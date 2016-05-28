@@ -15,12 +15,16 @@ $this->setBlock(TEMPLATE_content, 'has_news', 'has_news_block');
 $this->setBlock(TEMPLATE_content, 'no_news', 'no_news_block');
 $this->setBlock('has_news', 'news', 'news_block');
 $this->setBlock('news', "news_image", "news_image_block");
+$this->setBlock('news', "read_more", "read_more_block");
+$this->setBlock('news', "no_read_more", "no_read_more_block");
 $this->setBlock(TEMPLATE_content, 'previous_button', 'previous_button_block');
 $this->setBlock(TEMPLATE_content, 'page_number', 'page_number_block');
 $this->setBlock(TEMPLATE_content, 'next_button', 'next_button_block');
 $this->setBlock(TEMPLATE_content, 'topic_list', 'topic_list_block');
 
 $this->setVar('topic_header_block', '');
+$this->setVar("read_more_block", "");
+$this->setVar("no_read_more_block", "");
 
 $this->setTab('news');
 
@@ -165,15 +169,19 @@ if (is_array($items)) {
 
             $output = array(
                 'NEWS_ID' => $article['item_id'],
+                'NEWS_URL' => '/news/item/' . $article['item_id'],
                 'NEWS_TITLE' => $article['item_heading'],
                 'POSTER' => $owner,
                 'DATETIME' => $postDate->getLong(),
-                'NEWS_SHORT' => TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300),
+                'NEWS_SHORT' => empty($article['item_blurb'])
+                    ? '<p>'.TextFormatter::cutSentence(Scrub::html2text($article['item_body']), 300).'</p>'
+                    : Scrub::html($article['item_blurb']),
                 'NEWS_IMAGE' => $article['item_image'],
                 'TOPIC_NAME' => Scrub::text($previous['topicName']),
                 'ON_OFF'         => ++$j % 2 ? 'dark' : ''
             );
             $this->setVar($output);
+
 
             if ($article['item_image']) {
                 $this->parse('news_image_block', 'news_image');
@@ -181,6 +189,21 @@ if (is_array($items)) {
                 $this->setVar('news_image_block');
             }
 
+            if (empty(Scrub::html($article['item_body']))) {
+
+                // Body empty, no read more link
+
+                $this->setVar('read_more_block', '');
+                $this->parse('no_read_more_block', 'no_read_more');
+            }
+            else {
+
+                // Blurb is empty, always link to article
+
+                $this->parse('read_more_block', 'read_more');
+                $this->setVar('no_read_more_block', '');
+            }            
+            
             $this->parse('news_block', 'news',true);
         }
 

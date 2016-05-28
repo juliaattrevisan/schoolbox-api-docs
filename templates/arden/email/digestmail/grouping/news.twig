@@ -7,7 +7,17 @@
 
 {% block pretty %}
     {% set msg = row.messages | first %}
-    <a class="news-title" href="{{ msg.href }}">{{ msg.meta.title }}</a>
+    {% if msg.meta.title %}
+        {# use the meta title if possible, it looks nicer #}
+        {# Blurb only? show no link #}
+        {% if msg.meta.body|length %}
+            <a href="{{ msg.href }}" class="news-title">{{ msg.meta.title }}</a>
+        {% else %}
+            <span class="news-title">{{ msg.meta.title }}</span>
+        {% endif %}
+    {% else %}
+        {{ msg.title | raw }}
+    {% endif %}
 {% endblock %}
 
 {% block meta %}
@@ -21,11 +31,18 @@
                     <br/>{{ msg.meta.date }}
                 </em>
             </p>
-            <br/>
+        <br/>
         </td>
     </tr>
     <tr>
-        <td><p>{{ msg.meta.body | cutSentence(300, true) }}</p></td>
+        <td>
+            {% if msg.meta.blurb|length %}
+                {# blurb already has a <p> tag #}
+                {{ msg.meta.blurb | purify }}
+            {% else %}
+                <p>{{ msg.meta.body | cutSentence(300, true) }}</p>
+            {% endif %}
+        </td>
     </tr>
     {% endif %}
 {% endblock %}

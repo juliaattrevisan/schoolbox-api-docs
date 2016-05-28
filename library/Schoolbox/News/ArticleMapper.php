@@ -98,6 +98,14 @@ class ArticleMapper extends Mapper implements Searchable
 
         $this->hasMap(
             array(
+                'column'   => 'item_blurb',
+                'property' => 'blurb',
+                'type'     => Mapper::TYPE_STRING,
+            )
+        );
+
+        $this->hasMap(
+            array(
                 'column'   => 'item_deleted',
                 'property' => 'deleted',
                 'type'     => Mapper::TYPE_BOOLEAN,

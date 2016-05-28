@@ -9,7 +9,12 @@
     {% set msg = row.messages | first %}
     {% if msg.meta.title %}
         {# use the meta title if possible, it looks nicer #}
-        <a href="{{ msg.href }}" class="title">{{ msg.meta.title }}</a>
+        {# Blurb only? show no link #}
+        {% if msg.meta.body|length %}
+            <a href="{{ msg.href }}" class="title">{{ msg.meta.title }}</a>
+        {% else %}
+            <span class="title">{{ msg.meta.title }}</span>
+        {% endif %}
     {% else %}
         {{ msg.title | raw }}
     {% endif %}
@@ -29,7 +34,14 @@
         </td>
     </tr>
     <tr>
-        <td><p>{{ msg.meta.body | cutSentence(300, true) }}</p></td>
+        <td>
+            {% if msg.meta.blurb|length %}
+                {# blurb already has a <p> tag #}
+                {{ msg.meta.blurb | purify }}
+            {% else %}
+                <p>{{ msg.meta.body | cutSentence(300, true) }}</p>
+            {% endif %}
+        </td>
     </tr>
     {% endif %}
 {% endblock %}

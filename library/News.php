@@ -224,7 +224,7 @@ class News extends DeprecatedModel
 
         if (!$userHandler->isSuperuser()) {
             $query = "
-         SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_body,
+         SELECT DISTINCT(news_items.item_id), news_items.item_heading, news_items.item_owner, news_items.item_blurb, news_items.item_body,
             UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, item_image,
             news_items.item_datetime_posted, news_items.item_datetime_modified, news_items.item_datetime_published,
             UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime,
@@ -251,7 +251,7 @@ class News extends DeprecatedModel
         }
 
         $query = "
-		SELECT DISTINCT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_body, item_image,
+		SELECT DISTINCT news_items.item_id, news_items.item_heading, news_items.item_owner, news_items.item_blurb, news_items.item_body, item_image,
 			UNIX_TIMESTAMP(news_items.item_datetime_posted) AS post_datetime, news_items.item_datetime_posted, news_items.item_datetime_modified,
 			UNIX_TIMESTAMP(news_items.item_datetime_expires) AS expire_datetime, news_items.item_datetime_published,
 			user.lastname, user.title, user.firstname, user.id as uid, user.synergy_id synid, newsTopic.name topicName, newsTopicID, sequence

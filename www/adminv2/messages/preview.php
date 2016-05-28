@@ -156,7 +156,8 @@ switch ($this->arg[0]) {
                     'title'  => $article->getHeading(),
                     'author' => $article->getOwner()->formatName(),
                     'date'   => $article->getPostDate()->getLong(),
-                    'thumb'  => $thumb
+                    'thumb'  => $thumb,
+                    'blurb'  => $article->getBlurb(),
                 ))
                 ->setBody($article->getBody())
                 ->setByline("{$article->getPostDate()->getDateOnly()} by {$article->getOwner()->formatName()} in {$article->getTopic()->getName()}")

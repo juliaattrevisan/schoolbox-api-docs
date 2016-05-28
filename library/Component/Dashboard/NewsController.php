@@ -37,6 +37,8 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
         $this->setBlock('topic', "news", "news_block");
         $this->setBlock('news', "news_image", "news_image_block");
         $this->setBlock('news', "news_no_image", "news_no_image_block");
+        $this->setBlock('news', "read_more", "read_more_block");
+        $this->setBlock('news', "no_read_more", "no_read_more_block");
         $this->setBlock('news', "compact", "compact_block");
         $this->setBlock('news', "full", "full_block");
 
@@ -45,6 +47,8 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
         $this->setVar("news_block", "");
         $this->setVar("news_image_block", "");
         $this->setVar("news_no_image_block", "");
+        $this->setVar("read_more_block", "");
+        $this->setVar("no_read_more_block", "");
 
         $topicList = [];
 
@@ -97,7 +101,9 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                     $output = array(
                         'NEWS_TITLE' => $item['item_heading'],
                         'NEWS_URL' => '/news/item/' . $item['item_id'],
-                        'NEWS_SHORT' => TextFormatter::cutSentence(Scrub::html2text($item['item_body']), 300),
+                        'NEWS_SHORT' => empty($item['item_blurb'])
+                            ? '<p>'.TextFormatter::cutSentence(Scrub::html2text($item['item_body']), 300).'</p>'
+                            : Scrub::html($item['item_blurb']),
                         'NEWS_TIME' => $newsTime->getRelativeTime(),
                         'NEWS_IMAGE' => $item['item_image'],
                         'NEWS_AUTHOR_NAME' => $userFormatter->formatName($item),
@@ -112,6 +118,21 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                     } else {
                         $this->parse('news_no_image_block', 'news_no_image');
                         $this->setVar('news_image_block', '');
+                    }
+
+                    if (empty(Scrub::html($item['item_body']))) {
+
+                        // Body empty, no read more link
+
+                        $this->setVar('read_more_block', '');
+                        $this->parse('no_read_more_block', 'no_read_more');
+                    }
+                    else {
+
+                        // Blurb is empty, always link to article
+
+                        $this->parse('read_more_block', 'read_more');
+                        $this->setVar('no_read_more_block', '');
                     }
 
                     if ($this->getConfig('compactMode') == '1') {
