@@ -340,6 +340,12 @@ class Controller extends Base\Base
         // if something got passed, don't care: overriding it
         $post['id'] = $id;
 
+        // Do not permit Courses to be placed in Root
+        if(0 == $post['parent']){
+            $this->sendError(new Base\Exception("Course cannot reside directly in root",["move this Course out of root"]));
+            return;
+        }
+
         if (is_array($post['unitname'])) {
             // save unit name changes
             foreach ($post['unitname'] as $unitId => $unitName) {
