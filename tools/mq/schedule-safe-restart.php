@@ -291,6 +291,10 @@ function interrogate($input, LoggerInterface $log)
 		exit(2);
 	}
 
+	if ($instance instanceof \Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier) {
+		$instance->enableLogging(new \Schoolbox\Notif\Notif(), $log);
+	}
+
 	$log->debug(sprintf("Got a module instance of %s, continuing...", get_class($instance)));
 
 	$exit = 0;

@@ -11,9 +11,15 @@
 namespace Schoolbox\Assessment\Component\OnlineAssessment;
 
 use Alaress_Date_Format;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Mapper;
 
+/**
+ * Class AttemptMapper
+ * @package Schoolbox\Assessment\Component\OnlineAssessment
+ *
+ * @method Attempt createModel()
+ * @method Attempt hydrate(array $row, $alias = '', $callback = null)
+ */
 class AttemptMapper extends Mapper
 {
 

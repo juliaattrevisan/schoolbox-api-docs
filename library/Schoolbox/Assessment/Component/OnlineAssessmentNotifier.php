@@ -13,6 +13,7 @@ namespace Schoolbox\Assessment\Component;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress_Date_Format;
 use Monolog\Logger;
+use Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
 use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
@@ -21,8 +22,10 @@ use Schoolbox\Feed\SourceInterface;
 use Schoolbox\Mapper;
 use Schoolbox\Notif\Message\Message;
 use Schoolbox\Notif\Message\Messenger;
+use Schoolbox\Notif\Notif;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -499,13 +502,15 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$quizId = $quiz->getId();
 		$quiz   = $this->fullyHydrateQuiz($quiz);
 
-		// discard all update notifications if the submissionbox isn't open
-		$openStamp = $quiz->getStart()->getUnixTimestamp();
-		$closeStamp = $quiz->getFinish()->getUnixTimestamp();
-		$now = time();
+		// discard all update notifications if the quiz isn't open *EXCEPT mark visibility changes*
+		if (empty($diff['markVisibility'])) {
+			$openStamp = $quiz->getStart()->getUnixTimestamp();
+			$closeStamp = $quiz->getFinish()->getUnixTimestamp();
+			$now = time();
 
-		if($openStamp > $now || $closeStamp < $now) {
-			return $msgr;
+			if($openStamp > $now || $closeStamp < $now) {
+				return $msgr;
+			}
 		}
 
 		// if there's no actual difference
@@ -577,6 +582,22 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 
 			unset($diff['finish']);
 		}
+
+		// INCREASE in mark visibility (quiz can be finished in this instance)
+		// doesn't actually create messages, just triggers for others to be created
+		if (isset($diff['markVisibility'])) {
+			list($new, $old) = $diff['markVisibility'];
+			if ($new > $old) {
+				// for anyone who has been marked, raise the assess.marked notification
+				/** @var Collection|Attempt[] $attempts */
+				$attempts = $this->attemptMapper->findByColumn('assess_id', $quiz->getId());
+				foreach ($attempts as $attempt) {
+					$this->raiseNotification($quiz->getUser(), Mapper::METHOD_UPDATE, $attempt, $this->attemptMapper);
+				}
+			}
+			unset($diff['markVisibility']);
+		}
+
 
 
 		// if none of the above apply, but there are changes, just be generic
