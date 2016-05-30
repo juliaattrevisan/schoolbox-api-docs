@@ -340,10 +340,16 @@ class Controller extends Base\Base
         // if something got passed, don't care: overriding it
         $post['id'] = $id;
 
-        // Do not permit Courses to be placed in Root
+        // Do not permit Courses to be moved to, or created in, Root
         if(0 == $post['parent']){
-            $this->sendError(new Base\Exception("Course cannot reside directly in root",["move this Course out of root"]));
-            return;
+
+            // ...unless already in Root
+            if(0 != $parentId = $this->courseMapper->findCheaplyById($post['id'])->getParent()->getId()) {
+                $this->sendError(
+                    new Base\Exception("Course cannot reside directly in root",
+                    ["move this Course out of root"]));
+                return;
+            }
         }
 
         if (is_array($post['unitname'])) {
@@ -770,8 +776,10 @@ class Controller extends Base\Base
         foreach ($allCourses as $currentCourse) {
 
             // confirm course is in Faculty
-            if(!$this->getCourseMapper()->inFacultyArea($currentCourse)){
-                continue;
+            if(NULL === $searchParam) {
+                if (!$this->getCourseMapper()->inFacultyArea($currentCourse)) {
+                    continue;
+                }
             }
 
             // confirm you at least have read access...
