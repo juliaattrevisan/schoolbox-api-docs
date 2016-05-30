@@ -91,31 +91,47 @@ class TestFramework extends AbstractNotificationTest
      *
      * Actions in this method will trigger other `$this->on*` methods.
      *
-     * @rerouted  Added (?P<count>\d+) subscriptions
-     * @scheduled Connected to STOMP
-     * @digestd   Scheduling trigger
-     * @socketd   Listening for incoming websockets
+     * @rerouted  Added (?P<count>\d+) (?P<subscriptions>subscriptions)
+     * @scheduled Connected to (?P<stomp>STOMP)
+     * @digestd   Scheduling (?P<trigger>trigger)
+     * @socketd   Listening for incoming (?P<websockets>websockets)
+     *
+     * @param int    $subscriptions
+     * @param string $stomp
+     * @param string $trigger
+     * @param string $websockets
+     * @param null   $blah
      */
-    public function onAllDaemonsReady()
+    public function onAllDaemonsReady($subscriptions = null, $stomp = null, $trigger = null, $websockets = null, $blah = null)
     {
-        // If I got here that means that this test is a success.
+        // If I got here that means that this test is a success,
+        // as long as vars are parsed properly.
         $this->log->notice("All daemons are ready", [ 'char' => '>' ]);
+        $this->assertEquals('subscriptions', $subscriptions);
+        $this->assertEquals('STOMP', $stomp);
+        $this->assertEquals('trigger', $trigger);
+        $this->assertEquals('websockets', $websockets);
+        $this->assertNull($blah);
 
-        $testMapper = TestMapper::getInstance();
-        $testMapper->setSessionData([
-            'user' => UserMapper::getInstance()->findById(self::USERID_SUPERUSER),
-        ]);
+        // I should be able to signal that this is the end of the test.
+        // Any on* methods that haven't been called must fail.
 
-        // Teachers will be subscribed to instant notifications
-        // Students will be subscribed to digest notifications
-        $staffTest = new TestModel();
-        $staffTest->setFilename('staff.txt');
-        $staffTest->setUser(UserMapper::getInstance()->findById(self::USERID_ROLE_STAFF));
-        $studentTest = new TestModel();
-        $studentTest->setFilename('student.txt');
-        $studentTest->setUser(UserMapper::getInstance()->findById(self::USERID_ROLE_STUDENT));
-        $testMapper->save([$staffTest, $studentTest]);
-
+//        // Don't need any of this
+//        $testMapper = TestMapper::getInstance();
+//        $testMapper->setSessionData([
+//            'user' => UserMapper::getInstance()->findById(self::USERID_SUPERUSER),
+//        ]);
+//
+//        // Teachers will be subscribed to instant notifications
+//        // Students will be subscribed to digest notifications
+//        $staffTest = new TestModel();
+//        $staffTest->setFilename('staff.txt');
+//        $staffTest->setUser(UserMapper::getInstance()->findById(self::USERID_ROLE_STAFF));
+//        $studentTest = new TestModel();
+//        $studentTest->setFilename('student.txt');
+//        $studentTest->setUser(UserMapper::getInstance()->findById(self::USERID_ROLE_STUDENT));
+//        $testMapper->save([$staffTest, $studentTest]);
+//
 //        // Update the digest for students to notify in 5 seconds,
 //        // so that the digest daemon triggers
 //        /** @var \Schoolbox\Role $role */
@@ -123,9 +139,6 @@ class TestFramework extends AbstractNotificationTest
 //        $role = \Schoolbox\RoleMapper::getInstance()->findById(2);
 //        $role->setDigestSchedule($now->getUsingFormat('i H * * *'));
 //        \Schoolbox\RoleMapper::getInstance()->save($role);
-
-        // I should be able to signal that this is the end of the test.
-        // Any on* methods that haven't been called must fail.
     }
 
     /**
