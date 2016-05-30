@@ -103,6 +103,12 @@ class TestFramework extends AbstractNotificationTest
 
         $testMapper = TestMapper::getInstance();
 
+        // Mock the database!
+        $mockDatabase = new \Schoolbox\Test\MockDatabase($this);
+        $mockDatabase->setNextInsertId(1);
+        $mockDatabase->setNextFetchAll([]);
+        $testMapper->setDatabase($mockDatabase);
+
         // Teachers will be subscribed to instant notifications
         $testMapper->setSessionData([
             'user' => UserMapper::getInstance()->findById(self::USERID_ROLE_STAFF),
@@ -116,6 +122,9 @@ class TestFramework extends AbstractNotificationTest
         ]);
         $testModel = new TestModel();
         $testMapper->save($testModel);
+
+        // I should be able to signal that this is the end of the test.
+        // Any on* methods that haven't been called must fail.
     }
 
     /**
