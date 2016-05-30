@@ -43,6 +43,8 @@ if (Config::get('skin_builder')) {
         'body-bg'         => Config::get('skin_colour_body_bg'),
         'button-input-scale' => Config::get('skin_button_input_scale'),
         'login-form-background-color' => Config::get('skin_colour_login_background'),
+        'form-border-color' => Config::get('form_input_border_color'),
+        'form-bg-hover-color' => Config::get('form_background_hover_color'),
     ];
 } else {
     $logger->info('Skin builder is off - building using default color settings');

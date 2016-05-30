@@ -22,13 +22,13 @@ $input-height: $global-button-input-height;
 
 $input-bg-color: $white;
 
-$input-focus-bg-color: $content-ui-hover;
+$input-focus-bg-color: $form-bg-hover-color;
 $input-focus-color: calc-text-color($input-focus-bg-color);
 
-$input-border-color: $content-ui-background !default;
-$input-focus-border-color: $content-ui-foreground;
+$input-border-color: $form-border-color !default;
+$input-focus-border-color: darken($form-border-color, 15%);
 
-$input-hover-bg-color: $content-ui-hover;
+$input-hover-bg-color: $form-bg-hover-color;
 $input-hover-color: $black;
 
 $input-border-style: solid;
