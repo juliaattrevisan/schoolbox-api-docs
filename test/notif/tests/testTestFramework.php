@@ -100,21 +100,27 @@ class TestFramework extends AbstractNotificationTest
         $this->log->notice("All daemons are ready", [ 'char' => '>' ]);
 
         $testMapper = TestMapper::getInstance();
-
-        // Teachers will be subscribed to instant notifications
         $testMapper->setSessionData([
             'user' => UserMapper::getInstance()->findById(self::USERID_SUPERUSER),
         ]);
-        $testModel = new TestModel();
-        $testModel->setFilename('staff.txt');
-        $testModel->setUser(UserMapper::getInstance()->findById(self::USERID_ROLE_STAFF));
-        $testMapper->save($testModel);
 
+        // Teachers will be subscribed to instant notifications
         // Students will be subscribed to digest notifications
-        $testModel = new TestModel();
-        $testModel->setFilename('student.txt');
-        $testModel->setUser(UserMapper::getInstance()->findById(self::USERID_ROLE_STUDENT));
-        $testMapper->save($testModel);
+        $staffTest = new TestModel();
+        $staffTest->setFilename('staff.txt');
+        $staffTest->setUser(UserMapper::getInstance()->findById(self::USERID_ROLE_STAFF));
+        $studentTest = new TestModel();
+        $studentTest->setFilename('student.txt');
+        $studentTest->setUser(UserMapper::getInstance()->findById(self::USERID_ROLE_STUDENT));
+        $testMapper->save([$staffTest, $studentTest]);
+
+//        // Update the digest for students to notify in 5 seconds,
+//        // so that the digest daemon triggers
+//        /** @var \Schoolbox\Role $role */
+//        $now  = Alaress_Date_Format::now()->addMinutes(1);
+//        $role = \Schoolbox\RoleMapper::getInstance()->findById(2);
+//        $role->setDigestSchedule($now->getUsingFormat('i H * * *'));
+//        \Schoolbox\RoleMapper::getInstance()->save($role);
 
         // I should be able to signal that this is the end of the test.
         // Any on* methods that haven't been called must fail.
@@ -122,7 +128,6 @@ class TestFramework extends AbstractNotificationTest
 
     /**
      * @scheduled notify.user.(?P<recipientId>\d+).test.(?P<itemId>\d+).notified
-     * @scheduled A test notification has been made
      */
     public function onTestScheduleDaemon($recipientId, $itemId)
     {
