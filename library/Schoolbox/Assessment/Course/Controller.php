@@ -438,7 +438,7 @@ class Controller extends Base\Base
         }
 
         // if there were any validation problems, throw that back
-        if ($errors) {
+        if ($errors || !$parent instanceof FolderModel) {
             throw new Base\Exception("Could not save", $errors);
         }
 
