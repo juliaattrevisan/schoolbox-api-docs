@@ -74,9 +74,11 @@ class TestFramework extends AbstractNotificationTest
         $staffSource->setDescription('a test notification was made');
         Message\SourceMapper::getInstance()->save($staffSource);
         $staffPermission = new \Schoolbox\Realtime\Message\RoutePermission();
+        $staffPermission->setRole(\Schoolbox\RoleMapper::getInstance()->findById(2));
         $staffPermission->setMsgSource($staffSource);
         $staffPermission->setMask(['IN']);
         $staffPermission->setDefault(['IN']);
+        Message\RoutePermissionMapper::getInstance()->save($staffPermission);
 
         // Student permission: digest only
         $studentSource = new Message\Source();
@@ -86,9 +88,11 @@ class TestFramework extends AbstractNotificationTest
         $studentSource->setDescription('a test notification was made');
         Message\SourceMapper::getInstance()->save($studentSource);
         $studentPermission = new \Schoolbox\Realtime\Message\RoutePermission();
+        $studentPermission->setRole(\Schoolbox\RoleMapper::getInstance()->findById(3));
         $studentPermission->setMsgSource($studentSource);
         $studentPermission->setMask(['DI']);
         $studentPermission->setDefault(['DI']);
+        Message\RoutePermissionMapper::getInstance()->save($staffPermission);
     }
 
     /**
