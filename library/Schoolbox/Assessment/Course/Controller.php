@@ -247,11 +247,6 @@ class Controller extends Base\Base
                 }
             }
 
-            // ensure we are in faculty root
-            if(!$this->courseMapper->inFacultyArea($folder)){
-                throw $this->getErrorMapper()->generateException(172);
-            }
-
             $folder->setParent($this->getFolderMapper()->findById($folder->getParent()->getId()));
 
             $instances = [];
