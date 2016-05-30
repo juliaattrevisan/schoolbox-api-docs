@@ -12,6 +12,7 @@ use Schoolbox\Mapper;
 
 class TestMapper extends Mapper {
 	protected function mapping() {
+		$this->hasTable('test');
 		$this->hasModel('\\Schoolbox\\Test\\TestModel');
 		$this->hasMap(array(
 			'column'     => 'storage_id',

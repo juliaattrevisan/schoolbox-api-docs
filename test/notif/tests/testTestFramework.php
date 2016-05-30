@@ -50,6 +50,7 @@ class TestFramework extends AbstractNotificationTest
     {
         // fear not - you are sudo
         `mysql schoolbox < /vagrant/sql/notifications-all-instant.sql 2>&1`;
+        `mysql schoolbox < /vagrant/sql/test/test-notifier 2>&1`;
         $this->log->notice('Weapons to maximum');
         $this->log->notice(trim(`redis-cli keys "msg:vagrantx:*" | xargs redis-cli del 2>&1`) . ' redis queues cleared');
         `rabbitmqadmin get queue=vagrantx.sb.sched count=10000 requeue=false`;
@@ -133,12 +134,6 @@ class TestFramework extends AbstractNotificationTest
         $this->log->notice("All daemons are ready", [ 'char' => '>' ]);
 
         $testMapper = TestMapper::getInstance();
-
-        // Mock the database!
-        $mockDatabase = new \Schoolbox\Test\MockDatabase($this);
-        $mockDatabase->setNextInsertId(1);
-        $mockDatabase->setNextFetchAll([]);
-        $testMapper->setDatabase($mockDatabase);
 
         // Teachers will be subscribed to instant notifications
         $testMapper->setSessionData([
