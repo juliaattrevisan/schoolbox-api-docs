@@ -421,8 +421,8 @@ class Controller extends Base\Base
             $name = 'this course';
         }
 
+        $parentId = $post->get('parent');
         try {
-            $parentId = $post->get('parent');
             if ($parentId === "0" || $parentId > 0) {
                 $parent = $this->getFolderMapper()->findById($parentId);
             } else {
@@ -455,8 +455,26 @@ class Controller extends Base\Base
                 $folder = $this->getCourseMapper()->findById($id);
                 $mode = BaseMapper::METHOD_UPDATE;
 
+                // Sanity check for existing courses:
+                // * Don't allow moving outside of faculty root
+                //   (Keeping a course in a folder outside fac root is okay)
+                if ($folder->getParent()->getId() != $parentId
+                    && !$this->getCourseMapper()->inFacultyArea($parent)
+                ) {
+                    throw new Base\Exception("Courses may not be moved outside the faculty folder");
+                }
             } catch (BaseMapper\Exception $e) {
                 throw new Base\Exception("Could not save because " . $e->getMessage());
+            }
+        } else {
+            // Sanity checks for new courses:
+            // * Don't allow a course to be created in root folder
+            // * Don't allow outside of faculty root
+            if ($parentId == 0 || !isset($parent)) {
+                throw new Base\Exception("Courses may not be created in the root folder");
+            }
+            if (!$this->getCourseMapper()->inFacultyArea($parent)) {
+                throw new Base\Exception("Courses may not be created outside the faculty folder");
             }
         }
 
