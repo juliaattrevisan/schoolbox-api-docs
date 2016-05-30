@@ -86,7 +86,7 @@
 				{
 					// Ignore 'row' class
 
-					if (classes[i] != 'row')
+					if (classes[i] != 'row' && classes[i] != 'personal')
 					{
 						var found = false;
 
@@ -103,8 +103,9 @@
 								for (var j = 0; j < numbers.length; j++) {
 									var reconstitutedName = name + numbers[j];
 
-									if (reconstitutedName == classes[i])
+									if (reconstitutedName == classes[i]) {
 										found = true;
+									}
 								}
 							}
 						});
@@ -122,6 +123,8 @@
 						}
 					}
 				}
+
+				console.log("");
 			});
 
 			// Hide date headers if there are no events visible inside
