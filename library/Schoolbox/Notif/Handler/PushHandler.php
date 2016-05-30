@@ -45,10 +45,11 @@ class PushHandler extends AbstractProcessingHandler
             if ($conf->get('push_apns_cert_path')) {
 
                 // this is the only way I can think of that will be AWS S3 compatible
-                $tempCert = sys_get_temp_dir() . '/sbapns.pem';
+                $tempCert = $this->getTempCertFilename();
 
-                if (!is_readable($tempCert)) {
-                    // copy the cert if it's been wiped from /tmp
+                // since this is on-construction, check the file in play and see if it needs updating
+                if ($this->apnsCertRequiresUpdate($conf->get('push_apns_cert_path'))) {
+                    // copy the cert from storage
                     $fp = fopen($tempCert, 'w');
                     Storage\Mapper::getInstance()->findByHash($conf->get('push_apns_cert_path'))->pipe($fp);
                     fclose($fp);
@@ -61,6 +62,36 @@ class PushHandler extends AbstractProcessingHandler
         $this->cloudManager = new MobileApp\ServiceManager($services, $log);
     }
 
+
+    /**
+     * @param string $hashInStorage
+     * @return bool
+     */
+    protected function apnsCertRequiresUpdate($hashInStorage)
+    {
+        $tempCert = $this->getTempCertFilename();
+
+        if (!is_readable($tempCert)) {
+            return true;
+        }
+        if (!filesize($tempCert)) {
+            return true;
+        }
+        if (sha1_file($tempCert) != $hashInStorage) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @return string
+     */
+    protected function getTempCertFilename()
+    {
+        return sys_get_temp_dir() . '/sbapns.pem';
+    }
 
     /**
      * Writes the record down to the log of the implementing handler
