@@ -131,15 +131,7 @@ class Mapper extends FolderMapper
             $courseId = $row['id'];
 
             if (empty($cache[$courseId])) {
-
-                $object = $this->hydrate($row);
-
-                if (!$this->inFacultyArea($object)) {
-                    // if it doesn't exist within the faculty root: SKIP!
-                    continue;
-                }
-
-                $cache[$courseId] = $object;
+                $cache[$courseId] = $this->hydrate($row);
                 $cache[$courseId]->setUnits($this->createCollection());
             }
 
