@@ -452,6 +452,15 @@ class External_Schoolpro_User implements External_UserInterface
             return false;
         }
 
+        $photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
+
+        if (Config::get('photo_sis_import') == 0) {
+            if (file_exists($photoPath))
+                return $photoPath;
+            else
+                return false;
+        }
+
         $vars = array(
             'sbGetPortraitLastUpdated',
             array(

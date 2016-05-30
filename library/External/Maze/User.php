@@ -804,7 +804,17 @@ class External_Maze_User implements External_UserInterface {
 	 * @param Integer $externalUserId
 	 * @return Bool|String
 	 */
-	public function getPortrait($externalUserId) {
+	public function getPortrait($externalUserId)
+	{
+		$photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
+
+		if (Config::get('photo_sis_import') == 0) {
+			if (file_exists($photoPath))
+				return $photoPath;
+			else
+				return false;
+		}
+
 		$userMapper = new \Schoolbox\UserMapper();
         try {
 		    $user = $userMapper->findByExternalId($externalUserId);
@@ -833,7 +843,6 @@ class External_Maze_User implements External_UserInterface {
 		}
 
 		if ($photo = $this->getDb()->getRow($query)) {
-			$photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
 
 			//TODO: delete photos on rollover
 
