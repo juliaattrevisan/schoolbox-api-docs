@@ -1,0 +1,171 @@
+<?php
+/**
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2016, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+use Schoolbox\Mapper;
+use Schoolbox\Realtime\Test\AbstractNotificationTest;
+use Schoolbox\Test\TestMapper;
+use Schoolbox\Test\TestModel;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
+
+/**
+ * Test case for the test framework.
+ */
+class TestFramework extends AbstractNotificationTest
+{
+    /**
+     * User ID for a superuser.
+     */
+    const USERID_SUPERUSER = 19;
+
+    /**
+     * User ID for a staff member.
+     */
+    const USERID_ROLE_STAFF = 151;
+
+    /**
+     * User ID for a student.
+     */
+    const USERID_ROLE_STUDENT = 17;
+
+    /**
+     * User ID for a parent.
+     */
+    const USERID_ROLE_PARENT = 20;
+
+    /**
+     * @var User[]
+     */
+    protected $userCache;
+
+    /**
+     * Set up the test case.
+     */
+    public function prepare()
+    {
+        // fear not - you are sudo
+        `mysql schoolbox < /vagrant/sql/notifications-all-instant.sql 2>&1`;
+        $this->log->notice('Weapons to maximum');
+        $this->log->notice(trim(`redis-cli keys "msg:vagrantx:*" | xargs redis-cli del 2>&1`) . ' redis queues cleared');
+        `rabbitmqadmin get queue=vagrantx.sb.sched count=10000 requeue=false`;
+        $this->log->notice("Rabbit schedule queue cleared");
+
+        // Insert notification topics for the test model we're going to use
+        // Probably need to create a table for it, too.
+        // Redirect notifications for parents to
+    }
+
+    /**
+     * This test tests all daemons (I think).
+     *
+     * @return array
+     */
+    public function requiredDaemons()
+    {
+        return [
+            self::DAEMON_SCHEDULE,
+            self::DAEMON_REROUTE,
+            self::DAEMON_DIGEST,
+            self::DAEMON_SOCKET,
+//            self::DAEMON_BELL,
+        ];
+    }
+
+    /**
+     * @param int $id
+     * @return User
+     */
+    protected function getUser($id)
+    {
+        if (empty($this->userCache[$id])) {
+            $this->userCache[$id] = UserMapper::getInstance()->findById($id);
+        }
+        return $this->userCache[$id];
+    }
+
+    /**
+     * When all daemons are ready, do this.
+     *
+     * Actions in this method will trigger other `$this->on*` methods.
+     *
+     * @rerouted  Added (?P<count>\d+) subscriptions
+     * @scheduled Connected to STOMP
+     * @digestd   Schoolbox Digest Daemon
+     * @socketd   Schoolbox Socket Daemon
+     */
+    public function onAllDaemonsReady()
+    {
+        $this->log->notice("All daemons are ready", [ 'char' => '>' ]);
+
+        $testMapper = TestMapper::getInstance();
+
+        // Teachers will be subscribed to instant notifications
+        $testMapper->setSessionData([
+            'user' => UserMapper::getInstance()->findById(self::USERID_ROLE_STAFF),
+        ]);
+        $testModel = new TestModel();
+        $testMapper->save($testModel);
+
+        // Students will be subscribed to digest notifications
+        $testMapper->setSessionData([
+            'user' => UserMapper::getInstance()->findById(self::USERID_ROLE_STUDENT),
+        ]);
+        $testModel = new TestModel();
+        $testMapper->save($testModel);
+    }
+
+    /**
+     * @scheduled notify.user.(?P<recipientId>\d+).test.(?P<itemId>\d+).notified
+     * @scheduled A test notification has been made
+     */
+    public function onTestScheduleDaemon()
+    {
+        $this->log->notice("onTestScheduleDaemon triggered successfully", [ 'char' => '<' ]);
+    }
+
+    /**
+     * @rerouted ^SEND (?P<messageId>[0-9a-f]{40}:[0-9a-f]{40}) -> instant.user.(?P<userId>\d+)
+     *
+     * @param string $messageId
+     * @param int    $userId
+     */
+    public function onTestRerouteDaemon($messageId, $userId)
+    {
+        return;
+//        // TODO the below doesn't quite work
+//
+//        try {
+//            $message = $this->fetchMessageInstance($messageId)->jsonSerialize();
+//        } catch (OutOfBoundsException $e) {
+//            $this->log->error($e->getMessage(), [$e]);
+//            return;
+//        }
+    }
+
+    /**
+     * @socketd notify.user.(?P<recipientId>\d+).test.(?P<itemId>\d+).notified
+     * @socketd A test notification has been made
+     */
+    public function onTestSocketDaemon()
+    {
+        $this->log->notice("onTestSocketDaemon triggered successfully", [ 'char' => '<' ]);
+    }
+
+    /**
+     * @digestd ???
+     */
+    public function onTestDigestDaemon()
+    {
+    }
+
+    /**
+     * @belld ???
+     */
+    public function onTestBellDaemon()
+    {
+    }
+}
