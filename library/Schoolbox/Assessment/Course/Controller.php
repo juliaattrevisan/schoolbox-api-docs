@@ -775,7 +775,7 @@ class Controller extends Base\Base
 
         foreach ($allCourses as $currentCourse) {
 
-            // confirm course is in Faculty
+            // general search ignores Courses in Faculty
             if(NULL === $searchParam) {
                 if (!$this->getCourseMapper()->inFacultyArea($currentCourse)) {
                     continue;
