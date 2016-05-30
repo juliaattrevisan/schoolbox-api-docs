@@ -122,7 +122,7 @@ class TestFramework extends AbstractNotificationTest
      * @scheduled notify.user.(?P<recipientId>\d+).test.(?P<itemId>\d+).notified
      * @scheduled A test notification has been made
      */
-    public function onTestScheduleDaemon()
+    public function onTestScheduleDaemon($recipientId, $itemId)
     {
         $this->log->notice("onTestScheduleDaemon triggered successfully", [ 'char' => '<' ]);
     }
@@ -150,20 +150,20 @@ class TestFramework extends AbstractNotificationTest
      * @socketd notify.user.(?P<recipientId>\d+).test.(?P<itemId>\d+).notified
      * @socketd A test notification has been made
      */
-    public function onTestSocketDaemon()
+    public function onTestSocketDaemon($recipientId, $itemId)
     {
         $this->log->notice("onTestSocketDaemon triggered successfully", [ 'char' => '<' ]);
     }
 
     /**
-     * @digestd ???
+     * @digestd Nothing should match this yet
      */
     public function onTestDigestDaemon()
     {
     }
 
     /**
-     * @belld ???
+     * @belld Nothing should match this yet
      */
     public function onTestBellDaemon()
     {
