@@ -1,48 +1,60 @@
 <?php
 /**
- * Test mapper.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2013, Alaress Pty Ltd
+ * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
  
 namespace Schoolbox\Test;
-use Schoolbox\Mapper;
 
-class TestMapper extends Mapper {
-	protected function mapping() {
-		$this->hasModel('\\Schoolbox\\Test\\TestModel');
-		$this->hasMap(array(
-			'column'     => 'storage_id',
-			'property'   => 'id',
-			'type'       => self::TYPE_INTEGER,
-			'identifier' => true,
-		));
-		$this->hasMap(array(
-			'column'     => 'filename',
-			'property'   => 'filename',
-			'type'       => self::TYPE_STRING,
-		));
-		$this->hasMap(array(
-			'column'     => 'is_viewed',
-			'property'   => 'isViewed',
-			'type'       => self::TYPE_BOOLEAN,
-		));
-		$this->hasMap(array(
-			'column'     => 'file',
-			'property'   => 'file',
-			'type'       => self::TYPE_LOB,
-		));
-		$this->hasMap(array(
-			'column'     => 'parent',
-			'property'   => 'parent',
-			'type'       => self::TYPE_INTEGER,
-		));
-		$this->hasJoin('parent', array(
-			'mapper'    => '\\Schoolbox\\Test\\TestMapper',
-			'this_key'  => 'category',
-			'other_key' => 'id',
-		));
-	}
+use Alaress\Async\Notification\Instance\Builder;
+use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Realtime\Message\NSMapper;
+use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
+use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
+use Schoolbox\User;
+
+/**
+ * Test notifier.
+ *
+ * @package Schoolbox\Test
+ */
+class TestNotifier extends AbstractModuleNotifier
+{
+    const TRIGGER_NOTIFIED = 'notified';
+
+    /**
+     * @return string
+     */
+    protected function getSlug()
+    {
+        return NSMapper::NS_TEST;
+    }
+
+    /**
+     * @param TriggerBundleInterface $bundle
+     */
+    public function bundleTriggers($bundle)
+    {
+        $bundle->attach(self::TRIGGER_NOTIFIED, self::IMMEDIATELY);
+    }
+
+    /**
+     * @param TestModel $object
+     * @param User      $user
+     *
+     * @return Envelope
+     */
+    public function notifyNotified(TestModel $object, User $user)
+    {
+        $envelope = new Envelope();
+        $bob      = new Builder();
+        $bob->setTitle('A test notification has been made')
+            ->setNamespace($this->getSlug())
+            ->addTopic($this->getSlug().'.'.$object->getId().'.notified');
+        $message = $bob->build();
+        $envelope->targetToUser($user, $message);
+        return $envelope;
+    }
 }
