@@ -94,8 +94,8 @@ class TestFramework extends AbstractNotificationTest
      *
      * @rerouted  Added (?P<count>\d+) subscriptions
      * @scheduled Connected to STOMP
-     * @digestd   Schoolbox Digest Daemon
-     * @socketd   Schoolbox Socket Daemon
+     * @digestd   Scheduling trigger
+     * @socketd   Listening for incoming websockets
      */
     public function onAllDaemonsReady()
     {
