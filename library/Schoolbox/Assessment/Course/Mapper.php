@@ -257,7 +257,7 @@ class Mapper extends FolderMapper
      * @param Folder $folder
      * @return bool
      */
-    protected function inFacultyArea(Folder $folder)
+    public function inFacultyArea(Folder $folder)
     {
         $facultyNode = $this->getFacultyNode();
 
