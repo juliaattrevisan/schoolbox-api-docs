@@ -14,6 +14,7 @@ class TestMapper extends Mapper {
 	protected function mapping() {
 		$this->hasTable('test');
 		$this->hasModel('\\Schoolbox\\Test\\TestModel');
+		$this->hasModuleNotifier(TestNotifier::class);
 		$this->hasMap(array(
 			'column'     => 'storage_id',
 			'property'   => 'id',
