@@ -46,6 +46,7 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\Folder\Code;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
@@ -459,7 +460,7 @@ class Controller extends Base\Base
                 // * Don't allow moving outside of faculty root
                 //   (Keeping a course in a folder outside fac root is okay)
                 if ($folder->getParent()->getId() != $parentId
-                    && !$this->getCourseMapper()->inFacultyArea($parent)
+                    && !$this->isParentFolderValid($parent)
                 ) {
                     throw new Base\Exception("Courses may not be moved outside the faculty folder");
                 }
@@ -473,7 +474,7 @@ class Controller extends Base\Base
             if ($parentId == 0 || !isset($parent)) {
                 throw new Base\Exception("Courses may not be created in the root folder");
             }
-            if (!$this->getCourseMapper()->inFacultyArea($parent)) {
+            if (!$this->isParentFolderValid($parent)) {
                 throw new Base\Exception("Courses may not be created outside the faculty folder");
             }
         }
@@ -531,6 +532,24 @@ class Controller extends Base\Base
             throw new Base\Exception("Could not save because " . $e->getMessage());
         }
 
+    }
+
+    /**
+     * Is this a valid parent folder for a course? It is if it's either:
+     * * it's the faculty root
+     * * it's a child of the faculty root
+     *
+     * @param  FolderModel $parent
+     * @return bool
+     */
+    protected function isParentFolderValid(FolderModel $parent = null)
+    {
+        if (!$parent instanceof FolderModel) {
+            return false;
+        }
+        return
+            $this->getCourseMapper()->getFacultyNode()->getId() == $parent->getId()
+            || $this->getCourseMapper()->inFacultyArea($parent);
     }
 
     /**
