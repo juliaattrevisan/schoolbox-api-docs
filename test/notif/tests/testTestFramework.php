@@ -50,49 +50,11 @@ class TestFramework extends AbstractNotificationTest
     {
         // fear not - you are sudo
         `mysql schoolbox < /vagrant/sql/notifications-all-instant.sql 2>&1`;
-        `mysql schoolbox < /vagrant/sql/test/test-notifier 2>&1`;
+        `mysql schoolbox < /vagrant/sql/test/test-notifier.sql 2>&1`;
         $this->log->notice('Weapons to maximum');
         $this->log->notice(trim(`redis-cli keys "msg:vagrantx:*" | xargs redis-cli del 2>&1`) . ' redis queues cleared');
         `rabbitmqadmin get queue=vagrantx.sb.sched count=10000 requeue=false`;
         $this->log->notice("Rabbit schedule queue cleared");
-
-        // Insert notification topics for the test model we're going to use
-        // Probably need to create a table for it, too.
-        // Redirect notifications for parents too.
-
-        // Namespace for test notifications
-        $testNamespace = new Message\NS();
-        $testNamespace->setSlug('test');
-        $testNamespace->setLabel('test');
-        Message\NSMapper::getInstance()->save($testNamespace);
-
-        // Staff permission: instant
-        $staffSource = new Message\Source();
-        $staffSource->setNamespace($testNamespace);
-        $staffSource->setRoleType('staff');
-        $staffSource->setKey('notified');
-        $staffSource->setDescription('a test notification was made');
-        Message\SourceMapper::getInstance()->save($staffSource);
-        $staffPermission = new \Schoolbox\Realtime\Message\RoutePermission();
-        $staffPermission->setRole(\Schoolbox\RoleMapper::getInstance()->findById(2));
-        $staffPermission->setMsgSource($staffSource);
-        $staffPermission->setMask(['IN']);
-        $staffPermission->setDefault(['IN']);
-        Message\RoutePermissionMapper::getInstance()->save($staffPermission);
-
-        // Student permission: digest only
-        $studentSource = new Message\Source();
-        $studentSource->setNamespace($testNamespace);
-        $studentSource->setRoleType('student');
-        $studentSource->setKey('notified');
-        $studentSource->setDescription('a test notification was made');
-        Message\SourceMapper::getInstance()->save($studentSource);
-        $studentPermission = new \Schoolbox\Realtime\Message\RoutePermission();
-        $studentPermission->setRole(\Schoolbox\RoleMapper::getInstance()->findById(3));
-        $studentPermission->setMsgSource($studentSource);
-        $studentPermission->setMask(['DI']);
-        $studentPermission->setDefault(['DI']);
-        Message\RoutePermissionMapper::getInstance()->save($staffPermission);
     }
 
     /**
