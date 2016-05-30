@@ -769,6 +769,11 @@ class Controller extends Base\Base
 
         foreach ($allCourses as $currentCourse) {
 
+            // confirm course is in Faculty
+            if(!$this->getCourseMapper()->inFacultyArea($currentCourse)){
+                continue;
+            }
+
             // confirm you at least have read access...
             if (!$this->confirmAccess($currentCourse->getId())) {
                 continue;
