@@ -20,8 +20,14 @@ class Javascript extends Base
             $hasIcon = false;
             $hasStatus = false;
             $hasAttendanceRequestButton = false;
-            $hasListButton = false;
 
+            /* Output list button */
+            if($this->showAttendanceLink()) {
+                $hasListButton = "<a class='button icon-class-list' href='/modules/attendance/modify/{$this->event->getCode()}/{$this->event->getStartTime()->getDatabaseDate()}/{$this->event->getPeriod()}' title='Mark Attendance'>Attendance</a>";
+            }
+            else {
+                $hasListButton = false;
+            }
 
 
             /* Congeal all that stuff
@@ -93,8 +99,8 @@ class Javascript extends Base
                     'attendance' => array(
                         'icon'          => $hasIcon,
                         'status'        => $hasStatus,
-                        'requestButton' => $hasAttendanceRequestButton,
-                        'listButton'    => $hasListButton,
+                        'listButton' => $hasListButton,
+                        'requestButton'    => $hasAttendanceRequestButton,
                     )
                 )
             );

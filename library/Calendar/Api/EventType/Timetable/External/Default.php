@@ -77,10 +77,13 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                 if ($dayNumber <= 0) {
                     continue;
                 }
+
+                $currentDate =  date("Y-m-d", $currentTimestamp);
+
                 // Building the timetable is an expensive process,
                 // so only do when necessary, and only once for each day/campus
                 if (!isset($dayTimetable[$dayNumber][$campusId])) {
-                    $dayTimetable[$dayNumber][$campusId] = $this->buildTimetable($campus, $dayNumber, date("Y-m-d", $currentTimestamp));
+                    $dayTimetable[$dayNumber][$campusId] = $this->buildTimetable($campus, $dayNumber, $currentDate);
                 }
                 // Load events for this campus
                 if (isset($dayTimetable[$dayNumber][$campusId])) {
@@ -98,6 +101,8 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                                 );
                                 continue;
                             }
+
+
                             $event = new Event();
                             $event->setEventId(md5($key));
                             $event->setAllday(false);
@@ -128,6 +133,12 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                                 $event->setAccess(Event::CAMPUS_ACCESS);
                             }
                             $event->setType($eventType);
+
+                            /* Setup attendance button */
+                            $campusCode = $period['campus'] ? $period['campus'] . '/' . $period['code'] : '0/' . $period['code'];
+                            $event->setCode($campusCode);
+                            $event->setPeriod($period['periodNumber']);
+                            $event->setPeriodName($period['periodName']);
 
                             // Load the color for this timetabled class
                             if ($period['code'] && !array_key_exists($period['code'], $colorMap)) {

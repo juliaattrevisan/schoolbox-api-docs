@@ -27,4 +27,70 @@ class Event extends DayEvent implements EventInterface {
                                         'vcal'          => Renderer\VObject::class,
                                         'csv'           => Renderer\Csv::class,
     );
+
+    /**
+     * @var Class code as set in timetable
+     */
+    protected $code;
+
+    /**
+     * @var Period that this timetable event is in
+     */
+    protected $period;
+
+    /**
+     * @var Name of period that this class is in
+     */
+    protected $periodName;
+
+    /**
+     * @return Class
+     */
+    public function getCode()
+    {
+        return $this->code;
+    }
+
+    /**
+     * @param Class $code
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
+    }
+
+    /**
+     * @return Period
+     */
+    public function getPeriod()
+    {
+        return $this->period;
+    }
+
+    /**
+     * @param Period $period
+     */
+    public function setPeriod($period)
+    {
+        $this->period = $period;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPeriodName()
+    {
+        return $this->periodName;
+    }
+
+    /**
+     * @param mixed $periodName
+     */
+    public function setPeriodName($periodName)
+    {
+        $this->periodName = $periodName;
+    }
+
+
+
 }
