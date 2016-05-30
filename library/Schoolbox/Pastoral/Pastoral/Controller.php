@@ -460,6 +460,9 @@ class Controller extends Base
             if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->isParentOf($student))
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
 
+        if ($this->getUser()->getRole()->isParent() && !$this->getDi()->get('config')->get('pastoral_parent_access'))
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
+
         // Get the students contact details for display
 
         $studentContacts = [];
@@ -545,6 +548,9 @@ class Controller extends Base
             }
         }
 
+        if ($this->getUser()->getRole()->isParent() && !$this->getDi()->get('config')->get('pastoral_parent_access'))
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
+
         // Get the pastoral care record
 
         $pastoral = $this->getPastoralMapper()->findById($id);
@@ -623,6 +629,7 @@ class Controller extends Base
                     'student'           => $student,
                     'id'                => '',
                     'record'            => null,
+                    'allowParents'      => $this->getDi()->get('config')->get('pastoral_parent_access'),
                     'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
                     'categories'        => $this->getPastoralCategoryMapper()->findAll()->sortBy('name', 'asc'),
                     'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),

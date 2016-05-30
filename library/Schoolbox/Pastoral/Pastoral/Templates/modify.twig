@@ -82,7 +82,7 @@
             ajax: {
                 url:      '/ajax/user.php?studentId={{ student.getId }}{{ record.getStudent.getId }}',
                 type:     'GET',
-                data:     {roleTypeID: 'staff;parentofstudent'},
+                data:     {roleTypeID: 'staff{% if allowParents %};parentofstudent{% endif %}'},
                 dataType: 'json'
             }
         });
@@ -241,25 +241,25 @@
                             Roles
                             <span class="hint has-tip tip-top" data-tooltip title="Select the roles you would like to access this record and its contents. Roles not selected will not be able to see the record.">?</span>
                             {% for role in roles if role.getType != 'student' and role.getType != 'guest' %}
+                                {% if allowParents == 1 or role.getType != 'parent' %}
+                                    {# Default for new items: staff roles are selected, others are not #}
 
-                                {# Default for new items: staff roles are selected, others are not #}
-
-                                <input type="hidden" name="role[{{ role.getId }}]" value="0" />
-                                <input {% if role.getType == 'parent' %}data-role-parent{% endif %} type="checkbox" name="role[{{ role.getId }}]" id="role[{{ role.getId }}]" value="1"
-                                    {% if record.getId != '' %}
-                                        {% for access in record.getAccessList if access.getRole.getId != '' %}
-                                            {% if access.getRole.getId == role.getId %}
+                                    <input type="hidden" name="role[{{ role.getId }}]" value="0" />
+                                    <input {% if role.getType == 'parent' %}data-role-parent{% endif %} type="checkbox" name="role[{{ role.getId }}]" id="role[{{ role.getId }}]" value="1"
+                                        {% if record.getId != '' %}
+                                            {% for access in record.getAccessList if access.getRole.getId != '' %}
+                                                {% if access.getRole.getId == role.getId %}
+                                                    checked
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            {% if role.getType == 'staff' %}
                                                 checked
                                             {% endif %}
-                                        {% endfor %}
-                                    {% else %}
-                                        {% if role.getType == 'staff' %}
-                                            checked
                                         {% endif %}
-                                    {% endif %}
-                                />
-                                <label for="role[{{ role.getId }}]" class="checkbox-label">{{ role.getName }} {% if role.getType == 'parent' %}of student{% endif %}</label>
-
+                                    />
+                                    <label for="role[{{ role.getId }}]" class="checkbox-label">{{ role.getName }} {% if role.getType == 'parent' %}of student{% endif %}</label>
+                                {% endif %}
                             {% endfor %}
                         </label>
 

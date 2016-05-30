@@ -58,17 +58,16 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
                 $this->setVar("STUDENT_NAME", $child['name']);
                 $this->setVar("STUDENT_YEAR", $userChild->getYear());
 
-                // Show pastoral to staff and parents
-                if ($groupHandler->isParentOfChild($userChild->getId())) {
+                /** @var Schoolbox\User $user */
+                $user = $_SESSION["user"];
+
+                if (\Config::get('pastoral_enabled') &&
+                    $groupHandler->isParentOfChild($userChild->getId()) && 
+                    \Config::get('pastoral_parent_access')) {
                     $this->parse('pastoral_block', 'pastoral');
                 } else {
                     $this->setVar('pastoral_block', '');
                 }
-
-                if (\Config::get('pastoral_enabled') != 1) {
-                    $this->setVar('pastoral_block', '');
-                }
-
 
                 if ( is_array($child['subjects']) ) {
                     foreach ( $child['subjects'] as $subject ) {
