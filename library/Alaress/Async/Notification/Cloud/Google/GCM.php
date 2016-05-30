@@ -63,10 +63,11 @@ class GCM extends AbstractService
     public function propagate(array $registrationIds, $id, $title)
     {
         $data = [
-            'id'      => $id,
-            'title'   => ConfigMapper::getInstance()->get('title'),
-            'body'    => $title,
-            'vibrate' => true
+            'id'           => $id,
+            'title'        => ConfigMapper::getInstance()->get('title'),
+            'body'         => $title,
+            'vibrate'      => true,
+            'click_action' => 'MainActivity',
         ];
 
         $apiUri  = self::GCM_API_URI;
