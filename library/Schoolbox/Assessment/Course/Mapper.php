@@ -246,6 +246,21 @@ class Mapper extends FolderMapper
     }
 
     /**
+     * Is $folder a valid location for a course to be put into? It is if it's either:
+     * * it's the faculty root
+     * * it's a child of the faculty root
+     *
+     * @param Folder $folder
+     * @return bool
+     */
+    public function isValidCourseLocation(Folder $folder)
+    {
+        return
+            $this->getFacultyNode()->getId() == $folder->getId()
+            || $this->inFacultyArea($folder);
+    }
+
+    /**
      * @param Folder $folder
      * @return bool
      */
