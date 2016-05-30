@@ -10,6 +10,7 @@ namespace Schoolbox\Assessment\Course;
 
 use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Failure\Unauthorized;
+use Alaress\Tree\TreeNode;
 use Alaress\Web\Controller as Base;
 use Aura\Di\Exception\ServiceNotFound;
 use Aura\Web\Request\Values;
@@ -28,12 +29,14 @@ use Schoolbox\Assessment\Course\Mapper as CourseMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
 use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
+use Schoolbox\Assessment\Course\Unit\Mapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum;
 use Schoolbox\Error;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
@@ -43,10 +46,13 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\Folder\Code;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Role;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -335,6 +341,18 @@ class Controller extends Base\Base
         // if something got passed, don't care: overriding it
         $post['id'] = $id;
 
+        // Do not permit Courses to be moved to, or created in, Root
+        if(0 == $post['parent']){
+
+            // ...unless already in Root
+            if(0 != $parentId = $this->courseMapper->findCheaplyById($post['id'])->getParent()->getId()) {
+                $this->sendError(
+                    new Base\Exception("Course cannot reside directly in root",
+                    ["move this Course out of root"]));
+                return;
+            }
+        }
+
         if (is_array($post['unitname'])) {
             // save unit name changes
             foreach ($post['unitname'] as $unitId => $unitName) {
@@ -342,6 +360,9 @@ class Controller extends Base\Base
                     $this->getFolderMapper()->findById($unitId)->setName($unitName)
                 );
             }
+        } else{
+            $this->sendError(new Base\Exception("Cannot create a Course without Units",["create at least 1 unit"]));
+            return;
         }
 
         $this->saveCourse($post, $rq->isXhr(), 'course.courseList');
@@ -401,8 +422,8 @@ class Controller extends Base\Base
             $name = 'this course';
         }
 
+        $parentId = $post->get('parent');
         try {
-            $parentId = $post->get('parent');
             if ($parentId === "0" || $parentId > 0) {
                 $parent = $this->getFolderMapper()->findById($parentId);
             } else {
@@ -417,7 +438,7 @@ class Controller extends Base\Base
         }
 
         // if there were any validation problems, throw that back
-        if ($errors) {
+        if ($errors || !$parent instanceof FolderModel) {
             throw new Base\Exception("Could not save", $errors);
         }
 
@@ -435,8 +456,26 @@ class Controller extends Base\Base
                 $folder = $this->getCourseMapper()->findById($id);
                 $mode = BaseMapper::METHOD_UPDATE;
 
+                // Sanity check for existing courses:
+                // * Don't allow moving outside of faculty root
+                //   (Keeping a course in a folder outside fac root is okay)
+                if ($folder->getParent()->getId() != $parentId
+                    && !$this->getCourseMapper()->isValidCourseLocation($parent)
+                ) {
+                    throw new Base\Exception("Courses may not be moved outside the faculty folder");
+                }
             } catch (BaseMapper\Exception $e) {
                 throw new Base\Exception("Could not save because " . $e->getMessage());
+            }
+        } else {
+            // Sanity checks for new courses:
+            // * Don't allow a course to be created in root folder
+            // * Don't allow outside of faculty root
+            if ($parentId == 0) {
+                throw new Base\Exception("Courses may not be created in the root folder");
+            }
+            if (!$this->getCourseMapper()->isValidCourseLocation($parent)) {
+                throw new Base\Exception("Courses may not be created outside the faculty folder");
             }
         }
 
@@ -755,6 +794,13 @@ class Controller extends Base\Base
 
         foreach ($allCourses as $currentCourse) {
 
+            // general search ignores Courses in Faculty
+            if(NULL === $searchParam) {
+                if (!$this->getCourseMapper()->inFacultyArea($currentCourse)) {
+                    continue;
+                }
+            }
+
             // confirm you at least have read access...
             if (!$this->confirmAccess($currentCourse->getId())) {
                 continue;
@@ -812,31 +858,96 @@ class Controller extends Base\Base
         });
     }
 
+    /**
+     * Gets a permission string out of a permission code returned from
+     * $this->handler->getPermission().
+     *
+     * @param  $code
+     *
+     * @return string
+     */
+    protected function getPermissionString($code)
+    {
+        switch ($code) {
+            case UserAccess::ACCESS_FULL:
+                return 'full';
+                break;
+            case UserAccess::ACCESS_WRITE:
+                return 'write';
+                break;
+            case UserAccess::ACCESS_READ:
+                return 'read';
+                break;
+            case UserAccess::ACCESS_DENY:
+            default:
+                return '';
+        }
+    }
+
 
     /**
-     * @param AbstractTreeBuilder $tb
-     * @param array               $target
+     * Recursively convert TreeNode tree to nested array
+     * @param TreeNode $node
+     * @param array $courseIds    Maps $courseId => $courseId
+     * @param array $permissions    Maps $folderId => permissionLevel
      * @return array
      */
-    protected function recursiveTreeBuild(AbstractTreeBuilder $tb, $target)
+    private function recursiveTreeBuild(TreeNode $node, array $courseIds, array $permissions)
     {
-        $target['children'] = $tb->buildChildNodes($target['id']);
+        $array = array();
 
-        foreach ($target['children'] as $i => $child) {
+        // Special Case for SB Root
+        if(0 === $node->getId()){
+            $array['id'] = 0;
+            $array['text'] = "Root";
+        } else {
 
-            if ($child['type'] == 'course') {
-                unset($target['children'][$i]);
-                continue;
-            }
+            /** @var Folder\Model $folder */
+            $folder = $node->getItem();
 
-            if ($child['children']) {
-                $target['children'][$i] = $this->recursiveTreeBuild($tb, $child);
+            $array['id']      = $folder->getId();
+            $array['text']    = $folder->getName();
+            $array['type']    = $folder->getFolderType();
+            $array['li_attr'] = array(
+                'data-permission' => $this->getPermissionString($permissions[$folder->getId()]),
+                'data-type'       => $folder->getFolderType(),
+                'data-id'         => $folder->getId()
+            );
+            $array['a_attr'] = array(
+                'href'            => '/homepage/' . $folder->getId()
+            );
+        }
+
+        $array['children'] = array();
+
+        foreach($node->getChildren() as $childNode){
+            // Permission Business Rules
+            // not set => prune subtree
+            // 0 => prune subtree
+            // 1 => show node, but don't permit selection (enforced on save attempt)
+            // 2 => show node, permit selection
+            // 3 => show node, permit selection
+
+            // Folder Type Business Rules
+            // isCourse => prune subtree
+
+            $childId  = $childNode->getId();
+            $isSuper  = $this->getUser()->isSuperuser();
+            $isDenied = !isset($permissions[$childId]) || UserAccess::ACCESS_DENY === $permissions[$childId];
+            $isCourse = array_key_exists($childId,$courseIds);
+
+            if( ($isSuper || !$isDenied) && !$isCourse){
+                $array['children'][] = $this->recursiveTreeBuild($childNode, $courseIds, $permissions);
             }
         }
 
-        return $target;
-    }
+        //sort children alphabetically
+        usort($array['children'], function($a,$b){
+            return strcasecmp($a['text'],$b['text']);
+        });
 
+        return $array;
+    }
 
     /**
      * List the folders that are allowed to be course parents
@@ -852,22 +963,58 @@ class Controller extends Base\Base
         //  - stop at, and exclude, all Courses (folder that has > 0 units)
         //  - continue to exhaustion
 
-        $tb = new TreeBuilder($this->getFolderMapper(), $this->getUnitMapper(), $this->getUser());
+        $courseIds = $this->courseMapper->findAllIds();
 
-        $facultyNode = $this->getCourseMapper()->getFacultyNode();
+        // Enable later O(1) lookup
+        $courseIds = array_combine($courseIds,$courseIds);
 
-        $data = [
-            'id'   => $facultyNode->getId(),
-            'text' => $facultyNode->getName()
-        ];
+        // Generate Role-based Folder permission map
+        $roleAccessMapper = RoleAccessMapper::getInstance();
+        $roleAccesses = $roleAccessMapper->findByColumn('gid',$this->getUser()->getRole()->getId());
+        $rolePermissions = array();
+        foreach($roleAccesses as $roleAccess){
+            $rolePermissions[$roleAccess->getCategory()->getId()] = $roleAccess->getType();
+        }
 
-        // recurse, passing $data by reference
-        $data = $this->recursiveTreeBuild($tb, $data);
+        // Generate User-based Folder permission map
+        $userAccesses = $this->userAccessMapper->findByColumnList( array(
+            'uid' => $this->getUser()->getId(),
+            'service' => UserAccess::SERVICE_HOMEPAGE,
+            )
+        );
+        $userPermissions = array();
+        foreach($userAccesses as $userAccess){
+            $userPermissions[$userAccess->getServiceIdentifier()] = $userAccess->getAccessLevel();
+        }
 
-        $data = [
-            'branch' => $data
-        ];
+        // Merge permissions
+        $permissions = $rolePermissions;
+        foreach($userPermissions as $folderId => $userPermission){
+            if(array_key_exists($folderId,$permissions)){
+                $permissions[$folderId] = max($permissions[$folderId], $userPermission);
+            } else {
+                $permissions[$folderId] = $userPermission;
+            }
+        }
 
+        $allFolders = $this->getFolderMapper()->findAll();
+
+        // Build flat array of nodes
+        $nodes = array(0 => new TreeNode(NULL, 0, NULL));
+        foreach($allFolders as $folder){
+            $nodes[$folder->getId()] = new TreeNode($folder, $folder->getId(), $folder->getParent()->getId());
+        }
+
+        // O(N) Convert flat to tree
+        foreach($nodes as $id => $node){
+            if(NULL !== $node->getParent()){
+                $nodes[$node->getParent()]->addChild($node);
+            }
+        }
+
+        $courseRoot     = $nodes[$this->getCourseMapper()->getFacultyNode()->getId()];
+        $courseRootArr  = $this->recursiveTreeBuild($courseRoot,$courseIds,$permissions);
+        $data['branch'] = $courseRootArr;
         $this->tpl('parentList', $data);
     }
 
@@ -2339,3 +2486,4 @@ class Controller extends Base\Base
     }
 
 }
+

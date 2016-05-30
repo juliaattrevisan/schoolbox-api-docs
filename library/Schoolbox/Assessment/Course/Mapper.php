@@ -131,15 +131,7 @@ class Mapper extends FolderMapper
             $courseId = $row['id'];
 
             if (empty($cache[$courseId])) {
-
-                $object = $this->hydrate($row);
-
-                if (!$this->inFacultyArea($object)) {
-                    // if it doesn't exist within the faculty root: SKIP!
-                    continue;
-                }
-
-                $cache[$courseId] = $object;
+                $cache[$courseId] = $this->hydrate($row);
                 $cache[$courseId]->setUnits($this->createCollection());
             }
 
@@ -254,12 +246,33 @@ class Mapper extends FolderMapper
     }
 
     /**
+     * Is $folder a valid location for a course to be put into? It is if it's either:
+     * * it's the faculty root
+     * * it's a child of the faculty root
+     *
      * @param Folder $folder
      * @return bool
      */
-    protected function inFacultyArea(Folder $folder)
+    public function isValidCourseLocation(Folder $folder)
     {
-        return $this->getAncestry()->hasParent($folder, $this->getFacultyNode());
+        return
+            $this->getFacultyNode()->getId() == $folder->getId()
+            || $this->inFacultyArea($folder);
+    }
+
+    /**
+     * @param Folder $folder
+     * @return bool
+     */
+    public function inFacultyArea(Folder $folder)
+    {
+        $facultyNode = $this->getFacultyNode();
+
+        if(0 === $facultyNode->getId()){
+            return true;
+        }
+
+        return $this->getAncestry()->hasParent($folder, $facultyNode);
     }
 
     /**
