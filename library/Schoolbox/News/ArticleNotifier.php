@@ -127,6 +127,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 
 		$bob = new Builder();
 
+		$notifBody = strlen($article->getBlurb()) > 0 ? $article->getBlurb() : $article->getBody();
 		$envelope->broadcastToRoleType($roleType,
 			// title, params (if title :tokenised), icon, href, namespace, severity and topic are mandatory
 
@@ -150,7 +151,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
                     'thumb'  => $thumb,
                     'blurb'  => $article->getBlurb(),
                 ))
-				->setBody($article->getBody())
+				->setBody($notifBody)
 				->setByline("$shortDate by $authorName in $topicName")
 
 				// timestamp and filters are optional
