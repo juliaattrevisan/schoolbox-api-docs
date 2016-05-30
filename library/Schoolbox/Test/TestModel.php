@@ -9,6 +9,8 @@
  
 namespace Schoolbox\Test;
 
+use Schoolbox\User;
+
 class TestModel {
 	/**
 	 * @var int
@@ -34,6 +36,11 @@ class TestModel {
 	 * @var TestModel
 	 */
 	protected $parent;
+
+	/**
+	 * @var User
+	 */
+	protected $user;
 
 	/**
 	 * @param string $file
@@ -114,5 +121,21 @@ class TestModel {
 	 */
 	public function getParent() {
 		return $this->parent;
+	}
+
+	/**
+	 * @return User
+	 */
+	public function getUser()
+	{
+		return $this->user;
+	}
+
+	/**
+	 * @param User $user
+	 */
+	public function setUser($user)
+	{
+		$this->user = $user;
 	}
 }

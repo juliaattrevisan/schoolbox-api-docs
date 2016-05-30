@@ -9,6 +9,7 @@
  
 namespace Schoolbox\Test;
 use Schoolbox\Mapper;
+use Schoolbox\UserMapper;
 
 class TestMapper extends Mapper {
 	protected function mapping() {
@@ -46,5 +47,6 @@ class TestMapper extends Mapper {
 			'this_key'  => 'category',
 			'other_key' => 'id',
 		));
+		$this->joins('user_id', UserMapper::class);
 	}
 }

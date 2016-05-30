@@ -103,16 +103,17 @@ class TestFramework extends AbstractNotificationTest
 
         // Teachers will be subscribed to instant notifications
         $testMapper->setSessionData([
-            'user' => UserMapper::getInstance()->findById(self::USERID_ROLE_STAFF),
+            'user' => UserMapper::getInstance()->findById(self::USERID_SUPERUSER),
         ]);
         $testModel = new TestModel();
+        $testModel->setFilename('staff.txt');
+        $testModel->setUser(UserMapper::getInstance()->findById(self::USERID_ROLE_STAFF));
         $testMapper->save($testModel);
 
         // Students will be subscribed to digest notifications
-        $testMapper->setSessionData([
-            'user' => UserMapper::getInstance()->findById(self::USERID_ROLE_STUDENT),
-        ]);
         $testModel = new TestModel();
+        $testModel->setFilename('student.txt');
+        $testModel->setUser(UserMapper::getInstance()->findById(self::USERID_ROLE_STUDENT));
         $testMapper->save($testModel);
 
         // I should be able to signal that this is the end of the test.

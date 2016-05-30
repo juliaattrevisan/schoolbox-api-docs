@@ -77,7 +77,7 @@ class TestNotifier extends AbstractModuleNotifier
             ->setNamespace($this->getSlug())
             ->addTopic($this->getSlug() . '.' . $object->getId() . '.notified');
         $message = $bob->build();
-        $envelope->targetToUser($user, $message);
+        $envelope->targetToUser($object->getUser(), $message);
         return $envelope;
     }
 }
