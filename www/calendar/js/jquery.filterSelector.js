@@ -73,24 +73,87 @@
             toggleHeaders();
 		}
 
+		function updateItems()
+		{
+			// At least one filter was selected
+
+			$('[data-reveal-id]').each(function ()
+			{
+				var hide = false;
+				var classes = $(this)[0].classList;
+
+				for (var i=0; i<classes.length; i++)
+				{
+					// Ignore 'row' class
+
+					if (classes[i] != 'row')
+					{
+						var found = false;
+
+						$('[data-update-filter]:checked').each(function () {
+
+							if ($(this)[0].value !== undefined)
+							{
+								// Annoyingly some have commas in their name (eg. group1,2) need to split this
+								// into two different class names
+
+								var name = $(this)[0].value.replace(/[^a-zA-Z]/g, '');
+								var numbers = $(this)[0].value.replace(/[^0-9,]/g, '').split(',');
+
+								for (var j = 0; j < numbers.length; j++) {
+									var reconstitutedName = name + numbers[j];
+
+									if (reconstitutedName == classes[i])
+										found = true;
+								}
+							}
+						});
+
+						if (!found)
+							hide = true;
+
+						// Hide if it didn't match in any of the groups, or if nothing at all was found by the
+						// '[data-update-filter]:checked' selector
+
+						if (hide || $('[data-update-filter]:checked').length == 0) {
+							$(this).hide();
+						} else {
+							$(this).show();
+						}
+					}
+				}
+			});
+
+			// Hide date headers if there are no events visible inside
+
+			$('[data-calendar-date]').each(function() {
+				if ($(this).find('[data-reveal-id]:not([style*="display: none"])').length === 0) {
+					$(this).find('h2').hide();
+				} else {
+					$(this).find('h2').show();
+				}
+			});
+		}
+
 		/**
 		 * Turn events on/off based on checkbox selection
 		 */
-		function applyCheckboxToggle() {
-			$.each($(config.filterContainer).find('.applyFilters'), function(index, element) {
-				$(element).change(function(event) {
-					var attribute = $(this).val();
-                    var checked   = $(this).is(':checked');
-                    var base      = attribute.match(/^\D+/);
-                    if (base.length) {
-                        var ids = attribute.match(/\d+/g);
-                        if (ids) {
-                            ids.forEach(function(id) {
-                                $(config.eventContainer).find('.' + base + id).toggle(checked);
-                            });
-                        }
-                    }
-					toggleHeaders();
+		function applyCheckboxToggle() 
+		{
+			$.each($(config.filterContainer).find('.applyFilters'), function(index, element)
+			{
+				$(element).change(function()
+				{
+					updateItems();
+				});
+			});
+
+			$.each($(config.filterContainer).find('[data-select-all-filter]'), function(index, element)
+			{
+				$(element).change(function()
+				{
+					$(this).parent().find(':checkbox').prop('checked', $(this).prop('checked'));
+					updateItems();
 				});
 			});
 		}

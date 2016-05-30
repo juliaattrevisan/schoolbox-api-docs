@@ -119,12 +119,6 @@
             window.location = $.fn.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
         });
 
-        //select all clicked
-        $('#calendar-controls').on('change','.select_all', function(e) {
-            $(this).parent().find(':checkbox').prop('checked', $(this).prop('checked'));
-            updateFilters();
-        });
-
         /* Export calendar
          */
         $.fn.clipboardSelector({
@@ -213,7 +207,7 @@
                 <div class="small-6 large-3 columns">
                     <fieldset data-filter-checklist class="checklist sources">
                         <legend>Sources</legend>
-                        <input type="checkbox" class="select_all" id="sourceSelectAll" />
+                        <input data-select-all-filter type="checkbox" class="select_all" id="sourceSelectAll" />
                         <label for="sourceSelectAll">Select all</label>
                         <!-- BEGIN filter_source -->
                         <input data-update-filter type="checkbox" name="source" id="source{SOURCE_ID}" value="source{SOURCE_ID}" {SOURCE_ID_SELECTED} class="applyFilters"/>
@@ -224,7 +218,7 @@
                 <div class="small-6 large-3 columns">
                     <fieldset data-filter-checklist class="checklist groups">
                         <legend>Groups</legend>
-                        <input type="checkbox" class="select_all" id="groupsSelectAll" />
+                        <input data-select-all-filter type="checkbox" class="select_all" id="groupsSelectAll" />
                         <label for="groupsSelectAll">Select all</label>
                         <!-- BEGIN filter_group -->
                         <input data-update-filter type="checkbox" name="group" id="group{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="applyFilters"/>
@@ -235,7 +229,7 @@
                 <div class="small-6 large-3 columns">
                     <fieldset data-filter-checklist class="checklist campus">
                         <legend>Campus</legend>
-                        <input type="checkbox" class="select_all"  id="campusSelectAll" />
+                        <input data-select-all-filter type="checkbox" class="select_all"  id="campusSelectAll" />
                         <label for="campusSelectAll">Select all</label>
                         <!-- BEGIN filter_campus -->
                         <input data-update-filter type="checkbox" name="campus" id="campus{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="applyFilters"/>
@@ -246,7 +240,7 @@
                 <div class="small-6 large-3 columns">
                     <fieldset data-filter-checklist class="checklist events">
                         <legend>Event</legend>
-                        <input type="checkbox" id="eventTypeSelectAll" class="select_all" />
+                        <input data-select-all-filter type="checkbox" class="select_all" id="eventTypeSelectAll" />
                         <label for="eventTypeSelectAll">Select all</label>
                         <!-- BEGIN filter_event_type -->
                         <input data-update-filter type="checkbox" name="events" id="eventType{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED} value="type{EVENT_TYPE_ID}" class="applyFilters"/>
@@ -308,14 +302,16 @@
 <div class="row" data-eventlist="true">
     <div class="small-12 island">
         <!-- BEGIN date -->
-        <h2 class="subheader">{EVENT_DATE}</h2>
-        <section>
-            <ul class="calendar-list">
-            <!-- BEGIN event -->
-                {TWIG_EVENT}
-            <!-- END event -->
-            </ul>
-        </section>
+        <div data-calendar-date>
+            <h2 class="subheader">{EVENT_DATE}</h2>
+            <section>
+                <ul data-calendar-item class="calendar-list">
+                <!-- BEGIN event -->
+                    {TWIG_EVENT}
+                <!-- END event -->
+                </ul>
+            </section>
+        </div>
         <!-- END date -->
 
         <!-- BEGIN has_no_events -->
