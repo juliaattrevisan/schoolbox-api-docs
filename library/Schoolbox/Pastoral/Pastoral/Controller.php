@@ -831,8 +831,15 @@ class Controller extends Base
                 try {
                     /** @var PastoralTypeModel $type */
                     $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
-                    /** @var PastoralCategoryModel $type */
-                    $category = $this->getPastoralCategoryMapper()->findById($this->getRequest()->post["categoryId"]);
+
+                    try {
+                        /** @var PastoralCategoryModel $type */
+                        $category = $this->getPastoralCategoryMapper()->findById($this->getRequest()->post["categoryId"]);
+                        $record->setCategory($category);
+                    } catch (MapperException $e) {
+                        // Noop, this can be blank
+                    }
+
                     /** @var PastoralSeverityModel $severity */
                     $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
                 } catch (MapperException $e) {
@@ -842,7 +849,6 @@ class Controller extends Base
                 $record->setStudent($student);
                 $record->setHeading($this->getRequest()->post["heading"]);
                 $record->setType($type);
-                $record->setCategory($category);
                 $record->setSeverity($severity);
                 $record->setBody($this->getRequest()->post["body"]);
                 $record->setPrivate($this->getRequest()->post["private"]);
