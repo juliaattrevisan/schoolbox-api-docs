@@ -377,6 +377,20 @@ class External_Humanedge_User implements External_UserInterface
             LEFT JOIN StudentContact sc ON s.ID = sc.StudentID
             LEFT JOIN Contact c ON sc.ContactID = c.ID
             WHERE c.Code = {$this->getDatabase()->smartQuote($externalUserId)}
+            AND (
+                ResidentialGuardian = 'Y' OR
+                Relationship = 'Father' OR
+                Relationship = 'Mother' OR
+                Relationship = 'Stepfather' OR
+                Relationship = 'Stepmother' OR
+                Relationship = 'Guardian' OR
+                Relationship = 'Foster Mother' OR
+                Relationship = 'Foster Father' OR
+                Relationship = 'Foster Grandmother' OR
+                Relationship = 'Foster Grandfather' OR
+                Relationship = 'Carer' OR
+                Relationship = 'Guardian / Stepfather'
+            )
         ";
         return $this->getDatabase()->getAll($query);
     }
