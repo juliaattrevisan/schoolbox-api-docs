@@ -6,6 +6,7 @@
  */
 
 use Schoolbox\Mapper;
+use Schoolbox\Realtime\Message;
 use Schoolbox\Realtime\Test\AbstractNotificationTest;
 use Schoolbox\Test\TestMapper;
 use Schoolbox\Test\TestModel;
@@ -56,7 +57,37 @@ class TestFramework extends AbstractNotificationTest
 
         // Insert notification topics for the test model we're going to use
         // Probably need to create a table for it, too.
-        // Redirect notifications for parents to
+        // Redirect notifications for parents too.
+
+        // Namespace for test notifications
+        $testNamespace = new Message\NS();
+        $testNamespace->setSlug('test');
+        $testNamespace->setLabel('test');
+        Message\NSMapper::getInstance()->save($testNamespace);
+
+        // Staff permission: instant
+        $staffSource = new Message\Source();
+        $staffSource->setNamespace($testNamespace);
+        $staffSource->setRoleType('staff');
+        $staffSource->setKey('notified');
+        $staffSource->setDescription('a test notification was made');
+        Message\SourceMapper::getInstance()->save($staffSource);
+        $staffPermission = new \Schoolbox\Realtime\Message\RoutePermission();
+        $staffPermission->setMsgSource($staffSource);
+        $staffPermission->setMask(['IN']);
+        $staffPermission->setDefault(['IN']);
+
+        // Student permission: digest only
+        $studentSource = new Message\Source();
+        $studentSource->setNamespace($testNamespace);
+        $studentSource->setRoleType('student');
+        $studentSource->setKey('notified');
+        $studentSource->setDescription('a test notification was made');
+        Message\SourceMapper::getInstance()->save($studentSource);
+        $studentPermission = new \Schoolbox\Realtime\Message\RoutePermission();
+        $studentPermission->setMsgSource($studentSource);
+        $studentPermission->setMask(['DI']);
+        $studentPermission->setDefault(['DI']);
     }
 
     /**
