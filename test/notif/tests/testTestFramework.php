@@ -15,6 +15,8 @@ use Schoolbox\UserMapper;
 
 /**
  * Test case for the test framework.
+ *
+ * It tests solely whether the test framework is able to listen to all daemons.
  */
 class TestFramework extends AbstractNotificationTest
 {
@@ -69,7 +71,6 @@ class TestFramework extends AbstractNotificationTest
             self::DAEMON_REROUTE,
             self::DAEMON_DIGEST,
             self::DAEMON_SOCKET,
-//            self::DAEMON_BELL,
         ];
     }
 
@@ -97,6 +98,7 @@ class TestFramework extends AbstractNotificationTest
      */
     public function onAllDaemonsReady()
     {
+        // If I got here that means that this test is a success.
         $this->log->notice("All daemons are ready", [ 'char' => '>' ]);
 
         $testMapper = TestMapper::getInstance();
