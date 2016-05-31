@@ -1352,7 +1352,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         if (Access::getInstance()->getFolderAccess($mover, [$source]) < WRITE_ACCESS ||
             Access::getInstance()->getFolderAccess($mover, [$destination]) < WRITE_ACCESS ||
-            Access::getInstance()->getFolderAccess($mover, [$movedFolder->getParent()]) < WRITE_ACCESS
+            Access::getInstance()->getFolderAccess($mover, [$movedFolder->getParent()->getId()]) < WRITE_ACCESS
         ) {
             throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
         }
