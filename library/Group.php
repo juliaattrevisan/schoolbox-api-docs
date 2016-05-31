@@ -1,5 +1,6 @@
 <?php
 
+use \Schoolbox\User as UserModel;
 use \Schoolbox\UserMapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Permission\Access\Access;
@@ -22,6 +23,13 @@ class Group extends DeprecatedModel
      * @var Schoolbox\UserNotifier
      */
     protected $userNotifier;
+
+    /**
+     * The service for which this group object is for.
+     *
+     * @var int
+     */
+    private $_service = HOMEPAGE_SERVICE;
 
     function Group($service = HOMEPAGE_SERVICE)
     {
@@ -416,10 +424,19 @@ class Group extends DeprecatedModel
     }
 
     /**
-     * @param $relationID
-     * @param int $userID
-     * @param bool $cache
-     * @return bool|int
+     * The new getPermission method, which uses `\Schoolbox\Permission\Access\Access::getFolderAccess`
+     * under the hood.
+     *
+     * This only works when `$this->_service` is `HOMEPAGE_SERVICE` - if it
+     * isn't, it proxies through to `$this->legacyGetPermission`.
+     *
+     * @param  int  $relationID The ID of the object to get permissions on.
+     *                          Depending on `$this->_service` could be a
+     *                          folder, campus, residential house, or ignored.
+     * @param  int  $userID     The user to get permissions for.
+     *                          If omitted, defaults to current user.
+     * @param  bool $cache      If false, ignore cache.
+     * @return int
      */
     function getPermission($relationID, $userID = 0, $cache = true)
     {
@@ -428,7 +445,7 @@ class Group extends DeprecatedModel
                 $userID = $_SESSION['id'];
                 $this->cacheUser[$userID] = $_SESSION['user'];
             } else {
-                return false;
+                return DENY_ACCESS;
             }
         }
 
@@ -440,11 +457,59 @@ class Group extends DeprecatedModel
             $user = $this->cacheUser[$userID];
         }
 
-        $permission = Access::getInstance()->getFolderAccess($user, array($relationID), $cache);
+        if ($this->_service == HOMEPAGE_SERVICE) {
+            return Access::getInstance()->getFolderAccess($user, array($relationID), $cache);
+        } else {
+            return $this->legacyGetPermission($relationID, $user);
+        }
+    }
+
+    /**
+     * The old getPermission method, used when `$this->_service` isn't
+     * `HOMEPAGE_SERVICE`.
+     *
+     * @param  int  $relationID The ID of the object to get permissions on.
+     *                          Depending on `$this->_service` could be a
+     *                          folder, campus, residential house, or ignored.
+     * @param  UserModel $user  The user to get permissions for.
+     * @param  bool      $cache If false, ignore cache.
+     * @return int
+     */
+    private function legacyGetPermission($relationID, UserModel $user, $cache = true)
+    {
+        $userID = $user->getId();
+
+        /* Cached results */
+        if ($cache && isset($this->cache[$this->_service][$relationID][$userID])) {
+            return $this->cache[$this->_service][$relationID][$userID];
+        }
+
+        // if superuser just return highest permission type
+        if ($user->isSuperuser()) {
+            $this->cache[$this->_service][$relationID][$userID] = FULL_ACCESS;
+            return FULL_ACCESS;
+        }
+
+        $serviceIdFilter = '';
+        if (in_array($this->_service, array(CALENDAR_SERVICE, HOUSEMASTER_SERVICE))) {
+            $serviceIdFilter = "AND sid = {$this->db->smartQuote($relationID)}";
+        }
+
+        // check individual access
+        $query = "
+            SELECT type
+            FROM userAccess
+            WHERE uid = {$this->db->smartQuote($userID)}
+            $serviceIdFilter
+            AND ((service = {$this->db->smartQuote($this->_service)}))
+            ORDER BY `type` DESC LIMIT 1
+        ";
+
+        $permission = $this->db->getOne($query);
+        $permission = (int)$permission;
 
         // allow staff write access to NEWS_SERVICE by default except at shore...
-
-        if ($this->isStaff($userID)
+        if ($user->getRole()->isStaff()
             && (Cfg::get('news_staff_post_enabled') == '1')
             && ($this->_service == NEWS_SERVICE)
             && ($permission < WRITE_ACCESS)
@@ -452,6 +517,8 @@ class Group extends DeprecatedModel
             $permission = WRITE_ACCESS;
         }
 
+        /* Set cache */
+        $this->cache[$this->_service][$relationID][$userID] = $permission;
         return $permission;
     }
 
