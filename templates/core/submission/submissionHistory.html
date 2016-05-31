@@ -62,11 +62,39 @@
         </section>
     </div>
     <div class="small-12 large-5 xlarge-4 island">
+        <!-- BEGIN returned_work -->
+        <h2 class="subheader">Return</h2>
+        <section>
+            <div class="content">
+                <span class="grade">
+                    <span class="gradient-{RETURNED_WORK_GRADIENT}">{RETURNED_WORK_MARK}</span><br/>
+                </span>
+                <p class="comment">{RETURNED_WORK_COMMENT}</p>
+            </div>
+
+            <ul class="action-list">
+                <!-- BEGIN return_file -->
+                <li>
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
+                            <a href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1" data-plugin="preview">
+                                <img src="/images/mime/60x60/{RETURNED_WORK_FILE_THUMB}" class="mime" alt="{RETURNED_WORK_FILE_NAME}">
+                                <p>{RETURNED_WORK_FILE_NAME}</p>
+                                <p class="meta">Returned {RETURNED_WORK_FILE_DATE}</p>
+                                <p class="meta">{RETURNED_WORK_FILE_SIZE}</p>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+                <!-- END return_file -->
+            </ul>
+        </section>
+        <!-- END returned_work -->
 
         <!-- BEGIN recent_submission -->
         <div class="actions-small-1">
             <div class="list-item">
-                <h2 class="subheader">Most Recent Submission</h2>
+                <h2 class="subheader">Submissions</h2>
             </div>
             <nav>
                 <!-- BEGIN action_publish -->
@@ -102,58 +130,34 @@
                     </article>
                     <!-- END plag_score -->
                 </li>
-                <!-- END recent_submission_download -->
-            </ul>
-        </section>
-        <!-- END recent_submission -->
-
-
-        <!-- BEGIN returned_work -->
-        <h2 class="subheader">Return</h2>
-        <section>
-            <div class="content">
-                <span class="grade">
-                    <span class="gradient-{RETURNED_WORK_GRADIENT}">{RETURNED_WORK_MARK}</span><br/>
-                </span>
-                <p class="comment">{RETURNED_WORK_COMMENT}</p>
-            </div>
-
-            <ul class="action-list">
-                <!-- BEGIN return_file -->
-                <li>
-                    <div class="list-item">
-                        <div class="small-12 avatar card">
-                            <a href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1" data-plugin="preview">
-                                <img src="/images/mime/60x60/{RETURNED_WORK_FILE_THUMB}" class="mime" alt="{RETURNED_WORK_FILE_NAME}">
-                                <p>{RETURNED_WORK_FILE_NAME}</p>
-                                <p class="meta">Returned {RETURNED_WORK_FILE_DATE}</p>
-                                <p class="meta">{RETURNED_WORK_FILE_SIZE}</p>
-                            </a>
-                        </div>
-                    </div>
-                </li>
-                <!-- END return_file -->
                 <!-- BEGIN return_file_uuid -->
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="compact avatar card small-12">
-                            <a href="/submission/inlineGrading/viewStudent/{RETURNED_WORK_SUBMISSION_ID}">
+                            <a href="/submission/inlineGrading/viewStudent/{MOST_RECENT_SUBMISSION_FILE_ID}">
                                 <div class="icon-comment"></div>
                                 <h3>View Annotations</h3>
                             </a>
                         </div>
                     </div>
                     <nav>
-                        <a href='/submission/inlineGrading/download/{RETURNED_WORK_SUBMISSION_ID}' class='icon-download' title="Download"></a>
+                        <a href='/submission/inlineGrading/download/{MOST_RECENT_SUBMISSION_FILE_ID}' class='icon-download' title="Download"></a>
                     </nav>
                 </li>
                 <!-- END return_file_uuid -->
+                <!-- END recent_submission_download -->
+
             </ul>
         </section>
+        <!-- END recent_submission -->
+
+
+        <!-- BEGIN show_history -->
         <a href="#" id="view-history" class="button icon-history" title="View History" data-reveal-id="history-wrap">View History</a>
-        <!-- END returned_work -->
+        <!-- END show_history -->
 
     </div>
+
 </div>
 
 <!-- BEGIN has_rubric -->

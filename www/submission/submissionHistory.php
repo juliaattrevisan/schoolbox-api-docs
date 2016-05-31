@@ -26,13 +26,14 @@ $this->setBlock(TEMPLATE_content, 'show_owner', 'show_owner_block');
 $this->setBlock(TEMPLATE_content, 'show_status', 'show_status_block');
 $this->setBlock(TEMPLATE_content, 'returned_work', 'returned_work_block');
 $this->setBlock(TEMPLATE_content, 'has_rubric', 'has_rubric_block');
+$this->setBlock(TEMPLATE_content, 'show_history', 'show_history_block');
 $this->setBlock('has_rubric', 'rubric', 'rubric_block');
 $this->setBlock(TEMPLATE_content, 'action_submit', 'action_submit_block');
 $this->setBlock(TEMPLATE_content, 'attachments', 'attachments_block');
 $this->setBlock('returned_work', 'return_file', 'return_file_block');
-$this->setBlock('returned_work', 'return_file_uuid', 'return_file_uuid_block');
 $this->setBlock('recent_submission', 'plag_score', 'plag_score_block');
 $this->setBlock('recent_submission', 'recent_submission_download', 'recent_submission_download_block');
+$this->setBlock('recent_submission_download', 'return_file_uuid', 'return_file_uuid_block');
 $this->setBlock('subject', 'work', 'work_block');
 $this->setBlock('subject', 'teacher', 'teacher_block');
 $this->setBlock('attachments', 'download', 'download_block');
@@ -53,6 +54,7 @@ $this->setBlock('history_marked', 'history_marked_hascomment', 'history_marked_h
 $this->setVar([
     'teacher_block'       => '',
     'action_submit_block' => '',
+    'show_history_block'  => '',
     'STATUS_HEALTH'       => 'none',
     'STATUS_LABEL'        => '',
 ]);
@@ -298,13 +300,22 @@ $errors = $dem->listDisplayValues();
 
 $recent_activity = null;
 $recent_return     = null;
-$crocodocReturn = null;
 $fileReturn = array();
 $recentComment = null;
 $recentMark = null;
+$isMarked = false;
 
 if (count($submission_history)) {
     $j = 0;
+    $this->parse('show_history_block','show_history');
+
+    //Scan for return so we know its marked
+    foreach($submission_history as $activity_item) {
+        if($activity_item->isReturn()) {
+            $isMarked = true;
+            break;
+        }
+    }
 
     foreach ($submission_history as $activity_item) {
         /** @var Activity $activity_item */
@@ -357,6 +368,7 @@ if (count($submission_history)) {
 
             // Name, icon and ID of user: use student's
             $owner = $submission->getOwner()->getId();
+
 
         } elseif ($activity_item->isReturn()) {
             // if return item
@@ -426,6 +438,87 @@ if (count($submission_history)) {
                 $recent_activity = $activity_item;
             }
 
+            $recentSubmissionDate = new Alaress_Date_Format($activity_item->getDate(), 'U');
+
+            // get filetype details
+            $student_submission = $activity_item->getSubmission();
+
+
+            // populate details into page
+            if ($student_submission instanceof Component\SubmissionBox\Submission\File) {
+                $output = array(
+                    'MOST_RECENT_SUBMISSION_FILE_NAME'  => $student_submission->getFilename(),
+                    'MOST_RECENT_SUBMISSION_FILE_SIZE'  => Alaress_Byte_Format::bytesToString($student_submission->getSize()),
+                    'MOST_RECENT_SUBMISSION_FILE_THUMB' => $student_submission->getMimetype()->getIconFile() ?: 'txt.png',
+                    'MOST_RECENT_SUBMISSION_FILE_DATE'  => $recentSubmissionDate->getRelativeTime(),
+                    'MOST_RECENT_SUBMISSION_FILE_ID'    => $activity_item->getSubmission()->getId(),
+                );
+            } else {
+                $output = [];
+            }
+
+            $this->setVar($output);
+
+            // if we are the owning student, display plagiarism details if they are available
+            if (($userID == $currentUserId && $conf->get('plagscan_student_visible')) || $sessionUser->getRole()->isStaff() || $sessionUser->isSuperuser()) {
+                // retrieve plagiarism score, if available
+                $docMapper = Plagscan_DocumentMapper::getInstance();
+                $plagDoc   = null;
+                try {
+                    /* @var $plagDoc Plagscan_Document */
+                    $plagDoc = $docMapper->findOneByColumn('file_id', $activity_item->getSubmission()->getId());
+
+                    if ($plagDoc->getId() && $plagDoc->getStatus() == Plagscan_Document::STATUS_COMPLETE) {
+                        // what colour should the plagiarism text be, and what should the tooltip say?
+                        if ($plagDoc->getScore() > 0) {
+                            $status  = 'plagscan-critical';
+                            $tooltip = 'Your submission is extremely similar to other documents scanned.';
+                        } elseif ($plagDoc->getScore() > 20) {
+                            $status  = 'plagscan-warning';
+                            $tooltip = 'Your submission is somewhat similar to other documents scanned.';
+                        } else {
+                            $status  = 'plagscan-ok';
+                            $tooltip = 'Your submission is quite different to other documents scanned.';
+                        }
+
+                        $this->setVar(
+                            array(
+                                'MOST_RECENT_SUBMISSION_FILE_PLAG_CLASS' => $status,
+                                'MOST_RECENT_SUBMISSION_FILE_PLAGSCORE'  => $plagDoc->getScore(),
+                                'MOST_RECENT_SUBMISSION_FILE_PLAG_TITLE' => $tooltip,
+                            )
+                        );
+                        $this->parse('plag_score_block', 'plag_score');
+                    } else {
+                        $this->setVar('plag_score_block', '');
+                    }
+                } catch (Schoolbox\Mapper\Exception $e) {
+                    $this->setVar('plag_score_block', '');
+                }
+            } else {
+                $this->setVar('plag_score_block', '');
+            }
+
+            /* If there's a crocodoc document, display a link to it.
+            * Do this even if there's no returned file in storage.
+            */
+            if ($activity_item->getSubmission()->getUuid() && $is_mark_shown && $isMarked) {
+                $this->setVar(
+                    array(
+                        'RETURNED_WORK_SUBMISSION_ID' => $activity_item->getSubmission()->getId(),
+                    )
+                );
+                $this->parse('return_file_uuid_block', 'return_file_uuid');
+            }
+            else {
+                $this->setVar('return_file_uuid_block', '');
+
+            }
+
+            $this->parse('recent_submission_download_block', 'recent_submission_download',true);
+
+
+
         }
         // return by teacher
         $parentsCanSee = !($conf->get('restrict_parent_grades') && $groupHandler->isParent());
@@ -464,11 +557,6 @@ if (count($submission_history)) {
              */
             if (!isset($recent_return)) {
                 $recent_return = $activity_item;
-            }
-
-            /* Remember most recently return crocodoc */
-            if( !isset($crocodocReturn) && $activity_item->getReturnedWork()->getUuid()) {
-                $crocodocReturn = $activity_item->getReturnedWork();
             }
 
             /* Remember all returned files, could be more multiple */
@@ -537,79 +625,18 @@ if (isset($recent_activity)) {
         ]);
     }
 
-    $recentSubmissionDate = new Alaress_Date_Format($recent_activity->getDate(), 'U');
-
-    // get filetype details
-    $student_submission = $recent_activity->getSubmission();
-
-    // populate details into page
-    if ($student_submission instanceof Component\SubmissionBox\Submission\File) {
-        $output = array(
-            'MOST_RECENT_SUBMISSION_FILE_NAME'  => $student_submission->getFilename(),
-            'MOST_RECENT_SUBMISSION_FILE_SIZE'  => Alaress_Byte_Format::bytesToString($student_submission->getSize()),
-            'MOST_RECENT_SUBMISSION_FILE_THUMB' => $student_submission->getMimetype()->getIconFile() ?: 'txt.png',
-            'MOST_RECENT_SUBMISSION_FILE_DATE'  => $recentSubmissionDate->getRelativeTime(),
-            'MOST_RECENT_SUBMISSION_FILE_ID'    => $recent_activity->getSubmission()->getId(),
-        );
-    } else {
-        $output = [];
-    }
-
-    $this->setVar($output);
-
-    // if we are the owning student, display plagiarism details if they are available
-    if (($userID == $currentUserId && $conf->get('plagscan_student_visible')) || $sessionUser->getRole()->isStaff() || $sessionUser->isSuperuser()) {
-        // retrieve plagiarism score, if available
-        $docMapper = Plagscan_DocumentMapper::getInstance();
-        $plagDoc   = null;
-        try {
-            /* @var $plagDoc Plagscan_Document */
-            $plagDoc = $docMapper->findOneByColumn('file_id', $recent_activity->getSubmission()->getId());
-
-            if ($plagDoc->getId() && $plagDoc->getStatus() == Plagscan_Document::STATUS_COMPLETE) {
-                // what colour should the plagiarism text be, and what should the tooltip say?
-                if ($plagDoc->getScore() > 0) {
-                    $status  = 'plagscan-critical';
-                    $tooltip = 'Your submission is extremely similar to other documents scanned.';
-                } elseif ($plagDoc->getScore() > 20) {
-                    $status  = 'plagscan-warning';
-                    $tooltip = 'Your submission is somewhat similar to other documents scanned.';
-                } else {
-                    $status  = 'plagscan-ok';
-                    $tooltip = 'Your submission is quite different to other documents scanned.';
-                }
-
-                $this->setVar(
-                    array(
-                        'MOST_RECENT_SUBMISSION_FILE_PLAG_CLASS' => $status,
-                        'MOST_RECENT_SUBMISSION_FILE_PLAGSCORE'  => $plagDoc->getScore(),
-                        'MOST_RECENT_SUBMISSION_FILE_PLAG_TITLE' => $tooltip,
-                    )
-                );
-                $this->parse('plag_score_block', 'plag_score');
-            } else {
-                $this->setVar('plag_score_block', '');
-            }
-        } catch (Schoolbox\Mapper\Exception $e) {
-            $this->setVar('plag_score_block', '');
-        }
-    } else {
-        $this->setVar('plag_score_block', '');
-    }
-
     // only allow a resubmission if box allows it
     if ($hasSubmitPermission && $box->getAcceptMultiple()) {
         $this->setVar('SUBMIT_LABEL', $isSubmissionOnStudentBehalf ? 'Resubmit on student\'s behalf' : 'Resubmit');
         $this->parse('action_submit_block', 'action_submit');
     }
-
     // if parent, hide the "view submitted work" button
     if ($parentOnly) {
         $this->setVar('recent_submission_block', '');
     } else {
-        $this->parse('recent_submission_download_block', 'recent_submission_download');
         $this->parse('recent_submission_block', 'recent_submission');
     }
+
 
 } else {
     /* Hide most recent submission
@@ -649,6 +676,7 @@ if (!in_array($box->getCategory()->getId(), $categoryIDList)) {
 
 /* Detect returned work
  */
+$this->setVar('return_file_uuid_block', '');
 if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHandler->isParent())) {
     // get filetype details
     $return = $recent_return->getReturnedWork();
@@ -656,41 +684,17 @@ if (isset($recent_return) && !($conf->get('restrict_parent_grades') && $groupHan
 
     $this->setVar(
         array(
-            'RETURNED_WORK_OWNER_ID'   => $return->getOwner()->getId(),
-            'RETURNED_WORK_ID'         => $return->getId(),
-            'RETURNED_WORK_COMMENT'    => Scrub::Text($recentComment),
-            'RETURNED_WORK_MARK'       => Scrub::Text($mark),
-            'RETURNED_WORK_GRADIENT'   => $return->getGradientFromNormalizedMark(),
-            'STATUS_HEALTH'            => 'ok',
-            'STATUS_LABEL'             => 'Marked'
-        ));
-
-    // Just zero these so they don't appear
-    $this->setVar(
-        array(
             'RETURNED_WORK_SUBMISSION_ID' => '',
-            'return_file_uuid_block'      => '',
+            'RETURNED_WORK_OWNER_ID'      => $return->getOwner()->getId(),
+            'RETURNED_WORK_ID'            => $return->getId(),
+            'RETURNED_WORK_COMMENT'       => Scrub::Text($recentComment),
+            'RETURNED_WORK_MARK'          => Scrub::Text($mark),
+            'RETURNED_WORK_GRADIENT'      => $return->getGradientFromNormalizedMark(),
+            'STATUS_HEALTH'               => 'ok',
+            'STATUS_LABEL'                => 'Marked',
         )
     );
 
-    /* If there's a crocodoc document, display a link to it.
-     * Do this even if there's no returned file in storage.
-     */
-    if (isset($crocodocReturn) && $crocodocReturn->getUuid()) {
-        try {
-            $associatedSubmission = $submissionMapper->findOneByColumn('uuid', $crocodocReturn->getUuid());
-
-            $this->setVar(
-                array(
-                    'RETURNED_WORK_SUBMISSION_ID' => $associatedSubmission->getId(),
-                )
-            );
-            $this->parse('return_file_uuid_block', 'return_file_uuid');
-        } catch (\Exception $e) {
-            // This return doesn't relate to a submission for some reason.
-            // I suppose that's okay, but it doesn't link to anything.
-        }
-    }
 
     $this->setVar('return_file_block', '');
 

@@ -108,8 +108,9 @@
 @import "components/ui/selectize.customisation";
 
 //Magnific Popup
-@import "../../javascript/components/magnific-popup/src/css/settings";
 @import "../../javascript/components/magnific-popup/src/css/main";
+@import "components/magnific/settings";
+
 
 // combobox relies on selectize styles
 @import "components/ui/combobox";
