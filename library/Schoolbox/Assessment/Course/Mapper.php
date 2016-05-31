@@ -124,9 +124,9 @@ class Mapper extends FolderMapper
         $courses = parent::hydrateSelect($statement);
         $units = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $courseId = $row['id'];
+            $courseId = $row[$this->getIdentifier()];
             // Hydrate units (avoiding duplicates) and cache
-            if(!isset($units[$courseId][$row['unit.id']])){
+            if(!isset($units[$courseId][$row['unit.'.$this->getIdentifier()]])){
                 $unit = $this->hydrateJoin($row, 'unit', 'unit');
                 $units[$courseId][$unit->getId()] = $unit;
             }
