@@ -1,6 +1,11 @@
 <!-- BEGIN answerOption -->
-<li class="row content evaluation-answer-option {ANSWER_CHECKED}">
-    {ANSWER_DESCRIPTION}
-    <span class="close {ACTUAL_CORRECT_VALUE}"></span>
-</li>
+<tr class="row content evaluation-answer-option {ANSWER_OPTION_STATUS}">
+    <td>
+        <input type="checkbox" {ANSWER_CHECKED} readonly="">
+        <label class="checkbox-label"></label>
+    </td>
+    <td class="full-width">
+        {ANSWER_DESCRIPTION}
+    </td>
+</tr>
 <!-- END answerOption -->

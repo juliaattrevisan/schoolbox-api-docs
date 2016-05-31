@@ -543,7 +543,8 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                 if ($existing['response']) {
                     if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
                         $page->setVar(array(
-                            'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
+                            'ANSWER_OPTION_STATUS' => 'evaluation-selected-answer-option',
+                            'ANSWER_CHECKED' => 'checked',
                         ));
 
                         /* Was this a correctly-selected response? If so apply a
@@ -588,6 +589,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
 					else {
                         $page->setVar(array(
 							'OTHER_DESCRIPTION' => '',
+                            'ANSWER_OPTION_STATUS' => '',
                             'ANSWER_CHECKED' => '',
                             'CORRECT' => ''
                         ));
