@@ -82,7 +82,18 @@ class Sync implements SyncInterface
             FROM Contact c
             INNER JOIN StudentContact sc ON c.ID = sc.ContactID
             INNER JOIN Student         s ON sc.StudentID = s.ID
-            WHERE sc.ResidentialGuardian = 'Y'
+            WHERE (
+                sc.ResidentialGuardian = 'Y' OR
+                sc.Relationship = 'Father' OR
+                sc.Relationship = 'Mother' OR
+                sc.Relationship = 'Stepfather' OR
+                sc.Relationship = 'Stepmother' OR
+                sc.Relationship = 'Step Father' OR
+                sc.Relationship = 'Step Mother' OR
+                sc.Relationship LIKE '%Guardian%' OR
+                sc.Relationship LIKE 'Foster%' OR
+                sc.Relationship = 'Carer'
+            )
             AND   s.DateLeft IS NULL
             ORDER BY c.Code ASC
         ";
