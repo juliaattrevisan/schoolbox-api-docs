@@ -42,6 +42,7 @@ class DAV_Folder extends Sabre\DAV\Collection
 
         $this->groupHandler = new Group();
 
+        $this->folder = $this->getFolderMapper()->createModel()->setId(0);
         $this->setFolderFromPath($path);
 
         // Name may be configurable later on.
@@ -289,32 +290,27 @@ class DAV_Folder extends Sabre\DAV\Collection
      */
     private function setFolderFromPath($path)
     {
-        if ($path == '') {
-            $this->folder = $this->getFolderMapper()->createModel()->setId(0);
-
-        } else {
+        if ($path != '') {
             // Path list - strip any blank parts
             $folderList = array_filter(explode('/', $path), 'strlen');
-            $parent = 0;
-            $folder = null;
+            $parent     = 0;
+            $folder     = null;
 
             foreach ($folderList as $folderName) {
-                $allFolders = $this->getFolderMapper()->findByColumnList(array(
-                    'name' => $folderName,
-                    'parent' => $parent
-                ));
+                $allFolders = $this->getFolderMapper()->findByColumnList([
+                    'name'   => $folderName,
+                    'parent' => $parent,
+                ]);
 
                 if ($allFolders->count()) {
                     $folder = $allFolders->first();
-
                 } else {
                     return;
                 }
 
-                $parent = $folder->getId();
+                $this->folder = $folder;
+                $parent       = $folder->getId();
             }
-
-            $this->folder = $folder;
         }
     }
 
