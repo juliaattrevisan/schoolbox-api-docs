@@ -28,11 +28,6 @@
         right: 1.25rem;
         color: $warning-color;
     }
-
-    &.evaluation-selected-answer-option {
-        color: $accent-foreground;
-        background-color: $accent-background;
-    }
 }
 
 /* This is used to show which Respondents submitted a chosen response.
