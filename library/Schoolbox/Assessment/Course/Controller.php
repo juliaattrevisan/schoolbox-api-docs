@@ -438,7 +438,12 @@ class Controller extends Base\Base
         $parentId = $post->get('parent');
         try {
             if ($parentId === "0" || $parentId > 0) {
-                $parent = $this->getFolderMapper()->findById($parentId);
+                $access = $this->getAccess()->getFolderAccess($user = $this->getUser(), [$parentId]);
+                if($access < UserAccess::ACCESS_WRITE){
+                    $errors[] = "select a Faculty / Subject for which you have write access";
+                } else {
+                    $parent = $this->getFolderMapper()->findById($parentId);
+                }
             } else {
                 // cause a snap if no (or invalid) parent was supplied
                 throw new BaseMapper\Exception("Invalid parent nominated");
