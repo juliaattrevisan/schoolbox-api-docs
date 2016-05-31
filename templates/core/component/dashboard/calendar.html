@@ -14,21 +14,20 @@
             <h2 class="subheader">
                 <a href="/calendar/full/{CALENDAR_DATE}/#week">{LIST_DATE}</a>
             </h2>
+            <!-- BEGIN has_events -->
             <section>
-                <!-- BEGIN has_events -->
                 <ul class="calendar-list">
                     <!-- BEGIN event -->
                     {EVENT_CONTENT}
                     <!-- END event -->
                 </ul>
-                <!-- END has_events -->
-
-                <!-- BEGIN no_events -->
-                <div class="alert-box">
-                    There are no upcoming events.
-                </div>
-                <!-- END no_events -->
             </section>
+            <!-- END has_events -->
+            <!-- BEGIN no_events -->
+            <div class="empty-state">
+                <p>There are no upcoming events</p>
+            </div>
+            <!-- END no_events -->
         </div>
         <!-- END day -->
     </div>
