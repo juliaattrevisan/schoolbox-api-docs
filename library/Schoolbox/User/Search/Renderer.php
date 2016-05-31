@@ -105,8 +105,8 @@ class Renderer extends Handler
                 else
                 {
                     // Show pastoral to staff and parents
-                    if (($_SESSION['user']->getRole()->isStaff() || $groupHandler->isParentOfChild($user['id'])) &&
-                        $groupHandler->isStudent($user['id'])) {
+                    if (($_SESSION['user']->getRole()->isStaff() ||
+                        $groupHandler->isParentOfChild($user['id'])) && $groupHandler->isStudent($user['id']) && \Config::get('pastoral_parent_access')) {
                         $this->getPage()->parse('pastoral_block', 'pastoral');
                     } else {
                         $this->getPage()->setVar('pastoral_block', '');

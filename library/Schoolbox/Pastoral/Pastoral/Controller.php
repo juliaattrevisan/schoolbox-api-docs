@@ -460,6 +460,9 @@ class Controller extends Base
             if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->isParentOf($student))
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
 
+        if ($this->getUser()->getRole()->isParent() && !$this->getDi()->get('config')->get('pastoral_parent_access'))
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
+
         // Get the students contact details for display
 
         $studentContacts = [];
@@ -545,6 +548,9 @@ class Controller extends Base
             }
         }
 
+        if ($this->getUser()->getRole()->isParent() && !$this->getDi()->get('config')->get('pastoral_parent_access'))
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
+
         // Get the pastoral care record
 
         $pastoral = $this->getPastoralMapper()->findById($id);
@@ -623,6 +629,7 @@ class Controller extends Base
                     'student'           => $student,
                     'id'                => '',
                     'record'            => null,
+                    'allowParents'      => $this->getDi()->get('config')->get('pastoral_parent_access'),
                     'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
                     'categories'        => $this->getPastoralCategoryMapper()->findAll()->sortBy('name', 'asc'),
                     'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
@@ -824,8 +831,15 @@ class Controller extends Base
                 try {
                     /** @var PastoralTypeModel $type */
                     $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
-                    /** @var PastoralCategoryModel $type */
-                    $category = $this->getPastoralCategoryMapper()->findById($this->getRequest()->post["categoryId"]);
+
+                    try {
+                        /** @var PastoralCategoryModel $type */
+                        $category = $this->getPastoralCategoryMapper()->findById($this->getRequest()->post["categoryId"]);
+                        $record->setCategory($category);
+                    } catch (MapperException $e) {
+                        // Noop, this can be blank
+                    }
+
                     /** @var PastoralSeverityModel $severity */
                     $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
                 } catch (MapperException $e) {
@@ -835,7 +849,6 @@ class Controller extends Base
                 $record->setStudent($student);
                 $record->setHeading($this->getRequest()->post["heading"]);
                 $record->setType($type);
-                $record->setCategory($category);
                 $record->setSeverity($severity);
                 $record->setBody($this->getRequest()->post["body"]);
                 $record->setPrivate($this->getRequest()->post["private"]);

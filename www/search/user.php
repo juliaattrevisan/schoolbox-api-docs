@@ -244,6 +244,14 @@ function renderStudent(
 
     $page->setFile(TEMPLATE_content, 'output.html');
 
+    /** @var Schoolbox\User $user */
+    $user = $_SESSION["user"];
+
+    $showPastoral = Config::get('pastoral_enabled');
+
+    if ($user->getRole()->isParent() && !Config::get('pastoral_parent_access'))
+        $showPastoral = false;
+
     $page->setVar(
         'OUTPUT',
         $page->getTwig()->render(
@@ -252,7 +260,7 @@ function renderStudent(
                 'session'        => $_SESSION,
                 'user'           => $userObject,
                 'externalUser'   => $externalUser,
-                'showPastoral'   => Config::get('pastoral_enabled'),
+                'showPastoral'   => $showPastoral,
                 'eportfolioAuth' => $authenticator->canView(),
                 'hideContacts'   => $userObject->getHideContacts() ? 1 : 0,
                 'showClasses'    => $userObject->getHideTimetable() ? 0 : 1,
