@@ -8,6 +8,8 @@
 		applyCheckboxToggle();
         applyDefaultEventState();
 
+		updateItems();
+
 		/**
 		 * Init
 		 *
@@ -123,8 +125,6 @@
 						}
 					}
 				}
-
-				console.log("");
 			});
 
 			// Hide date headers if there are no events visible inside
