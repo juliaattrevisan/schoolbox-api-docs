@@ -365,6 +365,19 @@ class Controller extends Base\Base
             return;
         }
 
+        // Robustly handle either int, CSV string, or any level of nested arrays
+
+        if(is_array($post['curriculumCodes'])){
+            $tmpArr = [];
+            $itr = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($post['curriculumCodes']));
+            foreach($itr as $codes){
+                $tmpArr = array_merge($tmpArr, explode(',',$codes));
+            }
+            $post['curriculumCodes'] = $tmpArr;
+        } else if(isset($post['curriculumCodes'])){
+            $post['curriculumCodes'] = explode(',', $post['curriculumCodes']);
+        }
+
         $this->saveCourse($post, $rq->isXhr(), 'course.courseList');
     }
 

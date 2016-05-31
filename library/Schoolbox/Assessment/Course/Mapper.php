@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Course;
 
 use Component_Homepage_CourseBuilderController;
+use Config\Modules\Course;
 use PDO;
 use PDOStatement;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -94,9 +95,8 @@ class Mapper extends FolderMapper
      */
     protected function getSelectString()
     {
-        return "
-            SELECT {$this->getColumnString()},
-                   {$this->getJoinColumnString('unit', 'unit')}
+        return parent::getSelectString().",
+            {$this->getJoinColumnString('unit', 'unit')}
         ";
     }
 
@@ -108,8 +108,7 @@ class Mapper extends FolderMapper
      */
     protected function getFromString()
     {
-        return "
-            FROM `{$this->getTable()}`
+        return parent::getFromString()."
             LEFT JOIN {$this->getJoinSql('unit', '', 'unit', true)}
             INNER JOIN component_instance ci ON ci.identifier = unit.id AND ci.module = :module
             LEFT JOIN component_definition cd ON ci.component_definition_id = cd.id
@@ -121,24 +120,27 @@ class Mapper extends FolderMapper
      * @param  PDOStatement $statement
      * @return Collection|Folder[]
      */
-    protected function hydrateSelect(PDOStatement $statement)
-    {
-        /** @var Model[] $cache */
-        $cache = [];
-
+    protected function hydrateSelect(PDOStatement $statement) {
+        $courses = parent::hydrateSelect($statement);
+        $units = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-
-            $courseId = $row['id'];
-
-            if (empty($cache[$courseId])) {
-                $cache[$courseId] = $this->hydrate($row);
-                $cache[$courseId]->setUnits($this->createCollection());
+            $courseId = $row[$this->getIdentifier()];
+            // Hydrate units (avoiding duplicates) and cache
+            if(!isset($units[$courseId][$row['unit.'.$this->getIdentifier()]])){
+                $unit = $this->hydrateJoin($row, 'unit', 'unit');
+                $units[$courseId][$unit->getId()] = $unit;
             }
-
-            $cache[$courseId]->getUnits()->add($this->hydrateJoin($row, 'unit', 'unit'));
         }
-
-        return $this->createCollection(array_values($cache));
+        // set n:1 and n:n objects
+        foreach ($courses as $course) {
+            $course->setUnits($this->createCollection());
+            if(!empty($units[$course->getId()])) {
+                foreach ($units[$course->getId()] as $unit) {
+                    $course->getUnits()->add($unit);
+                }
+            }
+        }
+        return $courses;
     }
 
 
