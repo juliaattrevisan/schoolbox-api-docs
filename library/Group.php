@@ -23,6 +23,13 @@ class Group extends DeprecatedModel
      */
     protected $userNotifier;
 
+    /**
+     * The service for which this group object is for.
+     *
+     * @var int
+     */
+    private $_service = HOMEPAGE_SERVICE;
+
     function Group($service = HOMEPAGE_SERVICE)
     {
         $this->_table = 'userGroups';
@@ -452,6 +459,96 @@ class Group extends DeprecatedModel
             $permission = WRITE_ACCESS;
         }
 
+        return $permission;
+    }
+
+    /**
+     * The old-school getPermission method, used when $this->_service isn't
+     * HOMEPAGE_SERVICE.
+     *
+     * @param $relationID
+     * @param $userID
+     * @return int|mixed
+     */
+    private function legacyGetPermission($relationID, $userID)
+    {
+        /* Cached results */
+        if (isset($this->cache[$this->_service][$relationID][$userID])) {
+            return $this->cache[$this->_service][$relationID][$userID];
+        }
+
+        /* Cache users aswell */
+        if (!isset($this->cacheUser[$userID])) {
+            $userHandler = new User;
+            $this->cacheUser[$userID] = $user = $userHandler->getByID($userID);
+        } else {
+            $user = $this->cacheUser[$userID];
+        }
+
+        // if superuser just return highest permission type
+        if ($user['su']) {
+            $this->cache[$this->_service][$relationID][$userID] = FULL_ACCESS;
+            return FULL_ACCESS;
+        }
+        // check individual access
+        $query = "SELECT type FROM userAccess WHERE uid = "
+            . $this->db->smartQuote($userID)
+            . " AND ( ( service = " . $this->db->smartQuote($this->_service) . " ";
+
+        if (in_array(
+            $this->_service,
+            array(HOMEPAGE_SERVICE, CALENDAR_SERVICE, HOUSEMASTER_SERVICE)
+        )) {
+            $query .= "AND sid = " . $this->db->smartQuote($relationID) . " ";
+        }
+
+        $query .= " ) ";
+
+        if ($this->_service == HOMEPAGE_SERVICE) {
+            $query .= "OR service = " . CMS_SERVICE . " ";
+        }
+
+        $query .= ") ORDER BY `type` DESC LIMIT 1 ";
+
+        $permission = $this->db->getOne($query);
+        $permission = (int)$permission;
+
+//        // check group access (HOMEPAGE_SERVICE only)
+//        if ($permission < WRITE_ACCESS && $this->_service == HOMEPAGE_SERVICE) {
+//            $query = "SELECT type FROM perms WHERE cid="
+//                . $this->db->smartQuote($relationID)
+//                . " AND gid=" . $this->db->smartQuote($user['group_id']) . " ORDER BY type DESC";
+//            $groupPermission = $this->db->getOne($query);
+//            if ($groupPermission) {
+//                $permission = $groupPermission;
+//            }
+//
+//            /* Check subjects, allow users directly involved in a subject access regardless */
+//            if ($permission < READ_ACCESS) {
+//                // Allow read access to folder 0 for all users?
+//                if ($relationID == 0) {
+//                    $permission = READ_ACCESS;
+//                } elseif ($this->involvedInSubject($relationID, $userID)) {
+//                    if ($this->isStaff($userID)) {
+//                        $permission = WRITE_ACCESS;
+//                    } else {
+//                        $permission = READ_ACCESS;
+//                    }
+//                }
+//            }
+//        }
+
+        // allow staff write access to NEWS_SERVICE by default except at shore...
+        if ($this->isStaff($userID)
+            && (Cfg::get('news_staff_post_enabled') == '1')
+            && ($this->_service == NEWS_SERVICE)
+            && ($permission < WRITE_ACCESS)
+        ) {
+            $permission = WRITE_ACCESS;
+        }
+
+        /* Set cache */
+        $this->cache[$this->_service][$relationID][$userID] = $permission;
         return $permission;
     }
 
