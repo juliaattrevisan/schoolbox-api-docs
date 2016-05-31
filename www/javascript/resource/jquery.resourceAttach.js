@@ -166,6 +166,18 @@ if(typeof window.location.origin == 'undefined') {
                     azone.trigger('error.attachzone', [ file, errMsg ]);
                 });
 
+                // Disable form submission while uploading a file
+                var submit = dzone.closest('form').find(':submit');
+                this.on('sending', function () {
+                    submit.prop('disabled', true);
+                });
+                // Re-enable form submission when upload is done
+                this.on('totaluploadprogress', function (uploadProgress) {
+                    submit.prop('disabled', uploadProgress < 100);
+                });
+                this.on('queuecomplete', function () {
+                    submit.prop('disabled', false);
+                });
             },
 
             removedfile: function (file) {
