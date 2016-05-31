@@ -1,3 +1,4 @@
+
 /* Button Dimensions
  */
 @mixin button-dimensions() {
@@ -28,7 +29,7 @@ a[disabled], a.disabled {
 .button {
     @include button-dimensions();
 	@extend .hide-for-print;
-
+	font-size: $base-font-size;
     color: $content-ui-foreground;
     background-color: $content-ui-background;
 
@@ -53,6 +54,7 @@ a[disabled], a.disabled {
 
 	&.expand {
 		font-weight: 700;
+		font-size: $base-font-size;
 		padding: $global-button-padding;
 	}
 
@@ -84,7 +86,7 @@ a[disabled], a.disabled {
  */
 button {
     @extend .button;
-
+	font-size: $base-font-size;
     /* Remove mysterious highlight effect when you click
      * this particular element which, for all intents and
      * purposes, is visually just another .button
@@ -107,6 +109,7 @@ input[type="submit"]{
 	border: none;
 	color: $submit-button-color;
 	background-color: $submit-button-bg-color;
+	font-size: $base-font-size;
 	&:hover, &:focus {
 		color: $submit-button-color;
 		background-color: $submit-button-bg-hover;

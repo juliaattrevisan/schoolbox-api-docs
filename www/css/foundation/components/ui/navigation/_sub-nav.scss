@@ -6,7 +6,7 @@ $sub-nav-list-margin: 0 0 rem-calc(($base-font-size)) 0;
 //$sub-nav-active-padding: $sub-nav-padding;
 $sub-nav-list-padding-top: rem-calc(0);
 
-$sub-nav-font-size: rem-calc(($base-font-size - 2));
+$sub-nav-font-size: $base-font-size;
 $sub-nav-active-font-weight: $font-weight-normal;
 
 /* Somehow all those vars above get fed into the import below
@@ -20,11 +20,9 @@ $sub-nav-active-font-weight: $font-weight-normal;
 .sub-nav, .sub-nav.secondary {
     list-style: none;
 	li, dd {
-        line-height: 1rem;
 		margin: 0 1px 1px 0;
         a {
             @include button-dimensions();
-
             color: $content-ui-foreground;
             background-color: $content-ui-background;
             display: inline-block;
@@ -38,7 +36,6 @@ $sub-nav-active-font-weight: $font-weight-normal;
         &.active {
             a {
                 @include button-dimensions();
-
                 cursor: default;
                 color: $content-ui-foreground;
                 background-color: $content-ui-selected;

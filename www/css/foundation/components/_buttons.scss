@@ -6,6 +6,23 @@ $include-html-button-classes: $include-html-classes;
 // BUTTONS
 //
 
+/* Button/input dimensions
+ *
+ * text + padding-top + padding-bottom = global-button-height
+ * = 1rem + 1rem + 1rem (since padding-top == padding-bottom)
+ * = 3rem
+ *
+ * Converse also holds true if you adjust the height and need to
+ * decide the padding (this is used to vertically-center text):
+ * global-button-height = 1rem + padding-top + padding-bottom
+ * global-button-height - 1rem = padding * 2
+
+ */
+$button-input-scale: 250 !default;
+$global-button-input-height: rem-calc(($base-font-size  * ($button-input-scale / 100))) !default;
+$global-button-height: $global-button-input-height;
+$global-button-padding: rem-calc(($base-font-size / 2));
+
 // We use these to build padding for buttons.
 // $button-tny: rem-calc(10);
 // $button-sml: rem-calc(14);
