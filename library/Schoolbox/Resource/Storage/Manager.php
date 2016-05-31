@@ -141,7 +141,7 @@ class Manager
      */
     public function delete(Model $storage)
     {
-        return $storage->delete();
+        return $storage->getFilesystem()->deleteDir(dirname($storage->getPath()));
     }
 
 

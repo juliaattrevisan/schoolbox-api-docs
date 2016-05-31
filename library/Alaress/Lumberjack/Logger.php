@@ -54,6 +54,10 @@ class Logger implements LoggerInterface {
     /** @var bool */
     protected $porcelain;
 
+    /** @var int */
+    protected $level;
+
+
     /**
      * @param resource $outStream
      * @param resource $errStream
@@ -107,6 +111,17 @@ class Logger implements LoggerInterface {
             $handler->setFormatter(new CliFormatter($this->porcelain, true));
             $this->handlers[] = $handler;
         }
+
+        $this->level = $level;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getThreshold()
+    {
+        return $this->level;
     }
 
 
