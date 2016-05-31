@@ -487,7 +487,6 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     $settings['baseUri'].(12 - $_SESSION['year'] + date('Y')) . '/' . $_SESSION['username'] . '/',
                 );
             }
-
         }
         elseif ($site_location=='diocesan') {
             $settings = array(
@@ -498,8 +497,25 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             if ($groupHandler->isStaff()) {
                 $paths = array($settings['baseUri'] . 'rdrive/',);
             }
-        }
-        elseif ($site_location == 'rlc') {
+        } elseif ($site_location=='tccll') {
+            $settings = array(
+                'baseUri' => 'https://files.trinitylismore.nsw.edu.au/',
+                'userName' => "TRINITY/" . $_SESSION['username'],
+                'password' => $_SESSION['password'],
+            );
+
+            if ($groupHandler->isStaff()) {
+                $paths = array(
+                    $settings['baseUri'].'staffhome/' . $_SESSION['username'] .'/',
+                    $settings['baseUri'].'staffshare/',
+                );
+            } elseif ($groupHandler->isStudent()) {
+                $paths = array(
+                    $settings['baseUri'].'studentshare/',
+                );
+            }
+
+        } elseif ($site_location == 'rlc') {
             $settings = array(
                 'baseUri' => 'http://WebDavShareDrive.rlc.qld.edu.au',
                 'userName' => 'redeemer/'.$_SESSION['username'],
