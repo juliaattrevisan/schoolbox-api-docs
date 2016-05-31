@@ -438,7 +438,7 @@ if (count($submission_history)) {
                 $recent_activity = $activity_item;
             }
 
-            $recentSubmissionDate = new Alaress_Date_Format($recent_activity->getDate(), 'U');
+            $recentSubmissionDate = new Alaress_Date_Format($activity_item->getDate(), 'U');
 
             // get filetype details
             $student_submission = $activity_item->getSubmission();
