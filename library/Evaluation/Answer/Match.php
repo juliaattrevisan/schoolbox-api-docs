@@ -436,9 +436,11 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                 if ($right[$i] == $currentAnswer->answerRight) {
                     $correct   = $this->getCorrectClass();
                     $isCorrect = true;
+                    $title = 'Respondent ordered this correctly';
                 } else {
                     $correct   = $this->getIncorrectClass();
                     $isCorrect = false;
+                    $title = 'Respondent did not order this correctly';
                 }
 
                 $page->setVar(
@@ -450,6 +452,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                         'ANSWER_ICON_CLASS'             => $isCorrect
                             ? 'evaluation-correct-answer-icon'
                             : 'evaluation-incorrect-answer-icon',
+                        'ANSWER_ICON_TITLE'             => $title,
                     )
                 );
                 $page->parse('answerOption_block', 'answerOption', true);
@@ -500,9 +503,11 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                 if ($right[$i] == $currentAnswer->answerRight) {
                     $correct = $this->getCorrectClass();
                     $isCorrect = true;
+                    $title = 'Respondent ordered this correctly';
                 } else {
                     $correct = $this->getIncorrectClass();
                     $isCorrect = false;
+                    $title = 'Respondent did not order this correctly';
                 }
 
                 $page->setVar(
@@ -514,6 +519,7 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                         'ANSWER_ICON_CLASS'             => $isCorrect
                             ? 'evaluation-correct-answer-icon'
                             : 'evaluation-incorrect-answer-icon',
+                        'ANSWER_ICON_TITLE'             => $title,
                     )
                 );
 
