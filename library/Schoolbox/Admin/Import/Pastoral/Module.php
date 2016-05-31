@@ -1,7 +1,5 @@
 <?php
 /**
- * Course builder admin page
- *
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -27,6 +25,8 @@ class Module extends BaseModule
     public function initRoutes(Router $router, $basePath)
     {
         $this->addGetRoute($router, 'getIndex', $basePath, "");
+        $this->addGetRoute($router, 'getLog', $basePath, "/log");
+        $this->addGetRoute($router, 'getLogDetail', $basePath, "/log/{id}");
         $this->addPostRoute($router, 'postImport', $basePath, "/process");
     }
 

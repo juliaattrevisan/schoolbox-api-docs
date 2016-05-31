@@ -6,6 +6,12 @@
             $("[data-form-import]").submit();
         });
     });
+    $(function(){
+        $('[data-import-logs]').click(function(e) {
+            e.preventDefault();
+            window.location.href = '/adminv2/import-pastoral/log';
+        });
+    });
 </script>
 
 {# Shared navigation menu #}
@@ -50,9 +56,10 @@
                     subsequent imports.
                 </p>
                 <p>
-                    Click on the button below to begin the import.
+                    Click on the button below to begin the import (the import process may take several minutes to complete).
                 </p>
                 <input type="submit" data-import value="Import Pastoral Care Records">
+                <input type="submit" data-import-logs value="View Import Logs">
             </section>
         </form>
     </div>
@@ -60,15 +67,14 @@
 {% else %}
 
     <div class="small-12 island">
-        <form data-form-import method="post" action="/adminv2/import-pastoral/process">
-            <section class="content">
-                <p class="no-margin">
+            <div class="empty-state">
+                <i class="icon-pastoral"></i>
+                <p>
                     Sorry, importing of pastoral care records is only possible if
                     <a href='/adminv2/setting/External+DB'>External Pastoral Synchronisation</a> is enabled on the
                     External DB configuration screen.
                 </p>
-            </section>
-        </form>
+            </div>
     </div>
 
 {% endif %}
