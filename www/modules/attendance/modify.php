@@ -8,6 +8,8 @@
  * @link        http://www.alaress.com.au/
  */
 
+use Schoolbox\Config\Loader as Config;
+
 $this->setTitle('Student Attendance');
 $this->setFile(TEMPLATE_content, 'modules/attendance/modify.html');
 $this->setBlock(TEMPLATE_content, 'student', 'student_block');
@@ -42,7 +44,7 @@ if (!strlen($this->arg[2])) {
     error(149);
 }
 
-if (!is_numeric(preg_replace('/[^0-9]+/', '', $this->arg[3]))) {
+if (!preg_match('/^\d+$/', $this->arg[3]) || $this->arg[3] < 0 || $this->arg[3] > 100) {
     error(150);
 }
 
@@ -54,12 +56,15 @@ $attendanceDate = new Alaress_Date_Format($this->arg[2], 'Y-m-d');
 $attendanceDate->startOfDay();
 
 $now = Alaress_Date_Format::now();
+$now->endOfDay();
 
-if ($attendanceDate->getUsingFormat('W') < ($now->getUsingFormat('W') - 1)) {
+$days= Config::get('external_attendance_days');
+
+if ($attendanceDate->diffInDays($now) != 0 || $attendanceDate->diffInDays($now) > $days) {
     error(151);
 }
 
-if ($attendanceDate->getUnixTimestamp() > $now->getUnixTimestamp()) {
+if ($attendanceDate->gt($now) ) {
     error(152);
 }
 
