@@ -79,10 +79,17 @@ class Calendar_Layout_Full_Javascript extends Calendar_Layout_Full_Abstract
     {
         $this->setupMovementButtons();
 
+        $calendarView = $_SESSION['calendar_view'] ? $_SESSION['calendar_view'] : 'month';
+
+        // The list view is not part of fullcalendar and will cause a JS error, default back to the month view
+
+        if ($calendarView == 'list')
+            $calendarView = 'month';
+
         $this->getPage()->setVar(
             array(
                 'CALENDAR_USER_ID'         => $this->getUser()->getId(),
-                'CALENDAR_VIEW'            => $_SESSION['calendar_view'] ? $_SESSION['calendar_view'] : 'month',
+                'CALENDAR_VIEW'            => $calendarView,
                 'CALENDAR_COLLAPSE_EVENTS' => Config::get('calendar_collapse_events') ? 1 : '',
                 'CALENDAR_START_DAY'       => Config::get('calendar_start_day') ?: 0,
                 'USER_TOKEN'               => $this->getUser()->getKey(),

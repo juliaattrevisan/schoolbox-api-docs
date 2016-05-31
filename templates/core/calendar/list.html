@@ -9,6 +9,54 @@
 	$(function() {
 		var exportForm = $('#calendar-export-form-container');
 
+        var mapping = [];
+        mapping['sources'] = 'source';
+        mapping['campus'] = 'campus';
+        mapping['groups'] = 'group';
+        mapping['events'] = 'events';
+
+        var mappingAll = [];
+        mappingAll['sources'] = 'sourceSelectAll';
+        mappingAll['campus'] = 'campusSelectAll';
+        mappingAll['groups'] = 'groupsSelectAll';
+        mappingAll['events'] = 'eventTypeSelectAll';
+
+        function updateFilters() {
+            var index = 0;
+            var fList = [];
+
+            $('[data-filter-checklist]').each(function() {
+
+                var count = 0;
+
+                var className = $(this)[0].className;
+                var sourceName = className.split(" ")[1];
+
+                fList[index] = [sourceName, {}];
+                fList[index][1] = [];
+
+                var selectAll = $('#' + mappingAll[sourceName])[0];
+
+                if (selectAll.checked)
+                    fList[index][1][count++] = selectAll.value;
+
+                $('.checklist [name="' + mapping[sourceName] + '"]:checked').each(function() {
+                    fList[index][1][count++] = $(this).val();
+                });
+
+                index++;
+            });
+
+            $.post('/calendar/ajax/filter', {
+                view: 'list',
+                fList: fList
+            });
+        }
+
+        $('[data-update-filter]').change(function() {
+            updateFilters();
+        });
+
 		$('[data-filters="true"]').filterSelector({
 			filterContainer: '#calendar-controls',
 			eventContainer: $('[data-eventlist="true"]'),
@@ -69,11 +117,6 @@
             event.preventDefault();
             var form = $(event.target).closest('form');
             window.location = $.fn.getExportCalendarLink('{USER_TOKEN}', form.serializeArray())+'&format=csv';
-        });
-
-        //select all clicked
-        $('#calendar-controls').on('change','.select_all', function(e) {
-            $(this).parent().find(':checkbox').prop('checked', $(this).prop('checked'));
         });
 
         /* Export calendar
@@ -162,45 +205,45 @@
         <section>
             <fieldset class="content filter-list">
                 <div class="small-6 large-3 columns">
-                    <fieldset class="checklist sources">
+                    <fieldset data-filter-checklist class="checklist sources">
                         <legend>Sources</legend>
-                        <input type="checkbox" class="select_all" id="sourceSelectAll"/>
+                        <input data-select-all-filter type="checkbox" class="select_all" id="sourceSelectAll" checked />
                         <label for="sourceSelectAll">Select all</label>
                         <!-- BEGIN filter_source -->
-                        <input type="checkbox" name="source" id="source{SOURCE_ID}" value="source{SOURCE_ID}" {SOURCE_ID_SELECTED} class="applyFilters"/>
+                        <input data-update-filter type="checkbox" name="source" id="source{SOURCE_ID}" value="source{SOURCE_ID}" {SOURCE_ID_SELECTED} class="applyFilters"/>
                         <label for="source{SOURCE_ID}">{SOURCE_NAME}</label>
                         <!-- END filter_source -->
                     </fieldset>
                 </div>
                 <div class="small-6 large-3 columns">
-                    <fieldset class="checklist groups">
+                    <fieldset data-filter-checklist class="checklist groups">
                         <legend>Groups</legend>
-                        <input type="checkbox" class="select_all" id="groupsSelectAll" checked />
+                        <input data-select-all-filter type="checkbox" class="select_all" id="groupsSelectAll" checked />
                         <label for="groupsSelectAll">Select all</label>
                         <!-- BEGIN filter_group -->
-                        <input type="checkbox" name="group" id="group{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="applyFilters"/>
+                        <input data-update-filter type="checkbox" name="group" id="group{GROUP_ID}" value="group{GROUP_ID}" {GROUP_ID_SELECTED} class="applyFilters"/>
                         <label for="group{GROUP_ID}">{GROUP_NAME}</label>
                         <!-- END filter_group -->
                     </fieldset>
                 </div>
                 <div class="small-6 large-3 columns">
-                    <fieldset class="checklist campus">
+                    <fieldset data-filter-checklist class="checklist campus">
                         <legend>Campus</legend>
-                        <input type="checkbox" class="select_all"  id="campusSelectAll" checked />
+                        <input data-select-all-filter type="checkbox" class="select_all"  id="campusSelectAll" checked />
                         <label for="campusSelectAll">Select all</label>
                         <!-- BEGIN filter_campus -->
-                        <input type="checkbox" name="campus" id="campus{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="applyFilters"/>
+                        <input data-update-filter type="checkbox" name="campus" id="campus{CAMPUS_ID}" {CAMPUS_ID_SELECTED} value="campus{CAMPUS_ID}" class="applyFilters"/>
                         <label for="campus{CAMPUS_ID}">{CAMPUS_NAME}</label>
                         <!-- END filter_campus -->
                     </fieldset>
                 </div>
                 <div class="small-6 large-3 columns">
-                    <fieldset class="checklist events">
+                    <fieldset data-filter-checklist class="checklist events">
                         <legend>Event</legend>
-                        <input type="checkbox" id="eventTypeSelectAll" class="select_all" checked />
+                        <input data-select-all-filter type="checkbox" class="select_all" id="eventTypeSelectAll" checked />
                         <label for="eventTypeSelectAll">Select all</label>
                         <!-- BEGIN filter_event_type -->
-                        <input type="checkbox" name="events" id="eventType{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED} value="type{EVENT_TYPE_ID}" class="applyFilters"/>
+                        <input data-update-filter type="checkbox" name="events" id="eventType{EVENT_TYPE_ID}" {EVENT_TYPE_ID_SELECTED} value="type{EVENT_TYPE_ID}" class="applyFilters"/>
                         <label for="eventType{EVENT_TYPE_ID}"><span style="background-color:#{EVENT_TYPE_COLOUR};">{EVENT_TYPE_NAME}</span></label>
                         <!-- END filter_event_type -->
                     </fieldset>
@@ -208,7 +251,7 @@
             </fieldset>
         </section>
     </form>
-    <a href="#" id="applyFilters" class="button icon-tick">Apply Filters</a>
+    <a href="#" data-update-filter id="applyFilters" class="button icon-tick">Apply Filters</a>
     <!--/filter-drop-->
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
@@ -259,14 +302,16 @@
 <div class="row" data-eventlist="true">
     <div class="small-12 island">
         <!-- BEGIN date -->
-        <h2 class="subheader">{EVENT_DATE}</h2>
-        <section>
-            <ul class="calendar-list">
-            <!-- BEGIN event -->
-                {TWIG_EVENT}
-            <!-- END event -->
-            </ul>
-        </section>
+        <div data-calendar-date>
+            <h2 class="subheader">{EVENT_DATE}</h2>
+            <section>
+                <ul data-calendar-item class="calendar-list">
+                <!-- BEGIN event -->
+                    {TWIG_EVENT}
+                <!-- END event -->
+                </ul>
+            </section>
+        </div>
         <!-- END date -->
 
         <!-- BEGIN has_no_events -->

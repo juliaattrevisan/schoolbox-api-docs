@@ -75,7 +75,6 @@
         if (isSmallDevice()) {
             height = 'auto';
         }
-
         c = new Calendar('calendar', 'calendar-bubble', {
 			userId: '{CALENDAR_USER_ID}',
 
@@ -745,7 +744,7 @@
                 <div class="small-6 large-3 columns">
                     <fieldset class="checklist sources">
                         <legend>Sources</legend>
-                        <input type="checkbox" class="select_all" id="sourceSelectAll"/>
+                        <input type="checkbox" class="select_all" id="sourceSelectAll" checked />
                         <label for="sourceSelectAll">Select all</label>
                         <!-- BEGIN filter_source -->
                         <input type="checkbox" name="source" id="source{SOURCE_ID}" value="source{SOURCE_ID}" {SOURCE_ID_SELECTED} class="applyFilters"/>
