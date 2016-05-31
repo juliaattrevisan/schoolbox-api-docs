@@ -9,7 +9,14 @@
 
 use Alaress\DebugBar\Instance as DebugBar;
 
-class External_Synergetic_UserDetention implements External_UserDetentionInterface {
+class External_Synergetic_UserDetention implements External_UserDetentionInterface
+{
+    use External_Synergetic_ValidateExternalIdTrait;
+
+    /**
+     * @var MSSQL
+     */
+    protected $database;
 
     public function __construct() {
         $this->database = MSSQL::getInstance();
@@ -74,6 +81,9 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
         $semester
     ) {
         // Awards: fetch based on year and semester, not a date span?
+        if (!$this->isExternalIdValid($externalId)) {
+            return [];
+        }
         $query = "
             SELECT
                 ID,
@@ -117,6 +127,9 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
         DateTime $fromDate = null,
         DateTime $toDate = null
     ) {
+        if (!$this->isExternalIdValid($externalId)) {
+            return [];
+        }
         $query = "
             SELECT
                 ID,
@@ -151,6 +164,9 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
         DateTime $fromDate = null,
         DateTime $toDate = null
     ) {
+        if (!$this->isExternalIdValid($externalId)) {
+            return [];
+        }
         $query = "
             SELECT
                 ID,

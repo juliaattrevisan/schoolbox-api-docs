@@ -11,6 +11,7 @@ use Alaress\DebugBar\Instance as DebugBar;
 
 class External_Synergetic_Timetable implements External_TimetableInterface
 {
+    use External_Synergetic_ValidateExternalIdTrait;
 
     /**
      * @var MSSQL $database
@@ -380,13 +381,13 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
         $dayNumber = $this->getDayNumber($campus,$date->getUnixTimeStamp());
 
-        if (empty($externalUserId)) {
-            return array();
+        if (!$this->isExternalIdValid($externalUserId)) {
+            return [];
         }
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber);
 
         if (!is_array($timetabledef)) {
-            return false;
+            return [];
         }
 
         $campusString = $campus->getExtTimetableCode();
@@ -483,15 +484,15 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     }
 
 
-     public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber, $date = null)
+    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber, $date = null)
     {
-        if (empty($externalUserId)) {
-            return array();
+        if (!$this->isExternalIdValid($externalUserId)) {
+            return [];
         }
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $dayNumber, $date);
 
         if (!is_array($timetabledef)) {
-            return false;
+            return [];
         }
 
         $campusString = $campus->getExtTimetableCode();
@@ -588,14 +589,14 @@ class External_Synergetic_Timetable implements External_TimetableInterface
 
     public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus)
     {
-        if (empty($externalUserId)) {
-            return array();
+        if (!$this->isExternalIdValid($externalUserId)) {
+            return [];
         }
 
         $timetabledef = $this->getTimetableDefinition($externalUserId, $campus, $this->getDayNumber($campus));
 
         if (!is_array($timetabledef['desc'])) {
-            return false;
+            return [];
         }
 
         $campusString = $campus->getExtTimetableCode();

@@ -11,6 +11,8 @@ use Alaress\DebugBar\Instance as DebugBar;
 
 class External_Synergetic_User implements External_UserInterface
 {
+    use External_Synergetic_ValidateExternalIdTrait;
+
     /**
      * @var MSSQL
      */
@@ -35,6 +37,9 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function updateCustomAttribute($synergyId, $attributeId, $newValue)
     {
+        if (!$this->isExternalIdValid($synergyId)) {
+            return;
+        }
         /* First check if there is an Attribute $attributeId for the current person
          * If there is, update it's fields accordingly; otherwise ignore it
          *
@@ -84,7 +89,7 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getPortrait($externalUserId)
     {
-        if (!is_numeric($externalUserId)) {
+        if (!$this->isExternalIdValid($externalUserId)) {
             return false;
         }
 
@@ -143,6 +148,9 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getParent($synID)
     {
+        if (!$this->isExternalIdValid($synID)) {
+            return [];
+        }
         $query  = "
             SELECT
                 Contact.Title,
@@ -196,6 +204,9 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getParentSync($synID)
     {
+        if (!$this->isExternalIdValid($synID)) {
+            return [];
+        }
         if (is_array($synID)) {
             $assignation = " IN ('" . implode("','", array_map([$this->database, 'quote'], $synID)) . "')";
         } else {
@@ -270,6 +281,9 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getStudent($synID)
     {
+        if (!$this->isExternalIdValid($synID)) {
+            return [];
+        }
         $currentYear     = $this->getCurrentYear();
         $currentSemester = $this->getCurrentSemester();
         $query   = "SELECT
@@ -363,6 +377,9 @@ class External_Synergetic_User implements External_UserInterface
 
     public function getStaff($synID)
     {
+        if (!$this->isExternalIdValid($synID)) {
+            return [];
+        }
         $query = "
             SELECT
                 SchoolStaffCode,
@@ -611,6 +628,9 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getStudentContactList($externalUserId)
     {
+        if (!$this->isExternalIdValid($externalUserId)) {
+            return [];
+        }
         $query       = "
             SELECT
                 a.StudentContactID,
@@ -668,6 +688,9 @@ class External_Synergetic_User implements External_UserInterface
     protected function findFileYearAndSemester($externalUserId = null)
     {
         if ($externalUserId) {
+            if (!$this->isExternalIdValid($externalUserId)) {
+                return [];
+            }
             $result = $this->getDatabase()->executeProcedure(
                 'spsConfigUserDefaultYearSemester',
                 array(
@@ -726,8 +749,8 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getSubjectList($synergyID, $userID)
     {
-        if (empty($synergyID)) {
-            return false;
+        if (!$this->isExternalIdValid($synergyID)) {
+            return [];
         }
 
         if ($this->getGroup()->isStudent($userID)) {
@@ -799,6 +822,9 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getEnrolledStudents($synergyID)
     {
+        if (!$this->isExternalIdValid($synergyID)) {
+            return [];
+        }
         //
         // Valid Relations:
         // SN/DR:       Son/Daughter
@@ -822,6 +848,9 @@ class External_Synergetic_User implements External_UserInterface
 
     public function getEmail($id)
     {
+        if (!$this->isExternalIdValid($id)) {
+            return false;
+        }
         $query = "SELECT Email FROM Community WHERE id = {$this->database->quote($id)}";
         return $this->getDatabase()->getOne($query);
     }
@@ -1027,6 +1056,9 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getCampusFromTimetable($staffID)
     {
+        if (!$this->isExternalIdValid($staffID)) {
+            return [];
+        }
         $query = "SELECT DISTINCT( ClassCampus ) AS campus FROM timetable WHERE StaffID = '{$this->database->quote($staffID)}' AND FileYear = ".date('Y');
         return $this->getDatabase()->getAll($query);
     }
