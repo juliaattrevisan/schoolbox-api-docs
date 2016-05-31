@@ -423,6 +423,12 @@ class Group extends DeprecatedModel
     }
 
     /**
+     * The new getPermission method, which uses `\Schoolbox\Permission\Access\Access::getFolderAccess`
+     * under the hood.
+     *
+     * This only works when `$this->_service` is `HOMEPAGE_SERVICE` - if it
+     * isn't, it proxies through to `$this->legacyGetPermission`.
+     *
      * @param $relationID
      * @param int $userID
      * @param bool $cache
@@ -463,8 +469,8 @@ class Group extends DeprecatedModel
     }
 
     /**
-     * The old-school getPermission method, used when $this->_service isn't
-     * HOMEPAGE_SERVICE.
+     * The old getPermission method, used when `$this->_service` isn't
+     * `HOMEPAGE_SERVICE`.
      *
      * @param $relationID
      * @param $userID
@@ -477,66 +483,34 @@ class Group extends DeprecatedModel
             return $this->cache[$this->_service][$relationID][$userID];
         }
 
-        /* Cache users aswell */
-        if (!isset($this->cacheUser[$userID])) {
-            $userHandler = new User;
-            $this->cacheUser[$userID] = $user = $userHandler->getByID($userID);
-        } else {
-            $user = $this->cacheUser[$userID];
+        // User is cached by now - if not, that's a fail state
+        if (!array_key_exists($userID, $this->cacheUser)) {
+            return false;
+        }
+        $user = $this->cacheUser[$userID];
+        if (!$user instanceof Schoolbox\User) {
+            return false;
         }
 
         // if superuser just return highest permission type
-        if ($user['su']) {
+        if ($user->isSuperuser()) {
             $this->cache[$this->_service][$relationID][$userID] = FULL_ACCESS;
             return FULL_ACCESS;
         }
+
         // check individual access
         $query = "SELECT type FROM userAccess WHERE uid = "
             . $this->db->smartQuote($userID)
             . " AND ( ( service = " . $this->db->smartQuote($this->_service) . " ";
 
-        if (in_array(
-            $this->_service,
-            array(HOMEPAGE_SERVICE, CALENDAR_SERVICE, HOUSEMASTER_SERVICE)
-        )) {
+        if (in_array($this->_service, array(CALENDAR_SERVICE, HOUSEMASTER_SERVICE))) {
             $query .= "AND sid = " . $this->db->smartQuote($relationID) . " ";
         }
 
-        $query .= " ) ";
-
-        if ($this->_service == HOMEPAGE_SERVICE) {
-            $query .= "OR service = " . CMS_SERVICE . " ";
-        }
-
-        $query .= ") ORDER BY `type` DESC LIMIT 1 ";
+        $query .= " )) ORDER BY `type` DESC LIMIT 1 ";
 
         $permission = $this->db->getOne($query);
         $permission = (int)$permission;
-
-//        // check group access (HOMEPAGE_SERVICE only)
-//        if ($permission < WRITE_ACCESS && $this->_service == HOMEPAGE_SERVICE) {
-//            $query = "SELECT type FROM perms WHERE cid="
-//                . $this->db->smartQuote($relationID)
-//                . " AND gid=" . $this->db->smartQuote($user['group_id']) . " ORDER BY type DESC";
-//            $groupPermission = $this->db->getOne($query);
-//            if ($groupPermission) {
-//                $permission = $groupPermission;
-//            }
-//
-//            /* Check subjects, allow users directly involved in a subject access regardless */
-//            if ($permission < READ_ACCESS) {
-//                // Allow read access to folder 0 for all users?
-//                if ($relationID == 0) {
-//                    $permission = READ_ACCESS;
-//                } elseif ($this->involvedInSubject($relationID, $userID)) {
-//                    if ($this->isStaff($userID)) {
-//                        $permission = WRITE_ACCESS;
-//                    } else {
-//                        $permission = READ_ACCESS;
-//                    }
-//                }
-//            }
-//        }
 
         // allow staff write access to NEWS_SERVICE by default except at shore...
         if ($this->isStaff($userID)
