@@ -5,7 +5,6 @@
     /* Respondent chose a correct answer
      */
     .icon-tick {
-        @extend .icon-tick;
         font-size: rem-calc(($base-font-size + 14));
         position: absolute;
         right: 1.25rem;
@@ -15,7 +14,6 @@
     /* Respondent chose an incorrect answer
      */
     .icon-close{
-        @extend .icon-close;
         font-size: rem-calc(($base-font-size + 14));
         position: absolute;
         right: 1.25rem;
@@ -25,7 +23,6 @@
     /* Respondent did not choose a correct answer
      */
     .icon-previous{
-        @extend .icon-previous;
         font-size: rem-calc(($base-font-size + 14));
         position: absolute;
         right: 1.25rem;
