@@ -88,13 +88,12 @@ class Sync implements SyncInterface
                 sc.Relationship = 'Mother' OR
                 sc.Relationship = 'Stepfather' OR
                 sc.Relationship = 'Stepmother' OR
-                sc.Relationship = 'Guardian' OR
+                sc.Relationship LIKE '%Guardian%' OR
                 sc.Relationship = 'Foster Mother' OR
                 sc.Relationship = 'Foster Father' OR
                 sc.Relationship = 'Foster Grandmother' OR
                 sc.Relationship = 'Foster Grandfather' OR
-                sc.Relationship = 'Carer' OR
-                sc.Relationship = 'Guardian / Stepfather'
+                sc.Relationship = 'Carer'
             )
             AND   s.DateLeft IS NULL
             ORDER BY c.Code ASC

@@ -383,13 +383,12 @@ class External_Humanedge_User implements External_UserInterface
                 sc.Relationship = 'Mother' OR
                 sc.Relationship = 'Stepfather' OR
                 sc.Relationship = 'Stepmother' OR
-                sc.Relationship = 'Guardian' OR
+                sc.Relationship LIKE '%Guardian%' OR
                 sc.Relationship = 'Foster Mother' OR
                 sc.Relationship = 'Foster Father' OR
                 sc.Relationship = 'Foster Grandmother' OR
                 sc.Relationship = 'Foster Grandfather' OR
-                sc.Relationship = 'Carer' OR
-                sc.Relationship = 'Guardian / Stepfather'
+                sc.Relationship = 'Carer'
             )
         ";
         return $this->getDatabase()->getAll($query);
