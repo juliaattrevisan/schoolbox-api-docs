@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Evaluation_Answer_Multi
  *
@@ -9,14 +10,15 @@
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
  */
-abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
+abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer
+{
 
-	/**
-	 * Javascript class to use when creating UI
-	 *
-	 * @var string
-	 */
-	protected $plugin = 'evaluationMultipleChoiceOther';
+    /**
+     * Javascript class to use when creating UI
+     *
+     * @var string
+     */
+    protected $plugin = 'evaluationMultipleChoiceOther';
 
     protected $correctClass = 'multiCorrect';
     protected $incorrectClass = 'multiIncorrect';
@@ -88,9 +90,9 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                 if (is_array($allAnswers) && count($allAnswers)) {
                     foreach ($allAnswers as $currentAnswer) {
                         $page->setVar(array(
-                            'ANSWER_VALUE' => $currentAnswer->value,
+                            'ANSWER_VALUE'       => $currentAnswer->value,
                             'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-                            'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
+                            'ANSWER_CHECKED'     => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
                         ));
 
                         $page->parse('answerOption_block', 'answerOption', true);
@@ -108,56 +110,57 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
         }
     }
 
-	/**
-	 * Render answers in the QuestionBank
-	 *
-	 * @param  $page
-	 * @param string $answerGroup
-	 * @return void
-	 */
-	public function modifyInQuestionBank($page, $answerGroup) {
-		if (strlen($answerGroup)) {
-			$allAnswers = unserialize($answerGroup);
+    /**
+     * Render answers in the QuestionBank
+     *
+     * @param  $page
+     * @param string $answerGroup
+     * @return void
+     */
+    public function modifyInQuestionBank($page, $answerGroup)
+    {
+        if (strlen($answerGroup)) {
+            $allAnswers = unserialize($answerGroup);
 
-			if (is_array($allAnswers) && count($allAnswers)) {
-				foreach ($allAnswers as $currentAnswer) {
-					$page->setVar(array(
-						'ANSWER_VALUE' => $currentAnswer->value,
-						'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-						'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
-					));
+            if (is_array($allAnswers) && count($allAnswers)) {
+                foreach ($allAnswers as $currentAnswer) {
+                    $page->setVar(array(
+                        'ANSWER_VALUE'       => $currentAnswer->value,
+                        'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+                        'ANSWER_CHECKED'     => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
+                    ));
 
-					$page->parse('answerOption_block', 'answerOption', true);
-				}
-			}
-			else {
-				$page->setVar('answerOption_block', '');
-			}
-		}
-		else {
-			$page->setVar('answerOption_block', '');
-		}
-	}
+                    $page->parse('answerOption_block', 'answerOption', true);
+                }
+            } else {
+                $page->setVar('answerOption_block', '');
+            }
+        } else {
+            $page->setVar('answerOption_block', '');
+        }
+    }
 
-	/**
-	 * Serialize for db storage (we shouldn't be using serialize anymore)
-	 *
-	 * @param $data
-	 * @return string
-	 */
-	public function encodeForQuestionBank($data) {
-		return serialize(json_decode($data));
-	}
+    /**
+     * Serialize for db storage (we shouldn't be using serialize anymore)
+     *
+     * @param $data
+     * @return string
+     */
+    public function encodeForQuestionBank($data)
+    {
+        return serialize(json_decode($data));
+    }
 
-	/**
-	 * Assign a letter to the Other portion of possible answers
-	 *
-	 * @param $allAnswers
-	 * @return string
-	 */
-	private function otherLetterIndex($allAnswers) {
-		return $this->findLetterIndex((int)count($allAnswers) + 1);
-	}
+    /**
+     * Assign a letter to the Other portion of possible answers
+     *
+     * @param $allAnswers
+     * @return string
+     */
+    private function otherLetterIndex($allAnswers)
+    {
+        return $this->findLetterIndex((int)count($allAnswers) + 1);
+    }
 
     /**
      * Translate an integer to letters
@@ -165,7 +168,8 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
      * @param $num
      * @return string
      */
-    protected function findLetterIndex($num) {
+    protected function findLetterIndex($num)
+    {
         $firstLetter = floor($num / 26);
         $lastLetter = $num % 26;
 
@@ -179,10 +183,9 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
         /* Convert from numeric to alpha
          */
         if ($firstLetter) {
-            $string = chr($firstLetter+64) . chr($lastLetter+64);
-        }
-        else {
-            $string = chr($lastLetter+64);
+            $string = chr($firstLetter + 64) . chr($lastLetter + 64);
+        } else {
+            $string = chr($lastLetter + 64);
         }
 
         return $string;
@@ -214,23 +217,22 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
              */
             if ($existing['response']) {
                 $existingAnswer = unserialize($existing['response']);
-            }
-            else {
+            } else {
                 $existingAnswer = false;
             }
 
-			/* Enforce "Other" - This is assumed to always be the next letter in the sequence
-			 *
-			 * When it gets to Z, you're going to start seeing square brackets and slashes
-			 * used as array keys, which will be strange. You could do it so it goes AA, AB...
-			 * like excel does it.
- 			 */
-			$other = new StdClass();
+            /* Enforce "Other" - This is assumed to always be the next letter in the sequence
+             *
+             * When it gets to Z, you're going to start seeing square brackets and slashes
+             * used as array keys, which will be strange. You could do it so it goes AA, AB...
+             * like excel does it.
+              */
+            $other = new StdClass();
             $other->description = 'Other';
             $other->isOther = true;
-			$other->value = count($allAnswers)+1;
+            $other->value = count($allAnswers) + 1;
 
-			$allAnswers[] = $other;
+            $allAnswers[] = $other;
 
             $i = 1;
 
@@ -238,13 +240,13 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                 $valueFacade = $this->findLetterIndex($i);
 
                 $page->setVar(array(
-					'QUESTION_ID' => $question_id,
-					'QUESTION_PLUGIN' => $this->plugin,
-                    'ANSWER_ID' => $answerGroup['answer_id'],
+                    'QUESTION_ID'         => $question_id,
+                    'QUESTION_PLUGIN'     => $this->plugin,
+                    'ANSWER_ID'           => $answerGroup['answer_id'],
                     'ANSWER_VALUE_FACADE' => $valueFacade,
-                    'ANSWER_VALUE' => $currentAnswer->value,
-                    'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
-                    'ANSWER_DATA_ROLE' => ($currentAnswer->isOther ? 'data-role="other-checkbox"' : ''),
+                    'ANSWER_VALUE'        => $currentAnswer->value,
+                    'ANSWER_DESCRIPTION'  => Scrub::text($currentAnswer->description),
+                    'ANSWER_DATA_ROLE'    => ($currentAnswer->isOther ? 'data-role="other-checkbox"' : ''),
                 ));
 
                 if ($existingAnswer) {
@@ -253,27 +255,25 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                             'ANSWER_CHECKED' => 'checked=\'checked\'',
                         ));
 
-						if (($currentAnswer->description == 'Other') && strlen(trim($existingAnswer['other']))) {
-							$page->setVar(array(
-								'ANSWER_OTHER' => $existingAnswer['other']
-							));
-						}
-						else {
-							$page->setVar(array(
-								'ANSWER_OTHER' => ''
-							));
-						}
-                    }
-					else {
+                        if (($currentAnswer->description == 'Other') && strlen(trim($existingAnswer['other']))) {
+                            $page->setVar(array(
+                                'ANSWER_OTHER' => $existingAnswer['other']
+                            ));
+                        } else {
+                            $page->setVar(array(
+                                'ANSWER_OTHER' => ''
+                            ));
+                        }
+                    } else {
                         $page->setVar(array(
                             'ANSWER_CHECKED' => '',
-							'ANSWER_OTHER' => ''
+                            'ANSWER_OTHER' => ''
                         ));
                     }
                 } else {
                     $page->setVar(array(
                         'ANSWER_CHECKED' => '',
-						'ANSWER_OTHER' => ''
+                        'ANSWER_OTHER' => ''
                     ));
                 }
 
@@ -344,7 +344,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                     }
 
                     $page->setVar(array(
-                        'ANSWER_VALUE' => $currentAnswer->value,
+                        'ANSWER_VALUE'       => $currentAnswer->value,
                         'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                     ));
 
@@ -371,9 +371,9 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
 
             /* Set up data object in accordance with $this->create();
              */
-            $answer['description'] = html_entity_decode(trim((string)$currentAnswer->text), ENT_IGNORE|ENT_QUOTES);
-            $answer['value'] = trim((string)$currentAnswer->value);
-            $answer['correct'] = 0;
+            $answer['description'] = html_entity_decode(trim((string)$currentAnswer->text), ENT_IGNORE | ENT_QUOTES);
+            $answer['value']       = trim((string)$currentAnswer->value);
+            $answer['correct']     = 0;
 
             /* Indicate this is a correct answer
              */
@@ -413,23 +413,22 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                 */
             if ($this->getUseLongAnswers()) {
                 foreach ($data as $currentAnswer) {
-					$postprocessed[] = $this->getAnswerText($question_id, $currentAnswer);
+                    $postprocessed[] = $this->getAnswerText($question_id, $currentAnswer);
                 }
 
-				/* Condense empty elements which can rseult from getAnswerText() returning
-				 * an empty string when trying to find the value of an "Other" text input
-				 * This removes double-comma phenomenon after Other in csv
-				 */
-				$postprocessed = array_filter($postprocessed);
-            }
-			else {
+                /* Condense empty elements which can rseult from getAnswerText() returning
+                 * an empty string when trying to find the value of an "Other" text input
+                 * This removes double-comma phenomenon after Other in csv
+                 */
+                $postprocessed = array_filter($postprocessed);
+            } else {
                 $postprocessed = $data;
             }
 
             if ($this->getLegendHTML() !== false) {
                 $data['response'] = '<ul><li>' . implode('</li><li>', $postprocessed) . '</li></ul>';
             } else {
-				$postprocessed[] = $data['other'];
+                $postprocessed[] = $data['other'];
                 $data['response'] = strip_tags(implode(', ', $postprocessed));
             }
         }
@@ -458,11 +457,11 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
 
         $allOptions = unserialize($answer['answer']);
 
-		$other = new StdClass();
-		$other->description = 'Other';
-		$other->value = $this->otherLetterIndex($allOptions);;
+        $other = new StdClass();
+        $other->description = 'Other';
+        $other->value = $this->otherLetterIndex($allOptions);;
 
-		$allOptions[] = $other;
+        $allOptions[] = $other;
 
         foreach ($allOptions as $currentOption) {
             if ($currentOption->value == $value) {
@@ -511,17 +510,17 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
         if ($answerGroup) {
             $allAnswers = unserialize($answerGroup['answer']);
 
-			$other = new StdClass();
-			$other->description = 'Other';
-			$other->value = count($allAnswers) + 1;
+            $other = new StdClass();
+            $other->description = 'Other';
+            $other->value = count($allAnswers) + 1;
 
-			$allAnswers[] = $other;
+            $allAnswers[] = $other;
 
-			$page->setVar(array(
-                'ANSWER_ID' => $answerGroup['answer_id'],
-                'RESPONSE_ID' => $existing['response_id'],
+            $page->setVar(array(
+                'ANSWER_ID'        => $answerGroup['answer_id'],
+                'RESPONSE_ID'      => $existing['response_id'],
                 'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
-                'REVIEWED_MARKS' => $existing['mark'],
+                'REVIEWED_MARKS'   => $existing['mark'],
             ));
 
             foreach ($allAnswers as $currentAnswer) {
@@ -536,7 +535,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                 }
 
                 $page->setVar(array(
-                    'ANSWER_VALUE' => $currentAnswer->value,
+                    'ANSWER_VALUE'       => $currentAnswer->value,
                     'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
                 ));
 
@@ -544,7 +543,7 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                     if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
                         $page->setVar(array(
                             'ANSWER_OPTION_STATUS' => 'evaluation-selected-answer-option',
-                            'ANSWER_CHECKED' => 'checked',
+                            'ANSWER_CHECKED'       => 'checked',
                         ));
 
                         /* Was this a correctly-selected response? If so apply a
@@ -556,56 +555,52 @@ abstract class Evaluation_Answer_MultiOther extends Evaluation_Answer {
                          */
                         if ($currentAnswer->correct && in_array($currentAnswer->value, $existingAnswer)) {
                             $page->setVar(array(
-								'OTHER_DESCRIPTION' => '',
-                                'CORRECT' => $this->getCorrectClass(),
+                                'OTHER_DESCRIPTION' => '',
+                                'CORRECT'           => $this->getCorrectClass(),
                             ));
-                        }
-						else if (in_array($currentAnswer->value, $existingAnswer)) {
+                        } else {
+                            if (in_array($currentAnswer->value, $existingAnswer)) {
 
-							/* Render "Other" response
-							 */
-							if ($currentAnswer->value == $other->value) {
-								$page->setVar(array(
-									'OTHER_DESCRIPTION' => ': ' . $existingAnswer['other']
-								));
-							}
-							else {
-								$page->setVar(array(
-									'OTHER_DESCRIPTION' => ''
-								));
-							}
+                                /* Render "Other" response
+                                 */
+                                if ($currentAnswer->value == $other->value) {
+                                    $page->setVar(array(
+                                        'OTHER_DESCRIPTION' => ': ' . $existingAnswer['other']
+                                    ));
+                                } else {
+                                    $page->setVar(array(
+                                        'OTHER_DESCRIPTION' => ''
+                                    ));
+                                }
 
-                            $page->setVar(array(
-                                'CORRECT' => $this->getIncorrectClass(),
-                            ));
+                                $page->setVar(array(
+                                    'CORRECT' => $this->getIncorrectClass(),
+                                ));
+                            } else {
+                                $page->setVar(array(
+                                    'OTHER_DESCRIPTION' => '',
+                                    'CORRECT' => ''
+                                ));
+                            }
                         }
-						else {
-                            $page->setVar(array(
-								'OTHER_DESCRIPTION' => '',
-                                'CORRECT' => ''
-                            ));
-                        }
-                    }
-					else {
+                    } else {
                         $page->setVar(array(
-							'OTHER_DESCRIPTION' => '',
+                            'OTHER_DESCRIPTION'    => '',
                             'ANSWER_OPTION_STATUS' => '',
-                            'ANSWER_CHECKED' => '',
-                            'CORRECT' => ''
+                            'ANSWER_CHECKED'       => '',
+                            'CORRECT'              => ''
                         ));
                     }
-                }
-				else {
+                } else {
                     $page->setVar(array(
-						'OTHER_DESCRIPTION' => '',
+                        'OTHER_DESCRIPTION' => '',
                         'CORRECT' => ''
                     ));
                 }
 
                 $page->parse('answerOption_block', 'answerOption', true);
             }
-        }
-		else {
+        } else {
             $page->setVar('answerOption_block', '');
         }
     }
