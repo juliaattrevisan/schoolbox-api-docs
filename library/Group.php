@@ -1,5 +1,6 @@
 <?php
 
+use \Schoolbox\User as UserModel;
 use \Schoolbox\UserMapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Permission\Access\Access;
@@ -429,10 +430,13 @@ class Group extends DeprecatedModel
      * This only works when `$this->_service` is `HOMEPAGE_SERVICE` - if it
      * isn't, it proxies through to `$this->legacyGetPermission`.
      *
-     * @param $relationID
-     * @param int $userID
-     * @param bool $cache
-     * @return bool|int
+     * @param  int  $relationID The ID of the object to get permissions on.
+     *                          Depending on `$this->_service` could be a
+     *                          folder, campus, residential house, or ignored.
+     * @param  int  $userID     The user to get permissions for.
+     *                          If omitted, defaults to current user.
+     * @param  bool $cache      If false, ignore cache.
+     * @return int
      */
     function getPermission($relationID, $userID = 0, $cache = true)
     {
@@ -441,7 +445,7 @@ class Group extends DeprecatedModel
                 $userID = $_SESSION['id'];
                 $this->cacheUser[$userID] = $_SESSION['user'];
             } else {
-                return false;
+                return DENY_ACCESS;
             }
         }
 
@@ -464,12 +468,14 @@ class Group extends DeprecatedModel
      * The old getPermission method, used when `$this->_service` isn't
      * `HOMEPAGE_SERVICE`.
      *
-     * @param $relationID
-     * @param Schoolbox\User $user
-     * @param bool $cache
-     * @return int|mixed
+     * @param  int  $relationID The ID of the object to get permissions on.
+     *                          Depending on `$this->_service` could be a
+     *                          folder, campus, residential house, or ignored.
+     * @param  UserModel $user  The user to get permissions for.
+     * @param  bool      $cache If false, ignore cache.
+     * @return int
      */
-    private function legacyGetPermission($relationID, Schoolbox\User $user, $cache = true)
+    private function legacyGetPermission($relationID, UserModel $user, $cache = true)
     {
         $userID = $user->getId();
 
