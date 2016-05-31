@@ -1,12 +1,3 @@
-<script>
-    $(function(){
-        $('[data-back]').click(function(e) {
-            e.preventDefault();
-            window.location.href = '/adminv2/import-pastoral';
-        });
-    });
-</script>
-
 {# Shared navigation menu #}
 
 {{ renderAdminNavigation(pageCurrent) }}
@@ -53,9 +44,9 @@
     </section>
     <input type="submit" data-back value="Back">
     {% else %}
-        <section class="content">
-            <p class="no-margin">No import logs found.</p>
-            <input type="submit" data-back value="Back">
-        </section>
+        <div class="empty-state">
+            <i class="icon-pastoral"></i>
+            <p>No import logs found, return to <a href="/adminv2/import-pastoral">import screen</a></p>
+        </div>
     {% endif %}
 </div>
