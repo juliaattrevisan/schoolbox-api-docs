@@ -456,7 +456,7 @@ class Group extends DeprecatedModel
         if ($this->_service == HOMEPAGE_SERVICE) {
             return Access::getInstance()->getFolderAccess($user, array($relationID), $cache);
         } else {
-            return $this->legacyGetPermission($relationID, $userID);
+            return $this->legacyGetPermission($relationID, $user);
         }
     }
 
@@ -465,23 +465,15 @@ class Group extends DeprecatedModel
      * `HOMEPAGE_SERVICE`.
      *
      * @param $relationID
-     * @param $userID
+     * @param Schoolbox\User $user
      * @return int|mixed
      */
-    private function legacyGetPermission($relationID, $userID)
+    private function legacyGetPermission($relationID, Schoolbox\User $user)
     {
+        $userID = $user->getId();
         /* Cached results */
         if (isset($this->cache[$this->_service][$relationID][$userID])) {
             return $this->cache[$this->_service][$relationID][$userID];
-        }
-
-        // User is cached by now - if not, that's a fail state
-        if (!array_key_exists($userID, $this->cacheUser)) {
-            return false;
-        }
-        $user = $this->cacheUser[$userID];
-        if (!$user instanceof Schoolbox\User) {
-            return false;
         }
 
         // if superuser just return highest permission type
