@@ -490,16 +490,20 @@ class Group extends DeprecatedModel
             return FULL_ACCESS;
         }
 
-        // check individual access
-        $query = "SELECT type FROM userAccess WHERE uid = "
-            . $this->db->smartQuote($userID)
-            . " AND ( ( service = " . $this->db->smartQuote($this->_service) . " ";
-
+        $serviceIdFilter = '';
         if (in_array($this->_service, array(CALENDAR_SERVICE, HOUSEMASTER_SERVICE))) {
-            $query .= "AND sid = " . $this->db->smartQuote($relationID) . " ";
+            $serviceIdFilter = "AND sid = {$this->db->smartQuote($relationID)}";
         }
 
-        $query .= " )) ORDER BY `type` DESC LIMIT 1 ";
+        // check individual access
+        $query = "
+            SELECT type
+            FROM userAccess
+            WHERE uid = {$this->db->smartQuote($userID)}
+            $serviceIdFilter
+            AND ((service = {$this->db->smartQuote($this->_service)}))
+            ORDER BY `type` DESC LIMIT 1
+        ";
 
         $permission = $this->db->getOne($query);
         $permission = (int)$permission;
