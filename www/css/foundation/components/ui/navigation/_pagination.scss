@@ -12,7 +12,7 @@ $pagination-margin: rem-calc(0);
 // $pagination-li-float: $default-float;
 $pagination-li-height: rem-calc(($base-font-size + 21));
 $pagination-li-font-color: $content-ui-foreground;
-$pagination-li-font-size: rem-calc(($base-font-size - 2));
+$pagination-li-font-size: $base-font-size;
 $pagination-li-margin: rem-calc(0);
 
 // We use these for the pagination anchor links
@@ -37,7 +37,6 @@ $pagination-link-current-active-bg: $content-ui-selected;
 // Pagination
 ul.pagination {
     li {
-        line-height: 1rem;
         margin-right: 1px;
         margin-bottom: 1px;
 
@@ -49,13 +48,13 @@ ul.pagination {
             @include button-dimensions();
             background-color: $content-ui-background;
             border-radius: 0px;
-            font-weight: $font-weight-bold;
         }
 
         &.active a {
             @include button-dimensions();
             background-color: $pagination-link-current-background;
             color: $pagination-link-current-font-color;
+            font-weight: $font-weight-bold;
         }
     }
 }

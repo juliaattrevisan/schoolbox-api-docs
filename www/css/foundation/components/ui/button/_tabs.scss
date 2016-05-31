@@ -9,7 +9,7 @@ $tabs-navigation-active-bg-color: $content-ui-selected;
 $tabs-navigation-hover-bg-color: $content-ui-hover;
 $tabs-navigation-font-color: $content-ui-foreground;
 $tabs-navigation-active-font-color: $tabs-navigation-font-color;
-$tabs-navigation-font-size: rem-calc(($base-font-size - 2));
+$tabs-navigation-font-size: $base-font-size;
 // $tabs-navigation-font-family: $body-font-family;
 
 // $tabs-content-margin-bottom: rem-calc(24);
@@ -26,7 +26,6 @@ $tabs-content-padding: rem-calc(($base-font-size - 8));
          * this element is dimensioned, leading to some
          * sometimes-unexpected behaviour if you don't know this
          */
-        line-height: 1rem;
         margin-right: 1px;
         a {
             @include button-dimensions();
