@@ -20,13 +20,8 @@ use Schoolbox\User;
 
 require_once __DIR__ . '/../../include/Bootstrap.php';
 
-$rerouteFilters = [
-    new Filter\AlreadyReroutedFilter(),
-//    new Filter\SelfSendFilter(),
-//    new Filter\CampusMembershipFilter(),
-//    new Filter\RoleMembershipFilter(),
-//    new Filter\RoletypeFilter(),
-];
+$factory        = new Filter\FilterFactory();
+$rerouteFilters = $factory->setLiteMode()->build();
 
 $qf   = new SilentQueueFactory();
 $log  = new Logger(STDOUT, STDERR, 100);

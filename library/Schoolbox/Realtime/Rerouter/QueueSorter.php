@@ -31,7 +31,7 @@ use Swift_RfcComplianceException;
 
 class QueueSorter implements FilterInterface {
 
-	/** @var FilterInterface[] */
+	/** @var FilterInterface */
 	protected $filters;
 
 	/** @var LoggerInterface */
@@ -48,7 +48,7 @@ class QueueSorter implements FilterInterface {
 
 
     /**
-     * @param FilterInterface[]     $filters
+     * @param FilterInterface       $filter
      * @param LoggerInterface       $log
      * @param NotifInterface        $notif
      * @param IQueueFactory         $qFactory
@@ -56,24 +56,13 @@ class QueueSorter implements FilterInterface {
      * @throws \InvalidArgumentException
      */
     public function __construct(
-        array $filters,
+        FilterInterface $filter,
         LoggerInterface $log,
         NotifInterface $notif,
         IQueueFactory $qFactory,
         RoutePermissionMapper $permMapper
     ) {
-        $this->filters = array();
-
-        foreach ($filters as $filter) {
-            if ($filter instanceof FilterInterface) {
-                $this->filters[] = $filter;
-            }
-        }
-
-        if (!count($this->filters)) {
-            throw new InvalidArgumentException("At least one valid filter must be specified");
-        }
-
+        $this->filters    = $filter;
         $this->log        = $log;
         $this->permMapper = $permMapper;
         $this->notif      = $notif;
@@ -91,7 +80,7 @@ class QueueSorter implements FilterInterface {
 	public function process(User $user, Frame $frame) {
 		// anything echoed in this method is caught in an output buffer and piped to the log
 		$formatted = json_decode($frame->body, true);
-        $instance  = Instance::jsonUnserialize($formatted['message']);
+		$instance  = Instance::jsonUnserialize($formatted['message'], $formatted['channel']);
 
 		try {
 			$this->validate($instance, $formatted, $user);
@@ -163,10 +152,8 @@ class QueueSorter implements FilterInterface {
 	 * @return void
 	 */
 	public function validate($message, $formatted, $user) {
-		foreach($this->filters as $filter) {
-			// exceptions get thrown if it fails a given filter
-			$filter->validate($message, $formatted, $user);
-		}
+        // exceptions get thrown if it fails a given filter
+        $this->filters->validate($message, $formatted, $user);
 	}
 
 

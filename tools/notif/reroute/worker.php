@@ -59,26 +59,17 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     $qf = new QueueFactory();
     $qf->setRedis($client);
 
-	$rerouteFilters = array(
-		new Filter\AlreadyReroutedFilter(),
-        new Filter\UserEnabledFilter(),
-        new Filter\SelfSendFilter(),
-		new Filter\CampusMembershipFilter(),
-		new Filter\RoleMembershipFilter(),
-		new Filter\RoletypeFilter(),
-		new Filter\DuplicateFilter($uqf)
-	);
-
     // Add the messaging enabled filter
     $config = $di->get('config');
-    if ($config instanceof \Schoolbox\IConfigLoader) {
-        array_unshift($rerouteFilters, new Filter\MessagingEnabledFilter($config));
-    }
+
+    // obtain filter list
+    $filterFactory = new Filter\FilterFactory($uqf, $config);
+    $rerouteFilter = $filterFactory->build();
 
     $notif = new Notif();
     $notif->setLogger($log);
 
-    $sorter = new QueueSorter($rerouteFilters, $log, $notif, $qf, RoutePermissionMapper::getInstance());
+    $sorter = new QueueSorter($rerouteFilter, $log, $notif, $qf, RoutePermissionMapper::getInstance());
 
     // use the reroute strat
     $strat = new RerouterDispatchStrategy();
