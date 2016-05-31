@@ -6,6 +6,12 @@
             Thank you. Your password has been reset, and you may now log in with your new password.
         </div>
 
+        {% if not isCommunityPortalPasswordSet %}
+            <div class="alert-box alert">
+                However, your community portal password was not able to be updated as part of this process.
+            </div>
+        {% endif %}
+
         <a href="/login" class="button">Go to log in page</a>
     </div>
 </div>

@@ -334,6 +334,21 @@ class Healthcheck
         unset($list);
     }
 
+    private function SynergeticCheckCommunityPortal()
+    {
+        echo "\nSynergetic Permission Check - Community Portal - Tables (Optional)\n";
+        echo "  CommunityLogins : ";
+        $db = new MSSQL();
+        $db->debug = true;
+        $result = $db->query("UPDATE CommunityLogins SET Password = '' WHERE 1 = 0");
+        if ($result) {
+            echo "OK\n";
+        } else {
+            echo "\n    Failed - ".mssql_get_last_message()."\n";
+        }
+        unset($db,$result);
+    }
+
     private function SynergeticCheckAttendance()
     {
         // Attendance Specifc (Optional)

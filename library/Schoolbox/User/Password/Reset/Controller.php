@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Mail\TwigEmailFactory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\External\Connector\CommunityPortalFactory;
 
 /**
  * Controller for password resets
@@ -41,23 +42,31 @@ class Controller extends Base
     protected $passwordService;
 
     /**
+     * @var CommunityPortalFactory
+     */
+    protected $communityPortalFactory;
+
+    /**
      * Constructor
      *
-     * @param UserMapper       $userMapper
-     * @param Mapper           $resetMapper
-     * @param TwigEmailFactory $mailFactory
-     * @param PasswordService  $passwordService
+     * @param UserMapper             $userMapper
+     * @param Mapper                 $resetMapper
+     * @param TwigEmailFactory       $mailFactory
+     * @param PasswordService        $passwordService
+     * @param CommunityPortalFactory $communityPortalFactory
      */
     public function __construct(
         UserMapper $userMapper,
         Mapper $resetMapper,
         TwigEmailFactory $mailFactory,
-        PasswordService $passwordService
+        PasswordService $passwordService,
+        CommunityPortalFactory $communityPortalFactory
     ) {
-        $this->userMapper      = $userMapper;
-        $this->resetMapper     = $resetMapper;
-        $this->mailFactory     = $mailFactory;
-        $this->passwordService = $passwordService;
+        $this->userMapper             = $userMapper;
+        $this->resetMapper            = $resetMapper;
+        $this->mailFactory            = $mailFactory;
+        $this->passwordService        = $passwordService;
+        $this->communityPortalFactory = $communityPortalFactory;
     }
 
     /**
@@ -108,6 +117,9 @@ class Controller extends Base
         $this->getResponse()->content->set([
             'title'    => 'Password Reset Successful',
             'template' => '@userPasswordReset/successMessage.twig',
+            'data'     => [
+                'isCommunityPortalPasswordSet' => $this->getSessionSegment()->getFlash('isCommunityPortalPasswordSet', true),
+            ],
         ]);
     }
 
@@ -186,11 +198,13 @@ class Controller extends Base
             && preg_match('/[^a-z\\d]/i', $password)
         ) {
             // Reset password
-            $this->userMapper->save(
-                $reset->getUser()
-                    ->setPassword($this->passwordService->hash($password))
-                    ->setRetrievablePassword($password)
-            );
+            // Refetch user too cause other things may break
+            $user = $this->userMapper->findById($reset->getUser()->getId());
+            $user
+                ->setPassword($this->passwordService->hash($password))
+                ->setRetrievablePassword($password)
+            ;
+            $this->userMapper->save($user);
 
             // This reset has been used, save it
             $this->resetMapper->save($reset->setResetTime(\Alaress_Date_Format::now()));
@@ -200,6 +214,18 @@ class Controller extends Base
                     'userPasswordReset.displaySuccessMessage'
                 )
             );
+
+            // Reset their password in SCP too
+            if ($user->getRole()->isParent()) {
+                $communityPortal = $this->communityPortalFactory->build();
+                try {
+                    $communityPortal->changePassword($reset->getUser()->getExternalId(), $password);
+                } catch (\UnexpectedValueException $e) {
+                    // Portal integration wasn't set up properly?
+                    // Warn the user
+                    $this->getSessionSegment()->setFlash('isCommunityPortalPasswordSet', false);
+                }
+            }
         } else {
             $this->getSessionSegment()->setFlash('isPasswordValid', false);
             $this->getResponse()->redirect->to(

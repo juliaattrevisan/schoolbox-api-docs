@@ -60,15 +60,19 @@ if (isset($_POST['current_password'])) {
         }
 
         // Try this
-        $userHandler->updateExternalSystemPassword(
-            [
-                'uid'        => $user->getId(),
-                'username'   => $user->getUsername(),
-                'synergy_id' => $user->getExternalId(),
-            ],
-            $_POST['current_password'],
-            $_POST['new_password']
-        );
+        // I shouldn't have to send all those damn password change mails anymore either
+        $redirect = '/account/modify/success';
+        if ($user->getRole()->isParent()) {
+            $communityPortalFactory = new \Schoolbox\External\Connector\CommunityPortalFactory();
+            $communityPortal        = $communityPortalFactory->build();
+            try {
+                $communityPortal->changePassword($user->getExternalId(), $_POST['new_password']);
+            } catch (\UnexpectedValueException $e) {
+                // Portal integration wasn't set up properly?
+                // Warn the user, but don't stop password from getting set.
+                $redirect = '/account/modify/success/portalPasswordNotSet';
+            }
+        }
 
         $result = $userHandler->sendChangePasswordEmail($user->getId());
         $myconf = ConfigMapper::getInstance();
@@ -86,7 +90,7 @@ if (isset($_POST['current_password'])) {
         ));
         $_SESSION['password'] = $_POST['new_password'];
 
-        SitePage::localRedir('/account/modify/success');
+        SitePage::localRedir($redirect);
     } catch (Exception $e) {
         error(105, ['message' => $e->getMessage()]);
     }
