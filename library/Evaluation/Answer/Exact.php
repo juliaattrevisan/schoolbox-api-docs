@@ -282,9 +282,12 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
             array(
                 'ANSWER_ID' => $currentAnswer['answer_id'],
                 'ANSWER' => Scrub::text($existing['response']),
-                'ANSWER_CORRECT' => $this->compareStrings($existing['response'], $currentAnswer['answer'])
+                'ANSWER_OPTION_STATUS' => $this->compareStrings($existing['response'], $currentAnswer['answer'])
                     ? 'evaluation-correct-answer-option'
                     : 'evaluation-incorrect-answer-option',
+                'ANSWER_ICON_CLASS' => $this->compareStrings($existing['response'], $currentAnswer['answer'])
+                    ? 'evaluation-correct-answer-icon'
+                    : 'evaluation-incorrect-answer-icon',
                 'RESPONSE_ID' => $existing['response_id'],
                 'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
                 'REVIEWED_MARKS' => $existing['mark'],
@@ -327,7 +330,12 @@ abstract class Evaluation_Answer_Exact extends Evaluation_Answer {
 			'USER_LASTNAME' => $currentQuestion['lastname'],
 			'ANSWER_ID' => $currentAnswer['answer_id'],
 			'ANSWER' => Scrub::text($existing['response']),
-            'ANSWER_ICON' => $existing['response'] == $currentAnswer['answer'] ? 'icon-tick' : 'icon-close',
+            'ANSWER_OPTION_STATUS' => $existing['response'] == $currentAnswer['answer']
+                ? 'evaluation-correct-answer-option'
+                : 'evaluation-incorrect-answer-option',
+            'ANSWER_ICON_CLASS' => $existing['response'] == $currentAnswer['answer']
+                ? 'evaluation-correct-answer-icon'
+                : 'evaluation-incorrect-answer-icon',
 			'RESPONSE_ID' => $existing['response_id'],
 			'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
 			'REVIEWED_MARKS' => $existing['mark'],

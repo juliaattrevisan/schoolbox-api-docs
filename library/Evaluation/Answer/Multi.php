@@ -507,12 +507,12 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                 ) {
                     $page->setVar(array(
                         'ANSWER_OPTION_STATUS' => 'evaluation-selected-answer-option',
-                        'ANSWER_CHECKED' => 'checked',
+                        'ANSWER_CHECKED'       => 'checked',
                     ));
                 } else {
                     $page->setVar(array(
                         'ANSWER_OPTION_STATUS' => '',
-                        'ANSWER_CHECKED' => '',
+                        'ANSWER_CHECKED'       => '',
                     ));
                 }
 
@@ -575,20 +575,20 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                      */
                     if ($selectedByRespondent) {
                         $page->setVar([
-                            'ANSWER_ICON'       => 'icon-tick',
-                            'ANSWER_ICON_TITLE' => 'Respondent chose correctly',
-                            'ANSWER_ICON_CLASS' => 'evaluation-correct-answer-option',
-                            'ANSWER_CHECKED'    => 'checked',
+                            'ANSWER_OPTION_STATUS' => 'evaluation-correct-answer-option',
+                            'ANSWER_ICON_CLASS'    => 'evaluation-correct-answer-icon',
+                            'ANSWER_ICON_TITLE'    => 'Respondent chose correctly',
+                            'ANSWER_CHECKED'       => 'checked',
                         ]);
                     }
                     /* The respondent did not choose the correct answer
                      */
                     else {
                         $page->setVar([
-                            'ANSWER_ICON'       => 'icon-previous',
-                            'ANSWER_ICON_TITLE' => 'Respondent did not choose this correct answer',
-                            'ANSWER_ICON_CLASS' => 'evaluation-unselected-answer-option',
-                            'ANSWER_CHECKED'    => ''
+                            'ANSWER_OPTION_STATUS' => 'evaluation-unselected-answer-option',
+                            'ANSWER_ICON_CLASS'    => 'evaluation-unselected-answer-icon',
+                            'ANSWER_ICON_TITLE'    => 'Respondent did not choose this correct answer',
+                            'ANSWER_CHECKED'       => ''
                         ]);
                     }
                 }
@@ -600,20 +600,20 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                      */
                     if ($selectedByRespondent) {
                         $page->setVar([
-                            'ANSWER_ICON'       => 'icon-close',
-                            'ANSWER_ICON_TITLE' => 'Respondent chose an incorrect answer',
-                            'ANSWER_ICON_CLASS' => 'evaluation-incorrect-answer-option',
-                            'ANSWER_CHECKED'    => 'checked',
+                            'ANSWER_OPTION_STATUS' => 'evaluation-incorrect-answer-option',
+                            'ANSWER_ICON_CLASS'    => 'evaluation-incorrect-answer-icon',
+                            'ANSWER_ICON_TITLE'    => 'Respondent chose an incorrect answer',
+                            'ANSWER_CHECKED'       => 'checked',
                         ]);
                     }
                     /* The respondent didn't choose this answer
                      */
                     else {
                         $page->setVar([
-                            'ANSWER_ICON'       => '',
-                            'ANSWER_ICON_TITLE' => '',
-                            'ANSWER_ICON_CLASS' => '',
-                            'ANSWER_CHECKED'    => ''
+                            'ANSWER_OPTION_STATUS' => '',
+                            'ANSWER_ICON_CLASS'    => '',
+                            'ANSWER_ICON_TITLE'    => '',
+                            'ANSWER_CHECKED'       => ''
                         ]);
                     }
                 }
@@ -654,20 +654,20 @@ abstract class Evaluation_Answer_Multi extends Evaluation_Answer
                  */
                 if ($currentAnswer->correct) {
                     $page->setVar([
-                        'ANSWER_ICON'       => '',
-                        'ANSWER_ICON_TITLE' => '',
-                        'ANSWER_ICON_CLASS' => '',
-                        'ANSWER_CHECKED'    => 'checked',
+                        'ANSWER_OPTION_STATUS' => '',
+                        'ANSWER_ICON_CLASS'    => '',
+                        'ANSWER_ICON_TITLE'    => '',
+                        'ANSWER_CHECKED'       => 'checked',
                     ]);
                 }
                 /* This answer is not correct
                  */
                 else {
                     $page->setVar([
-                        'ANSWER_ICON'       => '',
-                        'ANSWER_ICON_TITLE' => '',
-                        'ANSWER_ICON_CLASS' => '',
-                        'ANSWER_CHECKED'    => ''
+                        'ANSWER_OPTION_STATUS' => '',
+                        'ANSWER_ICON_CLASS'    => '',
+                        'ANSWER_ICON_TITLE'    => '',
+                        'ANSWER_CHECKED'       => ''
                     ]);
                 }
 
