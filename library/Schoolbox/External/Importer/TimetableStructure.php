@@ -165,8 +165,22 @@ class TimetableStructure extends AbstractImporter
             $period = new TimetablePeriod();
             $this->log->info(sprintf('Parsing period "%s" for day %d', $title, $day));
             try {
-                $periodStart  = new Alaress_Date_Format($row['Period Start'], ['H:i', 'G:ia', 'Hi']);
-                $periodFinish = new Alaress_Date_Format($row['Period Finish'], ['H:i', 'G:ia', 'Hi']);
+                if(empty($row['Period Start'])){
+                    $this->log->notice(
+                        sprintf('Period "%s" for day %d missing "Period Start"',$title,$day),
+                        ['row' => $row]);
+                    $periodStart = NULL;
+                } else {
+                    $periodStart = new Alaress_Date_Format($row['Period Start'], ['H:i', 'G:ia', 'Hi']);
+                }
+                if(empty($row['Period Finish'])){
+                    $this->log->notice(
+                        sprintf('Period "%s" for day %d missing "Period Finish"',$title,$day),
+                        ['row' => $row]);
+                    $periodFinish = NULL;
+                } else {
+                    $periodFinish = new Alaress_Date_Format($row['Period Finish'], ['H:i', 'G:ia', 'Hi']);
+                }
             } catch (\InvalidArgumentException $e) {
                 $this->log->warning('"Period Start" and "Period Finish" must both be times in HH:MM format');
                 continue;
@@ -226,17 +240,29 @@ class TimetableStructure extends AbstractImporter
             // Sort periods by day, and then set period sequence that way
             $this->log->info('Setting sequence for periods');
             foreach ($timetable['periods'] as $day => $periods) {
-                /** @var Collection|TimetablePeriod[] $periods */
-                $periods->sortByCallback(
-                    function ($a, $b) {
-                        /** @var TimetablePeriod $a */
-                        /** @var TimetablePeriod $b */
-                        if (($cmp = $a->getStart()->compare($b->getStart())) !== 0) {
-                            return $cmp;
-                        }
-                        return $a->getFinish()->compare($b->getFinish());
+
+                // For any period on this day, if period start or finish not defined, retain CSV ordering.
+                $isMissingTimes = false;
+                foreach($periods as $period){
+                    if(empty($period->getStart()) || empty($period->getFinish())){
+                        $isMissingTimes = true;
+                        break;
                     }
-                );
+                }
+                if(!$isMissingTimes) {
+                    /** @var Collection|TimetablePeriod[] $periods */
+                    $periods->sortByCallback(
+                        function ($a, $b) {
+                            /** @var TimetablePeriod $a */
+                            /** @var TimetablePeriod $b */
+                            if (($cmp = $a->getStart()->compare($b->getStart())) !== 0) {
+                                return $cmp;
+                            }
+                            return $a->getFinish()->compare($b->getFinish());
+                        }
+                    );
+                }
+
                 $i = 1;
                 foreach ($periods as $period) {
                     $this->log->info(
