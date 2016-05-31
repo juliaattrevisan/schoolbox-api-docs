@@ -5,13 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Schoolbox\Mapper;
-use Schoolbox\Realtime\Message;
 use Schoolbox\Realtime\Test\AbstractNotificationTest;
-use Schoolbox\Test\TestMapper;
-use Schoolbox\Test\TestModel;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 /**
  * Test case for the test framework.

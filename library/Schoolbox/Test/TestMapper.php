@@ -9,13 +9,10 @@
  
 namespace Schoolbox\Test;
 use Schoolbox\Mapper;
-use Schoolbox\UserMapper;
 
 class TestMapper extends Mapper {
 	protected function mapping() {
-		$this->hasTable('test');
 		$this->hasModel('\\Schoolbox\\Test\\TestModel');
-		$this->hasModuleNotifier(TestNotifier::class);
 		$this->hasMap(array(
 			'column'     => 'storage_id',
 			'property'   => 'id',
@@ -47,6 +44,5 @@ class TestMapper extends Mapper {
 			'this_key'  => 'category',
 			'other_key' => 'id',
 		));
-		$this->joins('user_id', UserMapper::class);
 	}
 }
