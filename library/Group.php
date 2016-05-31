@@ -466,13 +466,15 @@ class Group extends DeprecatedModel
      *
      * @param $relationID
      * @param Schoolbox\User $user
+     * @param bool $cache
      * @return int|mixed
      */
-    private function legacyGetPermission($relationID, Schoolbox\User $user)
+    private function legacyGetPermission($relationID, Schoolbox\User $user, $cache = true)
     {
         $userID = $user->getId();
+
         /* Cached results */
-        if (isset($this->cache[$this->_service][$relationID][$userID])) {
+        if ($cache && isset($this->cache[$this->_service][$relationID][$userID])) {
             return $this->cache[$this->_service][$relationID][$userID];
         }
 
