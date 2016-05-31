@@ -273,22 +273,32 @@ abstract class Evaluation_Answer_Numeric extends Evaluation_Answer {
 
         $currentAnswer = $this->getByQuestionID($question_id);
 
+        $isCorrect = ($existing['response'] == $currentAnswer['answer']);
+
+        if ($isCorrect) {
+            $title = 'Respondent provided a correct answer';
+        }
+        else {
+            $title = 'Respondent did not provide a correct answer';
+        }
+
         /* Removed this check because it was wrongly matching a blank saved
-           * response with no response at all, preventing reviewed marks from
-           * displaying properly.
-           *
-           * if ($existing['response'] != null) { ... } else { ... }
-           */
+         * response with no response at all, preventing reviewed marks from
+         * displaying properly.
+         *
+         * if ($existing['response'] != null) { ... } else { ... }
+         */
         $page->setVar(
             array(
                 'ANSWER_ID' => $currentAnswer['answer_id'],
                 'ANSWER' => Scrub::text($existing['response']),
-                'ANSWER_OPTION_STATUS' => $existing['response'] == $currentAnswer['answer']
+                'ANSWER_OPTION_STATUS' => $isCorrect
                     ? 'evaluation-correct-answer-option'
                     : 'evaluation-incorrect-answer-option',
-                'ANSWER_ICON_CLASS' => $existing['response'] == $currentAnswer['answer']
+                'ANSWER_ICON_CLASS' => $isCorrect
                     ? 'evaluation-correct-answer-icon'
                     : 'evaluation-incorrect-answer-icon',
+                'ANSWER_ICON_TITLE' => $title,
                 'RESPONSE_ID' => $existing['response_id'],
                 'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
                 'REVIEWED_MARKS' => $existing['mark'],
@@ -319,25 +329,35 @@ abstract class Evaluation_Answer_Numeric extends Evaluation_Answer {
 
 		$currentAnswer = $this->getByQuestionID($currentQuestion['question_id']);
 
-		/* Removed this check because it was wrongly matching a blank saved
-		   * response with no response at all, preventing reviewed marks from
-		   * displaying properly.
-		   *
-		   * if ($existing['response'] != null) { ... } else { ... }
-		   */
+        $isCorrect = ($existing['response'] == $currentAnswer['answer']);
+
+        if ($isCorrect) {
+            $title = 'Respondent provided a correct answer';
+        }
+        else {
+            $title = 'Respondent did not provide a correct answer';
+        }
+
+        /* Removed this check because it was wrongly matching a blank saved
+         * response with no response at all, preventing reviewed marks from
+         * displaying properly.
+         *
+         * if ($existing['response'] != null) { ... } else { ... }
+         */
 		$page->setVar(array(
 			'USER_EXTERNAL_ID' => $currentQuestion['synergy_id'],
 			'USER_FIRSTNAME' => $currentQuestion['firstname'],
 			'USER_LASTNAME' => $currentQuestion['lastname'],
 			'ANSWER_ID' => $currentAnswer['answer_id'],
 			'ANSWER' => Scrub::text($existing['response']),
-            'ANSWER_CORRECT' => $existing['response'] == $currentAnswer['answer'] ? 'multiCorrect' : 'multiIncorrect',
-            'ANSWER_OPTION_STATUS' => $existing['response'] == $currentAnswer['answer']
+            'ANSWER_CORRECT' => $isCorrect ? 'multiCorrect' : 'multiIncorrect',
+            'ANSWER_OPTION_STATUS' => $isCorrect
                 ? 'evaluation-correct-answer-option'
                 : 'evaluation-incorrect-answer-option',
-            'ANSWER_ICON_CLASS' => $existing['response'] == $currentAnswer['answer']
+            'ANSWER_ICON_CLASS' => $isCorrect
                 ? 'evaluation-correct-answer-icon'
                 : 'evaluation-incorrect-answer-icon',
+            'ANSWER_ICON_TITLE' => $title,
 			'RESPONSE_ID' => $existing['response_id'],
 			'REVIEWED_COMMENT' => Scrub::text($existing['comment']),
 			'REVIEWED_MARKS' => $existing['mark'],
