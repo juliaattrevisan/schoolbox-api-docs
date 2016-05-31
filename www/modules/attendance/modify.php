@@ -44,7 +44,7 @@ if (!strlen($this->arg[2])) {
     error(149);
 }
 
-if (!is_numeric(preg_replace('/[^0-9]+/', '', $this->arg[3])) && $this->arg[3] > 0 && $this->arg[3] < 100) {
+if (!preg_match('/^\d+$/', $this->arg[3]) || $this->arg[3] < 0 || $this->arg[3] > 100) {
     error(150);
 }
 
