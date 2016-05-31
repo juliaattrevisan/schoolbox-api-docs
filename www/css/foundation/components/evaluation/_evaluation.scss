@@ -1,42 +1,35 @@
 /* Quiz and Survey
  */
-.evaluation-answer-option {
-
-    /* Respondent chose a correct answer
-     */
-    .evaluation-correct-answer-option {
-        @extend .icon-tick;
-        font-size: rem-calc(($base-font-size + 14));
-        position: absolute;
-        right: 1.25rem;
-        color: $success-color;
-    }
-
-    /* Respondent chose an incorrect answer
-     */
-    .evaluation-incorrect-answer-option {
-        @extend .icon-close;
-        font-size: rem-calc(($base-font-size + 14));
-        position: absolute;
-        right: 1.25rem;
-        color: $alert-color;
-    }
-
-    /* Respondent did not choose a correct answer
-     */
-    .evaluation-unselected-answer-option {
-        @extend .icon-previous;
-        font-size: rem-calc(($base-font-size + 14));
-        position: absolute;
-        right: 1.25rem;
-        color: $warning-color;
-    }
-
-    .evaluation-selected-answer-option {
-        color: $accent-foreground;
-        background-color: $accent-background;
-    }
+/* Respondent chose a correct answer
+ */
+.evaluation-correct-answer-icon {
+    @extend .icon-tick;
+    font-size: rem-calc(($base-font-size + 14));
+    position: absolute;
+    right: 1.25rem;
+    color: $success-color;
 }
+
+/* Respondent chose an incorrect answer
+ */
+.evaluation-incorrect-answer-icon {
+    @extend .icon-close;
+    font-size: rem-calc(($base-font-size + 14));
+    position: absolute;
+    right: 1.25rem;
+    color: $alert-color;
+}
+
+/* Respondent did not choose a correct answer
+ */
+.evaluation-unselected-answer-icon {
+    @extend .icon-previous;
+    font-size: rem-calc(($base-font-size + 14));
+    position: absolute;
+    right: 1.25rem;
+    color: $warning-color;
+}
+
 
 /* This is used to show which Respondents submitted a chosen response.
  * Formerly a panel (this is now extinct).

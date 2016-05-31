@@ -87,6 +87,9 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
                             array(
                                 'ANSWER_VALUE' => $currentAnswer->value,
                                 'ANSWER_DESCRIPTION' => Scrub::text($currentAnswer->description),
+                                'ANSWER_OPTION_STATUS' => $currentAnswer->correct != ''
+                                    ? 'evaluation-selected-answer-option'
+                                    : '',
                                 'ANSWER_CHECKED' => $currentAnswer->correct != '' ? 'checked=\'checked\'' : ''
                             )
                         );
@@ -493,12 +496,14 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer {
                 if ($existing['response'] && is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
                     $page->setVar(
                         array(
-                            'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
+                            'ANSWER_OPTION_STATUS' => 'evaluation-selected-answer-option',
+                            'ANSWER_CHECKED' => 'checked',
                         )
                     );
                 } else {
                     $page->setVar(
                         array(
+                            'ANSWER_OPTION_STATUS' => '',
                             'ANSWER_CHECKED' => '',
                         )
                     );

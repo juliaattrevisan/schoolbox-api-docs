@@ -436,9 +436,11 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                 if ($right[$i] == $currentAnswer->answerRight) {
                     $correct   = $this->getCorrectClass();
                     $isCorrect = true;
+                    $title = 'Respondent ordered this correctly';
                 } else {
                     $correct   = $this->getIncorrectClass();
                     $isCorrect = false;
+                    $title = 'Respondent did not order this correctly';
                 }
 
                 $page->setVar(
@@ -447,7 +449,10 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                         'ANSWER_RIGHT_VALUE'            => $right[$i],
                         'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
                         'CORRECT'                       => $correct,
-                        'ANSWER_ICON'                   => ($isCorrect ? 'evaluation-correct-answer-option' : 'evaluation-incorrect-answer-option'),
+                        'ANSWER_ICON_CLASS'             => $isCorrect
+                            ? 'evaluation-correct-answer-icon'
+                            : 'evaluation-incorrect-answer-icon',
+                        'ANSWER_ICON_TITLE'             => $title,
                     )
                 );
                 $page->parse('answerOption_block', 'answerOption', true);
@@ -498,9 +503,11 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                 if ($right[$i] == $currentAnswer->answerRight) {
                     $correct = $this->getCorrectClass();
                     $isCorrect = true;
+                    $title = 'Respondent ordered this correctly';
                 } else {
                     $correct = $this->getIncorrectClass();
                     $isCorrect = false;
+                    $title = 'Respondent did not order this correctly';
                 }
 
                 $page->setVar(
@@ -509,7 +516,10 @@ abstract class Evaluation_Answer_Match extends Evaluation_Answer
                         'ANSWER_RIGHT_VALUE'            => $right[$i],
                         'ANSWER_CORRECT_RESPONSE_VALUE' => Scrub::text($currentAnswer->answerRight),
                         'CORRECT'                       => $correct,
-                        'ANSWER_ICON'                   => ($isCorrect ? 'icon-tick' : 'icon-x'),
+                        'ANSWER_ICON_CLASS'             => $isCorrect
+                            ? 'evaluation-correct-answer-icon'
+                            : 'evaluation-incorrect-answer-icon',
+                        'ANSWER_ICON_TITLE'             => $title,
                     )
                 );
 

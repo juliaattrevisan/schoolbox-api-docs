@@ -37,9 +37,11 @@
 
     <div class="small-12 island">
         <h2 class="subheader">Correct Answer</h2>
-        <section class="content">
-            <!-- BEGIN answerInputsTop -->
-            <!-- END answerInputsTop -->
+        <section>
+            <ul class="information-list">
+                <!-- BEGIN answerInputsTop -->
+                <!-- END answerInputsTop -->
+            </ul>
         </section>
     </div>
 
@@ -56,7 +58,7 @@
                 });
             </script>
             <form id='questionForm-{RESPONSE_ID}' action="/assess/saveReviewedResponse/{QUESTION_QUESTION_ID}/{RESPONSE_ID}" class='validation_{RESPONSE_ID} questionForm' method="post">
-                <div class="avatar-card">
+                <div class="avatar-card small-12">
                     <a href="#" title="View Profile">
                         <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" alt="View Profile" />
                         <p>{USER_LASTNAME}, {USER_FIRSTNAME}</p>

@@ -93,10 +93,12 @@ class Survey_Answer_Radio extends Evaluation_Answer_Radio
                     && in_array($currentAnswer->value, $existingAnswer)
                 ) {
                     $page->setVar(array(
-                        'ANSWER_CHECKED' => 'evaluation-selected-answer-option',
+                        'ANSWER_OPTION_STATUS' => 'evaluation-selected-answer-option',
+                        'ANSWER_CHECKED' => 'checked',
                     ));
                 } else {
                     $page->setVar(array(
+                        'ANSWER_OPTION_STATUS' => '',
                         'ANSWER_CHECKED' => '',
                     ));
                 }
