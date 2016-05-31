@@ -482,8 +482,10 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer {
 			$pattern = '#<span class="selected-word">([^<]+)</span>#ms';
 			$replace = " <span class='submitted-late label'>&nbsp;</span> ";
 
+
+
 			$page->setVar(array(
-				'ANSWER' => preg_replace($pattern, $replace, Scrub::text($currentAnswer['answer'])),
+				'ANSWER' => preg_replace($pattern, $replace, Scrub::html($currentAnswer['answer'])),
 				'RESPONSE_ID' => $existing['response_id'],
 				'REVIEWED_COMMENT' => '',
 				'REVIEWED_MARKS' => 0,
