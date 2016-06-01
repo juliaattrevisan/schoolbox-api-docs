@@ -131,15 +131,13 @@
 
         {% else %}
 
-        <section>
-            <div class="empty-state">
-                <i class="icon-course"></i>
-                <p>
-                    There are no courses associated with this homepage, but you can
-                    <a href="{{ routeLookup('course.import', { courseId: 0, classCode: folder.id }) }}">import one</a>.
-                </p>
-            </div>
-        </section>
+        <div class="empty-state">
+            <i class="icon-course"></i>
+            <p>
+                There are no courses associated with this homepage, but you can
+                <a href="{{ routeLookup('course.import', { courseId: 0, classCode: folder.id }) }}">import one</a>.
+            </p>
+        </div>
 
         {% endif %}
     </div>
