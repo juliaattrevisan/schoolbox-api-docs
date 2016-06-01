@@ -9,5 +9,5 @@
 
 require_once __DIR__ . '/../../www/conf/conf.php';
 require_once __DIR__ . '/../../www/include/stdfuncs.php';
-require_once dirname(__FILE__) . '/../../include/Autoloader.php';
+require_once dirname(__FILE__) . '/../../library/Autoloader.php';
 Autoloader::initialise();

@@ -16,16 +16,11 @@ class Autoloader {
     static $rootPath = '';
 
     /**
-     * @var array Possible class locations
-     */
-    static $includePathArray = array('include', 'library');
-
-    /**
      * Initializes variables, registers autoloading functions with PHP and sets include paths
      */
     public static function initialise () {
         /* Set root path */
-        self::$rootPath = realpath( dirname(__FILE__) . '/..' );
+        self::$rootPath = realpath( __DIR__ . '/..' );
 
         //
         // Composer autoloader
@@ -34,13 +29,6 @@ class Autoloader {
         /* Register autoloaders with PHP */
         spl_autoload_register(array('Autoloader', 'load'));
 
-        /* Add include paths */
-        if ( is_array(self::$includePathArray) && !empty(self::$includePathArray) ) {
-            foreach (self::$includePathArray as &$includePath) {
-                $includePath = self::$rootPath . '/' . trim($includePath, '/');
-            }
-            unset($includePath);
-        }
     }
 
     /**
@@ -55,7 +43,7 @@ class Autoloader {
      */
     public static function load($class_name) {
         if ($class_file = self::getClassFile($class_name)) {
-            require($class_file);
+            require $class_file;
         }
     }
 
@@ -63,33 +51,10 @@ class Autoloader {
      * @param String $className The name of the relevant class
      * @return String|Bool The path to the file containing the class or false
      */
-    private static function getClassFile ($className) {
+    public static function getClassFile ($className) {
         $classSegments = preg_split('/[_\\\\]/', $className);
         $ideal_filename = implode('/', $classSegments).'.php';
-        if ($ideal_filename = self::fileExists($ideal_filename)) {
-            return $ideal_filename;
-        }
-        return false;
+        return __DIR__ . '/' .  $ideal_filename;
     }
 
-    /**
-     * @param String $filename The file name or path to be checked for existance
-     * @return Bool Wether or not the file exists
-     */
-    private static function fileExists ($filename) {
-        if ( empty($filename) ) {
-            return false;
-        }
-
-        //$includeArray = explode(PATH_SEPARATOR, get_include_path());
-
-        foreach (self::$includePathArray as $includePath) {
-            $includePath = rtrim($includePath, '/');
-            if ( file_exists("$includePath/$filename") ) {
-                return "$includePath/$filename";
-            }
-        }
-
-        return false;
-    }
 }

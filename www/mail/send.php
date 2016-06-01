@@ -10,7 +10,7 @@ use Alaress\Mail\AttachmentStream;
 ************************************************************/
 //outputs form to get users mail details and processes the information
 
-require_once __DIR__."/../../include/Bootstrap.php";
+require_once __DIR__."/../../library/Bootstrap.php";
 
 $page = new SitePage();
 

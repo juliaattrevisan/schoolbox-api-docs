@@ -8,7 +8,7 @@
  */
 
 if(!isset($this)) {
-    require_once('../../include/Bootstrap.php');
+    require_once('../../library/Bootstrap.php');
     error(2);
 }
 

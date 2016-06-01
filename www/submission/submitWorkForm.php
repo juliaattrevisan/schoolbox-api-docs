@@ -1,6 +1,6 @@
 <?php
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;

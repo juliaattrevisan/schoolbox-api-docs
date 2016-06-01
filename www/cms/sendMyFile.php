@@ -9,7 +9,7 @@
 //rather than just octet stream
 
 //includes
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
 
 if (is_numeric($_GET['id'])) {
     // ensure session

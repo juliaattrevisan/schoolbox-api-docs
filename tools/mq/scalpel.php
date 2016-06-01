@@ -66,7 +66,7 @@ if (!count($args)) {
 echo "Starting search & destroy...\n";
 
 // ok, setup done, ready to do this
-require_once __DIR__ . '/../../include/Bootstrap.php';
+require_once __DIR__ . '/../../library/Bootstrap.php';
 
 checkRedis($args, $regexMode);
 checkAmqp($args, $regexMode);

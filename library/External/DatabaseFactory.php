@@ -48,7 +48,8 @@ class External_DatabaseFactory
 
         // Try each database class in order of definition
         foreach ($databaseClasses as $databaseClass) {
-            if (class_exists($databaseClass, true)) {
+
+            if (file_exists(Autoloader::getClassFile($databaseClass))) {
                 try {
                     $dbClass =  new $databaseClass();
                     return $dbClass;

@@ -8,7 +8,7 @@
  */
 
 if(!isset($this)) {
-    require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
+    require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
     error(2); // not enough info
 }
 

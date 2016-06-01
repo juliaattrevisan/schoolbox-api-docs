@@ -1,6 +1,6 @@
 <?php
 
-require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
+require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;

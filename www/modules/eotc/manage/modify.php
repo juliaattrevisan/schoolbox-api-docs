@@ -16,7 +16,7 @@ if (isset($this)) {
     /* Direct access to modify.php -_-
      */
     /** @var Alaress\Application\Kernel $kernel */
-    $kernel = require_once(__DIR__ . '/../../../../include/Bootstrap.php');
+    $kernel = require_once(__DIR__ . '/../../../../library/Bootstrap.php');
 
     /** @var SitePage $page */
     $page = $kernel->getDependencyInjector()->get('sitePage');

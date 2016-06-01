@@ -11,7 +11,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 
 //includes
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
 $groupHandler = new Group;
 
 if (!is_numeric($_GET['id'])) {

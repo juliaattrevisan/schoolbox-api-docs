@@ -9,7 +9,7 @@
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-require_once dirname(__FILE__) . '/../include/Bootstrap.php';
+require_once dirname(__FILE__) . '/../library/Bootstrap.php';
 
 $page = new SitePage(false);
 

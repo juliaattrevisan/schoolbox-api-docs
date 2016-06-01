@@ -13,7 +13,7 @@ if(!(isset($_POST['fList']) && isset($_POST['view']))) {
 }
 
 // this is just to properly initialise the sessions so changes will take hold
-require_once dirname(__FILE__) . '/../../../include/Bootstrap.php';
+require_once dirname(__FILE__) . '/../../../library/Bootstrap.php';
 $page = new SitePage();
 $calHandler = new Calendar();
 

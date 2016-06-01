@@ -9,7 +9,7 @@
 
 // enforce SitePage context for authentication
 if(!isset($this)) {
-    require_once('../../../include/Bootstrap.php');
+    require_once('../../../library/Bootstrap.php');
     SitePage::localRedir('/modules/tuckshop/staff_enter');
 }
 

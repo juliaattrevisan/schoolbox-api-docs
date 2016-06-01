@@ -9,7 +9,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once('../include/Bootstrap.php');
+require_once('../library/Bootstrap.php');
 
 $groupHandler = new Group();
 

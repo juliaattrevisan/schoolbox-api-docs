@@ -4,7 +4,7 @@
  * the audio player as of version 14.
  */
 
-require_once(dirname(__FILE__) . '/../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
 
 
 $dataDir = \Config::get('file_dir');

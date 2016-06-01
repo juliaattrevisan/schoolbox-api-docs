@@ -18,7 +18,7 @@ use Schoolbox\Realtime\Rerouter\Filter;
 use Schoolbox\UserMapper;
 use Schoolbox\User;
 
-require_once __DIR__ . '/../../include/Bootstrap.php';
+require_once __DIR__ . '/../../library/Bootstrap.php';
 
 $factory        = new Filter\FilterFactory();
 $rerouteFilters = $factory->setLiteMode()->build();

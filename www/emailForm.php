@@ -15,7 +15,7 @@ use Schoolbox\IConfigLoader;
 use Schoolbox\Mail\CoreContext;
 use Schoolbox\Mail\TwigEmail;
 
-require_once dirname(__FILE__) . '/../include/Bootstrap.php';
+require_once dirname(__FILE__) . '/../library/Bootstrap.php';
 
 session_start();
 

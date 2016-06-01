@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
 
 $page = new SitePage();
 $page->setLite(true);

@@ -11,7 +11,7 @@ use Alaress\Image\Cache;
 use Alaress\Image\Processor\Freeform;
 use Alaress\Image\Implementation\Imagine;
 
-require_once __DIR__.'/../../include/Bootstrap.php';
+require_once __DIR__.'/../../library/Bootstrap.php';
 
 //
 // Get the code, then the image path from the code.

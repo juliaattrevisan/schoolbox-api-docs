@@ -12,7 +12,7 @@ if(isset($this)) {
     error(2);
 }
 
-require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../../library/Bootstrap.php');
 $sitePage = new SitePage();
 
 // this is an admin function, so check user is super-awesome

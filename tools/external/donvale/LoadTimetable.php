@@ -1,5 +1,5 @@
 <?php
-require_once '../../../include/Bootstrap.php';
+require_once '../../../library/Bootstrap.php';
 
 if ( php_sapi_name() != 'cli' ) {
 	die("\nThis script must be run through a command line interface");

@@ -12,7 +12,7 @@ use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Permission\Access\UserAccess;
 
-require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../../library/Bootstrap.php');
 
 $calendarMapper = EventMapper::getInstance();
 try {

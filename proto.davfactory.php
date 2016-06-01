@@ -11,7 +11,7 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
-require_once __DIR__ . '/include/Bootstrap.php';
+require_once __DIR__ . '/library/Bootstrap.php';
 
 
 class DavFactory {

@@ -6,7 +6,7 @@
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
-require_once __DIR__ . '/../../include/Bootstrap.php';
+require_once __DIR__ . '/../../library/Bootstrap.php';
 
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;

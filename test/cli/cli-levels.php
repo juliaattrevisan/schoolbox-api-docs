@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-require_once __DIR__ . '/../../include/Bootstrap.php';
+require_once __DIR__ . '/../../library/Bootstrap.php';
 
 date_default_timezone_set('Australia/Melbourne');
 

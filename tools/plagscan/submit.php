@@ -9,7 +9,7 @@
  *
  */
 
-require_once(dirname(__FILE__) . '/../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
 
 use Alaress\Lumberjack\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;

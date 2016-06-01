@@ -15,7 +15,7 @@
  */
 
 
-require_once dirname(__FILE__) . '/../../../include/Bootstrap.php';
+require_once dirname(__FILE__) . '/../../../library/Bootstrap.php';
 
 $page = new SitePage();
 

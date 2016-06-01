@@ -13,7 +13,7 @@ use Alaress\Image\Implementation\Imagine;
 use Alaress\Image\Processor\Freeform;
 use Alaress\Image\Transformation;
 
-require_once __DIR__ . '/../../include/Bootstrap.php';
+require_once __DIR__ . '/../../library/Bootstrap.php';
 
 /* Preserve old checks
  */

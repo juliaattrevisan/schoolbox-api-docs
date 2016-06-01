@@ -6,9 +6,9 @@
  * time: 9:56 pm
  */
 
-require_once dirname(__FILE__) . '/../include/Bootstrap.php';
+require_once dirname(__FILE__) . '/../library/Bootstrap.php';
 
-include dirname(__FILE__) . '/../include/Session.php';
+include dirname(__FILE__) . '/../library/Session.php';
 
 $publicdir = new DAV_Folder('');
 

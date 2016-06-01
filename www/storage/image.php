@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au
  */
 
-require_once '../../include/Bootstrap.php';
+require_once '../../library/Bootstrap.php';
 
 try {
     if (isset($_GET['hash']) && $_GET['hash']) {

@@ -11,7 +11,7 @@
  * @version     SVN: $Id$
  */
 
-require_once(__DIR__ . '/../../include/Bootstrap.php');
+require_once(__DIR__ . '/../../library/Bootstrap.php');
 
 if(isset($this)) {
 	error(2); // no sitepages here!

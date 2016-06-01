@@ -1,7 +1,7 @@
 <?php
 //small script to logout users
 
-require_once('../include/Bootstrap.php');
+require_once('../library/Bootstrap.php');
 
 session_start();
 session_regenerate_id(true);

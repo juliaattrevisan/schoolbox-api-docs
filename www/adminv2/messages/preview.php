@@ -13,7 +13,7 @@ use Schoolbox\Realtime\Message\NSMapper;
 
 
 if (!isset($this)) {
-    require_once __DIR__ . '/../../../include/Bootstrap.php';
+    require_once __DIR__ . '/../../../library/Bootstrap.php';
     SitePage::localRedir('/adminv2/messages/preview/digest');
 }
 

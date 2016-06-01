@@ -18,7 +18,7 @@ use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 
 use Alaress\Lumberjack\Logger;
 
-require_once __DIR__ . '/../../include/Bootstrap.php';
+require_once __DIR__ . '/../../library/Bootstrap.php';
 
 $options          = getopt('p::h', array('update-only', 'dry-run'));
 $parentId         = isset($options['p']) ? $options['p'] : 0;

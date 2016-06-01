@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
 
 use Schoolbox\News\ArticleMapper;
 use Schoolbox\News\TopicMapper;

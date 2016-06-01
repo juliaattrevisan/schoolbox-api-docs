@@ -5,7 +5,7 @@
  */
 
 /** @var Kernel $kernel */
-$kernel = require_once dirname(__FILE__) . '/../../include/Bootstrap.php';
+$kernel = require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
 
 /** @var SitePage $page */
 $page = $kernel->getDependencyInjector()->get('sitePage');

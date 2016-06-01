@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../../include/Bootstrap.php';
+require_once __DIR__ . '/../../library/Bootstrap.php';
 // Open session after bootstrap, otherwise $_SESSION[user] won't be a user.
 $page = new SitePage;
 

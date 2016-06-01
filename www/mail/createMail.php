@@ -5,7 +5,7 @@
  *                                                           *
  ************************************************************/
 //enable users to send email
-$kernel = require_once $_SERVER['DOCUMENT_ROOT'] . '/../include/Bootstrap.php';
+$kernel = require_once $_SERVER['DOCUMENT_ROOT'] . '/../library/Bootstrap.php';
 
 $page = new SitePage();
 $page->setDi($kernel->getDependencyInjector());

@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 
-require_once(__DIR__ . '/../../../include/Bootstrap.php');
+require_once(__DIR__ . '/../../../library/Bootstrap.php');
 
 $options = getopt('', ['structure', 'timetable', 'enrolment',]);
 

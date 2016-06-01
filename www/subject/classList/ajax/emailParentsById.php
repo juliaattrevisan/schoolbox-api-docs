@@ -8,7 +8,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once('../../../../include/Bootstrap.php');
+require_once('../../../../library/Bootstrap.php');
 
 /* avviare la sessione con il solito sitepage
  */

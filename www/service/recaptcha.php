@@ -8,7 +8,7 @@
  * To change this template use File | Settings | File Templates.
  */
  
-require_once '../../include/Bootstrap.php';
+require_once '../../library/Bootstrap.php';
 
 class Recaptcha_ServiceController {
     private $recaptcha;

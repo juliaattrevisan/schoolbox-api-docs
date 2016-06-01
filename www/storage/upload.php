@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-require_once '../../include/Bootstrap.php';
+require_once '../../library/Bootstrap.php';
 $sitePage = new SitePage;
 
 if (is_readable($_FILES['file']['tmp_name'])) {

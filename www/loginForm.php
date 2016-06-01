@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../include/Bootstrap.php';
+require_once __DIR__ . '/../library/Bootstrap.php';
 session_start();
 
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;

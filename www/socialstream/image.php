@@ -13,7 +13,7 @@ use Alaress\Image;
 use Alaress\Image\Implementation\Imagine;
 use Schoolbox\Resource\Storage;
 
-require_once __DIR__ . '/../../include/Bootstrap.php';
+require_once __DIR__ . '/../../library/Bootstrap.php';
 
 $postId = $_GET['id'];
 $size = $_GET['size'];

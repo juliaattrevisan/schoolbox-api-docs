@@ -10,7 +10,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-require_once(dirname(__FILE__) . '/../../../include/Bootstrap.php');
+require_once(dirname(__FILE__) . '/../../../library/Bootstrap.php');
 
 $sync = new Synchronise_External_Donvale_Facade();
 $sync->process();

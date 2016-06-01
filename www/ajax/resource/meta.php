@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-require_once('../../../include/Bootstrap.php');
+require_once('../../../library/Bootstrap.php');
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
