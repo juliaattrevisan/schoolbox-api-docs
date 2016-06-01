@@ -52,7 +52,7 @@
         <!-- BEGIN showcased_work_subject -->
         <h2 class="subheader">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</h2>
         <section>
-            <ul class="information-list">
+            <ul class="information-list" id="showcased-items">
                 <!-- BEGIN showcased_work -->
                 <li class="actions-small-1">
                     <div class="list-item">
@@ -88,12 +88,12 @@
                     </div>
                     <nav>
                         <!-- BEGIN has_modify_form -->
-                        <form action='/eportfolio/showcase/modifyForm.php' method='post'>
+                        <form action='/eportfolio/showcase/modifyForm.php' method='post' id="remove-showcase-{SHOWCASED_WORK_ITEM_ID}">
                             <input type='hidden' name='action' value='unpublish' />
                             <input type='hidden' name='userId' value='{SHOWCASED_WORK_ITEM_USER_ID}' />
                             <input type='hidden' name='showcaseItemId' value='{SHOWCASED_WORK_ITEM_ID}' />
-                            <input type='submit' value='Remove' />
                         </form>
+                        <a class="icon-delete" data-remove-showcase="{SHOWCASED_WORK_ITEM_ID}"></a>
                         <!-- END has_modify_form -->
                     </nav>
                 </li>
@@ -105,3 +105,19 @@
     </div>
 </div>
 
+<script type="text/javascript">
+    $('#showcased-items').on('click', '[data-remove-showcase]', function(event) {
+        event.preventDefault();
+
+        var element = $(this);
+
+        $(this).confirmDialog({
+            text: 'Are you sure you want to remove this item from your Showcase?',
+            confirmEvent: function() {
+                var formId = '#remove-showcase-' + element.attr('data-remove-showcase');
+
+                $(formId).submit();
+            }
+        });
+    });
+</script>
