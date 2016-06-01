@@ -51,10 +51,11 @@ class Autoloader {
      * @param String $className The name of the relevant class
      * @return String|Bool The path to the file containing the class or false
      */
-    public static function getClassFile ($className) {
+    public static function getClassFile($className)
+    {
         $classSegments = preg_split('/[_\\\\]/', $className);
-        $ideal_filename = implode('/', $classSegments).'.php';
-        return __DIR__ . '/' .  $ideal_filename;
+        $classPath     = __DIR__ . '/' .  implode('/', $classSegments).'.php';
+        return file_exists($classPath) ? $classPath : false;
     }
 
 }
