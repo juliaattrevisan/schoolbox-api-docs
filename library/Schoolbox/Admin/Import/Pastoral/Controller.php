@@ -12,8 +12,10 @@ namespace Schoolbox\Admin\Import\Pastoral;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Import\Pastoral\Mapper as LogMapper;
 use Schoolbox\User;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\UserMapper;
 
 class Controller extends Base
 {
@@ -26,6 +28,32 @@ class Controller extends Base
      * @var LogMapper
      */
     protected $logMapper;
+
+    /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /***
+     * @return ErrorMapper
+     */
+    public function getErrorMapper() {
+        return $this->errorMapper;
+    }
+
+    /**
+     * @param ErrorMapper $errorMapper
+     * @return $this
+     */
+    public function setErrorMapper($errorMapper) {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
 
     /***
      * @return ConfigMapper
@@ -40,6 +68,22 @@ class Controller extends Base
      */
     public function setConfigMapper($configMapper) {
         $this->configMapper = $configMapper;
+        return $this;
+    }
+
+    /***
+     * @return UserMapper
+     */
+    public function getUserMapper() {
+        return $this->userMapper;
+    }
+
+    /**
+     * @param UserMapper $userMapper
+     * @return $this
+     */
+    public function setUserMapper($userMapper) {
+        $this->userMapper = $userMapper;
         return $this;
     }
 
@@ -65,6 +109,8 @@ class Controller extends Base
     public function __construct()
     {
         $this->setConfigMapper(ConfigMapper::getInstance());
+        $this->setErrorMapper(ErrorMapper::getInstance());
+        $this->setUserMapper(UserMapper::getInstance());
         $this->setLogMapper(LogMapper::getInstance());
     }
 
@@ -73,6 +119,14 @@ class Controller extends Base
      */
     public function postImport()
     {
+        $post = $this->getRequest()->post;
+        
+        try {
+            $defaultOwner = $this->getUserMapper()->findById($post["defaultOwnerId"]);
+        } catch (\Exception $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
+        }
+
         // Do the import in a detached state so it doesn't time out
 
         $this->getResponse()->content->set([
@@ -81,8 +135,8 @@ class Controller extends Base
                 'pageCurrent' => 'import'
             ),
             'postOutput' => [
-                function() {
-                    $this->importCallback();
+                function() use ($defaultOwner) {
+                    $this->importCallback($defaultOwner);
                 }
             ],
         ]);
@@ -118,13 +172,15 @@ class Controller extends Base
 
     /**
      * Do pastoral record import in a detached state so it doesn't block the user
+     *
+     * @param \Schoolbox\User $defaultOwner         Fallback owner when cannot be located in Schoolbox
      */
-    public function importCallback()
+    public function importCallback($defaultOwner)
     {
         try
         {
             $pastoralExternal = new \External_Pastoral();
-            $pastoralExternal->importPastoral($this->getUser()->getId());
+            $pastoralExternal->importPastoral($this->getUser()->getId(), $defaultOwner);
         }
         catch (\Exception $e)
         {

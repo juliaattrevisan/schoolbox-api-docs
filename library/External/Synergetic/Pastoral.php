@@ -132,8 +132,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
     /**
      * Does an import of all pastoral care records stored in Synergetic
+     *
+     * @param int $userId                           The Schoolbox ID of the person doing the import
+     * @param \Schoolbox\User $defaultOwner         The fallback user when the owner of the pastoral record cannot be found
      */
-    public function importPastoral($userId)
+    public function importPastoral($userId, $defaultOwner)
     {
         /** @var \Schoolbox\Collection $results */
         $results = $this->getPastoralLogMapper()->findAll()->sortBy("importId", "desc");
@@ -257,10 +260,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 $owner = null;
                 $student = null;
 
-                if (!isset($userCache[$record["CreatedByID"]]))
-                    $userCache[$record["CreatedByID"]] = $this->getUserMapper()->findByExternalId($record["CreatedByID"]);
-
-                $owner = $userCache[$record["CreatedByID"]];
+                try {
+                    if (!isset($userCache[$record["CreatedByID"]]))
+                        $userCache[$record["CreatedByID"]] = $this->getUserMapper()->findByExternalId($record["CreatedByID"]);
+                    $owner = $userCache[$record["CreatedByID"]];
+                } catch (\Exception $e) {
+                    $owner = $defaultOwner;
+                }
 
                 if (!isset($userCache[$record["ID"]]))
                     $userCache[$record["ID"]] = $this->getUserMapper()->findByExternalId($record["ID"]);
@@ -347,24 +353,21 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 $log->setCreatedAt(\Alaress_Date_Format::now());
                 $log->setResult($record['reason']);
                 $this->getPastoralLogMapper()->save($log);
+
+                var_dump($student->getExternalId());
             }
             catch (\Exception $e)
             {
-                // The owner or student of the pastoral care record is not available in Schoolbox, skip this record
-
-                if ($owner == null)
-                    $record['reason'] = "Creator of record does not have a user record in Schoolbox";
-                else if ($student == null)
-                    $record['reason'] = "Student does not have a user record in Schoolbox";
+                // The student of the pastoral care record is not available in Schoolbox, skip this record
 
                 $log = new \Schoolbox\Admin\Import\Pastoral\Model();
                 $log->setUserId($userId);
                 $log->setImportId($importId);
                 $log->setHeading($record["heading"]);
-                $log->setStudentName($student->getFirstname() . " " . $student->getLastname());
+                $log->setStudentName($record["StudentFirstname"] . " " . $record["StudentLastname"]);
                 $log->setCreatorName($owner->getFirstname() . " " . $owner->getLastname());
                 $log->setCreatedAt(\Alaress_Date_Format::now());
-                $log->setResult($record['reason']);
+                $log->setResult("Student does not have a user record in Schoolbox");
                 $this->getPastoralLogMapper()->save($log);
             }
 
