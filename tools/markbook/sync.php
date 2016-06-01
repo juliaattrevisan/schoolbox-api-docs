@@ -95,6 +95,9 @@ foreach($categoryList as $category) {
         $log->notice("Setting marks for ".count($classList)." students");
         foreach($classList as $student) {
             $result = $markbookHandler->getByUser($student['uid'], $submissionBox->getId());
+            if (empty($result)) {
+                continue;
+            }
 
             // Pretending to be a mapper, even though I dont have one yet.
             $return = new Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork();
