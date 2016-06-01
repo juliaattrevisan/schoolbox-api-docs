@@ -24,7 +24,7 @@ if (isset($_POST['current_password'])) {
     }
 
     if (mb_strlen($_POST['new_password'], 'UTF-8') < 8) {
-        error(105, ['message' => "Your new password must be at least 6 characters long."]);
+        error(105, ['message' => "Your new password must be at least 8 characters long."]);
     }
 
     try {
