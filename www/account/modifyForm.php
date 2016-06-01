@@ -23,18 +23,8 @@ if (isset($_POST['current_password'])) {
         error(105, ['message' => "The new and confirmation passwords you entered do not match."]);
     }
 
-    if (strlen($_POST['new_password']) < 6) {
-        error(105, ['message' => "Your new password must be at least 6 characters long."]);
-    } else {
-        if (!preg_match('/[a-z]/i', $_POST['new_password'])) {
-            error(105, ['message' => "Your new password must have at least one letter."]);
-        }
-        if (!preg_match('/\\d/', $_POST['new_password'])) {
-            error(105, ['message' => "Your new password must have at least one number."]);
-        }
-        if (!preg_match('/[^a-z\\d]/i', $_POST['new_password'])) {
-            error(105, ['message' => "Your new password must have at least one non-letter or number character."]);
-        }
+    if (mb_strlen($_POST['new_password'], 'UTF-8') < 8) {
+        error(105, ['message' => "Your new password must be at least 8 characters long."]);
     }
 
     try {

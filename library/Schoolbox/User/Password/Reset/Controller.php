@@ -192,11 +192,7 @@ class Controller extends Base
         $confirm  = $this->getRequest()->post->get('confirm_password', '');
 
         // Verify that passwords match format and each other
-        if ($password === $confirm
-            && preg_match('/[a-z]/i', $password)
-            && preg_match('/\\d/i', $password)
-            && preg_match('/[^a-z\\d]/i', $password)
-        ) {
+        if ($password === $confirm && mb_strlen($password, 'UTF-8') >= 8) {
             // Reset password
             // Refetch user too cause other things may break
             $user = $this->userMapper->findById($reset->getUser()->getId());
