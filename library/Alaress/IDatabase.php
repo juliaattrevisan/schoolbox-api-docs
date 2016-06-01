@@ -67,4 +67,32 @@ interface IDatabase
      */
     public function quoteForLike($string);
 
+    /**
+     * Begin transaction
+     *
+     * @return bool
+     */
+    public function beginTransaction();
+
+    /**
+     * Roll back current transaction
+     *
+     * @return bool
+     */
+    public function rollback();
+
+    /**
+     * Commit current transaction
+     *
+     * @return bool
+     */
+    public function commit();
+
+    /**
+     * Retrieves last insert ID
+     *
+     * @param  string $name Some databases accept a table name to fetch last ID from
+     * @return string
+     */
+    public function lastInsertId($name = null);
 }

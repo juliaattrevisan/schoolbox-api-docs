@@ -36,6 +36,13 @@ class MockDatabase implements IDatabase
     protected $mock_statement;
 
     /**
+     * The next insert ID to be used.
+     *
+     * @var mixed
+     */
+    protected $nextInsertId;
+
+    /**
      * Builds the mock connection, using the test case to build mock statement.
      *
      * @param PHPUnit_Framework_TestCase $test_case
@@ -142,4 +149,44 @@ class MockDatabase implements IDatabase
         return $string;
     }
 
+    /**
+     * @return bool
+     */
+    public function beginTransaction()
+    {
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function commit()
+    {
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function rollback()
+    {
+        return true;
+    }
+
+    /**
+     * @param  null $name
+     * @return int
+     */
+    public function lastInsertId($name = null)
+    {
+        return $this->nextInsertId;
+    }
+
+    /**
+     * @param int $nextInsertId
+     */
+    public function setNextInsertId($nextInsertId)
+    {
+        $this->nextInsertId = $nextInsertId;
+    }
 }
