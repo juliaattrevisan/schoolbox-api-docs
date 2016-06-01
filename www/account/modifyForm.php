@@ -23,7 +23,7 @@ if (isset($_POST['current_password'])) {
         error(105, ['message' => "The new and confirmation passwords you entered do not match."]);
     }
 
-    if (strlen($_POST['new_password']) < 8) {
+    if (mb_strlen($_POST['new_password'], 'UTF-8') < 8) {
         error(105, ['message' => "Your new password must be at least 6 characters long."]);
     }
 
