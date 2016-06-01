@@ -958,7 +958,6 @@ class Controller extends Base
             $record->setSeverity($severity);
             $record->setBody($this->getRequest()->post["body"]);
             $record->setPrivate($this->getRequest()->post["private"]);
-            $record->setOwner($this->getUser());
             $record->setUpdatedAt(\Alaress_Date_Format::now());
             $this->getPastoralMapper()->setSessionData($_SESSION);
             $this->getPastoralMapper()->save($record);
