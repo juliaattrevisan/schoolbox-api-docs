@@ -451,10 +451,15 @@ class Statistics
             $allData[$taskId] = [];
             foreach ($task['work'] as $workId => $work) {
                 foreach ($work['marks'] as $userId => $currentMark) {
+                    if (!isset($currentMark['mark'])) {
+                        $value = null;
+                    } else {
+                        $value = (float)$currentMark['mark'];
+                    }
                     $allData[$taskId][] = array(
                         'info'  => null,
                         'uid'   => null,
-                        'value' => (float)$currentMark['mark'],
+                        'value' => $value,
                     );
                 }
             }
