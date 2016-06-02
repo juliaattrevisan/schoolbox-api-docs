@@ -10,7 +10,7 @@
 namespace Alaress\Mail;
 
 
-use Html2Text\Html2Text;
+use Alaress\Html\ToText as Html2Text;
 use Twig_Environment;
 use Twig_SimpleFilter;
 use Scrub;

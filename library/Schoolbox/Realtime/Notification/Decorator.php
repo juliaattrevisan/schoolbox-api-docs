@@ -14,7 +14,7 @@ namespace Schoolbox\Realtime\Notification;
 use Alaress\Async\Notification\Notification;
 use Alaress\Async\Notification\NotificationBundle;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
-use Html2Text\Html2Text;
+use Alaress\Html\ToText as Html2Text;
 use Schoolbox\Realtime\Message\NSMapper;
 use TextFormatter;
 use UnderflowException;
