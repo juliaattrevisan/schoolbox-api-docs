@@ -13,7 +13,7 @@
             <div class="avatar card small-12">
                 <a href="/search/user/{{ student.getId()|e('url') }}">
                     <img src="/portrait.php?userId={{ student.getExternalId()|e('url') }}&size=square64" />
-                    <h3>{{ student.formatName() }}</h3>
+                    <p>{{ student.formatName() }}</p>
                 </a>
                 <p class="meta">
                     {{ student.formatMetadata() }}
@@ -33,7 +33,7 @@
                             <div class="compact avatar card small-12">
                                 <a href="{{ routeLookup('customMoriahCohort.classReport', {studentId: student.getId(), classId: class.getId()}) }}">
                                     <span class="icon-home"></span>
-                                    <h3>{{ class.getNameWithCodes() }}</h3>
+                                    <p>{{ class.getNameWithCodes() }}</p>
                                     <p class="meta">
                                         {{ courseCount }} {% if courseCount == 1 %}course{% else %}courses{% endif %}
                                     </p>

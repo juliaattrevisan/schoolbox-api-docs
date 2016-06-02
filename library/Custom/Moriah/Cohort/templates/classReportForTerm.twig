@@ -216,7 +216,7 @@
             <div class="avatar card small-12">
                 <a href="/search/user/{{ student.getId()|e('url') }}">
                     <img src="/portrait.php?userId={{ student.getExternalId()|e('url') }}&size=square64" />
-                    <h3>{{ student.formatName() }}</h3>
+                    <p>{{ student.formatName() }}</p>
                 </a>
                 <p class="meta">
                     {{ student.formatMetadata() }}
@@ -226,8 +226,38 @@
     </div>
 
     {{ contextSelector|raw }}
+</div>
 
+{% if class.teachers is not empty %}
+<div class="row">
+    <div class="small-12 large-6 island">
+        <h2 class="subheader">Teachers</h2>
+        <section>
+            <ul class="action-list">
+                {% for teacher in class.teachers %}
+                    <li>
+                        <div class="small-12 avatar card">
+                            <a href="/search/user/{{ teacher.getId() }}" title="View Profile">
+                                <img src="/portrait.php?userId={{ teacher.getExternalId() }}&amp;size=square64"
+                                     alt="{{ teacher.formatName() }}">
+                                <p>{{ teacher.formatName() }}</p>
+                            </a>
+                            <p class="meta">{{ teacher.formatMetadata() }}</p>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+    <div class="small-12 large-6 island">
+        {# There's something here on grades page, but not for Moriah #}
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
     <div class="small-12 island">
+        <h2 class="subheader">Cohort Report</h2>
         <section>
             <ul class="action-list">
                 <li>
@@ -235,7 +265,7 @@
                         {% set otherUsageCount = max(0, (result.folders|length)-1) %}
                         <div class="avatar card small-12">
                             <span class="icon-course icon-32"></span>
-                            <h3>{{ result.course.getNameWithCodes() }}</h3>
+                            <p>{{ result.course.getNameWithCodes() }}</p>
                             {% if user.getRole().isStaff() %}
                             <p class="meta">
                                 Used by {{ otherUsageCount ?: 'no' }}
@@ -255,7 +285,7 @@
                             <li>
                                 <div class="avatar card small-12">
                                     <span class="icon-folder icon-32"></span>
-                                    <h3>{{ unitResult.unit.getTitle() }}</h3>
+                                    <p>{{ unitResult.unit.getTitle() }}</p>
                                 </div>
                                 <div data-unit-graph="{{ baseUnitId|e('html_attr') }}"
                                      id="unit-graph-{{ baseUnitId|e('html_attr') }}"></div>

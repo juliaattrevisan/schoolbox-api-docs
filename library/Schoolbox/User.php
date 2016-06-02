@@ -336,23 +336,27 @@ class User implements JsonSerializable, ISoftDeletable
      *
      * This is the same line that shows in search results underneath a student's name.
      *
+     * @todo allow schools to set the format as they can with `$this->formatName`
+     *
      * @return string
      */
     public function formatMetadata()
     {
-        $metadata = '';
-        $year     = $this->getYear();
-        $campus   = $this->getDefaultCampus()->getName();
-        $role     = $this->getRole()->getName();
-        if (!empty($year)) {
-            $metadata .= 'Year ' . $year;
-        }
-        // If $campus isn't in $role, output campus as well as role
-        if (stristr($role, $campus) === false) {
-            $metadata .= ' ' . $campus;
-        }
-        $metadata .= ' ' . $role;
-        return trim($metadata);
+        // For now, just show role name
+        return $this->getRole()->getName();
+//        $metadata = '';
+//        $year     = $this->getYear();
+//        $campus   = $this->getDefaultCampus()->getName();
+//        $role     = $this->getRole()->getName();
+//        if (!empty($year)) {
+//            $metadata .= 'Year ' . $year;
+//        }
+//        // If $campus isn't in $role, output campus as well as role
+//        if (stristr($role, $campus) === false) {
+//            $metadata .= ' ' . $campus;
+//        }
+//        $metadata .= ' ' . $role;
+//        return trim($metadata);
     }
 
     /**
