@@ -60,7 +60,8 @@ $now->endOfDay();
 
 $days= Config::get('external_attendance_days');
 
-if ($attendanceDate->diffInDays($now) != 0 || $attendanceDate->diffInDays($now) > $days) {
+// If not today and not within days range
+if ($attendanceDate->diffInDays($now) != 0 && $attendanceDate->diffInDays($now) > $days) {
     error(151);
 }
 
