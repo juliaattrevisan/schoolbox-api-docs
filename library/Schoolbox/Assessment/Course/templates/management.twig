@@ -96,7 +96,7 @@
                 {% set courseComponentRemoved = allCourseComponentIds[currentCourse.id].restorable %}
                 {% set courseParents = lineage[currentCourse.id] %}
 
-                <li class="actions-small-{{ courseComponentRemoved ? 3 : 2 }}">
+                <li class="actions-small-2">
                     <div class="list-item">
                         <div class="small-12 avatar card">
                             <h3>
@@ -120,8 +120,9 @@
                     <nav>
                         {% if courseComponentRemoved %}
                             <a href="{{ routeLookup('course.restoreCourse') }}" class="icon-undo" title="Restore Course" data-restore-course="{{ currentCourse.name }}" data-restore-folder="{{ folder.id }}" data-restore-component="{{ courseComponentId }}"></a>
+                        {% else %}
+                            <a href="{{ routeLookup('course.importModify', { componentId: courseComponentId }) }}" class="icon-modify" title="Modify Import"></a>
                         {% endif %}
-                        <a href="{{ routeLookup('course.importModify', { componentId: courseComponentId }) }}" class="icon-modify" title="Modify Import"></a>
                         <a href="" class="icon-delete" title="Permanently Delete Import" data-delete="{{ courseComponentId }}" data-coursename="{{ currentCourse.name }}"></a>
                     </nav>
                 </li>
