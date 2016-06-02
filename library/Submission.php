@@ -298,7 +298,7 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
                         ORDER BY datestamp DESC
                         ) submissions
                         GROUP BY id
-                        ORDER BY submitted DESC
+                        ORDER BY datestamp DESC
                     )
                     UNION
                     (
@@ -321,7 +321,7 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
                         AND (DATE_SUB(NOW(), INTERVAL {$threshold} MONTH) <= aa.finish)
                         ) attempts
                         GROUP BY id
-                        ORDER BY aa.finish DESC
+                        ORDER BY datestamp DESC
                     )
                     ORDER BY datestamp DESC";
 
