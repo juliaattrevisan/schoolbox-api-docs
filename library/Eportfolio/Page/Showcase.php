@@ -100,6 +100,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
                     /* Set up subject info
                      */
+                    $allSubjects[$currentBox->getCategory()->getId()]['id'] = $currentBox->getCategory()->getId();
                     $allSubjects[$currentBox->getCategory()->getId()]['name'] = $currentBox->getCategory()->getName();
 
                     /* Push individual items into the subject
@@ -123,10 +124,12 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
         $currentUser = $_SESSION['user'];
         if (count($allSubjects)) {
             foreach ($allSubjects as $currentSubject) {
+
                 /* Subject name
                  */
                 $this->getPage()->setVar(
                     array(
+                        'SHOWCASED_WORK_BOX_CATEGORY_ID' => $currentSubject['id'],
                         'SHOWCASED_WORK_BOX_CATEGORY_NAME' => $currentSubject['name'],
                     )
                 );
