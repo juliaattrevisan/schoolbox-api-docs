@@ -120,7 +120,7 @@ class Controller extends Base
     public function postImport()
     {
         $post = $this->getRequest()->post;
-        
+
         try {
             $defaultOwner = $this->getUserMapper()->findById($post["defaultOwnerId"]);
         } catch (\Exception $e) {

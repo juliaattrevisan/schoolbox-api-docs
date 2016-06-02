@@ -83,7 +83,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function getPastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
     {
-        $query = "SELECT PastoralCareSeq,
+        $query = "SELECT  PastoralCareSeq,
                           ID,
                           ClassCode,
                           ItemDate,
@@ -105,8 +105,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                           EmailSentByID,
                           DuplicateFromSeq,
                           SubjectClassesSeq
-                  FROM tPastoralCare
-                  WHERE PastoralCareSeq = " . $this->getPastoralIdentifier($pastoral);
+                  FROM    tPastoralCare
+                  WHERE   PastoralCareSeq = " . $this->getPastoralIdentifier($pastoral);
 
         return $this->getDatabase()->getAll($query);
     }
@@ -133,8 +133,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $silence = new SilentNotif();
 
         $this->getPastoralMapper()->setNotifier($silence);
-        $this->getPastoralAccessMapper()->setNotifier($silence);
         $this->getPastoralCommentMapper()->setNotifier($silence);
+        
+        $this->getPastoralLogMapper()->setSessionData($_SESSION);
 
         /** @var \Schoolbox\Collection $results */
         $results = $this->getPastoralLogMapper()->findAll()->sortBy("importId", "desc");
@@ -215,7 +216,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 catch (\Exception $e)
                 {
                     // Type doesn't exist in Schoolbox, create it
-                    
+
                     $type = new PastoralTypeModel();
                     $type->setName($record["TypeDescription"]);
                     $type->setExternalCode($record["TypeCode"]);
@@ -237,7 +238,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             catch (\Exception $e)
             {
                 // Category doesn't exist in Schoolbox, create it
-                
+
                 $category = new PastoralCategoryModel();
                 $category->setName($record["CategoryDescription"]);
                 $category->setExternalCode($record["CategoryCode"]);

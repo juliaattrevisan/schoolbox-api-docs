@@ -16,11 +16,28 @@ class Notifier extends AbstractModuleNotifier
     const TRIGGER_CREATED = 'created';
 
     /**
-     * @return string
+     * @param Model $model
+     * @param string $method
+     * @return Envelope
      */
-    protected function getSlug()
+    protected function buildMessage($model, $method)
     {
-        return NSMapper::NS_PASTORAL_LOG;
+        $envelope = new Envelope();
+
+        // Create the message
+
+        $builder = new Builder();
+        $builder->setTitle("Pastoral care import completed")
+            ->setIcon("/images/icon.php?size=48&icon=bolt")
+            ->setHref("/adminv2/import-pastoral/log/{$model->getImportId()}")
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::NOTICE)
+            ->addTopic("pastoral_log.{$model->getImportId()}.created");
+
+        $message = $builder->build();
+        $envelope->targetToUser($model->getUserId(), $message, true);
+
+        return $envelope;
     }
 
     /**
@@ -32,14 +49,11 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * @param string $label
-     * @return array
+     * @return string
      */
-    public function retrieveCallbacks($label)
+    protected function getSlug()
     {
-        return [
-            [ $this, "notifyCreated" ]
-        ];
+        return NSMapper::NS_PASTORAL_LOG;
     }
 
     /**
@@ -47,8 +61,10 @@ class Notifier extends AbstractModuleNotifier
      */
     public function bundleTriggers($bundle)
     {
-        if ($bundle->getMethod() == Mapper::METHOD_CREATE) {
-            $bundle->attach(self::TRIGGER_CREATED, self::IMMEDIATELY);
+        switch ($bundle->getMethod()) {
+            case BaseMapper::METHOD_CREATE:
+                $bundle->attach(self::TRIGGER_CREATED, self::IMMEDIATELY);
+                break;
         }
     }
 
@@ -60,22 +76,18 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyCreated($model, $userEffected, $diff=[])
     {
-        $envelope = new Envelope();
-
-        // Create the message
-
-        $builder = new Builder();
-        $builder->setTitle("Pastoral care import completed")
-            ->setIcon("/images/icon.php?size=48&icon=bolt")
-            ->setHref("/adminv2/import-pastoral/log/{$model->getImportId()}")
-            ->setNamespace($this->getSlug())
-            ->setSeverity(Logger::ERROR)
-            ->addTopic("pastoral_log.{$model->getImportId()}.created");
-
-        $message = $builder->build();
-        $envelope->targetToUser($model->getUserId(), $message, true);
-
-        return $envelope;
+        return $this->buildMessage($model, self::TRIGGER_CREATED);
     }
 
+    /**
+     * @param string $label
+     * @return array
+     */
+    public function retrieveCallbacks($label)
+    {
+        return [
+            [ $this, "notify" . ucfirst($label) ]
+        ];
+    }
 }
+
