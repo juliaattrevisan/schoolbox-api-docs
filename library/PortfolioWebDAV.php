@@ -565,6 +565,11 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     $settings['baseUri'] . '/thome/' . $_SESSION['username'] . '/',
                 );
             }
+            if ($groupHandler->isParent()) {
+                $paths = array(
+                    $settings['baseUri'] . '/reports/',
+                );
+            }
         } elseif ($site_location == 'sicol') {
             $settings = [
                 'baseUri'  => 'http://sbox_webdav.siena.vic.edu.au:81/',
