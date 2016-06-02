@@ -127,8 +127,6 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
-        $this->importCallback($defaultOwner);
-/*
         // Do the import in a detached state so it doesn't time out
 
         $this->getResponse()->content->set([
@@ -141,7 +139,7 @@ class Controller extends Base
                     $this->importCallback($defaultOwner);
                 }
             ],
-        ]);*/
+        ]);
     }
 
     /**
