@@ -274,7 +274,7 @@
                         {% set otherUsageCount = max(0, (result.folders|length)-1) %}
                         <div class="avatar card small-12">
                             <span class="icon-course icon-32"></span>
-                            <h3>{{ result.course.getNameWithCodes() }}</h3>
+                            <p>{{ result.course.getNameWithCodes() }}</p>
                             {% if user.getRole().isStaff() %}
                             <p class="meta">
                                 Used by {{ otherUsageCount ?: 'no' }}
@@ -294,7 +294,7 @@
                             <li>
                                 <div class="avatar card small-12">
                                     <span class="icon-folder icon-32"></span>
-                                    <h3>{{ unitResult.unit.getTitle() }}</h3>
+                                    <p>{{ unitResult.unit.getTitle() }}</p>
                                 </div>
                                 <div data-unit-graph="{{ baseUnitId|e('html_attr') }}"
                                      id="unit-graph-{{ baseUnitId|e('html_attr') }}"></div>

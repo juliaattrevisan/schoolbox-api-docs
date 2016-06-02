@@ -33,7 +33,7 @@
                             <div class="compact avatar card small-12">
                                 <a href="{{ routeLookup('customMoriahCohort.classReport', {studentId: student.getId(), classId: class.getId()}) }}">
                                     <span class="icon-home"></span>
-                                    <h3>{{ class.getNameWithCodes() }}</h3>
+                                    <p>{{ class.getNameWithCodes() }}</p>
                                     <p class="meta">
                                         {{ courseCount }} {% if courseCount == 1 %}course{% else %}courses{% endif %}
                                     </p>
