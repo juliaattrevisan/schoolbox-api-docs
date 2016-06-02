@@ -233,7 +233,7 @@
         <h2 class="subheader">Teachers</h2>
         <section>
             <ul class="action-list">
-                {% for teacher in teachers %}
+                {% for teacher in class.teachers %}
                     <li>
                         <div class="small-12 avatar card">
                             <a href="/search/user/{{ teacher.getId() }}" title="View Profile">

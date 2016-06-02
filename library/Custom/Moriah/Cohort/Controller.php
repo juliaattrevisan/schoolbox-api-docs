@@ -178,6 +178,9 @@ class Controller extends Base
 
             $contextSelectorHtml = $this->generateContextSelector($term);
 
+            // ¯\_(ツ)_/¯
+            $class->loadTeachers();
+
             // And get the classes which use them?
             $this->getResponse()->content->set([
                 'format'   => 'html',
