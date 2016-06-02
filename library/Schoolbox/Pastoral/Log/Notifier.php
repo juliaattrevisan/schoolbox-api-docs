@@ -24,18 +24,21 @@ class Notifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
 
-        // Create the message
+        if ($model->getResult() == 'Completed')
+        {
+            // Create the message
 
-        $builder = new Builder();
-        $builder->setTitle("Pastoral care import completed")
-            ->setIcon("/images/icon.php?size=48&icon=bolt")
-            ->setHref("/adminv2/import-pastoral/log/{$model->getImportId()}")
-            ->setNamespace($this->getSlug())
-            ->setSeverity(Logger::NOTICE)
-            ->addTopic("pastoral_log.{$model->getImportId()}.created");
+            $builder = new Builder();
+            $builder->setTitle("Pastoral care import completed")
+                ->setIcon("/images/icon.php?size=48&icon=bolt")
+                ->setHref("/adminv2/import-pastoral/log/{$model->getImportId()}")
+                ->setNamespace($this->getSlug())
+                ->setSeverity(Logger::NOTICE)
+                ->addTopic("pastoral_log.{$model->getImportId()}.created");
 
-        $message = $builder->build();
-        $envelope->targetToUser($model->getUserId(), $message, true);
+            $message = $builder->build();
+            $envelope->targetToUser($model->getUserId(), $message, true);
+        }
 
         return $envelope;
     }
