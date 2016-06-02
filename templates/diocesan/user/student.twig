@@ -1,6 +1,13 @@
 {% extends '@core/user/student.twig' %}
 
 {% if showButtons %}
+    {% block details_studiesCode %}
+        {% if externalUser.StudentStudiesCode %}
+        <dt class="no-margin small-6 medium-3">NSN</dt>
+        <dd class="no-margin small-6 medium-9">{{ externalUser.StudentStudiesCode }}</dd>
+        {% endif %}
+    {% endblock details_studiesCode %}
+
     {% block buttons_miscellaneous %}
         <!-- Start on School Grades page initially -->
         <li class="no-pad"><a href="/modules/custom/diocesan/achievementreport/{{ user.getExternalId() }}" class="no-margin fat icon-fat button icon-32 icon-progress" data-equalizer-watch>Achievement</a></li>
