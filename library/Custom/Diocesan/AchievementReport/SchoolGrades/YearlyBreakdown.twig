@@ -9,9 +9,9 @@
             $('[data-year="' + preselectedYear + '"]').addClass('current');
             $('[data-yearly-breakdown-year="' + preselectedYear + '"]').show();
 
-            /* Move to navigation element
-             */
-            $(document).scrollTop($('[data-year-selector]').offset().top);
+//            /* Move to navigation element
+//             */
+//            $(document).scrollTop($('[data-year-selector]').offset().top);
         }
 
         $('[data-year-selector]').on('click touchstart', 'a', function(event) {
@@ -32,9 +32,9 @@
             var baseUrl = window.location.href.replace(/\/(\d{4})$/, '');
             window.history.pushState('', '', baseUrl + '/' + $(this).attr('data-year'));
 
-            /* Move to navigation element
-             */
-            $(document).scrollTop($('[data-year-selector]').offset().top);
+//            /* Move to navigation element
+//             */
+//            $(document).scrollTop($('[data-year-selector]').offset().top);
         });
     });
 </script>
