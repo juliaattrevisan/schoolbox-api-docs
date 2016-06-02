@@ -86,6 +86,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 try {
+                    /** @var \Schoolbox\Assessment\Component\SubmissionBox $currentBox */
                     $currentBox = $currentShowcasedItem->getSubmissionBox();
 
                     $submission = $this->getLatestSubmission(
