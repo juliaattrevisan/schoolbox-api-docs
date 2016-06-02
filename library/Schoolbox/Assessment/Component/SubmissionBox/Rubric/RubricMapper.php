@@ -197,8 +197,7 @@ class RubricMapper
         $criteriaStatement = $this->database->query("
             SELECT
                 COUNT(box_id) usages,
-                COALESCE(selected, 0)
-                selected,
+                COALESCE(MAX(selected), 0) selected,
                 crit_id,
                 `grouping`,
                 `name`
