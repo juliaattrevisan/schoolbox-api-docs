@@ -106,6 +106,12 @@ class Statistics
         $quizVisibility   = new Visibility();
         $quizVisibilities = $quizVisibility->getVisibilityArray($student, $currentUser);
 
+        // SB-12505 - only items visible to parents are visible
+        $quizVisibilities = array_diff(
+            $quizVisibilities,
+            [SubmissionBox::MARK_VISIBILITY_PRIVATE, SubmissionBox::MARK_VISIBILITY_STUDENT,]
+        );
+
         // Get any classes which use this course.
         // (ever, not just in this date span - assessments could have varying due dates)
         $this->allFolders = $this->unitInstanceMapper->findAllFoldersUsingCourse($course);
