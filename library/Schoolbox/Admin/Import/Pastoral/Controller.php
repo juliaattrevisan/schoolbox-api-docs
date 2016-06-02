@@ -10,7 +10,7 @@
 namespace Schoolbox\Admin\Import\Pastoral;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Admin\Import\Pastoral\Mapper as LogMapper;
+use Schoolbox\Pastoral\Log\Mapper as LogMapper;
 use Schoolbox\User;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Storage;
@@ -127,6 +127,8 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
+        $this->importCallback($defaultOwner);
+/*
         // Do the import in a detached state so it doesn't time out
 
         $this->getResponse()->content->set([
@@ -139,7 +141,7 @@ class Controller extends Base
                     $this->importCallback($defaultOwner);
                 }
             ],
-        ]);
+        ]);*/
     }
 
     /**

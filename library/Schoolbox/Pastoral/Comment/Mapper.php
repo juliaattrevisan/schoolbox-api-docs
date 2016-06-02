@@ -74,8 +74,7 @@ class Mapper extends BaseMapper
 				`a`.`deleted_at` IS NULL AND
 				`a`.`pastoral_id` = :pastoralId
 			";
-
-
+        
         $statement = $this->database->prepare($query);
         $statement->bindParam(':pastoralId', $pastoralId);
         $statement->execute();
