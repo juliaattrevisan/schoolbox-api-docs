@@ -226,8 +226,47 @@
     </div>
 
     {{ contextSelector|raw }}
+</div>
 
+<div class="row">
+    <div class="small-12 large-6 island">
+        <h2 class="subheader">Teachers</h2>
+        <section>
+            <ul class="action-list">
+                {% for teacher in teachers %}
+                    <li>
+                        <div class="small-12 avatar card">
+                            <a href="/search/user/{{ teacher.getId() }}" title="View Profile">
+                                <img src="/portrait.php?userId={{ teacher.getExternalId() }}&amp;size=square64"
+                                     alt="{{ teacher.formatName() }}">
+                                <p>{{ teacher.formatName() }}</p>
+                            </a>
+                            <p class="meta">{{ teacher.formatMetadata() }}</p>
+                        </div>
+                    </li>
+                {% else %}
+                    <li>
+                        <div class="small-12 avatar card">
+                            <a href="/search/user/1" title="View Profile">
+                                <img src="/portrait.php?userId=1&amp;size=square64"
+                                     alt="Ms Example Teacher">
+                                <p>Ms Example Teacher</p>
+                            </a>
+                            <p class="meta">Teacher</p>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+    <div class="small-12 large-6 island">
+        {# There's something here on grades page, but not for Moriah #}
+    </div>
+</div>
+
+<div class="row">
     <div class="small-12 island">
+        <h2 class="subheader">Cohort Report</h2>
         <section>
             <ul class="action-list">
                 <li>
