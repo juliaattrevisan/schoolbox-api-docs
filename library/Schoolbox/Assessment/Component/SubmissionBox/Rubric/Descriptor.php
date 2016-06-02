@@ -10,9 +10,10 @@
 namespace Schoolbox\Assessment\Component\SubmissionBox\Rubric;
 
 use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\ISoftDeletable;
 
-class Descriptor {
-
+class Descriptor implements ISoftDeletable
+{
     /**
      * @var int
      */
@@ -165,4 +166,11 @@ class Descriptor {
         return $this->value;
     }
 
+    /**
+     * @return bool
+     */
+    public function isDeleted()
+    {
+        return !$this->getValid();
+    }
 }
