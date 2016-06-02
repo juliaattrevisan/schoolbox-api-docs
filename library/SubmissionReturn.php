@@ -118,6 +118,7 @@ class SubmissionReturn extends DeprecatedModel
                   LEFT JOIN submission_mark_type m ON s.mark_type = m.mark_type_id
                   WHERE r.deleted_at IS NULL
                   AND r.box_id = s.id
+                  AND r.is_confirmation_of_submission IS FALSE
                   AND s.category = c.id
                   AND s.deleted IS FALSE
                   AND r.owner = '$user_id'";
