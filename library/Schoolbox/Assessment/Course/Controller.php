@@ -1025,7 +1025,8 @@ class Controller extends Base\Base
 
         // O(N) Convert flat to tree
         foreach($nodes as $id => $node){
-            if(NULL !== $node->getParent()){
+            // Ignore top level nodes and nodes with missing parents
+            if(NULL !== $node->getParent() && isset($nodes[$node->getParent()])) {
                 $nodes[$node->getParent()]->addChild($node);
             }
         }
