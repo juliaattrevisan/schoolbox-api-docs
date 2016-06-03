@@ -121,7 +121,7 @@ elseif ($_POST['modusername']) {
         error(158);
     }
 
-    SitePage::localRedir('/adminv2/modify-user/' . $id);
+    SitePage::localRedir('/adminv2/modify-user/' . $user->getId());
 } /* Add user to group
  */
 elseif (isset($_POST['groupSubmit']) && is_numeric($_POST['uid'])) {
