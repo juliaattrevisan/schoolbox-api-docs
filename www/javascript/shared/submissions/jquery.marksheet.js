@@ -143,6 +143,7 @@
         {
             config.element.each(function() {
                 $(this).alaressValidate({
+                    ignoreTitle: true,
                     focusInvalid: false,
                     errorPlacement: function(error, element) {
                         // Attach to a table row if there is one there
