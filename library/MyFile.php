@@ -101,8 +101,8 @@ class MyFile extends DeprecatedModel
 	function delete ($fileID) {
 		$this->logAction($fileID, "delete");
 		return parent::update([
-            'id'      => $fileID,
-            'deleted' => 1
+            'id'         => $fileID,
+            'deleted_at' => Alaress_Date_Format::now()->getDatabase(),
         ]);
 	}
 
