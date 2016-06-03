@@ -139,7 +139,17 @@
                     }
                 });
             });
+
+            $('[data-validation-percent-limit]').each(function(idx,elem){
+                $(elem).rules( "add", {
+                    percentage: true,
+                    messages: {
+                        percentage: 'Please enter a value out of 100'
+                    }
+                });
+            });
         }
+
 
         function start()
         {
