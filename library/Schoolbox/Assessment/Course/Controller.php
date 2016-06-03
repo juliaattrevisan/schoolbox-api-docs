@@ -1481,7 +1481,8 @@ class Controller extends Base\Base
                     'componentId'    => $post["componentId"],
                     'courseHomepage' => $post["course_homepage"],
                     'unitDates'      => $post["unit"],
-                    'units'          => $allTaskDates['units']
+                    'units'          => $allTaskDates['units'],
+                    'submitValue'    => empty($post['ownerships']) ? 'Modify' : 'Import'
                 ]);
             }
         }
