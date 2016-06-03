@@ -117,18 +117,6 @@
                 }
             }, "Amount must be less or equal to mark limit");
 
-            // TODO: neither of these work anymore since the removal of functional CSS classes
-            jQuery.validator.addClassRules({
-                percent: {
-                    percentage: true
-                },
-
-                'out-of': {
-                    markLimit: true
-                }
-
-        });
-
             start();
 
             $('[data-validation-limit]').each(function(idx,elem){
