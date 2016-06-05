@@ -146,7 +146,7 @@ class Controller extends Base
     }
 
     /**
-     * Display form for adding another category
+     * Display form for adding another resource item
      */
     public function add()
     {
@@ -167,7 +167,7 @@ class Controller extends Base
     }
 
     /**
-     * Views an existing category
+     * Views an existing resource item
      *
      * @param Model $item
      */
@@ -193,7 +193,7 @@ class Controller extends Base
     }
 
     /**
-     * Display form for editing a category
+     * Display form for editing a resource item
      *
      * @param Model $item
      */
@@ -232,7 +232,7 @@ class Controller extends Base
     }
 
     /**
-     * Backend for adding a new category
+     * Backend for adding a new resource item
      */
     public function create()
     {
@@ -247,12 +247,12 @@ class Controller extends Base
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('resourceItem.browse', array())
+            $this->getRouter()->generate('resourceItem.read', array('id'=>$model->getId()))
         );
     }
 
     /**
-     * Backend for updating an existing category
+     * Backend for updating an existing resource item
      *
      * @param Model $item
      */
@@ -267,7 +267,7 @@ class Controller extends Base
         // If this is a JSON request, output a result - maybe if this is a
         // HTML request, redirect somewhere.
         $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate('resourceItem.browse', array())
+            $this->getRouter()->generate('resourceItem.read', array('id'=>$item->getId()))
         );
     }
 
