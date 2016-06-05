@@ -129,11 +129,18 @@ class Metadata {
          *
          * Otherwise aggregate for all folders that used the same course
          */
-        try {
-            $this->setSelectedFolder($folderMapper->findById($params['folderId']));
-            $this->getAllAggregateFolders()->add($this->getSelectedFolder());
+
+        if($params['folderId']) {
+
+            try {
+                $this->setSelectedFolder($folderMapper->findById($params['folderId']));
+                $this->getAllAggregateFolders()->add($this->getSelectedFolder());
+            } catch (\Exception $e) {
+                $this->setAllAggregateFolders($this->getAllFolders());
+            }
         }
-        catch (\Exception $e) {
+        else {
+            //If folderid not set, show all
             $this->setAllAggregateFolders($this->getAllFolders());
         }
     }
