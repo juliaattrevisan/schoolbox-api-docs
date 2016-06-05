@@ -14,7 +14,6 @@ use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use External_UserInterface;
-use Schoolbox\Assessment\Course;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
