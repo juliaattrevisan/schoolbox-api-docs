@@ -2,7 +2,7 @@
 <script type="text/javascript" src="/javascript/preview/preview.js"></script>
 <script type="text/javascript">
     $(function() {
-        $('#add-coverphoto').click(function(event){
+        $('#add-coverphoto').on('touchend click', function(event){
             event.preventDefault();
             $('#coverphoto-image').show().trigger('click').hide();
         });
