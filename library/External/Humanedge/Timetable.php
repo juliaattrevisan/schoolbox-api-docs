@@ -191,6 +191,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
                     CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
                     r.Code AS Room,
+                    a.NumConseqPeriods AS PeriodSpan,
                     $teacherSelect
                 FROM tblSubject s
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
@@ -213,6 +214,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
                     CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
                     r.Code AS Room,
+                    a.NumConseqPeriods AS PeriodSpan,
                     $teacherSelect
                 FROM tblSubject s
                 INNER JOIN tblBlockItem b on s.ID = b.SubjectID
@@ -240,6 +242,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
                     CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
                     r.Code AS Room,
+                    a.NumConseqPeriods AS PeriodSpan,
                     $teacherSelect
                 FROM tblSubject s
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
@@ -261,6 +264,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     CAST(ISNULL(pd.StartTime, p.StartTime) AS TIME) as StartTime,
                     CAST(ISNULL(pd.EndTime, p.EndTime) AS TIME) as EndTime,
                     r.Code AS Room,
+                    a.NumConseqPeriods AS PeriodSpan,
                     $teacherSelect
                 FROM tblSubject s
                 INNER JOIN tblBlockItem b on s.ID = b.SubjectID
@@ -290,8 +294,13 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             $timetable[$x]['class']          = [];
         }
         foreach ($db->getAll($query) as $timetabledClass) {
+            // Account for classes which extend multiple periods
+            $periodSpan = range(
+                $timetabledClass['PeriodNumber'],
+                $timetabledClass['PeriodNumber'] + $timetabledClass['PeriodSpan'] - 1
+            );
             foreach ($timetable as $x => $timetablePeriod) {
-                if ($timetabledClass['PeriodNumber'] == $timetablePeriod['periodNumber']) {
+                if (in_array($timetablePeriod['periodNumber'], $periodSpan)) {
                     $classCode = $timetabledClass['ClassCode'];
                     if (!isset($timetable[$x]['class'][$classCode])) {
                         // Period start/end isn't always the same as the base class period
@@ -318,7 +327,6 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                             'staffSurname'   => $timetabledClass['StaffSurname'],
                             'staffTitle'     => $timetabledClass['StaffTitle'],
                         );
-                        break;
                     }
                 }
             }
