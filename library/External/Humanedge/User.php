@@ -121,6 +121,7 @@ class External_Humanedge_User implements External_UserInterface
             -- LEFT JOIN Family f ON cf.FamilyID = f.ID
             LEFT JOIN vw_Contact_Addresses ca ON c.ID = ca.ContactID
             WHERE s.Code = {$this->getDatabase()->smartQuote($externalUserId)}
+            AND sc.ResidentialGuardian = 'Y'
         ";
         return $this->getDatabase()->getAll($query);
     }
