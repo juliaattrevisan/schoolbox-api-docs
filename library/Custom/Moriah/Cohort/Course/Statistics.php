@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Course;
+namespace Custom\Moriah\Cohort\Course;
 
 use Assess\Visibility;
 use Schoolbox\Assessment\Component\OnlineAssessment;
@@ -15,6 +15,9 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\UnitInstance;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -23,7 +26,10 @@ use Schoolbox\User;
 /**
  * Course-context port of `\Schoolbox\Assessment\ClassStatistics`.
  *
- * @package Schoolbox\Assessment\Course
+ * Currently only suited to Moriah's Schoolbox install, but likely to be able
+ * to be ported to others once Moriah-specific business logic is removed.
+ *
+ * @package Custom\Moriah\Cohort\Course
  */
 class Statistics
 {
