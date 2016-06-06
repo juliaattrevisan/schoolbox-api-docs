@@ -220,7 +220,7 @@ th, td{
         $label-selector: "label.#{$label-class}";
     }
 
-    float: left;
+    position: absolute;
     width: 0;
     height: 0;
     min-height: 0;
