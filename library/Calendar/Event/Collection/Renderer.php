@@ -51,6 +51,11 @@ class Renderer
     /**
      * @var User
      */
+    protected $user;
+
+    /**
+     * @var User
+     */
     protected $viewer;
 
     /**
@@ -81,15 +86,17 @@ class Renderer
      * @param $api
      * @param $startTimestamp
      * @param $endTimestamp
-     * @param \Schoolbox\User $viewer
+     * @param \Schoolbox\User $user
      * @param \SitePage $page
+     * @param \Schoolbox\User $viewer
      */
-    public function __construct($api, $startTimestamp, $endTimestamp, User $viewer, \SitePage $page)
+    public function __construct($api, $startTimestamp, $endTimestamp, User $user, \SitePage $page, User $viewer)
     {
         $this->setApi($api);
         $this->setStartTimestamp($startTimestamp);
         $this->setEndTimestamp($endTimestamp);
         $this->setPage($page);
+        $this->setUser($user);
         $this->setViewer($viewer);
 
         //TODO remove these deprecated dependencies
@@ -287,6 +294,22 @@ class Renderer
     public function getGroupHandler()
     {
         return $this->groupHandler;
+    }
+
+    /**
+     * @param User $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 
     /**

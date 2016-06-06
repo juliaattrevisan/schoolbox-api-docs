@@ -16,5 +16,6 @@ try {
 catch (Exception $e) {
     error($e->getCode());
 }
-$calendar = new Calendar_Layout_Full_Ajax_JSON($this, $user, $this->arg[0]);
+
+$calendar = new Calendar_Layout_Full_Ajax_JSON($this, $user, $this->arg[0], $_SESSION['user']);
 $calendar->render();

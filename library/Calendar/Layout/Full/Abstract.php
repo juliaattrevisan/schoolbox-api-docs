@@ -21,25 +21,25 @@ abstract class Calendar_Layout_Full_Abstract
     protected $selectedDate = null;
     protected $startOfWeek = null;
 
-    /* Actual connector instance
-     */
+    /** Actual connector instance */
     protected $api = null;
 
-    /**
-     * An instance of Schoolbox\User
-     *
-     * @var null
-     */
-    protected $user = null;
+    /** @var  Schoolbox\User $user     Who this Calendar is about */
+    protected $user;
+
+    /** @var  Schoolbox\User $viewer   Who is currently viewing the Calendar */
+    protected $viewer;
+
 
     /**
      * Constructor
      *
      * @param $page
-     * @param $user
+     * @param \Schoolbox\User $user
      * @param $date
+     * @param \Schoolbox\User $viewer
      */
-    public function __construct($page, \Schoolbox\User $user, $date)
+    public function __construct($page, \Schoolbox\User $user, $date, \Schoolbox\User $viewer)
     {
         $factory = new Calendar_Api_Factory($user);
         $api = $factory->produce();
@@ -51,6 +51,7 @@ abstract class Calendar_Layout_Full_Abstract
         $this->setCalendarHandler(new Calendar());
 
         $this->setUser($user);
+        $this->setViewer($viewer);
         $this->setGroupHandler(new Group());
         $this->setSubStuHandler(new SubmissionStudent());
         $this->setPage($page);
@@ -478,5 +479,23 @@ abstract class Calendar_Layout_Full_Abstract
     protected function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * Set viewer
+     *
+     * @param \User $viewer
+     */
+    public function setViewer($viewer){
+        $this->viewer = $viewer;
+    }
+
+    /**
+     * Get viewer
+     *
+     * @return \User
+     */
+    public function getViewer(){
+        return $this->viewer;
     }
 }

@@ -89,10 +89,9 @@ $calendar = new Lister(
     $start->getUnixTimestamp(),
     $finish->addDays(1)->getUnixTimestamp(),
     $user,
-    $this
+    $this,
+    $user
 );
-
-
 
 
 $lastDate = false;
