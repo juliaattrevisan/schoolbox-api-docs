@@ -9,6 +9,7 @@
 
 $user_mapper = new \Schoolbox\UserMapper();
 $user = $user_mapper->findById($_GET['userId']);
+$viewer = $_SESSION['user'];
 try {
     Calendar_Layout_Full_Javascript::permissionCheck(
         $_GET['userId'],
@@ -24,7 +25,7 @@ $renderer = new \Calendar\Event\Collection\Renderer(
     new \Calendar_Api_EventType_Submission_Schoolbox_ForDueWork($user, array()),
     $_GET['start'],
     $_GET['end'],
-    $user,
+    $viewer,
     $this
 );
 echo "[";
