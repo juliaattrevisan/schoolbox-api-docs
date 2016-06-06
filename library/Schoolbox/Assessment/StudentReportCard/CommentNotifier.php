@@ -122,6 +122,15 @@ class CommentNotifier extends AbstractModuleNotifier
     }
 
 
+    /**
+     * @param Term\Mapper $termMapper
+     * @return self
+     */
+    protected function setTermMapper($termMapper)
+    {
+        $this->termMapper = $termMapper;
+        return $this;
+    }
 
 
     /**
