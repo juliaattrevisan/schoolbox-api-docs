@@ -8,7 +8,9 @@
 namespace Custom\Moriah\Cohort;
 
 use Alaress\Web\Controller\Base;
+use Custom\Moriah\Cohort\Course\Statistics as CourseStatistics;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Resource\Folder;
@@ -27,7 +29,7 @@ class Controller extends Base
     protected $folderMapper;
 
     /**
-     * @var Course\UnitInstanceMapper
+     * @var UnitInstanceMapper
      */
     protected $unitInstanceMapper;
 
@@ -39,13 +41,13 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Folder\Mapper             $folderMapper
-     * @param Course\UnitInstanceMapper $unitInstanceMapper
-     * @param Term\Mapper               $termMapper
+     * @param Folder\Mapper      $folderMapper
+     * @param UnitInstanceMapper $unitInstanceMapper
+     * @param Term\Mapper        $termMapper
      */
     public function __construct(
         Folder\Mapper $folderMapper,
-        Course\UnitInstanceMapper $unitInstanceMapper,
+        UnitInstanceMapper $unitInstanceMapper,
         Term\Mapper $termMapper
     ) {
         $this->folderMapper       = $folderMapper;
@@ -139,7 +141,7 @@ class Controller extends Base
             foreach ($courseList as $course) {
                 // ONLY assessment tasks
                 // ONLY items that are on ALL folders in course
-                $courseStats = new Course\Statistics(
+                $courseStats = new CourseStatistics(
                     $course,
                     $term,
                     $student,

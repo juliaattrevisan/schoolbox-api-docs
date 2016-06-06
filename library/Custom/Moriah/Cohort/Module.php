@@ -14,6 +14,7 @@ use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use External_UserInterface;
+use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
@@ -143,7 +144,7 @@ class Module extends BaseModule
                 Controller::class,
                 [
                     'folderMapper'       => $this->folderMapper,
-                    'unitInstanceMapper' => $injector->lazyNew(Course\UnitInstanceMapper::class),
+                    'unitInstanceMapper' => $injector->lazyNew(UnitInstanceMapper::class),
                     'termMapper'         => $this->termMapper,
                 ]
             )
