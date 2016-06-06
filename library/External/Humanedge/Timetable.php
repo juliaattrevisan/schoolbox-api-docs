@@ -105,13 +105,14 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             ? new Alaress_Date_Format($date, Alaress_Date_Format::TIMESTAMP)
             : Alaress_Date_Format::now()
         ;
-        return $db->getOne("
+        $result = $db->getOne("
             SELECT d.[SortOrder]
             FROM tblDay d
             INNER JOIN tblCalendarDay c ON d.ID = c.TimetableDayID
             WHERE CAST(c.TimetableDate AS DATE) = CAST({$db->smartQuote($time->getDatabase())} AS DATE)
             AND d.deleted = 0
         ");
+        return intval($result);
     }
 
     /**
