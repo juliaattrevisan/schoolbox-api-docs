@@ -15,6 +15,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Term\Model as Term;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Metadata {
 
@@ -129,11 +130,16 @@ class Metadata {
          *
          * Otherwise aggregate for all folders that used the same course
          */
-        try {
-            $this->setSelectedFolder($folderMapper->findById($params['folderId']));
-            $this->getAllAggregateFolders()->add($this->getSelectedFolder());
+        if ($params['folderId']) {
+            try {
+                $this->setSelectedFolder($folderMapper->findById($params['folderId']));
+                $this->getAllAggregateFolders()->add($this->getSelectedFolder());
+            } catch (MapperException $e) {
+                $this->setAllAggregateFolders($this->getAllFolders());
+            }
         }
-        catch (\Exception $e) {
+        else {
+            //If folderid not set, show all
             $this->setAllAggregateFolders($this->getAllFolders());
         }
     }
