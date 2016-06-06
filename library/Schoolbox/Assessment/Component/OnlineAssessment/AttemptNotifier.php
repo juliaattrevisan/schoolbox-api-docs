@@ -76,6 +76,15 @@ class AttemptNotifier extends AbstractModuleNotifier {
     }
 
 
+	/**
+	 * @param UserAccessMapper $userAccessMapper
+	 * @return self
+	 */
+	protected function setUserAccessMapper($userAccessMapper)
+	{
+		$this->userAccessMapper = $userAccessMapper;
+		return $this;
+	}
 
 
 	/**
