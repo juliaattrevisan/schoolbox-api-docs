@@ -376,6 +376,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     d.SortOrder as DayNumber,
                     p.SortOrder as PeriodNumber,
                     r.Code AS Room,
+                    a.NumConseqPeriods AS PeriodSpan,
                     $teacherSelect
                 FROM tblSubject s
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
@@ -395,6 +396,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     d.SortOrder as DayNumber,
                     p.SortOrder as PeriodNumber,
                     r.Code AS Room,
+                    a.NumConseqPeriods AS PeriodSpan,
                     $teacherSelect
                 FROM tblSubject s
                 INNER JOIN tblBlockItem b on s.ID = b.SubjectID
@@ -419,6 +421,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     d.SortOrder as DayNumber,
                     p.SortOrder as PeriodNumber,
                     r.Code AS Room,
+                    a.NumConseqPeriods AS PeriodSpan,
                     $teacherSelect
                 FROM tblSubject s
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
@@ -437,6 +440,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                     d.SortOrder as DayNumber,
                     p.SortOrder as PeriodNumber,
                     r.Code AS Room,
+                    a.NumConseqPeriods AS PeriodSpan,
                     $teacherSelect
                 FROM tblSubject s
                 INNER JOIN tblBlockItem b on s.ID = b.SubjectID
@@ -466,8 +470,13 @@ class External_Humanedge_Timetable implements External_TimetableInterface
             $timetable[$x]['day']            = array_fill(1, $timetabledef['dayCount'], []);
         }
         foreach ($db->getAll($query) as $timetabledClass) {
+            // Account for classes which extend multiple periods
+            $periodSpan = range(
+                $timetabledClass['PeriodNumber'],
+                $timetabledClass['PeriodNumber'] + $timetabledClass['PeriodSpan'] - 1
+            );
             foreach ($timetable as $x => $timetablePeriod) {
-                if ($timetabledClass['PeriodNumber'] == $timetablePeriod['periodNumber']) {
+                if (in_array($timetablePeriod['periodNumber'], $periodSpan)) {
                     $classCode = $timetabledClass['ClassCode'];
                     $dayNumber = $timetabledClass['DayNumber'];
                     if (!isset($timetable[$x]['day'][$dayNumber][$classCode])) {
@@ -481,7 +490,6 @@ class External_Humanedge_Timetable implements External_TimetableInterface
                             'staffSurname'   => $timetabledClass['StaffSurname'],
                             'staffTitle'     => $timetabledClass['StaffTitle'],
                         );
-                        break;
                     }
                 }
             }
