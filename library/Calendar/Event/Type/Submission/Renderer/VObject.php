@@ -24,6 +24,10 @@ class VObject extends VObjectBase
      */
     public function render()
     {
+        if(!$this->isVisible()){
+            return '';
+        }
+
         // Output event times as UTC,
         // no client should be able to mess that up.
         $utcTimezone = new DateTimeZone('UTC');

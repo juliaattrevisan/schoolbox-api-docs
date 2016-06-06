@@ -19,6 +19,10 @@ class Csv extends CsvBase {
      */
     public function render()
     {
+        if(!$this->isVisible()){
+            return '';
+        }
+
         $fd = fopen('php://temp/maxmemory:10000', 'rw');
 
 

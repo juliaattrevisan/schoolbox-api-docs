@@ -25,6 +25,10 @@ class Javascript extends Base
      */
     public function render()
     {
+        if(!$this->isVisible()){
+            return '';
+        }
+
         /* Show a homepage if appropriate
          */
         $categoryId   = $this->getEvent()->getCategory()->getId();
