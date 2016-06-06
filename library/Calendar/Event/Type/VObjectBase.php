@@ -12,7 +12,7 @@
 
 namespace Calendar\Event\Type;
 
-use Html2Text\Html2Text;
+use Alaress\Html\ToText as Html2Text;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Property\ICalendar;
 use DateTimeZone;

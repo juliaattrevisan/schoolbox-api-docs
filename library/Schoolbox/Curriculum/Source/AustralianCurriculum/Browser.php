@@ -15,7 +15,7 @@ use Alaress_Curl_Url;
 use Alaress_Date_Format;
 use DateTime;
 use EasyRdf_Sparql_Client;
-use Html2Text\Html2Text;
+use Alaress\Html\ToText as Html2Text;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\LearningArea;
 use Schoolbox\Curriculum\LearningLevel;

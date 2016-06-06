@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-use Html2Text\Html2Text;
+use Alaress\Html\ToText as Html2Text;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Realtime\Notification\Decorator;
 use Schoolbox\Realtime\Notification\Envelope;

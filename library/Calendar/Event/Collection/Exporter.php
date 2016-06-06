@@ -10,7 +10,7 @@
 namespace Calendar\Event\Collection;
 
 use Sabre\VObject\Component\VCalendar;
-use Html2Text\Html2Text;
+use Alaress\Html\ToText as Html2Text;
 use Schoolbox\User;
 use SitePage;
 use Config;
@@ -45,7 +45,7 @@ class Exporter extends Renderer {
         $this->getVCalendar()->add('X-WR-CALNAME', Config::get('title').' Calendar');
         $this->getVCalendar()->add('X-WR-CALDESC', 'Calendar for '.Config::get('school_name'));
 
-        $this->setTextConverter(new \Html2Text\Html2Text());
+        $this->setTextConverter(new Html2Text());
 	}
 
     /**

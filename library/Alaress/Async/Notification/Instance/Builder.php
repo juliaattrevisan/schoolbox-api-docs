@@ -10,7 +10,7 @@
 namespace Alaress\Async\Notification\Instance;
 
 use Alaress\Async\Notification\Parameter\ParameterInterface;
-use Html2Text\Html2Text;
+use Alaress\Html\ToText as Html2Text;
 use InvalidArgumentException;
 use OutOfBoundsException;
 
