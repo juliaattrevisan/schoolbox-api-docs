@@ -401,7 +401,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 
 				&.active {
 					display: block;
-					max-height: 1000px;
+					max-height: 2000px;
 					visibility: visible;
 					@include transition(ease-in, 0.2s, max-height);
 				}
