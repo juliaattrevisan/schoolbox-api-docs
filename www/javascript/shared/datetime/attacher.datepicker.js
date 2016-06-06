@@ -20,6 +20,10 @@
                 var input         = $(this);
                 var previousValue = input.data('previousValue') || "";
 
+                $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
+                    input.val(data.time).blur();
+                });
+
                 // jQuery datepicker no longer triggers a change event.
                 // Do it manually.
                 if (string != previousValue) {
