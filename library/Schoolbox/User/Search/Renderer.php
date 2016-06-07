@@ -98,15 +98,16 @@ class Renderer extends Handler
                     $this->getPage()->parse('grades_button_block', 'grades_button');
                 }
 
-
-                if (\Config::get('pastoral_enabled') != 1) {
+                // Hide if disabled or not a student
+                if (\Config::get('pastoral_enabled') != 1 || !$groupHandler->isStudent($user['id'])) {
                     $this->getPage()->setVar('pastoral_block', '');
                 }
                 else
                 {
-                    // Show pastoral to staff and parents
-                    if (($_SESSION['user']->getRole()->isStaff() ||
-                        $groupHandler->isParentOfChild($user['id'])) && $groupHandler->isStudent($user['id']) && \Config::get('pastoral_parent_access')) {
+                    // Show this student's pastoral link to staff, or parents if config allows.
+                    if ( $_SESSION['user']->getRole()->isStaff() ||
+                        ($groupHandler->isParentOfChild($user['id']) && \Config::get('pastoral_parent_access'))
+                    ){
                         $this->getPage()->parse('pastoral_block', 'pastoral');
                     } else {
                         $this->getPage()->setVar('pastoral_block', '');
@@ -115,7 +116,7 @@ class Renderer extends Handler
 
 
 
-                    //Show student timetables to staff and parents of child
+                //Show student timetables to staff and parents of child
                 if ($groupHandler->isStudent($user['id'])) {
                     if ($_SESSION['user']->getRole()->isStaff() || $groupHandler->isParentOfChild($user['id'])) {
                         // Timetable shouldn't appear if synergy is disabled in the conf, or the students timetable is marked as hidden
