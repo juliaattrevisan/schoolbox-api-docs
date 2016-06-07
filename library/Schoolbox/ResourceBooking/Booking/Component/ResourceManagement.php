@@ -14,6 +14,7 @@ namespace Schoolbox\ResourceBooking\Booking\Component;
 use Component_Dashboard_ControllerAbstract;
 use Calendar_Api_EventType_ResourceBooking_Moderation_Default;
 use Schoolbox\Config\Config;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Loader;
 use Schoolbox\ResourceBooking\Booking;
 use Aura\Di;
@@ -42,8 +43,8 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
     public function execute()
     {
         //Ensure ResourceBooking module is enabled
-        $configLoader = new Loader();
-        if(0 == $configLoader->get('resource_booking_enabled')){
+        $configMapper = ConfigMapper::getInstance();
+        if(0 == $configMapper->get('resource_booking_enabled')){
             return false;
         }
 
