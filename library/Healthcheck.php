@@ -229,6 +229,15 @@ class Healthcheck
         $list[] = 'StaffSchedule';
         $list[] = 'StaffScheduleStudentClasses';
 
+        // Pastoral Care Tables
+
+        $list[] = 'luPastoralCareCategory';
+        $list[] = 'luPastoralCareType';
+        $list[] = 'PastoralCareComments';
+        $list[] = 'PastoralCareContacts';
+        $list[] = 'PastoralCareActions';
+        $list[] = 'tPastoralCare';
+
         sort($list);
 
         foreach ($list as $table) {
