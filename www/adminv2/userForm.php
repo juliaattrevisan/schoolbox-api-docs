@@ -111,7 +111,7 @@ elseif ($_POST['modusername']) {
     $user->setHideTimetable(!empty($_POST['hide_timetable']));
     $user->getSchoolHouse()->setId($_POST['house']);
     $user->getResidentialHouse()->setId($_POST['residential_house']);
-    $user->setEnabled($_POST['account_enabled']);
+    $user->setEnabled(isset($_POST['account_enabled']) ? $_POST['account_enabled'] : true);
 
     /* Users require a campus array before they can be created successfully
      */
