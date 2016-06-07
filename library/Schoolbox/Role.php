@@ -33,9 +33,9 @@ class Role implements ValueLabelInterface
     const PARENT = 'parent';
     const STAFF = 'staff';
 
-    const DIGEST_NEVER = 0;
-    const DIGEST_WEEKLY = 1;
-    const DIGEST_DAILY = 2;
+    const DIGEST_NEVER = '0';
+    const DIGEST_WEEKLY = '1';
+    const DIGEST_DAILY = '2';
 
     /**
      * True if role is guest
