@@ -68,10 +68,10 @@ class Calendar_Api_Factory {
 				$uniqueImplementation  = 'Calendar_Api_EventType_' . $config->getEventType() . '_' . $config->getConnectorClass() . '_' . ucwords(Cfg::get('site_location'));
 
 				/* Decide which to use (unique or default)
-                 *
-                 * Inject config settings, including the calendar_connector id
-                 * so it knows from whence it came
-                 */
+				 *
+				 * Inject config settings, including the calendar_connector id
+				 * so it knows from whence it came
+				 */
 				if (class_exists($uniqueImplementation)) {
 					$implementation = new $uniqueImplementation($this->getUser(), $config);
 					$implementation->setConnectorId($config->getId());
