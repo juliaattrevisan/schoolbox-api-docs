@@ -1269,6 +1269,26 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
+     * `findById` with fallback to:
+     * * soft-deleted version of object
+     * * empty object if hard-deleted
+     *
+     * @param  mixed $identifierValue
+     * @return object
+     * @throws Exception
+     */
+    public function findByIdWithFallback($identifierValue)
+    {
+        try {
+            return $this->findById($identifierValue);
+        } catch (Mapper\Exception\Deleted $e) {
+            return $e->getDeletedObject();
+        } catch (Mapper\Exception $e) {
+            return $this->createModel();
+        }
+    }
+
+    /**
      * Returns a collection with models filtered by column/property
      *
      * @param String $columnName
