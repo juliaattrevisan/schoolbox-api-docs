@@ -53,11 +53,7 @@
 
                             <div class="list-item">
                                 <div class="avatar card small-12">
-                                    <a href="{{ routeLookup('eportfolioBlog.getItem', {ownerId: page.getUid, pageId: page.getPageId, id: blog.getId}) }}">
-                                        <img src="/portrait.php?userId={{ blog.getOwner.getExternalId }}&size=square64" />
-                                        <h3>{{ blog.getHeading }}</h3>
-                                    </a>
-                                    <p class="meta">Posted by <a href="/search/user/{{ blog.getOwner.getId }}">{{ blog.getOwner.getFirstname }} {{ blog.getOwner.getLastname }}</a> {{ blog.getCreatedAt.getRelativeTime }}</p>
+                                    {% include '@eportfolioBlog/sub/blogAvatarCard.twig' with {blog: blog} %}
                                 </div>
                             </div>
 
@@ -88,10 +84,7 @@
                                     <li class="actions-small-1" data-thread>
                                         <div class="list-item">
                                             <div class="avatar card small-12">
-                                                <a href="/search/user/{{ comment.getOwner.getId }}">
-                                                    <img src="/portrait.php?userId={{ comment.getOwner.getExternalId }}&size=square64" />
-                                                    <p>{{ comment.getOwner.getFirstname }} {{ comment.getOwner.getLastname }}</p>
-                                                </a>
+                                                {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
                                                 <p class="meta">Commented {{ comment.getCreatedAt.getRelativeTime }}</p>
                                             </div>
                                         </div>

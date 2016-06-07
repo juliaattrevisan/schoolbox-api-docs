@@ -86,17 +86,17 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         /** @var BlogModel $blog */
         foreach ($blogs as $blog) {
-            $user = $this->getUserMapper()->findById($blog->getOwner()->getId());
+            // Rehydrate
+            $user = $this->getUserMapper()->findByIdWithFallback($blog->getOwner()->getId());
             $blog->setOwner($user);
 
             $blogComments[$blog->getId()] = $this->getBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
             $blogImages[$blog->getId()] = $this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId());
 
             // Hydrate owner of comments
-
             /** @var BlogCommentModel $comment */
             foreach ($blogComments[$blog->getId()] as $comment) {
-                $comment->setOwner($this->getUserMapper()->findById($comment->getOwner()->getId()));
+                $comment->setOwner($this->getUserMapper()->findByIdWithFallback($comment->getOwner()->getId()));
             }
         }
 
@@ -116,8 +116,6 @@ class Controller extends Component_Homepage_ControllerAbstract
             ),
             $this->hasWriteAccess() || !$this->getConfig('compactMode')
         );
-
-        return false;
     }
 
     /**

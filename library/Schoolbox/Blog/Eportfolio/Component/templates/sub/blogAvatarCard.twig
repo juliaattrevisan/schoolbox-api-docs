@@ -1,0 +1,13 @@
+<a href="{{ routeLookup('eportfolioBlog.getItem', {ownerId: page.getUid, pageId: page.getPageId, id: blog.getId}) }}">
+    <img src="/portrait.php?userId={{ blog.getOwner.getExternalId }}&size=square64" />
+    <h3>{{ blog.getHeading }}</h3>
+</a>
+<p class="meta">
+    Posted by
+    {% if not (blog.getOwner().isDeleted() or blog.getOwner().getId() == 0) %}
+        <a href="/search/user/{{ blog.getOwner().getId() }}">{{ blog.getOwner().formatName() }}</a>
+    {% else %}
+        {{ blog.getOwner().formatName() }}
+    {% endif %}
+    {{ blog.getCreatedAt().getRelativeTime() }}
+</p>
