@@ -55,14 +55,6 @@ if($enabled) {
     // aaaand put 0 at the start
     ksort($dayTests);
 
-    $timeDatetime = new DateTime();
-    $timeTests = array();
-    for($i = 0; $i < 24; ++$i) {
-        for($j = 0; $j < 60; $j += 30) {
-            $timeTests[] = array($i, $j);
-        }
-    }
-
     foreach(\Schoolbox\RoleMapper::getInstance()->findAll() as $role) {
 
         /** @var \Schoolbox\Role $role */
@@ -74,15 +66,6 @@ if($enabled) {
         ));
 
         $schedule = $role->getDigestSchedule();
-
-        switch($schedule) {
-            case \Schoolbox\Role::DIGEST_DAILY:
-                $schedule = \Schoolbox\Realtime\Digest\DigestScheduler::DAILY;
-                break;
-            case \Schoolbox\Role::DIGEST_WEEKLY:
-                $schedule = \Schoolbox\Realtime\Digest\DigestScheduler::WEEKLY;
-                break;
-        }
 
         // Only attempt to parse crontab if it's valid, don't create a fake one.
         // This prevents an issue where the check against
@@ -137,18 +120,8 @@ if($enabled) {
             $valid = false;
         }
 
-        foreach($timeTests as $time) {
-            if($valid) {
-                $selected = ($hr == $time[0] && $mi == $time[1]);
-            } else {
-                $selected = false;
-            }
-
-            if ($selected) {
-                $this->setVar(array(
-                    'TIME_VALUE' => sprintf("%02d:%02d", $time[0], $time[1])
-                ));
-            }
+        if ($valid) {
+            $this->setVar('TIME_VALUE', sprintf("%02d:%02d", $hr, $mi));
         }
 
         $this->parse('role_digest_block', 'role_digest', true);

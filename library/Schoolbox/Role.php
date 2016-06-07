@@ -22,7 +22,7 @@ class Role implements ValueLabelInterface
 
     /**
      * What's the digest schedule for this group?
-     * One of self::DIGEST_NEVER, self::DIGEST_DAILY, self::DIGEST_WEEKLY, or a cron schedule
+     * self::DIGEST_NEVER or a cron schedule
      *
      * @var string
      */
@@ -33,9 +33,7 @@ class Role implements ValueLabelInterface
     const PARENT = 'parent';
     const STAFF = 'staff';
 
-    const DIGEST_NEVER = 0;
-    const DIGEST_WEEKLY = 1;
-    const DIGEST_DAILY = 2;
+    const DIGEST_NEVER = '0';
 
     /**
      * True if role is guest

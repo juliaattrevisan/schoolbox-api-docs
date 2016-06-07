@@ -30,10 +30,6 @@ use Schoolbox\RoleMapper;
 
 class DigestScheduler extends CronScheduler {
 
-	const NEVER  = '0 1 31 2 *'; // 1am, Feb 31st (good luck)
-	const DAILY  = '0 6 * * 1-5'; // 6am, weekdays
-	const WEEKLY = '0 11 * * 5'; // 11am, Fridays
-
 	const QUEUE_COMMAND  = '.sb.cmd.digest';
 
 	/** @var DigestTrigger[] */
@@ -97,16 +93,6 @@ class DigestScheduler extends CronScheduler {
 			// cast 0 to "0", because loose typing equality because PHP -_-
 			if($schedule == (string)Role::DIGEST_NEVER) {
 				continue;
-			}
-
-			// convert old DAILY and WEEKLY enum into crontab
-			switch($schedule) {
-				case Role::DIGEST_DAILY:
-					$schedule = self::DAILY; // weekdaily, 6am
-					break;
-				case Role::DIGEST_WEEKLY:
-					$schedule = self::WEEKLY; // Friday, 11am
-					break;
 			}
 
 			try {
