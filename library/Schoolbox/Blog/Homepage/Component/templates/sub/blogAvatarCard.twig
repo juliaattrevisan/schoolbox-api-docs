@@ -7,7 +7,7 @@
     {% if not (blog.getOwner().isDeleted() or blog.getOwner().getId() == 0) %}
         <a href="/search/user/{{ blog.getOwner().getId() }}">{{ blog.getOwner().formatName() }}</a>
     {% else %}
-        {{ blog.getOwner()..formatName() }}
+        {{ blog.getOwner().formatName() }}
     {% endif %}
     {{ blog.getCreatedAt().getRelativeTime() }}
 </p>
