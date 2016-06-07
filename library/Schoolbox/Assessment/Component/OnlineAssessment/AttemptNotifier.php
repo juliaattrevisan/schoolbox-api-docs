@@ -31,6 +31,8 @@ class AttemptNotifier extends AbstractModuleNotifier {
 	const TRIGGER_ATTEMPTED = 'attempted';
 	const TRIGGER_MARKED    = 'marked';
 
+    const LOG_MARK_PATTERN = "Quiz %d mark visibility is %d: %s %s messages";
+
 	/** @var OnlineAssessmentMapper */
 	protected $assessMapper;
 
@@ -165,8 +167,11 @@ class AttemptNotifier extends AbstractModuleNotifier {
 		$assess   = $this->assessMapper->findById($assessId);
 
 		if (!$assess->isMarkShownToStudents()) {
+            $this->log->debug(sprintf(self::LOG_MARK_PATTERN, $assessId, $assess->getMarkVisibility(), 'suppressing', 'student'));
 			return $envelope;
-		}
+        } else {
+            $this->log->debug(sprintf(self::LOG_MARK_PATTERN, $assessId, $assess->getMarkVisibility(), 'sending', 'student'));
+        }
 
         $category = $this->categoryMapper->findById($assess->getCategory()->getId());
 
@@ -206,8 +211,11 @@ class AttemptNotifier extends AbstractModuleNotifier {
 		$assess   = $this->assessMapper->findById($assessId);
 
 		if ($this->conf->get('restrict_parent_duework_access') || !$assess->isMarkShownToParents()) {
+            $this->log->debug(sprintf(self::LOG_MARK_PATTERN, $assessId, $assess->getMarkVisibility(), 'suppressing', 'parent'));
 			return $envelope;
-		}
+		} else {
+            $this->log->debug(sprintf(self::LOG_MARK_PATTERN, $assessId, $assess->getMarkVisibility(), 'sending', 'parent'));
+        }
 
 		$assessId = $attempt->getAssessment()->getId();
 		/** @var OnlineAssessment $assess */
