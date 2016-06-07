@@ -231,12 +231,14 @@ class Healthcheck
 
         // Pastoral Care Tables
 
-        $list[] = 'luPastoralCareCategory';
-        $list[] = 'luPastoralCareType';
-        $list[] = 'PastoralCareComments';
-        $list[] = 'PastoralCareContacts';
-        $list[] = 'PastoralCareActions';
-        $list[] = 'tPastoralCare';
+        if (Config::get('pastoral_enabled')) {
+            $list[] = 'luPastoralCareCategory';
+            $list[] = 'luPastoralCareType';
+            $list[] = 'PastoralCareComments';
+            $list[] = 'PastoralCareContacts';
+            $list[] = 'PastoralCareActions';
+            $list[] = 'tPastoralCare';
+        }
 
         sort($list);
 
