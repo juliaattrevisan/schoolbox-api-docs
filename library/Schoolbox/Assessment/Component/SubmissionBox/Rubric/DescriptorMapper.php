@@ -51,11 +51,10 @@ class DescriptorMapper extends Schoolbox\Mapper {
             'property'   => 'description',
             'type'       => self::TYPE_STRING,
         ));
-        $this->hasMap(array(
-            'column'     => 'valid',
-            'property'   => 'valid',
-            'type'       => self::TYPE_BOOLEAN,
-        ));
+
+        // this is your soft-delete column
+        $this->uses('valid', self::TYPE_BOOLEAN);
+        $this->hasSoftDeleteField('valid', false, true);
 
         $this->hasJoin(
             'criterion',
