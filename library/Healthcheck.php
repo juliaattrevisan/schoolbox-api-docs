@@ -58,6 +58,28 @@ class Healthcheck
         unset($db,$result);
     }
 
+    /**
+     * Gets connection to A+ database.
+     *
+     * @return MSSQL
+     */
+    private function getMssqlAPlusConnection()
+    {
+        $db = new MSSQL(
+            Config::get('external_humanedge_aplus_db_db'),
+            [
+                'host'     => Config::get('external_humanedge_aplus_db_host'),
+                'user'     => Config::get('external_humanedge_aplus_db_user'),
+                'passwd'   => Config::get('external_humanedge_aplus_db_passwd'),
+                'db'       => Config::get('external_humanedge_aplus_db_db'),
+                'encoding' => Config::get('external_db_encoding'),
+            ],
+            true
+        );
+        $db->debug = true;
+        return $db;
+    }
+
     private function Db2Connection()
     {
         echo "  DB2 : ";
@@ -96,6 +118,22 @@ class Healthcheck
     {
         echo "\nMaze Connection Check\n";
         $this->MssqlConnection();
+    }
+
+    private function HumanedgeCheckConnection()
+    {
+        echo "\nHumanedge Connection Check\n";
+        echo "  MSSQL (SAS connection) : ";
+        $this->MssqlConnection();
+        echo "  MSSQL (A+ connection) : ";
+        $db = $this->getMssqlAPlusConnection();
+        $result = $db->query("SELECT @@VERSION");
+        if ($result) {
+            echo "OK\n";
+        } else {
+            echo "\n    Failed - ".mssql_get_last_message()."\n";
+        }
+        unset($db,$result);
     }
 
     /**
@@ -625,6 +663,65 @@ class Healthcheck
             }
         }
 
+    }
+
+    /**
+     * Check HumanEdge SAS2000 tables
+     */
+    private function HumanedgeCheckSasTables()
+    {
+        echo "\nHumanedge Permission Check - SAS Tables\n";
+        $tables = [
+            'Contact',
+            'Staff',
+            'Student',
+            'StudentContact',
+            'vw_Contact_Addresses',
+        ];
+        foreach ($tables as $table) {
+            echo "  $table : ";
+            $db        = new MSSQL();
+            $db->debug = true;
+            $result = $db->query("SELECT TOP 1 * FROM $table");
+            if ($result) {
+                echo "OK\n";
+            } else {
+                echo "\n    Failed - ".mssql_get_last_message()."\n";
+            }
+            unset($db, $result);
+        }
+    }
+
+    /**
+     * Check HumanEdge A+ tables
+     */
+    private function HumanedgeCheckAPlusTables()
+    {
+        echo "\nHumanedge Permission Check - SAS Tables\n";
+        $tables = [
+            'tblAllocation',
+            'tblBlockItem',
+            'tblCalendarDay',
+            'tblDay',
+            'tblPeriod',
+            'tblPeriodTimesByDay',
+            'tblRoom',
+            'tblStudent',
+            'tblSubject',
+            'tblSubjectChoice',
+            'tblTeacher',
+        ];
+        foreach ($tables as $table) {
+            echo "  $table : ";
+            $db     = $this->getMssqlAPlusConnection();
+            $result = $db->query("SELECT TOP 1 * FROM $table");
+            if ($result) {
+                echo "OK\n";
+            } else {
+                echo "\n    Failed - ".mssql_get_last_message()."\n";
+            }
+            unset($db, $result);
+        }
     }
 
     /**
