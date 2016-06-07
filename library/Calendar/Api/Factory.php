@@ -42,6 +42,7 @@ class Calendar_Api_Factory {
 		 */
 		foreach($allConfigRecords as $currentConfig) {
 
+			/** @var Calendar_Api_Config_Record $currentConfig */
 			$config = $currentConfig->decodeConfig();
 
 			/* Update $config so it knows the calendar_connector id from whence it came
