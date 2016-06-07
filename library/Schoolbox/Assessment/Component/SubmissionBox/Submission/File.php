@@ -15,6 +15,8 @@ use Eportfolio\ShowcaseMapper;
 use Plagscan_Document;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\File\Mimetype;
+use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\File\IFile;
@@ -287,11 +289,12 @@ class File implements IFile
 
     /**
      * Does this user have permission to view this submission?
-     *
-     * * Users may view their own returns
-     * * Staff may view returns, as long as they have write permission
-     *   to the folder that it's within
-     * * Parents may view their child's returns
+     * Users can view if:
+     * * Is SuperUser
+     * * Is Student and owns submission return
+     * * Is Parent of student who owns submission return
+     * * Is Staff and owns Submission Box
+     * * Is Staff and has write access to Homepage containing Submission Box
      * * If this work is showcased, anyone may view it
      *
      * @param  User             $user
@@ -304,22 +307,42 @@ class File implements IFile
         if ($user->isSuperuser()) {
             return true;
         }
+
+        // Owns the Submission Return
         if ($user->getId() == $this->getOwner()->getId()) {
             return true;
         }
+
         if ($user->getRole()->isStaff()) {
-            return $userAccessMapper->userHasMinimumAccessToAll(
+
+            // Owns the submission Box
+            if((int)$this->getSubmissionBox()->getOwner()->getId() === $user->getId()){
+                return true;
+            }
+
+            // Individual user permissions
+            if($userAccessMapper->userHasMinimumAccessToAll(
                 $user->getId(),
                 [$this->getSubmissionBox()->getCategory()->getId(),],
                 UserAccess::ACCESS_WRITE
-            );
+            )){
+                return true;
+            }
+
+            // Role permissions
+            $roleAccessMapper = RoleAccessMapper::getInstance();
+            $roleAccess = $roleAccessMapper->getAccess($user, $this->getSubmissionBox()->getCategory()->getId());
+            if($roleAccess->getType() >= UserAccess::ACCESS_WRITE){
+                return true;
+            }
         }
-        // le sigh
+
+        // Parents can view their own children's submissions
         $this->getOwner()->loadParents();
         if ($this->getOwner()->isChildOf($user)) {
             return true;
         }
-        // le sigh again
+
         // Check if file has been published/showcased in the ePortfolio, if so anyone can download the file
         return $showcaseMapper->countByColumnList([
             'uid'               => $this->getOwner()->getId(),
