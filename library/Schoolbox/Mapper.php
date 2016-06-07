@@ -1562,7 +1562,7 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * Verifies that a field's value is unique.
+     * Verifies that a field's value is unique. (Currently ignores soft-deleted rows.)
      *
      * @param  array  $columnList The column list to check for uniqueness.
      *                            (@see `findByColumnList`)
@@ -1572,7 +1572,7 @@ abstract class Mapper implements IMapper, Serializable
      *
      * @return bool
      */
-    public function isUnique($columnList = [], $currentId)
+    public function isUnique($columnList, $currentId)
     {
         $query = $this->selectScalarByColumnList($this->getTable() . '.' . $this->getIdentifier()['column'], $columnList);
         $query->execute();

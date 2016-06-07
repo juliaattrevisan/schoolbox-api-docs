@@ -11,6 +11,7 @@ namespace Schoolbox;
 
 use PDOStatement;
 use Schoolbox;
+use UnexpectedValueException;
 
 /**
  * Class UserMapper
@@ -277,6 +278,7 @@ class UserMapper extends Mapper
             return true;
         });
 
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueUsername']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateDefaultCampus']);
     }
@@ -612,6 +614,26 @@ class UserMapper extends Mapper
         $statement = $this->getDatabase()->prepare('SELECT PASSWORD(?)');
         $statement->execute([$password]);
         return $statement->fetchColumn();
+    }
+
+    /**
+     * Pre-save callback for verifying whether a user's name is unique.
+     *
+     * @param  User $user
+     * @return bool Always true, as long as it doesn't throw
+     * @throws UnexpectedValueException if it isn't unique
+     */
+    public function verifyUniqueUsername(User $user)
+    {
+        if (!$this->isUnique(['username' => $user->getUsername(),], $user->getId())) {
+            throw new UnexpectedValueException(
+                sprintf(
+                    'A user with username "%s" already exists.',
+                    $user->getUsername()
+                )
+            );
+        }
+        return true;
     }
 
     /**
