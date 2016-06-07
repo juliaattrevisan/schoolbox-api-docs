@@ -10,6 +10,7 @@
 namespace Calendar\Event\Type\Timetable\Renderer;
 
 use \Calendar\Event\Type\RendererBase;
+use \Calendar\Event\Type\Timetable\Event;
 use \Schoolbox\Config\Loader as Config;
 
 class Base extends RendererBase
@@ -19,9 +20,13 @@ class Base extends RendererBase
      */
     public function showAttendanceLink() {
         
-        if (Config::get('external_type') == 'synergetic'
+        if (
+            $this->getEvent() instanceof Event 
+            && Config::get('external_type') == 'synergetic'
             && Config::get('external_attendance')
-            && $this->getViewer()->getRole()->isStaff())
+            && $this->getViewer()->getRole()->isStaff()
+            && $this->getEvent()->getCode() != ''
+        )
         {
             $now = new \Alaress_Date_Format();
             $now->endOfDay();
