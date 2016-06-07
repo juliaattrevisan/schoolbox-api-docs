@@ -141,9 +141,12 @@ class External_Synergetic_Attendance implements External_AttendanceInterface
 
         if ($result['success'] == 1) {
             $this->setAllAttendanceRecords($result['result']);
+            return $this->getAllAttendanceRecords();
+        }
+        else {
+            throw new Schoolbox\External\Exception("Unable to setup work space for attendances, cannot continue");
         }
 
-        return $this->getAllAttendanceRecords();
     }
 
     /**
