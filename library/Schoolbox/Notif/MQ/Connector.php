@@ -52,6 +52,7 @@ class Connector extends AMQPConnector {
 	public function __construct($settings = array()) {
 		parent::__construct($settings);
 		$this->conf = ConfigMapper::getInstance();
+		$this->connect();
 	}
 
 

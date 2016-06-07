@@ -18,6 +18,7 @@ use Autoloader;
 use Database;
 use Schoolbox\Config\ConfigMapper;
 use Config\Modules\ModuleConfigInterface;
+use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Notif\Notif;
 
@@ -135,7 +136,10 @@ class Bootstrap implements BootstrapInterface {
 
 		// Configuration
 		$di->set('config', $di->lazyNew(ConfigMapper::class));
-		$di->set('notif', $di->lazyNew(Notif::class));
+		$di->set('notif', $di->lazy(function () {
+			// replace this with $di->lazyGetCall() once we upgrade Aura.Di
+			return Notifactory::create();
+		}));
 
         // Set correct timezone
         date_default_timezone_set($timezone = $di->get('config')->get('date_timezone'));

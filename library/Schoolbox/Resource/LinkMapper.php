@@ -15,6 +15,7 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Notifactory;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\ILocator;
 use Schoolbox\User;
@@ -260,7 +261,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
             'user'     => $user->getId(),
         );
 
-        $notif = new Notif(Notif::TOPIC_CMS);
+        $notif = Notifactory::create(Notif::TOPIC_CMS);
         $notif->notice("CRUD", $logEntry);
     }
 

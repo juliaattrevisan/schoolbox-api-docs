@@ -16,10 +16,14 @@ use Predis;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Notifactory;
 
 class RedisCache implements ICache
 {
     const EXPIRY_WINDOW = 345600; // 60s * 60m * 24h * 4d
+
+    /** @var LoggerInterface */
+    protected $log;
 
     /** @var Predis\ClientInterface */
     protected $redis;
@@ -64,7 +68,7 @@ class RedisCache implements ICache
         }
 
         // setup ready to go
-        $n = new Notif(Notif::TOPIC_APPLICATION);
+        $n = Notifactory::create(Notif::TOPIC_APPLICATION);
         $i = 0;
 
         foreach ($itemKeys as $itemKey) {

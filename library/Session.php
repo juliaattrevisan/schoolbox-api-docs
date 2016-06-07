@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Notifactory;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
@@ -125,7 +126,7 @@ class Session
             $result = $sbmAuth->appendSession($user['uid']);
 
             if ($this->getUseLoginLog()) {
-                $notif = new Notif(Notif::TOPIC_AUTH);
+                $notif = Notifactory::create(Notif::TOPIC_AUTH);
                 $notif->notice("Login success for $username", array(
                     'username' => $user['username'],
                     'ip'       => $ip,
@@ -199,7 +200,7 @@ class Session
 
         if (!$result) {
             /* Log failure */
-            $notif = new Notif(Notif::TOPIC_AUTH);
+            $notif = Notifactory::create(Notif::TOPIC_AUTH);
             $notif->notice("Login failure for ".$user->getUsername(), array(
                 'username' => $user->getUsername(),
                 'ip'       => $ip,

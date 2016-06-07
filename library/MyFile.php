@@ -1,6 +1,7 @@
 <?php
 
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Notifactory;
 
 /**
  * Class MyFile
@@ -88,7 +89,7 @@ class MyFile extends DeprecatedModel
             'user'     => $_SESSION['id'],
         ];
 
-		$notif = new Notif(Notif::TOPIC_CMS);
+		$notif = Notifactory::create(Notif::TOPIC_CMS);
 		$notif->info("CRUD", $logEntry);
 	}
 

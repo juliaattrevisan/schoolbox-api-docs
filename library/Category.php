@@ -2,6 +2,7 @@
 
 
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Notifactory;
 
 class Category extends DeprecatedModel
 {
@@ -478,7 +479,7 @@ class Category extends DeprecatedModel
             'user' => $_SESSION['id'],
         );
 
-        $notif = new Notif(Notif::TOPIC_CMS);
+        $notif = Notifactory::create(Notif::TOPIC_CMS);
         $notif->info("CRUD", $logEntry);
     }
 

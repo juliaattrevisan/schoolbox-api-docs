@@ -4,7 +4,7 @@
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\Queue\QueueFactory;
 use Schoolbox\Notif\UserQueue\UserQueueFactory;
 use Schoolbox\Realtime\Message\RoutePermissionMapper;
@@ -66,7 +66,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
     $filterFactory = new Filter\FilterFactory($uqf, $config);
     $rerouteFilter = $filterFactory->build();
 
-    $notif = new Notif();
+    $notif = Notifactory::create();
     $notif->setLogger($log);
 
     $sorter = new QueueSorter($rerouteFilter, $log, $notif, $qf, RoutePermissionMapper::getInstance());

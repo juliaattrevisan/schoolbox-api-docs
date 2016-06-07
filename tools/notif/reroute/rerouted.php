@@ -12,6 +12,7 @@ use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\Notifactory;
 use Schoolbox\Notif\Queue\Bindings\Generator;
 use Schoolbox\Notif\Queue\Bindings\UserQueueBinder;
 use Schoolbox\Notif\Queue\QueueFactory;
@@ -135,7 +136,7 @@ $kernel->run(function($di, $loop, $log, $opts) use (&$rerouter) {
 	}
 	catch(AMQPRuntimeException $e) {
 		$log->alert("Unable to connect to RabbitMQ: server is offline.", array($e));
-		$n = new Notif(Notif::TOPIC_NOTIFICATION);
+		$n = Notifactory::create(Notif::TOPIC_NOTIFICATION);
 		$n->alert('RabbitMQ is offline');
 		throw $e;
 	}
