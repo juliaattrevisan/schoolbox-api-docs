@@ -21,6 +21,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\File\StorableTrait;
+use Schoolbox\Role;
 use Schoolbox\User;
 
 class File implements IFile
@@ -294,6 +295,7 @@ class File implements IFile
      * * Is Student and owns submission return
      * * Is Parent of student who owns submission return
      * * Is Staff and owns Submission Box
+     * * Is Staff and teaches the Class containing the Submission Box
      * * Is Staff and has write access to Homepage containing Submission Box
      * * If this work is showcased, anyone may view it
      *
@@ -318,6 +320,19 @@ class File implements IFile
             // Owns the submission Box
             if((int)$this->getSubmissionBox()->getOwner()->getId() === $user->getId()){
                 return true;
+            }
+
+            // Teaches the Class containing the Submission Box
+            $teachers = $userAccessMapper->findUsersInCategory(
+                $this->getSubmissionBox()->getCategory(),
+                Role::STAFF,
+                UserAccess::ACCESS_WRITE,
+                true
+            );
+            foreach($teachers as $teacher){
+                if($teacher->getId() == $user->getId()){
+                    return true;
+                }
             }
 
             // Individual user permissions
