@@ -86,17 +86,26 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         /** @var BlogModel $blog */
         foreach ($blogs as $blog) {
-            $user = $this->getUserMapper()->findById($blog->getOwner()->getId());
+            // Rehydrate
+            try {
+                $user = $this->getUserMapper()->findById($blog->getOwner()->getId());
+            } catch (MapperException $e) {
+                $user = $this->getUserMapper()->createModel();
+            }
             $blog->setOwner($user);
 
             $blogComments[$blog->getId()] = $this->getBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
             $blogImages[$blog->getId()] = $this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId());
 
             // Hydrate owner of comments
-
             /** @var BlogCommentModel $comment */
             foreach ($blogComments[$blog->getId()] as $comment) {
-                $comment->setOwner($this->getUserMapper()->findById($comment->getOwner()->getId()));
+                try {
+                    $commentUser = $this->getUserMapper()->findById($comment->getOwner()->getId());
+                } catch (MapperException $e) {
+                    $commentUser = $this->getUserMapper()->createModel();
+                }
+                $comment->setOwner($commentUser);
             }
         }
 
@@ -116,8 +125,6 @@ class Controller extends Component_Homepage_ControllerAbstract
             ),
             $this->hasWriteAccess() || !$this->getConfig('compactMode')
         );
-
-        return false;
     }
 
     /**
