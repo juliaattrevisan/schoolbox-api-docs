@@ -100,14 +100,15 @@
                 return this.optional(element) || (parseFloat(value) <= 100);
             }, "Please enter a value out of 100");
 
-            jQuery.validator.addMethod("markLimit", function(value, element) {
+            jQuery.validator.addMethod("markLimit", function(value,element,param){
+                // If a pre-defined dropdown value
                 if(jQuery.combobox.instances.length) {
                     var valid = jQuery.combobox.instances[0].selector.allSelectOptions;
                     if(jQuery.inArray(value, valid) != -1) {
                         return true;
                     }
                 }
-                var markLimit = parseInt($(element).closest('form').find('[data-validation-limit]').text());
+                var markLimit = param;
                 if (value !== "") {
                     var v = parseInt(value);
                     return v <= markLimit && v >= 0;
@@ -116,19 +117,33 @@
                 }
             }, "Amount must be less or equal to mark limit");
 
+            start();
 
-            jQuery.validator.addClassRules({
-                percent: {
-                    percentage: true
-                },
-
-                'out-of': {
-                    markLimit: true
-                }
+            $('[data-validation-limit]').each(function(idx,elem){
+                $(elem).rules( "add", {
+                    markLimit: $(elem).attr('data-validation-limit'),
+                    messages: {
+                        markLimit: 'Mark must be less or equal to '+$(elem).attr('data-validation-limit')
+                    }
+                });
             });
 
+            $('[data-validation-percent-limit]').each(function(idx,elem){
+                $(elem).rules( "add", {
+                    percentage: true,
+                    messages: {
+                        percentage: 'Please enter a value out of 100'
+                    }
+                });
+            });
+        }
+
+
+        function start()
+        {
             config.element.each(function() {
                 $(this).alaressValidate({
+                    ignoreTitle: true,
                     focusInvalid: false,
                     errorPlacement: function(error, element) {
                         // Attach to a table row if there is one there
@@ -140,6 +155,7 @@
                         }
                     },
                     submitHandler: function(form) {
+
                         // Any inline submit forms? (there will be, if we are
                         // focused on a form element.) Use them if so.
                         // (Thankfully, the change event triggers before blur
@@ -178,7 +194,6 @@
                     }
                 });
             });
-
         }
 
         function selectGrouping() {

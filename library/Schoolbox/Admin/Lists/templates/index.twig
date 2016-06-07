@@ -187,7 +187,7 @@
 
                                                 {# All other fields are just text boxes #}
 
-                                                <input name="value-{{field_key}}[]" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" />
+                                                <input name="value-{{field_key}}[]" type="text" placeholder="{{ field.caption }}" value="{{ record[field_key] }}" maxlength="{{field.maxLength}}" />
 
                                                 {# Nullable text boxes get a tickbox as well #}
 

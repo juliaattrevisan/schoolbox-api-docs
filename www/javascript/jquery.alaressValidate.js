@@ -29,6 +29,7 @@
         var defaults = {
             // Default to not ignoring validation on any fields, even if hidden
             ignore: false,
+            ignoreTitle: true,
             errorPlacement: $.alaressValidate.defaultErrorPlacement
         };
         var config = $.extend({}, defaults, options || {});

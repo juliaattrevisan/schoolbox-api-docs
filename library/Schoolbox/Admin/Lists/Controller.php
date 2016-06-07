@@ -280,6 +280,7 @@ class Controller extends Base
                     'displayAs'     => [
                         'caption'   => 'Display Name',
                         'width'     => 6,
+                        'maxLength' => 16,
                     ],
                     'normaliseAs'   => [
                         'caption'   => 'Normalised Mark',
