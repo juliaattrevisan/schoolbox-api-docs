@@ -78,10 +78,7 @@
                         </div>
 
                         <div class="avatar card small-12">
-                            <a href="/search/user/{{ blog.getOwner.getId }}" title="View Profile">
-                                <img src="/portrait.php?userId={{ blog.getOwner.getExternalId }}&size=square64" alt="View Profile" />
-                                <p>{{ blog.getOwner().formatName() }}</p>
-                            </a>
+                            {% include '@blog/sub/userAvatarCard.twig' with {user: blog.getOwner()} %}
                             <p class="meta">Posted {{ blog.getCreatedAt.getLong }}</p>
                         </div>
 
@@ -101,10 +98,7 @@
 
                             <li>
                                 <div class="avatar card small-12">
-                                    <a href="/search/user/{{ comment.getOwner.getId }}" title="View Profile">
-                                        <img src="/portrait.php?userId={{ comment.getOwner.getExternalId }}&size=square64" alt="View Profile" />
-                                        <p>{{ comment.getOwner().formatName() }}</p>
-                                    </a>
+                                    {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
                                     <p class="meta">Commented {{ comment.createdAt.getLong }}</p>
                                 </div>
                                 <article>

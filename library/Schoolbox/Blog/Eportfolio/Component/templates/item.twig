@@ -48,10 +48,7 @@
             <div class="row">
                 <div class="small-12 column">
                     <div class="avatar card small-12">
-                        <a href="/search/user/{{ record.getOwner.getId }}">
-                            <img src="/portrait.php?userId={{ record.getOwner.getExternalId }}&size=square64" />
-                            <p>{{ record.getOwner().formatName() }}</p>
-                        </a>
+                        {% include '@blog/sub/userAvatarCard.twig' with {user: record.getOwner()} %}
                         <p class="meta">Posted by <a href="/search/user/{{ record.getOwner.getId }}">{{ record.getOwner().formatName() }}</a> {{ record.getCreatedAt.getRelativeTime }}</p>
                     </div>
                 </div>
@@ -79,10 +76,7 @@
 
                             <div class="list-item">
                                 <div class="avatar card small-12">
-                                    <a href="/search/user/{{ comment.getOwner.getId }}">
-                                        <img src="/portrait.php?userId={{ comment.getOwner.getExternalId }}&size=square64" />
-                                        <p>{{ comment.getOwner().formatName() }}</p>
-                                    </a>
+                                    {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
                                     <p class="meta">{{ comment.getCreatedAt.getRelativeTime }}</p>
                                 </div>
                             </div>
