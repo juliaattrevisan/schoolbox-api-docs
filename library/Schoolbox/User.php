@@ -509,6 +509,7 @@ class User implements JsonSerializable, ISoftDeletable
 
 
     /**
+     * @todo We should decide what type we want and enforce it.
      * @return int|string
      */
     public function getId()
