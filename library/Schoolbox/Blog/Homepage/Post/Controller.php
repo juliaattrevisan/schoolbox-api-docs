@@ -172,7 +172,7 @@ class Controller extends Base
             $folder = $this->getFolderMapper()->findById($blog->getFolder()->getId());
 
             /** @var User $user */
-            $user = $this->getUserMapper()->findById($blog->getOwner()->getId());
+            $user = $this->getUserMapper()->findByIdWithFallback($blog->getOwner()->getId());
 
             $blog->setFolder($folder);
             $blog->setOwner($user);
@@ -184,7 +184,7 @@ class Controller extends Base
             /** @var BlogCommentModel $comment */
             foreach ($comments as $comment) {
                 /** @var User $user */
-                $user = $this->getUserMapper()->findById($comment->getOwner()->getId());
+                $user = $this->getUserMapper()->findByIdWithFallback($comment->getOwner()->getId());
                 $comment->setOwner($user);
             }
 
@@ -335,7 +335,7 @@ class Controller extends Base
         foreach ($blogs as $blog) 
         {
             $dateSelectorArray[$blog->getCreatedAt()->getYear() . "-" . $blog->getCreatedAt()->getMonth(true)] = $blog->getCreatedAt();
-            $user = $this->getUserMapper()->findById($blog->getOwner()->getId());
+            $user = $this->getUserMapper()->findByIdWithFallback($blog->getOwner()->getId());
             $blog->setOwner($user);
 
             if ($blog->getCreatedAt()->getYear() == $year && $blog->getCreatedAt()->getMonth() == $month) {
@@ -345,7 +345,7 @@ class Controller extends Base
 
                 /** @var BlogCommentModel $comment */
                 foreach ($blogComments[$blog->getId()] as $comment) {
-                    $comment->setOwner($this->getUserMapper()->findById($comment->getOwner()->getId()));
+                    $comment->setOwner($this->getUserMapper()->findByIdWithFallback($comment->getOwner()->getId()));
                 }
 
                 $blogsSelectedMonth[] = $blog;
