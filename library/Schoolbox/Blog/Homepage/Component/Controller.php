@@ -89,6 +89,8 @@ class Controller extends Component_Homepage_ControllerAbstract
             // Rehydrate
             try {
                 $user = $this->getUserMapper()->findById($blog->getOwner()->getId());
+            } catch (MapperException\Deleted $e) {
+                $user = $e->getDeletedObject();
             } catch (MapperException $e) {
                 $user = $this->getUserMapper()->createModel();
             }
@@ -102,6 +104,8 @@ class Controller extends Component_Homepage_ControllerAbstract
             foreach ($blogComments[$blog->getId()] as $comment) {
                 try {
                     $commentUser = $this->getUserMapper()->findById($comment->getOwner()->getId());
+                } catch (MapperException\Deleted $e) {
+                    $commentUser = $e->getDeletedObject();
                 } catch (MapperException $e) {
                     $commentUser = $this->getUserMapper()->createModel();
                 }
