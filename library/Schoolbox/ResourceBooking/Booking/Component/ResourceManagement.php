@@ -13,9 +13,7 @@ namespace Schoolbox\ResourceBooking\Booking\Component;
 
 use Component_Dashboard_ControllerAbstract;
 use Calendar_Api_EventType_ResourceBooking_Moderation_Default;
-use Schoolbox\Config\Config;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Config\Loader;
 use Schoolbox\ResourceBooking\Booking;
 use Aura\Di;
 use Twig_Environment;
