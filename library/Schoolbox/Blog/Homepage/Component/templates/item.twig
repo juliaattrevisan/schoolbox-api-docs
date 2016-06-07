@@ -49,7 +49,7 @@
                 <div class="small-12 columns">
                     <div class="avatar card small-12">
                         {% include '@blog/sub/userAvatarCard.twig' with {user: record.getOwner()} %}
-                        <p class="meta">Posted by <a href="/search/user/{{ record.getOwner.getId }}">{{ record.getOwner().formatName() }}</a> {{ record.getCreatedAt.getRelativeTime }}</p>
+                        <p class="meta">Posted {{ record.getCreatedAt.getRelativeTime }}</p>
                     </div>
                 </div>
             </div>

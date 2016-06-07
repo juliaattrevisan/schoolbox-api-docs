@@ -53,11 +53,7 @@
 
                             <div class="list-item">
                                 <div class="avatar card small-12">
-                                    <a href="{{ routeLookup('blog.getItem', { id: blog.getId }) }}">
-                                        <img src="/portrait.php?userId={{ blog.getOwner.getExternalId }}&size=square64" />
-                                        <h3>{{ blog.getHeading }}</h3>
-                                    </a>
-                                    <p class="meta">Posted by <a href="/search/user/{{ blog.getOwner.getId }}">{{ blog.getOwner().formatName() }}</a> {{ blog.getCreatedAt.getRelativeTime }}</p>
+                                    {% include '@blog/sub/blogAvatarCard.twig' with {blog: blog} %}
                                 </div>
                             </div>
 
