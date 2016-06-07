@@ -369,7 +369,7 @@ class Framework
 
         $line = trim(substr($line, $apos + 4));
 
-        $record = "$name: $line";
+        $record = sprintf("%-9s -> %s", $name, $line);
 
         $match = false;
 
