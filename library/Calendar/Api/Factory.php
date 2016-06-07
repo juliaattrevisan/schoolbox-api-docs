@@ -63,26 +63,30 @@ class Calendar_Api_Factory {
 		$compositeApi = new Calendar_Api_Composite();
 
 		foreach($this->getAllTypes() as $config) {
-			$defaultImplementation = 'Calendar_Api_EventType_' . $config->getEventType() . '_' . $config->getConnectorClass() . '_Default';
-			$uniqueImplementation = 'Calendar_Api_EventType_' . $config->getEventType() . '_' . $config->getConnectorClass() . '_' . ucwords(Cfg::get('site_location'));
+			try {
+				$defaultImplementation = 'Calendar_Api_EventType_' . $config->getEventType() . '_' . $config->getConnectorClass() . '_Default';
+				$uniqueImplementation  = 'Calendar_Api_EventType_' . $config->getEventType() . '_' . $config->getConnectorClass() . '_' . ucwords(Cfg::get('site_location'));
 
-			/* Decide which to use (unique or default)
-			 * Or create no class, if neither exists
-			 *
-			 * Inject config settings, including the calendar_connector id
-			 * so it knows from whence it came
-			 */
-			if (class_exists($uniqueImplementation)) {
-				$implementation = new $uniqueImplementation($this->getUser(), $config);
-				$implementation->setConnectorId($config->getId());
+				/* Decide which to use (unique or default)
+                 *
+                 * Inject config settings, including the calendar_connector id
+                 * so it knows from whence it came
+                 */
+				if (class_exists($uniqueImplementation)) {
+					$implementation = new $uniqueImplementation($this->getUser(), $config);
+					$implementation->setConnectorId($config->getId());
 
-				$compositeApi->add($implementation);
-			}
-			else if (class_exists($defaultImplementation)) {
-				$implementation = new $defaultImplementation($this->getUser(), $config);
-				$implementation->setConnectorId($config->getId());
+					$compositeApi->add($implementation);
+				} else {
+					if (class_exists($defaultImplementation)) {
+						$implementation = new $defaultImplementation($this->getUser(), $config);
+						$implementation->setConnectorId($config->getId());
 
-				$compositeApi->add($implementation);
+						$compositeApi->add($implementation);
+					}
+				}
+			} catch(DomainException $e){
+				// Calendar API has an issue. Skip to next.
 			}
 		}
 
