@@ -85,9 +85,13 @@ class Controller extends Component_Eportfolio_ControllerAbstract
         $blogImages = [];
 
         /** @var EportfolioBlogModel $blog */
-        foreach ($blogs as $blog)
-        {
-            $user = $this->getUserMapper()->findById($blog->getOwner()->getId());
+        foreach ($blogs as $blog) {
+            // Rehydrate
+            try {
+                $user = $this->getUserMapper()->findById($blog->getOwner()->getId());
+            } catch (MapperException $e) {
+                $user = $this->getUserMapper()->createModel();
+            }
             $blog->setOwner($user);
 
             $blogComments[$blog->getId()] = $this->getEportfolioBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
@@ -97,7 +101,12 @@ class Controller extends Component_Eportfolio_ControllerAbstract
             
             /** @var EportfolioBlogCommentModel $comment */
             foreach ($blogComments[$blog->getId()] as $comment) {
-                $comment->setOwner($this->getUserMapper()->findById($comment->getOwner()->getId()));
+                try {
+                    $commentUser = $this->getUserMapper()->findById($comment->getOwner()->getId());
+                } catch (MapperException $e) {
+                    $commentUser = $this->getUserMapper()->createModel();
+                }
+                $comment->setOwner($commentUser);
             }
         }
         
