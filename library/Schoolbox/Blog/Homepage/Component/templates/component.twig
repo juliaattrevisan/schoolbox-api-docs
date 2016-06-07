@@ -57,7 +57,7 @@
                                         <img src="/portrait.php?userId={{ blog.getOwner.getExternalId }}&size=square64" />
                                         <h3>{{ blog.getHeading }}</h3>
                                     </a>
-                                    <p class="meta">Posted by <a href="/search/user/{{ blog.getOwner.getId }}">{{ blog.getOwner.getFirstname }} {{ blog.getOwner.getLastname }}</a> {{ blog.getCreatedAt.getRelativeTime }}</p>
+                                    <p class="meta">Posted by <a href="/search/user/{{ blog.getOwner.getId }}">{{ blog.getOwner().formatName() }}</a> {{ blog.getCreatedAt.getRelativeTime }}</p>
                                 </div>
                             </div>
 
@@ -90,7 +90,7 @@
                                             <div class="avatar card small-12">
                                                 <a href="/search/user/{{ comment.getOwner.getId }}">
                                                     <img src="/portrait.php?userId={{ comment.getOwner.getExternalId }}&size=square64" />
-                                                    <p>{{ comment.getOwner.getFirstname }} {{ comment.getOwner.getLastname }}</p>
+                                                    <p>{{ comment.getOwner().formatName() }}</p>
                                                 </a>
                                                 <p class="meta">Commented {{ comment.getCreatedAt.getRelativeTime }}</p>
                                             </div>
