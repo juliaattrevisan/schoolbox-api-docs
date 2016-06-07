@@ -99,16 +99,6 @@ class DigestScheduler extends CronScheduler {
 				continue;
 			}
 
-			// convert old DAILY and WEEKLY enum into crontab
-			switch($schedule) {
-				case Role::DIGEST_DAILY:
-					$schedule = self::DAILY; // weekdaily, 6am
-					break;
-				case Role::DIGEST_WEEKLY:
-					$schedule = self::WEEKLY; // Friday, 11am
-					break;
-			}
-
 			try {
 				$this->triggers[$role->getId()] = new DigestTrigger($schedule, $role);
 				$this->scheduleNotification($this->triggers[$role->getId()]);
