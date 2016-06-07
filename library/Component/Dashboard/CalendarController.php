@@ -110,6 +110,12 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
                     $currentDay = $this->start;
                 }
 
+                // Ensure that first event shows the day of the actual event,
+                // not today.
+                if ($prevDay == false) {
+                    $this->setVar('LIST_DATE', $currentDay->getLongDateOnly());
+                }
+
                 if ($prevDay != false && $currentDay->getDateOnly() != $prevDay->getDateOnly()) {
                     $this->parse('has_events_block', 'has_events');
                     $this->parse('day_block', 'day', true);
