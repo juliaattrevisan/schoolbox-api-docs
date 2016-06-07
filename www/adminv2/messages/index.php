@@ -67,15 +67,6 @@ if($enabled) {
 
         $schedule = $role->getDigestSchedule();
 
-        switch($schedule) {
-            case \Schoolbox\Role::DIGEST_DAILY:
-                $schedule = \Schoolbox\Realtime\Digest\DigestScheduler::DAILY;
-                break;
-            case \Schoolbox\Role::DIGEST_WEEKLY:
-                $schedule = \Schoolbox\Realtime\Digest\DigestScheduler::WEEKLY;
-                break;
-        }
-
         // Only attempt to parse crontab if it's valid, don't create a fake one.
         // This prevents an issue where the check against
         // \Schoolbox\Realtime\Digest\DigestScheduler::NEVER takes forever.
