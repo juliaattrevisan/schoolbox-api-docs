@@ -3,8 +3,8 @@
 {% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
 {% set isSelf = session.user.getId() == user.getId() %}
 
-{# details: only if allowed to show in include flag #}
-{% set showDetails = externalUser.DirectoryIncludeFlag and (isStaff or isSelf) %}
+{# details: always show to SU + staff, regardless of externalUser.DirectoryIncludeFlag #}
+{% set showDetails = isSuperuser or isStaff or isSelf %}
 {# emails: staff may view emails #}
 {% set showEmail = showDetails or isStaff %}
 
