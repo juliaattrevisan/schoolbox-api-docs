@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Sync\Provisioner\Provisioner;
 
-$options = getopt("vr:", array('perform-update'));
+$options = getopt("vr:", array('perform-update', 'instance::'));
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
@@ -43,6 +43,9 @@ $kernel->registerExceptionCallback($cleanup);
 $kernel->run(
     function ($di, $loop, $log, $opts) {
 
+        global $opts;
+        $instance_id = isset($opts["instance"]) ? $opts["instance"] : INSTANCE_ID;
+
         /**
          * @var Di\Container    $di
          * @var LoopInterface   $loop
@@ -51,7 +54,7 @@ $kernel->run(
          */
 
         // define the redis key we'll use for this run
-        $di->values['ups.redisKey'] = INSTANCE_ID . '.provision.user.' . getmypid();
+        $di->values['ups.redisKey'] = $instance_id . '.provision.user.' . getmypid();
 
         /** @var CompositeLoggerInterface $logger */
         $logger = $di->get('ups.logger');
