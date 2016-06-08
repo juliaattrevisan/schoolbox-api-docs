@@ -11,27 +11,38 @@
  * * datepicker
  */
 (function($){
+    /**
+     * Handle datepicker change events.
+     *
+     * @param datepicker
+     * @param string
+     * @param allowChangeTrigger
+     */
+    var datepickerOnChange = function(datepicker, string, allowChangeTrigger) {
+        var previousValue = datepicker.data('previousValue') || "";
+
+        $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
+            datepicker.val(data.time).blur();
+        });
+
+        // jQuery datepicker no longer triggers a change event.
+        // Do it manually.
+        if (allowChangeTrigger && string != previousValue) {
+            datepicker.trigger('change');
+        }
+        datepicker.data('previousValue', string);
+    };
+
     $(function(){
         $('[data-datepicker]').datepicker({
             constrainInput: false,
             nextText: '&raquo;',
             prevText: '&laquo;',
             onSelect: function (string) {
-                var input         = $(this);
-                var previousValue = input.data('previousValue') || "";
-
-                $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
-                    input.val(data.time).blur();
-                });
-
-                // jQuery datepicker no longer triggers a change event.
-                // Do it manually.
-                if (string != previousValue) {
-                    $(this).trigger('change');
-                }
-                input.data('previousValue', string);
-
+                datepickerOnChange($(this), string, true);
             }
+        }).on('change', function () {
+            datepickerOnChange($(this), this.value, false);
         });
-    })
+    });
 })(jQuery);
