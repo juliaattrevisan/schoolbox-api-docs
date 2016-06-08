@@ -56,16 +56,15 @@
             }
         });
 
-        var pendingRequestCount = 0;
-        $('#importTasks').on('blur','[data-datepicker]',function(e) {
-            var $input = $(e.target);
-            pendingRequestCount++;
-            $.getJSON('/ajax/strtotime.php', {string: $input.val()}, function (data) {
-                // Don't update if requests still in progress
-                if (0 === --pendingRequestCount) {
+        // On Blur, attempt to parse date
+        $('#importTasks').on('focusout','[data-datepicker]',function(e) {
+            // Filter out blur events triggered by DatePicker GUI
+            if(undefined === e.relatedTarget || !$(e.relatedTarget).closest('#ui-datepicker-div').length ) {
+                var $input = $(e.target);
+                $.getJSON('/ajax/strtotime.php', {string: $input.val()}, function (data) {
                     $input.val(data.time);
-                }
-            });
+                });
+            }
         });
 
         // On Submit, validate dates (N-1 should already match regExp leaving 1 for blocking sync call)
