@@ -12,7 +12,7 @@
 /* THE THREE MUSKETEERS
  */
 $externalClass = new External_Synergetic_Class();
-$class = $externalClass->getClass($_POST['classCode']);
+$class = $externalClass->getClass($_POST['classCode'], $_SESSION['user']);
 
 if (!$class) {
 	error(148);
@@ -68,8 +68,8 @@ try {
         $attendanceDate,
         $attendanceDay,
         $attendancePeriod,
-        $externalUserHandler->getCurrentYear(),
-        $externalUserHandler->getCurrentSemester(),
+        $externalUserHandler->getCurrentYear($_SESSION['user']->getExternalId()),
+        $externalUserHandler->getCurrentSemester($_SESSION['user']->getExternalId()),
         MSSQL::getInstance()
     );
 } catch(Exception $e) {
