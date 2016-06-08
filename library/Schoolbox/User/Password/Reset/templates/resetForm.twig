@@ -29,7 +29,7 @@
 
         <form id="resetPassword" action="{{ routeLookup('userPasswordReset.reset', {token: reset.getToken()}) }}" method="post" class="top">
             <section>
-                <div class="small-12 avatar card">
+                <div class="small-12 card">
                     {# As you are not logged in, you don't have permission to view this user's profile image. #}
                     <img src="/portrait.php?userId={{ reset.getUser().getExternalId() }}&amp;size=square64" alt="{{ reset.getUser().formatName() }}">
                     <h3>{{ reset.getUser().formatName() }}</h3>

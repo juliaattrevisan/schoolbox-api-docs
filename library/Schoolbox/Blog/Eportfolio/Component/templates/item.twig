@@ -47,7 +47,7 @@
         <section>
             <div class="row">
                 <div class="small-12 column">
-                    <div class="avatar card small-12">
+                    <div class="card small-12">
                         {% include '@blog/sub/userAvatarCard.twig' with {user: record.getOwner()} %}
                         <p class="meta">Posted {{ record.getCreatedAt.getRelativeTime }}</p>
                     </div>
@@ -75,7 +75,7 @@
                         <li class="actions-small-1">
 
                             <div class="list-item">
-                                <div class="avatar card small-12">
+                                <div class="card small-12">
                                     {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
                                     <p class="meta">{{ comment.getCreatedAt.getRelativeTime }}</p>
                                 </div>

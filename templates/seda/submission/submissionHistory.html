@@ -55,7 +55,7 @@
                 <!-- BEGIN download -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="small-12 avatar card">
+                        <div class="small-12 card">
                             <a href="/storage/fetch.php?hash={FILE_HASH}&save=1">
                                 <img src="/images/mime/60x60/{FILE_THUMB}" class="mime" alt="{FILE_NAME}">
                                 <p>{FILE_NAME}</p>
@@ -85,7 +85,7 @@
                 <!-- BEGIN return_file -->
                 <li>
                     <div class="list-item">
-                        <div class="small-12 avatar card">
+                        <div class="small-12 card">
                             <a href="/submission/send.php?id={RETURNED_WORK_FILE_ID}&return=1" data-plugin="preview">
                                 <img src="/images/mime/60x60/{RETURNED_WORK_FILE_THUMB}" class="mime" alt="{RETURNED_WORK_FILE_NAME}">
                                 <p>{RETURNED_WORK_FILE_NAME}</p>
@@ -128,7 +128,7 @@
             <ul class="action-list">
                 <!-- BEGIN recent_submission_download -->
                 <li>
-                    <div class="small-12 avatar card">
+                    <div class="small-12 card">
                         <a href="/submission/send.php?id={MOST_RECENT_SUBMISSION_FILE_ID}"
                            title="Most Recent Submission"
                            data-plugin="preview">
@@ -148,7 +148,7 @@
                 <!-- BEGIN return_file_uuid -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="compact avatar card small-12">
+                        <div class="compact card small-12">
                             <a href="/submission/inlineGrading/viewStudent/{MOST_RECENT_SUBMISSION_FILE_ID}">
                                 <div class="icon-comment"></div>
                                 <h3>View Annotations</h3>
@@ -204,7 +204,7 @@
             <ul class="action-list">
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="avatar card small-12">
+                        <div class="card small-12">
                             <p><a href="/homepage/{CATEGORY_ID}" title="Class">{CATEGORY_NAME}</a></p>
                             <p class="meta"><a href="/homepage/{CATEGORY_ID}" title="Class Code">{CATEGORY_CODE}</a></p>
                         </div>
@@ -216,7 +216,7 @@
                 <!-- BEGIN teacher -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="avatar card small-12">
+                        <div class="card small-12">
                             <a href="/search/user/{TEACHER_ID}" title="View Profile">
                                 <img src="{TEACHER_AVATAR}" alt="View Profile" />
                                 <p>{TEACHER_NAME}</p>
@@ -238,7 +238,7 @@
             <!-- BEGIN work -->
             <li class="{HISTORY_CLASS}">
                 <div class="small-10 columns no-pad">
-                    <div class="avatar card small-12">
+                    <div class="card small-12">
                         <a href="/search/user/{HISTORY_USER_ID}" title="View Profile">
                             <img src="{HISTORY_USER_THUMB}" />
                             {HISTORY_USER_NAME}
@@ -276,7 +276,7 @@
             <!-- END work -->
 
             <li class="row">
-                <div class="avatar card small-12">
+                <div class="card small-12">
                     <a href="/search/user/{OWNER_ID}" title="View Profile">
                         <img src="{OWNER_THUMB}" />
                         {OWNER_NAME}

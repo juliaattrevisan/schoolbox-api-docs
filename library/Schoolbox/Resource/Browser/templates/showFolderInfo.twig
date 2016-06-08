@@ -83,7 +83,7 @@
         {% if folder.group.category %}
             <dt class="small-12 medium-4">Group Administrator</dt>
             <dd class="small-12 medium-8">
-                <div class="avatar card tiny">
+                <div class="card tiny">
                     <a {% if admin.id %}href="/search/user/{{ admin.id }}"{% endif %}>
                         <img src="/portrait.php?size=square64&userId={{ admin.externalId }}" alt="{{ admin.formatName }}" />
                         <p>{{ admin.formatName }}</p>
@@ -95,7 +95,7 @@
         <dt class="small-12 medium-4">Teacher{{ folder.teachers.count == 1 ? '' : 's' }}</dt>
             {% for i, teacher in folder.teachers %}
             <dd class="small-12 medium-8{% if i > 0 %} medium-offset-4{% endif %}">
-                <div class="avatar card tiny">
+                <div class="card tiny">
                     <a href="/search/user/{{ teacher.id }}">
                         <img src="/portrait.php?size=square48&userId={{ teacher.externalId }}" alt="{{ teacher.formatName }}" />
                         <p>{{ teacher.formatName }}</p>

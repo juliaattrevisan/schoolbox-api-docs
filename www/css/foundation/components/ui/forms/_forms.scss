@@ -513,7 +513,7 @@ select.visibility {
     }
 }
 
-/* In Inline Grading, there is a selectize of avatar cards
+/* In Inline Grading, there is a selectize of cards
  * This is the context-switch in a special case
  */
 .avatar-switch {
@@ -540,7 +540,7 @@ select.visibility {
 
         .selectize-control {
 
-            /* Underneath the avatar card is an input field that you
+            /* Underneath the card is an input field that you
              * could right-click to focus; I think it's where the carat
              * goes for when you're adding more items (which we don't)
              *
@@ -552,10 +552,10 @@ select.visibility {
                 }
 
                 /* To combat the weird giant white gap under the current
-                 * avatar card selected
+                 * card selected
                  */
                 line-height: 0.5rem;
-                /* Push the current avatar card to the left, to offset some
+                /* Push the current card to the left, to offset some
                  * other margin setting
                  */
                 .card {

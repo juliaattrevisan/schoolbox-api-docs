@@ -77,7 +77,7 @@
                             {% endif %}
                         </div>
 
-                        <div class="avatar card small-12">
+                        <div class="card small-12">
                             {% include '@blog/sub/userAvatarCard.twig' with {user: blog.getOwner()} %}
                             <p class="meta">Posted {{ blog.getCreatedAt.getLong }}</p>
                         </div>
@@ -97,7 +97,7 @@
                             {% for comment in blogComments[blog.getId] %}
 
                             <li>
-                                <div class="avatar card small-12">
+                                <div class="card small-12">
                                     {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
                                     <p class="meta">Commented {{ comment.createdAt.getLong }}</p>
                                 </div>

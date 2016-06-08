@@ -52,7 +52,7 @@
 
                         {# Checkbox & Unit Name #}
 
-                        <div class="avatar card small-12 medium-6">
+                        <div class="card small-12 medium-6">
                             <input name="unit[{{ loop.index }}][import]" type="hidden" value="0" />
                             <input id="import-{{ loop.index }}" name="unit[{{ loop.index }}][import]" {% if unit.checked %}checked="checked" data-warn-removal {% endif %} type="checkbox" value="1" data-interaction="enable" />
                             <label for="import-{{ loop.index }}" class="checkbox-label">{{ unit.name }}</label>

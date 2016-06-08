@@ -28,7 +28,7 @@
                     <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="audio"></form>
                     <ul data-dz-template class="hide">
                         <li>
-                            <div class="avatar card small-12">
+                            <div class="card small-12">
                                 <div class="icon-audio icon-32"></div>
                                 <h3 data-dz-name></h3>
                                 <p class="meta" data-dz-status>Uploading...</p>
@@ -42,7 +42,7 @@
                         <!-- BEGIN audio_list -->
                         <li class="actions-small-2 resource-{AUDIO_LIST_ID}">
                             <div class="list-item">
-                                <div class="avatar card small-12">
+                                <div class="card small-12">
                                     <a href="/cms/sendVideo.php?type=sbfs&id={AUDIO_LIST_ID}" data-audiolink data-role="media-playlist-track">
                                         <div class="icon-audio icon-32"></div>
                                         <h3>{AUDIO_LIST_TITLE}</h3>
@@ -67,7 +67,7 @@
                         <!-- BEGIN audio_pending_list -->
                         <li>
                             <div class="list-item">
-                                <div class="avatar card small-12" >
+                                <div class="card small-12" >
                                     <img src="{AUDIO_LIST_STATUSIMG}" title="Currently transcoding {AUDIO_LIST_TITLE}" />
                                     <h3>{AUDIO_LIST_TITLE}</h3>
                                     <p class="meta">Posted by <a href="/search/user/{AUDIO_LIST_POSTER_ID}">{AUDIO_LIST_POSTER}</a></p>
