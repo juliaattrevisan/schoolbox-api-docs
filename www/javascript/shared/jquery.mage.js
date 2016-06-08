@@ -115,10 +115,6 @@
     function clickIntercept (e, self, elem, form) {
         e.preventDefault();
 
-        if (typeof elem.data('mageSubmitted') != 'undefined') {
-            // do not resubmit this section
-            return;
-        }
 
         // Perform validation if required
 
@@ -126,23 +122,32 @@
 
         if (events != null && typeof(events.validate) !== "undefined") {
 
-            // TODO: This is fragile in that triggerHandler() only returns the value of the last handler to execute.
-            // You could possibly iterate each handler using:
-            //     ($._data||$.data)( e.target, "events" )['validate'], or
-            //     events.validate
-            // but I'm unable at this stage to get a working solution.
+            // We cannot use a simple triggerHandler('validate') as that
+            // only returns the value of the last handler to execute.
             // @see http://stackoverflow.com/questions/2518421/jquery-find-events-handlers-registered-with-an-object
-            var validator = $(e.target).triggerHandler('validate');
 
-            if (validator !== undefined) {
-                if (!validator['result']) {
-
-                    // Validation failed, show message and bomb out
-
-                    form.find('[data-mage-error]').hide().html(validator['message']).slideDown();
-                    return;
-                }
+            var allValid = true;
+            $.each(events.validate, function(idx, obj){
+                // Quit as soon as we know data is invalid (don't merge errors)
+                if(allValid && undefined !== obj['type'] && 'validate' === obj['type']){
+                    var validator = obj.handler.call(e.target);
+                    if (validator !== undefined) {
+                        if (!validator['result']) {
+                            // Validation failed, show message and bomb out
+                            form.find('[data-mage-error]').hide().html(validator['message']).slideDown();
+                            allValid = false;
+                        }
+                    }
+               }
+            });
+            if(!allValid){
+                return;
             }
+        }
+
+        if (typeof elem.data('mageSubmitted') != 'undefined') {
+            // do not resubmit this section
+            return;
         }
 
         // HTML5 FTW
