@@ -125,6 +125,13 @@
         events = $(e.target).data('events');
 
         if (events != null && typeof(events.validate) !== "undefined") {
+
+            // TODO: This is fragile in that triggerHandler() only returns the value of the last handler to execute.
+            // You could possibly iterate each handler using:
+            //     ($._data||$.data)( e.target, "events" )['validate'], or
+            //     events.validate
+            // but I'm unable at this stage to get a working solution.
+            // @see http://stackoverflow.com/questions/2518421/jquery-find-events-handlers-registered-with-an-object
             var validator = $(e.target).triggerHandler('validate');
 
             if (validator !== undefined) {
