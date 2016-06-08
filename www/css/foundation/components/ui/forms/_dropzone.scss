@@ -109,8 +109,6 @@ ul.az-error-list {
     $attachzone-duration-half: $attachzone-overlay-duration / 2;
     $attachzone-duration-3quarter: $attachzone-overlay-duration * 3 / 4;
 
-    //position: relative;
-    //margin: 0;
     > li {
         clear: none;
         overflow: hidden;
@@ -130,7 +128,7 @@ ul.az-error-list {
             padding-top: 0;
             padding-bottom: 0;
         }
-        .avatar.card {
+        .card {
             min-height: rem-calc($base-font-size * 3 + 1);
         }
     }

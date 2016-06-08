@@ -51,11 +51,9 @@ $masonry-drop-background: $input-focus-bg-color;
      *
      * For compatibility in block grid
      */
-    .avatar {
-        &.card {
-            .icon-masonry {
-                padding-top: 1rem;
-            }
+    .card {
+        .icon-masonry {
+          padding-top: 1rem;
         }
     }
 }

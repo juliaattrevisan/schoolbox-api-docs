@@ -1093,7 +1093,7 @@ ul.flex-list {
  */
 .resource-list {
 	@extend .action-list;
-	.avatar.card {
+	.card {
         a {
             color: $content-ui-foreground;
         }
@@ -1145,16 +1145,7 @@ ul.flex-list {
         padding: 0 !important; // SORRY! foundation's selector is just too specific :'(
 		border-right: 1px solid $body-bg;
 		border-bottom: 1px solid $body-bg;
-		//&:last-child{
-		//	border: 0;
-		//}
 	}
-}
-
-// Avatar Card
-.avatar-card {
-    @extend .card;
-    @extend .avatar;
 }
 
 .card {
@@ -1162,181 +1153,177 @@ ul.flex-list {
 	float: left;
 	position: relative;
     min-height: (3 * rem-calc($base-font-size));
-    padding: 0.25rem 1rem 0 1rem;
+    padding: 0.5rem 1rem 0 1rem;
     @media #{$medium-up} {
         min-height: (4 * rem-calc($base-font-size));
-        padding: 0.5rem 1rem 0 1rem;
     }
 
-    /* Avatar Card
+    /*
      * Displays an icon, or a profile picture, in the left column
      * Right column contains text, metadata, or a variety of other
      * interface elements
      *
      * Can be used in conjunction with lists
      */
-    &.avatar {
-        img, [class^="icon-"] {
-            float: left;
-            margin: (-1 * rem-calc(($base-font-size - 12))) rem-calc($base-font-size) 0 -1rem;
-            width: (3 * rem-calc($base-font-size));
-            @media #{$medium-up} {
-                margin: (-1 * rem-calc(($base-font-size - 8))) rem-calc($base-font-size) 0 -1rem;
-                width: (4 * rem-calc($base-font-size));
-            }
-        }
+	img, [class^="icon-"] {
+		float: left;
+		margin: -0.5rem 1rem 0 -1rem;
+		width: (3 * rem-calc($base-font-size));
+		@media #{$medium-up} {
+			width: (4 * rem-calc($base-font-size));
+		}
+	}
 
-        [class^="icon-"] {
-            padding: 0.875rem 0 0 0.5rem;
-            @media #{$medium-up} {
-                padding: 1.375rem 0 0 1.125rem;
-            }
-
-			&:before {
-				padding-right: 0;
-			}
-        }
-
-        /* .avatar.card .label is used in viewSubmission.html and
-         * navigation-option.html for displaying a status under a
-         * user's name
-         *
-         * But this behaviour is too specific to a user status -
-         * labels should behave generically first, so to indicate
-         * a user status, use .avatar.card .label.status
-         */
-		.label {
-            padding: nth($label-padding, 1) 1rem;
-
-            /* Status Label special definition - this is now uses
-             * a label to indicate a user's current status in some
-             * way, as per original .avatar.card .label intent
-             */
-            &.status {
-                &:empty {
-                    display: none;
-                }
-                margin: 0 -0.5rem 0 -1rem;
-                text-align: left;
-                position: absolute;
-                left: 5rem;
-                bottom: 0;
-                width: calc(100% - 4rem);
-                @media #{$small-only} {
-                    width: calc(100% - 3rem);
-                    left: 4rem;
-                }
-            }
+	[class^="icon-"] {
+		padding: 0.875rem 0 0 0.5rem;
+		@media #{$medium-up} {
+			padding: 1rem 0 0 1rem;
 		}
 
-        /* row/col constructs inside an avatar card need to be kicked in a
-         * few rems, to accommodate the image/icon (only affects avatar card)
-         */
-        .row {
-            @media #{$medium-up} {
-                padding-left: 4rem;
-            }
-            @media #{$small-only} {
-                padding-left: 3.5rem;
-            }
-
-            /* A status label inside a row/col construct
-             */
-            .label {
-                &.status {
-                    position: static;
-                    @media #{$medium-up} {
-                        margin-left: -0.125rem;
-                    }
-                    @media #{$large-up} {
-                        margin-left: 0.125rem;
-                    }
-                }
-            }
-
-            /* A sequence of labels
-             */
-            .label-group {
-                margin-top: 0.5rem;
-
-                /* Align text within labels
-                 */
-                @media #{$small-only} {
-                    margin-left: -1.5rem;
-                }
-                @media #{$medium-up} {
-                    margin-left: -0.875rem;
-                }
-                @media #{$large-up} {
-                    margin-left: -0.875rem;
-                }
-
-                /* Hairline fracture between labels in sequence
-                 */
-                .label {
-                    margin-top: 0.125rem;
-                    margin-right: -0.125rem;
-                }
-            }
-
-            .meta{
-            	margin-left: 0;
-            }
-        }
-
-		p, ul {
-            line-height: 1.25rem;
-        }
-
-		img.mime {
-			@media #{$small-only} {
-				padding: 0.5rem !important;
-			}
-			@media #{$medium-up} {
-				padding: 0.75rem !important;
-			}
+		&:before {
+			padding-right: 0;
 		}
+	}
 
-        /* Progress Meters for Avatar Card List Items.
-         * They are adjacent (siblings) to .card constructs
-         */
-        & + .progress {
-			clear: both;
-			margin-bottom: 0;
-        }
+	/* .card .label is used in viewSubmission.html and
+	 * navigation-option.html for displaying a status under a
+	 * user's name
+	 *
+	 * But this behaviour is too specific to a user status -
+	 * labels should behave generically first, so to indicate
+	 * a user status, use .card .label.status
+	 */
+	.label {
+		padding: nth($label-padding, 1) 1rem;
 
-		/* Compact Mode Avatar Cards
+		/* Status Label special definition - this uses
+		 * a label to indicate a user's current status in some
+		 * way, as per original .card .label intent
 		 */
-		&.compact {
-			min-height: 2.5rem;
-
-			[class*="icon-"] {
-				width: 2rem;
-				margin-top: 0;
-				padding: 0 0 0 1rem;
-				@extend .text-center;
+		&.status {
+			&:empty {
+				display: none;
 			}
-
-			p {
-				margin-left: 2rem;
+			margin: 0 -0.5rem 0 -1rem;
+			text-align: left;
+			position: absolute;
+			left: 5rem;
+			bottom: 0;
+			width: calc(100% - 4rem);
+			@media #{$small-only} {
+				width: calc(100% - 3rem);
+				left: 4rem;
 			}
+		}
+	}
 
-			img {
-				width: 2rem;
+	/* row/col constructs inside card need to be kicked in a
+	 * few rems, to accommodate the image/icon (only affects avatar card)
+	 */
+	.row {
+		@media #{$medium-up} {
+			padding-left: 4rem;
+		}
+		@media #{$small-only} {
+			padding-left: 3.5rem;
+		}
 
-				&.mime {
-					padding: 0 0 0 0.5rem !important;
-					margin: 0 0.75rem 0 -0.75rem;
+		/* A status label inside a row/col construct
+		 */
+		.label {
+			&.status {
+				position: static;
+				@media #{$medium-up} {
+					margin-left: -0.125rem;
+				}
+				@media #{$large-up} {
+					margin-left: 0.125rem;
 				}
 			}
+		}
 
-			.progress {
-				width: calc(100% - 2.5rem);
-				left: 3.5rem;
-				height: 0.3125rem;
+		/* A sequence of labels
+		 */
+		.label-group {
+			margin-top: 0.5rem;
+
+			/* Align text within labels
+			 */
+			@media #{$small-only} {
+				margin-left: -1.5rem;
+			}
+			@media #{$medium-up} {
+				margin-left: -0.875rem;
+			}
+			@media #{$large-up} {
+				margin-left: -0.875rem;
+			}
+
+			/* Hairline fracture between labels in sequence
+			 */
+			.label {
+				margin-top: 0.125rem;
+				margin-right: -0.125rem;
 			}
 		}
-    }
+
+		.meta{
+			margin-left: 0;
+		}
+	}
+
+	p, ul {
+		line-height: 1.25rem;
+	}
+
+	img.mime {
+		@media #{$small-only} {
+			padding: 0.5rem !important;
+		}
+		@media #{$medium-up} {
+			padding: 0.75rem !important;
+		}
+	}
+
+	/* Progress Meters for Card List Items.
+	 * They are adjacent (siblings) to .card constructs
+	 */
+	& + .progress {
+		clear: both;
+		margin-bottom: 0;
+	}
+
+	/* Compact Cards
+	 */
+	&.compact {
+		min-height: 2.5rem;
+
+		[class*="icon-"] {
+			width: 2rem;
+			margin-top: 0;
+			padding: 0 0 0 1rem;
+			@extend .text-center;
+		}
+
+		p {
+			margin-left: 2rem;
+		}
+
+		img {
+			width: 2rem;
+
+			&.mime {
+				padding: 0 0 0 0.5rem !important;
+				margin: 0 0.75rem 0 -0.75rem;
+			}
+		}
+
+		.progress {
+			width: calc(100% - 2.5rem);
+			left: 3.5rem;
+			height: 0.3125rem;
+		}
+	}
 
 	&.removed {
 		h3 {
@@ -1366,8 +1353,6 @@ ul.flex-list {
         }
     }
 
-	// default size is L:4rem, <L:3rem
-
 	// forcibly small: 32x32 (2rem)
 	&.small {
 		min-height: 2.5rem;
@@ -1380,17 +1365,14 @@ ul.flex-list {
 		min-height: 1.5rem;
 		padding-top: 0;
 
-		&.avatar {
-			img {
-				width: 1.5rem;
-				margin-right: 0.5rem;
-				margin-top: 0;
-			}
+		img {
+			width: 1.5rem;
+			margin-top: 0;
+		}
 
-			p {
-				margin-left: 1.125rem;
-				line-height: 1.5rem;
-			}
+		p {
+			margin-left: 1.125rem;
+			line-height: 1.5rem;
 		}
 	}
 
@@ -1444,27 +1426,6 @@ ul.flex-list {
         width: #{'calc(100% - 4rem)'};
         max-width: #{'calc(100% - 4rem)'};
     }
-}
-
-.list-item > .card {
-	// cards directly inside list items replicate column functionality
-	// you still need to specify sizing (ie. small-12)
-	padding-left: 1rem;
-	padding-right: 1rem;
-	// same definition as .column, minus the width:100%;
-	float: left;
-	position: relative;
-
-	&.avatar {
-		img {
-			@media #{$small-only} {
-				//margin-left: -0.5rem;
-			}
-			@media #{$medium-only} {
-				//margin-left: -0.75rem;
-			}
-		}
-	}
 }
 
 p{
