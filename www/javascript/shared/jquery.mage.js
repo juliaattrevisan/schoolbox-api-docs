@@ -124,7 +124,7 @@
 
         events = $(e.target).data('events');
 
-        if (events != null && typeof(events.validate) !== undefined) {
+        if (events != null && typeof(events.validate) !== "undefined") {
             var validator = $(e.target).triggerHandler('validate');
 
             if (validator !== undefined) {
