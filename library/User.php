@@ -392,23 +392,20 @@ class User extends DeprecatedModel
     /**
      * Sends a change password confirmation email.
      *
+     * (This is a misnomer, all it does is get a bunch of PHPLibvars.)
+     *
      * @param \Schoolbox\User $user The user to send to.
      *
-     * @return bool
+     * @return array
      */
     public function sendChangePasswordEmail(\Schoolbox\User $user)
     {
-        try {
-            $this->logUserPasswordChange($user->getUsername(), 'email_change_pwd', 'info');
-            $result['EMAIL']     = $user->getEmail();
-            $result['FULLNAME']  = $user->formatName();
-            $result['FIRSTNAME'] = $user->getFirstname();
-            $result['DATE']      = date('j F Y', $_SERVER['REQUEST_TIME']);
-            $result['TIME']      = date('g:i a', $_SERVER['REQUEST_TIME']);
-            return $result;
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            return false;
-        }
+        $result['EMAIL']     = $user->getEmail();
+        $result['FULLNAME']  = $user->formatName();
+        $result['FIRSTNAME'] = $user->getFirstname();
+        $result['DATE']      = date('j F Y', $_SERVER['REQUEST_TIME']);
+        $result['TIME']      = date('g:i a', $_SERVER['REQUEST_TIME']);
+        return $result;
     }
 
     /**
@@ -425,20 +422,16 @@ class User extends DeprecatedModel
         if (empty($admin_address)) {
             return false;
         }
-        try {
-            $template = 'change-password-failure.html';
-            $subject  = Cfg::get('password_change_failed_email_subject');
-            $mailHandler = new Mailer($template, $subject, $admin_address);
-            $mailHandler->setVar('USERNAME', $user->getUsername());
-            $mailHandler->setVar('NAME', $user->formatName());
-            $mailHandler->setVar('EMAIL', $user->getEmail());
-            $mailHandler->setVar('IP', $_SERVER['REMOTE_ADDR']);
-            $mailHandler->setVar('DATE', date('j F Y', $_SERVER['REQUEST_TIME']));
-            $mailHandler->setVar('TIME', date('g:i a', $_SERVER['REQUEST_TIME']));
-            return $mailHandler->send();
-        } catch (\Schoolbox\Mapper\Exception $e) {
-            return false;
-        }
+        $template = 'change-password-failure.html';
+        $subject  = Cfg::get('password_change_failed_email_subject');
+        $mailHandler = new Mailer($template, $subject, $admin_address);
+        $mailHandler->setVar('USERNAME', $user->getUsername());
+        $mailHandler->setVar('NAME', $user->formatName());
+        $mailHandler->setVar('EMAIL', $user->getEmail());
+        $mailHandler->setVar('IP', $_SERVER['REMOTE_ADDR']);
+        $mailHandler->setVar('DATE', date('j F Y', $_SERVER['REQUEST_TIME']));
+        $mailHandler->setVar('TIME', date('g:i a', $_SERVER['REQUEST_TIME']));
+        return $mailHandler->send();
     }
 
     public function getCampusList()
