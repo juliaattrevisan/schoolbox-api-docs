@@ -11,20 +11,20 @@
  * * datepicker
  */
 (function($){
+
     /**
-     * Handle datepicker change events.
+     * Perform a blocking (synchronous) validation
      *
      * @param $datepicker
      * @param string
-     * @param async
      */
-    var datepickerOnChange = function($datepicker, string, async) {
+    var syncValidate = function($datepicker, string) {
 
         var previousValue = $datepicker.data('previousValue') || "";
 
-        // Optionally block potential form submission until validation returns
+        // Block potential form submission until validation returns
         $.ajax({
-            async: async,
+            async: false,
             dataType: "json",
             url: '/ajax/strtotime.php',
             data: {string:string},
@@ -43,11 +43,14 @@
             prevText: '&laquo;',
             onSelect: function (string) {
                 if(string != $(this).data('previousValue')){
-                    datepickerOnChange($(this), this.value, true);
+                    $(this).trigger('change',{ajaxValidate: false});
                 }
             }
-        }).on('change', function () {
-            datepickerOnChange($(this), this.value, false);
+        }).on('change', function (e, data) {
+            // Only skip ajax Validation if explicitly set to false
+            if(undefined == data || undefined == data.ajaxValidate || data.ajaxValidate) {
+                syncValidate($(this), this.value);
+            }
         });
     });
 })(jQuery);
