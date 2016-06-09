@@ -16,7 +16,7 @@ $prefix = 'code';
 /* Retrieve the category ID from the URI, must be an integer and at least 1 character long
  * e.g. /homepage/43
  */
-if (preg_match('/^[1-9]+[0-9]*$/', $this->arg[0])) {
+if (preg_match('/^[0-9]+$/', $this->arg[0])) {
     try {
         $category = $categoryMapper->findById($this->arg[0]);
     } catch (\Schoolbox\Mapper\Exception $e) {
