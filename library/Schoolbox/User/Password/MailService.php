@@ -43,25 +43,22 @@ class MailService
      */
     public function sendChangePasswordEmail(User $user)
     {
-        $result['EMAIL']     = $user->getEmail();
-        $result['FULLNAME']  = $user->formatName();
-        $result['FIRSTNAME'] = $user->getFirstname();
-        $result['DATE']      = date('j F Y', $_SERVER['REQUEST_TIME']);
-        $result['TIME']      = date('g:i a', $_SERVER['REQUEST_TIME']);
-
         $core  = new CoreContext($this->config);
         $email = new TwigEmail('passwordchanged.twig');
         $email->setCoreContext($core->getContext());
         try {
             $email->setFrom($this->config->get('password_change_email_from'), $this->config->get('mail_from_name'));
             $email->setSubject($this->config->get('title') . ' Password Changed');
-            $context['recipient'] = $result['FIRSTNAME'];
-            $context['date'] = $result['DATE'];
-            $context['time'] = $result['TIME'];
-            return $email->setContext($context)->send(array(
-                'name' => $result['FULLNAME'],
-                'email' => $result['EMAIL']
-            ));
+            return $email
+                ->setContext([
+                    'recipient' => $user->getFirstname(),
+                    'date'      => date('j F Y', $_SERVER['REQUEST_TIME']),
+                    'time'      => date('g:i a', $_SERVER['REQUEST_TIME']),
+                ])
+                ->send([
+                    'name'  => $user->formatName(),
+                    'email' => $user->getEmail(),
+                ]);
         } catch (Swift_RfcComplianceException $e) {
             return false;
         }
