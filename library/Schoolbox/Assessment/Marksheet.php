@@ -401,8 +401,8 @@ class Marksheet
 
     protected function getSubmissionBoxMarkForStudent($boxId, $studentId)
     {
-
-        $rtn = $this->returnHandler->getByUser($studentId, $boxId, 1);
+        $ignoreDefaultMark = false;
+        $rtn = $this->returnHandler->getByUser($studentId, $boxId, 1, $ignoreDefaultMark);
 
         if (isset($rtn[0]['mark'])) {
             $mark = array(
