@@ -44,7 +44,7 @@ if (isset($_POST['current_password'])) {
             $_SESSION['password'] = $_POST['new_password'];
         } else {
             $userHandler->logUserPasswordChange($user->getUsername(), 'change_pwd_fail', 'warn');
-            $userHandler->sendPasswordChangeFailureEmail($user->getId());
+            $userHandler->sendPasswordChangeFailureEmail($user);
             error(105, ['message' => "Your current password did not match what is stored in the database."]);
             exit;
         }
@@ -64,7 +64,7 @@ if (isset($_POST['current_password'])) {
             }
         }
 
-        $result = $userHandler->sendChangePasswordEmail($user->getId());
+        $result = $userHandler->sendChangePasswordEmail($user);
         $myconf = ConfigMapper::getInstance();
         $core = new CoreContext($myconf);
         $email = new TwigEmail('passwordchanged.twig');

@@ -394,17 +394,16 @@ class User extends DeprecatedModel
      *
      * Also, this filthily updates the user's hash.
      *
-     * @param int $id The user ID to send to.
+     * @param \Schoolbox\User $user The user to send to.
      *
      * @return bool
      */
-    public function sendChangePasswordEmail($id)
+    public function sendChangePasswordEmail(\Schoolbox\User $user)
     {
         try {
-            $user = \Schoolbox\UserMapper::getInstance()->findById($id);
             $this->logUserPasswordChange($user->getUsername(), 'email_change_pwd', 'info');
             $hash = substr(md5(uniqid() . time()), 0, 25);
-            $this->update(array('id' => $id, 'hash' => $hash));
+            $this->update(array('id' => $user->getId(), 'hash' => $hash));
             $result['EMAIL']     = $user->getEmail();
             $result['FULLNAME']  = $user->formatName();
             $result['FIRSTNAME'] = $user->getFirstname();
@@ -420,18 +419,17 @@ class User extends DeprecatedModel
      * Sends a password change fail message to the Schoolbox admin, if there is
      * one.
      *
-     * @param int $id The user ID to send to.
+     * @param \Schoolbox\User $user The user to send to.
      *
      * @return bool
      */
-    public function sendPasswordChangeFailureEmail($id)
+    public function sendPasswordChangeFailureEmail(\Schoolbox\User $user)
     {
         $admin_address = Cfg::get('mail_admin_address');
         if (empty($admin_address)) {
             return false;
         }
         try {
-            $user = \Schoolbox\UserMapper::getInstance()->findById($id);
             $template = 'change-password-failure.html';
             $subject  = Cfg::get('password_change_failed_email_subject');
             $mailHandler = new Mailer($template, $subject, $admin_address);
