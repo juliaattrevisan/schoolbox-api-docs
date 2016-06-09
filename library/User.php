@@ -392,24 +392,28 @@ class User extends DeprecatedModel
     /**
      * Sends a change password confirmation email.
      *
+     * Also, this filthily updates the user's hash.
+     *
      * @param int $id The user ID to send to.
      *
      * @return bool
      */
     public function sendChangePasswordEmail($id)
     {
-        if ($user = $this->getByID($id)) {
-            $this->logUserPasswordChange($user['username'], 'email_change_pwd', 'info');
+        try {
+            $user = \Schoolbox\UserMapper::getInstance()->findById($id);
+            $this->logUserPasswordChange($user->getUsername(), 'email_change_pwd', 'info');
             $hash = substr(md5(uniqid() . time()), 0, 25);
-            $this->update(array('id' => $user['id'], 'hash' => $hash));
-            $result['EMAIL'] = $user['alt_email'];
-            $result['FULLNAME'] = $user['firstname']." ".$user['lastname'];
-            $result['FIRSTNAME'] = $user['firstname'];
-            $result['DATE'] = date('j F Y', $_SERVER['REQUEST_TIME']);
-            $result['TIME'] = date('g:i a', $_SERVER['REQUEST_TIME']);
+            $this->update(array('id' => $id, 'hash' => $hash));
+            $result['EMAIL']     = $user->getEmail();
+            $result['FULLNAME']  = $user->formatName();
+            $result['FIRSTNAME'] = $user->getFirstname();
+            $result['DATE']      = date('j F Y', $_SERVER['REQUEST_TIME']);
+            $result['TIME']      = date('g:i a', $_SERVER['REQUEST_TIME']);
             return $result;
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            return false;
         }
-        return false;
     }
 
     /**
@@ -427,8 +431,11 @@ class User extends DeprecatedModel
     public function sendPasswordChangeFailureEmail($id, $is_synergetic_failure = false)
     {
         $admin_address = Cfg::get('mail_admin_address');
-        if (!empty($admin_address) && ($user = $this->getByID($id))) {
-            //
+        if (empty($admin_address)) {
+            return false;
+        }
+        try {
+            $user = \Schoolbox\UserMapper::getInstance()->findById($id);
             // Send a different email if the password change failed because the
             // passwords are desynched between Synergetic and Schoolbox.
             // If that happens, then it's not really the user's fault.
@@ -438,15 +445,16 @@ class User extends DeprecatedModel
                 $template = 'change-password-synergetic-failure.html';
             }
             $mailHandler = new Mailer($template, $subject, $admin_address);
-            $mailHandler->setVar('USERNAME', $user['username']);
-            $mailHandler->setVar('NAME', $user['firstname'] . ' ' . $user['lastname']);
-            $mailHandler->setVar('EMAIL', $user['alt_email']);
+            $mailHandler->setVar('USERNAME', $user->getUsername());
+            $mailHandler->setVar('NAME', $user->formatName());
+            $mailHandler->setVar('EMAIL', $user->getEmail());
             $mailHandler->setVar('IP', $_SERVER['REMOTE_ADDR']);
             $mailHandler->setVar('DATE', date('j F Y', $_SERVER['REQUEST_TIME']));
             $mailHandler->setVar('TIME', date('g:i a', $_SERVER['REQUEST_TIME']));
             return $mailHandler->send();
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            return false;
         }
-        return false;
     }
 
     public function getCampusList()
