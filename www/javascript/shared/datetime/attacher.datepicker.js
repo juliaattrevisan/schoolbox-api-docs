@@ -17,22 +17,22 @@
      *
      * @param $datepicker
      * @param string
+     * @param ajaxValidate
      */
-    var syncValidate = function($datepicker, string) {
+    var datepickerOnChange = function($datepicker, string, ajaxValidate) {
 
-        var previousValue = $datepicker.data('previousValue') || "";
-
-        // Block potential form submission until validation returns
-        $.ajax({
-            async: false,
-            dataType: "json",
-            url: '/ajax/strtotime.php',
-            data: {string:string},
-            success: function (data) {
-                $datepicker.val(data.time).blur();
-            }
-        });
-
+        if(ajaxValidate) {
+            // Block potential form submission until validation returns
+            $.ajax({
+                async: false,
+                dataType: "json",
+                url: '/ajax/strtotime.php',
+                data: {string: string},
+                success: function (data) {
+                    $datepicker.val(data.time).blur();
+                }
+            });
+        }
         $datepicker.data('previousValue', string);
     };
 
@@ -42,15 +42,15 @@
             nextText: '&raquo;',
             prevText: '&laquo;',
             onSelect: function (string) {
-                if(string != $(this).data('previousValue')){
+                var previousValue = $(this).data('previousValue') || '';
+                if(string != previousValue){
                     $(this).trigger('change',{ajaxValidate: false});
                 }
             }
         }).on('change', function (e, data) {
             // Only skip ajax Validation if explicitly set to false
-            if (undefined == data || undefined == data.ajaxValidate || data.ajaxValidate) {
-                syncValidate($(this), this.value);
-            }
+            var ajaxValidate = (undefined == data || undefined == data.ajaxValidate || data.ajaxValidate);
+            datepickerOnChange($(this), this.value, ajaxValidate);
         });
     });
 })(jQuery);
