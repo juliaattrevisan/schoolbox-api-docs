@@ -102,7 +102,7 @@
 
                                 {% endfor %}
 
-                                {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: blog}) %}
+                                {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: blog, page: page}) %}
                                 <li class="row hide" id="commentform-{{ blog.getId }}">
                                     <div class="column small-12 no-pad">
                                         <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post">
