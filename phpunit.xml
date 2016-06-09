@@ -20,13 +20,7 @@
   </testsuites>
   <filter>
       <whitelist>
-          <directory suffix=".php">./include/</directory>
           <directory suffix=".php">./library/</directory>
-          <exclude>
-              <directory suffix=".php">./include/HTMLPurifier/</directory>
-              <directory suffix=".php">./include/Sabre/</directory>
-              <directory suffix=".php">./include/PEAR/</directory>
-          </exclude>
       </whitelist>
   </filter>
 
