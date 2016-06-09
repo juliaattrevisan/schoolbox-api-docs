@@ -69,15 +69,19 @@ if (isset($_POST['current_password'])) {
         $core = new CoreContext($myconf);
         $email = new TwigEmail('passwordchanged.twig');
         $email->setCoreContext($core->getContext());
-        $email->setFrom(Cfg::get('password_change_email_from'), Cfg::get('mail_from_name'));
-        $email->setSubject(Cfg::get('title') . ' Password Changed');
-        $context['recipient'] = $result['FIRSTNAME'];
-        $context['date'] = $result['DATE'];
-        $context['time'] = $result['TIME'];
-        $email->setContext($context)->send(array(
-            'name' => $result['FULLNAME'],
-            'email' => $result['EMAIL']
-        ));
+        try {
+            $email->setFrom(Cfg::get('password_change_email_from'), Cfg::get('mail_from_name'));
+            $email->setSubject(Cfg::get('title') . ' Password Changed');
+            $context['recipient'] = $result['FIRSTNAME'];
+            $context['date'] = $result['DATE'];
+            $context['time'] = $result['TIME'];
+            $email->setContext($context)->send(array(
+                'name' => $result['FULLNAME'],
+                'email' => $result['EMAIL']
+            ));
+        } catch (Swift_RfcComplianceException $e) {
+            // From address isn't valid. Allow password anyway.
+        }
         $_SESSION['password'] = $_POST['new_password'];
 
         SitePage::localRedir($redirect);
