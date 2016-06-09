@@ -715,6 +715,9 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
             unset($diff['finish']);
         }
 
+        // the student version of this method spawned the mark visibility change, if any
+        unset($diff['markVisibility']);
+
         // if none of the above apply, but there are changes, just be generic
         if (count($diff) && $msgr->isEmpty()) {
             $msg = new Message(":child's $quizType :quizname was updated in :catname", $icon, $href);

@@ -17,14 +17,49 @@ use OutOfBoundsException;
 use Schoolbox\Notif\MQ\Connector;
 use Schoolbox\Notif\UserQueue\InstantUserQueue;
 use Schoolbox\Realtime\Notification\Decorator;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 abstract class AbstractNotificationTest extends AbstractTest
 {
+    /* COMMON USERS*/
+
+    // the Rhodes family
+    const DAVID_RHODES          = 230;
+    const CALEB_RHODES          = 245;
+    const JO_RHODES             = 75;
+    const MADDISON_RHODES       = 206;
+    const PETER_RHODES          = 74;
+    const RACHEL_RHODES         = 229;
+
+    // the Saxon family
+    const ANGELO_SAXON          = 226;
+    const ANITA_SAXON           = 17;
+    const LOUISE_SAXON          = 20;
+    const SOPHIA_SAXON_TEACHER  = 160;
+    const SOPHIA_SAXON_PARENT   = 244;
+
+    // various teachers
+    const GLENDA_SMITH          = 157;
+    const JACKIE_BENSON         = 247;
+    const ZANE_SMITH            = 151;
+    const GARY_GEORGE           = 153;
+    const ANNE_SMITH            = 159;
+    const RYAN_VOLLMER          = 13;
+
+    // admins
+    const TREVOR_REESE          = 14;
+    const ALARESS_ADMIN         = 19;
+
+
     /** @var \Predis\ClientInterface */
     private $redis;
 
     /** @var Connector */
     private $amqp;
+
+    /** @var User[] */
+    private $userCache;
 
 
     /**
@@ -54,6 +89,21 @@ abstract class AbstractNotificationTest extends AbstractTest
         $queue->fetchNotificationsIntoBundle($decorator);
 
         return $queue->fetchNotifications(-1);
+    }
+
+
+    /**
+     * Fetch the given user, either from cache or from DB
+     *
+     * @param int $id
+     * @return User
+     */
+    protected function getUser($id)
+    {
+        if (empty($this->userCache[$id])) {
+            $this->userCache[$id] = UserMapper::getInstance()->findById($id);
+        }
+        return $this->userCache[$id];
     }
 
 

@@ -20,7 +20,6 @@ spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 $kernel = new Schoolbox\Application\Daemon\Kernel('Assessment Return Notifications', [
     'verbose' => [ false, false, false ],
     'errors'  => E_ALL,
-    'flags'   => getopt('', ['work', 'quiz'])
 ]);
 
 $kernel->run(function($di, $loop, $log, $opts) {
@@ -30,20 +29,6 @@ $kernel->run(function($di, $loop, $log, $opts) {
      * @var LoggerInterface $log
      * @var array $opts
      */
-
-    $flags = $opts['flags'];
-
-    $doWork = true;
-    $doQuiz = true;
-
-
-    if (!empty($flags)) {
-        $doWork = false;
-        $doQuiz = false;
-    }
-
-    if (isset($flags['work'])) { $doWork = true; }
-    if (isset($flags['quiz'])) { $doQuiz = true; }
 
     // waaaait
     wait($log, 10);
@@ -58,97 +43,52 @@ $kernel->run(function($di, $loop, $log, $opts) {
     // connections
     $redis = Alaress\Redis::getClientInstance();
 
-    if ($doWork) {
-        // mappers
-        $workMap = Component\SubmissionBoxMapper::getInstance();
-        $workMap->setSessionData(['user' => $zsmith]);
-        $rtnMap  = Component\SubmissionBox\ReturnedWorkMapper::getInstance();
-        $rtnMap->setSessionData(['user' => $zsmith]);
+    // mappers
+    $workMap = Component\SubmissionBoxMapper::getInstance();
+    $workMap->setSessionData(['user' => $zsmith]);
+    $rtnMap  = Component\SubmissionBox\ReturnedWorkMapper::getInstance();
+    $rtnMap->setSessionData(['user' => $zsmith]);
 
-        // "jerry springer show"
-        $work = $workMap->findById(54);
-        $work->setMarkVisibility(0);
+    // "jerry springer show"
+    $work = $workMap->findById(54);
+    $work->setMarkVisibility(0);
 
-        // save that
-        $log->info("Set Work visibility to 0");
-        $workMap->save($work);
-    }
-
-    if ($doQuiz) {
-        // mappers
-        $quizMap = Component\OnlineAssessmentMapper::getInstance();
-        $quizMap->setSessionData(['user' => $zsmith]);
-        $attMap  = Component\OnlineAssessment\AttemptMapper::getInstance();
-        $attMap->setSessionData(['user' => $zsmith]);
-
-        // "lesson 1 - pretest"
-        $quiz = $quizMap->findById(39);
-        $quiz->setMarkVisibility(0);
-
-        // save that
-        $log->info("Set Quiz visibility to 0");
-        $quizMap->save($quiz);
-    }
+    // save that
+    $log->info("Set Work visibility to 0");
+    $workMap->save($work);
 
 
     //
     // now is the fun part... injecting marks (hint: not fun)
     //
 
-    if ($doWork) {
-        // work: just save a return
-        $log->info("Save new Work Return record");
-        $rtnMap->save($rtnMap->hydrate([
-            'box_id'    => $work->getId(),
-            'marker'    => $zsmith->getId(),
-            'owner'     => $drhodes->getId(),
-            'comment'   => 'INJECTION',
-            'mark'      => 'INJECTION',
-            'norm_mark' => 85,
-        ]));
-    }
+    // work: just save a return
+    $log->info("Save new Work Return record");
+    $rtnMap->save($rtnMap->hydrate([
+        'box_id'    => $work->getId(),
+        'marker'    => $zsmith->getId(),
+        'owner'     => $drhodes->getId(),
+        'comment'   => 'INJECTION',
+        'mark'      => 'INJECTION',
+        'norm_mark' => 85,
+    ]));
 
-    if ($doQuiz) {
-        // quiz: first create an attempt without a reviewed_at, then review it
-        $attempt = $attMap->hydrate([
-            'assess_id' => $quiz->getId(),
-            'user_id'   => $drhodes->getId(),
-            'start'     => Alaress_Date_Format::now()->addDays(-1)->getDatabase(),
-            'finish'    => Alaress_Date_Format::now()->addDays(-1)->addHours(1)->getDatabase(),
-        ]);
-
-        $log->info("Save new Quiz Attempt record");
-        $attMap->save($attempt);
-
-        $attempt->setReviewed(Alaress_Date_Format::now());
-
-        $log->info("Update Quiz Attempt record with review date");
-        $attMap->save($attempt);
-    }
 
     for ($i = 1; $i < 3; ++$i) {
         // sleeeeeeeep...
         wait($log);
 
-        stateCheck($log, $redis, $drhodes, $prhodes, $i-1, $doWork, $doQuiz);
+        stateCheck($log, $redis, $drhodes, $prhodes, $i-1);
 
-        if ($doWork) {
-            $log->info("Set Work visibility to $i");
-            $work->setMarkVisibility($i);
-            $workMap->save($work);
-        }
-
-        if ($doQuiz) {
-            $log->info("Set Quiz visibility to $i");
-            $quiz->setMarkVisibility($i);
-            $quizMap->save($quiz);
-        }
+        $log->info("Set Work visibility to $i");
+        $work->setMarkVisibility($i);
+        $workMap->save($work);
     }
 
     // sleeeeeeeep...
     wait($log);
 
-    stateCheck($log, $redis, $drhodes, $prhodes, 2, $doWork, $doQuiz);
+    stateCheck($log, $redis, $drhodes, $prhodes, 2);
 
 });
 
@@ -159,22 +99,11 @@ $kernel->run(function($di, $loop, $log, $opts) {
  * @param User            $student
  * @param User            $parent
  * @param int             $expected
- * @param bool            $doWork
- * @param bool            $doQuiz
  */
-function stateCheck(LoggerInterface $log, Redis $redis, User $student, User $parent, $expected, $doWork, $doQuiz)
+function stateCheck(LoggerInterface $log, Redis $redis, User $student, User $parent, $expected)
 {
-    $studentMsgs = [];
-    $parentMsgs  = [];
-
-    if ($doWork) {
-        $studentMsgs[] = ":teacher has marked your work for :boxname in :catname";
-        $parentMsgs[]  = ":teacher has marked :student's work for :boxname in :catname";
-    }
-    if ($doQuiz) {
-        $studentMsgs[] = ':staff has marked your attempt of :quiz in :cat';
-        $parentMsgs[]  = ":staff has marked :child's attempt of :quiz in :cat";
-    }
+    $studentMsgs[] = ":teacher has marked your work for :boxname in :catname";
+    $parentMsgs[]  = ":teacher has marked :student's work for :boxname in :catname";
 
     switch ($expected) {
         case 0: // staff only

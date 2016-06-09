@@ -32,7 +32,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
      * Spawn an Answer type.
      *
      * @param  $type_id
-     * @return class
+     * @return Evaluation_Answer
      */
     public function createAnswerModel($type_id)
     {
