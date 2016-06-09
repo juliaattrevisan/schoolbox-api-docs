@@ -53,15 +53,15 @@ class External_Synergetic_Class implements External_ClassInterface
      * Returns the details of a class based on its code
      * This function is Synergetic only, not included in the interface and used for attendances
      *
-     * @param $classCode
-     *
+     * @param string $classCode
+     * @param \Schoolbox\User $user
      * @return mixed
      */
-    public function getClass($classCode)
+    public function getClass($classCode, \Schoolbox\User $user)
     {
         $classQuery   = $this->getClassCodeQuery($classCode);
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
+        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($user->getExternalId()));
+        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($user->getExternalId()));
         $query = "
             SELECT *
             FROM SynergyOne.dbo.SubjectClasses

@@ -31,9 +31,9 @@ if (count($this->arg) < 3) {
  */
 $externalClass = new External_Synergetic_Class();
 if ($this->arg[0]) {
-    $class = $externalClass->getClass($this->arg[0] . '/' . $this->arg[1]);
+    $class = $externalClass->getClass($this->arg[0] . '/' . $this->arg[1], $_SESSION['user']);
 } else {
-    $class = $externalClass->getClass($this->arg[1]);
+    $class = $externalClass->getClass($this->arg[1], $_SESSION['user']);
 }
 
 if (!$class) {
@@ -122,8 +122,8 @@ if ($class) {
             $attendanceDate,
             $timetableDay,
             $attendancePeriod,
-            $externalUserHandler->getCurrentYear(),
-            $externalUserHandler->getCurrentSemester(),
+            $externalUserHandler->getCurrentYear($_SESSION['user']->getExternalId()),
+            $externalUserHandler->getCurrentSemester($_SESSION['user']->getExternalId()),
             MSSQL::getInstance()
         );
         $allStudents = $attendanceHandler->findAttendanceRecords();
