@@ -41,6 +41,14 @@ abstract class Calendar_Api_EventType_ResourceBooking_Base extends Calendar_Api_
      * @param $config
      */
     public function __construct($user, $config) {
+
+        //Ensure ResourceBooking module is enabled
+        $configMapper = \Schoolbox\Config\ConfigMapper::getInstance();
+        if(0 == $configMapper->get('resource_booking_enabled')){
+            throw new DomainException('Resource Booking Module is disabled');
+        }
+
+
         $this->setUser($user);
         $this->setup();
     }
