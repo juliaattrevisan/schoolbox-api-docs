@@ -392,8 +392,6 @@ class User extends DeprecatedModel
     /**
      * Sends a change password confirmation email.
      *
-     * Also, this filthily updates the user's hash.
-     *
      * @param \Schoolbox\User $user The user to send to.
      *
      * @return bool
@@ -402,8 +400,6 @@ class User extends DeprecatedModel
     {
         try {
             $this->logUserPasswordChange($user->getUsername(), 'email_change_pwd', 'info');
-            $hash = substr(md5(uniqid() . time()), 0, 25);
-            $this->update(array('id' => $user->getId(), 'hash' => $hash));
             $result['EMAIL']     = $user->getEmail();
             $result['FULLNAME']  = $user->formatName();
             $result['FIRSTNAME'] = $user->getFirstname();
