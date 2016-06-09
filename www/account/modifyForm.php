@@ -29,9 +29,10 @@ if (isset($_POST['current_password'])) {
 
     try {
         /** @var Schoolbox\User $user */
-        $user            = $_SESSION['user'];
-        $userMapper      = Schoolbox\UserMapper::getInstance();
-        $passwordService = new \Alaress\Password\Service();
+        $user                = $_SESSION['user'];
+        $userMapper          = Schoolbox\UserMapper::getInstance();
+        $passwordService     = new \Alaress\Password\Service();
+        $passwordMailService = new \Schoolbox\User\Password\MailService(ConfigMapper::getInstance());
         // Test password against existing
         $currentHash = $user->getPassword();
         if ($passwordService->verify($_POST['current_password'], $currentHash)
@@ -44,7 +45,7 @@ if (isset($_POST['current_password'])) {
             $_SESSION['password'] = $_POST['new_password'];
         } else {
             $userHandler->logUserPasswordChange($user->getUsername(), 'change_pwd_fail', 'warn');
-            $userHandler->sendPasswordChangeFailureEmail($user);
+            $passwordMailService->sendPasswordChangeFailureEmail($user);
             error(105, ['message' => "Your current password did not match what is stored in the database."]);
             exit;
         }
@@ -65,24 +66,7 @@ if (isset($_POST['current_password'])) {
         }
 
         $userHandler->logUserPasswordChange($user->getUsername(), 'email_change_pwd', 'info');
-        $result = $userHandler->sendChangePasswordEmail($user);
-        $myconf = ConfigMapper::getInstance();
-        $core = new CoreContext($myconf);
-        $email = new TwigEmail('passwordchanged.twig');
-        $email->setCoreContext($core->getContext());
-        try {
-            $email->setFrom(Cfg::get('password_change_email_from'), Cfg::get('mail_from_name'));
-            $email->setSubject(Cfg::get('title') . ' Password Changed');
-            $context['recipient'] = $result['FIRSTNAME'];
-            $context['date'] = $result['DATE'];
-            $context['time'] = $result['TIME'];
-            $email->setContext($context)->send(array(
-                'name' => $result['FULLNAME'],
-                'email' => $result['EMAIL']
-            ));
-        } catch (Swift_RfcComplianceException $e) {
-            // From address isn't valid. Allow password anyway.
-        }
+        $passwordMailService->sendChangePasswordEmail($user);
         $_SESSION['password'] = $_POST['new_password'];
 
         SitePage::localRedir($redirect);
