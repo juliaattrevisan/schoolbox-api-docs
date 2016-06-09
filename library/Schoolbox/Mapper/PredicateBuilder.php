@@ -107,7 +107,8 @@ class PredicateBuilder
 
     /**
      * @param string $columnName
-     * @param string $columnValue
+     * @param string $columnValue Used directly in LIKE statement.
+     *                            @see \Database::quoteForLike for escaping user input.
      * @return PredicateBuilder
      */
     public function like($columnName, $columnValue)
