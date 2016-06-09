@@ -48,7 +48,7 @@
             }
         }).on('change', function (e, data) {
             // Only skip ajax Validation if explicitly set to false
-            if(undefined == data || undefined == data.ajaxValidate || data.ajaxValidate) {
+            if (undefined == data || undefined == data.ajaxValidate || data.ajaxValidate) {
                 syncValidate($(this), this.value);
             }
         });
