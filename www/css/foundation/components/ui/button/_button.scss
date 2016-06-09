@@ -90,7 +90,7 @@ a[disabled], a.disabled {
 .splash {
 	display: block;
 	position: absolute;
-	background: rgba(0,0,0,0.1);
+	background: calc-button-color($content-ui-hover);
 	border-radius: 100%;
 	@include transform (scale(0));
 }
