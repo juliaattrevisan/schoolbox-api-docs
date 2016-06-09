@@ -112,7 +112,7 @@
 
                         </ul>
 
-                        {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: blog}) %}
+                        {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: blog, page: page}) %}
                         <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: blog.getId}) }}" method="post">
                             <input type="hidden" name="pageId" value="{{ page.getPageId }}">
                             <input type="hidden" name="ownerId" value="{{ page.getUid }}">

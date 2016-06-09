@@ -94,7 +94,7 @@
 
                     {% endfor %}
 
-                    {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: record, ownerId: page.getUid}) %}
+                    {% if isRouteAuthorized('eportfolioBlog.postCommentInsert', {blog: record, page: page}) %}
                     <li>
                         <form action="{{ routeLookup('eportfolioBlog.postCommentInsert', {id: record.getId}) }}" method="post">
                             <input type="hidden" name="pageId" value="{{ page.getPageId }}">
