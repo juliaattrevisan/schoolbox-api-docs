@@ -420,15 +420,11 @@ class User extends DeprecatedModel
      * Sends a password change fail message to the Schoolbox admin, if there is
      * one.
      *
-     * @param int  $id                    The user ID to send to.
-     * @param bool $is_synergetic_failure True if the password failed to change
-     *                                    because of something in Synergetic
-     *                                    rather than them putting the wrong
-     *                                    password in.
+     * @param int $id The user ID to send to.
      *
      * @return bool
      */
-    public function sendPasswordChangeFailureEmail($id, $is_synergetic_failure = false)
+    public function sendPasswordChangeFailureEmail($id)
     {
         $admin_address = Cfg::get('mail_admin_address');
         if (empty($admin_address)) {
@@ -436,14 +432,8 @@ class User extends DeprecatedModel
         }
         try {
             $user = \Schoolbox\UserMapper::getInstance()->findById($id);
-            // Send a different email if the password change failed because the
-            // passwords are desynched between Synergetic and Schoolbox.
-            // If that happens, then it's not really the user's fault.
             $template = 'change-password-failure.html';
             $subject  = Cfg::get('password_change_failed_email_subject');
-            if ($is_synergetic_failure) {
-                $template = 'change-password-synergetic-failure.html';
-            }
             $mailHandler = new Mailer($template, $subject, $admin_address);
             $mailHandler->setVar('USERNAME', $user->getUsername());
             $mailHandler->setVar('NAME', $user->formatName());
