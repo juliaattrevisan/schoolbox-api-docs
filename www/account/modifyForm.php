@@ -64,6 +64,7 @@ if (isset($_POST['current_password'])) {
             }
         }
 
+        $userHandler->logUserPasswordChange($user->getUsername(), 'email_change_pwd', 'info');
         $result = $userHandler->sendChangePasswordEmail($user);
         $myconf = ConfigMapper::getInstance();
         $core = new CoreContext($myconf);
