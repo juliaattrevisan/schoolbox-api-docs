@@ -57,7 +57,7 @@ class External_Synergetic_Class implements External_ClassInterface
      * @param \Schoolbox\User $user
      * @return mixed
      */
-    public function getClass($classCode, $user)
+    public function getClass($classCode, \Schoolbox\User $user)
     {
         $classQuery   = $this->getClassCodeQuery($classCode);
         $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($user->getExternalId()));
