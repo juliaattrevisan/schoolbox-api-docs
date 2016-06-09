@@ -75,7 +75,14 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
         $calendarApi  = new Calendar_Api_EventType_Event_Schoolbox_Campus($_SESSION['user'], array());
 
         // Render all events for group using html renderer
-        $eventRenderer = new Lister($calendarApi, $this->start->getUnixTimestamp(), $this->end->getUnixTimestamp(), $_SESSION['user'], $this->sitepage, $_SESSION['user']);
+        $eventRenderer = new Lister(
+            $calendarApi,
+            $this->start->getUnixTimestamp(),
+            $this->end->getUnixTimestamp(),
+            $_SESSION['user'],
+            $this->sitepage,
+            $_SESSION['user']
+        );
         foreach ($eventRenderer->getAllEvents() as $currentEvent) {
 
             //

@@ -33,12 +33,13 @@ class Exporter extends Renderer {
      * @param $api
      * @param $startTimestamp
      * @param $endTimestamp
-     * @param $viewer
+     * @param $user
      * @param $page
+     * @param $viewer
      */
-    public function __construct($api, $startTimestamp, $endTimestamp, User $viewer, \SitePage $page)
+    public function __construct($api, $startTimestamp, $endTimestamp, User $user, \SitePage $page, User $viewer)
     {
-        parent::__construct($api, $startTimestamp, $endTimestamp, $viewer, $page);
+        parent::__construct($api, $startTimestamp, $endTimestamp, $user, $page, $viewer);
 
 		$this->setVCalendar(new VCalendar());
 		$this->getVCalendar()->add('method', 'PUBLISH');

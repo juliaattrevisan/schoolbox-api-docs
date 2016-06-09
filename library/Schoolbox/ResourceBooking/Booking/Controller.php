@@ -895,7 +895,8 @@ class Controller extends Base
             $this->getRequest()->query['start'],
             $this->getRequest()->query['end'],
             $this->getUser(),
-            $this->getDi()->get('sitePage')
+            $this->getDi()->get('sitePage'),
+            $this->getUser()
         );
 
         $output = $calendar->renderAll('javascript');

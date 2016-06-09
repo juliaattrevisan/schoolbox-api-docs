@@ -25,8 +25,9 @@ $renderer = new \Calendar\Event\Collection\Renderer(
     new \Calendar_Api_EventType_Submission_Schoolbox_ForDueWork($user, array()),
     $_GET['start'],
     $_GET['end'],
-    $viewer,
-    $this
+    $user,
+    $this,
+    $viewer
 );
 echo "[";
 echo $renderer->renderAll('javascript');
