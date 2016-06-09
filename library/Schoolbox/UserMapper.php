@@ -271,7 +271,7 @@ class UserMapper extends Mapper
                 $model->setKey(substr(md5(uniqid() . time()), 0, 25));
             }
 
-            if (!$model->getHash() && $model->getRetrievablePassword()) {
+            if ($model->getRetrievablePassword()) {
                 $model->setHash(md5($model->getUsername() . ':' . $this->getConfigLoader()->get('site_location') . ':' . $model->getRetrievablePassword()));
             }
 
