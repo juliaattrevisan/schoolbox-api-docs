@@ -4,6 +4,8 @@
 @mixin button-dimensions() {
     min-height: $global-button-height;
     padding: $global-button-padding;
+	position: relative;
+	overflow: hidden;
 }
 
 a[disabled], a.disabled {
@@ -81,6 +83,27 @@ a[disabled], a.disabled {
 			margin-bottom: 0.25rem;
 		}
 	}
+}
+
+/* Splash effect when clicking buttons
+*/
+.splash {
+	display: block;
+	position: absolute;
+	background: rgba(0,0,0,0.1);
+	border-radius: 100%;
+	@include transform (scale(0));
+}
+
+/* On.click animation effect on buttons
+*/
+.splash.animate {
+	@include animation (ripple 0.65s linear);
+}
+	@keyframes ripple {
+		/* Scale 200% to safely cover the entire link and fade it out
+		 */
+		100% { opacity: 0; @include transform (scale(2)); }
 }
 
 /* Arbitrary <button> element
