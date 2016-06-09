@@ -136,7 +136,8 @@ try {
             $start,
             $end,
             $user,
-            new SitePage(false)
+            new SitePage(false),
+            $user
         );
     }
     else {

@@ -18,6 +18,7 @@ class Javascript extends RendererBase {
 	 * Visitor
 	 *
 	 * @param $this->getEvent()
+	 * @return string
 	 */
 	public function render() {
 		if ($this->isVisible($this->getEvent())) {
