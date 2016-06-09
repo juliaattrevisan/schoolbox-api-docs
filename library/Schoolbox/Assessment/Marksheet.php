@@ -701,14 +701,13 @@ class Marksheet
                 $mark   = $row['marks'][$item['isOA']][$item['id']];
                 $workId = $item['id'];
 
-                $markLabel = '';
+                $markLabel = '&ndash;';
                 if ($mark['in_progress']) {
                     $markLabel = 'In Progress';
                 } elseif (strlen($mark['mark'])) {
                     $markLabel = $mark['mark'];
-                } else {
-                    $markLabel = '&ndash;';
                 }
+
                 $page->setVar(
                     array(
                         'WORK_PATH'              => $item['isOA'] ? '/assess/results' : '/submission/viewSubmission',
