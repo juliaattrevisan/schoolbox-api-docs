@@ -2,9 +2,10 @@
 {% set isSuperuser = session.user.isSuperUser() %}
 {% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
 {% set isSelf = session.user.getId() == user.getId() %}
+{% set isParent = session.user.getRole().isParent() %}
 
-{# details: always show to SU + staff, regardless of externalUser.DirectoryIncludeFlag #}
-{% set showDetails = isSuperuser or isStaff or isSelf %}
+{# details: show to SU + staff + self, or other parents if externalUser.DirectoryIncludeFlag #}
+{% set showDetails = isSuperuser or isStaff or isSelf or(isParent and externalUser.DirectoryIncludeFlag) %}
 {# emails: staff may view emails #}
 {% set showEmail = showDetails or isStaff %}
 
