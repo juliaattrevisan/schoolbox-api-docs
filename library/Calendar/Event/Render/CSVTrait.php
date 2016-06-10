@@ -1,14 +1,17 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: andy
- * Date: 10/06/16
- * Time: 12:19 PM
+ * @author      Andy Ryan <andy.ryan@alaress.com.au>
+ * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
  */
 
 namespace Calendar\Event\Render;
 
-
+/**
+ * Default CSV rendering for all types of Calendar events.
+ * 
+ * @package Calendar\Event\Render
+ */
 trait CSVTrait
 {
     /**
