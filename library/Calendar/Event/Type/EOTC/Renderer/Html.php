@@ -13,7 +13,7 @@ use Calendar\Event\Type\RendererBase;
 use Scrub;
 use Calendar;
 
-class Html extends RendererBase {
+class Html extends Base {
 
     /**
      * Render this event
