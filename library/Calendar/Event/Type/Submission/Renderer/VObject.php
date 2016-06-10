@@ -9,7 +9,7 @@
 
 namespace Calendar\Event\Type\Submission\Renderer;
 
-use Calendar\Event\Type\VObjectBase;
+use Calendar\Event\Render\VObjectTrait;
 use DateTimeZone;
 use DateInterval;
 use DateTime;
