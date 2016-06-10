@@ -9,11 +9,11 @@
 
 namespace Calendar\Event\Type\Day\Renderer;
 
-use Calendar\Event\Type\CsvBase;
 
-class Csv extends CsvBase {
+class Csv extends Base {
+    
     /**
-     * Render this event out as CSV data
+     * Render this Day event out as CSV data
      *
      */
     public function render()
