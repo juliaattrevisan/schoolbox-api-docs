@@ -70,28 +70,26 @@ class Kernel extends \Alaress\Application\Kernel
         // Run router with requested path (trim trailing /)
         $path  = preg_replace('|/$|', '', parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH));
         $route = $this->di->get('router')->match($path, $_SERVER);
+
         if ($route instanceof Route) {
             // The route name's format:
             // "[controllerName].[action](:[label])"
             // The : and label are optional.
             preg_match('/^(?P<controller>\w+)\\.(?P<action>\w+)/', $route->name, $parsedName);
+
             $controllerName = $parsedName['controller'];
             $action         = $parsedName['action'];
+
             /** @var \Alaress\Module\Module $module */
             $module = $this->di->get('module:'.$controllerName);
             $module->initControllerDependencies();
             $module->initControllers($this->di);
             unset($module);
-            /** @var \Alaress\Web\Controller\Base $controller */
-            $controller = $this->di->get('controller:'.$controllerName);
-            /** @var \Alaress\Session\Session $session */
-            $session = $this->di->get('session');
-            /** @var \Aura\Web\Response $response */
-            $response = null;
-            // Has session expired? Assume no user here then, but that should probably
-            // be handled in authenticator.
-            $params = array();
+
             try {
+                /** @var \Alaress\Session\Session $session */
+                $session = $this->di->get('session');
+
                 // Do authorization here
                 // TODO Inject user getter into authorizer, and use it to determine:
                 // * if user is there
@@ -102,14 +100,26 @@ class Kernel extends \Alaress\Application\Kernel
                     $session->updateLastTime();
                 }
 
+                /** @var \Alaress\Web\Controller\Base $controller */
+                $controller = $this->di->get('controller:'.$controllerName);
+
+                /** @var \Aura\Web\Response $response */
+                $response = null;
+
+                // Has session expired? Assume no user here then, but that should probably
+                // be handled in authenticator.
+                $params = array();
+
                 // The preloader may throw an exception.
                 // It should be ignored if the user is not authorized,
                 // because we always want a login screen.
                 /** @var \Alaress\Web\Router\PathMatcher $preloader */
                 $preloader          = $this->di->get('preloader');
                 $preloaderException = null;
+
                 try {
                     $params = $preloader->check($route->name, $route->params);
+
                 } catch (\Exception $preloaderException) {
                     // Store the preloader exception for later
                 }
@@ -117,12 +127,15 @@ class Kernel extends \Alaress\Application\Kernel
                 // Authorize, throwing whatever exceptions might be thrown.
                 /** @var \Alaress\Authorizer\Authorizer $authorizer */
                 $auth = $this->di->get('authorizer');
+
                 try {
                     $auth->authorizePathForUser($route->name, $params, $user);
+
                 } catch (Unauthenticated $ue) {
                     // Unauthenticated:
                     // always throw this, even if there was preloader exception
                     throw $ue;
+
                 } catch (\Exception $ae) {
                     // Some other exception (including unauthorized):
                     // throw the preloader exception in preference to this
@@ -137,6 +150,7 @@ class Kernel extends \Alaress\Application\Kernel
                 if ($preloaderException instanceof \Exception) {
                     throw $preloaderException;
                 }
+
                 // If authorizePathForUser() threw no exception, authorization passed!
                 // Call the controller method.
                 // Ensure that the parameters match up with the names used.
