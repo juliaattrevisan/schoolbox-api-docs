@@ -9,9 +9,7 @@
 
 namespace Calendar\Event\Type\Submission\Renderer;
 
-use Calendar\Event\Type\CsvBase;
-
-class Csv extends CsvBase {
+class Csv extends Base{
 
     /**
      * Render this event out as CSV data
