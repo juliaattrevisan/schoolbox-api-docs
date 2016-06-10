@@ -16,6 +16,13 @@ use \Alaress_Date_Format;
 class RendererBase implements RendererInterface
 {
     /**
+     * The user who the event relates to
+     *
+     * @var \Schoolbox\User
+     */
+    var $user;
+
+    /**
      * The user who is viewing this event
      *
      * @var \Schoolbox\User
@@ -55,17 +62,21 @@ class RendererBase implements RendererInterface
     /**
      * @param SitePage $page
      * @param EventBase $event
+     * @param User $user
+     * @param \Group $groupHandler
+     * @param \Calendar $calHandler
      * @param User $viewer
-     * @param
      */
-    public function __construct(SitePage $page, EventBase $event, User $viewer, \Group $groupHandler, \Calendar $calHandler) {
+    public function __construct(SitePage $page, EventBase $event, User $user, \Group $groupHandler, \Calendar $calHandler, User $viewer) {
         $this->setPage($page);
         $this->setEvent($event);
+        $this->setUser($user);
         $this->setViewer($viewer);
 
         //TODO remove these
         $this->setGroupHandler($groupHandler);
         $this->setCalendarHandler($calHandler);
+        
     }
 
     /**
@@ -95,6 +106,23 @@ class RendererBase implements RendererInterface
      */
     public function getTemplate() {
         return $this->page->getDi()->get('templateEngine');
+    }
+
+
+    /**
+    * @param \Schoolbox\User $viewer
+    */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @return \Schoolbox\User
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 
     /**

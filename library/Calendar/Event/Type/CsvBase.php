@@ -22,6 +22,16 @@ use DateTime;
 
 class CsvBase extends RendererBase
 {
+    
+    public function isVisible()
+    {
+        $alwaysVisible = $this->getViewer()->isSuperuser() || $this->getViewer()->getRole()->isStaff();
+        if(!$alwaysVisible){
+            return $this->getEvent()->getPublishDate()->lte(new \Alaress_Date_Format());
+        }
+        return true;
+    }
+
     /**
      * Render this event out as CSV data
      *
