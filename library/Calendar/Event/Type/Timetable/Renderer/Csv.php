@@ -9,9 +9,8 @@
 
 namespace Calendar\Event\Type\Timetable\Renderer;
 
-use Calendar\Event\Type\CsvBase;
 
-class Csv extends CsvBase {
+class Csv extends Base {
     /**
      * Render this event out as CSV data
      *
