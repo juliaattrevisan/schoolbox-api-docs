@@ -10,6 +10,8 @@
 namespace Calendar\Event\Type\EOTC\Renderer;
 
 
+use Calendar\Event\Render\CSVTrait;
+
 class Csv extends Base {
 
     /**

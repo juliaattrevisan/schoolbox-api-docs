@@ -10,6 +10,8 @@
 namespace Calendar\Event\Type\Timetable\Renderer;
 
 
+use Calendar\Event\Render\CSVTrait;
+
 class Csv extends Base {
 
     /**

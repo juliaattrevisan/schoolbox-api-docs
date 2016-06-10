@@ -13,7 +13,6 @@ class Csv extends Base{
 
     /**
      * Render this event out as CSV data
-     *
      */
     public function render()
     {
@@ -40,7 +39,6 @@ class Csv extends Base{
         $row = fread($fd, 10000);
 
         return $row;
-
     }
 }
 

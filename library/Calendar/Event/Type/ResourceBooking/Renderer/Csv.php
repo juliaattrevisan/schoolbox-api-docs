@@ -9,6 +9,8 @@
 
 namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
+use Calendar\Event\Render\CSVTrait;
+
 class Csv extends Base {
 
     /**
