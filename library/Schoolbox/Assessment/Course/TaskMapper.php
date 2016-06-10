@@ -101,7 +101,7 @@ class TaskMapper extends Schoolbox\Mapper {
             'other_key' => 'assess_id',
         ));
 
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
         $this->registerCallback('preSave', array($this, 'preSave'));
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteRelatedObjects'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteRelatedObjects'));
