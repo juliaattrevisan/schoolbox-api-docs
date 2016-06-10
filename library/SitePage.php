@@ -1252,6 +1252,9 @@ class SitePage extends Page
      */
     function goLoginPage($error = '', $page = '')
     {
+        // If we hit the login page clear the 'synergetic_done' cookie so that the SSO popup fudge works again
+        setcookie('synergetic_done', '', 1, '/');
+
         // AJAX request? Don't ever output a page.
         // Output something with a 401 status code.
         if ($this->detectAjax()) {

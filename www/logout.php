@@ -12,6 +12,8 @@ $redis = \Alaress\Redis::getClientInstance();
 $username = $redis->executeCommand($redis->createCommand('del',array($_COOKIE['remember'])));
 setcookie('remember', '', 1, '/');
 
+// If we logout clear the 'synergetic_done' cookie so that the SSO popup fudge works again
+setcookie('synergetic_done', '', 1, '/');
 
 $samlLogoutUrl = trim(Cfg::get('saml_logout_url'));
 
