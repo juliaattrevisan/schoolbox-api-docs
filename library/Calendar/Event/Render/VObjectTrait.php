@@ -7,6 +7,10 @@
 
 namespace Calendar\Event\Render;
 
+use Calendar\Event\Type\EventBase;
+use Sabre\VObject\Component\VEvent;
+use Schoolbox\Calendar\Event;
+
 /**
  * Default VObject rendering for all types of Calendar events.
  *
@@ -28,6 +32,12 @@ trait VObjectTrait
 
 
     /**
+     * @return VEvent
+     */
+    public abstract function getEvent();
+
+
+        /**
      * Render this event
      *
      * @return string

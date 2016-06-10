@@ -7,6 +7,9 @@
 
 namespace Calendar\Event\Render;
 
+use Calendar\Event\Type\Day\Event;
+use Calendar\Event\Type\EventBase;
+
 /**
  * Default CSV rendering for all types of Calendar events.
  * 
@@ -14,6 +17,11 @@ namespace Calendar\Event\Render;
  */
 trait CSVTrait
 {
+    /**
+     * @return Event
+     */
+    public abstract function getEvent();
+    
     /**
      * Render this event out as CSV data
      */
