@@ -11,33 +11,11 @@ namespace Calendar\Event\Type\EOTC\Renderer;
 
 
 class Csv extends Base {
+
     /**
-     * Render this event out as CSV data
-     *
+     * Inherit default CSV formatting
+     * render()
      */
-    public function render()
-    {
-        $fd = fopen('php://temp/maxmemory:10000', 'rw');
-
-        $data = array(
-            $this->getEvent()->getStartTime()->getLocalShort(),
-            $this->getEvent()->getAllday() ? '' : $this->getEvent()->getStartTime()->getUsingFormat('H:i'),
-            $this->getEvent()->getEndTime()->getLocalShort(),
-            $this->getEvent()->getAllday() ? '' : $this->getEvent()->getEndTime()->getUsingFormat('H:i'),
-            $this->getEvent()->getAllday() ? 1 : 0,
-            $this->getEvent()->getTitle(),
-            $this->getEvent()->getDetail(),
-            $this->getEvent()->getLocation(),
-            $this->getEvent()->getType(),
-            $this->getEvent()->getPublishDate()->getLocalShort(),
-            $this->getEvent()->canAttend() ? 1 : 0,
-        );
-
-        fputcsv($fd, $data);
-        rewind($fd);
-        $row = fread($fd, 10000);
-
-        return $row;
-    }
+    use CSVTrait;
 
 }
