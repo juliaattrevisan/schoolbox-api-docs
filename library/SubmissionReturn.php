@@ -101,10 +101,11 @@ class SubmissionReturn extends DeprecatedModel
      * @param      $user_id
      * @param int  $box_id
      * @param bool $limit
+     * @param bool $ignoreConfirmations   Whether to exclude auto-generated submission returns
      * @return array|bool
      * @throws \Schoolbox\Mapper\Exception
      */
-    function getByUser($user_id, $box_id = 0, $limit = false)
+    function getByUser($user_id, $box_id = 0, $limit = false, $ignoreConfirmations = true)
     {
         $query = "SELECT
                     r.*,
@@ -118,10 +119,12 @@ class SubmissionReturn extends DeprecatedModel
                   LEFT JOIN submission_mark_type m ON s.mark_type = m.mark_type_id
                   WHERE r.deleted_at IS NULL
                   AND r.box_id = s.id
-                  AND r.is_confirmation_of_submission IS FALSE
                   AND s.category = c.id
                   AND s.deleted IS FALSE
                   AND r.owner = '$user_id'";
+        if($ignoreConfirmations){
+            $query .= ' AND r.is_confirmation_of_submission IS FALSE';
+        }
         if ($box_id) {
             $query .= " AND r.box_id = $box_id";
         }
