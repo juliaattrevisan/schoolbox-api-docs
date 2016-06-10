@@ -118,7 +118,7 @@
 
         // Perform validation if required
 
-        events = $(e.target).data('events');
+        var events = $(e.target).data('events');
 
         if (events != null && typeof(events.validate) !== "undefined") {
 
