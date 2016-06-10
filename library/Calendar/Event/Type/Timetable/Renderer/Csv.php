@@ -12,7 +12,34 @@ namespace Calendar\Event\Type\Timetable\Renderer;
 use Calendar\Event\Type\CsvBase;
 
 class Csv extends CsvBase {
+    /**
+     * Render this event out as CSV data
+     *
+     */
+    public function render()
+    {
+        $fd = fopen('php://temp/maxmemory:10000', 'rw');
 
+        $data = array(
+            $this->getEvent()->getStartTime()->getLocalShort(),
+            $this->getEvent()->getAllday() ? '' : $this->getEvent()->getStartTime()->getUsingFormat('H:i'),
+            $this->getEvent()->getEndTime()->getLocalShort(),
+            $this->getEvent()->getAllday() ? '' : $this->getEvent()->getEndTime()->getUsingFormat('H:i'),
+            $this->getEvent()->getAllday() ? 1 : 0,
+            $this->getEvent()->getTitle(),
+            $this->getEvent()->getDetail(),
+            $this->getEvent()->getLocation(),
+            $this->getEvent()->getType(),
+            $this->getEvent()->getPublishDate()->getLocalShort(),
+            $this->getEvent()->canAttend() ? 1 : 0,
+        );
+
+        fputcsv($fd, $data);
+        rewind($fd);
+        $row = fread($fd, 10000);
+
+        return $row;
+    }
 
 }
 
