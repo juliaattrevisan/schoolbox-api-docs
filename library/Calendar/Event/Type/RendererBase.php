@@ -76,7 +76,6 @@ class RendererBase implements RendererInterface
         //TODO remove these
         $this->setGroupHandler($groupHandler);
         $this->setCalendarHandler($calHandler);
-        
     }
 
     /**
@@ -110,7 +109,7 @@ class RendererBase implements RendererInterface
 
 
     /**
-    * @param \Schoolbox\User $viewer
+    * @param \Schoolbox\User $user
     */
     public function setUser($user)
     {
