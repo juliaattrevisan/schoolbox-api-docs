@@ -11,8 +11,6 @@
  */
 namespace Calendar\Event\Type\Submission\Renderer;
 
-use Calendar\Event\Type\Submission\Renderer\Base;
-use Schoolbox\Resource\Folder\Model as Folder;
 use \Scrub;
 
 class Javascript extends Base

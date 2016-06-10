@@ -9,8 +9,6 @@
  */
 namespace Calendar\Event\Type\Submission\Renderer;
 
-use Calendar\Event\Type\Submission\Renderer\Base;
-
 class Html extends Base {
 
 
