@@ -17,7 +17,7 @@ class TaskMapper extends Schoolbox\Mapper {
 
     protected function mapping() {
         $this->hasTable('task');
-        $this->hasModel('\\Schoolbox\\Assessment\\Course\\Task');
+        $this->hasModel(Task::class);
         $this->hasMap(array(
             'column'     => 'id',
             'property'   => 'id',
