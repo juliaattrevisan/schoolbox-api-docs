@@ -10,6 +10,8 @@ namespace Calendar\Event\Render;
 /**
  * Default VObject rendering for all types of Calendar events.
  *
+ * Inheriting classes may override selected methods & properties.
+ *
  * @package Calendar\Event\Render
  */
 trait VObjectTrait
