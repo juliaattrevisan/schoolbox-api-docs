@@ -9,9 +9,14 @@
 
 namespace Calendar\Event\Type\EOTC\Renderer;
 
-use Calendar\Event\Type\VObjectBase;
+use Calendar\Event\Render\VObjectTrait;
 
-class VObject extends VObjectBase
+
+class VObject extends Base
 {
-
+    /**
+     * Inherit default VObject formatting
+     * render()
+     */
+    use VObjectTrait;
 }
