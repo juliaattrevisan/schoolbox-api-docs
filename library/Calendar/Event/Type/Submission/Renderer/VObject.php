@@ -31,12 +31,15 @@ class VObject extends Base
      */
     public function render()
     {
-        // Output event times as UTC,
-        // no client should be able to mess that up.
-        $utcTimezone = new DateTimeZone('UTC');
         /* Show visible events only, in export
          */
-        if ($this->isVisible()) {
+        if (!$this->isVisible()) {
+            return '';
+        } else {
+            // Output event times as UTC,
+            // no client should be able to mess that up.
+            $utcTimezone = new DateTimeZone('UTC');
+
             /** @var VEvent $vEvent */
             $vEvent = $this->vCalendar->create('VEVENT');
             // Generate a UID based on $this->getEvent()->getEventId()

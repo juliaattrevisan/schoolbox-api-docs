@@ -10,6 +10,7 @@
 namespace Calendar\Event\Type\Submission\Renderer;
 
 use \Calendar\Event\Type\RendererBase;
+use Calendar\Event\Type\Submission\Event;
 
 abstract class Base extends RendererBase
 {
@@ -22,7 +23,11 @@ abstract class Base extends RendererBase
     public function isVisible() {
         $alwaysVisible = $this->getViewer()->isSuperuser() || $this->getViewer()->getRole()->isStaff();
         if(!$alwaysVisible){
-            return $this->getEvent()->getPublishDate()->lte(new \Alaress_Date_Format());
+            /**
+             * @var Event $submissionEvent
+             */
+            $submissionEvent = $this->getEvent();
+            return $submissionEvent->getPublishDate()->lte(new \Alaress_Date_Format());
         }
         return true;
     }

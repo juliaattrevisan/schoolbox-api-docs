@@ -19,7 +19,7 @@ class Javascript extends Base
     /**
      * Visitor
      *
-     * @param $this->getEvent()
+     * @return string
      */
     public function render()
     {
