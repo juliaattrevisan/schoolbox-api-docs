@@ -13,7 +13,7 @@ use Twig_Environment;
 use \Schoolbox\User;
 use \Alaress_Date_Format;
 
-class RendererBase implements RendererInterface
+abstract class RendererBase implements RendererInterface
 {
     /**
      * The user who the event relates to
@@ -83,9 +83,7 @@ class RendererBase implements RendererInterface
      *
      * @return string
      */
-    public function render() {
-        return '';
-    }
+    abstract public function render();
 
     /**
      * Is this event visible by this user, sometimes we can't tell till we render if we should show it
@@ -94,9 +92,7 @@ class RendererBase implements RendererInterface
      *
      * @return bool
      */
-    public function isVisible() {
-        return true;
-    }
+    abstract public function isVisible();
 
     /**
      * Return templating engine
