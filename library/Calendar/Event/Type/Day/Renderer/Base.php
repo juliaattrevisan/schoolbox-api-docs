@@ -11,7 +11,7 @@ namespace Calendar\Event\Type\Day\Renderer;
 
 use \Calendar\Event\Type\RendererBase;
 
-class Base extends RendererBase
+abstract class Base extends RendererBase
 {
     /**
      * If the Publish Date hasn't been reached yet, only show the events to Superusers

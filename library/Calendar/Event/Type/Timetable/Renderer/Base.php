@@ -13,7 +13,7 @@ use \Calendar\Event\Type\RendererBase;
 use \Calendar\Event\Type\Timetable\Event;
 use \Schoolbox\Config\Loader as Config;
 
-class Base extends RendererBase
+abstract class Base extends RendererBase
 {
     /**
      * Helper function to control showing the attendance link

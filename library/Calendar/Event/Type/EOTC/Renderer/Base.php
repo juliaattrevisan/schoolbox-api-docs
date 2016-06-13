@@ -12,7 +12,7 @@ namespace Calendar\Event\Type\EOTC\Renderer;
 
 use Calendar\Event\Type\RendererBase;
 
-class Base extends RendererBase
+abstract class Base extends RendererBase
 {
 
 }

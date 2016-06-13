@@ -13,7 +13,7 @@ use \Calendar\Event\Type\RendererBase;
 use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
 
-class Base extends RendererBase
+abstract class Base extends RendererBase
 {
     public function getEditURL() {
         return $this->getRouteIfAuthorized(

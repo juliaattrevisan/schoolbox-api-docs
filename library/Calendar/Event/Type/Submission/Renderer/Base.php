@@ -11,7 +11,7 @@ namespace Calendar\Event\Type\Submission\Renderer;
 
 use \Calendar\Event\Type\RendererBase;
 
-class Base extends RendererBase
+abstract class Base extends RendererBase
 {
 
     /**
