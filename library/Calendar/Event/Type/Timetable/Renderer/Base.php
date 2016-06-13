@@ -15,6 +15,15 @@ use \Schoolbox\Config\Loader as Config;
 
 abstract class Base extends RendererBase
 {
+
+    /**
+     * @return bool
+     */
+    public function isVisible()
+    {
+        return true;
+    }
+
     /**
      * Helper function to control showing the attendance link
      */
