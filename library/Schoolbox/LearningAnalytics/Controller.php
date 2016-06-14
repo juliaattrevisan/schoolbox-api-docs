@@ -203,6 +203,11 @@ class Controller extends Base {
      */
     private function process(Collection $allUnitInstances, Metadata $metadata) {
 
+        /**
+         * Extend timeout processing data
+         */
+        set_time_limit(60);
+        
         /* Get a list of all the students involved in each unit
          * and a list of units involved. This gets reused everywhere
          * so just hit the external db once
