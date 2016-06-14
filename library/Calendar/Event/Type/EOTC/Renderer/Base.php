@@ -14,5 +14,11 @@ use Calendar\Event\Type\RendererBase;
 
 abstract class Base extends RendererBase
 {
-
+    /**
+     * @return bool
+     */
+    public function isVisible()
+    {
+        return true;
+    }
 }

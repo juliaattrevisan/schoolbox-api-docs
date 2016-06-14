@@ -15,6 +15,15 @@ use Alaress\Authorizer\Authorizer;
 
 abstract class Base extends RendererBase
 {
+
+    /**
+     * @return bool
+     */
+    public function isVisible()
+    {
+        return true;
+    }
+
     public function getEditURL() {
         return $this->getRouteIfAuthorized(
             'resourceBooking.edit',
