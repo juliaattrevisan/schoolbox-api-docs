@@ -127,6 +127,8 @@ class Renderer
 
     /**
      * Render all events
+     * @param string $type
+     * @return string
      */
     public function renderAll($type)
     {
