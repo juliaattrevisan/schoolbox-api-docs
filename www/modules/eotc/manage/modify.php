@@ -435,4 +435,6 @@ if ($campusList->count()) {
     $page->setVar('event_campus_list_block', '');
 }
 
-$page->outputPage();
+if(!isset($this)){
+    $page->outputPage();
+}
