@@ -101,7 +101,7 @@ class Javascript extends RendererBase {
 
 				/* Campus slug so you can filter events
 				 */
-				'className' => $classes,
+				'className' => implode(' ', $classes),
 
 				/* Extra data that the Event Object doesn't directly support
 				 */
