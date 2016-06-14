@@ -100,6 +100,12 @@ class External_Maze_Timetable implements External_TimetableInterface
      */
     public function getTimetableDefinition($externalUserId, \Schoolbox\Campus $campus, $day = 0, $date = null)
     {
+        $periodQuery = "
+            SELECT TOP 1 *
+            FROM TH
+            WHERE THKEY = '{$this->getHelper()->getCurrentTHKEY()}'
+        ";
+        $periods = $this->getDb()->getRow($periodQuery) ?: [];
         $query = "
             SELECT *
             FROM TCTD
@@ -113,7 +119,13 @@ class External_Maze_Timetable implements External_TimetableInterface
 
         if (count($result) && is_array($result)) {
             foreach ($result as $current) {
-                $timetableDef['desc'][] = "Period {$current['TIME_INDEX']}";
+                if (!empty($periods[$this->getTimetablePeriodLabel($current['TIME_INDEX'])])) {
+                    $desc = $periods[$this->getTimetablePeriodLabel($current['TIME_INDEX'])];
+                } else {
+                    $desc = "Period {$current['TIME_INDEX']}";
+                }
+
+                $timetableDef['desc'][] = $desc;
                 $timetableDef['start'][] = $this->getHelper()->mazeTime($current['TIME_START']);
                 $timetableDef['end'][] = $this->getHelper()->mazeTime($current['TIME_END']);
                 $timetableDef['number'][] = $current['TIME_INDEX'];
@@ -122,6 +134,17 @@ class External_Maze_Timetable implements External_TimetableInterface
         }
 
         return $timetableDef;
+    }
+
+    /**
+     * Get timetable period label
+     *
+     * @param $i
+     * @return string
+     */
+    private function getTimetablePeriodLabel($i)
+    {
+        return $this->timetablePeriodLabel . ($i < 10 ? 0 . $i : $i);
     }
 
     /**
