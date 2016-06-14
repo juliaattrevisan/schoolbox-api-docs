@@ -22,8 +22,8 @@ abstract class Base extends RendererBase
      */
     public function isVisible() {
         $isFutureEvent = ($this->getEvent()->getPublishDate()->getUnixTimestamp() >= time());
-        $isVisibleToUser = ($this->getViewer()->isSuperuser() || $this->getEvent()->isOwner() || $this->getEvent()->isEditable());
-        if ($isFutureEvent && !($isVisibleToUser)) {
+        $isAlwaysVisible = ($this->getViewer()->isSuperuser() || $this->getEvent()->isOwner() || $this->getEvent()->isEditable());
+        if ($isFutureEvent && !($isAlwaysVisible)) {
             return false;
         }
         return true;

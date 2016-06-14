@@ -147,22 +147,4 @@ class Html extends Base {
             $this->getPage()->parse('note_block', 'note', true);
         }
     }
-
-    /**
-     * If the Publish Date hasn't been reached yet, only show the events to Superusers
-     * in a different way so they can still edit/click them. Otherwise, they don't appear
-     * at all for everyone else
-     *
-     * @return bool
-     */
-    public function isVisible() {
-        $isFutureEvent = ($this->getEvent()->getPublishDate()->getUnixTimestamp() >= time());
-        $isVisibleToUser = ($this->getGroupHandler()->isSuperuser() || $this->getEvent()->isOwner() || (is_numeric($this->getEvent()->getCategoryId()) && ($this->getGroupHandler()->getPermission($this->getEvent()->getCategoryId())) > READ_ACCESS));
-
-        if ($isFutureEvent && !($isVisibleToUser)) {
-            return false;
-        }
-
-        return true;
-    }
 }
