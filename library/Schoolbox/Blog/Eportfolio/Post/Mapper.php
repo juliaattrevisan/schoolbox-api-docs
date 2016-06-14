@@ -68,8 +68,10 @@ class Mapper extends BaseMapper
 				{$this->getJoinColumnString('user', 'u')}
 			FROM `{$this->getTable()}` AS `b`
             LEFT JOIN {$this->getJoinSql('user', 'b', 'u')}
+            JOIN `eportfolio_page` p ON p.page_id = b.page_id
 			WHERE `b`.`deleted_at` IS NULL
 				AND `b`.`owner_id` = :owner_id
+				AND `p`.`deleted_at` IS NULL
 			ORDER BY `b`.`created_at` DESC
 		";
 
