@@ -36,8 +36,8 @@ class Calendar_Api_Composite implements Calendar_Api_EventType_Interface {
 
 		foreach($this->getApi() as $currentApi) {
 			$result->merge($currentApi->getEvents($startTimestamp, $endTimestamp));
-			$result->sort();
 		}
+		$result->sort();
 
 		return $result;
 	}
