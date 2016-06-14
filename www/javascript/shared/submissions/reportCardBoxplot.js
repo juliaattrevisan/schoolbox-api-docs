@@ -41,8 +41,7 @@
 
         /* The plot unfolds
          */
-        $(options.element).highcharts({
-
+        var highchartsOptions = {
             /* can use inverted:true to make it horizontal'
              */
             chart: {
@@ -62,7 +61,7 @@
                 categories: options.allAssessments
             },
 
-            yAxis: options.yAxis || {
+            yAxis: {
                 min: 0,
                 max: 100,
                 labels: {
@@ -82,7 +81,8 @@
             },
 
             series: allSeries
-        });
+        };
+        $(options.element).highcharts($.extend(true, {}, highchartsOptions, options.highcharts));
     }
 
     /**
