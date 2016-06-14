@@ -36,16 +36,6 @@ class Event extends Day\Event implements EventInterface {
      */
     protected $custom = [];
 
-	/**
-	 * Render via external class
-	 *
-	 * @param \Calendar_Event_Type_EOTC_Renderer_Javascript $visitor
-	 *
-	 * @return mixed
-	 */
-    public function accept($visitor) {
-        return $visitor->visit($this);
-    }
 
     /**
      * Can someone attend this event
