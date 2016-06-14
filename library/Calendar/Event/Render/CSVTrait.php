@@ -8,7 +8,7 @@
 namespace Calendar\Event\Render;
 
 use Calendar\Event\Type\Day\Event;
-use Calendar\Event\Type\EventBase;
+
 
 /**
  * Default CSV rendering for all types of Calendar events.

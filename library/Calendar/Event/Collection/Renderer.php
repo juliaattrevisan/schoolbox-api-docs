@@ -95,8 +95,8 @@ class Renderer
         $this->setApi($api);
         $this->setStartTimestamp($startTimestamp);
         $this->setEndTimestamp($endTimestamp);
-        $this->setPage($page);
         $this->setUser($user);
+        $this->setPage($page);
         $this->setViewer($viewer);
 
         //TODO remove these deprecated dependencies

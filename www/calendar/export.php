@@ -38,6 +38,7 @@ try {
     } catch (Exception $ex) {
         throw new SchoolboxException('Invalid token', 401);
     }
+    $viewer = $user;
 
     $back = ConfigMapper::getInstance()->get('calendar_export_start');
     $forward = ConfigMapper::getInstance()->get('calendar_export_end');
@@ -137,7 +138,7 @@ try {
             $end,
             $user,
             new SitePage(false),
-            $user
+            $viewer
         );
     }
     else {
@@ -151,7 +152,7 @@ try {
             $end,
             $user,
             new SitePage(false),
-            $user
+            $viewer
         );
     }
 
