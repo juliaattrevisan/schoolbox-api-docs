@@ -130,7 +130,7 @@ ul.tileList {
     // Styles for individual tiles
     li.tile {
         // TODO: uncomment padding 0 when Foundation is moved out of container
-//        padding: 0;
+        //padding: 0;
         position: relative;
         display: inline-block;
         height: auto;
@@ -220,6 +220,10 @@ ul.tileList {
             width: 100%;
             transition: background-color 0.1s;
         }
+    }
+
+    a{
+        overflow: hidden;
     }
 }
 
