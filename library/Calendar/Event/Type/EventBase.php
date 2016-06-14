@@ -106,10 +106,7 @@ abstract class EventBase implements EventInterface
      *
      * @var array
      */
-    protected $renderClasses = array(   'javascript'    => RendererBase::class,
-                                        'html'          => RendererBase::class,
-                                        'vcal'          => VObjectBase::class,
-                                    );
+    protected $renderClasses;
 
     /**
      * Whether or not to display the modify link

@@ -22,7 +22,7 @@ class Event extends Day\Event implements EventInterface {
     protected $renderClasses = array(   'javascript'    => Renderer\Javascript::class,
                                         'html'          => Renderer\Html::class,
                                         'vcal'          => Renderer\VObject::class,
-                                        'csv'          => Renderer\Csv::class,
+                                        'csv'           => Renderer\Csv::class,
     );
 
     /* Attendance flag
