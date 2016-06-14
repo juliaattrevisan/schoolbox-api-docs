@@ -82,7 +82,7 @@
         });
 
         var splash, d, x, y;
-        $(".button, .sub-nav a, .tabs a, .pagination a, .flex-list a, input[type='submit'], nav a[class*='icon-'], [data-component-palette]").click(function(e){
+        $(".button, .sub-nav a, .tabs a, .pagination a, .flex-list a, input[type='submit'], nav a[class*='icon-'], [data-component-palette], .tileList a").click(function(e){
             if($(this).find(".splash").length === 0){
                 $(this).prepend("<span class='splash'></span>");
             }

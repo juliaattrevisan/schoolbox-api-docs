@@ -13,6 +13,10 @@ ul.tileList {
     line-height: 0;
     margin: 0;
 
+    a{
+        overflow: hidden;
+    }
+
     &.ui-sortable li {
         // Get rid of border and background on sortable tiles
         background-image: none;
