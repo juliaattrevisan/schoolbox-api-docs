@@ -143,34 +143,4 @@ class Javascript extends Base {
 		}
 	}
 
-    /**
-     * Determine whether an event is a task or not
-     *
-     * @param $this->getEvent()
-     * @return bool
-     */
-    private function isTask() {
-        if ($this->getEvent()->getType() == $this->getTaskTypeId()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @param int $taskTypeId
-     */
-    private function setTaskTypeId($taskTypeId) {
-        $this->taskTypeId = $taskTypeId;
-    }
-
-    /**
-     * @return int
-     */
-    private function getTaskTypeId() {
-        return $this->taskTypeId;
-    }
 }
