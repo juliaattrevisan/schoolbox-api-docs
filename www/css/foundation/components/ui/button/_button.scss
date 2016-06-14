@@ -90,7 +90,7 @@ a[disabled], a.disabled {
 .splash {
 	display: block;
 	position: absolute;
-	background: calc-button-color($content-ui-hover);
+	background-color: calc-button-color($content-ui-hover);
 	border-radius: 100%;
 	@include transform (scale(0));
 }
@@ -98,10 +98,10 @@ a[disabled], a.disabled {
 /* On.click animation effect on buttons
 */
 .splash.animate {
-	@include animation (ripple 0.65s linear);
+	@include animation (ripple 0.3s linear);
 }
 	@keyframes ripple {
-		/* Scale 200% to safely cover the entire link and fade it out
+		/* Scale 200% to safely cover the entire button and fade it out
 		 */
 		100% { opacity: 0; @include transform (scale(2)); }
 }

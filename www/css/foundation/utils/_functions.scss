@@ -31,8 +31,8 @@
 	}
 }
 
-@function calc-button-color($bground, $light: lighten($content-ui-hover, 5%), $dark: darken($content-ui-hover, 5%)) {
-	@if (perceptive-luminance($bground) < 0.45) {
+@function calc-button-color($bg, $light: lighten($content-ui-hover, 5%), $dark: darken($content-ui-hover, 5%)) {
+	@if (perceptive-luminance($bg) < 0.45) {
 		@return $dark; // Lighter background, return dark color
 	} @else {
 		@return $light; // Darker background, return light color
