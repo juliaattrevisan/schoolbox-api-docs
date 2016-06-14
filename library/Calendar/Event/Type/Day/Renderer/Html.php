@@ -14,7 +14,7 @@ class Html extends Base {
 
     /**
      * Render this event as html using twig
-     *
+     * @return string
      */
     public function render()
     {
