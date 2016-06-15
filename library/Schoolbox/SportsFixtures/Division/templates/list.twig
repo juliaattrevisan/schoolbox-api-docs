@@ -1,3 +1,19 @@
+<script type="text/javascript">
+    $(function() {
+        $('#allSports').on('click', '[data-delete]', function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this item?',
+                confirmEvent: function() {
+                    window.location.href = element.attr('href');
+                }
+            });
+        });
+    });
+</script>
 <ul class="breadcrumb">
     <li><a href="#">Sports Fixtures</a></li>
     <li><a href="#">Division</a></li>
@@ -11,7 +27,7 @@
 </div>
 
 <div class="row">
-    <div class="small-12 island">
+    <div class="small-12 island" id="allSports">
 
         {% for id, sportData in allSports %}
         <h2 class="subheader">{{ sportData.sport.name }}</h2>
@@ -27,7 +43,7 @@
                                 </div>
                             </div>
                             <nav>
-                                <a href="" class="icon-delete" title="Delete"></a>
+                                <a href="/sportsfixtures/division/delete/{{ currentDivision.id }}" class="icon-delete" title="Delete" data-delete></a>
                                 <a href="/sportsfixtures/division/update/{{ currentDivision.id }}" class="icon-modify" title="Modify"></a>
                             </nav>
                         </li>
