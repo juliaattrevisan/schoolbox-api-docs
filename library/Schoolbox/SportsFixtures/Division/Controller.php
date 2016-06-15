@@ -67,11 +67,14 @@ class Controller extends Base
     }
 
     /**
-     * Create a Division
+     * Create a Division in a particular Sport id
+     *
+     * @param $id
      */
-    public function getCreate()
+    public function getCreate($id)
     {
         $this->tpl('create', [
+            'sportId' => $id,
             'action' => 'Create'
         ]);
     }
@@ -88,6 +91,7 @@ class Controller extends Base
 
             $this->tpl('create', [
                 'division' => $division,
+                'sportId' => $division->getSport()->getId(),
                 'action' => 'Modify'
             ]);
         }

@@ -38,7 +38,7 @@ class Module extends BaseModule
         $routes = [
             'GET' => [
                 '/list'        => 'getList',
-                '/create'      => 'getCreate',
+                '/create/{id}' => 'getCreate',
                 '/update/{id}' => 'getUpdate',
             ],
             'POST' => [
