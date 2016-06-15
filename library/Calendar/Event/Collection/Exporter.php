@@ -73,7 +73,14 @@ class Exporter extends Renderer {
     public function renderEvent($event, $type)
     {
         $rendererClass = $event->getRendererClass($type);
-        $renderObj = new $rendererClass($this->getPage(), $event, $this->getViewer(), $this->getGroupHandler(), $this->getCalendarHandler());
+        $renderObj = new $rendererClass(
+            $this->getPage(),
+            $event,
+            $this->getUser(),
+            $this->getGroupHandler(),
+            $this->getCalendarHandler(),
+            $this->getViewer()
+        );
         $renderObj->setVCalendar($this->getVCalendar());
         $renderObj->setTextConverter($this->getTextConverter());
         return $renderObj->render();

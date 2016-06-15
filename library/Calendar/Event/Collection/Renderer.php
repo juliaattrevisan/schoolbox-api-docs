@@ -149,7 +149,14 @@ class Renderer
     {
         $rendererClass = $event->getRendererClass($type);
         /** @var RendererInterface $renderObj */
-        $renderObj = new $rendererClass($this->getPage(), $event, $this->getUser(), $this->getGroupHandler(), $this->getCalendarHandler(), $this->getViewer());
+        $renderObj = new $rendererClass(
+            $this->getPage(),
+            $event,
+            $this->getUser(),
+            $this->getGroupHandler(),
+            $this->getCalendarHandler(),
+            $this->getViewer()
+        );
         return $renderObj->render();
     }
 
