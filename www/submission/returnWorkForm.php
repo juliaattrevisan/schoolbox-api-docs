@@ -36,7 +36,7 @@ if (is_numeric($_GET['delete'])) {
     $boxId  = $return->getSubmissionBox()->getId();
     $userId = $return->getOwner()->getId();
 
-    $submissionboxMapper = \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance();
+    $submissionBoxMapper = \Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance();
 
     try {
         $submissionBox = $submissionBoxMapper->findById($boxId);
