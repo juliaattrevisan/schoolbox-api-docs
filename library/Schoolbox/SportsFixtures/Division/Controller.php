@@ -45,6 +45,25 @@ class Controller extends Base
     }
 
     /**
+     * Update a Division
+     *
+     * @param int $id
+     */
+    public function getUpdate($id)
+    {
+        try {
+            $division = Mapper::getInstance()->findById($id);
+
+            $this->tpl('create', [
+                'division' => $division
+            ]);
+        }
+        catch (MapperException $e) {
+            throw ErrorMapper::getInstance()->generateException(2);
+        }
+    }
+
+    /**
      * Save a Division
      */
     public function postCreate()
