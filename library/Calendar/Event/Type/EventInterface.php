@@ -183,6 +183,8 @@ interface EventInterface
     /**
      * Get renderer class
      *
+     * @param string $type
+     * @throws \Exception
      * @return string
      */
     public function getRendererClass($type);
