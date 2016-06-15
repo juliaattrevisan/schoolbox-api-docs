@@ -135,7 +135,7 @@ class Javascript extends RendererBase {
 						'listButton' => false,
 					),
 					'custom' => array(
-						'modifyLink' => '/modules/eotc/manage/modify.php?eventID=' . $this->getEvent()->getEventId(),
+						'modifyLink' => '/modules/eotc/manage/modify?eventID=' . $this->getEvent()->getEventId(),
 					)
 				)
 			);

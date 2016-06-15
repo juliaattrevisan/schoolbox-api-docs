@@ -214,7 +214,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         } // change was made by moderator (right?): inform applicant and TiC
         else {
             $inform = array($teacherInChargeId, $applicantId);
-            $href = "/modules/eotc/manage/modify.php?eventID=$relEventId";
+            $href = "/modules/eotc/manage/modify?eventID=$relEventId";
         }
 
         $bob->setHref($href)
@@ -292,7 +292,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
             ->setParam('moderator', new UserParam($effector));
 
         $hrefMod = "/modules/eotc/status/modify/$relEventId";
-        $hrefOwn = "/modules/eotc/manage/modify.php?eventID=$relEventId";
+        $hrefOwn = "/modules/eotc/manage/modify?eventID=$relEventId";
         $hrefReg = "/calendar/full/" . $relEvent->getStartDateTime()->getURLDate();
 
         /** @var EventMetadataMapper $mapper */
