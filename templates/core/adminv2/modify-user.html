@@ -540,7 +540,6 @@
 
                 <!-- BEGIN user_pastoral -->
                 <li class="actions-small-1">
-
                     <div class="list-item">
                         <div class="small-8 avatar card">Pastoral Moderator</div>
                         <div class="small-4 avatar card">
@@ -563,6 +562,30 @@
                 </li>
                 <!-- END user_pastoral -->
 
+                <!-- BEGIN user_sports_administrator -->
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-8 avatar card">Sports Administrator</div>
+                        <div class="small-4 avatar card">
+                            <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
+                                <input type="hidden" name="uid" value="{USERID}" />
+                                <input type="hidden" name="sid" value="{SID}" />
+                                <input type="hidden" name="service" value="{SERVICE_ID}" />
+                                <input type="hidden" name="updateServices" value="1" />
+                                <select name="type" data-autosubmit>
+                                    <option value="1" {READ_SELECTED}>Read</option>
+                                    <option value="2" {WRITE_SELECTED}>Write</option>
+                                    <option value="3" {ADMIN_SELECTED}>Moderate</option>
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                    <nav>
+                        <a href="/adminv2/userForm.php?deleteService={SERVICE_ID}&sid={SID}&uid={USERID}" class="icon-delete" title="Remove"></a>
+                    </nav>
+                </li>
+                <!-- END user_sports_administrator -->
+
                 <li class="actions-small-1">
                     <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService" data-action="addService" class="list-item">
                         <div class="small-4 avatar card">
@@ -575,6 +598,7 @@
                                 <option value="7" data-identifier="none">Resource Booking</option>
                                 <option value="8" data-identifier="none">Curriculum</option>
                                 <option value="9" data-identifier="none">Pastoral Moderator</option>
+                                <option value="10" data-identifier="none">Sports Administrator</option>
                             </select>
                         </div>
                         <div class="small-4 avatar card">

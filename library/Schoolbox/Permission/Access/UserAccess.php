@@ -65,6 +65,13 @@ class UserAccess
     const SERVICE_CURRICULUM = 8;
 
     /**
+     * Value for $this->service:
+     * $this->user has $this->accessLevel permission for the curriculum
+     * system.
+     */
+    const SERVICE_SPORTS_ADMINISTRATOR = 10;
+
+    /**
      * Value for $this->accessLevel:
      * $this->user is denied access to resource in $this->service.
      */

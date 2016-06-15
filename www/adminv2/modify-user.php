@@ -25,20 +25,22 @@ if(is_numeric($this->arg[0])) {
     $this->setBlock(TEMPLATE_content, 'user_resource_booking', 'user_resource_booking_block');
     $this->setBlock(TEMPLATE_content, 'user_curriculum', 'user_curriculum_block');
     $this->setBlock(TEMPLATE_content, 'user_pastoral', 'user_pastoral_block');
+    $this->setBlock(TEMPLATE_content, 'user_sports_administrator', 'user_sports_administrator_block');
 
     // include the admin navigation
     $nav = new AdminV2_Nav();
     $nav->parse($this, 'user');
 
-    $this->setVar(array(
-        'user_calendar_block' => '',
-        'user_news_block' => '',
-        'user_cms_block'=> '',
-        'user_housemaster_block'=> '',
-        'user_resource_booking_block'=> '',
-        'user_curriculum_block'=> '',
-        'user_pastoral_block'=> '',
-    ));
+    $this->setVar([
+        'user_calendar_block'             => '',
+        'user_news_block'                 => '',
+        'user_cms_block'                  => '',
+        'user_housemaster_block'          => '',
+        'user_resource_booking_block'     => '',
+        'user_curriculum_block'           => '',
+        'user_pastoral_block'             => '',
+        'user_sports_administrator_block' => '',
+    ]);
 
     /* Modify existing user
 	 */
@@ -233,6 +235,7 @@ if(is_numeric($this->arg[0])) {
 
                     case CMS_SERVICE:
                     case RESOURCE_BOOKING_SERVICE:
+                    case SPORTS_ADMINISTRATOR_SERVICE:
                     default:
                         break;
                 }
@@ -283,6 +286,13 @@ if(is_numeric($this->arg[0])) {
                      */
                     case PASTORAL_SERVICE:
                         $this->parse('user_pastoral_block', 'user_pastoral', true);
+                        break;
+
+                    /* Sports Administrator
+                     * Use the constants for now, but they should be removed
+                     */
+                    case SPORTS_ADMINISTRATOR_SERVICE:
+                        $this->parse('user_sports_administrator_block', 'user_sports_administrator', true);
                         break;
                 }
 
