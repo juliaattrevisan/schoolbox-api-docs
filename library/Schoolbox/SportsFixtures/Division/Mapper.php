@@ -26,7 +26,7 @@ class Mapper extends BaseMapper
         /**
          * Divisions (eg. Soccer First, Seconds, Thirds)
          */
-        $this->hasTable('sportsfixtures_sport_division');
+        $this->hasTable('sportsfixtures_division');
         $this->hasModel(DivisionModel::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);

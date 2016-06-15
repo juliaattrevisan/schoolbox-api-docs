@@ -16,7 +16,7 @@ PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Division Table
  */
-CREATE TABLE `sportsfixtures_sport_division` (
+CREATE TABLE `sportsfixtures_division` (
 	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
 	`sport_id` INT NULL COMMENT '',
 	`name` VARCHAR(255) NULL COMMENT '',
