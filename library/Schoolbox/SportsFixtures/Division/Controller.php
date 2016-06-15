@@ -119,6 +119,17 @@ class Controller extends Base
     }
 
     /**
+     * Delete a Division
+     */
+    public function postDelete()
+    {
+        /** @var Model $division */
+        $division = Mapper::getInstance()->findById($this->getRequest()->post['id']);
+
+        Mapper::getInstance()->delete($division);
+    }
+
+    /**
      * Save Division data to db
      *
      * @param Model $division

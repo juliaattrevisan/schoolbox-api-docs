@@ -44,6 +44,7 @@ class Module extends BaseModule
             'POST' => [
                 '/create' => 'postCreate',
                 '/update' => 'postUpdate',
+                '/delete' => 'postDelete',
             ]
         ];
 
