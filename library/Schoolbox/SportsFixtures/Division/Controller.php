@@ -9,7 +9,9 @@
 namespace Schoolbox\SportsFixtures\Division;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\Mapper\Exception as MapperException;
+use \Schoolbox\Error\Mapper as ErrorMapper;
+use \Schoolbox\Mapper\Exception as MapperException;
+use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 
 class Controller extends Base
 {
@@ -47,8 +49,22 @@ class Controller extends Base
      */
     public function postCreate()
     {
-        new \Alaress_Probe("Save Division");
-        die();
+        try {
+
+            /** @var \Schoolbox\SportsFixtures\Sport\Model $sport */
+            $sportMapper = SportMapper::getInstance();
+            $sport       = $sportMapper->findById($this->getRequest()->post['sportId']);
+
+            $division = new Model();
+            $division->setName($this->getRequest()->post['name']);
+            $division->setUrl($this->getRequest()->post['url']);
+            $division->setSport($sport);
+
+            Mapper::getInstance()->save($division);
+        }
+        catch (MapperException $e) {
+            throw ErrorMapper::getInstance()->generateException(2);
+        }
     }
 
     /**
