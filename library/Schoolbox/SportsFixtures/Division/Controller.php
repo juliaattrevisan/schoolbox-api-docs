@@ -61,6 +61,8 @@ class Controller extends Base
             $division->setSport($sport);
 
             Mapper::getInstance()->save($division);
+
+            $this->getResponse()->redirect->afterPost('/sportsfixtures/division/create');
         }
         catch (MapperException $e) {
             throw ErrorMapper::getInstance()->generateException(2);
