@@ -38,7 +38,15 @@
             <!-- BEGIN has_news -->
             <ul class="information-list">
                 <!-- BEGIN news -->
-                <li>
+                <li class="actions-small-1">
+
+                    <nav>
+                        <!-- BEGIN news_modify -->
+                        <a class="icon-modify no-text" href="{NEWS_MODIFY_URL}" title="Modify Article"></a>
+                        <!-- END news_modify -->
+                    </nav>
+
+
                     <div class="list-item">
                         <div class="avatar card small-12">
 
@@ -62,6 +70,7 @@
                             <p class="meta">{DATETIME}</p>
                         </div>
                     </div>
+
                     <article>{NEWS_SHORT}</article>
                 </li>
                 <!-- END news -->
