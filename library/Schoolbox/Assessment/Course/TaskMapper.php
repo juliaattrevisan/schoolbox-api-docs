@@ -17,7 +17,7 @@ class TaskMapper extends Schoolbox\Mapper {
 
     protected function mapping() {
         $this->hasTable('task');
-        $this->hasModel('\\Schoolbox\\Assessment\\Course\\Task');
+        $this->hasModel(Task::class);
         $this->hasMap(array(
             'column'     => 'id',
             'property'   => 'id',
@@ -101,8 +101,10 @@ class TaskMapper extends Schoolbox\Mapper {
             'other_key' => 'assess_id',
         ));
 
-        $this->hasSoftDeleteDateField('deleted_at');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE, 'deleted');
         $this->registerCallback('preSave', array($this, 'preSave'));
+        $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteRelatedObjects'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteRelatedObjects'));
     }
 
     /**
@@ -257,6 +259,35 @@ class TaskMapper extends Schoolbox\Mapper {
         return true;
     }
 
+    /**
+     * Post-delete method - cascades soft delete of submission box and quiz.
+     *
+     * @param Task $object
+     */
+    public function softDeleteRelatedObjects(Task $object)
+    {
+        if ($object->getAssessment()->getId()) {
+            $this->getJoinMapper('assessment')->softDelete($object->getAssessment());
+        }
+        if ($object->getSubmissionBox()->getId()) {
+            $this->getJoinMapper('submission_box')->softDelete($object->getSubmissionBox());
+        }
+    }
+
+    /**
+     * Post-delete method - cascades hard delete of submission box and quiz.
+     *
+     * @param Task $object
+     */
+    public function hardDeleteRelatedObjects(Task $object)
+    {
+        if ($object->getAssessment()->getId()) {
+            $this->getJoinMapper('assessment')->hardDelete($object->getAssessment());
+        }
+        if ($object->getSubmissionBox()->getId()) {
+            $this->getJoinMapper('submission_box')->hardDelete($object->getSubmissionBox());
+        }
+    }
 
     /**
      * Count the number of tasks in the given unit
