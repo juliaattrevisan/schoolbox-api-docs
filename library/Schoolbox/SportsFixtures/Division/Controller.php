@@ -37,6 +37,36 @@ class Controller extends Base
     }
 
     /**
+     * List of Divisions and the Sport they are in
+     */
+    public function getList()
+    {
+        /* TODO: Not sure if we need this here
+         * but I'll set it up anyway just in case
+         */
+        $allSports = SportMapper::getInstance()->findAll([
+            'order' => [
+                'name' => 'asc'
+            ]
+        ]);
+
+        $allDivisions = [];
+
+        foreach($allSports as $currentSport) {
+            $allDivisions[$currentSport->getId()]['sport'] = $currentSport;
+            $allDivisions[$currentSport->getId()]['allDivisions'] = Mapper::getInstance()->findByColumn('sport_id', $currentSport->getId(), [
+                'order' => [
+                    'name' => 'asc'
+                ]
+            ]);
+        }
+
+        $this->tpl('list', [
+            'allSports' => $allDivisions
+        ]);
+    }
+
+    /**
      * Create a Division
      */
     public function getCreate()
@@ -108,7 +138,7 @@ class Controller extends Base
 
             Mapper::getInstance()->save($division);
 
-            $this->getResponse()->redirect->afterPost('/sportsfixtures/division/create');
+            $this->getResponse()->redirect->afterPost('/sportsfixtures/division/list');
         }
         catch (MapperException $e) {
             throw ErrorMapper::getInstance()->generateException(2);

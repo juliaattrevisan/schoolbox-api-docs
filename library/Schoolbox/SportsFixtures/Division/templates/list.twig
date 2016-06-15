@@ -1,0 +1,41 @@
+<ul class="breadcrumb">
+    <li><a href="#">Sports Fixtures</a></li>
+    <li><a href="#">Division</a></li>
+    <li class="active"><a href="#">List</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sports Fixtures</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+
+        {% for id, sportData in allSports %}
+        <h2 class="subheader">{{ sportData.sport.name }}</h2>
+        <section>
+            <ul class="information-list">
+                <li>
+                    <ul class="action-list">
+                        {% for currentDivision in sportData.allDivisions %}
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="small-12 avatar card">
+                                    <p>{{ currentDivision.name }}</p>
+                                </div>
+                            </div>
+                            <nav>
+                                <a href="" class="icon-delete" title="Delete"></a>
+                                <a href="/sportsfixtures/division/update/{{ currentDivision.id }}" class="icon-modify" title="Modify"></a>
+                            </nav>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        {% endfor %}
+    </div>
+</div>
