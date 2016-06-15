@@ -435,4 +435,7 @@ if ($campusList->count()) {
     $page->setVar('event_campus_list_block', '');
 }
 
-$page->outputPage();
+// Legacy support for direct access to modify.php
+if(!isset($this)){
+    $page->outputPage();
+}

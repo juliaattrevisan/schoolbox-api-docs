@@ -266,7 +266,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 			/* Superuser modifying some arbitrary event
 			 */
-			$page->localRedir('/modules/eotc/manage/modify.php?eventID=' . $eventRecurrenceMapper->getFirstEventIdInSeries());
+			$page->localRedir('/modules/eotc/manage/modify?eventID=' . $eventRecurrenceMapper->getFirstEventIdInSeries());
 
 			break;
 
