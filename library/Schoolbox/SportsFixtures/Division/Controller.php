@@ -112,10 +112,15 @@ class Controller extends Base
      */
     public function postUpdate()
     {
-        /** @var Model $division */
-        $division = Mapper::getInstance()->findById($this->getRequest()->post['id']);
+        try {
+            /** @var Model $division */
+            $division = Mapper::getInstance()->findById($this->getRequest()->post['id']);
 
-        $this->saveDivision($division);
+            $this->saveDivision($division);
+        }
+        catch (MapperException $e) {
+            throw ErrorMapper::getInstance()->generateException(2);
+        }
     }
 
     /**
@@ -123,10 +128,15 @@ class Controller extends Base
      */
     public function postDelete()
     {
-        /** @var Model $division */
-        $division = Mapper::getInstance()->findById($this->getRequest()->post['id']);
+        try {
+            /** @var Model $division */
+            $division = Mapper::getInstance()->findById($this->getRequest()->post['id']);
 
-        Mapper::getInstance()->delete($division);
+            Mapper::getInstance()->delete($division);
+        }
+        catch (MapperException $e) {
+            throw ErrorMapper::getInstance()->generateException(2);
+        }
     }
 
     /**
