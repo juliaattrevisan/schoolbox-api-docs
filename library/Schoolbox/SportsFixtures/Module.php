@@ -15,6 +15,7 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Twig_Error_Loader;
 use Twig_Loader_Chain;
+use \Schoolbox\Permission\Access\UserAccess;
 
 class Module extends BaseModule
 {
@@ -55,14 +56,14 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initRoutePermissions(Authorizer $authorizer) {
-//        $this
-//            ->addRoutePermission($authorizer, '.*', new Rule\All(
-//                new Rule\IsLoggedIn(),
-//                new Rule\Any(
-//                    new Rule\IsSuperuser(),
-//                    new Rule\HasRole(Role::STAFF)
-//                )
-//            ));
+        $this
+            ->addRoutePermission($authorizer, '.*', new Rule\All(
+                new Rule\IsLoggedIn(),
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\HasServicePermission(UserAccess::SERVICE_SPORTS_ADMINISTRATOR, UserAccess::ACCESS_WRITE)
+                )
+            ));
     }
 
     /**
