@@ -1,0 +1,70 @@
+<script type="text/javascript">
+    $(function() {
+        $('#divisionForm').alaressValidate({
+            rules: {
+                name: {
+                    required: true,
+                    minlength: 2
+                },
+                sportId: {
+                    min: 1
+                }
+            },
+            messages: {
+                'sportId': 'Please choose a Sport.',
+                'name': 'Please enter a name.'
+            },
+            errorPlacement: function(error, element) {
+                $.alaressValidate.defaultErrorPlacement(error, element);
+            }
+        })
+    });
+</script>
+
+<ul class="breadcrumb">
+    <li><a href="#">Sports Fixtures</a></li>
+    <li><a href="#">Division</a></li>
+    <li class="active"><a href="#">Create</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sports Fixtures</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form id='divisionForm' action="" method="post">
+            <h2 class="subheader">Create Division</h2>
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="id" value="{{ division.id }}"/>
+
+                        <label>
+                            Name
+                            <input type="text" name="name" value="{{ division.name }}"/>
+                        </label>
+
+                        <label>
+                            Url
+                            <input type="text" name="url" value="{{ division.url }}" />
+                        </label>
+
+                        <label for="divisionSport">
+                            Sport
+                            <select id="sport" name="sportId">
+                                <option value="1">Tiddlywinks</option>
+                                <option value="2">Croquet</option>
+                            </select>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</div>

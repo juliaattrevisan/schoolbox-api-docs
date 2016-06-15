@@ -35,11 +35,20 @@ class Controller extends Base
     }
 
     /**
-     * Admin test
+     * Create a Division
      */
-    public function admin()
+    public function getCreate()
     {
-        $this->tpl('admin', []);
+        $this->tpl('create', []);
+    }
+
+    /**
+     * Save a Division
+     */
+    public function postCreate()
+    {
+        new \Alaress_Probe("Save Division");
+        die();
     }
 
     /**
