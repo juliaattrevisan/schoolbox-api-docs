@@ -9,11 +9,14 @@
  *
  */
 
+use \Schoolbox\Permission\Access\UserAccess;
+
 $this->setFile(TEMPLATE_content, 'news/news_list.html');
 $this->setBlock(TEMPLATE_content, 'add_news', 'add_news_block');
 $this->setBlock(TEMPLATE_content, 'has_news', 'has_news_block');
 $this->setBlock(TEMPLATE_content, 'no_news', 'no_news_block');
 $this->setBlock('has_news', 'news', 'news_block');
+$this->setBlock('news', "news_modify", "news_modify_block");
 $this->setBlock('news', "news_image", "news_image_block");
 $this->setBlock('news', "read_more", "read_more_block");
 $this->setBlock('news', "no_read_more", "no_read_more_block");
@@ -170,6 +173,7 @@ if (is_array($items)) {
             $output = array(
                 'NEWS_ID' => $article['item_id'],
                 'NEWS_URL' => '/news/item/' . $article['item_id'],
+                'NEWS_MODIFY_URL' => '/news/modify/'.$article['item_id'],
                 'NEWS_TITLE' => $article['item_heading'],
                 'POSTER' => $owner,
                 'DATETIME' => $postDate->getLong(),
@@ -187,6 +191,13 @@ if (is_array($items)) {
                 $this->parse('news_image_block', 'news_image');
             } else {
                 $this->setVar('news_image_block');
+            }
+
+            // does the current user have permission to modify this news article?
+            if($article['item_owner'] == $_SESSION['id'] || $permission == UserAccess::ACCESS_FULL){
+                $this->parse('news_modify_block', 'news_modify');
+            } else {
+                $this->setVar('news_modify_block', '');
             }
 
             if (empty(Scrub::html($article['item_body']))) {
