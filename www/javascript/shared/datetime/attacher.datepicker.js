@@ -11,27 +11,46 @@
  * * datepicker
  */
 (function($){
+
+    /**
+     * Perform a blocking (synchronous) validation
+     *
+     * @param $datepicker
+     * @param string
+     * @param ajaxValidate
+     */
+    var datepickerOnChange = function($datepicker, string, ajaxValidate) {
+
+        if(ajaxValidate) {
+            // Block potential form submission until validation returns
+            $.ajax({
+                async: false,
+                dataType: "json",
+                url: '/ajax/strtotime.php',
+                data: {string: string},
+                success: function (data) {
+                    $datepicker.val(data.time).blur();
+                }
+            });
+        }
+        $datepicker.data('previousValue', string);
+    };
+
     $(function(){
         $('[data-datepicker]').datepicker({
             constrainInput: false,
             nextText: '&raquo;',
             prevText: '&laquo;',
             onSelect: function (string) {
-                var input         = $(this);
-                var previousValue = input.data('previousValue') || "";
-
-                $.getJSON('/ajax/strtotime.php', {string:string}, function (data) {
-                    input.val(data.time).blur();
-                });
-
-                // jQuery datepicker no longer triggers a change event.
-                // Do it manually.
-                if (string != previousValue) {
-                    $(this).trigger('change');
+                var previousValue = $(this).data('previousValue') || '';
+                if(string != previousValue){
+                    $(this).trigger('change',{ajaxValidate: false});
                 }
-                input.data('previousValue', string);
-
             }
+        }).on('change', function (e, data) {
+            // Only skip ajax Validation if explicitly set to false
+            var ajaxValidate = (undefined == data || undefined == data.ajaxValidate || data.ajaxValidate);
+            datepickerOnChange($(this), this.value, ajaxValidate);
         });
-    })
+    });
 })(jQuery);
