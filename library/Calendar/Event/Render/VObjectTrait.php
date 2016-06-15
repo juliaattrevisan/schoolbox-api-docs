@@ -7,8 +7,12 @@
 
 namespace Calendar\Event\Render;
 
+use Html2Text\Html2Text;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VEvent;
+use \DateTime;
+use \DateInterval;
+use \DateTimeZone;
 
 
 /**
