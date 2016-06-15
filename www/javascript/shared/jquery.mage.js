@@ -118,31 +118,26 @@
 
         // Perform validation if required
 
-        var events = $(e.target).data('events');
+        // We cannot use a simple triggerHandler('validate') as that
+        // only returns the value of the last handler to execute.
+        // @see http://stackoverflow.com/questions/2518421/jquery-find-events-handlers-registered-with-an-object
 
-        if (events != null && typeof(events.validate) !== "undefined") {
-
-            // We cannot use a simple triggerHandler('validate') as that
-            // only returns the value of the last handler to execute.
-            // @see http://stackoverflow.com/questions/2518421/jquery-find-events-handlers-registered-with-an-object
-
-            var allValid = true;
-            $.each(events.validate, function(idx, obj){
-                // Quit as soon as we know data is invalid (don't merge errors)
-                if(allValid && undefined !== obj['type'] && 'validate' === obj['type']){
-                    var validator = obj.handler.call(e.target);
-                    if (validator !== undefined) {
-                        if (!validator['result']) {
-                            // Validation failed, show message and bomb out
-                            form.find('[data-mage-error]').hide().html(validator['message']).slideDown();
-                            allValid = false;
-                        }
+        var allValid = true;
+        $.each(getEventHandlers(e.target, 'validate'), function(idx, obj){
+            // Quit as soon as we know data is invalid (don't merge errors)
+            if(allValid && undefined !== obj['type'] && 'validate' === obj['type']){
+                var validator = obj.handler.call(e.target);
+                if (validator !== undefined) {
+                    if (!validator['result']) {
+                        // Validation failed, show message and bomb out
+                        form.find('[data-mage-error]').hide().html(validator['message']).slideDown();
+                        allValid = false;
                     }
-               }
-            });
-            if(!allValid){
-                return;
+                }
             }
+        });
+        if(!allValid){
+            return;
         }
 
         if (typeof elem.data('mageSubmitted') != 'undefined') {
@@ -338,6 +333,30 @@
         onXhrAlways.call(this.element);
     }
 
-
+    /**
+     * Retrieves all event handlers for a target.
+     *
+     * Deliberately not pluginified, as you shouldn't ever have to manually
+     * call event handlers.
+     *
+     * (Mage does in order to call validation handlers manually, because it
+     *  needs the result from all of them - see clickIntercept)
+     *
+     * @param target
+     * @param event
+     * @returns {Array}
+     */
+    function getEventHandlers(target, event)
+    {
+        if (!('_data' in $)) {
+            // Access to _data was removed
+            throw new Error('jQuery._data internal API method was removed');
+        }
+        var events = $._data(target, 'events');
+        if (typeof event === 'undefined') {
+            return events;
+        }
+        return (event in events) ? events[event] : [];
+    }
 
 })(jQuery, window, document);
