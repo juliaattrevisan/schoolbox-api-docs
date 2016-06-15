@@ -389,66 +389,6 @@ class User extends DeprecatedModel
         }
     }
 
-    /**
-     * Sends a change password confirmation email.
-     *
-     * @param int $id The user ID to send to.
-     *
-     * @return bool
-     */
-    public function sendChangePasswordEmail($id)
-    {
-        if ($user = $this->getByID($id)) {
-            $this->logUserPasswordChange($user['username'], 'email_change_pwd', 'info');
-            $hash = substr(md5(uniqid() . time()), 0, 25);
-            $this->update(array('id' => $user['id'], 'hash' => $hash));
-            $result['EMAIL'] = $user['alt_email'];
-            $result['FULLNAME'] = $user['firstname']." ".$user['lastname'];
-            $result['FIRSTNAME'] = $user['firstname'];
-            $result['DATE'] = date('j F Y', $_SERVER['REQUEST_TIME']);
-            $result['TIME'] = date('g:i a', $_SERVER['REQUEST_TIME']);
-            return $result;
-        }
-        return false;
-    }
-
-    /**
-     * Sends a password change fail message to the Schoolbox admin, if there is
-     * one.
-     *
-     * @param int  $id                    The user ID to send to.
-     * @param bool $is_synergetic_failure True if the password failed to change
-     *                                    because of something in Synergetic
-     *                                    rather than them putting the wrong
-     *                                    password in.
-     *
-     * @return bool
-     */
-    public function sendPasswordChangeFailureEmail($id, $is_synergetic_failure = false)
-    {
-        $admin_address = Cfg::get('mail_admin_address');
-        if (!empty($admin_address) && ($user = $this->getByID($id))) {
-            //
-            // Send a different email if the password change failed because the
-            // passwords are desynched between Synergetic and Schoolbox.
-            // If that happens, then it's not really the user's fault.
-            $template = 'change-password-failure.html';
-            $subject  = Cfg::get('password_change_failed_email_subject');
-            if ($is_synergetic_failure) {
-                $template = 'change-password-synergetic-failure.html';
-            }
-            $mailHandler = new Mailer($template, $subject, $admin_address);
-            $mailHandler->setVar('USERNAME', $user['username']);
-            $mailHandler->setVar('NAME', $user['firstname'] . ' ' . $user['lastname']);
-            $mailHandler->setVar('EMAIL', $user['alt_email']);
-            $mailHandler->setVar('IP', $_SERVER['REMOTE_ADDR']);
-            $mailHandler->setVar('DATE', date('j F Y', $_SERVER['REQUEST_TIME']));
-            $mailHandler->setVar('TIME', date('g:i a', $_SERVER['REQUEST_TIME']));
-            return $mailHandler->send();
-        }
-        return false;
-    }
-
     public function getCampusList()
     {
         $query = "SELECT * FROM luCampus";
