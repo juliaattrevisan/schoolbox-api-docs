@@ -35,7 +35,15 @@ class Controller extends Base
     }
 
     /**
-     * Test
+     * Admin test
+     */
+    public function admin()
+    {
+        $this->tpl('admin', []);
+    }
+
+    /**
+     * Public test
      */
     public function test()
     {

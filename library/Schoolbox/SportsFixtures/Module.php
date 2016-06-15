@@ -37,7 +37,8 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '/test' => 'test',
+                '/admin' => 'admin',
+                '/test'  => 'test',
             ],
             'POST' => [
             ]
@@ -57,17 +58,20 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer) {
 
+        /* Permissions requirements for being a Sports Administrator
+         */
+        $isSportsAdministrator = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_SPORTS_ADMINISTRATOR, UserAccess::ACCESS_WRITE)
+            )
+        );
+
         /* Apply route permissions here as you add them to initRoutes()
          * Note that if the perms change you need to log out/log in to refresh
          */
-        $this
-            ->addRoutePermission($authorizer, '.*', new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasServicePermission(UserAccess::SERVICE_SPORTS_ADMINISTRATOR, UserAccess::ACCESS_WRITE)
-                )
-            ));
+        $this->addRoutePermission($authorizer, 'admin', $isSportsAdministrator);
     }
 
     /**
