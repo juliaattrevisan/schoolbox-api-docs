@@ -36,17 +36,10 @@
     <div class="small-12 island">
         <!-- BEGIN no_showcased_work -->
         <div class="empty-state">
-            <i class="icon-eportfolio"></i>
-            <p>{USER_FIRSTNAME} {USER_LASTNAME} has no showcased work.</p>
+            <i class="icon-due-work"></i>
+            <p>Visit your <a href='/submission/allWork/{USER_ID}'>grades page</a> to publish items to your showcase.</p>
         </div>
         <!-- END no_showcased_work -->
-
-        <!-- BEGIN has_intro -->
-        <div class="empty-state">
-            <i class="icon-due-work"></i>
-            <p>Visit your <a href='/submission/allWork/{USER_ID}'>submission history page</a> to publish items to your showcase.</p>
-        </div>
-        <!-- END has_intro -->
 
         <!-- BEGIN has_showcased_work -->
         <!-- BEGIN showcased_work_subject -->
@@ -57,29 +50,25 @@
                 <li class="actions-small-1">
                     <div class="list-item">
                         <!-- BEGIN has_submission -->
-                        <div class="avatar card small-5">
-                            <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1" data-plugin="preview" title="View Profile">
+                        <div class="avatar card small-9">
+                            <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1" data-plugin="preview" title="View Showcased Work">
                                 <img src="/images/mime/60x60/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="" class="mime" />
                                 <p>{SHOWCASED_WORK_BOX_NAME}</p>
                             </a>
-                            <p class="meta"><a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></p>
-                            <p class="meta">{SHOWCASED_WORK_BOX_TYPE} ({SHOWCASED_WORK_SUBMISSION_FILESIZE})</p>
+                            <p class="meta">{SHOWCASED_WORK_BOX_TYPE}</p>
+                            <p class="meta">{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</p>
                         </div>
                         <!-- END has_submission -->
 
                         <!-- BEGIN no_submission -->
-                        <div class="small-3 columns">
+                        <div class="small-9 columns">
                             <div class="avatar card small-12">
                                 <h3>{SHOWCASED_WORK_BOX_NAME}</h3>
-                                <p class="meta">{SHOWCASED_WORK_SUBMISSION_FILESIZE}</p>
-                                <p class="meta"><a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></p>
+                                <p class="meta">{SHOWCASED_WORK_BOX_TYPE}</p>
+                                <p class="meta">{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</p>
                             </div>
                         </div>
                         <!-- END no_submission -->
-
-                        <div class="small-3 columns">
-                            {SHOWCASED_WORK_SUBMISSION_SUBMITTED}
-                        </div>
                         <div class="small-3 columns text-center">
                             <p class="grade gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">
                                 <span>{SHOWCASED_WORK_RETURNED_MARK}</span>
