@@ -39,7 +39,6 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
         $this->getPage()->setBlock('showcased_work', 'has_modify_form', 'has_modify_form_block');
         $this->getPage()->setBlock('showcased_work', 'has_submission', 'has_submission_block');
         $this->getPage()->setBlock('showcased_work', 'no_submission', 'no_submission_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'has_intro', 'has_intro_block');
 
         /* User details
          */
@@ -51,14 +50,9 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                 'USER_LASTNAME' => $user->getLastname(),
             )
         );
+        
 
-        /* Intro text
-         */
-        if ($this->getEportfolioHandler()->getUserId() == $_SESSION['id']) {
-            $this->getPage()->parse('has_intro_block', 'has_intro');
-        } else {
-            $this->getPage()->setVar('has_intro_block', '');
-        }
+        $this->getPage()->setVar('no_showcased_work_block', '');
 
         /* Render mime types
          */
@@ -86,6 +80,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
             foreach ($allShowcasedItems as $currentShowcasedItem) {
                 try {
+                    /** @var \Schoolbox\Assessment\Component\SubmissionBox $currentBox */
                     $currentBox = $currentShowcasedItem->getSubmissionBox();
 
                     $submission = $this->getLatestSubmission(
@@ -100,6 +95,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
 
                     /* Set up subject info
                      */
+                    $allSubjects[$currentBox->getCategory()->getId()]['id'] = $currentBox->getCategory()->getId();
                     $allSubjects[$currentBox->getCategory()->getId()]['name'] = $currentBox->getCategory()->getName();
 
                     /* Push individual items into the subject
@@ -123,10 +119,12 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
         $currentUser = $_SESSION['user'];
         if (count($allSubjects)) {
             foreach ($allSubjects as $currentSubject) {
+
                 /* Subject name
                  */
                 $this->getPage()->setVar(
                     array(
+                        'SHOWCASED_WORK_BOX_CATEGORY_ID' => $currentSubject['id'],
                         'SHOWCASED_WORK_BOX_CATEGORY_NAME' => $currentSubject['name'],
                     )
                 );
@@ -222,9 +220,10 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
             }
 
             $this->getPage()->parse('has_showcased_work_block', 'has_showcased_work');
-            $this->getPage()->setVar('no_showcased_work_block', '');
         } else {
-            $this->getPage()->parse('no_showcased_work_block', 'no_showcased_work');
+            if ($this->getEportfolioHandler()->getUserId() == $_SESSION['id']) {
+                $this->getPage()->parse('no_showcased_work_block', 'no_showcased_work');
+            }
             $this->getPage()->setVar('has_showcased_work_block', '');
         }
     }

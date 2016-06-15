@@ -36,66 +36,55 @@
     <div class="small-12 island">
         <!-- BEGIN no_showcased_work -->
         <div class="empty-state">
-            <i class="icon-eportfolio"></i>
-            <p>{USER_FIRSTNAME} {USER_LASTNAME} has no showcased work.</p>
+            <i class="icon-due-work"></i>
+            <p>Visit your <a href='/submission/allWork/{USER_ID}'>grades page</a> to publish items to your showcase.</p>
         </div>
         <!-- END no_showcased_work -->
-
-        <!-- BEGIN has_intro -->
-        <div class="alert-box content">
-            <p>Visit your submission history page to publish items to your showcase.</p>
-            <p><a href='/submission/allWork/{USER_ID}' class="button icon-due-work">Submission History</a></p>
-        </div>
-        <!-- END has_intro -->
 
         <!-- BEGIN has_showcased_work -->
         <!-- BEGIN showcased_work_subject -->
         <h2 class="subheader">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</h2>
         <section>
-            <ul class="information-list">
+            <ul class="information-list" id="showcased-items">
                 <!-- BEGIN showcased_work -->
-                <li class="row">
-                    <!-- BEGIN has_submission -->
-                    <div class="five-column">
-                        <div class="avatar card small-12">
-                            <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1" data-plugin="preview" title="View Profile">
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <!-- BEGIN has_submission -->
+                        <div class="avatar card small-9">
+                            <a href="/submission/send.php?id={SHOWCASED_WORK_SUBMISSION_ID}&save=1" data-plugin="preview" title="View Showcased Work">
                                 <img src="/images/mime/60x60/{SHOWCASED_WORK_MIMETYPE_ICONFILE}" alt="" class="mime" />
                                 <p>{SHOWCASED_WORK_BOX_NAME}</p>
                             </a>
-                            <p class="meta"><a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></p>
-                            <p class="meta">{SHOWCASED_WORK_BOX_TYPE} ({SHOWCASED_WORK_SUBMISSION_FILESIZE})</p>
+                            <p class="meta">{SHOWCASED_WORK_BOX_TYPE}</p>
+                            <p class="meta">{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</p>
+                        </div>
+                        <!-- END has_submission -->
+
+                        <!-- BEGIN no_submission -->
+                        <div class="small-9 columns">
+                            <div class="avatar card small-12">
+                                <h3>{SHOWCASED_WORK_BOX_NAME}</h3>
+                                <p class="meta">{SHOWCASED_WORK_BOX_TYPE}</p>
+                                <p class="meta">{SHOWCASED_WORK_SUBMISSION_SUBMITTED}</p>
+                            </div>
+                        </div>
+                        <!-- END no_submission -->
+                        <div class="small-3 columns text-center">
+                            <p class="grade gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">
+                                <span>{SHOWCASED_WORK_RETURNED_MARK}</span>
+                            </p>
                         </div>
                     </div>
-                    <!-- END has_submission -->
-
-                    <!-- BEGIN no_submission -->
-                    <div class="five-column">
-                        <div class="avatar card small-12">
-                            <h3>{SHOWCASED_WORK_BOX_NAME}</h3>
-                            <p class="meta">{SHOWCASED_WORK_SUBMISSION_FILESIZE}</p>
-                            <p class="meta"><a href="/homepage/{SHOWCASED_WORK_BOX_CATEGORY_ID}">{SHOWCASED_WORK_BOX_CATEGORY_NAME}</a></p>
-                        </div>
-                    </div>
-                    <!-- END no_submission -->
-
-                    <div class="three-column">
-                        {SHOWCASED_WORK_SUBMISSION_SUBMITTED}
-                    </div>
-                    <div class="two-column text-center">
-                        <p class="grade gradient-{SHOWCASED_WORK_RETURNED_GRADIENT}">
-                            <span>{SHOWCASED_WORK_RETURNED_MARK}</span>
-                        </p>
-                    </div>
-                    <div class="two-column">
+                    <nav>
                         <!-- BEGIN has_modify_form -->
-                        <form action='/eportfolio/showcase/modifyForm.php' method='post'>
+                        <form action='/eportfolio/showcase/modifyForm.php' method='post' id="remove-showcase-{SHOWCASED_WORK_ITEM_ID}">
                             <input type='hidden' name='action' value='unpublish' />
                             <input type='hidden' name='userId' value='{SHOWCASED_WORK_ITEM_USER_ID}' />
                             <input type='hidden' name='showcaseItemId' value='{SHOWCASED_WORK_ITEM_ID}' />
-                            <input type='submit' value='Remove' />
                         </form>
+                        <a class="icon-delete" data-remove-showcase="{SHOWCASED_WORK_ITEM_ID}"></a>
                         <!-- END has_modify_form -->
-                    </div>
+                    </nav>
                 </li>
                 <!-- END showcased_work -->
             </ul>
@@ -105,3 +94,19 @@
     </div>
 </div>
 
+<script type="text/javascript">
+    $('#showcased-items').on('click', '[data-remove-showcase]', function(event) {
+        event.preventDefault();
+
+        var element = $(this);
+
+        $(this).confirmDialog({
+            text: 'Are you sure you want to remove this item from your Showcase?',
+            confirmEvent: function() {
+                var formId = '#remove-showcase-' + element.attr('data-remove-showcase');
+
+                $(formId).submit();
+            }
+        });
+    });
+</script>
