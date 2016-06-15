@@ -12,7 +12,7 @@ use Calendar\Event\Type\Day\Event;
 
 /**
  * Default CSV rendering for all types of Calendar events.
- * 
+ *
  * @package Calendar\Event\Render
  */
 trait CSVTrait
@@ -21,7 +21,7 @@ trait CSVTrait
      * @return Event
      */
     public abstract function getEvent();
-    
+
     /**
      * Render this event out as CSV data
      */

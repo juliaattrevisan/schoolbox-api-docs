@@ -24,7 +24,7 @@ trait VObjectTrait
      * @var VCalendar
      */
     protected $vCalendar;
-    
+
     /**
      * @var Html2Text
      */

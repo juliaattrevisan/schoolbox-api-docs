@@ -18,7 +18,7 @@ use Config;
 class Exporter extends Renderer {
 
     /**
-     * @var Sabre\VObject\Component\VCalendar
+     * @var VCalendar
      */
     var $vCalendar;
 
