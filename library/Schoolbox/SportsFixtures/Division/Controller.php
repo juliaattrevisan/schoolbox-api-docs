@@ -71,13 +71,33 @@ class Controller extends Base
      */
     public function postCreate()
     {
+        $this->saveDivision(new Model());
+    }
+
+    /**
+     * Save a Division
+     */
+    public function postUpdate()
+    {
+        /** @var Model $division */
+        $division = Mapper::getInstance()->findById($this->getRequest()->post['id']);
+
+        $this->saveDivision($division);
+    }
+
+    /**
+     * Save Division data to db
+     *
+     * @param Model $division
+     */
+    private function saveDivision(Model $division)
+    {
         try {
 
             /** @var \Schoolbox\SportsFixtures\Sport\Model $sport */
             $sportMapper = SportMapper::getInstance();
             $sport       = $sportMapper->findById($this->getRequest()->post['sportId']);
 
-            $division = new Model();
             $division->setName($this->getRequest()->post['name']);
             $division->setUrl($this->getRequest()->post['url']);
             $division->setSport($sport);
