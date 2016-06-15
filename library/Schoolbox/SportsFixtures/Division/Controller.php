@@ -41,7 +41,9 @@ class Controller extends Base
      */
     public function getCreate()
     {
-        $this->tpl('create', []);
+        $this->tpl('create', [
+            'action' => 'Create'
+        ]);
     }
 
     /**
@@ -55,7 +57,8 @@ class Controller extends Base
             $division = Mapper::getInstance()->findById($id);
 
             $this->tpl('create', [
-                'division' => $division
+                'division' => $division,
+                'action' => 'Modify'
             ]);
         }
         catch (MapperException $e) {
