@@ -71,7 +71,10 @@ class Controller extends Base
      */
     public function postCreate()
     {
-        $this->saveDivision(new Model());
+        $division = new Model();
+        $division->setCreatedAt(\Alaress_Date_Format::now());
+
+        $this->saveDivision($division);
     }
 
     /**
@@ -101,6 +104,7 @@ class Controller extends Base
             $division->setName($this->getRequest()->post['name']);
             $division->setUrl($this->getRequest()->post['url']);
             $division->setSport($sport);
+            $division->setUpdatedAt(\Alaress_Date_Format::now());
 
             Mapper::getInstance()->save($division);
 
