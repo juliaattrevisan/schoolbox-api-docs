@@ -139,7 +139,7 @@ class External_Denbigh_User implements External_UserInterface {
             $adaption['Surname'] = $parentList[0]['surname'];
             $adaption['HomePhone'] = $parentList[0]['telephoneHome'];
             $adaption['SilentPhoneFlag'] = false;
-            $adaption['DirectoryIncludeFlag'] = 1;
+            $adaption['DirectoryIncludeFlag'] = '';
         }
 
         // Don't update spouse if user[1] is somehow same user as user[0]
@@ -149,7 +149,7 @@ class External_Denbigh_User implements External_UserInterface {
             $adaption['SpouseTitle'] = $parentList[1]['title'];
             $adaption['SpousePreferred'] = $parentList[1]['preferred_name'];
             $adaption['SpouseSurname'] = $parentList[1]['surname'];
-            $adaption['SpouseDirectoryIncludeFlag'] = 1;
+            $adaption['SpouseDirectoryIncludeFlag'] = '';
         }
 
         return $adaption;

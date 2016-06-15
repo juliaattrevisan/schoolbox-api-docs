@@ -2,9 +2,10 @@
 {% set isSuperuser = session.user.isSuperUser() %}
 {% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
 {% set isSelf = session.user.getId() == user.getId() %}
+{% set isParent = session.user.getRole().isParent() %}
 
-{# details: only if allowed to show in include flag #}
-{% set showDetails = externalUser.DirectoryIncludeFlag and (isStaff or isSelf) %}
+{# details: show to SU + staff + self, or other parents if externalUser.DirectoryIncludeFlag #}
+{% set showDetails = isSuperuser or isStaff or isSelf or(isParent and externalUser.DirectoryIncludeFlag) %}
 {# emails: staff may view emails #}
 {% set showEmail = showDetails or isStaff %}
 
@@ -67,7 +68,7 @@
                                 {% if externalUser.SpouseDirectoryIncludeFlag and externalUser.SpouseSurname and (not spouse.getHideContacts()) %}
                                     <dt class="no-margin small-12">Partner</dt>
                                     <dd class="no-margin small-12">
-                                        <div class="avatar-card">
+                                        <div class="avatar card small-12">
                                             {% if spouse %}
                                                 <a href="/search/user/{{ spouse.id }}">
                                                     <img src="/portrait.php?userId={{ externalUser.SpouseID }}&amp;size=square64">
