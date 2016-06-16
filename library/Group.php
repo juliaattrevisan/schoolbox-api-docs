@@ -3,6 +3,7 @@
 use \Schoolbox\User as UserModel;
 use \Schoolbox\UserMapper;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\Permission\Access\Access;
 
 class Group extends DeprecatedModel
@@ -691,12 +692,17 @@ class Group extends DeprecatedModel
                 foreach ($externalSubjectList as $currentSubject) {
                     try {
                         if($currentSubject['campusCode']) {
-                            $code = $currentSubject['campusCode'].'/'.$currentSubject['code']; 
+                            $code = $currentSubject['campusCode'].'/'.$currentSubject['code'];
+                            try {
+                                $folder = $folderMapper->findByCode($code);
+                            } catch(MapperException $e) {
+                                $folder = $folderMapper->findByCode($currentSubject['code']);
+                            }
+
                         }
                         else {
-                            $code = $currentSubject['code'];
+                            $folder = $folderMapper->findByCode($currentSubject['code']);
                         }
-                        $folder = $folderMapper->findByCode($code);
                         $allFolders[$folder->getId()] = array(
                             'id' => $folder->getId(),
                             'name' => $folder->getName(),
@@ -705,7 +711,7 @@ class Group extends DeprecatedModel
                             'code' => $folder->getCodeString(),
                             'template' => $folder->getHomepage()->getTemplate()->getId(),
                         );
-                    } catch (\Exception $e) {
+                    } catch (MapperException $e) {
                     }
                 }
             }
