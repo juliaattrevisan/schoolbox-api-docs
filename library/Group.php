@@ -690,7 +690,13 @@ class Group extends DeprecatedModel
             if (is_array($externalSubjectList)) {
                 foreach ($externalSubjectList as $currentSubject) {
                     try {
-                        $folder = $folderMapper->findByCode($currentSubject['code']);
+                        if($currentSubject['campusCode']) {
+                            $code = $currentSubject['campusCode'].'/'.$currentSubject['code']; 
+                        }
+                        else {
+                            $code = $currentSubject['code'];
+                        }
+                        $folder = $folderMapper->findByCode($code);
                         $allFolders[$folder->getId()] = array(
                             'id' => $folder->getId(),
                             'name' => $folder->getName(),
