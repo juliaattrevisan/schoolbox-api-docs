@@ -155,6 +155,14 @@ if (!empty($subjectList) && is_array($subjectList)) {
             $currentTerm->getActualFinish()
         );
 
+        // Is the assessment list empty?
+        // Don't show this list if this isn't a subject.
+        if (empty($assessments)) {
+            if (count($curCategory->getCodes()) === 0) {
+                continue;
+            }
+        }
+
         /* Get full student list of class to show those who have not submitted
          */
         if (count($curCategory->getCodes()) > 0 && Cfg::get('external_enable')) {
