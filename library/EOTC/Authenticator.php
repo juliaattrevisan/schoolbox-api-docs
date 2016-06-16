@@ -21,11 +21,21 @@ class Authenticator {
 	private $permissionMapper = null;
 
 	/**
+	 * Cache obtained permissions in associative array
+	 *
+	 * [ userId => [allPermissions]]
+	 *
+	 *
+	 * @var array
+	 */
+	private $allPermissions = [];
+
+	/**
 	 * Constructor
 	 *
 	 */
 	public function __construct() {
-		$this->setPermissionMapper(new \EOTC\EventPermissionMapper());
+		$this->setPermissionMapper(new EventPermissionMapper());
 
 		$this->setup();
 	}
@@ -70,12 +80,17 @@ class Authenticator {
 			return true;
 		}
 
-		$allPermissions = $this->getPermissionMapper()->findByUser($user);
+		/* Cache db call outcome, since these calls can be used in
+		 * a loop, which really hits the db
+		 */
+		if (!isset($this->allPermissions[$user->getId()])) {
+			$this->allPermissions[$user->getId()] = $this->getPermissionMapper()->findByUser($user);
+		}
 
 		/* Check permissions against a particular event's campus and status
 		 */
 		if ($event) {
-			foreach ($allPermissions as $currentPermission) {
+			foreach ($this->getAllPermissions() as $currentPermission) {
 				$inCampus  = $this->isPermissionInCampus($currentPermission, $event);
 				$hasStatus = $this->isPermissionInStatus($currentPermission, $event);
 
@@ -87,7 +102,39 @@ class Authenticator {
 		/* Determine whether you are an EOTC administrator, in general
 		 */
 		else {
-			if ($allPermissions->count()) {
+			if (count($this->getAllPermissions())) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Determine whether the specified user is an EOTC Administrator
+	 * for the Campus associated with $event.
+	 *
+	 * This will not check Status perms.
+	 *
+	 * @param User $user
+	 * @param Event $event
+	 * @return bool
+	 */
+	public function isEOTCAdministratorForCampus(User $user, Event $event)
+	{
+		/* Cache db call outcome, since these calls can be used in
+		 * a loop, which really hits the db
+		 */
+		if (!isset($this->allPermissions[$user->getId()])) {
+			$this->allPermissions[$user->getId()] = $this->getPermissionMapper()->findByUser($user);
+		}
+
+		/* Check permissions against a particular event's campus only
+		 */
+		foreach ($this->getAllPermissions() as $currentPermission) {
+			$inCampus = $this->isPermissionInCampus($currentPermission, $event);
+
+			if ($inCampus) {
 				return true;
 			}
 		}
@@ -236,5 +283,15 @@ class Authenticator {
 	 */
 	private function getPermissionMapper() {
 		return $this->permissionMapper;
+	}
+
+	/**
+	 * Get all permissions cache
+	 *
+	 * @return array
+	 */
+	private function getAllPermissions()
+	{
+		return $this->allPermissions;
 	}
 }
