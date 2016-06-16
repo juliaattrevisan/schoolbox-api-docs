@@ -66,7 +66,7 @@ class UserAccess
 
     /**
      * Value for $this->service:
-     * $this->user has $this->accessLevel permission for the curriculum
+     * $this->user has $this->accessLevel permission for the Sports Fixtures
      * system.
      */
     const SERVICE_SPORTS_ADMINISTRATOR = 10;
