@@ -82,16 +82,17 @@ else {
         array('term' => $currentTerm,)
     );
 
-    if($currentTerm->isMarkableBy($sessionUser) && $currentTerm->contains(Alaress_Date_Format::now()) ) {
-        $involvedIn = $groupHandler->involvedInCategoryList(
-            $sessionUser->getId(),
-            true,
-            \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE
-        );
-        if (is_array($involvedIn)) {
-            foreach ($involvedIn as $subject) {
-                $subjectList[] = $subject['id'];
-            }
+    // This semester: get the classes I'm involved in, and my groups
+    // Other semesters: just get my groups
+    $getClasses = $currentTerm->isMarkableBy($sessionUser) && $currentTerm->contains(Alaress_Date_Format::now());
+    $involvedIn = $groupHandler->involvedInCategoryList(
+        $sessionUser->getId(),
+        $getClasses,
+        \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE
+    );
+    if (is_array($involvedIn)) {
+        foreach ($involvedIn as $subject) {
+            $subjectList[] = $subject['id'];
         }
     }
 
