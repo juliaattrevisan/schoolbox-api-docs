@@ -151,8 +151,9 @@ class Component_Instance
     }
 
     /**
-    * @return int
-    */
+     * Return the id of the Folder where this Component resides
+     * @return int
+     */
     public function getIdentifier()
     {
         return $this->identifier;
