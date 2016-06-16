@@ -579,6 +579,7 @@ class Controller extends BaseController
         $userAccessMapper = $this->getUserAccessMapper();
         $groupMapper      = $this->getGroupMapper();
 
+        // is 'Create Group' set true?
         if ($postData['groupcheck']) {
 
             // Prevent students with write access from being able to create folders
@@ -615,21 +616,15 @@ class Controller extends BaseController
             } else {
                 throw new UnexpectedValueException("I find your lack of access disturbing.");
             }
-
-        } elseif ($postData['template'] == Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID) {
-            // Redirect to / if the homepage was removed from a category, otherwise go back to the category
-            // TODO replace with routeLookup once it exists
-            return '/resources/' . $model->getId();
-
-        } elseif (strlen(trim($postData['code']))) {
-            // If a category code exists, just go back to where you came from
-            return $this->getSession()->getHistory(2);
-
         }
 
-        // Otherwise if you deleted the category code, redirect to categoryId link instead
-        // TODO replace with routeLookup once it exists
-        return '/homepage/' . $model->getId();
+        // Did user remove the Homepage Template?
+        if ($postData['template'] == Homepage::REMOVE_HOMEPAGE_TEMPLATE_ID) {
+            // TODO replace with routeLookup once it exists
+            return '/resources/' . $model->getId();
+        }
+
+        return $this->getSession()->getHistory(2);
     }
 
     /**
