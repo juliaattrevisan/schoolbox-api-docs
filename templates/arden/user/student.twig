@@ -1,0 +1,31 @@
+{% extends '@core/user/student.twig' %}
+
+{% block buttons_island %}
+    {{ parent() }}
+    <ul id='fat-buttons' class="no-margin small-block-grid-2 medium-block-grid-3 large-block-grid-6" data-equalizer>
+        <li class="no-pad">
+            <!-- BEGIN timetable -->
+            <a href="/timetable/{STUDENT_ID}" class="no-margin button fat icon-fat icon-32 icon-timetable" data-equalizer-watch>Timetable</a>
+            <!-- END timetable -->
+        </li>
+
+        <li class="no-pad">
+            <a href="/synergetic/Docs/?id={STUDENT_EXTERNAL_ID}" class="no-margin fat button icon-fat icon-32 icon-document" data-equalizer-watch>Reports</a>
+        </li>
+        <li class="no-pad">
+            <a href="/synergetic/mydetails?id={STUDENT_EXTERNAL_ID}" class="no-margin fat button icon-fat icon-32 icon-info" data-equalizer-watch>Medical</a>
+        </li>
+
+        <li class="no-pad">
+            <a href="/synergetic/absences?id={STUDENT_EXTERNAL_ID}" class="no-margin fat button icon-fat icon-32 icon-user" data-equalizer-watch>Absences</a>
+        </li>
+
+        <li class="no-pad">
+            <a href="/synergetic/PTI?id={STUDENT_EXTERNAL_ID}" class="no-margin fat button icon-fat icon-32 icon-staff" data-equalizer-watch>Parent Teacher</a>
+        </li>
+
+        <li class="no-pad">
+            <a href="/synergetic/StudentParentContacts?id={STUDENT_EXTERNAL_ID}" class="no-margin fat button icon-fat icon-32 icon-directory" data-equalizer-watch>Parent Directory</a>
+        </li>
+    </ul>
+{% endblock buttons_island %}
