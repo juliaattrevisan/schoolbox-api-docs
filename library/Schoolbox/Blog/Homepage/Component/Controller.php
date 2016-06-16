@@ -72,10 +72,14 @@ class Controller extends Component_Homepage_ControllerAbstract
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
         }
 
-        // Get all the blog entries for this page, limit to the number specified in blog component config
+        // Check if using local or alt source
+
+        $folderId = $this->isUsingAltSource() ? $this->getConfig("src") : $this->getInstance()->getIdentifier();
+
+        // Get all the blog entries for this source, limit to the number specified in blog component config
 
         $blogs = $this->getBlogMapper()
-            ->findByColumn("folder_id", $this->getInstance()->getIdentifier())
+            ->findByColumn("folder_id", $folderId)
             ->sortBy('createdAt', 'desc')
             ->limit(0, $this->getConfig('size'));
 
