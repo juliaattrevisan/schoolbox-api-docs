@@ -83,7 +83,11 @@ else {
     );
 
     if($currentTerm->isMarkableBy($sessionUser) && $currentTerm->contains(Alaress_Date_Format::now()) ) {
-        $involvedIn = $groupHandler->involvedInSubjects($sessionUser->getId());
+        $involvedIn = $groupHandler->involvedInCategoryList(
+            $sessionUser->getId(),
+            true,
+            \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE
+        );
         if (is_array($involvedIn)) {
             foreach ($involvedIn as $subject) {
                 $subjectList[] = $subject['id'];
