@@ -162,6 +162,10 @@ class EventMapper extends Calendar\EventMapper {
 		throw new Exception('Instance of object not found');
 	}
 
+	private function findAllByListGroupsHydrate($query)
+	{
+	}
+
 	/**
 	 * Custom findAllByListGroups
 	 *

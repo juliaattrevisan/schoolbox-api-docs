@@ -89,8 +89,10 @@ class Authenticator {
 
 		/* Check permissions against a particular event's campus and status
 		 */
+		$allPermissions = $this->getAllPermissions();
+
 		if ($event) {
-			foreach ($this->getAllPermissions() as $currentPermission) {
+			foreach ($allPermissions[$user->getId()] as $currentPermission) {
 				$inCampus  = $this->isPermissionInCampus($currentPermission, $event);
 				$hasStatus = $this->isPermissionInStatus($currentPermission, $event);
 
@@ -131,7 +133,9 @@ class Authenticator {
 
 		/* Check permissions against a particular event's campus only
 		 */
-		foreach ($this->getAllPermissions() as $currentPermission) {
+		$allPermissions = $this->getAllPermissions();
+
+		foreach ($allPermissions[$user->getId()] as $currentPermission) {
 			$inCampus = $this->isPermissionInCampus($currentPermission, $event);
 
 			if ($inCampus) {
