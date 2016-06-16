@@ -21,9 +21,11 @@ $sessionUser = $_SESSION['user'];
 $this->setFile(TEMPLATE_content, 'modules/eotc/processed.html');
 $this->setBlock(TEMPLATE_content, 'event_list_group', 'event_list_group_block');
 $this->setBlock('event_list_group', 'event', 'event_block');
+$this->setBlock(TEMPLATE_content, 'has_all', 'has_all_block');
 
 $this->setVar(array(
-	'event_list_group_block' => ''
+	'event_list_group_block' => '',
+	'has_all_block' => '',
 ));
 
 $eventMapper = \EOTC\EventMapper::getInstance();
@@ -32,6 +34,8 @@ $eventMapper = \EOTC\EventMapper::getInstance();
  * Shows all future events that are approved/rejected
  */
 if (!count($this->arg)) {
+	$this->parse('has_all_block', 'has_all');
+
 	/** @var \EOTC\ListGroup\Collection $allListGroups */
 	$allListGroups = $eventMapper->findAllByListGroups(
 		[
