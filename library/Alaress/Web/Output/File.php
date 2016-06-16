@@ -50,7 +50,9 @@ class File extends Base
      */
     protected function getFile()
     {
-        return $this->file;
+        return isset($this->file)
+            ? $this->file
+            : $this->retrieveFieldFromResponse('file');
     }
 
     /**

@@ -218,7 +218,9 @@ class Base implements OutputInterface
      */
     protected function getData()
     {
-        return $this->data;
+        return isset($this->data)
+            ? $this->data
+            : $this->retrieveFieldFromResponse('data', []);
     }
 
     /**

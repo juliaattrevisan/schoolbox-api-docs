@@ -108,7 +108,9 @@ class ThemedHtml extends Html
      */
     protected function getTab()
     {
-        return $this->tab;
+        return isset($this->tab)
+            ? $this->tab
+            : $this->retrieveFieldFromResponse('tab');
     }
 
     /**
@@ -126,7 +128,9 @@ class ThemedHtml extends Html
      */
     protected function getTitle()
     {
-        return $this->title;
+        return isset($this->title)
+            ? $this->title
+            : $this->retrieveFieldFromResponse('title');
     }
 
     /**

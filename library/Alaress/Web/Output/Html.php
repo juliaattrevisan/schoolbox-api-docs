@@ -77,7 +77,9 @@ class Html extends Base
      */
     protected function getTemplate()
     {
-        return $this->template;
+        return isset($this->template)
+            ? $this->template
+            : $this->retrieveFieldFromResponse('template');
     }
 
     /**
