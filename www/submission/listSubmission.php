@@ -56,7 +56,9 @@ $groupHandler = new Group();
 $contextSelector = new ContextSelector('submission/listSubmission');
 $contextSelector->setTerms($termMapper->findAll(['order' => ['start' => 'desc']]));
 
-if(!$_SESSION['user']->getRole()->isStaff() ) {
+/** @var Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+if (!$sessionUser->getRole()->isStaff()) {
     error(19);
 }
 
@@ -80,8 +82,8 @@ else {
         array('term' => $currentTerm,)
     );
 
-    if($currentTerm->isMarkableBy($_SESSION['user']) && $currentTerm->contains(Alaress_Date_Format::now()) ) {
-        $involvedIn = $groupHandler->involvedInSubjects($_SESSION['id']);
+    if($currentTerm->isMarkableBy($sessionUser) && $currentTerm->contains(Alaress_Date_Format::now()) ) {
+        $involvedIn = $groupHandler->involvedInSubjects($sessionUser->getId());
         if (is_array($involvedIn)) {
             foreach ($involvedIn as $subject) {
                 $subjectList[] = $subject['id'];
@@ -92,7 +94,7 @@ else {
     /* Merge in all the rest that are not related to the user by folder but by owner
        note i am using an older function for a simple task that is why it does more than it should */
     $allUserBoxes = $submissionHandler->getAllForUser(
-        $_SESSION['user']->getId(),
+        $sessionUser->getId(),
         $currentTerm->getStart(),
         $currentTerm->getActualFinish()
     );
@@ -200,7 +202,7 @@ if (!empty($subjectList) && is_array($subjectList)) {
             $currentTerm->getActualFinish()
         );
 
-        $readonly = !$currentTerm->isMarkableBy($_SESSION['user']);
+        $readonly = !$currentTerm->isMarkableBy($sessionUser);
 
         if(is_array($assessments) && count($assessments) > 0 ) {
             /* Iterate over all the assessments and output them */
