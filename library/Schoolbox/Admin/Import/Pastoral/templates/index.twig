@@ -1,17 +1,46 @@
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script>
-    $(function(){
-        $('[data-import]').click(function(e) {
-            $("[data-import]").prop('value', 'Please Wait...');
-            $("[data-import]").prop('disabled', true);
-            $("[data-form-import]").submit();
+
+    $(function() {
+
+        $(function(){
+            $('[data-import]').click(function(e) {
+                var defaultOwnerId = $('#defaultOwner')[0].value;
+
+                $('#defaultOwnerError').addClass('hide');
+
+                if (defaultOwnerId != '') {
+                    $("[data-import]").prop('value', 'Please Wait...');
+                    $("[data-import]").prop('disabled', true);
+                    $("[data-form-import]").submit();
+                } else {
+                    $('#defaultOwner').focus();
+                    $('#defaultOwnerError').removeClass('hide');
+                    e.preventDefault();
+                }
+            });
         });
-    });
-    $(function(){
-        $('[data-import-logs]').click(function(e) {
-            e.preventDefault();
-            window.location.href = '/adminv2/import-pastoral/log';
+
+        $(function(){
+            $('[data-import-logs]').click(function(e) {
+                e.preventDefault();
+                window.location.href = '/adminv2/import-pastoral/log';
+            });
         });
+
+        $('#defaultOwner').selectizeSelector({
+            multiple: false,
+            ajax: {
+                url:      '/ajax/user.php',
+                type:     'GET',
+                data:     {roleTypeID: 'staff'},
+                dataType: 'json'
+            }
+        });
+
     });
+
 </script>
 
 {# Shared navigation menu #}
@@ -55,11 +84,22 @@
                     records created using the import feature (and associated comments/attachment) will be removed on
                     subsequent imports.
                 </p>
+
                 <p>
-                    Click on the button below to begin the import (the import process may take several minutes to complete).
+                    <b>Before importing pastoral records you must specify a fallback owner below.</b>
+                    This is the owner that will be assigned to pastoral records when the original author can not be
+                    located in the Schoolbox database.
                 </p>
+
+                <label>
+                    Fallback Record Owner
+                    <span class="hint has-tip tip-top" data-tooltip title="This is the owner that will be assigned when the original author of the pastoral record can not be located in the Schoolbox database.">?</span>
+                    <select id="defaultOwner" name="defaultOwnerId" placeholder="Fallback Record Owner"></select>
+                </label>
+
                 <input type="submit" data-import value="Import Pastoral Care Records">
                 <input type="submit" data-import-logs value="View Import Logs">
+                <label id="defaultOwnerError" for="defaultOwner" class="error hide">You must select a fallback record owner before you can proceed.</label>
             </section>
         </form>
     </div>

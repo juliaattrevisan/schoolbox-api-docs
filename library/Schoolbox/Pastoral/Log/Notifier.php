@@ -1,6 +1,6 @@
 <?php
 
-namespace Schoolbox\Admin\Import\Pastoral;
+namespace Schoolbox\Pastoral\Log;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Monolog\Logger;
@@ -9,7 +9,6 @@ use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
-use Schoolbox\Sync\Provisioner\UserMapper;
 use Schoolbox\User;
 
 class Notifier extends AbstractModuleNotifier
@@ -25,8 +24,8 @@ class Notifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
 
-        if ($model->getResult() == "Completed") {
-
+        if ($model->getResult() == 'Completed')
+        {
             // Create the message
 
             $builder = new Builder();
@@ -34,14 +33,14 @@ class Notifier extends AbstractModuleNotifier
                 ->setIcon("/images/icon.php?size=48&icon=bolt")
                 ->setHref("/adminv2/import-pastoral/log/{$model->getImportId()}")
                 ->setNamespace($this->getSlug())
-                ->setSeverity(Logger::ERROR)
-                ->addTopic("pastoral.{$model->getImportId()}.{$method}");
+                ->setSeverity(Logger::NOTICE)
+                ->addTopic("pastoral_log.{$model->getImportId()}.created");
 
             $message = $builder->build();
             $envelope->targetToUser($model->getUserId(), $message, true);
-
-            return $envelope;
         }
+
+        return $envelope;
     }
 
     /**
@@ -57,7 +56,7 @@ class Notifier extends AbstractModuleNotifier
      */
     protected function getSlug()
     {
-        return NSMapper::NS_PASTORAL;
+        return NSMapper::NS_PASTORAL_LOG;
     }
 
     /**
@@ -93,5 +92,5 @@ class Notifier extends AbstractModuleNotifier
             [ $this, "notify" . ucfirst($label) ]
         ];
     }
-
 }
+

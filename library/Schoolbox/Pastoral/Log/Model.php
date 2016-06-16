@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Admin\Import\Pastoral;
+namespace Schoolbox\Pastoral\Log;
 
 class Model {
 
@@ -110,14 +110,12 @@ class Model {
         return $this;
     }
 
-
     /**
      * @return int
      */
     public function getId() {
         return $this->id;
     }
-
 
     /**
      * @return int
@@ -151,7 +149,6 @@ class Model {
         return $this;
     }
 
-
     /**
      * @return int
      */
@@ -166,7 +163,8 @@ class Model {
     public function setUserId($userId) {
         $this->userId = $userId;
         return $this;
-    }    
+    }
+
     /**
      * @param \Alaress_Date_Format $createdAt
      * @return self

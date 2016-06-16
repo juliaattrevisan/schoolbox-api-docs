@@ -19,8 +19,8 @@ use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
-use Alaress\DebugBar\Instance as DebugBar;
-use Schoolbox\Admin\Import\Pastoral\Mapper as PastoralLogMapper;
+use Schoolbox\Pastoral\Log\Mapper as PastoralLogMapper;
+use Schoolbox\Pastoral\Log\Model as PastoralLogModel;
 
 class External_Synergetic_Pastoral implements External_PastoralInterface
 {
@@ -63,19 +63,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function __construct()
     {
-        $silence = new SilentNotif();
-
         $this->setDatabase(MSSQL::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
-
-        $pastoralMapper = PastoralMapper::getInstance();
-        $pastoralMapper->setNotifier($silence);
-        $this->setPastoralMapper($pastoralMapper);
-
-        $pastoralCommentMapper = PastoralCommentMapper::getInstance();
-        $pastoralCommentMapper->setNotifier($silence);
-        $this->setPastoralCommentMapper($pastoralCommentMapper);
-
+        $this->setPastoralMapper(PastoralMapper::getInstance());
+        $this->setPastoralAccessMapper(PastoralAccessMapper::getInstance());
+        $this->setPastoralCommentMapper(PastoralCommentMapper::getInstance());
         $this->setPastoralLogMapper(PastoralLogMapper::getInstance());
         $this->setPastoralTypeMapper(PastoralTypeMapper::getInstance());
         $this->setPastoralCategoryMapper(PastoralCategoryMapper::getInstance());
@@ -91,7 +83,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function getPastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
     {
-        $query = "SELECT PastoralCareSeq,
+        $query = "SELECT  PastoralCareSeq,
                           ID,
                           ClassCode,
                           ItemDate,
@@ -113,8 +105,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                           EmailSentByID,
                           DuplicateFromSeq,
                           SubjectClassesSeq
-                  FROM tPastoralCare
-                  WHERE PastoralCareSeq = " . $this->getPastoralIdentifier($pastoral);
+                  FROM    tPastoralCare
+                  WHERE   PastoralCareSeq = " . $this->getPastoralIdentifier($pastoral);
 
         return $this->getDatabase()->getAll($query);
     }
@@ -132,9 +124,19 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
     /**
      * Does an import of all pastoral care records stored in Synergetic
+     *
+     * @param int $userId                           The Schoolbox ID of the person doing the import
+     * @param \Schoolbox\User $defaultOwner         The fallback user when the owner of the pastoral record cannot be found
      */
-    public function importPastoral($userId)
+    public function importPastoral($userId, $defaultOwner)
     {
+        $silence = new SilentNotif();
+
+        $this->getPastoralMapper()->setNotifier($silence);
+        $this->getPastoralCommentMapper()->setNotifier($silence);
+        
+        $this->getPastoralLogMapper()->setSessionData($_SESSION);
+
         /** @var \Schoolbox\Collection $results */
         $results = $this->getPastoralLogMapper()->findAll()->sortBy("importId", "desc");
 
@@ -143,9 +145,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         } else {
             $importId = 1;
         }
+
         // Get all pastoral care records from Synergetic for current students only
 
-        $query = "
+        $query =
+        "
             SELECT       dbo.tPastoralCare.PastoralCareSeq, dbo.tPastoralCare.ID, dbo.tPastoralCare.ClassCode, dbo.tPastoralCare.ItemDate, dbo.tPastoralCare.MethodCode,
                          dbo.tPastoralCare.Details, dbo.tPastoralCare.PrivateDetails, dbo.tPastoralCare.InitiatorCode, dbo.tPastoralCare.TypeCode, dbo.tPastoralCare.CategoryCode,
                          dbo.tPastoralCare.ClassificationCode, dbo.tPastoralCare.IsFollowUpFlag, dbo.tPastoralCare.FollowUpDate, dbo.tPastoralCare.ConfidentialFlag,
@@ -153,10 +157,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                          dbo.tPastoralCare.EmailSentDate, dbo.tPastoralCare.EmailSentByID, dbo.tPastoralCare.DuplicateFromSeq, dbo.tPastoralCare.SubjectClassesSeq,
                          dbo.luPastoralCareType.Description AS TypeDescription, Community_1.Surname AS StudentLastname, Community_1.Given1 AS StudentFirstname,
                          dbo.Community.Surname AS OwnerLastname, dbo.Community.Given1 AS OwnerFirstname
-            FROM         dbo.tPastoralCare INNER JOIN
-                         dbo.luPastoralCareType ON dbo.tPastoralCare.TypeCode = dbo.luPastoralCareType.Code INNER JOIN
-                         dbo.Community ON dbo.tPastoralCare.CreatedByID = dbo.Community.ID INNER JOIN
-                         dbo.Community AS Community_1 ON dbo.tPastoralCare.ID = Community_1.ID
+            FROM         dbo.tPastoralCare 
+            INNER JOIN   dbo.luPastoralCareType ON dbo.tPastoralCare.TypeCode = dbo.luPastoralCareType.Code 
+            INNER JOIN   dbo.Community ON dbo.tPastoralCare.CreatedByID = dbo.Community.ID 
+            INNER JOIN   dbo.Community AS Community_1 ON dbo.tPastoralCare.ID = Community_1.ID
             WHERE        dbo.tPastoralCare.ID IN (SELECT ID FROM dbo.vStudents)
         ";
 
@@ -212,7 +216,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 catch (\Exception $e)
                 {
                     // Type doesn't exist in Schoolbox, create it
-                    
+
                     $type = new PastoralTypeModel();
                     $type->setName($record["TypeDescription"]);
                     $type->setExternalCode($record["TypeCode"]);
@@ -234,7 +238,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             catch (\Exception $e)
             {
                 // Category doesn't exist in Schoolbox, create it
-                
+
                 $category = new PastoralCategoryModel();
                 $category->setName($record["CategoryDescription"]);
                 $category->setExternalCode($record["CategoryCode"]);
@@ -257,10 +261,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 $owner = null;
                 $student = null;
 
-                if (!isset($userCache[$record["CreatedByID"]]))
-                    $userCache[$record["CreatedByID"]] = $this->getUserMapper()->findByExternalId($record["CreatedByID"]);
-
-                $owner = $userCache[$record["CreatedByID"]];
+                try {
+                    if (!isset($userCache[$record["CreatedByID"]]))
+                        $userCache[$record["CreatedByID"]] = $this->getUserMapper()->findByExternalId($record["CreatedByID"]);
+                    $owner = $userCache[$record["CreatedByID"]];
+                } catch (\Exception $e) {
+                    $owner = $defaultOwner;
+                }
 
                 if (!isset($userCache[$record["ID"]]))
                     $userCache[$record["ID"]] = $this->getUserMapper()->findByExternalId($record["ID"]);
@@ -335,9 +342,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         }
                     }
                 }
+
                 $record['reason'] = "Imported";
 
-                $log = new \Schoolbox\Admin\Import\Pastoral\Model();
+                $log = new PastoralLogModel();
                 $log->setUserId($userId);
                 $log->setPastoralId($pastoralRecord->getId());
                 $log->setImportId($importId);
@@ -350,28 +358,23 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             }
             catch (\Exception $e)
             {
-                // The owner or student of the pastoral care record is not available in Schoolbox, skip this record
+                // The student of the pastoral care record is not available in Schoolbox, skip this record
 
-                if ($owner == null)
-                    $record['reason'] = "Creator of record does not have a user record in Schoolbox";
-                else if ($student == null)
-                    $record['reason'] = "Student does not have a user record in Schoolbox";
-
-                $log = new \Schoolbox\Admin\Import\Pastoral\Model();
+                $log = new PastoralLogModel();
                 $log->setUserId($userId);
                 $log->setImportId($importId);
                 $log->setHeading($record["heading"]);
-                $log->setStudentName($student->getFirstname() . " " . $student->getLastname());
+                $log->setStudentName($record["StudentFirstname"] . " " . $record["StudentLastname"]);
                 $log->setCreatorName($owner->getFirstname() . " " . $owner->getLastname());
                 $log->setCreatedAt(\Alaress_Date_Format::now());
-                $log->setResult($record['reason']);
+                $log->setResult("Student does not have a user record in Schoolbox");
                 $this->getPastoralLogMapper()->save($log);
             }
 
             $records->next();
         }
 
-        $log = new \Schoolbox\Admin\Import\Pastoral\Model();
+        $log = new \Schoolbox\Pastoral\Log\Model();
         $log->setUserId($userId);
         $log->setImportId($importId);
         $log->setHeading("Import Completed");
@@ -417,8 +420,12 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         // Pastoral category code
 
-        $category = $this->getPastoralCategoryMapper()->findById($pastoral->getCategory()->getId());
-        $category_code = "'" . $category->getExternalCode() . "'";
+        if ($pastoral->getCategory() == null)
+            $category_code = "''";
+        else {
+            $category = $this->getPastoralCategoryMapper()->findById($pastoral->getCategory()->getId());
+            $category_code = "'" . $category->getExternalCode() . "'";
+        }
 
         // Created/modified dates
 

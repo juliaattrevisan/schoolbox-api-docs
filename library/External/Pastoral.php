@@ -46,9 +46,9 @@ class External_Pastoral implements External_PastoralInterface
     /**
      * Import pastoral care records from external SIS
      */
-    public function importPastoral($userId)
+    public function importPastoral($userId, $defaultOwnerId)
     {
-        return $this->getDatabase()->importPastoral($userId);
+        return $this->getDatabase()->importPastoral($userId, $defaultOwnerId);
     }
 
     /**

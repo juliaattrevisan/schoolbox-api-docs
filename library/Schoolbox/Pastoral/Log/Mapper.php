@@ -7,8 +7,9 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Admin\Import\Pastoral;
+namespace Schoolbox\Pastoral\Log;
 
+use Schoolbox\Pastoral\Log\Model as PastoralLogModel;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
@@ -23,7 +24,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('pastoral_import_log');
-        $this->hasModel(Model::class);
+        $this->hasModel(PastoralLogModel::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('pastoral_id', self::TYPE_INTEGER);
         $this->uses('import_id', self::TYPE_INTEGER);
@@ -35,6 +36,10 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME);
     }
 
+    /**
+     * Retrieves a list of unique import IDs from the log table along with the date the import started
+     * @return Collection
+     */
     public function findImportIds()
     {
         $query = "

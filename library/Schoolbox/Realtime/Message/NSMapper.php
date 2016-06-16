@@ -16,6 +16,7 @@ class NSMapper extends Mapper {
 
 	const NS_PASTORAL         = 'pastoral';
 	const NS_PASTORAL_COMMENT = 'pastoral_comment';
+	const NS_PASTORAL_LOG     = 'pastoral_log';
 	const NS_DUEWORK          = 'duework';
 	const NS_ONLINE_ASSESS    = 'assess';
 	const NS_BLOG             = 'blog';
