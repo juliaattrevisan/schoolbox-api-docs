@@ -56,7 +56,9 @@ $groupHandler = new Group();
 $contextSelector = new ContextSelector('submission/listSubmission');
 $contextSelector->setTerms($termMapper->findAll(['order' => ['start' => 'desc']]));
 
-if(!$_SESSION['user']->getRole()->isStaff() ) {
+/** @var Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
+if (!$sessionUser->getRole()->isStaff()) {
     error(19);
 }
 
@@ -80,19 +82,24 @@ else {
         array('term' => $currentTerm,)
     );
 
-    if($currentTerm->isMarkableBy($_SESSION['user']) && $currentTerm->contains(Alaress_Date_Format::now()) ) {
-        $involvedIn = $groupHandler->involvedInSubjects($_SESSION['id']);
-        if (is_array($involvedIn)) {
-            foreach ($involvedIn as $subject) {
-                $subjectList[] = $subject['id'];
-            }
+    // This semester: get the classes I'm involved in, and my groups
+    // Other semesters: just get my groups
+    $getClasses = $currentTerm->isMarkableBy($sessionUser) && $currentTerm->contains(Alaress_Date_Format::now());
+    $involvedIn = $groupHandler->involvedInCategoryList(
+        $sessionUser->getId(),
+        $getClasses,
+        \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE
+    );
+    if (is_array($involvedIn)) {
+        foreach ($involvedIn as $subject) {
+            $subjectList[] = $subject['id'];
         }
     }
 
     /* Merge in all the rest that are not related to the user by folder but by owner
        note i am using an older function for a simple task that is why it does more than it should */
     $allUserBoxes = $submissionHandler->getAllForUser(
-        $_SESSION['user']->getId(),
+        $sessionUser->getId(),
         $currentTerm->getStart(),
         $currentTerm->getActualFinish()
     );
@@ -133,65 +140,14 @@ if (!empty($subjectList) && is_array($subjectList)) {
     $allCoursesUsedInFolder = $unitInstanceMapper->findAllCoursesUsedInFolders($subjectList);
 
     foreach ($subjectList as $sub) {
+        /* @param  \Schoolbox\Resource\Folder\Model $curCategory */
         try {
             $curCategory = \Schoolbox\Resource\Folder\Mapper::getInstance()->findById($sub);
-            /* @param  \Schoolbox\Resource\Folder\Model $curCategory */
-
-            /* Get full student list of class to show those who have not submitted
-             */
-            if (count($curCategory->getCodes()) > 0 && Cfg::get('external_enable')) {
-                /* If synergy code, get synergy students
-                 */
-                $studentList = $synHandler->getStudents($curCategory->getCodeString());
-                $this->setVar('CATEGORY_CODE', urlencode($curCategory->getCodeString()));
-
-                $this->setVar('members_list_block' ,'');
-                $this->parse('class_list_block','class_list');
-            } else {
-                /* Retrieve student list from group membership
-                 */
-                $studentList = $groupHandler->getMemberList($curCategory->getId());
-                $this->setVar('class_list_block' ,'');
-                $this->parse('members_list_block','members_list');
-            }
-
-            $this->setVar('STUDENTS', count($studentList));
-
-            if (count($curCategory->getCodes()) > 0) {
-                $this->setVar('CATEGORY', Scrub::text($curCategory->getName()) . " (" . $curCategory->getCodeString() . ")");
-            } else {
-                $this->setVar('CATEGORY', Scrub::text($curCategory->getName()));
-            }
-
-            $this->setVar('CATEGORY_ID', $curCategory->getId());
-
-            /* Learning Analytics courses buttons go here
-             */
-            $this->setVar(array(
-                'learning_analytics_block' => ''
-            ));
-
-            $allCoursesUsed = $allCoursesUsedInFolder->getOffset($curCategory->getId());
-
-            if(isset($allCoursesUsed)) {
-                foreach ($allCoursesUsed as $courseFolder) {
-                    $this->setVar(array(
-                        'COURSE_FOLDER_ID' => $courseFolder->getId(),
-                        'COURSE_FOLDER_NAME' => $courseFolder->getName()
-                    ));
-
-                    $this->parse('learning_analytics_block', 'learning_analytics', true);
-                }
-            }
-
-            $this->setVar('submission_block', '');
-
-            $i = 0;
         }
         catch (Exception $e) {
             // Couldn't find category, probably as it wasn't set.
+            continue;
         }
-
 
         $assessments = $submissionHandler->getAllForUserCategory(
             $curCategory->getId(),
@@ -200,9 +156,70 @@ if (!empty($subjectList) && is_array($subjectList)) {
             $currentTerm->getActualFinish()
         );
 
-        $readonly = !$currentTerm->isMarkableBy($_SESSION['user']);
+        // Is the assessment list empty?
+        // Don't show this list if this isn't a subject.
+        if (empty($assessments)) {
+            if (count($curCategory->getCodes()) === 0) {
+                continue;
+            }
+        }
 
+        /* Get full student list of class to show those who have not submitted
+         */
+        if (count($curCategory->getCodes()) > 0 && Cfg::get('external_enable')) {
+            /* If synergy code, get synergy students
+             */
+            $studentList = $synHandler->getStudents($curCategory->getCodeString());
+            $this->setVar('CATEGORY_CODE', urlencode($curCategory->getCodeString()));
+
+            $this->setVar('members_list_block' ,'');
+            $this->parse('class_list_block','class_list');
+        } else {
+            /* Retrieve student list from group membership
+             */
+            $studentList = $groupHandler->getMemberList($curCategory->getId());
+            $this->setVar('class_list_block' ,'');
+            $this->parse('members_list_block','members_list');
+        }
+
+        $this->setVar('STUDENTS', count($studentList));
+
+        if (count($curCategory->getCodes()) > 0) {
+            $this->setVar('CATEGORY', Scrub::text($curCategory->getName()) . " (" . $curCategory->getCodeString() . ")");
+        } else {
+            $this->setVar('CATEGORY', Scrub::text($curCategory->getName()));
+        }
+
+        $this->setVar('CATEGORY_ID', $curCategory->getId());
+
+        /* Learning Analytics courses buttons go here
+         */
+        $this->setVar(array(
+            'learning_analytics_block' => ''
+        ));
+
+        $allCoursesUsed = $allCoursesUsedInFolder->getOffset($curCategory->getId());
+
+        if(isset($allCoursesUsed)) {
+            foreach ($allCoursesUsed as $courseFolder) {
+                $this->setVar(array(
+                    'COURSE_FOLDER_ID' => $courseFolder->getId(),
+                    'COURSE_FOLDER_NAME' => $courseFolder->getName()
+                ));
+
+                $this->parse('learning_analytics_block', 'learning_analytics', true);
+            }
+        }
+
+        $this->setVar('submission_block', '');
+
+        $i = 0;
+
+        $readonly = !$currentTerm->isMarkableBy($sessionUser);
+
+        $displayClass = false;
         if(is_array($assessments) && count($assessments) > 0 ) {
+            $displayClass = true;
             /* Iterate over all the assessments and output them */
             foreach ($assessments as $assess) {
 
