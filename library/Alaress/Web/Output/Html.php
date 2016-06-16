@@ -47,12 +47,6 @@ class Html extends Base
     {
         $template = $this->getTemplate();
         $data     = $this->getData();
-        if (!isset($template)) {
-            $template = $this->retrieveFieldFromResponse('template');
-        }
-        if (!isset($data)) {
-            $data = $this->retrieveFieldFromResponse('data', []);
-        }
         return $this->getTemplateEngine()->render($template, $data);
     }
 

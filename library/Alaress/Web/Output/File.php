@@ -32,16 +32,10 @@ class File extends Base
     protected function outputResponseBody()
     {
         $file = $this->getFile();
-        $file = isset($file) ? $file : $this->retrieveFieldFromResponse('file');
         if ($file) {
             readfile($file);
         } else {
-            $data = $this->getData();
-            if (isset($data)) {
-                echo $data;
-            } else {
-                echo $this->retrieveFieldFromResponse('data');
-            }
+            echo $this->getData();
         }
     }
 

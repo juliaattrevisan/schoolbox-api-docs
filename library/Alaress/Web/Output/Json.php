@@ -29,8 +29,6 @@ class Json extends Base
      */
     protected function outputResponseBody()
     {
-        $data = $this->getData();
-        $data = isset($data) ? $data : $this->retrieveFieldFromResponse('data', []);
-        echo json_encode($data);
+        echo json_encode($this->getData());
     }
 }

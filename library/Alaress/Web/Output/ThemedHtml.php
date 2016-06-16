@@ -50,13 +50,6 @@ class ThemedHtml extends Html
         $page     = $this->getSitepage();
         $template = $this->getTemplate();
         $data     = $this->getData();
-        if (!isset($template)) {
-            $template = $this->retrieveFieldFromResponse('template');
-        }
-        if (!isset($data)) {
-            $data = $this->retrieveFieldFromResponse('data', []);
-        }
-
         if (empty($template)) {
             // No template? I can't generate a standard response,
             // so return an error response.
@@ -68,9 +61,6 @@ class ThemedHtml extends Html
             }
         } else {
             $tab = $this->getTab();
-            if (!isset($tab)) {
-                $tab = $this->retrieveFieldFromResponse('tab');
-            }
             if ($tab) {
                 $page->setTab($tab);
             }
@@ -78,11 +68,7 @@ class ThemedHtml extends Html
             $page->buildPage();
             $page->setVar('OUTPUT', $this->getTemplateEngine()->render($template, $data));
 
-            $title = $this->getTitle();
-            if (!isset($title)) {
-                $title = $this->retrieveFieldFromResponse('title');
-            }
-            $page->setTitle($title);
+            $page->setTitle($this->getTitle());
             $page->outputPage(true);
         }
     }
