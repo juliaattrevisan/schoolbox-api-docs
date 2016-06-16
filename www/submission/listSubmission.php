@@ -192,6 +192,7 @@ if (!empty($subjectList) && is_array($subjectList)) {
         }
         catch (Exception $e) {
             // Couldn't find category, probably as it wasn't set.
+            continue;
         }
 
 
