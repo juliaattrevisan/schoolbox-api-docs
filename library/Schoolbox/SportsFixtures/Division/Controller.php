@@ -73,10 +73,17 @@ class Controller extends Base
      */
     public function getCreate($id)
     {
-        $this->tpl('create', [
-            'sportId' => $id,
-            'action' => 'Create'
-        ]);
+        try {
+            $sport = SportMapper::getInstance()->findById($id);
+
+            $this->tpl('create', [
+                'sport' => $sport,
+                'action' => 'Create'
+            ]);
+        }
+        catch (MapperException $e) {
+            throw ErrorMapper::getInstance()->generateException(2);
+        }
     }
 
     /**
@@ -88,10 +95,11 @@ class Controller extends Base
     {
         try {
             $division = Mapper::getInstance()->findById($id);
+            $sport = SportMapper::getInstance()->findById($division->getSport()->getId());
 
             $this->tpl('create', [
                 'division' => $division,
-                'sportId' => $division->getSport()->getId(),
+                'sport' => $sport,
                 'action' => 'Modify'
             ]);
         }
