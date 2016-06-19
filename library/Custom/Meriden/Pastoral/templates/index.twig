@@ -10,12 +10,18 @@
     })(jQuery);
 </script>
 
-<div id="pastoral-report">
-    <div id="meriden-crest">
-        {% include '@customMeridenPastoral/sub/crestSvg.twig' %}
+<div class="row">
+    <div class="small-12 columns">
+        <div id="meriden-crest">
+            {% include '@customMeridenPastoral/sub/crestSvg.twig' %}
+        </div>
     </div>
+    <div class="small-12 columns">
+        <h1>School Report - {{ report.tutorGroupReport.year }}</h1>
+    </div>
+</div>
 
-    <h1>School Report - {{ report.tutorGroupReport.year }}</h1>
+<div id="pastoral-report">
 
     <div id="context">
         {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
