@@ -3,7 +3,7 @@
     (function($){
         $(function(){
             // Jump menu for changing semester
-            $('#semester, #enrolled-subjects').on('change', function() {
+            $('#context-selector-semester, #context-selector-enrolled-subjects').on('change', function() {
                 window.location.href = this.value;
             });
         })
@@ -16,22 +16,31 @@
             {% include '@customMeridenPastoral/sub/crestSvg.twig' %}
         </div>
     </div>
+
     <div class="small-12 columns">
         <h1>School Report - {{ report.tutorGroupReport.year }}</h1>
     </div>
+
+
+    <div class="small-12 medium-5 island">
+        <section>
+            {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
+        </section>
+    </div>
+    <div class="small-12 medium-7 island">
+        <section>
+            {% include '@customMeridenPastoral/sub/selector.twig' with {
+                tutorGroupList:   report.tutorGroupList,
+                subjectList:      report.subjectList,
+                student:          report.student,
+                tutorGroupReport: report.tutorGroupReport
+            } %}
+        </section>
+    </div>
+
 </div>
 
 <div id="pastoral-report">
-
-    <div id="context">
-        {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
-        {% include '@customMeridenPastoral/sub/selector.twig' with {
-            tutorGroupList:   report.tutorGroupList,
-            subjectList:      report.subjectList,
-            student:          report.student,
-            tutorGroupReport: report.tutorGroupReport
-        } %}
-    </div>
 
     <ul id="house-info">
         <li>
