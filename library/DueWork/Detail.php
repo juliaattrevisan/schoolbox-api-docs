@@ -214,6 +214,15 @@ class DueWork_Detail
         $errs = $dem->listDisplayValues();
         $page->setVar('COMBO_OPTIONS', json_encode($errs));
 
+        // show or hide the archived warning, based on end date
+        if ($this->isArchived()) {
+            $page->parse('is_archived_block', 'is_archived');
+        }
+        else {
+            $page->setVar(array(
+                'is_archived_block' => ''
+            ));
+        }
 
         if (!$data = $this->sitepageData) {
             $page->setVar('student_row_block', 'This subject has no students in it.');
@@ -404,17 +413,6 @@ class DueWork_Detail
             $page->parse('report_btn_block', 'report_btn');
         } else {
             $page->setVar('report_btn_block', '');
-        }
-
-        // show or hide the archived warning, based on end date
-
-        if ($this->isArchived()) {
-            $page->parse('is_archived_block', 'is_archived');
-        }
-        else {
-            $page->setVar(array(
-                'is_archived_block' => ''
-            ));
         }
     }
 
