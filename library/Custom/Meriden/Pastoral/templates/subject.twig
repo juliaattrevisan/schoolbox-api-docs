@@ -84,39 +84,19 @@
 
         {# Endeavor Grades - complicated enough to be its own template #}
         {% include '@customMeridenPastoral/sub/endeavourGrades.twig' %}
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-    </div>
-</div>
-
-<div id="subject-report">
-    <dl id="course-info">
-
 
         {# Approaches to learning - another rubric #}
-        {% if report.subjectReport.namedGrades.learningApproaches
-           and report.subjectReport.namedGrades.learningApproaches.assessment.isMarkShownToRole(user.role)
-        %}
-        <dt class="fullwidth">
-            Approaches to Learning
-            <div class="description-link">[<a href="/homepage/3462">Grade Description</a>]</div>
-        </dt>
-        <dd class="fullwidth">
-            {%
-                include '@customMeridenPastoral/sub/assessmentResult.twig'
-                with {grade: report.subjectReport.namedGrades.learningApproaches}
-            %}
-        </dd>
+        {% if report.subjectReport.namedGrades.learningApproaches and report.subjectReport.namedGrades.learningApproaches.assessment.isMarkShownToRole(user.role) %}
+        <h2 class="subheader">Approaches to Learning</h2>
+        [<a href="/homepage/3462">Grade Description</a>]
+        <section>
+            {% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.learningApproaches} %}
+        </section>
         {% endif %}
-    </dl>
 
-    {% if report.subjectReport.grades %}
-        {%
-            include '@customMeridenPastoral/sub/assessments.twig'
-            with {work: report.subjectReport.grades, student: report.student}
-        %}
-    {% endif %}
+        {# Assessments #}
+        {% if report.subjectReport.grades %}
+            {% include '@customMeridenPastoral/sub/assessments.twig' with {work: report.subjectReport.grades, student: report.student} %}
+        {% endif %}
+    </div>
 </div>
