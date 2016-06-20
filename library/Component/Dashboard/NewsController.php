@@ -21,7 +21,16 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
     }
 
     public function execute() {
-        $this->headlineList = $this->news->getNewsListing(false);
+        $archive     = false;
+        $topic       = '';
+        $year        = 0;
+        $month       = 0;
+        $index       = 0;
+        $limit       = 0;
+        $orderByDate = true;
+
+        $this->headlineList = $this->news->getNewsListing($archive, $topic, $year, $month, $index, $limit, $orderByDate);
+
         return !empty($this->headlineList);
     }
 
