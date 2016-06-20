@@ -246,7 +246,6 @@ class Scrub
                 $def->addAttribute('a', 'data-iframely-url', 'Text');
                 $def->addAttribute('a', 'data-template', 'Text');
                 $def->addAttribute('a', 'data-portal', 'Text');
-                $def->addAttribute('a', 'data-deeplink', 'Text');
                 $def->addAttribute('blockquote', 'data-id', 'Text');
 
                 //
