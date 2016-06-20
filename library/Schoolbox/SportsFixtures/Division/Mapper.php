@@ -30,25 +30,13 @@ class Mapper extends BaseMapper
         $this->hasModel(DivisionModel::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-
         $this->joins('sport_id', SportMapper::class, 'id', null, null, 'sport', 'sport');
-
         $this->uses('name', self::TYPE_STRING);
         $this->uses('url', self::TYPE_STRING);
-        $this->uses('created_at', self::TYPE_DATETIME);
-        $this->uses('updated_at', self::TYPE_DATETIME);
-        $this->uses('deleted_at', self::TYPE_DATETIME);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->hasSoftDeleteDateField('deleted_at');
-    }
-
-    /**
-     * Find all divisions for a given sport
-     *
-     * @param $id
-     * @return \Schoolbox\Collection
-     */
-    public function findAllBySport($id) {
-        return $this->findByColumn("sport_id", $id);
     }
 }
