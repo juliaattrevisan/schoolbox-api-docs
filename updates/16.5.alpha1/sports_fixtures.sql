@@ -7,8 +7,7 @@ INSERT INTO `luServices` (`id`, `name`) VALUES (10, 'Sports Administrator');
 CREATE TABLE `sportsfixtures_sport` (
 	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
 	`name` VARCHAR(100) NULL COMMENT '',
-	`homepage` VARCHAR(255) NULL COMMENT '',
-	`results_individual` TINYINT(1) NOT NULL DEFAULT '0',
+	`url` VARCHAR(255) NULL COMMENT '',
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',

@@ -28,7 +28,7 @@ class Mapper extends BaseMapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
-        $this->uses('homepage', self::TYPE_STRING);
+        $this->uses('url', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME);
         $this->uses('updated_at', self::TYPE_DATETIME);
         $this->uses('deleted_at', self::TYPE_DATETIME);

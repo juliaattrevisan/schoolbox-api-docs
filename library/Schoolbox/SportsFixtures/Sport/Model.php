@@ -14,24 +14,32 @@ use Schoolbox\User;
  * @version     SVN: $Id$
  */
 class Model implements ISoftDeletable {
+
     /** @var int */
     protected $id;
+
     /** @var string */
     protected $name;
+
     /** @var string */
-    protected $homepage;
-    /** @var int */
-    //protected $year;
-    /** @var int */
-    //protected $semester;
-    /** @var boolean */
-    protected $resultsIndividual;
+    protected $url;
+
     /** @var \Alaress_Date_Format */
     protected $createdAt;
+
     /** @var \Alaress_Date_Format */
     protected $updatedAt;
+
     /** @var \Alaress_Date_Format */
     protected $deletedAt;
+
+    /**
+     * Model constructor.
+     */
+    public function __construct()
+    {
+    }
+
     /**
      * @param int $id
      * @return self
@@ -40,12 +48,14 @@ class Model implements ISoftDeletable {
         $this->id = $id;
         return $this;
     }
+
     /**
      * @return int
      */
     public function getId() {
         return $this->id;
     }
+
     /**
      * @param string $name
      * @return self
@@ -54,72 +64,30 @@ class Model implements ISoftDeletable {
         $this->name = $name;
         return $this;
     }
+
     /**
      * @return string
      */
     public function getName() {
         return $this->name;
     }
+
     /**
-     * @param string $homepage
+     * @param string $url
      * @return self
      */
-    public function setHomepage($homepage) {
-        $this->homepage = $homepage;
+    public function setUrl($url) {
+        $this->url = $url;
         return $this;
     }
+
     /**
      * @return string
      */
-    public function getHomepage() {
-        return $this->homepage;
+    public function getUrl() {
+        return $this->url;
     }
-    /**
-     * @param int $year
-     * @return self
-     */
-    /*    public function setYear($year) {
-            $this->year = $year;
-            return $this;
-        }
-    */
-    /**
-     * @return int
-     */
-    /*  public function getYear() {
-          return $this->year;
-      }
-  */
-    /**
-     * @param int $semester
-     * @return self
-     */
-    /*  public function setSemester($semester) {
-          $this->semester = $semester;
-          return $this;
-      }
-  */
-    /**
-     * @return int
-     */
-    /*  public function getSemester() {
-          return $this->semester;
-      }
-  */
-    /**
-     * @param boolean $resultsIndividual
-     * @return self
-     */
-    public function setResultsIndividual($resultsIndividual) {
-        $this->resultsIndividual = $resultsIndividual;
-        return $this;
-    }
-    /**
-     * @return boolean
-     */
-    public function getResultsIndividual() {
-        return $this->resultsIndividual;
-    }
+
     /**
      * @param \Alaress_Date_Format $createdAt
      * @return self
@@ -128,12 +96,14 @@ class Model implements ISoftDeletable {
         $this->createdAt = $createdAt;
         return $this;
     }
+
     /**
      * @return \Alaress_Date_Format
      */
     public function getCreatedAt() {
         return $this->createdAt;
     }
+
     /**
      * @param \Alaress_Date_Format $updatedAt
      * @return self
@@ -142,12 +112,14 @@ class Model implements ISoftDeletable {
         $this->updatedAt = $updatedAt;
         return $this;
     }
+
     /**
      * @return \Alaress_Date_Format
      */
     public function getUpdatedAt() {
         return $this->updatedAt;
     }
+
     /**
      * @param \Alaress_Date_Format $deletedAt
      * @return self
@@ -156,12 +128,14 @@ class Model implements ISoftDeletable {
         $this->deletedAt = $deletedAt;
         return $this;
     }
+
     /**
      * @return \Alaress_Date_Format
      */
     public function getDeletedAt() {
         return $this->deletedAt;
     }
+
     /**
      * Is this object deleted?
      *

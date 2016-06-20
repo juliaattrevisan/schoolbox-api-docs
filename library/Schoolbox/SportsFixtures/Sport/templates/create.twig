@@ -1,0 +1,58 @@
+<script type="text/javascript">
+    $(function() {
+        $('#divisionForm').alaressValidate({
+            rules: {
+                name: {
+                    required: true,
+                    minlength: 2
+                }
+            },
+            messages: {
+                'name': 'Please enter a Sport name.'
+            },
+            errorPlacement: function(error, element) {
+                $.alaressValidate.defaultErrorPlacement(error, element);
+            }
+        })
+    });
+</script>
+
+<ul class="breadcrumb">
+    <li><a href="#">Sports Fixtures</a></li>
+    <li><a href="/sportsfixtures/sport/list">Sports</a></li>
+    <li class="active"><a href="#">{{ action }}</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sports Fixtures</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form id='sportForm' action="/sportsfixtures/sport/{% if sport %}update{% else %}create{% endif %}" method="post">
+            <h2 class="subheader">{{ action }} Sport</h2>
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="id" value="{{ sport.id }}"/>
+
+                        <label>
+                            Name
+                            <input type="text" name="name" value="{{ sport.ame }}"/>
+                        </label>
+
+                        <label>
+                            Url
+                            <input type="text" name="url" value="{{ sport.url }}" />
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="{{ action }} Sport" />
+        </form>
+    </div>
+</div>
