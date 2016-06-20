@@ -616,18 +616,20 @@ class Controller extends Base {
                     'arguments'      => json_encode($arg)
                 ];
 
-                try {
-                    $mapper->save($mapper->hydrate($effect));
+                // treat skips special-like
+                if ($effectTypeMapper->isSkip($effectData['type'])) {
+                    $effect['arguments'] = json_encode([]);
                 }
-                catch (\PDOException $e) {
-                }
+
+
+                $mapper->save($mapper->hydrate($effect));
             }
         }
 
         // housekeeping - make sure there aren't any remnant invalid effects flying around
         $mapper->deleteByColumnList([
-            'rule_id'   => $ruleId,
-            'arguments' => json_encode(null)
+            'rule_id'         => $ruleId,
+            'arguments'       => json_encode(null)
         ]);
     }
 
