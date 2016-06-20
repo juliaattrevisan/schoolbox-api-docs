@@ -14,5 +14,7 @@
         {% endfor %}
     </table>
 {% else %}
-    {{ grade.pretty_mark }}
+    <div class="content">
+        {{ grade.pretty_mark }}
+    </div>
 {% endif %}
