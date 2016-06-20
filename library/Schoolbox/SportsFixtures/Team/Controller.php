@@ -176,19 +176,19 @@ class Controller extends Base
     }
 
     /**
-     * Delete a Division
+     * Delete a Team
      */
     public function postDelete()
     {
-//        try {
-//            /** @var Model $division */
-//            $division = $this->getDivisionMapper()->findById($this->getRequest()->post['id']);
-//
-//            $this->getDivisionMapper()->delete($division);
-//        }
-//        catch (MapperException $e) {
-//            throw $this->getErrorMapper()->generateException(2);
-//        }
+        try {
+            /** @var Team $team */
+            $team = $this->getTeamMapper()->findById($this->getRequest()->post['teamId']);
+
+            $this->getTeamMapper()->delete($team);
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(2);
+        }
     }
 
     /**
@@ -204,7 +204,7 @@ class Controller extends Base
         $team->setName($name);
         $team->setUrl($url);
         $team->setDivision($division);
-        $division->setUpdatedAt(\Alaress_Date_Format::now());
+        $team->setUpdatedAt(\Alaress_Date_Format::now());
 
         $this->getTeamMapper()->save($team);
     }
