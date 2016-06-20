@@ -438,10 +438,15 @@ class Factory
             $grades[$gradeKey]['rubric']     = array();
             // Is there a rubric involved? If so get student's marks for it
             if ($assess->isRubric()) {
-                $rubric     = $rubricHandler->getRubric($assessId);
-                $rubricMark = new \DueWork_Rubric_Mark($rubric);
-                $rubricMark->populateMarks($student->getId());
-                $grades[$gradeKey]['rubric'] = $rubricMark->toArray();
+                try {
+                    $rubric     = $rubricHandler->getRubric($assessId);
+                    $rubricMark = new \DueWork_Rubric_Mark($rubric);
+                    $rubricMark->populateMarks($student->getId());
+                    $grades[$gradeKey]['rubric'] = $rubricMark->toArray();
+                } catch (\Exception $e) {
+                    // Probably not marked yet
+                    $grades[$gradeKey]['rubric'] = [];
+                }
             }
         }
         // No quizzes anymore
