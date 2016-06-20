@@ -65,12 +65,12 @@ class Controller extends Base
     /**
      * List of Divisions and the Sport they are in
      *
-     * @param $id
+     * @param $sportId
      */
-    public function getList($id)
+    public function getList($sportId)
     {
         try {
-            $sport = $this->getSportMapper()->findById($id);
+            $sport = $this->getSportMapper()->findById($sportId);
 
             $allDivisions = $this->getDivisionMapper()->findByColumn('sport_id', $sport->getId(), [
                 'order' => [
@@ -91,12 +91,12 @@ class Controller extends Base
     /**
      * Create a Division in a particular Sport id
      *
-     * @param $id
+     * @param $sportId
      */
-    public function getCreate($id)
+    public function getCreate($sportId)
     {
         try {
-            $sport = $this->getSportMapper()->findById($id);
+            $sport = $this->getSportMapper()->findById($sportId);
 
             $this->tpl('create', [
                 'sport' => $sport,
@@ -111,12 +111,12 @@ class Controller extends Base
     /**
      * Update a Division
      *
-     * @param int $id
+     * @param int $divisionId
      */
-    public function getUpdate($id)
+    public function getUpdate($divisionId)
     {
         try {
-            $division = $this->getDivisionMapper()->findById($id);
+            $division = $this->getDivisionMapper()->findById($divisionId);
             $sport = $this->getSportMapper()->findById($division->getSport()->getId());
 
             $this->tpl('create', [
@@ -131,47 +131,36 @@ class Controller extends Base
     }
 
     /**
-     * Save a Division
+     * Create a Division
+     *
+     * @param Model $division
      */
-    public function postCreate()
+    public function postCreate(Model $division)
     {
-        try {
-            $division = $this->getDivisionMapper()->createModel();
-            $division->setCreatedAt(\Alaress_Date_Format::now());
-
-            $sportId = $this->getRequest()->post['sportId'];
-            $sport = $this->getSportMapper()->findById($sportId);
-
-            $this->saveDivision($sport, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $division);
-
-            $this->getResponse()->redirect->afterPost("/sportsfixtures/division/list/{$sportId}");
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
-        }
+        /* Get around aura's weird regexing
+         */
+        $this->postModify($division);
     }
 
     /**
-     * Save a Division
+     * Modify a Division
+     *
+     * @param Model $division
      */
-    public function postUpdate()
+    public function postModify(Model $division)
     {
         try {
-            /** @var Model $division */
-            $division = $this->getDivisionMapper()->findById($this->getRequest()->post['divisionId']);
-
             $sportId = $this->getRequest()->post['sportId'];
-            $sport = $this->getSportMapper()->findById($sportId);
+            $sport   = $this->getSportMapper()->findById($sportId);
 
             $this->saveDivision($sport, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $division);
 
             $this->getResponse()->redirect->afterPost("/sportsfixtures/division/list/{$sportId}");
-        }
-        catch (MapperException $e) {
+
+        } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);
         }
     }
-
     /**
      * Delete a Division
      */

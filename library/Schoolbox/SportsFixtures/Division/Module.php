@@ -11,11 +11,13 @@ namespace Schoolbox\SportsFixtures\Division;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Twig_Error_Loader;
 use Twig_Loader_Chain;
 use \Schoolbox\Permission\Access\UserAccess;
+use \Schoolbox\SportsFixtures\Division\Model as DivisionModel;
 
 class Module extends BaseModule
 {
@@ -37,14 +39,14 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                '/list/{id}'   => 'getList',
-                '/create/{id}' => 'getCreate',
-                '/update/{id}' => 'getUpdate',
+                '/list/{sportId}'      => 'getList',
+                '/create/{sportId}'    => 'getCreate',
+                '/update/{divisionId}' => 'getUpdate',
             ],
             'POST' => [
-                '/create' => 'postCreate',
-                '/update' => 'postUpdate',
-                '/delete' => 'postDelete',
+                '/create/{sportId}'    => 'postCreate',
+                '/update/{divisionId}' => 'postModify',
+                '/delete'              => 'postDelete',
             ]
         ];
 
@@ -55,6 +57,32 @@ class Module extends BaseModule
         foreach ($routes['POST'] as $path => $alias) {
             $this->addPostRoute($router, $alias, $basePath, $path);
         }
+    }
+
+    /**
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        $this->addRoutePreload($matcher, '(?:postCreate)', function ($params) {
+            /** @var DivisionModel $division */
+            $division = Mapper::getInstance()->createModel();
+            $division->setCreatedAt(\Alaress_Date_Format::now());
+
+            return [
+                'params' => $params,
+                'division' => $division
+            ];
+        });
+
+        $this->addRoutePreload($matcher, '(?:postModify)', function ($params) {
+            $division = Mapper::getInstance()->findById($params['divisionId']);
+
+            return [
+                'params' => $params,
+                'division' => $division
+            ];
+        });
     }
 
     /**
