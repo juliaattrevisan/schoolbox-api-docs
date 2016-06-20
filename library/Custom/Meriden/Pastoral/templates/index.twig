@@ -232,49 +232,41 @@
     {% endif %}
 </div>
 
-<div id="pastoral-report">
-
-    {##
-     # Subjects: exactly the same as the subject list on /search/user/{{ report.student.id }},
-     # except I guess they will link to this page instead.
-     #
-     # Meriden have requested that no email links display on this page,
-     # due to the possiblilty of parents getting drunk and sending emails to teachers.
-     #}
-    <div class="directory">
-        <div class="subjects">
-            <div id="subject-info">
-                <h2>Subjects</h2>
-                {# Split half the subjects in one column, half in the other #}
-                {% set reportHalf = (report.subjectList|length / 2)|round(0, 'ceil') %}
-                <ul>
-                    {% for subject in report.subjectList|slice(0, reportHalf) %}
-                        {% include '@customMeridenPastoral/sub/subject.twig' with {
-                            student: report.student,
-                            year: report.tutorGroupReport.year,
-                            subject: subject,
-                            showEmail: false,
-                            showPortrait: false
-                        } %}
-                    {% endfor %}
-                </ul>
-                {##
-                 # The second half has a ul per subject,
-                 # the first only has a single ul for all subjects.
-                 # Go figure!
-                 #}
+{# Subject list #}
+<div class="row">
+    <h2 class="subheader">Subjects</h2>
+    {% set reportHalf = (report.subjectList|length / 2)|round(0, 'ceil') %}
+    <section>
+        {##
+         # Subjects: exactly the same as the subject list on /search/user/{{ report.student.id }},
+         # except I guess they will link to this page instead.
+         #
+         # Meriden have requested that no email links display on this page,
+         # due to the possiblilty of parents getting drunk and sending emails to teachers.
+         #}
+        <div class="row">
+            <div class="small-12 medium-6 column">
+                {% for subject in report.subjectList|slice(0, reportHalf) %}
+                    {% include '@customMeridenPastoral/sub/subject.twig' with {
+                        student: report.student,
+                        year: report.tutorGroupReport.year,
+                        subject: subject,
+                        showEmail: false,
+                        showPortrait: false
+                    } %}
+                {% endfor %}
+            </div>
+            <div class="small-12 medium-6 column">
                 {% for subject in report.subjectList|slice(reportHalf) %}
-                    <ul>
-                        {% include '@customMeridenPastoral/sub/subject.twig' with {
-                            student: report.student,
-                            year: report.tutorGroupReport.year,
-                            subject: subject,
-                            showEmail: false,
-                            showPortrait: false}
-                        %}
-                    </ul>
+                    {% include '@customMeridenPastoral/sub/subject.twig' with {
+                    student: report.student,
+                    year: report.tutorGroupReport.year,
+                    subject: subject,
+                    showEmail: false,
+                    showPortrait: false
+                    } %}
                 {% endfor %}
             </div>
         </div>
-    </div>
+    </section>
 </div>
