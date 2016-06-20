@@ -13,6 +13,7 @@ use Alaress\Application\Kernel;
 use Schoolbox\SportsFixtures\Module;
 use Schoolbox\SportsFixtures\Sport\Module as SportModule;
 use Schoolbox\SportsFixtures\Division\Module as DivisionModule;
+use Schoolbox\SportsFixtures\Team\Module as TeamModule;
 
 class SportsFixtures implements ModuleConfigInterface
 {
@@ -33,6 +34,10 @@ class SportsFixtures implements ModuleConfigInterface
 
         $messagesModule = new DivisionModule($kernel->getDependencyInjector());
         $messagesModule->init('/sportsfixtures/division');
+
+        $messagesModule = new TeamModule($kernel->getDependencyInjector());
+        $messagesModule->init('/sportsfixtures/team');
+
     }
 
 } 

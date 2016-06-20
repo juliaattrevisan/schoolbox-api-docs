@@ -1,0 +1,71 @@
+<script type="text/javascript">
+    $(function() {
+        $('#divisionForm').alaressValidate({
+            rules: {
+                name: {
+                    required: true,
+                    minlength: 2
+                },
+                sportId: {
+                    min: 1
+                }
+            },
+            messages: {
+                'divisionId': 'Please choose a Division.',
+                'name': 'Please enter a Team name.'
+            },
+            errorPlacement: function(error, element) {
+                $.alaressValidate.defaultErrorPlacement(error, element);
+            }
+        })
+    });
+</script>
+
+<ul class="breadcrumb">
+    <li><a href="#">Sports Fixtures</a></li>
+    <li><a href="/sportsfixtures/sport/list">All Sports</a></li>
+    <li><a href="/sportsfixtures/division/list/{{ sport.id }}">Divisions in {{ sport.name }}</a></li>
+    <li><a href="/sportsfixtures/division/update/{{ division.id }}">{{ division.name }}</a></li>
+    <li><a href="/sportsfixtures/team/list/{{ division.id }}">Teams in {{ division.name }}</a></li>
+
+    {% if team.id %}
+    <li class="active"><a href="/sportsfixtures/team/update/{{ team.id }}">{{ team.name }}</a></li>
+    {% else %}
+    <li class="active"><a href="#">{{ action }}</a></li>
+    {% endif %}
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sports Fixtures</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form id='teamForm' action="/sportsfixtures/team/{% if team %}update/{{ team.id }}{% else %}create/{{ division.id }}{% endif %}" method="post">
+            <h2 class="subheader">{{ action }} Team in {{ division.name }}</h2>
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="divisionId" value="{{ division.id }}"/>
+                        <input type="hidden" name="teamId" value="{{ team.id }}"/>
+
+                        <label>
+                            Name
+                            <input type="text" name="name" value="{{ team.name }}"/>
+                        </label>
+
+                        <label>
+                            Url
+                            <input type="text" name="url" value="{{ team.url }}" />
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="{{ action }} Team" />
+        </form>
+    </div>
+</div>
