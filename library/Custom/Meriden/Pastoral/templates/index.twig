@@ -20,8 +20,9 @@
     <div class="small-12 columns">
         <h1>School Report - {{ report.tutorGroupReport.year }}</h1>
     </div>
+</div>
 
-
+<div class="row">
     <div class="small-12 medium-5 island">
         <section>
             {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
@@ -37,8 +38,10 @@
             } %}
         </section>
     </div>
+</div>
 
-    {# House info #}
+{# House info #}
+<div class="row">
     <div class="small-12 medium-4 island">
         <dl>
             <dt>House</dt>
@@ -53,7 +56,7 @@
             {% endfor %}
         </dl>
     </div>
-    <div class="small-12 medium-4 island">
+    <div class="small-12 medium-4 island end">
         <dl>
             <dt>Tutor</dt>
             {# Show only the last tutor (as list is ordered by semester asc #}
@@ -64,8 +67,10 @@
             {% endfor %}
         </dl>
     </div>
+</div>
 
-    {# Attendance info #}
+{# Attendance info #}
+<div class="row">
     <div class="small-12 medium-4 island">
         <dl>
             <dt>Days Absent</dt>
@@ -168,7 +173,7 @@
             </dd>
         </dl>
     </div>
-    <div class="small-12 medium-4 island">
+    <div class="small-12 medium-4 island end">
         <dl>
             {##
              # Athletics, Swimming, Camp, Uniform, Pastoral Services:
@@ -180,10 +185,13 @@
             {% endfor %}
         </dl>
     </div>
+</div>
 
-    {# Awards info #}
+{# Awards info #}
+<div class="row">
+    {# Please excuse the "end" logic #}
     {% if not report.tutorGroupReport.activities.awards is empty %}
-    <div class="small-12 medium-4 island">
+    <div class="small-12 medium-4 island {% if report.tutorGroupReport.activities.positions is empty and report.tutorGroupReport.activities.service is empty and report.tutorGroupReport.activities.cocurricular is empty %}end{% endif %}">
         <dl>
             <dt>Awards and Prizes</dt>
             {% for award in report.tutorGroupReport.activities.awards %}
@@ -193,7 +201,7 @@
     </div>
     {% endif %}
     {% if not report.tutorGroupReport.activities.cocurricular is empty %}
-    <div class="small-12 medium-4 island">
+    <div class="small-12 medium-4 island {% if report.tutorGroupReport.activities.positions is empty and report.tutorGroupReport.activities.service is empty %}end{% endif %}">
         <dl>
             <dt>Co-curricular Activities</dt>
             {% for activity in report.tutorGroupReport.activities.cocurricular %}
@@ -203,7 +211,7 @@
     </div>
     {% endif %}
     {% if not report.tutorGroupReport.activities.service is empty %}
-    <div class="small-12 medium-4 island">
+    <div class="small-12 medium-4 island {% if report.tutorGroupReport.activities.positions is empty %}end{% endif %}">
         <dl>
             <dt>Community Service</dt>
             {% for service in report.tutorGroupReport.activities.service %}
@@ -213,7 +221,7 @@
         </dl>
     </div>
     {% if not report.tutorGroupReport.activities.positions is empty %}
-    <div class="small-12 medium-4 island">
+    <div class="small-12 medium-4 island end">
         <dl>
             <dt>Positions of Office</dt>
             {% for position in report.tutorGroupReport.activities.positions %}
