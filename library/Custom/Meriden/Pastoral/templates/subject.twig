@@ -59,7 +59,9 @@
         <h2 class="subheader">Course Grade</h2>
         <p class="meta">[<a href="/homepage/3403">Grade Description</a>]</p>
         <section>
-            {% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.courseGrade} %}
+            <div class="content">
+                {% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.courseGrade} %}
+            </div>
         </section>
 
         {# grade distribution - other student's values for course grade #}
