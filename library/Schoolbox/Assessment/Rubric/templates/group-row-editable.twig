@@ -1,7 +1,7 @@
 {# ensure these are set #}
 {%- set rubricId  = rubricId ?: 'rb-' ~ rubric.id -%}
 {%- set groupId   = groupId ?: rubricId ~ '-' ~ group.id -%}
-{%- set groupName = groupName ? group.name ? group.name : '(no ' ~ locale.rubricGroup ~ ')' -%}
+{%- set groupName = groupName ? group.name ? group.name : '(no ' ~ locale.translate('rubricGroup') ~ ')' -%}
 {%- set groupInput = groupInput ?: formField ~ '[' ~ rubric.id ~ '][group]['  ~ group.id ~ ']' -%}
 
 {%- if rowspan is not null -%}
