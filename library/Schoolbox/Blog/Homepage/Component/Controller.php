@@ -73,15 +73,16 @@ class Controller extends Component_Homepage_ControllerAbstract
         }
 
         // Check if using local or alt source
-
         $folderId = $this->isUsingAltSource() ? $this->getConfig("src") : $this->getInstance()->getIdentifier();
 
-        // Get all the blog entries for this source, limit to the number specified in blog component config
+        // Limit to the number specified in blog component config (0 == 'ALL')
+        $limit = 0 == $this->getConfig('size') ? null : $this->getConfig('size');
 
+        // Get specified number of blog entries for this source
         $blogs = $this->getBlogMapper()
             ->findByColumn("folder_id", $folderId)
             ->sortBy('createdAt', 'desc')
-            ->limit(0, $this->getConfig('size'));
+            ->limit(0, $limit);
 
         // Grab comments and image gallery items for each blog post
 
