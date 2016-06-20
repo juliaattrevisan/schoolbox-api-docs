@@ -1,0 +1,19 @@
+<script>
+    $(function() {
+        $('[data-portal]').click(function() {
+            window.loginWindow = window.open('/synRedir.php', 'synRedir', 'height=50,width=50');
+            setTimeout(function() {
+                window.loginWindow.close();
+                window.location.reload();
+            }, 5000);
+        });
+    });
+</script>
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">Community Portal Login</h2>
+        <section class="content">
+            <a href="#" data-portal class="button expand">Click Here To Launch Community Portal</a>
+        </section>
+    </div>
+</div>
