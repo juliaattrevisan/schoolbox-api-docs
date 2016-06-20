@@ -11,11 +11,13 @@ namespace Schoolbox\SportsFixtures\Sport;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Twig_Error_Loader;
 use Twig_Loader_Chain;
 use \Schoolbox\Permission\Access\UserAccess;
+use \Schoolbox\SportsFixtures\Sport\Model as Sport;
 
 class Module extends BaseModule
 {
@@ -43,7 +45,7 @@ class Module extends BaseModule
             ],
             'POST' => [
                 '/create'           => 'postCreate',
-                '/update/{sportId}' => 'postUpdate',
+                '/update/{sportId}' => 'postModify',
                 '/delete'           => 'postDelete',
             ]
         ];
@@ -55,6 +57,32 @@ class Module extends BaseModule
         foreach ($routes['POST'] as $path => $alias) {
             $this->addPostRoute($router, $alias, $basePath, $path);
         }
+    }
+
+    /**
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        $this->addRoutePreload($matcher, '(?:postCreate)', function ($params) {
+            /** @var Sport $sport */
+            $sport = Mapper::getInstance()->createModel();
+            $sport->setCreatedAt(\Alaress_Date_Format::now());
+
+            return [
+                'params' => $params,
+                'sport' => $sport
+            ];
+        });
+
+        $this->addRoutePreload($matcher, '(?:postModify)', function ($params) {
+            $sport = Mapper::getInstance()->findById($params['sportId']);
+
+            return [
+                'params' => $params,
+                'sport' => $sport
+            ];
+        });
     }
 
     /**

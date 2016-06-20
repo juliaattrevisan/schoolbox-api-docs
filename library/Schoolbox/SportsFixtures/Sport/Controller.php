@@ -112,28 +112,27 @@ class Controller extends Base
     }
 
     /**
-     * Save a Sport
+     * Create a Sport
+     *
+     * @param Sport $sport
      */
-    public function postCreate()
+    public function postCreate(Sport $sport)
     {
-        $sport = $this->getSportMapper()->createModel();
-        $sport->setCreatedAt(\Alaress_Date_Format::now());
-
-        $this->saveSport($sport);
+        $this->postModify($sport);
     }
 
     /**
-     * Save a Sport
+     * Modify a Sport
+     *
+     * @param Sport $sport
      */
-    public function postUpdate()
+    public function postModify(Sport $sport)
     {
         try {
-            /** @var Sport $sport */
-            $sport = $this->getSportMapper()->findById($this->getRequest()->post['sportId']);
+            $this->saveSport($sport, $this->getRequest()->post['name'], $this->getRequest()->post['url']);
 
-            $this->saveSport($sport);
-        }
-        catch (MapperException $e) {
+            $this->getResponse()->redirect->afterPost("/sportsfixtures/sport/list");
+        } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);
         }
     }
@@ -157,23 +156,16 @@ class Controller extends Base
      * Save Sport data to db
      *
      * @param Sport $sport
+     * @param string $name
+     * @param string $url
      */
-    private function saveSport(Sport $sport)
+    private function saveSport(Sport $sport, $name, $url)
     {
-        try {
+        $sport->setName($name);
+        $sport->setUrl($url);
+        $sport->setUpdatedAt(\Alaress_Date_Format::now());
 
-            /** @var Sport $sport */
-            $sport->setName($this->getRequest()->post['name']);
-            $sport->setUrl($this->getRequest()->post['url']);
-            $sport->setUpdatedAt(\Alaress_Date_Format::now());
-
-            $this->getSportMapper()->save($sport);
-
-            $this->getResponse()->redirect->afterPost('/sportsfixtures/sport/list');
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
-        }
+        $this->getSportMapper()->save($sport);
     }
 
     /* Getters/Setters

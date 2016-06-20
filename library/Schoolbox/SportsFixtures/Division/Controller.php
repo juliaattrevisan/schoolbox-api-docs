@@ -162,6 +162,7 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(2);
         }
     }
+
     /**
      * Delete a Division
      */
