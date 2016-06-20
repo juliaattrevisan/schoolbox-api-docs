@@ -38,32 +38,28 @@ class Controller extends Base
 
     /**
      * List of Divisions and the Sport they are in
+     *
+     * @param $id
      */
-    public function getList()
+    public function getList($id)
     {
-        /* TODO: Not sure if we need this here
-         * but I'll set it up anyway just in case
-         */
-        $allSports = SportMapper::getInstance()->findAll([
-            'order' => [
-                'name' => 'asc'
-            ]
-        ]);
+        try {
+            $sport = SportMapper::getInstance()->findById($id);
 
-        $allDivisions = [];
-
-        foreach($allSports as $currentSport) {
-            $allDivisions[$currentSport->getId()]['sport'] = $currentSport;
-            $allDivisions[$currentSport->getId()]['allDivisions'] = Mapper::getInstance()->findByColumn('sport_id', $currentSport->getId(), [
+            $allDivisions = Mapper::getInstance()->findByColumn('sport_id', $sport->getId(), [
                 'order' => [
                     'name' => 'asc'
                 ]
             ]);
-        }
 
-        $this->tpl('list', [
-            'allSports' => $allDivisions
-        ]);
+            $this->tpl('list', [
+                'sport' => $sport,
+                'allDivisions' => $allDivisions
+            ]);
+        }
+        catch (MapperException $e) {
+            throw ErrorMapper::getInstance()->generateException(2);
+        }
     }
 
     /**
@@ -171,7 +167,7 @@ class Controller extends Base
 
             Mapper::getInstance()->save($division);
 
-            $this->getResponse()->redirect->afterPost('/sportsfixtures/division/list');
+            $this->getResponse()->redirect->afterPost("/sportsfixtures/division/list/{$sport->getId()}");
         }
         catch (MapperException $e) {
             throw ErrorMapper::getInstance()->generateException(2);

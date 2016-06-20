@@ -18,8 +18,8 @@
 </script>
 <ul class="breadcrumb">
     <li><a href="#">Sports Fixtures</a></li>
-    <li><a href="#">Divisions</a></li>
-    <li class="active"><a href="#">List</a></li>
+    <li><a href="/sportsfixtures/sport/list">All Sports</a></li>
+    <li class="active"><a href="/sportsfixtures/division/list/{{ sport.id }}">Divisions in {{ sport.name }}</a></li>
 </ul>
 
 <div class="row">
@@ -31,39 +31,41 @@
 <div class="row">
     <div class="small-12 island" id="allSports">
 
-        {% for id, sportData in allSports %}
         <div class="actions-small-1 row">
             <div class="list-item">
                 <div class="small-12 columns">
-                    <h2 class="subheader">{{ sportData.sport.name }}</h2>
+                    <h2 class="subheader">{{ sport.name }}</h2>
                 </div>
             </div>
             <nav>
-                <a href='/sportsfixtures/division/create/{{ sportData.sport.id }}' class="icon-add" title="Add Division to {{ sportData.sport.name }}"></a>
+                <a href='/sportsfixtures/division/create/{{ sport.id }}' class="icon-add" title="Add Division to {{ sportData.sport.name }}"></a>
             </nav>
         </div>
 
+        {% if allDivisions|length %}
         <section>
-            <ul class="information-list">
-                <li>
-                    <ul class="action-list">
-                        {% for currentDivision in sportData.allDivisions %}
-                        <li class="actions-small-1">
-                            <div class="list-item">
-                                <div class="small-12 avatar card">
-                                    <p>{{ currentDivision.name }}</p>
-                                </div>
-                            </div>
-                            <nav>
-                                <a href="/sportsfixtures/division/delete" class="icon-delete" title="Delete" data-delete="{{ currentDivision.id }}"></a>
-                                <a href="/sportsfixtures/division/update/{{ currentDivision.id }}" class="icon-modify" title="Modify"></a>
-                            </nav>
-                        </li>
-                        {% endfor %}
-                    </ul>
+            <ul class="action-list">
+                {% for currentDivision in allDivisions %}
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="small-12 avatar card">
+                            <p>{{ currentDivision.name }}</p>
+                        </div>
+                    </div>
+                    <nav>
+                        <a href="/sportsfixtures/division/delete" class="icon-delete" title="Delete" data-delete="{{ currentDivision.id }}"></a>
+                        <a href="/sportsfixtures/division/update/{{ currentDivision.id }}" class="icon-modify" title="Modify"></a>
+                    </nav>
                 </li>
+                {% endfor %}
             </ul>
         </section>
-        {% endfor %}
+        {% else %}
+        <div class="empty-state">
+            <i class="icon-sport"></i>
+            <p>There are no Divisions in {{ sport.name }}.</p>
+            <p><a href="/sportsfixtures/division/create/{{ sport.id }}" title="Add a Division">Add a Division</a></p>
+        </div>
+        {% endif %}
     </div>
 </div>

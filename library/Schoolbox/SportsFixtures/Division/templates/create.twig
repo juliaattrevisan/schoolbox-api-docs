@@ -23,8 +23,14 @@
 
 <ul class="breadcrumb">
     <li><a href="#">Sports Fixtures</a></li>
-    <li><a href="/sportsfixtures/division/list">Divisions</a></li>
+    <li><a href="/sportsfixtures/sport/list">All Sports</a></li>
+    <li><a href="/sportsfixtures/division/list/{{ sport.id }}">Divisions in {{ sport.name }}</a></li>
+
+    {% if division.id %}
+    <li class="active"><a href="/sportsfixtures/division/update/{{ division.id }}">{{ division.name }}</a></li>
+    {% else %}
     <li class="active"><a href="#">{{ action }}</a></li>
+    {% endif %}
 </ul>
 
 <div class="row">
