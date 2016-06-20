@@ -108,7 +108,7 @@ class Controller extends Base
      */
     public function postCreate()
     {
-        $sport = new Model();
+        $sport = $this->getSportMapper()->createModel();
         $sport->setCreatedAt(\Alaress_Date_Format::now());
 
         $this->saveSport($sport);

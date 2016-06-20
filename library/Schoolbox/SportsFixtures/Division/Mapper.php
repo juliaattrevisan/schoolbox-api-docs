@@ -16,6 +16,11 @@ use Schoolbox\User;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
 
+/**
+ * Class Mapper
+ * @method Model createModel()
+ * @package Schoolbox\SportsFixtures\Division
+ */
 class Mapper extends BaseMapper
 {
     /**

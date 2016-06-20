@@ -135,7 +135,7 @@ class Controller extends Base
      */
     public function postCreate()
     {
-        $division = new Model();
+        $division = $this->getDivisionMapper()->createModel();
         $division->setCreatedAt(\Alaress_Date_Format::now());
 
         $this->saveDivision($division);

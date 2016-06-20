@@ -16,6 +16,11 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 
+/**
+ * Class Mapper
+ * @method Model createModel()
+ * @package Schoolbox\SportsFixtures\Sport
+ */
 class Mapper extends BaseMapper
 {
     /**
