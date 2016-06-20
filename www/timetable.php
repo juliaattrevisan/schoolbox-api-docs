@@ -93,9 +93,10 @@ foreach ($userList as $user) {
             $colourIndex = 0;
 
             $outputUser = array(
-                'PERSON'  => $user->formatName(),
-                'YEAR'    => $user->getYear() ? ', Year ' . $user->getYear() : '',
-                'USER_ID' => $user->getId(),
+                'PERSON'    => $user->formatName(),
+                'YEAR'      => $user->getYear() ? ', Year ' . $user->getYear() : '',
+                'USER_ID'   => $user->getId(),
+                'CAMPUS_ID' => $campus->getId(),
             );
 
             $this->setVar($outputUser);
