@@ -616,6 +616,12 @@ class Controller extends Base {
                     'arguments'      => json_encode($arg)
                 ];
 
+                // treat skips special-like
+                if ($effectTypeMapper->isSkip($effectData['type'])) {
+                    $effect['arguments'] = json_encode([]);
+                }
+
+
                 $mapper->save($mapper->hydrate($effect));
             }
         }
