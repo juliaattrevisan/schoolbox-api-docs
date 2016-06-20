@@ -120,25 +120,27 @@ class Controller extends Base
     }
 
     /**
-     * Update a Division
+     * Update a Team
      *
-     * @param int $divisionId
+     * @param int $teamId
      */
-    public function getUpdate($divisionId)
+    public function getUpdate($teamId)
     {
-//        try {
-//            $division = $this->getDivisionMapper()->findById($divisionId);
-//            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
-//
-//            $this->tpl('create', [
-//                'division' => $division,
-//                'sport' => $sport,
-//                'action' => 'Modify'
-//            ]);
-//        }
-//        catch (MapperException $e) {
-//            throw $this->getErrorMapper()->generateException(2);
-//        }
+        try {
+            $team = $this->getTeamMapper()->findById($teamId);
+            $division = $this->getDivisionMapper()->findById($team->getDivision()->getId());
+            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
+
+            $this->tpl('create', [
+                'team' => $team,
+                'division' => $division,
+                'sport' => $sport,
+                'action' => 'Modify'
+            ]);
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(2);
+        }
     }
 
     /**
@@ -257,7 +259,6 @@ class Controller extends Base
     {
         $this->teamMapper = $teamMapper;
     }
-
 
     /**
      * @return ErrorMapper
