@@ -1,6 +1,11 @@
 /**
  * Styles for Meriden's pastoral page
  */
+@media print {
+    html, body {
+        max-width: 100%;
+    }
+}
 /*
 @media print {
     #pastoral-report,
