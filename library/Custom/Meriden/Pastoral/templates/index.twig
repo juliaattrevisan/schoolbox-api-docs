@@ -234,8 +234,9 @@
 
 {# Subject list #}
 <div class="row">
-    <h2 class="subheader">Subjects</h2>
-    {% set reportHalf = (report.subjectList|length / 2)|round(0, 'ceil') %}
+    <div class="small-12 column">
+        <h2 class="subheader">Subjects</h2>
+    </div>
     <section>
         {##
          # Subjects: exactly the same as the subject list on /search/user/{{ report.student.id }},
@@ -245,6 +246,7 @@
          # due to the possiblilty of parents getting drunk and sending emails to teachers.
          #}
         <div class="row">
+            {% set reportHalf = (report.subjectList|length / 2)|round(0, 'ceil') %}
             <div class="small-12 medium-6 column">
                 {% for subject in report.subjectList|slice(0, reportHalf) %}
                     {% include '@customMeridenPastoral/sub/subject.twig' with {
