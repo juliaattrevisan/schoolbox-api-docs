@@ -42,22 +42,22 @@
 
 {# House info #}
 <div class="row">
-    <div class="small-12 medium-4 island">
-        <dl>
+    <div class="small-12 medium-4 column">
+        <dl class="content">
             <dt>House</dt>
             <dd>{{ report.student.schoolHouse.house }}</dd>
         </dl>
     </div>
-    <div class="small-12 medium-4 island">
-        <dl>
+    <div class="small-12 medium-4 column">
+        <dl class="content">
             <dt>Year Coordinator</dt>
             {% for coordinator in report.tutorGroupReport.coordinators %}
                 <dd><a href="/search/user/{{ coordinator.id }}">{{ coordinator.formatName }}</a></dd>
             {% endfor %}
         </dl>
     </div>
-    <div class="small-12 medium-4 island end">
-        <dl>
+    <div class="small-12 medium-4 column end">
+        <dl class="content">
             <dt>Tutor</dt>
             {# Show only the last tutor (as list is ordered by semester asc #}
             {% for tutor in report.tutorGroupReport.tutors %}
@@ -71,35 +71,35 @@
 
 {# Attendance info #}
 <div class="row">
-    <div class="small-12 medium-4 island">
-        <dl>
+    <div class="small-12 medium-4 column">
+        <dl class="content">
             <dt>Days Absent</dt>
             <dd>{{ report.tutorGroupReport.attendances.absent }}</dd>
         </dl>
     </div>
-    <div class="small-12 medium-4 island">
-        <dl>
+    <div class="small-12 medium-4 column">
+        <dl class="content">
             <dt>Days Late</dt>
             <dd>{{ report.tutorGroupReport.attendances.late }}</dd>
         </dl>
     </div>
-    <div class="small-12 medium-4 island">
-        <dl>
+    <div class="small-12 medium-4 column">
+        <dl class="content">
             <dt>Detentions</dt>
             <dd>{{ report.tutorGroupReport.attendances.detentions }}</dd>
         </dl>
     </div>
     {# Don't show endorsed leave at all if there is none #}
     {% if report.tutorGroupReport.attendances.endorsedLeave %}
-        <div class="small-12 medium-4 island">
-            <dl>
+        <div class="small-12 medium-4 column">
+            <dl class="content">
                 <dt>Endorsed Leave</dt>
                 <dd>{{ report.tutorGroupReport.attendances.endorsedLeave }}</dd>
             </dl>
         </div>
     {% endif %}
-    <div class="small-12 medium-4 island">
-        <dl>
+    <div class="small-12 medium-4 column">
+        <dl class="content">
             <dt>Athletics Carnival</dt>
             <dd>
                 {% if report.tutorGroupReport.namedGrades.athletics %}
@@ -113,8 +113,8 @@
             </dd>
         </dl>
     </div>
-    <div class="small-12 medium-4 island">
-        <dl>
+    <div class="small-12 medium-4 column">
+        <dl class="content">
             <dt>Swimming Carnival</dt>
             <dd>
                 {% if report.tutorGroupReport.namedGrades.swimming %}
@@ -128,8 +128,8 @@
             </dd>
         </dl>
     </div>
-    <div class="small-12 medium-4 island">
-        <dl>
+    <div class="small-12 medium-4 column">
+        <dl class="content">
             <dt>School Camp</dt>
             <dd>
                 {% if report.tutorGroupReport.namedGrades.camp %}
@@ -143,8 +143,8 @@
             </dd>
         </dl>
     </div>
-    <div class="small-12 medium-4 island">
-        <dl>
+    <div class="small-12 medium-4 column">
+        <dl class="content">
             <dt>Uniform</dt>
             <dd>
                 {% if report.tutorGroupReport.namedGrades.uniform %}
@@ -158,8 +158,8 @@
             </dd>
         </dl>
     </div>
-    <div class="small-12 medium-4 island">
-        <dl>
+    <div class="small-12 medium-4 column">
+        <dl class="content">
             <dt>Pastoral activities involvement</dt>
             <dd>
                 {% if report.tutorGroupReport.namedGrades.pastoral %}
@@ -173,8 +173,8 @@
             </dd>
         </dl>
     </div>
-    <div class="small-12 medium-4 island end">
-        <dl>
+    <div class="small-12 medium-4 column end">
+        <dl class="content">
             {##
              # Athletics, Swimming, Camp, Uniform, Pastoral Services:
              # All these are attendances, and are based off of assessments in the grade page.
@@ -191,8 +191,8 @@
 <div class="row">
     {# Please excuse the "end" logic #}
     {% if not report.tutorGroupReport.activities.awards is empty %}
-    <div class="small-12 medium-4 island {% if report.tutorGroupReport.activities.positions is empty and report.tutorGroupReport.activities.service is empty and report.tutorGroupReport.activities.cocurricular is empty %}end{% endif %}">
-        <dl>
+    <div class="small-12 medium-4 column {% if report.tutorGroupReport.activities.positions is empty and report.tutorGroupReport.activities.service is empty and report.tutorGroupReport.activities.cocurricular is empty %}end{% endif %}">
+        <dl class="content">
             <dt>Awards and Prizes</dt>
             {% for award in report.tutorGroupReport.activities.awards %}
                 <dd>{{ award.act_desc }}</dd>
@@ -201,8 +201,8 @@
     </div>
     {% endif %}
     {% if not report.tutorGroupReport.activities.cocurricular is empty %}
-    <div class="small-12 medium-4 island {% if report.tutorGroupReport.activities.positions is empty and report.tutorGroupReport.activities.service is empty %}end{% endif %}">
-        <dl>
+    <div class="small-12 medium-4 column {% if report.tutorGroupReport.activities.positions is empty and report.tutorGroupReport.activities.service is empty %}end{% endif %}">
+        <dl class="content">
             <dt>Co-curricular Activities</dt>
             {% for activity in report.tutorGroupReport.activities.cocurricular %}
                 <dd>{{ activity.act_desc }}</dd>
@@ -211,8 +211,8 @@
     </div>
     {% endif %}
     {% if not report.tutorGroupReport.activities.service is empty %}
-    <div class="small-12 medium-4 island {% if report.tutorGroupReport.activities.positions is empty %}end{% endif %}">
-        <dl>
+    <div class="small-12 medium-4 column {% if report.tutorGroupReport.activities.positions is empty %}end{% endif %}">
+        <dl class="content">
             <dt>Community Service</dt>
             {% for service in report.tutorGroupReport.activities.service %}
                 <dd>{{ service.act_desc }}</dd>
@@ -221,8 +221,8 @@
         </dl>
     </div>
     {% if not report.tutorGroupReport.activities.positions is empty %}
-    <div class="small-12 medium-4 island end">
-        <dl>
+    <div class="small-12 medium-4 column end">
+        <dl class="content">
             <dt>Positions of Office</dt>
             {% for position in report.tutorGroupReport.activities.positions %}
                 <dd>{{ position.act_desc }}</dd>
