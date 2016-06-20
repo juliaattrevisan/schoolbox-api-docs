@@ -65,22 +65,24 @@
         {# grade distribution - other student's values for course grade #}
         <h2 class="subheader">Grade Distribution</h2>
         <section>
-            <table>
-                <thead>
-                <tr>
-                    {% for gradeLevel,_ in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
-                        <th>{{ gradeLevel }}</th>
-                    {% endfor %}
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    {% for _,results in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
-                        <td>{{ results|length }}</td>
-                    {% endfor %}
-                </tr>
-                </tbody>
-            </table>
+            <div class="scrollable">
+                <table>
+                    <thead>
+                    <tr>
+                        {% for gradeLevel,_ in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
+                            <th>{{ gradeLevel }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        {% for _,results in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
+                            <td>{{ results|length }}</td>
+                        {% endfor %}
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </section>
         {% endif %}
 

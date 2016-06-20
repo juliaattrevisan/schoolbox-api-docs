@@ -1,18 +1,20 @@
 {% if grade.rubric.groups %}
-    <table>
-        {% for group in grade.rubric.groups %}
-            {% for criterion in group.criteria %}
-                {% for descriptor in criterion.descriptors %}
-                    {% if descriptor.selected %}
-                        <tr>
-                            <th>{{ criterion.name }}</th>
-                            <td>{{ descriptor.text }}</td>
-                        </tr>
-                    {% endif %}
+    <div class="scrollable">
+        <table>
+            {% for group in grade.rubric.groups %}
+                {% for criterion in group.criteria %}
+                    {% for descriptor in criterion.descriptors %}
+                        {% if descriptor.selected %}
+                            <tr>
+                                <th>{{ criterion.name }}</th>
+                                <td>{{ descriptor.text }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
                 {% endfor %}
             {% endfor %}
-        {% endfor %}
-    </table>
+        </table>
+    </div>
 {% else %}
     <div class="content">
         {{ grade.pretty_mark }}
