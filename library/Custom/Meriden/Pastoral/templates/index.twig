@@ -217,9 +217,9 @@
             {% for service in report.tutorGroupReport.activities.service %}
                 <dd>{{ service.act_desc }}</dd>
             {% endfor %}
-        {% endif %}
         </dl>
     </div>
+    {% endif %}
     {% if not report.tutorGroupReport.activities.positions is empty %}
     <div class="small-12 medium-4 column end">
         <dl class="content">
