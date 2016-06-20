@@ -48,31 +48,21 @@
             {{ report.subjectReport.description }}
         </article>
     </div>
-
-
 </div>
 
-<div id="subject-report">
-
-    <dl id="course-info">
-        {# course grade - derived from grade for this class #}
-        {% if report.subjectReport.namedGrades.courseGrade
-           and report.subjectReport.namedGrades.courseGrade.assessment.isMarkShownToRole(user.role)
-        %}
-        <dt>
-            Course Grade
-            <div class="description-link">[<a href="/homepage/3403">Grade Description</a>]</div>
-        </dt>
-        <dd class="course-grade">
-            {%
-                include '@customMeridenPastoral/sub/assessmentResult.twig'
-                with {grade: report.subjectReport.namedGrades.courseGrade}
-            %}
-        </dd>
+{# course grade - derived from grade for this class #}
+<div class="row" id="course-info">
+    <div class="small-12 island">
+        {% if report.subjectReport.namedGrades.courseGrade and report.subjectReport.namedGrades.courseGrade.assessment.isMarkShownToRole(user.role) %}
+        <h2 class="subheader">Course Grade</h2>
+        [<a href="/homepage/3403">Grade Description</a>]
+        <section>
+            {% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.courseGrade} %}
+        </section>
 
         {# grade distribution - other student's values for course grade #}
-        <dt>Grade Distribution</dt>
-        <dd>
+        <h2 class="subheader">Grade Distribution</h2>
+        <section>
             <table>
                 <thead>
                 <tr>
@@ -89,11 +79,22 @@
                 </tr>
                 </tbody>
             </table>
-        </dd>
+        </section>
         {% endif %}
 
         {# Endeavor Grades - complicated enough to be its own template #}
         {% include '@customMeridenPastoral/sub/endeavourGrades.twig' %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+    </div>
+</div>
+
+<div id="subject-report">
+    <dl id="course-info">
+
 
         {# Approaches to learning - another rubric #}
         {% if report.subjectReport.namedGrades.learningApproaches
