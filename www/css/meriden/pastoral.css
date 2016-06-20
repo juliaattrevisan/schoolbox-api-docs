@@ -48,16 +48,17 @@
     font-size: 12px !important;
 }*/
 
-#meriden-crest {
+.meriden-crest {
     text-align: center;
 }
-#meriden-crest svg {
+.meriden-crest svg {
     width: 92px;
 }
+
+/*
 .teacher-profile.no-email {
     margin-right: 0;
 }
-/*
 
 !**
  * Undo default SB heading styles
