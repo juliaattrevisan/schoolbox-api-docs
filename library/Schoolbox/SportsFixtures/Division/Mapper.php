@@ -19,6 +19,7 @@ use Schoolbox\SportsFixtures\Division\Model as Division;
 /**
  * Class Mapper
  * @method Division createModel()
+ * @method Model findById($id)
  * @package Schoolbox\SportsFixtures\Division
  */
 class Mapper extends BaseMapper

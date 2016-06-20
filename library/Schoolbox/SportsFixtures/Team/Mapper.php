@@ -28,11 +28,11 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('sportsfixtures_division_team');
+        $this->hasTable('sportsfixtures_team');
         $this->hasModel(TeamModel::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('division_id', SportMapper::class, 'id', null, null, 'sport', 'sport');
+        $this->joins('division_id', SportMapper::class, 'id', null, null, 'division', 'division');
         $this->uses('name', self::TYPE_STRING);
         $this->uses('url', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);

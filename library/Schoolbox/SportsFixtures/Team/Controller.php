@@ -12,7 +12,10 @@ use Alaress\Web\Controller\Base;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
+use \Schoolbox\SportsFixtures\Division\Model as Division;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use \Schoolbox\SportsFixtures\Team\Model as Team;
+use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 
 class Controller extends Base
 {
@@ -28,6 +31,11 @@ class Controller extends Base
     protected $divisionMapper;
 
     /**
+     * @var TeamMapper
+     */
+    protected $teamMapper;
+
+    /**
      * @var ErrorMapper
      */
     protected $errorMapper;
@@ -39,6 +47,7 @@ class Controller extends Base
     {
         $this->setSportMapper(SportMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
+        $this->setTeamMapper(TeamMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
@@ -89,7 +98,7 @@ class Controller extends Base
     }
 
     /**
-     * Create a Division in a particular Sport id
+     * Create a Team in a particular Division id
      *
      * @param $divisionId
      */
@@ -131,36 +140,37 @@ class Controller extends Base
     }
 
     /**
-     * Create a Division
+     * Create a Team
      *
-     * @param Model $division
+     * @param Team $team
      */
-    public function postCreate(Model $division)
+    public function postCreate(Team $team)
     {
-//        /* Get around aura's weird regexing
-//         */
-//        $this->postModify($division);
+        /* Get around aura's weird regexing
+         */
+        $this->postModify($team);
     }
 
     /**
-     * Modify a Division
+     * Modify a Team
      *
-     * @param Model $division
+     * @param Team $team
      */
-    public function postModify(Model $division)
+    public function postModify(Team $team)
     {
-//        try {
-//            $sportId = $this->getRequest()->post['sportId'];
-//            $sport   = $this->getSportMapper()->findById($sportId);
-//
-//            $this->saveDivision($sport, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $division);
-//
-//            $this->getResponse()->redirect->afterPost("/sportsfixtures/division/list/{$sportId}");
-//
-//        } catch (MapperException $e) {
-//            throw $this->getErrorMapper()->generateException(2);
-//        }
+        try {
+            $divisionId = $this->getRequest()->post['divisionId'];
+            $division   = $this->getDivisionMapper()->findById($divisionId);
+
+            $this->saveTeam($division, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $team);
+
+            $this->getResponse()->redirect->afterPost("/sportsfixtures/team/list/{$divisionId}");
+
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(2);
+        }
     }
+
     /**
      * Delete a Division
      */
@@ -178,21 +188,21 @@ class Controller extends Base
     }
 
     /**
-     * Save Division data to db
+     * Save Team data to db
      *
-     * @param $sport
+     * @param Division $division
      * @param $name
      * @param $url
-     * @param Model $division
+     * @param Team $team
      */
-    private function saveDivision($sport, $name, $url, Model $division)
+    private function saveTeam(Division $division, $name, $url, Team $team)
     {
-//        $division->setName($name);
-//        $division->setUrl($url);
-//        $division->setSport($sport);
-//        $division->setUpdatedAt(\Alaress_Date_Format::now());
-//
-//        $this->getDivisionMapper()->save($division);
+        $team->setName($name);
+        $team->setUrl($url);
+        $team->setDivision($division);
+        $division->setUpdatedAt(\Alaress_Date_Format::now());
+
+        $this->getTeamMapper()->save($team);
     }
 
     /* Getters/Setters
@@ -229,6 +239,23 @@ class Controller extends Base
     {
         $this->divisionMapper = $divisionMapper;
     }
+
+    /**
+     * @return TeamMapper
+     */
+    public function getTeamMapper()
+    {
+        return $this->teamMapper;
+    }
+
+    /**
+     * @param TeamMapper $teamMapper
+     */
+    public function setTeamMapper($teamMapper)
+    {
+        $this->teamMapper = $teamMapper;
+    }
+
 
     /**
      * @return ErrorMapper
