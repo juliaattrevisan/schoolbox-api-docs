@@ -54,10 +54,10 @@
 
 {# course grade - derived from grade for this class #}
 <div class="row" id="course-info">
-    <div class="small-12 island">
+    <div class="small-12 column">
         {% if report.subjectReport.namedGrades.courseGrade and report.subjectReport.namedGrades.courseGrade.assessment.isMarkShownToRole(user.role) %}
         <h2 class="subheader">Course Grade</h2>
-        [<a href="/homepage/3403">Grade Description</a>]
+        <p class="meta">[<a href="/homepage/3403">Grade Description</a>]</p>
         <section>
             {% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.courseGrade} %}
         </section>
@@ -92,7 +92,7 @@
         {# Approaches to learning - another rubric #}
         {% if report.subjectReport.namedGrades.learningApproaches and report.subjectReport.namedGrades.learningApproaches.assessment.isMarkShownToRole(user.role) %}
         <h2 class="subheader">Approaches to Learning</h2>
-        [<a href="/homepage/3462">Grade Description</a>]
+        <p class="meta">[<a href="/homepage/3462">Grade Description</a>]</p>
         <section>
             {% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.learningApproaches} %}
         </section>
