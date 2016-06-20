@@ -31,7 +31,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form id='sportForm' action="/sportsfixtures/sport/{% if sport %}update{% else %}create{% endif %}" method="post">
+        <form id='sportForm' action="/sportsfixtures/sport/{% if sport %}update/{{ sport.id }}{% else %}create{% endif %}" method="post">
             <h2 class="subheader">{{ action }} Sport</h2>
 
             <section>

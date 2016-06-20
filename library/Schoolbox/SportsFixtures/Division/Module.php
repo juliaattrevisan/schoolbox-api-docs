@@ -17,7 +17,7 @@ use Aura\Router\Router;
 use Twig_Error_Loader;
 use Twig_Loader_Chain;
 use \Schoolbox\Permission\Access\UserAccess;
-use \Schoolbox\SportsFixtures\Division\Model as DivisionModel;
+use \Schoolbox\SportsFixtures\Division\Model as Division;
 
 class Module extends BaseModule
 {
@@ -65,7 +65,7 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
         $this->addRoutePreload($matcher, '(?:postCreate)', function ($params) {
-            /** @var DivisionModel $division */
+            /** @var Division $division */
             $division = Mapper::getInstance()->createModel();
             $division->setCreatedAt(\Alaress_Date_Format::now());
 

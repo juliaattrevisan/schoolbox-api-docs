@@ -11,6 +11,7 @@ namespace Schoolbox\SportsFixtures\Sport;
 use Alaress\Web\Controller\Base;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
+use \Schoolbox\SportsFixtures\Sport\Model as Sport;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 
@@ -93,12 +94,12 @@ class Controller extends Base
     /**
      * Update a Sport
      *
-     * @param int $id
+     * @param int $sportId
      */
-    public function getUpdate($id)
+    public function getUpdate($sportId)
     {
         try {
-            $sport = $this->getSportMapper()->findById($id);
+            $sport = $this->getSportMapper()->findById($sportId);
 
             $this->tpl('create', [
                 'sport' => $sport,
@@ -127,8 +128,8 @@ class Controller extends Base
     public function postUpdate()
     {
         try {
-            /** @var Model $sport */
-            $sport = $this->getSportMapper()->findById($this->getRequest()->post['id']);
+            /** @var Sport $sport */
+            $sport = $this->getSportMapper()->findById($this->getRequest()->post['sportId']);
 
             $this->saveSport($sport);
         }
@@ -143,8 +144,8 @@ class Controller extends Base
     public function postDelete()
     {
         try {
-            /** @var Model $sport */
-            $sport = $this->getSportMapper()->findById($this->getRequest()->post['id']);
+            /** @var Sport $sport */
+            $sport = $this->getSportMapper()->findById($this->getRequest()->post['sportId']);
             $this->getSportMapper()->delete($sport);
         }
         catch (MapperException $e) {
@@ -155,13 +156,13 @@ class Controller extends Base
     /**
      * Save Sport data to db
      *
-     * @param Model $sport
+     * @param Sport $sport
      */
-    private function saveSport(Model $sport)
+    private function saveSport(Sport $sport)
     {
         try {
 
-            /** @var \Schoolbox\SportsFixtures\Sport\Model $sport */
+            /** @var Sport $sport */
             $sport->setName($this->getRequest()->post['name']);
             $sport->setUrl($this->getRequest()->post['url']);
             $sport->setUpdatedAt(\Alaress_Date_Format::now());
