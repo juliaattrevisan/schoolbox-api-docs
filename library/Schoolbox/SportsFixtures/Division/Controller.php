@@ -12,9 +12,35 @@ use Alaress\Web\Controller\Base;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
+use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 
 class Controller extends Base
 {
+
+    /**
+     * @var SportMapper
+     */
+    protected $sportMapper;
+
+    /**
+     * @var DivisionMapper
+     */
+    protected $divisionMapper;
+
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
+     * Controller constructor.
+     */
+    public function __construct()
+    {
+        $this->setSportMapper(SportMapper::getInstance());
+        $this->setDivisionMapper(DivisionMapper::getInstance());
+        $this->setErrorMapper(ErrorMapper::getInstance());
+    }
 
     /**
      * Just a raw template render
@@ -44,9 +70,9 @@ class Controller extends Base
     public function getList($id)
     {
         try {
-            $sport = SportMapper::getInstance()->findById($id);
+            $sport = $this->getSportMapper()->findById($id);
 
-            $allDivisions = Mapper::getInstance()->findByColumn('sport_id', $sport->getId(), [
+            $allDivisions = $this->getDivisionMapper()->findByColumn('sport_id', $sport->getId(), [
                 'order' => [
                     'name' => 'asc'
                 ]
@@ -58,7 +84,7 @@ class Controller extends Base
             ]);
         }
         catch (MapperException $e) {
-            throw ErrorMapper::getInstance()->generateException(2);
+            throw $this->getErrorMapper()->generateException(2);
         }
     }
 
@@ -70,7 +96,7 @@ class Controller extends Base
     public function getCreate($id)
     {
         try {
-            $sport = SportMapper::getInstance()->findById($id);
+            $sport = $this->getSportMapper()->findById($id);
 
             $this->tpl('create', [
                 'sport' => $sport,
@@ -78,7 +104,7 @@ class Controller extends Base
             ]);
         }
         catch (MapperException $e) {
-            throw ErrorMapper::getInstance()->generateException(2);
+            throw $this->getErrorMapper()->generateException(2);
         }
     }
 
@@ -90,8 +116,8 @@ class Controller extends Base
     public function getUpdate($id)
     {
         try {
-            $division = Mapper::getInstance()->findById($id);
-            $sport = SportMapper::getInstance()->findById($division->getSport()->getId());
+            $division = $this->getDivisionMapper()->findById($id);
+            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
 
             $this->tpl('create', [
                 'division' => $division,
@@ -100,7 +126,7 @@ class Controller extends Base
             ]);
         }
         catch (MapperException $e) {
-            throw ErrorMapper::getInstance()->generateException(2);
+            throw $this->getErrorMapper()->generateException(2);
         }
     }
 
@@ -122,12 +148,12 @@ class Controller extends Base
     {
         try {
             /** @var Model $division */
-            $division = Mapper::getInstance()->findById($this->getRequest()->post['id']);
+            $division = $this->getDivisionMapper()->findById($this->getRequest()->post['id']);
 
             $this->saveDivision($division);
         }
         catch (MapperException $e) {
-            throw ErrorMapper::getInstance()->generateException(2);
+            throw $this->getErrorMapper()->generateException(2);
         }
     }
 
@@ -138,12 +164,12 @@ class Controller extends Base
     {
         try {
             /** @var Model $division */
-            $division = Mapper::getInstance()->findById($this->getRequest()->post['id']);
+            $division = $this->getDivisionMapper()->findById($this->getRequest()->post['id']);
 
-            Mapper::getInstance()->delete($division);
+            $this->getDivisionMapper()->delete($division);
         }
         catch (MapperException $e) {
-            throw ErrorMapper::getInstance()->generateException(2);
+            throw $this->getErrorMapper()->generateException(2);
         }
     }
 
@@ -157,28 +183,70 @@ class Controller extends Base
         try {
 
             /** @var \Schoolbox\SportsFixtures\Sport\Model $sport */
-            $sportMapper = SportMapper::getInstance();
-            $sport       = $sportMapper->findById($this->getRequest()->post['sportId']);
+            $sport = $this->getSportMapper()->findById($this->getRequest()->post['sportId']);
 
             $division->setName($this->getRequest()->post['name']);
             $division->setUrl($this->getRequest()->post['url']);
             $division->setSport($sport);
             $division->setUpdatedAt(\Alaress_Date_Format::now());
 
-            Mapper::getInstance()->save($division);
+            $this->getDivisionMapper()->save($division);
 
             $this->getResponse()->redirect->afterPost("/sportsfixtures/division/list/{$sport->getId()}");
         }
         catch (MapperException $e) {
-            throw ErrorMapper::getInstance()->generateException(2);
+            throw $this->getErrorMapper()->generateException(2);
         }
     }
 
-    /**
-     * Public test
+    /* Getters/Setters
      */
-    public function test()
+
+    /**
+     * @return SportMapper
+     */
+    protected function getSportMapper()
     {
-        $this->tpl('test', []);
+        return $this->sportMapper;
+    }
+
+    /**
+     * @param SportMapper $sportMapper
+     */
+    protected function setSportMapper($sportMapper)
+    {
+        $this->sportMapper = $sportMapper;
+    }
+
+    /**
+     * @return DivisionMapper
+     */
+    protected function getDivisionMapper()
+    {
+        return $this->divisionMapper;
+    }
+
+    /**
+     * @param DivisionMapper $divisionMapper
+     */
+    protected function setDivisionMapper($divisionMapper)
+    {
+        $this->divisionMapper = $divisionMapper;
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+    /**
+     * @param ErrorMapper $errorMapper
+     */
+    protected function setErrorMapper($errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
     }
 }
