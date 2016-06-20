@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Base;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
+use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 
 class Controller extends Base
 {
@@ -19,6 +20,11 @@ class Controller extends Base
      * @var SportMapper
      */
     protected $sportMapper;
+
+    /**
+     * @var DivisionMapper
+     */
+    protected $divisionMapper;
 
     /**
      * @var ErrorMapper
@@ -31,6 +37,7 @@ class Controller extends Base
     public function __construct()
     {
         $this->setSportMapper(SportMapper::getInstance());
+        $this->setDivisionMapper(DivisionMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
@@ -115,7 +122,7 @@ class Controller extends Base
     }
 
     /**
-     * Save a Division
+     * Save a Sport
      */
     public function postUpdate()
     {
@@ -131,14 +138,13 @@ class Controller extends Base
     }
 
     /**
-     * Delete a Division
+     * Delete a Sport
      */
     public function postDelete()
     {
         try {
             /** @var Model $sport */
             $sport = $this->getSportMapper()->findById($this->getRequest()->post['id']);
-
             $this->getSportMapper()->delete($sport);
         }
         catch (MapperException $e) {
@@ -147,7 +153,7 @@ class Controller extends Base
     }
 
     /**
-     * Save Division data to db
+     * Save Sport data to db
      *
      * @param Model $sport
      */
@@ -186,6 +192,22 @@ class Controller extends Base
     protected function setSportMapper($sportMapper)
     {
         $this->sportMapper = $sportMapper;
+    }
+
+    /**
+     * @return DivisionMapper
+     */
+    protected function getDivisionMapper()
+    {
+        return $this->divisionMapper;
+    }
+
+    /**
+     * @param DivisionMapper $divisionMapper
+     */
+    protected function setDivisionMapper($divisionMapper)
+    {
+        $this->divisionMapper = $divisionMapper;
     }
 
     /**

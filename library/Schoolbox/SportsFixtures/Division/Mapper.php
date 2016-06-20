@@ -1,6 +1,6 @@
 <?php
 /**
- * Mapper
+ * Divisions (eg. Soccer First, Seconds, Thirds) Mapper
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -28,9 +28,6 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        /**
-         * Divisions (eg. Soccer First, Seconds, Thirds)
-         */
         $this->hasTable('sportsfixtures_division');
         $this->hasModel(DivisionModel::class);
 
@@ -43,5 +40,22 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->hasSoftDeleteDateField('deleted_at');
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteTeams'));
+    }
+
+    /**
+     * Delete all Teams associated with this Division
+     * when it's being deleted
+     *
+     * @param Model $division
+     */
+    public function deleteTeams(Model $division)
+    {
+        /* TODO: Delete all Teams in this Division when this Division is deleted
+         */
+
+        /* TODO: Delete all Players in this Division's Lobby when this Division is deleted
+         */
     }
 }

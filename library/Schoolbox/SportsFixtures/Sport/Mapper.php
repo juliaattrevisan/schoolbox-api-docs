@@ -15,6 +15,7 @@ use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 
 /**
  * Class Mapper
@@ -40,5 +41,28 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->hasSoftDeleteDateField('deleted_at');
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteDivisions'));
+    }
+
+    /**
+     * Delete all Divisions associated with this Sport
+     * when it's being deleted
+     *
+     * Delete all Positions associated with this Sport
+     * when it's being deleted
+     *
+     * @param Model $sport
+     */
+    public function deleteDivisions(Model $sport)
+    {
+        $allDivisions = DivisionMapper::getInstance()->findByColumn('sport_id', $sport->getId());
+
+        foreach ($allDivisions as $currentDivision) {
+            DivisionMapper::getInstance()->delete($currentDivision);
+        }
+
+        /* TODO: Delete all Positions associated with this Sport
+         */
     }
 }
