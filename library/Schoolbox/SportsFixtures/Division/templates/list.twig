@@ -8,7 +8,7 @@
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Division?',
                 confirmEvent: function() {
-                    $.post(element.attr('href'), {id: element.attr('data-delete')}, function() {
+                    $.post(element.attr('href'), {divisionId: element.attr('data-delete')}, function() {
                         window.location.href = window.location.href;
                     });
                 }
@@ -50,6 +50,7 @@
                     <div class="list-item">
                         <div class="small-12 avatar card">
                             <p>{{ currentDivision.name }}</p>
+                            <p><a href="{{ currentDivision.url }}">{{ currentDivision.url }}</a>
                         </div>
                     </div>
                     <nav>

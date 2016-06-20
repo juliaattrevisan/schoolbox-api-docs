@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Base;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
+use \Schoolbox\SportsFixtures\Division\Model as Division;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 
 class Controller extends Base
@@ -65,7 +66,7 @@ class Controller extends Base
     /**
      * List of Divisions and the Sport they are in
      *
-     * @param $sportId
+     * @param int $sportId
      */
     public function getList($sportId)
     {
@@ -91,7 +92,7 @@ class Controller extends Base
     /**
      * Create a Division in a particular Sport id
      *
-     * @param $sportId
+     * @param int $sportId
      */
     public function getCreate($sportId)
     {
@@ -133,9 +134,9 @@ class Controller extends Base
     /**
      * Create a Division
      *
-     * @param Model $division
+     * @param Division $division
      */
-    public function postCreate(Model $division)
+    public function postCreate(Division $division)
     {
         /* Get around aura's weird regexing
          */
@@ -145,9 +146,9 @@ class Controller extends Base
     /**
      * Modify a Division
      *
-     * @param Model $division
+     * @param Division $division
      */
-    public function postModify(Model $division)
+    public function postModify(Division $division)
     {
         try {
             $sportId = $this->getRequest()->post['sportId'];
@@ -167,8 +168,8 @@ class Controller extends Base
     public function postDelete()
     {
         try {
-            /** @var Model $division */
-            $division = $this->getDivisionMapper()->findById($this->getRequest()->post['id']);
+            /** @var Division $division */
+            $division = $this->getDivisionMapper()->findById($this->getRequest()->post['divisionId']);
 
             $this->getDivisionMapper()->delete($division);
         }
@@ -183,9 +184,9 @@ class Controller extends Base
      * @param $sport
      * @param $name
      * @param $url
-     * @param Model $division
+     * @param Division $division
      */
-    private function saveDivision($sport, $name, $url, Model $division)
+    private function saveDivision($sport, $name, $url, Division $division)
     {
         $division->setName($name);
         $division->setUrl($url);
