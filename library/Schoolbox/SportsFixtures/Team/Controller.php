@@ -74,27 +74,29 @@ class Controller extends Base
     /**
      * List of Divisions and the Sport they are in
      *
-     * @param $sportId
+     * @param $divisionId
      */
-    public function getList($sportId)
+    public function getList($divisionId)
     {
-//        try {
-//            $sport = $this->getSportMapper()->findById($sportId);
-//
-//            $allDivisions = $this->getDivisionMapper()->findByColumn('sport_id', $sport->getId(), [
-//                'order' => [
-//                    'name' => 'asc'
-//                ]
-//            ]);
-//
-//            $this->tpl('list', [
-//                'sport' => $sport,
-//                'allDivisions' => $allDivisions
-//            ]);
-//        }
-//        catch (MapperException $e) {
-//            throw $this->getErrorMapper()->generateException(2);
-//        }
+        try {
+            $division = $this->getDivisionMapper()->findById($divisionId);
+            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
+
+            $allTeams = $this->getTeamMapper()->findByColumn('division_id', $division->getId(), [
+                'order' => [
+                    'name' => 'asc'
+                ]
+            ]);
+
+            $this->tpl('list', [
+                'sport' => $sport,
+                'division' => $division,
+                'allTeams' => $allTeams
+            ]);
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(2);
+        }
     }
 
     /**
