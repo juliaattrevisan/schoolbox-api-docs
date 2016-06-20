@@ -115,11 +115,10 @@ class RubricMapper
             SELECT rc.id, rc.grouping, rc.name, COUNT(ru.submission_box_id) usage_count
             FROM rubric_criterion rc
             LEFT JOIN rubric_usage ru ON rc.id = ru.criterion_id
-            LEFT JOIN submission_box b ON ru.submission_box_id = b.id
+            LEFT JOIN submission_box b ON ru.submission_box_id = b.id  AND (b.deleted IS NOT TRUE OR b.deleted IS NULL)
             WHERE rc.parent_type = 'category'
             AND rc.parent_id IN (:$in)
             AND rc.deleted_at IS NULL
-            AND (b.deleted IS NOT TRUE OR b.deleted IS NULL)
             GROUP BY rc.id
         ", $args);
 
