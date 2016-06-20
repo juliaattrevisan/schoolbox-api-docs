@@ -15,6 +15,24 @@ use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 
 class Controller extends Base
 {
+    /**
+     * @var SportMapper
+     */
+    protected $sportMapper;
+
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
+     * Controller constructor.
+     */
+    public function __construct()
+    {
+        $this->setSportMapper(SportMapper::getInstance());
+        $this->setErrorMapper(ErrorMapper::getInstance());
+    }
 
     /**
      * Just a raw template render
@@ -44,7 +62,7 @@ class Controller extends Base
         /* TODO: Not sure if we need this here
          * but I'll set it up anyway just in case
          */
-        $allSports = SportMapper::getInstance()->findAll([
+        $allSports = $this->getSportMapper()->findAll([
             'order' => [
                 'name' => 'asc'
             ]
@@ -73,7 +91,7 @@ class Controller extends Base
     public function getUpdate($id)
     {
         try {
-            $sport = SportMapper::getInstance()->findById($id);
+            $sport = $this->getSportMapper()->findById($id);
 
             $this->tpl('create', [
                 'sport' => $sport,
@@ -81,7 +99,7 @@ class Controller extends Base
             ]);
         }
         catch (MapperException $e) {
-            throw ErrorMapper::getInstance()->generateException(2);
+            throw $this->getErrorMapper()->generateException(2);
         }
     }
 
@@ -103,12 +121,12 @@ class Controller extends Base
     {
         try {
             /** @var Model $sport */
-            $sport = Mapper::getInstance()->findById($this->getRequest()->post['id']);
+            $sport = $this->getSportMapper()->findById($this->getRequest()->post['id']);
 
             $this->saveSport($sport);
         }
         catch (MapperException $e) {
-            throw ErrorMapper::getInstance()->generateException(2);
+            throw $this->getErrorMapper()->generateException(2);
         }
     }
 
@@ -119,12 +137,12 @@ class Controller extends Base
     {
         try {
             /** @var Model $sport */
-            $sport = Mapper::getInstance()->findById($this->getRequest()->post['id']);
+            $sport = $this->getSportMapper()->findById($this->getRequest()->post['id']);
 
-            Mapper::getInstance()->delete($sport);
+            $this->getSportMapper()->delete($sport);
         }
         catch (MapperException $e) {
-            throw ErrorMapper::getInstance()->generateException(2);
+            throw $this->getErrorMapper()->generateException(2);
         }
     }
 
@@ -142,12 +160,47 @@ class Controller extends Base
             $sport->setUrl($this->getRequest()->post['url']);
             $sport->setUpdatedAt(\Alaress_Date_Format::now());
 
-            Mapper::getInstance()->save($sport);
+            $this->getSportMapper()->save($sport);
 
             $this->getResponse()->redirect->afterPost('/sportsfixtures/sport/list');
         }
         catch (MapperException $e) {
-            throw ErrorMapper::getInstance()->generateException(2);
+            throw $this->getErrorMapper()->generateException(2);
         }
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return SportMapper
+     */
+    protected function getSportMapper()
+    {
+        return $this->sportMapper;
+    }
+
+    /**
+     * @param SportMapper $sportMapper
+     */
+    protected function setSportMapper($sportMapper)
+    {
+        $this->sportMapper = $sportMapper;
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+    /**
+     * @param ErrorMapper $errorMapper
+     */
+    protected function setErrorMapper($errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
     }
 }
