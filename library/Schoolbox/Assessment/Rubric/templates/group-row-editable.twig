@@ -27,6 +27,7 @@
             </label>
         {% else %}
             <label class="meta">{{ groupName | raw }}</label>
+            <input type="hidden" value="" name="{{ groupInput }}[name]" />
         {% endif %}
     </th>
 </tr>
