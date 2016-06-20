@@ -1,10 +1,4 @@
 <?php
-namespace Schoolbox\SportsFixtures\Sport;
-
-use Alaress_Date_Format;
-use Schoolbox\ISoftDeletable;
-use Schoolbox\User;
-
 /**
  * Model
  *
@@ -13,6 +7,13 @@ use Schoolbox\User;
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+namespace Schoolbox\SportsFixtures\Sport;
+
+use Alaress_Date_Format;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\User;
+
 class Model implements ISoftDeletable {
 
     /** @var int */
