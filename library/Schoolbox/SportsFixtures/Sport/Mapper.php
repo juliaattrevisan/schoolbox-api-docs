@@ -19,6 +19,7 @@ use Schoolbox\User;
 /**
  * Class Mapper
  * @method Model createModel()
+ * @method Model findById($id)
  * @package Schoolbox\SportsFixtures\Sport
  */
 class Mapper extends BaseMapper

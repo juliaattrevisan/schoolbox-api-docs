@@ -135,10 +135,20 @@ class Controller extends Base
      */
     public function postCreate()
     {
-        $division = $this->getDivisionMapper()->createModel();
-        $division->setCreatedAt(\Alaress_Date_Format::now());
+        try {
+            $division = $this->getDivisionMapper()->createModel();
+            $division->setCreatedAt(\Alaress_Date_Format::now());
 
-        $this->saveDivision($division);
+            $sportId = $this->getRequest()->post['sportId'];
+            $sport = $this->getSportMapper()->findById($sportId);
+
+            $this->saveDivision($sport, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $division);
+
+            $this->getResponse()->redirect->afterPost("/sportsfixtures/division/list/{$sportId}");
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(2);
+        }
     }
 
     /**
@@ -148,9 +158,14 @@ class Controller extends Base
     {
         try {
             /** @var Model $division */
-            $division = $this->getDivisionMapper()->findById($this->getRequest()->post['id']);
+            $division = $this->getDivisionMapper()->findById($this->getRequest()->post['divisionId']);
 
-            $this->saveDivision($division);
+            $sportId = $this->getRequest()->post['sportId'];
+            $sport = $this->getSportMapper()->findById($sportId);
+
+            $this->saveDivision($sport, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $division);
+
+            $this->getResponse()->redirect->afterPost("/sportsfixtures/division/list/{$sportId}");
         }
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);
@@ -176,27 +191,19 @@ class Controller extends Base
     /**
      * Save Division data to db
      *
+     * @param $sport
+     * @param $name
+     * @param $url
      * @param Model $division
      */
-    private function saveDivision(Model $division)
+    private function saveDivision($sport, $name, $url, Model $division)
     {
-        try {
+        $division->setName($name);
+        $division->setUrl($url);
+        $division->setSport($sport);
+        $division->setUpdatedAt(\Alaress_Date_Format::now());
 
-            /** @var \Schoolbox\SportsFixtures\Sport\Model $sport */
-            $sport = $this->getSportMapper()->findById($this->getRequest()->post['sportId']);
-
-            $division->setName($this->getRequest()->post['name']);
-            $division->setUrl($this->getRequest()->post['url']);
-            $division->setSport($sport);
-            $division->setUpdatedAt(\Alaress_Date_Format::now());
-
-            $this->getDivisionMapper()->save($division);
-
-            $this->getResponse()->redirect->afterPost("/sportsfixtures/division/list/{$sport->getId()}");
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
-        }
+        $this->getDivisionMapper()->save($division);
     }
 
     /* Getters/Setters
