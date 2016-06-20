@@ -6,7 +6,7 @@
             var element = $(this);
 
             $(this).confirmDialog({
-                text: 'Are you sure you want to delete this item?',
+                text: 'Are you sure you want to delete this Sport?',
                 confirmEvent: function() {
                     $.post(element.attr('href'), {id: element.attr('data-delete')}, function() {
                         window.location.href = window.location.href;
