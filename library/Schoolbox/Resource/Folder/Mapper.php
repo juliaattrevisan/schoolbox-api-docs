@@ -754,7 +754,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $query = "
             {$this->getSelectString()}
             {$this->getFromString()}
-            WHERE c.name LIKE :code
+            WHERE {$this->getTable()}.name LIKE :code
         ";
         $statement = $this->database->prepare($query);
         $statement->execute(
