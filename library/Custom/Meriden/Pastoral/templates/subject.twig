@@ -38,13 +38,13 @@
     {# course grade - derived from grade for this class #}
     {% if report.subjectReport.namedGrades.courseGrade and report.subjectReport.namedGrades.courseGrade.assessment.isMarkShownToRole(user.role) %}
         <div class="row" id="course-info">
-            <div class="small-12 medium-4 column">
+            <div class="small-12 medium-2 column">
                 <dl>
                     <dt>Course Grade</dt>
                     <dd class="explanation hide-for-print"><a href="/homepage/3403">[Grade Description]</a></dd>
                 </dl>
             </div>
-            <div class="small-12 medium-8 column">
+            <div class="small-12 medium-10 column">
                 <div class="content">
                     <h3>{{ report.subjectReport.namedGrades.courseGrade.pretty_mark }}</h3>
                 </div>
@@ -52,12 +52,12 @@
         </div>
 
         <div class="row" id="grade-distribution">
-            <div class="small-12 medium-4 column">
+            <div class="small-12 medium-2 column">
                 <dl>
                     <dt>Grade Distribution</dt>
                 </dl>
             </div>
-            <div class="small-12 medium-8 column">
+            <div class="small-12 medium-10 column">
                 <table class="width-auto bordered-table">
                     <thead>
                     <tr>
@@ -84,13 +84,13 @@
     {# Approaches to learning - another rubric #}
     {% if report.subjectReport.namedGrades.learningApproaches and report.subjectReport.namedGrades.learningApproaches.assessment.isMarkShownToRole(user.role) %}
         <div class="row" id="learning-approaches">
-            <div class="small-12 medium-4 column">
+            <div class="small-12 column">
                 <dl>
                     <dt>Approaches to Learning</dt>
                     <dd class="explanation hide-for-print"><a href="/homepage/3462">[Grade Description]</a></dd>
                 </dl>
             </div>
-            <div class="small-12 medium-8 column">
+            <div class="small-12 column">
                 {% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.learningApproaches} %}
             </div>
         </div>
