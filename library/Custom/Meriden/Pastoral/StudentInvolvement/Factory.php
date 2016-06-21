@@ -109,6 +109,7 @@ class Factory
             ->moveToNamedGrade('camp', 'School Camp')
             ->moveToNamedGrade('uniform', 'Uniform')
             ->moveToNamedGrade('pastoral', 'Pastoral activities involvement')
+            ->moveToNamedGrade('tutorComment', 'Tutor Comment')
         ;
 
         // Add write level staff as coordinators

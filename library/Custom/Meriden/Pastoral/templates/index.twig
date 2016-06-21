@@ -234,6 +234,18 @@
     {% endif %}
 </div>
 
+{# Tutor comment #}
+{% if report.tutorGroupReport.namedGrades.tutorComment %}
+<div class="row">
+    <div class="small-12 column">
+        <dl class="content">
+            <dt>Tutor Comments</dt>
+            <dd>{{ report.tutorGroupReport.namedGrades.tutorComment.comment }}</dd>
+        </dl>
+    </div>
+</div>
+{% endif %}
+
 {# Subject list #}
 <div class="row">
     <div class="small-12 column">
