@@ -339,6 +339,7 @@ class SitePage extends Page
             'PAGE_SECURE'            => empty($_SERVER['HTTPS']) ? 'false' : 'true',
             'DATEPICKER_FORMAT'      => json_encode(Alaress_Date_Format_Converter::toDatepicker($dateFormat)),
             'MOMENTJS_FORMAT'        => json_encode(Alaress_Date_Format_Converter::toMomentJs($dateFormat)),
+            'SYNERGETIC_SSO'         => isset($_SESSION["communityLogin"]) ? 'true' : 'false',
         );
 
         $this->setVar($templateVar);
@@ -893,7 +894,6 @@ class SitePage extends Page
             'TAB_SUBMISSION_ON'                            => '',
             'TAB_COURSE_ON'                                => '',
             'TAB_GRADE_ON'                                 => '',
-            'SYNERGETIC_SSO'                               => isset($_SESSION["communityLogin"]) ? 'true' : 'false',
             'TAB_' . strtoupper($this->currentTab) . '_ON' => ' navthis',
         );
 
