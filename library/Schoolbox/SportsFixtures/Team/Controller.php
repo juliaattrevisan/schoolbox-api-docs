@@ -74,7 +74,7 @@ class Controller extends Base
     /**
      * List of Divisions and the Sport they are in
      *
-     * @param $divisionId
+     * @param int $divisionId
      */
     public function getList($divisionId)
     {
@@ -102,7 +102,7 @@ class Controller extends Base
     /**
      * Create a Team in a particular Division id
      *
-     * @param $divisionId
+     * @param int $divisionId
      */
     public function getCreate($divisionId)
     {
@@ -182,7 +182,6 @@ class Controller extends Base
     public function postDelete()
     {
         try {
-            /** @var Team $team */
             $team = $this->getTeamMapper()->findById($this->getRequest()->post['teamId']);
 
             $this->getTeamMapper()->delete($team);
@@ -196,8 +195,8 @@ class Controller extends Base
      * Save Team data to db
      *
      * @param Division $division
-     * @param $name
-     * @param $url
+     * @param string $name
+     * @param string $url
      * @param Team $team
      */
     private function saveTeam(Division $division, $name, $url, Team $team)

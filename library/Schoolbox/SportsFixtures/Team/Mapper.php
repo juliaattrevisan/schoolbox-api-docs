@@ -14,11 +14,12 @@ use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
-use Schoolbox\SportsFixtures\Team\Model as TeamModel;
+use Schoolbox\SportsFixtures\Team\Model as Team;
 
 /**
  * Class Mapper
- * @method Model createModel()
+ * @method Team createModel()
+ * @method Team findById($id)
  * @package Schoolbox\SportsFixtures\Division
  */
 class Mapper extends BaseMapper
@@ -29,7 +30,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('sportsfixtures_team');
-        $this->hasModel(TeamModel::class);
+        $this->hasModel(Team::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('division_id', SportMapper::class, 'id', null, null, 'division', 'division');
@@ -46,9 +47,9 @@ class Mapper extends BaseMapper
      * Delete all Players associated with this Team
      * when it's being deleted
      *
-     * @param Model $team
+     * @param Team $team
      */
-    public function deletePlayers(Model $team)
+    public function deletePlayers(Team $team)
     {
         /* TODO: Delete all Players in this Team when this Team is deleted
          */
