@@ -292,14 +292,19 @@ class Module {
     /**
      * Helper method for adding a route preload for this component's basename.
      *
-     * @param  PathMatcher $matcher
-     * @param  string      $regexPart  The part of the route to match (after $this->basename)
-     * @param  callable    $preload
+     * @param  PathMatcher  $matcher
+     * @param  string|array $regexPart  The part of the route(s) to match (after $this->basename)
+     * @param  callable     $preload
      * @return $this
      */
     protected function addRoutePreload(PathMatcher $matcher, $regexPart, callable $preload)
     {
-        $matcher->add("/^{$this->basename}\\.{$regexPart}$/", $preload);
+        if (!is_array($regexPart)) {
+            $regexPart = [$regexPart];
+        }
+        foreach ($regexPart as $part) {
+            $matcher->add("/^{$this->basename}\\.{$part}$/", $preload);
+        }
         return $this;
     }
 
@@ -314,13 +319,18 @@ class Module {
      * Helper method for adding a route permission for this component's basename.
      *
      * @param  Authorizer         $authorizer
-     * @param  string             $regexPart  The part of the route to match (after $this->basename)
+     * @param  string|array       $regexPart  The part of the route(s) to match (after $this->basename)
      * @param  IAuthorizationRule $rule
      * @return $this
      */
     protected function addRoutePermission(Authorizer $authorizer, $regexPart, IAuthorizationRule $rule)
     {
-        $authorizer->addRule("/^{$this->basename}\\.{$regexPart}$/", $rule);
+        if (!is_array($regexPart)) {
+            $regexPart = [$regexPart];
+        }
+        foreach ($regexPart as $part) {
+            $authorizer->addRule("/^{$this->basename}\\.{$part}$/", $rule);
+        }
         return $this;
     }
 
