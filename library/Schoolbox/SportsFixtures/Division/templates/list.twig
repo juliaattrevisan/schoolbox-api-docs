@@ -56,6 +56,7 @@
                     <nav>
                         <a href="{{ routeLookup('sportsfixturesDivision.postDelete', {}) }}" class="icon-delete" title="Delete" data-delete="{{ currentDivision.id }}"></a>
                         <a href="{{ routeLookup('sportsfixturesDivision.getUpdate', {divisionId: currentDivision.id}) }}" class="icon-modify" title="Modify"></a>
+                        <a href="/sportsfixtures/team/list/{{ currentDivision.id }}" class="icon-list" title="Manage Teams in {{ currentDivision.name }}"></a>
                     </nav>
                 </li>
                 {% endfor %}
