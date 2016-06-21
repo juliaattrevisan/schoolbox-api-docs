@@ -408,8 +408,6 @@ class Factory
     protected function augmentGradesWithAssessment($grades, User $student)
     {
         // TODO inject dependencies
-        // TODO get rid of the handlers too
-        $rubricHandler = new \DueWork_Rubric_Handler();
 
         // Get the 'a' off the start of the assessment grades to get a list of
         // actual assess IDs
@@ -423,8 +421,8 @@ class Factory
             } elseif ($type === 'q') {
                 $quizKeys[] = $id;
             }
-
         }
+
 
         // Fetch only assessment tasks
         $assessments = SubmissionBoxMapper::getInstance()->findByColumnList([
