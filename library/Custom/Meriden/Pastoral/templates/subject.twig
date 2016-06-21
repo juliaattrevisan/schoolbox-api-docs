@@ -87,11 +87,17 @@
 
     {# Approaches to learning - another rubric #}
     {% if report.subjectReport.namedGrades.learningApproaches and report.subjectReport.namedGrades.learningApproaches.assessment.isMarkShownToRole(user.role) %}
-        <h2 class="subheader">Approaches to Learning</h2>
-        <span class="explanation">[<a href="/homepage/3462">Grade Description</a>]</span>
-        <section>
-            {% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.learningApproaches} %}
-        </section>
+        <div class="row" id="learning-approaches">
+            <div class="small-12 medium-4 column">
+                <dl>
+                    <dt>Approaches to Learning</dt>
+                    <dd class="explanation">[<a href="/homepage/3462">Grade Description</a>]</dd>
+                </dl>
+            </div>
+            <div class="small-12 medium-8 column">
+                {% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.learningApproaches} %}
+            </div>
+        </div>
     {% endif %}
 
     {# Assessments #}
