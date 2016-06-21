@@ -34,8 +34,8 @@
 
 <div class="row">
     <div class="small-12 island" id="allSports">
+        {% if allSports|length %}
         <section>
-            {% if allSports|length %}
             <ul class="information-list">
                 {% for currentSport in allSports %}
                 <li class="actions-small-1">
@@ -53,13 +53,13 @@
                 </li>
                 {% endfor %}
             </ul>
-            {% else %}
-            <div class="empty-state">
-                <i class="icon-sport"></i>
-                <p>There are no Sports.</p>
-                <p><a href="/sportsfixtures/sport/create" title="Add a Sport">Add a Sport</a></p>
-            </div>
-            {% endif %}
         </section>
+        {% else %}
+        <div class="empty-state">
+            <i class="icon-sport"></i>
+            <p>There are no Sports.</p>
+            <p><a href="/sportsfixtures/sport/create" title="Add a Sport">Add a Sport</a></p>
+        </div>
+        {% endif %}
     </div>
 </div>
