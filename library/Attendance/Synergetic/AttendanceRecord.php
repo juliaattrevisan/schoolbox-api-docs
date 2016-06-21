@@ -47,7 +47,7 @@ class Attendance_Synergetic_AttendanceRecord
 
             /* Set through all the data contained in array and set it */
             foreach ($data as $key => $value) {
-                $query .= " $key = '$value',";
+                $query .= " $key = '" . $this->getDatabase()->quote($value) . "',";
             }
 
             $query = substr($query, 0, -1);
