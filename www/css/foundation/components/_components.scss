@@ -247,30 +247,43 @@ ul.tileList {
 /* Eportfolio
  */
 .eportfolio {
-    &.cover-photo {
-        height: auto;
+    position: relative;
+    .cover-photo {
         background-image: url(/images/core/eportfolio/coverphotoPlaceholder.jpg);
         background-size: cover;
         background-position: center;
-        // relative so that .cover-photo-controls shows inside .cover-photo
-        position: relative;
+        height: 28rem;
+
+        ~ nav {
+            @include absolute (1rem, auto, auto, auto);
+            @media #{$small-only}  { right: 1rem; }
+            @media #{$medium-only} { right: 2.5rem; }
+            @media #{$large-up}    { right: 2rem; }
+        }
     }
-    &.cover-photo-controls {
-        position: absolute;
-        top: 0;
-        right: 0;
-    }
-    &.profile-image {
-        margin: auto;
-        padding: 10%;
-    }
-    &.profile-name {
-        margin-bottom: 2rem;
-    }
-}
-@media #{$large-up} {
-    .eportfolio.profile-image {
-        padding: 15%;
+    .avatar.card {
+        @include absolute (auto, auto, 0, auto);
+        margin: 0rem 1rem 0 0rem;
+        .wrap{
+            @include linear-gradient(rgba(0,0,0,0), rgba(0,0,0,.46));
+            float: left;
+            width: 100%;
+            height: 8rem;
+            padding: 0 0 1rem 1rem;
+        }
+        img{
+            border: 2px solid $white;
+            width: 8rem;
+            margin: -1rem 1rem 0rem 0;
+        }
+        h1, p{
+            color: $white;
+            @include vertical-align;
+            // This usually exists in cards but not H1, this is a once off.
+            text-overflow: ellipsis;
+            overflow-x: hidden;
+            white-space: nowrap;
+        }
     }
 }
 

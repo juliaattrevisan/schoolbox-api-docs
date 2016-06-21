@@ -53,6 +53,9 @@ class Zone {
     /** @var bool */
     protected $readOnly;
 
+    /** @var bool */
+    protected $buttonMode;
+
     /** @var StorageMapper */
     protected $mapper;
 
@@ -78,6 +81,7 @@ class Zone {
         $this->mimeFilter  = '';
         $this->attachments = array();
         $this->readOnly    = false;
+        $this->buttonMode  = false;
     }
 
 
@@ -235,6 +239,7 @@ class Zone {
             'mime'     => $filter,
             'readonly' => $this->readOnly,
             'multi'    => $this->multi,
+            'mode'     => $this->buttonMode ? 'button' : 'normal',
             'size'     => $this->size
         );
 
@@ -305,6 +310,17 @@ class Zone {
         return implode('', array_map(function ($v) {
             return ucfirst($v);
         }, $xpl));
+    }
+
+
+    /**
+     * @param bool $bool
+     * @return $this
+     */
+    public function setButtonMode($bool)
+    {
+        $this->buttonMode = $bool;
+        return $this;
     }
 
 } 

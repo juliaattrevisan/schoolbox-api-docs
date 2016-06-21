@@ -17,37 +17,42 @@ $pageId = 'profile';
 
 $authenticator = new Eportfolio_Authenticator($_SESSION['id'], $ownerId, $pageId);
 
+$message = 'Bad Request';
+$hash    = null;
+$code    = 400;
 if ($authenticator->canModify()) {
 	if ($action == 'addCoverPhoto') {
-		$uploadedFilename = $_FILES['imagehash']['name'];
-		$uploadedLocation = $_FILES['imagehash']['tmp_name'];
 		$uploadedUid = $_SESSION['id'];
+		// Get image out of storage, and save it
+		try {
+			$factory = new \Schoolbox\Resource\Attachment\Collector\CollectorFactory();
+			$imageResource = $factory->build([$_POST['imagehash']])->getFirst();
 
-		if (is_readable($uploadedLocation)) {
-			$allowedFiles = new \Schoolbox\File\MimetypeMapper();
-			$mime = $allowedFiles->getByFilename($_FILES['imagehash']['name']);
-
-			/* Check mime types and save it if it's an image
-			 */
+			$mime = $imageResource->getMimetype();
 			if (is_object($mime) && $mime->getEnable() == 'true' && stristr($mime->getMime(),'image/')) {
 				$now = new Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
-
 				$coverPhoto = new \Eportfolio\CoverPhoto();
 				$coverPhoto->setUid($ownerId);
 				$coverPhoto->setCreatedAt($now);
 				$coverPhoto->setUpdatedAt($now);
-
-                try {
-				    $imageResource = Schoolbox\Resource\Storage\Mapper::getInstance()->accept($uploadedFilename, $uploadedLocation, $uploadedUid);
-				    $coverPhoto->setImagehash($imageResource->getHash());
-                } catch (Exception $e) {
-                    //Silently fail if image cannot be uploaded
-                }
-
+				$coverPhoto->setImagehash($imageResource->getHash());
 				\Eportfolio\CoverPhotoMapper::getInstance()->save($coverPhoto);
+				$code    = 200;
+				$message = 'OK';
+				$hash    = $coverPhoto->getImagehash();
 			}
+		} catch (\Schoolbox\Resource\Exception $e) {
+			$message = 'Internal Server Error';
+			$code    = 500;
 		}
 	}
+} else {
+	$message = 'Authorization Failed';
+	$code    = 401;
+}
 
-	SitePage::localRedir("/eportfolio/{$ownerId}/profile");
+if ($page->detectAjax()) {
+	$page->outputJson(['message' => $message, 'hash' => $hash], false, $code);
+} else {
+	$page->localRedir("/eportfolio/{$ownerId}/profile");
 }

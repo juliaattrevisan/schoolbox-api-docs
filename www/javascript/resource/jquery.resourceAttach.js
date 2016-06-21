@@ -74,7 +74,7 @@ if(typeof window.location.origin == 'undefined') {
 
 
     function ResourceAttach(element, options) {
-        var self, opt, azone, dzone, prompt;
+        var self, opt, azone, dzone, prompt = '';
 
         this.element = element;
         this.options = $.extend(true, {}, defaults, options);
@@ -99,7 +99,10 @@ if(typeof window.location.origin == 'undefined') {
             e.preventDefault();
         });
 
-        prompt = 'Click or drag here to ' + opt.dictDefaultMessage.trim().charAt(0).toLowerCase() + opt.dictDefaultMessage.substr(1);
+        if (opt.dictDefaultMessage) {
+            prompt = 'Click or drag here to ' + opt.dictDefaultMessage.trim().charAt(0).toLowerCase() + opt.dictDefaultMessage.substr(1);
+        }
+
 
         // wrap ourselves around an instance of dropzone
         azone.dropzone({

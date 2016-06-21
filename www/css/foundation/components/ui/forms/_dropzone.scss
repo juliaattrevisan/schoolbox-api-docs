@@ -293,6 +293,11 @@ ul.az-error-list {
         height: 0;
         //.transition(none);
         border-width: 0;
+        &.button {
+            height: 0;
+            opacity: 0;
+            padding: 0;
+        }
     }
     img[data-dz-thumbnail] {
         background: url('/images/resources/ajax.gif') no-repeat center center;
@@ -300,9 +305,20 @@ ul.az-error-list {
     }
     ul.az-list > li {
         position: relative;
+        background: rgba($white, 0.8);
     }
     .dzone {
         width: 100%;
+        &.button {
+            @extend .button;
+            width: auto;
+            min-width: 2.5rem;
+            &:before {
+                top: 6px;
+                left: 7px;
+                font-size: 1.75rem;
+            }
+        }
         span {
             display: table-cell;
             vertical-align: middle;

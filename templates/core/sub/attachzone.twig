@@ -10,6 +10,7 @@ $data = {
     readonly: (bool),
     multi: (bool),
     size: (int),
+    mode: (string),
     attachments: [{
         name: (string),
         hash: (string),
@@ -41,7 +42,7 @@ $data = {
         {% endfor %}
     </ul>
     {% if not attachzone.readonly %}
-    <div class="dzone" id="{{ attachzone.camelId }}Zone">
+    <div class="dzone{% if attachzone.mode == 'button' %} button" title="{{ attachzone.prompt | capitalize }}{% endif %}" id="{{ attachzone.camelId }}Zone">
         <ul data-template class="hide">
             <li class="actions-small-1">
                 <div class="list-item">
@@ -67,7 +68,7 @@ $data = {
                 trigger: 'div.dzone',
                 detachSelector: '[data-dz-remove]',
                 dropzoneSelector: 'div.dzone',
-                dictDefaultMessage: '{{ attachzone.prompt }}',
+                dictDefaultMessage: {{ attachzone.mode == 'button' ? 'null' : "'" ~ attachzone.prompt ~ "'" }},
                 allowedFiles: {{ attachzone.mime|raw ?: 'null' }},
                 multi: {{ attachzone.multi ? 'true' : 'false' }},
                 title: '{{ attachzone.title }}',

@@ -87,9 +87,6 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
         $this->getPage()->setBlock(TEMPLATE_content, 'has_recent_photo', 'has_recent_photo_block');
         $this->getPage()->setBlock('has_recent_photo', 'recent_photo', 'recent_photo_block');
 
-        $this->getPage()->setBlock(TEMPLATE_content, 'has_cover_photo_control', 'has_cover_photo_control_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'no_cover_photo_control', 'no_cover_photo_control_block');
-
         $this->getPage()->setBlock(TEMPLATE_content, 'has_cover_photo', 'has_cover_photo_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'no_cover_photo', 'no_cover_photo_block');
 
@@ -154,17 +151,18 @@ class Eportfolio_Page_Profile extends Eportfolio_Page_Abstract
 
         /* Control button
          */
+        $this->getPage()->setVar('ATTACH_ZONE', '');
         if ($this->getCurrentUser()->getId() == $this->getUserId()) {
-            if ($coverPhotoCollection->count()) {
-                $this->getPage()->parse('has_cover_photo_control_block', 'has_cover_photo_control');
-                $this->getPage()->setVar('no_cover_photo_control_block', '');
-            } else {
-                $this->getPage()->parse('no_cover_photo_control_block', 'no_cover_photo_control');
-                $this->getPage()->setVar('has_cover_photo_control_block', '');
-            }
-        } else {
-            $this->getPage()->setVar('has_cover_photo_control_block', '');
-            $this->getPage()->setVar('no_cover_photo_control_block', '');
+            $zone = new \Schoolbox\Resource\Attachment\Zone('cover-photo');
+            $zone
+                ->setButtonMode(true)
+                ->setMulti(false)
+                ->setMimeFilter('image/*')
+                ->setThumbnailSize(32)
+                ->setAttachPrompt('upload a cover photo')
+                ->setModalTitle('Select a cover photo')
+                ->setAttachmentsLabel('');
+            $zone->renderIntoSitePage($this->getPage(), 'ATTACH_ZONE');
         }
     }
 
