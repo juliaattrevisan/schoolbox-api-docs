@@ -13,8 +13,10 @@ namespace Schoolbox\SportsFixtures\Sport;
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
+use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 class Model implements ISoftDeletable {
+    use DeletedAtDate;
 
     /** @var int */
     protected $id;
@@ -30,9 +32,6 @@ class Model implements ISoftDeletable {
 
     /** @var \Alaress_Date_Format */
     protected $updatedAt;
-
-    /** @var \Alaress_Date_Format */
-    protected $deletedAt;
 
     /**
      * Model constructor.
@@ -119,30 +118,5 @@ class Model implements ISoftDeletable {
      */
     public function getUpdatedAt() {
         return $this->updatedAt;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $deletedAt
-     * @return self
-     */
-    public function setDeletedAt($deletedAt) {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getDeletedAt() {
-        return $this->deletedAt;
-    }
-
-    /**
-     * Is this object deleted?
-     *
-     * @return bool
-     */
-    public function isDeleted() {
-        return ($this->getDeletedAt() instanceof Alaress_Date_Format && !$this->getDeletedAt()->isNull());
     }
 }
