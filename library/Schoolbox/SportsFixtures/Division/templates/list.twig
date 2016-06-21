@@ -54,8 +54,8 @@
                         </div>
                     </div>
                     <nav>
-                        <a href="/sportsfixtures/division/delete" class="icon-delete" title="Delete" data-delete="{{ currentDivision.id }}"></a>
-                        <a href="/sportsfixtures/division/update/{{ currentDivision.id }}" class="icon-modify" title="Modify"></a>
+                        <a href="{{ routeLookup('sportsfixturesDivision.postDelete', {}) }}" class="icon-delete" title="Delete" data-delete="{{ currentDivision.id }}"></a>
+                        <a href="{{ routeLookup('sportsfixturesDivision.getUpdate', {divisionId: currentDivision.id}) }}" class="icon-modify" title="Modify"></a>
                     </nav>
                 </li>
                 {% endfor %}

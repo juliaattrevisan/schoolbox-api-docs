@@ -46,9 +46,9 @@
                         </div>
                     </div>
                     <nav>
-                        <a href="/sportsfixtures/sport/delete" class="icon-delete" title="Delete" data-delete="{{ currentSport.id }}"></a>
-                        <a href="/sportsfixtures/sport/update/{{ currentSport.id }}" class="icon-modify" title="Modify"></a>
-                        <a href="/sportsfixtures/division/list/{{ currentSport.id }}" class="icon-list" title="Manage Divisions in {{ currentSport.name }}"></a>
+                        <a href="{{ routeLookup('sportsfixturesSport.postDelete', {}) }}" class="icon-delete" title="Delete" data-delete="{{ currentSport.id }}"></a>
+                        <a href="{{ routeLookup('sportsfixturesSport.getUpdate', {sportId: currentSport.id}) }}" class="icon-modify" title="Modify"></a>
+                        <a href="{{ routeLookup('sportsfixturesDivision.getList', {sportId: currentSport.id}) }}" class="icon-list" title="Manage Divisions in {{ currentSport.name }}"></a>
                     </nav>
                 </li>
                 {% endfor %}
