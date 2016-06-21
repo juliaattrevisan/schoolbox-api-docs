@@ -1,8 +1,10 @@
 {# Student's portrait - exactly the same as /submission/allWork/{{ student.id }} #}
-<div class="small-12 avatar card">
-    <a href="/search/user/{{ student.getId() }}" title="View Profile">
-        <img src="/portrait.php?userId={{ student.getExternalId() }}&amp;size=square64" alt="{{ student.formatName() }}" />
-        <p>{{ student.formatName() }}</p>
-        <p class="meta">Year {{ student.getYear() }} Student</p>
-    </a>
-</div>
+<section>
+    <div class="small-12 avatar card">
+        <a href="/search/user/{{ student.getId() }}" title="View Profile">
+            <img src="/portrait.php?userId={{ student.getExternalId() }}&amp;size=square64" alt="{{ student.formatName() }}" />
+            <p>{{ student.formatName() }}</p>
+            <p class="meta">Year {{ student.getYear() }} Student</p>
+        </a>
+    </div>
+</section>

@@ -24,19 +24,15 @@
 
 <div class="row">
     <div class="small-12 medium-5 island">
-        <section>
-            {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
-        </section>
+        {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
     </div>
     <div class="small-12 medium-7 island">
-        <section>
-            {% include '@customMeridenPastoral/sub/selector.twig' with {
-                tutorGroupList:   report.tutorGroupList,
-                subjectList:      report.subjectList,
-                student:          report.student,
-                tutorGroupReport: report.tutorGroupReport
-            } %}
-        </section>
+        {% include '@customMeridenPastoral/sub/selector.twig' with {
+            tutorGroupList:   report.tutorGroupList,
+            subjectList:      report.subjectList,
+            student:          report.student,
+            tutorGroupReport: report.tutorGroupReport
+        } %}
     </div>
 </div>
 
