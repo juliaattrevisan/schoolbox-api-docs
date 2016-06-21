@@ -17,6 +17,12 @@
     width: 5.75rem;
 }
 
+/*
+.e-report {
+    font-size: .75rem;
+}
+*/
+
 /** headers ought to be bold **/
 .e-report h1,
 .e-report h2,
@@ -24,11 +30,26 @@
     font-weight: bold;
 }
 
+/** Font sizes for stuff (clobbering specificity) **/
+.e-report h1 {
+    font-size: 1rem;
+}
+.e-report h2 {
+    font-size: .875rem;
+}
+.e-report dl dt,
+.e-report dl dd,
+.e-report p,
+.e-report th,
+.e-report td {
+    line-height: .75rem;
+    font-size: .75rem;
+}
+
 /** Reduce space between definitions **/
 .e-report dl dt,
 .e-report dl dd {
     margin-bottom: 0;
-    line-height: 1rem;
 }
 
 /** Explanations are tiny **/
@@ -46,4 +67,5 @@
 .e-report .bordered-table th,
 .e-report .bordered-table td {
     border: .0625rem solid black;
+    padding: .5rem;
 }
