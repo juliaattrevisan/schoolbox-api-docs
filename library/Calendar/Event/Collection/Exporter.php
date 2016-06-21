@@ -18,7 +18,7 @@ use Config;
 class Exporter extends Renderer {
 
     /**
-     * @var Sabre\VObject\Component\VCalendar
+     * @var VCalendar
      */
     var $vCalendar;
 
@@ -33,12 +33,13 @@ class Exporter extends Renderer {
      * @param $api
      * @param $startTimestamp
      * @param $endTimestamp
-     * @param $viewer
+     * @param $user
      * @param $page
+     * @param $viewer
      */
-    public function __construct($api, $startTimestamp, $endTimestamp, User $viewer, \SitePage $page)
+    public function __construct($api, $startTimestamp, $endTimestamp, User $user, \SitePage $page, User $viewer)
     {
-        parent::__construct($api, $startTimestamp, $endTimestamp, $viewer, $page);
+        parent::__construct($api, $startTimestamp, $endTimestamp, $user, $page, $viewer);
 
 		$this->setVCalendar(new VCalendar());
 		$this->getVCalendar()->add('method', 'PUBLISH');
@@ -72,7 +73,14 @@ class Exporter extends Renderer {
     public function renderEvent($event, $type)
     {
         $rendererClass = $event->getRendererClass($type);
-        $renderObj = new $rendererClass($this->getPage(), $event, $this->getViewer(), $this->getGroupHandler(), $this->getCalendarHandler());
+        $renderObj = new $rendererClass(
+            $this->getPage(),
+            $event,
+            $this->getUser(),
+            $this->getGroupHandler(),
+            $this->getCalendarHandler(),
+            $this->getViewer()
+        );
         $renderObj->setVCalendar($this->getVCalendar());
         $renderObj->setTextConverter($this->getTextConverter());
         return $renderObj->render();

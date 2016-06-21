@@ -10,14 +10,13 @@
  */
 namespace Calendar\Event\Type\EOTC\Renderer;
 
-use Calendar\Event\Type\RendererBase;
 
-class Javascript extends RendererBase {
+class Javascript extends Base {
 
 	/**
 	 * Visitor
 	 *
-	 * @param $this->getEvent()
+	 * @return string
 	 */
 	public function render() {
 		if ($this->isVisible($this->getEvent())) {
@@ -144,34 +143,4 @@ class Javascript extends RendererBase {
 		}
 	}
 
-    /**
-     * Determine whether an event is a task or not
-     *
-     * @param $this->getEvent()
-     * @return bool
-     */
-    private function isTask() {
-        if ($this->getEvent()->getType() == $this->getTaskTypeId()) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @param int $taskTypeId
-     */
-    private function setTaskTypeId($taskTypeId) {
-        $this->taskTypeId = $taskTypeId;
-    }
-
-    /**
-     * @return int
-     */
-    private function getTaskTypeId() {
-        return $this->taskTypeId;
-    }
 }

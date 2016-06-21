@@ -53,18 +53,6 @@ class Event extends EventBase implements EventInterface {
      */
     protected $is_assessment = false;
 
-
-    /**
-	 * Render via external class
-	 *
-	 * @param \Calendar_Event_StudentBirthday_Renderer $visitor
-	 *
-	 * @return mixed
-	 */
-    public function accept($visitor) {
-        return $visitor->visit($this);
-    }
-
     /**
      * Get submission note
 	 *

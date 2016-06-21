@@ -9,9 +9,10 @@
 
 namespace Calendar\Event\Collection;
 
+use Html2Text\Html2Text;
+use Sabre\VObject\Component\VCalendar;
 use Schoolbox\User;
-use SitePage;
-use Config;
+
 
 class CSVExporter extends Renderer {
 
@@ -29,6 +30,16 @@ class CSVExporter extends Renderer {
                            );
 
     /**
+     * @var VCalendar $vCalendar
+     */
+    protected $vCalendar;
+
+    /**
+     * @var Html2Text
+     */
+    protected $textConverter;
+
+    /**
      * This will stream the vcal output as it parses over the event collection
      */
     public function renderAll() {
@@ -41,7 +52,7 @@ class CSVExporter extends Renderer {
 	}
 
     /**
-     * @param \Sabre\VObject\Component\VCalendar $vCalendar
+     * @param VCalendar $vCalendar
      */
     public function setVCalendar($vCalendar)
     {
@@ -49,7 +60,7 @@ class CSVExporter extends Renderer {
     }
 
     /**
-     * @return \Sabre\VObject\Component\VCalendar
+     * @return VCalendar
      */
     public function getVCalendar()
     {
@@ -57,7 +68,7 @@ class CSVExporter extends Renderer {
     }
 
     /**
-     * @param \Html2Text\Html2Text $textConverter
+     * @param Html2Text $textConverter
      */
     public function setTextConverter($textConverter)
     {
@@ -65,7 +76,7 @@ class CSVExporter extends Renderer {
     }
 
     /**
-     * @return \Html2Text\Html2Text
+     * @return Html2Text
      */
     public function getTextConverter()
     {

@@ -9,9 +9,14 @@
 
 namespace Calendar\Event\Type\Day\Renderer;
 
-use Calendar\Event\Type\CsvBase;
 
-class Csv extends CsvBase {
+use Calendar\Event\Render\CSVTrait;
 
+class Csv extends Base {
 
+    /**
+     * Inherit default CSV formatting
+     * render()
+     */
+    use CSVTrait;
 }

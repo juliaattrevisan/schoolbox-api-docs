@@ -10,11 +10,14 @@
 
 $user_mapper = new \Schoolbox\UserMapper();
 $user = $user_mapper->findById($_GET['userId']);
+$viewer = $_SESSION['user'];
+
 try {
-    Calendar_Layout_Full_Javascript::permissionCheck($_GET['userId'], $_SESSION['user'], new Group());
+    Calendar_Layout_Full_Javascript::permissionCheck($_GET['userId'], $viewer, new Group());
 }
 catch (Exception $e) {
     error($e->getCode());
 }
-$calendar = new Calendar_Layout_Full_Ajax_JSON($this, $user, $this->arg[0]);
+
+$calendar = new Calendar_Layout_Full_Ajax_JSON($this, $user, $this->arg[0], $viewer);
 $calendar->render();

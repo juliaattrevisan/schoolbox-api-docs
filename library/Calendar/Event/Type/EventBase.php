@@ -106,10 +106,7 @@ abstract class EventBase implements EventInterface
      *
      * @var array
      */
-    protected $renderClasses = array(   'javascript'    => RendererBase::class,
-                                        'html'          => RendererBase::class,
-                                        'vcal'          => VObjectBase::class,
-                                    );
+    protected $renderClasses;
 
     /**
      * Whether or not to display the modify link
@@ -207,7 +204,7 @@ abstract class EventBase implements EventInterface
     }
 
     /**
-     * Special time formattng
+     * Special time formatting
      *
      * @return string
      */
@@ -474,7 +471,7 @@ abstract class EventBase implements EventInterface
     /**
      * Set renderer class
      *
-     * @param string $rendererClass
+     * @param string $renderClasses
      */
     public function setRendererClass($renderClasses)
     {
@@ -484,7 +481,8 @@ abstract class EventBase implements EventInterface
     /**
      * Get renderer class
      *
-     * @param string
+     * @param string $type
+     * @throws \Exception
      * @return string
      */
     public function getRendererClass($type)

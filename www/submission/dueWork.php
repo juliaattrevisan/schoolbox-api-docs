@@ -464,8 +464,15 @@ foreach ($categoryList as $category) {
 }
 
 $feedItems = array();
-
 foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restrict_grades) as $activity) {
+
+    // Only permit Staff & Admins to view unpublished Due Work
+    if($activity->getSubmissionBox() && $activity->getSubmissionBox()->getPublishDate()->gt(new Alaress_Date_Format())){
+        if(!($groupHandler->isSuperuser() || $groupHandler->isStaff())){
+            continue;
+        }
+    }
+
     $mark        = null;
     $numericMark = null;
 

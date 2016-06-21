@@ -13,8 +13,15 @@ use Twig_Environment;
 use \Schoolbox\User;
 use \Alaress_Date_Format;
 
-class RendererBase implements RendererInterface
+abstract class RendererBase implements RendererInterface
 {
+    /**
+     * The user who the event relates to
+     *
+     * @var \Schoolbox\User
+     */
+    var $user;
+
     /**
      * The user who is viewing this event
      *
@@ -55,12 +62,15 @@ class RendererBase implements RendererInterface
     /**
      * @param SitePage $page
      * @param EventBase $event
+     * @param User $user
+     * @param \Group $groupHandler
+     * @param \Calendar $calHandler
      * @param User $viewer
-     * @param
      */
-    public function __construct(SitePage $page, EventBase $event, User $viewer, \Group $groupHandler, \Calendar $calHandler) {
+    public function __construct(SitePage $page, EventBase $event, User $user, \Group $groupHandler, \Calendar $calHandler, User $viewer) {
         $this->setPage($page);
         $this->setEvent($event);
+        $this->setUser($user);
         $this->setViewer($viewer);
 
         //TODO remove these
@@ -73,9 +83,7 @@ class RendererBase implements RendererInterface
      *
      * @return string
      */
-    public function render() {
-        return '';
-    }
+    abstract public function render();
 
     /**
      * Is this event visible by this user, sometimes we can't tell till we render if we should show it
@@ -84,9 +92,7 @@ class RendererBase implements RendererInterface
      *
      * @return bool
      */
-    public function isVisible() {
-        return true;
-    }
+    abstract public function isVisible();
 
     /**
      * Return templating engine
@@ -95,6 +101,23 @@ class RendererBase implements RendererInterface
      */
     public function getTemplate() {
         return $this->page->getDi()->get('templateEngine');
+    }
+
+
+    /**
+    * @param \Schoolbox\User $user
+    */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @return \Schoolbox\User
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 
     /**

@@ -49,6 +49,6 @@ if (count($this->arg) == 2) {
     $user = $_SESSION['user'];
 }
 
-$calendar = new Calendar_Layout_Full_Javascript($this, $user, $selectedDate);
+$calendar = new Calendar_Layout_Full_Javascript($this, $user, $selectedDate, $_SESSION['user']);
 $calendar->render();
 

@@ -9,13 +9,15 @@
  */
 namespace Calendar\Event\Type\Submission\Renderer;
 
-use Calendar\Event\Type\Submission\Renderer\Base;
-
 class Html extends Base {
 
 
     public function render()
     {
+        if(!$this->isVisible()){
+            return '';
+        }
+
         return $this->getTemplate()->render('calendar/type/submission.twig',
             array(  'event' => $this->getEvent(),
                     'renderer' => $this)

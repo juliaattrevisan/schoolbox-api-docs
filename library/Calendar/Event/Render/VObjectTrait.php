@@ -1,31 +1,33 @@
 <?php
 /**
- * Calendar_Event_Type_Exporter_VObject
- *
- * Like Calendar_Event_Type_Exporter but works with the
- * \Sabre\VObject\Component\VCalendar class instead.
- *
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2014, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * @author      Andy Ryan <andy.ryan@alaress.com.au>
+ * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
  */
 
-namespace Calendar\Event\Type;
+namespace Calendar\Event\Render;
 
-use Alaress\Html\ToText as Html2Text;
+use Html2Text\Html2Text;
 use Sabre\VObject\Component\VCalendar;
-use Sabre\VObject\Property\ICalendar;
-use DateTimeZone;
-use DateInterval;
-use DateTime;
 use Sabre\VObject\Component\VEvent;
+use \DateTime;
+use \DateInterval;
+use \DateTimeZone;
 
-class VObjectBase extends RendererBase
+
+/**
+ * Default VObject rendering for all types of Calendar events.
+ *
+ * Inheriting classes may override selected methods & properties.
+ *
+ * @package Calendar\Event\Render
+ */
+trait VObjectTrait
 {
     /**
      * @var VCalendar
      */
-    protected $vcalendar;
+    protected $vCalendar;
 
     /**
      * @var Html2Text
@@ -34,6 +36,12 @@ class VObjectBase extends RendererBase
 
 
     /**
+     * @return VEvent
+     */
+    public abstract function getEvent();
+
+
+        /**
      * Render this event
      *
      * @return string
@@ -46,17 +54,15 @@ class VObjectBase extends RendererBase
         /* Show visible events only, in export
          */
         if ($this->isVisible()) {
+            /** @var VEvent $vEvent */
+            $vEvent = $this->vCalendar->create('VEVENT');
             // Generate a UID based on $this->getEvent()->getEventId()
-            /** @var VEvent $vevent */
-            $vevent = $this->vcalendar->create(
-                'VEVENT',
-                ['UID' => $this->getEvent()->getEventId() . '/' . $this->getEvent()->getConnectorId(),]
-            );
-            $vevent->add('CATEGORIES', $this->getEvent()->getEventType());
-            $vevent->add('LOCATION', $this->getEvent()->getLocation());
+            $vEvent->add('UID', $this->getEvent()->getEventId() . '/' . $this->getEvent()->getConnectorId());
+            $vEvent->add('CATEGORIES', $this->getEvent()->getEventType());
+            $vEvent->add('LOCATION', $this->getEvent()->getLocation());
 
             $this->getTextConverter()->setHtml($this->getEvent()->getDetail());
-            $vevent->add('DESCRIPTION', $this->getTextConverter()->getText());
+            $vEvent->add('DESCRIPTION', $this->getTextConverter()->getText());
 
             $start_time = $this->getEvent()->getStartTime()->getDateTimeObject();
             if (!($start_time instanceof DateTime)) {
@@ -69,27 +75,27 @@ class VObjectBase extends RendererBase
             if (!$this->getEvent()->getAllday()) {
                 $start_time->setTimezone($utcTimezone);
                 $end_time->setTimezone($utcTimezone);
-                $vevent->add('DTSTART', $start_time);
-                $vevent->add('DTEND', $end_time);
+                $vEvent->add('DTSTART', $start_time);
+                $vEvent->add('DTEND', $end_time);
             } else {
                 $end_time->add(new DateInterval('P1D'));
-                $vevent->add('DTSTART', $start_time->format('Ymd'), array('VALUE' => 'DATE'));
-                $vevent->add('DTEND', $end_time->format('Ymd'), array('VALUE' => 'DATE'));
+                $vEvent->add('DTSTART', $start_time->format('Ymd'), array('VALUE' => 'DATE'));
+                $vEvent->add('DTEND', $end_time->format('Ymd'), array('VALUE' => 'DATE'));
             }
 
-            $vevent->add('SUMMARY', $this->getEvent()->getTitle());
+            $vEvent->add('SUMMARY', $this->getEvent()->getTitle());
 
-            return $vevent->serialize();
+            return $vEvent->serialize();
         }
     }
 
     /**
-     * @param  \Sabre\VObject\Component\VCalendar $vcalendar
+     * @param  \Sabre\VObject\Component\VCalendar $vCalendar
      * @return $this
      */
-    public function setVCalendar($vcalendar)
+    public function setVCalendar($vCalendar)
     {
-        $this->vcalendar = $vcalendar;
+        $this->vCalendar = $vCalendar;
         return $this;
     }
 
@@ -98,7 +104,7 @@ class VObjectBase extends RendererBase
      */
     public function getVCalendar()
     {
-        return $this->vcalendar;
+        return $this->vCalendar;
     }
 
     /**

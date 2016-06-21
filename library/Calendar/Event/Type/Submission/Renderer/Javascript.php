@@ -11,8 +11,6 @@
  */
 namespace Calendar\Event\Type\Submission\Renderer;
 
-use Calendar\Event\Type\Submission\Renderer\Base;
-use Schoolbox\Resource\Folder\Model as Folder;
 use \Scrub;
 
 class Javascript extends Base
@@ -21,10 +19,14 @@ class Javascript extends Base
     /**
      * Visitor
      *
-     * @param $this->getEvent()
+     * @return string
      */
     public function render()
     {
+        if(!$this->isVisible()){
+            return '';
+        }
+
         /* Show a homepage if appropriate
          */
         $categoryId   = $this->getEvent()->getCategory()->getId();

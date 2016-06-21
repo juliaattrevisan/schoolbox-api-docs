@@ -13,8 +13,17 @@ use \Calendar\Event\Type\RendererBase;
 use Aura\Router\Router;
 use Alaress\Authorizer\Authorizer;
 
-class Base extends RendererBase
+abstract class Base extends RendererBase
 {
+
+    /**
+     * @return bool
+     */
+    public function isVisible()
+    {
+        return true;
+    }
+
     public function getEditURL() {
         return $this->getRouteIfAuthorized(
             'resourceBooking.edit',

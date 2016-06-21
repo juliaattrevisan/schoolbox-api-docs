@@ -9,16 +9,17 @@
 
 namespace Calendar\Event\Type\Submission\Renderer;
 
-use Calendar\Event\Type\CsvBase;
-
-class Csv extends CsvBase {
+class Csv extends Base{
 
     /**
      * Render this event out as CSV data
-     *
      */
     public function render()
     {
+        if(!$this->isVisible()){
+            return '';
+        }
+
         $fd = fopen('php://temp/maxmemory:10000', 'rw');
 
 
@@ -38,7 +39,6 @@ class Csv extends CsvBase {
         $row = fread($fd, 10000);
 
         return $row;
-
     }
 }
 

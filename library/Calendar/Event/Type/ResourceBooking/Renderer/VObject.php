@@ -9,14 +9,20 @@
 
 namespace Calendar\Event\Type\ResourceBooking\Renderer;
 
-use Calendar\Event\Type\VObjectBase;
+use Calendar\Event\Render\VObjectTrait;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
 use Sabre\VObject\Component\VEvent;
 
-class VObject extends VObjectBase
+class VObject extends Base
 {
+    /**
+     * Inherit default VObject formatting
+     * render()
+     */
+    use VObjectTrait;
+
     /**
      * Render this event
      *
@@ -30,14 +36,14 @@ class VObject extends VObjectBase
         /* Show visible events only, in export
          */
         if ($this->isVisible()) {
-            /** @var VEvent $vevent */
-            $vevent = $this->vcalendar->create('VEVENT');
+            /** @var VEvent $vEvent */
+            $vEvent = $this->vCalendar->create('VEVENT');
             // Generate a UID based on $this->getEvent()->getEventId()
-            $vevent->add('UID', $this->getEvent()->getEventId() . '/' . $this->getEvent()->getConnectorId());
-            $vevent->add('CATEGORIES', $this->getEvent()->getCategory());
+            $vEvent->add('UID', $this->getEvent()->getEventId() . '/' . $this->getEvent()->getConnectorId());
+            $vEvent->add('CATEGORIES', $this->getEvent()->getCategory());
 
             $this->getTextConverter()->setHtml($this->getEvent()->getDetail());
-            $vevent->add('DESCRIPTION', $this->getTextConverter()->getText());
+            $vEvent->add('DESCRIPTION', $this->getTextConverter()->getText());
 
             $start_time = $this->getEvent()->getStartTime()->getDateTimeObject();
             if (!($start_time instanceof DateTime)) {
@@ -50,17 +56,17 @@ class VObject extends VObjectBase
             if (!$this->getEvent()->getAllday()) {
                 $start_time->setTimezone($utcTimezone);
                 $end_time->setTimezone($utcTimezone);
-                $vevent->add('DTSTART', $start_time);
-                $vevent->add('DTEND', $end_time);
+                $vEvent->add('DTSTART', $start_time);
+                $vEvent->add('DTEND', $end_time);
             } else {
                 $end_time->add(new DateInterval('P1D'));
-                $vevent->add('DTSTART', $start_time->format('Ymd'), array('VALUE' => 'DATE'));
-                $vevent->add('DTEND', $end_time->format('Ymd'), array('VALUE' => 'DATE'));
+                $vEvent->add('DTSTART', $start_time->format('Ymd'), array('VALUE' => 'DATE'));
+                $vEvent->add('DTEND', $end_time->format('Ymd'), array('VALUE' => 'DATE'));
             }
 
-            $vevent->add('SUMMARY', $this->getEvent()->getTitle());
+            $vEvent->add('SUMMARY', $this->getEvent()->getTitle());
 
-            return $vevent->serialize();
+            return $vEvent->serialize();
         }
     }
 }

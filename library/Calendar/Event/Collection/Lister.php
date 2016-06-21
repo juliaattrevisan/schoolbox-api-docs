@@ -21,12 +21,13 @@ class Lister extends Renderer
      * @param $api
      * @param $startTimestamp
      * @param $endTimestamp
-     * @param $viewer
-     * @param $page
+     * @param User $user            Who the Calendar is about
+     * @param \SitePage $page
+     * @param User $viewer          Who is viewing the Calendar
      */
-    public function __construct($api, $startTimestamp, $endTimestamp, User $viewer, \SitePage $page)
+    public function __construct($api, $startTimestamp, $endTimestamp, User $user, \SitePage $page, User $viewer)
     {
-        parent::__construct($api, $startTimestamp, $endTimestamp, $viewer, $page);
+        parent::__construct($api, $startTimestamp, $endTimestamp, $user, $page, $viewer);
 
         /* Detonate multi-day events into their individual day ingredients
          * Merje and sort

@@ -51,6 +51,11 @@ class Renderer
     /**
      * @var User
      */
+    protected $user;
+
+    /**
+     * @var User
+     */
     protected $viewer;
 
     /**
@@ -81,14 +86,16 @@ class Renderer
      * @param $api
      * @param $startTimestamp
      * @param $endTimestamp
-     * @param \Schoolbox\User $viewer
+     * @param \Schoolbox\User $user
      * @param \SitePage $page
+     * @param \Schoolbox\User $viewer
      */
-    public function __construct($api, $startTimestamp, $endTimestamp, User $viewer, \SitePage $page)
+    public function __construct($api, $startTimestamp, $endTimestamp, User $user, \SitePage $page, User $viewer)
     {
         $this->setApi($api);
         $this->setStartTimestamp($startTimestamp);
         $this->setEndTimestamp($endTimestamp);
+        $this->setUser($user);
         $this->setPage($page);
         $this->setViewer($viewer);
 
@@ -120,6 +127,8 @@ class Renderer
 
     /**
      * Render all events
+     * @param string $type
+     * @return string
      */
     public function renderAll($type)
     {
@@ -140,7 +149,14 @@ class Renderer
     {
         $rendererClass = $event->getRendererClass($type);
         /** @var RendererInterface $renderObj */
-        $renderObj = new $rendererClass($this->getPage(), $event, $this->getViewer(), $this->getGroupHandler(), $this->getCalendarHandler());
+        $renderObj = new $rendererClass(
+            $this->getPage(),
+            $event,
+            $this->getUser(),
+            $this->getGroupHandler(),
+            $this->getCalendarHandler(),
+            $this->getViewer()
+        );
         return $renderObj->render();
     }
 
@@ -287,6 +303,22 @@ class Renderer
     public function getGroupHandler()
     {
         return $this->groupHandler;
+    }
+
+    /**
+     * @param User $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
     }
 
     /**

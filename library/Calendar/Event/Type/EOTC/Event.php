@@ -22,7 +22,7 @@ class Event extends Day\Event implements EventInterface {
     protected $renderClasses = array(   'javascript'    => Renderer\Javascript::class,
                                         'html'          => Renderer\Html::class,
                                         'vcal'          => Renderer\VObject::class,
-                                        'csv'          => Renderer\Csv::class,
+                                        'csv'           => Renderer\Csv::class,
     );
 
     /* Attendance flag
@@ -36,16 +36,6 @@ class Event extends Day\Event implements EventInterface {
      */
     protected $custom = [];
 
-	/**
-	 * Render via external class
-	 *
-	 * @param \Calendar_Event_Type_EOTC_Renderer_Javascript $visitor
-	 *
-	 * @return mixed
-	 */
-    public function accept($visitor) {
-        return $visitor->visit($this);
-    }
 
     /**
      * Can someone attend this event

@@ -11,7 +11,7 @@ namespace Calendar\Event\Type\Day\Renderer;
 
 use \Calendar\Event\Type\RendererBase;
 
-class Base extends RendererBase
+abstract class Base extends RendererBase
 {
     /**
      * If the Publish Date hasn't been reached yet, only show the events to Superusers
@@ -22,8 +22,8 @@ class Base extends RendererBase
      */
     public function isVisible() {
         $isFutureEvent = ($this->getEvent()->getPublishDate()->getUnixTimestamp() >= time());
-        $isVisibleToUser = ($this->getViewer()->isSuperuser() || $this->getEvent()->isOwner() || $this->getEvent()->isEditable());
-        if ($isFutureEvent && !($isVisibleToUser)) {
+        $isAlwaysVisible = ($this->getViewer()->isSuperuser() || $this->getEvent()->isOwner() || $this->getEvent()->isEditable());
+        if ($isFutureEvent && !($isAlwaysVisible)) {
             return false;
         }
         return true;

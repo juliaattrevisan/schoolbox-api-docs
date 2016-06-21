@@ -10,6 +10,9 @@ namespace Calendar\Event\Type\Day\Renderer;
 
 class Javascript extends Base
 {
+    /**
+     * @return string
+     */
     public function render()
     {
         if ($this->isVisible()) {
@@ -125,6 +128,8 @@ class Javascript extends Base
             );
 
             return json_encode($event) . ',';
+        } else {
+            return '';
         }
     }
 
