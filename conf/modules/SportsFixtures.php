@@ -11,6 +11,8 @@ namespace Config\Modules;
 
 use Alaress\Application\Kernel;
 use Schoolbox\SportsFixtures\Module;
+use Schoolbox\SportsFixtures\Sport\Module as SportModule;
+use Schoolbox\SportsFixtures\Division\Module as DivisionModule;
 
 class SportsFixtures implements ModuleConfigInterface
 {
@@ -25,6 +27,12 @@ class SportsFixtures implements ModuleConfigInterface
     {
         $messagesModule = new Module($kernel->getDependencyInjector());
         $messagesModule->init('/sportsfixtures');
+
+        $messagesModule = new SportModule($kernel->getDependencyInjector());
+        $messagesModule->init('/sportsfixtures/sport');
+
+        $messagesModule = new DivisionModule($kernel->getDependencyInjector());
+        $messagesModule->init('/sportsfixtures/division');
     }
 
 } 

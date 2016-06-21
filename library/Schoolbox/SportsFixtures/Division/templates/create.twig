@@ -1,0 +1,69 @@
+<script type="text/javascript">
+    $(function() {
+        $('#divisionForm').alaressValidate({
+            rules: {
+                name: {
+                    required: true,
+                    minlength: 2
+                },
+                sportId: {
+                    min: 1
+                }
+            },
+            messages: {
+                'sportId': 'Please choose a Sport.',
+                'name': 'Please enter a Division name.'
+            },
+            errorPlacement: function(error, element) {
+                $.alaressValidate.defaultErrorPlacement(error, element);
+            }
+        })
+    });
+</script>
+
+<ul class="breadcrumb">
+    <li><a href="#">Sports Fixtures</a></li>
+    <li><a href="/sportsfixtures/sport/list">All Sports</a></li>
+    <li><a href="/sportsfixtures/division/list/{{ sport.id }}">Divisions in {{ sport.name }}</a></li>
+
+    {% if division.id %}
+    <li class="active"><a href="/sportsfixtures/division/update/{{ division.id }}">{{ division.name }}</a></li>
+    {% else %}
+    <li class="active"><a href="#">{{ action }}</a></li>
+    {% endif %}
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sports Fixtures</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form id='divisionForm' action="/sportsfixtures/division/{% if division %}update/{{ division.id }}{% else %}create/{{ sport.id }}{% endif %}" method="post">
+            <h2 class="subheader">{{ action }} Division in {{ sport.name }}</h2>
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="sportId" value="{{ sport.id }}"/>
+                        <input type="hidden" name="divisionId" value="{{ division.id }}"/>
+
+                        <label>
+                            Name
+                            <input type="text" name="name" value="{{ division.name }}"/>
+                        </label>
+
+                        <label>
+                            Url
+                            <input type="text" name="url" value="{{ division.url }}" />
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="{{ action }} Division" />
+        </form>
+    </div>
+</div>
