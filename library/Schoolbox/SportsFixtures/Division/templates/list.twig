@@ -18,8 +18,8 @@
 </script>
 <ul class="breadcrumb">
     <li><a href="#">Sports Fixtures</a></li>
-    <li><a href="/sportsfixtures/sport/list">All Sports</a></li>
-    <li class="active"><a href="/sportsfixtures/division/list/{{ sport.id }}">Divisions in {{ sport.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
+    <li class="active"><a href="{{ routeLookup('sportsfixturesDivision.getList', {sportId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
 </ul>
 
 <div class="row">
@@ -38,7 +38,7 @@
                 </div>
             </div>
             <nav>
-                <a href='/sportsfixtures/division/create/{{ sport.id }}' class="icon-add" title="Add Division to {{ sport.name }}"></a>
+                <a href='{{ routeLookup('sportsfixturesDivision.getCreate', {sportId: sport.id}) }}' class="icon-add" title="Add Division to {{ sport.name }}"></a>
             </nav>
         </div>
 
@@ -65,7 +65,7 @@
         <div class="empty-state">
             <i class="icon-sport"></i>
             <p>There are no Divisions in {{ sport.name }}.</p>
-            <p><a href="/sportsfixtures/division/create/{{ sport.id }}" title="Add a Division">Add a Division</a></p>
+            <p><a href="{{ routeLookup('sportsfixturesDivision.getCreate', {sportId: sport.id}) }}" title="Add a Division">Add a Division</a></p>
         </div>
         {% endif %}
     </div>
