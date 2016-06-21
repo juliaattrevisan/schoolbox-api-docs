@@ -48,6 +48,7 @@
     font-size: 12px !important;
 }*/
 
+/** Style the crest **/
 .meriden-crest {
     text-align: center;
 }
@@ -55,31 +56,34 @@
     width: 5.75rem;
 }
 
+/** headers ought to be bold **/
+.e-report h1,
+.e-report h2,
+.e-report h3 {
+    font-weight: bold;
+}
+
 /** Reduce space between definitions **/
-.pastoral-report dl dt,
-.pastoral-report dl dd,
-.subject-report dl dt,
-.subject-report dl dd {
+.e-report dl dt,
+.e-report dl dd {
     margin-bottom: 0;
     line-height: 1rem;
 }
 
-.pastoral-report .explanation,
-.subject-report .explanation {
+/** Explanations are tiny **/
+.e-report .explanation {
     font-size: 0.75rem;
 }
 
-.pastoral-report .width-auto,
-.subject-report .width-auto {
+/** Tables in eReport shouldn't auto-stretch **/
+.e-report .width-auto {
     width: auto;
 }
 
-.pastoral-report .bordered-table,
-.subject-report .bordered-table,
-.pastoral-report .bordered-table th,
-.subject-report .bordered-table th,
-.pastoral-report .bordered-table td,
-.subject-report .bordered-table td {
+/** Tables in eReport should have boarders **/
+.e-report .bordered-table,
+.e-report .bordered-table th,
+.e-report .bordered-table td {
     border: .0625rem solid black;
 }
 
