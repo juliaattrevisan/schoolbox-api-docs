@@ -240,7 +240,7 @@
     <div class="small-12 column">
         <dl class="content">
             <dt>Tutor Comments</dt>
-            <dd>{{ report.tutorGroupReport.namedGrades.tutorComment.comment }}</dd>
+            <dd>{{ report.tutorGroupReport.namedGrades.tutorComment.comment|e('html')|nl2br }}</dd>
         </dl>
     </div>
 </div>
