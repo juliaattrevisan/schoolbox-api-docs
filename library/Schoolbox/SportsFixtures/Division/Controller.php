@@ -102,6 +102,31 @@ class Controller extends AbstractController
     }
 
     /**
+     * Show the player lobby for this division
+     *
+     * @param int $divisionId
+     */
+    public function getLobby($divisionId)
+    {
+        try {
+            $division = $this->getDivisionMapper()->findById($divisionId);
+            $sport    = $this->getSportMapper()->findById($division->getSport()->getId());
+
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput(
+                    '@sportsfixturesDivision/lobby.twig', [
+                        'division' => $division,
+                        'sport'    => $sport,
+                    ]
+                )
+            );
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(2);
+        }
+    }
+
+    /**
      * @param Division $entity
      * @return void
      */
