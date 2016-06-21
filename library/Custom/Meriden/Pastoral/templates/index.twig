@@ -24,17 +24,7 @@
     </div>
 
     <div class="row" id="context">
-        <div class="small-12 medium-5 island">
-            {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
-        </div>
-        <div class="small-12 medium-7 island">
-            {% include '@customMeridenPastoral/sub/selector.twig' with {
-                tutorGroupList:   report.tutorGroupList,
-                subjectList:      report.subjectList,
-                student:          report.student,
-                tutorGroupReport: report.tutorGroupReport
-            } %}
-        </div>
+        {% include '@customMeridenPastoral/sub/context.twig' with {report: report} %}
     </div>
 
     {# House info #}
