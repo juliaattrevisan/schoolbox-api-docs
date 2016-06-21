@@ -15,10 +15,11 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Division\Model as Division;
-
+use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 /**
  * Class Mapper
  * @method Division createModel()
+ * @method Model findById($id)
  * @package Schoolbox\SportsFixtures\Division
  */
 class Mapper extends BaseMapper
@@ -50,8 +51,11 @@ class Mapper extends BaseMapper
      */
     public function deleteTeams(Division $division)
     {
-        /* TODO: Delete all Teams in this Division when this Division is deleted
-         */
+        $allTeams = TeamMapper::getInstance()->findByColumn('division_id', $division->getId());
+
+        foreach ($allTeams as $currentTeam) {
+            TeamMapper::getInstance()->delete($currentTeam);
+        }
 
         /* TODO: Delete all Players in this Division's Lobby when this Division is deleted
          */
