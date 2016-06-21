@@ -35,76 +35,72 @@
     </div>
 
     <div class="small-12 medium-8 column">
-        <section>
-            <div class="scrollable">
-                <table>
-                    <thead>
-                    <tr>
-                        {% if displaySeparate %}
-                            <th>Term 1</th>
-                            <th>Term 2</th>
-                            <th>Term 3</th>
-                            <th>Term 4</th>
+        <table class="width-auto">
+            <thead>
+            <tr>
+                {% if displaySeparate %}
+                    <th>Term 1</th>
+                    <th>Term 2</th>
+                    <th>Term 3</th>
+                    <th>Term 4</th>
+                {% else %}
+                    {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
+                        <th>{{ criterion.label }}</th>
+                    {% else %}
+                        {# fill all with N/A #}
+                        <th>Term 1</th>
+                        <th>Term 2</th>
+                        <th>Term 3</th>
+                        <th>Term 4</th>
+                    {% endfor %}
+                {% endif %}
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                {% if displaySeparate %}
+                    <td>
+                        {% if display1 %}
+                            {{ report.subjectReport.namedGrades.endeavourGrade1.pretty_mark|default('N/A') }}
                         {% else %}
-                            {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
-                                <th>{{ criterion.label }}</th>
-                            {% else %}
-                                {# fill all with N/A #}
-                                <th>Term 1</th>
-                                <th>Term 2</th>
-                                <th>Term 3</th>
-                                <th>Term 4</th>
-                            {% endfor %}
+                            N/A
                         {% endif %}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        {% if displaySeparate %}
-                            <td>
-                                {% if display1 %}
-                                    {{ report.subjectReport.namedGrades.endeavourGrade1.pretty_mark|default('N/A') }}
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if display2 %}
-                                    {{ report.subjectReport.namedGrades.endeavourGrade2.pretty_mark|default('N/A') }}
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if display3 %}
-                                    {{ report.subjectReport.namedGrades.endeavourGrade3.pretty_mark|default('N/A') }}
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if display4 %}
-                                    {{ report.subjectReport.namedGrades.endeavourGrade4.pretty_mark|default('N/A') }}
-                                {% else %}
-                                    N/A
-                                {% endif %}
-                            </td>
+                    </td>
+                    <td>
+                        {% if display2 %}
+                            {{ report.subjectReport.namedGrades.endeavourGrade2.pretty_mark|default('N/A') }}
                         {% else %}
-                            {# Old-style rubric endeavor grade #}
-                            {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
-                                <td>{{ criterion.results[criterion.value]|default('N/A') }}</td>
-                            {% else %}
-                                <td>N/A</td>
-                                <td>N/A</td>
-                                <td>N/A</td>
-                                <td>N/A</td>
-                            {% endfor %}
+                            N/A
                         {% endif %}
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                    </td>
+                    <td>
+                        {% if display3 %}
+                            {{ report.subjectReport.namedGrades.endeavourGrade3.pretty_mark|default('N/A') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if display4 %}
+                            {{ report.subjectReport.namedGrades.endeavourGrade4.pretty_mark|default('N/A') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                {% else %}
+                    {# Old-style rubric endeavor grade #}
+                    {% for criterion in report.subjectReport.namedGrades.endeavourGrades.rubric.criteria %}
+                        <td>{{ criterion.results[criterion.value]|default('N/A') }}</td>
+                    {% else %}
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                    {% endfor %}
+                {% endif %}
+            </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 {% endif %}

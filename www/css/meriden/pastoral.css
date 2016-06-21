@@ -69,6 +69,11 @@
     font-size: 0.75rem;
 }
 
+.pastoral-report .width-auto,
+.subject-report .width-auto {
+    width: auto;
+}
+
 /*
 !**
  * Undo default SB heading styles

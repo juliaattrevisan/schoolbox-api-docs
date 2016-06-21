@@ -33,7 +33,7 @@
             <h2 class="subheader">Course Description</h2>
             <section>
                 <article class="content" id="course-description">
-                    {{ report.subjectReport.description }}
+                    <p>{{ report.subjectReport.description }}</p>
                 </article>
             </section>
         </div>
@@ -49,9 +49,13 @@
                 </dl>
             </div>
             <div class="small-12 medium-8 column">
-                <dl>
-                    <dd>{% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.courseGrade} %}</dd>
-                </dl>
+                <div class="content">
+                    <dl>
+                        <dd>
+                            {% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.courseGrade} %}
+                        </dd>
+                    </dl>
+                </div>
             </div>
         </div>
 
@@ -62,7 +66,7 @@
                 </dl>
             </div>
             <div class="small-12 medium-8 column">
-                <table>
+                <table class="width-auto">
                     <thead>
                     <tr>
                         {% for gradeLevel,_ in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
