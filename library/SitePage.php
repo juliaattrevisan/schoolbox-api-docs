@@ -893,9 +893,10 @@ class SitePage extends Page
             'TAB_SUBMISSION_ON'                            => '',
             'TAB_COURSE_ON'                                => '',
             'TAB_GRADE_ON'                                 => '',
-
+            'SYNERGETIC_SSO'                               => isset($_SESSION["communityLogin"]) ? 'true' : 'false',
             'TAB_' . strtoupper($this->currentTab) . '_ON' => ' navthis',
         );
+
 
         $this->setVar($output);
     }
