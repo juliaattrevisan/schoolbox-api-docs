@@ -12,7 +12,16 @@ namespace Alaress\Web\Output;
 
 use Aura\Web\Response;
 
-class File extends Base {
+class File extends Base
+{
+    /**
+     * A file path to output.
+     *
+     * @todo make this support Flysystem
+     *
+     * @var string
+     */
+    protected $file = null;
 
     /**
      * Outputs the response body from the response object.
@@ -20,14 +29,33 @@ class File extends Base {
      * This method assumes the output is an array with a "file" key, and that
      * appropriate file type headers have been set.
      */
-    protected function outputResponseBody() {
-        $response = $this->getResponse()->content->get();
-        if ($response['file']) {
-            readfile($response['file']);
-        }
-        else {
-            echo $response['data'];
+    protected function outputResponseBody()
+    {
+        $file = $this->getFile();
+        if ($file) {
+            readfile($file);
+        } else {
+            echo $this->getData();
         }
     }
 
+    /**
+     * @return string
+     */
+    protected function getFile()
+    {
+        return isset($this->file)
+            ? $this->file
+            : $this->retrieveFieldFromResponse('file');
+    }
+
+    /**
+     * @param  string $file
+     * @return $this
+     */
+    public function setFile($file)
+    {
+        $this->file = $file;
+        return $this;
+    }
 }

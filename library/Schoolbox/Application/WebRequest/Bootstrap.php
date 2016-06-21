@@ -20,6 +20,7 @@ use DebugBar\Bridge\Twig\TraceableTwigEnvironment;
 use DebugBar\Bridge\Twig\TwigCollector;
 use Alaress\Redis;
 use Alaress\Session\Factory;
+use Alaress\Web\Output;
 use Alaress\Web\Router\RouterFactory;
 use Alaress_Date_Locale_Config;
 use Aura\Di;
@@ -296,12 +297,13 @@ class Bootstrap implements BootstrapInterface {
 		}));
 
 		// Web output class - currently uses Sitepage
-		$di->setters['Alaress\\Web\\Output\\Html']['setTemplateEngine'] = $di->lazyGet('templateEngine');
-		$di->setters['Alaress\\Web\\Output\\ThemedHtml']['setSitepage'] = $di->lazyGet('layoutEngine');
-		$di->set('webOutput:html', $di->lazyNew('Alaress\\Web\\Output\\ThemedHtml'));
-		$di->set('webOutput:nochrome', $di->lazyNew('Alaress\\Web\\Output\\Html'));
-		$di->set('webOutput:json', $di->lazyNew('Alaress\\Web\\Output\\Json'));
-		$di->set('webOutput:file', $di->lazyNew('Alaress\\Web\\Output\\File'));
+		$di->setters[Output\Html::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
+		$di->setters[Output\ThemedHtml::class]['setSitepage'] = $di->lazyGet('layoutEngine');
+		$di->set('webOutput:base', $di->lazyNew(Output\Base::class));
+		$di->set('webOutput:html', $di->lazyNew(Output\ThemedHtml::class));
+		$di->set('webOutput:nochrome', $di->lazyNew(Output\Html::class));
+		$di->set('webOutput:json', $di->lazyNew(Output\Json::class));
+		$di->set('webOutput:file', $di->lazyNew(Output\File::class));
 
 		// Mapper notifications:
 		// They rely upon the session being injected into them, so do that.

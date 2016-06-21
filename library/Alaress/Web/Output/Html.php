@@ -11,7 +11,16 @@ namespace Alaress\Web\Output;
 
 use Aura\Web\Response;
 
-class Html extends Base {
+class Html extends Base
+{
+    /**
+     * The template to use.
+     *
+     * If not set via `setTemplate`, it uses the version from the response.
+     *
+     * @var string
+     */
+    protected $template = null;
 
     /**
      * @var \Twig_Environment
@@ -25,8 +34,7 @@ class Html extends Base {
      * keys.
      */
     protected function outputResponseBody() {
-        $response = $this->getResponse()->content->get();
-        echo $this->getTemplateEngine()->render($response['template'], $response['data']);
+        echo $this->getAsString();
     }
 
     /**
@@ -35,9 +43,11 @@ class Html extends Base {
      *
      * @return string
      */
-    public function getAsString() {
-        $response = $this->getResponse()->content->get();
-        return $this->getTemplateEngine()->render($response['template'], $response['data']);
+    public function getAsString()
+    {
+        $template = $this->getTemplate();
+        $data     = $this->getData();
+        return $this->getTemplateEngine()->render($template, $data);
     }
 
     /**
@@ -56,4 +66,23 @@ class Html extends Base {
         return $this->templateEngine;
     }
 
+    /**
+     * @return string
+     */
+    protected function getTemplate()
+    {
+        return isset($this->template)
+            ? $this->template
+            : $this->retrieveFieldFromResponse('template');
+    }
+
+    /**
+     * @param  string $template
+     * @return $this
+     */
+    public function setTemplate($template)
+    {
+        $this->template = $template;
+        return $this;
+    }
 }

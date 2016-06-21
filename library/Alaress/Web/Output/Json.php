@@ -12,12 +12,13 @@ namespace Alaress\Web\Output;
 use Aura\Web\Response;
 use Alaress\Json as JsonHelper;
 
-class Json extends Base {
-
+class Json extends Base
+{
     /**
      * Ensures Content-Type is set to application/json, as it should be for JSON
      */
-    public function preprocessOutput() {
+    public function preprocessOutput()
+    {
         $this->getResponse()->headers->set('Content-Type', 'application/json');
     }
 
@@ -26,8 +27,8 @@ class Json extends Base {
      *
      * This method assumes the output is an array with a "data" key.
      */
-    protected function outputResponseBody() {
-        $response = $this->getResponse()->content->get();
-        echo json_encode($response['data']);
+    protected function outputResponseBody()
+    {
+        echo json_encode($this->getData());
     }
 }

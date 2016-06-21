@@ -17,18 +17,32 @@ namespace Alaress\Web\Output;
 
 use Aura\Web\Response;
 
-class Base {
+class Base implements OutputInterface
+{
     /**
      * @var Response
      */
     protected $response;
 
     /**
+     * The data to set in the template.
+     *
+     * If not set via `setData`, it uses the version from the response.
+     *
+     * @var string
+     */
+    protected $data = null;
+
+    /**
      * Outputs a response and its headers in the most basic fashion.
      *
      * Copied from https://github.com/auraphp/Aura.Web/blob/develop-2/README-RESPONSE.md
+     *
+     * @param Response $response
      */
-    public function output() {
+    public function output(Response $response)
+    {
+        $this->setResponse($response);
         $this->preprocessOutput();
         $this->outputResponseCode();
         $this->outputHeaders();
@@ -93,10 +107,17 @@ class Base {
     /**
      * Outputs the response body from the response object.
      *
-     * This method assumes the output is simply a string.
+     * This method assumes the output is simply a string, or was set in
+     * `$this->setData`.
      */
-    protected function outputResponseBody() {
-        echo $this->getResponse()->content->get();
+    protected function outputResponseBody()
+    {
+        $data = $this->getData();
+        if (isset($data)) {
+            echo $data;
+        } else {
+            echo $this->getResponse()->content->get();
+        }
     }
 
     /**
@@ -156,6 +177,27 @@ class Base {
     }
 
     /**
+     * Helper function for getting a field value out of this output's response object.
+     *
+     * Assumes that `$this->response->content` is an array or array-like object.
+     *
+     * @param  string $field
+     * @param  mixed  $default
+     * @return mixed Value of $field in $response, or $default if not set.
+     */
+    protected function retrieveFieldFromResponse($field, $default = null)
+    {
+        if ($this->response instanceof Response) {
+            $content = $this->getResponse()->content->get();
+            // $content could be this same object (as it's set via $response->set)
+            if (is_array($content) || $content instanceof \ArrayAccess) {
+                return isset($content[$field]) ? $content[$field] : $default;
+            }
+        }
+        return $default;
+    }
+
+    /**
      * @param  \Aura\Web\Response $response
      * @return $this
      */
@@ -171,4 +213,23 @@ class Base {
         return $this->response;
     }
 
+    /**
+     * @return string
+     */
+    protected function getData()
+    {
+        return isset($this->data)
+            ? $this->data
+            : $this->retrieveFieldFromResponse('data', []);
+    }
+
+    /**
+     * @param  string $data
+     * @return $this
+     */
+    public function setData($data)
+    {
+        $this->data = $data;
+        return $this;
+    }
 }
