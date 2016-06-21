@@ -156,7 +156,9 @@ class Controller extends Base
 
             $this->saveDivision($sport, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $division);
 
-            $this->getResponse()->redirect->afterPost("/sportsfixtures/division/list/{$sportId}");
+            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesDivision.getList', [
+                'sportId' => $sportId
+            ]));
 
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);
