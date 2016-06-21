@@ -270,6 +270,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
 				sr.mark,
 				sr.norm_mark,
 				sr.returned,
+				sr.comment,
 				sb.weight,
 				sb.mark_type,
 				sb.submission_grade_group_id
@@ -292,6 +293,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper implements Schoolbox\Assessmen
                 $marks[$box_id] = array(
                     'mark'                      => $mark,
                     'pretty_mark'               => $pretty_mark,
+                    'comment'                   => $row['comment'],
                     'date'                      => $row['returned'],
                     'weight'                    => $row['weight'],
                     'mark_type'                 => $row['mark_type'],
