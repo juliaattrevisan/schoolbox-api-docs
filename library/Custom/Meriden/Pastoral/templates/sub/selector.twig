@@ -1,6 +1,6 @@
 {# Selector - like the grades selector, but displays only years #}
 {% set currentYear = (tutorGroupReport.year ?: subjectReport.year) %}
-<div class="content">
+<div class="content hide-for-print">
     <div class="context-switch">
         <nav>
             <a data-interaction="previous"
