@@ -36,3 +36,15 @@ CREATE TABLE `sportsfixtures_team` (
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
 	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+
+/* Position Table
+ */
+CREATE TABLE `sportsfixtures_position` (
+	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
+	`sport_id` INT NULL COMMENT '',
+	`name` VARCHAR(255) NULL COMMENT '',
+	`created_at` DATETIME NULL COMMENT '',
+	`updated_at` DATETIME NULL COMMENT '',
+	`deleted_at` DATETIME NULL COMMENT '',
+	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+
