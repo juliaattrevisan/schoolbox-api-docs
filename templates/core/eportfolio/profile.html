@@ -5,6 +5,18 @@
     $(function () {
         // Upload file when it gets attached
         var dropzone = $('#cover-photo-zone');
+        var failveal = $('#uploadFailedModal');
+        var failtell = $('#uploadFailedModalReason');
+
+        dropzone.on('error.attachzone', function (event, file, errorReason) {
+            failtell.text(errorReason);
+            failveal.foundation('reveal', 'open');
+
+            // remove invalid files
+            dropzone.data('plugin_resourceAttach').dropzone.removeAllFiles();
+            dropzone.find('.az-error-list').empty();
+        });
+
         dropzone.on('accept.attachzone success.attachzone', function(event, file) {
 
             if (!file.hash) {
@@ -32,7 +44,8 @@
                 );
             })
             .fail(function() {
-                $('#uploadFailedModal').foundation('reveal', 'open');
+                failtell.text('Please reload the page and try again.');
+                failveal.foundation('reveal', 'open');
             })
             .always(function() {
                 dropzone.data('plugin_resourceAttach').dropzone.removeAllFiles();
@@ -241,6 +254,6 @@
 
 <div id="uploadFailedModal" aria-labelledby="uploadFailedModalTitle" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
     <h2 id="uploadFailedModalTitle">Upload failed</h2>
-    <p>Please reload the page and try again.</p>
+    <p id="uploadFailedModalReason">Please reload the page and try again.</p>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
