@@ -10,275 +10,277 @@
     })(jQuery);
 </script>
 
-<div class="row">
-    <div class="small-12 columns">
-        <div class="meriden-crest">
-            {% include '@customMeridenPastoral/sub/crestSvg.twig' %}
+<div id="pastoral-report" class="pastoral-report">
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="meriden-crest">
+                {% include '@customMeridenPastoral/sub/crestSvg.twig' %}
+            </div>
+        </div>
+
+        <div class="small-12 columns">
+            <h1>School Report - {{ report.tutorGroupReport.year }}</h1>
         </div>
     </div>
 
-    <div class="small-12 columns">
-        <h1>School Report - {{ report.tutorGroupReport.year }}</h1>
+    <div class="row">
+        <div class="small-12 medium-5 island">
+            {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
+        </div>
+        <div class="small-12 medium-7 island">
+            {% include '@customMeridenPastoral/sub/selector.twig' with {
+                tutorGroupList:   report.tutorGroupList,
+                subjectList:      report.subjectList,
+                student:          report.student,
+                tutorGroupReport: report.tutorGroupReport
+            } %}
+        </div>
     </div>
-</div>
 
-<div class="row">
-    <div class="small-12 medium-5 island">
-        {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
-    </div>
-    <div class="small-12 medium-7 island">
-        {% include '@customMeridenPastoral/sub/selector.twig' with {
-            tutorGroupList:   report.tutorGroupList,
-            subjectList:      report.subjectList,
-            student:          report.student,
-            tutorGroupReport: report.tutorGroupReport
-        } %}
-    </div>
-</div>
-
-{# House info #}
-<div class="row">
-    <div class="small-12 medium-4 column">
-        <dl class="content">
-            <dt>House</dt>
-            <dd>{{ report.student.schoolHouse.house }}</dd>
-        </dl>
-    </div>
-    <div class="small-12 medium-4 column">
-        <dl class="content">
-            <dt>Year Coordinator</dt>
-            {% for coordinator in report.tutorGroupReport.coordinators %}
-                <dd><a href="/search/user/{{ coordinator.id }}">{{ coordinator.formatName }}</a></dd>
-            {% endfor %}
-        </dl>
-    </div>
-    <div class="small-12 medium-4 column end">
-        <dl class="content">
-            <dt>Tutor</dt>
-            {# Show only the last tutor (as list is ordered by semester asc #}
-            {% for tutor in report.tutorGroupReport.tutors %}
-                {% if loop.last %}
-                    <dd>{{ tutor.tch_name }}</dd>
-                {% endif %}
-            {% endfor %}
-        </dl>
-    </div>
-</div>
-
-{# Attendance info #}
-<div class="row">
-    <div class="small-12 medium-4 column">
-        <dl class="content">
-            <dt>Days Absent</dt>
-            <dd>{{ report.tutorGroupReport.attendances.absent }}</dd>
-        </dl>
-    </div>
-    <div class="small-12 medium-4 column">
-        <dl class="content">
-            <dt>Days Late</dt>
-            <dd>{{ report.tutorGroupReport.attendances.late }}</dd>
-        </dl>
-    </div>
-    <div class="small-12 medium-4 column">
-        <dl class="content">
-            <dt>Detentions</dt>
-            <dd>{{ report.tutorGroupReport.attendances.detentions }}</dd>
-        </dl>
-    </div>
-    {# Don't show endorsed leave at all if there is none #}
-    {% if report.tutorGroupReport.attendances.endorsedLeave %}
+    {# House info #}
+    <div class="row">
         <div class="small-12 medium-4 column">
             <dl class="content">
-                <dt>Endorsed Leave</dt>
-                <dd>{{ report.tutorGroupReport.attendances.endorsedLeave }}</dd>
+                <dt>House</dt>
+                <dd>{{ report.student.schoolHouse.house }}</dd>
             </dl>
         </div>
+        <div class="small-12 medium-4 column">
+            <dl class="content">
+                <dt>Year Coordinator</dt>
+                {% for coordinator in report.tutorGroupReport.coordinators %}
+                    <dd><a href="/search/user/{{ coordinator.id }}">{{ coordinator.formatName }}</a></dd>
+                {% endfor %}
+            </dl>
+        </div>
+        <div class="small-12 medium-4 column end">
+            <dl class="content">
+                <dt>Tutor</dt>
+                {# Show only the last tutor (as list is ordered by semester asc #}
+                {% for tutor in report.tutorGroupReport.tutors %}
+                    {% if loop.last %}
+                        <dd>{{ tutor.tch_name }}</dd>
+                    {% endif %}
+                {% endfor %}
+            </dl>
+        </div>
+    </div>
+
+    {# Attendance info #}
+    <div class="row">
+        <div class="small-12 medium-4 column">
+            <dl class="content">
+                <dt>Days Absent</dt>
+                <dd>{{ report.tutorGroupReport.attendances.absent }}</dd>
+            </dl>
+        </div>
+        <div class="small-12 medium-4 column">
+            <dl class="content">
+                <dt>Days Late</dt>
+                <dd>{{ report.tutorGroupReport.attendances.late }}</dd>
+            </dl>
+        </div>
+        <div class="small-12 medium-4 column">
+            <dl class="content">
+                <dt>Detentions</dt>
+                <dd>{{ report.tutorGroupReport.attendances.detentions }}</dd>
+            </dl>
+        </div>
+        {# Don't show endorsed leave at all if there is none #}
+        {% if report.tutorGroupReport.attendances.endorsedLeave %}
+            <div class="small-12 medium-4 column">
+                <dl class="content">
+                    <dt>Endorsed Leave</dt>
+                    <dd>{{ report.tutorGroupReport.attendances.endorsedLeave }}</dd>
+                </dl>
+            </div>
+        {% endif %}
+        <div class="small-12 medium-4 column">
+            <dl class="content">
+                <dt>Athletics Carnival</dt>
+                <dd>
+                    {% if report.tutorGroupReport.namedGrades.athletics %}
+                        {%
+                        include '@customMeridenPastoral/sub/assessmentResult.twig'
+                        with {grade: report.tutorGroupReport.namedGrades.athletics}
+                        %}
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </dd>
+            </dl>
+        </div>
+        <div class="small-12 medium-4 column">
+            <dl class="content">
+                <dt>Swimming Carnival</dt>
+                <dd>
+                    {% if report.tutorGroupReport.namedGrades.swimming %}
+                        {%
+                        include '@customMeridenPastoral/sub/assessmentResult.twig'
+                        with {grade: report.tutorGroupReport.namedGrades.swimming}
+                        %}
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </dd>
+            </dl>
+        </div>
+        <div class="small-12 medium-4 column">
+            <dl class="content">
+                <dt>School Camp</dt>
+                <dd>
+                    {% if report.tutorGroupReport.namedGrades.camp %}
+                        {%
+                        include '@customMeridenPastoral/sub/assessmentResult.twig'
+                        with {grade: report.tutorGroupReport.namedGrades.camp}
+                        %}
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </dd>
+            </dl>
+        </div>
+        <div class="small-12 medium-4 column">
+            <dl class="content">
+                <dt>Uniform</dt>
+                <dd>[<a href="/homepage/5648/">View Description</a>]</dd>
+                <dd>
+                    {% if report.tutorGroupReport.namedGrades.uniform %}
+                        {%
+                        include '@customMeridenPastoral/sub/assessmentResult.twig'
+                        with {grade: report.tutorGroupReport.namedGrades.uniform}
+                        %}
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </dd>
+            </dl>
+        </div>
+        <div class="small-12 medium-4 column">
+            <dl class="content">
+                <dt>Pastoral activities involvement</dt>
+                <dd>[<a href="/homepage/5648/">View Description</a>]</dd>
+                <dd>
+                    {% if report.tutorGroupReport.namedGrades.pastoral %}
+                        {%
+                        include '@customMeridenPastoral/sub/assessmentResult.twig'
+                        with {grade: report.tutorGroupReport.namedGrades.pastoral}
+                        %}
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </dd>
+            </dl>
+        </div>
+        <div class="small-12 medium-4 column end">
+            <dl class="content">
+                {##
+                 # Athletics, Swimming, Camp, Uniform, Pastoral Services:
+                 # All these are attendances, and are based off of assessments in the grade page.
+                 #}
+                {% for grade in report.tutorGroupReport.grades %}
+                    <dt>{{ grade.assessment.name }}</dt>
+                    <dd>{{ grade.pretty_mark }}</dd>
+                {% endfor %}
+            </dl>
+        </div>
+    </div>
+
+    {# Awards info #}
+    <div class="row">
+        {# Please excuse the "end" logic #}
+        {% if not report.tutorGroupReport.activities.awards is empty %}
+        <div class="small-12 medium-4 column {% if report.tutorGroupReport.activities.positions is empty and report.tutorGroupReport.activities.service is empty and report.tutorGroupReport.activities.cocurricular is empty %}end{% endif %}">
+            <dl class="content">
+                <dt>Awards and Prizes</dt>
+                {% for award in report.tutorGroupReport.activities.awards %}
+                    <dd>{{ award.act_desc }}</dd>
+                {% endfor %}
+            </dl>
+        </div>
+        {% endif %}
+        {% if not report.tutorGroupReport.activities.cocurricular is empty %}
+        <div class="small-12 medium-4 column {% if report.tutorGroupReport.activities.positions is empty and report.tutorGroupReport.activities.service is empty %}end{% endif %}">
+            <dl class="content">
+                <dt>Co-curricular Activities</dt>
+                {% for activity in report.tutorGroupReport.activities.cocurricular %}
+                    <dd>{{ activity.act_desc }}</dd>
+                {% endfor %}
+            </dl>
+        </div>
+        {% endif %}
+        {% if not report.tutorGroupReport.activities.service is empty %}
+        <div class="small-12 medium-4 column {% if report.tutorGroupReport.activities.positions is empty %}end{% endif %}">
+            <dl class="content">
+                <dt>Community Service</dt>
+                {% for service in report.tutorGroupReport.activities.service %}
+                    <dd>{{ service.act_desc }}</dd>
+                {% endfor %}
+            </dl>
+        </div>
+        {% endif %}
+        {% if not report.tutorGroupReport.activities.positions is empty %}
+        <div class="small-12 medium-4 column end">
+            <dl class="content">
+                <dt>Positions of Office</dt>
+                {% for position in report.tutorGroupReport.activities.positions %}
+                    <dd>{{ position.act_desc }}</dd>
+                {% endfor %}
+            </dl>
+        </div>
+        {% endif %}
+    </div>
+
+    {# Tutor comment #}
+    {% if report.tutorGroupReport.namedGrades.tutorComment %}
+    <div class="row">
+        <div class="small-12 column">
+            <dl class="content">
+                <dt>Tutor Comments</dt>
+                <dd>{{ report.tutorGroupReport.namedGrades.tutorComment.comment|e('html')|nl2br }}</dd>
+            </dl>
+        </div>
+    </div>
     {% endif %}
-    <div class="small-12 medium-4 column">
-        <dl class="content">
-            <dt>Athletics Carnival</dt>
-            <dd>
-                {% if report.tutorGroupReport.namedGrades.athletics %}
-                    {%
-                    include '@customMeridenPastoral/sub/assessmentResult.twig'
-                    with {grade: report.tutorGroupReport.namedGrades.athletics}
-                    %}
-                {% else %}
-                    Unknown
-                {% endif %}
-            </dd>
-        </dl>
-    </div>
-    <div class="small-12 medium-4 column">
-        <dl class="content">
-            <dt>Swimming Carnival</dt>
-            <dd>
-                {% if report.tutorGroupReport.namedGrades.swimming %}
-                    {%
-                    include '@customMeridenPastoral/sub/assessmentResult.twig'
-                    with {grade: report.tutorGroupReport.namedGrades.swimming}
-                    %}
-                {% else %}
-                    Unknown
-                {% endif %}
-            </dd>
-        </dl>
-    </div>
-    <div class="small-12 medium-4 column">
-        <dl class="content">
-            <dt>School Camp</dt>
-            <dd>
-                {% if report.tutorGroupReport.namedGrades.camp %}
-                    {%
-                    include '@customMeridenPastoral/sub/assessmentResult.twig'
-                    with {grade: report.tutorGroupReport.namedGrades.camp}
-                    %}
-                {% else %}
-                    Unknown
-                {% endif %}
-            </dd>
-        </dl>
-    </div>
-    <div class="small-12 medium-4 column">
-        <dl class="content">
-            <dt>Uniform</dt>
-            <dd>[<a href="/homepage/5648/">View Description</a>]</dd>
-            <dd>
-                {% if report.tutorGroupReport.namedGrades.uniform %}
-                    {%
-                    include '@customMeridenPastoral/sub/assessmentResult.twig'
-                    with {grade: report.tutorGroupReport.namedGrades.uniform}
-                    %}
-                {% else %}
-                    Unknown
-                {% endif %}
-            </dd>
-        </dl>
-    </div>
-    <div class="small-12 medium-4 column">
-        <dl class="content">
-            <dt>Pastoral activities involvement</dt>
-            <dd>[<a href="/homepage/5648/">View Description</a>]</dd>
-            <dd>
-                {% if report.tutorGroupReport.namedGrades.pastoral %}
-                    {%
-                    include '@customMeridenPastoral/sub/assessmentResult.twig'
-                    with {grade: report.tutorGroupReport.namedGrades.pastoral}
-                    %}
-                {% else %}
-                    Unknown
-                {% endif %}
-            </dd>
-        </dl>
-    </div>
-    <div class="small-12 medium-4 column end">
-        <dl class="content">
+
+    {# Subject list #}
+    <div class="row">
+        <div class="small-12 column">
+            <h2 class="subheader">Subjects</h2>
+        </div>
+        <section>
             {##
-             # Athletics, Swimming, Camp, Uniform, Pastoral Services:
-             # All these are attendances, and are based off of assessments in the grade page.
+             # Subjects: exactly the same as the subject list on /search/user/{{ report.student.id }},
+             # except I guess they will link to this page instead.
+             #
+             # Meriden have requested that no email links display on this page,
+             # due to the possiblilty of parents getting drunk and sending emails to teachers.
              #}
-            {% for grade in report.tutorGroupReport.grades %}
-                <dt>{{ grade.assessment.name }}</dt>
-                <dd>{{ grade.pretty_mark }}</dd>
-            {% endfor %}
-        </dl>
-    </div>
-</div>
-
-{# Awards info #}
-<div class="row">
-    {# Please excuse the "end" logic #}
-    {% if not report.tutorGroupReport.activities.awards is empty %}
-    <div class="small-12 medium-4 column {% if report.tutorGroupReport.activities.positions is empty and report.tutorGroupReport.activities.service is empty and report.tutorGroupReport.activities.cocurricular is empty %}end{% endif %}">
-        <dl class="content">
-            <dt>Awards and Prizes</dt>
-            {% for award in report.tutorGroupReport.activities.awards %}
-                <dd>{{ award.act_desc }}</dd>
-            {% endfor %}
-        </dl>
-    </div>
-    {% endif %}
-    {% if not report.tutorGroupReport.activities.cocurricular is empty %}
-    <div class="small-12 medium-4 column {% if report.tutorGroupReport.activities.positions is empty and report.tutorGroupReport.activities.service is empty %}end{% endif %}">
-        <dl class="content">
-            <dt>Co-curricular Activities</dt>
-            {% for activity in report.tutorGroupReport.activities.cocurricular %}
-                <dd>{{ activity.act_desc }}</dd>
-            {% endfor %}
-        </dl>
-    </div>
-    {% endif %}
-    {% if not report.tutorGroupReport.activities.service is empty %}
-    <div class="small-12 medium-4 column {% if report.tutorGroupReport.activities.positions is empty %}end{% endif %}">
-        <dl class="content">
-            <dt>Community Service</dt>
-            {% for service in report.tutorGroupReport.activities.service %}
-                <dd>{{ service.act_desc }}</dd>
-            {% endfor %}
-        </dl>
-    </div>
-    {% endif %}
-    {% if not report.tutorGroupReport.activities.positions is empty %}
-    <div class="small-12 medium-4 column end">
-        <dl class="content">
-            <dt>Positions of Office</dt>
-            {% for position in report.tutorGroupReport.activities.positions %}
-                <dd>{{ position.act_desc }}</dd>
-            {% endfor %}
-        </dl>
-    </div>
-    {% endif %}
-</div>
-
-{# Tutor comment #}
-{% if report.tutorGroupReport.namedGrades.tutorComment %}
-<div class="row">
-    <div class="small-12 column">
-        <dl class="content">
-            <dt>Tutor Comments</dt>
-            <dd>{{ report.tutorGroupReport.namedGrades.tutorComment.comment|e('html')|nl2br }}</dd>
-        </dl>
-    </div>
-</div>
-{% endif %}
-
-{# Subject list #}
-<div class="row">
-    <div class="small-12 column">
-        <h2 class="subheader">Subjects</h2>
-    </div>
-    <section>
-        {##
-         # Subjects: exactly the same as the subject list on /search/user/{{ report.student.id }},
-         # except I guess they will link to this page instead.
-         #
-         # Meriden have requested that no email links display on this page,
-         # due to the possiblilty of parents getting drunk and sending emails to teachers.
-         #}
-        <div class="row">
-            {% set reportHalf = (report.subjectList|length / 2)|round(0, 'ceil') %}
-            <div class="small-12 medium-6 column">
-                {% for subject in report.subjectList|slice(0, reportHalf) %}
-                    {% include '@customMeridenPastoral/sub/subject.twig' with {
+            <div class="row">
+                {% set reportHalf = (report.subjectList|length / 2)|round(0, 'ceil') %}
+                <div class="small-12 medium-6 column">
+                    {% for subject in report.subjectList|slice(0, reportHalf) %}
+                        {% include '@customMeridenPastoral/sub/subject.twig' with {
+                            student: report.student,
+                            year: report.tutorGroupReport.year,
+                            subject: subject,
+                            showEmail: false,
+                            showPortrait: false
+                        } %}
+                    {% endfor %}
+                </div>
+                <div class="small-12 medium-6 column">
+                    {% for subject in report.subjectList|slice(reportHalf) %}
+                        {% include '@customMeridenPastoral/sub/subject.twig' with {
                         student: report.student,
                         year: report.tutorGroupReport.year,
                         subject: subject,
                         showEmail: false,
                         showPortrait: false
-                    } %}
-                {% endfor %}
+                        } %}
+                    {% endfor %}
+                </div>
             </div>
-            <div class="small-12 medium-6 column">
-                {% for subject in report.subjectList|slice(reportHalf) %}
-                    {% include '@customMeridenPastoral/sub/subject.twig' with {
-                    student: report.student,
-                    year: report.tutorGroupReport.year,
-                    subject: subject,
-                    showEmail: false,
-                    showPortrait: false
-                    } %}
-                {% endfor %}
-            </div>
-        </div>
-    </section>
+        </section>
+    </div>
 </div>
