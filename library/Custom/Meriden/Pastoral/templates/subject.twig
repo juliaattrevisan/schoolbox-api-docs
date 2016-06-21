@@ -50,11 +50,7 @@
             </div>
             <div class="small-12 medium-8 column">
                 <div class="content">
-                    <dl>
-                        <dd>
-                            {% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.courseGrade} %}
-                        </dd>
-                    </dl>
+                    <strong>{{ report.subjectReport.namedGrades.courseGrade.pretty_mark }}</strong>
                 </div>
             </div>
         </div>
