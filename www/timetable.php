@@ -128,10 +128,12 @@ foreach ($userList as $user) {
                 /* Only display subnav elements for timetables that contain data
                  */
                 $this->setVar([
-                    'PERSON'    => $user->formatName(),
-                    'YEAR'      => $user->getYear() ? ', Year ' . $user->getYear() : '',
-                    'USER_ID'   => $user->getId(),
-                    'CAMPUS_ID' => $campus->getId(),
+                    'PERSON'      => $user->formatName(),
+                    'YEAR'        => $user->getYear() ? ', Year ' . $user->getYear() : '',
+                    'USER_ID'     => $user->getId(),
+                    'CAMPUS_ID'   => $campus->getId(),
+                    'CAMPUS_CODE' => $campus->getExtTimetableCode(),
+                    'CAMPUS_NAME' => $campus->getName(),
                 ]);
 
                 $this->parse('timetable_person_block', 'timetable_person', true);
