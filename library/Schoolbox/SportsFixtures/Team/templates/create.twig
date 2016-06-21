@@ -23,13 +23,13 @@
 
 <ul class="breadcrumb">
     <li><a href="#">Sports Fixtures</a></li>
-    <li><a href="/sportsfixtures/sport/list">All Sports</a></li>
-    <li><a href="/sportsfixtures/division/list/{{ sport.id }}">Divisions in {{ sport.name }}</a></li>
-    <li><a href="/sportsfixtures/division/update/{{ division.id }}">{{ division.name }}</a></li>
-    <li><a href="/sportsfixtures/team/list/{{ division.id }}">Teams in {{ division.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {sportId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesDivision.getUpdate', {divisionId: division.id}) }}">{{ division.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesTeam.getList', {divisionId: division.id}) }}">Teams in {{ division.name }}</a></li>
 
     {% if team.id %}
-    <li class="active"><a href="/sportsfixtures/team/update/{{ team.id }}">{{ team.name }}</a></li>
+    <li class="active"><a href="{{ routeLookup('sportsfixturesTeam.getUpdate', {teamId: team.id}) }}">{{ team.name }}</a></li>
     {% else %}
     <li class="active"><a href="#">{{ action }}</a></li>
     {% endif %}
@@ -43,7 +43,13 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form id='teamForm' action="/sportsfixtures/team/{% if team %}update/{{ team.id }}{% else %}create/{{ division.id }}{% endif %}" method="post">
+        {% if sport %}
+            {% set formUrl = routeLookup('sportsfixturesTeam.getUpdate', {teamId: team.id}) %}
+        {% else %}
+            {% set formUrl = routeLookup('sportsfixturesTeam.getCreate', {divisionId: division.id}) %}
+        {% endif %}
+
+        <form id='teamForm' action="{{ formUrl }}" method="post">
             <h2 class="subheader">{{ action }} Team in {{ division.name }}</h2>
 
             <section>

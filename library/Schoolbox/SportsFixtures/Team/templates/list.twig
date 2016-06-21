@@ -18,10 +18,10 @@
 </script>
 <ul class="breadcrumb">
     <li><a href="#">Sports Fixtures</a></li>
-    <li><a href="/sportsfixtures/sport/list">All Sports</a></li>
-    <li><a href="/sportsfixtures/division/list/{{ sport.id }}">Divisions in {{ sport.name }}</a></li>
-    <li><a href="/sportsfixtures/division/update/{{ division.id }}">{{ division.name }}</a></li>
-    <li class="active"><a href="/sportsfixtures/team/list/{{ division.id }}">Teams in {{ division.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {sportId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesDivision.getUpdate', {divisionId: division.id}) }}">{{ division.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesTeam.getList', {divisionId: division.id}) }}">Teams in {{ division.name }}</a></li>
 </ul>
 
 <div class="row">
@@ -39,7 +39,7 @@
                 </div>
             </div>
             <nav>
-                <a href='/sportsfixtures/team/create/{{ division.id }}' class="icon-add" title="Add Team to {{ division.name }}"></a>
+                <a href='{{ routeLookup('sportsfixturesTeam.getCreate', {divisionId: division.id}) }}' class="icon-add" title="Add Team to {{ division.name }}"></a>
             </nav>
         </div>
 
@@ -55,8 +55,8 @@
                         </div>
                     </div>
                     <nav>
-                        <a href="/sportsfixtures/team/delete" class="icon-delete" title="Delete" data-delete="{{ currentTeam.id }}"></a>
-                        <a href="/sportsfixtures/team/update/{{ currentTeam.id }}" class="icon-modify" title="Modify"></a>
+                        <a href="{{ routeLookup('sportsfixturesTeam.postDelete', {}) }}" class="icon-delete" title="Delete" data-delete="{{ currentTeam.id }}"></a>
+                        <a href="{{ routeLookup('sportsfixturesTeam.getUpdate', {teamId: currentTeam.id}) }}" class="icon-modify" title="Modify"></a>
                     </nav>
                 </li>
                 {% endfor %}
@@ -66,7 +66,7 @@
         <div class="empty-state">
             <i class="icon-sport"></i>
             <p>There are no Teams in {{ division.name }}.</p>
-            <p><a href="/sportsfixtures/team/create/{{ division.id }}" title="Add a Team">Add a Team</a></p>
+            <p><a href="{{ routeLookup('sportsfixturesTeam.getCreate', {divisionId: division.id}) }}" title="Add a Team">Add a Team</a></p>
         </div>
         {% endif %}
     </div>
