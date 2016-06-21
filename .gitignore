@@ -36,3 +36,4 @@ www/css/foundation/utils/_skin.scss
 www/css/foundation/utils/_custom.scss
 .sass-cache/
 post-provision.sh
+.idea/
