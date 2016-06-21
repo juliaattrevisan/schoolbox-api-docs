@@ -74,6 +74,15 @@
     width: auto;
 }
 
+.pastoral-report .bordered-table,
+.subject-report .bordered-table,
+.pastoral-report .bordered-table th,
+.subject-report .bordered-table th,
+.pastoral-report .bordered-table td,
+.subject-report .bordered-table td {
+    border: .0625rem solid black;
+}
+
 /*
 !**
  * Undo default SB heading styles

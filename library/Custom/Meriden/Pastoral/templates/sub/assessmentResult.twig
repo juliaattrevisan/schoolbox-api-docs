@@ -1,5 +1,5 @@
 {% if grade.rubric.groups %}
-    <table class="width-auto">
+    <table class="width-auto bordered-table">
         {% for group in grade.rubric.groups %}
             {% for criterion in group.criteria %}
                 {% for descriptor in criterion.descriptors %}
