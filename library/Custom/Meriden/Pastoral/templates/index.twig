@@ -178,46 +178,61 @@
 
     {# Awards info #}
     <div class="row" id="awards-info">
-        {# Please excuse the "end" logic #}
         {% if not report.tutorGroupReport.activities.awards is empty %}
-        <div class="small-12 medium-4 column {% if report.tutorGroupReport.activities.positions is empty and report.tutorGroupReport.activities.service is empty and report.tutorGroupReport.activities.cocurricular is empty %}end{% endif %}">
-            <dl class="content">
-                <dt>Awards and Prizes</dt>
-                {% for award in report.tutorGroupReport.activities.awards %}
-                    <dd>{{ award.act_desc }}</dd>
-                {% endfor %}
-            </dl>
-        </div>
+            <div class="small-12 medium-4 column">
+                <dl class="content">
+                    <dt>Awards and Prizes</dt>
+                </dl>
+            </div>
+            <div class="small-12 medium-8 column end">
+                <dl class="content">
+                    {% for award in report.tutorGroupReport.activities.awards %}
+                        <dd>{{ award.act_desc }}</dd>
+                    {% endfor %}
+                </dl>
+            </div>
         {% endif %}
         {% if not report.tutorGroupReport.activities.cocurricular is empty %}
-        <div class="small-12 medium-4 column {% if report.tutorGroupReport.activities.positions is empty and report.tutorGroupReport.activities.service is empty %}end{% endif %}">
-            <dl class="content">
-                <dt>Co-curricular Activities</dt>
-                {% for activity in report.tutorGroupReport.activities.cocurricular %}
-                    <dd>{{ activity.act_desc }}</dd>
-                {% endfor %}
-            </dl>
-        </div>
+            <div class="small-12 medium-4 column">
+                <dl class="content">
+                    <dt>Co-curricular Activities</dt>
+                </dl>
+            </div>
+            <div class="small-12 medium-8 column end">
+                <dl class="content">
+                    {% for activity in report.tutorGroupReport.activities.cocurricular %}
+                        <dd>{{ activity.act_desc }}</dd>
+                    {% endfor %}
+                </dl>
+            </div>
         {% endif %}
         {% if not report.tutorGroupReport.activities.service is empty %}
-        <div class="small-12 medium-4 column {% if report.tutorGroupReport.activities.positions is empty %}end{% endif %}">
-            <dl class="content">
-                <dt>Community Service</dt>
-                {% for service in report.tutorGroupReport.activities.service %}
-                    <dd>{{ service.act_desc }}</dd>
-                {% endfor %}
-            </dl>
-        </div>
+            <div class="small-12 medium-4 column">
+                <dl class="content">
+                    <dt>Community Service</dt>
+                </dl>
+            </div>
+            <div class="small-12 medium-8 column end">
+                <dl class="content">
+                    {% for service in report.tutorGroupReport.activities.service %}
+                        <dd>{{ service.act_desc }}</dd>
+                    {% endfor %}
+                </dl>
+            </div>
         {% endif %}
         {% if not report.tutorGroupReport.activities.positions is empty %}
-        <div class="small-12 medium-4 column end">
-            <dl class="content">
-                <dt>Positions of Office</dt>
-                {% for position in report.tutorGroupReport.activities.positions %}
-                    <dd>{{ position.act_desc }}</dd>
-                {% endfor %}
-            </dl>
-        </div>
+            <div class="small-12 medium-4 column">
+                <dl class="content">
+                    <dt>Positions of Office</dt>
+                </dl>
+            </div>
+            <div class="small-12 medium-8 column end">
+                <dl class="content">
+                    {% for position in report.tutorGroupReport.activities.positions %}
+                        <dd>{{ position.act_desc }}</dd>
+                    {% endfor %}
+                </dl>
+            </div>
         {% endif %}
     </div>
 
