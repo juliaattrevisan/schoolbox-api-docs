@@ -48,3 +48,19 @@ CREATE TABLE `sportsfixtures_position` (
 	`deleted_at` DATETIME NULL COMMENT '',
 	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
 
+
+/** Division players table **/
+CREATE TABLE `sportsfixtures_division_user` (
+	`id` INT NOT NULL,
+	`division_id` INT NOT NULL,
+	`user_id` INT NOT NULL,
+	`sequence` INT NOT NULL DEFAULT 0,
+	PRIMARY KEY (`id`),
+	INDEX `fk_sportsfixtures_division_user__division_idx` (`division_id` ASC),
+	INDEX `sportsfixtures_division_user__user` (`user_id` ASC)  COMMENT 'Would be a FK if user table wasn''t MYISAM',
+	CONSTRAINT `fk_sportsfixtures_division_user__division`
+	FOREIGN KEY (`division_id`)
+	REFERENCES `sportsfixtures_division` (`id`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+	) ENGINE=InnoDB CHARACTER SET=utf8;
