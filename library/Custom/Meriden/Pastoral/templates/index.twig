@@ -30,13 +30,13 @@
     {# House info #}
     <div class="row" id="house-info">
         <div class="small-12 medium-4 column">
-            <dl class="content">
+            <dl>
                 <dt>House</dt>
                 <dd>{{ report.student.schoolHouse.house }}</dd>
             </dl>
         </div>
         <div class="small-12 medium-4 column">
-            <dl class="content">
+            <dl>
                 <dt>Year Coordinator</dt>
                 {% for coordinator in report.tutorGroupReport.coordinators %}
                     <dd><a href="/search/user/{{ coordinator.id }}">{{ coordinator.formatName }}</a></dd>
@@ -44,7 +44,7 @@
             </dl>
         </div>
         <div class="small-12 medium-4 column end">
-            <dl class="content">
+            <dl>
                 <dt>Tutor</dt>
                 {# Show only the last tutor (as list is ordered by semester asc #}
                 {% for tutor in report.tutorGroupReport.tutors %}
@@ -59,19 +59,19 @@
     {# Attendance info #}
     <div class="row" id="attendance-info">
         <div class="small-12 medium-4 column">
-            <dl class="content">
+            <dl>
                 <dt>Days Absent</dt>
                 <dd>{{ report.tutorGroupReport.attendances.absent }}</dd>
             </dl>
         </div>
         <div class="small-12 medium-4 column">
-            <dl class="content">
+            <dl>
                 <dt>Days Late</dt>
                 <dd>{{ report.tutorGroupReport.attendances.late }}</dd>
             </dl>
         </div>
         <div class="small-12 medium-4 column">
-            <dl class="content">
+            <dl>
                 <dt>Detentions</dt>
                 <dd>{{ report.tutorGroupReport.attendances.detentions }}</dd>
             </dl>
@@ -79,14 +79,14 @@
         {# Don't show endorsed leave at all if there is none #}
         {% if report.tutorGroupReport.attendances.endorsedLeave %}
             <div class="small-12 medium-4 column">
-                <dl class="content">
+                <dl>
                     <dt>Endorsed Leave</dt>
                     <dd>{{ report.tutorGroupReport.attendances.endorsedLeave }}</dd>
                 </dl>
             </div>
         {% endif %}
         <div class="small-12 medium-4 column">
-            <dl class="content">
+            <dl>
                 <dt>Athletics Carnival</dt>
                 <dd>
                     {% if report.tutorGroupReport.namedGrades.athletics %}
@@ -101,7 +101,7 @@
             </dl>
         </div>
         <div class="small-12 medium-4 column">
-            <dl class="content">
+            <dl>
                 <dt>Swimming Carnival</dt>
                 <dd>
                     {% if report.tutorGroupReport.namedGrades.swimming %}
@@ -116,7 +116,7 @@
             </dl>
         </div>
         <div class="small-12 medium-4 column">
-            <dl class="content">
+            <dl>
                 <dt>School Camp</dt>
                 <dd>
                     {% if report.tutorGroupReport.namedGrades.camp %}
@@ -131,7 +131,7 @@
             </dl>
         </div>
         <div class="small-12 medium-4 column">
-            <dl class="content">
+            <dl>
                 <dt>Uniform</dt>
                 <dd class="explanation">[<a href="/homepage/5648/">Explanation</a>]</dd>
                 <dd>
@@ -147,7 +147,7 @@
             </dl>
         </div>
         <div class="small-12 medium-4 column">
-            <dl class="content">
+            <dl>
                 <dt>Pastoral activities involvement</dt>
                 <dd class="explanation">[<a href="/homepage/5648/">Explanation</a>]</dd>
                 <dd>
@@ -163,7 +163,7 @@
             </dl>
         </div>
         <div class="small-12 medium-4 column end">
-            <dl class="content">
+            <dl>
                 {##
                  # Athletics, Swimming, Camp, Uniform, Pastoral Services:
                  # All these are attendances, and are based off of assessments in the grade page.
@@ -208,7 +208,7 @@
     {% if report.tutorGroupReport.namedGrades.tutorComment %}
     <div class="row" id="tutor-comment">
         <div class="small-12 column">
-            <dl class="content">
+            <dl>
                 <dt>Tutor Comments</dt>
                 <dd>{{ report.tutorGroupReport.namedGrades.tutorComment.comment|e('html')|nl2br }}</dd>
             </dl>
