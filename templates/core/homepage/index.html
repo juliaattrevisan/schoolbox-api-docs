@@ -274,24 +274,29 @@
         <li>
             <a href="/resources/{ID}" class="icon-folder">Browse {TPL_LOCAL_RESOURCE_PLURAL_PC}</a>
         </li>
-        <!-- BEGIN subscribedModerated -->
         <li>
-            <a href="/group/joinForm.php?leave={ID}&return=true" class="icon-help">Awaiting approval</a>
+            <a href="/homepage/rss/{ID}/{USER_TOKEN}" class="icon-homepagefeed">RSS</a>
+        </li>
+
+        <!-- BEGIN subscribedModerated -->
+        <li class="separator">Awaiting Membership</li>
+        <li>
+            <a href="/group/joinForm.php?leave={ID}&return=true" class="icon-cancel">Cancel Application</a>
         </li>
         <!-- END subscribedModerated -->
         <!-- BEGIN subscribed -->
+        <li class="separator">Group Membership</li>
         <li>
-            <a href="/group/joinForm.php?leave={ID}" class="icon-logout">Leave Group</a>
+            <a href="/group/joinForm.php?leave={ID}&return=true" class="icon-logout">Leave Group</a>
         </li>
         <!-- END subscribed -->
         <!-- BEGIN unsubscribed -->
+        <li class="separator">Group Membership</li>
         <li>
             <a href="/group/joinForm.php?join={ID}&return=true" class="icon-add">Join Group</a>
         </li>
         <!-- END unsubscribed -->
-        <li>
-            <a href="/homepage/rss/{ID}/{USER_TOKEN}" class="icon-homepagefeed">RSS</a>
-        </li>
+
         <!-- BEGIN manage_class -->
         <li class="separator">Course Actions</li>
         <li><a href="/course/import/{ID}" class="icon-course" data-course-selector>Link to Course</a></li>

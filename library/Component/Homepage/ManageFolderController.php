@@ -84,20 +84,21 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
         $this->setVar('subscribedModerated_block', '');
         $this->setVar('unsubscribed_block', '');
 
-        // If you are subscribed but are awaiting authorisation
         $type = $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext()->getId());
 
-        if ($type == DENY_ACCESS && $type !== null) {
+        if ($type == DENY_ACCESS && $type !== null && $type !== false) {
+            // If you are subscribed but are awaiting authorisation
             $this->parse('subscribedModerated_block', 'subscribedModerated');
-        } // If you are subscribed with something greater than DENY_ACCESS and you can subscribe, display the unsubscribe button
-        elseif ($this->groupHandler->canSubscribe($this->getContext()->getId()) && ($type == READ_ACCESS || $type == WRITE_ACCESS)) {
+        } elseif ($this->groupHandler->canSubscribe($this->getContext()->getId()) && ($type == READ_ACCESS || $type == WRITE_ACCESS)) {
+            // If you are subscribed with something greater than DENY_ACCESS and you can subscribe, display the unsubscribe button
             $this->parse('subscribed_block', 'subscribed');
         } elseif ($type == FULL_ACCESS) {
-        } /* You aren't subscribed to the group yet.
-        * If you can subscribe to the group, present option.
-        * Otherwise do nothing
-        */
-        elseif ($this->groupHandler->canSubscribe($this->getContext()->getId())) {
+            // don't show anything
+        } elseif ($this->groupHandler->canSubscribe($this->getContext()->getId())) {
+            /* You aren't subscribed to the group yet.
+             * If you can subscribe to the group, present option.
+             * Otherwise do nothing
+             */
             $this->parse('unsubscribed_block', 'unsubscribed');
         }
 
