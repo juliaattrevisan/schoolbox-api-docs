@@ -179,60 +179,28 @@
     {# Awards info #}
     <div class="row" id="awards-info">
         {% if not report.tutorGroupReport.activities.awards is empty %}
-            <div class="small-12 medium-4 column">
-                <dl class="content">
-                    <dt>Awards and Prizes</dt>
-                </dl>
-            </div>
-            <div class="small-12 medium-8 column end">
-                <dl class="content">
-                    {% for award in report.tutorGroupReport.activities.awards %}
-                        <dd>{{ award.act_desc }}</dd>
-                    {% endfor %}
-                </dl>
-            </div>
+            {% include '@customMeridenPastoral/sub/activity.twig' with {
+                header: 'Awards and Prizes',
+                activityList: report.tutorGroupReport.activities.awards
+            } %}
         {% endif %}
         {% if not report.tutorGroupReport.activities.cocurricular is empty %}
-            <div class="small-12 medium-4 column">
-                <dl class="content">
-                    <dt>Co-curricular Activities</dt>
-                </dl>
-            </div>
-            <div class="small-12 medium-8 column end">
-                <dl class="content">
-                    {% for activity in report.tutorGroupReport.activities.cocurricular %}
-                        <dd>{{ activity.act_desc }}</dd>
-                    {% endfor %}
-                </dl>
-            </div>
+            {% include '@customMeridenPastoral/sub/activity.twig' with {
+                header: 'Co-curricular Activitiess',
+                activityList: report.tutorGroupReport.activities.cocurricular
+            } %}
         {% endif %}
         {% if not report.tutorGroupReport.activities.service is empty %}
-            <div class="small-12 medium-4 column">
-                <dl class="content">
-                    <dt>Community Service</dt>
-                </dl>
-            </div>
-            <div class="small-12 medium-8 column end">
-                <dl class="content">
-                    {% for service in report.tutorGroupReport.activities.service %}
-                        <dd>{{ service.act_desc }}</dd>
-                    {% endfor %}
-                </dl>
-            </div>
+            {% include '@customMeridenPastoral/sub/activity.twig' with {
+                header: 'Community Service',
+                activityList: report.tutorGroupReport.activities.service
+            } %}
         {% endif %}
         {% if not report.tutorGroupReport.activities.positions is empty %}
-            <div class="small-12 medium-4 column">
-                <dl class="content">
-                    <dt>Positions of Office</dt>
-                </dl>
-            </div>
-            <div class="small-12 medium-8 column end">
-                <dl class="content">
-                    {% for position in report.tutorGroupReport.activities.positions %}
-                        <dd>{{ position.act_desc }}</dd>
-                    {% endfor %}
-                </dl>
-            </div>
+            {% include '@customMeridenPastoral/sub/activity.twig' with {
+                header: 'Positions of Office',
+                activityList: report.tutorGroupReport.activities.positions
+            } %}
         {% endif %}
     </div>
 
