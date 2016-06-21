@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row" id="context">
         <div class="small-12 medium-5 island">
             {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
         </div>
@@ -37,8 +37,8 @@
         </div>
     </div>
 
-    <div class="row" id="subject-report">
-        {# course description #}
+    {# course description #}
+    <div class="row" id="course-description">
         <div class="small-12 column">
             <h2 class="subheader">Course Description</h2>
             <section>

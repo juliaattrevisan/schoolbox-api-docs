@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <div class="row">
+    <div class="row" id="context">
         <div class="small-12 medium-5 island">
             {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
         </div>
@@ -38,7 +38,7 @@
     </div>
 
     {# House info #}
-    <div class="row">
+    <div class="row" id="house-info">
         <div class="small-12 medium-4 column">
             <dl class="content">
                 <dt>House</dt>
@@ -67,7 +67,7 @@
     </div>
 
     {# Attendance info #}
-    <div class="row">
+    <div class="row" id="attendance-info">
         <div class="small-12 medium-4 column">
             <dl class="content">
                 <dt>Days Absent</dt>
@@ -187,7 +187,7 @@
     </div>
 
     {# Awards info #}
-    <div class="row">
+    <div class="row" id="awards-info">
         {# Please excuse the "end" logic #}
         {% if not report.tutorGroupReport.activities.awards is empty %}
         <div class="small-12 medium-4 column {% if report.tutorGroupReport.activities.positions is empty and report.tutorGroupReport.activities.service is empty and report.tutorGroupReport.activities.cocurricular is empty %}end{% endif %}">
@@ -233,7 +233,7 @@
 
     {# Tutor comment #}
     {% if report.tutorGroupReport.namedGrades.tutorComment %}
-    <div class="row">
+    <div class="row" id="tutor-comment">
         <div class="small-12 column">
             <dl class="content">
                 <dt>Tutor Comments</dt>
@@ -244,7 +244,7 @@
     {% endif %}
 
     {# Subject list #}
-    <div class="row">
+    <div class="row" id="subject-list">
         <div class="small-12 column">
             <h2 class="subheader">Subjects</h2>
         </div>
