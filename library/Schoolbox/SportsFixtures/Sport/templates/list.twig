@@ -18,7 +18,7 @@
 </script>
 <ul class="breadcrumb">
     <li><a href="#">Sports Fixtures</a></li>
-    <li class="active"><a href="/sportsfixtures/sport/list">All Sports</a></li>
+    <li class="active"><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
 </ul>
 
 <div class="actions-small-1 row">
@@ -28,7 +28,7 @@
         </div>
     </div>
     <nav>
-        <a href='/sportsfixtures/sport/create' class="icon-add" title="Add Sport"></a>
+        <a href='{{ routeLookup('sportsfixturesSport.getCreate', {}) }}' class="icon-add" title="Add Sport"></a>
     </nav>
 </div>
 
@@ -58,7 +58,7 @@
         <div class="empty-state">
             <i class="icon-sport"></i>
             <p>There are no Sports.</p>
-            <p><a href="/sportsfixtures/sport/create" title="Add a Sport">Add a Sport</a></p>
+            <p><a href="{{ routeLookup('sportsfixturesSport.getCreate', {}) }}" title="Add a Sport">Add a Sport</a></p>
         </div>
         {% endif %}
     </div>
