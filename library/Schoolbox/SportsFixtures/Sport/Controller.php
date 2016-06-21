@@ -43,26 +43,6 @@ class Controller extends Base
     }
 
     /**
-     * Just a raw template render
-     *
-     * @param string $template
-     * @param array  $data
-     */
-    protected function tpl($template, $data = [])
-    {
-        $content = [
-            'template' => "@sportsfixturesSport/$template.twig",
-            'data'     => $data,
-        ];
-
-        if ($this->getRequest()->isXhr()) {
-            $content['format'] = 'nochrome';
-        }
-
-        $this->getResponse()->content->set($content);
-    }
-
-    /**
      * List of Sports
      */
     public function getList()
@@ -76,9 +56,9 @@ class Controller extends Base
             ]
         ]);
 
-        $this->tpl('list', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesSport/list.twig', [
             'allSports' => $allSports
-        ]);
+        ]));
     }
 
     /**
@@ -86,9 +66,9 @@ class Controller extends Base
      */
     public function getCreate()
     {
-        $this->tpl('create', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesSport/create.twig', [
             'action' => 'Create'
-        ]);
+        ]));
     }
 
     /**
@@ -101,10 +81,10 @@ class Controller extends Base
         try {
             $sport = $this->getSportMapper()->findById($sportId);
 
-            $this->tpl('create', [
+            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesSport/create.twig', [
                 'sport' => $sport,
                 'action' => 'Modify'
-            ]);
+            ]));
         }
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);

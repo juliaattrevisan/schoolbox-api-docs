@@ -52,26 +52,6 @@ class Controller extends Base
     }
 
     /**
-     * Just a raw template render
-     *
-     * @param string $template
-     * @param array  $data
-     */
-    protected function tpl($template, $data = [])
-    {
-        $content = [
-            'template' => "@sportsfixturesTeam/$template.twig",
-            'data'     => $data,
-        ];
-
-        if ($this->getRequest()->isXhr()) {
-            $content['format'] = 'nochrome';
-        }
-
-        $this->getResponse()->content->set($content);
-    }
-
-    /**
      * List of Divisions and the Sport they are in
      *
      * @param int $divisionId
@@ -88,11 +68,11 @@ class Controller extends Base
                 ]
             ]);
 
-            $this->tpl('list', [
+            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/list.twig', [
                 'sport' => $sport,
                 'division' => $division,
                 'allTeams' => $allTeams
-            ]);
+            ]));
         }
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);
@@ -109,10 +89,10 @@ class Controller extends Base
         try {
             $division = $this->getDivisionMapper()->findById($divisionId);
 
-            $this->tpl('create', [
+            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/create.twig', [
                 'division' => $division,
                 'action' => 'Create'
-            ]);
+            ]));
         }
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);
@@ -131,12 +111,12 @@ class Controller extends Base
             $division = $this->getDivisionMapper()->findById($team->getDivision()->getId());
             $sport = $this->getSportMapper()->findById($division->getSport()->getId());
 
-            $this->tpl('create', [
+            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/create.twig', [
                 'team' => $team,
                 'division' => $division,
                 'sport' => $sport,
                 'action' => 'Modify'
-            ]);
+            ]));
         }
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);
