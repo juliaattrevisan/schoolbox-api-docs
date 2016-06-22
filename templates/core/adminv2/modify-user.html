@@ -325,10 +325,10 @@
                 <!-- BEGIN user_group -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="avatar card small-7">
+                        <div class="card small-7">
                             <a href="/homepage/{USER_GROUP_ID}">{USER_GROUP_NAME}</a>
                         </div>
-                        <div class="avatar card small-5">
+                        <div class="card small-5">
                             <form action="/adminv2/userForm.php" method="post">
                                 <input type="hidden" name="uid" value="{USERID}" />
                                 <input type="hidden" name="sid" value="{USER_GROUP_ID}" />
@@ -351,7 +351,7 @@
 
                 <li class="actions-small-1">
                     <form action="/adminv2/userForm.php" method="post" id="groupAdd" data-validatable-as="addGroup" class="list-item">
-                        <div class="avatar card small-7">
+                        <div class="card small-7">
                             <select required name="sid" id="groupSelect" form="groupAdd" class="required">
                                 <option value="">Select a Group</option>
                                 <!-- BEGIN all_group -->
@@ -359,14 +359,14 @@
                                 <!-- END all_group -->
                             </select>
                         </div>
-                        <div class="avatar card small-5 end">
+                        <div class="card small-5 end">
                             <select required name="type" form="groupAdd">
                                 <option value="1">Read</option>
                                 <option value="2">Write</option>
                                 <option value="3">Group Admin</option>
                             </select>
                         </div>
-                        <div class="avatar card small-12">
+                        <div class="card small-12">
                             <input type="hidden" name="groupSubmit" />
                             <input type="hidden" value="{USERID}" name="uid" />
                             <input type="hidden" value="1" name="service" />
@@ -394,9 +394,9 @@
                 <!-- BEGIN user_calendar -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="small-4 avatar card">Calendar</div>
-                        <div class="small-4 avatar card">Campus: {PERM_CAMPUS_NAME}</div>
-                        <div class="small-4 avatar card">
+                        <div class="small-4 card">Calendar</div>
+                        <div class="small-4 card">Campus: {PERM_CAMPUS_NAME}</div>
+                        <div class="small-4 card">
                             <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                                 <input type="hidden" name="uid" value="{USERID}" />
                                 <input type="hidden" name="sid" value="{SID}" />
@@ -419,9 +419,9 @@
                 <!-- BEGIN user_news -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="small-4 avatar card">News</div>
-                        <div class="small-4 avatar card">Campus: {PERM_CAMPUS_NAME}</div>
-                        <div class="small-4 avatar card">
+                        <div class="small-4 card">News</div>
+                        <div class="small-4 card">Campus: {PERM_CAMPUS_NAME}</div>
+                        <div class="small-4 card">
                             <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                                 <input type="hidden" name="uid" value="{USERID}" />
                                 <input type="hidden" name="sid" value="{SID}" />
@@ -444,8 +444,8 @@
                 <!-- BEGIN user_cms -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="small-8 avatar card">CMS</div>
-                        <div class="small-4 avatar card">
+                        <div class="small-8 card">CMS</div>
+                        <div class="small-4 card">
                             <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                                 <input type="hidden" name="uid" value="{USERID}" />
                                 <input type="hidden" name="sid" value="{SID}" />
@@ -468,9 +468,9 @@
                 <!-- BEGIN user_housemaster -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="small-4 avatar card">Housemaster</div>
-                        <div class="small-4 avatar card">Residential House: {PERM_RESIDENT_HOUSE_NAME}</div>
-                        <div class="small-4 avatar card">
+                        <div class="small-4 card">Housemaster</div>
+                        <div class="small-4 card">Residential House: {PERM_RESIDENT_HOUSE_NAME}</div>
+                        <div class="small-4 card">
                             <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                                 <input type="hidden" name="uid" value="{USERID}" />
                                 <input type="hidden" name="sid" value="{SID}" />
@@ -493,8 +493,8 @@
                 <!-- BEGIN user_resource_booking -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="small-8 avatar card">Resource Booking</div>
-                        <div class="small-4 avatar card">
+                        <div class="small-8 card">Resource Booking</div>
+                        <div class="small-4 card">
                             <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                                 <input type="hidden" name="uid" value="{USERID}" />
                                 <input type="hidden" name="sid" value="{SID}" />
@@ -517,8 +517,8 @@
                 <!-- BEGIN user_curriculum -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="small-8 avatar card">Curriculum</div>
-                        <div class="small-4 avatar card">
+                        <div class="small-8 card">Curriculum</div>
+                        <div class="small-4 card">
                             <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                                 <input type="hidden" name="uid" value="{USERID}" />
                                 <input type="hidden" name="sid" value="{SID}" />
@@ -541,8 +541,8 @@
                 <!-- BEGIN user_pastoral -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="small-8 avatar card">Pastoral Moderator</div>
-                        <div class="small-4 avatar card">
+                        <div class="small-8 card">Pastoral Moderator</div>
+                        <div class="small-4 card">
                             <form action="/adminv2/userForm.php" method="post" class="updateServicesForm">
                                 <input type="hidden" name="uid" value="{USERID}" />
                                 <input type="hidden" name="sid" value="{SID}" />
@@ -588,7 +588,7 @@
 
                 <li class="actions-small-1">
                     <form id="serviceCloneForm" action="/adminv2/userForm.php" method="post" data-validatable-as="addService" data-action="addService" class="list-item">
-                        <div class="small-4 avatar card">
+                        <div class="small-4 card">
                             <select data-role="serviceSelector" name="service" id="serviceSelect" form="serviceCloneForm" required>
                                 <option value="" data-identifier="none">Select Service</option>
                                 <option value="2" data-identifier="campus">Calendar</option>
@@ -601,7 +601,7 @@
                                 <option value="10" data-identifier="none">Sports Administrator</option>
                             </select>
                         </div>
-                        <div class="small-4 avatar card">
+                        <div class="small-4 card">
                             <select data-service-type="campus" name="sid" id="campusSelect" class="hide" disabled required>
                                 <option value="">Select Campus</option>
                                 <!-- BEGIN campusPermsList -->
@@ -622,7 +622,7 @@
                                 <option value="" disabled>--</option>
                             </select>
                         </div>
-                        <div class="small-4 avatar card end">
+                        <div class="small-4 card end">
                             <select name="type" form="serviceCloneForm" required>
                                 <option value="1">Read</option>
                                 <option value="2">Write</option>
@@ -631,7 +631,7 @@
                             <input type="hidden" name="addService" />
                             <input type="hidden" value="{USERID}" name="uid">
                         </div>
-                        <div class="small-12 avatar card">
+                        <div class="small-12 card">
                             <input type="submit" class="submit-btn-plain" value="Add" name="serviceSubmit">
                         </div>
                     </form>
@@ -654,7 +654,7 @@
                 <!-- BEGIN user_linked -->
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="avatar card small-12">
+                        <div class="card small-12">
                             <a href="/adminv2/modify-user/{LINKED_USER_ID}">{LINKED_USER}</a>
                         </div>
                     </div>
@@ -665,10 +665,10 @@
                 <!-- END user_linked -->
                 <li class="actions-small-1">
                     <form action="/adminv2/userForm.php" method="post" id="linkedUserAdd" class="list-item">
-                        <div class="small-12 avatar card">
+                        <div class="small-12 card">
                             <select data-selectizeuser="addUser" name="linkUser[]" multiple placeholder="Search Users" form="linkedUserAdd"></select>
                         </div>
-                        <div class="small-12 avatar card">
+                        <div class="small-12 card">
                             <input type="hidden" name="userID" value="{USERID}" />
                             <input type="submit" value="Add" disabled />
                         </div>

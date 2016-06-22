@@ -40,7 +40,7 @@
         {# Show image for item if it's there, otherwise some empty image? #}
         <ul class="action-list">
             <li>
-                <div class="avatar card small-12">
+                <div class="card small-12">
                     <a href="{{ routeLookup('resourceItem.read', {id: item.resource.id}) }}">
                         {% if item.resource.image.hash %}
                             <img src="/storage/image.php?size=square64&amp;hash={{ item.resource.image.hash|e('url') }}" />
@@ -56,8 +56,8 @@
             {% for event in item.bookingEvents %}
             <li class="actions-small-1">
                 <div class="list-item">
-                    {# show booker's avatar card #}
-                    <div class="small-12 avatar card">
+                    {# show booker's card #}
+                    <div class="small-12 card">
                         <a href="/search/user/{{ event.booking.event.owner.id }}">
                             <img src="/portrait.php?userId={{ event.booking.event.owner.externalId|e('url') }}&amp;size=square64" />
                         </a>

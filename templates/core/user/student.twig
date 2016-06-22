@@ -348,7 +348,7 @@
                             {% for contact in contacts %}
                             <li class="actions-small-1">
                                 <div class="list-item">
-                                    <div class="avatar card small-12">
+                                    <div class="card small-12">
                                         {% if contact.main %}
                                         <a href="/search/user/{{ contact.main.getId() }}">
                                             <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
@@ -381,7 +381,7 @@
                             {% if contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred %}
                             <li class="actions-small-1">
                                 <div class="list-item">
-                                    <div class="avatar card small-12">
+                                    <div class="card small-12">
                                         {# need to know user's schoolbox info here #}
                                         {% if contact.spouse %}
                                         <a href="/search/user/{{ contact.spouse.getId() }}">
@@ -414,7 +414,7 @@
 
                             <li class="actions-small-1">
                                 <div class="list-item">
-                                    <div class="avatar card small-12">
+                                    <div class="card small-12">
                                         <span class="icon-home icon-32"></span>
                                         {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
                                         <p>{{ contact.StudentContactAddress1 }}</p>
@@ -456,7 +456,7 @@
                                 {% if externalUser["StudentEmergency#{index}Name"] %}
                                     <li class="actions-small-1 actions-medium-2">
                                         <div class="list-item">
-                                            <div class="avatar card small">
+                                            <div class="card small">
                                                 <span class="icon-alert"></span>
                                                 {{ externalUser["StudentEmergency#{index}Name"] }}
                                             </div>
@@ -505,7 +505,7 @@
                             <ul class="subject-list">
                                 <li>
                                     <div class="list-item">
-                                        <div class="avatar card small-12">
+                                        <div class="card small-12">
                                             {% if subject.folder.getId() and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
                                             <a href="/homepage/code/{{ subject.code|e('url')|e('url')|e('url') }}">
                                                 <span class="icon-folder icon-32"></span>
@@ -523,7 +523,7 @@
                                 {% set teacherEmails = teacherEmails ~ teacher.getEmail() ~ ',' %}
                                 <li class="actions-small-1">
                                     <div class="list-item">
-                                        <div class="avatar card small-12">
+                                        <div class="card small-12">
                                             <a href="/search/user/{{ teacher.getId() }}">
                                                 <img src="/portrait.php?userId={{ teacher.getExternalId()|e('url') }}&amp;size=square64" />
                                                 <h3>{{ teacher.formatName() }}</h3>
@@ -567,7 +567,7 @@
                             <ul class="subject-list">
                                 <li>
                                     <div class="list-item">
-                                        <div class="avatar card small-12 ">
+                                        <div class="card small-12 ">
                                             {% if group.perms > 0 %}
                                                 <a href="/homepage/{{ group.id }}">
                                                     <span class="icon-folder icon-32"></span>
@@ -583,7 +583,7 @@
                                 {% if group.owner %}
                                 <li class="actions-small-1">
                                     <div class="list-item">
-                                        <div class="avatar card small-12">
+                                        <div class="card small-12">
                                             <a href="/search/user/{{ group.owner.getId() }}">
                                                 <img src="/portrait.php?userId={{ group.owner.getExternalId() }}&amp;size=square64" />
                                                 <h3>{{ group.owner.formatName() }}</h3>

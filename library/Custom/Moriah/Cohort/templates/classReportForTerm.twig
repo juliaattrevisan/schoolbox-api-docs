@@ -221,7 +221,7 @@
 <div class="row">
     <div class="small-12 medium-5 island">
         <section>
-            <div class="avatar card small-12">
+            <div class="card small-12">
                 <a href="/search/user/{{ student.getId()|e('url') }}">
                     <img src="/portrait.php?userId={{ student.getExternalId()|e('url') }}&size=square64" />
                     <p>{{ student.formatName() }}</p>
@@ -244,7 +244,7 @@
             <ul class="action-list">
                 {% for teacher in class.teachers %}
                     <li>
-                        <div class="small-12 avatar card">
+                        <div class="card small-12">
                             <a href="/search/user/{{ teacher.getId() }}" title="View Profile">
                                 <img src="/portrait.php?userId={{ teacher.getExternalId() }}&amp;size=square64"
                                      alt="{{ teacher.formatName() }}">
@@ -271,7 +271,7 @@
                 <li>
                     {% for result in results %}
                         {% set otherUsageCount = max(0, (result.folders|length)-1) %}
-                        <div class="avatar card small-12">
+                        <div class="card small-12">
                             <span class="icon-course icon-32"></span>
                             <p>{{ result.course.getNameWithCodes() }}</p>
                             {% if user.getRole().isStaff() %}
@@ -291,7 +291,7 @@
                         <ul class="action-list reply">
                         {% for baseUnitId, unitResult in result.units %}
                             <li>
-                                <div class="avatar card small-12">
+                                <div class="card small-12">
                                     <span class="icon-folder icon-32"></span>
                                     <p>{{ unitResult.unit.getTitle() }}</p>
                                 </div>

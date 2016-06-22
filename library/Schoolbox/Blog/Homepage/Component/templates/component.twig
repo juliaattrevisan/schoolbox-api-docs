@@ -52,7 +52,7 @@
                         <li class="actions-small-1" id="blog_{{ blog.getId }}" data-blog>
 
                             <div class="list-item">
-                                <div class="avatar card small-12">
+                                <div class="card small-12">
                                     {% include '@blog/sub/blogAvatarCard.twig' with {blog: blog} %}
                                 </div>
                             </div>
@@ -83,7 +83,7 @@
 
                                     <li class="actions-small-1" data-thread>
                                         <div class="list-item">
-                                            <div class="avatar card small-12">
+                                            <div class="card small-12">
                                                 {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
                                                 <p class="meta">Commented {{ comment.getCreatedAt.getRelativeTime }}</p>
                                             </div>
@@ -107,7 +107,7 @@
                                     <div class="column small-12 no-pad">
                                         <form action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}" method="post">
                                             <input type="hidden" name="component" value="1">
-                                            <div class="avatar card small-12">
+                                            <div class="card small-12">
                                                 <img src="/portrait.php?userId={{ session.user.getExternalId }}&size=square64" />
                                                 <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
                                             </div>

@@ -6,7 +6,7 @@
                 {% for item in list %}
                 <li class="actions-small-1">
                     <div class="list-item">
-                        <div class="small-12 avatar card">
+                        <div class="small-12 card">
                             {% if isRouteAuthorized('resourceCategory.read', {id: item.id, item: item}) %}
                                 <a id="resourcecategory-read-{{item.id}}"
                                    href="{{ routeLookup('resourceCategory.read', {id: item.id}) }}">{{ item.name }}</a>

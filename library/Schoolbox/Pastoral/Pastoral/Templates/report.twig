@@ -65,7 +65,7 @@
                     <ul class="action-list">
                         <li class="actions-small-1">
                             <div class="list-item">
-                                <div class="small-12 avatar card wrap-down">
+                                <div class="small-12 card wrap-down">
                                     {# Theres no need for the all the twig access checks like the list page, if the user got to this screen they can view everything #}
                                     <a href="/search/user/{{ record.owner.getId() }}">
                                         <img class="show-on-print" src="/portrait.php?userId={{ record.getStudent().getExternalId() }}&amp;size=square64" width="64">
@@ -136,7 +136,7 @@
                                 {# Show all comments for this record #}
                                 {% for comment in record.getCommentList %}
                                     <div class="content">
-                                        <div class="small-12 avatar card wrap-down">
+                                        <div class="small-12 card wrap-down">
                                             {# Comment author photo #}
                                             <a href="/search/user/{{ comment.owner.getId() }}" title="View Profile">
                                                 <img src="/portrait.php?userId={{ comment.owner.getExternalId() }}&size=square64" alt="" />

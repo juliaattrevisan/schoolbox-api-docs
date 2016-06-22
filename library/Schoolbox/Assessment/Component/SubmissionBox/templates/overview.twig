@@ -46,7 +46,7 @@
                     {% for student in students %}
                     <tr>
                         <td class="no-pad">
-                            <div class="avatar card small-12">
+                            <div class="card small-12">
                                 <a href="/search/user/{{ student.id }}" title="View Profile">
                                     <img src="/portrait?userId={{ student.externalId }}&size=square64" alt="View Profile" />
                                     <p>{{ student.formatName('{lastname}, {firstname}') }}</p>

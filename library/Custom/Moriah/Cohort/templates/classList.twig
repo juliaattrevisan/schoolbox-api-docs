@@ -10,7 +10,7 @@
 
     <div class="small-12 island">
         <section>
-            <div class="avatar card small-12">
+            <div class="card small-12">
                 <a href="/search/user/{{ student.getId()|e('url') }}">
                     <img src="/portrait.php?userId={{ student.getExternalId()|e('url') }}&size=square64" />
                     <p>{{ student.formatName() }}</p>
@@ -30,7 +30,7 @@
                     {% if courseCount > 0 %}
                     <li>
                         <div class="list-item">
-                            <div class="compact avatar card small-12">
+                            <div class="compact card small-12">
                                 <a href="{{ routeLookup('customMoriahCohort.classReport', {studentId: student.getId(), classId: class.getId()}) }}">
                                     <span class="icon-home"></span>
                                     <p>{{ class.getNameWithCodes() }}</p>

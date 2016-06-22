@@ -2,7 +2,7 @@
     {% if namespace == 'resourceBrowser' %}
         <dt class="small-12 medium-4">Uploaded by</dt>
         <dd class="small-12 medium-8">
-            <div class="avatar card tiny">
+            <div class="tiny card small-12">
                 <a href="/search/user/{{ file.owner.id }}">
                     <img src="{{ portrait ~ file.owner.externalId }}" alt="{{ file.owner.formatName }}" />
                     <p>{{ file.owner.formatName }}</p>
