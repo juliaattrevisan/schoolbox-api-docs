@@ -195,6 +195,27 @@ class Controller extends AbstractController
     }
 
     /**
+     * Remove players from a Division
+     *
+     * @param Division $division
+     */
+    public function postRemovePlayers(Division $division)
+    {
+        $this->getDivisionUserMapper()->delete(
+            $this->getDivisionUserMapper()->findByColumnList([
+                'user_id'     => $this->getRequest()->post->get('userId'),
+                'division_id' => $division->getId(),
+            ])
+        );
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'sportsfixturesDivision.getLobby',
+                ['divisionId' => $division->getId(),]
+            )
+        );
+    }
+
+    /**
      * Save Division data to db
      *
      * @param $sport

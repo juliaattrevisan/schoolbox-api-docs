@@ -13,6 +13,19 @@
                     dataType: 'json'
                 }
             });
+        $('[data-remove-player]').on('click', function(e) {
+            e.preventDefault();
+            $(this).confirmDialog({
+                confirmEvent: function(el) {
+                    $.post(
+                        el.attr('href'),
+                        [{name: 'userId[]', value: el.data('removePlayer')}]
+                    ).done(function() {
+                        window.location.reload();
+                    })
+                }
+            });
+        });
     });
 </script>
 <ul class="breadcrumb">
@@ -46,7 +59,7 @@
             <section>
                 <ul class="information-list">
                     {% for currentPlayer in players %}
-                        <li>
+                        <li class="actions-small-1">
                             <div class="list-item">
                                 <div class="small-12 avatar card">
                                     <a href="/search/user/{{ currentPlayer.user.getId() }}">
@@ -56,6 +69,12 @@
                                     <p class="meta">{{ currentPlayer.user.formatMetadata() }}</p>
                                 </div>
                             </div>
+                            <nav>
+                                <a href="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {divisionId: division.getId()}) }}"
+                                   class="icon-delete"
+                                   title="Remove Player"
+                                   data-remove-player="{{ currentPlayer.user.getId() }}"></a>
+                            </nav>
                         </li>
                     {% endfor %}
                 </ul>
