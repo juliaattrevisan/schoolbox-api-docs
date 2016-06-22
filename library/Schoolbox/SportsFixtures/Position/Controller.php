@@ -8,6 +8,7 @@
 namespace Schoolbox\SportsFixtures\Position;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
@@ -192,7 +193,7 @@ class Controller extends Base
     {
         $position->setName($name);
         $position->setSport($sport);
-        $position->setUpdatedAt(\Alaress_Date_Format::now());
+        $position->setUpdatedAt(Alaress_Date_Format::now());
 
         $this->getPositionMapper()->save($position);
     }
