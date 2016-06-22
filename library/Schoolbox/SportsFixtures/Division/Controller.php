@@ -37,6 +37,11 @@ class Controller extends AbstractController
     protected $teamMapper;
 
     /**
+     * @var User\Mapper
+     */
+    protected $divisionUserMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -45,6 +50,7 @@ class Controller extends AbstractController
         $this->setSportMapper(SportMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setTeamMapper(TeamMapper::getInstance());
+        $this->setDivisionUserMapper(User\Mapper::getInstance());
     }
 
     /**
@@ -119,6 +125,7 @@ class Controller extends AbstractController
             $division = $this->getDivisionMapper()->findById($divisionId);
             $sport    = $this->getSportMapper()->findById($division->getSport()->getId());
             $teams    = $this->getTeamMapper()->findByColumn('division_id', $divisionId);
+            $players  = $this->getDivisionUserMapper()->findByColumn('division_id', $divisionId, ['order' => ['sequence' => 'desc']]);
 
             $this->getResponse()->content->set(
                 $this->buildHtmlOutput(
@@ -126,6 +133,7 @@ class Controller extends AbstractController
                         'division' => $division,
                         'sport'    => $sport,
                         'teams'    => $teams,
+                        'players'  => $players,
                     ]
                 )
             );
@@ -231,6 +239,24 @@ class Controller extends AbstractController
     public function setTeamMapper(TeamMapper $teamMapper)
     {
         $this->teamMapper = $teamMapper;
+        return $this;
+    }
+
+    /**
+     * @return User\Mapper
+     */
+    public function getDivisionUserMapper()
+    {
+        return $this->divisionUserMapper;
+    }
+
+    /**
+     * @param User\Mapper $divisionUserMapper
+     * @return $this
+     */
+    public function setDivisionUserMapper($divisionUserMapper)
+    {
+        $this->divisionUserMapper = $divisionUserMapper;
         return $this;
     }
 }
