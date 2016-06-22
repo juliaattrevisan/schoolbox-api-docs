@@ -46,6 +46,15 @@ class Model
     protected $sequence;
 
     /**
+     * Constructor - instantiate this object into minimum non-erroneous state.
+     */
+    public function __construct()
+    {
+        $this->user     = new UserModel();
+        $this->division = new DivisionModel();
+    }
+
+    /**
      * @return int
      */
     public function getId()
