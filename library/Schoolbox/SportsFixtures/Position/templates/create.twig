@@ -2,12 +2,13 @@
     $(function() {
         $('#positionForm').alaressValidate({
             rules: {
+                sportId: {
+                    required: true,
+                    min: 1
+                },
                 name: {
                     required: true,
                     minlength: 2
-                },
-                sportId: {
-                    min: 1
                 }
             },
             messages: {
