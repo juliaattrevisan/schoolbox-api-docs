@@ -179,10 +179,11 @@ class Controller extends AbstractController
     public function postAddPlayers(Division $division)
     {
         $divisionUsers = [];
-        foreach ($this->getUserMapper()->findByColumn('user_id', $this->getRequest()->post->get('userId')) as $user) {
+        foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
             $divisionUsers[] = $this->getDivisionUserMapper()->createModel()
                 ->setDivision($division)
-                ->setUser($user);
+                ->setUser($user)
+                ->setSequence(0);
         }
         $this->getDivisionUserMapper()->save($divisionUsers);
         $this->getResponse()->redirect->afterPost(

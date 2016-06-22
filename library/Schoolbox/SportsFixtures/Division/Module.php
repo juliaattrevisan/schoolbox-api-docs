@@ -62,6 +62,21 @@ class Module extends RestfulModule
     }
 
     /**
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        $this->addRoutePreload($matcher, '(?:postModify|postAddPlayers)', function ($params) {
+            $division = Mapper::getInstance()->findById($params['divisionId']);
+
+            return [
+                'params' => $params,
+                'division' => $division
+            ];
+        });
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function initRoutePermissions(Authorizer $authorizer) {
