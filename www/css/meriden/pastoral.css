@@ -77,3 +77,8 @@
     border: .0625rem solid black;
     padding: .5rem;
 }
+
+/** Subject list gets pushed down **/
+.e-report .subject-list {
+    margin-top: 1.5rem;
+}
