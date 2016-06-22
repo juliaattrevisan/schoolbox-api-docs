@@ -22,7 +22,8 @@ $di = $this->getDi();
 
 /* Note: Insert new tag types here. */
 $registry = [
-    'pastoral' => $di->lazyNew(PastoralMapper::class),
+    'pastoral'       => $di->lazyNew(PastoralMapper::class),
+    'sport_position' => $di->lazyNew(PositionMapper::class)
 ];
 
 // Validate params
