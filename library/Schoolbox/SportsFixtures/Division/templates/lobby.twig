@@ -35,19 +35,21 @@
         <h2 class="subheader">Players</h2>
         {% if players is not empty %}
             <ul class="information-list">
-                {% for currentPlayer in players %}
-                    <li>
-                        <div class="list-item">
-                            <div class="small-12 avatar card">
-                                <a href="/search/user/{{ currentPlayer.user.getId() }}">
-                                    <img src="/portrait.php?userId={{ currentPlayer.user.getExternalId() }}&amp;size=square64" />
-                                    <h3>{{ currentPlayer.user.formatName() }}</h3>
-                                </a>
-                                <p class="meta">{{ currentPlayer.user.formatMetadata() }}</p>
+                <section>
+                    {% for currentPlayer in players %}
+                        <li>
+                            <div class="list-item">
+                                <div class="small-12 avatar card">
+                                    <a href="/search/user/{{ currentPlayer.user.getId() }}">
+                                        <img src="/portrait.php?userId={{ currentPlayer.user.getExternalId() }}&amp;size=square64" />
+                                        <h3>{{ currentPlayer.user.formatName() }}</h3>
+                                    </a>
+                                    <p class="meta">{{ currentPlayer.user.formatMetadata() }}</p>
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                {% endfor %}
+                        </li>
+                    {% endfor %}
+                </section>
             </ul>
         {% else %}
             <div class="empty-state">
@@ -61,18 +63,20 @@
     <div class="hide-for-small medium-6 island">
         <h2 class="subheader">Teams</h2>
         {% if teams is not empty %}
-            <ul class="information-list">
-                {% for currentTeam in teams %}
-                    <li>
-                        <div class="list-item">
-                            <div class="small-12 avatar card">
-                                <p>{{ currentTeam.getName() }}</p>
-                                <p><a href="{{ currentTeam.getUrl() }}">{{ currentTeam.getUrl() }}</a>
+            <section>
+                <ul class="information-list">
+                    {% for currentTeam in teams %}
+                        <li>
+                            <div class="list-item">
+                                <div class="small-12 avatar card">
+                                    <h3>{{ currentTeam.getName() }}</h3>
+                                    <p><a href="{{ currentTeam.getUrl() }}">{{ currentTeam.getUrl() }}</a>
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
         {% else %}
             <div class="empty-state">
                 <i class="icon-sport"></i>
