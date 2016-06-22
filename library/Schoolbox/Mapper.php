@@ -2697,7 +2697,8 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
-     * @brief Returns an array of distinct matches. Each item is an associative array of colName => colValue
+     * Returns a 1-dimensional array of distinct values in specified column
+     * Does not support multi-column distinctness
      *
      * @param string $column                     distinct column
      * @param array $columnList                  a set of key-value pairs:
