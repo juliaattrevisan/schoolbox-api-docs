@@ -51,7 +51,7 @@ CREATE TABLE `sportsfixtures_position` (
 
 /** Division players table **/
 CREATE TABLE `sportsfixtures_division_user` (
-	`id` INT NOT NULL,
+	`id` INT NOT NULL AUTO_INCREMENT,
 	`division_id` INT NOT NULL,
 	`user_id` INT NOT NULL,
 	`sequence` INT NOT NULL DEFAULT 0,
