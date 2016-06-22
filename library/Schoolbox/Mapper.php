@@ -2652,6 +2652,7 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
+     * @throws Exception
      * @return array
      */
     public function listUnmappedFields()
@@ -2698,7 +2699,7 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * @brief Returns an array of distinct matches. Each item is an associative array of colName => colValue
      *
-     * @param array|string $distinctList         distinct column[s]
+     * @param string $column                     distinct column
      * @param array $columnList                  a set of key-value pairs:
      *                                           * key:   the name of the column to find
      *                                           * value: the value (or array of values) to search for
@@ -2714,15 +2715,13 @@ abstract class Mapper implements IMapper, Serializable
      *                   'limit' or 'offset')
      * @return array
      */
-    public function findDistinct($distinctList, $columnList = array(), $options = array())
+    public function findDistinct($column, $columnList = array(), $options = array())
     {
-        $selection = is_array($distinctList) ? implode(",", $distinctList) : $distinctList;
-
         try {
-            $stmt = $this->selectScalarByColumnList("DISTINCT $selection", $columnList, $options);
+            $stmt = $this->selectScalarByColumnList("DISTINCT $column", $columnList, $options);
         } catch (UnderflowException $e) {
             return [];
         }
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 }
