@@ -14,6 +14,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\SportsFixtures\Sport\Model as Sport;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
+use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 
@@ -31,6 +32,11 @@ class Controller extends AbstractController
     protected $errorMapper;
 
     /**
+     * @var TeamMapper
+     */
+    protected $teamMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -38,6 +44,7 @@ class Controller extends AbstractController
         parent::__construct(DivisionMapper::getInstance());
         $this->setSportMapper(SportMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
+        $this->setTeamMapper(TeamMapper::getInstance());
     }
 
     /**
@@ -111,12 +118,14 @@ class Controller extends AbstractController
         try {
             $division = $this->getDivisionMapper()->findById($divisionId);
             $sport    = $this->getSportMapper()->findById($division->getSport()->getId());
+            $teams    = $this->getTeamMapper()->findByColumn('division_id', $divisionId);
 
             $this->getResponse()->content->set(
                 $this->buildHtmlOutput(
                     '@sportsfixturesDivision/lobby.twig', [
                         'division' => $division,
                         'sport'    => $sport,
+                        'teams'    => $teams,
                     ]
                 )
             );
@@ -205,5 +214,23 @@ class Controller extends AbstractController
     protected function setErrorMapper($errorMapper)
     {
         $this->errorMapper = $errorMapper;
+    }
+
+    /**
+     * @return TeamMapper
+     */
+    public function getTeamMapper()
+    {
+        return $this->teamMapper;
+    }
+
+    /**
+     * @param  TeamMapper $teamMapper
+     * @return $this
+     */
+    public function setTeamMapper(TeamMapper $teamMapper)
+    {
+        $this->teamMapper = $teamMapper;
+        return $this;
     }
 }
