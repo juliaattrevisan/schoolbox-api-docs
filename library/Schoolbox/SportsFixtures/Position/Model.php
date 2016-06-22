@@ -11,6 +11,14 @@ use Schoolbox\ISoftDeletable;
 use \Alaress_Date_Format;
 use \Schoolbox\SportsFixtures\Sport\Model as Sport;
 
+/**
+ * Represents a Position a player may take in some Sport.
+ * Eg, 'Full Forward' or 'Full Back' in Aussie Rules Football
+ *
+ * For the time being, a participant may only be assigned 0 or 1 position
+ *
+ * @package Schoolbox\SportsFixtures\Position
+ */
 class Model implements ISoftDeletable
 {
     /** @var int */
