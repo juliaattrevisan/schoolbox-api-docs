@@ -46,9 +46,11 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('user', 'u')},
+                {$this->getJoinColumnString('user.role', 'ur')},
                 {$this->getJoinColumnString('division', 'd')}
             FROM {$this->database->quoteIdentifier($this->table)}
             INNER JOIN {$this->getJoinSql('user', '', 'u')}
+            INNER JOIN {$this->getJoinSql('user.role', 'u', 'ur')}
             INNER JOIN {$this->getJoinSql('division', '', 'd')}
         ";
     }
@@ -65,7 +67,7 @@ class Mapper extends BaseMapper
         foreach ($statement as $row) {
             $model = $this->createModel()
                 ->setId($row['id'])
-                ->setUser($this->hydrateJoin($row, 'user', 'u'))
+                ->setUser($this->hydrateJoin($row, 'user', 'u')->setRole($this->hydrateJoin($row, 'user.role', 'ur')))
                 ->setDivision($this->hydrateJoin($row, 'division', 'd'))
                 ->setSequence($row['sequence']);
             $collection->add($model);
