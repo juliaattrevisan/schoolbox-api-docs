@@ -38,8 +38,8 @@
                 </div>
             </div>
             <nav>
-                <a href="/" class="icon-add" title="Add Players" data-reveal-id="addPlayersModal"></a>
-                <a href="/" class="icon-upload" title="Upload Player List"></a>
+                <a href="#" class="icon-add" title="Add Players" data-reveal-id="addPlayersModal"></a>
+                <a href="#" class="icon-upload" title="Upload Player List" data-reveal-id="uploadPlayersModal"></a>
             </nav>
         </div>
         {% if players is not empty %}
@@ -99,17 +99,14 @@
 <div id="addPlayersModal" class="reveal-modal" data-reveal aria-labelledby="addPlayersModalTitle" aria-hidden="true" role="dialog">
     <h2 id="addPlayersModalTitle">Add Players</h2>
     <form action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {divisionId: division.getId()}) }}" method="post" class="no-margin">
-        <label for="addUser">
-            Add Members
-            <span data-tooltip class="has-tip tip-top hint" title="You may add users individually by typing their name and selecting from the list.">?</span>
-        </label>
         <select data-role="userSelector" name="userId[]" multiple placeholder="Search Users"></select>
-        <input type="submit" class="full-width" value="Add Users" />
+        <input type="submit" class="full-width" value="Add" />
     </form>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
 
 <div id="uploadPlayersModal" class="reveal-modal" data-reveal aria-labelledby="uploadPlayersModalTitle" aria-hidden="true" role="dialog">
-    <h2 id="uploadPlayersModalTitle">Upload Players</h2>
+    <h2 id="uploadPlayersModalTitle">Upload Player List</h2>
+    <p>Not yet implemented</p>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
