@@ -1,0 +1,70 @@
+<script type="text/javascript">
+    $(function() {
+        $('#positionForm').alaressValidate({
+            rules: {
+                name: {
+                    required: true,
+                    minlength: 2
+                },
+                sportId: {
+                    min: 1
+                }
+            },
+            messages: {
+                'sportId': 'Please choose a Sport.',
+                'name': 'Please enter a Position name.'
+            },
+            errorPlacement: function(error, element) {
+                $.alaressValidate.defaultErrorPlacement(error, element);
+            }
+        })
+    });
+</script>
+
+<ul class="breadcrumb">
+    <li><a href="#">Sports Fixtures</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesPosition.getList', {sportId: sport.id}) }}">Positions in {{ sport.name }}</a></li>
+
+    {% if position.id %}
+        <li class="active"><a href="{{ routeLookup('sportsfixturesPosition.getUpdate', {positionId: position.id}) }}">{{ position.name }}</a></li>
+    {% else %}
+        <li class="active"><a href="#">{{ action }}</a></li>
+    {% endif %}
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sports Fixtures</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% if position %}
+            {% set formUrl = routeLookup('sportsfixturesPosition.getUpdate', {positionId: position.id}) %}
+        {% else %}
+            {% set formUrl = routeLookup('sportsfixturesPosition.getCreate', {sportId: sport.id}) %}
+        {% endif %}
+
+        <form id='positionForm' action="{{ formUrl }}" method="post">
+            <h2 class="subheader">{{ action }} Position in {{ sport.name }}</h2>
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="sportId" value="{{ sport.id }}"/>
+                        <input type="hidden" name="positionId" value="{{ position.id }}"/>
+
+                        <label>
+                            Name
+                            <input type="text" name="name" value="{{ position.name }}"/>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="{{ action }} Position" />
+        </form>
+    </div>
+</div>
