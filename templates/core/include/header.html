@@ -112,30 +112,3 @@
 <!-- BEGIN header_javascript -->
 <script type="text/javascript" src="{HEADER_SCRIPT_LOCATION}"></script>
 <!-- END header_javascript -->
-
-<script>
-
-    $(function() {
-        $('[data-portal]').click(function(e) {
-            // Get link we need to go to
-
-            var deeplink = "/" + $(e.target).attr('data-portal');
-
-            // Check if we have already gone through the SSO popup process
-
-            if ({SYNERGETIC_SSO}) {
-                // Already done, just go to the page
-
-                window.location.href='/synergetic' + deeplink;
-            } else {
-                // Launch portal in a popup to allow SSO to work, then go to the page after a timeout
-
-                window.loginWindow = window.open('/synRedir.php', 'synRedir', 'height=200,width=150');
-                setTimeout(function() {
-                    window.loginWindow.close();
-                    window.location.href='/synergetic' + deeplink;
-                }, 5000);
-            }
-        });
-    });
-</script>
