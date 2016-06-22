@@ -46,6 +46,10 @@
     font-size: .75rem;
 }
 
+/** Any definition list that doesn't have a table after it has less space after **/
+.e-report dl.small-gap {
+    margin-bottom: 0.375rem;
+}
 /** Reduce space between definitions **/
 .e-report dl dt,
 .e-report dl dd {
