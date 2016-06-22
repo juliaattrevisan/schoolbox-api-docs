@@ -34,8 +34,8 @@
     <div class="small-12 medium-6 island">
         <h2 class="subheader">Players</h2>
         {% if players is not empty %}
-            <ul class="information-list">
-                <section>
+            <section>
+                <ul class="information-list">
                     {% for currentPlayer in players %}
                         <li>
                             <div class="list-item">
@@ -49,8 +49,8 @@
                             </div>
                         </li>
                     {% endfor %}
-                </section>
-            </ul>
+                </ul>
+            </section>
         {% else %}
             <div class="empty-state">
                 <i class="icon-group"></i>
