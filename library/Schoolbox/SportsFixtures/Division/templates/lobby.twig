@@ -37,17 +37,25 @@
 
     <div class="hide-for-small medium-6 island">
         <h2 class="subheader">Teams</h2>
-        <ul class="information-list">
-            {% for currentTeam in teams %}
-                <li>
-                    <div class="list-item">
-                        <div class="small-12 avatar card">
-                            <p>{{ currentTeam.name }}</p>
-                            <p><a href="{{ currentTeam.url }}">{{ currentTeam.url }}</a>
+        {% if teams is not empty %}
+            <ul class="information-list">
+                {% for currentTeam in teams %}
+                    <li>
+                        <div class="list-item">
+                            <div class="small-12 avatar card">
+                                <p>{{ currentTeam.getName() }}</p>
+                                <p><a href="{{ currentTeam.getUrl() }}">{{ currentTeam.getUrl() }}</a>
+                            </div>
                         </div>
-                    </div>
-                </li>
-            {% endfor %}
-        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-sport"></i>
+                <p>There are no Teams in {{ division.getName() }}.</p>
+                <p><a href="{{ routeLookup('sportsfixturesTeam.getCreate', {divisionId: division.id}) }}" title="Add a Team">Add a Team</a></p>
+            </div>
+        {% endif %}
     </div>
 </div>
