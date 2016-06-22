@@ -57,7 +57,7 @@ CREATE TABLE `sportsfixtures_division_user` (
 	`sequence` INT NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`),
 	INDEX `fk_sportsfixtures_division_user__division_idx` (`division_id` ASC),
-	INDEX `sportsfixtures_division_user__user` (`user_id` ASC)  COMMENT 'Would be a FK if user table wasn''t MYISAM',
+	INDEX `sportsfixtures_division_user__user` (`user_id` ASC),
 	CONSTRAINT `fk_sportsfixtures_division_user__division`
 	FOREIGN KEY (`division_id`)
 	REFERENCES `sportsfixtures_division` (`id`)
