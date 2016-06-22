@@ -7,6 +7,10 @@
     html, body {
         max-width: 100%;
     }
+
+    .e-report a {
+        text-decoration: none;
+    }
 }
 
 /** Style the crest **/
