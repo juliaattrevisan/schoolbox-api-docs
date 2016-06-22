@@ -245,7 +245,7 @@
                     'object[id,name,width,height];' +
                     'param[name,value];' +
                     'embed[src,type,allowscriptaccess,allowfullscreen,wmode,width,height];' +
-                    'a[id,href,target];' +
+                    'a[id,href,target,data-portal];' +
                     'map[!name];' +
                     'area[!shape,!coords,!href,target,!alt];' +
                     'img[usemap];'

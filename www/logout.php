@@ -12,7 +12,6 @@ $redis = \Alaress\Redis::getClientInstance();
 $username = $redis->executeCommand($redis->createCommand('del',array($_COOKIE['remember'])));
 setcookie('remember', '', 1, '/');
 
-
 $samlLogoutUrl = trim(Cfg::get('saml_logout_url'));
 
 // Replace some dynamic variables in the logout URL if set
