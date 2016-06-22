@@ -48,6 +48,7 @@ class Module extends RestfulModule
                 '/lobby/{divisionId}'  => 'getLobby',
             ],
             'POST' => [
+                '/addPlayers/{divisionId}' => 'postAddPlayers',
             ]
         ];
 

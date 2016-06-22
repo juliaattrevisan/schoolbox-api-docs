@@ -10,6 +10,7 @@ namespace Schoolbox\SportsFixtures\Division;
 
 use Alaress\Web\Controller\Exception;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
+use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\SportsFixtures\Sport\Model as Sport;
@@ -17,6 +18,7 @@ use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\UserMapper;
 
 class Controller extends AbstractController
 {
@@ -37,6 +39,11 @@ class Controller extends AbstractController
     protected $teamMapper;
 
     /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
      * @var User\Mapper
      */
     protected $divisionUserMapper;
@@ -51,6 +58,7 @@ class Controller extends AbstractController
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setTeamMapper(TeamMapper::getInstance());
         $this->setDivisionUserMapper(User\Mapper::getInstance());
+        $this->setUserMapper(UserMapper::getInstance());
     }
 
     /**
@@ -164,6 +172,28 @@ class Controller extends AbstractController
     }
 
     /**
+     * Add players to a Division
+     *
+     * @param Division $division
+     */
+    public function postAddPlayers(Division $division)
+    {
+        $divisionUsers = [];
+        foreach ($this->getUserMapper()->findByColumn('user_id', $this->getRequest()->post->get('userId')) as $user) {
+            $divisionUsers[] = $this->getDivisionUserMapper()->createModel()
+                ->setDivision($division)
+                ->setUser($user);
+        }
+        $this->getDivisionUserMapper()->save($divisionUsers);
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'sportsfixturesDivision.getLobby',
+                ['divisionId' => $division->getId(),]
+            )
+        );
+    }
+
+    /**
      * Save Division data to db
      *
      * @param $sport
@@ -257,6 +287,24 @@ class Controller extends AbstractController
     public function setDivisionUserMapper($divisionUserMapper)
     {
         $this->divisionUserMapper = $divisionUserMapper;
+        return $this;
+    }
+
+    /**
+     * @return UserMapper
+     */
+    public function getUserMapper()
+    {
+        return $this->userMapper;
+    }
+
+    /**
+     * @param UserMapper $userMapper
+     * @return $this
+     */
+    public function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
         return $this;
     }
 }
