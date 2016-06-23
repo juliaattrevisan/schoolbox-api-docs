@@ -37,24 +37,23 @@ if(empty($this->arg[0])){
 if(empty($registry[$this->arg[0]])){
     $errors[] = 'Tag type not in registry';
 }
-if($errors){
-    error(2,implode("\n", $errors));
-}
-
-$mapper = $registry[$this->arg[0]]();
-$tags   = $mapper->findDistinct('name');
-$query  = strtolower($_GET['query']);
 
 $tagsArray = [];
-foreach ($tags as $tag) {
-    if (strpos(strtolower($tag), $query) !== false) {
-        $tagsArray[] = ['id' => $tag, 'name' => $tag];
+
+if($errors){
+    header(':', true, 400);
+} else {
+    /** @var \Schoolbox\Mapper $mapper */
+    $mapper = $registry[$this->arg[0]]();
+    $tags   = $mapper->findDistinct('name');
+    $query  = strtolower($_GET['query']);
+
+    foreach ($tags as $tag) {
+        if (strpos(strtolower($tag), $query) !== false) {
+            $tagsArray[] = ['id' => $tag, 'name' => $tag];
+        }
     }
 }
 
 header('Content-type: application/json');
 echo json_encode($tagsArray);
-
-
-
-
