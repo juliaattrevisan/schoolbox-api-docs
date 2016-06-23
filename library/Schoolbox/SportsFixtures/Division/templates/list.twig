@@ -8,7 +8,7 @@
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Division?',
                 confirmEvent: function() {
-                    $.post(element.attr('href'), {divisionId: element.attr('data-delete')}, function() {
+                    $.post(element.attr('href'), {}, function() {
                         window.location.href = window.location.href;
                     });
                 }
@@ -19,7 +19,7 @@
 <ul class="breadcrumb">
     <li><a href="#">Sports Fixtures</a></li>
     <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
-    <li class="active"><a href="{{ routeLookup('sportsfixturesDivision.getList', {sportId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
+    <li class="active"><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
 </ul>
 
 <div class="row">
@@ -38,7 +38,7 @@
                 </div>
             </div>
             <nav>
-                <a href='{{ routeLookup('sportsfixturesDivision.getCreate', {sportId: sport.id}) }}' class="icon-add" title="Add Division to {{ sport.name }}"></a>
+                <a href='{{ routeLookup('sportsfixturesDivision.getCreateForm', {contextId: sport.id}) }}' class="icon-add" title="Add Division to {{ sport.name }}"></a>
             </nav>
         </div>
 
@@ -54,9 +54,9 @@
                         </div>
                     </div>
                     <nav>
-                        <a href="{{ routeLookup('sportsfixturesDivision.postDelete', {}) }}" class="icon-delete" title="Delete" data-delete="{{ currentDivision.id }}"></a>
-                        <a href="{{ routeLookup('sportsfixturesDivision.getUpdate', {divisionId: currentDivision.id}) }}" class="icon-modify" title="Modify"></a>
-                        <a href="{{ routeLookup('sportsfixturesTeam.getList', {divisionId: currentDivision.id}) }}" class="icon-list" title="Manage Teams in {{ currentDivision.name }}"></a>
+                        <a href="{{ routeLookup('sportsfixturesDivision.deleteEntity', {entityId: currentDivision.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentDivision.id }}"></a>
+                        <a href="{{ routeLookup('sportsfixturesDivision.getModifyForm', {entityId: currentDivision.id}) }}" class="icon-modify" title="Modify"></a>
+                        <a href="{{ routeLookup('sportsfixturesTeam.getList', {contextId: currentDivision.id}) }}" class="icon-list" title="Manage Teams in {{ currentDivision.name }}"></a>
                     </nav>
                 </li>
                 {% endfor %}
@@ -66,7 +66,7 @@
         <div class="empty-state">
             <i class="icon-sport"></i>
             <p>There are no Divisions in {{ sport.name }}.</p>
-            <p><a href="{{ routeLookup('sportsfixturesDivision.getCreate', {sportId: sport.id}) }}" title="Add a Division">Add a Division</a></p>
+            <p><a href="{{ routeLookup('sportsfixturesDivision.getCreateForm', {contextId: sport.id}) }}" title="Add a Division">Add a Division</a></p>
         </div>
         {% endif %}
     </div>

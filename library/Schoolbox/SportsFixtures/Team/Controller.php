@@ -8,7 +8,8 @@
 
 namespace Schoolbox\SportsFixtures\Team;
 
-use Alaress\Web\Controller\Base;
+use Alaress\Web\Controller\Exception;
+use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
@@ -17,7 +18,7 @@ use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 
-class Controller extends Base
+class Controller extends AbstractController
 {
 
     /**
@@ -31,11 +32,6 @@ class Controller extends Base
     protected $divisionMapper;
 
     /**
-     * @var TeamMapper
-     */
-    protected $teamMapper;
-
-    /**
      * @var ErrorMapper
      */
     protected $errorMapper;
@@ -45,32 +41,50 @@ class Controller extends Base
      */
     public function __construct()
     {
+        parent::__construct(TeamMapper::getInstance());
         $this->setSportMapper(SportMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
-        $this->setTeamMapper(TeamMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
     /**
-     * List of Divisions and the Sport they are in
+     * Populate the Response object with a representation of the given entity:
+     *  - in the format provided in the request Accepts header
+     * If entity is deleted, respond with '210 Gone'
      *
-     * @param int $divisionId
+     * @param Team $entity
+     * @throws Exception
+     * @return void
      */
-    public function getList($divisionId)
+    public function getEntity($entity)
+    {
+        $division = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
+        $sport = $this->getSportMapper()->findById($division->getSport()->getId());
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/entity.twig', [
+            'sport'    => $sport,
+            'division' => $division,
+            'team'     => $entity
+        ]));
+    }
+
+    /**
+     * List of Teams and the Division they are in
+     * @param Division $context
+     */
+    public function getList($context = null)
     {
         try {
-            $division = $this->getDivisionMapper()->findById($divisionId);
-            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
-
-            $allTeams = $this->getTeamMapper()->findByColumn('division_id', $division->getId(), [
+            $sport    = $this->getSportMapper()->findById($context->getSport()->getId());
+            $allTeams = $this->getTeamMapper()->findByColumn('division_id', $context->getId(), [
                 'order' => [
                     'name' => 'asc'
                 ]
             ]);
 
             $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/list.twig', [
-                'sport' => $sport,
-                'division' => $division,
+                'sport'    => $sport,
+                'division' => $context,
                 'allTeams' => $allTeams
             ]));
         }
@@ -82,91 +96,48 @@ class Controller extends Base
     /**
      * Create a Team in a particular Division id
      *
-     * @param int $divisionId
+     * @param Team     $entity
+     * @param Division $context
+     * @return void
      */
-    public function getCreate($divisionId)
+    public function getForm($entity, $context = null)
     {
         try {
-            $division = $this->getDivisionMapper()->findById($divisionId);
+            if (empty($context)) {
+                $context = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
+            }
+
+            $sport = $this->getSportMapper()->findById($context->getSport()->getId());
 
             $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/create.twig', [
-                'division' => $division,
-                'action' => 'Create'
+                'sport'    => $sport,
+                'division' => $context,
+                'team'     => $entity,
+                'action'   => $entity->getId() ? 'Modify' : 'Create'
             ]));
         }
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);
         }
-    }
-
-    /**
-     * Update a Team
-     *
-     * @param int $teamId
-     */
-    public function getUpdate($teamId)
-    {
-        try {
-            $team = $this->getTeamMapper()->findById($teamId);
-            $division = $this->getDivisionMapper()->findById($team->getDivision()->getId());
-            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
-
-            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/create.twig', [
-                'team' => $team,
-                'division' => $division,
-                'sport' => $sport,
-                'action' => 'Modify'
-            ]));
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
-        }
-    }
-
-    /**
-     * Create a Team
-     *
-     * @param Team $team
-     */
-    public function postCreate(Team $team)
-    {
-        /* Get around aura's weird regexing
-         */
-        $this->postModify($team);
     }
 
     /**
      * Modify a Team
      *
-     * @param Team $team
+     * @param Team $entity
      */
-    public function postModify(Team $team)
+    public function persistEntity($entity)
     {
         try {
             $divisionId = $this->getRequest()->post['divisionId'];
             $division   = $this->getDivisionMapper()->findById($divisionId);
 
-            $this->saveTeam($division, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $team);
+            $this->saveTeam($division, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $entity);
 
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesTeam.getList', [
-                'divisionId' => $divisionId
+                'contextId' => $divisionId
             ]));
         } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
-        }
-    }
-
-    /**
-     * Delete a Team
-     */
-    public function postDelete()
-    {
-        try {
-            $team = $this->getTeamMapper()->findById($this->getRequest()->post['teamId']);
-
-            $this->getTeamMapper()->delete($team);
-        }
-        catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);
         }
     }
@@ -229,15 +200,7 @@ class Controller extends Base
      */
     public function getTeamMapper()
     {
-        return $this->teamMapper;
-    }
-
-    /**
-     * @param TeamMapper $teamMapper
-     */
-    public function setTeamMapper($teamMapper)
-    {
-        $this->teamMapper = $teamMapper;
+        return $this->mapper;
     }
 
     /**

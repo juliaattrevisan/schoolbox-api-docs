@@ -28,17 +28,16 @@ class SportsFixtures implements ModuleConfigInterface
      */
     public function configure($kernel)
     {
-        $messagesModule = new Module($kernel->getDependencyInjector());
-        $messagesModule->init('/sportsfixtures');
+        $namespace = 'sportsfixtures';
 
-        $messagesModule = new SportModule($kernel->getDependencyInjector());
-        $messagesModule->init('/sportsfixtures/sport');
+        $sportModule = new SportModule($kernel->getDependencyInjector());
+        $sportModule->init("/$namespace");
 
-        $messagesModule = new DivisionModule($kernel->getDependencyInjector());
-        $messagesModule->init('/sportsfixtures/division');
+        $divisionModule = new DivisionModule($kernel->getDependencyInjector(), $sportModule);
+        $divisionModule->init("/$namespace");
 
-        $messagesModule = new TeamModule($kernel->getDependencyInjector());
-        $messagesModule->init('/sportsfixtures/team');
+        $messagesModule = new TeamModule($kernel->getDependencyInjector(), $divisionModule);
+        $messagesModule->init("/$namespace");
 
         $positionsModule = new PositionModule($kernel->getDependencyInjector());
         $positionsModule->init('/sportsfixtures/position');

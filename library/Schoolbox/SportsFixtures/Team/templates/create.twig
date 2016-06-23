@@ -24,12 +24,11 @@
 <ul class="breadcrumb">
     <li><a href="#">Sports Fixtures</a></li>
     <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {sportId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesDivision.getUpdate', {divisionId: division.id}) }}">{{ division.name }}</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesTeam.getList', {divisionId: division.id}) }}">Teams in {{ division.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesTeam.getList', {contextId: division.id}) }}">Teams in {{ division.name }}</a></li>
 
     {% if team.id %}
-    <li class="active"><a href="{{ routeLookup('sportsfixturesTeam.getUpdate', {teamId: team.id}) }}">{{ team.name }}</a></li>
+    <li class="active"><a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: team.id}) }}">{{ team.name }}</a></li>
     {% else %}
     <li class="active"><a href="#">{{ action }}</a></li>
     {% endif %}
@@ -43,10 +42,10 @@
 
 <div class="row">
     <div class="small-12 island">
-        {% if sport %}
-            {% set formUrl = routeLookup('sportsfixturesTeam.getUpdate', {teamId: team.id}) %}
+        {% if team %}
+            {% set formUrl = routeLookup('sportsfixturesTeam.updateEntity', {entityId: team.id}) %}
         {% else %}
-            {% set formUrl = routeLookup('sportsfixturesTeam.getCreate', {divisionId: division.id}) %}
+            {% set formUrl = routeLookup('sportsfixturesTeam.createEntity', {contextId: division.id}) %}
         {% endif %}
 
         <form id='teamForm' action="{{ formUrl }}" method="post">

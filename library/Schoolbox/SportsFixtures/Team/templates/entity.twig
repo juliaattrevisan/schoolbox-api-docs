@@ -1,0 +1,44 @@
+<ul class="breadcrumb">
+    <li><a href="#">Sports Fixtures</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesSport.getEntity', { entityId: sport.id }) }}">{{ sport.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesDivision.getEntity', { entityId: division.id }) }}">{{ division.name }}</a></li>
+    <li class="active"><a href="#">{{ team.name }}</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sports Fixtures</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+
+        <h2 class="subheader">{{ team.name }}</h2>
+
+        <section class="content">
+            <div class="small-12 columns">
+                <dl>
+                    <dt>ID</dt>
+                    <dd>{{ team.id }}</dd>
+
+                    <dt>Name</dt>
+                    <dd>{{ team.name }}</dd>
+
+                    <dt>Url</dt>
+                    <dd>{{ team.url }}</dd>
+
+                    <dt>Created</dt>
+                    <dd>{{ team.createdAt.database }}</dd>
+
+                    {% if not team.createdAt.eq(team.updatedAt) %}
+                        <dt>Last Updated</dt>
+                        <dd>{{ team.updatedAt.database }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </section>
+
+    </div>
+</div>
