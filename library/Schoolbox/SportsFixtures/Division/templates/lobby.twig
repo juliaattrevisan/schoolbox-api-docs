@@ -102,7 +102,10 @@
             <div class="empty-state">
                 <i class="icon-group"></i>
                 <p>There are no Players in {{ division.getName() }}.</p>
-                <p><a href="#" title="Add Players">Add Players</a></p>
+                <p>
+                    You may <a href="#" title="Add Players" data-reveal-id="addPlayersModal">add players by name</a>,
+                    or <a href="#" title="Upload Player List" data-reveal-id="uploadPlayersModal">upload a list</a>.
+                </p>
             </div>
         {% endif %}
     </div>
