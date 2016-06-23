@@ -214,6 +214,37 @@ class Controller extends AbstractController
             )
         );
     }
+    /**
+     * Reorder players within a Division
+     *
+     * @param Division $division
+     */
+    public function postReorderPlayers(Division $division)
+    {
+        $userIds       = $this->getRequest()->post->get('userId');
+        $divisionUsers = [];
+        $sequenceNo    = count($userIds);
+        foreach ($userIds as $userId) {
+            try {
+                /** @var User\Model $divisionUser */
+                $divisionUser = $this->getDivisionUserMapper()->findOneByColumnList([
+                    'user_id'     => $userId,
+                    'division_id' => $division->getId(),
+                ]);
+                $divisionUsers[] = $divisionUser->setSequence($sequenceNo--);
+            } catch (MapperException $e) {
+                // User isn't in division. Ignore
+                continue;
+            }
+        }
+        $this->getDivisionUserMapper()->save($divisionUsers);
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'sportsfixturesDivision.getLobby',
+                ['divisionId' => $division->getId(),]
+            )
+        );
+    }
 
     /**
      * Save Division data to db

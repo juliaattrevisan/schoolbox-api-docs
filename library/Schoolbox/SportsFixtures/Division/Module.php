@@ -48,8 +48,9 @@ class Module extends RestfulModule
                 '/lobby/{divisionId}'  => 'getLobby',
             ],
             'POST' => [
-                '/addPlayers/{divisionId}'    => 'postAddPlayers',
-                '/removePlayers/{divisionId}' => 'postRemovePlayers',
+                '/addPlayers/{divisionId}'     => 'postAddPlayers',
+                '/removePlayers/{divisionId}'  => 'postRemovePlayers',
+                '/reorderPlayers/{divisionId}' => 'postReorderPlayers',
             ]
         ];
 
@@ -67,7 +68,7 @@ class Module extends RestfulModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $this->addRoutePreload($matcher, '(?:postModify|postAddPlayers|postRemovePlayers)', function ($params) {
+        $this->addRoutePreload($matcher, '(?:postModify|postAddPlayers|postRemovePlayers|postReorderPlayers)', function ($params) {
             $division = Mapper::getInstance()->findById($params['divisionId']);
 
             return [

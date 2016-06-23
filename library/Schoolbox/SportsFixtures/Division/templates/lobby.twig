@@ -13,6 +13,8 @@
                     dataType: 'json'
                 }
             });
+
+        // Remove player from division action
         $('[data-remove-player]').on('click', function(e) {
             e.preventDefault();
             $(this).confirmDialog({
@@ -25,6 +27,20 @@
                     })
                 }
             });
+        });
+
+        // Reorder players
+        $('[data-player-list]').sortable({
+            handle: '.grip',
+            axis:   'y',
+            stop:   function(e) {
+                // Build a list of user IDs, and save ordering
+                var el   = $(e.target);
+                var data = el.find('[data-player]').map(function() {
+                    return {name: 'userId[]', value: $(this).data('player')};
+                });
+                $.post(el.data('sortableOnstopAction'), data);
+            }
         });
     });
 </script>
@@ -57,11 +73,14 @@
         </div>
         {% if players is not empty %}
             <section>
-                <ul class="information-list">
+                <ul class="information-list sortable"
+                    data-player-list
+                    data-sortable-onstop-action="{{ routeLookup('sportsfixturesDivision.postReorderPlayers', {divisionId: division.getId()}) }}">
                     {% for currentPlayer in players %}
-                        <li class="actions-small-1" data-player>
+                        <li class="actions-small-1" data-player="{{ currentPlayer.user.getId() }}">
                             <div class="list-item">
-                                <div class="small-12 avatar card">
+                                <div class="grip"></div>
+                                <div class="small-11 avatar card">
                                     <a href="/search/user/{{ currentPlayer.user.getId() }}">
                                         <img src="/portrait.php?userId={{ currentPlayer.user.getExternalId() }}&amp;size=square64" />
                                         <h3>{{ currentPlayer.user.formatName() }}</h3>
