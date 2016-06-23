@@ -21,7 +21,7 @@
                         el.attr('href'),
                         [{name: 'userId[]', value: el.data('removePlayer')}]
                     ).done(function() {
-                        window.location.reload();
+                        el.closest('[data-player]').fadeOut();
                     })
                 }
             });
@@ -59,7 +59,7 @@
             <section>
                 <ul class="information-list">
                     {% for currentPlayer in players %}
-                        <li class="actions-small-1">
+                        <li class="actions-small-1" data-player>
                             <div class="list-item">
                                 <div class="small-12 avatar card">
                                     <a href="/search/user/{{ currentPlayer.user.getId() }}">
