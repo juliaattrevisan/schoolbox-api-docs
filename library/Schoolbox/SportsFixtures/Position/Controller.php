@@ -11,6 +11,7 @@ use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\SportsFixtures\Sport\Model as Sport;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Position\Model as Position;
 use \Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
@@ -185,8 +186,8 @@ class Controller extends Base
     /**
      * Save Position data to db
      *
-     * @param $sport
-     * @param $name
+     * @param Sport $sport
+     * @param string $name
      * @param Position $position
      */
     private function savePosition($sport, $name, Position $position)
