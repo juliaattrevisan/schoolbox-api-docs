@@ -8,17 +8,19 @@
 
 namespace Schoolbox\SportsFixtures\Division;
 
+use Alaress\Csv\Reader;
 use Alaress\Web\Controller\Exception;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
-use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\SportsFixtures\Sport\Model as Sport;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\User as UserModel;
 use Schoolbox\UserMapper;
 
 class Controller extends AbstractController
@@ -208,12 +210,43 @@ class Controller extends AbstractController
     public function postUploadPlayers(Division $division)
     {
         $divisionUsers = [];
-        foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
-            $divisionUsers[] = $this->getDivisionUserMapper()->createModel()
-                ->setDivision($division)
-                ->setUser($user)
-                ->setSequence(0);
+
+        // Do stuff with upload
+        $factory = new CollectorFactory();
+        $attach  = $this->getRequest()->post->get('attachment');
+        if (is_array($attach)) {
+            $upload = $factory->build($attach)->getFirst();
+        } else {
+            // error out
+            throw $this->getErrorMapper()->generateException(2);
         }
+
+        // What are the users in this upload?
+        $reader = new Reader($upload->readStream());
+        $reader->setLoadFromFirst(true);
+        foreach ($reader as $row) {
+            // Try ID, then username, then external ID
+            $user = null;
+            try {
+                if (!empty($row['Schoolbox User ID'])) {
+                    $user = $this->getUserMapper()->findById($row['Schoolbox User ID']);
+                } elseif (!empty($row['Username'])) {
+                    $user = $this->getUserMapper()->findOneByColumn('username', $row['Username']);
+                } elseif (!empty($row['External ID'])) {
+                    $user = $this->getUserMapper()->findByExternalId($row['External ID']);
+                }
+            } catch (MapperException $e) {
+                // noop
+            }
+            if ($user instanceof UserModel) {
+                $divisionUsers[] = $this->getDivisionUserMapper()->createModel()
+                    ->setDivision($division)
+                    ->setUser($user)
+                    ->setSequence(0);
+            }
+        }
+
+        // and save
         $this->getDivisionUserMapper()->save($divisionUsers);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(

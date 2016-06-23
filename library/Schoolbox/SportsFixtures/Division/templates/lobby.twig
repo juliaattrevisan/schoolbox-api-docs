@@ -140,7 +140,7 @@
 
 <div id="addPlayersModal" class="reveal-modal" data-reveal aria-labelledby="addPlayersModalTitle" aria-hidden="true" role="dialog">
     <h2 id="addPlayersModalTitle">Add Players</h2>
-    <form action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {divisionId: division.getId()}) }}" method="post" class="no-margin">
+    <form action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {divisionId: division.getId()}) }}" method="post">
         <select data-role="userSelector" name="userId[]" multiple placeholder="Search Users"></select>
         <input type="submit" class="full-width" value="Add" />
     </form>
@@ -149,7 +149,7 @@
 
 <div id="uploadPlayersModal" class="reveal-modal" data-reveal aria-labelledby="uploadPlayersModalTitle" aria-hidden="true" role="dialog">
     <h2 id="uploadPlayersModalTitle">Upload Player List</h2>
-    <form action="{{ routeLookup('sportsfixturesDivision.postUploadPlayers', {divisionId: division.getId()}) }}">
+    <form action="{{ routeLookup('sportsfixturesDivision.postUploadPlayers', {divisionId: division.getId()}) }}" method="post">
         <p>
             You may upload a list of Schoolbox User IDs, usernames or external IDs into this division.
             Make sure that it conforms to the <a href="/sportsfixtures/import/userTemplate.csv">template</a> provided.

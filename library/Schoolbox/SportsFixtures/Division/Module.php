@@ -69,14 +69,17 @@ class Module extends RestfulModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        $this->addRoutePreload($matcher, '(?:postModify|postAddPlayers|postRemovePlayers|postReorderPlayers)', function ($params) {
-            $division = Mapper::getInstance()->findById($params['divisionId']);
-
-            return [
-                'params' => $params,
-                'division' => $division
-            ];
-        });
+        $this->addRoutePreload(
+            $matcher,
+            '(?:postModify|postAddPlayers|postRemovePlayers|postReorderPlayers|postUploadPlayers)',
+            function ($params) {
+                $division = Mapper::getInstance()->findById($params['divisionId']);
+                return [
+                    'params'   => $params,
+                    'division' => $division
+                ];
+            }
+        );
     }
 
     /**
