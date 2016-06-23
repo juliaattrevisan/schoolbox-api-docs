@@ -1,20 +1,59 @@
 <?php
-require_once dirname(__FILE__) . '/../../library/Bootstrap.php';
-require_once SITE_root . '/www/include/stdfuncs.php';
+/**
+ * @author      Damien Sloane <damian.sloane@alaress.com.au>
+ * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ *
+ * System-wide Selectize tag data-generator.
+ * @link       http://selectize.github.io/selectize.js/
+ */
 
-$tags = \Schoolbox\Pastoral\Tags\Mapper::getInstance()->findAll();
+use Schoolbox\Pastoral\Tags\Mapper as PastoralMapper;
+use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 
-$tagsarray = [];
-$found = [];
+if(!isset($this)) {
+    require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
+    error(2);
+}
+/** @var SitePage $this */
+$this->setAjax();
 
-foreach ($tags as $tag) {
-    if (!isset($found[strtolower($tag->getName())])) {
-        if (strpos(strtolower($tag->getName()), $_GET["query"]) !== false) {
-            $tagsarray[] = ['id' => $tag->getName(), 'name' => $tag->getName()];
+$di = $this->getDi();
+
+/* Note: Insert new tag types here. */
+$registry = [
+    'pastoral'       => $di->lazyNew(PastoralMapper::class),
+    'sport_position' => $di->lazyNew(PositionMapper::class)
+];
+
+// Validate params
+$errors = [];
+if(empty($_GET['query'])){
+    $errors[] = 'Query fragment not supplied';
+}
+if(empty($this->arg[0])){
+    $errors[] = 'Tag type not supplied';
+}
+if(empty($registry[$this->arg[0]])){
+    $errors[] = 'Tag type not in registry';
+}
+
+$tagsArray = [];
+
+if($errors){
+    header(':', true, 400);
+} else {
+    /** @var \Schoolbox\Mapper $mapper */
+    $mapper = $registry[$this->arg[0]]();
+    $tags   = $mapper->findDistinct('name');
+    $query  = strtolower($_GET['query']);
+
+    foreach ($tags as $tag) {
+        if (strpos(strtolower($tag), $query) !== false) {
+            $tagsArray[] = ['id' => $tag, 'name' => $tag];
         }
-        $found[strtolower($tag->getName())] = 1;
     }
 }
 
 header('Content-type: application/json');
-echo json_encode($tagsarray);
+echo json_encode($tagsArray);

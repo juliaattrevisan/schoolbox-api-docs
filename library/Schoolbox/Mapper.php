@@ -2652,6 +2652,7 @@ abstract class Mapper implements IMapper, Serializable
 
 
     /**
+     * @throws Exception
      * @return array
      */
     public function listUnmappedFields()
@@ -2692,5 +2693,36 @@ abstract class Mapper implements IMapper, Serializable
         $knownFields = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         return array_values(array_diff($knownFields, $mappedFields));
+    }
+
+
+    /**
+     * Returns a 1-dimensional array of distinct values in specified column
+     * Does not support multi-column distinctness
+     *
+     * @param string $column                     distinct column
+     * @param array $columnList                  a set of key-value pairs:
+     *                                           * key:   the name of the column to find
+     *                                           * value: the value (or array of values) to search for
+     * @param array $options                     * limit, offset: limit and offset for query
+     *                                           * deleted:       whether to retrieve deleted items
+     *                                           (defaults to false)
+     *                                           * order:         a set of key-value pairs:
+     *                                           key: column name, value: ASC or DESC
+     *
+     * @throws Exception if for some reason the limit or offset parameters
+     *                   cannot be created (this should never happen in practise
+     *                   as columnList would have to contain a field named
+     *                   'limit' or 'offset')
+     * @return array
+     */
+    public function findDistinct($column, $columnList = array(), $options = array())
+    {
+        try {
+            $stmt = $this->selectScalarByColumnList("DISTINCT $column", $columnList, $options);
+        } catch (UnderflowException $e) {
+            return [];
+        }
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 }

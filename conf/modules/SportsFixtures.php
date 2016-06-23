@@ -14,6 +14,8 @@ use Schoolbox\SportsFixtures\Module;
 use Schoolbox\SportsFixtures\Sport\Module as SportModule;
 use Schoolbox\SportsFixtures\Division\Module as DivisionModule;
 use Schoolbox\SportsFixtures\Team\Module as TeamModule;
+use Schoolbox\SportsFixtures\Position\Module as PositionModule;
+
 
 class SportsFixtures implements ModuleConfigInterface
 {
@@ -38,6 +40,8 @@ class SportsFixtures implements ModuleConfigInterface
         $messagesModule = new TeamModule($kernel->getDependencyInjector());
         $messagesModule->init('/sportsfixtures/team');
 
+        $positionsModule = new PositionModule($kernel->getDependencyInjector());
+        $positionsModule->init('/sportsfixtures/position');
     }
 
 } 
