@@ -16,6 +16,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use \Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 
 /**
  * Class Mapper
@@ -60,7 +61,10 @@ class Mapper extends BaseMapper
             DivisionMapper::getInstance()->delete($currentDivision);
         }
 
-        /* TODO: Delete all Positions associated with this Sport
-         */
+        $allPositions = PositionMapper::getInstance()->findByColumn('sport_id', $sport->getId());
+
+        foreach ($allPositions as $currentPosition) {
+            PositionMapper::getInstance()->delete($currentPosition);
+        }
     }
 }
