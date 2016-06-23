@@ -20,6 +20,8 @@ use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use \Schoolbox\SportsFixtures\Division\User\Model as DivisionUserModel;
+use \Schoolbox\SportsFixtures\Division\User\Mapper as DivisionUserMapper;
 use Schoolbox\User as UserModel;
 use Schoolbox\UserMapper;
 
@@ -47,7 +49,7 @@ class Controller extends AbstractController
     protected $userMapper;
 
     /**
-     * @var User\Mapper
+     * @var DivisionUserMapper
      */
     protected $divisionUserMapper;
 
@@ -60,7 +62,7 @@ class Controller extends AbstractController
         $this->setSportMapper(SportMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setTeamMapper(TeamMapper::getInstance());
-        $this->setDivisionUserMapper(User\Mapper::getInstance());
+        $this->setDivisionUserMapper(DivisionUserMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
     }
 
@@ -288,7 +290,7 @@ class Controller extends AbstractController
         $sequenceNo    = count($userIds);
         foreach ($userIds as $userId) {
             try {
-                /** @var User\Model $divisionUser */
+                /** @var DivisionUserModel $divisionUser */
                 $divisionUser = $this->getDivisionUserMapper()->findOneByColumnList([
                     'user_id'     => $userId,
                     'division_id' => $division->getId(),
@@ -388,7 +390,7 @@ class Controller extends AbstractController
     }
 
     /**
-     * @return User\Mapper
+     * @return DivisionUserMapper
      */
     public function getDivisionUserMapper()
     {
@@ -396,10 +398,10 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param User\Mapper $divisionUserMapper
+     * @param DivisionUserMapper $divisionUserMapper
      * @return $this
      */
-    public function setDivisionUserMapper($divisionUserMapper)
+    public function setDivisionUserMapper(DivisionUserMapper $divisionUserMapper)
     {
         $this->divisionUserMapper = $divisionUserMapper;
         return $this;
@@ -417,7 +419,7 @@ class Controller extends AbstractController
      * @param UserMapper $userMapper
      * @return $this
      */
-    public function setUserMapper($userMapper)
+    public function setUserMapper(UserMapper $userMapper)
     {
         $this->userMapper = $userMapper;
         return $this;
