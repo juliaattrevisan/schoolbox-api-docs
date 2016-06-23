@@ -107,12 +107,16 @@ try {
             // All day events, but exclude other sources
             $api = new Calendar_Api_Composite();
             $api->add(new Calendar_Api_EventType_Event_Schoolbox_Default($user, array()));
-            // Resource bookings too for now, as there's no other place for them
-            if (class_exists('Calendar_Api_EventType_ResourceBooking_Booking_Default')) {
-                $api->add(new Calendar_Api_EventType_ResourceBooking_Booking_Default($user, array()));
-            }
-            if (class_exists('Calendar_Api_EventType_ResourceBooking_Moderation_Default')) {
-                $api->add(new Calendar_Api_EventType_ResourceBooking_Moderation_Default($user, array()));
+            try {
+                // Resource bookings too for now, as there's no other place for them
+                if (class_exists('Calendar_Api_EventType_ResourceBooking_Booking_Default')) {
+                    $api->add(new Calendar_Api_EventType_ResourceBooking_Booking_Default($user, array()));
+                }
+                if (class_exists('Calendar_Api_EventType_ResourceBooking_Moderation_Default')) {
+                    $api->add(new Calendar_Api_EventType_ResourceBooking_Moderation_Default($user, array()));
+                }
+            } catch(DomainException $e){
+                // Do nothing. This is expected if Resource Booking is disabled
             }
             break;
 
