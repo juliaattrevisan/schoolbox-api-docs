@@ -49,6 +49,7 @@ class Module extends RestfulModule
             ],
             'POST' => [
                 '/addPlayers/{divisionId}'     => 'postAddPlayers',
+                '/uploadPlayers/{divisionId}'  => 'postUploadPlayers',
                 '/removePlayers/{divisionId}'  => 'postRemovePlayers',
                 '/reorderPlayers/{divisionId}' => 'postReorderPlayers',
             ]

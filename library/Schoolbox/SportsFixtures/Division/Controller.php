@@ -13,6 +13,7 @@ use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\SportsFixtures\Sport\Model as Sport;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
@@ -134,14 +135,18 @@ class Controller extends AbstractController
             $sport    = $this->getSportMapper()->findById($division->getSport()->getId());
             $teams    = $this->getTeamMapper()->findByColumn('division_id', $divisionId);
             $players  = $this->getDivisionUserMapper()->findByColumn('division_id', $divisionId, ['order' => ['sequence' => 'desc']]);
+            $zone     = new Zone("uploadZone");
+            $zone->setMimeFilter('text/csv')->setAttachPrompt('upload a list of players');
 
             $this->getResponse()->content->set(
                 $this->buildHtmlOutput(
                     '@sportsfixturesDivision/lobby.twig', [
-                        'division' => $division,
-                        'sport'    => $sport,
-                        'teams'    => $teams,
-                        'players'  => $players,
+                        'division'   => $division,
+                        'sport'      => $sport,
+                        'teams'      => $teams,
+                        'players'    => $players,
+                        'uploadZone' => $zone,
+                        'user'       => $this->getUser(),
                     ]
                 )
             );
@@ -177,6 +182,30 @@ class Controller extends AbstractController
      * @param Division $division
      */
     public function postAddPlayers(Division $division)
+    {
+        $divisionUsers = [];
+        foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
+            $divisionUsers[] = $this->getDivisionUserMapper()->createModel()
+                ->setDivision($division)
+                ->setUser($user)
+                ->setSequence(0);
+        }
+        $this->getDivisionUserMapper()->save($divisionUsers);
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'sportsfixturesDivision.getLobby',
+                ['divisionId' => $division->getId(),]
+            )
+        );
+    }
+
+
+    /**
+     * Uploads players from a CSV into a Division
+     *
+     * @param Division $division
+     */
+    public function postUploadPlayers(Division $division)
     {
         $divisionUsers = [];
         foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
