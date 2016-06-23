@@ -171,7 +171,7 @@ class Module extends BaseModule
                     $columnName = $catMapper->getIdentifier()['column'];
 
                     return array(
-                        'homepage' => $catMapper->findByColumn($columnName, $folderId, ['deleted' => true]),
+                        'homepage' => $catMapper->findByColumn($columnName, $folderId, ['deleted' => true])->first(),
                     );
                 }
                 return array();
