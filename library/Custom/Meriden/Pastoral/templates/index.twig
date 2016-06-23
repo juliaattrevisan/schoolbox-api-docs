@@ -1,89 +1,86 @@
-<link rel="stylesheet" type="text/css" href="/css/meriden/pastoral.css" />
 <script type="text/javascript">
     (function($){
         $(function(){
             // Jump menu for changing semester
-            $('#semester, #enrolled-subjects').on('change', function() {
+            $('#context-selector-semester, #context-selector-enrolled-subjects').on('change', function() {
                 window.location.href = this.value;
             });
         })
     })(jQuery);
 </script>
 
-<div id="pastoral-report">
-    <div id="meriden-crest">
-        {% include '@customMeridenPastoral/sub/crestSvg.twig' %}
+<div id="pastoral-report" class="e-report">
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="meriden-crest">
+                {% include '@customMeridenPastoral/sub/crestSvg.twig' %}
+            </div>
+        </div>
     </div>
 
-    <h1>School Report - {{ report.tutorGroupReport.year }}</h1>
-
-    <div id="context">
-        {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
-        {% include '@customMeridenPastoral/sub/selector.twig' with {
-            tutorGroupList:   report.tutorGroupList,
-            subjectList:      report.subjectList,
-            student:          report.student,
-            tutorGroupReport: report.tutorGroupReport
-        } %}
+    <div class="row" id="context">
+        {% include '@customMeridenPastoral/sub/context.twig' with {report: report} %}
     </div>
 
-    <ul id="house-info">
-        <li>
+    {# House info #}
+    <div class="row" id="house-info">
+        <div class="small-12 medium-4 column">
             <dl>
                 <dt>House</dt>
                 <dd>{{ report.student.schoolHouse.house }}</dd>
             </dl>
-        </li>
-        <li>
+        </div>
+        <div class="small-12 medium-4 column">
             <dl>
                 <dt>Year Coordinator</dt>
                 {% for coordinator in report.tutorGroupReport.coordinators %}
                     <dd><a href="/search/user/{{ coordinator.id }}">{{ coordinator.formatName }}</a></dd>
                 {% endfor %}
             </dl>
-        </li>
-        <li>
+        </div>
+        <div class="small-12 medium-4 column end">
             <dl>
                 <dt>Tutor</dt>
                 {# Show only the last tutor (as list is ordered by semester asc #}
                 {% for tutor in report.tutorGroupReport.tutors %}
                     {% if loop.last %}
-                    <dd>{{ tutor.tch_name }}</dd>
+                        <dd>{{ tutor.tch_name }}</dd>
                     {% endif %}
                 {% endfor %}
             </dl>
-        </li>
-    </ul>
+        </div>
+    </div>
 
-    <ul id="attendance-info">
-        <li>
+    {# Attendance info #}
+    <div class="row" id="attendance-info">
+        <div class="small-12 medium-4 column">
             <dl>
                 <dt>Days Absent</dt>
                 <dd>{{ report.tutorGroupReport.attendances.absent }}</dd>
             </dl>
-        </li>
-        <li>
+        </div>
+        <div class="small-12 medium-4 column">
             <dl>
                 <dt>Days Late</dt>
                 <dd>{{ report.tutorGroupReport.attendances.late }}</dd>
             </dl>
-        </li>
-        <li>
+        </div>
+        <div class="small-12 medium-4 column">
             <dl>
                 <dt>Detentions</dt>
                 <dd>{{ report.tutorGroupReport.attendances.detentions }}</dd>
             </dl>
-        </li>
+        </div>
+        {# Don't show endorsed leave at all if there is none #}
         {% if report.tutorGroupReport.attendances.endorsedLeave %}
-        <li>
-            <dl>
-                {# Don't show endorsed leave at all if there is none #}
-                <dt>Endorsed Leave</dt>
-                <dd>{{ report.tutorGroupReport.attendances.endorsedLeave }}</dd>
-            </dl>
-        </li>
+            <div class="small-12 medium-4 column">
+                <dl>
+                    <dt>Endorsed Leave</dt>
+                    <dd>{{ report.tutorGroupReport.attendances.endorsedLeave }}</dd>
+                </dl>
+            </div>
         {% endif %}
-        <li>
+        <div class="small-12 medium-4 column">
             <dl>
                 <dt>Athletics Carnival</dt>
                 <dd>
@@ -97,8 +94,8 @@
                     {% endif %}
                 </dd>
             </dl>
-        </li>
-        <li>
+        </div>
+        <div class="small-12 medium-4 column">
             <dl>
                 <dt>Swimming Carnival</dt>
                 <dd>
@@ -112,8 +109,8 @@
                     {% endif %}
                 </dd>
             </dl>
-        </li>
-        <li>
+        </div>
+        <div class="small-12 medium-4 column">
             <dl>
                 <dt>School Camp</dt>
                 <dd>
@@ -127,10 +124,11 @@
                     {% endif %}
                 </dd>
             </dl>
-        </li>
-        <li>
+        </div>
+        <div class="small-12 medium-4 column">
             <dl>
                 <dt>Uniform</dt>
+                <dd class="explanation hide-for-print"><a href="/homepage/5648/">[Explanation]</a></dd>
                 <dd>
                     {% if report.tutorGroupReport.namedGrades.uniform %}
                         {%
@@ -142,10 +140,11 @@
                     {% endif %}
                 </dd>
             </dl>
-        </li>
-        <li>
+        </div>
+        <div class="small-12 medium-4 column">
             <dl>
                 <dt>Pastoral activities involvement</dt>
+                <dd class="explanation hide-for-print"><a href="/homepage/5648/">[Explanation]</a></dd>
                 <dd>
                     {% if report.tutorGroupReport.namedGrades.pastoral %}
                         {%
@@ -157,8 +156,8 @@
                     {% endif %}
                 </dd>
             </dl>
-        </li>
-        <li>
+        </div>
+        <div class="small-12 medium-4 column end">
             <dl>
                 {##
                  # Athletics, Swimming, Camp, Uniform, Pastoral Services:
@@ -169,53 +168,65 @@
                     <dd>{{ grade.pretty_mark }}</dd>
                 {% endfor %}
             </dl>
-        </li>
-    </ul>
+        </div>
+    </div>
 
-    <dl id="awards-info">
+    {# Awards info #}
+    <div class="row" id="awards-info">
         {% if not report.tutorGroupReport.activities.awards is empty %}
-            <dt>Awards and Prizes</dt>
-            {% for award in report.tutorGroupReport.activities.awards %}
-                <dd>{{ award.act_desc }}</dd>
-            {% endfor %}
+            {% include '@customMeridenPastoral/sub/activity.twig' with {
+                header: 'Awards and Prizes',
+                activityList: report.tutorGroupReport.activities.awards
+            } %}
         {% endif %}
-
         {% if not report.tutorGroupReport.activities.cocurricular is empty %}
-            <dt>Co-curricular Activities</dt>
-            {% for activity in report.tutorGroupReport.activities.cocurricular %}
-                <dd>{{ activity.act_desc }}</dd>
-            {% endfor %}
+            {% include '@customMeridenPastoral/sub/activity.twig' with {
+                header: 'Co-curricular Activitiess',
+                activityList: report.tutorGroupReport.activities.cocurricular
+            } %}
         {% endif %}
-
         {% if not report.tutorGroupReport.activities.service is empty %}
-            <dt>Community Service</dt>
-            {% for service in report.tutorGroupReport.activities.service %}
-                <dd>{{ service.act_desc }}</dd>
-            {% endfor %}
+            {% include '@customMeridenPastoral/sub/activity.twig' with {
+                header: 'Community Service',
+                activityList: report.tutorGroupReport.activities.service
+            } %}
         {% endif %}
-
         {% if not report.tutorGroupReport.activities.positions is empty %}
-            <dt>Positions of Office</dt>
-            {% for position in report.tutorGroupReport.activities.positions %}
-                <dd>{{ position.act_desc }}</dd>
-            {% endfor %}
+            {% include '@customMeridenPastoral/sub/activity.twig' with {
+                header: 'Positions of Office',
+                activityList: report.tutorGroupReport.activities.positions
+            } %}
         {% endif %}
-    </dl>
+    </div>
 
-    {##
-     # Subjects: exactly the same as the subject list on /search/user/{{ report.student.id }},
-     # except I guess they will link to this page instead.
-     #
-     # Meriden have requested that no email links display on this page,
-     # due to the possiblilty of parents getting drunk and sending emails to teachers.
-     #}
-    <div class="directory">
-        <div class="subjects">
-            <div id="subject-info">
-                <h2>Subjects</h2>
-                {# Split half the subjects in one column, half in the other #}
+    {# Tutor comment #}
+    {% if report.tutorGroupReport.namedGrades.tutorComment %}
+    <div class="row" id="tutor-comment">
+        <div class="small-12 column">
+            <dl>
+                <dt>Tutor Comment</dt>
+                <dd>{{ report.tutorGroupReport.namedGrades.tutorComment.comment|e('html')|nl2br }}</dd>
+            </dl>
+        </div>
+    </div>
+    {% endif %}
+
+    {# Subject list #}
+    <div class="row subject-list" id="subject-list">
+        <div class="small-12 column">
+            <h2 class>Subjects</h2>
+        </div>
+        <section>
+            {##
+             # Subjects: exactly the same as the subject list on /search/user/{{ report.student.id }},
+             # except I guess they will link to this page instead.
+             #
+             # Meriden have requested that no email links display on this page,
+             # due to the possiblilty of parents getting drunk and sending emails to teachers.
+             #}
+            <div class="row">
                 {% set reportHalf = (report.subjectList|length / 2)|round(0, 'ceil') %}
-                <ul>
+                <div class="small-12 medium-6 column">
                     {% for subject in report.subjectList|slice(0, reportHalf) %}
                         {% include '@customMeridenPastoral/sub/subject.twig' with {
                             student: report.student,
@@ -225,24 +236,19 @@
                             showPortrait: false
                         } %}
                     {% endfor %}
-                </ul>
-                {##
-                 # The second half has a ul per subject,
-                 # the first only has a single ul for all subjects.
-                 # Go figure!
-                 #}
-                {% for subject in report.subjectList|slice(reportHalf) %}
-                    <ul>
+                </div>
+                <div class="small-12 medium-6 column">
+                    {% for subject in report.subjectList|slice(reportHalf) %}
                         {% include '@customMeridenPastoral/sub/subject.twig' with {
-                            student: report.student,
-                            year: report.tutorGroupReport.year,
-                            subject: subject,
-                            showEmail: false,
-                            showPortrait: false}
-                        %}
-                    </ul>
-                {% endfor %}
+                        student: report.student,
+                        year: report.tutorGroupReport.year,
+                        subject: subject,
+                        showEmail: false,
+                        showPortrait: false
+                        } %}
+                    {% endfor %}
+                </div>
             </div>
-        </div>
+        </section>
     </div>
 </div>

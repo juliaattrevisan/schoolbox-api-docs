@@ -1,104 +1,102 @@
-<link rel="stylesheet" type="text/css" href="/css/meriden/pastoral.css" />
 <script type="text/javascript">
     (function($){
         $(function(){
             // Jump menu for changing semester
-            $('#semester, #enrolled-subjects').on('change', function() {
+            $('#context-selector-semester, #context-selector-enrolled-subjects').on('change', function() {
                 window.location.href = this.value;
             });
         })
     })(jQuery);
 </script>
 
-<div id="subject-report">
-    <div id="meriden-crest">
-        {% include '@customMeridenPastoral/sub/crestSvg.twig' %}
+<div id="subject-report" class="e-report">
+    <div class="row">
+        <div class="small-12 columns">
+            <div class="meriden-crest">
+                {% include '@customMeridenPastoral/sub/crestSvg.twig' %}
+            </div>
+        </div>
     </div>
 
-    <h1>{{ report.subjectReport.name }}</h1>
-
-    <div id="context">
-        {% include '@customMeridenPastoral/sub/studentPortrait.twig' with {student: report.student} %}
-        {% include '@customMeridenPastoral/sub/selector.twig' with {
-            tutorGroupList: report.tutorGroupList,
-            subjectList:    report.subjectList,
-            student:        report.student,
-            subjectReport:  report.subjectReport
-        } %}
+    <div class="row" id="context">
+        {% include '@customMeridenPastoral/sub/context.twig' with {report: report} %}
     </div>
 
     {# course description #}
-    <h2 class="clear">Course Description</h2>
-    <p id="course-description">
-    {{ report.subjectReport.description }}
-    </p>
+    <div class="row" id="course-description">
+        <div class="small-12 column">
+            <h2>Course Description</h2>
+            <section>
+                <article class="content" id="course-description">
+                    <p>{{ report.subjectReport.description }}</p>
+                </article>
+            </section>
+        </div>
+    </div>
 
-    <dl id="course-info">
-        {# course grade - derived from grade for this class #}
-        {% if report.subjectReport.namedGrades.courseGrade
-           and report.subjectReport.namedGrades.courseGrade.assessment.isMarkShownToRole(user.role)
-        %}
-        <dt>
-            Course Grade
-            <div class="description-link">[<a href="/homepage/3403">Grade Description</a>]</div>
-        </dt>
-        <dd class="course-grade">
-            {%
-                include '@customMeridenPastoral/sub/assessmentResult.twig'
-                with {grade: report.subjectReport.namedGrades.courseGrade}
-            %}
-        </dd>
+    {# course grade - derived from grade for this class #}
+    {% if report.subjectReport.namedGrades.courseGrade and report.subjectReport.namedGrades.courseGrade.assessment.isMarkShownToRole(user.role) %}
+        <div class="row" id="course-info">
+            <div class="small-6 medium-2 column">
+                <dl>
+                    <dt>Course Grade</dt>
+                    <dd class="explanation hide-for-print"><a href="/homepage/3403">[Grade Description]</a></dd>
+                </dl>
+            </div>
+            <div class="small-6 medium-10 column">
+                <div class="content">
+                    <p><strong>{{ report.subjectReport.namedGrades.courseGrade.pretty_mark }}</strong></p>
+                </div>
+            </div>
+        </div>
 
-        {# grade distribution - other student's values for course grade #}
-        <dt>Grade Distribution</dt>
-        <dd>
-            <table>
-                <thead>
-                <tr>
-                    {% for gradeLevel,_ in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
-                        <th>{{ gradeLevel }}</th>
-                    {% endfor %}
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    {% for _,results in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
-                        <td>{{ results|length }}</td>
-                    {% endfor %}
-                </tr>
-                </tbody>
-            </table>
-        </dd>
-        {% endif %}
+        <div class="row" id="grade-distribution">
+            <div class="small-12 medium-2 column">
+                <dl class="small-gap">
+                    <dt>Grade Distribution</dt>
+                </dl>
+            </div>
+            <div class="small-12 medium-10 column">
+                <table class="width-auto bordered-table">
+                    <thead>
+                    <tr>
+                        {% for gradeLevel,_ in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
+                            <th>{{ gradeLevel }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        {% for _,results in report.subjectReport.namedGrades.courseGrade.distribution.grouped %}
+                            <td>{{ results|length }}</td>
+                        {% endfor %}
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
 
-        {# Endeavor Grades - complicated enough to be its own template #}
-        {% include '@customMeridenPastoral/sub/endeavourGrades.twig' %}
+    {# Endeavor Grades - complicated enough to be its own template #}
+    {% include '@customMeridenPastoral/sub/endeavourGrades.twig' %}
 
-        {# Approaches to learning - another rubric #}
-        {% if report.subjectReport.namedGrades.learningApproaches
-           and report.subjectReport.namedGrades.learningApproaches.assessment.isMarkShownToRole(user.role)
-        %}
-        <dt class="fullwidth">
-            Approaches to Learning
-            <div class="description-link">[<a href="/homepage/3462">Grade Description</a>]</div>
-        </dt>
-        <dd class="fullwidth">
-            <table class="learning-approaches">
-            {% for criterion in report.subjectReport.namedGrades.learningApproaches.rubric.criteria %}
-                <tr>
-                    <td>{{ criterion.label }}:</td>
-                    <td><strong>{{ criterion.results[criterion.value] }}</strong></td>
-                </tr>
-            {% endfor %}
-            </table>
-        </dd>
-        {% endif %}
-    </dl>
+    {# Approaches to learning - another rubric #}
+    {% if report.subjectReport.namedGrades.learningApproaches and report.subjectReport.namedGrades.learningApproaches.assessment.isMarkShownToRole(user.role) %}
+        <div class="row" id="learning-approaches">
+            <div class="small-12 column">
+                <dl class="small-gap">
+                    <dt>Approaches to Learning</dt>
+                    <dd class="explanation hide-for-print"><a href="/homepage/3462">[Grade Description]</a></dd>
+                </dl>
+            </div>
+            <div class="small-12 column">
+                {% include '@customMeridenPastoral/sub/assessmentResult.twig' with {grade: report.subjectReport.namedGrades.learningApproaches} %}
+            </div>
+        </div>
+    {% endif %}
 
+    {# Assessments #}
     {% if report.subjectReport.grades %}
-        {%
-            include '@customMeridenPastoral/sub/assessments.twig'
-            with {work: report.subjectReport.grades, student: report.student}
-        %}
+        {% include '@customMeridenPastoral/sub/assessments.twig' with {work: report.subjectReport.grades, student: report.student} %}
     {% endif %}
 </div>

@@ -109,6 +109,7 @@ class Factory
             ->moveToNamedGrade('camp', 'School Camp')
             ->moveToNamedGrade('uniform', 'Uniform')
             ->moveToNamedGrade('pastoral', 'Pastoral activities involvement')
+            ->moveToNamedGrade('tutorComment', 'Tutor Comment')
         ;
 
         // Add write level staff as coordinators
@@ -407,8 +408,6 @@ class Factory
     protected function augmentGradesWithAssessment($grades, User $student)
     {
         // TODO inject dependencies
-        // TODO get rid of the handlers too
-        $rubricHandler = new \DueWork_Rubric_Handler();
 
         // Get the 'a' off the start of the assessment grades to get a list of
         // actual assess IDs
@@ -422,8 +421,8 @@ class Factory
             } elseif ($type === 'q') {
                 $quizKeys[] = $id;
             }
-
         }
+
 
         // Fetch only assessment tasks
         $assessments = SubmissionBoxMapper::getInstance()->findByColumnList([
@@ -438,10 +437,8 @@ class Factory
             $grades[$gradeKey]['rubric']     = array();
             // Is there a rubric involved? If so get student's marks for it
             if ($assess->isRubric()) {
-                $rubric     = $rubricHandler->getRubric($assessId);
-                $rubricMark = new \DueWork_Rubric_Mark($rubric);
-                $rubricMark->populateMarks($student->getId());
-                $grades[$gradeKey]['rubric'] = $rubricMark->toArray();
+                $grid = SubmissionBox\Rubric\RubricMapper::getInstance()->findBySubmissionBoxAndStudent($assess, $student);
+                $grades[$gradeKey]['rubric'] = $grid->toContext();
             }
         }
         // No quizzes anymore

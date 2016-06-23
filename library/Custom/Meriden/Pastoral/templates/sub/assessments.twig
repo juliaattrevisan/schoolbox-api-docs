@@ -1,26 +1,25 @@
 {% set thead %}
-<div id="assessment-info">
-    <h2>
-        Assessments
-        <span class="feedback">(Feedback is provided with the marked task)</span>
-    </h2>
-    <div class="listing">
-        <table class="upcoming-work table ruler">
-            <thead>
-            <tr>
-                <th>Title</th>
-                <th>Result</th>
-                <th>Standard Deviation %</th>
-                <th>Mean %</th>
-                <th>Date Due</th>
-            </tr>
-            </thead>
-            <tbody>
+<div class="row" id="assessments">
+    <div class="small-12 column">
+        <h2>Assessments <span class="explanation">(Feedback is provided with the marked task)</span></h2>
+        <div class="scrollable">
+            <table class="bordered-table">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Result</th>
+                    <th>Standard Deviation %</th>
+                    <th>Mean %</th>
+                    <th>Date Due</th>
+                </tr>
+                </thead>
+                <tbody>
 {% endset %}
 
 {% set tfoot %}
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endset %}
@@ -45,20 +44,18 @@
         <tr>
             <td>
                 {% if workItem.assessment %}
-                    <a class="title" href="/submission/submissionHistory/{{ workItem.assessment.id }}/{{ student.id }}">
+                    <a href="/submission/submissionHistory/{{ workItem.assessment.id }}/{{ student.id }}">
                         {{ workItem.assessment.name }}
                     </a>
                 {% elseif workItem.quiz %}
-                    <a class="title" href="/assess/attempts/{{ workItem.quiz.id }}/{{ student.id }}">
+                    <a href="/assess/attempts/{{ workItem.quiz.id }}/{{ student.id }}">
                         {{ workItem.quiz.title }}
                     </a>
                 {% else %}
                     Unknown
                 {% endif %}
             </td>
-            <td class="grade">
-                {{ workItem.pretty_mark }}
-            </td>
+            <td>{{ workItem.pretty_mark }}</td>
             <td>{{ workItem.distribution.continuous.sd.pretty_mark }}</td>
             <td>{{ workItem.distribution.continuous.mean.pretty_mark }}</td>
             <td>

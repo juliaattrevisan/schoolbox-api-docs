@@ -1,54 +1,44 @@
 {# Selector - like the grades selector, but displays only years #}
 {% set currentYear = (tutorGroupReport.year ?: subjectReport.year) %}
-<div id="enrolment">
-    <form id="semesters">
-        <a class="sem-back"
-           {% if not tutorGroupList[currentYear-1] %}disabled{% endif %}
-           href="{{ routeLookup(
-            'customMeridenPastoral.index',
-            {year: currentYear-1, id: student.id})
-           }}">&lsaquo;</a>
-        <select id="semester">
-            {% for level in tutorGroupList %}
-                <option value="{{ routeLookup(
-                            'customMeridenPastoral.index',
-                            {year: level.year, id: student.id})
-                        }}"
-                        label="{{ level.name }}"
-                        {% if level.year == currentYear %}selected{% endif %}
-                        >{{ level.name }}</option>
-            {% endfor %}
-        </select>
-        <a class="sem-fwd"
-           {% if not tutorGroupList[currentYear+1] %}disabled{% endif %}
-           href="{{ routeLookup(
-            'customMeridenPastoral.index',
-            {year: currentYear+1, id: student.id})
-           }}">&rsaquo;</a>
-    </form>
-    <form id="subjects" method="get">
-        <span class="elbow">&#9492;</span>
-        <select id="enrolled-subjects">
-            {# Subject report? show a "Back to eReport" option #}
-            {% if tutorGroupReport.subjectCode %}
-                <option disabled="disabled" selected="selected">Select a subject</option>
-            {% elseif subjectReport.subjectCode %}
-                <option value="{{ routeLookup(
-                            'customMeridenPastoral.index',
-                            {year: subjectReport.year, id: student.id})
-                        }}"
-                        label="« {{ subjectReport.year }} eReport"
-                        >« {{ subjectReport.year }} eReport</option>
-            {% endif %}
-            {% for currentSubject in subjectList %}
-                <option value="{{ routeLookup(
-                            'customMeridenPastoral.subject',
-                            {year: currentSubject.year, id: student.id, subjectCode: currentSubject.subjectCode})
-                        }}"
-                        label="{{ currentSubject.name }} ({{ currentSubject.subjectCode }})"
-                        {% if currentSubject.subjectCode == subjectReport.subjectCode %}selected{% endif %}
-                        >{{ currentSubject.name }} ({{ currentSubject.subjectCode }})</option>
-            {% endfor %}
-        </select>
-    </form>
+<div class="content">
+    <div class="context-switch clearfix">
+        <nav>
+            <a data-interaction="previous"
+               {% if not tutorGroupList[currentYear-1] %}disabled{% endif %}
+               href="{{ routeLookup('customMeridenPastoral.index', {year: currentYear-1, id: student.id}) }}"></a>
+        </nav>
+        <div class="semester">
+            <select id="context-selector-semester">
+                {% for level in tutorGroupList %}
+                    <option value="{{ routeLookup('customMeridenPastoral.index', {year: level.year, id: student.id}) }}"
+                            label="{{ level.name }}"
+                            {% if level.year == currentYear %}selected{% endif %}>{{ level.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <nav>
+            <a data-interaction="next"
+               {% if not tutorGroupList[currentYear+1] %}disabled{% endif %}
+               href="{{ routeLookup('customMeridenPastoral.index', {year: currentYear+1, id: student.id}) }}"></a>
+        </nav>
+
+        <div class="subject">
+            <select id="context-selector-enrolled-subjects">
+                {# Subject report? show a "Back to eReport" option #}
+                {% if tutorGroupReport.subjectCode %}
+                    <option disabled="disabled" selected="selected">Select a subject</option>
+                {% elseif subjectReport.subjectCode %}
+                    <option value="{{ routeLookup('customMeridenPastoral.index', {year: subjectReport.year, id: student.id}) }}"
+                            label="« {{ subjectReport.year }} eReport"
+                    >« {{ subjectReport.year }} eReport</option>
+                {% endif %}
+                {% for currentSubject in subjectList %}
+                    <option value="{{ routeLookup('customMeridenPastoral.subject', {year: currentSubject.year, id: student.id, subjectCode: currentSubject.subjectCode}) }}"
+                            label="{{ currentSubject.name }} ({{ currentSubject.subjectCode }})"
+                            {% if currentSubject.subjectCode == subjectReport.subjectCode %}selected{% endif %}
+                    >{{ currentSubject.name }} ({{ currentSubject.subjectCode }})</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
 </div>
