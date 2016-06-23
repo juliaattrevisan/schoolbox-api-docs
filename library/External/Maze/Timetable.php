@@ -39,6 +39,13 @@ class External_Maze_Timetable implements External_TimetableInterface
     private $userMapper = null;
 
     /**
+     * A cache of users retrieved from $this->userMapper.
+     *
+     * @var array|\Schoolbox\User[]
+     */
+    private $userCache = [];
+
+    /**
      * Array key
      *
      * @var string
@@ -418,7 +425,7 @@ class External_Maze_Timetable implements External_TimetableInterface
                     }
 
                     try {
-                        $user = $this->getUserMapper()->findByExternalId($currentRow[$key]);
+                        $user = $this->findUserByMazeId($currentRow[$key]);
 
                         /* Paste teacher in
                          */
@@ -519,7 +526,7 @@ class External_Maze_Timetable implements External_TimetableInterface
 
                 if (strlen($teacherKey)) {
                     try {
-                        $user = $this->getUserMapper()->findByExternalId($teacherKey);
+                        $user = $this->findUserByMazeId($teacherKey);
 
                         /* Paste teacher in. There are dupe records for teachers at this point,
                          * so accept the first in the list
@@ -647,6 +654,26 @@ class External_Maze_Timetable implements External_TimetableInterface
     {
         // I'm not even going to try navigating this MAZE
         return array();
+    }
+
+    /**
+     * Finds a user by their MAZE ID.
+     *
+     * @param mixed $mazeId
+     * @return \Schoolbox\User
+     * @throws RuntimeException if $mazeId isn't set.
+     *                          This will be interpreted as no user found.
+     */
+    private function findUserByMazeId($mazeId)
+    {
+        if (!isset($mazeId)) {
+            throw new RuntimeException('$mazeId is empty');
+        }
+        if (array_key_exists($mazeId, $this->userCache)) {
+            return $this->userCache[$mazeId];
+        }
+        $this->userCache[$mazeId] = $this->getUserMapper()->findByExternalId($mazeId);
+        return $this->userCache[$mazeId];
     }
 
     /* Getters/Setters
