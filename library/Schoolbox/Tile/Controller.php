@@ -475,7 +475,12 @@ class Controller extends Base
     protected function getFolderForComponent(Component_Instance $component)
     {
         if ($component->getModule() === 'homepage') {
-            return $this->getFolderMapper()->findById($component->getIdentifier());
+
+            // Support tile alt source to potentially soft-deleted homepage
+            $folderId   = $component->getIdentifier();
+            $columnName = $this->getFolderMapper()->getIdentifier()['column'];
+
+            return $this->getFolderMapper()->findByColumn($columnName, $folderId, ['deleted' => true])->first();
         }
         return null;
     }
