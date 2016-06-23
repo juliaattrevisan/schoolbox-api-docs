@@ -501,7 +501,7 @@ class Bootstrap implements BootstrapInterface {
 
 
 		// initialise session
-		$di->get('session')->getAuthUser();
+		$di->get('session')->start();
 
 
 		// Initialise module configuration
