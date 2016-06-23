@@ -31,8 +31,6 @@ class Route
      */
     public function __construct($path, Trie $trie, $delimiter = '/')
     {
-        var_dump($path);
-
         $this->path      = $path;
         $this->delimiter = $delimiter;
 

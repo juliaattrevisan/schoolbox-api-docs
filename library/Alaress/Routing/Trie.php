@@ -59,8 +59,7 @@ class Trie
 
         // literal failed, try for regex
         foreach ($this->tries as $pattern => $trie) {
-            if (preg_match("`^$pattern$`", $key, $matches)) {
-                array_shift($matches);
+            if (preg_match("`^$pattern$`", $key)) {
                 return $trie;
             }
         }
