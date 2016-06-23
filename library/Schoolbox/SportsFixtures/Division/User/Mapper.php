@@ -10,8 +10,11 @@ namespace Schoolbox\SportsFixtures\Division\User;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Mapper As BaseMapper;
+use Schoolbox\Role as RoleModel;
+use Schoolbox\User as UserModel;
 use Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
 
 /**
  * Mapper for the relation between divisions and users.
@@ -67,9 +70,21 @@ class Mapper extends BaseMapper
         foreach ($statement as $row) {
             $model = $this->createModel()
                 ->setId($row['id'])
-                ->setUser($this->hydrateJoin($row, 'user', 'u')->setRole($this->hydrateJoin($row, 'user.role', 'ur')))
-                ->setDivision($this->hydrateJoin($row, 'division', 'd'))
                 ->setSequence($row['sequence']);
+
+            // set user and division only if retrieved properly
+            $user = $this->hydrateJoin($row, 'user', 'u');
+            if ($user instanceof UserModel) {
+                $role = $this->hydrateJoin($row, 'user.role', 'ur');
+                if ($role instanceof RoleModel) {
+                    $user->setRole($role);
+                }
+                $model->setUser($user);
+            }
+            $division = $this->hydrateJoin($row, 'division', 'd');
+            if ($division instanceof DivisionModel) {
+                $model->setDivision($division);
+            }
             $collection->add($model);
         }
         return $collection;
