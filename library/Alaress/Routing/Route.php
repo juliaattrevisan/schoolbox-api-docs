@@ -28,6 +28,7 @@ class Route
      * @param string $path
      * @param Trie   $trie
      * @param string $delimiter
+     * @throws \InvalidArgumentException
      */
     public function __construct($path, Trie $trie, $delimiter = '/')
     {
@@ -45,6 +46,7 @@ class Route
     /**
      * @param string $path
      * @param Trie   $trie
+     * @throws \InvalidArgumentException
      * @return Trie
      */
     protected function locate($path, Trie $trie)
@@ -74,6 +76,7 @@ class Route
 
 
     /**
+     * @throws \InvalidArgumentException
      * @return array
      */
     public function data()
@@ -86,7 +89,7 @@ class Route
             return $this->trie->fetch($matches);
         }
 
-        throw new \InvalidArgumentException("Not data match");
+        throw new \InvalidArgumentException("No data match");
     }
 
 }

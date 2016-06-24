@@ -103,6 +103,7 @@ class Trie
 
     /**
      * @param array $params
+     * @throws \InvalidArgumentException
      * @return array
      */
     public function fetch(array $params)

@@ -32,6 +32,7 @@ class Router
      *
      * @param string $delimiter
      * @param array  $dictionary
+     * @throws \InvalidArgumentException
      */
     public function __construct($delimiter = '/', array $dictionary = null)
     {
