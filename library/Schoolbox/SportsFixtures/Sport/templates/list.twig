@@ -49,7 +49,7 @@
                         <a href="{{ routeLookup('sportsfixturesSport.deleteEntity', {entityId: currentSport.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentSport.id }}"></a>
                         <a href="{{ routeLookup('sportsfixturesSport.getModifyForm', {entityId: currentSport.id}) }}" class="icon-modify" title="Modify"></a>
                         <a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: currentSport.id}) }}" class="icon-list" title="Manage Divisions in {{ currentSport.name }}"></a>
-                        <a href="{{ routeLookup('sportsfixturesPosition.getList', {sportId: currentSport.id}) }}" class="icon-advanced-list" title="Manage Positions in {{ currentSport.name }}"></a>
+                        <a href="{{ routeLookup('sportsfixturesPosition.getList', {contextId: currentSport.id}) }}" class="icon-advanced-list" title="Manage Positions in {{ currentSport.name }}"></a>
                     </nav>
                 </li>
                 {% endfor %}
