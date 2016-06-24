@@ -52,6 +52,7 @@ class Authorizer extends PathMatcher {
      *
      * @param  Rule\IAuthorizationRule $callback
      * @param  array                   $params
+     * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
      * @return array
      */
     protected function getActionResult($callback, $params) {
