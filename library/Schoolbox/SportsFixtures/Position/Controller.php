@@ -112,7 +112,7 @@ class Controller extends AbstractController
             $this->savePosition($sport, $this->getRequest()->post['name'], $entity);
 
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesPosition.getList', [
-                'sportId' => $sportId
+                'contextId' => $sportId
             ]));
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);
