@@ -121,6 +121,9 @@ class Module extends BaseModule
                 if ($params['folder'] instanceof Folder\Model) {
                     return $params['folder']->getId();
                 }
+                if ($params['blog'] instanceof BlogModel) {
+                    return $params['blog']->getFolder()->getId();
+                }
                 return null;
             },
             Access::getInstance()
