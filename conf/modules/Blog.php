@@ -11,8 +11,8 @@ namespace Config\Modules;
 
 
 use Alaress\Application\Kernel;
-use Schoolbox\Blog\Eportfolio\Component\Module as EportfolioBlogModule;
-use Schoolbox\Blog\Homepage\Component\Module as BlogModule;
+use Schoolbox\Blog\Eportfolio\Module as EportfolioBlogModule;
+use Schoolbox\Blog\Homepage\Module as BlogModule;
 
 class Blog implements ModuleConfigInterface
 {
