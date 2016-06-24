@@ -130,15 +130,15 @@ class Controller extends AbstractController
     /**
      * Show the player lobby for this division
      *
-     * @param int $divisionId
+     * @param int $entityId
      */
-    public function getLobby($divisionId)
+    public function getLobby($entityId)
     {
         try {
-            $division = $this->getDivisionMapper()->findById($divisionId);
+            $division = $this->getDivisionMapper()->findById($entityId);
             $sport    = $this->getSportMapper()->findById($division->getSport()->getId());
-            $teams    = $this->getTeamMapper()->findByColumn('division_id', $divisionId);
-            $players  = $this->getDivisionUserMapper()->findByColumn('division_id', $divisionId, ['order' => ['sequence' => 'desc']]);
+            $teams    = $this->getTeamMapper()->findByColumn('division_id', $entityId);
+            $players  = $this->getDivisionUserMapper()->findByColumn('division_id', $entityId, ['order' => ['sequence' => 'desc']]);
             $zone     = new Zone("uploadZone");
             $zone->setMimeFilter('text/csv')->setAttachPrompt('upload a list of players');
 
@@ -198,7 +198,7 @@ class Controller extends AbstractController
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'sportsfixturesDivision.getLobby',
-                ['divisionId' => $division->getId(),]
+                ['entityId' => $division->getId(),]
             )
         );
     }
@@ -253,7 +253,7 @@ class Controller extends AbstractController
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'sportsfixturesDivision.getLobby',
-                ['divisionId' => $division->getId(),]
+                ['entityId' => $division->getId(),]
             )
         );
     }
@@ -274,7 +274,7 @@ class Controller extends AbstractController
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'sportsfixturesDivision.getLobby',
-                ['divisionId' => $division->getId(),]
+                ['entityId' => $division->getId(),]
             )
         );
     }
@@ -305,7 +305,7 @@ class Controller extends AbstractController
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'sportsfixturesDivision.getLobby',
-                ['divisionId' => $division->getId(),]
+                ['entityId' => $division->getId(),]
             )
         );
     }

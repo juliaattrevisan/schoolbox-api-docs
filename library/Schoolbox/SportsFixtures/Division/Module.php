@@ -45,15 +45,16 @@ class Module extends RestfulModule
     public function initRoutes(Router $router, $basePath)
     {
         parent::initRoutes($router, $basePath);
+        $collection = $this->getCollectionName();
         $routes = [
             'GET' => [
-                '/lobby/{divisionId}'  => 'getLobby',
+                "/$collection/{entityId}/lobby" => "getLobby",
             ],
-            'POST' => [
-                '/addPlayers/{divisionId}'     => 'postAddPlayers',
-                '/uploadPlayers/{divisionId}'  => 'postUploadPlayers',
-                '/removePlayers/{divisionId}'  => 'postRemovePlayers',
-                '/reorderPlayers/{divisionId}' => 'postReorderPlayers',
+            "POST" => [
+                "/$collection/{entityId}/addPlayers"     => "postAddPlayers",
+                "/$collection/{entityId}/uploadPlayers"  => "postUploadPlayers",
+                "/$collection/{entityId}/removePlayers"  => "postRemovePlayers",
+                "/$collection/{entityId}/reorderPlayers" => "postReorderPlayers",
             ]
         ];
 
@@ -76,7 +77,7 @@ class Module extends RestfulModule
             $matcher,
             '(?:postModify|postAddPlayers|postRemovePlayers|postReorderPlayers|postUploadPlayers)',
             function ($params) {
-                $division = Mapper::getInstance()->findById($params['divisionId']);
+                $division = Mapper::getInstance()->findById($params['entityId']);
                 return [
                     'params'   => $params,
                     'division' => $division
