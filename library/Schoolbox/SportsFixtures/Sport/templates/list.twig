@@ -28,7 +28,7 @@
         </div>
     </div>
     <nav>
-        <a href='{{ routeLookup('sportsfixturesSport.getCreate', {}) }}' class="icon-add" title="Add Sport"></a>
+        <a href='{{ routeLookup('sportsfixturesSport.getCreateForm', {}) }}' class="icon-add" title="Add Sport"></a>
     </nav>
 </div>
 
@@ -46,10 +46,10 @@
                         </div>
                     </div>
                     <nav>
-                        <a href="{{ routeLookup('sportsfixturesSport.postDelete', {}) }}" class="icon-delete" title="Delete" data-delete="{{ currentSport.id }}"></a>
-                        <a href="{{ routeLookup('sportsfixturesSport.getUpdate', {sportId: currentSport.id}) }}" class="icon-modify" title="Modify"></a>
-                        <a href="{{ routeLookup('sportsfixturesDivision.getList', {sportId: currentSport.id}) }}" class="icon-list" title="Manage Divisions in {{ currentSport.name }}"></a>
-                        <a href="{{ routeLookup('sportsfixturesPosition.getList', {sportId: currentSport.id}) }}" class="icon-advanced-list" title="Manage Positions in {{ currentSport.name }}"></a>
+                        <a href="{{ routeLookup('sportsfixturesSport.deleteEntity', {entityId: currentSport.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentSport.id }}"></a>
+                        <a href="{{ routeLookup('sportsfixturesSport.getModifyForm', {entityId: currentSport.id}) }}" class="icon-modify" title="Modify"></a>
+                        <a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: currentSport.id}) }}" class="icon-list" title="Manage Divisions in {{ currentSport.name }}"></a>
+                        <a href="{{ routeLookup('sportsfixturesPosition.getList', {contextId: currentSport.id}) }}" class="icon-advanced-list" title="Manage Positions in {{ currentSport.name }}"></a>
                     </nav>
                 </li>
                 {% endfor %}
@@ -59,7 +59,7 @@
         <div class="empty-state">
             <i class="icon-sport"></i>
             <p>There are no Sports.</p>
-            <p><a href="{{ routeLookup('sportsfixturesSport.getCreate', {}) }}" title="Add a Sport">Add a Sport</a></p>
+            <p><a href="{{ routeLookup('sportsfixturesSport.getCreateForm', {}) }}" title="Add a Sport">Add a Sport</a></p>
         </div>
         {% endif %}
     </div>

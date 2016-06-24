@@ -500,6 +500,10 @@ class Bootstrap implements BootstrapInterface {
 		$this->kernel->setDebugMode($this->debugEnabled);
 
 
+		// initialise session
+		$di->get('session')->start();
+
+
 		// Initialise module configuration
 		require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
         $customModuleLocation = sprintf(
@@ -515,13 +519,10 @@ class Bootstrap implements BootstrapInterface {
 			require_once $routePath;
 
             // Get a route name out of this path
-//            $path = dirname($routePath);
             $path = preg_replace('/^'.preg_quote(SITE_root.'/conf/modules/', '/').'/', '', $routePath);
             $path = preg_replace('/\\.php$/', '', $path);
             $path = preg_replace('/\\//', '\\', $path);
 
-//			$start = strrpos($routePath, '/') + 1;
-//			$length = strrpos($routePath, '.php') - $start;
 			$class = 'Config\\Modules\\' . $path;
 
 			if(class_exists($class, false)) {

@@ -10,79 +10,23 @@ namespace Schoolbox\SportsFixtures\Division;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
-use Alaress\Module\Module as BaseModule;
-use Alaress\Web\Router\PathMatcher;
+use Aura\Di\Container;
 use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
-use Twig_Error_Loader;
-use Twig_Loader_Chain;
+use Schoolbox\Module\RestfulModule;
+use Schoolbox\Module\StandardModuleTrait;
 use \Schoolbox\Permission\Access\UserAccess;
-use \Schoolbox\SportsFixtures\Division\Model as Division;
 
-class Module extends BaseModule
+class Module extends RestfulModule
 {
-    /** @var string */
-    protected $basename = 'sportsfixturesDivision';
+    use StandardModuleTrait;
 
     /**
-     * Initializes any routes for this module, with a given base path.
-     *
-     * The base path for each route needs to match up to the name of the
-     * controller in $this->initControllers(), so if its base path is
-     * "user", there must be a controller in the DI container called
-     * "controller:user"
-     *
-     * @param Router $router
-     * @param string $basePath The base route for this module
+     * @param ContainerInterface $injector
+     * @param RestfulModule      $context
      */
-    public function initRoutes(Router $router, $basePath)
+    public function __construct(ContainerInterface $injector, RestfulModule $context)
     {
-        $routes = [
-            'GET' => [
-                '/list/{sportId}'      => 'getList',
-                '/create/{sportId}'    => 'getCreate',
-                '/update/{divisionId}' => 'getUpdate',
-            ],
-            'POST' => [
-                '/create/{sportId}'    => 'postCreate',
-                '/update/{divisionId}' => 'postModify',
-                '/delete'              => 'postDelete',
-            ]
-        ];
-
-        foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
-        }
-
-        foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($router, $alias, $basePath, $path);
-        }
-    }
-
-    /**
-     * @param PathMatcher $matcher
-     */
-    public function initRoutePreloads(PathMatcher $matcher)
-    {
-        $this->addRoutePreload($matcher, '(?:postCreate)', function ($params) {
-            /** @var Division $division */
-            $division = Mapper::getInstance()->createModel();
-            $division->setCreatedAt(\Alaress_Date_Format::now());
-
-            return [
-                'params' => $params,
-                'division' => $division
-            ];
-        });
-
-        $this->addRoutePreload($matcher, '(?:postModify)', function ($params) {
-            $division = Mapper::getInstance()->findById($params['divisionId']);
-
-            return [
-                'params' => $params,
-                'division' => $division
-            ];
-        });
+        parent::__construct($injector, Mapper::getInstance(), 'divisions', $context, 'sportsfixturesDivision');
     }
 
     /**
@@ -106,25 +50,19 @@ class Module extends BaseModule
         $this->addRoutePermission($authorizer, '.*', $isSportsAdministrator);
     }
 
-    /**
-     * @param Twig_Loader_Chain $templateLoader
-     * @throws Twig_Error_Loader
-     */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
-    {
-        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
 
     /**
-     * Initializes controller classes into the dependency injector.
+     * Override with any steps required for a controller and its routes
      *
-     * @param ContainerInterface $injector The dependency injection container.
+     * You should use this method to initialize any mappers or other objects
+     * which the controller needs, but are too heavy to initialize at module
+     * init time.
+     *
+     * @param Container|ContainerInterface $injector The dependency injection container.
      */
-    public function initControllers(ContainerInterface $injector)
+    protected function preInitControllerDependencies(ContainerInterface $injector)
     {
-        $injector->set(
-            'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
-        );
+        $injector->params[Controller::class]['mapper'] = $injector->lazy(function () { Mapper::getInstance(); });
     }
+
 }

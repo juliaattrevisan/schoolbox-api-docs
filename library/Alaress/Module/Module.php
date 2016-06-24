@@ -66,9 +66,13 @@ class Module {
      *  shouldn't be used outside of init() anyway)
      *
      * @param ContainerInterface $injector
+     * @param string             $basename
      */
-    public function __construct(ContainerInterface $injector) {
+    public function __construct(ContainerInterface $injector, $basename = '') {
         $this->setInjector($injector);
+        if ($basename) {
+            $this->setBasename($basename);
+        }
     }
 
     /**
@@ -367,6 +371,25 @@ class Module {
      */
     public function getInjector() {
         return $this->injector;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getBasename()
+    {
+        return $this->basename;
+    }
+
+
+    /**
+     * @param $basename
+     * @return $this
+     */
+    protected function setBasename($basename)
+    {
+        $this->basename = $basename;
+        return $this;
     }
 
 }

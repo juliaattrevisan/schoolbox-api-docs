@@ -8,20 +8,16 @@
 
 namespace Schoolbox\SportsFixtures\Sport;
 
-use Alaress\Web\Controller\Base;
+use Alaress\Web\Controller\Exception;
+use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Sport\Model as Sport;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 
-class Controller extends Base
+class Controller extends AbstractController
 {
-    /**
-     * @var SportMapper
-     */
-    protected $sportMapper;
-
     /**
      * @var DivisionMapper
      */
@@ -37,15 +33,17 @@ class Controller extends Base
      */
     public function __construct()
     {
-        $this->setSportMapper(SportMapper::getInstance());
+        parent::__construct(SportMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
     /**
      * List of Sports
+     *
+     * @param null $context
      */
-    public function getList()
+    public function getList($context = null)
     {
         /* TODO: Not sure if we need this here
          * but I'll set it up anyway just in case
@@ -62,72 +60,46 @@ class Controller extends Base
     }
 
     /**
-     * Create a Sport
+     * @param Sport $entity
+     * @param object $context
+     * @return void
      */
-    public function getCreate()
+    protected function getForm($entity, $context = null)
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesSport/create.twig', [
-            'action' => 'Create'
+            'sport'  => $entity,
+            'action' => $entity->getId() ? 'Modify' : 'Create'
         ]));
     }
 
     /**
-     * Update a Sport
+     * Populate the Response object with a representation of the given entity:
+     *  - in the format provided in the request Accepts header
+     * If entity is deleted, respond with '210 Gone'
      *
-     * @param int $sportId
+     * @param object $entity
+     * @throws Exception
+     * @return void
      */
-    public function getUpdate($sportId)
+    public function getEntity($entity)
     {
-        try {
-            $sport = $this->getSportMapper()->findById($sportId);
-
-            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesSport/create.twig', [
-                'sport' => $sport,
-                'action' => 'Modify'
-            ]));
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
-        }
-    }
-
-    /**
-     * Create a Sport
-     *
-     * @param Sport $sport
-     */
-    public function postCreate(Sport $sport)
-    {
-        $this->postModify($sport);
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesSport/entity.twig', [
+            'sport' => $entity
+        ]));
     }
 
     /**
      * Modify a Sport
      *
-     * @param Sport $sport
+     * @param Sport $entity
      */
-    public function postModify(Sport $sport)
+    public function persistEntity($entity)
     {
         try {
-            $this->saveSport($sport, $this->getRequest()->post['name'], $this->getRequest()->post['url']);
+            $this->saveSport($entity, $this->getRequest()->post['name'], $this->getRequest()->post['url']);
 
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesSport.getList'));
         } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
-        }
-    }
-
-    /**
-     * Delete a Sport
-     */
-    public function postDelete()
-    {
-        try {
-            /** @var Sport $sport */
-            $sport = $this->getSportMapper()->findById($this->getRequest()->post['sportId']);
-            $this->getSportMapper()->delete($sport);
-        }
-        catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);
         }
     }
@@ -156,15 +128,7 @@ class Controller extends Base
      */
     protected function getSportMapper()
     {
-        return $this->sportMapper;
-    }
-
-    /**
-     * @param SportMapper $sportMapper
-     */
-    protected function setSportMapper($sportMapper)
-    {
-        $this->sportMapper = $sportMapper;
+        return $this->mapper;
     }
 
     /**

@@ -7,8 +7,9 @@
 
 namespace Schoolbox\SportsFixtures\Position;
 
-use Alaress\Web\Controller\Base;
+use Alaress\Web\Controller\Exception;
 use Alaress_Date_Format;
+use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\SportsFixtures\Sport\Model as Sport;
@@ -17,18 +18,13 @@ use \Schoolbox\SportsFixtures\Position\Model as Position;
 use \Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 
 
-class Controller extends Base
+class Controller extends AbstractController
 {
 
     /**
      * @var SportMapper
      */
     protected $sportMapper;
-
-    /**
-     * @var PositionMapper
-     */
-    protected $positionMapper;
 
     /**
      * @var ErrorMapper
@@ -40,51 +36,29 @@ class Controller extends Base
      */
     public function __construct()
     {
+        parent::__construct(PositionMapper::getInstance());
         $this->setSportMapper(SportMapper::getInstance());
-        $this->setPositionMapper(PositionMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
-    }
-
-    /**
-     * Just a raw template render
-     *
-     * @param string $template
-     * @param array  $data
-     */
-    protected function tpl($template, $data = [])
-    {
-        $content = [
-            'template' => "@sportsfixturesPosition/$template.twig",
-            'data'     => $data,
-        ];
-
-        if ($this->getRequest()->isXhr()) {
-            $content['format'] = 'nochrome';
-        }
-
-        $this->getResponse()->content->set($content);
     }
 
     /**
      * List of Positions and the Sport they are in
      *
-     * @param int $sportId
+     * @param Sport $context
      */
-    public function getList($sportId)
+    public function getList($context = null)
     {
         try {
-            $sport = $this->getSportMapper()->findById($sportId);
-
-            $allPositions = $this->getPositionMapper()->findByColumn('sport_id', $sport->getId(), [
+            $allPositions = $this->mapper->findByColumn('sport_id', $context->getId(), [
                 'order' => [
                     'name' => 'asc'
                 ]
             ]);
 
-            $this->tpl('list', [
-                'sport' => $sport,
+            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesPosition/list.twig', [
+                'sport'        => $context,
                 'allPositions' => $allPositions
-            ]);
+            ]));
         }
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);
@@ -92,93 +66,56 @@ class Controller extends Base
     }
 
     /**
-     * Create a Position in a particular Sport id
+     * View a single position
      *
-     * @param int $sportId
+     * @param Model $entity
      */
-    public function getCreate($sportId)
+    public function getEntity($entity)
     {
-        try {
-            $sport = $this->getSportMapper()->findById($sportId);
+        $sport = $this->getSportMapper()->findById($entity->getSport()->getId());
 
-            $this->tpl('create', [
-                'sport' => $sport,
-                'action' => 'Create'
-            ]);
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
-        }
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesPosition/entity.twig', [
+            'sport'    => $sport,
+            'position' => $entity
+        ]));
     }
 
     /**
-     * Update a Position
+     * Display form for create/update position
      *
-     * @param int $positionId
+     * @param Model $entity
+     * @param Sport $context
      */
-    public function getUpdate($positionId)
+    protected function getForm($entity, $context = null)
     {
-        try {
-            $position = $this->getPositionMapper()->findById($positionId);
-            $sport = $this->getSportMapper()->findById($position->getSport()->getId());
+        if (empty($context)) {
+            $context = $this->getSportMapper()->findById($entity->getSport()->getId());
+        }
 
-            $this->tpl('create', [
-                'position' => $position,
-                'sport' => $sport,
-                'action' => 'Modify'
-            ]);
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
-        }
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesPosition/create.twig', [
+            'position' => $entity,
+            'sport'    => $context,
+            'action'   => $entity->getId() ? 'Modify' : 'Create'
+        ]));
     }
 
     /**
-     * Create a Position
+     * Persist method for entity
      *
-     * @param Position $position
+     * @param Model $entity
      */
-    public function postCreate(Position $position)
-    {
-        /* Get around aura's weird regexing
-         */
-        $this->postModify($position);
-    }
-
-    /**
-     * Modify a Position
-     *
-     * @param Position $position
-     */
-    public function postModify(Position $position)
+    protected function persistEntity($entity)
     {
         try {
             $sportId = $this->getRequest()->post['sportId'];
             $sport   = $this->getSportMapper()->findById($sportId);
 
-            $this->savePosition($sport, $this->getRequest()->post['name'], $position);
+            $this->savePosition($sport, $this->getRequest()->post['name'], $entity);
 
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesPosition.getList', [
-                'sportId' => $sportId
+                'contextId' => $sportId
             ]));
-
         } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
-        }
-    }
-
-    /**
-     * Delete a Position
-     */
-    public function postDelete()
-    {
-        try {
-            /** @var Position $position */
-            $position = $this->getPositionMapper()->findById($this->getRequest()->post['positionId']);
-
-            $this->getPositionMapper()->delete($position);
-        }
-        catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);
         }
     }
@@ -196,7 +133,7 @@ class Controller extends Base
         $position->setSport($sport);
         $position->setUpdatedAt(Alaress_Date_Format::now());
 
-        $this->getPositionMapper()->save($position);
+        $this->mapper->save($position);
     }
 
     /* Getters/Setters
@@ -216,22 +153,6 @@ class Controller extends Base
     protected function setSportMapper($sportMapper)
     {
         $this->sportMapper = $sportMapper;
-    }
-
-    /**
-     * @return PositionMapper
-     */
-    protected function getPositionMapper()
-    {
-        return $this->positionMapper;
-    }
-
-    /**
-     * @param PositionMapper $positionMapper
-     */
-    protected function setPositionMapper($positionMapper)
-    {
-        $this->positionMapper = $positionMapper;
     }
 
     /**
