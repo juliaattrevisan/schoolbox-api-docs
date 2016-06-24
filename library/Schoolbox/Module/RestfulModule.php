@@ -195,13 +195,8 @@ abstract class RestfulModule extends \Alaress\Module\Module
     {
         try {
             return $mapper->findById($id);
-
-        } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-            throw \Schoolbox\Error\Mapper::getInstance()->generateException(8);
-
         } catch (\Schoolbox\Mapper\Exception $e) {
             throw \Schoolbox\Error\Mapper::getInstance()->generateException(101);
         }
     }
-
 }
