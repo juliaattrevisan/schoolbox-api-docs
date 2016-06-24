@@ -50,7 +50,15 @@ class Route
     protected function locate($path, Trie $trie)
     {
         $this->chunks[] = $trie->key();
-        list ($chunk, $remainder) = explode($this->delimiter, $path, 2);
+
+        if (strpos($path, $this->delimiter) === false) {
+            $chunk = $path;
+            $remainder = '';
+
+        } else {
+            list ($chunk, $remainder) = explode($this->delimiter, $path, 2);
+        }
+
 
         // aaaaaaand recursion
         try {
@@ -61,7 +69,7 @@ class Route
         }
 
         // try with remainder
-        return $trie->get($remainder);
+        return $trie->get($path);
     }
 
 
