@@ -7,8 +7,8 @@
 
 namespace Schoolbox\SportsFixtures\Position;
 
-use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\SportsFixtures\Sport\Model as Sport;
@@ -17,18 +17,13 @@ use \Schoolbox\SportsFixtures\Position\Model as Position;
 use \Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 
 
-class Controller extends Base
+class Controller extends AbstractController
 {
 
     /**
      * @var SportMapper
      */
     protected $sportMapper;
-
-    /**
-     * @var PositionMapper
-     */
-    protected $positionMapper;
 
     /**
      * @var ErrorMapper
@@ -40,8 +35,8 @@ class Controller extends Base
      */
     public function __construct()
     {
+        parent::__construct(PositionMapper::getInstance())
         $this->setSportMapper(SportMapper::getInstance());
-        $this->setPositionMapper(PositionMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
@@ -68,21 +63,19 @@ class Controller extends Base
     /**
      * List of Positions and the Sport they are in
      *
-     * @param int $sportId
+     * @param Sport $context
      */
-    public function getList($sportId)
+    public function getList($context = null)
     {
         try {
-            $sport = $this->getSportMapper()->findById($sportId);
-
-            $allPositions = $this->getPositionMapper()->findByColumn('sport_id', $sport->getId(), [
+            $allPositions = $this->mapper->findByColumn('sport_id', $context->getId(), [
                 'order' => [
                     'name' => 'asc'
                 ]
             ]);
 
             $this->tpl('list', [
-                'sport' => $sport,
+                'sport'        => $context,
                 'allPositions' => $allPositions
             ]);
         }
@@ -119,7 +112,7 @@ class Controller extends Base
     public function getUpdate($positionId)
     {
         try {
-            $position = $this->getPositionMapper()->findById($positionId);
+            $position = $this->mapper->findById($positionId);
             $sport = $this->getSportMapper()->findById($position->getSport()->getId());
 
             $this->tpl('create', [
@@ -174,9 +167,9 @@ class Controller extends Base
     {
         try {
             /** @var Position $position */
-            $position = $this->getPositionMapper()->findById($this->getRequest()->post['positionId']);
+            $position = $this->mapper->findById($this->getRequest()->post['positionId']);
 
-            $this->getPositionMapper()->delete($position);
+            $this->mapper->delete($position);
         }
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);
@@ -196,7 +189,7 @@ class Controller extends Base
         $position->setSport($sport);
         $position->setUpdatedAt(Alaress_Date_Format::now());
 
-        $this->getPositionMapper()->save($position);
+        $this->mapper->save($position);
     }
 
     /* Getters/Setters
@@ -216,22 +209,6 @@ class Controller extends Base
     protected function setSportMapper($sportMapper)
     {
         $this->sportMapper = $sportMapper;
-    }
-
-    /**
-     * @return PositionMapper
-     */
-    protected function getPositionMapper()
-    {
-        return $this->positionMapper;
-    }
-
-    /**
-     * @param PositionMapper $positionMapper
-     */
-    protected function setPositionMapper($positionMapper)
-    {
-        $this->positionMapper = $positionMapper;
     }
 
     /**
