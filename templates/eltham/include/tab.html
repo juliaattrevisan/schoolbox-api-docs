@@ -1,9 +1,18 @@
 <script>
     $(function() {
-        $('#content').find('a[data-portal]').click(function(e) {
+        // Replace any links with '/synergetic-sso/' at the start with '#' and add data-portal attribute instead
+        // this is for side menu items and tiles
+
+        $("a[href^='/synergetic-sso/']").each(function(e) {
+            $(this).attr('data-portal', $(this).attr('href').replace('/synergetic-sso/', ''));
+            $(this).attr('href', '#');
+        });
+
+        $('#content, #nav').find('a[data-portal]').click(function(e) {
+            e.preventDefault();
             // Get link we need to go to
 
-            var deeplink = "/" + $(e.target).attr('data-portal');
+            var deeplink = "/" + $(this).attr('data-portal');
 
             // Check if we have already gone through the SSO popup process
 
@@ -18,11 +27,12 @@
                 setTimeout(function() {
                     window.loginWindow.close();
                     window.location.href='/synergetic' + deeplink;
-                }, 5000);
+                }, 6500);
             }
         });
     });
 </script>
+
 
 <!-- BEGIN duework_tab -->
 <li><a class="icon-due-work {TAB_SUBMISSION_ON}" href="/submission/dueWork" title="Access your due work"><span>My Work</span></a></li>
