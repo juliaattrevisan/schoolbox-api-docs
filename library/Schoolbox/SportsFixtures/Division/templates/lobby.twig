@@ -132,7 +132,7 @@
             <div class="empty-state">
                 <i class="icon-sport"></i>
                 <p>There are no Teams in {{ division.getName() }}.</p>
-                <p><a href="{{ routeLookup('sportsfixturesTeam.getCreateForm', {entityId: division.id}) }}" title="Add a Team">Add a Team</a></p>
+                <p><a href="{{ routeLookup('sportsfixturesTeam.getCreateForm', {contextId: division.id}) }}" title="Add a Team">Add a Team</a></p>
             </div>
         {% endif %}
     </div>
