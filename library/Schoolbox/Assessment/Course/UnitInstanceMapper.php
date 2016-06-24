@@ -322,15 +322,19 @@ class UnitInstanceMapper extends BaseMapper {
         /* Check every unit -_-
          */
         foreach ($allUnits as $currentUnit) {
-            $course = $this->findCourseForUnit($currentUnit);
-
-            /* component_id is the closest concept to a course_id
-             * and we can derive it from the associated unit
-             */
-            $allCourses[$course->getId()] = [
-                'componentId' => $currentUnit->getComponent()->getId(),
-                'restorable' => in_array($currentUnit->getId(), $allRestorableUnitIds) ? true : false,
-            ];
+            try {
+                $course = $this->findCourseForUnit($currentUnit);
+                /* component_id is the closest concept to a course_id
+                 * and we can derive it from the associated unit
+                 */
+                $allCourses[$course->getId()] = [
+                    'componentId' => $currentUnit->getComponent()->getId(),
+                    'restorable' => in_array($currentUnit->getId(), $allRestorableUnitIds) ? true : false,
+                ];
+            } catch (BaseMapper\Exception $e) {
+                // what can I do, except:
+                continue;
+            }
         }
 
         return $allCourses;
