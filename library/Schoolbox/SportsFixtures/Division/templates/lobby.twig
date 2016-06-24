@@ -1,0 +1,174 @@
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript">
+    $(function() {
+        // Selectize box for selecting one or more users
+        $('[data-role="userSelector"]')
+            .selectizeSelector({
+                multiple: true,
+                ajax: {
+                    url:      '/ajax/user.php',
+                    type:     'GET',
+                    data:     {groupID: 0},
+                    dataType: 'json'
+                }
+            });
+
+        // Remove player from division action
+        $('[data-remove-player]').on('click', function(e) {
+            e.preventDefault();
+            $(this).confirmDialog({
+                confirmEvent: function(el) {
+                    $.post(
+                        el.attr('href'),
+                        [{name: 'userId[]', value: el.data('removePlayer')}]
+                    ).done(function() {
+                        el.closest('[data-player]').fadeOut();
+                    })
+                }
+            });
+        });
+
+        // Reorder players
+        $('[data-player-list]').sortable({
+            handle: '.grip',
+            axis:   'y',
+            stop:   function(e) {
+                // Build a list of user IDs, and save ordering
+                var el   = $(e.target);
+                var data = el.find('[data-player]').map(function() {
+                    return {name: 'userId[]', value: $(this).data('player')};
+                });
+                $.post(el.data('sortableOnstopAction'), data);
+            }
+        });
+    });
+</script>
+<ul class="breadcrumb">
+    <li><a href="#">Sports Fixtures</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesDivision.getModifyForm', {entityId: division.id}) }}">{{ division.name }}</a></li>
+    <li class="active"><a href="{{ routeLookup('sportsfixturesDivision.getLobby', {entityId: division.id}) }}">Division Lobby</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sports Fixtures</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 medium-6 island">
+        <div class="actions-small-2 row">
+            <div class="list-item">
+                <div class="small-12 column">
+                    <h2 class="subheader">Players</h2>
+                </div>
+            </div>
+            <nav>
+                <a href="#" class="icon-add" title="Add Players" data-reveal-id="addPlayersModal"></a>
+                <a href="#" class="icon-upload" title="Upload Player List" data-reveal-id="uploadPlayersModal"></a>
+            </nav>
+        </div>
+        {% if players is not empty %}
+            <section>
+                <ul class="information-list sortable"
+                    data-player-list
+                    data-sortable-onstop-action="{{ routeLookup('sportsfixturesDivision.postReorderPlayers', {entityId: division.getId()}) }}">
+                    {% for currentPlayer in players %}
+                        <li class="actions-small-1" data-player="{{ currentPlayer.user.getId() }}">
+                            <div class="list-item">
+                                <div class="grip"></div>
+                                <div class="small-11 avatar card">
+                                    <a href="/search/user/{{ currentPlayer.user.getId() }}">
+                                        <img src="/portrait.php?userId={{ currentPlayer.user.getExternalId() }}&amp;size=square64" />
+                                        <h3>{{ currentPlayer.user.formatName() }}</h3>
+                                    </a>
+                                    <p class="meta">{{ currentPlayer.user.formatMetadata() }}</p>
+                                </div>
+                            </div>
+                            <nav>
+                                <a href="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.getId()}) }}"
+                                   class="icon-delete"
+                                   title="Remove Player"
+                                   data-remove-player="{{ currentPlayer.user.getId() }}"></a>
+                            </nav>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-group"></i>
+                <p>There are no Players in {{ division.getName() }}.</p>
+                <p>
+                    You may <a href="#" title="Add Players" data-reveal-id="addPlayersModal">add players by name</a>,
+                    or <a href="#" title="Upload Player List" data-reveal-id="uploadPlayersModal">upload a list</a>.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="hide-for-small medium-6 island">
+        <h2 class="subheader">Teams</h2>
+        {% if teams is not empty %}
+            <section>
+                <ul class="information-list">
+                    {% for currentTeam in teams %}
+                        <li>
+                            <div class="list-item">
+                                <div class="small-12 avatar card">
+                                    <h3>{{ currentTeam.getName() }}</h3>
+                                    <p><a href="{{ currentTeam.getUrl() }}">{{ currentTeam.getUrl() }}</a>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-sport"></i>
+                <p>There are no Teams in {{ division.getName() }}.</p>
+                <p><a href="{{ routeLookup('sportsfixturesTeam.getCreateForm', {contextId: division.id}) }}" title="Add a Team">Add a Team</a></p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="addPlayersModal" class="reveal-modal" data-reveal aria-labelledby="addPlayersModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="addPlayersModalTitle">Add Players</h2>
+    <form action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {entityId: division.getId()}) }}" method="post">
+        <select data-role="userSelector" name="userId[]" multiple placeholder="Search Users"></select>
+        <input type="submit" class="full-width" value="Add" />
+    </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div id="uploadPlayersModal" class="reveal-modal" data-reveal aria-labelledby="uploadPlayersModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="uploadPlayersModalTitle">Upload Player List</h2>
+    <form action="{{ routeLookup('sportsfixturesDivision.postUploadPlayers', {entityId: division.getId()}) }}" method="post">
+        <p>
+            You may upload a list of Schoolbox User IDs, usernames or external IDs into this division.
+            Make sure that it conforms to the <a href="/sportsfixtures/import/userTemplate.csv">template</a> provided.
+        </p>
+
+        {% if user.isSuperuser() %}
+            {# Show only superusers the role report link, as only they can see it #}
+            <p>
+                You may also download a report from the
+                <a href="/adminv2/home" target="_blank">Role Statistics section in Administration</a>,
+                and use it as the list of users to upload.
+            </p>
+        {% endif %}
+
+        {% include 'sub/attachzone.twig' with { attachzone: uploadZone.getTwigContext() } %}
+        <ul class="flex-list buttons">
+            <li><a href="/sportsfixtures/import/userTemplate.csv" class="button">Download Template</a></li>
+            <li><input type="submit" class="full-width" value="Upload" /></li>
+        </ul>
+    </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
