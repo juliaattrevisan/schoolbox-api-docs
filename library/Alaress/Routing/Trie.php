@@ -102,10 +102,21 @@ class Trie
 
 
     /**
+     * @param array $params
      * @return array
      */
-    public function data()
+    public function fetch(array $params)
     {
-        return $this->data;
+        $node =& $this->data;
+
+        foreach ($params as $p) {
+            if (empty($node[$p])) {
+                throw new \InvalidArgumentException("No data match");
+            }
+            $node =& $node[$p];
+        }
+
+        return $node;
     }
+
 }

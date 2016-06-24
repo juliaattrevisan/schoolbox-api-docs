@@ -75,19 +75,10 @@ class Route
         if (preg_match($regex, $this->path, $matches)) {
             array_shift($matches);
 
-            $node =& $this->trie->data();
-
-            foreach ($matches as $p) {
-                if (empty($node[$p])) {
-                    throw new \InvalidArgumentException("No data match");
-                }
-                $node =& $node[$p];
-            }
-
-            return $node;
+            return $this->trie->fetch($matches);
         }
 
-        return [$regex];
+        throw new \InvalidArgumentException("Not data match");
     }
 
 }
