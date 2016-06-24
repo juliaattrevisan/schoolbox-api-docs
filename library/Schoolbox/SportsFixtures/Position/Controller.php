@@ -87,7 +87,12 @@ class Controller extends AbstractController
 
     public function getEntity($entity)
     {
-        // TODO: Implement getEntity() method.
+        $sport = $this->getSportMapper()->findById($entity->getSport()->getId());
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesPosition/entity.twig', [
+            'sport'    => $sport,
+            'position' => $entity
+        ]));
     }
 
     protected function getForm($entity, $context = null)
