@@ -13,6 +13,8 @@ use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Mapper;
+use \Schoolbox\Mapper\Exception as MapperException;
+use \Alaress\Module\Module as AlaressModule;
 
 /**
  * Class RestfulModule
@@ -22,7 +24,7 @@ use Schoolbox\Mapper;
  *
  * @package Schoolbox\Module
  */
-abstract class RestfulModule extends \Alaress\Module\Module
+abstract class RestfulModule extends AlaressModule
 {
 
     /** @var string */
@@ -195,7 +197,7 @@ abstract class RestfulModule extends \Alaress\Module\Module
     {
         try {
             return $mapper->findById($id);
-        } catch (\Schoolbox\Mapper\Exception $e) {
+        } catch (MapperException $e) {
             throw \Schoolbox\Error\Mapper::getInstance()->generateException(101);
         }
     }
