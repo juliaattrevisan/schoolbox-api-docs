@@ -71,6 +71,7 @@ class Module extends RestfulModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
+        parent::initRoutePreloads($matcher);
         $this->addRoutePreload(
             $matcher,
             '(?:postModify|postAddPlayers|postRemovePlayers|postReorderPlayers|postUploadPlayers)',
