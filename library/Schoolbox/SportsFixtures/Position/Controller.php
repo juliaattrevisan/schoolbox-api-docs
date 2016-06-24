@@ -97,7 +97,7 @@ class Controller extends AbstractController
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesPosition/create.twig', [
-            'division' => $entity,
+            'position' => $entity,
             'sport'    => $context,
             'action'   => $entity->getId() ? 'Modify' : 'Create'
         ]));
