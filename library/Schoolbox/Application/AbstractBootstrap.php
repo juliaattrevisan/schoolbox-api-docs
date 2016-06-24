@@ -14,6 +14,7 @@ use Alaress\Application\Kernel;
 use Alaress\Authorizer\Rule;
 use Alaress\DebugBar\Instance as DebugBar;
 use Alaress\Module\Loader as ModuleLoader;
+use Alaress\Redis;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use DebugBar\Bridge\Twig\TraceableTwigEnvironment;
@@ -436,6 +437,10 @@ abstract class AbstractBootstrap implements BootstrapInterface
                 ]
             )
         );
+
+        $di->set('redis', $di->lazy(function () {
+            return Redis::getClientInstance();
+        }));
 
         // Register External_User service
         $di->set('externalUser', $di->lazyNew(\External_User::class));

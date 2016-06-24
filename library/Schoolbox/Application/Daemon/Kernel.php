@@ -51,7 +51,7 @@ class Kernel extends \Alaress\Application\Kernel {
 		error_reporting(isset($opts['errors']) ? $opts['errors'] : E_ALL ^ E_NOTICE);
 		$this->name = $name;
 
-		$this->loop = Factory::create();
+		$this->loop = $this->di->values['react.loop'] = Factory::create();
 	}
 
 
@@ -168,7 +168,7 @@ EOL;
             case E_STRICT:
             case E_DEPRECATED:
             case E_USER_DEPRECATED:
-                $this->logger()->warning("Warning: $errStr ($errFile:$errLine)");
+                $this->logger()->warning("Warning: $errStr in $errFile:$errLine");
                 return true;
 
 			default:

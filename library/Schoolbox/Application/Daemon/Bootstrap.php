@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -12,6 +12,7 @@ namespace Schoolbox\Application\Daemon;
 use Alaress\Redis;
 use Autoloader;
 use Database;
+use React\Stomp;
 use Schoolbox\Application\AbstractBootstrap;
 use Schoolbox\Config\ConfigMapper;
 
@@ -104,5 +105,38 @@ class Bootstrap extends AbstractBootstrap {
 		// Redis connection configuration
 		Redis::getInstance()->connect(ConfigMapper::getInstance()->get('redis_url'), null, INSTANCE_ID);
 	}
+
+    /**
+     * Install any internal dependencies into the kernel (routing, etc.)
+
+     * @throws \Aura\Di\Exception
+     * @return void
+     */
+    public function installDependencies()
+    {
+        parent::installDependencies();
+
+        $di = $this->getKernel()->getDependencyInjector();
+
+        $di->set('stomp.factory', $di->lazyNew(
+            Stomp\Factory::class, [
+            'loop' => $di->lazyValue('react.loop')
+        ]));
+
+        $di->set('stomp', $di->lazy(function () use ($di) {
+            $conf = $di->get('config');
+
+            return $di->get('stomp.factory')->createClient(
+                [
+                    'host'     => $conf->get('amqp_host'),
+                    'port'     => $conf->get('amqp_stomp_port'),
+                    'vhost'    => $conf->get('amqp_vhost'),
+                    'login'    => $conf->get('amqp_user'),
+                    'passcode' => $conf->get('amqp_pass'),
+                ]
+            );
+        }));
+
+    }
 
 }
