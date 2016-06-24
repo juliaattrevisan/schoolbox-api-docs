@@ -63,10 +63,8 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        // Work out which folder we are in and grab a handle to it
-        // Check if using local or alt source
+        // Work out which folder this Blog's data is coming from, and grab a handle to it
         $folderId = $this->isUsingAltSource() ? $this->getConfig("src") : $this->getInstance()->getIdentifier();
-
         try {
             /** @var FolderModel $folder */
             $folder = $this->getFolderMapper()->findById($folderId);
