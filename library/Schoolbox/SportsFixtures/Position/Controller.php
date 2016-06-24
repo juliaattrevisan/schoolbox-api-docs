@@ -7,6 +7,7 @@
 
 namespace Schoolbox\SportsFixtures\Position;
 
+use Alaress\Web\Controller\Exception;
 use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
@@ -35,7 +36,7 @@ class Controller extends AbstractController
      */
     public function __construct()
     {
-        parent::__construct(PositionMapper::getInstance())
+        parent::__construct(PositionMapper::getInstance());
         $this->setSportMapper(SportMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
@@ -84,81 +85,115 @@ class Controller extends AbstractController
         }
     }
 
-    /**
-     * Create a Position in a particular Sport id
-     *
-     * @param int $sportId
-     */
-    public function getCreate($sportId)
+    public function getEntity($entity)
     {
-        try {
-            $sport = $this->getSportMapper()->findById($sportId);
-
-            $this->tpl('create', [
-                'sport' => $sport,
-                'action' => 'Create'
-            ]);
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
-        }
+        // TODO: Implement getEntity() method.
     }
 
-    /**
-     * Update a Position
-     *
-     * @param int $positionId
-     */
-    public function getUpdate($positionId)
+    protected function getForm($entity, $context = null)
     {
-        try {
-            $position = $this->mapper->findById($positionId);
-            $sport = $this->getSportMapper()->findById($position->getSport()->getId());
+        if (empty($context)) {
+            $context = $this->getSportMapper()->findById($entity->getSport()->getId());
+        }
 
-            $this->tpl('create', [
-                'position' => $position,
-                'sport' => $sport,
-                'action' => 'Modify'
-            ]);
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
-        }
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesPosition/create.twig', [
+            'division' => $entity,
+            'sport'    => $context,
+            'action'   => $entity->getId() ? 'Modify' : 'Create'
+        ]));
     }
 
-    /**
-     * Create a Position
-     *
-     * @param Position $position
-     */
-    public function postCreate(Position $position)
-    {
-        /* Get around aura's weird regexing
-         */
-        $this->postModify($position);
-    }
-
-    /**
-     * Modify a Position
-     *
-     * @param Position $position
-     */
-    public function postModify(Position $position)
+    protected function persistEntity($entity)
     {
         try {
             $sportId = $this->getRequest()->post['sportId'];
             $sport   = $this->getSportMapper()->findById($sportId);
 
-            $this->savePosition($sport, $this->getRequest()->post['name'], $position);
+            $this->savePosition($sport, $this->getRequest()->post['name'], $entity);
 
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesPosition.getList', [
                 'sportId' => $sportId
             ]));
-
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);
         }
     }
+
+//    /**
+//     * Create a Position in a particular Sport id
+//     *
+//     * @param int $sportId
+//     */
+//    public function getCreate($sportId)
+//    {
+//        try {
+//            $sport = $this->getSportMapper()->findById($sportId);
+//
+//            $this->tpl('create', [
+//                'sport' => $sport,
+//                'action' => 'Create'
+//            ]);
+//        }
+//        catch (MapperException $e) {
+//            throw $this->getErrorMapper()->generateException(2);
+//        }
+//    }
+//
+//    /**
+//     * Update a Position
+//     *
+//     * @param int $positionId
+//     */
+//    public function getUpdate($positionId)
+//    {
+//        try {
+//            $position = $this->mapper->findById($positionId);
+//            $sport = $this->getSportMapper()->findById($position->getSport()->getId());
+//
+//            $this->tpl('create', [
+//                'position' => $position,
+//                'sport' => $sport,
+//                'action' => 'Modify'
+//            ]);
+//        }
+//        catch (MapperException $e) {
+//            throw $this->getErrorMapper()->generateException(2);
+//        }
+//    }
+//
+//    /**
+//     * Create a Position
+//     *
+//     * @param Position $position
+//     */
+//    public function postCreate(Position $position)
+//    {
+//        /* Get around aura's weird regexing
+//         */
+//        $this->postModify($position);
+//    }
+//
+//    /**
+//     * Modify a Position
+//     *
+//     * @param Position $position
+//     */
+//    public function postModify(Position $position)
+//    {
+//        try {
+//            $sportId = $this->getRequest()->post['sportId'];
+//            $sport   = $this->getSportMapper()->findById($sportId);
+//
+//            $this->savePosition($sport, $this->getRequest()->post['name'], $position);
+//
+//            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesPosition.getList', [
+//                'sportId' => $sportId
+//            ]));
+//
+//        } catch (MapperException $e) {
+//            throw $this->getErrorMapper()->generateException(2);
+//        }
+//    }
 
     /**
      * Delete a Position
