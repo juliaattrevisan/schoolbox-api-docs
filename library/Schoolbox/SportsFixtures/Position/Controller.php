@@ -85,6 +85,11 @@ class Controller extends AbstractController
         }
     }
 
+    /**
+     * View a single position
+     *
+     * @param Model $entity
+     */
     public function getEntity($entity)
     {
         $sport = $this->getSportMapper()->findById($entity->getSport()->getId());
@@ -95,6 +100,12 @@ class Controller extends AbstractController
         ]));
     }
 
+    /**
+     * Display form for create/update position
+     *
+     * @param Model $entity
+     * @param Sport $context
+     */
     protected function getForm($entity, $context = null)
     {
         if (empty($context)) {
@@ -108,6 +119,11 @@ class Controller extends AbstractController
         ]));
     }
 
+    /**
+     * Persist method for entity
+     *
+     * @param Model $entity
+     */
     protected function persistEntity($entity)
     {
         try {
