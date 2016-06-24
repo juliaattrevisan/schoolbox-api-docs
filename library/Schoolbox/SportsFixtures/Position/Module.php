@@ -9,93 +9,23 @@ namespace Schoolbox\SportsFixtures\Position;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
-use Alaress\Module\Module as BaseModule;
-use Alaress\Web\Router\PathMatcher;
-use Alaress_Date_Format;
 use Aura\Di\ContainerInterface;
-use Aura\Router\Router;
+use Schoolbox\Module\RestfulModule;
+use Schoolbox\Module\StandardModuleTrait;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\SportsFixtures\Position\Model as Position;
-use Twig_Loader_Chain;
-use Twig_Error_Loader;
 
 
-class Module extends BaseModule
+class Module extends RestfulModule
 {
-    /**
-     * The base name for this module.
-     *
-     * This module will be injected into the dependency injector at "module:$basename".
-     *
-     * @var string
-     */
-    protected $basename = 'sportsfixturesPosition';
+    use StandardModuleTrait;
 
     /**
-     * Initializes any routes for this module, with a given base path.
-     *
-     * The base path for each route needs to match up to the name of the
-     * controller in $this->initControllers(), so if its base path is
-     * "user", there must be a controller in the DI container called
-     * "controller:user"
-     *
-     * @param Router $router
-     * @param string $basePath The base route for this module
+     * @param ContainerInterface $injector
+     * @param RestfulModule      $context
      */
-    public function initRoutes(Router $router, $basePath)
+    public function __construct(ContainerInterface $injector, RestfulModule $context)
     {
-        $routes = [
-            'GET' => [
-                '/list/{sportId}'      => 'getList',
-                '/create/{sportId}'    => 'getCreate',
-                '/update/{positionId}' => 'getUpdate',
-            ],
-            'POST' => [
-                '/create/{sportId}'    => 'postCreate',
-                '/update/{positionId}' => 'postModify',
-                '/delete'              => 'postDelete',
-            ]
-        ];
-
-        foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
-        }
-
-        foreach ($routes['POST'] as $path => $alias) {
-            $this->addPostRoute($router, $alias, $basePath, $path);
-        }
-    }
-
-    /**
-     * Initializes any preloads on routes for this module.
-     *
-     * Preloads adjust route params before they are passed to the controller.
-     * Usually, they're used to load a single item into the route's params,
-     * which is then passed directly as a parameter to the action.
-     *
-     * @param PathMatcher $matcher
-     */
-    public function initRoutePreloads(PathMatcher $matcher)
-    {
-        $this->addRoutePreload($matcher, '(?:postCreate)', function ($params) {
-            /** @var Position $position */
-            $position = Mapper::getInstance()->createModel();
-            $position->setCreatedAt(Alaress_Date_Format::now());
-
-            return [
-                'params' => $params,
-                'position' => $position
-            ];
-        });
-
-        $this->addRoutePreload($matcher, '(?:postModify)', function ($params) {
-            $position = Mapper::getInstance()->findById($params['positionId']);
-
-            return [
-                'params' => $params,
-                'position' => $position
-            ];
-        });
+        parent::__construct($injector, Mapper::getInstance(), 'positions', $context, 'sportsfixturesPosition');
     }
 
     /**
@@ -118,28 +48,6 @@ class Module extends BaseModule
         /* Apply route permissions here as you add them to initRoutes()
          * Note that if the perms change you need to log out/log in to refresh
          */
-        $this->addRoutePermission($authorizer, 'admin', $isSportsAdministrator);
-    }
-
-    /**
-     * @param Twig_Loader_Chain $templateLoader
-     * @throws Twig_Error_Loader
-     */
-    public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
-    {
-        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
-    }
-
-    /**
-     * Initializes controller classes into the dependency injector.
-     *
-     * @param ContainerInterface $injector The dependency injection container.
-     */
-    public function initControllers(ContainerInterface $injector)
-    {
-        $injector->set(
-            'controller:'.$this->basename,
-            $injector->lazyNew(Controller::class)
-        );
+        $this->addRoutePermission($authorizer, '.*', $isSportsAdministrator);
     }
 }

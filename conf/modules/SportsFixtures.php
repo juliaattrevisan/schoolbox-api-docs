@@ -39,8 +39,8 @@ class SportsFixtures implements ModuleConfigInterface
         $messagesModule = new TeamModule($kernel->getDependencyInjector(), $divisionModule);
         $messagesModule->init("/$namespace");
 
-        $positionsModule = new PositionModule($kernel->getDependencyInjector());
-        $positionsModule->init('/sportsfixtures/position');
+        $positionsModule = new PositionModule($kernel->getDependencyInjector(), $sportModule);
+        $positionsModule->init("/$namespace");
     }
 
 } 
