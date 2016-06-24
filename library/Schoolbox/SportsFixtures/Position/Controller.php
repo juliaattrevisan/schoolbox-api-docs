@@ -42,26 +42,6 @@ class Controller extends AbstractController
     }
 
     /**
-     * Just a raw template render
-     *
-     * @param string $template
-     * @param array  $data
-     */
-    protected function tpl($template, $data = [])
-    {
-        $content = [
-            'template' => "@sportsfixturesPosition/$template.twig",
-            'data'     => $data,
-        ];
-
-        if ($this->getRequest()->isXhr()) {
-            $content['format'] = 'nochrome';
-        }
-
-        $this->getResponse()->content->set($content);
-    }
-
-    /**
      * List of Positions and the Sport they are in
      *
      * @param Sport $context
@@ -75,10 +55,10 @@ class Controller extends AbstractController
                 ]
             ]);
 
-            $this->tpl('list', [
+            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesPosition/list.twig', [
                 'sport'        => $context,
                 'allPositions' => $allPositions
-            ]);
+            ]));
         }
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(2);
