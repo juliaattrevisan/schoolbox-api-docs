@@ -12,21 +12,21 @@
     <div class="small-12 columns">
         <dl class="sub-nav">
             <!-- BEGIN timetable_person -->
-            <dd><a data-timetable-selector="{USER_ID}">{PERSON}</a></dd>
+            <dd><a data-timetable-selector="{USER_ID}-{CAMPUS_ID}" title="Timetable for {PERSON} in {CAMPUS_NAME}">{PERSON} ({CAMPUS_NAME})</a></dd>
             <!-- END timetable_person -->
         </dl>
     </div>
 </div>
 
 <!-- BEGIN timetable -->
-<div class="row hide" data-timetable-wrapper="{USER_ID}">
+<div class="row hide" data-timetable-wrapper="{USER_ID}-{CAMPUS_ID}">
     <div class="small-12 columns">
         <h1 data-timetable-title>Timetable for {PERSON}{YEAR}</h1>
     </div>
 
     <div class="small-12 columns">
         <div class="scrollable show-for-medium-up">
-            <table class="timetable no-hover" data-timetable="{USER_ID}">
+            <table class="timetable no-hover" data-timetable="{USER_ID}-{CAMPUS_ID}">
                 <thead>
                     <tr>
                         <th></th>

@@ -92,15 +92,6 @@ foreach ($userList as $user) {
             $subjectColourMap = array();
             $colourIndex = 0;
 
-            $outputUser = array(
-                'PERSON'  => $user->formatName(),
-                'YEAR'    => $user->getYear() ? ', Year ' . $user->getYear() : '',
-                'USER_ID' => $user->getId(),
-            );
-
-            $this->setVar($outputUser);
-            $this->parse('timetable_person_block', 'timetable_person', true);
-
             $staffFlag = $user->getRole()->isStaff();
 
             $periodCurrent = $timetableHandler->getPeriodNumber($campus);
@@ -134,6 +125,21 @@ foreach ($userList as $user) {
             if (is_array($timetable) && !empty($timetable) && $classCount) {
                 $numTimetables++;
 
+                /* Only display subnav elements for timetables that contain data
+                 */
+                $this->setVar([
+                    'PERSON'      => $user->formatName(),
+                    'YEAR'        => $user->getYear() ? ', Year ' . $user->getYear() : '',
+                    'USER_ID'     => $user->getId(),
+                    'CAMPUS_ID'   => $campus->getId(),
+                    'CAMPUS_CODE' => $campus->getExtTimetableCode(),
+                    'CAMPUS_NAME' => $campus->getName(),
+                ]);
+
+                $this->parse('timetable_person_block', 'timetable_person', true);
+
+                /* Continue as normal
+                 */
                 $days = count($timetable[1]['day']);
 
                 $this->setVar('TIMETABLE_FIELD_WIDTH', round((95 / ($days + 1)), 1));
