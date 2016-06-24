@@ -63,7 +63,7 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        // Work out which folder this Blog's data is coming from, and grab a handle to it
+        // Work out which (possibly deleted) folder this Blog's data is coming from, and grab a handle to it
         $folderId = $this->isUsingAltSource() ? $this->getConfig("src") : $this->getInstance()->getIdentifier();
         try {
             /** @var FolderModel $folder */
