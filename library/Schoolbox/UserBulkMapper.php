@@ -52,7 +52,7 @@ class UserBulkMapper extends UserMapper
 
         /* Augmented where
          */
-        $query .= "WHERE 1 = 1";
+        $query .= "WHERE u.deleted_at is null";
 
         if ($searchCampus != $this->getUnchanged()) {
             $query .= "
