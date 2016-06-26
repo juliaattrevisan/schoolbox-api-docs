@@ -1866,6 +1866,9 @@ class Controller extends Base\Base
         foreach ($compendium as $id => $values) {
             /** @var Folder\Model $folder */
             $folder = $values['folder'];
+            if (!$folder instanceof Folder\Model) {
+                continue;
+            }
 
             /** @var UnitInstance $selected */
             $selected = $values['selected'];
