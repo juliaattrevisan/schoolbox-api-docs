@@ -1869,15 +1869,18 @@ class Controller extends Base\Base
             /** @var Folder\Model $folder */
             $folder = $values['folder'];
             $unitTitle = '';
+            $checkable = false;
             if ($folder instanceof Folder\Model) {
                 $unitTitle = $folder->getName();
+                $checkable = true;
             } elseif ($selected instanceof UnitInstance) {
                 $unitTitle = $selected->getTitle();
             }
 
             $unitOutput[$id] = [
-                'id' => $id,
-                'name' => $unitTitle,
+                'id'        => $id,
+                'name'      => $unitTitle,
+                'checkable' => $checkable,
             ];
 
             if (isset($values['selected'])) {
