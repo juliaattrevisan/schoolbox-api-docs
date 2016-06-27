@@ -49,8 +49,13 @@
                         <li class="actions-small-1">
                             <div class="list-item">
                                 <div class="small-12 avatar card">
-                                    <p>{{ currentMatch.name }}</p>
-                                    <p class="meta">{{ currentMatch.homeTeam.name }} vs {{ currentMatch.awayTeam.name }}</p>
+                                    {% if currentMatch.name %}
+                                        <p>{{ currentMatch.name }}</p>
+                                        <p class="meta">{{ currentMatch.homeTeam.name }} vs {{ currentMatch.awayTeam.name }}</p>
+                                    {% else %}
+                                        <p>{{ currentMatch.homeTeam.name }} vs {{ currentMatch.awayTeam.name }}</p>
+                                    {% endif %}
+
                                     <p class="meta">{{ currentMatch.startAt.getLocal }}</p>
                                 </div>
                             </div>
