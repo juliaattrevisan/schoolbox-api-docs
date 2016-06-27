@@ -1,8 +1,10 @@
+<script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+
 <script type="text/javascript">
     $(function() {
         $('#positionForm').alaressValidate({
             rules: {
-                sportId: {
+                divisionId: {
                     required: true,
                     min: 1
                 },
@@ -12,23 +14,32 @@
                 }
             },
             messages: {
-                'sportId': 'Please choose a Sport.',
-                'name': 'Please enter a Position name.'
+                'sportId': 'Please choose a Division.',
+                'name': 'Please enter a Match name.'
             },
             errorPlacement: function(error, element) {
                 $.alaressValidate.defaultErrorPlacement(error, element);
             }
-        })
+        });
+
+        $('#matchForm').find('[data-datepicker]').datepicker();
+
+        $('#matchForm').find('[data-timepicker]').timepicker({
+            appendTo: function ($input) {
+                return $input.closest('.timepick');
+            }
+        });
     });
 </script>
 
 <ul class="breadcrumb">
     <li><a href="#">Sports Fixtures</a></li>
     <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesPosition.getList', {contextId: sport.id}) }}">Positions in {{ sport.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}">Matches in {{ division.name }}</a></li>
 
-    {% if position.id %}
-        <li class="active"><a href="{{ routeLookup('sportsfixturesPosition.getModifyForm', {entityId: position.id}) }}">{{ position.name }}</a></li>
+    {% if match.id %}
+        <li class="active"><a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: match.id}) }}">{{ match.name }}</a></li>
     {% else %}
         <li class="active"><a href="#">{{ action }}</a></li>
     {% endif %}
@@ -43,29 +54,45 @@
 <div class="row">
     <div class="small-12 island">
         {% if position %}
-            {% set formUrl = routeLookup('sportsfixturesPosition.updateEntity', {entityId: position.id}) %}
+            {% set formUrl = routeLookup('sportsfixturesMatch.updateEntity', {entityId: match.id}) %}
         {% else %}
-            {% set formUrl = routeLookup('sportsfixturesPosition.createEntity') %}
+            {% set formUrl = routeLookup('sportsfixturesMatch.createEntity') %}
         {% endif %}
 
-        <form id='positionForm' action="{{ formUrl }}" method="post">
-            <h2 class="subheader">{{ action }} Position in {{ sport.name }}</h2>
+        <form id='matchForm' action="{{ formUrl }}" method="post">
+            <h2 class="subheader">{{ action }} Match in {{ division.name }}</h2>
 
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <input type="hidden" name="sportId" value="{{ sport.id }}"/>
-                        <input type="hidden" name="positionId" value="{{ position.id }}"/>
+                        <input type="hidden" name="divisionId" value="{{ division.id }}"/>
+                        <input type="hidden" name="matchId" value="{{ match.id }}"/>
 
                         <label>
                             Name
-                            <input type="text" name="name" value="{{ position.name }}"/>
+                            <input type="text" name="name" value="{{ match.name }}"/>
                         </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>
+                            Date
+                            <input type="text" name="startAtDate" placeholder="Date" data-datepicker>
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <div class="timepick">
+                            <label>
+                                Time
+                                <input type="text" name="startAtTime" autocomplete="off" placeholder="Start Time" class="ui-timepicker-input" data-timepicker>
+                            </label>
+                        </div>
                     </div>
                 </fieldset>
             </section>
 
-            <input type="submit" value="{{ action }} Position" />
+            <input type="submit" value="{{ action }} Match" />
         </form>
     </div>
 </div>

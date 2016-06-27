@@ -88,10 +88,23 @@ class Controller extends AbstractController
      */
     protected function getForm($entity, $context = null)
     {
-//        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesSport/create.twig', [
-//            'sport'  => $entity,
-//            'action' => $entity->getId() ? 'Modify' : 'Create'
-//        ]));
+        try {
+            if (empty($context)) {
+                $context = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
+            }
+
+            $sport = $this->getSportMapper()->findById($context->getSport()->getId());
+
+            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/create.twig', [
+                'sport'    => $sport,
+                'division' => $context,
+                'team'     => $entity,
+                'action'   => $entity->getId() ? 'Modify' : 'Create'
+            ]));
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(2);
+        }
     }
 
     /**
