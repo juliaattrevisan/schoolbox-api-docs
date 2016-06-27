@@ -178,6 +178,21 @@ class Controller extends AbstractController
     }
 
     /**
+     * Add players to a Team
+     *
+     * @param Team $team
+     */
+    public function postAddPlayers(Team $team)
+    {
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'sportsfixturesTeam.getList',
+                ['contextId' => $team->getDivision()->getId()]
+            )
+        );
+    }
+
+    /**
      * Save Team data to db
      *
      * @param Division $division
