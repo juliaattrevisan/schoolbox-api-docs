@@ -167,9 +167,11 @@ class Controller extends AbstractController
      */
     public function getTeamList($contextId)
     {
+        $query = $this->getRequest()->query->get('query');
+
         /** @var TeamMapper $mapper */
         $mapper = $this->getMapper();
-        $allTeams = $mapper->findByName($contextId, 'bl');
+        $allTeams = $mapper->findByName($contextId, $query);
 
         $teams = [];
 
@@ -183,6 +185,7 @@ class Controller extends AbstractController
          */
         header('Content-Type: application/json');
         echo json_encode($teams);
+        exit();
     }
 
     /* Getters/Setters
