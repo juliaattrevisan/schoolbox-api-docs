@@ -177,7 +177,7 @@ class Controller extends AbstractController
 
         /** @var Team $currentTeam */
         foreach ($allTeams as $currentTeam) {
-            $teams[] = $currentTeam->findValueLabelPair();
+            $teams[] = array_combine(['id','name'], $currentTeam->findValueLabelPair());
         }
 
         /* TODO: What's the best way to do this now?
