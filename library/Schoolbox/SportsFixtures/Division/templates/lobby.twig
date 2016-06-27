@@ -15,6 +15,18 @@
                 }
             });
 
+        // Add player to team action
+        $('[data-move-player]').on('click', function(e) {
+            e.preventDefault();
+            var el = $(this);
+            $.post(
+                el.attr('href'),
+                [{name: 'userId[]', value: el.data('movePlayer')}]
+            ).done(function() {
+                window.location.reload();
+            });
+        });
+
         // Remove player from division action
         $('[data-remove-player]').on('click', function(e) {
             e.preventDefault();
@@ -89,11 +101,18 @@
                                 </div>
                             </div>
                             <nav>
-                                <a href="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.getId()}) }}"
-                                   class="icon-delete"
-                                   title="Remove Player"
-                                   data-remove-player="{{ currentPlayer.user.getId() }}"></a>
+                                <a href="#" class="icon-more" data-dropdown="sportsfixtures-player-{{ currentPlayer.user.getId() }}-actions"></a>
                             </nav>
+                            <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-player-{{ currentPlayer.user.getId() }}-actions">
+                                {% for currentTeam in teams %}
+                                    <li><a href="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.getId()}) }}"
+                                           class="icon-add"
+                                           data-move-player="{{ currentPlayer.user.getId() }}">Add Player to {{ currentTeam.getName() }}</a></li>
+                                {% endfor %}
+                                <li><a href="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.getId()}) }}"
+                                       class="icon-delete"
+                                       data-remove-player="{{ currentPlayer.user.getId() }}">Remove Player From Division</a></li>
+                            </ul>
                         </li>
                     {% endfor %}
                 </ul>
