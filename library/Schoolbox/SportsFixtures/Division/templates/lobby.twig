@@ -98,13 +98,8 @@
                                         <h3>{{ divisionPlayer.formatName() }}</h3>
                                     </a>
                                     <p class="meta">{{ divisionPlayer.formatMetadata() }}</p>
-                                    {# what sports am I in? #}
-                                    {% for currentTeam in division.getTeams() %}
-                                        {% for teamPlayer in currentTeam.getPlayers() %}
-                                            {% if teamPlayer.getId() == divisionPlayer.getId() %}
-                                                <p class="meta icon-sport">{{ currentTeam.getName() }}</p>
-                                            {% endif %}
-                                        {% endfor %}
+                                    {% for currentTeam in division.getTeamsForPlayer(divisionPlayer) %}
+                                        <p class="meta icon-sport">{{ currentTeam.getName() }}</p>
                                     {% endfor %}
                                 </div>
                             </div>
