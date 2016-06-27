@@ -17,6 +17,8 @@ use \Schoolbox\SportsFixtures\Division\Model as Division;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
+use \Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
+use Schoolbox\UserMapper;
 
 class Controller extends AbstractController
 {
@@ -37,6 +39,16 @@ class Controller extends AbstractController
     protected $errorMapper;
 
     /**
+     * @var TeamUserMapper
+     */
+    protected $teamUserMapper;
+
+    /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -44,6 +56,8 @@ class Controller extends AbstractController
         parent::__construct(TeamMapper::getInstance());
         $this->setSportMapper(SportMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
+        $this->setUserMapper(UserMapper::getInstance());
+        $this->setTeamUserMapper(TeamUserMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
@@ -184,6 +198,13 @@ class Controller extends AbstractController
      */
     public function postAddPlayers(Team $team)
     {
+        $teamUsers = [];
+        foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
+            $teamUsers[] = $this->getTeamUserMapper()->createModel()
+                ->setTeam($team)
+                ->setUser($user);
+        }
+        $this->getTeamUserMapper()->save($teamUsers);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'sportsfixturesTeam.getList',
@@ -267,5 +288,41 @@ class Controller extends AbstractController
     protected function setErrorMapper($errorMapper)
     {
         $this->errorMapper = $errorMapper;
+    }
+
+    /**
+     * @return TeamUserMapper
+     */
+    protected function getTeamUserMapper()
+    {
+        return $this->teamUserMapper;
+    }
+
+    /**
+     * @param TeamUserMapper $teamUserMapper
+     * @return static
+     */
+    protected function setTeamUserMapper(TeamUserMapper $teamUserMapper)
+    {
+        $this->teamUserMapper = $teamUserMapper;
+        return $this;
+    }
+
+    /**
+     * @return UserMapper
+     */
+    protected function getUserMapper()
+    {
+        return $this->userMapper;
+    }
+
+    /**
+     * @param UserMapper $userMapper
+     * @return static
+     */
+    protected function setUserMapper(UserMapper $userMapper)
+    {
+        $this->userMapper = $userMapper;
+        return $this;
     }
 }
