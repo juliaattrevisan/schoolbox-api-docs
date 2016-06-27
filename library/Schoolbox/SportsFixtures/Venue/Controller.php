@@ -1,0 +1,145 @@
+<?php
+/**
+ * @author      Andy Ryan <andy.ryan@alaress.com.au>
+ * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\SportsFixtures\Venue;
+
+use Alaress\Web\Controller\Exception;
+use Alaress_Date_Format;
+use Schoolbox\Application\WebRequest\Restful\AbstractController;
+use \Schoolbox\Error\Mapper as ErrorMapper;
+use \Schoolbox\Mapper\Exception as MapperException;
+use \Schoolbox\SportsFixtures\Venue\Model as Venue;
+use \Schoolbox\SportsFixtures\Venue\Mapper as VenueMapper;
+
+
+class Controller extends AbstractController
+{
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
+     * Controller constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct(VenueMapper::getInstance());
+        $this->setErrorMapper(ErrorMapper::getInstance());
+    }
+
+    /**
+     * List of Venues
+     *
+     * @param object $context
+     */
+    public function getList($context = null)
+    {
+        try {
+            $allVenues = $this->mapper->findAll([
+                'order' => [
+                    'name' => 'asc'
+                ]
+            ]);
+
+            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesVenue/list.twig', [
+                'allVenues' => $allVenues
+            ]));
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(2);
+        }
+    }
+
+    /**
+     * View a single venue
+     *
+     * @param Model $entity
+     */
+    public function getEntity($entity)
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesVenue/entity.twig', [
+            'venue' => $entity
+        ]));
+    }
+
+    /**
+     * Display form for create/update venue
+     *
+     * @param Model $entity
+     * @param object $context
+     */
+    protected function getForm($entity, $context = null)
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesVenue/create.twig', [
+            'venue'  => $entity,
+            'action' => $entity->getId() ? 'Modify' : 'Create'
+        ]));
+    }
+
+    /**
+     * Persist method for entity
+     *
+     * @param Model $entity
+     */
+    protected function persistEntity($entity)
+    {
+        try {
+            $this->saveVenue(
+                $entity,
+                $this->getRequest()->post['name'],
+                $this->getRequest()->post['latitude'],
+                $this->getRequest()->post['longitude'],
+                $this->getRequest()->post['address']
+            );
+
+            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesVenue.getList'));
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(2);
+        }
+    }
+
+    /**
+     * Save Venue data to db
+     *
+     * @param Venue $venue
+     * @param string $name
+     * @param string $latitude
+     * @param string $longitude
+     * @param string $address
+     */
+    private function saveVenue(Venue $venue, $name, $latitude, $longitude, $address)
+    {
+        $venue->setName($name);
+        $venue->setLatitude($latitude);
+        $venue->setLongitude($longitude);
+        $venue->setAddress($address);
+        $venue->setUpdatedAt(Alaress_Date_Format::now());
+
+        $this->mapper->save($venue);
+    }
+
+    /* Getters/Setters
+     */
+
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+    /**
+     * @param ErrorMapper $errorMapper
+     */
+    protected function setErrorMapper($errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
+    }
+}
