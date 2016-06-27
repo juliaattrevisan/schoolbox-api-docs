@@ -1,0 +1,87 @@
+<script type="text/javascript">
+    $(function() {
+        $('#venueForm').alaressValidate({
+            rules: {
+                name: {
+                    required: true,
+                    minlength: 2
+                },
+                address: {
+                    required: true,
+                    minlength: 2
+                }
+            },
+            messages: {
+                name: 'Please enter a Venue name.',
+                latitude: {
+                    min: 'Latitude must lie between -90.00000 and 90.000000',
+                    max: 'Latitude must lie between -90.00000 and 90.000000'
+                },
+                longitude: {
+                    min: 'Longitude must lie between -180.00000 and 180.000000',
+                    max: 'Longitude must lie between -180.00000 and 180.000000'
+                },
+                address: "Please enter the Venue's address."
+            },
+            errorPlacement: function(error, element) {
+                $.alaressValidate.defaultErrorPlacement(error, element);
+            }
+        })
+    });
+</script>
+
+<ul class="breadcrumb">
+    <li><a href="#">Sports Fixtures</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesVenue.getList', {}) }}">All Venues</a></li>
+    <li class="active"><a href="#">{{ action }}</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sports Fixtures</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% if venue %}
+            {% set formUrl = routeLookup('sportsfixturesVenue.updateEntity', {entityId: venue.id}) %}
+        {% else %}
+            {% set formUrl = routeLookup('sportsfixturesVenue.createEntity') %}
+        {% endif %}
+
+        <form id='venueForm' action="{{ formUrl }}" method="post">
+            <h2 class="subheader">{{ action }} Venue</h2>
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="id" value="{{ venue.id }}"/>
+
+                        <label>
+                            Name
+                            <input type="text" name="name" value="{{ venue.name }}"/>
+                        </label>
+
+                        <label>
+                            Latitude
+                            <input type="number" name="latitude" value="{{ venue.latitude }}" maxlength="10" min="-90.000000" max="90.000000"/>
+                        </label>
+
+                        <label>
+                            Longitude
+                            <input type="number" name="longitude" value="{{ venue.longitude }}" maxlength="11" min="-180.000000" max="180.000000"/>
+                        </label>
+
+                        <label>
+                            Address
+                            <input type="text" name="address" value="{{ venue.address }}" maxlength="255"/>
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="{{ action }} Venue" />
+        </form>
+    </div>
+</div>
