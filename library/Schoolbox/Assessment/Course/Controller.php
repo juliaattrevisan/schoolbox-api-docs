@@ -1864,18 +1864,20 @@ class Controller extends Base\Base
         $unitOutput = [];
 
         foreach ($compendium as $id => $values) {
-            /** @var Folder\Model $folder */
-            $folder = $values['folder'];
-            if (!$folder instanceof Folder\Model) {
-                continue;
-            }
-
             /** @var UnitInstance $selected */
             $selected = $values['selected'];
+            /** @var Folder\Model $folder */
+            $folder = $values['folder'];
+            $unitTitle = '';
+            if ($folder instanceof Folder\Model) {
+                $unitTitle = $folder->getName();
+            } elseif ($selected instanceof UnitInstance) {
+                $unitTitle = $selected->getTitle();
+            }
 
             $unitOutput[$id] = [
                 'id' => $id,
-                'name' => $folder->getName(),
+                'name' => $unitTitle,
             ];
 
             if (isset($values['selected'])) {
