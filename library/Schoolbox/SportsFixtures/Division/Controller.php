@@ -156,13 +156,6 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
-        try {
-            $teams = $this->getTeamMapper()->findByColumn('division_id', $entityId);
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
-        }
-
         $zone     = new Zone("uploadZone");
         $zone->setMimeFilter('text/csv')->setAttachPrompt('upload a list of players');
 
@@ -174,6 +167,14 @@ class Controller extends AbstractController
             $division->getPlayers()->add($player->getUser());
         }
 
+        // Load teams into division
+        try {
+            $teams = $this->getTeamMapper()->findByColumn('division_id', $entityId);
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+        }
+        $division->setTeams($teams);
         // TODO add players into team model as a M2M join
         $teamPlayers = $this->getTeamUserMapper()->findByColumn(
             'team_id',

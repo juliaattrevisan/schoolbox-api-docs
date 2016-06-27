@@ -99,7 +99,7 @@
                                     </a>
                                     <p class="meta">{{ divisionPlayer.formatMetadata() }}</p>
                                     {# what sports am I in? #}
-                                    {% for currentTeam in teams %}
+                                    {% for currentTeam in division.getTeams() %}
                                         {% for teamPlayer in currentTeam.getPlayers() %}
                                             {% if teamPlayer.getId() == divisionPlayer.getId() %}
                                                 <p class="meta icon-sport">{{ currentTeam.getName() }}</p>
@@ -112,7 +112,7 @@
                                 <a href="#" class="icon-more" data-dropdown="sportsfixtures-player-{{ divisionPlayer.getId() }}-actions"></a>
                             </nav>
                             <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-player-{{ divisionPlayer.getId() }}-actions">
-                                {% for currentTeam in teams %}
+                                {% for currentTeam in division.getTeams() %}
                                     <li><a href="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.getId()}) }}"
                                            class="icon-next"
                                            data-move-player="{{ divisionPlayer.getId() }}">Add Player to {{ currentTeam.getName() }}</a></li>
@@ -139,10 +139,10 @@
 
     <div class="hide-for-small medium-6 island">
         <h2 class="subheader">Teams</h2>
-        {% if teams is not empty %}
+        {% if division.getTeams() is not empty %}
             <section>
                 <ul class="information-list sortable">
-                    {% for currentTeam in teams %}
+                    {% for currentTeam in division.getTeams() %}
                         <li>
                             <div class="list-item">
                                 <div class="small-12 avatar card">
