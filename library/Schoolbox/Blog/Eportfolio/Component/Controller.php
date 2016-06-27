@@ -40,7 +40,6 @@ class Controller extends Component_Eportfolio_ControllerAbstract
         SitePage $sitepage
     ) {
         parent::__construct($instance, $user, $sitepage);
-        $this->setFolderMapper(FolderMapper::getInstance());
         $this->setEportfolioBlogMapper(EportfolioBlogMapper::getInstance());
         $this->setEportfolioBlogImageMapper(EportfolioBlogImageMapper::getInstance());
         $this->setEportfolioBlogCommentMapper(EportfolioBlogCommentMapper::getInstance());
@@ -124,11 +123,6 @@ class Controller extends Component_Eportfolio_ControllerAbstract
      */
 
     /**
-     * @var FolderMapper;
-     */
-    protected $folderMapper;
-
-    /**
      * @var EportfolioBlogMapper;
      */
     protected $blogMapper;
@@ -157,24 +151,6 @@ class Controller extends Component_Eportfolio_ControllerAbstract
      * @var EportfolioPageMapper
      */
     protected $eportfolioPageMapper;
-
-    /**
-     * @return FolderMapper
-     */
-    public function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }
-
-    /**
-     * @param  FolderMapper $folderMapper
-     * @return $this
-     */
-    public function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-        return $this;
-    }
 
     /**
      * @return EportfolioBlogMapper

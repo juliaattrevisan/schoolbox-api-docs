@@ -99,6 +99,11 @@ abstract class Component_ControllerAbstract
     protected $configurationTemplate = '';
 
     /**
+     * @var Schoolbox\Resource\Folder\Mapper;
+     */
+    protected $folderMapper;
+
+    /**
     * Constructor
     *
     * @param Component_Instance $instance
@@ -112,6 +117,7 @@ abstract class Component_ControllerAbstract
         $this->sitepage = $sitepage;
         $this->config   = $instance->getConfigArray();
         $this->context  = new \Schoolbox\Resource\Folder\Model();
+        $this->setFolderMapper(Schoolbox\Resource\Folder\Mapper::getInstance());
     }
 
     /**
@@ -781,6 +787,40 @@ abstract class Component_ControllerAbstract
     public function isUsingAltSource()
     {
         return intval($this->getConfig("src")) > 0;
+    }
+
+    /**
+     * Gets the Folder this component draws its data from
+     *
+     * @return Schoolbox\Resource\Folder\Model
+     */
+    public function getSourceFolder(){
+
+        if($this->isUsingAltSource()){
+            $folderId = $this->getConfig("src");
+            $columnName = $this->getFolderMapper()->getIdentifier()['column'];
+            return $this->getFolderMapper()->findByColumn($columnName, $folderId, ['deleted' => true])->first();
+        } else {
+            return $this->getContext();
+        }
+    }
+
+    /**
+     * @return Schoolbox\Resource\Folder\Mapper
+     */
+    public function getFolderMapper()
+    {
+        return $this->folderMapper;
+    }
+
+    /**
+     * @param  Schoolbox\Resource\Folder\Mapper $folderMapper
+     * @return $this
+     */
+    public function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+        return $this;
     }
 
     /**

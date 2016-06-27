@@ -19,7 +19,6 @@ use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
 use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -40,7 +39,6 @@ class Controller extends Component_Homepage_ControllerAbstract
         SitePage $sitepage
     ) {
         parent::__construct($instance, $user, $sitepage);
-        $this->setFolderMapper(FolderMapper::getInstance());
         $this->setBlogMapper(BlogMapper::getInstance());
         $this->setBlogImageMapper(BlogImageMapper::getInstance());
         $this->setBlogCommentMapper(BlogCommentMapper::getInstance());
@@ -130,11 +128,6 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
 
     /**
-     * @var FolderMapper;
-     */
-    protected $folderMapper;
-
-    /**
      * @var BlogMapper;
      */
     protected $blogMapper;
@@ -158,24 +151,6 @@ class Controller extends Component_Homepage_ControllerAbstract
      * @var BlogImageMapper;
      */
     protected $blogImageMapper;
-
-    /**
-     * @return FolderMapper
-     */
-    public function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }
-
-    /**
-     * @param  FolderMapper $folderMapper
-     * @return $this
-     */
-    public function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-        return $this;
-    }
 
     /**
      * @return BlogMapper
