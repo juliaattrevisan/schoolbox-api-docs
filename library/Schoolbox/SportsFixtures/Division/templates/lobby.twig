@@ -99,7 +99,13 @@
                                     </a>
                                     <p class="meta">{{ divisionPlayer.formatMetadata() }}</p>
                                     {% for currentTeam in division.getTeamsForPlayer(divisionPlayer) %}
-                                        <p class="meta icon-sport">{{ currentTeam.getName() }}</p>
+                                        {% if loop.first %}
+                                            <p class="meta icon-sport">
+                                        {% endif %}
+                                        {{ currentTeam.getName() }}{% if not loop.last %}, {% endif %}
+                                        {% if loop.last %}
+                                            </p>
+                                        {% endif %}
                                     {% endfor %}
                                 </div>
                             </div>
