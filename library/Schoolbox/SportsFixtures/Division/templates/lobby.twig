@@ -143,6 +143,22 @@
                                 </div>
                             </div>
                         </li>
+                        {% for teamPlayer in currentTeam.getPlayers() %}
+                            <li class="actions-small-1" data-player="{{ teamPlayer.getId() }}">
+                                <div class="list-item">
+                                    <div class="grip"></div>
+                                    <div class="small-11 avatar card">
+                                        <a href="/search/user/{{ teamPlayer.getId() }}">
+                                            <img src="/portrait.php?userId={{ teamPlayer.getExternalId() }}&amp;size=square64" />
+                                            <h3>{{ teamPlayer.formatName() }}</h3>
+                                        </a>
+                                        <p class="meta">{{ teamPlayer.formatMetadata() }}</p>
+                                    </div>
+                                </div>
+                                <nav>
+                                </nav>
+                            </li>
+                        {% endfor %}
                     {% endfor %}
                 </ul>
             </section>

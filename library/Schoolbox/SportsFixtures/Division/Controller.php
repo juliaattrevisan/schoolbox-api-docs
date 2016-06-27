@@ -167,6 +167,24 @@ class Controller extends AbstractController
         $zone     = new Zone("uploadZone");
         $zone->setMimeFilter('text/csv')->setAttachPrompt('upload a list of players');
 
+        // TODO add players into division model as a M2M join
+
+        // TODO add players into team model as a M2M join
+        $teamPlayers = $this->getTeamUserMapper()->findByColumn(
+            'team_id',
+            $teams->map(function ($v) { return $v->getId(); }),
+            ['order' => ['team_id' => 'asc']]
+        );
+        foreach ($teamPlayers as $teamPlayer) {
+            $teamPlayerTeamId = $teamPlayer->getTeam()->getId();
+            foreach ($teams as $team) {
+                $teamId = $team->getId();
+                if ($teamPlayerTeamId == $teamId) {
+                    $team->getPlayers()->add($teamPlayer->getUser());
+                }
+            }
+        }
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@sportsfixturesDivision/lobby.twig', [
