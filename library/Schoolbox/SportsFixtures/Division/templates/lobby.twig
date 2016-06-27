@@ -27,6 +27,23 @@
             });
         });
 
+        // Remove player from team action
+        $('[data-remove-team-player]').on('click', function(e) {
+            e.preventDefault();
+            $(this).confirmDialog({
+                confirmEvent: function(el) {
+                    $.post(
+                        el.attr('href'),
+                        [{name: 'userId[]', value: el.data('removeTeamPlayer')}]
+                    ).done(function() {
+                        // If this event came from division list: reload that player
+                        // If this event came from team list: fade out
+                        window.location.reload();
+                    })
+                }
+            });
+        });
+
         // Remove player from division action
         $('[data-remove-player]').on('click', function(e) {
             e.preventDefault();
