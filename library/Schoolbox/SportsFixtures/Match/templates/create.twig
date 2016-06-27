@@ -35,9 +35,8 @@
         $(function() {
             $('#homeTeam').selectizeSelector({
                 ajax: {
-                    url:      '/ajax/user.php',
+                    url:      '/sportsfixtures/divisions/{{ division.id }}/teams/list',
                     type:     'GET',
-                    data:     {showCampus: true},
                     dataType: 'json'
                 },
                 {% if match.homeTeam.id %}
@@ -48,9 +47,8 @@
 
             $('#awayTeam').selectizeSelector({
                 ajax: {
-                    url:      '/ajax/user.php',
+                    url:      '/sportsfixtures/divisions/{{ division.id }}/teams/list',
                     type:     'GET',
-                    data:     {showCampus: true},
                     dataType: 'json'
                 },
                 {% if match.awayTeam.id %}

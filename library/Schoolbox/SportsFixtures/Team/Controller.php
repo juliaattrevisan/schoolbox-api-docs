@@ -160,6 +160,28 @@ class Controller extends AbstractController
         $this->getTeamMapper()->save($team);
     }
 
+    /**
+     * Get a list of Teams for a particular Division
+     *
+     * @param int $contextId
+     */
+    public function getTeamList($contextId)
+    {
+        $allTeams = $this->getMapper()->findByColumn('division_id', $contextId);
+
+        $teams = [];
+
+        foreach ($allTeams as $currentTeam) {
+            $teams[] = $currentTeam->findValueLabelPair();
+        }
+
+        /* TODO: What's the best way to do this now?
+         * Pretty sure we talked about it, but can't remember right now
+         */
+        header('Content-Type: application/json');
+        echo json_encode($teams);
+    }
+
     /* Getters/Setters
      */
 
