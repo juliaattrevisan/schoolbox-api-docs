@@ -7,7 +7,6 @@
 
 namespace Schoolbox\SportsFixtures\Venue;
 
-use Alaress\Web\Controller\Exception;
 use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
