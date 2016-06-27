@@ -15,6 +15,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\User;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Team\Model as Team;
+use Schoolbox\Collection;
 
 /**
  * Class Mapper
@@ -41,6 +42,47 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deletePlayers'));
+    }
+
+    /**
+     * Find all the teams whose names are like $keyword
+     *
+     * @param int $divisionId
+     * @param string $keyword
+     * @return \Schoolbox\Collection
+     * @throws Exception
+     */
+    public function findByName($divisionId, $keyword)
+    {
+        $query = "
+            SELECT
+                {$this->getColumnString('t')}
+            FROM {$this->getTable()} t
+			WHERE t.name LIKE :nameLike
+			AND division_id = :divisionId
+        ";
+
+        /* Don't know why codeLike contained / and not a trailing %
+         */
+        $params = [
+            'nameLike' => "%{$this->database->quoteForLike($keyword)}%",
+            'divisionId' => $divisionId
+        ];
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($params);
+
+        $hashtable = array();
+
+        /* Only need to return category records
+         */
+        foreach ($statement as $row) {
+            $team = $this->hydrate($row, 't');
+
+            $hashtable[$team->getId()] = $team;
+        }
+
+        return new Collection(array_values($hashtable));
     }
 
     /**

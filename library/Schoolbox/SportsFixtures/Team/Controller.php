@@ -167,10 +167,13 @@ class Controller extends AbstractController
      */
     public function getTeamList($contextId)
     {
-        $allTeams = $this->getMapper()->findByColumn('division_id', $contextId);
+        /** @var TeamMapper $mapper */
+        $mapper = $this->getMapper();
+        $allTeams = $mapper->findByName($contextId, 'bl');
 
         $teams = [];
 
+        /** @var Team $currentTeam */
         foreach ($allTeams as $currentTeam) {
             $teams[] = $currentTeam->findValueLabelPair();
         }
