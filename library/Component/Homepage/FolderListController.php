@@ -19,20 +19,6 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
     private $groupHandler;
 
     /**
-     * An instance of Category
-     *
-     * @var \Schoolbox\Resource\Folder\Model
-     */
-    private $source;
-
-    /**
-     * Category Mapper
-     *
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private $categoryMapper = null;
-
-    /**
      * Prepares data for the render function. Business logic.
      *
      * @return void
@@ -40,23 +26,6 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
     public function execute()
     {
         $this->groupHandler = new Group();
-
-        $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
-
-        $this->source = $this->getContext();
-
-        // remove any non-numeric values from the source config
-        if ($this->getConfig('src')) {
-            $id = preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'));
-
-            try {
-                $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
-                $folder       = $folderMapper->findById($id);
-
-                $this->source = $folder;
-            } catch (\Exception $e) {
-            }
-        }
     }
 
     /**
@@ -150,24 +119,4 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
     /* Getters/Setters
      */
-
-    /**
-     * Set category mapper
-     *
-     * @param null $categoryMapper
-     */
-    private function setCategoryMapper($categoryMapper)
-    {
-        $this->categoryMapper = $categoryMapper;
-    }
-
-    /**
-     * Get category mapper
-     *
-     * @return null
-     */
-    private function getCategoryMapper()
-    {
-        return $this->categoryMapper;
-    }
 }

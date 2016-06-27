@@ -21,15 +21,11 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
             $context = new Folder\Model();
         }
         parent::setup($context, $config);
+
         $g = new Group();
         // Content permission: based on alt source if it's there
         // Control permission: always based on current context
-        if (!empty($config['src']['value'])) {
-            $sourceId = $config['src']['value'];
-        } else {
-            $sourceId = $this->getContext()->getId();
-        }
-        $this->contentPermission = min($g->getPermission($sourceId), $this->getMaximumPermission());
+        $this->contentPermission = min($g->getPermission($this->source->getId()), $this->getMaximumPermission());
         $this->contextPermission = min($g->getPermission($this->getContext()->getId()), $this->getMaximumPermission());
         $this->sitepage->setVar('ID', $this->getContext()->getId());
 

@@ -9,19 +9,6 @@
  */
 class Component_Homepage_PollController extends Component_Homepage_ControllerAbstract
 {
-
-    /**
-     * Prepares data for the render function. Business logic.
-     *
-     * @return void
-     */
-    public function execute()
-    {
-
-        // TODO: Implement execute() method.
-
-    }
-
     /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle

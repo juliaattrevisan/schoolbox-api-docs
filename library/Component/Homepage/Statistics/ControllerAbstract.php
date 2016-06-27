@@ -84,4 +84,23 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
 
         return parent::getTemplate($templateName, $templatePath);
     }
+
+    /**
+     * Gets the Folder, if any, this component draws its data from
+     *
+     * @throws DomainException
+     */
+    public function getSource(){
+        throw new DomainException('Homepage Statistic components do not allow alternative data sources');
+    }
+
+    /**
+     * Sets the Folder, if any, this component draws its data from
+     *
+     * @param Schoolbox\Resource\Folder\Model $source
+     * @throws DomainException
+     */
+    public function setSource($source) {
+        throw new DomainException('Homepage Statistic components do not allow alternative data sources');
+    }
 }

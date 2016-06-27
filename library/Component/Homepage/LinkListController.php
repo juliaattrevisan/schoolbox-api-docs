@@ -24,20 +24,6 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     private $linkMapper = null;
 
     /**
-     * An instance of Category
-     *
-     * @var \Schoolbox\Resource\Folder\Model
-     */
-    private $source;
-
-    /**
-     * Category Mapper
-     *
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private $categoryMapper = null;
-
-    /**
      * Available sort fields for this component.
      *
      * @var array
@@ -53,17 +39,6 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     {
         $this->groupHandler = new Group();
         $this->setLinkMapper(new \Schoolbox\Resource\LinkMapper());
-        $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
-
-        $this->source = $this->getContext();
-
-        if (is_numeric($this->getConfig('src'))) {
-            try {
-                // remove any non-numeric values from the source config
-                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            } catch (\Exception $e) {
-            }
-        }
     }
 
     /**
@@ -182,25 +157,5 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     private function getLinkMapper()
     {
         return $this->linkMapper;
-    }
-
-    /**
-     * Set category mapper
-     *
-     * @param \Schoolbox\Resource\Folder\Mapper $categoryMapper
-     */
-    private function setCategoryMapper($categoryMapper)
-    {
-        $this->categoryMapper = $categoryMapper;
-    }
-
-    /**
-     * Get category mapper
-     *
-     * @return \Schoolbox\Resource\Folder\Mapper
-     */
-    private function getCategoryMapper()
-    {
-        return $this->categoryMapper;
     }
 }

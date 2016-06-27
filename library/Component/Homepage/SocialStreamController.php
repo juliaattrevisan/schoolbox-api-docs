@@ -11,17 +11,6 @@ use Schoolbox\Resource\Attachment\Zone;
  */
 class Component_Homepage_SocialStreamController extends Component_Homepage_ControllerAbstract
 {
-
-    /**
-     * Prepares data for the render function. Business logic.
-     *
-     * @return void
-     */
-    public function execute()
-    {
-        return true;
-    }
-
     /**
      * Outputs HTML template defined by config variable 'template'
      *

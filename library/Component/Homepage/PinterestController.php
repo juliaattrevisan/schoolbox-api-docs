@@ -10,17 +10,6 @@
  */
 class Component_Homepage_PinterestController extends Component_Homepage_ControllerAbstract
 {
-
-    /**
-     * Prepares data for the render function. Business logic.
-     *
-     * @return void
-     */
-    public function execute()
-    {
-
-    }
-
     /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle

@@ -30,20 +30,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     private $userMapper;
 
     /**
-     * An instance of Category
-     *
-     * @var \Schoolbox\Resource\Folder\Model
-     */
-    private $source;
-
-    /**
-     * Category Mapper
-     *
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private $categoryMapper = null;
-
-    /**
      * Available filters for this component.
      *
      * @see Component_Config_Filter for how this data is passed in/out of the database
@@ -69,17 +55,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->fileMapper         = Schoolbox\Resource\File\Mapper::getInstance();
         $this->userMapper         = Schoolbox\UserMapper::getInstance();
         $this->allowedFileHandler = new AllowedFile();
-        $this->setCategoryMapper(Schoolbox\Resource\Folder\Mapper::getInstance());
-
-        $this->source = $this->getContext();
-
-        if (is_numeric($this->getConfig('src'))) {
-            try {
-                // remove any non-numeric values from the source config
-                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            } catch (\Exception $e) {
-            }
-        }
     }
 
     /**
@@ -221,24 +196,4 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
     /* Getters/Setters
      */
-
-    /**
-     * Set category mapper
-     *
-     * @param Schoolbox\Resource\Folder\Mapper $categoryMapper
-     */
-    private function setCategoryMapper($categoryMapper)
-    {
-        $this->categoryMapper = $categoryMapper;
-    }
-
-    /**
-     * Get category mapper
-     *
-     * @return Schoolbox\Resource\Folder\Mapper
-     */
-    private function getCategoryMapper()
-    {
-        return $this->categoryMapper;
-    }
 }

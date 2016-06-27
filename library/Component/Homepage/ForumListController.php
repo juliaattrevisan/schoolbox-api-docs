@@ -9,23 +9,10 @@
  */
 class Component_Homepage_ForumListController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * @var Group
      */
     private $groupHandler;
-
-    /**
-     * Category Mapper
-     *
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private $categoryMapper = null;
-
-    /**
-     * @var array
-     */
-    private $source;
 
     /**
      * Available sort fields for this component.
@@ -42,17 +29,6 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
     public function execute()
     {
         $this->groupHandler = new Group();
-        $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
-
-        $this->source = $this->getContext();
-
-        if (is_numeric($this->getConfig('src'))) {
-            try {
-                // remove any non-numeric values from the source config
-                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            } catch (\Exception $e) {
-            }
-        }
     }
 
     /**
@@ -146,28 +122,5 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
         }
 
         return true;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set category mapper
-     *
-     * @param null $categoryMapper
-     */
-    private function setCategoryMapper($categoryMapper)
-    {
-        $this->categoryMapper = $categoryMapper;
-    }
-
-    /**
-     * Get category mapper
-     *
-     * @return null
-     */
-    private function getCategoryMapper()
-    {
-        return $this->categoryMapper;
     }
 }

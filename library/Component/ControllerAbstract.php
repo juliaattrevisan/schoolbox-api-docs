@@ -35,6 +35,13 @@ abstract class Component_ControllerAbstract
     protected $context;
 
     /**
+     * The folder the component pulls data from, if any.
+     *
+     * @var \Schoolbox\Resource\Folder\Model
+     */
+    protected $source;
+
+    /**
      * @var array
      */
     protected $config;
@@ -117,6 +124,7 @@ abstract class Component_ControllerAbstract
         $this->sitepage = $sitepage;
         $this->config   = $instance->getConfigArray();
         $this->context  = new \Schoolbox\Resource\Folder\Model();
+        $this->source   = new \Schoolbox\Resource\Folder\Model();
         $this->setFolderMapper(Schoolbox\Resource\Folder\Mapper::getInstance());
     }
 
@@ -130,15 +138,25 @@ abstract class Component_ControllerAbstract
     {
         $this->context = $context;
         $this->config  = $config;
+
+        if($this->isUsingAltSource()){
+            // remove any non-numeric values from the source config & support deleted folders.
+            $folderId = preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'));
+            $columnName = $this->getFolderMapper()->getIdentifier()['column'];
+            $this->setSource($this->getFolderMapper()->findByColumn($columnName, $folderId, ['deleted' => true])->first());
+        } else {
+            $this->setSource($context);
+        }
     }
 
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @abstract
      * @return void
      */
-    abstract function execute();
+    public function execute(){
+        // Default to no action
+    }
 
     /**
      * Hook method for components to perform their own dynamic
@@ -790,19 +808,21 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Gets the Folder this component draws its data from
+     * Gets the Folder, if any, this component draws its data from
      *
      * @return Schoolbox\Resource\Folder\Model
      */
-    public function getSourceFolder(){
+    public function getSource(){
+        return $this->source;
+    }
 
-        if($this->isUsingAltSource()){
-            $folderId = $this->getConfig("src");
-            $columnName = $this->getFolderMapper()->getIdentifier()['column'];
-            return $this->getFolderMapper()->findByColumn($columnName, $folderId, ['deleted' => true])->first();
-        } else {
-            return $this->getContext();
-        }
+    /**
+     * Sets the Folder, if any, this component draws its data from
+     *
+     * @param Schoolbox\Resource\Folder\Model $source
+     */
+    public function setSource($source){
+        $this->source = $source;
     }
 
     /**

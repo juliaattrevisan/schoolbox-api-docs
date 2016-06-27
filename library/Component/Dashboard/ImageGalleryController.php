@@ -18,13 +18,6 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
     private $groupHandler = null;
 
     /**
-     * A category mapper
-     *
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private $categoryMapper = null;
-
-    /**
      * File mapper
      *
      * @var null
@@ -37,13 +30,6 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
      * @var int
      */
     private $imagesPerRow = 4;
-
-    /**
-     * Source category
-     *
-     * @var \Schoolbox\Resource\Folder\Model
-     */
-    protected $source = null;
 
     /**
      * Template file to load
@@ -60,27 +46,10 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
     public function execute()
     {
         $this->setGroupHandler(new Group());
-        $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
         $this->setFileMapper(new \Schoolbox\Resource\File\Mapper());
-        $this->determineSourceFolder();
     }
 
-    /**
-     * Determine source folder for images
-     */
-    private function determineSourceFolder()
-    {
-        // remove any non-numeric values from the source config
-        $categoryId = $this->getConfig('src')
-            ? preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'))
-            : $this->getContext()->getId();
 
-        try {
-            $this->setSource($this->getCategoryMapper()->findById($categoryId));
-        } catch (\Exception $e) {
-            $this->setSource(new \Schoolbox\Resource\Folder\Model());
-        }
-    }
 
     /**
      * Renders the data into the SitePage. Presentation logic.
@@ -147,28 +116,6 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
         return true;
     }
 
-    /* Getters/Setters
-     */
-
-    /**
-     * Set category mapper
-     *
-     * @param null $categoryMapper
-     */
-    private function setCategoryMapper($categoryMapper)
-    {
-        $this->categoryMapper = $categoryMapper;
-    }
-
-    /**
-     * Get category mapper
-     *
-     * @return null
-     */
-    private function getCategoryMapper()
-    {
-        return $this->categoryMapper;
-    }
 
     /**
      * Set file mapper
@@ -228,26 +175,6 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
     private function getGroupHandler()
     {
         return $this->groupHandler;
-    }
-
-    /**
-     * Set source
-     *
-     * @param null $source
-     */
-    protected function setSource($source)
-    {
-        $this->source = $source;
-    }
-
-    /**
-     * Get source
-     *
-     * @return null
-     */
-    protected function getSource()
-    {
-        return $this->source;
     }
 
     /**

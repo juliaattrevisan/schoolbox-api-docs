@@ -33,15 +33,6 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
     protected $sortFields = array('name', 'date');
 
     /**
-     * Prepares data for the render function. Business logic.
-     *
-     * @return void
-     */
-    public function execute()
-    {
-    }
-
-    /**
      * Renders the data into the SitePage. Presentation logic.
      *
      * @param String $templateHandle

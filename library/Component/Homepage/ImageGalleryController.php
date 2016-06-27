@@ -18,20 +18,6 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     private $groupHandler;
 
     /**
-     * An instance of Category
-     *
-     * @var \Schoolbox\Resource\Folder\Model
-     */
-    private $source;
-
-    /**
-     * Category Mapper
-     *
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private $categoryMapper = null;
-
-    /**
      * Template file to load
      *
      * @var string
@@ -46,17 +32,6 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     public function execute()
     {
         $this->groupHandler = new Group();
-        $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
-
-        $this->source = $this->getContext();
-
-        if (is_numeric($this->getConfig('src'))) {
-            try {
-                // remove any non-numeric values from the source config
-                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            } catch (\Exception $e) {
-            }
-        }
     }
 
     /**
@@ -147,26 +122,6 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
      */
 
     /**
-     * Set category mapper
-     *
-     * @param \Schoolbox\Resource\Folder\Mapper $categoryMapper
-     */
-    private function setCategoryMapper($categoryMapper)
-    {
-        $this->categoryMapper = $categoryMapper;
-    }
-
-    /**
-     * Get category mapper
-     *
-     * @return \Schoolbox\Resource\Folder\Mapper
-     */
-    private function getCategoryMapper()
-    {
-        return $this->categoryMapper;
-    }
-
-    /**
      * Set template handle
      *
      * @param string $templateHandle
@@ -184,25 +139,5 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     protected function getTemplateHandle()
     {
         return $this->templateHandle;
-    }
-
-    /**
-     * Set source
-     *
-     * @param \Schoolbox\Resource\Folder\Model $source
-     */
-    protected function setSource($source)
-    {
-        $this->source = $source;
-    }
-
-    /**
-     * Get source
-     *
-     * @return \Schoolbox\Resource\Folder\Model
-     */
-    protected function getSource()
-    {
-        return $this->source;
     }
 }

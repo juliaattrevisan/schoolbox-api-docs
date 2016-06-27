@@ -45,16 +45,6 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
     }
 
     /**
-     * Prepares data for the render function. Business logic.
-     *
-     * @return void
-     */
-    public function execute()
-    {
-        return true;
-    }
-
-    /**
      * Outputs HTML template defined by config variable 'template'
      *
      * @param String $templateHandle
@@ -68,8 +58,10 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 
         $this->parseConfig();
 
-        $this->setBlock($templateHandle, 'etherpad_pad', 'etherpad_pad_block');
-        $this->setBlock($templateHandle, 'etherpad_has_create', 'etherpad_has_create_block');
+        $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
+        $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');        
+        $this->setBlock('source_folder_exists', 'etherpad_pad', 'etherpad_pad_block');
+        $this->setBlock('source_folder_exists', 'etherpad_has_create', 'etherpad_has_create_block');
         $this->setBlock('etherpad_pad', 'etherpad_has_modify', 'etherpad_has_modify_block');
 
         $this->setVar(
@@ -80,64 +72,78 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
             )
         );
 
-        /* Decide which homepage to stream from
-         */
-        if (is_numeric($this->getConfig('src'))) {
-            $homepageSource = $this->getConfig('src');
+        // Is component source set to different folder, which has been deleted?
+        $isDeletedAltSource = $this->isUsingAltSource() && $this->getSource()->isDeleted();
+
+        if($isDeletedAltSource){
+            $twigTemplate = 'sub/componentSourceDeleted.twig';
+            $twigData = array(
+                'componentInstanceId' => $this->getInstance()->getId()
+            );
+            $this->setVar('SOURCE_FOLDER_DELETED', $this->sitepage->getTwig()->render($twigTemplate, $twigData));
+            $this->parse('source_folder_deleted_block','source_folder_deleted');
+            $this->setVar('source_folder_exists_block', '');
         } else {
-            $homepageSource = $this->instance->getIdentifier();
-        }
+            $this->setVar('source_folder_deleted_block', '');
 
-        /* Find all the pads associated with this list of groups
-         * Apply all the component powers
-         */
-        $padMapper = new \Etherpad\PadMapper();
+            /* Decide which homepage to stream from
+             */
+            $homepageSource = $this->isUsingAltSource() ? $this->getConfig('src') : $this->instance->getIdentifier();
 
-        $options = array(
-            'order' => array(
-                $this->getSortKey($this->getConfig('sort')) => $this->getConfig('sortdir')
-            )
-        );
 
-        /* Optional limits
-         */
-        if ($this->getConfig('size')) {
-            $options['limit'] = $this->getConfig('size');
-        }
+            /* Find all the pads associated with this list of groups
+             * Apply all the component powers
+             */
+            $padMapper = new \Etherpad\PadMapper();
 
-        $allPads = $padMapper->findByColumn('homepage_id', $homepageSource, $options);
-
-        /* Only provide Modify Document button to those with write access
-         */
-        foreach ($allPads as $currentPad) {
-            $this->setVar(
-                array(
-                    'HOMEPAGE_ID'         => $this->instance->getIdentifier(),
-                    'ETHERPAD_PAD_ID'     => $currentPad->getId(),
-                    'ETHERPAD_NAME'       => $currentPad->getDisplayName(),
-                    'ETHERPAD_UPDATED_AT' => $currentPad->getUpdatedAt()->getShort(),
+            $options = array(
+                'order' => array(
+                    $this->getSortKey($this->getConfig('sort')) => $this->getConfig('sortdir')
                 )
             );
 
-            if ($this->contentPermission > READ_ACCESS) {
-                $this->parse('etherpad_has_modify_block', 'etherpad_has_modify');
+            /* Optional limits
+             */
+            if ($this->getConfig('size')) {
+                $options['limit'] = $this->getConfig('size');
             }
 
-            $this->parse('etherpad_pad_block', 'etherpad_pad', true);
+            $allPads = $padMapper->findByColumn('homepage_id', $homepageSource, $options);
 
-            /* Clear children after parsing out the parent
+            /* Only provide Modify Document button to those with write access
              */
-            $this->setVar(
-                array(
-                    'etherpad_has_modify_block' => ''
-                )
-            );
-        }
+            foreach ($allPads as $currentPad) {
+                $this->setVar(
+                    array(
+                        'HOMEPAGE_ID' => $this->instance->getIdentifier(),
+                        'ETHERPAD_PAD_ID' => $currentPad->getId(),
+                        'ETHERPAD_NAME' => $currentPad->getDisplayName(),
+                        'ETHERPAD_UPDATED_AT' => $currentPad->getUpdatedAt()->getShort(),
+                    )
+                );
 
-        /* Only provide Create Document button to those with write access
-         */
-        if ($this->contentPermission > READ_ACCESS) {
-            $this->parse('etherpad_has_create_block', 'etherpad_has_create');
+                if ($this->contentPermission > READ_ACCESS) {
+                    $this->parse('etherpad_has_modify_block', 'etherpad_has_modify');
+                }
+
+                $this->parse('etherpad_pad_block', 'etherpad_pad', true);
+
+                /* Clear children after parsing out the parent
+                 */
+                $this->setVar(
+                    array(
+                        'etherpad_has_modify_block' => ''
+                    )
+                );
+            }
+
+            /* Only provide Create Document button to those with write access
+             */
+            if ($this->contentPermission > READ_ACCESS) {
+                $this->parse('etherpad_has_create_block', 'etherpad_has_create');
+            }
+
+            $this->parse('source_folder_exists_block','source_folder_exists');
         }
 
         return true;

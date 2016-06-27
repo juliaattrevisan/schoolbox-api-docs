@@ -15,19 +15,6 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
      */
     private $groupHandler;
 
-    /**
-     * An instance of Category
-     *
-     * @var \Schoolbox\Resource\Folder\Model
-     */
-    private $source;
-
-    /**
-     * Category Mapper
-     *
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private $categoryMapper = null;
 
     /**
      * Available sort fields for this component.
@@ -44,17 +31,6 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
     public function execute()
     {
         $this->groupHandler = new Group();
-        $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
-
-        $this->source = $this->getContext();
-
-        if (is_numeric($this->getConfig('src'))) {
-            try {
-                // remove any non-numeric values from the source config
-                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            } catch (\Exception $e) {
-            }
-        }
     }
 
     /**
@@ -173,28 +149,5 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         $this->parseConfig();
 
         return true; // everything went according to plan
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set category mapper
-     *
-     * @param null $categoryMapper
-     */
-    private function setCategoryMapper($categoryMapper)
-    {
-        $this->categoryMapper = $categoryMapper;
-    }
-
-    /**
-     * Get category mapper
-     *
-     * @return null
-     */
-    private function getCategoryMapper()
-    {
-        return $this->categoryMapper;
     }
 }

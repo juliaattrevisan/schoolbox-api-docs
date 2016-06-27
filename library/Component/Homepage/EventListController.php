@@ -12,15 +12,6 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 {
 
     /**
-     * Prepares data for the render function. Business logic.
-     *
-     * @return void
-     */
-    public function execute()
-    {
-    }
-
-    /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle
      * @return boolean

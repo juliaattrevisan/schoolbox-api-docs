@@ -10,41 +10,6 @@ use Schoolbox\Resource\Folder;
  */
 class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract
 {
-
-    /**
-     * An instance of Category
-     *
-     * @var \Schoolbox\Resource\Folder\Model
-     */
-    private $source;
-
-    /**
-     * Category Mapper
-     *
-     * @var Folder\Mapper
-     */
-    private $folderMapper = null;
-
-    /**
-     * Prepares data for the render function. Business logic.
-     *
-     * @return void
-     */
-    public function execute()
-    {
-        $this->setFolderMapper(new Folder\Mapper());
-
-        $this->source = $this->getContext();
-
-        if (is_numeric($this->getConfig('src'))) {
-            try {
-                // remove any non-numeric values from the source config
-                $this->source = $this->getFolderMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            } catch (\Exception $e) {
-            }
-        }
-    }
-
     /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle
@@ -155,26 +120,4 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         return true; // everything went according to plan
     }
 
-    /* Getters/Setters
-     */
-
-    /**
-     * Set category mapper
-     *
-     * @param Folder\Mapper $folderMapper
-     */
-    private function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-    }
-
-    /**
-     * Get category mapper
-     *
-     * @return Folder\Mapper
-     */
-    private function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }
 }
