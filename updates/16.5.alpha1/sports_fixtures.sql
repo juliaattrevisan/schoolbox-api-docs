@@ -71,6 +71,7 @@ CREATE TABLE `sportsfixtures_division_user` (
 	`user_id` INT NOT NULL,
 	`sequence` INT NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`),
+	UNIQUE INDEX `sportsfixtures_division_user__division_user` (`division_id` ASC, `user_id` ASC),
 	INDEX `fk_sportsfixtures_division_user__division_idx` (`division_id` ASC),
 	INDEX `sportsfixtures_division_user__user` (`user_id` ASC),
 	CONSTRAINT `fk_sportsfixtures_division_user__division`
