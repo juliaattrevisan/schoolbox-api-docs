@@ -63,7 +63,7 @@ class Sync implements SyncInterface
     {
         $stmt = $this->database->prepare('
             SELECT
-                NULL                     AS "student_contact_network_login",
+                p.USERNAME               AS "student_contact_network_login",
                 p.CARER_NUMBER           AS "student_contact_id",
                 NULL                     AS "student_contact_title",
                 p.FULL_NAME              AS "student_contact_given_name",
@@ -86,7 +86,7 @@ class Sync implements SyncInterface
             UNION ALL
 
             SELECT
-                NULL                     AS "student_contact_network_login",
+                p.SPOUSE_USERNAME        AS "student_contact_network_login",
                 p.SPOUSE_CARER_NUMBER    AS "student_contact_id",
                 NULL                     AS "student_contact_title",
                 p.SPOUSE_FULL_NAME       AS "student_contact_given_name",
