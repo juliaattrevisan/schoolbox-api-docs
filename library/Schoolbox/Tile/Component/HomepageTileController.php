@@ -71,16 +71,22 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
      */
     public function renderTemplate($templateHandle)
     {
-        return $this->renderTwigTemplate(
-            $templateHandle,
-            '@tile/component/tile.twig',
-            array(
+        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
+            $twigTemplate = 'sub/componentSourceDeleted.twig';
+            $twigData = array(
+                'componentInstanceId' => $this->getInstance()->getId(),
+            );
+        } else {
+            $twigTemplate = 'sub/componentSourceDeleted.twig';
+            $twigData = array(
                 'component'                  => $this,
                 'showButtons'                => $this->hasWriteAccess(),
                 'tile_component_instance_id' => $this->getConfig('tileSource') ?: $this->getInstance()->getId(),
-            ),
-            $this->hasWriteAccess() || !$this->getConfig('compactMode') || ($this->isUsingAltSource() && $this->hasContextWriteAccess())
-        );
+            );
+        }
+        $renderHeader = $this->hasWriteAccess() || !$this->getConfig('compactMode') || ($this->isUsingAltSource() && $this->hasContextWriteAccess());
+
+        return $this->renderTwigTemplate($templateHandle, $twigTemplate, $twigData, $renderHeader);
     }
 
     /**
