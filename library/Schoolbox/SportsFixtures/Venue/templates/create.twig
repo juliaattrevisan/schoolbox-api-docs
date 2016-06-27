@@ -5,10 +5,6 @@
                 name: {
                     required: true,
                     minlength: 2
-                },
-                address: {
-                    required: true,
-                    minlength: 2
                 }
             },
             messages: {
@@ -20,8 +16,7 @@
                 longitude: {
                     min: 'Longitude must lie between -180.00000 and 180.000000',
                     max: 'Longitude must lie between -180.00000 and 180.000000'
-                },
-                address: "Please enter the Venue's address."
+                }
             },
             errorPlacement: function(error, element) {
                 $.alaressValidate.defaultErrorPlacement(error, element);
