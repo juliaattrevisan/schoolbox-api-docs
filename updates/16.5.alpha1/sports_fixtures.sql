@@ -85,6 +85,8 @@ CREATE TABLE `sportsfixtures_venue` (
 CREATE TABLE `sportsfixtures_match` (
 	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
 	`division_id` INT NOT NULL,
+	`home_team_id` INT,
+	`away_team_id` INT,
 	`name` VARCHAR(255) NULL COMMENT '',
 	`start_at` DATETIME NULL COMMENT '',
 	`created_at` DATETIME NULL COMMENT '',
