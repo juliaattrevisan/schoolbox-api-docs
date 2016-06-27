@@ -98,6 +98,14 @@
                                         <h3>{{ currentPlayer.user.formatName() }}</h3>
                                     </a>
                                     <p class="meta">{{ currentPlayer.user.formatMetadata() }}</p>
+                                    {# what sports am I in? #}
+                                    {% for currentTeam in teams %}
+                                        {% for teamPlayer in currentTeam.getPlayers() %}
+                                            {% if teamPlayer.getId() == currentPlayer.user.getId() %}
+                                                <p class="meta icon-sport">{{ currentTeam.getName() }}</p>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endfor %}
                                 </div>
                             </div>
                             <nav>
