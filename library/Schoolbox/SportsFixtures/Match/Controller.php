@@ -15,6 +15,8 @@ use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Division\Model as Division;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use \Schoolbox\SportsFixtures\Team\Model as Team;
+use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 
@@ -29,6 +31,11 @@ class Controller extends AbstractController
      * @var DivisionMapper
      */
     protected $divisionMapper;
+
+    /**
+     * @var TeamMapper
+     */
+    protected $teamMapper;
 
     /**
      * @var MatchMapper
@@ -48,6 +55,7 @@ class Controller extends AbstractController
         parent::__construct(MatchMapper::getInstance());
         $this->setSportMapper(SportMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
+        $this->setTeamMapper(TeamMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
@@ -144,7 +152,10 @@ class Controller extends AbstractController
             $date = "{$this->getRequest()->post['startAtDate']} {$this->getRequest()->post['startAtTime']}";
             $startAt = \Alaress_Date_Format::newLocal($date);
 
-            $this->saveMatch($entity, $division, $this->getRequest()->post['name'], $startAt);
+            $homeTeam = $this->getTeamMapper()->findById($this->getRequest()->post['homeTeamId']);
+            $awayTeam = $this->getTeamMapper()->findById($this->getRequest()->post['awayTeamId']);
+
+            $this->saveMatch($entity, $division, $this->getRequest()->post['name'], $startAt, $homeTeam, $awayTeam);
 
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesMatch.getList', [
                 'contextId' => $divisionId
@@ -157,16 +168,20 @@ class Controller extends AbstractController
     /**
      * Save Match data to db
      *
-     * @param Match $match
+     * @param Model $match
      * @param Division $division
-     * @param string $name
+     * @param $name
      * @param \Alaress_Date_Format $startAt
+     * @param Team $homeTeam
+     * @param Team $awayTeam
      */
-    private function saveMatch(Match $match, Division $division, $name, \Alaress_Date_Format $startAt)
+    private function saveMatch(Match $match, Division $division, $name, \Alaress_Date_Format $startAt, Team $homeTeam, Team $awayTeam)
     {
         $match->setDivision($division);
         $match->setName($name);
         $match->setStartAt($startAt);
+        $match->setHomeTeam($homeTeam);
+        $match->setAwayTeam($awayTeam);
         $match->setUpdatedAt(\Alaress_Date_Format::now());
 
         $this->getMapper()->save($match);
@@ -205,6 +220,24 @@ class Controller extends AbstractController
     protected function setDivisionMapper($divisionMapper)
     {
         $this->divisionMapper = $divisionMapper;
+    }
+
+    /**
+     * @return TeamMapper
+     */
+    public function getTeamMapper()
+    {
+        return $this->teamMapper;
+    }
+
+    /**
+     * @param  TeamMapper $teamMapper
+     * @return $this
+     */
+    public function setTeamMapper(TeamMapper $teamMapper)
+    {
+        $this->teamMapper = $teamMapper;
+        return $this;
     }
 
     /**
