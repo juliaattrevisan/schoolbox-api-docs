@@ -1,4 +1,6 @@
 <script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 
 <script type="text/javascript">
     $(function() {
@@ -28,6 +30,34 @@
             appendTo: function ($input) {
                 return $input.closest('.timepick');
             }
+        });
+
+        $(function() {
+            $('#homeTeam').selectizeSelector({
+                ajax: {
+                    url:      '/ajax/user.php',
+                    type:     'GET',
+                    data:     {showCampus: true},
+                    dataType: 'json'
+                },
+                {% if match.homeTeam.id %}
+                value: {"id":{{ match.homeTeam.id }},"name":"{{ match.homeTeam.name }}"},
+                {% endif %}
+                multiple: false
+            });
+
+            $('#awayTeam').selectizeSelector({
+                ajax: {
+                    url:      '/ajax/user.php',
+                    type:     'GET',
+                    data:     {showCampus: true},
+                    dataType: 'json'
+                },
+                {% if match.awayTeam.id %}
+                value: {"id":{{ match.awayTeam.id }},"name":"{{ match.awayTeam.name }}"},
+                {% endif %}
+                multiple: false
+            });
         });
     });
 </script>
@@ -88,6 +118,21 @@
                                 <input type="text" name="startAtTime" autocomplete="off" placeholder="Start Time" class="ui-timepicker-input" data-timepicker value="{{ match.startAt.getTimeOnly }}">
                             </label>
                         </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Home Team
+                        </label>
+                        <input id='homeTeam' name="homeTeamId" type='text' value='' placeholder="Search Teams" data-selectizeuser />
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Away Team
+                        </label>
+                        <input id='awayTeam' name="awayTeamId" type='text' value='' placeholder="Search Teams" data-selectizeuser />
                     </div>
                 </fieldset>
             </section>

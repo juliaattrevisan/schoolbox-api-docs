@@ -15,13 +15,14 @@ use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
+use Schoolbox\SportsFixtures\Match\Model as Match;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 
 /**
  * Class Mapper
  * @method Model createModel()
- * @method Model findById($id)
  * @package Schoolbox\SportsFixtures\Match
  */
 class Mapper extends BaseMapper
@@ -43,5 +44,53 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+    /**
+     * Find a Match by its id
+     *
+     * Also include both Teams
+     *
+     * @param $id
+     * @return Match
+     * @throws Exception
+     */
+    public function findById($id)
+    {
+        $query = "
+            SELECT
+                {$this->getColumnString('m')},
+                {$this->getJoinColumnString('home_team', 'h')},
+                {$this->getJoinColumnString('away_team', 'a')},
+				{$this->getJoinColumnString('division', 'd')}
+            FROM {$this->getTable()} `m`
+            LEFT JOIN {$this->getJoinSql('home_team', 'm', 'h')}
+            LEFT JOIN {$this->getJoinSql('away_team', 'm', 'a')}
+            LEFT JOIN {$this->getJoinSql('division', 'm', 'd')}
+            WHERE m.id = ?
+            AND m.deleted_at IS NULL
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute(array($id));
+
+
+        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+
+            /** @var Match $match */
+            $match = $this->hydrate($row, 'm');
+
+            /** @var Team $homeTeam */
+            /** @var Team $awayTeam */
+            $homeTeam = $this->hydrateJoin($row, 'home_team', 'h');
+            $awayTeam = $this->hydrateJoin($row, 'away_team', 'a');
+
+            $match->setHomeTeam($homeTeam);
+            $match->setAwayTeam($awayTeam);
+
+            return $match;
+        }
+
+        throw new Exception('Instance of object not found');
     }
 }
