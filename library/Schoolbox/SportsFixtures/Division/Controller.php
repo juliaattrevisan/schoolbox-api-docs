@@ -167,15 +167,14 @@ class Controller extends AbstractController
             $division->getPlayers()->add($player->getUser());
         }
 
-        // Load teams into division
+        // Load players into teams, and teams into division
+        // TODO add players into team model as a M2M join
         try {
             $teams = $this->getTeamMapper()->findByColumn('division_id', $entityId);
         }
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
-        $division->setTeams($teams);
-        // TODO add players into team model as a M2M join
         $teamPlayers = $this->getTeamUserMapper()->findByColumn(
             'team_id',
             $teams->map(function ($v) { return $v->getId(); }),
@@ -190,6 +189,7 @@ class Controller extends AbstractController
                 }
             }
         }
+        $division->setTeams($teams);
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
