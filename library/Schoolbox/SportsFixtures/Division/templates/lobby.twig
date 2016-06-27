@@ -83,25 +83,25 @@
                 <a href="#" class="icon-upload" title="Upload Player List" data-reveal-id="uploadPlayersModal"></a>
             </nav>
         </div>
-        {% if players is not empty %}
+        {% if division.getPlayers() is not empty %}
             <section>
                 <ul class="information-list sortable"
                     data-player-list
                     data-sortable-onstop-action="{{ routeLookup('sportsfixturesDivision.postReorderPlayers', {entityId: division.getId()}) }}">
-                    {% for currentPlayer in players %}
-                        <li class="actions-small-1" data-player="{{ currentPlayer.user.getId() }}">
+                    {% for divisionPlayer in division.getPlayers() %}
+                        <li class="actions-small-1" data-player="{{ divisionPlayer.getId() }}">
                             <div class="list-item">
                                 <div class="grip"></div>
                                 <div class="small-11 avatar card">
-                                    <a href="/search/user/{{ currentPlayer.user.getId() }}">
-                                        <img src="/portrait.php?userId={{ currentPlayer.user.getExternalId() }}&amp;size=square64" />
-                                        <h3>{{ currentPlayer.user.formatName() }}</h3>
+                                    <a href="/search/user/{{ divisionPlayer.getId() }}">
+                                        <img src="/portrait.php?userId={{ divisionPlayer.getExternalId() }}&amp;size=square64" />
+                                        <h3>{{ divisionPlayer.formatName() }}</h3>
                                     </a>
-                                    <p class="meta">{{ currentPlayer.user.formatMetadata() }}</p>
+                                    <p class="meta">{{ divisionPlayer.formatMetadata() }}</p>
                                     {# what sports am I in? #}
                                     {% for currentTeam in teams %}
                                         {% for teamPlayer in currentTeam.getPlayers() %}
-                                            {% if teamPlayer.getId() == currentPlayer.user.getId() %}
+                                            {% if teamPlayer.getId() == divisionPlayer.getId() %}
                                                 <p class="meta icon-sport">{{ currentTeam.getName() }}</p>
                                             {% endif %}
                                         {% endfor %}
@@ -109,17 +109,17 @@
                                 </div>
                             </div>
                             <nav>
-                                <a href="#" class="icon-more" data-dropdown="sportsfixtures-player-{{ currentPlayer.user.getId() }}-actions"></a>
+                                <a href="#" class="icon-more" data-dropdown="sportsfixtures-player-{{ divisionPlayer.getId() }}-actions"></a>
                             </nav>
-                            <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-player-{{ currentPlayer.user.getId() }}-actions">
+                            <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-player-{{ divisionPlayer.getId() }}-actions">
                                 {% for currentTeam in teams %}
                                     <li><a href="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.getId()}) }}"
                                            class="icon-next"
-                                           data-move-player="{{ currentPlayer.user.getId() }}">Add Player to {{ currentTeam.getName() }}</a></li>
+                                           data-move-player="{{ divisionPlayer.getId() }}">Add Player to {{ currentTeam.getName() }}</a></li>
                                 {% endfor %}
                                 <li><a href="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.getId()}) }}"
                                        class="icon-delete"
-                                       data-remove-player="{{ currentPlayer.user.getId() }}">Remove Player From Division</a></li>
+                                       data-remove-player="{{ divisionPlayer.getId() }}">Remove Player From Division</a></li>
                             </ul>
                         </li>
                     {% endfor %}
