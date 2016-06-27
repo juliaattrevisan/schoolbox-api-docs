@@ -106,7 +106,7 @@
                             <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-player-{{ currentPlayer.user.getId() }}-actions">
                                 {% for currentTeam in teams %}
                                     <li><a href="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.getId()}) }}"
-                                           class="icon-add"
+                                           class="icon-next"
                                            data-move-player="{{ currentPlayer.user.getId() }}">Add Player to {{ currentTeam.getName() }}</a></li>
                                 {% endfor %}
                                 <li><a href="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.getId()}) }}"
@@ -133,7 +133,7 @@
         <h2 class="subheader">Teams</h2>
         {% if teams is not empty %}
             <section>
-                <ul class="information-list">
+                <ul class="information-list sortable">
                     {% for currentTeam in teams %}
                         <li>
                             <div class="list-item">
@@ -156,6 +156,7 @@
                                     </div>
                                 </div>
                                 <nav>
+                                    <a href="#" class="icon-previous" title="Remove Player from {{ currentTeam.getName() }}"></a>
                                 </nav>
                             </li>
                         {% endfor %}
