@@ -46,6 +46,7 @@ class Module extends RestfulModule
         parent::initRoutes($router, $basePath);
         $collection = $this->getCollectionName();
         $this->addPostRoute($router, "postAddPlayers", $basePath, "/$collection/{entityId}/addPlayers");
+        $this->addPostRoute($router, "postRemovePlayers", $basePath, "/$collection/{entityId}/removePlayers");
     }
 
     /**
@@ -56,7 +57,7 @@ class Module extends RestfulModule
         parent::initRoutePreloads($matcher);
         $this->addRoutePreload(
             $matcher,
-            '(?:postAddPlayers)',
+            '(?:postAddPlayers|postRemovePlayers)',
             function ($params) {
                 return ['team' => Mapper::getInstance()->findById($params['entityId'])];
             }

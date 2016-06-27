@@ -114,9 +114,17 @@
                             </nav>
                             <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-player-{{ divisionPlayer.getId() }}-actions">
                                 {% for currentTeam in division.getTeams() %}
-                                    <li><a href="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.getId()}) }}"
-                                           class="icon-next"
-                                           data-add-team-player="{{ divisionPlayer.getId() }}">Add Player to {{ currentTeam.getName() }}</a></li>
+                                    <li>
+                                        {% if currentTeam.isPlayerInTeam(divisionPlayer) %}
+                                            <a href="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: currentTeam.getId()}) }}"
+                                               class="icon-previous"
+                                               data-remove-team-player="{{ divisionPlayer.getId() }}">Remove Player from {{ currentTeam.getName() }}</a>
+                                        {% else %}
+                                            <a href="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.getId()}) }}"
+                                               class="icon-next"
+                                               data-add-team-player="{{ divisionPlayer.getId() }}">Add Player to {{ currentTeam.getName() }}</a>
+                                        {% endif %}
+                                    </li>
                                 {% endfor %}
                                 <li><a href="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.getId()}) }}"
                                        class="icon-delete"
@@ -165,7 +173,10 @@
                                     </div>
                                 </div>
                                 <nav>
-                                    <a href="#" class="icon-previous" title="Remove Player from {{ currentTeam.getName() }}"></a>
+                                    <a href="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: currentTeam.getId()}) }}"
+                                       class="icon-previous"
+                                       title="Remove Player from {{ currentTeam.getName() }}"
+                                       data-remove-team-player="{{ teamPlayer.getId() }}"></a>
                                 </nav>
                             </li>
                         {% endfor %}
