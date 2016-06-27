@@ -34,7 +34,7 @@
         <div class="actions-small-1 row">
             <div class="list-item">
                 <div class="small-12 columns">
-                    <h2 class="subheader">{{ division.name }}</h2>
+                    <h2 class="subheader">Matches in {{ division.name }}</h2>
                 </div>
             </div>
             <nav>
@@ -50,6 +50,7 @@
                             <div class="list-item">
                                 <div class="small-12 avatar card">
                                     <p>{{ currentMatch.name }}</p>
+                                    <p class="meta">{{ currentMatch.startAt.getLocal }}</p>
                                 </div>
                             </div>
                             <nav>

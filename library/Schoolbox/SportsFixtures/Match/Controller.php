@@ -30,7 +30,9 @@ class Controller extends AbstractController
      */
     protected $divisionMapper;
 
-    /** @var MatchMapper */
+    /**
+     * @var MatchMapper
+     */
     protected $matchMapper;
 
     /**
@@ -66,7 +68,7 @@ class Controller extends AbstractController
 
             $allTeams = $this->getMapper()->findByColumn('division_id', $division->getId(), [
                 'order' => [
-                    'name' => 'asc'
+                    'start_at' => 'asc'
                 ]
             ]);
 
@@ -130,29 +132,39 @@ class Controller extends AbstractController
      */
     public function persistEntity($entity)
     {
-//        try {
-//            $this->saveSport($entity, $this->getRequest()->post['name'], $this->getRequest()->post['url']);
-//
-//            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesSport.getList'));
-//        } catch (MapperException $e) {
-//            throw $this->getErrorMapper()->generateException(2);
-//        }
+        try {
+            $divisionId = $this->getRequest()->post['divisionId'];
+            $division   = $this->getDivisionMapper()->findById($divisionId);
+
+            $date = "{$this->getRequest()->post['startAtDate']} {$this->getRequest()->post['startAtTime']}";
+            $startAt = \Alaress_Date_Format::newLocal($date);
+
+            $this->saveMatch($entity, $division, $this->getRequest()->post['name'], $startAt);
+
+            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesMatch.getList', [
+                'contextId' => $divisionId
+            ]));
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(2);
+        }
     }
 
     /**
      * Save Match data to db
      *
      * @param Match $match
+     * @param Division $division
      * @param string $name
-     * @param string $url
+     * @param \Alaress_Date_Format $startAt
      */
-    private function saveMatch(Match $match, $name, $url)
+    private function saveMatch(Match $match, Division $division, $name, \Alaress_Date_Format $startAt)
     {
-//        $sport->setName($name);
-//        $sport->setUrl($url);
-//        $sport->setUpdatedAt(\Alaress_Date_Format::now());
-//
-//        $this->getSportMapper()->save($sport);
+        $match->setDivision($division);
+        $match->setName($name);
+        $match->setStartAt($startAt);
+        $match->setUpdatedAt(\Alaress_Date_Format::now());
+
+        $this->getMapper()->save($match);
     }
 
     /* Getters/Setters
