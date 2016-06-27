@@ -120,9 +120,14 @@ class Controller extends AbstractController
      */
     public function getEntity($entity)
     {
-//        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesSport/entity.twig', [
-//            'sport' => $entity
-//        ]));
+        $division = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
+        $sport    = $this->getSportMapper()->findById($division->getSport()->getId());
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/entity.twig', [
+            'sport' => $sport,
+            'division' => $division,
+            'match' => $entity
+        ]));
     }
 
     /**
