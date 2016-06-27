@@ -143,6 +143,7 @@ class Controller extends AbstractController
     public function getLobby($entityId)
     {
         try {
+            // Load division
             $division = $this->getDivisionMapper()->findById($entityId);
         }
         catch (MapperException $e) {
@@ -150,14 +151,11 @@ class Controller extends AbstractController
         }
 
         try {
-            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
+            $division->setSport($this->getSportMapper()->findById($division->getSport()->getId()));
         }
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
-
-        $zone     = new Zone("uploadZone");
-        $zone->setMimeFilter('text/csv')->setAttachPrompt('upload a list of players');
 
         // Load players into division
         // TODO add players into division model as a M2M join
@@ -191,12 +189,14 @@ class Controller extends AbstractController
         }
         $division->setTeams($teams);
 
+        // Create file upload zone
+        $zone     = new Zone("uploadZone");
+        $zone->setMimeFilter('text/csv')->setAttachPrompt('upload a list of players');
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@sportsfixturesDivision/lobby.twig', [
                     'division'   => $division,
-                    'sport'      => $sport,
-                    'teams'      => $teams,
                     'uploadZone' => $zone,
                     'user'       => $this->getUser(),
                 ]
