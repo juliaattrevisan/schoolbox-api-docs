@@ -65,6 +65,22 @@ class Model implements ISoftDeletable, ValueLabelInterface {
         ];
     }
 
+    /**
+     * Is this player in this team?
+     *
+     * @param User $player
+     * @return bool
+     */
+    public function isPlayerInTeam(User $player)
+    {
+        foreach ($this->getPlayers() as $teamPlayer) {
+            if ($teamPlayer->getId() == $player->getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /* Getters/Setters
      */
 

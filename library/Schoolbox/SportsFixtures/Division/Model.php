@@ -62,6 +62,55 @@ class Model implements ISoftDeletable {
         $this->players = new Collection();
     }
 
+    /**
+     * Is this player in this division?
+     *
+     * @param User $player
+     * @return bool
+     */
+    public function isPlayerInDivision(User $player)
+    {
+        foreach ($this->getPlayers() as $divisionPlayer) {
+            if ($divisionPlayer->getId() == $player->getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Is this player in a team within this division?
+     *
+     * @param User $player
+     * @return bool
+     */
+    public function isPlayerInTeam(User $player)
+    {
+        foreach ($this->getTeams() as $team) {
+            if ($team->isPlayerInTeam($player)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * What teams within this division is this player in?
+     *
+     * @param User $player
+     * @return Collection|Team\Model[]
+     */
+    public function getTeamsForPlayer(User $player)
+    {
+        $teams = new Collection();
+        foreach ($this->getTeams() as $team) {
+            if ($team->isPlayerInTeam($player)) {
+                $teams->add($team);
+            }
+        }
+        return $teams;
+    }
+
     /* Getters/Setters
      */
 
