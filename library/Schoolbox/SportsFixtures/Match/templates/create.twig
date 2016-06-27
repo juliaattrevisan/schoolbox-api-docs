@@ -77,7 +77,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Date
-                            <input type="text" name="startAtDate" placeholder="Date" data-datepicker>
+                            <input type="text" name="startAtDate" placeholder="Date" data-datepicker value="{{ match.startAt.getLocalShort }}">
                         </label>
                     </div>
 
@@ -85,7 +85,7 @@
                         <div class="timepick">
                             <label>
                                 Time
-                                <input type="text" name="startAtTime" autocomplete="off" placeholder="Start Time" class="ui-timepicker-input" data-timepicker>
+                                <input type="text" name="startAtTime" autocomplete="off" placeholder="Start Time" class="ui-timepicker-input" data-timepicker value="{{ match.startAt.getTimeOnly }}">
                             </label>
                         </div>
                     </div>
