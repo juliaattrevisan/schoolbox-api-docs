@@ -184,7 +184,9 @@ class Healthcheck
         $list[] = 'portalusers';
         $list[] = 'studboard';
         $list[] = 'tel_vw_telemf';
-        $list[] = 'ttparms';
+	$list[] = 'ttparms';
+	$list[] = 'family';
+	$list[] = 'persondefs';
         sort($list);
 
         foreach ($list as $table) {

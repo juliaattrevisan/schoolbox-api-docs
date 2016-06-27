@@ -102,10 +102,15 @@ class Sync implements SyncInterface
                 AND p.cmpy_code = sf.cmpy_code
             LEFT JOIN student as s
                 ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
+            LEFT JOIN family f
+                ON f.entity_code = p.par_code AND f.entity_gender = 'M'
+            LEFT JOIN persondefs pd
+                ON pd.person_num = f.person_num
             WHERE p.cmpy_code = $companyCode
             AND   p.f_name IS NOT NULL
             AND   s.given_name IS NOT NULL
             AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
+            AND   pd.deceased_flg != 'Y'
 
             UNION ALL
 
@@ -131,10 +136,15 @@ class Sync implements SyncInterface
                 AND p.cmpy_code = sf.cmpy_code
             LEFT JOIN student as s
                 ON (p.par_code = s.par_code AND p.cmpy_code = s.cmpy_code)
+            LEFT JOIN family f
+                ON f.entity_code = p.par_code AND f.entity_gender = 'F'
+            LEFT JOIN persondefs pd
+                ON pd.person_num = f.person_num
             WHERE p.cmpy_code = $companyCode
             AND   p.m_name IS NOT NULL
             AND   s.given_name IS NOT NULL
             AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
+            AND   pd.deceased_flg != 'Y'
 
             ORDER BY student_contact_id ASC
         ";
