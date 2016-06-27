@@ -16,12 +16,12 @@
             });
 
         // Add player to team action
-        $('[data-move-player]').on('click', function(e) {
+        $('[data-add-team-player]').on('click', function(e) {
             e.preventDefault();
             var el = $(this);
             $.post(
                 el.attr('href'),
-                [{name: 'userId[]', value: el.data('movePlayer')}]
+                [{name: 'userId[]', value: el.data('addTeamPlayer')}]
             ).done(function() {
                 window.location.reload();
             });
@@ -116,7 +116,7 @@
                                 {% for currentTeam in division.getTeams() %}
                                     <li><a href="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.getId()}) }}"
                                            class="icon-next"
-                                           data-move-player="{{ divisionPlayer.getId() }}">Add Player to {{ currentTeam.getName() }}</a></li>
+                                           data-add-team-player="{{ divisionPlayer.getId() }}">Add Player to {{ currentTeam.getName() }}</a></li>
                                 {% endfor %}
                                 <li><a href="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.getId()}) }}"
                                        class="icon-delete"
