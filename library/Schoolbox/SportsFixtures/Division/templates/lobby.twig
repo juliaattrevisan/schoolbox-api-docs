@@ -138,7 +138,7 @@
                         <li>
                             <div class="list-item">
                                 <div class="small-12 avatar card">
-                                    <h3>{{ currentTeam.getName() }}</h3>
+                                    <h3>{{ currentTeam.getName() }} ({{ currentTeam.getPlayers()|length }} {{ currentTeam.getPlayers()|length == 1 ? 'player' : 'players'}})</h3>
                                     <p><a href="{{ currentTeam.getUrl() }}">{{ currentTeam.getUrl() }}</a>
                                 </div>
                             </div>
