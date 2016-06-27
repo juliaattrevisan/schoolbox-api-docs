@@ -74,16 +74,15 @@ class Controller extends AbstractController
             $sport = $this->getSportMapper()->findById($context->getSport()->getId());
             $division = $this->getDivisionMapper()->findById($context->getId());
 
-            $allTeams = $this->getMapper()->findByColumn('division_id', $division->getId(), [
-                'order' => [
-                    'start_at' => 'asc'
-                ]
-            ]);
+            /** @var MatchMapper $mapper */
+            $mapper = $this->getMapper();
+
+            $allMatches = $mapper->findAllByDivision($division->getId());
 
             $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/list.twig', [
                 'sport' => $sport,
                 'division' => $context,
-                'allMatches' => $allTeams
+                'allMatches' => $allMatches
             ]));
         }
         catch (MapperException $e) {

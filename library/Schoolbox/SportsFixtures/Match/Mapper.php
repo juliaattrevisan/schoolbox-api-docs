@@ -74,7 +74,6 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute(array($id));
 
-
         if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
 
             /** @var Match $match */
@@ -92,5 +91,54 @@ class Mapper extends BaseMapper
         }
 
         throw new Exception('Instance of object not found');
+    }
+
+
+    /**
+     * Find all Match by their division id
+     *
+     * Also include both Teams
+     *
+     * @param int $divisionId
+     * @return \Schoolbox\Collection
+     * @throws Exception
+     */
+    public function findAllByDivision($divisionId)
+    {
+        $query = "
+            SELECT
+                {$this->getColumnString('m')},
+                {$this->getJoinColumnString('home_team', 'h')},
+                {$this->getJoinColumnString('away_team', 'a')}
+            FROM {$this->getTable()} `m`
+            LEFT JOIN {$this->getJoinSql('home_team', 'm', 'h')}
+            LEFT JOIN {$this->getJoinSql('away_team', 'm', 'a')}
+            WHERE m.division_id = ?
+            AND m.deleted_at IS NULL
+            ORDER BY m.start_at ASC
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([$divisionId]);
+
+        $collection = new \Schoolbox\Collection();
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+
+            /** @var Match $match */
+            $match = $this->hydrate($row, 'm');
+
+            /** @var Team $homeTeam */
+            /** @var Team $awayTeam */
+            $homeTeam = $this->hydrateJoin($row, 'home_team', 'h');
+            $awayTeam = $this->hydrateJoin($row, 'away_team', 'a');
+
+            $match->setHomeTeam($homeTeam);
+            $match->setAwayTeam($awayTeam);
+
+            $collection->add($match);
+        }
+
+        return $collection;
     }
 }
