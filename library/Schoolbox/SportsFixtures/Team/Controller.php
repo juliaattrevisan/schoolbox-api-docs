@@ -202,7 +202,8 @@ class Controller extends AbstractController
         foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
             $teamUsers[] = $this->getTeamUserMapper()->createModel()
                 ->setTeam($team)
-                ->setUser($user);
+                ->setUser($user)
+                ->setSequence(0);
         }
         $this->getTeamUserMapper()->save($teamUsers);
         $this->getResponse()->redirect->afterPost(

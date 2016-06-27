@@ -39,6 +39,13 @@ class Model
     protected $user;
 
     /**
+     * Order of this user within the division (higher value = higher rank)
+     *
+     * @var int
+     */
+    protected $sequence;
+
+    /**
      * Constructor - instantiate this object into minimum non-erroneous state.
      */
     public function __construct()
@@ -98,6 +105,24 @@ class Model
     public function setUser(UserModel $user)
     {
         $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSequence()
+    {
+        return $this->sequence;
+    }
+
+    /**
+     * @param  int $sequence
+     * @return static
+     */
+    public function setSequence($sequence)
+    {
+        $this->sequence = $sequence;
         return $this;
     }
 }

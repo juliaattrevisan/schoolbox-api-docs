@@ -35,6 +35,7 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('team_id', TeamMapper::class, 'id', null, null, 'team', 'team');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
+        $this->uses('sequence', self::TYPE_INTEGER);
     }
 
     /**
@@ -67,7 +68,9 @@ class Mapper extends BaseMapper
     {
         $collection = new Collection();
         foreach ($statement as $row) {
-            $model = $this->createModel()->setId($row['id']);
+            $model = $this->createModel()
+                ->setId($row['id'])
+                ->setSequence($row['sequence']);
 
             // set user and team only if retrieved properly
             $user = $this->hydrateJoin($row, 'user', 'u');

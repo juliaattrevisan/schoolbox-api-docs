@@ -158,6 +158,7 @@ CREATE TABLE `sportsfixtures_team_user` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`team_id` INT NOT NULL,
 	`user_id` INT NOT NULL,
+	`sequence` INT NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`),
 	UNIQUE INDEX `sportsfixtures_team_user__team_user` (`team_id` ASC, `user_id` ASC),
 	INDEX `fk_sportsfixtures_team_user__team_idx` (`team_id` ASC),
