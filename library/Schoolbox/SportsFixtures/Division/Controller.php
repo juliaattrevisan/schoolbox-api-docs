@@ -18,6 +18,8 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\SportsFixtures\Sport\Model as Sport;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
+use \Schoolbox\SportsFixtures\Team\User\Model as TeamUserModel;
+use \Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
 use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Division\User\Model as DivisionUserModel;
@@ -54,6 +56,11 @@ class Controller extends AbstractController
     protected $divisionUserMapper;
 
     /**
+     * @var TeamUserMapper
+     */
+    protected $teamUserMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -64,6 +71,7 @@ class Controller extends AbstractController
         $this->setTeamMapper(TeamMapper::getInstance());
         $this->setDivisionUserMapper(DivisionUserMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
+        $this->setTeamUserMapper(TeamUserMapper::getInstance());
     }
 
     /**
@@ -354,10 +362,12 @@ class Controller extends AbstractController
 
     /**
      * @param SportMapper $sportMapper
+     * @return static
      */
-    protected function setSportMapper($sportMapper)
+    protected function setSportMapper(SportMapper $sportMapper)
     {
         $this->sportMapper = $sportMapper;
+        return $this;
     }
 
     /**
@@ -378,25 +388,27 @@ class Controller extends AbstractController
 
     /**
      * @param ErrorMapper $errorMapper
+     * @return static
      */
-    protected function setErrorMapper($errorMapper)
+    protected function setErrorMapper(ErrorMapper $errorMapper)
     {
         $this->errorMapper = $errorMapper;
+        return $this;
     }
 
     /**
      * @return TeamMapper
      */
-    public function getTeamMapper()
+    protected function getTeamMapper()
     {
         return $this->teamMapper;
     }
 
     /**
      * @param  TeamMapper $teamMapper
-     * @return $this
+     * @return static
      */
-    public function setTeamMapper(TeamMapper $teamMapper)
+    protected function setTeamMapper(TeamMapper $teamMapper)
     {
         $this->teamMapper = $teamMapper;
         return $this;
@@ -405,16 +417,16 @@ class Controller extends AbstractController
     /**
      * @return DivisionUserMapper
      */
-    public function getDivisionUserMapper()
+    protected function getDivisionUserMapper()
     {
         return $this->divisionUserMapper;
     }
 
     /**
      * @param DivisionUserMapper $divisionUserMapper
-     * @return $this
+     * @return static
      */
-    public function setDivisionUserMapper(DivisionUserMapper $divisionUserMapper)
+    protected function setDivisionUserMapper(DivisionUserMapper $divisionUserMapper)
     {
         $this->divisionUserMapper = $divisionUserMapper;
         return $this;
@@ -423,18 +435,36 @@ class Controller extends AbstractController
     /**
      * @return UserMapper
      */
-    public function getUserMapper()
+    protected function getUserMapper()
     {
         return $this->userMapper;
     }
 
     /**
      * @param UserMapper $userMapper
-     * @return $this
+     * @return static
      */
-    public function setUserMapper(UserMapper $userMapper)
+    protected function setUserMapper(UserMapper $userMapper)
     {
         $this->userMapper = $userMapper;
+        return $this;
+    }
+
+    /**
+     * @return TeamUserMapper
+     */
+    protected function getTeamUserMapper()
+    {
+        return $this->teamUserMapper;
+    }
+
+    /**
+     * @param TeamUserMapper $teamUserMapper
+     * @return static
+     */
+    protected function setTeamUserMapper(TeamUserMapper $teamUserMapper)
+    {
+        $this->teamUserMapper = $teamUserMapper;
         return $this;
     }
 }
