@@ -105,8 +105,6 @@ class Sync implements SyncInterface
             INNER JOIN db2inst1.schoolbox_students
                 AS s ON ps.STUDENT_NUMBER = s.STUDENT_NUMBER
             WHERE p.SPOUSE_CARER_NUMBER IS NOT NULL
-
-            ORDER BY INTEGER("student_contact_id") ASC, INTEGER("student_id") ASC
         ');
         $stmt->execute();
         return new Iterator\Guardian(new ResultIterator($stmt));
