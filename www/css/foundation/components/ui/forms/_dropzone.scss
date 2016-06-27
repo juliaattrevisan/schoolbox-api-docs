@@ -121,15 +121,16 @@ ul.az-error-list {
             padding $attachzone-duration-3quarter $attachzone-overlay-timing $attachzone-duration-quarter,
             background-color $attachzone-overlay-duration $attachzone-overlay-timing
         );
+        &:hover{
+            background-color: transparent;
+            cursor: default;
+        }
         &.detach {
             opacity: 0;
             min-height: 0 !important;
             height: 0;
             padding-top: 0;
             padding-bottom: 0;
-        }
-        .card {
-            min-height: rem-calc($base-font-size * 3 + 1);
         }
     }
     p {
@@ -150,7 +151,6 @@ ul.az-error-list {
     }
     .filename {
         line-height: 2rem;
-        height: 2rem;
         font-style: italic;
         cursor: pointer;
     }
@@ -288,8 +288,7 @@ ul.az-error-list {
         }
     }
     &.dz-max-files-reached .dzone {
-        height: 0;
-        //.transition(none);
+        display: none;
         border-width: 0;
         &.button {
             height: 0;
@@ -327,7 +326,7 @@ ul.az-error-list {
         background-color: $attachzone-error-background;
         color: $attachzone-error-color;
         img[data-dz-thumbnail] {
-            opacity: 0;
+            display: none;
         }
         .dz-upload {
             background-color: $attachzone-error-background;
