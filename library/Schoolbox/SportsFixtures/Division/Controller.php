@@ -179,7 +179,7 @@ class Controller extends AbstractController
         $teamPlayers = $this->getTeamUserMapper()->findByColumn(
             'team_id',
             $teams->map(function ($v) { return $v->getId(); }),
-            ['order' => ['team_id' => 'asc']]
+            ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]
         );
         foreach ($teamPlayers as $teamPlayer) {
             $teamPlayerTeamId = $teamPlayer->getTeam()->getId();
