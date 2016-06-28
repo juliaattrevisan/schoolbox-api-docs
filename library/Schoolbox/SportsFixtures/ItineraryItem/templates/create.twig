@@ -48,8 +48,8 @@
                 type: 'GET',
                 dataType: 'json'
             },
-            {% if match.venue.id %}
-            value: {"id":{{ match.venue.id }}, "name": "{{ match.venue.name }}"},
+            {% if itineraryItem.venue.id %}
+            value: {"id":{{ itineraryItem.venue.id }}, "name": "{{ itineraryItem.venue.name }}"},
             {% endif %}
             multiple: false
         });

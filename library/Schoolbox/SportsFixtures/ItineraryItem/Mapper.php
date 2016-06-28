@@ -9,9 +9,10 @@ namespace Schoolbox\SportsFixtures\ItineraryItem;
 
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
+use Schoolbox\SportsFixtures\Venue\Model as Venue;
 use Schoolbox\SportsFixtures\Venue\Mapper as VenueMapper;
 use Schoolbox\SportsFixtures\ItineraryItem\Model as ItineraryItem;
-
+use \Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Class Mapper
@@ -37,5 +38,45 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+    /**
+     * Find a Match by its id
+     *
+     * Also include both Teams
+     *
+     * @param $id
+     * @return ItineraryItem
+     * @throws MapperException
+     */
+    public function findById($id)
+    {
+        $query = "
+            SELECT
+                {$this->getColumnString('i')},
+                {$this->getJoinColumnString('venue', 'v')}
+            FROM {$this->getTable()} `i`
+            LEFT JOIN {$this->getJoinSql('venue', 'i', 'v')}
+            WHERE i.id = ?
+            AND i.deleted_at IS NULL
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([$id]);
+
+        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+
+            /** @var ItineraryItem $itineraryItem */
+            $itineraryItem = $this->hydrate($row, 'i');
+
+            /** @var Venue $venue */
+            $venue = $this->hydrateJoin($row, 'venue', 'v');
+
+            $itineraryItem->setVenue($venue);
+
+            return $itineraryItem;
+        }
+
+        throw new MapperException('Instance of object not found');
     }
 }
