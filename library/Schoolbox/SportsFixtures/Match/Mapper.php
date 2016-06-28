@@ -23,6 +23,7 @@ use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Venue\Model as Venue;
 use Schoolbox\SportsFixtures\Venue\Mapper as VenueMapper;
+use Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
 use Schoolbox\Collection;
 
 /**
@@ -50,6 +51,23 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteItineraryItems'));
+    }
+
+    /**
+     * Delete all Itinerary Items associated with this Match
+     * when it's being deleted
+     *
+     * @param Match $match
+     */
+    public function deleteItineraryItems(Match $match)
+    {
+        $allItineraryItems = ItineraryItemMapper::getInstance()->findByColumn('match_id', $match->getId());
+
+        foreach ($allItineraryItems as $currentItineraryItem) {
+            ItineraryItemMapper::getInstance()->delete($currentItineraryItem);
+        }
     }
 
     /**
