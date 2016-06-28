@@ -4,7 +4,7 @@
 
 <script type="text/javascript">
     $(function() {
-        $('#positionForm').alaressValidate({
+        $('#matchForm').alaressValidate({
             rules: {
                 divisionId: {
                     required: true,
@@ -13,11 +13,29 @@
                 name: {
                     required: true,
                     minlength: 2
+                },
+                startAtDate: {
+                    required: true,
+                    minlength: 1
+                },
+                startAtTime: {
+                    required: true,
+                    minlength: 1
+                },
+                homeTeamId: {
+                    required: true,
+                    minlength: 1
+                },
+                awayTeamId: {
+                    required: true,
+                    minlength: 1
                 }
             },
             messages: {
-                'sportId': 'Please choose a Division.',
-                'name': 'Please enter a Match name.'
+                'divisionId': 'Please choose a Division.',
+                'name': 'Please enter a Match name.',
+                'startAtDate': 'Please choose a date.',
+                'startAtTime': 'Please choose a time.'
             },
             errorPlacement: function(error, element) {
                 $.alaressValidate.defaultErrorPlacement(error, element);
@@ -32,30 +50,28 @@
             }
         });
 
-        $(function() {
-            $('#homeTeam').selectizeSelector({
-                ajax: {
-                    url:      '/sportsfixtures/divisions/{{ division.id }}/teams/list',
-                    type:     'GET',
-                    dataType: 'json'
-                },
-                {% if match.homeTeam.id %}
-                value: {"id":{{ match.homeTeam.id }},"name":"{{ match.homeTeam.name }}"},
-                {% endif %}
-                multiple: false
-            });
+        $('#homeTeam').selectizeSelector({
+            ajax: {
+                url:      '/sportsfixtures/divisions/{{ division.id }}/teams/list',
+                type:     'GET',
+                dataType: 'json'
+            },
+            {% if match.homeTeam.id %}
+            value: {"id":{{ match.homeTeam.id }},"name":"{{ match.homeTeam.name }}"},
+            {% endif %}
+            multiple: false
+        });
 
-            $('#awayTeam').selectizeSelector({
-                ajax: {
-                    url:      '/sportsfixtures/divisions/{{ division.id }}/teams/list',
-                    type:     'GET',
-                    dataType: 'json'
-                },
-                {% if match.awayTeam.id %}
-                value: {"id":{{ match.awayTeam.id }},"name":"{{ match.awayTeam.name }}"},
-                {% endif %}
-                multiple: false
-            });
+        $('#awayTeam').selectizeSelector({
+            ajax: {
+                url:      '/sportsfixtures/divisions/{{ division.id }}/teams/list',
+                type:     'GET',
+                dataType: 'json'
+            },
+            {% if match.awayTeam.id %}
+            value: {"id":{{ match.awayTeam.id }},"name":"{{ match.awayTeam.name }}"},
+            {% endif %}
+            multiple: false
         });
     });
 </script>
