@@ -7,6 +7,7 @@
 
 namespace Schoolbox\SportsFixtures\Venue;
 
+use Schoolbox\Column\Decimal;
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\SportsFixtures\Venue\Model as Venue;
 
@@ -18,6 +19,27 @@ use Schoolbox\SportsFixtures\Venue\Model as Venue;
  */
 class Mapper extends BaseMapper
 {
+    /** @const int DEC_PLACES_LATITUDE Matches Google Maps API, accurate to ~1cm */
+    const DECIMAL_PLACES_LATITUDE = 7;
+
+    /** @const int DEC_PLACES_LONGITUDE Matches Google Maps API, accurate to ~1cm */
+    const DECIMAL_PLACES_LONGITUDE = 7;
+
+    /**
+     * Override default decimal places
+     */
+    public function __construct(){
+        parent::__construct();
+
+        /** @var Decimal $latitudeHydrator */
+        $latitudeHydrator = $this->getMap()['latitude']['hydrator'];
+        $latitudeHydrator->setPlaces(self::DECIMAL_PLACES_LATITUDE);
+
+        /** @var Decimal $longitudeHydrator */
+        $longitudeHydrator = $this->getMap()['longitude']['hydrator'];
+        $longitudeHydrator->setPlaces(self::DECIMAL_PLACES_LONGITUDE);
+    }
+
     /**
      * Setup mapping
      * @return void

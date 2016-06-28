@@ -10,12 +10,12 @@
             messages: {
                 name: 'Please enter a Venue name.',
                 latitude: {
-                    min: 'Latitude must lie between -90.00000 and 90.000000',
-                    max: 'Latitude must lie between -90.00000 and 90.000000'
+                    min: 'Latitude must lie between -90.000000 and 90.0000000',
+                    max: 'Latitude must lie between -90.000000 and 90.0000000'
                 },
                 longitude: {
-                    min: 'Longitude must lie between -180.00000 and 180.000000',
-                    max: 'Longitude must lie between -180.00000 and 180.000000'
+                    min: 'Longitude must lie between -180.000000 and 180.0000000',
+                    max: 'Longitude must lie between -180.000000 and 180.0000000'
                 }
             },
             errorPlacement: function(error, element) {
@@ -60,12 +60,12 @@
 
                         <label>
                             Latitude
-                            <input type="number" name="latitude" value="{{ venue.latitude }}" maxlength="10" min="-90.000000" max="90.000000"/>
+                            <input type="number" name="latitude" value="{{ venue.latitude }}" maxlength="11" min="-90.000000" max="90.000000"/>
                         </label>
 
                         <label>
                             Longitude
-                            <input type="number" name="longitude" value="{{ venue.longitude }}" maxlength="11" min="-180.000000" max="180.000000"/>
+                            <input type="number" name="longitude" value="{{ venue.longitude }}" maxlength="12" min="-180.000000" max="180.000000"/>
                         </label>
 
                         <label>

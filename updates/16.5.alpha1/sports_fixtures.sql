@@ -66,15 +66,14 @@ CREATE TABLE `sportsfixtures_division_user` (
 	) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Venue Table */
--- Lat/Long 6 decimal places -> 10cm accuracy
--- 9 decimal digits -> 4 bytes storage
--- Latitude:   -90.000000 ->  +90.000000
--- Longitude: -180.000000 -> +180.000000
+-- Lat/Long 7 decimal places -> 1cm accuracy (matches Google API return types)
+-- Latitude:   -90.0000000 ->  +90.0000000
+-- Longitude: -180.0000000 -> +180.0000000
 CREATE TABLE `sportsfixtures_venue` (
 	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
 	`name` VARCHAR(255) NOT NULL COMMENT '',
-	`latitude` DECIMAL(8,6) NULL COMMENT '',
-	`longitude` DECIMAL(9,6) NULL COMMENT '',
+	`latitude` DECIMAL(9,7) NULL COMMENT '',
+	`longitude` DECIMAL(10,7) NULL COMMENT '',
 	`address` VARCHAR(255) NOT NULL COMMENT '',
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
