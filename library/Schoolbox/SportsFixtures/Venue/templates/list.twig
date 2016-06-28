@@ -42,7 +42,7 @@
                             <div class="list-item">
                                 <div class="small-12 avatar card">
                                     <p>{{ currentVenue.name }}</p>
-                                    <dl><dt>{{ currentVenue.address }}</dt></dl>
+                                    <p class="meta">{{ currentVenue.address }}</p>
                                 </div>
                             </div>
                             <nav>
@@ -55,7 +55,7 @@
             </section>
         {% else %}
             <div class="empty-state">
-                <i class="icon-weather"></i>
+                <i class="icon-sport"></i>
                 <p>There are no Venues.</p>
                 <p><a href="{{ routeLookup('sportsfixturesVenue.getCreateForm', {}) }}" title="Add a Venue">Add a Venue</a></p>
             </div>
