@@ -99,12 +99,18 @@ class Controller extends AbstractController
      */
     public function getEntity($entity)
     {
-//        $sport = $this->getSportMapper()->findById($entity->getSport()->getId());
-//
-//        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesPosition/entity.twig', [
-//            'sport'    => $sport,
-//            'position' => $entity
-//        ]));
+        $match = $this->getMatchMapper()->findById($entity->getMatch()->getId());
+        $division = $this->getDivisionMapper()->findById($match->getDivision()->getId());
+        $sport = $this->getSportMapper()->findById($division->getSport()->getId());
+        $venue = $this->getVenueMapper()->findById($entity->getVenue()->getId());
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesItineraryItem/entity.twig', [
+            'sport'         => $sport,
+            'division'      => $division,
+            'match'         => $match,
+            'venue'         => $venue,
+            'itineraryItem' => $entity
+        ]));
     }
 
     /**

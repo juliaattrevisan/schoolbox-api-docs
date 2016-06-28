@@ -1,13 +1,9 @@
 <ul class="breadcrumb">
     <li><a href="#">Sports Fixtures</a></li>
     <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesPosition.getList', {contextId: sport.id}) }}">Positions in {{ sport.name }}</a></li>
-
-    {% if position.id %}
-        <li class="active"><a href="{{ routeLookup('sportsfixturesPosition.getModifyForm', {entityId: position.id}) }}">{{ position.name }}</a></li>
-    {% else %}
-        <li class="active"><a href="#">{{ action }}</a></li>
-    {% endif %}
+    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}">Matches in {{ division.name }}</a></li>
+    <li class="active"><a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: match.id}) }}">{{ match.name }}</a></li>
 </ul>
 
 <div class="row">
@@ -24,17 +20,26 @@
             <div class="small-12 columns">
                 <dl>
                     <dt>ID</dt>
-                    <dd>{{ position.id }}</dd>
+                    <dd>{{ itineraryItem.id }}</dd>
+
+                    <dt>Match</dt>
+                    <dd>{{ match.name }}</dd>
+
+                    <dt>Venue</dt>
+                    <dd>{{ venue.name }}</dd>
 
                     <dt>Name</dt>
-                    <dd>{{ position.name }}</dd>
+                    <dd>{{ itineraryItem.name }}</dd>
+
+                    <dt>Starts At</dt>
+                    <dd>{{ itineraryItem.startAt.database }}</dd>
 
                     <dt>Created</dt>
-                    <dd>{{ position.createdAt.database }}</dd>
+                    <dd>{{ itineraryItem.createdAt.database }}</dd>
 
-                    {% if not position.createdAt.eq(position.updatedAt) %}
+                    {% if not itineraryItem.createdAt.eq(itineraryItem.updatedAt) %}
                         <dt>Last Updated</dt>
-                        <dd>{{ position.updatedAt.database }}</dd>
+                        <dd>{{ itineraryItem.updatedAt.database }}</dd>
                     {% endif %}
                 </dl>
             </div>
