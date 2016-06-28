@@ -22,58 +22,65 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
-                <!-- BEGIN text_editable -->
-                <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
-                <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-                <script type="text/javascript">
-                    $(function() {
-                        $.fn.alaressEditor({
-                            targetElements: $('textarea[name=textBoxBody]'),
-                            file_browser_category_id : {ID}
+                <!-- BEGIN source_folder_deleted -->
+                    {SOURCE_FOLDER_DELETED}
+                <!-- END source_folder_deleted -->
+
+                <!-- BEGIN source_folder_exists -->
+
+                    <!-- BEGIN text_editable -->
+                    <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+                    <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+                    <script type="text/javascript">
+                        $(function() {
+                            $.fn.alaressEditor({
+                                targetElements: $('textarea[name=textBoxBody]'),
+                                file_browser_category_id : {ID}
+                            });
                         });
-                    });
-                </script>
+                    </script>
 
-                <form action="/textbox/textBoxForm.php" method="post" id="textBoxForm{TEXTBOX_ID}">
-                    <input type="hidden" name="originID" value="{ID}" />
-                    <input type="hidden" name="categoryID" value="{TEXTBOX_CATEGORY_ID}" />
-                    <input type="hidden" name="textBoxID" value="{TEXTBOX_ID}" />
-                    <input type="hidden" name="componentID" value="{COMPONENT_INSTANCE_ID}" />
+                    <form action="/textbox/textBoxForm.php" method="post" id="textBoxForm{TEXTBOX_ID}">
+                        <input type="hidden" name="originID" value="{ID}" />
+                        <input type="hidden" name="categoryID" value="{TEXTBOX_CATEGORY_ID}" />
+                        <input type="hidden" name="textBoxID" value="{TEXTBOX_ID}" />
+                        <input type="hidden" name="componentID" value="{COMPONENT_INSTANCE_ID}" />
 
+                        <div class="content">
+                            <a name="go-to{COMPONENT_INSTANCE_ID}"></a>
+
+                            <label for="textBoxHeading{TEXTBOX_ID}">
+                                Textbox Heading
+                                <input type="text" maxlength="100" name="textBoxHeading" id="textBoxHeading{TEXTBOX_ID}" value="{TEXTBOX_HEADING}" />
+                            </label>
+
+                            <label for="textBoxBody{TEXTBOX_ID}">
+                                Textbox Content
+                                <textarea rows="20" name="textBoxBody" id="textBoxBody{TEXTBOX_ID}">{TEXTBOX_BODY}</textarea>
+                            </label>
+
+                            <input type="submit" value="Save Content" />
+                        </div>
+                    </form>
+                    <!-- END text_editable -->
+
+                    <!-- BEGIN text_locked -->
                     <div class="content">
-                        <a name="go-to{COMPONENT_INSTANCE_ID}"></a>
-
-                        <label for="textBoxHeading{TEXTBOX_ID}">
-                            Textbox Heading
-                            <input type="text" maxlength="100" name="textBoxHeading" id="textBoxHeading{TEXTBOX_ID}" value="{TEXTBOX_HEADING}" />
-                        </label>
-
-                        <label for="textBoxBody{TEXTBOX_ID}">
-                            Textbox Content
-                            <textarea rows="20" name="textBoxBody" id="textBoxBody{TEXTBOX_ID}">{TEXTBOX_BODY}</textarea>
-                        </label>
-
-                        <input type="submit" value="Save Content" />
+                        <article>{TEXTBOX_BODY}</article>
                     </div>
-                </form>
-                <!-- END text_editable -->
-
-                <!-- BEGIN text_locked -->
-                <div class="content">
-                    <article>{TEXTBOX_BODY}</article>
-                </div>
-                <!-- BEGIN modify_text -->
-                <div class="content">
-                    <a href="/homepage/{ID}/textBoxModify/{COMPONENT_INSTANCE_ID}#go-to{COMPONENT_INSTANCE_ID}" class="button icon-modify">Modify</a>
-                    <a href="/textbox/textBoxForm.php?delete={TEXTBOX_ID}&originID={ID}" data-delete class="button icon-delete">Delete</a>
-                </div>
-                <!-- END modify_text -->
-                <!-- BEGIN create_text -->
-                <div class="content">
-                    <a href="/homepage/{ID}/textBoxCreate/{COMPONENT_INSTANCE_ID}" class="button icon-add">Create</a>
-                </div>
-                <!-- END create_text -->
-                <!-- END text_locked -->
+                    <!-- BEGIN modify_text -->
+                    <div class="content">
+                        <a href="/homepage/{ID}/textBoxModify/{COMPONENT_INSTANCE_ID}#go-to{COMPONENT_INSTANCE_ID}" class="button icon-modify">Modify</a>
+                        <a href="/textbox/textBoxForm.php?delete={TEXTBOX_ID}&originID={ID}" data-delete class="button icon-delete">Delete</a>
+                    </div>
+                    <!-- END modify_text -->
+                        <!-- BEGIN create_text -->
+                        <div class="content">
+                            <a href="/homepage/{ID}/textBoxCreate/{COMPONENT_INSTANCE_ID}" class="button icon-add">Create</a>
+                        </div>
+                        <!-- END create_text -->
+                    <!-- END text_locked -->
+                <!-- END source_folder_exists -->
             </section>
         </div>
     </div>
