@@ -60,11 +60,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
         $this->setBlock('text_locked', 'create_text', 'create_text_block');
 
-        if ($this->textbox instanceof \Schoolbox\Textbox\Model) {
-            $sourceCategory = $this->textbox->getCategory()->getId();
-        } else {
-            $sourceCategory = $this->getContext()->getId();
-        }
 
         /* If user does not have access to the source, do not output anything */
         if ($this->contentPermission < READ_ACCESS) {
@@ -110,7 +105,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                         'TEXTBOX_HEADING'     => '',
                         'TEXTBOX_BODY'        => '',
                         'TEXTBOX_ID'          => '',
-                        'TEXTBOX_CATEGORY_ID' => $sourceCategory,
+                        'TEXTBOX_CATEGORY_ID' => $this->getSource()->getId(),
                     )
                 );
             }

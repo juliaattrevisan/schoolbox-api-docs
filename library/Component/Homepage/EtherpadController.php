@@ -86,11 +86,6 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
         } else {
             $this->setVar('source_folder_deleted_block', '');
 
-            /* Decide which homepage to stream from
-             */
-            $homepageSource = $this->isUsingAltSource() ? $this->getConfig('src') : $this->instance->getIdentifier();
-
-
             /* Find all the pads associated with this list of groups
              * Apply all the component powers
              */
@@ -108,7 +103,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
                 $options['limit'] = $this->getConfig('size');
             }
 
-            $allPads = $padMapper->findByColumn('homepage_id', $homepageSource, $options);
+            $allPads = $padMapper->findByColumn('homepage_id', $this->getSource()->getId(), $options);
 
             /* Only provide Modify Document button to those with write access
              */

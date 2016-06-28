@@ -51,8 +51,4 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
 
         return true; // everything went according to plan
     }
-
-    /* Getters/Setters
-     */
-
 }

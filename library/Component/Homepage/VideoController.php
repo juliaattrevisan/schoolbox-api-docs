@@ -19,13 +19,6 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
     protected $defaultVideo;
 
     /**
-     * Source category for this component.
-     *
-     * @var int
-     */
-    protected $source_category_id;
-
-    /**
      * Available sort fields for this component.
      *
      * @var array
@@ -46,11 +39,6 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         }
         $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
-        $source = $this->getConfig('src');
-        if (empty($source)) {
-            $source = $this->getContext()->getId();
-        }
-
         /* Sort order
          */
         $sortConfig = array(
@@ -59,16 +47,15 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
             'mime'    => 'video',
         );
 
-        $this->source_category_id = $source;
 
         if ($this->getConfig('size') >= 1) {
             $this->outputList = $videoResourceMapper->findByCategory(
-                    $source,
+                    $this->getSource()->getId(),
                     $sortConfig,
                     $this->getConfig('size')
             );
         } elseif ($this->getConfig('size') == 0) {
-            $this->outputList = $videoResourceMapper->findByCategory($source, $sortConfig);
+            $this->outputList = $videoResourceMapper->findByCategory($this->getSource()->getId(), $sortConfig);
         } else {
             $this->outputList = new \Schoolbox\Collection(array());
         }
@@ -78,7 +65,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         if ($this->getConfig('video')) {
             try {
                 $video = $videoResourceMapper->findByFileId($this->getConfig('video'));
-                if ($video->isComplete() && $video->getFile()->getFolder()->getId() == $source) {
+                if ($video->isComplete() && $video->getFile()->getFolder()->getId() == $this->getSource()->getId()) {
                     $this->defaultVideo = $video;
                 }
             } catch (\Schoolbox\Mapper\Exception $e) {
@@ -102,7 +89,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 
         // Set up component name
         $this->setVar(array(
-            'FILE_CAT_ID' => $this->source_category_id,
+            'FILE_CAT_ID' => $this->getSource()->getId(),
         ));
 
         $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname'): $this->getComponentName());

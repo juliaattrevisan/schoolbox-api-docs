@@ -22,9 +22,8 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
      */
     public function execute()
     {
-
         $this->groupHandler = new Group();
-
+        return true;
     }
 
     /**

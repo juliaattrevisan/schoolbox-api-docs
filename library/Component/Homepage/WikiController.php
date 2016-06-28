@@ -73,7 +73,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         */
         $this->setVar('wiki_row_block', '');
 
-        $wikiList = $wikiHandler->getByCategory($this->source->getId(), strtolower($this->getConfig('sort')), $this->getConfig('sortdir'), $this->getConfig('size'));
+        $wikiList = $wikiHandler->getByCategory($this->getSource()->getId(), strtolower($this->getConfig('sort')), $this->getConfig('sortdir'), $this->getConfig('size'));
 
         $this->setVar(
             array(

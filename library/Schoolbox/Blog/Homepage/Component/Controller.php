@@ -51,26 +51,12 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        // Work out which (possibly deleted) folder this Blog's data is coming from, and grab a handle to it
-        $folderId = $this->isUsingAltSource() ? $this->getConfig("src") : $this->getInstance()->getIdentifier();
-        try {
-            /** @var FolderModel $folder */
-            $folder = $this->getFolderMapper()->findById($folderId);
-        } catch (MapperException\Deleted $e) {
-            $folder = $e->getDeletedObject();
-            if(!($folder instanceof FolderModel)) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-            }
-        }
-
-
-
         // Limit to the number specified in blog component config (0 == 'ALL')
         $limit = 0 == $this->getConfig('size') ? null : $this->getConfig('size');
 
         // Get specified number of blog entries for this source
         $blogs = $this->getBlogMapper()
-            ->findByColumn("folder_id", $folderId)
+            ->findByColumn("folder_id", $this->getSource()->getId())
             ->sortBy('createdAt', 'desc')
             ->limit(0, $limit);
 
@@ -102,7 +88,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             '@blog/component.twig',
             array(
                 'session'               => $_SESSION,
-                'folder'                => $folder,
+                'folder'                => $this->getSource(),
                 'blogs'                 => $blogs,
                 'blogComments'          => $blogComments,
                 'blogImages'            => $blogImages,
@@ -121,11 +107,6 @@ class Controller extends Component_Homepage_ControllerAbstract
      * @var BlogMapper;
      */
     protected $blogMapper;
-
-    /**
-     * @var ErrorMapper;
-     */
-    protected $errorMapper;
 
     /**
      * @var UserMapper;
@@ -157,24 +138,6 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function setBlogMapper($blogMapper)
     {
         $this->blogMapper = $blogMapper;
-        return $this;
-    }
-
-    /**
-     * @return ErrorMapper
-     */
-    public function getErrorMapper()
-    {
-        return $this->errorMapper;
-    }
-
-    /**
-     * @param  ErrorMapper $errorMapper
-     * @return $this
-     */
-    public function setErrorMapper($errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
         return $this;
     }
 

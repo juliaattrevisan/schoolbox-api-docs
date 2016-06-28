@@ -9,6 +9,10 @@
  *
  */
 
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+
 abstract class Component_ControllerAbstract
 {
 
@@ -105,10 +109,11 @@ abstract class Component_ControllerAbstract
      */
     protected $configurationTemplate = '';
 
-    /**
-     * @var Schoolbox\Resource\Folder\Mapper;
-     */
+    /** @var FolderMapper $folderMapper */
     protected $folderMapper;
+
+    /** @var ErrorMapper $errorMapper */
+    protected $errorMapper;
 
     /**
     * Constructor
@@ -123,9 +128,10 @@ abstract class Component_ControllerAbstract
         $this->user     = $user;
         $this->sitepage = $sitepage;
         $this->config   = $instance->getConfigArray();
-        $this->context  = new \Schoolbox\Resource\Folder\Model();
-        $this->source   = new \Schoolbox\Resource\Folder\Model();
-        $this->setFolderMapper(Schoolbox\Resource\Folder\Mapper::getInstance());
+        $this->context  = new FolderModel();
+        $this->source   = new FolderModel();
+        $this->setFolderMapper(FolderMapper::getInstance());
+        $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
     /**
@@ -143,7 +149,11 @@ abstract class Component_ControllerAbstract
             // remove any non-numeric values from the source config & support deleted folders.
             $folderId = preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'));
             $columnName = $this->getFolderMapper()->getIdentifier()['column'];
-            $this->setSource($this->getFolderMapper()->findByColumn($columnName, $folderId, ['deleted' => true])->first());
+            $source = $this->getFolderMapper()->findByColumn($columnName, $folderId, ['deleted' => true])->first();
+            if(!($source instanceof FolderModel)){
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+            }
+            $this->setSource($source);
         } else {
             $this->setSource($context);
         }
@@ -841,6 +851,24 @@ abstract class Component_ControllerAbstract
     public function setFolderMapper($folderMapper)
     {
         $this->folderMapper = $folderMapper;
+        return $this;
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    public function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+    /**
+     * @param  ErrorMapper $errorMapper
+     * @return $this
+     */
+    public function setErrorMapper($errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
         return $this;
     }
 

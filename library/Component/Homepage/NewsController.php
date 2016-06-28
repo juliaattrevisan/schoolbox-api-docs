@@ -62,14 +62,15 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
         $this->setVar(
             array(
                 // These are for the Select Alternate Source resourcebrowser
-                'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId() ? 'Local' : $this->source->getName(),
-                'NEWS_CATEGORY_ID'          => $this->source->getId(),
+                'COMPONENT_CONFIG_SRC_ID'   => $this->getSource()->getId(),
+                'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getId() == $this->getContext()->getId()
+                    ? 'Local'
+                    : $this->getSource()->getName(),
+                'NEWS_CATEGORY_ID'          => $this->getSource()->getId(),
             )
         );
 
-        $isDeletedAltSource = $this->isUsingAltSource() && $this->source->isDeleted();
-
+        $isDeletedAltSource = $this->isUsingAltSource() && $this->getSource()->isDeleted();
 
         if($isDeletedAltSource){
             $twigTemplate = 'sub/componentSourceDeleted.twig';

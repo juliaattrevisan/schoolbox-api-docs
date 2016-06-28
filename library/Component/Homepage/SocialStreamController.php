@@ -31,31 +31,10 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 
         $this->setBlock($templateHandle, 'socialstream_has_newpost', 'socialstream_has_newpost_block');
 
-        /* Assign homepage id and settings
-         */
-        $config = $this->getConfig();
-
-        /* Enforce ints
-         * Use the homepageId that the user selected via Select Alternate Source
-         * or, if that was not set, just use the current homepageId from arg[]
-         */
-        if (is_numeric($config['src']) && strlen($config['src'])) {
-            $homepageId = intval($config['src']);
-        } else {
-            $homepageId = intval($this->instance->getIdentifier());
-        }
-
-        /* Apply limits
-         */
-        $limit = intval($config['size']);
-
-        /* Set chosen homepageId - this was chosen using Select Alternate Source
-         * or otherwise uses the default arg[0] value
-         */
         $this->setVar(
             array(
-                'HOMEPAGE_ID'             => $homepageId,
-                'SOCIALSTREAM_AJAX_LIMIT' => $limit,
+                'HOMEPAGE_ID'             => $this->getSource()->getId(),
+                'SOCIALSTREAM_AJAX_LIMIT' => $this->getConfig('size'),
             )
         );
 
@@ -106,7 +85,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
 
         /* See how many posts there could be at the moment
          */
-        $numPosts = \SocialStream\PostMapper::getInstance()->findCount($homepageId);
+        $numPosts = \SocialStream\PostMapper::getInstance()->findCount($this->getSource()->getId());
 
         $this->setVar(
             array(

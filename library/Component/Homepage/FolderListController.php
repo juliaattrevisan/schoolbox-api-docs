@@ -117,7 +117,4 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
         return true;
     }
-
-    /* Getters/Setters
-     */
 }

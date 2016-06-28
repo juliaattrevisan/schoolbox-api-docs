@@ -82,11 +82,11 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->setVar(
             array(
                 // These are for the Select Alternate Source resourcebrowser
-                'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId()
+                'COMPONENT_CONFIG_SRC_ID'   => $this->getSource()->getId(),
+                'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getId() == $this->getContext()->getId()
                         ? 'Local'
-                        : $this->source->getName(),
-                'FILES_CATEGORY_ID'         => $this->source->getId(),
+                        : $this->getSource()->getName(),
+                'FILES_CATEGORY_ID'         => $this->getSource()->getId(),
             )
         );
 
@@ -111,7 +111,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         $this->parseConfig();
 
         $fileList = $this->fileMapper->findForFolders(
-            [ $this->source->getId() ],
+            [ $this->getSource()->getId() ],
             array(
                 'size'      => $this->getConfig('size'),
                 'filter'    => $filter,
@@ -182,19 +182,13 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             $this->setVar('files_block', '');
         }
         //setup block for submission button
-        $this->setVar('FILE_CAT_ID', $this->source->getId());
+        $this->setVar('FILE_CAT_ID', $this->getSource()->getId());
         $this->setBlock($templateHandle, "submit_file", "submit_file_block");
         if ($this->contentPermission < WRITE_ACCESS) {
             $this->setVar("submit_file_block", "");
         } else {
             $this->parse("submit_file_block", "submit_file");
         }
-
-
-
         return true;
     }
-
-    /* Getters/Setters
-     */
 }

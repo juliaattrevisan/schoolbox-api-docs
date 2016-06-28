@@ -118,11 +118,6 @@ class Controller extends Component_Eportfolio_ControllerAbstract
     protected $blogMapper;
 
     /**
-     * @var ErrorMapper;
-     */
-    protected $errorMapper;
-
-    /**
      * @var UserMapper;
      */
     protected $userMapper;
@@ -157,24 +152,6 @@ class Controller extends Component_Eportfolio_ControllerAbstract
     public function setEportfolioBlogMapper($blogMapper)
     {
         $this->blogMapper = $blogMapper;
-        return $this;
-    }
-
-    /**
-     * @return ErrorMapper
-     */
-    public function getErrorMapper()
-    {
-        return $this->errorMapper;
-    }
-
-    /**
-     * @param  ErrorMapper $errorMapper
-     * @return $this
-     */
-    public function setErrorMapper($errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
         return $this;
     }
 

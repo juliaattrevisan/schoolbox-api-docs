@@ -68,11 +68,6 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         // Just use the first in the list
         $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
 
-        $source = $this->getConfig('src');
-        if (empty($source)) {
-            $source = $this->getContext()->getId();
-        }
-
         /* Sort order
          */
         $sortConfig = array(
@@ -81,16 +76,14 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             'mime'    => 'audio',
         );
 
-        $this->source_category_id = $source;
-
         if ($this->getConfig('size') >= 1) {
             $this->outputList = $videoResourceMapper->findByCategory(
-                $source,
+                $this->getSource()->getId(),
                 $sortConfig,
                 $this->getConfig('size')
             );
         } elseif ($this->getConfig('size') == 0) {
-            $this->outputList = $videoResourceMapper->findByCategory($source, $sortConfig);
+            $this->outputList = $videoResourceMapper->findByCategory($this->getSource()->getId(), $sortConfig);
         } else {
             $this->outputList = new \Schoolbox\Collection(array());
         }
