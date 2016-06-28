@@ -229,7 +229,9 @@ $allReturnedWork    = new Collection();
 $returnedActivities = $returnWorkMapper->getHistory($user->getId(), $submissionBox->getId());
 foreach ($returnedActivities as $activity) {
     if ($activity instanceof Activity) {
-        $allReturnedWork->add($activity->getReturnedWork());
+		if(!$activity->getReturnedWork()->isDeleted()) {
+			$allReturnedWork->add($activity->getReturnedWork());
+		}
     }
 }
 
