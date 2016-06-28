@@ -16,67 +16,7 @@
                 }
             });
 
-        // Add player to team action
-        $('[data-add-team-player]').on('click', function(e) {
-            e.preventDefault();
-            var el       = $(this);
-            var feedback = el.closest('[data-division]').find('[data-relation="save-label"]');
-            feedback.labelActivate({text: 'Adding to team...'});
-            $.post(el.attr('href'), [{name: 'userId[]', value: el.data('addTeamPlayer')}])
-                .done(function() {
-                    window.location.reload();
-                })
-                .done(function() {
-                    feedback.labelTimeout({text: 'Added!', css: 'success'});
-                })
-                .fail(function() {
-                    feedback.labelTimeout({text: 'Add failed!', css: 'alert'});
-                });
-        });
-
-        // Remove player from team action
-        $('[data-remove-team-player]').on('click', function(e) {
-            e.preventDefault();
-            $(this).confirmDialog({
-                confirmEvent: function(el) {
-                    var feedback = el.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
-                    feedback.labelActivate({text: 'Removing from team...'});
-                    $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removeTeamPlayer')}])
-                        .done(function() {
-                            // If this event came from division list: reload that player
-                            // If this event came from team list: fade out
-                            window.location.reload();
-                        })
-                        .done(function() {
-                            feedback.labelTimeout({text: 'Removed!', css: 'success'});
-                        })
-                        .fail(function() {
-                            feedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
-                        });
-                }
-            });
-        });
-
-        // Remove player from division action
-        $('[data-remove-player]').on('click', function(e) {
-            e.preventDefault();
-            $(this).confirmDialog({
-                confirmEvent: function(el) {
-                    var feedback = el.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
-                    feedback.labelActivate({text: 'Removing from division...'});
-                    $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removePlayer')}])
-                        .done(function() {
-                            el.closest('[data-player]').fadeOut();
-                        })
-                        .done(function() {
-                            feedback.labelTimeout({text: 'Removed!', css: 'success'});
-                        })
-                        .fail(function() {
-                            feedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
-                        });
-                }
-            });
-        });
+        var sortables = $('[data-division-player-list], [data-team-player-list]');
 
         /**
          * Save ordering of a sortable.
@@ -113,6 +53,68 @@
             return $.post(sortable.data('removePlayersAction'), [{name: 'userId[]', value: playerId}])
         };
 
+        // Add player to team action
+        $('[data-add-team-player]').on('click', function(e) {
+            e.preventDefault();
+            var el       = $(this);
+            var feedback = el.closest('[data-division]').find('[data-relation="save-label"]');
+            feedback.labelActivate({text: 'Adding to team...'});
+            addPlayer(el.data('addTeamPlayer'), el.closest(sortables))
+                .done(function() {
+                    window.location.reload();
+                })
+                .done(function() {
+                    feedback.labelTimeout({text: 'Added!', css: 'success'});
+                })
+                .fail(function() {
+                    feedback.labelTimeout({text: 'Add failed!', css: 'alert'});
+                });
+        });
+
+        // Remove player from team action
+        $('[data-remove-team-player]').on('click', function(e) {
+            e.preventDefault();
+            $(this).confirmDialog({
+                confirmEvent: function(el) {
+                    var feedback = el.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
+                    feedback.labelActivate({text: 'Removing from team...'});
+                    removePlayer(el.data('removeTeamPlayer'), el.closest(sortables))
+                        .done(function() {
+                            // If this event came from division list: reload that player
+                            // If this event came from team list: fade out
+                            window.location.reload();
+                        })
+                        .done(function() {
+                            feedback.labelTimeout({text: 'Removed!', css: 'success'});
+                        })
+                        .fail(function() {
+                            feedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
+                        });
+                }
+            });
+        });
+
+        // Remove player from division action
+        $('[data-remove-player]').on('click', function(e) {
+            e.preventDefault();
+            $(this).confirmDialog({
+                confirmEvent: function(el) {
+                    var feedback = el.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
+                    feedback.labelActivate({text: 'Removing from division...'});
+                    removePlayer(el.data('removePlayer'), el.closest(sortables))
+                        .done(function() {
+                            el.closest('[data-player]').fadeOut();
+                        })
+                        .done(function() {
+                            feedback.labelTimeout({text: 'Removed!', css: 'success'});
+                        })
+                        .fail(function() {
+                            feedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
+                        });
+                }
+            });
+        });
+
         // Reorder players in division or team
         // This action handles:
         // * reordering within a division
@@ -120,7 +122,6 @@
         // * dragging from division to team (add to team + reorder team)
         // * dragging from team to division (remove from team + reorder division)
         // * dragging from team to team (remove from team + add to team + reorder team)
-        var sortables = $('[data-division-player-list], [data-team-player-list]');
         sortables.sortable({
             handle: '.grip',
             connectWith: sortables,
