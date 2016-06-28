@@ -100,22 +100,22 @@ class Controller extends AbstractController
     }
 
     /**
-     * Display form for create/update position
+     * Display form for create/update Itinerary Items
      *
      * @param Model $entity
-     * @param Sport $context
+     * @param Match $context
      */
     protected function getForm($entity, $context = null)
     {
-//        if (empty($context)) {
-//            $context = $this->getSportMapper()->findById($entity->getSport()->getId());
-//        }
-//
-//        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesPosition/create.twig', [
-//            'position' => $entity,
-//            'sport'    => $context,
-//            'action'   => $entity->getId() ? 'Modify' : 'Create'
-//        ]));
+        if (empty($context)) {
+            $context = $this->getMatchMapper()->findById($entity->getgetId());
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesItineraryItem/create.twig', [
+            'match'         => $context,
+            'itineraryItem' => $entity,
+            'action'        => $entity->getId() ? 'Modify' : 'Create'
+        ]));
     }
 
     /**

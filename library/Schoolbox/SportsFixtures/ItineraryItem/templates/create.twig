@@ -102,7 +102,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Date
-                            <input type="text" name="startAtDate" placeholder="Date" data-datepicker value="{{ match.startAt.getLocalShort }}">
+                            <input type="text" name="startAtDate" placeholder="Date" data-datepicker value="{{ itineraryItem.startAt.getLocalShort }}">
                         </label>
                     </div>
 
@@ -110,14 +110,14 @@
                         <div class="timepick">
                             <label>
                                 Time
-                                <input type="text" name="startAtTime" autocomplete="off" placeholder="Start Time" class="ui-timepicker-input" data-timepicker value="{{ match.startAt.getTimeOnly }}">
+                                <input type="text" name="startAtTime" autocomplete="off" placeholder="Start Time" class="ui-timepicker-input" data-timepicker value="{{ itineraryItem.startAt.getTimeOnly }}">
                             </label>
                         </div>
                     </div>
                 </fieldset>
 
                 <fieldset class="content">
-                    <div class="small-12 medium-6 columns">
+                    <div class="small-12 columns">
                         <label>
                             Venue
                         </label>
@@ -126,7 +126,7 @@
                 </fieldset>
             </section>
 
-            <input type="submit" value="{{ action }} Position" />
+            <input type="submit" value="{{ action }} Itinerary Item" />
         </form>
     </div>
 </div>
