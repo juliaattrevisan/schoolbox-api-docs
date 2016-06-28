@@ -50,18 +50,6 @@
             }
         });
 
-        $('#venue').selectizeSelector({
-            ajax: {
-                url:      '/sportsfixtures/venues/list',
-                type:     'GET',
-                dataType: 'json'
-            },
-            {% if match.venue.id %}
-            value: {"id":{{ match.venue.id }},"name":"{{ match.venue.name }}"},
-            {% endif %}
-            multiple: false
-        });
-
         $('#homeTeam').selectizeSelector({
             ajax: {
                 url:      '/sportsfixtures/divisions/{{ division.id }}/teams/list',
@@ -145,25 +133,30 @@
                             </label>
                         </div>
                     </div>
+                </fieldset>
 
+                <fieldset class="content">
+                    <legend>Itinerary</legend>
                     <div class="small-12 columns">
-                        <label>
-                            Venue
-                        </label>
-                        <input id='venue' name="venueId" type='text' value='' placeholder="Search Venues" />
+                        <div class="empty-state">
+                            <i class="icon-list"></i>
+                            <p>There are no items in this Match's Itinerary.</p>
+                            <p><a href="/sportsfixtures/matches/2/itinerary/new" title="Add an Itinerary Item">Add an Itinerary Item.</a></p>
+                        </div>
                     </div>
                 </fieldset>
 
                 <fieldset class="content">
+                    <legend>Participating Teams</legend>
                     <div class="small-12 medium-6 columns">
                         <label>
-                            Home Team
+                            Home
                         </label>
                         <input id='homeTeam' name="homeTeamId" type='text' value='' placeholder="Search Teams" />
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
-                            Away Team
+                            Away
                         </label>
                         <input id='awayTeam' name="awayTeamId" type='text' value='' placeholder="Search Teams" />
                     </div>
