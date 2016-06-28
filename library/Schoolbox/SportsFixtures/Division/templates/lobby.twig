@@ -78,7 +78,7 @@
             });
         });
 
-        // Reorder players
+        // Reorder players in division
         $('[data-player-list]').sortable({
             handle: '.grip',
             axis:   'y',
@@ -98,6 +98,12 @@
                         feedback.labelTimeout({text: 'Save failed!', css: 'alert'});
                     });
             }
+        });
+
+        // Reorder players in team
+        $('[data-team-player-list]').sortable({
+            handle: '.grip',
+            axis:   'y'
         });
     });
 </script>
@@ -197,7 +203,7 @@
             {% for currentTeam in division.getTeams() %}
                 <section data-team="{{ currentTeam.getId() }}">
                     <span class="label full-width hide" data-relation="save-label"></span>
-                    <ul class="information-list sortable">
+                    <ul class="information-list sortable" data-team-player-list="{{ currentTeam.getId() }}">
                         <li>
                             <div class="list-item">
                                 <div class="small-12 avatar card">
