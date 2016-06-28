@@ -48,9 +48,7 @@ class CMS
      * @param \Alaress_Date_Format $end
      * @param string $action
      * @param string $mimeType  a mime prefix, eg 'image' that will match eg, mime of 'image/gif'
-     * @return array $result
-     * @var string $result[$i]['name']
-     * @var int    $result[$i]['total']
+     * @return array
      */
     public function logFileType(\Alaress_Date_Format $start, \Alaress_Date_Format $end, $action, $mimeType){
 
@@ -90,10 +88,7 @@ class CMS
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    /**
-     * @param $role
-     * @return string
-     */
+    /* TODO This appears to be dead code as of 2016/06/28. Deliberately commented out for now.
     public function totalFiles($role) {
         $query = "SELECT COUNT(*) FROM file JOIN `user` ON file.owner=user.id
                   WHERE group_id = :role AND deleted=0";
@@ -107,4 +102,5 @@ class CMS
     public function totalLinks() {
 
     }
+    */
 }
