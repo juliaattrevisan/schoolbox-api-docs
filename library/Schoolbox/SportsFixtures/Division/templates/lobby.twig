@@ -78,6 +78,41 @@
             });
         });
 
+        /**
+         * Save ordering of a sortable.
+         *
+         * @param sortable The sortable list to save order for
+         * @returns {*} A jqXHR object
+         */
+        var saveOrdering = function(sortable) {
+            var data = sortable.find('[data-player]').map(function() {
+                return {name: 'userId[]', value: $(this).data('player')};
+            });
+            return $.post(sortable.data('reorderPlayersAction'), data)
+        };
+
+        /**
+         * Adds player to a sortable list.
+         *
+         * @param dragged  The player that was dragged
+         * @param sortable The sortable list to save into
+         * @returns {*} A jqXHR object
+         */
+        var addPlayer = function(dragged, sortable) {
+            return $.post(sortable.data('addPlayersAction'), [{name: 'userId[]', value: dragged.data('player')}])
+        };
+
+        /**
+         * Removes player from a sortable list.
+         *
+         * @param dragged  The player to remove
+         * @param sortable The sortable list to remove from
+         * @returns {*} A jqXHR object
+         */
+        var removePlayer = function(dragged, sortable) {
+            return $.post(sortable.data('removePlayersAction'), [{name: 'userId[]', value: dragged.data('player')}])
+        };
+
         // Reorder players in division or team
         // This action handles:
         // * reordering within a division
@@ -90,31 +125,71 @@
             handle: '.grip',
             connectWith: sortables,
             stop: function(event, ui) {
-                var dragged = ui.item;
-                var from    = $(event.target);
-                var to      = dragged.closest(sortables);
+                var dragged      = ui.item,
+                    from         = $(event.target),
+                    fromFeedback = from.closest('[data-team], [data-division]').find('[data-relation="save-label"]'),
+                    to           = dragged.closest(sortables),
+                    toFeedback   = to.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
                 if (from.is(to)) {
                     // Reordering either within team or division:
                     // action is the same
-                    var data = from.find('[data-player]').map(function() {
-                        return {name: 'userId[]', value: $(this).data('player')};
-                    });
-                    var feedback = from.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
-                    feedback.labelActivate({text: 'Saving order...'});
-                    $.post(from.data('reorderPlayersAction'), data)
+                    fromFeedback.labelActivate({text: 'Saving order...'});
+                    saveOrdering(from)
                         .done(function() {
-                            feedback.labelTimeout({text: 'Saved!', css: 'success'});
+                            fromFeedback.labelTimeout({text: 'Saved!', css: 'success'});
                         })
                         .fail(function() {
-                            feedback.labelTimeout({text: 'Save failed!', css: 'alert'});
+                            fromFeedback.labelTimeout({text: 'Save failed!', css: 'alert'});
                         });
 
                 } else if (from.is('[data-team-player-list]') && to.is('[data-team-player-list]')) {
-                    // Move between teams (remove from team + add to team + reorder team)
+                    // Move between teams (remove from team + add to team, reorder team)
+                    fromFeedback.labelActivate({text: 'Removing from team...'});
+                    toFeedback.labelActivate({text: 'Adding to team...'});
+                    $.when(removePlayer(dragged, from), addPlayer(dragged, to), saveOrdering(to))
+                        // TODO replace reload with AJAX redraw of player list
+                        .done(function() {
+                            window.location.reload();
+                        })
+                        .done(function() {
+                            fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
+                            toFeedback.labelTimeout({text: 'Added!', css: 'success'});
+                        })
+                        .fail(function() {
+                            fromFeedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
+                            toFeedback.labelTimeout({text: 'Added failed!', css: 'alert'});
+                        });
+
                 } else if (from.is('[data-division-player-list]') && to.is('[data-team-player-list]')) {
-                    // Move from division to team (add to team + reorder team)
+                    // Move from division to team (add to team, reorder team)
+                    toFeedback.labelActivate({text: 'Adding to team...'});
+                    $.when(addPlayer(dragged, to), saveOrdering(to))
+                        .done(function() {
+                            window.location.reload();
+                        })
+                        .done(function() {
+                            toFeedback.labelTimeout({text: 'Added!', css: 'success'});
+                        })
+                        .fail(function() {
+                            toFeedback.labelTimeout({text: 'Added failed!', css: 'alert'});
+                        });
+
                 } else if (from.is('[data-team-player-list]') && to.is('[data-division-player-list]')) {
                     // Move from team to division (remove from team + reorder division)
+                    fromFeedback.labelActivate({text: 'Removing from team...'});
+                    toFeedback.labelActivate({text: 'Saving order...'});
+                    $.when(removePlayer(dragged, from), saveOrdering(to))
+                        .done(function() {
+                            window.location.reload();
+                        })
+                        .done(function() {
+                            fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
+                            toFeedback.labelTimeout({text: 'Saved!', css: 'success'});
+                        })
+                        .fail(function() {
+                            fromFeedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
+                            toFeedback.labelTimeout({text: 'Save failed!', css: 'alert'});
+                        });
                 }
             }
         });
