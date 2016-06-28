@@ -12,6 +12,9 @@ use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
+use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
+use \Schoolbox\SportsFixtures\Division\Model as Division;
+use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use \Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
@@ -19,6 +22,16 @@ use \Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
 
 class Controller extends AbstractController
 {
+    /**
+     * @var SportMapper
+     */
+    protected $sportMapper;
+
+    /**
+     * @var DivisionMapper
+     */
+    protected $divisionMapper;
+
     /**
      * @var MatchMapper
      */
@@ -35,6 +48,8 @@ class Controller extends AbstractController
     public function __construct()
     {
         parent::__construct(ItineraryItemMapper::getInstance());
+        $this->setSportMapper(SportMapper::getInstance());
+        $this->setDivisionMapper(DivisionMapper::getInstance());
         $this->setMatchMapper(MatchMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
@@ -47,13 +62,19 @@ class Controller extends AbstractController
     public function getList($context = null)
     {
         try {
-            $allItineraryItems = $this->mapper->findByColumn('match_id', $context->getId(), [
+            /** @var Match $context */
+            $division = $this->getDivisionMapper()->findById($context->getDivision()->getId());
+            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
+
+            $allItineraryItems = $this->getMapper()->findByColumn('match_id', $context->getId(), [
                 'order' => [
                     'start_at' => 'asc'
                 ]
             ]);
 
             $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesItineraryItem/list.twig', [
+                'sport'             => $sport,
+                'division'          => $division,
                 'match'             => $context,
                 'allItineraryItems' => $allItineraryItems
             ]));
@@ -136,6 +157,38 @@ class Controller extends AbstractController
 
     /* Getters/Setters
      */
+
+    /**
+     * @return SportMapper
+     */
+    protected function getSportMapper()
+    {
+        return $this->sportMapper;
+    }
+
+    /**
+     * @param SportMapper $sportMapper
+     */
+    protected function setSportMapper($sportMapper)
+    {
+        $this->sportMapper = $sportMapper;
+    }
+
+    /**
+     * @return DivisionMapper
+     */
+    protected function getDivisionMapper()
+    {
+        return $this->divisionMapper;
+    }
+
+    /**
+     * @param DivisionMapper $divisionMapper
+     */
+    protected function setDivisionMapper($divisionMapper)
+    {
+        $this->divisionMapper = $divisionMapper;
+    }
 
     /**
      * @return MatchMapper

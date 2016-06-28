@@ -1,8 +1,20 @@
+<script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+
 <script type="text/javascript">
     $(function() {
-        $('#positionForm').alaressValidate({
+        $('#itineraryItemForm').alaressValidate({
             rules: {
-                sportId: {
+                matchId: {
+                    required: true,
+                    min: 1
+                },
+                venueId: {
+                    required: true,
+                    min: 1
+                },
+                startAt: {
                     required: true,
                     min: 1
                 },
@@ -12,23 +24,47 @@
                 }
             },
             messages: {
-                'sportId': 'Please choose a Sport.',
-                'name': 'Please enter a Position name.'
+                'matchId': 'Please choose a Match.',
+                'venueId': 'Please choose a Venue.',
+                'startAt': 'Please choose a Time',
+                'name': 'Please enter a name.'
             },
             errorPlacement: function(error, element) {
                 $.alaressValidate.defaultErrorPlacement(error, element);
             }
-        })
+        });
+
+        $('#itineraryItemForm').find('[data-datepicker]').datepicker();
+
+        $('#itineraryItemForm').find('[data-timepicker]').timepicker({
+            appendTo: function ($input) {
+                return $input.closest('.timepick');
+            }
+        });
+
+        $('#venue').selectizeSelector({
+            ajax: {
+                url: '/sportsfixtures/venues/list',
+                type: 'GET',
+                dataType: 'json'
+            },
+            {% if match.venue.id %}
+            value: {"id":{{ match.venue.id }}, "name": "{{ match.venue.name }}"},
+            {% endif %}
+            multiple: false
+        });
     });
 </script>
 
 <ul class="breadcrumb">
     <li><a href="#">Sports Fixtures</a></li>
     <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesPosition.getList', {contextId: sport.id}) }}">Positions in {{ sport.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}">Matches in {{ division.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {contextId: match.id}) }}">{{ match.name }}</a></li>
 
-    {% if position.id %}
-        <li class="active"><a href="{{ routeLookup('sportsfixturesPosition.getModifyForm', {entityId: position.id}) }}">{{ position.name }}</a></li>
+    {% if itineraryItem.id %}
+        <li class="active"><a href="{{ routeLookup('sportsfixturesItineraryItem.getModifyForm', {entityId: itineraryItem.id}) }}">{{ itineraryItem.name }}</a></li>
     {% else %}
         <li class="active"><a href="#">{{ action }}</a></li>
     {% endif %}
@@ -42,25 +78,50 @@
 
 <div class="row">
     <div class="small-12 island">
-        {% if position %}
-            {% set formUrl = routeLookup('sportsfixturesPosition.updateEntity', {entityId: position.id}) %}
+        {% if itineraryitem %}
+            {% set formUrl = routeLookup('sportsfixturesItineraryItem.updateEntity', {entityId: itineraryItem.id}) %}
         {% else %}
-            {% set formUrl = routeLookup('sportsfixturesPosition.createEntity') %}
+            {% set formUrl = routeLookup('sportsfixturesItineraryItem.createEntity') %}
         {% endif %}
 
-        <form id='positionForm' action="{{ formUrl }}" method="post">
-            <h2 class="subheader">{{ action }} Position in {{ sport.name }}</h2>
+        <form id='itineraryItemForm' action="{{ formUrl }}" method="post">
+            <h2 class="subheader">{{ action }} Itinerary Item in {{ match.name }}</h2>
 
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <input type="hidden" name="sportId" value="{{ sport.id }}"/>
-                        <input type="hidden" name="positionId" value="{{ position.id }}"/>
+                        <input type="hidden" name="matchId" value="{{ match.id }}"/>
+                        <input type="hidden" name="itineraryItemId" value="{{ itineraryItem.id }}"/>
 
                         <label>
                             Name
-                            <input type="text" name="name" value="{{ position.name }}"/>
+                            <input type="text" name="name" value="{{ itineraryItem.name }}"/>
                         </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>
+                            Date
+                            <input type="text" name="startAtDate" placeholder="Date" data-datepicker value="{{ match.startAt.getLocalShort }}">
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <div class="timepick">
+                            <label>
+                                Time
+                                <input type="text" name="startAtTime" autocomplete="off" placeholder="Start Time" class="ui-timepicker-input" data-timepicker value="{{ match.startAt.getTimeOnly }}">
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <div class="small-12 medium-6 columns">
+                        <label>
+                            Venue
+                        </label>
+                        <input id='venue' name="venueId" type='text' value='' placeholder="Search Venues" />
                     </div>
                 </fieldset>
             </section>
