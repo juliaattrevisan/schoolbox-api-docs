@@ -15,6 +15,8 @@ use Schoolbox\User as UserModel;
 use Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
+use Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
+use Schoolbox\SportsFixtures\Team\User\Model as TeamUserModel;
 
 /**
  * Mapper for the relation between divisions and users.
@@ -36,6 +38,7 @@ class Mapper extends BaseMapper
         $this->joins('division_id', DivisionMapper::class, 'id', null, null, 'division', 'division');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('sequence', self::TYPE_INTEGER);
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteTeamMembership']);
     }
 
     /**
@@ -88,5 +91,20 @@ class Mapper extends BaseMapper
             $collection->add($model);
         }
         return $collection;
+    }
+
+    /**
+     * Post-delete hook - remove this player from any teams in this division.
+     *
+     * @param Model $model
+     */
+    public function deleteTeamMembership(Model $model)
+    {
+        TeamUserMapper::getInstance()->delete(
+            TeamUserMapper::getInstance()->findForUserInDivision(
+                $model->getUser(),
+                $model->getDivision()
+            )
+        );
     }
 }

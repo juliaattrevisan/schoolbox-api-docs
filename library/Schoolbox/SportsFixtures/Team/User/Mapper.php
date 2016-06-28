@@ -12,9 +12,11 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Role as RoleModel;
 use Schoolbox\User as UserModel;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Team\Model as TeamModel;
+use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
 
 /**
  * Mapper for the relation between teams and users.
@@ -50,11 +52,13 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('user', 'u')},
                 {$this->getJoinColumnString('user.role', 'ur')},
-                {$this->getJoinColumnString('team', 't')}
+                {$this->getJoinColumnString('team', 't')},
+                {$this->getJoinColumnString('team.division', 'td')}
             FROM {$this->database->quoteIdentifier($this->table)}
             INNER JOIN {$this->getJoinSql('user', '', 'u')}
             INNER JOIN {$this->getJoinSql('user.role', 'u', 'ur')}
             INNER JOIN {$this->getJoinSql('team', '', 't')}
+            INNER JOIN {$this->getJoinSql('team.division', 't', 'td')}
         ";
     }
 
@@ -83,10 +87,29 @@ class Mapper extends BaseMapper
             }
             $team = $this->hydrateJoin($row, 'team', 't');
             if ($team instanceof TeamModel) {
+                $division = $this->hydrateJoin($row, 'team.division', 'td');
+                if ($division instanceof DivisionModel) {
+                    $team->setDivision($division);
+                }
                 $model->setTeam($team);
             }
             $collection->add($model);
         }
         return $collection;
+    }
+
+    /**
+     * Finds all team memberships for a user in a division.
+     *
+     * @param User          $user
+     * @param DivisionModel $division
+     * @return Collection|Model[]
+     */
+    public function findForUserInDivision(User $user, DivisionModel $division)
+    {
+        $query = $this->getSelectString().' WHERE td.id = :divisionId AND u.id = :userId';
+        $stmt  = $this->getDatabase()->prepare($query);
+        $stmt->execute(['userId' => $user->getId(), 'divisionId' => $division->getId(),]);
+        return $this->hydrateList($stmt);
     }
 }
