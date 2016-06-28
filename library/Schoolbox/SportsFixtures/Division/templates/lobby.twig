@@ -231,7 +231,6 @@
         </div>
         {% if division.getPlayers() is not empty %}
             <section data-division="{{ division.getId() }}">
-                <span class="label full-width hide" data-relation="save-label"></span>
                 <ul class="information-list sortable"
                     data-division-player-list="{{ division.getId() }}"
                     data-add-players-action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {entityId: division.getId()}) }}"
@@ -282,6 +281,7 @@
                         </li>
                     {% endfor %}
                 </ul>
+                <span class="label full-width hide" data-relation="save-label"></span>
             </section>
         {% else %}
             <div class="empty-state">
@@ -300,7 +300,6 @@
         {% if division.getTeams() is not empty %}
             {% for currentTeam in division.getTeams() %}
                 <section data-team="{{ currentTeam.getId() }}">
-                    <span class="label full-width hide" data-relation="save-label"></span>
                     <ul class="information-list sortable"
                         data-team-player-list="{{ currentTeam.getId() }}"
                         data-add-players-action="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.getId()}) }}"
@@ -338,6 +337,7 @@
                             </li>
                         {% endfor %}
                     </ul>
+                    <span class="label full-width hide" data-relation="save-label"></span>
                 </section>
             {% endfor %}
         {% else %}
