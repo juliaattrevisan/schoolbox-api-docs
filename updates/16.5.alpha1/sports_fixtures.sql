@@ -93,3 +93,16 @@ CREATE TABLE `sportsfixtures_match` (
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
 	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+
+/* Match ItineraryItem Table
+ */
+CREATE TABLE `sportsfixtures_match_itineraryitem` (
+	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
+	`match_id` INT NOT NULL,
+	`venue_id` INT,
+	`name` VARCHAR(255) NULL COMMENT '',
+	`start_at` DATETIME NULL COMMENT '',
+	`created_at` DATETIME NULL COMMENT '',
+	`updated_at` DATETIME NULL COMMENT '',
+	`deleted_at` DATETIME NULL COMMENT '',
+	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
