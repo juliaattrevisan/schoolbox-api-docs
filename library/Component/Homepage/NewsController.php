@@ -55,6 +55,10 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
         $this->setBlock('news', "compact", "compact_block");
         $this->setBlock('news', "full", "full_block");
 
+        /* Need title injected here
+         */
+        $this->parseConfig();
+
         /* Set up component name
          */
         $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
@@ -70,17 +74,11 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
             )
         );
 
-        $isDeletedAltSource = $this->isUsingAltSource() && $this->getSource()->isDeleted();
-
-        if($isDeletedAltSource){
-            $twigTemplate = 'sub/componentSourceDeleted.twig';
-            $twigData = array(
-                'componentInstanceId' => $this->getInstance()->getId()
-            );
-            $this->setVar('SOURCE_FOLDER_DELETED', $this->sitepage->getTwig()->render($twigTemplate, $twigData));
-            $this->parse('source_folder_deleted_block','source_folder_deleted');
-            $this->setVar('source_folder_exists_block', '');
+        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
+            $this->renderAltSourceDeleted();
         } else {
+            $this->setVar('source_folder_deleted_block', '');
+
             /* Prevent multiple news from other categories stacking up in the wrong place
              * and initialise empty news roll by default
              */
@@ -192,11 +190,10 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                     ));
                 }
             }
+            $this->parse('source_folder_exists_block','source_folder_exists');
         }
 
-        /* Need title injected here
-         */
-        $this->parseConfig();
+
 
         return true;
     }

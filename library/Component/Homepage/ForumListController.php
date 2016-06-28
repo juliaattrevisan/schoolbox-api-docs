@@ -50,15 +50,20 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
             return false;
         }
 
-        $this->parseConfig();
-
         if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 
-        $this->setBlock($templateHandle, 'forum', 'forum_block');
-        $this->setBlock($templateHandle, 'forum_post', 'forum_post_block');
+        $this->parseConfig();
+
+
+        $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
+        $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
+        $this->setBlock('source_folder_exists', 'forum', 'forum_block');
+        $this->setBlock('source_folder_exists', 'forum_post', 'forum_post_block');
         $this->setBlock('forum', 'forum_reply', 'forum_reply_block');
+
+        $isDeletedAltSource = $this->isUsingAltSource() && $this->getSource()->isDeleted();
 
         // Set up component name
         $this->setVar(

@@ -19,19 +19,6 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
      */
     private $fileMapper;
 
-    /**
-     * Category Mapper
-     *
-     * @var Schoolbox\Resource\Folder\Mapper
-     */
-    private $categoryMapper = null;
-
-    /**
-     * A category
-     *
-     * @var Schoolbox\Resource\Folder\Model
-     */
-    private $source;
 
     /**
      * Available sort fields for this component.
@@ -47,6 +34,9 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
      */
     public function execute()
     {
+        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
+            return false;
+        }
         $this->groupHandler = new Group();
         $this->setFileMapper(Schoolbox\Resource\File\Mapper::getInstance());
         return true;
@@ -119,7 +109,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         );
 
         // Have update form to back to this homepage, not the gallery's homepage
-        $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source->getId());
+        $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->getSource()->getId());
 
         // Iterate
         foreach ($allFiles as $currentFile) {
@@ -162,26 +152,6 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
 
     /* Getters/Setters
      */
-
-    /**
-     * Set category mapper
-     *
-     * @param Schoolbox\Resource\Folder\Mapper $categoryMapper
-     */
-    private function setCategoryMapper($categoryMapper)
-    {
-        $this->categoryMapper = $categoryMapper;
-    }
-
-    /**
-     * Get category mapper
-     *
-     * @return Schoolbox\Resource\Folder\Mapper
-     */
-    private function getCategoryMapper()
-    {
-        return $this->categoryMapper;
-    }
 
 
     /**
