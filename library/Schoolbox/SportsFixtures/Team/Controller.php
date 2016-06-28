@@ -17,6 +17,7 @@ use \Schoolbox\SportsFixtures\Division\Model as Division;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
+use \Schoolbox\SportsFixtures\Team\User\Model as TeamUserModel;
 use \Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
 use Schoolbox\UserMapper;
 
@@ -227,6 +228,38 @@ class Controller extends AbstractController
                 'team_id' => $team->getId(),
             ])
         );
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'sportsfixturesTeam.getList',
+                ['contextId' => $team->getDivision()->getId()]
+            )
+        );
+    }
+
+    /**
+     * Reorder players within a Team
+     *
+     * @param Team $team
+     */
+    public function postReorderPlayers(Team $team)
+    {
+        $userIds    = $this->getRequest()->post->get('userId');
+        $teamUsers  = [];
+        $sequenceNo = count($userIds);
+        foreach ($userIds as $userId) {
+            try {
+                /** @var TeamUserModel $teamUser */
+                $teamUser = $this->getTeamUserMapper()->findOneByColumnList([
+                    'user_id' => $userId,
+                    'team_id' => $team->getId(),
+                ]);
+                $teamUsers[] = $teamUser->setSequence($sequenceNo--);
+            } catch (MapperException $e) {
+                // User isn't in team. Ignore
+                continue;
+            }
+        }
+        $this->getTeamUserMapper()->save($teamUsers);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'sportsfixturesTeam.getList',
