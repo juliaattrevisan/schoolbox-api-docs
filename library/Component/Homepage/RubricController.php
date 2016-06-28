@@ -43,6 +43,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
             ),
             array('order' => array('grouping' => 'ASC', 'name' => 'ASC'))
         );
+        return true;
     }
 
     /**

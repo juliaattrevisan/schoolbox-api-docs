@@ -18,7 +18,8 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
     /**
      * Prepares data for the render function. Business logic.
-     * @return void
+     *
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
@@ -40,6 +41,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         if (!$this->getTextbox()->getHeading()) {
             $this->getTextbox()->setHeading('Text Box');
         }
+        return true;
     }
 
     /**

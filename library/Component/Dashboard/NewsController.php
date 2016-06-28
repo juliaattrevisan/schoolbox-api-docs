@@ -20,6 +20,11 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
         $this->news = $news;
     }
 
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
     public function execute() {
         $archive     = false;
         $topic       = '';

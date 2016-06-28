@@ -27,11 +27,12 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
         $this->groupHandler = new Group();
+        return true;
     }
 
     /**

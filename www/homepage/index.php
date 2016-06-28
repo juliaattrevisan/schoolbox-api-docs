@@ -422,7 +422,7 @@ foreach ($componentCollection as $component) {
 
     $component->setup($category, $instance->getConfigArray());
 
-    if ($component->execute() !== false) {
+    if ($component->execute()) {
         if ($component->renderTemplate($templateHandle) !== false) {
             if (!in_array($instance->getPosition(), $occupiedPositionList)) {
                 $occupiedPositionList[] = $instance->getPosition();

@@ -11,6 +11,11 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
     private $feedList;
     private $limit = 20;
 
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
     public function execute() {
         $feedHandler = new Feed();
         $groupHandler = new Group();

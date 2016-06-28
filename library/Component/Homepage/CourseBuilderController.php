@@ -48,7 +48,9 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
     protected $categoryWithUnitList;
 
     /**
-     * {@inheritdoc}
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
@@ -70,6 +72,7 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
                 }
             )
         );
+        return true;
     }
 
     /**

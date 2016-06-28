@@ -14,6 +14,11 @@ class Component_Dashboard_TextboxController extends Component_Dashboard_Controll
 	private $content;
 	private $hideHeader;
 
+	/**
+	 * Prepares data for the render function. Business logic.
+	 *
+	 * @return bool Whether to continue on and attempt Component render
+	 */
 	public function execute() {
 		$textBoxID = $this->getConfig('textboxSearch');
 		$this->hideHeader = $this->getConfig('compactMode');
@@ -35,10 +40,8 @@ class Component_Dashboard_TextboxController extends Component_Dashboard_Controll
 					'BOX_CONTENT' => ''
 				);
 			}
-
 			return true;
 		}
-
 		return false;
 	}
 

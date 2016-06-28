@@ -35,23 +35,12 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
         $this->groupHandler = new Group();
-        $this->setCategoryMapper(Schoolbox\Resource\Folder\Mapper::getInstance());
-
-        $this->source = $this->getCategoryMapper()->createModel();
-
-        if (is_numeric($this->getConfig('src'))) {
-            try {
-                // remove any non-numeric values from the source config
-                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            } catch (\Exception $e) {
-                // noop
-            }
-        }
+        return true;
     }
 
     /**

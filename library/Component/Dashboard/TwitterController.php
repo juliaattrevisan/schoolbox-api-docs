@@ -12,15 +12,6 @@ use Zend\Uri\UriFactory;
 class Component_Dashboard_TwitterController extends Component_Dashboard_ControllerAbstract {
 
     /**
-     * Prepares data for the render function. Business logic.
-     *
-     * @return void
-     */
-    public function execute() {
-
-    }
-
-    /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle
      * @return boolean

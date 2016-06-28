@@ -12,6 +12,11 @@ class Component_Homepage_Statistics_PageVisitsController extends Component_Homep
 
     private $colours = array();
 
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
     public function execute() {
         $groupColours = array(
             'staff'   => '#579DCF',

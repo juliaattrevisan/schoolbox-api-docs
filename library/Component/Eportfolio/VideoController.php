@@ -32,14 +32,6 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
     */
     protected $sortFields = array('name', 'date');
 
-    /**
-     * Prepares data for the render function. Business logic.
-     *
-     * @return void
-     */
-    public function execute()
-    {
-    }
 
     /**
      * Renders the data into the SitePage. Presentation logic.

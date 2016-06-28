@@ -44,7 +44,7 @@ class Component_Dashboard_CalendarController extends Component_Dashboard_Control
     /**
      * Get all the events you need to pump into the page
      *
-     * @return bool|void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {

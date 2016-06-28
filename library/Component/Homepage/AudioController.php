@@ -31,11 +31,12 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
         $this->allowedFileHandler = new AllowedFile();
+        return true;
     }
 
     /**

@@ -18,13 +18,12 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
-
         $this->groupHandler = new Group();
-
+        return true;
     }
 
     /**

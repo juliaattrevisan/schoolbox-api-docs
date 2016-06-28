@@ -16,14 +16,20 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
     protected $componentName = 'Most Recent Submissions';
     protected $componentHref = '/submission/listSubmission/';
 
-    public function execute () {
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
+    public function execute()
+    {
         // init handlers
         $this->submissionHandler = new Submission();
 
-
         // don't try to parse data if we're not a teacher
-        if(!$_SESSION['user']->getRole()->isStaff())
+        if (!$_SESSION['user']->getRole()->isStaff()) {
             return false;
+        }
 
         // returns appropriately sorted and formatted data for this module
         $this->submissions = $this->getSubmissionHandler()->getTotalSubmissionsByOwner($_SESSION['id']);

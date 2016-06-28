@@ -33,12 +33,13 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
         $this->groupHandler = new Group();
         $this->setLinkMapper(new \Schoolbox\Resource\LinkMapper());
+        return true;
     }
 
     /**

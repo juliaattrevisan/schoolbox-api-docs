@@ -152,10 +152,11 @@ abstract class Component_ControllerAbstract
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute(){
         // Default to no action
+        return true;
     }
 
     /**

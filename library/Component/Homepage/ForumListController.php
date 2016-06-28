@@ -24,11 +24,12 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
         $this->groupHandler = new Group();
+        return true;
     }
 
     /**

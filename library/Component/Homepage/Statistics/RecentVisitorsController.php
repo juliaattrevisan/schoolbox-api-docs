@@ -10,6 +10,11 @@ class Component_Homepage_Statistics_RecentVisitorsController extends Component_H
 {
     private $visitors;
 
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
     public function execute()
     {
         $dateFilter = sprintf(
@@ -42,6 +47,7 @@ class Component_Homepage_Statistics_RecentVisitorsController extends Component_H
             $visitors[] = $user;
         }
         $this->visitors = $visitors;
+        return true;
     }
 
     public function renderTemplate($templateHandle)

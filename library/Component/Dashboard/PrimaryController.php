@@ -13,6 +13,11 @@ class Component_Dashboard_PrimaryController extends Component_Dashboard_Controll
 
     protected $homeroom;
 
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
     public function execute () {
         if ( is_array($_SESSION['subjects']) ) {
             foreach ( $_SESSION['subjects'] as $subject ) {

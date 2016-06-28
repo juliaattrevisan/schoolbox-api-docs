@@ -13,6 +13,11 @@ class Component_Dashboard_QuicklinksController extends Component_Dashboard_Contr
 
     private $quicklinks;
 
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
     public function execute () {
 
         // data setup is based on the user that's about to see it

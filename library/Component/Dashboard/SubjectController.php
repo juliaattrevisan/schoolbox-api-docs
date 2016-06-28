@@ -23,9 +23,9 @@ class Component_Dashboard_SubjectController extends Component_Dashboard_Controll
     protected $componentName = 'My Subjects';
 
     /**
-     * Business logic to collate data ready for output
+     * Prepares data for the render function. Business logic.
      *
-     * @return bool
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute() {
         $this->subject_list = $_SESSION['subjects'];

@@ -21,11 +21,12 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
         $this->groupHandler = new Group();
+        return true;
     }
 
     /**

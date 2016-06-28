@@ -40,6 +40,11 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         $this->category = $category;
     }
 
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
     public function execute()
     {
         $user = $_SESSION['user'];
@@ -80,8 +85,6 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         $this->colourList = Timetable_ColourMapper::getInstance()->findAll();
 
         return true;
-
-
     }
 
     function __call($name, $arguments)

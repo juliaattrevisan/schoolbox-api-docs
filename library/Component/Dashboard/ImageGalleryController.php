@@ -41,12 +41,13 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
         $this->setGroupHandler(new Group());
         $this->setFileMapper(new \Schoolbox\Resource\File\Mapper());
+        return true;
     }
 
 

@@ -23,7 +23,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
@@ -32,6 +32,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                 ->getUpcomingActivities(null, $this->getConfig('size'), $this->getContext()->getId())
                 ->getColumnValues('submissionBox')
         );
+        return true;
     }
 
     /**

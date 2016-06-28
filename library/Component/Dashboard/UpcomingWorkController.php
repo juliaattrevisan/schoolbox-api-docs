@@ -47,9 +47,11 @@ class Component_Dashboard_UpcomingWorkController extends Component_Dashboard_Con
      */
     private $showAssessLink;
 
+
     /**
      * Business logic to collate data ready for output
-     * @return bool
+     *
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {

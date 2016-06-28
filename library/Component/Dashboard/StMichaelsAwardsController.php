@@ -46,7 +46,7 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return bool
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {

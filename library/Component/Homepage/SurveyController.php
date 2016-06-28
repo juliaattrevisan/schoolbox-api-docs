@@ -18,7 +18,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {

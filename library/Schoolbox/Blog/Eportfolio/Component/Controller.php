@@ -48,16 +48,6 @@ class Controller extends Component_Eportfolio_ControllerAbstract
     }
 
     /**
-     * Loads the grid component into its set configuration.
-     *
-     * @return true
-     */
-    public function execute()
-    {
-        return true;
-    }
-
-    /**
      * @param String $templateHandle
      *
      * @return bool

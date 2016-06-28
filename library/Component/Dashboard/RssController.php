@@ -27,10 +27,6 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
 
     }
 
-    public function execute() {
-
-        return true;
-    }
 
     public function renderTemplate($templateHandle) {
         if (!$this->loadTemplate($templateHandle, 'rss')) {

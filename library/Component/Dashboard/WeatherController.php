@@ -22,6 +22,11 @@ class Component_Dashboard_WeatherController extends Component_Dashboard_Controll
     }
 
 
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
     public function execute() {
         if (!Cfg::get('weather_enable')) {
             return false;

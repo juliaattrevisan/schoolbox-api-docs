@@ -22,12 +22,13 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
         $this->groupHandler = new Group();
         $this->newsHandler  = new CategoryNews();
+        return true;
     }
 
     /**

@@ -29,7 +29,7 @@ class CurriculumOverviewController extends Component_Homepage_ControllerAbstract
     /**
      * Loads the component's configuration.
      *
-     * @return bool
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {

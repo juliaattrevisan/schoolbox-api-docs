@@ -17,8 +17,8 @@ class Component_Dashboard_GreetingController extends Component_Dashboard_Control
 	 * Generate a text string for the header, containing a greeting and
 	 * the current user's full name
 	 *
-	 * @return bool|void
-	 */
+     * @return bool Whether to continue on and attempt Component render
+     */
 	public function execute() {
         $tf = new TextFormatter();
 

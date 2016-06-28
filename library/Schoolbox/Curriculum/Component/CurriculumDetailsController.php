@@ -26,9 +26,9 @@ class CurriculumDetailsController extends Component_Homepage_ControllerAbstract
     protected $curriculumNode = null;
 
     /**
-     * Loads the component's configuration.
+     * Prepares data for the render function. Business logic.
      *
-     * @return bool
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
