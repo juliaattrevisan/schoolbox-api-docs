@@ -42,6 +42,26 @@
             return $.post(action, [{name: 'userId[]', value: playerId}])
         };
 
+        /**
+         * Refreshes player lists given a HTML segment.
+         *
+         * @param segment The HTML segment
+         */
+        var refreshPlayerList = function(segment) {
+            var newSegments = $(segment).find('[data-division-player-list], [data-team-player-list]');
+            sortables.each(function() {
+                var oldList = $(this);
+                // Find matching in newSegments
+                var newList = newSegments.filter(function() {
+                    var $this = $(this);
+                    return (oldList.data('divisionPlayerList') == $this.data('divisionPlayerList')
+                        && oldList.data('teamPlayerList') == $this.data('teamPlayerList')
+                    );
+                });
+                oldList.empty().append(newList.children());
+            });
+        };
+
         // Add player to team action
         sortables.on('click', '[data-add-team-player]', function(e) {
             e.preventDefault();
@@ -49,8 +69,8 @@
             var feedback = el.closest('[data-division]').find('[data-relation="save-label"]');
             feedback.labelActivate({text: 'Adding to team...'});
             postPlayer(el.data('addTeamPlayer'), el.attr('href'))
-                .done(function() {
-                    window.location.reload();
+                .done(function(response) {
+                    refreshPlayerList(response);
                 })
                 .done(function() {
                     feedback.labelTimeout({text: 'Added!', css: 'success'});
@@ -68,10 +88,8 @@
                     var feedback = el.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
                     feedback.labelActivate({text: 'Removing from team...'});
                     postPlayer(el.data('removeTeamPlayer'), el.attr('href'))
-                        .done(function() {
-                            // If this event came from division list: reload that player
-                            // If this event came from team list: fade out
-                            window.location.reload();
+                        .done(function(response) {
+                            refreshPlayerList(response);
                         })
                         .done(function() {
                             feedback.labelTimeout({text: 'Removed!', css: 'success'});
@@ -91,8 +109,8 @@
                     var feedback = el.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
                     feedback.labelActivate({text: 'Removing from division...'});
                     postPlayer(el.data('removePlayer'), el.attr('href'))
-                        .done(function() {
-                            el.closest('[data-player]').fadeOut();
+                        .done(function(response) {
+                            refreshPlayerList(response);
                         })
                         .done(function() {
                             feedback.labelTimeout({text: 'Removed!', css: 'success'});
@@ -144,9 +162,8 @@
                         .then(function() {
                             return saveOrdering(to);
                         })
-                        .done(function() {
-                            // TODO replace reload with AJAX redraw of player list
-                            window.location.reload();
+                        .done(function(response) {
+                            refreshPlayerList(response);
                         })
                         .done(function() {
                             fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
@@ -165,8 +182,8 @@
                         .then(function() {
                             return saveOrdering(to);
                         })
-                        .done(function() {
-                            window.location.reload();
+                        .done(function(response) {
+                            refreshPlayerList(response);
                         })
                         .done(function() {
                             toFeedback.labelTimeout({text: 'Added!', css: 'success'});
@@ -180,8 +197,8 @@
                     fromFeedback.labelActivate({text: 'Removing from team...'});
                     toFeedback.labelActivate({text: 'Saving order...'});
                     $.when(postPlayer(dragged.data('player'), from.data('removePlayersAction')), saveOrdering(to))
-                        .done(function() {
-                            window.location.reload();
+                        .done(function(response) {
+                            refreshPlayerList(response);
                         })
                         .done(function() {
                             fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
