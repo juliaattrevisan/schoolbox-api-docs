@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use React\Stomp\Protocol\Frame;
 use Schoolbox\Notif\Formatter\CompressedFormatter;
 use Schoolbox\Notif\Formatter\CompressionException;
+use Schoolbox\Notif\SilentNotif;
 use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Realtime\Schedule\ScheduleException;
 
@@ -292,7 +293,7 @@ function interrogate($input, LoggerInterface $log)
 	}
 
 	if ($instance instanceof \Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier) {
-		$instance->enableLogging(new \Schoolbox\Notif\Notif(), $log);
+		$instance->enableLogging(new SilentNotif($log), $log);
 	}
 
 	$log->debug(sprintf("Got a module instance of %s, continuing...", get_class($instance)));
