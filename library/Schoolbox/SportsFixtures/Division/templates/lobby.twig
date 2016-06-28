@@ -161,7 +161,7 @@
                         })
                         .fail(function() {
                             fromFeedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
-                            toFeedback.labelTimeout({text: 'Added failed!', css: 'alert'});
+                            toFeedback.labelTimeout({text: 'Add failed!', css: 'alert'});
                         });
 
                 } else if (from.is('[data-division-player-list]') && to.is('[data-team-player-list]')) {
@@ -179,7 +179,7 @@
                             toFeedback.labelTimeout({text: 'Added!', css: 'success'});
                         })
                         .fail(function() {
-                            toFeedback.labelTimeout({text: 'Added failed!', css: 'alert'});
+                            toFeedback.labelTimeout({text: 'Add failed!', css: 'alert'});
                         });
 
                 } else if (from.is('[data-team-player-list]') && to.is('[data-division-player-list]')) {
