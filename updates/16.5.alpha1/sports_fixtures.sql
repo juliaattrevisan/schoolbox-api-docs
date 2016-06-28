@@ -79,3 +79,15 @@ CREATE TABLE `sportsfixtures_venue` (
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
 	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+
+/* Match Table
+ */
+CREATE TABLE `sportsfixtures_match` (
+	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
+	`division_id` INT NOT NULL,
+	`name` VARCHAR(255) NULL COMMENT '',
+	`start_at` DATETIME NULL COMMENT '',
+	`created_at` DATETIME NULL COMMENT '',
+	`updated_at` DATETIME NULL COMMENT '',
+	`deleted_at` DATETIME NULL COMMENT '',
+	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;

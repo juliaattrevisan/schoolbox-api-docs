@@ -43,4 +43,22 @@ abstract class AbstractController extends \Alaress\Web\Controller\Restful\Abstra
         $this->mapper->delete($entity);
     }
 
+    /* Getters/Setters
+     */
+
+    /**
+     * @return Mapper
+     */
+    protected function getMapper()
+    {
+        return $this->mapper;
+    }
+
+    /**
+     * @param Mapper $mapper
+     */
+    protected function setMapper($mapper)
+    {
+        $this->mapper = $mapper;
+    }
 }

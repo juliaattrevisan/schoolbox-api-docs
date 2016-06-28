@@ -1,0 +1,43 @@
+<ul class="breadcrumb">
+    <li><a href="#">Sports Fixtures</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesPosition.getList', {contextId: sport.id}) }}">Positions in {{ sport.name }}</a></li>
+
+    {% if position.id %}
+        <li class="active"><a href="{{ routeLookup('sportsfixturesPosition.getModifyForm', {entityId: position.id}) }}">{{ position.name }}</a></li>
+    {% else %}
+        <li class="active"><a href="#">{{ action }}</a></li>
+    {% endif %}
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sports Fixtures</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">{{ position.name }}</h2>
+
+        <section class="content">
+            <div class="small-12 columns">
+                <dl>
+                    <dt>ID</dt>
+                    <dd>{{ position.id }}</dd>
+
+                    <dt>Name</dt>
+                    <dd>{{ position.name }}</dd>
+
+                    <dt>Created</dt>
+                    <dd>{{ position.createdAt.database }}</dd>
+
+                    {% if not position.createdAt.eq(position.updatedAt) %}
+                        <dt>Last Updated</dt>
+                        <dd>{{ position.updatedAt.database }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </section>
+    </div>
+</div>
