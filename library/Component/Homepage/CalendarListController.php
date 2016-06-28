@@ -25,6 +25,12 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
      * @var Calendar
      */
     private $calendarHandler;
+    
+    /** @var  Alaress_Date_Format $start */
+    protected $start;
+
+    /** @var  Alaress_Date_Format $end */
+    protected $end;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -66,7 +72,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
         }
 
         $now         = Alaress_Date_Format::now();
-        $prevDay = false;
+        $prevDay     = false;
         $this->start = $now->startOfDay();
         $this->end   = clone $this->start;
         $this->end->addDays($days);
