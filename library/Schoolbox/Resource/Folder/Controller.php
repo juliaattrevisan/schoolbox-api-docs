@@ -266,9 +266,7 @@ class Controller extends BaseController
             throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_RESOURCE_DELETE);
         }
 
-        $_SESSION['resourcesID'] = $folder->getParent()->getId();
-
-        $folderMapper->delete($folder);
+        $this->recursiveDelete($this->getRequest()->post["id"], $this->getUser());
 
         $this->getResponse()->content->set([
             'format' => 'json',
@@ -628,13 +626,13 @@ class Controller extends BaseController
     }
 
     /**
-     * Delete folder and all children (superusers only)
+     * This is the same action as deleting a folder.
      *
      * @throws SchoolboxException
      */
     public function postDeleteFolderAll()
     {
-        $this->recursiveDelete($this->getRequest()->post["id"], $this->getUser());
+        $this->postDeleteFolder();
     }
 
 
@@ -648,8 +646,11 @@ class Controller extends BaseController
         $errorMapper = $this->getErrorMapper();
         $folderMapper = $this->getFolderMapper();
 
+        // If I'm not a superuser, I can't delete a non-empty folder
         if (!$user->isSuperuser()) {
-            throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_DELETE_SUBFOLDERS);
+            if ($folderMapper->countByColumn('parent', $id) > 0) {
+                throw $errorMapper->generateException(ErrorMapper::ERROR_PERM_CATEGORY_DELETE_SUBFOLDERS);
+            }
         }
 
         try {
