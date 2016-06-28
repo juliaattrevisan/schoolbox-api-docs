@@ -172,8 +172,11 @@
                         <li>
                             <div class="list-item">
                                 <div class="small-12 avatar card">
-                                    <h3>{{ currentTeam.getName() }} ({{ currentTeam.getPlayers()|length }} {{ currentTeam.getPlayers()|length == 1 ? 'player' : 'players'}})</h3>
-                                    <p><a href="{{ currentTeam.getUrl() }}">{{ currentTeam.getUrl() }}</a>
+                                    <h3>{{ currentTeam.getName() }}</h3>
+                                    <p class="meta icon-group">
+                                        {{ currentTeam.getPlayers()|length }}
+                                        {{ currentTeam.getPlayers()|length == 1 ? 'player in team' : 'players in team'}}
+                                    </p>
                                 </div>
                             </div>
                         </li>
