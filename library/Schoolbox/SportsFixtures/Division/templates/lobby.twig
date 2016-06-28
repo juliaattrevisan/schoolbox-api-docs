@@ -79,24 +79,20 @@
         });
 
         // Reorder players in division or team
-        $('[data-player-list], [data-team-player-list]').sortable({
+        // This action handles:
+        // * reordering within a division
+        // * reordering within a team
+        // * dragging from division to team (add to team + reorder team)
+        // * dragging from team to division (remove from team + reorder division)
+        // * dragging from team to team (remove from team + add to team + reorder team)
+        var sortables = $('[data-player-list], [data-team-player-list]');
+        sortables.sortable({
             handle: '.grip',
-            axis:   'y',
-            stop:   function(e) {
-                // Build a list of user IDs, and save ordering
-                var el   = $(e.target);
-                var data = el.find('[data-player]').map(function() {
-                    return {name: 'userId[]', value: $(this).data('player')};
-                });
-                var feedback = el.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
-                feedback.labelActivate({text: 'Saving order...'});
-                $.post(el.data('sortableOnstopAction'), data)
-                    .done(function() {
-                        feedback.labelTimeout({text: 'Saved!', css: 'success'});
-                    })
-                    .fail(function() {
-                        feedback.labelTimeout({text: 'Save failed!', css: 'alert'});
-                    });
+            connectWith: sortables,
+            stop: function(event, ui) {
+                var dragged = ui.item;
+                var from    = $(event.target);
+                var to      = dragged.closest(sortables);
             }
         });
     });
