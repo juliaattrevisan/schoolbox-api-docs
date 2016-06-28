@@ -119,7 +119,17 @@ class Controller extends AbstractController
             $context = $this->getMatchMapper()->findById($entity->getMatch()->getId());
         }
 
+        try {
+            $division = $this->getDivisionMapper()->findById($context->getDivision()->getId());
+            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
+        }
+        catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(2);
+            }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesItineraryItem/create.twig', [
+            'sport'         => $sport,
+            'division'      => $division,
             'match'         => $context,
             'itineraryItem' => $entity,
             'action'        => $entity->getId() ? 'Modify' : 'Create'
