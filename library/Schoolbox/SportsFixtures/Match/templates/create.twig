@@ -137,8 +137,8 @@
 
                 <fieldset class="content">
                     <legend>Itinerary</legend>
-                    <div class="small-12 columns">
 
+                    <div class="small-12 columns">
                         {% if allItineraryItems|length %}
                         <ul class="action-list">
                             {% for currentItineraryItem in allItineraryItems %}
@@ -162,6 +162,8 @@
                             <p><a href="{{ routeLookup('sportsfixturesItineraryItem.getCreateForm', {contextId: match.id}) }}" title="Add an Itinerary Item">Add an Itinerary Item.</a></p>
                         </div>
                         {% endif %}
+
+                        <a href="{{ routeLookup('sportsfixturesItineraryItem.getCreateForm', {contextId: match.id}) }}" class="full-width button icon-add">Add Itinerary Item</a>
                     </div>
                 </fieldset>
 
