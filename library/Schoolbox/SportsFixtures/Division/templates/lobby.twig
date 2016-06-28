@@ -84,6 +84,7 @@
         sortables.on('click', '[data-remove-team-player]', function(e) {
             e.preventDefault();
             $(this).confirmDialog({
+                text: 'Are you sure you wish to remove this player from this team?',
                 confirmEvent: function(el) {
                     var feedback = el.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
                     feedback.labelActivate({text: 'Removing from team...'});
@@ -105,6 +106,7 @@
         sortables.on('click', '[data-remove-player]', function(e) {
             e.preventDefault();
             $(this).confirmDialog({
+                text: 'Are you sure you wish to remove this player from this division, and all teams within this division?',
                 confirmEvent: function(el) {
                     var feedback = el.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
                     feedback.labelActivate({text: 'Removing from division...'});
