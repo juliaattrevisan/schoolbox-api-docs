@@ -16,9 +16,11 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\SportsFixtures\Match\Model as Match;
+use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
+use Schoolbox\Collection;
 
 /**
  * Class Mapper
@@ -79,11 +81,15 @@ class Mapper extends BaseMapper
             /** @var Match $match */
             $match = $this->hydrate($row, 'm');
 
+            /** @var Division $division */
+            $division = $this->hydrateJoin($row, 'division', 'd');
+
             /** @var Team $homeTeam */
             /** @var Team $awayTeam */
             $homeTeam = $this->hydrateJoin($row, 'home_team', 'h');
             $awayTeam = $this->hydrateJoin($row, 'away_team', 'a');
 
+            $match->setDivision($division);
             $match->setHomeTeam($homeTeam);
             $match->setAwayTeam($awayTeam);
 
@@ -121,7 +127,7 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([$divisionId]);
 
-        $collection = new \Schoolbox\Collection();
+        $collection = new Collection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
 
