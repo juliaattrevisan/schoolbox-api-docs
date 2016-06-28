@@ -40,26 +40,52 @@ class CMS
         return $statement->fetchAll();
     }
 
+    /**
+     *
+     * @param \Alaress_Date_Format $start
+     * @param \Alaress_Date_Format $end
+     * @param string $action
+     * @param string $fileType
+     * @return array $result
+     * @var string $result[$i]['name']
+     * @var int    $result[$i]['total']
+     */
     public function logFileType(\Alaress_Date_Format $start, \Alaress_Date_Format $end, $action, $fileType) {
-        $query = "
-                SELECT groups.name, COUNT(*) as total FROM cmsLog
-                JOIN `user` ON cmsLog.user = `user`.id JOIN groups ON user.group_id = groups.id
-                JOIN file ON objectId = file.id
-                WHERE object = 'file' AND action = :action AND
-                file.mime_type like :type AND
-                `time` >= :start AND `time` <= :end
-                GROUP BY group_id";
 
-        $fileType = $fileType.'%';
+        // Generate a list of file extensions for the specified fileType, eg 'image' => ['bmp','gif','jpeg',...]
+        $query = " SELECT `mime` FROM `allowedFileTypes` WHERE `mime` LIKE :mime; ";
+        $statement = $this->database->prepare($query);
+        $mime = "$fileType%";
+        $statement->bindParam(':mime', $mime);
+        $statement->execute();
+        $results = $statement->fetchAll(\PDO::FETCH_COLUMN);
+
+        $fileExtensions = array();
+        foreach($results as $result){
+            $fileExtensions[] = "'".preg_replace('/\+.*/','',str_replace("$fileType/",'',$result))."'";
+        }
+        $fileExtensionsString = implode(',',$fileExtensions);
+
+        // Get Logs
+        $query = "
+                SELECT `groups`.`name`, COUNT(*) AS total
+                FROM `cmsLog`
+                JOIN `user` ON `cmsLog`.`user` = `user`.`id`
+                JOIN `groups` ON `user`.`group_id` = `groups`.`id`
+                JOIN `file` ON `cmsLog`.`objectId` = `file`.`id`
+                JOIN `storage` ON `file`.`hash` = `storage`.`hash`
+                WHERE `storage`.`ext` IN ($fileExtensionsString)
+                AND `cmsLog`.`object` = 'file'
+                AND `cmsLog`.`action` = :action
+                AND `time` >= :start AND `time` <= :end
+                GROUP BY `user`.`group_id`";
+
         $statement = $this->database->prepare($query);
         $statement->bindParam(':start', $start->getDatabaseDate());
         $statement->bindParam(':end', $end->getDatabaseDate());
         $statement->bindParam(':action', $action);
-        $statement->bindParam(':type', $fileType);
-
-
         $statement->execute();
-        return $statement->fetchAll();
+        return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     public function totalFiles($role) {
