@@ -161,7 +161,7 @@ class Controller extends AbstractController
             $date = "{$this->getRequest()->post['startAtDate']} {$this->getRequest()->post['startAtTime']}";
             $startAt = \Alaress_Date_Format::newLocal($date);
 
-            $this->saveItineraryItem($match, $venue, $this->getRequest()->post['name'], $startAt, $entity);
+            $this->saveItineraryItem($match, $venue, $this->getRequest()->post['description'], $startAt, $entity);
 
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesItineraryItem.getList', [
                 'contextId' => $matchId
@@ -176,15 +176,15 @@ class Controller extends AbstractController
      *
      * @param Match $match
      * @param Venue $venue
-     * @param $name
+     * @param string $description
      * @param Alaress_Date_Format $startAt
      * @param Model $itineraryItem
      */
-    private function saveItineraryItem(Match $match, Venue $venue, $name, \Alaress_Date_Format $startAt, ItineraryItem $itineraryItem)
+    private function saveItineraryItem(Match $match, Venue $venue, $description, \Alaress_Date_Format $startAt, ItineraryItem $itineraryItem)
     {
         $itineraryItem->setMatch($match);
         $itineraryItem->setVenue($venue);
-        $itineraryItem->setName($name);
+        $itineraryItem->setDescription($description);
         $itineraryItem->setStartAt($startAt);
         $itineraryItem->setUpdatedAt(Alaress_Date_Format::now());
 

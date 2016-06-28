@@ -36,7 +36,7 @@ class Model implements ISoftDeletable
     protected $venue;
 
     /** @var string */
-    protected $name;
+    protected $description;
 
     /** @var \Alaress_Date_Format */
     protected $startAt;
@@ -74,19 +74,19 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param string $name
-     * @return self
+     * @return string
      */
-    public function setName($name) {
-        $this->name = $name;
-        return $this;
+    public function getDescription()
+    {
+        return $this->description;
     }
 
     /**
-     * @return string
+     * @param string $description
      */
-    public function getName() {
-        return $this->name;
+    public function setDescription($description)
+    {
+        $this->description = $description;
     }
 
     /**

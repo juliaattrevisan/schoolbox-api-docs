@@ -18,7 +18,7 @@
                     required: true,
                     min: 1
                 },
-                name: {
+                description: {
                     required: true,
                     minlength: 2
                 }
@@ -27,7 +27,7 @@
                 'matchId': 'Please choose a Match.',
                 'venueId': 'Please choose a Venue.',
                 'startAt': 'Please choose a Time',
-                'name': 'Please enter a name.'
+                'description': 'Please enter a name.'
             },
             errorPlacement: function(error, element) {
                 $.alaressValidate.defaultErrorPlacement(error, element);
@@ -78,7 +78,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        {% if itineraryitem %}
+        {% if itineraryItem %}
             {% set formUrl = routeLookup('sportsfixturesItineraryItem.updateEntity', {entityId: itineraryItem.id}) %}
         {% else %}
             {% set formUrl = routeLookup('sportsfixturesItineraryItem.createEntity') %}
@@ -94,8 +94,8 @@
                         <input type="hidden" name="itineraryItemId" value="{{ itineraryItem.id }}"/>
 
                         <label>
-                            Name
-                            <input type="text" name="name" value="{{ itineraryItem.name }}"/>
+                            Description
+                            <input type="text" name="description" value="{{ itineraryItem.description }}"/>
                         </label>
                     </div>
 

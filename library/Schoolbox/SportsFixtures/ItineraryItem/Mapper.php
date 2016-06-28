@@ -33,7 +33,7 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('match_id', MatchMapper::class, 'id', null, null, 'match', 'match');
         $this->joins('venue_id', VenueMapper::class, 'id', null, null, 'venue', 'venue');
-        $this->uses('name', self::TYPE_STRING);
+        $this->uses('description', self::TYPE_STRING);
         $this->uses('start_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);

@@ -100,7 +100,7 @@ CREATE TABLE `sportsfixtures_match_itineraryitem` (
 	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
 	`match_id` INT NOT NULL,
 	`venue_id` INT,
-	`name` VARCHAR(255) NULL COMMENT '',
+	`description` TEXT NULL COMMENT '',
 	`start_at` DATETIME NULL COMMENT '',
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
