@@ -144,11 +144,15 @@
 
                 } else if (from.is('[data-team-player-list]') && to.is('[data-team-player-list]')) {
                     // Move between teams (remove from team + add to team, reorder team)
+                    // Remove+add first as player must be in team before reordering
                     fromFeedback.labelActivate({text: 'Removing from team...'});
                     toFeedback.labelActivate({text: 'Adding to team...'});
-                    $.when(removePlayer(dragged, from), addPlayer(dragged, to), saveOrdering(to))
-                        // TODO replace reload with AJAX redraw of player list
+                    $.when(removePlayer(dragged, from), addPlayer(dragged, to))
+                        .then(function() {
+                            return saveOrdering(to);
+                        })
                         .done(function() {
+                            // TODO replace reload with AJAX redraw of player list
                             window.location.reload();
                         })
                         .done(function() {
@@ -162,8 +166,12 @@
 
                 } else if (from.is('[data-division-player-list]') && to.is('[data-team-player-list]')) {
                     // Move from division to team (add to team, reorder team)
+                    // Add first as player must be in team before reordering
                     toFeedback.labelActivate({text: 'Adding to team...'});
-                    $.when(addPlayer(dragged, to), saveOrdering(to))
+                    addPlayer(dragged, to)
+                        .then(function() {
+                            return saveOrdering(to);
+                        })
                         .done(function() {
                             window.location.reload();
                         })
