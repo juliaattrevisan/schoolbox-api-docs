@@ -43,7 +43,7 @@
         };
 
         // Add player to team action
-        $('[data-add-team-player]').on('click', function(e) {
+        sortables.on('click', '[data-add-team-player]', function(e) {
             e.preventDefault();
             var el       = $(this);
             var feedback = el.closest('[data-division]').find('[data-relation="save-label"]');
@@ -61,7 +61,7 @@
         });
 
         // Remove player from team action
-        $('[data-remove-team-player]').on('click', function(e) {
+        sortables.on('click', '[data-remove-team-player]', function(e) {
             e.preventDefault();
             $(this).confirmDialog({
                 confirmEvent: function(el) {
@@ -84,7 +84,7 @@
         });
 
         // Remove player from division action
-        $('[data-remove-player]').on('click', function(e) {
+        sortables.on('click', '[data-remove-player]', function(e) {
             e.preventDefault();
             $(this).confirmDialog({
                 confirmEvent: function(el) {
