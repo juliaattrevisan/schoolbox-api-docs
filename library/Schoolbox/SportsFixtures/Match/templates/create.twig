@@ -138,11 +138,30 @@
                 <fieldset class="content">
                     <legend>Itinerary</legend>
                     <div class="small-12 columns">
+
+                        {% if allItineraryItems|length %}
+                        <ul class="action-list">
+                            {% for currentItineraryItem in allItineraryItems %}
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="small-12 card">
+                                        <p>{{ currentItineraryItem.startAt.local }}</p>
+                                        <p class="meta">{{ currentItineraryItem.name }}</p>
+                                    </div>
+                                </div>
+                                <nav>
+                                    <a href="{{ routeLookup('sportsfixturesItineraryItem.getModifyForm', {entityId: currentItineraryItem.id}) }}" class="icon-modify" title="Modify"></a>
+                                </nav>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
                         <div class="empty-state">
                             <i class="icon-list"></i>
                             <p>There are no items in this Match's Itinerary.</p>
-                            <p><a href="/sportsfixtures/matches/2/itinerary/new" title="Add an Itinerary Item">Add an Itinerary Item.</a></p>
+                            <p><a href="{{ routeLookup('sportsfixturesItineraryItem.getCreateForm', {contextId: match.id}) }}" title="Add an Itinerary Item">Add an Itinerary Item.</a></p>
                         </div>
+                        {% endif %}
                     </div>
                 </fieldset>
 

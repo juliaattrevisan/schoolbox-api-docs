@@ -19,6 +19,7 @@ use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
+use \Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
 
 class Controller extends AbstractController
 {
@@ -43,6 +44,11 @@ class Controller extends AbstractController
     protected $matchMapper;
 
     /**
+     * @var ItineraryItemMapper
+     */
+    protected $itineraryItemMapper;
+
+    /**
      * @var ErrorMapper
      */
     protected $errorMapper;
@@ -56,6 +62,7 @@ class Controller extends AbstractController
         $this->setSportMapper(SportMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
         $this->setTeamMapper(TeamMapper::getInstance());
+        $this->setItineraryItemMapper(ItineraryItemMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
@@ -108,11 +115,14 @@ class Controller extends AbstractController
 
             $sport = $this->getSportMapper()->findById($context->getSport()->getId());
 
+            $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $entity->getId());
+
             $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/create.twig', [
-                'sport'    => $sport,
-                'division' => $context,
-                'match'    => $entity,
-                'action'   => $entity->getId() ? 'Modify' : 'Create'
+                'sport'             => $sport,
+                'division'          => $context,
+                'match'             => $entity,
+                'allItineraryItems' => $allItineraryItems,
+                'action'            => $entity->getId() ? 'Modify' : 'Create'
             ]));
         }
         catch (MapperException $e) {
@@ -257,6 +267,22 @@ class Controller extends AbstractController
     public function setMatchMapper($matchMapper)
     {
         $this->matchMapper = $matchMapper;
+    }
+
+    /**
+     * @return ItineraryItemMapper
+     */
+    public function getItineraryItemMapper()
+    {
+        return $this->itineraryItemMapper;
+    }
+
+    /**
+     * @param ItineraryItemMapper $itineraryItemMapper
+     */
+    public function setItineraryItemMapper($itineraryItemMapper)
+    {
+        $this->itineraryItemMapper = $itineraryItemMapper;
     }
 
     /**
