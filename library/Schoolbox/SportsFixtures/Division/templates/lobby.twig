@@ -94,23 +94,23 @@
         /**
          * Adds player to a sortable list.
          *
-         * @param dragged  The player that was dragged
+         * @param playerId The player to add
          * @param sortable The sortable list to save into
          * @returns {*} A jqXHR object
          */
-        var addPlayer = function(dragged, sortable) {
-            return $.post(sortable.data('addPlayersAction'), [{name: 'userId[]', value: dragged.data('player')}])
+        var addPlayer = function(playerId, sortable) {
+            return $.post(sortable.data('addPlayersAction'), [{name: 'userId[]', value: playerId}])
         };
 
         /**
          * Removes player from a sortable list.
          *
-         * @param dragged  The player to remove
+         * @param playerId The player to remove
          * @param sortable The sortable list to remove from
          * @returns {*} A jqXHR object
          */
-        var removePlayer = function(dragged, sortable) {
-            return $.post(sortable.data('removePlayersAction'), [{name: 'userId[]', value: dragged.data('player')}])
+        var removePlayer = function(playerId, sortable) {
+            return $.post(sortable.data('removePlayersAction'), [{name: 'userId[]', value: playerId}])
         };
 
         // Reorder players in division or team
@@ -147,7 +147,7 @@
                     // Remove+add first as player must be in team before reordering
                     fromFeedback.labelActivate({text: 'Removing from team...'});
                     toFeedback.labelActivate({text: 'Adding to team...'});
-                    $.when(removePlayer(dragged, from), addPlayer(dragged, to))
+                    $.when(removePlayer(dragged.data('player'), from), addPlayer(dragged.data('player'), to))
                         .then(function() {
                             return saveOrdering(to);
                         })
@@ -168,7 +168,7 @@
                     // Move from division to team (add to team, reorder team)
                     // Add first as player must be in team before reordering
                     toFeedback.labelActivate({text: 'Adding to team...'});
-                    addPlayer(dragged, to)
+                    addPlayer(dragged.data('player'), to)
                         .then(function() {
                             return saveOrdering(to);
                         })
@@ -186,7 +186,7 @@
                     // Move from team to division (remove from team + reorder division)
                     fromFeedback.labelActivate({text: 'Removing from team...'});
                     toFeedback.labelActivate({text: 'Saving order...'});
-                    $.when(removePlayer(dragged, from), saveOrdering(to))
+                    $.when(removePlayer(dragged.data('player'), from), saveOrdering(to))
                         .done(function() {
                             window.location.reload();
                         })
