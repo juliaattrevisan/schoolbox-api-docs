@@ -54,7 +54,6 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
             return true;
         }
 
-        $j = 0;
         foreach ($this->feed->renderAsFeedArray() as $n) {
             $date = new Alaress_Date_Format($n['time'], 'U');
             $this->setVar(
