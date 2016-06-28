@@ -32,24 +32,13 @@
         };
 
         /**
-         * Adds player to a sortable list.
+         * Performs a post action on a player to a sortable list.
          *
          * @param playerId The player to add
          * @param action   The sortable list to remove from
          * @returns {*} A jqXHR object
          */
-        var addPlayer = function(playerId, action) {
-            return $.post(action, [{name: 'userId[]', value: playerId}])
-        };
-
-        /**
-         * Removes player from a sortable list.
-         *
-         * @param playerId The player to remove
-         * @param action   The sortable list to remove from
-         * @returns {*} A jqXHR object
-         */
-        var removePlayer = function(playerId, action) {
+        var postPlayer = function(playerId, action) {
             return $.post(action, [{name: 'userId[]', value: playerId}])
         };
 
@@ -59,7 +48,7 @@
             var el       = $(this);
             var feedback = el.closest('[data-division]').find('[data-relation="save-label"]');
             feedback.labelActivate({text: 'Adding to team...'});
-            addPlayer(el.data('addTeamPlayer'), el.attr('href'))
+            postPlayer(el.data('addTeamPlayer'), el.attr('href'))
                 .done(function() {
                     window.location.reload();
                 })
@@ -78,7 +67,7 @@
                 confirmEvent: function(el) {
                     var feedback = el.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
                     feedback.labelActivate({text: 'Removing from team...'});
-                    removePlayer(el.data('removeTeamPlayer'), el.attr('href'))
+                    postPlayer(el.data('removeTeamPlayer'), el.attr('href'))
                         .done(function() {
                             // If this event came from division list: reload that player
                             // If this event came from team list: fade out
@@ -101,7 +90,7 @@
                 confirmEvent: function(el) {
                     var feedback = el.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
                     feedback.labelActivate({text: 'Removing from division...'});
-                    removePlayer(el.data('removePlayer'), el.attr('href'))
+                    postPlayer(el.data('removePlayer'), el.attr('href'))
                         .done(function() {
                             el.closest('[data-player]').fadeOut();
                         })
@@ -149,8 +138,8 @@
                     fromFeedback.labelActivate({text: 'Removing from team...'});
                     toFeedback.labelActivate({text: 'Adding to team...'});
                     $.when(
-                        removePlayer(dragged.data('player'), from.data('removePlayersAction')),
-                        addPlayer(dragged.data('player'), to.data('addPlayersAction'))
+                        postPlayer(dragged.data('player'), from.data('removePlayersAction')),
+                        postPlayer(dragged.data('player'), to.data('addPlayersAction'))
                     )
                         .then(function() {
                             return saveOrdering(to);
@@ -172,7 +161,7 @@
                     // Move from division to team (add to team, reorder team)
                     // Add first as player must be in team before reordering
                     toFeedback.labelActivate({text: 'Adding to team...'});
-                    addPlayer(dragged.data('player'), to.data('addPlayersAction'))
+                    postPlayer(dragged.data('player'), to.data('addPlayersAction'))
                         .then(function() {
                             return saveOrdering(to);
                         })
@@ -190,7 +179,7 @@
                     // Move from team to division (remove from team + reorder division)
                     fromFeedback.labelActivate({text: 'Removing from team...'});
                     toFeedback.labelActivate({text: 'Saving order...'});
-                    $.when(removePlayer(dragged.data('player'), from.data('removePlayersAction')), saveOrdering(to))
+                    $.when(postPlayer(dragged.data('player'), from.data('removePlayersAction')), saveOrdering(to))
                         .done(function() {
                             window.location.reload();
                         })
