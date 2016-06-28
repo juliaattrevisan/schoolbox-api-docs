@@ -54,7 +54,7 @@ class External_Tass_Class implements External_ClassInterface {
 			AND ( $classQuery )
 		ORDER BY lastname, firstname";
 
-		return $this->getDatabase()->getAll($query);
+		return $this->getDatabase()->trimAll($this->getDatabase()->getAll($query));
 	}
 	
 	function getTeacherName($subCode) {
