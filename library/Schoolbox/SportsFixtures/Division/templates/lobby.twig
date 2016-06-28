@@ -1,6 +1,7 @@
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript">
     $(function() {
         // Selectize box for selecting one or more users
@@ -18,13 +19,19 @@
         // Add player to team action
         $('[data-add-team-player]').on('click', function(e) {
             e.preventDefault();
-            var el = $(this);
-            $.post(
-                el.attr('href'),
-                [{name: 'userId[]', value: el.data('addTeamPlayer')}]
-            ).done(function() {
-                window.location.reload();
-            });
+            var el       = $(this);
+            var feedback = el.closest('[data-division]').find('[data-relation="save-label"]');
+            feedback.labelActivate({text: 'Adding to team...'});
+            $.post(el.attr('href'), [{name: 'userId[]', value: el.data('addTeamPlayer')}])
+                .done(function() {
+                    window.location.reload();
+                })
+                .done(function() {
+                    feedback.labelTimeout({text: 'Added!', css: 'success'});
+                })
+                .fail(function() {
+                    feedback.labelTimeout({text: 'Add failed!', css: 'alert'});
+                });
         });
 
         // Remove player from team action
@@ -32,14 +39,20 @@
             e.preventDefault();
             $(this).confirmDialog({
                 confirmEvent: function(el) {
-                    $.post(
-                        el.attr('href'),
-                        [{name: 'userId[]', value: el.data('removeTeamPlayer')}]
-                    ).done(function() {
-                        // If this event came from division list: reload that player
-                        // If this event came from team list: fade out
-                        window.location.reload();
-                    })
+                    var feedback = el.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
+                    feedback.labelActivate({text: 'Removing from team...'});
+                    $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removeTeamPlayer')}])
+                        .done(function() {
+                            // If this event came from division list: reload that player
+                            // If this event came from team list: fade out
+                            window.location.reload();
+                        })
+                        .done(function() {
+                            feedback.labelTimeout({text: 'Removed!', css: 'success'});
+                        })
+                        .fail(function() {
+                            feedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
+                        });
                 }
             });
         });
@@ -49,12 +62,18 @@
             e.preventDefault();
             $(this).confirmDialog({
                 confirmEvent: function(el) {
-                    $.post(
-                        el.attr('href'),
-                        [{name: 'userId[]', value: el.data('removePlayer')}]
-                    ).done(function() {
-                        el.closest('[data-player]').fadeOut();
-                    })
+                    var feedback = el.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
+                    feedback.labelActivate({text: 'Removing from division...'});
+                    $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removePlayer')}])
+                        .done(function() {
+                            el.closest('[data-player]').fadeOut();
+                        })
+                        .done(function() {
+                            feedback.labelTimeout({text: 'Removed!', css: 'success'});
+                        })
+                        .fail(function() {
+                            feedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
+                        });
                 }
             });
         });
@@ -69,7 +88,15 @@
                 var data = el.find('[data-player]').map(function() {
                     return {name: 'userId[]', value: $(this).data('player')};
                 });
-                $.post(el.data('sortableOnstopAction'), data);
+                var feedback = el.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
+                feedback.labelActivate({text: 'Saving order...'});
+                $.post(el.data('sortableOnstopAction'), data)
+                    .done(function() {
+                        feedback.labelTimeout({text: 'Saved!', css: 'success'});
+                    })
+                    .fail(function() {
+                        feedback.labelTimeout({text: 'Save failed!', css: 'alert'});
+                    });
             }
         });
     });
@@ -101,7 +128,8 @@
             </nav>
         </div>
         {% if division.getPlayers() is not empty %}
-            <section>
+            <section data-division="{{ division.getId() }}">
+                <span class="label full-width hide" data-relation="save-label"></span>
                 <ul class="information-list sortable"
                     data-player-list
                     data-sortable-onstop-action="{{ routeLookup('sportsfixturesDivision.postReorderPlayers', {entityId: division.getId()}) }}">
@@ -167,7 +195,8 @@
         <h2 class="subheader">Teams</h2>
         {% if division.getTeams() is not empty %}
             {% for currentTeam in division.getTeams() %}
-                <section>
+                <section data-team="{{ currentTeam.getId() }}">
+                    <span class="label full-width hide" data-relation="save-label"></span>
                     <ul class="information-list sortable">
                         <li>
                             <div class="list-item">
