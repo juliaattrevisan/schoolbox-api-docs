@@ -85,7 +85,7 @@
         // * dragging from division to team (add to team + reorder team)
         // * dragging from team to division (remove from team + reorder division)
         // * dragging from team to team (remove from team + add to team + reorder team)
-        var sortables = $('[data-player-list], [data-team-player-list]');
+        var sortables = $('[data-division-player-list], [data-team-player-list]');
         sortables.sortable({
             handle: '.grip',
             connectWith: sortables,
@@ -109,8 +109,12 @@
                             feedback.labelTimeout({text: 'Save failed!', css: 'alert'});
                         });
 
-                } else {
-                    // Move between teams or divisions
+                } else if (from.is('[data-team-player-list]') && to.is('[data-team-player-list]')) {
+                    // Move between teams (remove from team + add to team + reorder team)
+                } else if (from.is('[data-division-player-list]') && to.is('[data-team-player-list]')) {
+                    // Move from division to team (add to team + reorder team)
+                } else if (from.is('[data-team-player-list]') && to.is('[data-division-player-list]')) {
+                    // Move from team to division (remove from team + reorder division)
                 }
             }
         });
@@ -146,7 +150,9 @@
             <section data-division="{{ division.getId() }}">
                 <span class="label full-width hide" data-relation="save-label"></span>
                 <ul class="information-list sortable"
-                    data-player-list
+                    data-division-player-list="{{ division.getId() }}"
+                    data-add-players-action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {entityId: division.getId()}) }}"
+                    data-remove-players-action="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.getId()}) }}"
                     data-reorder-players-action="{{ routeLookup('sportsfixturesDivision.postReorderPlayers', {entityId: division.getId()}) }}">
                     {% for divisionPlayer in division.getPlayers() %}
                         <li class="actions-small-1" data-player="{{ divisionPlayer.getId() }}">
@@ -214,6 +220,8 @@
                     <span class="label full-width hide" data-relation="save-label"></span>
                     <ul class="information-list sortable"
                         data-team-player-list="{{ currentTeam.getId() }}"
+                        data-add-players-action="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.getId()}) }}"
+                        data-remove-players-action="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: currentTeam.getId()}) }}"
                         data-reorder-players-action="{{ routeLookup('sportsfixturesTeam.postReorderPlayers', {entityId: currentTeam.getId()}) }}">
                         <li>
                             <div class="list-item">
