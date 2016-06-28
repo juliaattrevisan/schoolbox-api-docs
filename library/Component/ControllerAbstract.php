@@ -660,6 +660,21 @@ abstract class Component_ControllerAbstract
     }
 
     /**
+     * Convenience method for PHPLib-based Components to render the 'AltSourceDeleted' empty state
+     *
+     * Twig-based Components can simply include the twig fragment by checking {source.isDeleted}
+     */
+    protected function renderAltSourceDeleted(){
+        $twigTemplate = 'sub/componentSourceDeleted.twig';
+        $twigData = array(
+            'componentInstanceId' => $this->getInstance()->getId()
+        );
+        $this->setVar('SOURCE_FOLDER_DELETED', $this->sitepage->getTwig()->render($twigTemplate, $twigData));
+        $this->parse('source_folder_deleted_block','source_folder_deleted');
+        $this->setVar('source_folder_exists_block', '');
+    }
+
+    /**
      * @return \Schoolbox\Resource\Folder\Model
      */
     public function getContext()

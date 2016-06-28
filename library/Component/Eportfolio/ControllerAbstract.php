@@ -150,4 +150,13 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
     public function setSource($source) {
         throw new DomainException('Eportfolio components do not currently allow alternative data sources');
     }
+
+    /**
+     * For now, Eportfolio Components are unable to use Alt Data Sources
+     *
+     * @throws DomainException
+     */
+    protected function renderAltSourceDeleted(){
+        throw new DomainException('Eportfolio components do not currently allow alternative data sources');
+    }
 }
