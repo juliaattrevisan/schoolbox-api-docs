@@ -15,6 +15,7 @@ use Schoolbox\SportsFixtures\Sport\Module as SportModule;
 use Schoolbox\SportsFixtures\Division\Module as DivisionModule;
 use Schoolbox\SportsFixtures\Team\Module as TeamModule;
 use Schoolbox\SportsFixtures\Position\Module as PositionModule;
+use Schoolbox\SportsFixtures\Venue\Module as VenueModule;
 
 
 class SportsFixtures implements ModuleConfigInterface
@@ -36,11 +37,14 @@ class SportsFixtures implements ModuleConfigInterface
         $divisionModule = new DivisionModule($kernel->getDependencyInjector(), $sportModule);
         $divisionModule->init("/$namespace");
 
-        $messagesModule = new TeamModule($kernel->getDependencyInjector(), $divisionModule);
-        $messagesModule->init("/$namespace");
+        $teamModule = new TeamModule($kernel->getDependencyInjector(), $divisionModule);
+        $teamModule->init("/$namespace");
 
-        $positionsModule = new PositionModule($kernel->getDependencyInjector(), $sportModule);
-        $positionsModule->init("/$namespace");
+        $positionModule = new PositionModule($kernel->getDependencyInjector(), $sportModule);
+        $positionModule->init("/$namespace");
+        
+        $venueModule = new VenueModule($kernel->getDependencyInjector());
+        $venueModule->init("/$namespace");
     }
 
 } 
