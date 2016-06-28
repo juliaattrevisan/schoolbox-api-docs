@@ -41,32 +41,34 @@ class CMS
     }
 
     /**
+     * Returns a set of arrays, each with a group name and count of specified access between
+     * given dates for the specified action and mimeType
      *
      * @param \Alaress_Date_Format $start
      * @param \Alaress_Date_Format $end
      * @param string $action
-     * @param string $fileType
+     * @param string $mimeType  a mime prefix, eg 'image' that will match eg, mime of 'image/gif'
      * @return array $result
      * @var string $result[$i]['name']
      * @var int    $result[$i]['total']
      */
-    public function logFileType(\Alaress_Date_Format $start, \Alaress_Date_Format $end, $action, $fileType) {
+    public function logFileType(\Alaress_Date_Format $start, \Alaress_Date_Format $end, $action, $mimeType){
 
         // Generate a list of file extensions for the specified fileType, eg 'image' => ['bmp','gif','jpeg',...]
         $query = " SELECT `mime` FROM `allowedFileTypes` WHERE `mime` LIKE :mime; ";
         $statement = $this->database->prepare($query);
-        $mime = "$fileType%";
+        $mime = "$mimeType%";
         $statement->bindParam(':mime', $mime);
         $statement->execute();
         $results = $statement->fetchAll(\PDO::FETCH_COLUMN);
 
         $fileExtensions = array();
         foreach($results as $result){
-            $fileExtensions[] = "'".preg_replace('/\+.*/','',str_replace("$fileType/",'',$result))."'";
+            // eg 'image/svg+xml' => 'svg'
+            $fileExtensions[] = "'".preg_replace('/\+.*/','',str_replace("$mimeType/",'',$result))."'";
         }
         $fileExtensionsString = implode(',',$fileExtensions);
 
-        // Get Logs
         $query = "
                 SELECT `groups`.`name`, COUNT(*) AS total
                 FROM `cmsLog`
@@ -88,6 +90,10 @@ class CMS
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    /**
+     * @param $role
+     * @return string
+     */
     public function totalFiles($role) {
         $query = "SELECT COUNT(*) FROM file JOIN `user` ON file.owner=user.id
                   WHERE group_id = :role AND deleted=0";
