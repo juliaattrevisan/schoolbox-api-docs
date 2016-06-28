@@ -209,8 +209,8 @@ class Controller extends AbstractController
         $this->getTeamUserMapper()->save($teamUsers);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
-                'sportsfixturesTeam.getList',
-                ['contextId' => $team->getDivision()->getId()]
+                'sportsfixturesDivision.getLobby',
+                ['entityId' => $team->getDivision()->getId()]
             )
         );
     }
@@ -230,8 +230,8 @@ class Controller extends AbstractController
         );
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
-                'sportsfixturesTeam.getList',
-                ['contextId' => $team->getDivision()->getId()]
+                'sportsfixturesDivision.getLobby',
+                ['entityId' => $team->getDivision()->getId()]
             )
         );
     }
@@ -262,8 +262,8 @@ class Controller extends AbstractController
         $this->getTeamUserMapper()->save($teamUsers);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
-                'sportsfixturesTeam.getList',
-                ['contextId' => $team->getDivision()->getId()]
+                'sportsfixturesDivision.getLobby',
+                ['entityId' => $team->getDivision()->getId()]
             )
         );
     }
