@@ -50,6 +50,18 @@
             }
         });
 
+        $('#venue').selectizeSelector({
+            ajax: {
+                url:      '/sportsfixtures/venues/list',
+                type:     'GET',
+                dataType: 'json'
+            },
+            {% if match.venue.id %}
+            value: {"id":{{ match.venue.id }},"name":"{{ match.venue.name }}"},
+            {% endif %}
+            multiple: false
+        });
+
         $('#homeTeam').selectizeSelector({
             ajax: {
                 url:      '/sportsfixtures/divisions/{{ division.id }}/teams/list',
@@ -133,6 +145,13 @@
                             </label>
                         </div>
                     </div>
+
+                    <div class="small-12 columns">
+                        <label>
+                            Venue
+                        </label>
+                        <input id='venue' name="venueId" type='text' value='' placeholder="Search Venues" />
+                    </div>
                 </fieldset>
 
                 <fieldset class="content">
@@ -140,13 +159,13 @@
                         <label>
                             Home Team
                         </label>
-                        <input id='homeTeam' name="homeTeamId" type='text' value='' placeholder="Search Teams" data-selectizeuser />
+                        <input id='homeTeam' name="homeTeamId" type='text' value='' placeholder="Search Teams" />
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
                             Away Team
                         </label>
-                        <input id='awayTeam' name="awayTeamId" type='text' value='' placeholder="Search Teams" data-selectizeuser />
+                        <input id='awayTeam' name="awayTeamId" type='text' value='' placeholder="Search Teams" />
                     </div>
                 </fieldset>
             </section>

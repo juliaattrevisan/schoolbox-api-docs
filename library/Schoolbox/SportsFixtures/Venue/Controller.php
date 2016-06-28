@@ -135,9 +135,36 @@ class Controller extends AbstractController
         $this->mapper->save($venue);
     }
 
+    /**
+     * Get a list of Venues
+     *
+     * @param int $contextId
+     */
+    public function getVenueList($contextId)
+    {
+        $query = $this->getRequest()->query->get('query');
+
+        /** @var VenueMapper $mapper */
+        $mapper = $this->getMapper();
+        $allVenues = $mapper->findByName($contextId, $query);
+
+        $venues = [];
+
+        /** @var Venue $currentVenue */
+        foreach ($allVenues as $currentVenue) {
+            $venues[] = array_combine(['id','name'], $currentVenue->findValueLabelPair());
+        }
+
+        /* TODO: What's the best way to do this now?
+         * Pretty sure we talked about it, but can't remember right now
+         */
+        header('Content-Type: application/json');
+        echo json_encode($venues);
+        exit();
+    }
+
     /* Getters/Setters
      */
-
 
     /**
      * @return ErrorMapper

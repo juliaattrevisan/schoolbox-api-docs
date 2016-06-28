@@ -10,7 +10,8 @@ namespace Schoolbox\SportsFixtures\Venue;
 use Schoolbox\Column\Decimal;
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\SportsFixtures\Venue\Model as Venue;
-
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Collection;
 
 /**
  * Class Mapper
@@ -59,5 +60,41 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
+    /**
+     * Find all the teams whose names are like $keyword
+     *
+     * @param string $keyword
+     * @return \Schoolbox\Collection
+     * @throws MapperException
+     */
+    public function findByName($keyword)
+    {
+        $query = "
+            SELECT
+                {$this->getColumnString('v')}
+            FROM {$this->getTable()} v
+			WHERE v.name LIKE :nameLike
+        ";
 
+        /* Don't know why codeLike contained / and not a trailing %
+         */
+        $params = [
+            'nameLike' => "%{$this->database->quoteForLike($keyword)}%",
+        ];
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($params);
+
+        $hashtable = array();
+
+        /* Only need to return category records
+         */
+        foreach ($statement as $row) {
+            $venue = $this->hydrate($row, 'v');
+
+            $hashtable[$venue->getId()] = $venue;
+        }
+
+        return new Collection(array_values($hashtable));
+    }
 }
