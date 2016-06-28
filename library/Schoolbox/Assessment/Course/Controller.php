@@ -1584,7 +1584,7 @@ class Controller extends Base\Base
         /** @var \Schoolbox\User[] $owners */
         $owners = [];
 
-        if (isset($post['ownerships']) && is_array($post['ownerships']) && count($post['ownerships'])) {
+        if (isset($post['ownerships']) && strlen($post['ownerships']) && strpos($post['ownerships'], ':')) {
             // unsquash ownerships
             foreach (explode(',', $post['ownerships']) as $ownership) {
                 if (preg_match('/^\\d+:\\d+/', $ownership)) {
