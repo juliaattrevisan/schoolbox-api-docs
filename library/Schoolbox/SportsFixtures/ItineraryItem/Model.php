@@ -10,6 +10,8 @@ namespace Schoolbox\SportsFixtures\ItineraryItem;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use \Alaress_Date_Format;
+use Schoolbox\SportsFixtures\Match\Model as Match;
+use Schoolbox\SportsFixtures\Venue\Model as Venue;
 
 /**
  * Represents a Position a player may take in some Sport.

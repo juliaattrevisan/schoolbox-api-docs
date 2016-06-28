@@ -17,8 +17,10 @@ use \Schoolbox\SportsFixtures\Division\Model as Division;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
+use \Schoolbox\SportsFixtures\ItineraryItem\Model as ItineraryItem;
 use \Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
-
+use \Schoolbox\SportsFixtures\Venue\Model as Venue;
+use \Schoolbox\SportsFixtures\Venue\Mapper as VenueMapper;
 
 class Controller extends AbstractController
 {
@@ -38,6 +40,11 @@ class Controller extends AbstractController
     protected $matchMapper;
 
     /**
+     * @var VenueMapper
+     */
+    protected $venueMapper;
+
+    /**
      * @var ErrorMapper
      */
     protected $errorMapper;
@@ -51,6 +58,7 @@ class Controller extends AbstractController
         $this->setSportMapper(SportMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
         $this->setMatchMapper(MatchMapper::getInstance());
+        $this->setVenueMapper(VenueMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
@@ -108,7 +116,7 @@ class Controller extends AbstractController
     protected function getForm($entity, $context = null)
     {
         if (empty($context)) {
-            $context = $this->getMatchMapper()->findById($entity->getgetId());
+            $context = $this->getMatchMapper()->findById($entity->getMatch()->getId());
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesItineraryItem/create.twig', [
@@ -125,34 +133,46 @@ class Controller extends AbstractController
      */
     protected function persistEntity($entity)
     {
-//        try {
-//            $sportId = $this->getRequest()->post['sportId'];
-//            $sport   = $this->getSportMapper()->findById($sportId);
-//
-//            $this->savePosition($sport, $this->getRequest()->post['name'], $entity);
-//
-//            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesPosition.getList', [
-//                'contextId' => $sportId
-//            ]));
-//        } catch (MapperException $e) {
-//            throw $this->getErrorMapper()->generateException(2);
-//        }
+        try {
+            /** @var Match $match */
+            $matchId = $this->getRequest()->post['matchId'];
+            $match   = $this->getMatchMapper()->findById($matchId);
+
+            /** @var Venue $venue */
+            $venueId = $this->getRequest()->post['venueId'];
+            $venue   = $this->getVenueMapper()->findById($venueId);
+
+            $date = "{$this->getRequest()->post['startAtDate']} {$this->getRequest()->post['startAtTime']}";
+            $startAt = \Alaress_Date_Format::newLocal($date);
+
+            $this->saveItineraryItem($match, $venue, $this->getRequest()->post['name'], $startAt, $entity);
+
+            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesItineraryItem.getList', [
+                'contextId' => $matchId
+            ]));
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(2);
+        }
     }
 
     /**
-     * Save Position data to db
+     * Save ItineraryItem data to db
      *
-     * @param Sport $sport
-     * @param string $name
-     * @param Position $position
+     * @param Match $match
+     * @param Venue $venue
+     * @param $name
+     * @param Alaress_Date_Format $startAt
+     * @param Model $itineraryItem
      */
-    private function savePosition($sport, $name, Position $position)
+    private function saveItineraryItem(Match $match, Venue $venue, $name, \Alaress_Date_Format $startAt, ItineraryItem $itineraryItem)
     {
-//        $position->setName($name);
-//        $position->setSport($sport);
-//        $position->setUpdatedAt(Alaress_Date_Format::now());
-//
-//        $this->mapper->save($position);
+        $itineraryItem->setMatch($match);
+        $itineraryItem->setVenue($venue);
+        $itineraryItem->setName($name);
+        $itineraryItem->setStartAt($startAt);
+        $itineraryItem->setUpdatedAt(Alaress_Date_Format::now());
+
+        $this->mapper->save($itineraryItem);
     }
 
     /* Getters/Setters
@@ -204,6 +224,22 @@ class Controller extends AbstractController
     public function setMatchMapper($matchMapper)
     {
         $this->matchMapper = $matchMapper;
+    }
+
+    /**
+     * @return VenueMapper
+     */
+    public function getVenueMapper()
+    {
+        return $this->venueMapper;
+    }
+
+    /**
+     * @param VenueMapper $venueMapper
+     */
+    public function setVenueMapper($venueMapper)
+    {
+        $this->venueMapper = $venueMapper;
     }
 
     /**
