@@ -93,6 +93,25 @@
                 var dragged = ui.item;
                 var from    = $(event.target);
                 var to      = dragged.closest(sortables);
+                if (from.is(to)) {
+                    // Reordering either within team or division:
+                    // action is the same
+                    var data = from.find('[data-player]').map(function() {
+                        return {name: 'userId[]', value: $(this).data('player')};
+                    });
+                    var feedback = from.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
+                    feedback.labelActivate({text: 'Saving order...'});
+                    $.post(from.data('sortableOnstopAction'), data)
+                        .done(function() {
+                            feedback.labelTimeout({text: 'Saved!', css: 'success'});
+                        })
+                        .fail(function() {
+                            feedback.labelTimeout({text: 'Save failed!', css: 'alert'});
+                        });
+
+                } else {
+                    // Move between teams or divisions
+                }
             }
         });
     });
