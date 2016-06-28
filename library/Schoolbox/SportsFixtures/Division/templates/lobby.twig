@@ -101,7 +101,7 @@
                     });
                     var feedback = from.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
                     feedback.labelActivate({text: 'Saving order...'});
-                    $.post(from.data('sortableOnstopAction'), data)
+                    $.post(from.data('reorderPlayersAction'), data)
                         .done(function() {
                             feedback.labelTimeout({text: 'Saved!', css: 'success'});
                         })
@@ -147,7 +147,7 @@
                 <span class="label full-width hide" data-relation="save-label"></span>
                 <ul class="information-list sortable"
                     data-player-list
-                    data-sortable-onstop-action="{{ routeLookup('sportsfixturesDivision.postReorderPlayers', {entityId: division.getId()}) }}">
+                    data-reorder-players-action="{{ routeLookup('sportsfixturesDivision.postReorderPlayers', {entityId: division.getId()}) }}">
                     {% for divisionPlayer in division.getPlayers() %}
                         <li class="actions-small-1" data-player="{{ divisionPlayer.getId() }}">
                             <div class="list-item">
@@ -214,7 +214,7 @@
                     <span class="label full-width hide" data-relation="save-label"></span>
                     <ul class="information-list sortable"
                         data-team-player-list="{{ currentTeam.getId() }}"
-                        data-sortable-onstop-action="{{ routeLookup('sportsfixturesTeam.postReorderPlayers', {entityId: currentTeam.getId()}) }}">
+                        data-reorder-players-action="{{ routeLookup('sportsfixturesTeam.postReorderPlayers', {entityId: currentTeam.getId()}) }}">
                         <li>
                             <div class="list-item">
                                 <div class="small-12 avatar card">
