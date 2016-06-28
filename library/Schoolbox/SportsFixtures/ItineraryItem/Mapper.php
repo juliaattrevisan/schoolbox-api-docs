@@ -38,37 +38,4 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
-
-    /**
-     * Find a Match by its id
-     *
-     * Also include both Teams
-     *
-     * @param $id
-     * @return ItineraryItem
-     * @throws MapperException
-     */
-    public function findById($id)
-    {
-        $query = "
-            SELECT
-                {$this->getColumnString('i')}
-            FROM {$this->getTable()} `i`
-            WHERE i.id = ?
-            AND i.deleted_at IS NULL
-        ";
-
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->execute([$id]);
-
-        if ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-
-            /** @var ItineraryItem $itineraryItem */
-            $itineraryItem = $this->hydrate($row, 'i');
-
-            return $itineraryItem;
-        }
-
-        throw new MapperException('Instance of object not found');
-    }
 }
