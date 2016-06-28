@@ -88,6 +88,18 @@
             {% endif %}
             multiple: false
         });
+
+        $('#venue').selectizeSelector({
+            ajax: {
+                url: '/sportsfixtures/venues/list',
+                type: 'GET',
+                dataType: 'json'
+            },
+            {% if match.venue.id %}
+            value: {"id":{{ match.venue.id }}, "name": "{{ match.venue.name }}"},
+            {% endif %}
+            multiple: false
+        });
     });
 </script>
 
@@ -147,6 +159,13 @@
                                 <input type="text" name="startAtTime" autocomplete="off" placeholder="Start Time" class="ui-timepicker-input" data-timepicker value="{{ match.startAt.getTimeOnly }}">
                             </label>
                         </div>
+                    </div>
+
+                    <div class="small-12 columns">
+                        <label>
+                            Venue
+                        </label>
+                        <input id='venue' name="venueId" type='text' value='' placeholder="Search Venues" />
                     </div>
                 </fieldset>
 

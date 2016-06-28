@@ -20,6 +20,8 @@ use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use \Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
+use \Schoolbox\SportsFixtures\Venue\Model as Venue;
+use \Schoolbox\SportsFixtures\Venue\Mapper as VenueMapper;
 
 class Controller extends AbstractController
 {
@@ -44,6 +46,11 @@ class Controller extends AbstractController
     protected $matchMapper;
 
     /**
+     * @var VenueMapper
+     */
+    protected $venueMapper;
+
+    /**
      * @var ItineraryItemMapper
      */
     protected $itineraryItemMapper;
@@ -63,6 +70,7 @@ class Controller extends AbstractController
         $this->setDivisionMapper(DivisionMapper::getInstance());
         $this->setTeamMapper(TeamMapper::getInstance());
         $this->setItineraryItemMapper(ItineraryItemMapper::getInstance());
+        $this->setVenueMapper(VenueMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
@@ -143,11 +151,13 @@ class Controller extends AbstractController
     {
         $division = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
         $sport    = $this->getSportMapper()->findById($division->getSport()->getId());
+        $venue    = $this->getVenueMapper()->findById($entity->getVenue()->getId());
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/entity.twig', [
-            'sport' => $sport,
+            'sport'    => $sport,
             'division' => $division,
-            'match' => $entity
+            'match'    => $entity,
+            'venue'    => $venue,
         ]));
     }
 
@@ -168,7 +178,11 @@ class Controller extends AbstractController
             $homeTeam = $this->getTeamMapper()->findById($this->getRequest()->post['homeTeamId']);
             $awayTeam = $this->getTeamMapper()->findById($this->getRequest()->post['awayTeamId']);
 
-            $this->saveMatch($entity, $division, $this->getRequest()->post['name'], $startAt, $homeTeam, $awayTeam);
+            /** @var Venue $venue */
+            $venueId = $this->getRequest()->post['venueId'];
+            $venue   = $this->getVenueMapper()->findById($venueId);
+
+            $this->saveMatch($entity, $division, $this->getRequest()->post['name'], $startAt, $homeTeam, $awayTeam, $venue);
 
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesMatch.getList', [
                 'contextId' => $divisionId
@@ -187,14 +201,16 @@ class Controller extends AbstractController
      * @param \Alaress_Date_Format $startAt
      * @param Team $homeTeam
      * @param Team $awayTeam
+     * @param Venue $venue
      */
-    private function saveMatch(Match $match, Division $division, $name, \Alaress_Date_Format $startAt, Team $homeTeam, Team $awayTeam)
+    private function saveMatch(Match $match, Division $division, $name, \Alaress_Date_Format $startAt, Team $homeTeam, Team $awayTeam, Venue $venue)
     {
         $match->setDivision($division);
         $match->setName($name);
         $match->setStartAt($startAt);
         $match->setHomeTeam($homeTeam);
         $match->setAwayTeam($awayTeam);
+        $match->setVenue($venue);
         $match->setUpdatedAt(\Alaress_Date_Format::now());
 
         $this->getMapper()->save($match);
@@ -283,6 +299,22 @@ class Controller extends AbstractController
     public function setItineraryItemMapper($itineraryItemMapper)
     {
         $this->itineraryItemMapper = $itineraryItemMapper;
+    }
+
+    /**
+     * @return VenueMapper
+     */
+    public function getVenueMapper()
+    {
+        return $this->venueMapper;
+    }
+
+    /**
+     * @param VenueMapper $venueMapper
+     */
+    public function setVenueMapper($venueMapper)
+    {
+        $this->venueMapper = $venueMapper;
     }
 
     /**

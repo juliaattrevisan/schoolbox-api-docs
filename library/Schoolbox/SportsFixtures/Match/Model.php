@@ -16,7 +16,7 @@ use Schoolbox\User;
 use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use \Schoolbox\SportsFixtures\Division\Model as Division;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
-
+use Schoolbox\SportsFixtures\Venue\Model as Venue;
 
 class Model implements ISoftDeletable {
     use DeletedAtDate;
@@ -29,6 +29,9 @@ class Model implements ISoftDeletable {
 
     /** @var string */
     protected $name;
+
+    /** @var Venue $venue */
+    protected $venue;
 
     /** @var Team $homeTeam */
     protected $homeTeam;
@@ -130,6 +133,22 @@ class Model implements ISoftDeletable {
      */
     public function getName() {
         return $this->name;
+    }
+
+    /**
+     * @return Venue
+     */
+    public function getVenue()
+    {
+        return $this->venue;
+    }
+
+    /**
+     * @param Venue $venue
+     */
+    public function setVenue($venue)
+    {
+        $this->venue = $venue;
     }
 
     /**

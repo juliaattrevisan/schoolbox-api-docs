@@ -21,6 +21,8 @@ use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
+use Schoolbox\SportsFixtures\Venue\Model as Venue;
+use Schoolbox\SportsFixtures\Venue\Mapper as VenueMapper;
 use Schoolbox\Collection;
 
 /**
@@ -40,6 +42,7 @@ class Mapper extends BaseMapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('division_id', DivisionMapper::class, 'id', null, null, 'division', 'division');
+        $this->joins('venue_id', VenueMapper::class, 'id', null, null, 'venue', 'venue');
         $this->uses('name', self::TYPE_STRING);
         $this->uses('start_at', self::TYPE_DATETIME);
         $this->joins('home_team_id', TeamMapper::class, 'id', null, null, 'homeTeam', 'home_team');
@@ -61,7 +64,8 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('home_team', 'h')},
                 {$this->getJoinColumnString('away_team', 'a')},
-				{$this->getJoinColumnString('division', 'd')}
+				{$this->getJoinColumnString('division', 'd')},
+				{$this->getJoinColumnString('venue', 'v')}
             ";
     }
 
@@ -77,6 +81,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('home_team', null, 'h')}
             LEFT JOIN {$this->getJoinSql('away_team', null, 'a')}
             LEFT JOIN {$this->getJoinSql('division', null, 'd')}
+            LEFT JOIN {$this->getJoinSql('venue', null, 'v')}
         ";
     }
 
@@ -99,11 +104,15 @@ class Mapper extends BaseMapper
             /** @var Division $division */
             $division = $this->hydrateJoin($row, 'division', 'd');
 
+            /** @var Venue $venue */
+            $venue = $this->hydrateJoin($row, 'venue', 'v');
+
             /** @var Team $homeTeam */
             /** @var Team $awayTeam */
             $homeTeam = $this->hydrateJoin($row, 'home_team', 'h');
             $awayTeam = $this->hydrateJoin($row, 'away_team', 'a');
 
+            $match->setVenue($venue);
             $match->setDivision($division);
             $match->setHomeTeam($homeTeam);
             $match->setAwayTeam($awayTeam);

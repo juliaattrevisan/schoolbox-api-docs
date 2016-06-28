@@ -11,7 +11,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use \Alaress_Date_Format;
 use Schoolbox\SportsFixtures\Match\Model as Match;
-use Schoolbox\SportsFixtures\Venue\Model as Venue;
+
 
 /**
  * Represents a Position a player may take in some Sport.
@@ -31,9 +31,6 @@ class Model implements ISoftDeletable
 
     /** @var Match $match */
     protected $match;
-
-    /** @var Venue $venue */
-    protected $venue;
 
     /** @var string */
     protected $description;
@@ -103,22 +100,6 @@ class Model implements ISoftDeletable
     public function setMatch($match)
     {
         $this->match = $match;
-    }
-
-    /**
-     * @return Venue
-     */
-    public function getVenue()
-    {
-        return $this->venue;
-    }
-
-    /**
-     * @param Venue $venue
-     */
-    public function setVenue($venue)
-    {
-        $this->venue = $venue;
     }
 
     /**

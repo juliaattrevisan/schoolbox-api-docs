@@ -32,7 +32,6 @@ class Mapper extends BaseMapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('match_id', MatchMapper::class, 'id', null, null, 'match', 'match');
-        $this->joins('venue_id', VenueMapper::class, 'id', null, null, 'venue', 'venue');
         $this->uses('description', self::TYPE_STRING);
         $this->uses('start_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
@@ -53,10 +52,8 @@ class Mapper extends BaseMapper
     {
         $query = "
             SELECT
-                {$this->getColumnString('i')},
-                {$this->getJoinColumnString('venue', 'v')}
+                {$this->getColumnString('i')}
             FROM {$this->getTable()} `i`
-            LEFT JOIN {$this->getJoinSql('venue', 'i', 'v')}
             WHERE i.id = ?
             AND i.deleted_at IS NULL
         ";
@@ -68,11 +65,6 @@ class Mapper extends BaseMapper
 
             /** @var ItineraryItem $itineraryItem */
             $itineraryItem = $this->hydrate($row, 'i');
-
-            /** @var Venue $venue */
-            $venue = $this->hydrateJoin($row, 'venue', 'v');
-
-            $itineraryItem->setVenue($venue);
 
             return $itineraryItem;
         }
