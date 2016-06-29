@@ -79,7 +79,7 @@ class Controller extends AbstractController
                     )
                 );
             } catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(2);
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
             }
         }
     }
@@ -138,7 +138,7 @@ class Controller extends AbstractController
 
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesVenue.getList'));
         } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
         }
     }
 
