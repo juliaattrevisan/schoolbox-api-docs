@@ -193,10 +193,35 @@ class Controller extends AbstractController
         $zone     = new Zone("uploadZone");
         $zone->setMimeFilter('text/csv')->setAttachPrompt('upload a list of players');
 
+        // Create twig-friendly data model
+        $dataModel = [
+            'division' => $division,
+            'players'  => [],
+            'teams'    => [],
+        ];
+        foreach ($division->getPlayers() as $player) {
+            $playerDataModel = [
+                'player' => $player,
+                'teams'  => [],
+            ];
+            foreach ($division->getTeams() as $team) {
+                if ($team->isPlayerInTeam($player)) {
+                    $playerDataModel['teams'][] = $team;
+                }
+            }
+            $dataModel['players'][] = $playerDataModel;
+        }
+        foreach ($division->getTeams() as $team) {
+            $dataModel['teams'][] = [
+                'team'    => $team,
+                'players' => $team->getPlayers(),
+            ];
+        }
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@sportsfixturesDivision/lobby.twig', [
-                    'division'   => $division,
+                    'data'       => $dataModel,
                     'uploadZone' => $zone,
                     'user'       => $this->getUser(),
                 ]
