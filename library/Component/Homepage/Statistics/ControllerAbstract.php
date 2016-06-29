@@ -86,25 +86,6 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
     }
 
     /**
-     * Gets the Folder, if any, this component draws its data from
-     *
-     * @throws DomainException
-     */
-    public function getSource(){
-        throw new DomainException('HomepageStatistic components do not allow alternative data sources');
-    }
-
-    /**
-     * Sets the Folder, if any, this component draws its data from
-     *
-     * @param Schoolbox\Resource\Folder\Model $source
-     * @throws DomainException
-     */
-    public function setSource($source) {
-        throw new DomainException('HomepageStatistic components do not allow alternative data sources');
-    }
-
-    /**
      * For now, HomepageStatistic Components are unable to use Alt Data Sources
      *
      * @throws DomainException
