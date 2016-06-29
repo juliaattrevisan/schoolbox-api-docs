@@ -84,7 +84,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('away_team', 'a')},
 				{$this->getJoinColumnString('division', 'd')},
 				{$this->getJoinColumnString('venue', 'v')}
-            ";
+        ";
     }
 
     /**
