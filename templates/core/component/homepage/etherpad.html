@@ -4,37 +4,36 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
-
                 <!-- BEGIN source_folder_deleted -->
-                    {SOURCE_FOLDER_DELETED}
+                {SOURCE_FOLDER_DELETED}
                 <!-- END source_folder_deleted -->
 
                 <!-- BEGIN source_folder_exists -->
-                    <ul class="action-list">
-                        <!-- BEGIN etherpad_pad -->
-                        <li class="actions-small-2">
-                            <div class="list-item">
-                                <div class="card small-12">
-                                    <a href='/collabdoc/edit/{ETHERPAD_PAD_ID}/{ID}'>
-                                        <h3>{ETHERPAD_NAME}</h3>
-                                    </a>
-                                    <p class="meta">Last updated on {ETHERPAD_UPDATED_AT}</p>
-                                </div>
+                <ul class="action-list">
+                    <!-- BEGIN etherpad_pad -->
+                    <li class="actions-small-2">
+                        <div class="list-item">
+                            <div class="card small-12">
+                                <a href='/collabdoc/edit/{ETHERPAD_PAD_ID}/{ID}'>
+                                    <h3>{ETHERPAD_NAME}</h3>
+                                </a>
+                                <p class="meta">Last updated on {ETHERPAD_UPDATED_AT}</p>
                             </div>
-                            <nav>
-                                <!-- BEGIN etherpad_has_modify -->
-                                <a class="icon-modify" href="/collabdoc/modify/{ETHERPAD_PAD_ID}" title="Modify Collab Doc"></a>
-                                <!-- END etherpad_has_modify -->
-                            </nav>
-                        </li>
-                        <!-- END etherpad_pad -->
-                    </ul>
+                        </div>
+                        <nav>
+                            <!-- BEGIN etherpad_has_modify -->
+                            <a class="icon-modify" href="/collabdoc/modify/{ETHERPAD_PAD_ID}" title="Modify Collab Doc"></a>
+                            <!-- END etherpad_has_modify -->
+                        </nav>
+                    </li>
+                    <!-- END etherpad_pad -->
+                </ul>
 
-                    <div class="content">
-                        <!-- BEGIN etherpad_has_create -->
-                        <a href="/collabdoc/create/{ID}" class="button icon-add">Create Document</a>
-                        <!-- END etherpad_has_create -->
-                    </div>
+                <div class="content">
+                    <!-- BEGIN etherpad_has_create -->
+                    <a href="/collabdoc/create/{ID}" class="button icon-add">Create Document</a>
+                    <!-- END etherpad_has_create -->
+                </div>
                 <!-- END source_folder_exists -->
             </section>
         </div>

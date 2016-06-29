@@ -55,18 +55,18 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             return false;
         }
 
+        /* If user does not have access to the source, do not output anything */
+        if ($this->contentPermission < READ_ACCESS) {
+            return false;
+        }
+
         $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
         $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
         $this->setBlock('source_folder_exists', 'text_editable', 'text_editable_block');
         $this->setBlock('source_folder_exists', 'text_locked', 'text_locked_block');
         $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
         $this->setBlock('text_locked', 'create_text', 'create_text_block');
-
-
-        /* If user does not have access to the source, do not output anything */
-        if ($this->contentPermission < READ_ACCESS) {
-            return false;
-        }
+        
 
         /* Remember where the texbox came from - if you modify a streamed
          * textbox which comes from another homepage, you were able to
@@ -86,17 +86,10 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             'text_locked_block'   => '',
         ));
 
-        $isDeletedAltSource = $this->isUsingAltSource() && $this->getSource()->isDeleted();
-
-        if($isDeletedAltSource){
-            $twigTemplate = 'sub/componentSourceDeleted.twig';
-            $twigData = array(
-                'componentInstanceId' => $this->getInstance()->getId()
-            );
-            $this->setVar('SOURCE_FOLDER_DELETED', $this->sitepage->getTwig()->render($twigTemplate, $twigData));
-            $this->parse('source_folder_deleted_block','source_folder_deleted');
-            $this->setVar('source_folder_exists_block', '');
+        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
+            $this->renderAltSourceDeleted();
         } else {
+            $this->setVar('source_folder_deleted_block', '');
 
             /* To edit someone else's textbox, you need write access to both homepages.
              * To just edit one homepage's textbox, you need write access to that homepage.
@@ -135,6 +128,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                 // formatted text
                 $this->parse('text_locked_block', 'text_locked');
             }
+            $this->parse('source_folder_exists_block','source_folder_exists');
         }
 
         /* Need title injected here

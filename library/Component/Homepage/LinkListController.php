@@ -55,11 +55,13 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             return false;
         }
 
-        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
-
         if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
+
+        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
+
+
 
         // Set up component name
         $this->setVar(
@@ -78,60 +80,70 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $this->parseConfig();
 
         //link output
-        $this->setBlock($templateHandle, 'link', 'link_block');
+        $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
+        $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
+        $this->setBlock('source_folder_exists', 'link', 'link_block');
+        $this->setBlock('source_folder_exists', "submit_link", "submit_link_block");
         $this->setBlock('link', 'modify_link', 'modify_link_block');
 
-        /** @var Schoolbox\Resource\Link[] $allLinks */
-        $allLinks = $this->getLinkMapper()->findAllInCategory(
-            $this->getSource(),
-            array(
-                'size'    => $this->getConfig('size'),
-                'sort'    => $this->getConfig('sort'),
-                'sortdir' => $this->getConfig('sortdir'),
-            )
-        );
+        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
+            $this->renderAltSourceDeleted();
+        } else {
+            $this->setVar('source_folder_deleted_block', '');
 
-        $this->setVar('link_block', '');
-
-        $j = 0;
-
-        foreach ($allLinks as $currentLink) {
-            if ($currentLink->getHidden() && $this->contentPermission < WRITE_ACCESS) {
-                continue;
-            }
-            $this->setVar(
+            /** @var Schoolbox\Resource\Link[] $allLinks */
+            $allLinks = $this->getLinkMapper()->findAllInCategory(
+                $this->getSource(),
                 array(
-                    'LINK_ID'           => $currentLink->getId(),
-                    'LINK_NAME'         => Scrub::text($currentLink->getDescription()),
-                    'LINK_URL'          => $currentLink->getHref(),
-                    'LINK_TARGET'       => $currentLink->getLinkTarget(),
-                    'LINK_POSTED_BY'    => $currentLink->getOwner()->formatName(),
-                    'LINK_POSTED_BY_ID' => $currentLink->getOwner()->getId(),
-                    'LINK_POSTED_DATE'  => $currentLink->getSubmitted()->getShort(),
-                    'LINK_COMMENT'      => nl2br(Scrub::text($currentLink->getComment())),
-                    'ON_OFF'            => ++$j % 2 ? '' : 'dark',
-                    'HIDDEN'            => $currentLink->getHidden() ? 'hidden' : '',
+                    'size' => $this->getConfig('size'),
+                    'sort' => $this->getConfig('sort'),
+                    'sortdir' => $this->getConfig('sortdir'),
                 )
             );
 
-            // Controls
-            if ($this->contentPermission < WRITE_ACCESS) {
-                $this->setVar('modify_link_block', '');
-            } else {
-                $this->parse('modify_link_block', 'modify_link');
+            $this->setVar('link_block', '');
+
+            $j = 0;
+
+            foreach ($allLinks as $currentLink) {
+                if ($currentLink->getHidden() && $this->contentPermission < WRITE_ACCESS) {
+                    continue;
+                }
+                $this->setVar(
+                    array(
+                        'LINK_ID' => $currentLink->getId(),
+                        'LINK_NAME' => Scrub::text($currentLink->getDescription()),
+                        'LINK_URL' => $currentLink->getHref(),
+                        'LINK_TARGET' => $currentLink->getLinkTarget(),
+                        'LINK_POSTED_BY' => $currentLink->getOwner()->formatName(),
+                        'LINK_POSTED_BY_ID' => $currentLink->getOwner()->getId(),
+                        'LINK_POSTED_DATE' => $currentLink->getSubmitted()->getShort(),
+                        'LINK_COMMENT' => nl2br(Scrub::text($currentLink->getComment())),
+                        'ON_OFF' => ++$j % 2 ? '' : 'dark',
+                        'HIDDEN' => $currentLink->getHidden() ? 'hidden' : '',
+                    )
+                );
+
+                // Controls
+                if ($this->contentPermission < WRITE_ACCESS) {
+                    $this->setVar('modify_link_block', '');
+                } else {
+                    $this->parse('modify_link_block', 'modify_link');
+                }
+
+                $this->parse("link_block", "link", true);
             }
 
-            $this->parse("link_block", "link", true);
-        }
+            //setup block for submission button
+            $this->setVar('LINK_CAT_ID', $this->source->getId());
 
-        //setup block for submission button
-        $this->setVar('LINK_CAT_ID', $this->source->getId());
-        $this->setBlock($templateHandle, "submit_link", "submit_link_block");
 
-        if ($this->contentPermission < WRITE_ACCESS) {
-            $this->setVar("submit_link_block", "");
-        } else {
-            $this->parse("submit_link_block", "submit_link");
+            if ($this->contentPermission < WRITE_ACCESS) {
+                $this->setVar("submit_link_block", "");
+            } else {
+                $this->parse("submit_link_block", "submit_link");
+            }
+            $this->parse('source_folder_exists_block','source_folder_exists');
         }
 
         return true;

@@ -5,13 +5,19 @@
 
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
-                <ul class="breadcrumb">
-                    <!-- BEGIN category_breadcrumb -->
-                    <li class="{BREADCRUMB_CATEGORY_CLASS}">
-                        <a href="/homepage/{BREADCRUMB_CATEGORY_ID}/" >{BREADCRUMB_CATEGORY_NAME}</a>
-                    </li>
-                    <!-- END category_breadcrumb -->
-                </ul>
+            <!-- BEGIN source_folder_deleted -->
+            {SOURCE_FOLDER_DELETED}
+            <!-- END source_folder_deleted -->
+
+            <!-- BEGIN source_folder_exists -->
+            <ul class="breadcrumb">
+                <!-- BEGIN category_breadcrumb -->
+                <li class="{BREADCRUMB_CATEGORY_CLASS}">
+                    <a href="/homepage/{BREADCRUMB_CATEGORY_ID}/" >{BREADCRUMB_CATEGORY_NAME}</a>
+                </li>
+                <!-- END category_breadcrumb -->
+            </ul>
+            <!-- END source_folder_exists -->
         </div>
     </div>
 </div>

@@ -75,14 +75,8 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
         // Is component source set to different folder, which has been deleted?
         $isDeletedAltSource = $this->isUsingAltSource() && $this->getSource()->isDeleted();
 
-        if($isDeletedAltSource){
-            $twigTemplate = 'sub/componentSourceDeleted.twig';
-            $twigData = array(
-                'componentInstanceId' => $this->getInstance()->getId()
-            );
-            $this->setVar('SOURCE_FOLDER_DELETED', $this->sitepage->getTwig()->render($twigTemplate, $twigData));
-            $this->parse('source_folder_deleted_block','source_folder_deleted');
-            $this->setVar('source_folder_exists_block', '');
+        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
+            $this->renderAltSourceDeleted();
         } else {
             $this->setVar('source_folder_deleted_block', '');
 

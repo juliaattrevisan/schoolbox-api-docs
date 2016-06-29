@@ -34,6 +34,7 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
      */
     public function execute()
     {
+        // Hide Dashboard components if the folder they pull data is soft-deleted
         if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
             return false;
         }

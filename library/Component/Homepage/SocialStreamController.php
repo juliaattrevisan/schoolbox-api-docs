@@ -23,75 +23,86 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
             return false;
         }
 
-        $this->parseConfig();
-
         if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 
-        $this->setBlock($templateHandle, 'socialstream_has_newpost', 'socialstream_has_newpost_block');
+        $this->parseConfig();
 
-        $this->setVar(
-            array(
-                'HOMEPAGE_ID'             => $this->getSource()->getId(),
-                'SOCIALSTREAM_AJAX_LIMIT' => $this->getConfig('size'),
-            )
-        );
 
-        /* If you can neither comment nor collaborate, hide the form
-         * and disable javascript and hide links
-         */
-        $newPost       = new \SocialStream_Post_String();
-        $currentUser   = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
-        $authenticator = new \SocialStream\Authenticator($newPost, $this->instance, $currentUser);
+        $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
+        $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
+        $this->setBlock('source_folder_exists', 'socialstream_has_newpost', 'socialstream_has_newpost_block');
 
-        if (!$authenticator->canComment() && !$authenticator->canCollaborate()) {
+        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
+            $this->renderAltSourceDeleted();
+        } else {
+            $this->setVar('source_folder_deleted_block', '');
+
             $this->setVar(
                 array(
-                    'socialstream_has_newpost_block' => '',
+                    'HOMEPAGE_ID' => $this->getSource()->getId(),
+                    'SOCIALSTREAM_AJAX_LIMIT' => $this->getConfig('size'),
                 )
             );
-        } else {
-            if ($authenticator->canCollaborate()) {
+
+
+            /* If you can neither comment nor collaborate, hide the form
+             * and disable javascript and hide links
+             */
+            $newPost = new \SocialStream_Post_String();
+            $currentUser = \Schoolbox\UserMapper::getInstance()->findById($_SESSION['id']);
+            $authenticator = new \SocialStream\Authenticator($newPost, $this->instance, $currentUser);
+
+            if (!$authenticator->canComment() && !$authenticator->canCollaborate()) {
                 $this->setVar(
                     array(
-                        'FORM_CLASS' => ''
+                        'socialstream_has_newpost_block' => '',
                     )
                 );
-            } /* Use hidden cloneable
-			 */
-            else {
-                if ($authenticator->canComment()) {
+            } else {
+                if ($authenticator->canCollaborate()) {
                     $this->setVar(
                         array(
-                            'FORM_CLASS' => 'hide'
+                            'FORM_CLASS' => ''
                         )
                     );
+                } /* Use hidden cloneable
+			 */
+                else {
+                    if ($authenticator->canComment()) {
+                        $this->setVar(
+                            array(
+                                'FORM_CLASS' => 'hide'
+                            )
+                        );
+                    }
                 }
+
+                $zone = new Zone('sstream-attachment-' . $this->instance->getId());
+                $zone->setMimeFilter(null)
+                    ->setAttachPrompt('Share a file')
+                    ->setAttachmentsLabel('')
+                    ->setModalTitle('Select a file or folder')
+                    ->setMulti(false)
+                    ->setThumbnailSize(32);
+
+                $zone->renderIntoSitePage($this->sitepage, 'ATTACH_ZONE');
+
+                $this->parse('socialstream_has_newpost_block', 'socialstream_has_newpost');
             }
 
-            $zone = new Zone('sstream-attachment-' . $this->instance->getId());
-            $zone->setMimeFilter(null)
-                ->setAttachPrompt('Share a file')
-                ->setAttachmentsLabel('')
-                ->setModalTitle('Select a file or folder')
-                ->setMulti(false)
-                ->setThumbnailSize(32);
+            /* See how many posts there could be at the moment
+             */
+            $numPosts = \SocialStream\PostMapper::getInstance()->findCount($this->getSource()->getId());
 
-            $zone->renderIntoSitePage($this->sitepage, 'ATTACH_ZONE');
-
-            $this->parse('socialstream_has_newpost_block', 'socialstream_has_newpost');
+            $this->setVar(
+                array(
+                    'SOCIALSTREAM_NUM_POSTS' => $numPosts
+                )
+            );
+            $this->parse('source_folder_exists_block','source_folder_exists');
         }
-
-        /* See how many posts there could be at the moment
-         */
-        $numPosts = \SocialStream\PostMapper::getInstance()->findCount($this->getSource()->getId());
-
-        $this->setVar(
-            array(
-                'SOCIALSTREAM_NUM_POSTS' => $numPosts
-            )
-        );
 
         return true;
     }

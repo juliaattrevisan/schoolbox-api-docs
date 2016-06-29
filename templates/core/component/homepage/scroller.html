@@ -1,35 +1,40 @@
 <div id="component{COMPONENT_INSTANCE_ID}" class="component-container {COMPONENT_CLASS}" data-component>
     <script type="text/javascript" src="/javascript/components/anyslider/dist/jquery.anyslider.min.js"></script>
-    <script type="text/javascript">
-        // Expanded? init on load
-        // Collapsed? init on expand
-        $(function(){
-            var component = $("#component{COMPONENT_INSTANCE_ID}");
-            var init = function() {
-                component.find("[data-imageslider]").anyslider({
-                    interval: {COMPONENT_CONFIG_TIMING_VALUE_MS},
-                    prevLabel: '',
-                    nextLabel: '',
-                    showBullets: false,
-                    showControls: true,
-                    startSlide: {COMPONENT_RANDOM_SLIDE}
-                });
-            };
-
-            var collapser = component.find('[data-collapsable="true"]');
-            if (collapser.data('collapseState') === 'uncollapsed') {
-                init();
-            } else {
-                collapser.one('expandStop.collapsable', init);
-            }
-        });
-    </script>
 
     {CONFIGURATION}
 
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section class="imageslider-container">
+                <!-- BEGIN source_folder_deleted -->
+                {SOURCE_FOLDER_DELETED}
+                <!-- END source_folder_deleted -->
+
+                <!-- BEGIN source_folder_exists -->
+                <script type="text/javascript">
+                    // Expanded? init on load
+                    // Collapsed? init on expand
+                    $(function(){
+                        var component = $("#component{COMPONENT_INSTANCE_ID}");
+                        var init = function() {
+                            component.find("[data-imageslider]").anyslider({
+                                interval: {COMPONENT_CONFIG_TIMING_VALUE_MS},
+                                prevLabel: '',
+                                nextLabel: '',
+                                showBullets: false,
+                                showControls: true,
+                                startSlide: {COMPONENT_RANDOM_SLIDE}
+                            });
+                        };
+
+                        var collapser = component.find('[data-collapsable="true"]');
+                        if (collapser.data('collapseState') === 'uncollapsed') {
+                            init();
+                        } else {
+                            collapser.one('expandStop.collapsable', init);
+                        }
+                    });
+                </script>
                 <div class="dropzone-wrap no-margin">
                     <form class="dropzone overlay" id="dropzone{COMPONENT_INSTANCE_ID}" action="/cms/fileForm.php?ajax=1" method="post" data-accepts="image"></form>
                     <div data-imageslider class="imageslider">
@@ -67,48 +72,50 @@
                         </ul>
                     </ul>
                 </div>
+
+                <!-- BEGIN submit_image_scroller -->
+                <div class="content">
+                    <a href="/cms/file/new/{IMAGESCROLLER_CATEGORY_ID}" class="button icon-upload">Post Image</a>
+                    <script type="text/javascript">
+                        $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
+                            wrapClass: 'dragging',
+                            wrap: '#content',
+                            showIfEmpty: false,
+                            previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
+                            previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
+                            createImageThumbnails: true,
+                            thumbnailHeight: 400,
+                            thumbnailWidth: null,
+                            dictDefaultMessage: 'You can drag an image into this space.',
+                            acceptedFiles: 'image/*',
+                            refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
+                            refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
+                            addedfile: function (file) {
+                            },
+                            sending: function (file, xhr, formData) {
+                                $(file.previewElement)
+                                        .addClass('category-{IMAGESCROLLER_CATEGORY_ID}')
+                                        .data('node', {IMAGESCROLLER_CATEGORY_ID});
+
+                                $('#img{COMPONENT_INSTANCE_ID}').remove();
+
+                                formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
+                                formData.append('category', $(file.previewElement).data('node'));
+                                formData.append('comment', '');
+                                formData.append('hidden', 0);
+                            },
+                            error: function (file) {
+                                $(file.previewElement)
+                                        .closest('[data-dz-container]')
+                                        .find('.dz-preview').remove();
+                            }
+                        });
+                    </script>
+                </div>
+                <!-- END submit_image_scroller -->
+
+                <!-- END source_folder_exists -->
             </section>
-
-            <!-- BEGIN submit_image_scroller -->
-            <section class="content">
-                <a href="/cms/file/new/{IMAGESCROLLER_CATEGORY_ID}" class="button icon-upload">Post Image</a>
-                <script type="text/javascript">
-                    $('#dropzone{COMPONENT_INSTANCE_ID}').fileDrop({
-                        wrapClass: 'dragging',
-                        wrap: '#content',
-                        showIfEmpty: false,
-                        previewsContainer: '#component{COMPONENT_INSTANCE_ID} [data-dz-container]',
-                        previewTemplate: '#component{COMPONENT_INSTANCE_ID} [data-dz-template]',
-                        createImageThumbnails: true,
-                        thumbnailHeight: 400,
-                        thumbnailWidth: null,
-                        dictDefaultMessage: 'You can drag an image into this space.',
-                        acceptedFiles: 'image/*',
-                        refreshSelector: '#component{COMPONENT_INSTANCE_ID}',
-                        refreshData: { cid: '{ID}', reload: '{COMPONENT_INSTANCE_ID}' },
-                        addedfile: function (file) {
-                        },
-                        sending: function (file, xhr, formData) {
-                            $(file.previewElement)
-                                .addClass('category-{IMAGESCROLLER_CATEGORY_ID}')
-                                .data('node', {IMAGESCROLLER_CATEGORY_ID});
-
-                            $('#img{COMPONENT_INSTANCE_ID}').remove();
-
-                            formData.append('description', file.name.substr(0, file.name.lastIndexOf('.')));
-                            formData.append('category', $(file.previewElement).data('node'));
-                            formData.append('comment', '');
-                            formData.append('hidden', 0);
-                        },
-                        error: function (file) {
-                            $(file.previewElement)
-                                .closest('[data-dz-container]')
-                                .find('.dz-preview').remove();
-                        }
-                    });
-                </script>
-            </section>
-            <!-- END submit_image_scroller -->
         </div>
     </div>
 </div>

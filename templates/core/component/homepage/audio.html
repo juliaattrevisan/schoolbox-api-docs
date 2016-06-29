@@ -11,6 +11,12 @@
     <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
+                <!-- BEGIN source_folder_deleted -->
+                {SOURCE_FOLDER_DELETED}
+                <!-- END source_folder_deleted -->
+
+                <!-- BEGIN source_folder_exists -->
+
                 <!-- BEGIN default_audio -->
                 <div class="content">
                     <h3 class="mejs-player-title" data-role="media-playlist-title">{DEFAULT_AUDIO_TITLE}</h3>
@@ -127,6 +133,7 @@
                     });
                 </script>
                 <!-- END submit_file -->
+                <!-- END source_folder_exists -->
             </section>
         </div>
     </div>

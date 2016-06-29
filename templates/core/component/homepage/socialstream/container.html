@@ -31,6 +31,11 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
+                <!-- BEGIN source_folder_deleted -->
+                {SOURCE_FOLDER_DELETED}
+                <!-- END source_folder_deleted -->
+
+                <!-- BEGIN source_folder_exists -->
                 <div data-socialstream-form class="editPanel socialstream-new-post">
                     <!-- BEGIN socialstream_has_newpost -->
                     <form action='/socialstream/modifyForm.php' method='post' id='socialstream-form-default-{COMPONENT_INSTANCE_ID}' data-add-post-form class='{FORM_CLASS}' enctype='multipart/form-data'>
@@ -124,6 +129,7 @@
                         <a class="button icon-comment">Load More</a>
                     </div>
                 </div>
+                <!-- END source_folder_exists -->
             </section>
         </div>
     </div>

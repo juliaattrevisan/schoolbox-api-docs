@@ -77,7 +77,7 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
                 'componentInstanceId' => $this->getInstance()->getId(),
             );
         } else {
-            $twigTemplate = 'sub/componentSourceDeleted.twig';
+            $twigTemplate = '@tile/component/tile.twig';
             $twigData = array(
                 'component'                  => $this,
                 'showButtons'                => $this->hasWriteAccess(),
