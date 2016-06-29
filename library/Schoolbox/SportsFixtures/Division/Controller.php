@@ -233,7 +233,7 @@ class Controller extends AbstractController
             $upload = $factory->build($attach)->getFirst();
         } else {
             // error out
-            throw $this->getErrorMapper()->generateException(2);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
         // What are the users in this upload?
