@@ -144,6 +144,7 @@ class Mapper extends BaseMapper
     const ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND = 173;
     const ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND = 174;
     const ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND = 175;
+    const ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND = 176;
 
     public function mapping()
     {

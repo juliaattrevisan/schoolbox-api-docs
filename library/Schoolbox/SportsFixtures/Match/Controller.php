@@ -87,26 +87,30 @@ class Controller extends AbstractController
         try {
             /** @var Division $context */
             $sport = $this->getSportMapper()->findById($context->getSport()->getId());
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
+        }
+
+        try {
             $division = $this->getDivisionMapper()->findById($context->getId());
-
-            /** @var MatchMapper $mapper */
-            $mapper = $this->getMapper();
-
-            $allMatches = $mapper->findByColumn('division_id', $division->getId(), [
-                'order' => [
-                    'start_at' => 'asc'
-                ]
-            ]);
-
-            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/list.twig', [
-                'sport' => $sport,
-                'division' => $context,
-                'allMatches' => $allMatches
-            ]));
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
-        }
+
+        /** @var MatchMapper $mapper */
+        $mapper = $this->getMapper();
+
+        $allMatches = $mapper->findByColumn('division_id', $division->getId(), [
+            'order' => [
+                'start_at' => 'asc'
+            ]
+        ]);
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/list.twig', [
+            'sport' => $sport,
+            'division' => $context,
+            'allMatches' => $allMatches
+        ]));
     }
 
     /**
@@ -116,26 +120,29 @@ class Controller extends AbstractController
      */
     protected function getForm($entity, $context = null)
     {
-        try {
-            if (empty($context)) {
+        if (empty($context)) {
+            try {
                 $context = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
+            } catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
             }
+        }
 
+        try {
             $sport = $this->getSportMapper()->findById($context->getSport()->getId());
-
-            $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $entity->getId());
-
-            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/create.twig', [
-                'sport'             => $sport,
-                'division'          => $context,
-                'match'             => $entity,
-                'allItineraryItems' => $allItineraryItems,
-                'action'            => $entity->getId() ? 'Modify' : 'Create'
-            ]));
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
-        }
+
+        $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $entity->getId());
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/create.twig', [
+            'sport'             => $sport,
+            'division'          => $context,
+            'match'             => $entity,
+            'allItineraryItems' => $allItineraryItems,
+            'action'            => $entity->getId() ? 'Modify' : 'Create'
+        ]));
     }
 
     /**
@@ -149,9 +156,23 @@ class Controller extends AbstractController
      */
     public function getEntity($entity)
     {
-        $division = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
-        $sport    = $this->getSportMapper()->findById($division->getSport()->getId());
-        $venue    = $this->getVenueMapper()->findById($entity->getVenue()->getId());
+        try {
+            $division = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
+        }
+
+        try {
+            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+        }
+
+        try {
+            $venue = $this->getVenueMapper()->findById($entity->getVenue()->getId());
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
+        }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/entity.twig', [
             'sport'    => $sport,
@@ -171,25 +192,33 @@ class Controller extends AbstractController
         try {
             $divisionId = $this->getRequest()->post['divisionId'];
             $division   = $this->getDivisionMapper()->findById($divisionId);
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
+        }
 
-            $date = "{$this->getRequest()->post['startAtDate']} {$this->getRequest()->post['startAtTime']}";
-            $startAt = \Alaress_Date_Format::newLocal($date);
+        $date    = "{$this->getRequest()->post['startAtDate']} {$this->getRequest()->post['startAtTime']}";
+        $startAt = \Alaress_Date_Format::newLocal($date);
 
+        try {
             $homeTeam = $this->getTeamMapper()->findById($this->getRequest()->post['homeTeamId']);
             $awayTeam = $this->getTeamMapper()->findById($this->getRequest()->post['awayTeamId']);
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+        }
 
+        try {
             /** @var Venue $venue */
             $venueId = $this->getRequest()->post['venueId'];
             $venue   = $this->getVenueMapper()->findById($venueId);
-
-            $this->saveMatch($entity, $division, $this->getRequest()->post['name'], $startAt, $homeTeam, $awayTeam, $venue);
-
-            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesMatch.getList', [
-                'contextId' => $divisionId
-            ]));
         } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
         }
+
+        $this->saveMatch($entity, $division, $this->getRequest()->post['name'], $startAt, $homeTeam, $awayTeam, $venue);
+
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesMatch.getList', [
+            'contextId' => $divisionId
+        ]));
     }
 
     /**
