@@ -61,7 +61,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Find all the teams whose names are like $keyword
+     * Find all the Teams whose names are like $keyword
      *
      * @param string $keyword
      * @return \Schoolbox\Collection
@@ -76,8 +76,6 @@ class Mapper extends BaseMapper
 			WHERE v.name LIKE :nameLike
         ";
 
-        /* Don't know why codeLike contained / and not a trailing %
-         */
         $params = [
             'nameLike' => "%{$this->database->quoteForLike($keyword)}%",
         ];
@@ -85,10 +83,8 @@ class Mapper extends BaseMapper
         $statement = $this->database->prepare($query);
         $statement->execute($params);
 
-        $hashtable = array();
+        $hashtable = [];
 
-        /* Only need to return category records
-         */
         foreach ($statement as $row) {
             $venue = $this->hydrate($row, 'v');
 
