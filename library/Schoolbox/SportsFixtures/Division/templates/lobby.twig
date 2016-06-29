@@ -218,7 +218,7 @@
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
     <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: division.getSport().getId()}) }}">Divisions in {{ division.getSport().getName() }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: division.sport.id}) }}">Divisions in {{ division.sport.name }}</a></li>
     <li class="active"><a href="{{ routeLookup('sportsfixturesDivision.getLobby', {entityId: division.id}) }}">{{ division.name }} Lobby</a></li>
 </ul>
 
@@ -241,20 +241,20 @@
                 <a href="#" class="icon-upload" title="Upload Player List" data-reveal-id="uploadPlayersModal"></a>
             </nav>
         </div>
-        {% if division.getPlayers() is not empty %}
-            <section data-division="{{ division.getId() }}">
+        {% if division.players is not empty %}
+            <section data-division="{{ division.id }}">
                 <ul class="information-list sortable"
-                    data-division-player-list="{{ division.getId() }}"
-                    data-add-players-action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {entityId: division.getId()}) }}"
-                    data-remove-players-action="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.getId()}) }}"
-                    data-reorder-players-action="{{ routeLookup('sportsfixturesDivision.postReorderPlayers', {entityId: division.getId()}) }}">
-                    {% for divisionPlayer in division.getPlayers() %}
-                        <li class="actions-small-1" data-player="{{ divisionPlayer.getId() }}">
+                    data-division-player-list="{{ division.id }}"
+                    data-add-players-action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {entityId: division.id}) }}"
+                    data-remove-players-action="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.id}) }}"
+                    data-reorder-players-action="{{ routeLookup('sportsfixturesDivision.postReorderPlayers', {entityId: division.id}) }}">
+                    {% for divisionPlayer in division.players %}
+                        <li class="actions-small-1" data-player="{{ divisionPlayer.id }}">
                             <div class="list-item">
                                 <div class="grip"></div>
                                 <div class="small-11 avatar card">
-                                    <a href="/search/user/{{ divisionPlayer.getId() }}">
-                                        <img src="/portrait.php?userId={{ divisionPlayer.getExternalId() }}&amp;size=square64" />
+                                    <a href="/search/user/{{ divisionPlayer.id }}">
+                                        <img src="/portrait.php?userId={{ divisionPlayer.externalId }}&amp;size=square64" />
                                         <h3>{{ divisionPlayer.formatName() }}</h3>
                                     </a>
                                     <p class="meta">{{ divisionPlayer.formatMetadata() }}</p>
@@ -262,7 +262,7 @@
                                         {% if loop.first %}
                                             <p class="meta icon-sport">
                                         {% endif %}
-                                        {{ currentTeam.getName() }}{% if not loop.last %}, {% endif %}
+                                        {{ currentTeam.name }}{% if not loop.last %}, {% endif %}
                                         {% if loop.last %}
                                             </p>
                                         {% endif %}
@@ -270,29 +270,29 @@
                                 </div>
                             </div>
                             <nav>
-                                <a href="#" class="icon-more" data-dropdown="sportsfixtures-player-{{ divisionPlayer.getId() }}-actions"></a>
+                                <a href="#" class="icon-more" data-dropdown="sportsfixtures-player-{{ divisionPlayer.id }}-actions"></a>
                             </nav>
-                            <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-player-{{ divisionPlayer.getId() }}-actions">
-                                {% for currentTeam in division.getTeams() %}
+                            <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-player-{{ divisionPlayer.id }}-actions">
+                                {% for currentTeam in division.teams %}
                                     {% if loop.first %}
                                         <li class="separator">Team Membership</li>
                                     {% endif %}
                                     <li>
                                         {% if currentTeam.isPlayerInTeam(divisionPlayer) %}
-                                            <a href="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: currentTeam.getId()}) }}"
+                                            <a href="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: currentTeam.id}) }}"
                                                class="icon-close"
-                                               data-remove-team-player="{{ divisionPlayer.getId() }}">Remove Player from {{ currentTeam.getName() }}</a>
+                                               data-remove-team-player="{{ divisionPlayer.id }}">Remove Player from {{ currentTeam.name }}</a>
                                         {% else %}
-                                            <a href="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.getId()}) }}"
+                                            <a href="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.id}) }}"
                                                class="icon-add"
-                                               data-add-team-player="{{ divisionPlayer.getId() }}">Add Player to {{ currentTeam.getName() }}</a>
+                                               data-add-team-player="{{ divisionPlayer.id }}">Add Player to {{ currentTeam.name }}</a>
                                         {% endif %}
                                     </li>
                                 {% endfor %}
                                 <li class="separator">Division Membership</li>
-                                <li><a href="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.getId()}) }}"
+                                <li><a href="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.id}) }}"
                                        class="icon-delete"
-                                       data-remove-player="{{ divisionPlayer.getId() }}">Remove Player From Division</a></li>
+                                       data-remove-player="{{ divisionPlayer.id }}">Remove Player From Division</a></li>
                             </ul>
                         </li>
                     {% endfor %}
@@ -301,8 +301,8 @@
             </section>
         {% else %}
             <div class="empty-state">
-                <i class="icon-player"></i>
-                <p>There are no Players in {{ division.getName() }}.</p>
+                <i class="icon-group"></i>
+                <p>There are no Players in {{ division.name }}.</p>
                 <p>
                     You may <a href="#" title="Add Players" data-reveal-id="addPlayersModal">add players by name</a>,
                     or <a href="#" title="Upload Player List" data-reveal-id="uploadPlayersModal">upload a list</a>.
@@ -313,42 +313,42 @@
 
     <div class="hide-for-small medium-6 island">
         <h2 class="subheader">Teams</h2>
-        {% if division.getTeams() is not empty %}
-            {% for currentTeam in division.getTeams() %}
-                <section data-team="{{ currentTeam.getId() }}">
+        {% if division.teams is not empty %}
+            {% for currentTeam in division.teams %}
+                <section data-team="{{ currentTeam.id }}">
                     <ul class="information-list sortable"
-                        data-team-player-list="{{ currentTeam.getId() }}"
-                        data-add-players-action="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.getId()}) }}"
-                        data-remove-players-action="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: currentTeam.getId()}) }}"
-                        data-reorder-players-action="{{ routeLookup('sportsfixturesTeam.postReorderPlayers', {entityId: currentTeam.getId()}) }}">
+                        data-team-player-list="{{ currentTeam.id }}"
+                        data-add-players-action="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.id}) }}"
+                        data-remove-players-action="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: currentTeam.id}) }}"
+                        data-reorder-players-action="{{ routeLookup('sportsfixturesTeam.postReorderPlayers', {entityId: currentTeam.id}) }}">
                         <li>
                             <div class="list-item">
                                 <div class="small-12 avatar card">
-                                    <h3>{{ currentTeam.getName() }}</h3>
+                                    <h3>{{ currentTeam.name }}</h3>
                                     <p class="meta icon-group">
-                                        {{ currentTeam.getPlayers()|length }}
-                                        {{ currentTeam.getPlayers()|length == 1 ? 'player in team' : 'players in team'}}
+                                        {{ currentTeam.players|length }}
+                                        {{ currentTeam.players|length == 1 ? 'player in team' : 'players in team'}}
                                     </p>
                                 </div>
                             </div>
                         </li>
-                        {% for teamPlayer in currentTeam.getPlayers() %}
-                            <li class="actions-small-1" data-player="{{ teamPlayer.getId() }}">
+                        {% for teamPlayer in currentTeam.players %}
+                            <li class="actions-small-1" data-player="{{ teamPlayer.id }}">
                                 <div class="list-item">
                                     <div class="grip"></div>
                                     <div class="small-11 avatar card">
-                                        <a href="/search/user/{{ teamPlayer.getId() }}">
-                                            <img src="/portrait.php?userId={{ teamPlayer.getExternalId() }}&amp;size=square64" />
+                                        <a href="/search/user/{{ teamPlayer.id }}">
+                                            <img src="/portrait.php?userId={{ teamPlayer.externalId }}&amp;size=square64" />
                                             <h3>{{ teamPlayer.formatName() }}</h3>
                                         </a>
                                         <p class="meta">{{ teamPlayer.formatMetadata() }}</p>
                                     </div>
                                 </div>
                                 <nav>
-                                    <a href="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: currentTeam.getId()}) }}"
+                                    <a href="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: currentTeam.id}) }}"
                                        class="icon-close"
-                                       title="Remove Player from {{ currentTeam.getName() }}"
-                                       data-remove-team-player="{{ teamPlayer.getId() }}"></a>
+                                       title="Remove Player from {{ currentTeam.name }}"
+                                       data-remove-team-player="{{ teamPlayer.id }}"></a>
                                 </nav>
                             </li>
                         {% endfor %}
@@ -358,8 +358,8 @@
             {% endfor %}
         {% else %}
             <div class="empty-state">
-                <i class="icon-team"></i>
-                <p>There are no Teams in {{ division.getName() }}.</p>
+                <i class="icon-sport"></i>
+                <p>There are no Teams in {{ division.name }}.</p>
                 <p><a href="{{ routeLookup('sportsfixturesTeam.getCreateForm', {contextId: division.id}) }}" title="Add a Team">Add a Team</a></p>
             </div>
         {% endif %}
@@ -368,7 +368,7 @@
 
 <div id="addPlayersModal" class="reveal-modal" data-reveal aria-labelledby="addPlayersModalTitle" aria-hidden="true" role="dialog">
     <h2 id="addPlayersModalTitle">Add Players</h2>
-    <form action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {entityId: division.getId()}) }}" method="post">
+    <form action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {entityId: division.id}) }}" method="post">
         <select data-role="userSelector" name="userId[]" multiple placeholder="Search Users"></select>
         <input type="submit" class="full-width" value="Add" />
     </form>
@@ -377,13 +377,13 @@
 
 <div id="uploadPlayersModal" class="reveal-modal" data-reveal aria-labelledby="uploadPlayersModalTitle" aria-hidden="true" role="dialog">
     <h2 id="uploadPlayersModalTitle">Upload Player List</h2>
-    <form action="{{ routeLookup('sportsfixturesDivision.postUploadPlayers', {entityId: division.getId()}) }}" method="post">
+    <form action="{{ routeLookup('sportsfixturesDivision.postUploadPlayers', {entityId: division.id}) }}" method="post">
         <p>
             You may upload a list of Schoolbox User IDs, usernames or external IDs into this division.
             Make sure that it conforms to the <a href="/sportsfixtures/import/userTemplate.csv">template</a> provided.
         </p>
 
-        {% if user.isSuperuser() %}
+        {% if user.isSuperuser %}
             {# Show only superusers the role report link, as only they can see it #}
             <p>
                 You may also download a report from the
@@ -392,7 +392,7 @@
             </p>
         {% endif %}
 
-        {% include 'sub/attachzone.twig' with { attachzone: uploadZone.getTwigContext() } %}
+        {% include 'sub/attachzone.twig' with { attachzone: uploadZone.twigContext } %}
         <ul class="flex-list buttons">
             <li><a href="/sportsfixtures/import/userTemplate.csv" class="button">Download Template</a></li>
             <li><input type="submit" class="full-width" value="Upload" /></li>
