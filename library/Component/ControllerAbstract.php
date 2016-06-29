@@ -135,10 +135,13 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Method to provide global config details to the component
+     * Provide global config details to the component in preparation for business logic.
+     *
+     * May perform setup operations common to all component types.
      *
      * @param mixed $context Type is clarified in subclasses
      * @param array $config
+     * @return void
      */
     public function setup($context = null, array $config = array())
     {
@@ -146,9 +149,10 @@ abstract class Component_ControllerAbstract
         $this->config  = $config;
 
         if($this->isUsingAltSource()){
-            // remove any non-numeric values from the source config & support deleted folders.
+            // remove any non-numeric values from the source config (legacy support)
             $folderId = preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'));
 
+            // source may be deleted
             try {
                 $source = $this->getFolderMapper()->findById($folderId);
             } catch(\Schoolbox\Mapper\Exception\Deleted $e){
@@ -161,24 +165,27 @@ abstract class Component_ControllerAbstract
         } else {
             $this->setSource($context);
         }
+
+        $this->postConstruct();
+    }
+
+    /**
+     * Hook method for components to perform their own dynamic setup() amendments
+     */
+    protected function postConstruct()
+    {
     }
 
     /**
      * Prepares data for the render function. Business logic.
+     *
+     * All permission checks, data retrieval & object creation should happen here.
      *
      * @return bool Whether to continue on and attempt Component render
      */
     public function execute(){
         // Default to no action
         return true;
-    }
-
-    /**
-     * Hook method for components to perform their own dynamic
-     * setup() amendments
-     */
-    protected function postConstruct()
-    {
     }
 
     /**
@@ -206,6 +213,13 @@ abstract class Component_ControllerAbstract
         return true;
     }
 
+    /**
+     * Gets a template's file name relative to system template folder
+     *
+     * @param string $templateName
+     * @param string $templatePath
+     * @return string
+     */
     protected function getTemplate($templateName = '', $templatePath = '')
     {
         if (empty($templateName)) {
@@ -225,12 +239,13 @@ abstract class Component_ControllerAbstract
     /**
      * Renders view using Component_AbstractController::$templateObject.
      *
+     * Responsible just for rendering objects already retrieved during execute()
+     *
      * @param String $templateHandle
      * @return boolean
      */
     public function renderTemplate($templateHandle)
     {
-
         if (!$this->loadTemplate($templateHandle)) {
             return false;
         }
