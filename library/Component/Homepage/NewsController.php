@@ -26,6 +26,9 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
      */
     public function execute()
     {
+        if(!parent::execute()){
+            return false;
+        }
         $this->groupHandler = new Group();
         $this->newsHandler  = new CategoryNews();
         return true;

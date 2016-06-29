@@ -30,6 +30,9 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
      */
     public function execute()
     {
+        if(!parent::execute()){
+            return false;
+        }
         $this->groupHandler = new Group();
         return true;
     }

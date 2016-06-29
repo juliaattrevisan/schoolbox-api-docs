@@ -72,8 +72,6 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
             )
         );
 
-        // Is component source set to different folder, which has been deleted?
-        $isDeletedAltSource = $this->isUsingAltSource() && $this->getSource()->isDeleted();
 
         if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
             $this->renderAltSourceDeleted();

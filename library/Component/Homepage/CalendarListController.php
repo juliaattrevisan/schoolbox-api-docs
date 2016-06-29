@@ -39,6 +39,9 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
      */
     public function execute()
     {
+        if(!parent::execute()){
+            return false;
+        }
         $this->db              = DeprecatedDatabase::getInstance();
         $this->calendarHandler = new Calendar();
         return true;

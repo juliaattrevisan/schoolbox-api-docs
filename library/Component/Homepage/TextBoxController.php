@@ -23,6 +23,9 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
      */
     public function execute()
     {
+        if(!parent::execute()){
+            return false;
+        }
         $this->groupHandler = new Group();
 
         try {

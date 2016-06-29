@@ -27,6 +27,9 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
      */
     public function execute()
     {
+        if(!parent::execute()){
+            return false;
+        }
         $this->myLinkHandler = new MyLinks();
         $this->groupHandler  = new Group();
         return true;

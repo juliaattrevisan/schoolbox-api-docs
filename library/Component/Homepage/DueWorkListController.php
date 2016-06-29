@@ -27,6 +27,9 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
      */
     public function execute()
     {
+        if(!parent::execute()){
+            return false;
+        }
         $this->submissionList = new Collection(
             SubmissionBoxMapper::getInstance()
                 ->getUpcomingActivities(null, $this->getConfig('size'), $this->getContext()->getId())

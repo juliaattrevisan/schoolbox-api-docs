@@ -37,6 +37,9 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
      */
     public function execute()
     {
+        if(!parent::execute()){
+            return false;
+        }
         $this->groupHandler = new Group();
         $this->setLinkMapper(new \Schoolbox\Resource\LinkMapper());
         return true;

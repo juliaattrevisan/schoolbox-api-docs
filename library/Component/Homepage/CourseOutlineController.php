@@ -61,6 +61,10 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
      */
     public function execute()
     {
+        if(!parent::execute()){
+            return false;
+        }
+        
         // Get the list of students for this class (in which method?)
         $group_handler = new Group();
         $code          = $this->getContext()->getCodeString();

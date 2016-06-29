@@ -22,6 +22,9 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
      */
     public function execute()
     {
+        if(!parent::execute()){
+            return false;
+        }
         $this->db = DeprecatedDatabase::getInstance();
         return true;
     }

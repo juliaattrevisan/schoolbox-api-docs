@@ -32,6 +32,22 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         $this->postConstruct();
     }
 
+
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
+    public function execute()
+    {
+        // Always render (possibly emptyState) component if WRITE+ access to this page
+        if($this->contextPermission >= WRITE_ACCESS){
+            return true;
+        }
+        // Else READ on this page, don't render if can't at least READ content
+        return $this->contentPermission >= READ_ACCESS;
+    }
+
     /**
      * Parse configuration and settings panels for each component
      *

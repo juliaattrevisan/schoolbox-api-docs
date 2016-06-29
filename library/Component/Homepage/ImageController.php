@@ -22,6 +22,9 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
      */
     public function execute()
     {
+        if(!parent::execute()){
+            return false;
+        }
         $this->db = DeprecatedDatabase::getInstance();
         return true;
     }

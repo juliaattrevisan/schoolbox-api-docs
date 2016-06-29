@@ -33,6 +33,9 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
      */
     public function execute()
     {
+        if(!parent::execute()){
+            return false;
+        }
         $this->group_handler = new Group();
 
         // get rubric details

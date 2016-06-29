@@ -51,6 +51,9 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
      */
     public function execute()
     {
+        if(!parent::execute()){
+            return false;
+        }
         $this->groupHandler       = new Group();
         $this->fileMapper         = Schoolbox\Resource\File\Mapper::getInstance();
         $this->userMapper         = Schoolbox\UserMapper::getInstance();

@@ -22,6 +22,9 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
      */
     public function execute()
     {
+        if(!parent::execute()){
+            return false;
+        }
         $this->groupHandler = new Group();
         return true;
     }

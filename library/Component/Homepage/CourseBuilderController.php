@@ -54,6 +54,9 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
      */
     public function execute()
     {
+        if(!parent::execute()){
+            return false;
+        }
         $this->group_handler = new Group();
         $categoryId          = $this->getContext()->getId();
         if ($categoryId > 0) {

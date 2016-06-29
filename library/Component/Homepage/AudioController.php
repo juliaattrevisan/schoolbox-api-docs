@@ -35,6 +35,9 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
      */
     public function execute()
     {
+        if(!parent::execute()){
+            return false;
+        }
         $this->allowedFileHandler = new AllowedFile();
         return true;
     }
