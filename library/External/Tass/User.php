@@ -44,7 +44,9 @@ class External_Tass_User implements External_UserInterface
     public function getParentEmails($synergyIds)
     {
         $emailList = array();
-        $idList    = implode(',', array_map('intval', $synergyIds));
+        $db = $this->getDatabase();
+        $idList    = implode(',', array_map(array($db, 'smartQuote'), $synergyIds));
+        
         if (empty($idList)) {
             return array();
         }
