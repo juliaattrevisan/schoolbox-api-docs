@@ -154,6 +154,9 @@
 .icon-directory:before {
 	content: "\e61c";
 }
+.icon-division:before {
+	content: "\e904";
+}
 .icon-document:before {
 	content: "\e61d";
 }
@@ -213,7 +216,8 @@
 .icon-grip:before {
 	content: "\e62f";
 }
-.icon-group:before {
+.icon-group:before,
+.icon-team:before{
 	content: "\e630";
 }
 .icon-group-managers:before {
@@ -255,7 +259,8 @@
 .icon-list-view:before {
 	content: "\e63c";
 }
-.icon-location:before {
+.icon-location:before,
+.icon-venue:before{
 	content: "\e63d";
 }
 .icon-locked:before,
@@ -264,6 +269,9 @@
 }
 .icon-logout:before {
 	content: "\e63f";
+}
+.icon-match:before {
+	content: "\e903";
 }
 .icon-menu:before,
 .icon-hamburger:before {
@@ -329,6 +337,9 @@
 }
 .icon-poll:before {
 	content: "\e654";
+}
+.icon-position:before {
+	content: "\e905";
 }
 .icon-previous:before {
 	content: "\e655";
