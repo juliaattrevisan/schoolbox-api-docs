@@ -41,19 +41,46 @@ class Controller extends AbstractController
      */
     public function getList($context = null)
     {
-        try {
-            $allVenues = $this->mapper->findAll([
-                'order' => [
-                    'name' => 'asc'
-                ]
-            ]);
 
-            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesVenue/list.twig', [
-                'allVenues' => $allVenues
-            ]));
+        /* ajax a list of venues
+         */
+        if ($this->getRequest()->isXhr()) {
+            $query = $this->getRequest()->query->get('query');
+
+            /** @var VenueMapper $mapper */
+            $mapper    = $this->getMapper();
+            $allVenues = $mapper->findByName($query);
+
+            $venues = [];
+
+            /** @var Venue $currentVenue */
+            foreach ($allVenues as $currentVenue) {
+                $venues[] = array_combine(['id', 'name'], $currentVenue->findValueLabelPair());
+            }
+
+            $this->getResponse()->content->set($this->buildJsonOutput($venues));
         }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
+        else {
+            try {
+                $allVenues = $this->mapper->findAll(
+                    [
+                        'order' => [
+                            'name' => 'asc'
+                        ]
+                    ]
+                );
+
+                $this->getResponse()->content->set(
+                    $this->buildHtmlOutput(
+                        '@sportsfixturesVenue/list.twig',
+                        [
+                            'allVenues' => $allVenues
+                        ]
+                    )
+                );
+            } catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(2);
+            }
         }
     }
 
@@ -133,34 +160,6 @@ class Controller extends AbstractController
         $venue->setUpdatedAt(Alaress_Date_Format::now());
 
         $this->mapper->save($venue);
-    }
-
-    /**
-     * Get a list of Venues
-     *
-     * @param int $contextId
-     */
-    public function getVenueList($contextId)
-    {
-        $query = $this->getRequest()->query->get('query');
-
-        /** @var VenueMapper $mapper */
-        $mapper = $this->getMapper();
-        $allVenues = $mapper->findByName($contextId, $query);
-
-        $venues = [];
-
-        /** @var Venue $currentVenue */
-        foreach ($allVenues as $currentVenue) {
-            $venues[] = array_combine(['id','name'], $currentVenue->findValueLabelPair());
-        }
-
-        /* TODO: What's the best way to do this now?
-         * Pretty sure we talked about it, but can't remember right now
-         */
-        header('Content-Type: application/json');
-        echo json_encode($venues);
-        exit();
     }
 
     /* Getters/Setters
