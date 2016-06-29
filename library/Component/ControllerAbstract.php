@@ -148,8 +148,12 @@ abstract class Component_ControllerAbstract
         if($this->isUsingAltSource()){
             // remove any non-numeric values from the source config & support deleted folders.
             $folderId = preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'));
-            $columnName = $this->getFolderMapper()->getIdentifier()['column'];
-            $source = $this->getFolderMapper()->findByColumn($columnName, $folderId, ['deleted' => true])->first();
+
+            try {
+                $source = $this->getFolderMapper()->findById($folderId);
+            } catch(\Schoolbox\Mapper\Exception\Deleted $e){
+                $source = $e->getDeletedObject();
+            }
             if(!($source instanceof FolderModel)){
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
             }
