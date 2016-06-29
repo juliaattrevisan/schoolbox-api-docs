@@ -44,7 +44,6 @@ class Module extends BaseModule
                 '/folder/move'                          => 'postMoveFolder',
                 '/folder/update'                        => 'postUpdateFolder',
                 '/folder/delete'                        => 'postDeleteFolder',
-                '/folder/delete-all'                    => 'postDeleteFolderAll',
                 '/folder/reset'                         => 'postFolderReset',
             ]
         ];
