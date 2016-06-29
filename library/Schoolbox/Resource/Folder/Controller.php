@@ -626,17 +626,6 @@ class Controller extends BaseController
     }
 
     /**
-     * This is the same action as deleting a folder.
-     *
-     * @throws SchoolboxException
-     */
-    public function postDeleteFolderAll()
-    {
-        $this->postDeleteFolder();
-    }
-
-
-    /**
      * @param int  $id
      * @param User $user
      * @throws SchoolboxException
