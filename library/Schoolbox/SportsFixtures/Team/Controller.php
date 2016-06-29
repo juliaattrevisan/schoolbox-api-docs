@@ -74,22 +74,50 @@ class Controller extends AbstractController
      */
     public function getList($context = null)
     {
-        try {
-            $sport    = $this->getSportMapper()->findById($context->getSport()->getId());
-            $allTeams = $this->getTeamMapper()->findByColumn('division_id', $context->getId(), [
-                'order' => [
-                    'name' => 'asc'
-                ]
-            ]);
+        /* ajax a list of Teams for a particular Division
+         */
+        if ($this->getRequest()->isXhr()) {
+            $query = $this->getRequest()->query->get('query');
 
-            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/list.twig', [
-                'sport'    => $sport,
-                'division' => $context,
-                'allTeams' => $allTeams
-            ]));
+            /** @var TeamMapper $mapper */
+            $mapper   = $this->getMapper();
+            $allTeams = $mapper->findByName($context->getId(), $query);
+
+            $teams = [];
+
+            /** @var Team $currentTeam */
+            foreach ($allTeams as $currentTeam) {
+                $teams[] = array_combine(['id', 'name'], $currentTeam->findValueLabelPair());
+            }
+
+            $this->getResponse()->content->set($this->buildJsonOutput($teams));
         }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
+        else {
+            try {
+                $sport    = $this->getSportMapper()->findById($context->getSport()->getId());
+                $allTeams = $this->getTeamMapper()->findByColumn(
+                    'division_id',
+                    $context->getId(),
+                    [
+                        'order' => [
+                            'name' => 'asc'
+                        ]
+                    ]
+                );
+
+                $this->getResponse()->content->set(
+                    $this->buildHtmlOutput(
+                        '@sportsfixturesTeam/list.twig',
+                        [
+                            'sport'    => $sport,
+                            'division' => $context,
+                            'allTeams' => $allTeams
+                        ]
+                    )
+                );
+            } catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(2);
+            }
         }
     }
 
@@ -158,34 +186,6 @@ class Controller extends AbstractController
         $team->setUpdatedAt(\Alaress_Date_Format::now());
 
         $this->getTeamMapper()->save($team);
-    }
-
-    /**
-     * Get a list of Teams for a particular Division
-     *
-     * @param int $contextId
-     */
-    public function getTeamList($contextId)
-    {
-        $query = $this->getRequest()->query->get('query');
-
-        /** @var TeamMapper $mapper */
-        $mapper = $this->getMapper();
-        $allTeams = $mapper->findByName($contextId, $query);
-
-        $teams = [];
-
-        /** @var Team $currentTeam */
-        foreach ($allTeams as $currentTeam) {
-            $teams[] = array_combine(['id','name'], $currentTeam->findValueLabelPair());
-        }
-
-        /* TODO: What's the best way to do this now?
-         * Pretty sure we talked about it, but can't remember right now
-         */
-        header('Content-Type: application/json');
-        echo json_encode($teams);
-        exit();
     }
 
     /* Getters/Setters

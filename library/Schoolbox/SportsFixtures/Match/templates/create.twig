@@ -72,7 +72,7 @@
 
         $('#homeTeam').selectizeSelector({
             ajax: {
-                url:      '/sportsfixtures/divisions/{{ division.id }}/teams/list',
+                url:      '/sportsfixtures/divisions/{{ division.id }}/teams',
                 type:     'GET',
                 dataType: 'json'
             },
@@ -84,7 +84,7 @@
 
         $('#awayTeam').selectizeSelector({
             ajax: {
-                url:      '/sportsfixtures/divisions/{{ division.id }}/teams/list',
+                url:      '/sportsfixtures/divisions/{{ division.id }}/teams',
                 type:     'GET',
                 dataType: 'json'
             },
