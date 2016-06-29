@@ -195,9 +195,11 @@ class Controller extends AbstractController
 
         // Create twig-friendly data model
         $dataModel = [
-            'division' => $division,
-            'players'  => [],
-            'teams'    => [],
+            'division'   => $division,
+            'players'    => [],
+            'teams'      => [],
+            'user'       => $this->getUser(),
+            'uploadZone' => $zone,
         ];
         foreach ($division->getPlayers() as $player) {
             $playerDataModel = [
@@ -219,13 +221,7 @@ class Controller extends AbstractController
         }
 
         $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@sportsfixturesDivision/lobby.twig', [
-                    'data'       => $dataModel,
-                    'uploadZone' => $zone,
-                    'user'       => $this->getUser(),
-                ]
-            )
+            $this->buildHtmlOutput('@sportsfixturesDivision/lobby.twig', $dataModel)
         );
     }
 
