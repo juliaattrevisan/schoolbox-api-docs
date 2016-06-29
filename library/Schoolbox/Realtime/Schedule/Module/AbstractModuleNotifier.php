@@ -18,7 +18,7 @@ use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\IMapper;
 use Schoolbox\Mapper;
-use Schoolbox\Notif\Notif;
+use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Message\Source;
@@ -36,7 +36,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
     /** @var IConfigLoader */
     protected $conf;
 
-    /** @var Notif */
+    /** @var NotifInterface */
     protected $notif;
 
     /** @var LoggerInterface */
@@ -290,11 +290,11 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
 
 
     /**
-     * @param Notif           $notif
+     * @param NotifInterface  $notif
      * @param LoggerInterface $log
      * @return void
      */
-    public function enableLogging(Notif $notif, LoggerInterface $log)
+    public function enableLogging(NotifInterface $notif, LoggerInterface $log)
     {
         $this->notif = $notif;
         $this->log   = $log;
