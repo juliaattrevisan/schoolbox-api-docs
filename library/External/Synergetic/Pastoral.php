@@ -401,7 +401,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // Set the item date to the post date
 
         $item_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getCreatedAt());
-        $item_date = $item_date_alaress->getYear() . "-" . $item_date_alaress->getMonth() . "-" . $item_date_alaress->getDay(true);
+        $item_date = $item_date_alaress->getDatabase();
 
         // If the message is marked as private, do not put in public details
 
@@ -430,7 +430,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         // Created/modified dates
 
         $created_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getCreatedAt());
-        $created_date = $created_date_alaress->getYear() . "-" . $created_date_alaress->getMonth() . "-" . $created_date_alaress->getDay(true);
+        $created_date = $created_date_alaress->getDatabase();
         $created_by_id = $pastoral->getOwner()->getExternalId();
 
         // Execute the query
@@ -451,14 +451,14 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                     EmailSentByID
                 ) VALUES (
                     {$id},
-                    {$item_date},
+                    '{$item_date}',
                     {$details},
                     {$private_details},
                     {$type_code},
                     {$category_code},
-                    {$created_date},
+                    '{$created_date}',
                     {$created_by_id},
-                    {$created_date},
+                    '{$created_date}',
                     {$created_by_id},
                     '',
                     '',
@@ -513,7 +513,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             $body = str_replace("'", "''", $comment->getBody());
 
             $created_date_alaress = \Alaress_Date_Format::newLocal($comment->getCreatedAt());
-            $created_date = $created_date_alaress->getYear() . "-" . $created_date_alaress->getMonth() . "-" . $created_date_alaress->getDay(true);
+            $created_date = $created_date_alaress->getDatabase();
             $created_by_id = $comment->getOwner()->getExternalId();
 
             // Execute the query
@@ -530,9 +530,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                             {$pastoral->getExternalId()},
                             COALESCE((SELECT MAX(IndexOrder) + 1 FROM PastoralCareComments WHERE PastoralCareSeq = {$pastoral->getExternalId()}), 1),
                             '{$body}',
-                            {$created_date},
+                            '{$created_date}',
                             {$created_by_id},
-                            {$created_date},
+                            '{$created_date}',
                             {$created_by_id}
                         )";
 
@@ -569,7 +569,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             // Set the item date to the post date
 
             $item_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getCreatedAt());
-            $item_date = $item_date_alaress->getYear() . "-" . $item_date_alaress->getMonth() . "-" . $item_date_alaress->getDay(true);
+            $item_date = $item_date_alaress->getDatabase();
 
             // If the message is marked as private, do not put in public details
 
@@ -598,19 +598,19 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             else
                 $modified_date_alaress = \Alaress_Date_Format::newLocal($pastoral->getCreatedAt());
 
-            $modified_date = "'" . $modified_date_alaress->getYear() . "-" . $modified_date_alaress->getMonth() . "-" . $modified_date_alaress->getDay(true) . "'";
+            $modified_date = $modified_date_alaress->getDatabase();
             $modified_by_id = $pastoral->getOwner()->getExternalId();
 
             // Execute the query
 
             $query = "UPDATE tPastoralCare SET
                         ID = {$id},
-                        ItemDate = {$item_date},
+                        ItemDate = '{$item_date}',
                         Details = {$details},
                         PrivateDetails = {$private_details},
                         TypeCode = {$type_code},
                         CategoryCode = {$category_code},
-                        ModifiedDate = {$modified_date},
+                        ModifiedDate = '{$modified_date}',
                         ModifiedById = {$modified_by_id},
                         ClassCode = '',
                         MethodCode = '',
