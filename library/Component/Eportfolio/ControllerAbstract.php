@@ -133,22 +133,21 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
     }
 
     /**
-     * Gets the Folder, if any, this component draws its data from
+     * Gets the Eportfolio_Page_Instance this component draws its data from
      *
-     * @throws DomainException
+     * @return Eportfolio_Page_Instance
      */
     public function getSource(){
-        throw new DomainException('Eportfolio components do not currently allow alternative data sources');
+        return $this->source;
     }
 
     /**
-     * Sets the Folder, if any, this component draws its data from
+     * Sets the Eportfolio_Page_Instance this component draws its data from
      *
-     * @param Schoolbox\Resource\Folder\Model $source
-     * @throws DomainException
+     * @param Eportfolio_Page_Instance $source
      */
     public function setSource($source) {
-        throw new DomainException('Eportfolio components do not currently allow alternative data sources');
+        $this->source = $source;
     }
 
     /**
