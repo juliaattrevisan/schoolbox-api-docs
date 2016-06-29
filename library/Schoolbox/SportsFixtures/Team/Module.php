@@ -49,38 +49,4 @@ class Module extends RestfulModule
          */
         $this->addRoutePermission($authorizer, '.*', $isSportsAdministrator);
     }
-
-
-    /**
-     * Initializes any routes for this module, with a given base path.
-     *
-     * The base path for each route needs to match up to the name of the
-     * controller in $this->initControllers(), so if its base path is
-     * "user", there must be a controller in the DI container called
-     * "controller:user"
-     *
-     * @param Router $router
-     * @param string $basePath The base route for this module
-     */
-    public function initRoutes(Router $router, $basePath)
-    {
-        parent::initRoutes($router, $basePath);
-
-        $collection = $this->getCollectionName();
-
-        // if this module has context (ie. a containing entity) then create a prefix to be used with contextual routes
-        $context = $this->context
-            ? "{$this->context->getCollectionName()}/{contextId}/"
-            : '';
-
-        $routes = [
-            'GET' => [
-                "/$context$collection/list" => 'getTeamList',
-            ]
-        ];
-
-        foreach ($routes['GET'] as $path => $controllerMethod) {
-            $this->addGetRoute($router, $controllerMethod, $basePath, $path)->setTokens([ 'contextId' => '\d+', 'entityId' => '\d+' ]);
-        }
-    }
 }
