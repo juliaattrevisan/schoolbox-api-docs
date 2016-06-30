@@ -11,7 +11,6 @@ use Schoolbox\Column\Decimal;
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\SportsFixtures\Venue\Model as Venue;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Collection;
 
 /**
  * Class Mapper
@@ -69,28 +68,6 @@ class Mapper extends BaseMapper
      */
     public function findByName($keyword)
     {
-        $query = "
-            SELECT
-                {$this->getColumnString('v')}
-            FROM {$this->getTable()} v
-			WHERE v.name LIKE :nameLike
-        ";
-
-        $params = [
-            'nameLike' => "%{$this->database->quoteForLike($keyword)}%",
-        ];
-
-        $statement = $this->database->prepare($query);
-        $statement->execute($params);
-
-        $hashtable = [];
-
-        foreach ($statement as $row) {
-            $venue = $this->hydrate($row, 'v');
-
-            $hashtable[$venue->getId()] = $venue;
-        }
-
-        return new Collection(array_values($hashtable));
+        return $this->findByColumn('~name', "%{$this->database->quoteForLike($keyword)}%");
     }
 }
