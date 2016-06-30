@@ -73,8 +73,18 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
         );
 
 
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
-            $this->renderAltSourceDeleted();
+        if(!$this->isSourceRenderable()) {
+            if($this->hasContextWriteAccess()) {
+                if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
+                } else if(!$this->hasReadAccess()) {
+                    $this->renderAltSourceDenied();
+                } else {
+                    $this->renderEmptyState();
+                }
+            } else {
+                return false;
+            }
         } else {
             $this->setVar('source_folder_deleted_block', '');
 

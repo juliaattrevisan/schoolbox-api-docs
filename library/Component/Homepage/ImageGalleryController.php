@@ -34,6 +34,12 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         if(!parent::execute()){
             return false;
         }
+
+        // Short Circuit: No point to load data if we can't view it
+        if(!$this->isSourceRenderable()){
+            return true;
+        }
+
         $this->groupHandler = new Group();
         return true;
     }
@@ -53,9 +59,6 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
             return false;
         }
 
-        if ($this->contentPermission < READ_ACCESS) {
-            return false;
-        }
 
         $this->parseConfig();
 
@@ -66,8 +69,18 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         $this->setBlock('source_folder_exists', 'image_gallery', 'image_gallery_block');
         $this->setBlock('source_folder_exists', 'submit_image_gallery', 'submit_image_gallery_block');
 
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
-            $this->renderAltSourceDeleted();
+        if(!$this->isSourceRenderable()) {
+            if($this->hasContextWriteAccess()) {
+                if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
+                } else if(!$this->hasReadAccess()) {
+                    $this->renderAltSourceDenied();
+                } else {
+                    $this->renderEmptyState();
+                }
+            } else {
+                return false;
+            }
         } else {
             $this->setVar('source_folder_deleted_block', '');
 

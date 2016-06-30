@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
@@ -40,6 +39,12 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         if(!parent::execute()){
             return false;
         }
+
+        // Short Circuit: No point to load data if we can't view it
+        if(!$this->isSourceRenderable()){
+            return true;
+        }
+        
         $this->groupHandler = new Group();
         $this->setLinkMapper(new \Schoolbox\Resource\LinkMapper());
         return true;
@@ -58,13 +63,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             return false;
         }
 
-        if ($this->contentPermission < READ_ACCESS) {
-            return false;
-        }
-
         $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
-
-
 
         // Set up component name
         $this->setVar(
@@ -89,8 +88,18 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $this->setBlock('source_folder_exists', "submit_link", "submit_link_block");
         $this->setBlock('link', 'modify_link', 'modify_link_block');
 
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
-            $this->renderAltSourceDeleted();
+        if(!$this->isSourceRenderable()) {
+            if($this->hasContextWriteAccess()) {
+                if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
+                } else if(!$this->hasReadAccess()) {
+                    $this->renderAltSourceDenied();
+                } else {
+                    $this->renderEmptyState();
+                }
+            } else {
+                return false;
+            }
         } else {
             $this->setVar('source_folder_deleted_block', '');
 

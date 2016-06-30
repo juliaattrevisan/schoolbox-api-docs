@@ -5,8 +5,6 @@
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
-use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Component_Homepage_BreadcrumbController extends Component_Homepage_ControllerAbstract
 {
@@ -21,24 +19,38 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
             return false;
         }
 
-        $this->parseConfig();
+
 
         $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
         $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
 
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
-            $this->renderAltSourceDeleted();
+        if ($this->contentPermission < WRITE_ACCESS && $this->getConfig('compactMode')) {
+            /* Remove headers */
+            $this->setVar('CONFIGURATION', '');
+            $this->setBlock('source_folder_exists', 'header', 'header_block');
+            $this->setBlock('source_folder_exists', 'dashboard_header', 'dashboard_header_block');
+            $this->setVar('header_block', '');
+            $this->setVar('dashboard_header_block', '');
+        }
+
+        $this->parseConfig();
+
+        if(!$this->isSourceRenderable()) {
+            if($this->hasContextWriteAccess()) {
+                if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
+                } else if(!$this->hasReadAccess()) {
+                    $this->renderAltSourceDenied();
+                } else {
+                    $this->renderEmptyState();
+                }
+            } else {
+                return false;
+            }
         } else {
             $this->setVar('source_folder_deleted_block', '');
 
-            if ($this->contentPermission < WRITE_ACCESS && $this->getConfig('compactMode')) {
-                /* Remove headers */
-                $this->setVar('CONFIGURATION', '');
-                $this->setBlock('source_folder_exists', 'header', 'header_block');
-                $this->setBlock('source_folder_exists', 'dashboard_header', 'dashboard_header_block');
-                $this->setVar('header_block', '');
-                $this->setVar('dashboard_header_block', '');
-            }
+
 
 
             $this->setBlock('source_folder_exists', 'category_breadcrumb', 'category_breadcrumb_block');

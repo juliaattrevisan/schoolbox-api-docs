@@ -71,11 +71,18 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
      */
     public function renderTemplate($templateHandle)
     {
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
-            $twigTemplate = 'sub/componentSourceDeleted.twig';
-            $twigData = array(
-                'componentInstanceId' => $this->getInstance()->getId(),
-            );
+        if(!$this->isSourceRenderable()) {
+            if($this->hasContextWriteAccess()) {
+                if($this->getSource()->isDeleted()) {
+                    return $this->renderTwigAltSourceDeleted($templateHandle);
+                } else if(!$this->hasReadAccess()) {
+                    return $this->renderTwigAltSourceDenied($templateHandle);
+                } else {
+                    return $this->renderTwigEmptyState($templateHandle);
+                }
+            } else {
+                return false;
+            }
         } else {
             $twigTemplate = '@tile/component/tile.twig';
             $twigData = array(
@@ -83,10 +90,9 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
                 'showButtons'                => $this->hasWriteAccess(),
                 'tile_component_instance_id' => $this->getConfig('tileSource') ?: $this->getInstance()->getId(),
             );
+            $renderHeader = $this->hasWriteAccess() || !$this->getConfig('compactMode') || $this->hasContextWriteAccess();
+            return $this->renderTwigTemplate($templateHandle, $twigTemplate, $twigData, $renderHeader);
         }
-        $renderHeader = $this->hasWriteAccess() || !$this->getConfig('compactMode') || ($this->isUsingAltSource() && $this->hasContextWriteAccess());
-
-        return $this->renderTwigTemplate($templateHandle, $twigTemplate, $twigData, $renderHeader);
     }
 
     /**

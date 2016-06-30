@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -26,6 +25,12 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         if(!parent::execute()){
             return false;
         }
+
+        // Short Circuit: No point to load data if we can't view it
+        if(!$this->isSourceRenderable()){
+            return true;
+        }
+
         $this->groupHandler = new Group();
 
         try {
@@ -38,7 +43,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             $this->textbox = new \Schoolbox\Textbox\Model();
             $this->textbox
                 ->setHeading('Text Box')
-                ->setCategory(\Schoolbox\Resource\Folder\Mapper::getInstance()->createModel()->setId($this->getContext()->getId()));
+                ->setCategory(\Schoolbox\Resource\Folder\Mapper::getInstance()->createModel()->setId($this->getSource()->getId()));
         }
 
         if (!$this->getTextbox()->getHeading()) {
@@ -58,11 +63,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             return false;
         }
 
-        /* If user does not have access to the source, do not output anything */
-        if ($this->contentPermission < READ_ACCESS) {
-            return false;
-        }
-
         $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
         $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
         $this->setBlock('source_folder_exists', 'text_editable', 'text_editable_block');
@@ -71,28 +71,40 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         $this->setBlock('text_locked', 'create_text', 'create_text_block');
         
 
-        /* Remember where the texbox came from - if you modify a streamed
-         * textbox which comes from another homepage, you were able to
-         * inadvertently steal ownership of it
-         */
-        $heading = Scrub::text($this->getTextbox()->getHeading());
-        $this->setComponentName($heading);
 
-        $this->setVar(array(
-            'TEXTBOX_HEADING'     => $heading,
-            'TEXTBOX_BODY'        => Scrub::html($this->getTextbox()->getBody()),
-            'TEXTBOX_ID'          => $this->getTextbox()->getId(),
-            'TEXTBOX_CATEGORY_ID' => $this->getTextbox()->getCategory()->getId(),
-            'text_editable_block' => '',
-            'modify_text_block'   => '',
-            'create_text_block'   => '',
-            'text_locked_block'   => '',
-        ));
 
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
-            $this->renderAltSourceDeleted();
+        if(!$this->isSourceRenderable()) {
+            if($this->hasContextWriteAccess()) {
+                if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
+                } else if(!$this->hasReadAccess()) {
+                    $this->renderAltSourceDenied();
+                } else {
+                    $this->renderEmptyState();
+                }
+            } else {
+                return false;
+            }
         } else {
             $this->setVar('source_folder_deleted_block', '');
+
+            /* Remember where the texbox came from - if you modify a streamed
+             * textbox which comes from another homepage, you were able to
+             * inadvertently steal ownership of it
+             */
+            $heading = Scrub::text($this->getTextbox()->getHeading());
+            $this->setComponentName($heading);
+
+            $this->setVar(array(
+                'TEXTBOX_HEADING'     => $heading,
+                'TEXTBOX_BODY'        => Scrub::html($this->getTextbox()->getBody()),
+                'TEXTBOX_ID'          => $this->getTextbox()->getId(),
+                'TEXTBOX_CATEGORY_ID' => $this->getTextbox()->getCategory()->getId(),
+                'text_editable_block' => '',
+                'modify_text_block'   => '',
+                'create_text_block'   => '',
+                'text_locked_block'   => '',
+            ));
 
             /* To edit someone else's textbox, you need write access to both homepages.
              * To just edit one homepage's textbox, you need write access to that homepage.

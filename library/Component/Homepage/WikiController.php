@@ -33,6 +33,12 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
         if(!parent::execute()){
             return false;
         }
+
+        // Short Circuit: No point to load data if we can't view it
+        if(!$this->isSourceRenderable()){
+            return true;
+        }
+
         $this->groupHandler = new Group();
         return true;
     }
@@ -48,16 +54,12 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
             return false;
         }
 
-        if ($this->contentPermission < READ_ACCESS) {
-            return false;
-        }
-
         // Set up component name
         $this->setVar(array(
             'COMPONENT_INSTANCE_ID' => $this->instance->getId(),
         ));
 
-        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
+
 
         /* Need title injected here
          */
@@ -72,10 +74,22 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
 
         // Custom sorting options
 
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
-            $this->renderAltSourceDeleted();
+        if(!$this->isSourceRenderable()) {
+            if($this->hasContextWriteAccess()) {
+                if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
+                } else if(!$this->hasReadAccess()) {
+                    $this->renderAltSourceDenied();
+                } else {
+                    $this->renderEmptyState();
+                }
+            } else {
+                return false;
+            }
         } else {
             $this->setVar('source_folder_deleted_block', '');
+
+            $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
             $wikiHandler = new Wiki();
             $userHandler = new User();

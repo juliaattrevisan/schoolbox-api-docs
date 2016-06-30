@@ -31,6 +31,12 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
         if(!parent::execute()){
             return false;
         }
+
+        // Short Circuit: No point to load data if we can't view it
+        if(!$this->isSourceRenderable()){
+            return true;
+        }
+
         $this->groupHandler = new Group();
         return true;
     }
@@ -46,19 +52,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
             return false;
         }
 
-        // don't show forums to parents if they not a direct member of group
-        // (Allow parents to read, but not post, if a child is in group)
-        $is_post_allowed = !$this->groupHandler->hasChildAccessOnly($this->getContext()->getId());
-        if (!$is_post_allowed && Cfg::get('restrict_parent_forum_access')) {
-            return false;
-        }
-
-        if ($this->contentPermission < READ_ACCESS) {
-            return false;
-        }
-
         $this->parseConfig();
-
 
         $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
         $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
@@ -76,12 +70,29 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
             )
         );
 
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
-            $this->renderAltSourceDeleted();
+        if(!$this->isSourceRenderable()) {
+            if($this->hasContextWriteAccess()) {
+                if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
+                } else if(!$this->hasReadAccess()) {
+                    $this->renderAltSourceDenied();
+                } else {
+                    $this->renderEmptyState();
+                }
+            } else {
+                return false;
+            }
         } else {
             $this->setVar('source_folder_deleted_block', '');
 
             $this->setVar('forum_post_block', '');
+
+            // don't show forums to parents if they not a direct member of group
+            // (Allow parents to read, but not post, if a child is in group)
+            $is_post_allowed = !$this->groupHandler->hasChildAccessOnly($this->getContext()->getId());
+            if (!$is_post_allowed && Cfg::get('restrict_parent_forum_access')) {
+                return false;
+            }
 
             if ($is_post_allowed) {
                 $this->parse('forum_post_block', 'forum_post');

@@ -40,12 +40,9 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
      */
     public function execute()
     {
-        // Always render (possibly emptyState) component if WRITE+ access to this page
-        if($this->contextPermission >= WRITE_ACCESS){
-            return true;
-        }
-        // Else READ on this page, don't render if can't at least READ content
-        return $this->contentPermission >= READ_ACCESS;
+        // Always render (possibly emptyState) if WRITE+ to this page or READ+ to extant content
+        $sourceDeleted = $this->isUsingAltSource() && $this->getSource()->isDeleted();
+        return $this->hasContextWriteAccess() || ($this->hasReadAccess() && !$sourceDeleted);
     }
 
     /**

@@ -19,6 +19,7 @@ use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
 use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -51,37 +52,53 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        // Limit to the number specified in blog component config (0 == 'ALL')
-        $limit = 0 == $this->getConfig('size') ? null : $this->getConfig('size');
+        if(!$this->isSourceRenderable()) {
+            if($this->hasContextWriteAccess()) {
+                if($this->getSource()->isDeleted()) {
+                    return $this->renderTwigAltSourceDeleted($templateHandle);
+                } else if(!$this->hasReadAccess()) {
+                    return $this->renderTwigAltSourceDenied($templateHandle);
+                } else {
+                    return $this->renderTwigEmptyState($templateHandle);
+                }
+            } else {
+                return false;
+            }
+        } else {
 
-        // Get specified number of blog entries for this source
-        $blogs = $this->getBlogMapper()
-            ->findByColumn("folder_id", $this->getSource()->getId())
-            ->sortBy('createdAt', 'desc')
-            ->limit(0, $limit);
+            // Limit to the number specified in blog component config (0 == 'ALL')
+            $limit = 0 == $this->getConfig('size') ? null : $this->getConfig('size');
 
-        // Grab comments and image gallery items for each blog post
+            // Get specified number of blog entries for this source
+            $blogs = $this->getBlogMapper()
+                ->findByColumn("folder_id", $this->getSource()->getId())
+                ->sortBy('createdAt', 'desc')
+                ->limit(0, $limit);
 
-        $blogComments = [];
-        $blogImages = [];
+            // Grab comments and image gallery items for each blog post
 
-        /** @var BlogModel $blog */
-        foreach ($blogs as $blog) {
-            // Rehydrate
-            $user = $this->getUserMapper()->findByIdWithFallback($blog->getOwner()->getId());
-            $blog->setOwner($user);
+            $blogComments = [];
+            $blogImages = [];
 
-            $blogComments[$blog->getId()] = $this->getBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
-            $blogImages[$blog->getId()] = $this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId());
+            /** @var BlogModel $blog */
+            foreach ($blogs as $blog) {
+                // Rehydrate
+                $user = $this->getUserMapper()->findByIdWithFallback($blog->getOwner()->getId());
+                $blog->setOwner($user);
 
-            // Hydrate owner of comments
-            /** @var BlogCommentModel $comment */
-            foreach ($blogComments[$blog->getId()] as $comment) {
-                $comment->setOwner($this->getUserMapper()->findByIdWithFallback($comment->getOwner()->getId()));
+                $blogComments[$blog->getId()] = $this->getBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
+                $blogImages[$blog->getId()] = $this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId());
+
+                // Hydrate owner of comments
+                /** @var BlogCommentModel $comment */
+                foreach ($blogComments[$blog->getId()] as $comment) {
+                    $comment->setOwner($this->getUserMapper()->findByIdWithFallback($comment->getOwner()->getId()));
+                }
             }
         }
 
         // Render this component out
+
 
         return $this->renderTwigTemplate(
             $templateHandle,

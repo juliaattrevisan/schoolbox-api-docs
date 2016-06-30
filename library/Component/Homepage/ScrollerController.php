@@ -21,9 +21,6 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
             return false;
         }
 
-        if ($this->contentPermission < READ_ACCESS) {
-            return false;
-        }
 
         $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
         $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
@@ -33,17 +30,26 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
         $this->setBlock('image_scroller', 'linked_image', 'linked_image_block');
         $this->setBlock('image_scroller', 'unlinked_image', 'unlinked_image_block');
 
-        // Set up component name
-        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
-
-
         $this->parseConfig();
 
-
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
-            $this->renderAltSourceDeleted();
+        if(!$this->isSourceRenderable()) {
+            if($this->hasContextWriteAccess()) {
+                if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
+                } else if(!$this->hasReadAccess()) {
+                    $this->renderAltSourceDenied();
+                } else {
+                    $this->renderEmptyState();
+                }
+            } else {
+                return false;
+            }
         } else {
             $this->setVar('source_folder_deleted_block', '');
+
+            // Set up component name
+            $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
+
 
             $this->setVar(
                 array(

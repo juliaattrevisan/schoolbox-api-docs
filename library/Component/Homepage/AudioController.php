@@ -38,6 +38,12 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         if(!parent::execute()){
             return false;
         }
+
+        // Short Circuit: No point to load data if we can't view it
+        if(!$this->isSourceRenderable()){
+            return true;
+        }
+
         $this->allowedFileHandler = new AllowedFile();
         return true;
     }
@@ -60,8 +66,19 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         $this->setBlock('source_folder_exists', 'audio_list', 'audio_list_block');
         $this->setBlock('source_folder_exists', 'audio_pending_list', 'audio_pending_list_block');
 
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
-            $this->renderAltSourceDeleted();
+
+        if(!$this->isSourceRenderable()) {
+            if($this->hasContextWriteAccess()) {
+                if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
+                } else if(!$this->hasReadAccess()) {
+                    $this->renderAltSourceDenied();
+                } else {
+                    $this->renderEmptyState();
+                }
+            } else {
+                return false;
+            }
         } else {
             $this->setVar('source_folder_deleted_block', '');
 

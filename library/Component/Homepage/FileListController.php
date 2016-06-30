@@ -54,6 +54,12 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
         if(!parent::execute()){
             return false;
         }
+
+        // Short Circuit: No point to load data if we can't view it
+        if(!$this->isSourceRenderable()){
+            return true;
+        }
+
         $this->groupHandler       = new Group();
         $this->fileMapper         = Schoolbox\Resource\File\Mapper::getInstance();
         $this->userMapper         = Schoolbox\UserMapper::getInstance();
@@ -71,10 +77,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
     public function renderTemplate($templateHandle)
     {
         if (!parent::loadTemplate($templateHandle, 'fileList')) {
-            return false;
-        }
-
-        if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 
@@ -105,9 +107,18 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
              */
         $this->parseConfig();
 
-
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
-            $this->renderAltSourceDeleted();
+        if(!$this->isSourceRenderable()) {
+            if($this->hasContextWriteAccess()) {
+                if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
+                } else if(!$this->hasReadAccess()) {
+                    $this->renderAltSourceDenied();
+                } else {
+                    $this->renderEmptyState();
+                }
+            } else {
+                return false;
+            }
         } else {
             $this->setVar('source_folder_deleted_block', '');
 

@@ -45,8 +45,18 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         $this->setBlock('source_folder_exists', 'video_pending_list', 'video_pending_list_block');
         $this->setBlock('source_folder_exists', 'submit_video', 'submit_video_block');
 
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
-            $this->renderAltSourceDeleted();
+        if(!$this->isSourceRenderable()) {
+            if($this->hasContextWriteAccess()) {
+                if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
+                } else if(!$this->hasReadAccess()) {
+                    $this->renderAltSourceDenied();
+                } else {
+                    $this->renderEmptyState();
+                }
+            } else {
+                return false;
+            }
         } else {
             $this->setVar('source_folder_deleted_block', '');
 

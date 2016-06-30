@@ -23,9 +23,6 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
             return false;
         }
 
-        if ($this->contentPermission < READ_ACCESS) {
-            return false;
-        }
 
         $this->parseConfig();
 
@@ -34,8 +31,18 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
         $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
         $this->setBlock('source_folder_exists', 'socialstream_has_newpost', 'socialstream_has_newpost_block');
 
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
-            $this->renderAltSourceDeleted();
+        if(!$this->isSourceRenderable()) {
+            if($this->hasContextWriteAccess()) {
+                if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
+                } else if(!$this->hasReadAccess()) {
+                    $this->renderAltSourceDenied();
+                } else {
+                    $this->renderEmptyState();
+                }
+            } else {
+                return false;
+            }
         } else {
             $this->setVar('source_folder_deleted_block', '');
 

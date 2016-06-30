@@ -29,6 +29,12 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
         if(!parent::execute()){
             return false;
         }
+
+        // Short Circuit: No point to load data if we can't view it
+        if(!$this->isSourceRenderable()){
+            return true;
+        }
+
         $this->groupHandler = new Group();
         $this->newsHandler  = new CategoryNews();
         return true;
@@ -42,10 +48,6 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
     public function renderTemplate($templateHandle)
     {
         if (!parent::loadTemplate($templateHandle, 'news')) {
-            return false;
-        }
-
-        if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 
@@ -68,7 +70,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
         $this->setVar(
             array(
-                // These are for the Select Alternate Source resourcebrowser
+                // These are for the Select Alternate Source Resource Browser
                 'COMPONENT_CONFIG_SRC_ID'   => $this->getSource()->getId(),
                 'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getId() == $this->getContext()->getId()
                     ? 'Local'
@@ -77,8 +79,18 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
             )
         );
 
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
-            $this->renderAltSourceDeleted();
+        if(!$this->isSourceRenderable()) {
+            if($this->hasContextWriteAccess()) {
+                if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
+                } else if(!$this->hasReadAccess()) {
+                    $this->renderAltSourceDenied();
+                } else {
+                    $this->renderEmptyState();
+                }
+            } else {
+                return false;
+            }
         } else {
             $this->setVar('source_folder_deleted_block', '');
 
@@ -194,9 +206,8 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                 }
             }
             $this->parse('source_folder_exists_block','source_folder_exists');
+
         }
-
-
 
         return true;
     }

@@ -1,7 +1,4 @@
 <?php
-use Schoolbox\Assessment\Course\TaskMapper;
-use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
 
 /**
@@ -28,6 +25,13 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         if(!parent::execute()){
             return false;
         }
+
+        // Short Circuit: No point to load data if we can't view it
+        if(!$this->isSourceRenderable()){
+            return true;
+        }
+
+
         $this->groupHandler = new Group();
         return true;
     }
@@ -44,10 +48,6 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             return false;
         }
 
-        if ($this->contentPermission < READ_ACCESS) {
-            return false;
-        }
-
         $this->parseConfig();
 
         //file output
@@ -58,8 +58,18 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         $this->setBlock('folders', 'homepage_folder', 'homepage_folder_block');
         $this->setBlock('folders', 'modify_folder', 'modify_folder_block');
 
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
-            $this->renderAltSourceDeleted();
+        if(!$this->isSourceRenderable()) {
+            if($this->hasContextWriteAccess()) {
+                if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
+                } else if(!$this->hasReadAccess()) {
+                    $this->renderAltSourceDenied();
+                } else {
+                    $this->renderEmptyState();
+                }
+            } else {
+                return false;
+            }
         } else {
             $this->setVar('source_folder_deleted_block', '');
 

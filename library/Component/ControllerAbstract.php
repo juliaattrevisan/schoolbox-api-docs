@@ -12,6 +12,7 @@
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use \Schoolbox\Permission\Access\UserAccess;
 
 abstract class Component_ControllerAbstract
 {
@@ -240,6 +241,8 @@ abstract class Component_ControllerAbstract
      * Renders view using Component_AbstractController::$templateObject.
      *
      * Responsible just for rendering objects already retrieved during execute()
+     *
+     * Should never be called if some sort of rendering is not to take place.
      *
      * @param String $templateHandle
      * @return boolean
@@ -679,20 +682,82 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Convenience method for PHPLib-based Components to render the 'AltSourceDeleted' empty state
-     *
-     * Twig-based Components can simply include the twig fragment by checking {source.isDeleted}
+     * Convenience method for twig-based Components to render the 'AltSourceDeleted' empty state
+     * @param string $templateHandle
+     * @return string
      */
-    protected function renderAltSourceDeleted(){
-        $twigTemplate = 'sub/componentSourceDeleted.twig';
-        $twigData = array(
-            'componentInstanceId' => $this->getInstance()->getId()
-        );
-        $this->setVar('SOURCE_FOLDER_DELETED', $this->sitepage->getTwig()->render($twigTemplate, $twigData));
-        $this->parse('source_folder_deleted_block','source_folder_deleted');
-        $this->setVar('source_folder_exists_block', '');
+    protected function renderTwigAltSourceDeleted($templateHandle){
+        $this->renderTwigEmptyState($templateHandle, 'The alternative data source this component was using has been deleted.');
     }
 
+    /**
+     * Convenience method for twig-based Components to render the 'AltSourceDenied' empty state
+     * @param string $templateHandle
+     * @return string
+     */
+    protected function renderTwigAltSourceDenied($templateHandle){
+        $this->renderTwigEmptyState($templateHandle, 'You no longer have access to this component\'s data source.');
+    }
+
+    /**
+     * Renders empty state into twig-based Components
+     *
+     * Normally, this should not be called directly, instead use convenience methods which
+     * define a consistent message.
+     *
+     * @param string $templateHandle
+     * @param string $msg
+     * @return string
+     */
+    protected function renderTwigEmptyState($templateHandle, $msg = 'Unable to display Component data.'){
+        return $this->renderTwigTemplate(
+            $templateHandle,
+            'sub/componentSourceUnavailable.twig',
+            array(
+                'componentInstanceId' => $this->getInstance()->getId(),
+                'emptyStateMsg'       => $msg,
+            )
+        );
+    }
+
+    /**
+     * Convenience method for PHPLib-based Components to render the 'AltSourceDenied' empty state
+     * @return bool
+     */
+    protected function renderAltSourceDenied(){
+        return $this->renderEmptyState('You no longer have access to this component\'s data source.');
+    }
+
+    /**
+     * Convenience method for PHPLib-based Components to render the 'AltSourceDeleted' empty state
+     * @return bool
+     */
+    protected function renderAltSourceDeleted(){
+        return $this->renderEmptyState('The alternative data source this component was using has been deleted.');
+    }
+
+    /**
+     * Renders empty state into PHPLib-based Components
+     *
+     * Normally, this should not be called directly, instead use convenience methods which
+     * define a consistent message.
+     *
+     * @param string $msg
+     * @return true
+     */
+    protected function renderEmptyState($msg = 'Unable to display Component data.'){
+        $twigTemplate = 'sub/componentSourceUnavailable.twig';
+        $twigData = array(
+            'componentInstanceId' => $this->getInstance()->getId(),
+            'emptyStateMsg' => $msg,
+        );
+        $this->setVar('SOURCE_FOLDER_UNAVAILABLE', $this->sitepage->getTwig()->render($twigTemplate, $twigData));
+        $this->parse('source_folder_deleted_block','source_folder_deleted');
+        $this->setVar('source_folder_exists_block', '');
+        return true;
+    }
+
+ 
     /**
      * @return \Schoolbox\Resource\Folder\Model
      */
@@ -789,7 +854,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasReadAccess()
     {
-        return $this->contentPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_READ;
+        return $this->contentPermission >= UserAccess::ACCESS_READ;
     }
 
     /**
@@ -799,7 +864,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasWriteAccess()
     {
-        return $this->contentPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
+        return $this->contentPermission >= UserAccess::ACCESS_WRITE;
     }
 
     /**
@@ -809,7 +874,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasFullAccess()
     {
-        return $this->contentPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
+        return $this->contentPermission >= UserAccess::ACCESS_FULL;
     }
 
     /**
@@ -819,7 +884,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasContextReadAccess()
     {
-        return $this->contextPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_READ;
+        return $this->contextPermission >= UserAccess::ACCESS_READ;
     }
 
     /**
@@ -829,7 +894,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasContextWriteAccess()
     {
-        return $this->contextPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
+        return $this->contextPermission >= UserAccess::ACCESS_WRITE;
     }
 
     /**
@@ -839,7 +904,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasContextFullAccess()
     {
-        return $this->contextPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
+        return $this->contextPermission >= UserAccess::ACCESS_FULL;
     }
 
     /**
@@ -868,6 +933,18 @@ abstract class Component_ControllerAbstract
      */
     public function setSource($source){
         $this->source = $source;
+    }
+
+    /**
+     * Return whether we are unable to render this component's content.
+     * Either due to lack of permission, or because content is deleted.
+     * @return bool
+     */
+    public function isSourceRenderable(){
+        if(!$this->hasReadAccess() || ($this->isUsingAltSource() && $this->getSource()->isDeleted())){
+            return false;
+        }
+        return true;
     }
 
     /**
