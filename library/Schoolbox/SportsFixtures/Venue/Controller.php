@@ -87,6 +87,7 @@ class Controller extends AbstractController
     /**
      * View a single venue
      *
+     * @api GET /sportsfixures/venues/{venue.id}
      * @level 165
      *
      * @param Model $entity
