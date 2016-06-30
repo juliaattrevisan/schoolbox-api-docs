@@ -23,7 +23,12 @@ CREATE TABLE `sportsfixtures_division` (
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
-	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`sport_id`)
+	REFERENCES `sportsfixtures_sport`(`id`)
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION
+) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Team Table
  */
@@ -35,7 +40,12 @@ CREATE TABLE `sportsfixtures_team` (
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
-	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`division_id`)
+	REFERENCES `sportsfixtures_division`(`id`)
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION
+) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Position Table
  */
@@ -46,7 +56,12 @@ CREATE TABLE `sportsfixtures_position` (
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
-	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`sport_id`)
+	REFERENCES `sportsfixtures_sport`(`id`)
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION
+) ENGINE=InnoDB CHARACTER SET=utf8;
 
 
 /** Division players table **/
@@ -93,7 +108,24 @@ CREATE TABLE `sportsfixtures_match` (
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
-	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`division_id`)
+		REFERENCES `sportsfixtures_division`(`id`)
+			ON UPDATE NO ACTION
+			ON DELETE NO ACTION,
+	FOREIGN KEY (`venue_id`)
+		REFERENCES `sportsfixtures_venue`(`id`)
+			ON UPDATE NO ACTION
+			ON DELETE NO ACTION,
+	FOREIGN KEY (`home_team_id`)
+		REFERENCES `sportsfixtures_team`(`id`)
+			ON UPDATE NO ACTION
+			ON DELETE NO ACTION,
+	FOREIGN KEY (`away_team_id`)
+		REFERENCES `sportsfixtures_team`(`id`)
+			ON UPDATE NO ACTION
+			ON DELETE NO ACTION
+) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Match ItineraryItem Table
  */
@@ -105,4 +137,9 @@ CREATE TABLE `sportsfixtures_match_itineraryitem` (
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
-	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`match_id`)
+		REFERENCES `sportsfixtures_match`(`id`)
+			ON UPDATE NO ACTION
+			ON DELETE NO ACTION
+) ENGINE=InnoDB CHARACTER SET=utf8;
