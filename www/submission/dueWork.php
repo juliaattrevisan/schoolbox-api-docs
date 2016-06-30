@@ -551,6 +551,10 @@ foreach (getActivities($user['uid'], 15, $categoryIDList, $visibilities, $restri
                         $numericMark = $marksheet->convertRawMark($rtn['norm_mark'], $rtn['max_mark'], true, false);
                     }
 
+                    if ($numericMark == null) {
+                        $numericMark = 'feedback';
+                    }
+
                     $mark = sprintf(
                         '<a href="/submission/submissionHistory/%s/%s">%s</a>',
                         $rtn['box_id'],
