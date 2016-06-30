@@ -134,7 +134,11 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
-        $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $entity->getId());
+        $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $entity->getId(), [
+            'order' => [
+                'start_at' => 'asc'
+            ]
+        ]);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/create.twig', [
             'sport'             => $sport,
