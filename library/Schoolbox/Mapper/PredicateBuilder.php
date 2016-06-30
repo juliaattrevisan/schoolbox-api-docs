@@ -10,11 +10,14 @@ namespace Schoolbox\Mapper;
 
 use Alaress\IDatabase;
 use Countable;
+use InvalidArgumentException;
 use Traversable;
 use UnderflowException;
 
 class PredicateBuilder
 {
+    const NOT  = '!';
+    const LIKE = '~';
 
     /** @var IDatabase */
     protected $database;
@@ -169,6 +172,18 @@ class PredicateBuilder
      */
     protected function addPredicate($columnName, $columnValue, $operand = '=')
     {
+        // check for valid column definition
+        if (!preg_match('`^([^a-z0-9_\.]*)([a-z0-9_\.]+)$`i', $columnName, $matches)) {
+            throw new InvalidArgumentException("Invalid column name '$columnName' given.");
+        }
+
+        // strip off any modifiers
+        list (, $modifiers, $columnName) = $matches;
+
+        // prepare known modifiers
+        $negate = strpos($modifiers, self::NOT)  !== false;
+        $fuzzy  = strpos($modifiers, self::LIKE) !== false;
+
         // accommodate joins
         $xpl = explode('.', $columnName) ?: [];
 
@@ -187,11 +202,7 @@ class PredicateBuilder
             return $this;
         }
 
-        if (substr($columnName, 0, 1) == "!")
-            $columnName = substr($columnName, 1);
-
-        // If a field name starts with "!" character then we'll assume the query intention for the field is "not equal"
-        if (substr($field, 0, 1) == "!") {
+        if ($negate) {
             $whereNot = "NOT ";
             $operand  = "<>";
             $field    = substr($field, 1);
@@ -206,10 +217,10 @@ class PredicateBuilder
             $this->where[] = "$escaped_name IS {$whereNot}NULL";
 
         } elseif ($columnValue === true) {
-            $this->where[] = "$escaped_name IS TRUE";
+            $this->where[] = "$escaped_name IS {$whereNot}TRUE";
 
         } elseif ($columnValue === false) {
-            $this->where[] = "$escaped_name IS FALSE";
+            $this->where[] = "$escaped_name IS {$whereNot}FALSE";
 
         } else {
             // This method is smart enough to work with arrays and IN statements
@@ -224,16 +235,30 @@ class PredicateBuilder
                     throw new UnderflowException('List of column values is empty');
                 }
 
-                $this->where[] = "$escaped_name {$whereNot}IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
+                if ($fuzzy) {
+                    // fuzzy match: use (LIKE :x OR LIKE :y)
+                    $likeParts = [];
+
+                    foreach ($this->getPlaceholders($columnValue, $columnName) as $option) {
+                        $likeParts[] = "$escaped_name {$whereNot}$option";
+                    }
+
+                    $this->where[] = '(' . implode(' OR ', $likeParts) . ')';
+
+                } else {
+                    // exact match: use IN
+                    $this->where[] = "$escaped_name {$whereNot}IN {$this->getArrayPlaceholders($columnValue, $columnName)}";
+                }
+
                 $this->params  = array_merge($this->params, $this->getArrayParameters($columnValue, $columnName));
 
             } else {
                 // alias the param
                 $a = $columnName . '_0';
 
-                if ($operand == '=' && strpos($columnValue, '%') !== false) {
+                if ($fuzzy || ($operand == '=' && strpos($columnValue, '%') !== false)) {
                     // if wildcards are in the value, do a LIKE search rather than equals
-                    $operand = 'LIKE';
+                    $operand = "{$whereNot}LIKE";
                 }
 
                 $this->where[] = "$escaped_name $operand :$a";
@@ -255,13 +280,26 @@ class PredicateBuilder
      *
      * @return string Something like "(:id_0, :id_1, :id_2)".
      */
-    public static function getArrayPlaceholders($input, $prefix = null)
+    public static function getArrayPlaceholders(array $input, $prefix = null)
     {
-        $placeholders = array();
+        return '(' . implode(',', self::getPlaceholders($input, $prefix)) . ')';
+    }
+
+
+    /**
+     * The non-concatenated version of getArrayPlaceholders()
+     *
+     * @param array $input
+     * @param string $prefix
+     * @return array
+     */
+    protected static function getPlaceholders(array $input, $prefix = null)
+    {
+        $placeholders = [];
         foreach ($input as $i => $param) {
             $placeholders[] = isset($prefix) ? (':' . $prefix . '_' . $i) : '?';
         }
-        return '(' . implode(',', $placeholders) . ')';
+        return $placeholders;
     }
 
 
