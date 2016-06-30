@@ -69,7 +69,7 @@
             </section>
         {% else %}
             <div class="empty-state">
-                <i class="icon-sport"></i>
+                <i class="icon-match"></i>
                 <p>There are no Matches in {{ division.name }}.</p>
                 <p><a href="{{ routeLookup('sportsfixturesMatch.getCreateForm', {contextId: division.id}) }}" title="Add a Match">Add a Match</a></p>
             </div>

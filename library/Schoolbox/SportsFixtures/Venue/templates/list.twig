@@ -55,9 +55,9 @@
             </section>
         {% else %}
             <div class="empty-state">
-                <i class="icon-sport"></i>
+                <i class="icon-venue"></i>
                 <p>There are no Venues.</p>
-                <p><a href="{{ routeLookup('sportsfixturesVenue.getCreateForm', {}) }}" title="Add a Venue">Add a Venue</a></p>
+                <p><a href="{{ routeLookup('sportsfixturesVenue.getCreateForm', {context: match.id}) }}" title="Add a Venue">Add a Venue</a></p>
             </div>
         {% endif %}
     </div>
