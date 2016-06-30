@@ -113,7 +113,7 @@ class NodeRenderer
         );
         if ($currentNode) {
             $output = array(
-                'NODE_NAME' => $currentNode['name'],
+                'NODE_NAME' => htmlspecialchars($currentNode['name']),
                 'NODE_ID'   => $currentNode['categoryId'],
                 'NODE_LINK' => '/homepage/' . $currentNode['categoryId'],
             );
