@@ -161,6 +161,7 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             if ($this->contentPermission < WRITE_ACCESS) {
                 $this->setVar("submit_file_block", "");
             } else {
+                $this->setVar('ID', $this->getSource()->getId());
                 $this->parse("submit_file_block", "submit_file");
             }
 
