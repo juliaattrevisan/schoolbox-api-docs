@@ -47,7 +47,7 @@
     <li><a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: match.id}) }}">{{ match.name }}</a></li>
 
     {% if itineraryItem.id %}
-        <li class="active"><a href="{{ routeLookup('sportsfixturesItineraryItem.getModifyForm', {entityId: itineraryItem.id}) }}">{{ itineraryItem.name }}</a></li>
+        <li class="active"><a href="{{ routeLookup('sportsfixturesItineraryItem.getModifyForm', {entityId: itineraryItem.id}) }}">{{ itineraryItem.decription }}</a></li>
     {% else %}
         <li class="active"><a href="#">{{ action }}</a></li>
     {% endif %}
