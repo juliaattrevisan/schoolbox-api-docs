@@ -35,10 +35,11 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
+
         $routes = [
             'GET' => [
-                '/admin' => 'admin',
-                '/test'  => 'test',
+                ''         => 'getLanding',
+                '/admin'    => 'admin',
             ],
             'POST' => [
             ]
@@ -71,7 +72,7 @@ class Module extends BaseModule
         /* Apply route permissions here as you add them to initRoutes()
          * Note that if the perms change you need to log out/log in to refresh
          */
-        $this->addRoutePermission($authorizer, 'admin', $isSportsAdministrator);
+        $this->addRoutePermission($authorizer, 'getLanding', $isSportsAdministrator);
     }
 
     /**

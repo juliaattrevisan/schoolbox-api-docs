@@ -35,18 +35,10 @@ class Controller extends Base
     }
 
     /**
-     * Admin test
+     * Admin landing page
      */
-    public function admin()
+    public function getLanding()
     {
-        $this->tpl('admin', []);
-    }
-
-    /**
-     * Public test
-     */
-    public function test()
-    {
-        $this->tpl('test', []);
+        $this->tpl('landing', []);
     }
 }
