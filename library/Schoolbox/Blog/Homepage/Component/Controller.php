@@ -1,7 +1,7 @@
 <?php
 /**
- * E-portfolio blog component controller. Is responsible for rendering the TWIG into component
- * on e-portfolio pages
+ * Homepage blog component controller. Is responsible for rendering the TWIG into component
+ * on homepage pages
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
@@ -64,16 +64,20 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function renderTemplate($templateHandle)
     {
         // Work out which folder we are in and grab a handle to it
+        // Check if using local or alt source
+        $folderId = $this->isUsingAltSource() ? $this->getConfig("src") : $this->getInstance()->getIdentifier();
 
         try {
             /** @var FolderModel $folder */
-            $folder = $this->getFolderMapper()->findById($this->getInstance()->getIdentifier());
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+            $folder = $this->getFolderMapper()->findById($folderId);
+        } catch (MapperException\Deleted $e) {
+            $folder = $e->getDeletedObject();
+            if(!($folder instanceof FolderModel)) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+            }
         }
 
-        // Check if using local or alt source
-        $folderId = $this->isUsingAltSource() ? $this->getConfig("src") : $this->getInstance()->getIdentifier();
+
 
         // Limit to the number specified in blog component config (0 == 'ALL')
         $limit = 0 == $this->getConfig('size') ? null : $this->getConfig('size');
