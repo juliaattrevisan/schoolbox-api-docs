@@ -254,19 +254,7 @@ class Logger implements LoggerInterface {
             // no handler spec'd - don't try to do anything
             return;
         }
-
-        try {
-            // unwind the stack
-            while($this->log->popHandler());
-        }
-        catch(\LogicException $e) {
-            // wind on the new handlers
-            foreach($this->handlers as $h) {
-                $this->log->pushHandler($h);
-            }
-        }
-
-
+        
         $this->log->setHandlers($this->handlers);
 
         try {
