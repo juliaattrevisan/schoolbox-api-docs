@@ -333,7 +333,13 @@ $(document).ready(function() {
                             </div>
                             <div class="card small-11 medium-5 ">
                                 <a href="/search/user/{USER_ID}">
+                                    <!-- BEGIN show_photo -->
                                     <img src="/portrait.php?userId={USER_EXTERNAL_ID}&size=square64" />
+                                    <!-- END show_photo -->
+                                    <!-- BEGIN hide_photo -->
+                                    <img src="/images/fail.php?transform_type=portrait&transform=square64&code=404" />
+                                    <!-- END hide_photo -->
+
                                     {USER_NAME}
                                 </a>
                                 <p class="meta {USER_ICON}">
