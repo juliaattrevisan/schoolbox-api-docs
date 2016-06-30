@@ -100,7 +100,7 @@
             </section>
         {% else %}
             <div class="empty-state">
-                <i class="icon-group"></i>
+                <i class="icon-player"></i>
                 <p>There are no Players in {{ division.getName() }}.</p>
                 <p>
                     You may <a href="#" title="Add Players" data-reveal-id="addPlayersModal">add players by name</a>,
@@ -129,7 +129,7 @@
             </section>
         {% else %}
             <div class="empty-state">
-                <i class="icon-sport"></i>
+                <i class="icon-team"></i>
                 <p>There are no Teams in {{ division.getName() }}.</p>
                 <p><a href="{{ routeLookup('sportsfixturesTeam.getCreateForm', {contextId: division.id}) }}" title="Add a Team">Add a Team</a></p>
             </div>
