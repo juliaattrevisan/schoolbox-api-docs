@@ -256,33 +256,6 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Allows calls to the sitepage object in this style:
-     * $this->setBlock();
-     * Exists to ease porting of existing components.
-     *
-     * @param String $method
-     * @param Array $argumentList
-     * @return mixed
-     */
-//    public function __call($method, $argumentList) {
-//        echo "USING BACKPORTING: " . get_called_class() . "->$method()</br>";
-//        if(method_exists($this, $method)) {
-//            $object = $this;
-//        }
-//        elseif(method_exists($this->sitepage, $method)) {
-//            $object = $this->sitepage;
-//        }
-//        if(!empty($object)) {
-//            $rm = new ReflectionMethod($object, $method);
-//            return $rm->invokeArgs($object, $argumentList);
-//        }
-//        throw new Exception("Method `$method` not found.");
-//    }
-
-
-    // ENCAPSULATION FOR SITEPAGE METHODS: __CALL() IS SLOW AND CAUSES PARSING ERRORS
-
-    /**
      * @param $varname
      * @return mixed
      */
@@ -768,6 +741,7 @@ abstract class Component_ControllerAbstract
 
     /**
      * @param string $key
+     * @param string $attr
      * @return mixed
      */
     public function getConfig($key = '', $attr = 'value')
