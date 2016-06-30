@@ -39,7 +39,6 @@ class Module extends BaseModule
         $routes = [
             'GET' => [
                 ''         => 'getLanding',
-                '/admin'    => 'admin',
             ],
             'POST' => [
             ]
