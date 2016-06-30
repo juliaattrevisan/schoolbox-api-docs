@@ -49,8 +49,7 @@
     <li><a href="#">Sports Fixtures</a></li>
     <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
     <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesDivision.getModifyForm', {entityId: division.id}) }}">{{ division.name }}</a></li>
-    <li class="active"><a href="{{ routeLookup('sportsfixturesDivision.getLobby', {entityId: division.id}) }}">Division Lobby</a></li>
+    <li class="active"><a href="{{ routeLookup('sportsfixturesDivision.getLobby', {entityId: division.id}) }}">{{ division.name }} Lobby</a></li>
 </ul>
 
 <div class="row">

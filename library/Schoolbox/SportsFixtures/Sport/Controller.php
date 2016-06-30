@@ -100,7 +100,7 @@ class Controller extends AbstractController
 
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesSport.getList'));
         } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
     }
 

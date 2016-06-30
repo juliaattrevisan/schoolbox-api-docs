@@ -13,10 +13,11 @@ namespace Schoolbox\SportsFixtures\Team;
 use \Alaress_Date_Format;
 use \Schoolbox\ISoftDeletable;
 use \Schoolbox\User;
+use \Schoolbox\ValueLabelInterface;
 use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use \Schoolbox\SportsFixtures\Division\Model as Division;
 
-class Model implements ISoftDeletable {
+class Model implements ISoftDeletable, ValueLabelInterface {
     use DeletedAtDate;
 
     /** @var int */
@@ -42,6 +43,19 @@ class Model implements ISoftDeletable {
      */
     public function __construct()
     {
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
+    public function findValueLabelPair()
+    {
+        return [
+            'value' => $this->getId(),
+            'label' => $this->getName()
+        ];
     }
 
     /* Getters/Setters

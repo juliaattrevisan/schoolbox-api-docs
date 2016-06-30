@@ -44,6 +44,22 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Find all the teams whose names are like $keyword
+     *
+     * @param int $divisionId
+     * @param string $keyword
+     * @return \Schoolbox\Collection
+     * @throws Exception
+     */
+    public function findByName($divisionId, $keyword)
+    {
+        return $this->findByColumnList([
+            'division_id' => $divisionId,
+            '~name'       => "%{$this->database->quoteForLike($keyword)}%"
+        ]);
+    }
+
+    /**
      * Delete all Players associated with this Team
      * when it's being deleted
      *

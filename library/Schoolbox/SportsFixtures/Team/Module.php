@@ -11,6 +11,7 @@ namespace Schoolbox\SportsFixtures\Team;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
+use Aura\Router\Router;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use \Schoolbox\Permission\Access\UserAccess;
@@ -48,5 +49,4 @@ class Module extends RestfulModule
          */
         $this->addRoutePermission($authorizer, '.*', $isSportsAdministrator);
     }
-
 }

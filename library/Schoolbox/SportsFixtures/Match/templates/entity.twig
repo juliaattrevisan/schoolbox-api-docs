@@ -1,0 +1,50 @@
+<ul class="breadcrumb">
+    <li><a href="#">Sports Fixtures</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}">Matches in {{ division.name }}</a></li>
+
+    {% if match.id %}
+        <li class="active"><a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: match.id}) }}">{{ match.name }}</a></li>
+    {% else %}
+        <li class="active"><a href="#">{{ action }}</a></li>
+    {% endif %}
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sports Fixtures</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">{{ match.name }}</h2>
+
+        <section class="content">
+            <div class="small-12 columns">
+                <dl>
+                    <dt>ID</dt>
+                    <dd>{{ match.id }}</dd>
+
+                    <dt>Name</dt>
+                    <dd>{{ match.name }}</dd>
+
+                    <dt>Venue</dt>
+                    <dd>{{ venue.name }}</dd>
+
+                    <dt>Starts</dt>
+                    <dd>{{ match.startAt.database }}</dd>
+
+                    <dt>Created</dt>
+                    <dd>{{ match.createdAt.database }}</dd>
+
+                    {% if not match.createdAt.eq(match.updatedAt) %}
+                        <dt>Last Updated</dt>
+                        <dd>{{ match.updatedAt.database }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </section>
+    </div>
+</div>

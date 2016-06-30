@@ -49,19 +49,27 @@ class Controller extends AbstractController
     public function getList($context = null)
     {
         try {
-            $allPositions = $this->mapper->findByColumn('sport_id', $context->getId(), [
-                'order' => [
-                    'name' => 'asc'
+            $allPositions = $this->mapper->findByColumn(
+                'sport_id',
+                $context->getId(),
+                [
+                    'order' => [
+                        'name' => 'asc'
+                    ]
                 ]
-            ]);
+            );
 
-            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesPosition/list.twig', [
-                'sport'        => $context,
-                'allPositions' => $allPositions
-            ]));
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput(
+                    '@sportsfixturesPosition/list.twig',
+                    [
+                        'sport'        => $context,
+                        'allPositions' => $allPositions
+                    ]
+                )
+            );
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
     }
 
@@ -72,7 +80,11 @@ class Controller extends AbstractController
      */
     public function getEntity($entity)
     {
-        $sport = $this->getSportMapper()->findById($entity->getSport()->getId());
+        try {
+            $sport = $this->getSportMapper()->findById($entity->getSport()->getId());
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
+        }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesPosition/entity.twig', [
             'sport'    => $sport,
@@ -89,7 +101,11 @@ class Controller extends AbstractController
     protected function getForm($entity, $context = null)
     {
         if (empty($context)) {
-            $context = $this->getSportMapper()->findById($entity->getSport()->getId());
+            try {
+                $context = $this->getSportMapper()->findById($entity->getSport()->getId());
+            } catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
+            }
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesPosition/create.twig', [
@@ -109,15 +125,15 @@ class Controller extends AbstractController
         try {
             $sportId = $this->getRequest()->post['sportId'];
             $sport   = $this->getSportMapper()->findById($sportId);
-
-            $this->savePosition($sport, $this->getRequest()->post['name'], $entity);
-
-            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesPosition.getList', [
-                'contextId' => $sportId
-            ]));
         } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
+
+        $this->savePosition($sport, $this->getRequest()->post['name'], $entity);
+
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesPosition.getList', [
+            'contextId' => $sportId
+        ]));
     }
 
     /**

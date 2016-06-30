@@ -59,6 +59,7 @@
                     <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-division-{{ currentDivision.getId() }}-actions">
                         <li><a href="{{ routeLookup('sportsfixturesDivision.getLobby', {entityId: currentDivision.id}) }}" class="icon-group" title="Manage Players in {{ currentDivision.name }}">Manage Players</a></li>
                         <li><a href="{{ routeLookup('sportsfixturesTeam.getList', {contextId: currentDivision.id}) }}" class="icon-list" title="Manage Teams in {{ currentDivision.name }}">Manage Teams</a></li>
+                        <li><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: currentDivision.id}) }}" class="icon-list" title="Manage Matches in {{ currentDivision.name }}">Manage Matches</a></li>
                         <li><a href="{{ routeLookup('sportsfixturesDivision.getModifyForm', {entityId: currentDivision.id}) }}" class="icon-modify" title="Modify">Modify</a></li>
                         <li><a href="{{ routeLookup('sportsfixturesDivision.deleteEntity', {entityId: currentDivision.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentDivision.id }}">Delete</a></li>
                     </ul>

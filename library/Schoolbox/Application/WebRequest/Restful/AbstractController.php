@@ -25,9 +25,8 @@ abstract class AbstractController extends \Alaress\Web\Controller\Restful\Abstra
      */
     public function __construct(Mapper $mapper)
     {
-        $this->mapper = $mapper;
+        $this->setMapper($mapper);
     }
-
 
     /**
      * Delete the given entity. Deletion is considered to be an idempotent method, so do not return an error on repeat attempts to delete an entity.
@@ -40,7 +39,25 @@ abstract class AbstractController extends \Alaress\Web\Controller\Restful\Abstra
      */
     public function deleteEntity($entity)
     {
-        $this->mapper->delete($entity);
+        $this->getMapper()->delete($entity);
     }
 
+    /* Getters/Setters
+     */
+
+    /**
+     * @return Mapper
+     */
+    protected function getMapper()
+    {
+        return $this->mapper;
+    }
+
+    /**
+     * @param Mapper $mapper
+     */
+    protected function setMapper($mapper)
+    {
+        $this->mapper = $mapper;
+    }
 }

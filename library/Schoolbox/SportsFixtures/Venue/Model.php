@@ -10,7 +10,7 @@ namespace Schoolbox\SportsFixtures\Venue;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use \Alaress_Date_Format;
-
+use \Schoolbox\ValueLabelInterface;
 
 /**
  * Represents a Position a player may take in some Sport.
@@ -20,7 +20,7 @@ use \Alaress_Date_Format;
  *
  * @package Schoolbox\SportsFixtures\Position
  */
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, ValueLabelInterface
 {
     // Implements ISoftDeletable
     use DeletedAtDate;
@@ -46,12 +46,24 @@ class Model implements ISoftDeletable
     /** @var Alaress_Date_Format */
     protected $updatedAt;
 
-
     /**
      * Model constructor.
      */
     public function __construct()
     {
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return array
+     */
+    public function findValueLabelPair()
+    {
+        return [
+            'value' => $this->getId(),
+            'label' => $this->getName()
+        ];
     }
 
     /* Getters/Setters

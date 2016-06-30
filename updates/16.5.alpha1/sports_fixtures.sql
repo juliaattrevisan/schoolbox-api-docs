@@ -23,7 +23,12 @@ CREATE TABLE `sportsfixtures_division` (
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
-	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`sport_id`)
+	REFERENCES `sportsfixtures_sport`(`id`)
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION
+) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Team Table
  */
@@ -35,7 +40,12 @@ CREATE TABLE `sportsfixtures_team` (
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
-	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`division_id`)
+	REFERENCES `sportsfixtures_division`(`id`)
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION
+) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Position Table
  */
@@ -46,7 +56,12 @@ CREATE TABLE `sportsfixtures_position` (
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
-	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`sport_id`)
+	REFERENCES `sportsfixtures_sport`(`id`)
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION
+) ENGINE=InnoDB CHARACTER SET=utf8;
 
 
 /** Division players table **/
@@ -79,3 +94,60 @@ CREATE TABLE `sportsfixtures_venue` (
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
 	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+
+/* Match Table
+ */
+CREATE TABLE `sportsfixtures_match` (
+	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
+	`division_id` INT NOT NULL,
+	`venue_id` INT NOT NULL,
+	`home_team_id` INT,
+	`away_team_id` INT,
+	`name` VARCHAR(255) NULL COMMENT '',
+	`start_at` DATETIME NULL COMMENT '',
+	`created_at` DATETIME NULL COMMENT '',
+	`updated_at` DATETIME NULL COMMENT '',
+	`deleted_at` DATETIME NULL COMMENT '',
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`division_id`)
+		REFERENCES `sportsfixtures_division`(`id`)
+			ON UPDATE NO ACTION
+			ON DELETE NO ACTION,
+	FOREIGN KEY (`venue_id`)
+		REFERENCES `sportsfixtures_venue`(`id`)
+			ON UPDATE NO ACTION
+			ON DELETE NO ACTION,
+	FOREIGN KEY (`home_team_id`)
+		REFERENCES `sportsfixtures_team`(`id`)
+			ON UPDATE NO ACTION
+			ON DELETE NO ACTION,
+	FOREIGN KEY (`away_team_id`)
+		REFERENCES `sportsfixtures_team`(`id`)
+			ON UPDATE NO ACTION
+			ON DELETE NO ACTION
+) ENGINE=InnoDB CHARACTER SET=utf8;
+
+/* Match ItineraryItem Table
+ */
+CREATE TABLE `sportsfixtures_match_itineraryitem` (
+	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
+	`match_id` INT NOT NULL,
+	`description` TEXT NULL COMMENT '',
+	`start_at` DATETIME NULL COMMENT '',
+	`created_at` DATETIME NULL COMMENT '',
+	`updated_at` DATETIME NULL COMMENT '',
+	`deleted_at` DATETIME NULL COMMENT '',
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`match_id`)
+		REFERENCES `sportsfixtures_match`(`id`)
+			ON UPDATE NO ACTION
+			ON DELETE NO ACTION
+) ENGINE=InnoDB CHARACTER SET=utf8;
+
+/* Error table entries */
+INSERT INTO `error` VALUES
+    (173, 'The requested sport could not be found.'),
+    (174, 'The requested division could not be found.'),
+    (175, 'The requested team could not be found.'),
+    (176, 'The requested venue could not be found.'),
+    (177, 'The requested match could not be found.');

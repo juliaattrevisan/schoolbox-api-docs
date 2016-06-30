@@ -10,7 +10,7 @@ namespace Schoolbox\SportsFixtures\Venue;
 use Schoolbox\Column\Decimal;
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\SportsFixtures\Venue\Model as Venue;
-
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Class Mapper
@@ -59,5 +59,15 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
-
+    /**
+     * Find all the Teams whose names are like $keyword
+     *
+     * @param string $keyword
+     * @return \Schoolbox\Collection
+     * @throws MapperException
+     */
+    public function findByName($keyword)
+    {
+        return $this->findByColumn('~name', "%{$this->database->quoteForLike($keyword)}%");
+    }
 }

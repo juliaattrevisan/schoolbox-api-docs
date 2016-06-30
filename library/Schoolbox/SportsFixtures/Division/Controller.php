@@ -105,7 +105,7 @@ class Controller extends AbstractController
             ]));
         }
         catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
     }
 
@@ -136,28 +136,41 @@ class Controller extends AbstractController
     {
         try {
             $division = $this->getDivisionMapper()->findById($entityId);
-            $sport    = $this->getSportMapper()->findById($division->getSport()->getId());
-            $teams    = $this->getTeamMapper()->findByColumn('division_id', $entityId);
-            $players  = $this->getDivisionUserMapper()->findByColumn('division_id', $entityId, ['order' => ['sequence' => 'desc']]);
-            $zone     = new Zone("uploadZone");
-            $zone->setMimeFilter('text/csv')->setAttachPrompt('upload a list of players');
-
-            $this->getResponse()->content->set(
-                $this->buildHtmlOutput(
-                    '@sportsfixturesDivision/lobby.twig', [
-                        'division'   => $division,
-                        'sport'      => $sport,
-                        'teams'      => $teams,
-                        'players'    => $players,
-                        'uploadZone' => $zone,
-                        'user'       => $this->getUser(),
-                    ]
-                )
-            );
         }
         catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
+
+        try {
+            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
+        }
+
+        try {
+            $teams = $this->getTeamMapper()->findByColumn('division_id', $entityId);
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+        }
+
+        $players  = $this->getDivisionUserMapper()->findByColumn('division_id', $entityId, ['order' => ['sequence' => 'desc']]);
+        $zone     = new Zone("uploadZone");
+        $zone->setMimeFilter('text/csv')->setAttachPrompt('upload a list of players');
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@sportsfixturesDivision/lobby.twig', [
+                    'division'   => $division,
+                    'sport'      => $sport,
+                    'teams'      => $teams,
+                    'players'    => $players,
+                    'uploadZone' => $zone,
+                    'user'       => $this->getUser(),
+                ]
+            )
+        );
     }
 
     /**
@@ -176,7 +189,7 @@ class Controller extends AbstractController
             ]));
 
         } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(2);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
     }
 
@@ -220,7 +233,7 @@ class Controller extends AbstractController
             $upload = $factory->build($attach)->getFirst();
         } else {
             // error out
-            throw $this->getErrorMapper()->generateException(2);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
         }
 
         // What are the users in this upload?
