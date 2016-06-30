@@ -50,23 +50,8 @@ class CMS
      * @param string $mimeType  a mime prefix, eg 'image' that will match eg, mime of 'image/gif'
      * @return array
      */
-    public function logFileType(\Alaress_Date_Format $start, \Alaress_Date_Format $end, $action, $mimeType){
-
-        // Generate a list of file extensions for the specified fileType, eg 'image' => ['bmp','gif','jpeg',...]
-        $query = " SELECT `mime` FROM `allowedFileTypes` WHERE `mime` LIKE :mime; ";
-        $statement = $this->database->prepare($query);
-        $mime = "$mimeType%";
-        $statement->bindParam(':mime', $mime);
-        $statement->execute();
-        $results = $statement->fetchAll(\PDO::FETCH_COLUMN);
-
-        $fileExtensions = array();
-        foreach($results as $result){
-            // eg 'image/svg+xml' => 'svg'
-            $fileExtensions[] = "'".preg_replace('/\+.*/','',str_replace("$mimeType/",'',$result))."'";
-        }
-        $fileExtensionsString = implode(',',$fileExtensions);
-
+    public function logFileType(\Alaress_Date_Format $start, \Alaress_Date_Format $end, $action, $mimeType)
+    {
         $query = "
                 SELECT `groups`.`name`, COUNT(*) AS total
                 FROM `cmsLog`
@@ -74,16 +59,20 @@ class CMS
                 JOIN `groups` ON `user`.`group_id` = `groups`.`id`
                 JOIN `file` ON `cmsLog`.`objectId` = `file`.`id`
                 JOIN `storage` ON `file`.`hash` = `storage`.`hash`
-                WHERE `storage`.`ext` IN ($fileExtensionsString)
+                JOIN `allowedFileExtension` `afe` ON `storage`.`ext` = `afe`.`extension`
+                JOIN `allowedFileTypes` `aft` ON `afe`.`fileTypeID` = `aft`.`fileTypeID`
+                WHERE aft.mime LIKE :type
                 AND `cmsLog`.`object` = 'file'
                 AND `cmsLog`.`action` = :action
                 AND `time` >= :start AND `time` <= :end
                 GROUP BY `user`.`group_id`";
 
+        $mimeType = $mimeType.'%';
         $statement = $this->database->prepare($query);
         $statement->bindParam(':start', $start->getDatabaseDate());
         $statement->bindParam(':end', $end->getDatabaseDate());
         $statement->bindParam(':action', $action);
+        $statement->bindParam(':type', $mimeType);
         $statement->execute();
         return $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
