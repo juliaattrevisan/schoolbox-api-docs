@@ -16,6 +16,16 @@ use \Schoolbox\Permission\Access\UserAccess;
 
 abstract class Component_ControllerAbstract
 {
+    /* Reasons for showing a component empty state */
+    /** @const int EMPTY_STATE_REASON_UNKNOWN. Default. */
+    const EMPTY_STATE_REASON_UNKNOWN = 0;
+
+    /** @const int EMPTY_STATE_REASON_DENIED. No READ+ access to data source folder */
+    const EMPTY_STATE_REASON_DENIED  = 1;
+
+    /** @const int EMPTY_STATE_REASON_DELETED. Component's data source folder is deleted */
+    const EMPTY_STATE_REASON_DELETED = 2;
+
 
     /**
      * @var Component_Instance
@@ -660,7 +670,7 @@ abstract class Component_ControllerAbstract
      * @return string
      */
     protected function renderTwigAltSourceDeleted($templateHandle){
-        $this->renderTwigEmptyState($templateHandle, 'The alternative data source this component was using has been deleted.');
+        $this->renderTwigEmptyState($templateHandle, self::EMPTY_STATE_REASON_DELETED);
     }
 
     /**
@@ -669,7 +679,7 @@ abstract class Component_ControllerAbstract
      * @return string
      */
     protected function renderTwigAltSourceDenied($templateHandle){
-        $this->renderTwigEmptyState($templateHandle, "You do not have permission to view this component's data source.");
+        $this->renderTwigEmptyState($templateHandle, self::EMPTY_STATE_REASON_DENIED);
     }
 
     /**
@@ -679,16 +689,21 @@ abstract class Component_ControllerAbstract
      * define a consistent message.
      *
      * @param string $templateHandle
-     * @param string $msg
+     * @param int $reason Why we are unable to display this component's content.
      * @return string
      */
-    protected function renderTwigEmptyState($templateHandle, $msg = 'Unable to display component data.'){
+    protected function renderTwigEmptyState($templateHandle, $reason = self::EMPTY_STATE_REASON_UNKNOWN){
+
+        $isAltSourceDenied  = self::EMPTY_STATE_REASON_DENIED  === $reason;
+        $isAltSourceDeleted = self::EMPTY_STATE_REASON_DELETED === $reason;
+
         return $this->renderTwigTemplate(
             $templateHandle,
             'sub/componentSourceUnavailable.twig',
             array(
                 'componentInstanceId' => $this->getInstance()->getId(),
-                'emptyStateMsg'       => $msg,
+                'isAltSourceDenied'   => $isAltSourceDenied,
+                'isAltSourceDeleted'  => $isAltSourceDeleted,
             )
         );
     }
@@ -698,7 +713,7 @@ abstract class Component_ControllerAbstract
      * @return bool
      */
     protected function renderAltSourceDenied(){
-        return $this->renderEmptyState("You do not have permission to view this component's data source.");
+        return $this->renderEmptyState(self::EMPTY_STATE_REASON_DENIED);
     }
 
     /**
@@ -706,7 +721,7 @@ abstract class Component_ControllerAbstract
      * @return bool
      */
     protected function renderAltSourceDeleted(){
-        return $this->renderEmptyState('The alternative data source this component was using has been deleted.');
+        return $this->renderEmptyState(self::EMPTY_STATE_REASON_DELETED);
     }
 
     /**
@@ -715,14 +730,19 @@ abstract class Component_ControllerAbstract
      * Normally, this should not be called directly, instead use convenience methods which
      * define a consistent message.
      *
-     * @param string $msg
+     * @param int $reason Why we are unable to display this component's content.
      * @return true
      */
-    protected function renderEmptyState($msg = 'Unable to display component data.'){
+    protected function renderEmptyState($reason = self::EMPTY_STATE_REASON_UNKNOWN){
+
+        $isAltSourceDenied  = self::EMPTY_STATE_REASON_DENIED  === $reason;
+        $isAltSourceDeleted = self::EMPTY_STATE_REASON_DELETED === $reason;
+
         $twigTemplate = 'sub/componentSourceUnavailable.twig';
         $twigData = array(
             'componentInstanceId' => $this->getInstance()->getId(),
-            'emptyStateMsg' => $msg,
+            'isAltSourceDenied'   => $isAltSourceDenied,
+            'isAltSourceDeleted'  => $isAltSourceDeleted,
         );
         $this->setVar('SOURCE_FOLDER_UNAVAILABLE', $this->sitepage->getTwig()->render($twigTemplate, $twigData));
         $this->parse('source_folder_deleted_block','source_folder_deleted');

@@ -26,7 +26,16 @@
 
 <div class="empty-state" data-deleted-source>
     <i class="icon-info"></i>
-    <p>{{ emptyStateMsg }}</p>
+
+    {# Note: We show 'denied' before 'deleted' if both are true. Fallback to default if no reason set #}
+
+    {% if isAltSourceDenied %}
+        <p>You do not have permission to view this component's data source.</p>
+    {% elseif isAltSourceDeleted %}
+        <p>The alternative data source this component was using has been deleted.</p>
+    {% else %}
+        <p>Unable to display component data.</p>
+    {% endif %}
     <p>You can either
         <a href="#" title="Remove this Component" data-action="remove">Remove this Component</a>, or
         <a href="#" title="Select Source" data-action="select_source">Select a new Data Source</a>
