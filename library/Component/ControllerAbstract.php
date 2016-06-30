@@ -709,7 +709,7 @@ abstract class Component_ControllerAbstract
      * @param string $msg
      * @return string
      */
-    protected function renderTwigEmptyState($templateHandle, $msg = 'Unable to display Component data.'){
+    protected function renderTwigEmptyState($templateHandle, $msg = 'Unable to display component data.'){
         return $this->renderTwigTemplate(
             $templateHandle,
             'sub/componentSourceUnavailable.twig',
@@ -745,7 +745,7 @@ abstract class Component_ControllerAbstract
      * @param string $msg
      * @return true
      */
-    protected function renderEmptyState($msg = 'Unable to display Component data.'){
+    protected function renderEmptyState($msg = 'Unable to display component data.'){
         $twigTemplate = 'sub/componentSourceUnavailable.twig';
         $twigData = array(
             'componentInstanceId' => $this->getInstance()->getId(),
