@@ -28,7 +28,7 @@
     <li><a href="{{ routeLookup('sportsfixturesTeam.getList', {contextId: division.id}) }}">Teams in {{ division.name }}</a></li>
 
     {% if team.id %}
-    <li class="active"><a href="{{ routeLookup('sportsfixturesTeam.getEntity', {entityId: team.id}) }}">{{ team.name }}</a></li>
+    <li class="active"><a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: team.id}) }}">{{ team.name }}</a></li>
     {% else %}
     <li class="active"><a href="#">{{ action }}</a></li>
     {% endif %}
