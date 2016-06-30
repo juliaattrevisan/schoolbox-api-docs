@@ -11,9 +11,11 @@
 <div class="row">
     <div class="small-12 island">
         <section class="content">
-            <a href="/sportsfixtures/sports">Sports</a><br>
-            <a href="/sportsfixtures/positions">Positions</a><br>
-            <a href="/sportsfixtures/venues">Venues</a><br>
+            <a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">Sports</a><br>
+            {% for sport in sports %}
+                <a href="{{ routeLookup('sportsfixturesPosition.getList', {contextId: sport.id}) }}">Positions - {{ sport.name }}</a><br>
+            {% endfor %}
+            <a href="{{ routeLookup('sportsfixturesVenue.getList', {}) }}">Venues</a><br>
         </section>
     </div>
 </div>
