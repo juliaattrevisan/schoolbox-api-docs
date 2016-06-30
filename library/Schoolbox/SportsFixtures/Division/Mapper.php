@@ -12,7 +12,6 @@ namespace Schoolbox\SportsFixtures\Division;
 
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\User;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
@@ -57,7 +56,7 @@ class Mapper extends BaseMapper
             TeamMapper::getInstance()->delete($currentTeam);
         }
 
-        /* TODO: Delete all Players in this Division's Lobby when this Division is deleted
-         */
+        $divisionUserMapper = User\Mapper::getInstance();
+        $divisionUserMapper->delete($divisionUserMapper->findByColumn('division_id', $division->getId()));
     }
 }
