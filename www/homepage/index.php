@@ -131,7 +131,9 @@ $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
 /* BUILD COMPONENTRY */
 $componentFactory = new Component_Homepage_Factory(new \Schoolbox\User(), $this);
-$componentFactory->setMaximumPermission($virtualPermission);
+if($_GET['readonly']) {
+    $componentFactory->setMaximumPermission($virtualPermission);
+}
 $componentCollection = $componentFactory->buildComponentList($category->getId());
 
 // Decide which of parent/student view butonyes to show, if either
