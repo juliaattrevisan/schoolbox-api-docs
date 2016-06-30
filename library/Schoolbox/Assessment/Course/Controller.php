@@ -26,6 +26,7 @@ use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
 use Schoolbox\Assessment\Course\Import\Import as CourseImport;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
+use Schoolbox\Assessment\Course\Model as CourseModel;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
 use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
@@ -1836,11 +1837,24 @@ class Controller extends Base\Base
             $owner = $this->getUser();
         }
 
+        $course = null;
         foreach ($selectedUnitInstances as $selectedUnitInstance) {
             $compendium[$selectedUnitInstance->getUnitCategory()->getId()]['selected'] = $selectedUnitInstance;
+            if (!$course instanceof CourseModel) {
+                try {
+                    $course = $this->getUnitInstanceMapper()->findCourseForUnit($selectedUnitInstance);
+                } catch (MapperException $e) {
+                    // This unit doesn't actually exist - get course from next one
+                    continue;
+                }
+            }
         }
 
-        $course   = $this->getUnitInstanceMapper()->findCourseForUnit($selectedUnitInstances->first());
+        // After testing every unit do I still not have a course? That's an error
+        if (!$course instanceof CourseModel) {
+            throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_RESOURCE_NOT_FOUND);
+        }
+
         $allUnits = $course->getUnits();
 
         foreach ($allUnits as $unit) {
@@ -1850,15 +1864,23 @@ class Controller extends Base\Base
         $unitOutput = [];
 
         foreach ($compendium as $id => $values) {
-            /** @var Folder\Model $folder */
-            $folder = $values['folder'];
-
             /** @var UnitInstance $selected */
             $selected = $values['selected'];
+            /** @var Folder\Model $folder */
+            $folder = $values['folder'];
+            $unitTitle = '';
+            $checkable = false;
+            if ($folder instanceof Folder\Model) {
+                $unitTitle = $folder->getName();
+                $checkable = true;
+            } elseif ($selected instanceof UnitInstance) {
+                $unitTitle = $selected->getTitle();
+            }
 
             $unitOutput[$id] = [
-                'id' => $id,
-                'name' => $folder->getName(),
+                'id'        => $id,
+                'name'      => $unitTitle,
+                'checkable' => $checkable,
             ];
 
             if (isset($values['selected'])) {
