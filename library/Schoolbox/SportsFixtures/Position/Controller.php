@@ -17,7 +17,6 @@ use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Position\Model as Position;
 use \Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 
-
 class Controller extends AbstractController
 {
 

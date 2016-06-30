@@ -13,40 +13,11 @@ use Schoolbox\Mapper\Exception as MapperException;
 
 class Controller extends Base
 {
-
     /**
-     * Just a raw template render
-     *
-     * @param string $template
-     * @param array  $data
+     * Admin landing page
      */
-    protected function tpl($template, $data = [])
+    public function getLanding()
     {
-        $content = [
-            'template' => "@sportsfixtures/$template.twig",
-            'data'     => $data,
-        ];
-
-        if ($this->getRequest()->isXhr()) {
-            $content['format'] = 'nochrome';
-        }
-
-        $this->getResponse()->content->set($content);
-    }
-
-    /**
-     * Admin test
-     */
-    public function admin()
-    {
-        $this->tpl('admin', []);
-    }
-
-    /**
-     * Public test
-     */
-    public function test()
-    {
-        $this->tpl('test', []);
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixtures/landing.twig', []));
     }
 }
