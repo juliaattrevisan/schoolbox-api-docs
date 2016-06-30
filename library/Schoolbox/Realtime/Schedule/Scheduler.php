@@ -330,7 +330,7 @@ class Scheduler extends StompScheduler
         $this->log->notice("Received worker response to handle: '$command'");
 
         // detach the trigger, which will ACK the message if that was the last trigger (even if it errors out)
-        $this->detachTrigger($trigger);
+        $this->processCompletedTrigger($trigger);
 
         // will throw RuntimeException if unserialization fails
         $bundle = unserialize($data[0]);
@@ -458,6 +458,33 @@ class Scheduler extends StompScheduler
         }
 
         return -1;
+    }
+
+
+    /**
+     * @param TriggerInterface $trigger
+     * @return int
+     */
+    protected function processCompletedTrigger(TriggerInterface $trigger)
+    {
+        // this is in the future; reschedule that!
+        if ($trigger->getTimestamp() > $this->clock->time()) {
+            $this->log->info("Trigger not complete, rescheduling");
+
+            try {
+                $this->schedule($trigger, $this->timerCallback(), false);
+
+                // don't detach, just return the count
+                $resolver = $this->resolvers->getResolverByTrigger($trigger);
+                return $this->resolvers->getTriggerCount($resolver);
+
+            } catch (OutOfBoundsException $e) {
+                // resolver was already detached; this isn't good, since a scheduler restart would lose state
+                $this->log->warning("Resolver was already detached for trigger '{$trigger->getIdString()}'");
+            }
+        }
+
+        return $this->detachTrigger($trigger);
     }
 
 }

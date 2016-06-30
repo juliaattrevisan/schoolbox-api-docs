@@ -18,6 +18,7 @@ use Monolog\Logger;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Realtime;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
@@ -27,9 +28,10 @@ use Schoolbox\User;
 class EventMetadataNotifier extends AbstractModuleNotifier
 {
 
-    const TRIGGER_SUBMITTED = 'submitted';
-    const TRIGGER_UPDATED = 'updated';
+    const TRIGGER_SUBMITTED     = 'submitted';
+    const TRIGGER_UPDATED       = 'updated';
     const TRIGGER_STATUSCHANGED = 'statuschanged';
+    const TRIGGER_UPCOMING      = 'upcoming';
 
     /**
      * Namespace slug, as defined in msg_namespace
@@ -77,8 +79,75 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
             // process the other kinds of updates
             $bundle->attach(self::TRIGGER_UPDATED, self::IMMEDIATELY);
+
+
+            /** @var EventMetadata $object */
+            $object = $bundle->getEvent()->getObject();
+
+            $status = $object->getStatus();
+
+            // if in a final state, don't add extra reminders
+            if ($status->isApproved() || $status->isRejected()) {
+                return;
+            }
         }
+
+        $bundle->attach(self::TRIGGER_UPCOMING, array($this, 'getNextReminderTime'));
     }
+
+
+    /**
+     * This is a callback method for deriving the time for a recurring reminder trigger
+     *
+     * @param Realtime\Schedule\Event $event
+     * @return int
+     */
+    public function getNextReminderTime(Realtime\Schedule\Event $event)
+    {
+        /** @var EventMetadata $object */
+        $object = $event->getObject();
+
+        // retrieve the event that this metadata object is connected to
+        $eventCollection = EventMetadataMapper::getInstance()->findEventsForMetadata($object);
+
+        if (!$eventCollection->count()) {
+            // this shouldn't happen, but we have no recourse for it
+            return -1;
+        }
+
+        $now = \Alaress_Date_Format::now();
+
+        $startTime = EventMapper::getInstance()->findById($eventCollection->first()->getId())->getStartDateTime();
+
+        $eotcConf  = ConfigMapper::getInstance();
+
+        // rewind first reminder `n` days from start time
+        $firstReminder = clone $startTime;
+        $firstReminder->addDays(-1 * $eotcConf->findFirstReminderThreshold()->getValue());
+
+        if ($firstReminder->gte($now)) {
+            // if this first reminder is in the future, schedule it
+            return $firstReminder->getUnixTimeStamp();
+        }
+
+        // rewind daily reminder `m` days from start time
+        $dailyReminder = clone $startTime;
+        $dailyReminder->addDays(-1 * $eotcConf->findDailyReminderThreshold()->getValue());
+
+        while ($dailyReminder->lt($now)) {
+            // increment by days until it's in the past
+            $dailyReminder->addDays(1);
+        }
+
+        if ($dailyReminder->lt($startTime)) {
+            // so long as the reminder is before the actual start date, return that
+            return $dailyReminder->getUnixTimeStamp();
+        }
+
+        // all reminders are in the past. discard this trigger
+        return -1;
+    }
+
 
     /**
      * @param string $label
@@ -95,6 +164,70 @@ class EventMetadataNotifier extends AbstractModuleNotifier
             );
         }
         return array();
+    }
+
+
+    /**
+     * @param EventMetadata $eventMetadata
+     * @param User          $effector
+     * @param array         $diff
+     * @return Envelope
+     */
+    public function notifyUpcoming($eventMetadata, $effector, $diff = null)
+    {
+        $envelope = new Envelope();
+        $bob      = new Builder();
+
+        // retrieve the event that this metadata object is connected to
+        $eventCollection = EventMetadataMapper::getInstance()->findEventsForMetadata($eventMetadata);
+
+        // no event? no messages
+        if (!$eventCollection->count()) {
+            $this->log->error("No events attached to EOTC metadata");
+            return $envelope;
+        }
+
+        /** @var Event $relEvent */
+        $relEvent      = EventMapper::getInstance()->findById($eventCollection->first()->getId());
+        $relEventId    = $relEvent->getId();
+        $relEventStart = $relEvent->getStartDateTime();
+        $currentStatus = $eventMetadata->getStatus();
+
+        $userIds = $this->getInterestedUsers($relEvent, $currentStatus);
+
+        if (count($userIds) == 0) {
+            // no audience? no messages
+            $this->log->error("No audience for EOTC $relEventId");
+            return $envelope;
+        }
+
+        // compensate for timing issues by pushing "now" back a few minutes.
+        $days = $relEventStart->diffInDays((new \Alaress_Date_Format(time(), 'u'))->addMinutes(-10));
+
+        if ($days == 0) {
+            // wut.
+            $days = 1;
+        }
+
+        $href = "/modules/eotc/status/modify/$relEventId";
+
+        $bob->setTitle(sprintf("Warning: :event starts %s, but has not been given final approval", $days == 1 ? 'tomorrow' : "in $days days"))
+            ->setHref($href)
+            ->setParams(array(
+                'event' => new Param($relEvent->getTitle(), $href)
+            ))
+            ->setSeverity(Logger::WARNING)
+            ->setNamespace($this->getSlug())
+            ->addTopic("eotc.$relEventId.".self::TRIGGER_UPCOMING)
+            ->setIcon("/images/icon.php?icon=alert&size=32");
+
+        $msg = $bob->build();
+
+        foreach ($userIds as $userId) {
+            $envelope->targetToUser($userId, $msg);
+        }
+
+        return $envelope;
     }
 
 
@@ -128,9 +261,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
         $permissionCollection = EventPermissionMapper::getInstance()->findByColumnList(
             array(
                 'campus_id' => $relEvent->getCampusCollection()->getColumnValues('id'),
-                'status_id' => $eventMetadata->getStatus() instanceof EventStatus ?
-                    $eventMetadata->getStatus()->getId() :
-                    $eventMetadata->getStatus()
+                'status_id' => $eventMetadata->getStatus()->getId()
             )
         );
 
@@ -199,10 +330,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
 
         // get list of moderators relevant to the current status
         $currentStatus = $eventMetadata->getStatus();
-        $moderatorIds  = $this->getInterestedUsers(
-            $relEvent,
-            $currentStatus instanceof EventStatus ? $currentStatus->getId() : (int)$currentStatus
-        );
+        $moderatorIds  = $this->getInterestedUsers($relEvent, $currentStatus);
 
         // prep msg data
         $bob->setIcon("/portrait.php?size={$this->iconSize}&userId=$effectorExtId");
@@ -361,7 +489,7 @@ class EventMetadataNotifier extends AbstractModuleNotifier
                         $bob->setHref($hrefMod)
                             ->setParam('event', new Param($relEventNote, $hrefMod));
 
-                        $ramsModIds = $this->getInterestedUsers($relEvent, EventStatusMapper::STATUS_DETAILSCOMPLETED);
+                        $ramsModIds = $this->getInterestedUsers($relEvent, EventStatusMapper::getInstance()->findById(EventStatusMapper::STATUS_DETAILSCOMPLETED));
 
                         foreach ($ramsModIds as $userId) {
                             $envelope->targetToUser($userId, $bob->build());
@@ -409,13 +537,18 @@ class EventMetadataNotifier extends AbstractModuleNotifier
      * assumed that these users will be subscribed to Approved and Cancelled
      * events.
      *
-     * @param Event     $event        the event in question
-     * @param int|array $targetStatus can be an array of statuses
+     * @param Event           $event        the event in question
+     * @param EventStatus|int $targetStatus can be an array of statuses
      *
      * @return array
      */
-    protected function getInterestedUsers($event, $targetStatus)
+    protected function getInterestedUsers(Event $event, $targetStatus)
     {
+        if ($targetStatus instanceof EventStatus) {
+            // normalise to int
+            $targetStatus = $targetStatus->getId();
+        }
+
         $campusIds = array();
         // coerce "campuses" out of their "collection"
         // because PHP lacks any form of reassurance that what something is meant to contain actually DOES contain it

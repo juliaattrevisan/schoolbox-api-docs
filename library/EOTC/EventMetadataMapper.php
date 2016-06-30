@@ -89,8 +89,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":eventId", $event->getId());
-		$statement->execute();
+		$statement->execute(["eventId" => $event->getId()]);
 
 		$allMetadataIds = array();
 
@@ -128,9 +127,10 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":eventId", $event->getId());
-		$statement->bindParam(":metadataId", $event->getMetadata()->getId());
-		$statement->execute();
+		$statement->execute([
+			"eventId"    => $event->getId(),
+			"metadataId" => $event->getMetadata()->getId()
+		]);
 	}
 
 	/**
@@ -199,8 +199,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":metadataId", $metadata->getId());
-		$statement->execute();
+		$statement->execute([ 'metadataId' => $metadata->getId() ]);
 	}
 
 	/**
@@ -216,9 +215,10 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 
 		foreach ($metadata->getStaffAttendees() as $currentStaff) {
 			$statement = $this->database->prepare($query);
-			$statement->bindParam(":metadataId", $metadata->getId());
-			$statement->bindParam(":userId", $currentStaff->getId());
-			$statement->execute();
+			$statement->execute([
+				"metadataId" => $metadata->getId(),
+				"userId"     => $currentStaff->getId()
+			]);
 		}
 	}
 
@@ -245,7 +245,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 				'relation' => array(
 					'column' => 'user_id',
 					'key' => 'id',
-					'mapper' => new UserMapper()
+					'mapper' => UserMapper::getInstance()
 				),
 			)
 		);
@@ -266,8 +266,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":metadataId", $metadata->getId());
-		$statement->execute();
+		$statement->execute([ 'metadataId' => $metadata->getId() ]);
 	}
 
 	/**
@@ -283,9 +282,10 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 
 		foreach ($metadata->getStudentAttendees() as $currentStudent) {
 			$statement = $this->database->prepare($query);
-			$statement->bindParam(":metadataId", $metadata->getId());
-			$statement->bindParam(":userId", $currentStudent->getId());
-			$statement->execute();
+			$statement->execute([
+				'metadataId' => $metadata->getId(),
+				"userId"     => $currentStudent->getId()
+			]);
 		}
 	}
 
@@ -305,9 +305,10 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 			foreach($ids as $currentId) {
 				if (preg_match('/[0-9]+/', $currentId)) {
 					$statement = $this->database->prepare($query);
-					$statement->bindParam(":metadataId", $metadata->getId());
-					$statement->bindParam(":userId", $currentId);
-					$statement->execute();
+					$statement->execute([
+						"metadataId" => $metadata->getId(),
+						"userId"     => $currentId
+					]);
 				}
 			}
 		}
@@ -336,7 +337,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 				'relation' => array(
 					'column' => 'user_id',
 					'key' => 'id',
-					'mapper' => new UserMapper(),
+					'mapper' => UserMapper::getInstance(),
 					'options' => array(
 						'order' => array(
 							'lastname' => 'ASC'
@@ -362,8 +363,9 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":metadataId", $metadata->getId());
-		$statement->execute();
+		$statement->execute([
+			"metadataId" => $metadata->getId()
+		]);
 	}
 
 	/**
@@ -391,8 +393,9 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 			";
 
 			$statement = $this->database->prepare($query);
-			$statement->bindParam(":metadataId", $metadata->getId());
-			$statement->execute();
+			$statement->execute([
+				"metadataId" => $metadata->getId()
+			]);
 		}
 	}
 
@@ -409,9 +412,10 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 
 		foreach ($metadata->getResourceBookings() as $currentResourceBooking) {
 			$statement = $this->database->prepare($query);
-			$statement->bindParam(":metadataId", $metadata->getId());
-			$statement->bindParam(":bookingId", $currentResourceBooking->getId());
-			$statement->execute();
+			$statement->execute([
+				"metadataId" => $metadata->getId(),
+				"bookingId"  => $currentResourceBooking->getId()
+			]);
 		}
 	}
 
@@ -438,7 +442,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 				'relation' => array(
 					'column' => 'booking_id',
 					'key' => 'id',
-					'mapper' => new \Schoolbox\ResourceBooking\Booking\Mapper()
+					'mapper' => \Schoolbox\ResourceBooking\Booking\Mapper::getInstance()
 				),
 			)
 		);
@@ -459,8 +463,9 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":metadataId", $metadata->getId());
-		$statement->execute();
+		$statement->execute([
+			"metadataId" => $metadata->getId()
+		]);
 	}
 
 	/**
@@ -487,7 +492,7 @@ class EventMetadataMapper extends \Schoolbox\Mapper {
 				'relation' => array(
 					'column' => 'event_id',
 					'key' => 'id',
-					'mapper' => new \EOTC\EventMapper(),
+					'mapper' => \EOTC\EventMapper::getInstance(),
 				),
 			)
 		);

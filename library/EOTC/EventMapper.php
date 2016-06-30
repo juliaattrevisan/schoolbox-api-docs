@@ -85,8 +85,9 @@ class EventMapper extends Calendar\EventMapper {
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":eventId", $identifier);
-		$statement->execute();
+		$statement->execute([
+			'eventId' => $identifier
+		]);
 
 		;
 
@@ -120,7 +121,7 @@ class EventMapper extends Calendar\EventMapper {
 			/* Determine current status
 			 */
 			if ($eventItem->getMetadata()) {
-				$metadataMapper = new EventMetadataMapper();
+				$metadataMapper = EventMetadataMapper::getInstance();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 
 				/* Accumulate staff attendees for this event
@@ -145,7 +146,7 @@ class EventMapper extends Calendar\EventMapper {
 
 				/* Activity logs
 				 */
-				$activityLogMapper = new ActivityLog\Mapper();
+				$activityLogMapper = ActivityLog\Mapper::getInstance();
 
 				$allActivityLogs = $activityLogMapper->findByColumn('metadata_id', $eventItem->getMetadata()->getId(), array(
 					'order' => array(
@@ -240,7 +241,7 @@ class EventMapper extends Calendar\EventMapper {
 			/* Determine current status
 			 */
 			if ($eventItem->getMetadata()) {
-				$metadataMapper = new EventMetadataMapper();
+				$metadataMapper = EventMetadataMapper::getInstance();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 
 				/* Ignore this event, because it's not one of the Status
@@ -317,8 +318,9 @@ class EventMapper extends Calendar\EventMapper {
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":userId", $user->getId());
-		$statement->execute();
+		$statement->execute([
+			'userId' => $user->getId()
+		]);
 
 		$allEvents = new Collection();
 		$processedSeriesIds = array();
@@ -345,7 +347,7 @@ class EventMapper extends Calendar\EventMapper {
 			/* Determine current status
 			 */
 			if ($eventItem->getMetadata()) {
-				$metadataMapper = new EventMetadataMapper();
+				$metadataMapper = EventMetadataMapper::getInstance();
 				$metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
 
 				/* Accumulate student attendees for this event
@@ -379,7 +381,7 @@ class EventMapper extends Calendar\EventMapper {
 	 * @param Event $event
 	 */
 	protected function postSave($event) {
-		$metadataMapper = new EventMetadataMapper();
+		$metadataMapper = EventMetadataMapper::getInstance();
 		$metadataMapper->save($event->getMetadata());
 		$metadataMapper->saveRelation($event);
 
@@ -422,7 +424,7 @@ class EventMapper extends Calendar\EventMapper {
 				'relation' => array(
 					'column' => 'metadata_id',
 					'key' => 'id',
-					'mapper' => new EventMetadataMapper()
+					'mapper' => EventMetadataMapper::getInstance()
 				),
 			)
 		);
@@ -443,8 +445,9 @@ class EventMapper extends Calendar\EventMapper {
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":eventId", $event->getId());
-		$statement->execute();
+		$statement->execute([
+			'eventId' => $event->getId()
+		]);
 	}
 
 	/**
@@ -458,11 +461,17 @@ class EventMapper extends Calendar\EventMapper {
 			VALUES (:eventId, :campusId)
 		";
 
+		$statement = $this->database->prepare($query);
+
 		foreach ($event->getCampusCollection() as $currentCampus) {
-			$statement = $this->database->prepare($query);
-			$statement->bindParam(":eventId", $event->getId());
-			$statement->bindParam(":campusId", $currentCampus);
-			$statement->execute();
+			$currentCampus = ($currentCampus instanceof \Schoolbox\Campus)
+				? $currentCampus->getId()
+				: $currentCampus;
+
+			$statement->execute([
+				"eventId"  => $event->getId(),
+				"campusId" => $currentCampus
+			]);
 		}
 	}
 
@@ -489,7 +498,7 @@ class EventMapper extends Calendar\EventMapper {
 				'relation' => array(
 					'column' => 'campus_id',
 					'key' => 'id',
-					'mapper' => new CampusMapper()
+					'mapper' => CampusMapper::getInstance()
 				),
 			)
 		);
@@ -510,7 +519,8 @@ class EventMapper extends Calendar\EventMapper {
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":eventId", $event->getId());
-		$statement->execute();
+		$statement->execute([
+			'eventId' => $event->getId()
+		]);
 	}
 }

@@ -96,8 +96,7 @@ class EventPermissionMapper extends \Schoolbox\Mapper {
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":userId", $user->getId());
-		$statement->execute();
+		$statement->execute([ 'userId' => $user->getId() ]);
 	}
 
 	/**
@@ -148,8 +147,7 @@ class EventPermissionMapper extends \Schoolbox\Mapper {
 		";
 
 		$statement = $this->database->prepare($query);
-		$statement->bindParam(":userId", $user->getId());
-		$statement->execute();
+		$statement->execute([ "userId" => $user->getId() ]);
 		return $this->hydrateWithCampusAndStatus($statement);
 	}
 
@@ -174,8 +172,7 @@ class EventPermissionMapper extends \Schoolbox\Mapper {
 		";
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(":userId", $user->getId());
-        $statement->execute();
+        $statement->execute([ "userId" => $user->getId() ]);
         return $this->hydrateWithCampusAndStatus($statement);
     }
 

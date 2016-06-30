@@ -254,7 +254,7 @@ class Logger implements LoggerInterface {
             // no handler spec'd - don't try to do anything
             return;
         }
-
+        
         $this->log->setHandlers($this->handlers);
 
         try {

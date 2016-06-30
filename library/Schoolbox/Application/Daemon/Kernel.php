@@ -84,7 +84,8 @@ class Kernel extends \Alaress\Application\Kernel {
 	 * Go. Do stuff.
 	 *
 	 * @param callable $callable
-	 * @return void
+	 * @throws Exception
+	 * @throws \Schoolbox\External\Exception
 	 */
 	public function run($callable = null) {
         if(!is_null($this->getOpt('verbose'))) {
@@ -164,7 +165,7 @@ EOL;
             case E_STRICT:
             case E_DEPRECATED:
             case E_USER_DEPRECATED:
-                $this->logger()->warning("Warning: $errStr");
+                $this->logger()->warning("Warning: $errStr ($errFile:$errLine)");
                 return true;
 
 			default:

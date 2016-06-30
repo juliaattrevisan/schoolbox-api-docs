@@ -46,7 +46,7 @@ class TriggerBundle implements TriggerBundleInterface {
 
 	/**
 	 * @param string $label
-	 * @param int $timestamp
+	 * @param int|callable $timestamp
 	 */
 	public function attach($label, $timestamp) {
 		$this->attachEach(array($label => $timestamp));

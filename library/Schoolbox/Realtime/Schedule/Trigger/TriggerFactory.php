@@ -70,7 +70,7 @@ class TriggerFactory {
 		foreach($events as $label => $time) {
 
             if (is_callable($time)) {
-                continue; // FIREFIGHT
+                // continue; // FIREFIGHT
                 $t = new CallbackTrigger($label, $time, $this->event, $this->notifier);
             } else {
                 $t = new InstantTrigger($label, $time ?: $now, $this->event, $this->notifier);
