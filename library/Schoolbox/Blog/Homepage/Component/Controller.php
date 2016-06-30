@@ -54,10 +54,10 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         if(!$this->isSourceRenderable()) {
             if($this->hasContextWriteAccess()) {
-                if($this->getSource()->isDeleted()) {
-                    return $this->renderTwigAltSourceDeleted($templateHandle);
-                } else if(!$this->hasReadAccess()) {
+                if(!$this->hasReadAccess()) {
                     return $this->renderTwigAltSourceDenied($templateHandle);
+                } else if($this->getSource()->isDeleted()) {
+                    return $this->renderTwigAltSourceDeleted($templateHandle);
                 } else {
                     return $this->renderTwigEmptyState($templateHandle);
                 }

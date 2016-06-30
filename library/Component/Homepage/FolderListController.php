@@ -60,10 +60,10 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
         if(!$this->isSourceRenderable()) {
             if($this->hasContextWriteAccess()) {
-                if($this->getSource()->isDeleted()) {
-                    $this->renderAltSourceDeleted();
-                } else if(!$this->hasReadAccess()) {
+                if(!$this->hasReadAccess()) {
                     $this->renderAltSourceDenied();
+                } else if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
                 } else {
                     $this->renderEmptyState();
                 }

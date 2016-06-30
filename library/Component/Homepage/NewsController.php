@@ -47,6 +47,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
      */
     public function renderTemplate($templateHandle)
     {
+
         if (!parent::loadTemplate($templateHandle, 'news')) {
             return false;
         }
@@ -64,9 +65,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
          */
         $this->parseConfig();
 
-        /* Set up component name
-         */
-        $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
+
 
         $this->setVar(
             array(
@@ -81,10 +80,10 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
         if(!$this->isSourceRenderable()) {
             if($this->hasContextWriteAccess()) {
-                if($this->getSource()->isDeleted()) {
-                    $this->renderAltSourceDeleted();
-                } else if(!$this->hasReadAccess()) {
+                if(!$this->hasReadAccess()) {
                     $this->renderAltSourceDenied();
+                } else if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
                 } else {
                     $this->renderEmptyState();
                 }
@@ -93,6 +92,10 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
             }
         } else {
             $this->setVar('source_folder_deleted_block', '');
+
+            /* Set up component name
+            */
+            $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
             /* Prevent multiple news from other categories stacking up in the wrong place
              * and initialise empty news roll by default
@@ -110,6 +113,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                 case WRITE_ACCESS:
                     $this->parse("submit_news_block", "submit_news");
                 // no break, intentionally carry through
+
 
                 case READ_ACCESS:
                     $newsList = $this->newsHandler->getAllForCategory(

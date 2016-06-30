@@ -25,9 +25,8 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         $g = new Group();
         // Content permission: based on alt source if it's there
         // Control permission: always based on current context
-        $this->contentPermission = min($g->getPermission($this->source->getId()), $this->getMaximumPermission());
+        $this->contentPermission = min($g->getPermission($this->getSource()->getId()), $this->getMaximumPermission());
         $this->contextPermission = min($g->getPermission($this->getContext()->getId()), $this->getMaximumPermission());
-        $this->sitepage->setVar('ID', $this->getContext()->getId());
 
         $this->postConstruct();
     }

@@ -71,10 +71,10 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
 
         if(!$this->isSourceRenderable()) {
             if($this->hasContextWriteAccess()) {
-                if($this->getSource()->isDeleted()) {
-                    $this->renderAltSourceDeleted();
-                } else if(!$this->hasReadAccess()) {
+                if(!$this->hasReadAccess()) {
                     $this->renderAltSourceDenied();
+                } else if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
                 } else {
                     $this->renderEmptyState();
                 }

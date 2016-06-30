@@ -75,10 +75,10 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 
         if(!$this->isSourceRenderable()) {
             if($this->hasContextWriteAccess()) {
-                if($this->getSource()->isDeleted()) {
-                    $this->renderAltSourceDeleted();
-                } else if(!$this->hasReadAccess()) {
+                if(!$this->hasReadAccess()) {
                     $this->renderAltSourceDenied();
+                } else if($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
                 } else {
                     $this->renderEmptyState();
                 }

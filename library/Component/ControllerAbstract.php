@@ -696,7 +696,7 @@ abstract class Component_ControllerAbstract
      * @return string
      */
     protected function renderTwigAltSourceDenied($templateHandle){
-        $this->renderTwigEmptyState($templateHandle, 'You no longer have access to this component\'s data source.');
+        $this->renderTwigEmptyState($templateHandle, "You do not have permission to view this component's data source.");
     }
 
     /**
@@ -725,7 +725,7 @@ abstract class Component_ControllerAbstract
      * @return bool
      */
     protected function renderAltSourceDenied(){
-        return $this->renderEmptyState('You no longer have access to this component\'s data source.');
+        return $this->renderEmptyState("You do not have permission to view this component's data source.");
     }
 
     /**
