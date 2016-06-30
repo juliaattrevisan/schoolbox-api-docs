@@ -309,9 +309,9 @@ class Marksheet
                 function ($a, $b) {
                     /** @var User $a */
                     /** @var User $b */
-                    $cmp = strcmp($a->getLastname(), $b->getLastname());
+                    $cmp = strcasecmp($a->getLastname(), $b->getLastname());
                     if ($cmp === 0) {
-                        $cmp = strcmp($a->getFirstname(), $b->getFirstname());
+                        $cmp = strcasecmp($a->getFirstname(), $b->getFirstname());
                     }
                     return $cmp;
                 }
