@@ -143,3 +143,11 @@ CREATE TABLE `sportsfixtures_match_itineraryitem` (
 			ON UPDATE NO ACTION
 			ON DELETE NO ACTION
 ) ENGINE=InnoDB CHARACTER SET=utf8;
+
+/* Error table entries */
+INSERT INTO `error` VALUES
+    (173, 'The requested sport could not be found.'),
+    (174, 'The requested division could not be found.'),
+    (175, 'The requested team could not be found.'),
+    (176, 'The requested venue could not be found.'),
+    (177, 'The requested match could not be found.');
