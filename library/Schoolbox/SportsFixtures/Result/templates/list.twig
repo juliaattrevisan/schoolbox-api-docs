@@ -1,0 +1,56 @@
+<ul class="breadcrumb">
+    <li><a href="#">Sports Fixtures</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}">Matches in {{ division.name }}</a></li>
+    <li class="active"><a href="{{ routeLookup('sportsfixturesMatch.getEntity', {entityId: match.id}) }}">{{ match.name }}</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sports Fixtures</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 columns">
+                    <h2 class="subheader">Results for {{ match.name }}</h2>
+                </div>
+            </div>
+            <nav>
+                {% if not allResults|length %}
+                <a href='{{ routeLookup('sportsfixturesResult.getCreateForm', {contextId: match.id}) }}' class="icon-add" title="Add Results to {{ match.name }}"></a>
+                {% endif %}
+            </nav>
+        </div>
+
+        {% if allResults|length %}
+            <section>
+                <ul class="action-list">
+                    {% for currentResult in allResults %}
+                    <li class="actions-small-2">
+                        <div class="list-item">
+                            <div class="small-12 avatar card">
+                                {{ currentResult.description|raw }}
+                            </div>
+                        </div>
+                        <nav>
+                            <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: currentResult.id}) }}" class="icon-modify" title="Modify"></a>
+                        </nav>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-result"></i>
+                <p>There are no Results for {{ match.name }}.</p>
+                <p><a href="{{ routeLookup('sportsfixturesResult.getCreateForm', {contextId: match.id}) }}" title="Add Results to {{ match.name }}">Add Results to {{ match.name }}</a></p>
+            </div>
+        {% endif %}
+    </div>
+</div>

@@ -147,6 +147,22 @@ CREATE TABLE `sportsfixtures_match_itineraryitem` (
 			ON DELETE NO ACTION
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
+/* Match Result Table
+ */
+CREATE TABLE `sportsfixtures_result` (
+	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
+	`match_id` INT NOT NULL,
+	`description` TEXT NULL COMMENT '',
+	`created_at` DATETIME NULL COMMENT '',
+	`updated_at` DATETIME NULL COMMENT '',
+	`deleted_at` DATETIME NULL COMMENT '',
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`match_id`)
+		REFERENCES `sportsfixtures_match`(`id`)
+			ON UPDATE NO ACTION
+			ON DELETE NO ACTION
+) ENGINE=InnoDB CHARACTER SET=utf8;
+
 /* Error table entries */
 INSERT INTO `error` VALUES
     (173, 'The requested sport could not be found.'),
