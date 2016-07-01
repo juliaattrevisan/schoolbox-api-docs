@@ -98,6 +98,7 @@ abstract class Evaluation_Question_Category_List
     {
         $this->getPage()->setBlock(TEMPLATE_content, 'category_list_start', 'category_list_start_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'category_list_item_start', 'category_list_item_start_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'item_count', 'item_count_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'category_list_item', 'category_list_item_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'category_list_item_end', 'category_list_item_end_block');
 
@@ -150,6 +151,11 @@ abstract class Evaluation_Question_Category_List
                 } else {
                     $selected = '';
                 }
+
+                if ($currentCategory['parent_id'] == '#')
+                    $this->getPage()->setVar('item_count_block', '');
+                else
+                    $this->getPage()->parse('item_count_block', 'item_count');
 
                 $this->getPage()->setVar(array(
                     'CATEGORY_LIST_ITEM_NODE' => 'node_' . $currentCategory['question_category_id'],

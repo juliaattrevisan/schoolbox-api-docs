@@ -25,7 +25,7 @@
                         <!-- BEGIN category_list_item -->
                         <li id='{CATEGORY_LIST_ITEM_NODE}' class='{CATEGORY_LIST_ITEM_SELECTED}'>
                             <a href='#'>
-                                {CATEGORY_LIST_ITEM_NAME} ({CATEGORY_LIST_ITEM_NUMQUESTIONS})
+                                {CATEGORY_LIST_ITEM_NAME} <!-- BEGIN item_count -->({CATEGORY_LIST_ITEM_NUMQUESTIONS})<!-- END item_count -->
                             </a>
                             <!-- END category_list_item -->
 
@@ -53,11 +53,11 @@
         // reinit foundation to account for ajax'd content
         $(document).foundation();
 
+
         $("#category-tree")
             .on('select_node.jstree', function(event, jstree) {
-                $('#question-bank').find('input[type=submit]').prop('disabled', false);
-
                 cid.val(jstree.selected[0].replace(/^node_/, ''));
+                $('#question-bank').find('input[type=submit]').prop('disabled', cid.val() == 0);
             })
             .on('deselect_node.jstree', function() {
                 $('#question_category').val('');
@@ -72,8 +72,17 @@
                         "dots" : true,
                         "icons" : false
                     }
-                }
+                },
             });
+
+        // Open root node by default
+
+        $("#category-tree").jstree('open_node', '#node_0', function(e, data) {
+
+            // After the tree opens select the root node by default
+
+            $('#category-tree').jstree('select_node', '#node_0');
+        });
 
         form.on('submit', function (e) {
             e.preventDefault();
