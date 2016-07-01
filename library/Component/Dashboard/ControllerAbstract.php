@@ -20,9 +20,14 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
     {
         parent::setup(null, $config);
 
-        // if you're able to see the component, you're in admin mode so full access is granted
-        $this->contentPermission = FULL_ACCESS;
         $this->contextPermission = FULL_ACCESS;
+
+        if($this->isUsingAltSource()){
+            $g = new Group;
+            $this->contentPermission = min($g->getPermission($this->getSource()->getId()), $this->getMaximumPermission());
+        } else {
+            $this->contentPermission = FULL_ACCESS;
+        }
     }
 
     /**
