@@ -250,6 +250,12 @@
                                 </article>
                             </li>
                         </ul>
+                        {% else %}
+                        <div class="empty-state">
+                            <i class="icon-result"></i>
+                            <p>There are no Results for this Match.</p>
+                            <p><a href="{{ routeLookup('sportsfixturesResult.getCreateForm', {contextId: match.id}) }}" title="Add Results">Add Results.</a></p>
+                        </div>
                         {% endif %}
                     </div>
                 </fieldset>
