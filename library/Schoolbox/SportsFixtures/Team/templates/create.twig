@@ -70,6 +70,26 @@
                 </fieldset>
             </section>
 
+            {% if team.coaches is not empty %}
+                <section>
+                    <ul class="information-list">
+                        {% for coach in team.coaches %}
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="small-12 avatar card">
+                                        <a href="/search/user/{{ coach.id }}">
+                                            <img src="/portrait.php?userId={{ coach.externalId }}&amp;size=square64" />
+                                            <h3>{{ coach.formatName() }}</h3>
+                                        </a>
+                                        <p class="meta">{{ coach.formatMetadata() }}</p>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endif %}
+
             <input type="submit" value="{{ action }} Team" />
         </form>
     </div>
