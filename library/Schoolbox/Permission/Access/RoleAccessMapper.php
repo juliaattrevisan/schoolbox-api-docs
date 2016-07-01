@@ -200,7 +200,7 @@ class RoleAccessMapper extends Mapper
 
         if ($serviceIdentifier != 0 && $service == UserAccess::SERVICE_HOMEPAGE)
         {
-            $folder = FolderMapper::getInstance()->findCheaplyById($serviceIdentifier);
+            $folder = FolderMapper::getInstance()->findCheaplyById($serviceIdentifier, ['deleted' => true]);
 
             if ($folder->getInherit())
             {

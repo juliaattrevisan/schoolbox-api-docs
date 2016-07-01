@@ -1099,10 +1099,11 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * This was used to cheaply manufacture breadcrumb trails
      *
      * @param $folderId
+     * @param array $options
      * @return \Schoolbox\Resource\Folder\Model
      * @throws MapperException
      */
-    public function findCheaplyById($folderId) {
+    public function findCheaplyById($folderId, $options = array()) {
 
         // special case: 0 == root, but not in db
         if ($folderId == 0) {
@@ -1116,8 +1117,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             SELECT id, name, parent, inherit
             FROM `{$this->getTable()}` c
             WHERE id = :folderId
-            AND deleted_at IS NULL
         ";
+
+        if(empty($options['deleted']) || !$options['deleted']){
+            $query .= "
+                AND deleted_at IS NULL
+            ";
+        }
 
         $statement = $this->database->prepare($query);
         $statement->execute(array(
@@ -1212,7 +1218,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
             // Round we go again
 
-            $parent = $this->findCheaplyById($folder->getParent()->getId());
+            $parent = $this->findCheaplyById($folder->getParent()->getId(), ['deleted' => true]);
             $result = $this->findNearestNonInheritingAncestralNode($parent, $iteration++);
         }
         else
