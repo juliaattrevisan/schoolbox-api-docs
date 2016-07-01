@@ -35,7 +35,6 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
         $orderByDate = true;
 
         $this->headlineList = $this->news->getNewsListing($archive, $topic, $year, $month, $index, $limit, $orderByDate);
-
         return !empty($this->headlineList);
     }
 
@@ -169,6 +168,8 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
 
         // output tabs
         if (is_array($topicList)) {
+
+            var_dump($topicList);
             foreach ($topicList as $i => $topic) {
                 $url = new Url($topic);
 

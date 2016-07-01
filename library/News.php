@@ -499,6 +499,10 @@ class News extends DeprecatedModel
      */
     public function timecmp($a, $b)
     {
+        if ($a['sequence'] != $b['sequence']) {
+            return $a['sequence'] > $b['sequence'] ? 1 : -1;
+        }
+
         // Most recent published first
         if ($result = strcmp($a['item_datetime_published'], $b['item_datetime_published'])) {
             return $result * -1;
