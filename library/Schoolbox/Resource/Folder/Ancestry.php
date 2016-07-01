@@ -11,6 +11,7 @@
 namespace Schoolbox\Resource\Folder;
 
 use OverflowException;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -173,7 +174,13 @@ class Ancestry
 
             $ancestry[$parent_id] = true;
 
-            array_unshift($stack, $this->findCachedNode($parent_id, $cheaply));
+            try {
+                array_unshift($stack, $this->findCachedNode($parent_id, $cheaply));
+            } catch (MapperException $e) {
+                // Some folder was deleted somewhere in the hierarchy.
+                // The only thing I can do is:
+                break;
+            }
         }
 
         // Remove the current category from the parent list first.
