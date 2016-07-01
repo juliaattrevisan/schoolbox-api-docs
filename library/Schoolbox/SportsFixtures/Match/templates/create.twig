@@ -229,36 +229,6 @@
                         {% endif %}
                     </div>
                 </fieldset>
-
-                <fieldset class="content">
-                    <legend>Results</legend>
-
-                    <div class="small-12 columns">
-                        {% if match.result.id %}
-                        <ul class="action-list">
-                            <li class="actions-small-2">
-                                <div class="list-item">
-                                    <div class="small-12 card compact">
-                                        <span class="meta">Last Updated: {{ match.result.updatedAt.local }}</span>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: match.result.id}) }}" class="icon-modify" title="Modify"></a>
-                                </nav>
-                                <article>
-                                    {{ match.result.description|raw }}
-                                </article>
-                            </li>
-                        </ul>
-                        {% else %}
-                        <div class="empty-state">
-                            <i class="icon-result"></i>
-                            <p>There are no Results for this Match.</p>
-                            <p><a href="{{ routeLookup('sportsfixturesResult.getCreateForm', {contextId: match.id}) }}" title="Add Results">Add Results.</a></p>
-                        </div>
-                        {% endif %}
-                    </div>
-                </fieldset>
                 {% endif %}
             </section>
 

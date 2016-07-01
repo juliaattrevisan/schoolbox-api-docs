@@ -43,10 +43,19 @@
                     </dd>
                     {% endif %}
 
+                    {% if match.result.id %}
                     <dt>Result</dt>
                     <dd>
                         {{ match.result.description|raw }}
                     </dd>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="icon-result"></i>
+                        <p>There are no Results for this Match.</p>
+                        <p><a href="{{ routeLookup('sportsfixturesResult.getCreateForm', {contextId: match.id}) }}" title="Add Results">Add Results.</a></p>
+                    </div>
+                    {% endif %}
+
                     <dt>Created</dt>
                     <dd>{{ match.createdAt.database }}</dd>
 
