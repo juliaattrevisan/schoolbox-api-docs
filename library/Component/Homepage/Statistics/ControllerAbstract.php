@@ -86,6 +86,14 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
     }
 
     /**
+     * Convenience method for PHPLib-based Components to render the 'AltSourceDenied' empty state
+     * @return bool
+     */
+    protected function renderAltSourceDenied(){
+        throw new DomainException('HomepageStatistic components do not currently allow alternative data sources');
+    }
+
+    /**
      * For now, HomepageStatistic Components are unable to use Alt Data Sources
      *
      * @throws DomainException
