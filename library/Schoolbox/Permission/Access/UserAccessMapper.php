@@ -442,6 +442,10 @@ class UserAccessMapper extends Mapper
      */
     public function involvedInSubject(User $user, $code)
     {
+        // Take into account class codes with commas
+
+        $codes = explode(",", $code);
+
         if ($user->getExternalId()) {
             $externalUser = new \External_User;
             $externalSubjectList = $externalUser->getSubjectList($user->getExternalId(), $user->getId());
@@ -449,17 +453,21 @@ class UserAccessMapper extends Mapper
             if (is_array($externalSubjectList)) {
                 foreach ($externalSubjectList as $currentSubject) {
 
-                    // Check if there is a campus mangled in the class code
+                    foreach ($codes as $code) {
 
-                    if (strpos($code, '/') !== false) {
-                        $codeArray = explode('/', $code);
-                        if (strtolower($currentSubject["code"]) == strtolower($codeArray[1]) &&
-                            strtolower($currentSubject["campusCode"]) == strtolower($codeArray[0])) {
-                            return true;
-                        }
-                    } else {
-                        if (strtolower($currentSubject["code"]) == strtolower($code)) {
-                            return true;
+                        // Check if there is a campus mangled in the class code
+
+                        if (strpos($code, '/') !== false) {
+                            $codeArray = explode('/', $code);
+                            if (strtolower($currentSubject["code"]) == strtolower($codeArray[1]) &&
+                                strtolower($currentSubject["campusCode"]) == strtolower($codeArray[0])
+                            ) {
+                                return true;
+                            }
+                        } else {
+                            if (strtolower($currentSubject["code"]) == strtolower($code)) {
+                                return true;
+                            }
                         }
                     }
                 }
