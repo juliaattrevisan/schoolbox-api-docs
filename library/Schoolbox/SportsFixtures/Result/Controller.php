@@ -135,33 +135,41 @@ class Controller extends AbstractController
      */
     protected function getForm($entity, $context = null)
     {
-//        if (empty($context)) {
-//            try {
-//                $context = $this->getMatchMapper()->findById($entity->getMatch()->getId());
-//            } catch (MapperException $e) {
-//                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
-//            }
-//        }
-//
-//        try {
-//            $division = $this->getDivisionMapper()->findById($context->getDivision()->getId());
-//        } catch (MapperException $e) {
-//            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
-//        }
-//
-//        try {
-//            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
-//        } catch (MapperException $e) {
-//            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
-//        }
-//
-//        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/create.twig', [
-//            'sport'    => $sport,
-//            'division' => $division,
-//            'match'    => $context,
-//            'result'   => $entity,
-//            'action'   => $entity->getId() ? 'Modify' : 'Create'
-//        ]));
+        if (empty($context)) {
+            try {
+                $context = $this->getMatchMapper()->findById($entity->getMatch()->getId());
+            } catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
+            }
+        }
+
+        try {
+            $division = $this->getDivisionMapper()->findById($context->getDivision()->getId());
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
+        }
+
+        try {
+            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
+        }
+
+        /* If results already exist, modify it instead
+         */
+        try {
+            $entity = $this->getMapper()->findOneByColumn('match_id', $context->getId());
+        }
+        catch (MapperException $e) {
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/create.twig', [
+            'sport'    => $sport,
+            'division' => $division,
+            'match'    => $context,
+            'result'   => $entity,
+            'action'   => $entity->getId() ? 'Modify' : 'Create'
+        ]));
     }
 
     /**
@@ -171,19 +179,19 @@ class Controller extends AbstractController
      */
     protected function persistEntity($entity)
     {
-//        try {
-//            /** @var Match $match */
-//            $matchId = $this->getRequest()->post['matchId'];
-//            $match   = $this->getMatchMapper()->findById($matchId);
-//        } catch (MapperException $e) {
-//            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
-//        }
-//
-//        $this->saveResult($match, $this->getRequest()->post['description'], $entity);
-//
-//        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesResult.getList', [
-//            'contextId' => $matchId
-//        ]));
+        try {
+            /** @var Match $match */
+            $matchId = $this->getRequest()->post['matchId'];
+            $match   = $this->getMatchMapper()->findById($matchId);
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
+        }
+
+        $this->saveResult($match, $this->getRequest()->post['description'], $entity);
+
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesResult.getList', [
+            'contextId' => $matchId
+        ]));
     }
 
     /**
@@ -196,11 +204,11 @@ class Controller extends AbstractController
      */
     private function saveResult(Match $match, $description, Result $result)
     {
-//        $result->setMatch($match);
-//        $result->setDescription($description);
-//        $result->setUpdatedAt(Alaress_Date_Format::now());
-//
-//        $this->getMapper()->save($result);
+        $result->setMatch($match);
+        $result->setDescription($description);
+        $result->setUpdatedAt(Alaress_Date_Format::now());
+
+        $this->getMapper()->save($result);
     }
 
     /* Getters/Setters
