@@ -34,7 +34,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
      */
     public function execute()
     {
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
+        if(!parent::execute()){
             return false;
         }
         $this->groupHandler = new Group();

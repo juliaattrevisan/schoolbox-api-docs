@@ -25,7 +25,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
      */
     public function execute()
     {
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
+        if(!parent::execute()){
             return false;
         }
         $this->groupHandler = new Group();

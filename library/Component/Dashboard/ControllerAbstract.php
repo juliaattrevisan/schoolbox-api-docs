@@ -23,8 +23,6 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
         // if you're able to see the component, you're in admin mode so full access is granted
         $this->contentPermission = FULL_ACCESS;
         $this->contextPermission = FULL_ACCESS;
-
-        $this->postConstruct();
     }
 
     /**
@@ -34,8 +32,8 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
      */
     public function execute()
     {
-        // Hide Dashboard components if the folder they pull data is soft-deleted
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
+        // Hide Dashboard components if the folder they pull data is soft-deleted or user lacks perm.
+        if(!$this->isSourceRenderable()){
             return false;
         }
         return true;

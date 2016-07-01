@@ -45,7 +45,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
      */
     public function execute()
     {
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
+        if(!parent::execute()){
             return false;
         }
 

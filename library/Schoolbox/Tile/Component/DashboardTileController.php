@@ -61,7 +61,7 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
      */
     public function execute()
     {
-        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
+        if(!parent::execute()){
             return false;
         }
         $this->setLayout($this->delegate->fetchLayout($this));
