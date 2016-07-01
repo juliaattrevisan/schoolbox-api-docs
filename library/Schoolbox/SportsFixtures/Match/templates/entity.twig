@@ -36,6 +36,13 @@
                     <dt>Starts</dt>
                     <dd>{{ match.startAt.database }}</dd>
 
+                    {% if match.homeTeam.id and match.awayTeam.id %}
+                    <dt>Teams</dt>
+                    <dd>
+                        {{ match.homeTeam.name }} vs {{ match.awayTeam.name }}
+                    </dd>
+                    {% endif %}
+
                     <dt>Result</dt>
                     <dd>
                         {{ match.result.description|raw }}

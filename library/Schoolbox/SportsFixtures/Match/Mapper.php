@@ -109,8 +109,6 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('venue', null, 'v')}
             LEFT JOIN {$this->getJoinSql('result', null, 'r')}
         ";
-
-
     }
 
     /**
