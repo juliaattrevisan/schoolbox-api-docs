@@ -1,136 +1,129 @@
-<div id="component{{ componentInstanceId }}" class="component-container {{ componentClass }}" data-component>
-    <script type="text/javascript" src="/javascript/shared/jquery.blog-commentary.js"></script>
-    <script type="text/javascript">
-        $(function() {
+<script type="text/javascript" src="/javascript/shared/jquery.blog-commentary.js"></script>
+<script type="text/javascript">
+    $(function() {
 
-            var comp = $('#component{{ componentInstanceId }}');
+        var comp = $('#component{{ componentInstanceId }}');
 
-            $('[data-interaction="deletecomment"]').click(function(event) {
+        $('[data-interaction="deletecomment"]').click(function(event) {
 
-                event.preventDefault();
-                var commentId = $(event.target).attr('data-comment-id');
-                var blogId = $(event.target).attr('data-blog-id');
-                var commentCount = $('#commentCount-' + blogId).attr('data-numcomments');
+            event.preventDefault();
+            var commentId = $(event.target).attr('data-comment-id');
+            var blogId = $(event.target).attr('data-blog-id');
+            var commentCount = $('#commentCount-' + blogId).attr('data-numcomments');
 
-                $(this).confirmDialog({
-                    text: 'Are you sure you want to delete this comment?',
-                    confirmEvent: function() {
-                        $.post('/blog/comment/delete/'+String(commentId))
-                        .done(function() {
-                            // Remove from list after AJAX returns
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this comment?',
+                confirmEvent: function() {
+                    $.post('/blog/comment/delete/'+String(commentId))
+                    .done(function() {
+                        // Remove from list after AJAX returns
 
-                            $(event.target).closest('li').remove();
+                        $(event.target).closest('li').remove();
 
-                            // Update comment count
+                        // Update comment count
 
-                            commentCount--;
+                        commentCount--;
 
-                            // Remove button if there are no comments left, otherwise update the displayed count
+                        // Remove button if there are no comments left, otherwise update the displayed count
 
-                            if (commentCount <= 0)
-                                $('#commentCount-' + blogId).remove();
-                            else {
-                                $('#commentCount-' + blogId).html('Show Comments (' + commentCount + ')');
-                                $('#commentCount-' + blogId).attr('data-numcomments', commentCount);
-                            }
-                        });
-                    }
-                });
+                        if (commentCount <= 0)
+                            $('#commentCount-' + blogId).remove();
+                        else {
+                            $('#commentCount-' + blogId).html('Show Comments (' + commentCount + ')');
+                            $('#commentCount-' + blogId).attr('data-numcomments', commentCount);
+                        }
+                    });
+                }
             });
-
-            comp.blogCommentary();
         });
-    </script>
 
-    <div data-collapsable='true' class="row {CONFIG_COLLAPSED_CLASS}" data-collapse-state="{CONFIG_COLLAPSED_STATE}">
-        <div class="island small-12">
-            <section>
-                <ul class="information-list">
+        comp.blogCommentary();
+    });
+</script>
 
-                    {% for blog in blogs %}
+<ul class="information-list">
 
-                        <li class="actions-small-1" id="blog_{{ blog.getId }}" data-blog>
+    {% for blog in blogs %}
 
-                            <div class="list-item">
-                                <div class="card small-12">
-                                    {% include '@blog/sub/blogAvatarCard.twig' with {blog: blog} %}
-                                </div>
-                            </div>
+        <li class="actions-small-1" id="blog_{{ blog.getId }}" data-blog>
 
-                            {% if isRouteAuthorized('blog.getModify', { blog: blog, folder: folder }) %}
-                                <nav>
-                                    <a class="icon-modify" href="{{ routeLookup('blog.getModify', { id: blog.getId }) }}" title="Modify Blog post"></a>
-                                </nav>
-                            {% endif %}
-
-                            <article>
-                                {{ blog.getBody | purify }}
-                                {% if blogImages[blog.getId] | length > 0 %}
-                                    {% include '@blog/sub/imageGallery.twig' with {images: blogImages[blog.getId()]} %}
-                                {% endif %}
-                                {% if blogComments[blog.getId] | length > 0 %}
-                                    <a id="commentCount-{{ blog.getId }}" data-interaction="showcomments" class="button icon-chat" data-numcomments="{{ blogComments[blog.getId] | length }}">Show Comments ({{ blogComments[blog.getId] | length }})</a>
-                                {% endif %}
-
-                                {% if isRouteAuthorized('blog.postCommentInsert', { blog: blog }) %}
-                                <a data-toggle="commentform-{{ blog.getId }}" class='button icon-add' >Add Comment</a>
-                                {% endif %}
-                            </article>
-
-                            <ul class="information-list reply" id="blogComment_{{ blog.getId }}">
-
-                                {% for comment in blogComments[blog.getId] %}
-
-                                    <li class="actions-small-1" data-thread>
-                                        <div class="list-item">
-                                            <div class="card small-12">
-                                                {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
-                                                <p class="meta">Commented {{ comment.getCreatedAt.getRelativeTime }}</p>
-                                            </div>
-                                        </div>
-
-                                        {% if isRouteAuthorized('blog.postCommentDelete', { comment: comment, folder: folder }) %}
-                                            <nav>
-                                                <a data-interaction="deletecomment" class="icon-delete" data-blog-id="{{ blog.getId }}" data-comment-id="{{ comment.getId }}"></a>
-                                            </nav>
-                                        {% endif %}
-
-                                        <article>
-                                            <p>{{ comment.getBody | purify }}</p>
-                                        </article>
-                                    </li>
-
-                                {% endfor %}
-
-                                {% if isRouteAuthorized('blog.postCommentInsert', { blog: blog }) %}
-                                <li class="row hide" id="commentform-{{ blog.getId }}">
-                                    <div class="column small-12 no-pad">
-                                        <form action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}" method="post">
-                                            <input type="hidden" name="component" value="1">
-                                            <div class="card small-12">
-                                                <img src="/portrait.php?userId={{ session.user.getExternalId }}&size=square64" />
-                                                <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
-                                            </div>
-                                            <input type="submit" name="comment" value="Add Comment"/>
-                                        </form>
-                                    </div>
-                                </li>
-                                {% endif %}
-                            </ul>
-                        </li>
-
-                    {% endfor %}
-
-                </ul>
-                <div class="content">
-                    {% if isRouteAuthorized('blog.getArchiveCurrent', { folder: folder }) %}
-                    <a href="{{ routeLookup('blog.getArchiveCurrent', { folderId: folder.getId }) }}" class="button icon-archive">View Archive</a>
-                    {% endif %}
-                    {% if isRouteAuthorized('blog.getInsert', { folder: folder }) %}
-                    <a href="{{ routeLookup('blog.getInsert', { folderId: folder.getId }) }}" class="button icon-upload">Post Blog</a>
-                    {% endif %}
+            <div class="list-item">
+                <div class="card small-12">
+                    {% include '@blog/sub/blogAvatarCard.twig' with {blog: blog} %}
                 </div>
-            </section>
-        </div>
-    </div>
+            </div>
+
+            {% if isRouteAuthorized('blog.getModify', { blog: blog, folder: folder }) %}
+                <nav>
+                    <a class="icon-modify" href="{{ routeLookup('blog.getModify', { id: blog.getId }) }}" title="Modify Blog post"></a>
+                </nav>
+            {% endif %}
+
+            <article>
+                {{ blog.getBody | purify }}
+                {% if blogImages[blog.getId] | length > 0 %}
+                    {% include '@blog/sub/imageGallery.twig' with {images: blogImages[blog.getId()]} %}
+                {% endif %}
+                {% if blogComments[blog.getId] | length > 0 %}
+                    <a id="commentCount-{{ blog.getId }}" data-interaction="showcomments" class="button icon-chat" data-numcomments="{{ blogComments[blog.getId] | length }}">Show Comments ({{ blogComments[blog.getId] | length }})</a>
+                {% endif %}
+
+                {% if isRouteAuthorized('blog.postCommentInsert', { blog: blog }) %}
+                <a data-toggle="commentform-{{ blog.getId }}" class='button icon-add' >Add Comment</a>
+                {% endif %}
+            </article>
+
+            <ul class="information-list reply" id="blogComment_{{ blog.getId }}">
+
+                {% for comment in blogComments[blog.getId] %}
+
+                    <li class="actions-small-1" data-thread>
+                        <div class="list-item">
+                            <div class="card small-12">
+                                {% include '@blog/sub/userAvatarCard.twig' with {user: comment.getOwner()} %}
+                                <p class="meta">Commented {{ comment.getCreatedAt.getRelativeTime }}</p>
+                            </div>
+                        </div>
+
+                        {% if isRouteAuthorized('blog.postCommentDelete', { comment: comment, folder: folder }) %}
+                            <nav>
+                                <a data-interaction="deletecomment" class="icon-delete" data-blog-id="{{ blog.getId }}" data-comment-id="{{ comment.getId }}"></a>
+                            </nav>
+                        {% endif %}
+
+                        <article>
+                            <p>{{ comment.getBody | purify }}</p>
+                        </article>
+                    </li>
+
+                {% endfor %}
+
+                {% if isRouteAuthorized('blog.postCommentInsert', { blog: blog }) %}
+                <li class="row hide" id="commentform-{{ blog.getId }}">
+                    <div class="column small-12 no-pad">
+                        <form action="{{ routeLookup('blog.postCommentInsert', { id: blog.getId }) }}" method="post">
+                            <input type="hidden" name="component" value="1">
+                            <div class="card small-12">
+                                <img src="/portrait.php?userId={{ session.user.getExternalId }}&size=square64" />
+                                <textarea name="body" rows="2" cols="100" placeholder="Add your comment"></textarea>
+                            </div>
+                            <input type="submit" name="comment" value="Add Comment"/>
+                        </form>
+                    </div>
+                </li>
+                {% endif %}
+            </ul>
+        </li>
+
+    {% endfor %}
+
+</ul>
+<div class="content">
+    {% if isRouteAuthorized('blog.getArchiveCurrent', { folder: folder }) %}
+    <a href="{{ routeLookup('blog.getArchiveCurrent', { folderId: folder.getId }) }}" class="button icon-archive">View Archive</a>
+    {% endif %}
+    {% if isRouteAuthorized('blog.getInsert', { folder: folder }) %}
+    <a href="{{ routeLookup('blog.getInsert', { folderId: folder.getId }) }}" class="button icon-upload">Post Blog</a>
+    {% endif %}
 </div>
+
