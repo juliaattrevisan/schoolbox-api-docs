@@ -448,8 +448,19 @@ class UserAccessMapper extends Mapper
 
             if (is_array($externalSubjectList)) {
                 foreach ($externalSubjectList as $currentSubject) {
-                    if (strtolower($currentSubject["code"]) == strtolower($code)) {
-                        return true;
+
+                    // Check if there is a campus mangled in the class code
+
+                    if (strpos($code, '/') !== false) {
+                        $codeArray = explode('/', $code);
+                        if (strtolower($currentSubject["code"]) == strtolower($codeArray[1]) &&
+                            strtolower($currentSubject["campusCode"]) == strtolower($codeArray[0])) {
+                            return true;
+                        }
+                    } else {
+                        if (strtolower($currentSubject["code"]) == strtolower($code)) {
+                            return true;
+                        }
                     }
                 }
             }
