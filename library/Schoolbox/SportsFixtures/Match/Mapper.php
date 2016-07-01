@@ -24,6 +24,8 @@ use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Venue\Model as Venue;
 use Schoolbox\SportsFixtures\Venue\Mapper as VenueMapper;
 use Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
+use Schoolbox\SportsFixtures\Result\Model as Result;
+use Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
 use Schoolbox\Collection;
 
 /**
@@ -53,6 +55,8 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->joins('id', ResultMapper::getInstance(), 'match_id', null, self::COLUMN_JOIN_READONLY, 'result', 'result');
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteItineraryItems'));
     }
@@ -85,7 +89,8 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('home_team', 'h')},
                 {$this->getJoinColumnString('away_team', 'a')},
 				{$this->getJoinColumnString('division', 'd')},
-				{$this->getJoinColumnString('venue', 'v')}
+				{$this->getJoinColumnString('venue', 'v')},
+				{$this->getJoinColumnString('result', 'r')}
         ";
     }
 
@@ -102,7 +107,10 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('away_team', null, 'a')}
             LEFT JOIN {$this->getJoinSql('division', null, 'd')}
             LEFT JOIN {$this->getJoinSql('venue', null, 'v')}
+            LEFT JOIN {$this->getJoinSql('result', null, 'r')}
         ";
+
+
     }
 
     /**
@@ -132,10 +140,14 @@ class Mapper extends BaseMapper
             $homeTeam = $this->hydrateJoin($row, 'home_team', 'h');
             $awayTeam = $this->hydrateJoin($row, 'away_team', 'a');
 
+            /** @var Result $result */
+            $result = $this->hydrateJoin($row, 'result', 'r');
+
             $match->setVenue($venue);
             $match->setDivision($division);
             $match->setHomeTeam($homeTeam);
             $match->setAwayTeam($awayTeam);
+            $match->setResult($result);
 
             $collection->add($match);
         }
