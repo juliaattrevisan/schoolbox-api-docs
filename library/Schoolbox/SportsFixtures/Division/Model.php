@@ -11,10 +11,12 @@
 namespace Schoolbox\SportsFixtures\Division;
 
 use \Alaress_Date_Format;
+use Schoolbox\Collection;
 use \Schoolbox\ISoftDeletable;
 use \Schoolbox\User;
 use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use \Schoolbox\SportsFixtures\Sport\Model as Sport;
+use \Schoolbox\SportsFixtures\Team;
 
 class Model implements ISoftDeletable {
     use DeletedAtDate;
@@ -38,10 +40,75 @@ class Model implements ISoftDeletable {
     protected $updatedAt;
 
     /**
+     * The teams in this division.
+     *
+     * @var Collection|Team\Model[]
+     */
+    protected $teams;
+
+    /**
+     * The players in this division.
+     *
+     * @var Collection|User[]
+     */
+    protected $players;
+
+    /**
      * Model constructor.
      */
     public function __construct()
     {
+        $this->teams   = new Collection();
+        $this->players = new Collection();
+    }
+
+    /**
+     * Is this player in this division?
+     *
+     * @param User $player
+     * @return bool
+     */
+    public function isPlayerInDivision(User $player)
+    {
+        foreach ($this->getPlayers() as $divisionPlayer) {
+            if ($divisionPlayer->getId() == $player->getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Is this player in a team within this division?
+     *
+     * @param User $player
+     * @return bool
+     */
+    public function isPlayerInTeam(User $player)
+    {
+        foreach ($this->getTeams() as $team) {
+            if ($team->isPlayerInTeam($player)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * What teams within this division is this player in?
+     *
+     * @param User $player
+     * @return Collection|Team\Model[]
+     */
+    public function getTeamsForPlayer(User $player)
+    {
+        $teams = new Collection();
+        foreach ($this->getTeams() as $team) {
+            if ($team->isPlayerInTeam($player)) {
+                $teams->add($team);
+            }
+        }
+        return $teams;
     }
 
     /* Getters/Setters
@@ -141,5 +208,41 @@ class Model implements ISoftDeletable {
      */
     public function getUpdatedAt() {
         return $this->updatedAt;
+    }
+
+    /**
+     * @return Collection|Team\Model[]
+     */
+    public function getTeams()
+    {
+        return $this->teams;
+    }
+
+    /**
+     * @param Collection|Team\Model[] $teams
+     * @return static
+     */
+    public function setTeams($teams)
+    {
+        $this->teams = $teams;
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getPlayers()
+    {
+        return $this->players;
+    }
+
+    /**
+     * @param Collection|User[] $players
+     * @return static
+     */
+    public function setPlayers($players)
+    {
+        $this->players = $players;
+        return $this;
     }
 }

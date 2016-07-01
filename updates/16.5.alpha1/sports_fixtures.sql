@@ -71,6 +71,7 @@ CREATE TABLE `sportsfixtures_division_user` (
 	`user_id` INT NOT NULL,
 	`sequence` INT NOT NULL DEFAULT 0,
 	PRIMARY KEY (`id`),
+	UNIQUE INDEX `sportsfixtures_division_user__division_user` (`division_id` ASC, `user_id` ASC),
 	INDEX `fk_sportsfixtures_division_user__division_idx` (`division_id` ASC),
 	INDEX `sportsfixtures_division_user__user` (`user_id` ASC),
 	CONSTRAINT `fk_sportsfixtures_division_user__division`
@@ -151,3 +152,20 @@ INSERT INTO `error` VALUES
     (175, 'The requested team could not be found.'),
     (176, 'The requested venue could not be found.'),
     (177, 'The requested match could not be found.');
+
+/** Team players table **/
+CREATE TABLE `sportsfixtures_team_user` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`team_id` INT NOT NULL,
+	`user_id` INT NOT NULL,
+	`sequence` INT NOT NULL DEFAULT 0,
+	PRIMARY KEY (`id`),
+	UNIQUE INDEX `sportsfixtures_team_user__team_user` (`team_id` ASC, `user_id` ASC),
+	INDEX `fk_sportsfixtures_team_user__team_idx` (`team_id` ASC),
+	INDEX `sportsfixtures_team_user__user` (`user_id` ASC),
+	CONSTRAINT `fk_sportsfixtures_team_user__team`
+	FOREIGN KEY (`team_id`)
+	REFERENCES `sportsfixtures_team` (`id`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+) ENGINE=InnoDB CHARACTER SET=utf8;

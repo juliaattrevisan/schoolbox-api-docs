@@ -12,7 +12,6 @@ namespace Schoolbox\SportsFixtures\Team;
 
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\User;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Team\Model as Team;
 
@@ -67,8 +66,8 @@ class Mapper extends BaseMapper
      */
     public function deletePlayers(Team $team)
     {
-        /* TODO: Delete all Players in this Team when this Team is deleted
-         */
+        $teamUserMapper = User\Mapper::getInstance();
+        $teamUserMapper->delete($teamUserMapper->findByColumn('team_id', $team->getId()));
 
         /* TODO: Delete all Fixtures in this Team when this Team is deleted
          */

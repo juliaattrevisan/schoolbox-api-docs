@@ -11,6 +11,7 @@
 namespace Schoolbox\SportsFixtures\Team;
 
 use \Alaress_Date_Format;
+use Schoolbox\Collection;
 use \Schoolbox\ISoftDeletable;
 use \Schoolbox\User;
 use \Schoolbox\ValueLabelInterface;
@@ -39,10 +40,16 @@ class Model implements ISoftDeletable, ValueLabelInterface {
     protected $updatedAt;
 
     /**
+     * @var Collection|User[]
+     */
+    protected $players;
+
+    /**
      * Model constructor.
      */
     public function __construct()
     {
+        $this->players = new Collection();
     }
 
     /**
@@ -56,6 +63,22 @@ class Model implements ISoftDeletable, ValueLabelInterface {
             'value' => $this->getId(),
             'label' => $this->getName()
         ];
+    }
+
+    /**
+     * Is this player in this team?
+     *
+     * @param User $player
+     * @return bool
+     */
+    public function isPlayerInTeam(User $player)
+    {
+        foreach ($this->getPlayers() as $teamPlayer) {
+            if ($teamPlayer->getId() == $player->getId()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /* Getters/Setters
@@ -155,5 +178,23 @@ class Model implements ISoftDeletable, ValueLabelInterface {
      */
     public function getUpdatedAt() {
         return $this->updatedAt;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getPlayers()
+    {
+        return $this->players;
+    }
+
+    /**
+     * @param Collection|User[] $players
+     * @return static
+     */
+    public function setPlayers($players)
+    {
+        $this->players = $players;
+        return $this;
     }
 }

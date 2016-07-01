@@ -18,6 +18,8 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\SportsFixtures\Sport\Model as Sport;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
+use \Schoolbox\SportsFixtures\Team\User\Model as TeamUserModel;
+use \Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
 use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Division\User\Model as DivisionUserModel;
@@ -54,6 +56,11 @@ class Controller extends AbstractController
     protected $divisionUserMapper;
 
     /**
+     * @var TeamUserMapper
+     */
+    protected $teamUserMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -64,6 +71,7 @@ class Controller extends AbstractController
         $this->setTeamMapper(TeamMapper::getInstance());
         $this->setDivisionUserMapper(DivisionUserMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
+        $this->setTeamUserMapper(TeamUserMapper::getInstance());
     }
 
     /**
@@ -135,6 +143,7 @@ class Controller extends AbstractController
     public function getLobby($entityId)
     {
         try {
+            // Load division
             $division = $this->getDivisionMapper()->findById($entityId);
         }
         catch (MapperException $e) {
@@ -142,34 +151,77 @@ class Controller extends AbstractController
         }
 
         try {
-            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
+            $division->setSport($this->getSportMapper()->findById($division->getSport()->getId()));
         }
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
+        // Load players into division
+        // TODO add players into division model as a M2M join
+        /** @var DivisionUserModel[] $players */
+        $players = $this->getDivisionUserMapper()->findByColumn('division_id', $entityId, ['order' => ['sequence' => 'desc']]);
+        foreach ($players as $player) {
+            $division->getPlayers()->add($player->getUser());
+        }
+
+        // Load players into teams, and teams into division
+        // TODO add players into team model as a M2M join
         try {
             $teams = $this->getTeamMapper()->findByColumn('division_id', $entityId);
         }
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
+        $teamPlayers = $this->getTeamUserMapper()->findByColumn(
+            'team_id',
+            $teams->getColumnValues('id'),
+            ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]
+        );
+        foreach ($teamPlayers as $teamPlayer) {
+            $teamPlayerTeamId = $teamPlayer->getTeam()->getId();
+            foreach ($teams as $team) {
+                $teamId = $team->getId();
+                if ($teamPlayerTeamId == $teamId) {
+                    $team->getPlayers()->add($teamPlayer->getUser());
+                }
+            }
+        }
+        $division->setTeams($teams);
 
-        $players  = $this->getDivisionUserMapper()->findByColumn('division_id', $entityId, ['order' => ['sequence' => 'desc']]);
+        // Create file upload zone
         $zone     = new Zone("uploadZone");
         $zone->setMimeFilter('text/csv')->setAttachPrompt('upload a list of players');
 
+        // Create twig-friendly data model
+        $dataModel = [
+            'division'   => $division,
+            'players'    => [],
+            'teams'      => [],
+            'user'       => $this->getUser(),
+            'uploadZone' => $zone,
+        ];
+        foreach ($division->getPlayers() as $player) {
+            $playerDataModel = [
+                'player' => $player,
+                'teams'  => [],
+            ];
+            foreach ($division->getTeams() as $team) {
+                if ($team->isPlayerInTeam($player)) {
+                    $playerDataModel['teams'][] = $team;
+                }
+            }
+            $dataModel['players'][] = $playerDataModel;
+        }
+        foreach ($division->getTeams() as $team) {
+            $dataModel['teams'][] = [
+                'team'    => $team,
+                'players' => $team->getPlayers(),
+            ];
+        }
+
         $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@sportsfixturesDivision/lobby.twig', [
-                    'division'   => $division,
-                    'sport'      => $sport,
-                    'teams'      => $teams,
-                    'players'    => $players,
-                    'uploadZone' => $zone,
-                    'user'       => $this->getUser(),
-                ]
-            )
+            $this->buildHtmlOutput('@sportsfixturesDivision/lobby.twig', $dataModel)
         );
     }
 
@@ -354,10 +406,12 @@ class Controller extends AbstractController
 
     /**
      * @param SportMapper $sportMapper
+     * @return static
      */
-    protected function setSportMapper($sportMapper)
+    protected function setSportMapper(SportMapper $sportMapper)
     {
         $this->sportMapper = $sportMapper;
+        return $this;
     }
 
     /**
@@ -378,25 +432,27 @@ class Controller extends AbstractController
 
     /**
      * @param ErrorMapper $errorMapper
+     * @return static
      */
-    protected function setErrorMapper($errorMapper)
+    protected function setErrorMapper(ErrorMapper $errorMapper)
     {
         $this->errorMapper = $errorMapper;
+        return $this;
     }
 
     /**
      * @return TeamMapper
      */
-    public function getTeamMapper()
+    protected function getTeamMapper()
     {
         return $this->teamMapper;
     }
 
     /**
      * @param  TeamMapper $teamMapper
-     * @return $this
+     * @return static
      */
-    public function setTeamMapper(TeamMapper $teamMapper)
+    protected function setTeamMapper(TeamMapper $teamMapper)
     {
         $this->teamMapper = $teamMapper;
         return $this;
@@ -405,16 +461,16 @@ class Controller extends AbstractController
     /**
      * @return DivisionUserMapper
      */
-    public function getDivisionUserMapper()
+    protected function getDivisionUserMapper()
     {
         return $this->divisionUserMapper;
     }
 
     /**
      * @param DivisionUserMapper $divisionUserMapper
-     * @return $this
+     * @return static
      */
-    public function setDivisionUserMapper(DivisionUserMapper $divisionUserMapper)
+    protected function setDivisionUserMapper(DivisionUserMapper $divisionUserMapper)
     {
         $this->divisionUserMapper = $divisionUserMapper;
         return $this;
@@ -423,18 +479,36 @@ class Controller extends AbstractController
     /**
      * @return UserMapper
      */
-    public function getUserMapper()
+    protected function getUserMapper()
     {
         return $this->userMapper;
     }
 
     /**
      * @param UserMapper $userMapper
-     * @return $this
+     * @return static
      */
-    public function setUserMapper(UserMapper $userMapper)
+    protected function setUserMapper(UserMapper $userMapper)
     {
         $this->userMapper = $userMapper;
+        return $this;
+    }
+
+    /**
+     * @return TeamUserMapper
+     */
+    protected function getTeamUserMapper()
+    {
+        return $this->teamUserMapper;
+    }
+
+    /**
+     * @param TeamUserMapper $teamUserMapper
+     * @return static
+     */
+    protected function setTeamUserMapper(TeamUserMapper $teamUserMapper)
+    {
+        $this->teamUserMapper = $teamUserMapper;
         return $this;
     }
 }
