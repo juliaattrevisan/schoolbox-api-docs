@@ -90,6 +90,15 @@ class Controller extends AbstractController
         $division = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
         $sport = $this->getSportMapper()->findById($division->getSport()->getId());
 
+        // Load coaches into entity
+        /** @var TeamUserModel[] $teamCoaches */
+        $teamCoaches = $this->getTeamUserMapper()->findByColumnList(
+            ['team_id' => $entity->getId(), 'user_type' => TeamUserModel::USERTYPE_COACH,]
+        );
+        foreach ($teamCoaches as $teamCoach) {
+            $entity->getCoaches()->add($teamCoach->getUser());
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/entity.twig', [
             'sport'    => $sport,
             'division' => $division,

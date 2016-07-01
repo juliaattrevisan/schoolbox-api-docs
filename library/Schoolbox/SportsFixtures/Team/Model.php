@@ -40,9 +40,18 @@ class Model implements ISoftDeletable, ValueLabelInterface {
     protected $updatedAt;
 
     /**
+     * Players within the team.
+     *
      * @var Collection|User[]
      */
     protected $players;
+
+    /**
+     * Coaches within the team.
+     *
+     * @var Collection|User[]
+     */
+    protected $coaches;
 
     /**
      * Model constructor.
@@ -50,6 +59,7 @@ class Model implements ISoftDeletable, ValueLabelInterface {
     public function __construct()
     {
         $this->players = new Collection();
+        $this->coaches = new Collection();
     }
 
     /**
@@ -195,6 +205,24 @@ class Model implements ISoftDeletable, ValueLabelInterface {
     public function setPlayers($players)
     {
         $this->players = $players;
+        return $this;
+    }
+
+    /**
+     * @return Collection|User[]
+     */
+    public function getCoaches()
+    {
+        return $this->coaches;
+    }
+
+    /**
+     * @param Collection|User[] $coaches
+     * @return static
+     */
+    public function setCoaches($coaches)
+    {
+        $this->coaches = $coaches;
         return $this;
     }
 }
