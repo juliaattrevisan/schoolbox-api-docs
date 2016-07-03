@@ -1708,6 +1708,7 @@ class Controller extends Base\Base
                         /** @var TaskInstance $taskInstance */
                         foreach ($taskInstances as $taskInstance)
                         {
+                            $dates = $post["work"][$taskInstance->getId()];
                             switch ($taskInstance->getType())
                             {
                                 case Task::TYPE_DUE_WORK:
@@ -1716,15 +1717,26 @@ class Controller extends Base\Base
 
                                     $submissionBox = $this->submissionBoxMapper->findById($taskInstance->getSubmissionBox()->getId());
 
-                                    $due_date = \Alaress_Date_Format::newLocalShort($post["work"][$taskInstance->getId()]['due_date']);
-                                    $late_date = \Alaress_Date_Format::newLocalShort($post["work"][$taskInstance->getId()]['late_date']);
-                                    $open_date = \Alaress_Date_Format::newLocalShort($post["work"][$taskInstance->getId()]['open_date']);
-                                    $publish_date = \Alaress_Date_Format::newLocalShort($post["work"][$taskInstance->getId()]['publish_date']);
+                                    // Set dates
+                                    // Open date = publish date if not set
+                                    // Late date = due date if not set
+                                    $publish_date = isset($dates['publish_date'])
+                                        ? \Alaress_Date_Format::newLocalShort($dates['publish_date'])->startOfDay()
+                                        : \Alaress_Date_Format::now()->startOfDay();
+                                    $open_date = isset($dates['open_date'])
+                                        ? \Alaress_Date_Format::newLocalShort($dates['open_date'])->startOfDay()
+                                        : $publish_date;
+                                    $due_date = isset($dates['due_date'])
+                                        ? \Alaress_Date_Format::newLocalShort($dates['due_date'])->endOfDay()
+                                        : \Alaress_Date_Format::now()->endOfDay();
+                                    $late_date = isset($dates['late_date'])
+                                        ? \Alaress_Date_Format::newLocalShort($dates['late_date'])->endOfDay()
+                                        : $due_date;
 
-                                    $submissionBox->setDueDate($due_date->endOfDay());
-                                    $submissionBox->setLateDate($late_date->endOfDay());
-                                    $submissionBox->setOpenDate($open_date->startOfDay());
-                                    $submissionBox->setPublishDate($publish_date->startOfDay());
+                                    $submissionBox->setPublishDate($publish_date);
+                                    $submissionBox->setOpenDate($open_date);
+                                    $submissionBox->setDueDate($due_date);
+                                    $submissionBox->setLateDate($late_date);
 
                                     if (isset($owners[$homepage])) {
                                         // update the owner
@@ -1741,8 +1753,13 @@ class Controller extends Base\Base
 
                                     $assessment = $this->getOnlineAssessmentMapper()->findById($taskInstance->getAssessment()->getId());
 
-                                    $start_date = \Alaress_Date_Format::newLocalShort($post["quiz"][$taskInstance->getId()]['start_date']);
-                                    $finish_date = \Alaress_Date_Format::newLocalShort($post["quiz"][$taskInstance->getId()]['finish_date']);
+                                    // Set dates
+                                    $start_date = isset($dates['start_date'])
+                                        ? \Alaress_Date_Format::newLocalShort($dates['start_date'])->startOfDay()
+                                        : \Alaress_Date_Format::now()->startOfDay();
+                                    $finish_date = isset($dates['open_date'])
+                                        ? \Alaress_Date_Format::newLocalShort($dates['finish_date'])->endOfDay()
+                                        : \Alaress_Date_Format::now()->endOfDay();
 
                                     $assessment->setStart($start_date->startOfDay());
                                     $assessment->setFinish($finish_date->endOfDay());
