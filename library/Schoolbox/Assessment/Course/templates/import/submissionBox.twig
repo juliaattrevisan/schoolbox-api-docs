@@ -17,7 +17,7 @@
 </div>
 <div class="small-12 medium-3 large-2 columns">
     {# Due Work: Open Date #}
-    {% if work.item.acceptOnline %}
+    {% if work.detail.acceptOnline %}
     <label for="work_open_date-{{ work.item.id }}">Open Date</label>
     <input id="work_open_date-{{ work.item.id }}"
            name="work[{{ work.item.id }}][open_date]"
@@ -44,7 +44,7 @@
     <label for="work_due_date-{{ work.item.id }}" class="hide error">This field is required.</label>
 </div>
 <div class="small-12 medium-3 large-2 columns">
-    {% if work.item.acceptOnline %}
+    {% if work.detail.acceptOnline %}
     <label for="work_late_date-{{ work.item.id }}">Late Date</label>
     <input id="work_late_date-{{ work.item.id }}"
            name="work[{{ work.item.id }}][late_date]"
