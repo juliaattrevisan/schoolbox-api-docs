@@ -581,4 +581,23 @@ class OnlineAssessment implements ISoftDeletable
     {
         return $this->mark_visibility;
     }
+
+    /**
+     * Helper method for setting dates from a form.
+     *
+     * @param array $formDates
+     * @return $this
+     */
+    public function setDatesFromForm($formDates)
+    {
+        $start_date  = isset($formDates['start_date'])
+            ? \Alaress_Date_Format::newLocalShort($formDates['start_date'])->startOfDay()
+            : \Alaress_Date_Format::now()->startOfDay();
+        $finish_date = isset($formDates['finish_date'])
+            ? \Alaress_Date_Format::newLocalShort($formDates['finish_date'])->endOfDay()
+            : \Alaress_Date_Format::now()->endOfDay();
+        $this->setStart($start_date);
+        $this->setFinish($finish_date);
+        return $this;
+    }
 }

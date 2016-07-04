@@ -1746,26 +1746,14 @@ class Controller extends Base\Base
                                     // Quizzes
 
                                     $assessment = $this->getOnlineAssessmentMapper()->findById($taskInstance->getAssessment()->getId());
-
-                                    // Set dates
-                                    $dates       = $post["quiz"][$taskInstance->getId()];
-                                    $start_date  = isset($dates['start_date'])
-                                        ? \Alaress_Date_Format::newLocalShort($dates['start_date'])->startOfDay()
-                                        : \Alaress_Date_Format::now()->startOfDay();
-                                    $finish_date = isset($dates['finish_date'])
-                                        ? \Alaress_Date_Format::newLocalShort($dates['finish_date'])->endOfDay()
-                                        : \Alaress_Date_Format::now()->endOfDay();
+                                    $assessment->setDatesFromForm($post["quiz"][$taskInstance->getId()]);
 
                                     // Date validation:
                                     // Start <= Finish
-                                    if ($start_date->gt($finish_date)) {
+                                    if ($assessment->getStart()->gt($assessment->getFinish())) {
                                         $this->throwError('A task\'s finish date may not be before its start date.');
                                         return;
                                     }
-
-
-                                    $assessment->setStart($start_date->startOfDay());
-                                    $assessment->setFinish($finish_date->endOfDay());
 
                                     if (isset($owners[$homepage])) {
                                         // update the owner
