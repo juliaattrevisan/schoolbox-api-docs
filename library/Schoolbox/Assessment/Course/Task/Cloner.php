@@ -193,19 +193,15 @@ class Cloner
             // Check if we need to override the dates
 
             $workDates = $this->task_instance->getUnitInstance()->getWorkDates();
+            $datesOverridden = false;
 
             if (is_array($workDates)) {
                 $box = SubmissionBoxMapper::getInstance()->findById($box_id);
                 $task_id = $box->getTask()->getId();
 
                 if (isset($workDates[$task_id])) {
+                    $datesOverridden = true;
                     $box->setDatesFromForm($workDates[$task_id]);
-                } else {
-                    $box
-                        ->setPublishDate($this->getOpenTimeFromTask())
-                        ->setOpenDate($this->getOpenTimeFromTask())
-                        ->setDueDate($this->getSubmissionBoxCloseTimeFromTask())
-                        ->setLateDate($this->getSubmissionBoxCloseTimeFromTask());
                 }
             }
 
@@ -215,6 +211,13 @@ class Cloner
                 ->setOwner($this->task_instance->getOwner() ?: $_SESSION['user'])
                 ->setCategory($this->category)
             ;
+            if (!$datesOverridden) {
+                $box
+                    ->setPublishDate($this->getOpenTimeFromTask())
+                    ->setOpenDate($this->getOpenTimeFromTask())
+                    ->setDueDate($this->getSubmissionBoxCloseTimeFromTask())
+                    ->setLateDate($this->getSubmissionBoxCloseTimeFromTask());
+            }
             SubmissionBoxMapper::getInstance()->create($box);
 
             // Clone rubrix too
