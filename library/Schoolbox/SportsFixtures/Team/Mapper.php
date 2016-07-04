@@ -12,7 +12,7 @@ namespace Schoolbox\SportsFixtures\Team;
 
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
+use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Team\Model as Team;
 
 /**
@@ -32,7 +32,7 @@ class Mapper extends BaseMapper
         $this->hasModel(Team::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('division_id', SportMapper::class, 'id', null, null, 'division', 'division');
+        $this->joins('division_id', DivisionMapper::class, 'id', null, null, 'division', 'division');
         $this->uses('name', self::TYPE_STRING);
         $this->uses('url', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
