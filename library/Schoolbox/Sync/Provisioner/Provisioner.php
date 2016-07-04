@@ -176,6 +176,7 @@ class Provisioner
 
                     } catch (MapperException $e) {
                         $internalUser = $this->userMapper->createModel();
+                        $internalUser->getRole()->setType($roleType);
                         $this->logger->debug("No existing user to retrieve: new user", $commonContext);
                         $action = 'create';
                     }
