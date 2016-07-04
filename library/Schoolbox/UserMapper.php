@@ -279,6 +279,15 @@ class UserMapper extends Mapper
         });
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueUsername']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidUsername']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidRoleType']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyHasCampus']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidFirstName']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidLocalEmail']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidWebmail']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidInternalMail']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidEportfolioEnabled']);
+
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateDefaultCampus']);
     }
