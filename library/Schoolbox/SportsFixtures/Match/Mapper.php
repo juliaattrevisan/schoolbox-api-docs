@@ -56,7 +56,13 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
-        $this->joins('id', ResultMapper::getInstance(), 'match_id', null, self::COLUMN_JOIN_READONLY, 'result', 'result');
+        /* Reverse join thingo
+         */
+        $this->hasJoin('result', array(
+            'mapper'    => ResultMapper::class,
+            'this_key'  => 'id',
+            'other_key' => 'match_id',
+        ));
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteItineraryItems'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteResults'));
