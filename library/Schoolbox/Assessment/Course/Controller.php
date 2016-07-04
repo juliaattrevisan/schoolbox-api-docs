@@ -1733,6 +1733,21 @@ class Controller extends Base\Base
                                         ? \Alaress_Date_Format::newLocalShort($dates['late_date'])->endOfDay()
                                         : $due_date;
 
+                                    // Date validation:
+                                    // Publish <= Open <= Due <= Late
+                                    if ($publish_date->gt($open_date)) {
+                                        $this->throwError('A task\'s open date may not be before its publish date.');
+                                        return;
+                                    }
+                                    if ($open_date->gt($due_date)) {
+                                        $this->throwError('A task\'s due date may not be before its open date.');
+                                        return;
+                                    }
+                                    if ($due_date->gt($late_date)) {
+                                        $this->throwError('A task\'s late date may not be before its due date.');
+                                        return;
+                                    }
+
                                     $submissionBox->setPublishDate($publish_date);
                                     $submissionBox->setOpenDate($open_date);
                                     $submissionBox->setDueDate($due_date);
@@ -1760,6 +1775,14 @@ class Controller extends Base\Base
                                     $finish_date = isset($dates['open_date'])
                                         ? \Alaress_Date_Format::newLocalShort($dates['finish_date'])->endOfDay()
                                         : \Alaress_Date_Format::now()->endOfDay();
+
+                                    // Date validation:
+                                    // Start <= Finish
+                                    if ($start_date->gt($finish_date)) {
+                                        $this->throwError('A task\'s finish date may not be before its start date.');
+                                        return;
+                                    }
+
 
                                     $assessment->setStart($start_date->startOfDay());
                                     $assessment->setFinish($finish_date->endOfDay());
