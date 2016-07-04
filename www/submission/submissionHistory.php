@@ -228,7 +228,8 @@ $this->setVar(
         'BOX_OWNER_ID'         => $userID,
         'BOX_DESCRIPTION'      => Scrub::html($box->getDescription()),
         'BOX_TYPE'             => $work_mapper->getNameFromId($box->getWorkType()->getId()),
-        'BOX_CREATED'          => $createdDate->getRelativeTime()
+        'BOX_CREATED'          => $createdDate->getRelativeTime(),
+        'BOX_CREATED_EXACT'    => $createdDate->getLong()
     )
 );
 
@@ -347,6 +348,7 @@ if (count($submission_history)) {
             'HISTORY_ICON'                 => null,
             'HISTORY_GRADIENT'             => 0,
             'HISTORY_DATETIME'             => $workDate->getRelativeTime(),
+            'HISTORY_DATETIME_EXACT'             => $workDate->getLong(),
             'HISTORY_MARK'                 => '',
             'HISTORY_COMMENT'              => null,
             'HISTORY_SUBMISSION_FILE_ID'   => null,
