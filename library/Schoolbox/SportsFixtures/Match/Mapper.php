@@ -59,6 +59,7 @@ class Mapper extends BaseMapper
         $this->joins('id', ResultMapper::getInstance(), 'match_id', null, self::COLUMN_JOIN_READONLY, 'result', 'result');
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteItineraryItems'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteResults'));
     }
 
     /**
@@ -73,6 +74,20 @@ class Mapper extends BaseMapper
 
         foreach ($allItineraryItems as $currentItineraryItem) {
             ItineraryItemMapper::getInstance()->delete($currentItineraryItem);
+        }
+    }
+
+    /**
+     * Delete all Results associated with this Match
+     *
+     * @param Model $match
+     */
+    public function deleteResults(Match $match)
+    {
+        $allResults = ResultMapper::getInstance()->findByColumn('match_id', $match->getId());
+
+        foreach ($allResults as $currentResult) {
+            ResultMapper::getInstance()->delete($currentResult);
         }
     }
 
