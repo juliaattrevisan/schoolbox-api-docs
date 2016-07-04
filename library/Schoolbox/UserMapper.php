@@ -637,6 +637,127 @@ class UserMapper extends Mapper
     }
 
     /**
+     * Pre-save callback for verifying whether a user's name is not null or zero-length
+     *
+     * @param  User $user
+     * @return bool Always true, as long as it doesn't throw
+     * @throws UnexpectedValueException if user's name is null or zero-length
+     */
+    public function verifyValidUsername(User $user)
+    {
+        if ($user->getUsername() === null || !strlen($user->getUsername())) {
+            throw new UnexpectedValueException('Username cannot be null');
+        }
+        return true;
+    }
+
+    /**
+     * Pre-save callback for verifying whether a user's role type is set.
+     *
+     * @param  User $user
+     * @return bool Always true, as long as it doesn't throw
+     * @throws UnexpectedValueException if role type is null
+     */
+    public function verifyValidRoleType(User $user)
+    {
+        if (!$user->getRole() instanceof Role || null === $user->getRole()->getType()) {
+            throw new UnexpectedValueException('User role cannot be null');
+        }
+        return true;
+    }
+
+    /**
+     * Pre-save callback for ensuring a user has at least one campus
+     *
+     * @param  User $user
+     * @return bool Always true, as long as it doesn't throw
+     * @throws UnexpectedValueException if user has no Campus
+     */
+    public function verifyHasCampus(User $user)
+    {
+        if ($user->getCampusCollection()->count() < 1 ) {
+            throw new UnexpectedValueException('User must have at least one campus');
+        }
+        return true;
+    }
+
+    /**
+     * Pre-save callback for ensuring a user's firstname is not null or zero-length
+     *
+     * @param  User $user
+     * @return bool Always true, as long as it doesn't throw
+     * @throws UnexpectedValueException if firstname is null or zero-length
+     */
+    public function verifyValidFirstName(User $user)
+    {
+        if ($user->getFirstname() === null || !strlen($user->getFirstname())) {
+            throw new UnexpectedValueException('Firstname cannot be null');
+        }
+        return true;
+    }
+
+    /**
+     * Pre-save callback for ensuring a user's Local email flag is not null
+     *
+     * @param  User $user
+     * @return bool Always true, as long as it doesn't throw
+     * @throws UnexpectedValueException if Local email flag is null
+     */
+    public function verifyValidLocalEmail(User $user)
+    {
+        if ($user->getLocalEmail() === null) {
+            throw new UnexpectedValueException('Local email flag cannot be null');
+        }
+        return true;
+    }
+
+    /**
+     * Pre-save callback for ensuring a user's webmail flag is not null
+     *
+     * @param  User $user
+     * @return bool Always true, as long as it doesn't throw
+     * @throws UnexpectedValueException if webmail flag is null
+     */
+    public function verifyValidWebmail(User $user)
+    {
+        if ($user->getWebmail() === null) {
+            throw new UnexpectedValueException('Webmail flag cannot be null');
+        }
+        return true;
+    }
+
+    /**
+     * Pre-save callback for ensuring a user's internal mail flag is not null
+     *
+     * @param  User $user
+     * @return bool Always true, as long as it doesn't throw
+     * @throws UnexpectedValueException if internal mail flag is null
+     */
+    public function verifyValidInternalMail(User $user)
+    {
+        if ($user->getUseInternalMail() === null) {
+            throw new UnexpectedValueException('Use internal mail flag cannot be null');
+        }
+        return true;
+    }
+
+    /**
+     * Pre-save callback for ensuring a user's Eportfolio enabled flag is not null
+     *
+     * @param  User $user
+     * @return bool Always true, as long as it doesn't throw
+     * @throws UnexpectedValueException if Eportfolio enable flag is null
+     */
+    public function verifyValidEportfolioEnabled(User $user)
+    {
+        if ($user->getEportfolioEnable() === null) {
+            throw new UnexpectedValueException('Eportfolio enabled flag cannot be null');
+        }
+        return true;
+    }
+
+
+    /**
      * Post-save callback for updating a user's superuser status.
      *
      * @param User $user
