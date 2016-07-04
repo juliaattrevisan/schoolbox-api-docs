@@ -188,7 +188,9 @@ class Mapper extends BaseMapper
              */
             $itinerary = $this->hydrateJoin($row, 'itinerary', 'i');
 
-            $collection->getOffset($match->getId())->getItinerary()->add($itinerary);
+            if ($itinerary->getId()) {
+                $collection->getOffset($match->getId())->getItinerary()->add($itinerary);
+            }
         }
 
         /* Order itinerary items in asc order
