@@ -250,6 +250,16 @@ class Provisioner
 
                     $this->logger->log($level, $message, $context);
 
+                    if(!$update){
+                        try {
+                            $this->sanityCheck($internalUser);
+                            $this->logger->debug("User record passes sanity check", $commonContext);
+                        } catch (UnexpectedValueException $e) {
+                            $this->logger->warning(sprintf("User record fails sanity check (%s): skipping", $e->getMessage()), array_merge($commonContext, [ 'error' => $e ]));
+                            continue;
+                        }
+                    }
+
                     // And save with pre-save sanity check
                     if ($update) {
                         try {
@@ -319,5 +329,26 @@ class Provisioner
                 return $this->externalUserSource->findAllParents();
         }
         throw new InvalidArgumentException("$roleType is not one of: student, staff, parent");
+    }
+
+    /**
+     * Performs a sanity check on this user - checks if all their required
+     * fields are set.
+     *
+     * Throws validation exceptions if it isn't.
+     *
+     * @param User $internalUser
+     * @throws UnexpectedValueException if a value isn't what it should be
+     */
+    protected function sanityCheck(User $internalUser)
+    {
+        $this->userMapper->verifyValidUsername($internalUser);
+        $this->userMapper->verifyValidRoleType($internalUser);
+        $this->userMapper->verifyHasCampus($internalUser);
+        $this->userMapper->verifyValidFirstName($internalUser);
+        $this->userMapper->verifyValidLocalEmail($internalUser);
+        $this->userMapper->verifyValidWebmail($internalUser);
+        $this->userMapper->verifyValidInternalMail($internalUser);
+        $this->userMapper->verifyValidEportfolioEnabled($internalUser);
     }
 }
