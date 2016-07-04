@@ -211,7 +211,10 @@
                     // Move from team to division (remove from team + reorder division)
                     fromFeedback.labelActivate({text: 'Removing from team...'});
                     toFeedback.labelActivate({text: 'Saving order...'});
-                    $.when(postPlayer(dragged.data('player'), from.data('removePlayersAction')), saveOrdering(to))
+                    $.when(postPlayer(dragged.data('player'), from.data('removePlayersAction')))
+                        .then(function() {
+                            return saveOrdering(to);
+                        })
                         .done(function(response) {
                             refreshPlayerList(response);
                         })
