@@ -17,6 +17,39 @@
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript">
     $(function() {
+
+        connectPlayerPositionButtons = function() {
+
+            // When the player clicks the edit positions button
+
+            $('[data-player-positions-user]').click(function (e) {
+
+                // Set the form data with the team/user IDs
+                $('#playerPositionName').html($(this).attr('data-player-positions-team-name') + ' - ' + $(this).attr('data-player-positions-name'));
+                $('#playerPositionUserId').val($(this).attr('data-player-positions-user'));
+                $('#playerPositionTeamId').val($(this).attr('data-player-positions-team'));
+
+                // Get the players current positions and split into array
+                var positions = $(this).attr('data-player-positions').split(',');
+                ;
+
+                $('[data-position]').each(function () {
+                    // Deselect position
+                    $(this).prop('checked', false);
+
+                    // Iterate all position checkboxes and find out if we should check it
+                    for (var i = 0; i < positions.length; i++) {
+                        if ($(this).val() == positions[i]) {
+                            // Player was in this position, check it
+                            $(this).prop('checked', true);
+                            break;
+                        }
+                    }
+
+                });
+            });
+        };
+
         // Selectize box for selecting one or more users
         $('[data-role="userSelector"]')
             .selectizeSelector({
@@ -73,6 +106,7 @@
                 });
                 oldList.empty().append(newList.children());
             });
+            connectPlayerPositionButtons();
         };
 
         // Add player to team action
@@ -229,6 +263,8 @@
                 }
             }
         });
+
+        connectPlayerPositionButtons();
     });
 </script>
 <ul class="breadcrumb">
@@ -349,18 +385,34 @@
                             </div>
                         </li>
                         {% for teamPlayer in teamData.players %}
-                            <li class="actions-small-1" data-player="{{ teamPlayer.id }}">
+                            <li class="actions-small-2" data-player="{{ teamPlayer.id }}">
                                 <div class="list-item">
                                     <div class="grip"></div>
-                                    <div class="small-11 avatar card">
+                                    <div class="small-10 avatar card">
                                         <a href="/search/user/{{ teamPlayer.id }}">
                                             <img src="/portrait.php?userId={{ teamPlayer.externalId }}&amp;size=square64" />
                                             <h3>{{ teamPlayer.formatName() }}</h3>
                                         </a>
                                         <p class="meta">{{ teamPlayer.formatMetadata() }}</p>
+                                        <p>
+                                            {% for teamPosition in teamData.positions if teamPosition.user.id == teamPlayer.id %}
+                                                {{ teamPosition.position.name }}<br>
+                                            {% endfor %}
+                                        </p>
                                     </div>
+
                                 </div>
                                 <nav>
+                                    <a href="#"
+                                       data-reveal-id="editPlayerPositions"
+                                       class="icon-sport"
+                                       title="Change Player Positions"
+                                       data-player-positions-name="{{ teamPlayer.formatName() }}"
+                                       data-player-positions-team-name="{{ teamData.team.name }}"
+                                       data-player-positions-user="{{ teamPlayer.id }}"
+                                       data-player-positions-team="{{ teamData.team.id }}"
+                                       data-player-positions="{% for teamPosition in teamData.positions if teamPosition.user.id == teamPlayer.id %}{% if not loop.first %},{% endif %}{{ teamPosition.position.id }}{% endfor %}"
+                                    ></a>
                                     <a href="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: teamData.team.id}) }}"
                                        class="icon-close"
                                        title="Remove Player from {{ teamData.team.name }}"
@@ -387,6 +439,24 @@
     <form action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {entityId: division.id}) }}" method="post">
         <select data-role="userSelector" name="userId[]" multiple placeholder="Search Users"></select>
         <input type="submit" class="full-width" value="Add" />
+    </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+{# Change player positions modal #}
+
+<div id="editPlayerPositions" class="reveal-modal" data-reveal aria-labelledby="editPlayerPositionsModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="editPlayerPositionsModalTitle">Change Player Positions</h2>
+    <form action="{{ routeLookup('sportsfixturesDivision.postPlayerPositions', {entityId: division.id}) }}" method="post">
+        <input type="hidden" name="team_id" id="playerPositionTeamId">
+        <input type="hidden" name="user_id" id="playerPositionUserId">
+        <fieldset class="checklist" data-equalizer-watch="">
+            <legend id="playerPositionName"></legend>
+            {% for position in positions %}
+                <input data-position id="position-{{ position.id }}" name="positions[]" value="{{ position.id }}" type="checkbox"><label for="position-{{ position.id }}">{{ position.name }}</label>
+            {% endfor %}
+        </fieldset>
+        <input type="submit" class="full-width" value="Save Changes" />
     </form>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
