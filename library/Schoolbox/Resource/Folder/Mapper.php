@@ -762,7 +762,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 'code' => '%[%' . $this->database->quoteForLike($code) . '%]',
             )
         );
-        return $this->hydrateList($statement, 'c');
+        return $this->hydrateList($statement);
     }
 
 
