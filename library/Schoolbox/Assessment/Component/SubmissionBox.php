@@ -792,6 +792,7 @@ class SubmissionBox implements ISoftDeletable
         $this->setOpenDate($open_date);
         $this->setDueDate($due_date);
         $this->setLateDate($late_date);
+        return $this;
     }
 
 
