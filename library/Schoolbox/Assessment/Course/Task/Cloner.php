@@ -190,11 +190,6 @@ class Cloner
                 throw new ClonerException('No submission box is attached to this task');
             }
 
-            $publish = $this->getOpenTimeFromTask();
-            $open = $this->getOpenTimeFromTask();
-            $due = $this->getSubmissionBoxCloseTimeFromTask();
-            $late = $this->getSubmissionBoxCloseTimeFromTask();
-
             // Check if we need to override the dates
 
             $workDates = $this->task_instance->getUnitInstance()->getWorkDates();
@@ -204,10 +199,13 @@ class Cloner
                 $task_id = $box->getTask()->getId();
 
                 if (isset($workDates[$task_id])) {
-                    $publish = \Alaress_Date_Format::newLocalShort($workDates[$task_id]['publish_date']->sta);
-                    $open = \Alaress_Date_Format::newLocalShort($workDates[$task_id]['open_date']);
-                    $due = \Alaress_Date_Format::newLocalShort($workDates[$task_id]['due_date'])->endOfDay();
-                    $late = \Alaress_Date_Format::newLocalShort($workDates[$task_id]['late_date'])->endOfDay();
+                    $box->setDatesFromForm($workDates[$task_id]);
+                } else {
+                    $box
+                        ->setPublishDate($this->getOpenTimeFromTask())
+                        ->setOpenDate($this->getOpenTimeFromTask())
+                        ->setDueDate($this->getSubmissionBoxCloseTimeFromTask())
+                        ->setLateDate($this->getSubmissionBoxCloseTimeFromTask());
                 }
             }
 
@@ -216,10 +214,6 @@ class Cloner
                 ->setTaskInstance($this->task_instance)
                 ->setOwner($this->task_instance->getOwner() ?: $_SESSION['user'])
                 ->setCategory($this->category)
-                ->setPublishDate($publish)
-                ->setOpenDate($open)
-                ->setDueDate($due)
-                ->setLateDate($late)
             ;
             SubmissionBoxMapper::getInstance()->create($box);
 
