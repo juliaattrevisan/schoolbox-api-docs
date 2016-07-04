@@ -18,11 +18,11 @@
 <script type="text/javascript">
     $(function() {
 
-        connectPlayerPositionButtons = function() {
+        var connectPlayerPositionButtons = function() {
 
             // When the player clicks the edit positions button
 
-            $('[data-player-positions-user]').click(function (e) {
+            $('[data-player-positions-user]').click(function() {
 
                 // Set the form data with the team/user IDs
                 $('#playerPositionName').html($(this).attr('data-player-positions-team-name') + ' - ' + $(this).attr('data-player-positions-name'));
@@ -31,7 +31,6 @@
 
                 // Get the players current positions and split into array
                 var positions = $(this).attr('data-player-positions').split(',');
-                ;
 
                 $('[data-position]').each(function () {
                     // Deselect position

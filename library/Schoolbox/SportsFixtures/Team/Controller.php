@@ -19,7 +19,6 @@ use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\SportsFixtures\Team\User\Model as TeamUserModel;
 use \Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
-use \Schoolbox\SportsFixtures\Team\Position\Model as TeamPositionModel;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
 use Schoolbox\UserMapper;
 

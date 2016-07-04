@@ -20,7 +20,6 @@ use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Position\Model as PositionModel;
 use \Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use \Schoolbox\SportsFixtures\Team\User\Model as TeamUserModel;
 use \Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
 use \Schoolbox\SportsFixtures\Team\Position\Model as TeamPositionModel;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
@@ -403,14 +402,6 @@ class Controller extends AbstractController
      */
     public function postPlayerPositions($entityId) {
 
-        try {
-            // Load division
-            $division = $this->getDivisionMapper()->findById($entityId);
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
-        }
-
         $teamId = $this->getRequest()->post['team_id'];
         try {
             // Load team
@@ -463,7 +454,7 @@ class Controller extends AbstractController
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'sportsfixturesDivision.getLobby',
-                ['entityId' => $division->getId(),]
+                ['entityId' => $entityId]
             )
         );
     }
