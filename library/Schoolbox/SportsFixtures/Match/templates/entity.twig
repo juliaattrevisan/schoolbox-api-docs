@@ -46,7 +46,16 @@
                     {% if match.result.id %}
                     <dt>Result</dt>
                     <dd>
-                        {{ match.result.description|raw }}
+                        <div class="actions-small-1 row">
+                            <div class="list-item">
+                                <div class="small-12 columns">
+                                    {{ match.result.description|raw }}
+                                </div>
+                            </div>
+                            <nav>
+                                <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: match.result.id}) }}" class="icon-modify" title="Modify"></a>
+                            </nav>
+                        </div>
                     </dd>
                     {% else %}
                     <div class="empty-state">
@@ -64,6 +73,8 @@
                         <dd>{{ match.updatedAt.database }}</dd>
                     {% endif %}
                 </dl>
+
+
             </div>
         </section>
     </div>
