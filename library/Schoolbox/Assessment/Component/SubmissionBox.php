@@ -768,6 +768,32 @@ class SubmissionBox implements ISoftDeletable
         return $this;
     }
 
+    /**
+     * Helper method for setting dates from a form.
+     *
+     * @param array $formDates
+     * @return $this
+     */
+    public function setDatesFromForm($formDates)
+    {
+        $publish_date = isset($formDates['publish_date'])
+            ? \Alaress_Date_Format::newLocalShort($formDates['publish_date'])->startOfDay()
+            : \Alaress_Date_Format::now()->startOfDay();
+        $open_date    = isset($formDates['open_date'])
+            ? \Alaress_Date_Format::newLocalShort($formDates['open_date'])->startOfDay()
+            : $publish_date;
+        $due_date     = isset($formDates['due_date'])
+            ? \Alaress_Date_Format::newLocalShort($formDates['due_date'])->endOfDay()
+            : \Alaress_Date_Format::now()->endOfDay();
+        $late_date    = isset($formDates['late_date'])
+            ? \Alaress_Date_Format::newLocalShort($formDates['late_date'])->endOfDay()
+            : $due_date;
+        $this->setPublishDate($publish_date);
+        $this->setOpenDate($open_date);
+        $this->setDueDate($due_date);
+        $this->setLateDate($late_date);
+    }
+
 
     /**
      * Returns true if the current time is between the open and late dates of this box

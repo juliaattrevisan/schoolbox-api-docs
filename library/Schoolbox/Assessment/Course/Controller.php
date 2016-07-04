@@ -1715,42 +1715,22 @@ class Controller extends Base\Base
                                     // Due work
 
                                     $submissionBox = $this->submissionBoxMapper->findById($taskInstance->getSubmissionBox()->getId());
-                                    // Set dates
-                                    // Open date = publish date if not set
-                                    // Late date = due date if not set
-                                    $dates        = $post["work"][$taskInstance->getId()];
-                                    $publish_date = isset($dates['publish_date'])
-                                        ? \Alaress_Date_Format::newLocalShort($dates['publish_date'])->startOfDay()
-                                        : \Alaress_Date_Format::now()->startOfDay();
-                                    $open_date    = isset($dates['open_date'])
-                                        ? \Alaress_Date_Format::newLocalShort($dates['open_date'])->startOfDay()
-                                        : $publish_date;
-                                    $due_date     = isset($dates['due_date'])
-                                        ? \Alaress_Date_Format::newLocalShort($dates['due_date'])->endOfDay()
-                                        : \Alaress_Date_Format::now()->endOfDay();
-                                    $late_date    = isset($dates['late_date'])
-                                        ? \Alaress_Date_Format::newLocalShort($dates['late_date'])->endOfDay()
-                                        : $due_date;
+                                    $submissionBox->setDatesFromForm($post["work"][$taskInstance->getId()]);
 
                                     // Date validation:
                                     // Publish <= Open <= Due <= Late
-                                    if ($publish_date->gt($open_date)) {
+                                    if ($submissionBox->getPublishDate()->gt($submissionBox->getOpenDate())) {
                                         $this->throwError('A task\'s open date may not be before its publish date.');
                                         return;
                                     }
-                                    if ($open_date->gt($due_date)) {
+                                    if ($submissionBox->getOpenDate()->gt($submissionBox->getDueDate())) {
                                         $this->throwError('A task\'s due date may not be before its open date.');
                                         return;
                                     }
-                                    if ($due_date->gt($late_date)) {
+                                    if ($submissionBox->getDueDate()->gt($submissionBox->getLateDate())) {
                                         $this->throwError('A task\'s late date may not be before its due date.');
                                         return;
                                     }
-
-                                    $submissionBox->setPublishDate($publish_date);
-                                    $submissionBox->setOpenDate($open_date);
-                                    $submissionBox->setDueDate($due_date);
-                                    $submissionBox->setLateDate($late_date);
 
                                     if (isset($owners[$homepage])) {
                                         // update the owner
