@@ -155,32 +155,35 @@ class Mapper extends BaseMapper
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
 
-            /** @var Match $match */
-            $match = $this->hydrate($row);
-
-            /** @var Division $division */
-            $division = $this->hydrateJoin($row, 'division', 'd');
-
-            /** @var Venue $venue */
-            $venue = $this->hydrateJoin($row, 'venue', 'v');
-
-            /** @var Team $homeTeam */
-            /** @var Team $awayTeam */
-            $homeTeam = $this->hydrateJoin($row, 'home_team', 'h');
-            $awayTeam = $this->hydrateJoin($row, 'away_team', 'a');
-
-            /** @var Result $result */
-            $result = $this->hydrateJoin($row, 'result', 'r');
-
-            $match->setVenue($venue);
-            $match->setDivision($division);
-            $match->setHomeTeam($homeTeam);
-            $match->setAwayTeam($awayTeam);
-            $match->setResult($result);
+            $matchId = $row['id'];
 
             /* Set up us the match in the collection
+             * Only hydrate all this stuff if it never existed previously
              */
-            if (!($collection->getOffset($match->getId()) instanceof Match)) {
+            if (!($collection->getOffset($matchId) instanceof Match)) {
+                /** @var Match $match */
+                $match = $this->hydrate($row);
+
+                /** @var Division $division */
+                $division = $this->hydrateJoin($row, 'division', 'd');
+
+                /** @var Venue $venue */
+                $venue = $this->hydrateJoin($row, 'venue', 'v');
+
+                /** @var Team $homeTeam */
+                /** @var Team $awayTeam */
+                $homeTeam = $this->hydrateJoin($row, 'home_team', 'h');
+                $awayTeam = $this->hydrateJoin($row, 'away_team', 'a');
+
+                /** @var Result $result */
+                $result = $this->hydrateJoin($row, 'result', 'r');
+
+                $match->setVenue($venue);
+                $match->setDivision($division);
+                $match->setHomeTeam($homeTeam);
+                $match->setAwayTeam($awayTeam);
+                $match->setResult($result);
+
                 $collection->setOffset($match->getId(), $match);
             }
 
@@ -189,7 +192,7 @@ class Mapper extends BaseMapper
             $itinerary = $this->hydrateJoin($row, 'itinerary', 'i');
 
             if ($itinerary->getId()) {
-                $collection->getOffset($match->getId())->getItinerary()->add($itinerary);
+                $collection->getOffset($matchId)->getItinerary()->add($itinerary);
             }
         }
 
