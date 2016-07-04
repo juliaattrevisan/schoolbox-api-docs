@@ -250,28 +250,23 @@ class Provisioner
 
                     $this->logger->log($level, $message, $context);
 
-                    if(!$update){
-                        try {
+                    try{                        
+                        if(!$update){
+                            // Dry Run
                             $this->sanityCheck($internalUser);
                             $this->logger->debug("User record passes sanity check", $commonContext);
-                        } catch (UnexpectedValueException $e) {
-                            $this->logger->warning(sprintf("User record fails sanity check (%s): skipping", $e->getMessage()), array_merge($commonContext, [ 'error' => $e ]));
-                            continue;
                         }
-                    }
-
-                    // And save with pre-save sanity check
-                    if ($update) {
-                        try {
+                        else {
+                            // Save includes pre-save sanity check
                             $this->userMapper->save($internalUser);
                             $this->logger->debug("User record passes sanity check", $commonContext);
                             $this->logger->debug("User record saved", $commonContext);
-                        } catch (UnexpectedValueException $e) {
-                            $this->logger->warning(sprintf("User record fails sanity check (%s): skipping", $e->getMessage()), array_merge($commonContext, [ 'error' => $e ]));
-                            continue;
-                        }catch (\Exception $e) {
-                            $this->logger->error("User record save failed!", array_merge($commonContext, [ 'error' => $e ]));
                         }
+                    } catch (UnexpectedValueException $e) {
+                        $this->logger->warning(sprintf("User record fails sanity check (%s): skipping", $e->getMessage()), array_merge($commonContext, [ 'error' => $e ]));
+                        continue;
+                    } catch (\Exception $e) {
+                        $this->logger->error("User record save failed!", array_merge($commonContext, [ 'error' => $e ]));
                     }
                 }
 
