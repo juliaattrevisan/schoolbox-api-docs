@@ -65,6 +65,20 @@
                     </div>
                     {% endif %}
 
+                    {% if match.itinerary|length %}
+                    <dt>Itinerary</dt>
+                    <dd>
+                        <ul class="information-list">
+                            {% for currentItineraryItem in match.itinerary %}
+                            <li>
+                                {{ currentItineraryItem.startAt.local }}:
+                                {{ currentItineraryItem.description }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </dd>
+                    {% endif %}
+
                     <dt>Created</dt>
                     <dd>{{ match.createdAt.database }}</dd>
 
@@ -73,8 +87,6 @@
                         <dd>{{ match.updatedAt.database }}</dd>
                     {% endif %}
                 </dl>
-
-
             </div>
         </section>
     </div>

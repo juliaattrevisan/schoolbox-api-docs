@@ -13,9 +13,10 @@ namespace Schoolbox\SportsFixtures\Match;
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
-use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use \Schoolbox\SportsFixtures\Division\Model as Division;
-use \Schoolbox\SportsFixtures\Team\Model as Team;
+use Schoolbox\Collection;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\SportsFixtures\Division\Model as Division;
+use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Venue\Model as Venue;
 use Schoolbox\SportsFixtures\Result\Model as Result;
 
@@ -58,11 +59,15 @@ class Model implements ISoftDeletable {
     /** @var Result */
     protected $result;
 
+    /** @var Collection */
+    protected $itinerary;
+
     /**
      * Model constructor.
      */
     public function __construct()
     {
+        $this->setItinerary(new Collection());
     }
 
     /**
@@ -207,6 +212,22 @@ class Model implements ISoftDeletable {
     public function setResult($result)
     {
         $this->result = $result;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getItinerary()
+    {
+        return $this->itinerary;
+    }
+
+    /**
+     * @param Collection $itinerary
+     */
+    public function setItinerary($itinerary)
+    {
+        $this->itinerary = $itinerary;
     }
 
     /**

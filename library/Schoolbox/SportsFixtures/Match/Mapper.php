@@ -64,6 +64,14 @@ class Mapper extends BaseMapper
             'other_key' => 'match_id',
         ));
 
+        /* Reverse join thingo
+         */
+        $this->hasJoin('itinerary', array(
+            'mapper'    => ItineraryItemMapper::class,
+            'this_key'  => 'id',
+            'other_key' => 'match_id',
+        ));
+
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteItineraryItems'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteResults'));
     }
@@ -111,6 +119,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('away_team', 'a')},
 				{$this->getJoinColumnString('division', 'd')},
 				{$this->getJoinColumnString('venue', 'v')},
+				{$this->getJoinColumnString('itinerary', 'i')},
 				{$this->getJoinColumnString('result', 'r')}
         ";
     }
@@ -128,6 +137,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('away_team', null, 'a')}
             LEFT JOIN {$this->getJoinSql('division', null, 'd')}
             LEFT JOIN {$this->getJoinSql('venue', null, 'v')}
+            LEFT JOIN {$this->getJoinSql('itinerary', null, 'i')}
             LEFT JOIN {$this->getJoinSql('result', null, 'r')}
         ";
     }
@@ -168,7 +178,23 @@ class Mapper extends BaseMapper
             $match->setAwayTeam($awayTeam);
             $match->setResult($result);
 
-            $collection->add($match);
+            /* Set up us the match in the collection
+             */
+            if (!($collection->getOffset($match->getId()) instanceof Match)) {
+                $collection->setOffset($match->getId(), $match);
+            }
+
+            /* Append all itinerary items as you go
+             */
+            $itinerary = $this->hydrateJoin($row, 'itinerary', 'i');
+
+            $collection->getOffset($match->getId())->getItinerary()->add($itinerary);
+        }
+
+        /* Order itinerary items in asc order
+         */
+        foreach ($collection as $current) {
+            $current->getItinerary()->sortBy('startAt', 'asc');
         }
 
         return $collection;
