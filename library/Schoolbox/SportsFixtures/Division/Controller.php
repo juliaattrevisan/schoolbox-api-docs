@@ -431,22 +431,23 @@ class Controller extends AbstractController
 
         $positions = $this->getRequest()->post["positions"];
 
-        foreach ($positions as $position)
-        {
-            // Find the position
+        if (is_array($positions)) {
+            foreach ($positions as $position) {
+                // Find the position
 
-            /** @var PositionModel $positionModel */
-            try {
-                $positionModel = $this->getPositionMapper()->findById($position);
-            } catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_POSITION_NOT_FOUND);
+                /** @var PositionModel $positionModel */
+                try {
+                    $positionModel = $this->getPositionMapper()->findById($position);
+                } catch (MapperException $e) {
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_POSITION_NOT_FOUND);
+                }
+
+                $teamPosition = new TeamPositionModel();
+                $teamPosition->setTeam($team);
+                $teamPosition->setUser($player);
+                $teamPosition->setPosition($positionModel);
+                $this->getTeamPositionMapper()->save($teamPosition);
             }
-
-            $teamPosition = new TeamPositionModel();
-            $teamPosition->setTeam($team);
-            $teamPosition->setUser($player);
-            $teamPosition->setPosition($positionModel);
-            $this->getTeamPositionMapper()->save($teamPosition);
         }
 
         // Return to lobby
