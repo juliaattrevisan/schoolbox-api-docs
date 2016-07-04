@@ -29,7 +29,7 @@ class CommunityPortalFactory
             $key = false;
             $iv  = false;
             if (is_readable($webServicesKeyFile) && is_file($webServicesKeyFile)) {
-                $config = json_decode(file_get_contents($webServicesKeyFile));
+                $config = json_decode(file_get_contents($webServicesKeyFile), true);
                 $key    = base64_decode($config['key']);
                 $iv     = base64_decode($config['iv']);
             } else {
