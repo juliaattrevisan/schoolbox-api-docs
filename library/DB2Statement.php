@@ -14,8 +14,12 @@
  */
 class DB2Statement implements Iterator {
 
+    /** @var int $ptr zero-indexed */
     private $ptr = null;
-    private $valid = false;
+
+    /** @var array|bool $current */
+    private $current = false;
+
 
     /**
      * The SQL being executed
@@ -70,8 +74,8 @@ class DB2Statement implements Iterator {
         $success = db2_execute($this->statement, $sequential);
 
         if($success) {
-            $this->ptr = 0;
-            $this->valid = true;
+            $this->ptr     = 0;
+            $this->current = $this->fetch();
         }
         else {
             // non-fatal errors can occur here, so don't want them displayed but would like a log of them
@@ -162,11 +166,7 @@ class DB2Statement implements Iterator {
      * @return mixed Can return any type.
      */
     public function current() {
-        $fetch = $this->fetch();
-        if($fetch === false) {
-            $this->valid = false;
-        }
-        return $fetch;
+        return $this->current;
     }
 
     /**
@@ -176,6 +176,7 @@ class DB2Statement implements Iterator {
      */
     public function next() {
         ++$this->ptr;
+        $this->current = $this->fetch();
     }
 
     /**
@@ -194,7 +195,7 @@ class DB2Statement implements Iterator {
      *       Returns true on success or false on failure.
      */
     public function valid() {
-        return $this->valid;
+        return false !== $this->current;
     }
 
     /**
