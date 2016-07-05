@@ -43,8 +43,8 @@ fi
 #apt-get -y install ruby-bundler;
 #bundle install;
 
-echo "Installing and building Bower submodules";
-grunt bower build.deps;
+echo "Installing Bower submodules";
+grunt bower;
 if [ $? -ne 0 ];
 then
 	echo "An error occurred";
