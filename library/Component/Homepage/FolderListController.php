@@ -55,17 +55,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         $this->setBlock('folders', 'modify_folder', 'modify_folder_block');
 
         if(!$this->isSourceRenderable()) {
-            if($this->hasContextWriteAccess()) {
-                if(!$this->hasReadAccess()) {
-                    $this->renderAltSourceDenied();
-                } else if($this->getSource()->isDeleted()) {
-                    $this->renderAltSourceDeleted();
-                } else {
-                    $this->renderEmptyState();
-                }
-            } else {
-                return false;
-            }
+            return $this->renderSourceUnavailable();
         } else {
             $this->setVar('source_folder_deleted_block', '');
 

@@ -50,17 +50,7 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function renderTemplate($templateHandle)
     {
         if(!$this->isSourceRenderable()) {
-            if($this->hasContextWriteAccess()) {
-                if(!$this->hasReadAccess()) {
-                    return $this->renderTwigAltSourceDenied($templateHandle);
-                } else if($this->getSource()->isDeleted()) {
-                    return $this->renderTwigAltSourceDeleted($templateHandle);
-                } else {
-                    return $this->renderTwigEmptyState($templateHandle);
-                }
-            } else {
-                return false;
-            }
+            return $this->renderSourceUnavailableTwig($templateHandle);
         } else {
 
             // Limit to the number specified in blog component config (0 == 'ALL')

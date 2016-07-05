@@ -36,17 +36,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
         $this->parseConfig();
 
         if(!$this->isSourceRenderable()) {
-            if($this->hasContextWriteAccess()) {
-                if(!$this->hasReadAccess()) {
-                    $this->renderAltSourceDenied();
-                } else if($this->getSource()->isDeleted()) {
-                    $this->renderAltSourceDeleted();
-                } else {
-                    $this->renderEmptyState();
-                }
-            } else {
-                return false;
-            }
+            return $this->renderSourceUnavailable();
         } else {
             $this->setVar('source_folder_deleted_block', '');
 

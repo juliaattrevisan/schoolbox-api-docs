@@ -665,21 +665,66 @@ abstract class Component_ControllerAbstract
     }
 
     /**
+     * If current user has WRITE+ access to current context, render an empty state, else render nothing.
+     *
+     * Used by phpLib-based components.
+     *
+     * @return bool
+     */
+    protected function renderSourceUnavailable(){
+        if($this->hasContextWriteAccess()) {
+            if(!$this->hasReadAccess()) {
+                $this->renderAltSourceDenied();
+            } else if($this->getSource()->isDeleted()) {
+                $this->renderAltSourceDeleted();
+            } else {
+                $this->renderEmptyState();
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * If current user has WRITE+ access to current context, render an empty state, else render nothing.
+     *
+     * Used by twig-based components.
+     *
+     * @param string $templateHandle
+     * @return bool
+     */
+    protected function renderSourceUnavailableTwig($templateHandle){
+        if($this->hasContextWriteAccess()) {
+            if(!$this->hasReadAccess()) {
+                return $this->renderTwigAltSourceDenied($templateHandle);
+            } else if($this->getSource()->isDeleted()) {
+                return $this->renderTwigAltSourceDeleted($templateHandle);
+            } else {
+                return $this->renderTwigEmptyState($templateHandle);
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Convenience method for twig-based Components to render the 'AltSourceDeleted' empty state
      * @param string $templateHandle
-     * @return string
+     * @return bool
      */
     protected function renderTwigAltSourceDeleted($templateHandle){
-        $this->renderTwigEmptyState($templateHandle, self::EMPTY_STATE_REASON_DELETED);
+        return $this->renderTwigEmptyState($templateHandle, self::EMPTY_STATE_REASON_DELETED);
     }
 
     /**
      * Convenience method for twig-based Components to render the 'AltSourceDenied' empty state
      * @param string $templateHandle
-     * @return string
+     * @return bool
      */
     protected function renderTwigAltSourceDenied($templateHandle){
-        $this->renderTwigEmptyState($templateHandle, self::EMPTY_STATE_REASON_DENIED);
+        return $this->renderTwigEmptyState($templateHandle, self::EMPTY_STATE_REASON_DENIED);
     }
 
     /**
@@ -690,7 +735,7 @@ abstract class Component_ControllerAbstract
      *
      * @param string $templateHandle
      * @param int $reason Why we are unable to display this component's content.
-     * @return string
+     * @return bool
      */
     protected function renderTwigEmptyState($templateHandle, $reason = self::EMPTY_STATE_REASON_UNKNOWN){
 

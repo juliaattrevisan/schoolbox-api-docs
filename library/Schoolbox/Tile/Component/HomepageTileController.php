@@ -78,17 +78,7 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
     public function renderTemplate($templateHandle)
     {
         if(!$this->isSourceRenderable()) {
-            if($this->hasContextWriteAccess()) {
-                if(!$this->hasReadAccess()) {
-                    return $this->renderTwigAltSourceDenied($templateHandle);
-                } else if($this->getSource()->isDeleted()) {
-                    return $this->renderTwigAltSourceDeleted($templateHandle);
-                } else {
-                    return $this->renderTwigEmptyState($templateHandle);
-                }
-            } else {
-                return false;
-            }
+            return $this->renderSourceUnavailableTwig($templateHandle);
         } else {
             $twigTemplate = '@tile/component/tile.twig';
             $twigData = array(
