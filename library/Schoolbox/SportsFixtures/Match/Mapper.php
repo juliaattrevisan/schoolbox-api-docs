@@ -185,18 +185,22 @@ class Mapper extends BaseMapper
 
             /* Append all Result instances as you go
              */
-            if (!($collection->getOffset($matchId)->getResult()->getOffset($row['r.team_id']) instanceof Result)) {
-                $result = $this->hydrateJoin($row, 'result', 'r');
+            if ($row['r.team_id']) {
+                if (!($collection->getOffset($matchId)->getResult()->getOffset($row['r.team_id']) instanceof Result)) {
+                    $result = $this->hydrateJoin($row, 'result', 'r');
 
-                $collection->getOffset($matchId)->getResult()->setOffset($result->getTeam()->getId(), $result);
+                    $collection->getOffset($matchId)->getResult()->setOffset($result->getTeam()->getId(), $result);
+                }
             }
 
             /* Append all ItineraryItems as you go
              */
-            if (!($collection->getOffset($matchId)->getItinerary()->getOffset($row['i.id']) instanceof ItineraryItem)) {
-                $itineraryItem = $this->hydrateJoin($row, 'itinerary', 'i');
+            if ($row['i.id']) {
+                if (!($collection->getOffset($matchId)->getItinerary()->getOffset($row['i.id']) instanceof ItineraryItem)) {
+                    $itineraryItem = $this->hydrateJoin($row, 'itinerary', 'i');
 
-                $collection->getOffset($matchId)->getItinerary()->setOffset($itineraryItem->getId(), $itineraryItem);
+                    $collection->getOffset($matchId)->getItinerary()->setOffset($itineraryItem->getId(), $itineraryItem);
+                }
             }
         }
 
