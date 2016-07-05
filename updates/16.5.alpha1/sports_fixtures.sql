@@ -293,3 +293,17 @@ INSERT INTO `msg_route_perm`
 SELECT s.id src_id, g.id role_id, 'MU,IN,MO,EM', 'IN,MO' FROM msg_source s
 JOIN groups g ON g.group_type = s.role_type
 WHERE s.namespace = @sportns;
+
+INSERT INTO `component_definition` (id, name, class, description, module, component_category, visible, multiple)
+VALUES (86, 'Sport Fixtures', 'Schoolbox\\SportsFixtures\\Homepage\\Component\\Controller', 'Shows sports fixtures', 'homepage', 1, 'true', 'true');
+
+INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
+VALUES (86, 'collapse', '0', 'Collapse Content', null);
+
+INSERT INTO `component_definition` (id, name, class, description, module, component_category, visible, multiple)
+VALUES (87, 'Sport Fixtures', 'Schoolbox\\SportsFixtures\\Homepage\\Component\\Controller', 'Shows sports fixtures', 'dashboard', null, 'true', 'true');
+
+INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
+VALUES (87, 'collapse', '0', 'Collapse Content', null);
+
+
