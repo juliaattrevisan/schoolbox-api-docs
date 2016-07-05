@@ -37,8 +37,8 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
      */
     public function execute()
     {
-        // Hide Dashboard components if the folder they pull data is soft-deleted or user lacks perm.
-        return $this->isSourceRenderable();
+        // Hide Dashboard components if the folder they pull data from is soft-deleted
+        return (!$this->isUsingAltSource() || !$this->getSource()->isDeleted());
     }
 
     protected function getTemplate($templateName = '', $templatePath = '')
