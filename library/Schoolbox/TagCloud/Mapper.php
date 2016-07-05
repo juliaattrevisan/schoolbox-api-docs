@@ -82,7 +82,9 @@ class Mapper extends BaseMapper
      */
     public function getTagLike($string) {
         $query = "
-            SELECT {$this->getColumnString('t')}
+            SELECT 
+              `t`.id as id, 
+              `t`.name as name
             FROM {$this->getTable()} `t`
             WHERE t.{$this->fieldValue} LIKE ?
             ORDER BY t.{$this->fieldValue} ASC
@@ -94,7 +96,10 @@ class Mapper extends BaseMapper
         $records = new Collection();
 
         foreach ($statement as $row)
-            $records->add($row);
+            $records->add([
+                'id' => $row['id'],
+                'name' => $row['name']
+            ]);
 
         return $records;
     }

@@ -22,6 +22,7 @@ use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use \Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
 use \Schoolbox\SportsFixtures\Venue\Model as Venue;
 use \Schoolbox\SportsFixtures\Venue\Mapper as VenueMapper;
+use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
 
 class Controller extends AbstractController
 {
@@ -61,6 +62,11 @@ class Controller extends AbstractController
     protected $errorMapper;
 
     /**
+     * @var TagCloudMapper
+     */
+    protected $schoolTagCloudMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -72,6 +78,7 @@ class Controller extends AbstractController
         $this->setItineraryItemMapper(ItineraryItemMapper::getInstance());
         $this->setVenueMapper(VenueMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
+        $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
     }
 
     /**
@@ -109,7 +116,8 @@ class Controller extends AbstractController
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/list.twig', [
             'sport' => $sport,
             'division' => $context,
-            'allMatches' => $allMatches
+            'allMatches' => $allMatches,
+            'schoolMapper' => $this->getSchoolTagCloudMapper()
         ]));
     }
 
@@ -144,6 +152,7 @@ class Controller extends AbstractController
             'sport'             => $sport,
             'division'          => $context,
             'match'             => $entity,
+            'schoolMapper'      => $this->getSchoolTagCloudMapper(),
             'allItineraryItems' => $allItineraryItems,
             'action'            => $entity->getId() ? 'Modify' : 'Create'
         ]));
@@ -205,7 +214,14 @@ class Controller extends AbstractController
 
         try {
             $homeTeam = $this->getTeamMapper()->findById($this->getRequest()->post['homeTeamId']);
-            $awayTeam = $this->getTeamMapper()->findById($this->getRequest()->post['awayTeamId']);
+            if (substr($this->getRequest()->post['awayTeamId'], 0, 4) == "tag:") {
+                // Away team is a faceless school, save the team as null
+                $awayTeam = new Team();
+                $awaySchoolId = substr($this->getRequest()->post['awayTeamId'], 4);
+            } else {
+                $awayTeam = $this->getTeamMapper()->findById($this->getRequest()->post['awayTeamId']);
+                $awaySchoolId = null;
+            }
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
@@ -218,7 +234,7 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
         }
 
-        $this->saveMatch($entity, $division, $this->getRequest()->post['name'], $startAt, $homeTeam, $awayTeam, $venue);
+        $this->saveMatch($entity, $division, $this->getRequest()->post['name'], $startAt, $homeTeam, $awayTeam, $awaySchoolId, $venue);
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesMatch.getList', [
             'contextId' => $divisionId
@@ -234,15 +250,17 @@ class Controller extends AbstractController
      * @param \Alaress_Date_Format $startAt
      * @param Team $homeTeam
      * @param Team $awayTeam
+     * @param int $awaySchoolId
      * @param Venue $venue
      */
-    private function saveMatch(Match $match, Division $division, $name, \Alaress_Date_Format $startAt, Team $homeTeam, Team $awayTeam, Venue $venue)
+    private function saveMatch(Match $match, Division $division, $name, \Alaress_Date_Format $startAt, Team $homeTeam, Team $awayTeam, $awaySchoolId, Venue $venue)
     {
         $match->setDivision($division);
         $match->setName($name);
         $match->setStartAt($startAt);
         $match->setHomeTeam($homeTeam);
         $match->setAwayTeam($awayTeam);
+        $match->setAwaySchoolId($awaySchoolId);
         $match->setVenue($venue);
         $match->setUpdatedAt(\Alaress_Date_Format::now());
 
@@ -364,5 +382,21 @@ class Controller extends AbstractController
     protected function setErrorMapper($errorMapper)
     {
         $this->errorMapper = $errorMapper;
+    }
+
+    /**
+     * @return TagCloudMapper
+     */
+    protected function getSchoolTagCloudMapper()
+    {
+        return $this->schoolTagCloudMapper;
+    }
+
+    /**
+     * @param TagCloudMapper $schoolTagCloudMapper
+     */
+    protected function setSchoolTagCloudMapper($schoolTagCloudMapper)
+    {
+        $this->schoolTagCloudMapper = $schoolTagCloudMapper;
     }
 }

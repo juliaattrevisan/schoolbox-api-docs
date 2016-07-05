@@ -84,12 +84,15 @@
 
         $('#awayTeam').selectizeSelector({
             ajax: {
-                url:      '/sportsfixtures/divisions/{{ division.id }}/teams',
+                url:      '/sportsfixtures/divisions/{{ division.id }}/teams?schools=1',
                 type:     'GET',
                 dataType: 'json'
             },
             {% if match.awayTeam.id %}
             value: {"id":{{ match.awayTeam.id }},"name":"{{ match.awayTeam.name }}"},
+            {% endif %}
+            {% if match.awaySchoolId %}
+            value: {"id":'tag:{{ match.awaySchoolId }}',"name":"{{ schoolMapper.getTagValue(match.awaySchoolId) }}"},
             {% endif %}
             multiple: false
         });
