@@ -11,29 +11,6 @@ module.exports = function(grunt) {
             },
             install: {}
         },
-        shell: {
-            options: {
-                stdout: false,
-                stederr: true,
-                failOnError: true
-            },
-            "jqueryui.install": {
-                command: 'npm install',
-                options: {
-                    execOptions: {
-                        cwd: 'www/javascript/components/jquery.ui/'
-                    }
-                }
-            },
-            "jqueryui.build": {
-                command: 'grunt build',
-                options: {
-                    execOptions: {
-                        cwd: 'www/javascript/components/jquery.ui/'
-                    }
-                }
-            }
-        },
         uglify: {
             options: {
                 banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
@@ -68,7 +45,7 @@ module.exports = function(grunt) {
                     'www/javascript/jquery.alaressValidate.js',
 
                     // jQueryUI
-                    'www/javascript/components/jquery.ui/dist/jquery-ui.js',
+                    'www/javascript/components/jquery-ui/ui/jquery-ui.js',
 
                     // jQueryUI Touch Punch
                     'www/javascript/components/jqueryui-touch-punch-improved/jquery.ui.touch-punch-improved.js',
@@ -144,9 +121,6 @@ module.exports = function(grunt) {
     require('jit-grunt')(grunt, {bower: 'grunt-bower-task'})
 
     // Build tasks
-    grunt.registerTask('build.deps', [
-        'shell:jqueryui.install', 'shell:jqueryui.build'
-    ]);
     grunt.registerTask('build.js',   ['uglify']);
     grunt.registerTask('sass', 'Builds SASS stylesheet (through tools/skin/builder.php)', function() {
         // Run sass build
@@ -157,6 +131,6 @@ module.exports = function(grunt) {
             grunt.fail.warn("Skin may not have been built successfully! (error code: "+String(result.code)+')');
         }
     });
-    grunt.registerTask('build',      ['bower', 'build.deps', 'build.js', 'sass']);
+    grunt.registerTask('build',      ['bower', 'build.js', 'sass']);
     grunt.registerTask('default',    ['build']);
 };
