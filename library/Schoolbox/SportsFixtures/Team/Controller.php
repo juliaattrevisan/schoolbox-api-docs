@@ -115,12 +115,17 @@ class Controller extends AbstractController
     {
         /* ajax a list of Teams for a particular Division
          */
-        if ($this->getRequest()->isXhr()) {
+        if (true ||$this->getRequest()->isXhr()) {
             $query = $this->getRequest()->query->get('query');
 
             /** @var TeamMapper $mapper */
             $mapper   = $this->getMapper();
-            $allTeams = $mapper->findByName($context->getId(), $query);
+
+            if ($context == null) {
+                $allTeams = $mapper->findByColumn('~name', "%{$query}%");
+            } else {
+                $allTeams = $mapper->findByName($context->getId(), $query);
+            }
 
             $teams = [];
 
