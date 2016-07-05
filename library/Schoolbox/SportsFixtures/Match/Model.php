@@ -56,7 +56,7 @@ class Model implements ISoftDeletable {
     /** @var \Alaress_Date_Format */
     protected $updatedAt;
 
-    /** @var Result */
+    /** @var Collection */
     protected $result;
 
     /** @var Collection */
@@ -68,6 +68,7 @@ class Model implements ISoftDeletable {
     public function __construct()
     {
         $this->setItinerary(new Collection());
+        $this->setResult(new Collection());
     }
 
     /**
@@ -199,7 +200,7 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @return Result
+     * @return Collection
      */
     public function getResult()
     {
@@ -207,7 +208,7 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @param Result $result
+     * @param Collection $result
      */
     public function setResult($result)
     {

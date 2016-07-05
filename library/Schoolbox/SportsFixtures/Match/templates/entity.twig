@@ -43,19 +43,25 @@
                     </dd>
                     {% endif %}
 
-                    {% if match.result.id %}
+                    {% if match.result|length %}
                     <dt>Result</dt>
                     <dd>
-                        <div class="actions-small-1 row">
-                            <div class="list-item">
-                                <div class="small-12 columns">
-                                    {{ match.result.description|raw }}
+                        <ul class="information-list">
+                            {% for currentResult in match.result %}
+                            <li>
+                                <div class="actions-small-1 row">
+                                    <div class="list-item">
+                                        <div class="small-12 columns">
+                                            {{ currentResult.description|raw }}
+                                        </div>
+                                    </div>
+                                    <nav>
+                                        <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: currentResult.id}) }}" class="icon-modify" title="Modify"></a>
+                                    </nav>
                                 </div>
-                            </div>
-                            <nav>
-                                <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: match.result.id}) }}" class="icon-modify" title="Modify"></a>
-                            </nav>
-                        </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
                     </dd>
                     {% else %}
                     <div class="empty-state">

@@ -23,6 +23,7 @@ use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Venue\Model as Venue;
 use Schoolbox\SportsFixtures\Venue\Mapper as VenueMapper;
+use Schoolbox\SportsFixtures\ItineraryItem\Model as ItineraryItem;
 use Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
 use Schoolbox\SportsFixtures\Result\Model as Result;
 use Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
@@ -154,7 +155,6 @@ class Mapper extends BaseMapper
         $collection = new Collection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-
             $matchId = $row['id'];
 
             /* Set up us the match in the collection
@@ -175,24 +175,28 @@ class Mapper extends BaseMapper
                 $homeTeam = $this->hydrateJoin($row, 'home_team', 'h');
                 $awayTeam = $this->hydrateJoin($row, 'away_team', 'a');
 
-                /** @var Result $result */
-                $result = $this->hydrateJoin($row, 'result', 'r');
-
                 $match->setVenue($venue);
                 $match->setDivision($division);
                 $match->setHomeTeam($homeTeam);
                 $match->setAwayTeam($awayTeam);
-                $match->setResult($result);
 
                 $collection->setOffset($match->getId(), $match);
             }
 
-            /* Append all itinerary items as you go
+            /* Append all Result instances as you go
              */
-            $itinerary = $this->hydrateJoin($row, 'itinerary', 'i');
+            if (!($collection->getOffset($matchId)->getResult()->getOffset($row['r.team_id']) instanceof Result)) {
+                $result = $this->hydrateJoin($row, 'result', 'r');
 
-            if ($itinerary->getId()) {
-                $collection->getOffset($matchId)->getItinerary()->add($itinerary);
+                $collection->getOffset($matchId)->getResult()->setOffset($result->getTeam()->getId(), $result);
+            }
+
+            /* Append all ItineraryItems as you go
+             */
+            if (!($collection->getOffset($matchId)->getItinerary()->getOffset($row['i.id']) instanceof ItineraryItem)) {
+                $itineraryItem = $this->hydrateJoin($row, 'itinerary', 'i');
+
+                $collection->getOffset($matchId)->getItinerary()->setOffset($itineraryItem->getId(), $itineraryItem);
             }
         }
 
