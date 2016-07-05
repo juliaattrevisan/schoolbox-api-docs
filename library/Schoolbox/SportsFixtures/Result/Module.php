@@ -53,17 +53,11 @@ class Module extends RestfulModule
         $this->addRoutePermission($authorizer, '.*', $isSportsAdministrator);
     }
 
-
     /**
-     * Initializes any routes for this module, with a given base path.
-     *
-     * The base path for each route needs to match up to the name of the
-     * controller in $this->initControllers(), so if its base path is
-     * "user", there must be a controller in the DI container called
-     * "controller:user"
+     * {@inheritdoc}
      *
      * @param Router $router
-     * @param string $basePath The base route for this module
+     * @param string $basePath
      */
     public function initRoutes(Router $router, $basePath)
     {
@@ -87,6 +81,11 @@ class Module extends RestfulModule
         }
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param PathMatcher $matcher
+     */
     public function initRoutePreloads(PathMatcher $matcher)
     {
         parent::initRoutePreloads($matcher);
@@ -97,6 +96,13 @@ class Module extends RestfulModule
                 'entity' => $this->mapper->createModel(),
                 'context' => $this->findContextById($params['contextId']),
                 'team' => TeamMapper::getInstance()->findById($params['teamId'])
+            ];
+        });
+
+        $this->addRoutePreload($matcher, '(?:createEntity)', function () {
+            return [
+                'entity' => $this->mapper->createModel(),
+                'team' => TeamMapper::getInstance()->createModel()
             ];
         });
     }

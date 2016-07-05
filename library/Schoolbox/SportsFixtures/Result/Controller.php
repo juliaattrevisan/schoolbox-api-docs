@@ -19,6 +19,8 @@ use Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use \Schoolbox\SportsFixtures\Result\Model as Result;
 use \Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
+use \Schoolbox\SportsFixtures\Team\Model as Team;
+use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 
 class Controller extends AbstractController
 {
@@ -38,6 +40,11 @@ class Controller extends AbstractController
     protected $matchMapper;
 
     /**
+     * @var TeamMapper
+     */
+    protected $teamMapper;
+
+    /**
      * @var ErrorMapper
      */
     protected $errorMapper;
@@ -51,6 +58,7 @@ class Controller extends AbstractController
         $this->setSportMapper(SportMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
         $this->setMatchMapper(MatchMapper::getInstance());
+        $this->setTeamMapper(TeamMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
@@ -86,9 +94,6 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
-        /* TODO: Get $teamId from somewhere
-         */
-
         /* If results already exist, modify it instead
          */
         try {
@@ -104,6 +109,7 @@ class Controller extends AbstractController
             'sport'    => $sport,
             'division' => $division,
             'match'    => $context,
+            'team'     => $team,
             'result'   => $entity,
             'action'   => $entity->getId() ? 'Modify' : 'Create'
         ]));
@@ -208,7 +214,15 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
         }
 
-        $this->saveResult($match, $this->getRequest()->post['description'], $entity);
+        try {
+            /** @var Team $team */
+            $teamId = $this->getRequest()->post['teamId'];
+            $team   = $this->getTeamMapper()->findById($teamId);
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+        }
+
+        $this->saveResult($match, $team, $this->getRequest()->post['description'], $entity);
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesResult.getList', [
             'contextId' => $matchId
@@ -219,13 +233,14 @@ class Controller extends AbstractController
      * Save Result data to db
      *
      * @param Match $match
-
+     * @param Team $team
      * @param string $description
      * @param Result $result
      */
-    private function saveResult(Match $match, $description, Result $result)
+    private function saveResult(Match $match, Team $team, $description, Result $result)
     {
         $result->setMatch($match);
+        $result->setTeam($team);
         $result->setDescription($description);
         $result->setUpdatedAt(Alaress_Date_Format::now());
 
@@ -281,6 +296,22 @@ class Controller extends AbstractController
     public function setMatchMapper($matchMapper)
     {
         $this->matchMapper = $matchMapper;
+    }
+
+    /**
+     * @return TeamMapper
+     */
+    public function getTeamMapper()
+    {
+        return $this->teamMapper;
+    }
+
+    /**
+     * @param TeamMapper $teamMapper
+     */
+    public function setTeamMapper($teamMapper)
+    {
+        $this->teamMapper = $teamMapper;
     }
 
     /**
