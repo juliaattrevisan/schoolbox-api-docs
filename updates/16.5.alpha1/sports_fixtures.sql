@@ -152,6 +152,7 @@ CREATE TABLE `sportsfixtures_match_itineraryitem` (
 CREATE TABLE `sportsfixtures_result` (
 	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
 	`match_id` INT NOT NULL,
+	`team_id` INT NOT NULL,
 	`description` TEXT NULL COMMENT '',
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',

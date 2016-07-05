@@ -55,6 +55,61 @@ class Controller extends AbstractController
     }
 
     /**
+     * Populate the Response object with a form that provides a means to mutate the given (new) entity.
+     * Only text/html is Accept-able.
+     *
+     * @param object $entity
+     * @param object $team
+     * @param object $context
+     * @throws Exception
+     * @return void
+     */
+    public function getCreateFormForTeam($entity, $team, $context = null)
+    {
+        if (empty($context)) {
+            try {
+                $context = $this->getMatchMapper()->findById($entity->getMatch()->getId());
+            } catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
+            }
+        }
+
+        try {
+            $division = $this->getDivisionMapper()->findById($context->getDivision()->getId());
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
+        }
+
+        try {
+            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
+        }
+
+        /* TODO: Get $teamId from somewhere
+         */
+
+        /* If results already exist, modify it instead
+         */
+        try {
+            $entity = $this->getMapper()->findOneByColumnList([
+                'match_id' => $context->getId(),
+                'team_id' => $team->getId()
+            ]);
+        }
+        catch (MapperException $e) {
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/create.twig', [
+            'sport'    => $sport,
+            'division' => $division,
+            'match'    => $context,
+            'result'   => $entity,
+            'action'   => $entity->getId() ? 'Modify' : 'Create'
+        ]));
+    }
+
+    /**
      * List of Results and the Match they are in
      *
      * @param Match $context
@@ -135,41 +190,7 @@ class Controller extends AbstractController
      */
     protected function getForm($entity, $context = null)
     {
-        if (empty($context)) {
-            try {
-                $context = $this->getMatchMapper()->findById($entity->getMatch()->getId());
-            } catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
-            }
-        }
 
-        try {
-            $division = $this->getDivisionMapper()->findById($context->getDivision()->getId());
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
-        }
-
-        try {
-            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
-        }
-
-        /* If results already exist, modify it instead
-         */
-        try {
-            $entity = $this->getMapper()->findOneByColumn('match_id', $context->getId());
-        }
-        catch (MapperException $e) {
-        }
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/create.twig', [
-            'sport'    => $sport,
-            'division' => $division,
-            'match'    => $context,
-            'result'   => $entity,
-            'action'   => $entity->getId() ? 'Modify' : 'Create'
-        ]));
     }
 
     /**

@@ -11,6 +11,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use \Alaress_Date_Format;
 use Schoolbox\SportsFixtures\Match\Model as Match;
+use Schoolbox\SportsFixtures\Team\Model as Team;
 
 
 /**
@@ -28,6 +29,9 @@ class Model implements ISoftDeletable
 
     /** @var Match $match */
     protected $match;
+
+    /** @var Team $team */
+    protected $team;
 
     /** @var string */
     protected $description;
@@ -78,6 +82,22 @@ class Model implements ISoftDeletable
     public function setDescription($description)
     {
         $this->description = $description;
+    }
+
+    /**
+     * @return Team
+     */
+    public function getTeam()
+    {
+        return $this->team;
+    }
+
+    /**
+     * @param Team $team
+     */
+    public function setTeam($team)
+    {
+        $this->team = $team;
     }
 
     /**
