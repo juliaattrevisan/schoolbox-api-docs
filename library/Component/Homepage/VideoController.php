@@ -50,8 +50,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         } else {
             $this->setVar('source_folder_deleted_block', '');
 
-
-            $videoResourceMapper = new \Schoolbox\Video\ResourceVideoMapper();
+            $videoResourceMapper = \Schoolbox\Video\ResourceVideoMapper::getInstance();
 
             /* Sort order
              */
