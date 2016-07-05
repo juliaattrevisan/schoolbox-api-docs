@@ -930,8 +930,8 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Return whether we are unable to render this component's content.
-     * Either due to lack of permission, or because content is deleted.
+     * Return whether we are able to render this component's content for current user.
+     * False if lacks READ+ permission on content, or because content is deleted.
      * @return bool
      */
     public function isSourceRenderable(){
