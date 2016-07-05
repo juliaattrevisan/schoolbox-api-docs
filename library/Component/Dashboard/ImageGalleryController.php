@@ -45,7 +45,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
      */
     public function execute()
     {
-        if(!parent::execute()){
+        if(!$this->isSourceRenderable()){
             return false;
         }
 

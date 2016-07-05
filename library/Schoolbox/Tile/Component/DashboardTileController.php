@@ -61,9 +61,10 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
      */
     public function execute()
     {
-        if(!parent::execute()){
+        if(!$this->isSourceRenderable()){
             return false;
         }
+
         $this->setLayout($this->delegate->fetchLayout($this));
         return true;
     }

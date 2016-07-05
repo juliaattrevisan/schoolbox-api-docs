@@ -34,9 +34,10 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
      */
     public function execute()
     {
-        if(!parent::execute()){
+        if(!$this->isSourceRenderable()){
             return false;
         }
+
         $this->groupHandler = new Group();
         $this->setFileMapper(Schoolbox\Resource\File\Mapper::getInstance());
         return true;

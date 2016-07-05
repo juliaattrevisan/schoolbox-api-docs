@@ -40,8 +40,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
     public function execute()
     {
         // Always render (possibly emptyState) if WRITE+ to this page or READ+ to extant content
-        $sourceDeleted = $this->isUsingAltSource() && $this->getSource()->isDeleted();
-        return $this->hasContextWriteAccess() || ($this->hasReadAccess() && !$sourceDeleted);
+        return $this->hasContextWriteAccess() || $this->isSourceRenderable();
     }
 
     /**

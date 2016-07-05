@@ -61,8 +61,10 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
      */
     public function execute()
     {
-        if(!parent::execute()){
-            return false;
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
+        if(!$this->isSourceRenderable()){
+            return $this->hasContextWriteAccess();
         }
         
         // Get the list of students for this class (in which method?)

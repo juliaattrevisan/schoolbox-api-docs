@@ -35,13 +35,10 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
      */
     public function execute()
     {
-        if(!parent::execute()){
-            return false;
-        }
-
-        // Short Circuit: No point to load data if we can't view it
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
         if(!$this->isSourceRenderable()){
-            return true;
+            return $this->hasContextWriteAccess();
         }
 
         $this->allowedFileHandler = new AllowedFile();

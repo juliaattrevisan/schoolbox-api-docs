@@ -27,9 +27,12 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
      */
     public function execute()
     {
-        if(!parent::execute()){
-            return false;
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
+        if(!$this->isSourceRenderable()){
+            return $this->hasContextWriteAccess();
         }
+
         $this->submissionList = new Collection(
             SubmissionBoxMapper::getInstance()
                 ->getUpcomingActivities(null, $this->getConfig('size'), $this->getContext()->getId())

@@ -22,9 +22,12 @@ class Component_Homepage_RandImageController extends Component_Homepage_Controll
      */
     public function execute()
     {
-        if(!parent::execute()){
-            return false;
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
+        if(!$this->isSourceRenderable()){
+            return $this->hasContextWriteAccess();
         }
+
         $this->db = DeprecatedDatabase::getInstance();
         return true;
     }

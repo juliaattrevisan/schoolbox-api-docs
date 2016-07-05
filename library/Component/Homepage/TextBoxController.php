@@ -22,13 +22,10 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
      */
     public function execute()
     {
-        if(!parent::execute()){
-            return false;
-        }
-
-        // Short Circuit: No point to load data if we can't view it
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
         if(!$this->isSourceRenderable()){
-            return true;
+            return $this->hasContextWriteAccess();
         }
 
         $this->groupHandler = new Group();

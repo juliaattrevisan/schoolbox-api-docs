@@ -25,9 +25,10 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
      */
     public function execute()
     {
-        if(!parent::execute()){
+        if(!$this->isSourceRenderable()){
             return false;
         }
+
         $this->groupHandler = new Group();
         return true;
     }
