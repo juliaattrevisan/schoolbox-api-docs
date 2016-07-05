@@ -78,7 +78,7 @@ class Staff extends IteratorIterator
             if (strlen($currentEmail->getAddress())) {
                 $staff->addEmail($currentEmail);
             }
-	}
+        }
 
         /* Work Email - one for every item in stack
          */
