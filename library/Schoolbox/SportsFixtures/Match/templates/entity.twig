@@ -61,10 +61,11 @@
                     <div class="empty-state">
                         <i class="icon-result"></i>
                         <p>There are no Results for this Match.</p>
-                        <p><a href="{{ routeLookup('sportsfixturesResult.getCreateForm', {contextId: match.id}) }}" title="Add Results">Add Results.</a></p>
+
+                        <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}" title="Add Results">Add Results for the Home Team.</a></p>
+                        <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}" title="Add Results">Add Results for the Away Team.</a></p>
                     </div>
                     {% endif %}
-
 
                     {% if match.itinerary|length %}
                     <dt>Itinerary</dt>
