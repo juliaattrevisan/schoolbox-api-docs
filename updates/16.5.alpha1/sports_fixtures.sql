@@ -192,3 +192,10 @@ CREATE TABLE `sportsfixtures_team_position` (
 	ON DELETE CASCADE
 	ON UPDATE CASCADE
 ) ENGINE=InnoDB CHARACTER SET=utf8;
+
+/* Tag cloud of enemy schools */
+CREATE TABLE `sportsfixtures_school` (
+	`id` int(11) NOT NULL AUTO_INCREMENT,
+	`name` varchar(255) DEFAULT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
