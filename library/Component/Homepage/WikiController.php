@@ -51,13 +51,6 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
             return false;
         }
 
-        // Set up component name
-        $this->setVar(array(
-            'COMPONENT_INSTANCE_ID' => $this->instance->getId(),
-        ));
-
-
-
         /* Need title injected here
          */
         $this->parseConfig();
