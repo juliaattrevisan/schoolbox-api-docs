@@ -196,7 +196,13 @@ class Controller extends AbstractController
      */
     protected function getForm($entity, $context = null)
     {
+        try {
+            $team = $this->getTeamMapper()->findById($entity->getTeam()->getId());
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+        }
 
+        $this->getCreateFormForTeam($entity, $team, $context);
     }
 
     /**
