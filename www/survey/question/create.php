@@ -157,6 +157,7 @@ if (!empty($_POST)) {
             'QUESTION'              => '',
             'MARKS'                 => '',
             'SUBMIT_DISABLED'       => '',
+            'RETURN_URL'            => ''
         )
     );
 

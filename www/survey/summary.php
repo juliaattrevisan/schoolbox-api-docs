@@ -56,6 +56,7 @@ $this->setVar(array(
     'ASSESS_CATEGORY_ID'   => $folder->getId(),
     'ASSESS_CATEGORY_NAME' => $folder->getName(),
     'RETURN_URL'           => '',
+    'RETURN_URL_DECODED'   => '',
 ));
 
 $this->setFile(TEMPLATE_content, 'assess/summary.html');
