@@ -12,6 +12,7 @@ use Alaress\Web\Controller\Exception;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
+use \Schoolbox\SportsFixtures\Coach;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Division\Model as Division;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
@@ -62,6 +63,11 @@ class Controller extends AbstractController
     protected $schoolTagCloudMapper;
 
     /**
+     * @var Coach\Mapper
+     */
+    protected $coachMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -74,6 +80,7 @@ class Controller extends AbstractController
         $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
+        $this->setCoachMapper(Coach\Mapper::getInstance());
     }
 
     /**
@@ -91,13 +98,7 @@ class Controller extends AbstractController
         $sport = $this->getSportMapper()->findById($division->getSport()->getId());
 
         // Load coaches into entity
-        /** @var TeamUserModel[] $teamCoaches */
-        $teamCoaches = $this->getTeamUserMapper()->findByColumnList(
-            ['team_id' => $entity->getId(), 'user_type' => TeamUserModel::USERTYPE_COACH,]
-        );
-        foreach ($teamCoaches as $teamCoach) {
-            $entity->getCoaches()->add($teamCoach->getUser());
-        }
+        $entity->setCoaches($this->getCoachMapper()->findForTeam($entity));
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/entity.twig', [
             'sport'    => $sport,
@@ -458,5 +459,23 @@ class Controller extends AbstractController
     protected function setSchoolTagCloudMapper($schoolTagCloudMapper)
     {
         $this->schoolTagCloudMapper = $schoolTagCloudMapper;
+    }
+
+    /**
+     * @return Coach\Mapper
+     */
+    public function getCoachMapper()
+    {
+        return $this->coachMapper;
+    }
+
+    /**
+     * @param Coach\Mapper $coachMapper
+     * @return static
+     */
+    public function setCoachMapper($coachMapper)
+    {
+        $this->coachMapper = $coachMapper;
+        return $this;
     }
 }
