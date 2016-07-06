@@ -22,14 +22,23 @@
         });
 
         // Selectize box for selecting one or more users
+        // This box allows freetext entry, because of the requirement that
+        // coaches won't always be Schoolbox users.
         $('[data-role="userSelector"]')
             .selectizeSelector({
                 multiple: true,
                 ajax: {
-                    url:      '/ajax/user.php',
+                    url:      '/ajax/tags/sport_coach',
                     type:     'GET',
-                    data:     {groupID: 0},
                     dataType: 'json'
+                },
+                selectize: {
+                    create: function(input) {
+                        var freeEntry = {};
+                        freeEntry[this.settings.valueField]  = input;
+                        freeEntry[this.settings.searchField] = input;
+                        return freeEntry;
+                    }
                 }
             });
     });
