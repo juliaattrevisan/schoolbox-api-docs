@@ -24,8 +24,11 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
     {
         // If current user can't view component's source, only display the
         // component if the user has context WRITE+ permission
+
         if(!$this->isSourceRenderable()){
-            return $this->hasContextWriteAccess();
+            if(!$this->hasContextWriteAccess()){
+                return false;
+            }
         }
 
         $this->groupHandler = new Group();
@@ -66,7 +69,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         $this->setBlock('source_folder_exists', 'text_locked', 'text_locked_block');
         $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
         $this->setBlock('text_locked', 'create_text', 'create_text_block');
-        
 
 
 
@@ -75,8 +77,9 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         } else {
             $this->setVar('source_folder_deleted_block', '');
 
-            /* Remember where the texbox came from - if you modify a streamed
-             * textbox which comes from another homepage, you were able to
+            /*
+             * Remember where the textBox came from - if you modify a streamed
+             * textBox which comes from another homepage, you were able to
              * inadvertently steal ownership of it
              */
             $heading = Scrub::text($this->getTextbox()->getHeading());
@@ -130,7 +133,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                 // formatted text
                 $this->parse('text_locked_block', 'text_locked');
             }
-            $this->parse('source_folder_exists_block','source_folder_exists');
+            $this->parse('source_folder_exists_block', 'source_folder_exists');
         }
 
         /* Need title injected here
