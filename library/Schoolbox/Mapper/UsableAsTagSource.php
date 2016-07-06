@@ -13,7 +13,11 @@ use Schoolbox\User;
 /**
  * Interface for Mapper objects which may be used as the source for a tag cloud.
  *
- * A stripped-down version of Searchable
+ * In practise, this is a stripped-down version of Searchable.
+ *
+ * Mappers which implement this interface should use a model class which
+ * implements JsonSerializable, so that a collection from this source can be
+ * sent as a JSON string.
  *
  * @package Schoolbox\Mapper
  */
