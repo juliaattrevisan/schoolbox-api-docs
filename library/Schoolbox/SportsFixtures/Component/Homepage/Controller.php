@@ -119,7 +119,11 @@ class Controller extends Component_Homepage_ControllerAbstract
         $teams = [];
         $sports = [];
 
+        // Get the team we are looking at
+
         $team = $this->getTeamMapper()->findById($this->config["team"]["value"]);
+
+        // Load all home and away matches for the team
 
         $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getId());
         $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getId());
@@ -128,6 +132,7 @@ class Controller extends Component_Homepage_ControllerAbstract
 
         /** @var Match $match */
         foreach ($home_matches as $match) {
+            // Only want future matches
             if ($match->getStartAt()->isFuture()) {
                 $matches[] = $match;
 
@@ -156,6 +161,7 @@ class Controller extends Component_Homepage_ControllerAbstract
         }
 
         foreach ($away_matches as $match) {
+            // Only want future matches
             if ($match->getStartAt()->isFuture()) {
                 $matches[] = $match;
 
@@ -183,7 +189,7 @@ class Controller extends Component_Homepage_ControllerAbstract
             }
         }
 
-        // Sort by date order
+        // Sort matches by date order
         usort($matches, function($a, $b) {
             /** @var Match $a */
             /** @var Match $b */

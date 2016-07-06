@@ -126,10 +126,11 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
             foreach ($_SESSION["children"] as $child) {
 
-                // Create array ot hold childs matches
+                // Create array to hold childs matches
                 $child["matches"] = [];
 
                 try {
+                    // Get the teams the child is on
                     $childTeams = $this->getTeamUserMapper()->findByColumn('user_id', $child["id"]);
 
                     /** @var TeamUser $team */
@@ -140,15 +141,16 @@ class Controller extends Component_Dashboard_ControllerAbstract
                             $teams[$team->getTeam()->getId()] = $this->getTeamMapper()->findById($team->getTeam()->getId())->getName();
                         }
 
+                        // Get all home and away matches for the current team
                         $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getTeam()->getId());
                         $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getTeam()->getId());
 
+                        // Create an array to hold these matches
                         $child["matches"] = [];
-
-                        // Whack all of the matches into an array
 
                         /** @var Match $match */
                         foreach ($home_matches as $match) {
+                            // Only interested in future matches
                             if ($match->getStartAt()->isFuture()) {
                                 $child["matches"][] = $match;
 
@@ -167,6 +169,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
                         }
 
                         foreach ($away_matches as $match) {
+                            // Only interested in future matches
                             if ($match->getStartAt()->isFuture()) {
                                 $child["matches"][] = $match;
 
@@ -189,7 +192,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
                 } catch (MapperException $e) {
                 }
 
-                // Sort by date order
+                // Sort matches by date order
                 usort($child["matches"], function($a, $b) {
                     /** @var Match $a */
                     /** @var Match $b */
@@ -213,6 +216,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             $sports = [];
 
             try {
+                // Get all teams the current user is in
                 $childTeams = $this->getTeamUserMapper()->findByColumn('user_id', $this->user->getId());
 
                 /** @var TeamUser $team */
@@ -224,13 +228,14 @@ class Controller extends Component_Dashboard_ControllerAbstract
                             $this->getTeamMapper()->findById($team->getTeam()->getId())->getName();
                     }
 
+                    // Get all home and away matches for the current team
                     $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getTeam()->getId());
                     $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getTeam()->getId());
 
                     // Whack all of the matches into an array
-
                     /** @var Match $match */
                     foreach ($home_matches as $match) {
+                        // Only interested in future matches
                         if ($match->getStartAt()->isFuture()) {
                             $matches[] = $match;
 
@@ -259,6 +264,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
                     }
 
                     foreach ($away_matches as $match) {
+                        // Only interested in future matches
                         if ($match->getStartAt()->isFuture()) {
                             $matches[] = $match;
 
@@ -290,7 +296,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
             } catch (MapperException $e) {
             }
 
-            // Sort by date order
+            // Sort matches by date order
             usort($matches, function($a, $b) {
                 /** @var Match $a */
                 /** @var Match $b */
