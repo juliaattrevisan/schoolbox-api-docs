@@ -64,7 +64,7 @@
                                 <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}">
                                     <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" alt="{{ child.name }}">
                                     <h3>
-                                        <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}">{{ match.name }} ({{ teams[match.homeTeam.id] }} vs {% if match.awayTeam.id == null %}Unspecified Team{% else %}{{ teams[match.awayTeam.id] }}{% endif %})</a>
+                                        {{ match.name }} ({{ teams[match.homeTeam.id] }} vs {% if match.awayTeam.id == null %}Unspecified Team{% else %}{{ teams[match.awayTeam.id] }}{% endif %})
                                     </h3>
                                 </a>
                                 <p class="meta">
@@ -76,7 +76,7 @@
                             <a class="icon-view no-text" href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}" title="View Match Details"></a>
                         </nav>
                     </li>
-                    
+
                 {% endfor %}
 
             </ul>
