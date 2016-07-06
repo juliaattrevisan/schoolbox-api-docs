@@ -89,6 +89,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                 'TEXTBOX_HEADING'     => $heading,
                 'TEXTBOX_BODY'        => Scrub::html($this->getTextbox()->getBody()),
                 'TEXTBOX_ID'          => $this->getTextbox()->getId(),
+                'ID'                  => $this->getContext()->getId(),
                 'TEXTBOX_CATEGORY_ID' => $this->getTextbox()->getCategory()->getId(),
                 'text_editable_block' => '',
                 'modify_text_block'   => '',
