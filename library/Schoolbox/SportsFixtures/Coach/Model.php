@@ -14,7 +14,7 @@ use Schoolbox\User;
  * Class Model
  * @package Schoolbox\SportsFixtures\Coach
  */
-class Model
+class Model implements \JsonSerializable
 {
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
@@ -77,5 +77,19 @@ class Model
     {
         $this->user = $user;
         return $this;
+    }
+
+    /**
+     * Serialize
+     *
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'   => $this->getId(),
+            'name' => $this->getName(),
+            'user' => $this->getUser(),
+        ];
     }
 }
