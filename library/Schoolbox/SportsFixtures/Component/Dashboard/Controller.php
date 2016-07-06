@@ -138,7 +138,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
                         // Load the teams details if we haven't already
                         if (!isset($teams[$team->getTeam()->getId()])) {
-                            $teams[$team->getTeam()->getId()] = $this->getTeamMapper()->findById($team->getTeam()->getId())->getName();
+                            $teams[$team->getTeam()->getId()] =
+                                $this->getTeamMapper()->findById($team->getTeam()->getId())->getName();
                         }
 
                         // Get all home and away matches for the current team
@@ -156,14 +157,23 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
                                 // Load sport if we haven't already
                                 if (!isset($sports[$match->getDivision()->getSport()->getId()])) {
-                                    $sports[$match->getDivision()->getSport()->getId()] = $this->getSportMapper()->findById($match->getDivision()->getSport()->getId())->getName();
+                                    $sports[$match->getDivision()->getSport()->getId()] =
+                                        $this->getSportMapper()->findById(
+                                            $match->getDivision()->getSport()->getId()
+                                        )->getName();
                                 }
                                 // Load team if we haven't already
                                 if (!isset($teams[$match->getAwayTeam()->getId()])) {
-                                    $teams[$match->getAwayTeam()->getId()] = $this->getTeamMapper()->findById($match->getAwayTeam()->getId())->getName();
+                                    $teams[$match->getAwayTeam()->getId()] =
+                                        $this->getTeamMapper()->findById(
+                                            $match->getAwayTeam()->getId()
+                                        )->getName();
                                 }
                                 if (!isset($teams[$match->getHomeTeam()->getId()])) {
-                                    $teams[$match->getHomeTeam()->getId()] = $this->getTeamMapper()->findById($match->getHomeTeam()->getId())->getName();
+                                    $teams[$match->getHomeTeam()->getId()] =
+                                        $this->getTeamMapper()->findById(
+                                            $match->getHomeTeam()->getId()
+                                        )->getName();
                                 }
                             }
                         }
@@ -175,15 +185,24 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
                                 // Load sport if we haven't already
                                 if (!isset($sports[$match->getDivision()->getSport()->getId()])) {
-                                    $sports[$match->getDivision()->getSport()->getId()] = $this->getSportMapper()->findById($match->getDivision()->getSport()->getId())->getName();
+                                    $sports[$match->getDivision()->getSport()->getId()] =
+                                        $this->getSportMapper()->findById(
+                                            $match->getDivision()->getSport()->getId()
+                                        )->getName();
                                 }
 
                                 // Load team if we haven't already
                                 if (!isset($teams[$match->getAwayTeam()->getId()])) {
-                                    $teams[$match->getAwayTeam()->getId()] = $this->getTeamMapper()->findById($match->getAwayTeam()->getId())->getName();
+                                    $teams[$match->getAwayTeam()->getId()] =
+                                        $this->getTeamMapper()->findById(
+                                            $match->getAwayTeam()->getId()
+                                        )->getName();
                                 }
                                 if (!isset($teams[$match->getHomeTeam()->getId()])) {
-                                    $teams[$match->getHomeTeam()->getId()] = $this->getTeamMapper()->findById($match->getHomeTeam()->getId())->getName();
+                                    $teams[$match->getHomeTeam()->getId()] =
+                                        $this->getTeamMapper()->findById(
+                                            $match->getHomeTeam()->getId()
+                                        )->getName();
                                 }
                             }
                         }
@@ -288,7 +307,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
                                     $this->getTeamMapper()->findById(
                                         $match->getHomeTeam()->getId()
                                     )->getName();
-                            }                            
+                            }
                         }
                     }
                 }
@@ -327,35 +346,21 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
 
     /**
-     * @return SportMapper
+     * @return TeamUserMapper
      */
-    protected function getSportMapper()
+    public function getTeamUserMapper()
     {
-        return $this->sportMapper;
+        return $this->teamUserMapper;
     }
 
     /**
-     * @param SportMapper $sportMapper
+     * @param  TeamUserMapper $teamUserMapper
+     * @return $this
      */
-    protected function setSportMapper($sportMapper)
+    public function setTeamUserMapper(TeamUserMapper $teamUserMapper)
     {
-        $this->sportMapper = $sportMapper;
-    }
-
-    /**
-     * @return DivisionMapper
-     */
-    protected function getDivisionMapper()
-    {
-        return $this->divisionMapper;
-    }
-
-    /**
-     * @param DivisionMapper $divisionMapper
-     */
-    protected function setDivisionMapper($divisionMapper)
-    {
-        $this->divisionMapper = $divisionMapper;
+        $this->teamUserMapper = $teamUserMapper;
+        return $this;
     }
 
     /**
@@ -377,24 +382,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
     }
 
     /**
-     * @return TeamUserMapper
-     */
-    public function getTeamUserMapper()
-    {
-        return $this->teamUserMapper;
-    }
-
-    /**
-     * @param  TeamUserMapper $teamUserMapper
-     * @return $this
-     */
-    public function setTeamUserMapper(TeamUserMapper $teamUserMapper)
-    {
-        $this->teamUserMapper = $teamUserMapper;
-        return $this;
-    }
-
-    /**
      * @return MatchMapper
      */
     public function getMatchMapper()
@@ -408,6 +395,22 @@ class Controller extends Component_Dashboard_ControllerAbstract
     public function setMatchMapper($matchMapper)
     {
         $this->matchMapper = $matchMapper;
+    }
+
+    /**
+     * @return SportMapper
+     */
+    protected function getSportMapper()
+    {
+        return $this->sportMapper;
+    }
+
+    /**
+     * @param SportMapper $sportMapper
+     */
+    protected function setSportMapper($sportMapper)
+    {
+        $this->sportMapper = $sportMapper;
     }
 
     /**
@@ -440,22 +443,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
     public function setVenueMapper($venueMapper)
     {
         $this->venueMapper = $venueMapper;
-    }
-
-    /**
-     * @return ErrorMapper
-     */
-    protected function getErrorMapper()
-    {
-        return $this->errorMapper;
-    }
-
-    /**
-     * @param ErrorMapper $errorMapper
-     */
-    protected function setErrorMapper($errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
     }
 
     /**
@@ -492,5 +479,37 @@ class Controller extends Component_Dashboard_ControllerAbstract
     {
         $this->folderMapper = $folderMapper;
         return $this;
+    }
+
+    /**
+     * @return DivisionMapper
+     */
+    protected function getDivisionMapper()
+    {
+        return $this->divisionMapper;
+    }
+
+    /**
+     * @param DivisionMapper $divisionMapper
+     */
+    protected function setDivisionMapper($divisionMapper)
+    {
+        $this->divisionMapper = $divisionMapper;
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+    /**
+     * @param ErrorMapper $errorMapper
+     */
+    protected function setErrorMapper($errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
     }
 }

@@ -217,38 +217,6 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
 
     /**
-     * @return SportMapper
-     */
-    protected function getSportMapper()
-    {
-        return $this->sportMapper;
-    }
-
-    /**
-     * @param SportMapper $sportMapper
-     */
-    protected function setSportMapper($sportMapper)
-    {
-        $this->sportMapper = $sportMapper;
-    }
-
-    /**
-     * @return DivisionMapper
-     */
-    protected function getDivisionMapper()
-    {
-        return $this->divisionMapper;
-    }
-
-    /**
-     * @param DivisionMapper $divisionMapper
-     */
-    protected function setDivisionMapper($divisionMapper)
-    {
-        $this->divisionMapper = $divisionMapper;
-    }
-
-    /**
      * @return TeamMapper
      */
     public function getTeamMapper()
@@ -267,6 +235,38 @@ class Controller extends Component_Homepage_ControllerAbstract
     }
 
     /**
+     * @return MatchMapper
+     */
+    public function getMatchMapper()
+    {
+        return $this->matchMapper;
+    }
+
+    /**
+     * @param MatchMapper $matchMapper
+     */
+    public function setMatchMapper($matchMapper)
+    {
+        $this->matchMapper = $matchMapper;
+    }
+
+    /**
+     * @return SportMapper
+     */
+    protected function getSportMapper()
+    {
+        return $this->sportMapper;
+    }
+
+    /**
+     * @param SportMapper $sportMapper
+     */
+    protected function setSportMapper($sportMapper)
+    {
+        $this->sportMapper = $sportMapper;
+    }
+
+    /**
      * @return TeamUserMapper
      */
     public function getTeamUserMapper()
@@ -282,22 +282,6 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         $this->teamUserMapper = $teamUserMapper;
         return $this;
-    }
-
-    /**
-     * @return MatchMapper
-     */
-    public function getMatchMapper()
-    {
-        return $this->matchMapper;
-    }
-
-    /**
-     * @param MatchMapper $matchMapper
-     */
-    public function setMatchMapper($matchMapper)
-    {
-        $this->matchMapper = $matchMapper;
     }
 
     /**
@@ -330,22 +314,6 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function setVenueMapper($venueMapper)
     {
         $this->venueMapper = $venueMapper;
-    }
-
-    /**
-     * @return ErrorMapper
-     */
-    protected function getErrorMapper()
-    {
-        return $this->errorMapper;
-    }
-
-    /**
-     * @param ErrorMapper $errorMapper
-     */
-    protected function setErrorMapper($errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
     }
 
     /**
@@ -382,5 +350,37 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         $this->folderMapper = $folderMapper;
         return $this;
+    }
+
+    /**
+     * @return DivisionMapper
+     */
+    protected function getDivisionMapper()
+    {
+        return $this->divisionMapper;
+    }
+
+    /**
+     * @param DivisionMapper $divisionMapper
+     */
+    protected function setDivisionMapper($divisionMapper)
+    {
+        $this->divisionMapper = $divisionMapper;
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+    /**
+     * @param ErrorMapper $errorMapper
+     */
+    protected function setErrorMapper($errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
     }
 }
