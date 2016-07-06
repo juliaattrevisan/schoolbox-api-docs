@@ -427,21 +427,36 @@ class Controller extends AbstractController
             'team_id' => $teamId
         ]);
 
+        // Cache positions as we grab them
+
+        $positionCache = [];
+
         // Iterate through all the position checkboxes that were ticked
 
         $positions = $this->getRequest()->post["positions"];
 
         if (is_array($positions)) {
             foreach ($positions as $position) {
+                // Find the position
+
+                if (!isset($positionCache[$position])) {
+                    // Haven't got this position, load it and shove into cache
+                    /** @var PositionModel $positionModel */
+                    try {
+                        $positionModel = $this->getPositionMapper()->findById($position);
+                        $positionCache[$position] = $positionModel;
+                    } catch (MapperException $e) {
+                        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_POSITION_NOT_FOUND);
+                    }
+                } else {
+                    // Already got this position
+                    $positionModel = $positionCache[$position];
+                }
 
                 $teamPosition = new TeamPositionModel();
                 $teamPosition->setTeam($team);
                 $teamPosition->setUser($player);
-
-                $positionModel = new PositionModel();
-                $positionModel->setId($position);
                 $teamPosition->setPosition($positionModel);
-
                 $this->getTeamPositionMapper()->save($teamPosition);
             }
         }
