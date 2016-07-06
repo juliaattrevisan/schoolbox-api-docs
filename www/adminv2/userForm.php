@@ -33,15 +33,10 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
             }
         }
 
-        $user->setUsername($_POST['modusername']);
         $user->setTitle($_POST['title']);
         $user->setFirstname($_POST['firstname']);
         $user->setLastname($_POST['lastname']);
         $user->setExternalId($_POST['database_id'] == '' ? null : $_POST['database_id']);
-        $user->setLocalEmail($_POST['local_email']);
-        $user->setUseInternalMail($_POST['mail_handler']);
-        $user->setAltEmail($_POST['alt_email']);
-        $user->setWebmail($_POST['webmail']);
         $user->getRole()->setId($_POST['group']);
         $user->setCampusCollection(new \Schoolbox\CampusCollection());
         foreach ($_POST['campus'] as $campusId) {
@@ -53,14 +48,7 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
             }
             $user->getCampusCollection()->add($campus);
         }
-        $user->setSuperuser(isset($_POST['superuser']));
-        $user->setYear($_POST['year'] == '' ? null : $_POST['year']);
-        $user->setEportfolioEnable(!empty($_POST['eportfolio']));
-        $user->setHideContacts(!empty($_POST['hide_contacts']));
-        $user->setHideTimetable(!empty($_POST['hide_timetable']));
-        $user->getSchoolHouse()->setId($_POST['house']);
-        $user->getResidentialHouse()->setId($_POST['residential_house']);
-        $user->setEnabled($_POST['account_enabled']);
+        $user->setUsername($_POST['modusername']);
 
         // Do not change password if its the default output value
         if ($_POST['modpassword'] != 'donotchange') {
@@ -68,6 +56,20 @@ if (is_numeric($_POST['userID']) && $_POST['modusername']) {
                 ->setRetrievablePassword($_POST['modpassword'])
                 ->setPassword($passwordService->hash($_POST['modpassword']));
         }
+        $user->setAltEmail($_POST['alt_email']);
+        $user->setYear($_POST['year'] == '' ? null : $_POST['year']);
+        $user->getSchoolHouse()->setId($_POST['house']);
+        $user->getResidentialHouse()->setId($_POST['residential_house']);
+
+        // Checkboxes of value='1' (NULL if unchecked)
+        $user->setEportfolioEnable(!empty($_POST['eportfolio']));
+        $user->setHideContacts(!empty($_POST['hide_contacts']));
+        $user->setHideTimetable(!empty($_POST['hide_timetable']));
+        $user->setLocalEmail(!empty($_POST['local_email']));
+        $user->setUseInternalMail(!empty($_POST['mail_handler']));
+        $user->setWebmail(!empty($_POST['webmail']));
+        $user->setSuperuser(isset($_POST['superuser']));
+        $user->setEnabled(!empty($_POST['account_enabled']));
 
         $userMapper->save($user);
         SitePage::localRedir('/adminv2/modify-user/' . $user->getId());
