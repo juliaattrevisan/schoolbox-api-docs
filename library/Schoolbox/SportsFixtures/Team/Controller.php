@@ -115,7 +115,7 @@ class Controller extends AbstractController
     {
         /* ajax a list of Teams for a particular Division
          */
-        if (true ||$this->getRequest()->isXhr()) {
+        if ($this->getRequest()->isXhr()) {
             $query = $this->getRequest()->query->get('query');
 
             /** @var TeamMapper $mapper */
