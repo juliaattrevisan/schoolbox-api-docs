@@ -18,7 +18,7 @@ class Model implements \JsonSerializable
 {
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
-    use ModelTrait\ModifiedAtDate;
+    use ModelTrait\UpdatedAtDate;
     use ModelTrait\DeletedAtDate;
 
     /**
