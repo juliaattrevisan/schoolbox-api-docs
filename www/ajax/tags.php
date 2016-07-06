@@ -9,6 +9,7 @@
  */
 
 use Schoolbox\Pastoral\Tags\Mapper as PastoralMapper;
+use Schoolbox\SportsFixtures\Coach\Mapper as CoachMapper;
 use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 
 if(!isset($this)) {
@@ -24,7 +25,7 @@ $di = $this->getDi();
 $registry = [
     'pastoral'       => $di->lazyNew(PastoralMapper::class),
     'sport_position' => $di->lazyNew(PositionMapper::class),
-    'sport_coach'    => Schoolbox\SportsFixtures\Coach\Mapper::getInstance(),
+    'sport_coach'    => $di->lazyNew(CoachMapper::class),
 ];
 
 // Validate params
