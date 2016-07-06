@@ -23,7 +23,8 @@ $di = $this->getDi();
 /* Note: Insert new tag types here. */
 $registry = [
     'pastoral'       => $di->lazyNew(PastoralMapper::class),
-    'sport_position' => $di->lazyNew(PositionMapper::class)
+    'sport_position' => $di->lazyNew(PositionMapper::class),
+    'sport_coach'    => Schoolbox\SportsFixtures\Coach\Mapper::getInstance(),
 ];
 
 // Validate params
