@@ -13,7 +13,6 @@ $this->setBlock(TEMPLATE_content, 'groupUnmanaged', 'groupUnmanaged_block');
 $this->setBlock(TEMPLATE_content, 'member', 'member_block');
 $this->setBlock(TEMPLATE_content, 'hide_no_members', 'hide_no_members_block');
 $this->setBlock('member', 'show_photo', 'show_photo_block');
-$this->setBlock('member', 'hide_photo', 'hide_photo_block');
 $this->setBlock('member', 'make_owner', 'make_owner_block');
 $this->setBlock('member', 'msg_enabled_userfollow', 'msg_enabled_userfollow_block');
 $this->setBlock('member', 'msg_enabled_usermute', 'msg_enabled_usermute_block');
@@ -207,9 +206,7 @@ if (is_numeric($this->arg[0])) {
 
             if (count($memberList) > 100) {
                 $this->setVar(array('show_photo_block' => ''));
-                $this->parse('hide_photo_block', 'hide_photo');
             } else {
-                $this->setVar(array('hide_photo_block' => ''));
                 $this->parse('show_photo_block', 'show_photo');
             }
 
