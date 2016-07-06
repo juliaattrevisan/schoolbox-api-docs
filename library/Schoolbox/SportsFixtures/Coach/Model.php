@@ -86,10 +86,17 @@ class Model implements \JsonSerializable
      */
     public function jsonSerialize()
     {
-        return [
-            'id'   => $this->getId(),
-            'name' => $this->getName(),
-            'user' => $this->getUser(),
-        ];
+        // Render coaches with and without a user differently
+        if ($this->getUser()->getId()) {
+            return [
+                'id'   => 'user:'.$this->getUser()->getId(),
+                'name' => $this->getUser()->formatName(),
+            ];
+        } else {
+            return [
+                'id'   => 'coach:'.$this->getId(),
+                'name' => $this->getName(),
+            ];
+        }
     }
 }
