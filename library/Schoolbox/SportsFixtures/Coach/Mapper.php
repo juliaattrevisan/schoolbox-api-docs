@@ -9,6 +9,7 @@ namespace Schoolbox\SportsFixtures\Coach;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\SportsFixtures\Team;
 use Schoolbox\UserMapper;
 use Schoolbox\User as UserModel;
 
@@ -34,6 +35,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+        $this->joinsVia('sportsfixtures_team_coach', Team\Mapper::class, 'id', 'team_id', 'coach_id');
     }
 
     /**
@@ -148,6 +150,26 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
         $statement->bindValue('search', $this->getDatabase()->quoteForLike($keyword).'%', \PDO::PARAM_STR);
         $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
         $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
+        $statement->execute();
+        return $this->hydrateSelect($statement);
+    }
+
+    /**
+     * Retrieves coaches for the given team.
+     *
+     * @param Team\Model $team
+     * @return Collection|Model[]
+     */
+    public function findForTeam(Team\Model $team)
+    {
+        $query = "
+            {$this->getSelectString()}
+            INNER JOIN {$this->getJoinSql('sportsfixtures_team_coach', '', 'stc')}
+            WHERE stc.team_id = :teamId
+            ORDER BY name ASC
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->bindValue('teamId', $team->getId(), \PDO::PARAM_INT);
         $statement->execute();
         return $this->hydrateSelect($statement);
     }
