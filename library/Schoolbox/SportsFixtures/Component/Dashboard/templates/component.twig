@@ -23,7 +23,10 @@
                                         </h3>
                                     </a>
                                     <p class="meta">
-                                        <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span> | {{ sports[match.division.sport.id] }} | {{ match.division.name }}
+                                        <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span> |
+                                        {{ sports[match.division.sport.id] }} |
+                                        {{ match.division.name }} |
+                                        {{ match.venue.name }}
                                     </p>
                                 </div>
                             </div>
