@@ -96,10 +96,11 @@
                     <div class="small-12 columns">
                         <label>
                             Coaches
-                            <input type="text" data-role="userSelector" name="coach[]" multiple placeholder="Search Users" />
+                            <select type="text" data-role="userSelector" name="coach[]" multiple placeholder="Search Users">
                             {#{% for coach in team.coaches %}#}
                             {#<option value="{{ coach.identifier }}">{{ coach.name }}</option>#}
                             {#{% endfor %}#}
+                            </select>
                         </label>
                     </div>
                 </fieldset>
