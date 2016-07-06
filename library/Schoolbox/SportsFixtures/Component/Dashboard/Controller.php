@@ -9,7 +9,6 @@ namespace Schoolbox\SportsFixtures\Component\Dashboard;
 
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
-use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -17,16 +16,13 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use SitePage;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
-use \Schoolbox\SportsFixtures\Division\Model as Division;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
-use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\SportsFixtures\Team\User\Model as TeamUser;
 use \Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use \Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
-use \Schoolbox\SportsFixtures\Venue\Model as Venue;
 use \Schoolbox\SportsFixtures\Venue\Mapper as VenueMapper;
 
 class Controller extends Component_Dashboard_ControllerAbstract
