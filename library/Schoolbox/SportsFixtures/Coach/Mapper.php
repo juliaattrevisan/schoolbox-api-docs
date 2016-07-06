@@ -60,6 +60,57 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     }
 
     /**
+     * Saves a tag cloud.
+     *
+     * @param array|string[] $tags A list of tag names that can be parsed into
+     *                             Model objects
+     * @return array|int[] A list of IDs of Model objects which match the tags.
+     */
+    public function saveTagCloud($tags)
+    {
+        $tagIds = [];
+        foreach ($tags as $tag) {
+            if (preg_match('/^(\\s+):(\\d+)$/', $tag, $matches)) {
+                list(, $prefix, $identifier) = $matches;
+                $newModel = null;
+                switch ($prefix) {
+                    case Model::PREFIX_EXISTING_TAG:
+                        // This tag already exists. Don't try to resave it.
+                        $tagIds[] = $identifier;
+                        break;
+
+                    case Model::PREFIX_NEW_FROM_INPUT:
+                        // This is a new tag, to be created from plain text input
+                        $newModel = $this->createModel()->setName($identifier);
+                        break;
+
+                    case Model::PREFIX_NEW_FROM_USER:
+                        // This is a new tag, to be created from an existing user
+                        try {
+                            /** @var UserModel $user */
+                            $user = $this->getJoinMapper('user')->findById($identifier);
+                        } catch (BaseMapper\Exception $e) {
+                            // User don't exist, so:
+                            break;
+                        }
+                        $newModel = $this->createModel()->setUser($user);
+                        break;
+
+                    default:
+                        break;
+                }
+
+                // save it if necessary
+                if ($newModel instanceof Model) {
+                    $this->save($newModel);
+                    $tagIds[] = $newModel->getId();
+                }
+            }
+        }
+        return $tagIds;
+    }
+
+    /**
      * Retrieves a list of items for a tag cloud.
      *
      * @param UserModel $user
