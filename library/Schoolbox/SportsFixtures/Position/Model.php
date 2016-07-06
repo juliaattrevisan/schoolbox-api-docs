@@ -20,7 +20,7 @@ use \Schoolbox\SportsFixtures\Sport\Model as Sport;
  *
  * @package Schoolbox\SportsFixtures\Position
  */
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, \JsonSerializable
 {
     // Implements ISoftDeletable
     use DeletedAtDate;
@@ -131,5 +131,16 @@ class Model implements ISoftDeletable
      */
     public function getUpdatedAt() {
         return $this->updatedAt;
+    }
+
+    /**
+     * @return array
+     */
+    function jsonSerialize()
+    {
+        return [
+            'id'   => $this->getId(),
+            'name' => $this->getName(),
+        ];
     }
 }
