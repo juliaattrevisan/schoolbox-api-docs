@@ -153,6 +153,7 @@ class Controller extends AbstractController
             'division'          => $context,
             'match'             => $entity,
             'schoolMapper'      => $this->getSchoolTagCloudMapper(),
+            'schoolToken'       => TagCloudMapper::SCHOOL_PREFIX,
             'allItineraryItems' => $allItineraryItems,
             'action'            => $entity->getId() ? 'Modify' : 'Create'
         ]));
@@ -214,10 +215,11 @@ class Controller extends AbstractController
 
         try {
             $homeTeam = $this->getTeamMapper()->findById($this->getRequest()->post['homeTeamId']);
-            if (substr($this->getRequest()->post['awayTeamId'], 0, 4) == "tag:") {
+
+            if (preg_match("/" . TagCloudMapper::SCHOOL_PREFIX . "(.*)/", $this->getRequest()->post['awayTeamId'], $matches)) {
                 // Away team is a faceless school, save the team as null
                 $awayTeam = new Team();
-                $awaySchoolId = substr($this->getRequest()->post['awayTeamId'], 4);
+                $awaySchoolId = $matches[1];
             } else {
                 $awayTeam = $this->getTeamMapper()->findById($this->getRequest()->post['awayTeamId']);
                 $awaySchoolId = null;

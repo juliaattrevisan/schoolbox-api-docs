@@ -18,6 +18,8 @@ use Schoolbox\Collection;
 class Mapper extends BaseMapper
 {
 
+    const SCHOOL_PREFIX = 'school:';
+
     /** @var string $tableName */
     protected $tableName;
 
@@ -82,12 +84,10 @@ class Mapper extends BaseMapper
      */
     public function getTagLike($string) {
         $query = "
-            SELECT 
-              `t`.id as id, 
-              `t`.name as name
-            FROM {$this->getTable()} `t`
-            WHERE t.{$this->fieldValue} LIKE ?
-            ORDER BY t.{$this->fieldValue} ASC
+            SELECT {$this->getColumnString()}
+            FROM {$this->getTable()} 
+            WHERE {$this->fieldValue} LIKE ?
+            ORDER BY {$this->fieldValue} ASC
         ";
 
         $statement = $this->getDatabase()->prepare($query);
@@ -97,8 +97,8 @@ class Mapper extends BaseMapper
 
         foreach ($statement as $row)
             $records->add([
-                'id' => $row['id'],
-                'name' => $row['name']
+                'id' => $row[$this->fieldId],
+                'name' => $row[$this->fieldValue]
             ]);
 
         return $records;

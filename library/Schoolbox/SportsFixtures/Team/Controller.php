@@ -124,9 +124,10 @@ class Controller extends AbstractController
             if ($this->getRequest()->query->get('schools') == 1) {
                 // Add schools from the tag cloud
                 $schools = $this->getSchoolTagCloudMapper()->getTagLike($query);
+
                 foreach ($schools as $school) {
-                    // Prefix their ID with the token 'tag:', we will parse it later when saving a match
-                    $school['id'] = 'tag:' . $school['id'];
+                    // Prefix their ID with the external school token, we will parse it later when saving a match
+                    $school['id'] = TagCloudMapper::SCHOOL_PREFIX . $school['id'];
                     $teams[] = $school;
                 }
 
