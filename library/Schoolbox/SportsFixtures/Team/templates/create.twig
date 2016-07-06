@@ -1,3 +1,5 @@
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function() {
         $('#teamForm').alaressValidate({
@@ -17,7 +19,19 @@
             errorPlacement: function(error, element) {
                 $.alaressValidate.defaultErrorPlacement(error, element);
             }
-        })
+        });
+
+        // Selectize box for selecting one or more users
+        $('[data-role="userSelector"]')
+            .selectizeSelector({
+                multiple: true,
+                ajax: {
+                    url:      '/ajax/user.php',
+                    type:     'GET',
+                    data:     {groupID: 0},
+                    dataType: 'json'
+                }
+            });
     });
 </script>
 
@@ -68,27 +82,19 @@
                         </label>
                     </div>
                 </fieldset>
-            </section>
 
-            {% if team.coaches is not empty %}
-                <section>
-                    <ul class="information-list">
-                        {% for coach in team.coaches %}
-                            <li class="actions-small-1">
-                                <div class="list-item">
-                                    <div class="small-12 avatar card">
-                                        <a href="/search/user/{{ coach.id }}">
-                                            <img src="/portrait.php?userId={{ coach.externalId }}&amp;size=square64" />
-                                            <h3>{{ coach.formatName() }}</h3>
-                                        </a>
-                                        <p class="meta">{{ coach.formatMetadata() }}</p>
-                                    </div>
-                                </div>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </section>
-            {% endif %}
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Coaches
+                            <input type="text" data-role="userSelector" name="coach[]" multiple placeholder="Search Users" />
+                            {#{% for coach in team.coaches %}#}
+                            {#<option value="{{ coach.identifier }}">{{ coach.name }}</option>#}
+                            {#{% endfor %}#}
+                        </label>
+                    </div>
+                </fieldset>
+            </section>
 
             <input type="submit" value="{{ action }} Team" />
         </form>
