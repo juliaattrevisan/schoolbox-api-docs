@@ -433,19 +433,15 @@ class Controller extends AbstractController
 
         if (is_array($positions)) {
             foreach ($positions as $position) {
-                // Find the position
-
-                /** @var PositionModel $positionModel */
-                try {
-                    $positionModel = $this->getPositionMapper()->findById($position);
-                } catch (MapperException $e) {
-                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_POSITION_NOT_FOUND);
-                }
 
                 $teamPosition = new TeamPositionModel();
                 $teamPosition->setTeam($team);
                 $teamPosition->setUser($player);
+
+                $positionModel = new PositionModel();
+                $positionModel->setId($position);
                 $teamPosition->setPosition($positionModel);
+
                 $this->getTeamPositionMapper()->save($teamPosition);
             }
         }
