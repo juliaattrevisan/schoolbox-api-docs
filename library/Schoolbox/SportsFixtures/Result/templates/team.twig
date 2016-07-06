@@ -2,6 +2,25 @@
 
 {% block results %}
     {% if match.result.offset(team.id) %}
+    <script type="text/javascript">
+        $(function() {
+            $('[data-delete]').click(function(event) {
+                event.preventDefault();
+
+                var element = $(this);
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you want to delete this Result?',
+                    confirmEvent: function() {
+                        $.post(element.attr('href'), {}, function() {
+                            window.location.href = window.location.href;
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
     <h3 class="subheader">Results</h3>
     <section class="content">
         <div class="row">
@@ -9,12 +28,13 @@
                 <div class="actions-small-1 row">
                     <div class="list-item">
                         <div class="small-12 columns">
-                            <h4>{{ match.homeTeam.name }}</h4>
-                            {{ match.result.offset(match.homeTeam.id).description|raw }}
+                            <h4>{{ match.team.name }}</h4>
+                            {{ match.result.offset(team.id).description|raw }}
                         </div>
                     </div>
                     <nav>
-                        <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: match.result[match.homeTeam.id].id}) }}" class="icon-modify" title="Modify"></a>
+                        <a href="{{ routeLookup('sportsfixturesResult.deleteEntity', {entityId: match.result[team.id].id}) }}" class="icon-delete" title="Delete" data-delete="{{ match.result[team.id].id }}"></a>
+                        <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: match.result[team.id].id}) }}" class="icon-modify" title="Modify"></a>
                     </nav>
                 </div>
             </div>
@@ -25,7 +45,7 @@
         <i class="icon-result"></i>
         <p>There are no Results for this Team.</p>
 
-        <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}" title="Add Results">Add Results for this Team.</a></p>
+        <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: team.id}) }}" title="Add Results">Add Results for this Team.</a></p>
     </div>
     {% endif %}
 {% endblock %}
