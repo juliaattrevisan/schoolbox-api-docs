@@ -72,6 +72,20 @@ class Model implements ISoftDeletable {
     }
 
     /**
+     * This Match contains $team
+     *
+     * @param Team $team
+     * @return bool
+     */
+    public function hasTeam(Team $team)
+    {
+        return in_array($team->getId(), [$this->getHomeTeam()->getId(), $this->getAwayTeam()->getId()]);
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
      * @param int $id
      * @return self
      */

@@ -220,6 +220,12 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
+        /* Only spawn Results for Teams that were in this Match
+         */
+        if (!$context->hasTeam($team)) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/team.twig', [
             'sport'    => $sport,
             'division' => $division,
