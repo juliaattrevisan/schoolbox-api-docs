@@ -35,7 +35,7 @@
                 selectize: {
                     create: function(input) {
                         var freeEntry = {};
-                        freeEntry[this.settings.valueField]  = input;
+                        freeEntry[this.settings.valueField]  = 'newFromInput:'+input;
                         freeEntry[this.settings.searchField] = input;
                         return freeEntry;
                     }
