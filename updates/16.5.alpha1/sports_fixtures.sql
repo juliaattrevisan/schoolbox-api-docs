@@ -255,3 +255,21 @@ CREATE TABLE `sportsfixtures_coach` (
 	INDEX `sportsfixtures_coach__name` (`name` ASC),
 	INDEX `sportsfixtures_coach__user` (`user_id` ASC)
 ) ENGINE=InnoDB CHARACTER SET=utf8;
+
+/** Coaches/teams M2M join table **/
+CREATE TABLE `sportsfixtures_team_coach` (
+	`sportsfixtures_team_id` INT NOT NULL,
+	`sportsfixtures_coach_id` INT NOT NULL,
+	INDEX `fk_sportsfixtures_team_coach_1_idx` (`sportsfixtures_team_id` ASC),
+	INDEX `fk_sportsfixtures_team_coach_2_idx` (`sportsfixtures_coach_id` ASC),
+	CONSTRAINT `fk_sportsfixtures_team_coach__team`
+	FOREIGN KEY (`sportsfixtures_team_id`)
+	REFERENCES `sportsfixtures_team` (`id`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
+	CONSTRAINT `fk_sportsfixtures_team_coach__coach`
+	FOREIGN KEY (`sportsfixtures_coach_id`)
+	REFERENCES `sportsfixtures_coach` (`id`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE
+) ENGINE=InnoDB CHARACTER SET=utf8;
