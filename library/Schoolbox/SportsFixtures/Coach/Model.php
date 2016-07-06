@@ -80,23 +80,39 @@ class Model implements \JsonSerializable
     }
 
     /**
+     * Formats the ID of this model.
+     *
+     * (If this model isn't saved yet, it returns the user's ID with a prefix.)
+     *
+     * @return string
+     */
+    public function formatId()
+    {
+        return $this->getId() ?: ('user:'.$this->getUser()->getId());
+    }
+
+    /**
+     * Formats the name of this model.
+     *
+     * (If this model isn't saved yet, it returns the user's name.)
+     *
+     * @return string
+     */
+    public function formatName()
+    {
+        return $this->getId() ? $this->getName() : $this->getUser()->formatName();
+    }
+
+    /**
      * Serialize
      *
      * @return array
      */
     public function jsonSerialize()
     {
-        // Render coaches with and without a user differently
-        if ($this->getUser()->getId()) {
-            return [
-                'id'   => 'user:'.$this->getUser()->getId(),
-                'name' => $this->getUser()->formatName(),
-            ];
-        } else {
-            return [
-                'id'   => 'coach:'.$this->getId(),
-                'name' => $this->getName(),
-            ];
-        }
+        return [
+            'id'   => $this->formatId(),
+            'name' => $this->formatName(),
+        ];
     }
 }
