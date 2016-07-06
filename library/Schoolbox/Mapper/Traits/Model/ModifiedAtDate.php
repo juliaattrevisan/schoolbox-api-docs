@@ -11,31 +11,31 @@ namespace Schoolbox\Mapper\Traits\Model;
 
 use Alaress_Date_Format;
 
-trait ModifiedDate
+trait ModifiedAtDate
 {
     /**
      * Modified date
      *
      * @var Alaress_Date_Format
      */
-    protected $modifiedDate;
+    protected $modifiedAt;
 
     /**
      * @return Alaress_Date_Format
      */
-    public function getModifiedDate()
+    public function getModifiedAt()
     {
-        return $this->modifiedDate;
+        return $this->modifiedAt;
     }
 
     /**
-     * @param  Alaress_Date_Format $modifiedDate
+     * @param  Alaress_Date_Format $modifiedAt
      *
      * @return $this
      */
-    public function setModifiedDate($modifiedDate)
+    public function setModifiedAt($modifiedAt)
     {
-        $this->modifiedDate = $modifiedDate;
+        $this->modifiedAt = $modifiedAt;
         return $this;
     }
 }
