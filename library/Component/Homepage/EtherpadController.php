@@ -127,7 +127,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
             /* Only provide Create Document button to those with write access
              */
             if ($this->contentPermission > READ_ACCESS) {
-                $this->setVar('ID', $this->getSource()->getId());
+                $this->setVar('SOURCE_ID', $this->getSource()->getId());
                 $this->parse('etherpad_has_create_block', 'etherpad_has_create');
             }
 

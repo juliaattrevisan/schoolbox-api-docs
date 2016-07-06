@@ -63,7 +63,6 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
         $this->setBlock('source_folder_exists', 'audio_list', 'audio_list_block');
         $this->setBlock('source_folder_exists', 'audio_pending_list', 'audio_pending_list_block');
 
-
         if(!$this->isSourceRenderable()) {
             return $this->renderSourceUnavailable();
         } else {
@@ -165,7 +164,7 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
             if ($this->contentPermission < WRITE_ACCESS) {
                 $this->setVar("submit_file_block", "");
             } else {
-                $this->setVar('ID', $this->getSource()->getId());
+                $this->setVar('SOURCE_ID', $this->getSource()->getId());
                 $this->parse("submit_file_block", "submit_file");
             }
 
