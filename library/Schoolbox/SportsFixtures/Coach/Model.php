@@ -16,6 +16,10 @@ use Schoolbox\User;
  */
 class Model implements \JsonSerializable
 {
+    const PREFIX_EXISTING_TAG   = 'existing';
+    const PREFIX_NEW_FROM_USER  = 'newFromUser';
+    const PREFIX_NEW_FROM_INPUT = 'newFromInput';
+
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
     use ModelTrait\UpdatedAtDate;
@@ -82,13 +86,22 @@ class Model implements \JsonSerializable
     /**
      * Formats the ID of this model.
      *
-     * (If this model isn't saved yet, it returns the user's ID with a prefix.)
+     * It applies the appropriate prefix, depending on whether:
+     * * the coach is already saved
+     * * the coach doesn't exist yet but is based off an existing user
+     * * the coach doesn't exist yet and doesn't exist as a user
      *
      * @return string
      */
     public function formatId()
     {
-        return $this->getId() ?: ('user:'.$this->getUser()->getId());
+        if ($this->getId()) {
+            return self::PREFIX_EXISTING_TAG.':'.$this->getId();
+        } elseif ($this->getUser()->getId()) {
+            return self::PREFIX_NEW_FROM_USER.':'.$this->getUser()->getId();
+        } else {
+            return self::PREFIX_NEW_FROM_INPUT.':'.$this->getName();
+        }
     }
 
     /**
@@ -100,7 +113,7 @@ class Model implements \JsonSerializable
      */
     public function formatName()
     {
-        return $this->getId() ? $this->getName() : $this->getUser()->formatName();
+        return $this->getName() ?: $this->getUser()->formatName();
     }
 
     /**
