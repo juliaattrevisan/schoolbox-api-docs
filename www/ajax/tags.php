@@ -42,18 +42,15 @@ if(empty($registry[$this->arg[0]])){
 
 $tagsArray = [];
 
-if($errors){
+if ($errors) {
     header(':', true, 400);
 } else {
-    /** @var \Schoolbox\Mapper $mapper */
+    /** @var \Schoolbox\Mapper\UsableAsTagSource $mapper */
     $mapper = $registry[$this->arg[0]]();
-    $tags   = $mapper->findDistinct('name');
-    $query  = strtolower($_GET['query']);
-
-    foreach ($tags as $tag) {
-        if (strpos(strtolower($tag), $query) !== false) {
-            $tagsArray[] = ['id' => $tag, 'name' => $tag];
-        }
+    if ($mapper instanceof \Schoolbox\Mapper\UsableAsTagSource) {
+        $tagsArray = $mapper->findForTag($_SESSION['user'], $_GET['query']);
+    } else {
+        header(':', true, 500);
     }
 }
 
