@@ -18,7 +18,7 @@ use Schoolbox\User as UserModel;
  * @method Model createModel()
  * @package Schoolbox\SportsFixtures\Coach
  */
-class Mapper extends BaseMapper
+class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
 {
     /**
      * Setup mapping
@@ -62,12 +62,15 @@ class Mapper extends BaseMapper
     /**
      * Retrieves a list of items for a tag cloud.
      *
-     * @param string $search
+     * @param UserModel $user
+     * @param string $keyword
+     * @param int $offset
+     * @param int $limit
      * @return Collection|Model[]
      */
-    public function findForTagCloud($search)
+    public function findForTag(UserModel $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT)
     {
-        if (strlen($search) === 0) {
+        if (strlen($keyword) === 0) {
             return new Collection();
         }
         // Join side: tag w/o user is okay, so is user w/o tag - therefore FULL OUTER JOIN.
@@ -87,10 +90,14 @@ class Mapper extends BaseMapper
             ($selectPart LEFT JOIN {$this->getJoinSql('user', '', 'u')} $wherePart)
             UNION ALL
             ($selectPart RIGHT JOIN {$this->getJoinSql('user', '', 'u')} $wherePart)
-            -- ORDER BY u. ASC, {$this->getTable()}.name ASC
+            ORDER BY name ASC, `u.lastname` ASC, `u.firstname` ASC
+            LIMIT :limit OFFSET :offset
         ";
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(['search' => $this->getDatabase()->quoteForLike($search).'%']);
+        $statement->bindValue('search', $this->getDatabase()->quoteForLike($keyword).'%', \PDO::PARAM_STR);
+        $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
+        $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
+        $statement->execute();
         return $this->hydrateSelect($statement);
     }
 }
