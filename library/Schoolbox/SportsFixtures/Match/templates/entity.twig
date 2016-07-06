@@ -1,134 +1,65 @@
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}">Matches in {{ division.name }}</a></li>
+{% extends '@sportsfixturesMatch/match.twig' %}
 
-    {% if match.id %}
-        <li class="active"><a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: match.id}) }}">{{ match.name }}</a></li>
-    {% else %}
-        <li class="active"><a href="#">{{ action }}</a></li>
-    {% endif %}
-</ul>
+{% block results %}
+    {% if match.result|length %}
+    <h3 class="subheader">Results</h3>
+    <section class="content">
+        <div class="row">
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Sports Fixtures</h1>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">{{ match.name }}</h2>
-
-        <section class="content">
-            <div class="small-12 columns">
-                <dl>
-                    <dt>ID</dt>
-                    <dd>{{ match.id }}</dd>
-
-                    <dt>Name</dt>
-                    <dd>{{ match.name }}</dd>
-
-                    <dt>Venue</dt>
-                    <dd>{{ venue.name }}</dd>
-
-                    <dt>Starts</dt>
-                    <dd>{{ match.startAt.database }}</dd>
-
-                    {% if match.homeTeam.id and match.awayTeam.id %}
-                    <dt>Teams</dt>
-                    <dd>
-                        {{ match.homeTeam.name }} vs {{ match.awayTeam.name }}
-                    </dd>
-                    {% endif %}
-
-                    {% if match.itinerary|length %}
-                    <dt>Itinerary</dt>
-                    <dd>
-                        <ul class="information-list">
-                            {% for currentItineraryItem in match.itinerary %}
-                            <li>
-                                {{ currentItineraryItem.startAt.local }}:
-                                {{ currentItineraryItem.description }}
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </dd>
-                    {% endif %}
-
-                    <dt>Created</dt>
-                    <dd>{{ match.createdAt.database }}</dd>
-
-                    {% if not match.createdAt.eq(match.updatedAt) %}
-                        <dt>Last Updated</dt>
-                        <dd>{{ match.updatedAt.database }}</dd>
-                    {% endif %}
-                </dl>
-
-            </div>
-        </section>
-
-        {% if match.result|length %}
-        <h3 class="subheader">Results</h3>
-        <section class="content">
-            <div class="row">
-
-                <div class="small-12 large-6 columns">
-                    {% if match.result.offset(match.homeTeam.id) %}
-                    <div class="actions-small-1 row">
-                        <div class="list-item">
-                            <div class="small-12 columns">
-                                <h4>{{ match.homeTeam.name }}</h4>
-                                {{ match.result.offset(match.homeTeam.id).description|raw }}
-                            </div>
+            <div class="small-12 large-6 columns">
+                {% if match.result.offset(match.homeTeam.id) %}
+                <div class="actions-small-1 row">
+                    <div class="list-item">
+                        <div class="small-12 columns">
+                            <h4>{{ match.homeTeam.name }}</h4>
+                            {{ match.result.offset(match.homeTeam.id).description|raw }}
                         </div>
-                        <nav>
-                            <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: match.result[match.homeTeam.id].id}) }}" class="icon-modify" title="Modify"></a>
-                        </nav>
                     </div>
-                    {% else %}
-                    <div class="empty-state">
-                        <i class="icon-result"></i>
-                        <p>There are no Results for the Home Team.</p>
-
-                        <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}" title="Add Results">Add Results for the Home Team.</a></p>
-                    </div>
-                    {% endif %}
+                    <nav>
+                        <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: match.result[match.homeTeam.id].id}) }}" class="icon-modify" title="Modify"></a>
+                    </nav>
                 </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="icon-result"></i>
+                    <p>There are no Results for the Home Team.</p>
 
-                <div class="small-12 large-6 columns">
-                    {% if match.result.offset(match.awayTeam.id) %}
-                    <div class="actions-small-1 row">
-                        <div class="list-item">
-                            <div class="small-12 columns">
-                                <h4>{{ match.awayTeam.name }}</h4>
-                                {{ match.result.offset(match.awayTeam.id).description|raw }}
-                            </div>
-                        </div>
-                        <nav>
-                            <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: match.result[match.awayTeam.id].id}) }}" class="icon-modify" title="Modify"></a>
-                        </nav>
-                    </div>
-                    {% else %}
-                    <div class="empty-state">
-                        <i class="icon-result"></i>
-                        <p>There are no Results for the Away Team.</p>
-
-                        <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}" title="Add Results">Add Results for the Away Team.</a></p>
-                    </div>
-                    {% endif %}
+                    <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}" title="Add Results">Add Results for the Home Team.</a></p>
                 </div>
+                {% endif %}
             </div>
-        </section>
-        {% else %}
-        <div class="empty-state">
-            <i class="icon-result"></i>
-            <p>There are no Results for this Match.</p>
 
-            <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}" title="Add Results">Add Results for the Home Team.</a></p>
-            <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}" title="Add Results">Add Results for the Away Team.</a></p>
+            <div class="small-12 large-6 columns">
+                {% if match.result.offset(match.awayTeam.id) %}
+                <div class="actions-small-1 row">
+                    <div class="list-item">
+                        <div class="small-12 columns">
+                            <h4>{{ match.awayTeam.name }}</h4>
+                            {{ match.result.offset(match.awayTeam.id).description|raw }}
+                        </div>
+                    </div>
+                    <nav>
+                        <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: match.result[match.awayTeam.id].id}) }}" class="icon-modify" title="Modify"></a>
+                    </nav>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="icon-result"></i>
+                    <p>There are no Results for the Away Team.</p>
+
+                    <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}" title="Add Results">Add Results for the Away Team.</a></p>
+                </div>
+                {% endif %}
+            </div>
         </div>
-        {% endif %}
+    </section>
+    {% else %}
+    <div class="empty-state">
+        <i class="icon-result"></i>
+        <p>There are no Results for this Match.</p>
+
+        <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}" title="Add Results">Add Results for the Home Team.</a></p>
+        <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}" title="Add Results">Add Results for the Away Team.</a></p>
     </div>
-</div>
+    {% endif %}
+{% endblock %}
