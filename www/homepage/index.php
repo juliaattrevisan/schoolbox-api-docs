@@ -419,7 +419,7 @@ foreach ($componentCollection as $component) {
     /** @var Component_Homepage_ControllerAbstract $component */
     $instance       = $component->getInstance();
     $templateTarget = "component_position_{$instance->getPosition()}";
-    $templateHandle = "component_{$instance->getDefinitionId()}";
+    $templateHandle = "component_{$instance->getId()}";
 
 
     $component->setup($category, $instance->getConfigArray());

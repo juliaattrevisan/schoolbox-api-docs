@@ -216,7 +216,7 @@ abstract class Component_ControllerAbstract
         $output = array(
             'COMPONENT_INSTANCE_ID'   => $this->instance->getId(),
             'COMPONENT_DEFINITION_ID' => $this->instance->getDefinitionId(),
-            'COMPONENT_HANDLE'        => $templateHandle . '_' . $this->instance->getId()
+            'COMPONENT_HANDLE'        => $templateHandle
         );
 
         $this->setVar($output);
