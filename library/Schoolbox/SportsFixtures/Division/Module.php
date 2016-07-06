@@ -55,6 +55,7 @@ class Module extends RestfulModule
                 "/$collection/{entityId}/uploadPlayers"  => "postUploadPlayers",
                 "/$collection/{entityId}/removePlayers"  => "postRemovePlayers",
                 "/$collection/{entityId}/reorderPlayers" => "postReorderPlayers",
+                "/$collection/{entityId}/setPositions"   => "postPlayerPositions",
             ]
         ];
 

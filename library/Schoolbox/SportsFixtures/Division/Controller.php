@@ -17,9 +17,12 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\SportsFixtures\Sport\Model as Sport;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
+use \Schoolbox\SportsFixtures\Position\Model as PositionModel;
+use \Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use \Schoolbox\SportsFixtures\Team\User\Model as TeamUserModel;
 use \Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
+use \Schoolbox\SportsFixtures\Team\Position\Model as TeamPositionModel;
+use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
 use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Division\User\Model as DivisionUserModel;
@@ -46,6 +49,11 @@ class Controller extends AbstractController
     protected $teamMapper;
 
     /**
+     * @var PositionMapper
+     */
+    protected $positionMapper;
+
+    /**
      * @var UserMapper
      */
     protected $userMapper;
@@ -61,6 +69,11 @@ class Controller extends AbstractController
     protected $teamUserMapper;
 
     /**
+     * @var TeamPositionMapper
+     */
+    protected $teamPositionMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -69,9 +82,11 @@ class Controller extends AbstractController
         $this->setSportMapper(SportMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setTeamMapper(TeamMapper::getInstance());
+        $this->setPositionMapper(PositionMapper::getInstance());
         $this->setDivisionUserMapper(DivisionUserMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
         $this->setTeamUserMapper(TeamUserMapper::getInstance());
+        $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
     }
 
     /**
@@ -214,11 +229,16 @@ class Controller extends AbstractController
             $dataModel['players'][] = $playerDataModel;
         }
         foreach ($division->getTeams() as $team) {
+            $positions = $this->getTeamPositionMapper()->findByColumn('team_id', $team->getId());
+
             $dataModel['teams'][] = [
-                'team'    => $team,
-                'players' => $team->getPlayers(),
+                'team'      => $team,
+                'players'   => $team->getPlayers(),
+                'positions' => $positions
             ];
         }
+
+        $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@sportsfixturesDivision/lobby.twig', $dataModel)
@@ -376,6 +396,82 @@ class Controller extends AbstractController
     }
 
     /**
+     * Update player positions
+     *
+     * @param int $entityId
+     */
+    public function postPlayerPositions($entityId) {
+
+        $teamId = $this->getRequest()->post['team_id'];
+        try {
+            // Load team
+            $team = $this->getTeamMapper()->findById($teamId);
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+        }
+
+        $userId = $this->getRequest()->post['user_id'];
+        try {
+            // Load player
+            $player = $this->getUserMapper()->findById($userId);
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
+        }
+
+        // Blow away all old positions for this player on the team
+
+        $this->getTeamPositionMapper()->deleteByColumnList([
+            'user_id' => $userId,
+            'team_id' => $teamId
+        ]);
+
+        // Cache positions as we grab them
+
+        $positionCache = [];
+
+        // Iterate through all the position checkboxes that were ticked
+
+        $positions = $this->getRequest()->post["positions"];
+
+        if (is_array($positions)) {
+            foreach ($positions as $position) {
+                // Find the position
+
+                if (!isset($positionCache[$position])) {
+                    // Haven't got this position, load it and shove into cache
+                    /** @var PositionModel $positionModel */
+                    try {
+                        $positionModel = $this->getPositionMapper()->findById($position);
+                        $positionCache[$position] = $positionModel;
+                    } catch (MapperException $e) {
+                        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_POSITION_NOT_FOUND);
+                    }
+                } else {
+                    // Already got this position
+                    $positionModel = $positionCache[$position];
+                }
+
+                $teamPosition = new TeamPositionModel();
+                $teamPosition->setTeam($team);
+                $teamPosition->setUser($player);
+                $teamPosition->setPosition($positionModel);
+                $this->getTeamPositionMapper()->save($teamPosition);
+            }
+        }
+
+        // Return to lobby
+
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'sportsfixturesDivision.getLobby',
+                ['entityId' => $entityId]
+            )
+        );
+    }
+
+    /**
      * Save Division data to db
      *
      * @param $sport
@@ -459,6 +555,24 @@ class Controller extends AbstractController
     }
 
     /**
+     * @return PositionMapper
+     */
+    protected function getPositionMapper()
+    {
+        return $this->positionMapper;
+    }
+
+    /**
+     * @param  PositionMapper $positionMapper
+     * @return static
+     */
+    protected function setPositionMapper(PositionMapper $positionMapper)
+    {
+        $this->positionMapper = $positionMapper;
+        return $this;
+    }    
+
+    /**
      * @return DivisionUserMapper
      */
     protected function getDivisionUserMapper()
@@ -511,4 +625,22 @@ class Controller extends AbstractController
         $this->teamUserMapper = $teamUserMapper;
         return $this;
     }
+
+    /**
+     * @return TeamPositionMapper
+     */
+    protected function getTeamPositionMapper()
+    {
+        return $this->teamPositionMapper;
+    }
+
+    /**
+     * @param TeamPositionMapper $teamPositionMapper
+     * @return static
+     */
+    protected function setTeamPositionMapper(TeamPositionMapper $teamPositionMapper)
+    {
+        $this->teamPositionMapper = $teamPositionMapper;
+        return $this;
+    }    
 }

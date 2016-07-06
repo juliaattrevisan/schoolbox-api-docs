@@ -19,6 +19,7 @@ use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\SportsFixtures\Team\User\Model as TeamUserModel;
 use \Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
+use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
 use Schoolbox\UserMapper;
 
 class Controller extends AbstractController
@@ -45,6 +46,11 @@ class Controller extends AbstractController
     protected $teamUserMapper;
 
     /**
+     * @var TeamPositionMapper
+     */
+    protected $teamPositionMapper;
+
+    /**
      * @var UserMapper
      */
     protected $userMapper;
@@ -59,6 +65,7 @@ class Controller extends AbstractController
         $this->setDivisionMapper(DivisionMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
         $this->setTeamUserMapper(TeamUserMapper::getInstance());
+        $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
@@ -228,6 +235,10 @@ class Controller extends AbstractController
                 'team_id' => $team->getId(),
             ])
         );
+        $this->getTeamPositionMapper()->deleteByColumnList([
+            'user_id' => $this->getRequest()->post->get('userId'),
+            'team_id' => $team->getId(),
+        ]);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'sportsfixturesDivision.getLobby',
@@ -360,6 +371,24 @@ class Controller extends AbstractController
     protected function setTeamUserMapper(TeamUserMapper $teamUserMapper)
     {
         $this->teamUserMapper = $teamUserMapper;
+        return $this;
+    }
+
+    /**
+     * @return TeamPositionMapper
+     */
+    protected function getTeamPositionMapper()
+    {
+        return $this->teamPositionMapper;
+    }
+
+    /**
+     * @param TeamPositionMapper $teamPositionMapper
+     * @return static
+     */
+    protected function setTeamPositionMapper(TeamPositionMapper $teamPositionMapper)
+    {
+        $this->teamPositionMapper = $teamPositionMapper;
         return $this;
     }
 

@@ -151,7 +151,8 @@ INSERT INTO `error` VALUES
     (174, 'The requested division could not be found.'),
     (175, 'The requested team could not be found.'),
     (176, 'The requested venue could not be found.'),
-    (177, 'The requested match could not be found.');
+		(177, 'The requested match could not be found.'),
+		(178, 'The requested position could not be found.');
 
 /** Team players table **/
 CREATE TABLE `sportsfixtures_team_user` (
@@ -168,4 +169,26 @@ CREATE TABLE `sportsfixtures_team_user` (
 	REFERENCES `sportsfixtures_team` (`id`)
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
+) ENGINE=InnoDB CHARACTER SET=utf8;
+
+/** Team player positions **/
+CREATE TABLE `sportsfixtures_team_position` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`team_id` INT NOT NULL,
+	`user_id` INT NOT NULL,
+	`position_id` INT NOT NULL,
+	PRIMARY KEY (`id`),
+	UNIQUE INDEX `sportsfixtures_team_position__team_user_position` (`team_id` ASC, `user_id` ASC, `position_id` ASC),
+	INDEX `fk_sportsfixtures_team_position__team_idx` (`team_id` ASC),
+	INDEX `fk_sportsfixtures_team_position__position_idx` (`position_id` ASC),
+	INDEX `sportsfixtures_team_position__user` (`user_id` ASC),
+	CONSTRAINT `fk_sportsfixtures_team_position__team`
+	FOREIGN KEY (`team_id`)
+	REFERENCES `sportsfixtures_team` (`id`)
+		ON DELETE CASCADE
+		ON UPDATE CASCADE,
+	FOREIGN KEY (`position_id`)
+	REFERENCES `sportsfixtures_position` (`id`)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
 ) ENGINE=InnoDB CHARACTER SET=utf8;
