@@ -73,6 +73,7 @@ class Module extends RestfulModule
         $routes = [
             'GET' => [
                 "/$context$collection/{teamId}/new" => 'getCreateFormForTeam',
+                "/$context$collection/{teamId}"     => 'getResultForTeam',
             ],
         ];
 
@@ -103,6 +104,15 @@ class Module extends RestfulModule
             return [
                 'entity' => $this->mapper->createModel(),
                 'team' => TeamMapper::getInstance()->createModel()
+            ];
+        });
+
+        /* Result Page for a particular Team
+         */
+        $this->addRoutePreload($matcher, '(?:getResultForTeam)', function ($params) {
+            return [
+                'context' => $this->findContextById($params['contextId']),
+                'team' => TeamMapper::getInstance()->findById($params['teamId'])
             ];
         });
     }

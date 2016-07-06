@@ -156,7 +156,10 @@ class Controller extends AbstractController
     }
 
     /**
-     * View a single Result
+     * View all Results (from both Teams) on the Match page
+     * Probably used if you are a Sports Admin and you want
+     * to give Results to both Teams without having to mash
+     * your way through the UI; can do it quickly from here
      *
      * @param Result $entity
      */
@@ -185,6 +188,44 @@ class Controller extends AbstractController
             'division' => $division,
             'match'    => $match,
             'result'   => $entity
+        ]));
+    }
+
+    /**
+     * Show Results for a particular Team from that Match
+     * The same as getEntity() except that it only shows
+     * the Results for the specified Team
+     *
+     * @param $context
+     * @param $team
+     */
+    public function getResultForTeam($context, $team)
+    {
+        try {
+            /** @var Match $context */
+            $match = $this->getMatchMapper()->findById($context->getId());
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
+        }
+
+        try {
+            $division = $this->getDivisionMapper()->findById($match->getDivision()->getId());
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
+        }
+
+        try {
+            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/team.twig', [
+            'sport'    => $sport,
+            'division' => $division,
+            'match'    => $match,
+            'team'     => $team,
+            'result'   => $context
         ]));
     }
 
