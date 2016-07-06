@@ -1,1 +1,93 @@
-UPCOMING MATCHES DASHBOARD
+{% if role == 'parent' %}
+
+    {% set match_count = 0 %}
+
+    {% for child in children %}
+
+        {% if child.matches | length %}
+
+            {% set match_count = match_count + child.matches | length %}
+
+            <div class="small-12 columns no-pad">
+                <ul class="action-list">
+
+                    {% for match in child.matches %}
+
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="card small-12">
+                                    <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}">
+                                        <img src="/portrait.php?userId={{ child.sid }}&amp;size=square64" alt="{{ child.name }}">
+                                        <h3>
+                                            <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}">{{ match.name }} ({{ teams[match.homeTeam.id] }} vs {% if match.awayTeam.id == null %}Unspecified Team{% else %}{{ teams[match.awayTeam.id] }}{% endif %})</a>
+                                        </h3>
+                                    </a>
+                                    <p class="meta">
+                                        <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span> | {{ sports[match.division.sport.id] }} | {{ match.division.name }}
+                                    </p>
+                                </div>
+                            </div>
+                            <nav>
+                                <a class="icon-view no-text" href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}" title="View Match Details"></a>
+                            </nav>
+                        </li>
+
+                    {% endfor %}
+
+                </ul>
+            </div>
+
+        {% endif %}
+
+    {% endfor %}
+
+    {% if match_count == 0 %}
+
+        <div class="content">
+            Your children do not have any upcoming matches scheduled.
+        </div>
+
+    {% endif %}
+
+{% elseif role == 'student' %}
+
+    {% if matches | length %}
+
+        <div class="small-12 columns no-pad">
+            <ul class="action-list">
+
+                {% for match in matches %}
+
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="card small-12">
+                                <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}">
+                                    <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" alt="{{ child.name }}">
+                                    <h3>
+                                        <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}">{{ match.name }} ({{ teams[match.homeTeam.id] }} vs {% if match.awayTeam.id == null %}Unspecified Team{% else %}{{ teams[match.awayTeam.id] }}{% endif %})</a>
+                                    </h3>
+                                </a>
+                                <p class="meta">
+                                    <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span> | {{ sports[match.division.sport.id] }} | {{ match.division.name }}
+                                </p>
+                            </div>
+                        </div>
+                        <nav>
+                            <a class="icon-view no-text" href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}" title="View Match Details"></a>
+                        </nav>
+                    </li>
+                    
+                {% endfor %}
+
+            </ul>
+        </div>
+
+    {% else %}
+
+        <div class="content">
+            You have no upcoming matches scheduled.
+        </div>
+
+    {% endif %}
+
+{% endif %}
