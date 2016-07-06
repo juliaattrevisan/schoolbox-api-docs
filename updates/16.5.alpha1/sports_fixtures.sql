@@ -242,3 +242,16 @@ INSERT INTO `sportsfixtures_status` VALUES
 (null,'Cancelled',NOW(),NOW(),null);
 
 INSERT INTO `msg_namespace` (`slug`, `label`) VALUES ('sports_fixtures', 'Sports Fixtures');
+
+/** Coaches table **/
+CREATE TABLE `sportsfixtures_coach` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(255) NOT NULL,
+	`user_id` INT NULL DEFAULT NULL,
+	`created_at` DATETIME NOT NULL,
+	`updated_at` DATETIME NOT NULL,
+	`deleted_at` DATETIME NULL DEFAULT NULL,
+	PRIMARY KEY (`id`),
+	INDEX `sportsfixtures_coach__name` (`name` ASC),
+	INDEX `sportsfixtures_coach__user` (`user_id` ASC)
+) ENGINE=InnoDB CHARACTER SET=utf8;
