@@ -16,6 +16,14 @@
                 confirmEvent: function () {
                     $.post('{{ routeLookup('sportsfixturesSchool.postDeleteSchool') }}', {id: schoolId}, function() {
                         $(row).remove();
+                        console.log($('#schoolList li'));
+                        if ($('#schoolList li').length == 0) {
+                            $('#schoolEmpty').removeClass('hide');
+                            $('#schoolList').addClass('hide');
+                        } else {
+                            $('#schoolEmpty').addClass('hide');
+                            $('#schoolList').removeClass('hide');
+                        }
                     });
                 }
             });
@@ -49,7 +57,7 @@
         </div>
 
         {% if schools | length %}
-            <section>
+            <section id="schoolList">
                 <ul class="action-list">
                     {% for school in schools %}
                     <li class="actions-small-2">
@@ -66,13 +74,13 @@
                     {% endfor %}
                 </ul>
             </section>
-        {% else %}
-            <div class="empty-state">
-                <i class="icon-match"></i>
-                <p>There are no External Schools.</p>
-                <p><a href="#" data-reveal-id="addSchoolModal" title="Add a School">Add a School</a></p>
-            </div>
         {% endif %}
+
+        <div id="schoolEmpty" class="empty-state {% if schools | length %}hide{% endif %}">
+            <i class="icon-match"></i>
+            <p>There are no External Schools.</p>
+            <p><a href="#" data-reveal-id="addSchoolModal" title="Add a School">Add a School</a></p>
+        </div>
     </div>
 </div>
 
