@@ -62,7 +62,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     }
 
     /**
-     * Saves a tag cloud.
+     * Saves a set of coaches.
      *
      * @param array|string[] $tags A list of tag names that can be parsed into
      *                             Model objects
@@ -72,8 +72,8 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     {
         $tagIds = [];
         foreach ($tags as $tag) {
-            if (preg_match('/^(\\s+):(\\d+)$/', $tag, $matches)) {
-                list(, $prefix, $identifier) = $matches;
+            if (strpos($tag, ':') !== false) {
+                list($prefix, $identifier) = explode(':', $tag, 2);
                 $newModel = null;
                 switch ($prefix) {
                     case Model::PREFIX_EXISTING_TAG:
@@ -95,7 +95,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
                             // User don't exist, so:
                             break;
                         }
-                        $newModel = $this->createModel()->setUser($user);
+                        $newModel = $this->createModel()->setName($user->formatName())->setUser($user);
                         break;
 
                     default:
