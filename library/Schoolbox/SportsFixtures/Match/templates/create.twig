@@ -72,12 +72,15 @@
 
         $('#homeTeam').selectizeSelector({
             ajax: {
-                url:      '/sportsfixtures/divisions/{{ division.id }}/teams',
+                url:      '/sportsfixtures/divisions/{{ division.id }}/teams?schools=1',
                 type:     'GET',
                 dataType: 'json'
             },
             {% if match.homeTeam.id %}
             value: {"id":{{ match.homeTeam.id }},"name":"{{ match.homeTeam.name }}"},
+            {% endif %}
+            {% if match.homeSchoolId %}
+            value: {"id":'{{ schoolToken }}{{ match.homeSchoolId }}',"name":"{{ schoolMapper.getTagValue(match.homeSchoolId) }}"},
             {% endif %}
             multiple: false
         });

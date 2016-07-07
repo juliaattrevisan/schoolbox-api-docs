@@ -214,7 +214,14 @@ class Controller extends AbstractController
         $startAt = \Alaress_Date_Format::newLocal($date);
 
         try {
-            $homeTeam = $this->getTeamMapper()->findById($this->getRequest()->post['homeTeamId']);
+            if (preg_match("/" . TagCloudMapper::SCHOOL_PREFIX . "(.*)/", $this->getRequest()->post['homeTeamId'], $matches)) {
+                // Home team is a faceless school, save the team as null
+                $homeTeam = new Team();
+                $homeSchoolId = $matches[1];
+            } else {
+                $homeTeam = $this->getTeamMapper()->findById($this->getRequest()->post['homeTeamId']);
+                $homeSchoolId = null;
+            }
 
             if (preg_match("/" . TagCloudMapper::SCHOOL_PREFIX . "(.*)/", $this->getRequest()->post['awayTeamId'], $matches)) {
                 // Away team is a faceless school, save the team as null
@@ -236,7 +243,7 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
         }
 
-        $this->saveMatch($entity, $division, $this->getRequest()->post['name'], $startAt, $homeTeam, $awayTeam, $awaySchoolId, $venue);
+        $this->saveMatch($entity, $division, $this->getRequest()->post['name'], $startAt, $homeTeam, $awayTeam, $homeSchoolId, $awaySchoolId, $venue);
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesMatch.getList', [
             'contextId' => $divisionId
@@ -252,16 +259,18 @@ class Controller extends AbstractController
      * @param \Alaress_Date_Format $startAt
      * @param Team $homeTeam
      * @param Team $awayTeam
+     * @param int $homeSchoolId
      * @param int $awaySchoolId
      * @param Venue $venue
      */
-    private function saveMatch(Match $match, Division $division, $name, \Alaress_Date_Format $startAt, Team $homeTeam, Team $awayTeam, $awaySchoolId, Venue $venue)
+    private function saveMatch(Match $match, Division $division, $name, \Alaress_Date_Format $startAt, Team $homeTeam, Team $awayTeam, $homeSchoolId, $awaySchoolId, Venue $venue)
     {
         $match->setDivision($division);
         $match->setName($name);
         $match->setStartAt($startAt);
         $match->setHomeTeam($homeTeam);
         $match->setAwayTeam($awayTeam);
+        $match->setHomeSchoolId($homeSchoolId);
         $match->setAwaySchoolId($awaySchoolId);
         $match->setVenue($venue);
         $match->setUpdatedAt(\Alaress_Date_Format::now());

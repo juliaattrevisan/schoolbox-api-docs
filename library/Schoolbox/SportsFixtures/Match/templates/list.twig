@@ -51,7 +51,15 @@
                                 <div class="small-12 avatar card">
                                     {% if currentMatch.name %}
                                         <p>{{ currentMatch.name }}</p>
-                                        <p class="meta">{{ currentMatch.homeTeam.name }} vs
+                                        <p class="meta">
+                                            {% if currentMatch.homeSchoolId == null %}
+                                                {{ currentMatch.homeTeam.name }}
+                                            {% else %}
+                                                {{ schoolMapper.getTagValue(currentMatch.homeSchoolId) }}
+                                            {% endif %}
+                                            
+                                            vs
+
                                             {% if currentMatch.awaySchoolId == null %}
                                                 {{ currentMatch.awayTeam.name }}
                                             {% else %}
@@ -59,7 +67,15 @@
                                             {% endif %}
                                     </p>
                                     {% else %}
-                                        <p>{{ currentMatch.homeTeam.name }} vs
+                                        <p>
+                                            {% if currentMatch.homeSchoolId == null %}
+                                                {{ currentMatch.homeTeam.name }}
+                                            {% else %}
+                                                {{ schoolMapper.getTagValue(currentMatch.homeSchoolId) }}
+                                            {% endif %}
+
+                                            vs
+
                                             {% if currentMatch.awaySchoolId == null %}
                                                 {{ currentMatch.awayTeam.name }}
                                             {% else %}

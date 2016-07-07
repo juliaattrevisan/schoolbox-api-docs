@@ -104,6 +104,7 @@ CREATE TABLE `sportsfixtures_match` (
 	`venue_id` INT NOT NULL,
 	`home_team_id` INT,
 	`away_team_id` INT NULL,
+	`home_school_id` INT NULL,
 	`away_school_id` INT NULL,
 	`name` VARCHAR(255) NULL COMMENT '',
 	`start_at` DATETIME NULL COMMENT '',

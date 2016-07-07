@@ -42,6 +42,9 @@ class Model implements ISoftDeletable {
     /** @var int $awaySchoolId */
     protected $awaySchoolId;
 
+    /** @var int $homeSchoolId */
+    protected $homeSchoolId;
+
     /** @var \Alaress_Date_Format */
     protected $startAt;
 
@@ -120,7 +123,23 @@ class Model implements ISoftDeletable {
     public function setAwaySchoolId($awaySchoolId)
     {
         $this->awaySchoolId = $awaySchoolId;
-    }    
+    }
+
+    /**
+     * @return int
+     */
+    public function getHomeSchoolId()
+    {
+        return $this->homeSchoolId;
+    }
+
+    /**
+     * @param int $homeSchoolId
+     */
+    public function setHomeSchoolId($homeSchoolId)
+    {
+        $this->homeSchoolId = $homeSchoolId;
+    }
 
     /**
      * @return Division
