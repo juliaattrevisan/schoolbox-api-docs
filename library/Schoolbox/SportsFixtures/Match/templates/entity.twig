@@ -19,7 +19,7 @@
                         <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: match.result[match.homeTeam.id].id}) }}" class="icon-modify" title="Modify"></a>
                     </nav>
                 </div>
-                {% else %}
+                {% elseif match.homeTeam.id %}
                 <div class="empty-state">
                     <i class="icon-result"></i>
                     <p>There are no Results for the Home Team.</p>
@@ -42,7 +42,7 @@
                         <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: match.result[match.awayTeam.id].id}) }}" class="icon-modify" title="Modify"></a>
                     </nav>
                 </div>
-                {% else %}
+                {% elseif match.awayTeam.id %}
                 <div class="empty-state">
                     <i class="icon-result"></i>
                     <p>There are no Results for the Away Team.</p>
@@ -58,8 +58,13 @@
         <i class="icon-result"></i>
         <p>There are no Results for this Match.</p>
 
-        <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}" title="Add Results">Add Results for the Home Team.</a></p>
-        <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}" title="Add Results">Add Results for the Away Team.</a></p>
+        {% if match.homeTeam.id %}
+            <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}" title="Add Results">Add Results for the Home Team.</a></p>
+        {% endif %}
+
+        {% if match.awayTeam.id %}
+            <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}" title="Add Results">Add Results for the Away Team.</a></p>
+        {% endif %}
     </div>
     {% endif %}
 {% endblock %}
