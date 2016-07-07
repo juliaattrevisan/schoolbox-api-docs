@@ -100,11 +100,12 @@ class Mapper extends BaseMapper
 
         $records = new Collection();
 
-        foreach ($statement as $row)
+        foreach ($statement as $row) {
             $records->add([
                 'id' => $row[$this->fieldId],
                 'name' => $row[$this->fieldValue]
             ]);
+        }
 
         return $records;
     }
