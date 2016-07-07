@@ -50,10 +50,10 @@
                             <div class="list-item">
                                 <div class="small-12 avatar card">
                                     {% if currentMatch.name %}
-                                        <p><a href="{{ routeLookup('sportsfixturesMatch.getEntity', {entityId: currentMatch.id}) }}">{{ currentMatch.name }}</a></p>
+                                        <p>{{ currentMatch.name }}</p>
                                         <p class="meta">
                                             {% if currentMatch.homeSchoolId == null %}
-                                                {{ currentMatch.homeTeam.name }}
+                                                <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: currentMatch.id, teamId: currentMatch.homeTeam.id}) }}">{{ currentMatch.homeTeam.name }}</a>
                                             {% else %}
                                                 {{ schoolMapper.getTagName(currentMatch.homeSchoolId) }}
                                             {% endif %}
@@ -61,15 +61,15 @@
                                             vs
 
                                             {% if currentMatch.awaySchoolId == null %}
-                                                {{ currentMatch.awayTeam.name }}
+                                                <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: currentMatch.id, teamId: currentMatch.awayTeam.id}) }}">{{ currentMatch.awayTeam.name }}</a>
                                             {% else %}
                                                 {{ schoolMapper.getTagName(currentMatch.awaySchoolId) }}
                                             {% endif %}
                                         </p>
                                     {% else %}
-                                        <p><a href="{{ routeLookup('sportsfixturesMatch.getEntity', {entityId: currentMatch.id}) }}">
+                                        <p>
                                             {% if currentMatch.homeSchoolId == null %}
-                                                {{ currentMatch.homeTeam.name }}
+                                                <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: currentMatch.id, teamId: currentMatch.homeTeam.id}) }}">{{ currentMatch.homeTeam.name }}</a>
                                             {% else %}
                                                 {{ schoolMapper.getTagName(currentMatch.homeSchoolId) }}
                                             {% endif %}
@@ -77,11 +77,11 @@
                                             vs
 
                                             {% if currentMatch.awaySchoolId == null %}
-                                                {{ currentMatch.awayTeam.name }}
+                                                <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: currentMatch.id, teamId: currentMatch.awayTeam.id}) }}">{{ currentMatch.awayTeam.name }}</a>
                                             {% else %}
                                                 {{ schoolMapper.getTagName(currentMatch.awaySchoolId) }}
                                             {% endif %}
-                                        </a></p>
+                                        </p>
                                     {% endif %}
 
                                 <p class="meta">{{ currentMatch.startAt.getLocal }}</p>
