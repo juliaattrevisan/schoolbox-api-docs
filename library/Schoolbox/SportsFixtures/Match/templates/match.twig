@@ -5,7 +5,7 @@
     <li><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}">Matches in {{ division.name }}</a></li>
 
     {% if match.id %}
-        <li class="active"><a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: match.id}) }}">{{ match.name }}</a></li>
+        <li class="active"><a href="{{ routeLookup('sportsfixturesMatch.getEntity', {entityId: match.id}) }}">{{ match.name }}</a></li>
     {% else %}
         <li class="active"><a href="#">{{ action }}</a></li>
     {% endif %}
