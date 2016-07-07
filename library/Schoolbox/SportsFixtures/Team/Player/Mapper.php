@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\SportsFixtures\Team\User;
+namespace Schoolbox\SportsFixtures\Team\Player;
 
 use PDOStatement;
 use Schoolbox\Collection;
