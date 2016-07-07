@@ -227,7 +227,13 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
 
-        $this->saveTeam($division, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $entity);
+        $this->saveTeam(
+            $division,
+            $this->getRequest()->post['name'],
+            $this->getRequest()->post['url'],
+            $this->getRequest()->post->get('coach', []),
+            $entity
+        );
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesTeam.getList', [
             'contextId' => $divisionId
@@ -320,15 +326,20 @@ class Controller extends AbstractController
      * @param Division $division
      * @param string $name
      * @param string $url
+     * @param array $coaches
      * @param Team $team
      */
-    private function saveTeam(Division $division, $name, $url, Team $team)
+    private function saveTeam(Division $division, $name, $url, $coaches, Team $team)
     {
         $team->setName($name);
         $team->setUrl($url);
         $team->setDivision($division);
         $team->setUpdatedAt(\Alaress_Date_Format::now());
 
+        // Save each coach in the tag cloud too, and add to the team.
+        $team->setCoaches(
+            $this->getCoachMapper()->findByColumn('id', $this->getCoachMapper()->saveTagCloud($coaches))
+        );
         $this->getTeamMapper()->save($team);
     }
 
