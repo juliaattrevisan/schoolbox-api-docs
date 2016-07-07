@@ -174,8 +174,8 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     {
         $query = "
             {$this->getSelectString()}
-            INNER JOIN {$this->getJoinSql('sportsfixtures_team_coach', '', 'stc')}
-            WHERE stc.team_id = :teamId
+            INNER JOIN sportsfixtures_team_coach stc ON {$this->getTable()}.id = stc.sportsfixtures_coach_id
+            WHERE stc.sportsfixtures_team_id = :teamId
             ORDER BY name ASC
         ";
         $statement = $this->getDatabase()->prepare($query);
