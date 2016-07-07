@@ -94,7 +94,8 @@ CREATE TABLE `sportsfixtures_venue` (
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
-	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+	PRIMARY KEY (`id`)  COMMENT ''
+) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Match Table
  */
@@ -220,4 +221,4 @@ CREATE TABLE `sportsfixtures_school` (
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
 	PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB CHARACTER SET=utf8;
