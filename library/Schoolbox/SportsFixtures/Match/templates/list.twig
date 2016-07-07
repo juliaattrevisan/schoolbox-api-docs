@@ -55,7 +55,7 @@
                                             {% if currentMatch.homeSchoolId == null %}
                                                 {{ currentMatch.homeTeam.name }}
                                             {% else %}
-                                                {{ schoolMapper.getTagValue(currentMatch.homeSchoolId) }}
+                                                {{ schoolMapper.getTagName(currentMatch.homeSchoolId) }}
                                             {% endif %}
                                             
                                             vs
@@ -63,7 +63,7 @@
                                             {% if currentMatch.awaySchoolId == null %}
                                                 {{ currentMatch.awayTeam.name }}
                                             {% else %}
-                                                {{ schoolMapper.getTagValue(currentMatch.awaySchoolId) }}
+                                                {{ schoolMapper.getTagName(currentMatch.awaySchoolId) }}
                                             {% endif %}
                                     </p>
                                     {% else %}
@@ -71,7 +71,7 @@
                                             {% if currentMatch.homeSchoolId == null %}
                                                 {{ currentMatch.homeTeam.name }}
                                             {% else %}
-                                                {{ schoolMapper.getTagValue(currentMatch.homeSchoolId) }}
+                                                {{ schoolMapper.getTagName(currentMatch.homeSchoolId) }}
                                             {% endif %}
 
                                             vs
@@ -79,7 +79,7 @@
                                             {% if currentMatch.awaySchoolId == null %}
                                                 {{ currentMatch.awayTeam.name }}
                                             {% else %}
-                                                {{ schoolMapper.getTagValue(currentMatch.awaySchoolId) }}
+                                                {{ schoolMapper.getTagName(currentMatch.awaySchoolId) }}
                                             {% endif %}
                                         </p>
                                     {% endif %}

@@ -26,8 +26,8 @@ class Mapper extends BaseMapper
     /** @var string $fieldId */
     protected $fieldId;
 
-    /** @var string $fieldValue */
-    protected $fieldValue;
+    /** @var string $fieldName */
+    protected $fieldName;
     
     /** @var \Alaress_Date_Format $deletedAt */
     protected $deletedAt;
@@ -37,13 +37,13 @@ class Mapper extends BaseMapper
      *
      * @param string $tableName        Table name
      * @param string $fieldId          Column name of tag ID
-     * @param string $fieldValue       Column name of tag value
+     * @param string $fieldName       Column name of tag name
      */
-    public function __construct($tableName, $fieldId, $fieldValue)
+    public function __construct($tableName, $fieldId, $fieldName)
     {
         $this->tableName = $tableName;
         $this->fieldId = $fieldId;
-        $this->fieldValue = $fieldValue;
+        $this->fieldName = $fieldName;
 
         parent::__construct();
     }
@@ -53,16 +53,16 @@ class Mapper extends BaseMapper
      *
      * @param $tableName
      * @param $fieldId
-     * @param $fieldValue
+     * @param $fieldName
      *
      * @return static
      */
-    public static function getInstance($tableName, $fieldId, $fieldValue)
+    public static function getInstance($tableName, $fieldId, $fieldName)
     {
-        $instance_name = get_called_class()."_".$tableName."_".$fieldId."_".$fieldValue;
+        $instance_name = get_called_class()."_".$tableName."_".$fieldId."_".$fieldName;
 
         if (!isset(self::$instance[$instance_name])) {
-            self::$instance[$instance_name] = new static($tableName, $fieldId, $fieldValue);
+            self::$instance[$instance_name] = new static($tableName, $fieldId, $fieldName);
             self::$instance[$instance_name]->postSetup();
         }
 
@@ -77,7 +77,7 @@ class Mapper extends BaseMapper
         $this->hasTable($this->tableName);
         $this->hasModel(Model::class);
         $this->uses($this->fieldId, self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
-        $this->uses($this->fieldValue, self::TYPE_STRING, null, 'name');
+        $this->uses($this->fieldName, self::TYPE_STRING, null, 'name');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
@@ -90,9 +90,9 @@ class Mapper extends BaseMapper
         $query = "
             SELECT {$this->getColumnString()}
             FROM {$this->getTable()} 
-            WHERE {$this->fieldValue} LIKE ?
+            WHERE {$this->fieldName} LIKE ?
             AND `deleted_at` IS NULL
-            ORDER BY {$this->fieldValue} ASC
+            ORDER BY {$this->fieldName} ASC
         ";
 
         $statement = $this->getDatabase()->prepare($query);
@@ -103,7 +103,7 @@ class Mapper extends BaseMapper
         foreach ($statement as $row) {
             $records->add([
                 'id' => $row[$this->fieldId],
-                'name' => $row[$this->fieldValue]
+                'name' => $row[$this->fieldName]
             ]);
         }
 
@@ -111,11 +111,11 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Retrieve value of tag given the ID number
+     * Retrieve name of tag given the ID number
      * @param $id
      * @return null|string
      */
-    public function getTagValue($id) {
+    public function getTagName($id) {
 
         try {
             /** @var Model $row */
@@ -135,13 +135,13 @@ class Mapper extends BaseMapper
 
         try {
             /** @var Model $row */
-            $row = self::findOneByColumn($this->fieldValue, $string);
+            $row = self::findOneByColumn($this->fieldName, $string);
             return $row->getId();
         } catch (MapperException $e) {
             if ($create) {
                 // Tag did not already exist, and we want to auto-create a new one
                 $tag = new Model();
-                $tag->setValue($string);
+                $tag->setName($string);
                 $this->save($tag);
 
                 return $tag->getId();
