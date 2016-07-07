@@ -1,15 +1,5 @@
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}">Matches in {{ division.name }}</a></li>
-
-    {% if match.id %}
-        <li class="active"><a href="{{ routeLookup('sportsfixturesMatch.getEntity', {entityId: match.id}) }}">{{ match.name }}</a></li>
-    {% else %}
-        <li class="active"><a href="#">{{ action }}</a></li>
-    {% endif %}
-</ul>
+{% block breadcrumbs %}
+{% endblock %}
 
 <div class="row">
     <div class="small-12 columns">
@@ -72,3 +62,4 @@
         {% endblock %}
     </div>
 </div>
+
