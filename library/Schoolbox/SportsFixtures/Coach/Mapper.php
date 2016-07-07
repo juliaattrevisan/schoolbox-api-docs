@@ -35,7 +35,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->joinsVia('sportsfixtures_team_coach', Team\Mapper::class, 'id', 'team_id', 'coach_id');
+        $this->joinsVia('sportsfixtures_team_coach', Team\Mapper::class, 'id', 'sportsfixtures_team_id', 'sportsfixtures_coach_id');
     }
 
     /**
