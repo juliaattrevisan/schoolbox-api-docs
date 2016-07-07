@@ -295,7 +295,7 @@ class UserMapper extends Mapper
     {
         $query  = $this->getSelectString() . ' WHERE (user.alt_email = :altEmail AND user.local_email IS FALSE)';
         $params = ['altEmail' => $email];
-        if (!filter_var(FILTER_VALIDATE_EMAIL, $email)) {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $emailParts = explode('@', $email, 2);
             if (count($emailParts) === 2) {
                 // Compare this email's hostname against the actual hostname
