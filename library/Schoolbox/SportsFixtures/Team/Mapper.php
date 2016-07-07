@@ -39,7 +39,17 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->joinsVia('sportsfixtures_team_coach', Coach\Mapper::class, 'id', 'sportsfixtures_coach_id', 'sportsfixtures_team_id');
+        $this->joinsVia(
+            'sportsfixtures_team_coach',
+            Coach\Mapper::class,
+            'id',
+            'sportsfixtures_coach_id',
+            'sportsfixtures_team_id',
+            null,
+            null,
+            null,
+            'coaches'
+        );
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deletePlayers'));
     }
