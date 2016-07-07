@@ -38,10 +38,12 @@ class Module extends BaseModule
 
         $routes = [
             'GET' => [
-                ''         => 'getList',
+                ''              => 'getList',
             ],
             'POST' => [
-                '/add'     => 'postAddSchool',
+                '/add'          => 'postAddSchool',
+                '/edit'         => 'postEditSchool',
+                '/delete'       => 'postDeleteSchool',
             ]
         ];
 

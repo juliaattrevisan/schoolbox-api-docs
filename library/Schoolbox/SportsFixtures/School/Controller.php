@@ -11,6 +11,7 @@ namespace Schoolbox\SportsFixtures\School;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
+use \Schoolbox\TagCloud\Model as TagCloudModel;
 
 class Controller extends Base
 {
@@ -40,6 +41,23 @@ class Controller extends Base
         $this->getSchoolTagCloudMapper()->getTagId($this->getRequest()->post["name"]);
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesSchool.getList', []));
+    }
+
+    public function postEditSchool() {
+
+        /** @var TagCloudModel $tag */
+        $tag = $this->getSchoolTagCloudMapper()->findById($this->getRequest()->post["id"]);
+        $tag->setValue($this->getRequest()->post["name"]);
+        $this->getSchoolTagCloudMapper()->save($tag);
+
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesSchool.getList', []));
+    }
+
+    public function postDeleteSchool() {
+
+        /** @var TagCloudModel $tag */
+        $tag = $this->getSchoolTagCloudMapper()->findById($this->getRequest()->post["id"]);
+        $this->getSchoolTagCloudMapper()->delete($tag);
     }
 
     /**

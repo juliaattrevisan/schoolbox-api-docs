@@ -28,6 +28,9 @@ class Mapper extends BaseMapper
 
     /** @var string $fieldValue */
     protected $fieldValue;
+    
+    /** @var \Alaress_Date_Format $deletedAt */
+    protected $deletedAt;
 
     /**
      * Mapper constructor.
@@ -75,6 +78,7 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses($this->fieldId, self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->uses($this->fieldValue, self::TYPE_STRING, null, 'value');
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**
@@ -87,6 +91,7 @@ class Mapper extends BaseMapper
             SELECT {$this->getColumnString()}
             FROM {$this->getTable()} 
             WHERE {$this->fieldValue} LIKE ?
+            AND `deleted_at` IS NULL
             ORDER BY {$this->fieldValue} ASC
         ";
 
@@ -125,20 +130,24 @@ class Mapper extends BaseMapper
      * @param $string
      * @return int
      */
-    public function getTagId($string) {
+    public function getTagId($string, $create = true) {
 
         try {
             /** @var Model $row */
             $row = self::findOneByColumn($this->fieldValue, $string);
             return $row->getId();
         } catch (MapperException $e) {
-            // Tag did not already exist, create a new one
+            if ($create) {
+                // Tag did not already exist, and we want to auto-create a new one
+                $tag = new Model();
+                $tag->setValue($string);
+                $this->save($tag);
 
-            $tag = new Model();
-            $tag->setValue($string);
-            $this->save($tag);
-
-            return $tag->getId();
+                return $tag->getId();
+            } else {
+                // Not creating one, just return null
+                return null;
+            }
         }
     }
 }

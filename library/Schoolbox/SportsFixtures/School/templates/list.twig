@@ -1,3 +1,28 @@
+<script>
+    $(function() {
+        $('[data-school-modify]').click(function() {
+            $('#schoolId').val($(this).attr('data-school-modify'));
+            $('#schoolName').val($(this).attr('data-school-name'));
+        });
+
+        $('[data-school-delete]').click(function() {
+            event.preventDefault();
+
+            var row = $(this).closest('li');
+            var schoolId = $(this).attr('data-school-delete');
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this school?',
+                confirmEvent: function () {
+                    $.post('{{ routeLookup('sportsfixturesSchool.postDeleteSchool') }}', {id: schoolId}, function() {
+                        $(row).remove();
+                    });
+                }
+            });
+        });
+    });
+</script>
+
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
     <li class="active"><a href="{{ routeLookup('sportsfixturesSchool.getList', {}) }}">External Schools</a></li>
@@ -33,15 +58,18 @@
                                 <p>{{ school.value }}</p>
                             </div>
                         </div>
+                        <nav>
+                            <a href='#' data-reveal-id="editSchoolModal" data-school-name="{{ school.value }}" data-school-modify="{{ school.id }}" class="icon-modify" title="Edit School"></a>
+                            <a href='#' data-school-delete="{{ school.id }}" class="icon-delete" title="Delete School"></a>
+                        </nav>
                     </li>
-
                     {% endfor %}
                 </ul>
             </section>
         {% else %}
             <div class="empty-state">
                 <i class="icon-match"></i>
-                <p>There are no External Schools .</p>
+                <p>There are no External Schools.</p>
                 <p><a href="#" data-reveal-id="addSchoolModal" title="Add a School">Add a School</a></p>
             </div>
         {% endif %}
@@ -54,6 +82,16 @@
     <form action="{{ routeLookup('sportsfixturesSchool.postAddSchool') }}" method="post">
         <input type="text" name="name" placeholder="School Name">
         <input type="submit" class="full-width" value="Add" />
+    </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div id="editSchoolModal" class="reveal-modal" data-reveal aria-labelledby="editSchoolModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="editSchoolModalTitle">Edit External School</h2>
+    <form action="{{ routeLookup('sportsfixturesSchool.postEditSchool') }}" method="post">
+        <input type="hidden" id="schoolId" name="id">
+        <input type="text" id="schoolName" name="name" placeholder="School Name">
+        <input type="submit" class="full-width" value="Edit" />
     </form>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>

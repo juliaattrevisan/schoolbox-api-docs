@@ -19,6 +19,9 @@ class Model {
     /** @var string */
     protected $value;
 
+    /** @var \Alaress_Date_Format */
+    protected $deletedAt;
+
     /**
      * Model constructor.
      */
@@ -57,4 +60,20 @@ class Model {
     public function getValue() {
         return $this->value;
     }
+
+    /**
+     * @param string $deletedAt
+     * @return self
+     */
+    public function setDeletedAt($deletedAt) {
+        $this->deletedAt = $deletedAt;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeletedAt() {
+        return $this->deletedAt;
+    }    
 }
