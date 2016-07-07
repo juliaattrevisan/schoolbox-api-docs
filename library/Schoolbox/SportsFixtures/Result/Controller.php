@@ -277,8 +277,9 @@ class Controller extends AbstractController
 
         $this->saveResult($match, $team, $this->getRequest()->post['description'], $entity);
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesResult.getList', [
-            'contextId' => $matchId
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesResult.getResultForTeam', [
+            'contextId' => $matchId,
+            'teamId' => $team->getId()
         ]));
     }
 
