@@ -75,6 +75,8 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses($this->fieldId, self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->uses($this->fieldName, self::TYPE_STRING, null, 'name');
+        $this->uses('created_at', self::TYPE_DATETIME);
+        $this->uses('updated_at', self::TYPE_DATETIME);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
