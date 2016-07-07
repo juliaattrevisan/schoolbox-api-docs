@@ -20,6 +20,9 @@ class Controller extends Base
      */
     protected $schoolTagCloudMapper;
 
+    /**
+     * Controller constructor.
+     */
     public function __construct()
     {
         $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
@@ -37,24 +40,32 @@ class Controller extends Base
         );
     }
 
+    /**
+     * Add external school to tag cloud
+     */
     public function postAddSchool() {
         $this->getSchoolTagCloudMapper()->getTagId($this->getRequest()->post["name"]);
-
+        
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesSchool.getList', []));
     }
 
+    /**
+     * Update name of school
+     */
     public function postEditSchool() {
 
         /** @var TagCloudModel $tag */
         $tag = $this->getSchoolTagCloudMapper()->findById($this->getRequest()->post["id"]);
-        $tag->setValue($this->getRequest()->post["name"]);
+        $tag->setName($this->getRequest()->post["name"]);
         $this->getSchoolTagCloudMapper()->save($tag);
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesSchool.getList', []));
     }
 
+    /**
+     * Delete external school from tag cloud
+     */
     public function postDeleteSchool() {
-
         /** @var TagCloudModel $tag */
         $tag = $this->getSchoolTagCloudMapper()->findById($this->getRequest()->post["id"]);
         $this->getSchoolTagCloudMapper()->delete($tag);
