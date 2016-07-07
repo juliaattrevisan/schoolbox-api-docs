@@ -1,0 +1,75 @@
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+
+<script type="text/javascript">
+    $(function() {
+        $('#resultForm').alaressValidate({
+            rules: {
+                matchId: {
+                    required: true,
+                    min: 1
+                }
+            },
+            messages: {
+                'matchId': 'Please choose a Match.'
+            },
+            errorPlacement: function(error, element) {
+                $.alaressValidate.defaultErrorPlacement(error, element);
+            }
+        });
+
+        $('#resultForm').find('[data-description]').alaressEditor();
+    });
+</script>
+
+<ul class="breadcrumb">
+    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}">Matches in {{ division.name }}</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: match.id}) }}">{{ match.name }}</a></li>
+
+    {% if result.id %}
+        <li class="active"><a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: result.id}) }}">Result for {{ team.name }}</a></li>
+    {% else %}
+        <li class="active"><a href="#">{{ action }} Result for {{ team.name }}</a></li>
+    {% endif %}
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sports Fixtures</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        {% if result %}
+            {% set formUrl = routeLookup('sportsfixturesResult.updateEntity', {entityId: result.id}) %}
+        {% else %}
+            {% set formUrl = routeLookup('sportsfixturesResult.createEntity') %}
+        {% endif %}
+
+        <form id='resultForm' action="{{ formUrl }}" method="post">
+            <h2 class="subheader">{{ action }} Result for {{ match.name }}</h2>
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="matchId" value="{{ match.id }}"/>
+                        <input type="hidden" name="teamId" value="{{ team.id }}"/>
+                        <input type="hidden" name="resultId" value="{{ result.id }}"/>
+
+                        <label>
+                            Description
+                        </label>
+
+                        <textarea name="description" data-description>{{ result.description }}</textarea>
+                    </div>
+                </fieldset>
+            </section>
+
+            <input type="submit" value="{{ action }} Result" />
+        </form>
+    </div>
+</div>

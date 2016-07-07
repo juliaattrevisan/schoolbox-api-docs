@@ -94,7 +94,8 @@ CREATE TABLE `sportsfixtures_venue` (
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
-	PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
+	PRIMARY KEY (`id`)  COMMENT ''
+) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Match Table
  */
@@ -137,6 +138,23 @@ CREATE TABLE `sportsfixtures_match_itineraryitem` (
 	`match_id` INT NOT NULL,
 	`description` TEXT NULL COMMENT '',
 	`start_at` DATETIME NULL COMMENT '',
+	`created_at` DATETIME NULL COMMENT '',
+	`updated_at` DATETIME NULL COMMENT '',
+	`deleted_at` DATETIME NULL COMMENT '',
+	PRIMARY KEY (`id`),
+	FOREIGN KEY (`match_id`)
+		REFERENCES `sportsfixtures_match`(`id`)
+			ON UPDATE NO ACTION
+			ON DELETE NO ACTION
+) ENGINE=InnoDB CHARACTER SET=utf8;
+
+/* Match Result Table
+ */
+CREATE TABLE `sportsfixtures_result` (
+	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
+	`match_id` INT NOT NULL,
+	`team_id` INT NOT NULL,
+	`description` TEXT NULL COMMENT '',
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
@@ -203,4 +221,4 @@ CREATE TABLE `sportsfixtures_school` (
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
 	PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1
+) ENGINE=InnoDB CHARACTER SET=utf8;

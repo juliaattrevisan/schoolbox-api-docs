@@ -23,7 +23,10 @@ use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Venue\Model as Venue;
 use Schoolbox\SportsFixtures\Venue\Mapper as VenueMapper;
+use Schoolbox\SportsFixtures\ItineraryItem\Model as ItineraryItem;
 use Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
+use Schoolbox\SportsFixtures\Result\Model as Result;
+use Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
 use Schoolbox\Collection;
 
 /**
@@ -54,7 +57,24 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
+        /* Reverse join thingo
+         */
+        $this->hasJoin('result', array(
+            'mapper'    => ResultMapper::class,
+            'this_key'  => 'id',
+            'other_key' => 'match_id',
+        ));
+
+        /* Reverse join thingo
+         */
+        $this->hasJoin('itinerary', array(
+            'mapper'    => ItineraryItemMapper::class,
+            'this_key'  => 'id',
+            'other_key' => 'match_id',
+        ));
+
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteItineraryItems'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteResults'));
     }
 
     /**
@@ -73,6 +93,20 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Delete all Results associated with this Match
+     *
+     * @param Model $match
+     */
+    public function deleteResults(Match $match)
+    {
+        $allResults = ResultMapper::getInstance()->findByColumn('match_id', $match->getId());
+
+        foreach ($allResults as $currentResult) {
+            ResultMapper::getInstance()->delete($currentResult);
+        }
+    }
+
+    /**
      * {@inheritdoc}
      *
      * @return string
@@ -85,7 +119,9 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('home_team', 'h')},
                 {$this->getJoinColumnString('away_team', 'a')},
 				{$this->getJoinColumnString('division', 'd')},
-				{$this->getJoinColumnString('venue', 'v')}
+				{$this->getJoinColumnString('venue', 'v')},
+				{$this->getJoinColumnString('itinerary', 'i')},
+				{$this->getJoinColumnString('result', 'r')}
         ";
     }
 
@@ -102,6 +138,8 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('away_team', null, 'a')}
             LEFT JOIN {$this->getJoinSql('division', null, 'd')}
             LEFT JOIN {$this->getJoinSql('venue', null, 'v')}
+            LEFT JOIN {$this->getJoinSql('itinerary', null, 'i')}
+            LEFT JOIN {$this->getJoinSql('result', null, 'r')}
         ";
     }
 
@@ -117,27 +155,59 @@ class Mapper extends BaseMapper
         $collection = new Collection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $matchId = $row['id'];
 
-            /** @var Match $match */
-            $match = $this->hydrate($row);
+            /* Set up us the match in the collection
+             * Only hydrate all this stuff if it never existed previously
+             */
+            if (!($collection->getOffset($matchId) instanceof Match)) {
+                /** @var Match $match */
+                $match = $this->hydrate($row);
 
-            /** @var Division $division */
-            $division = $this->hydrateJoin($row, 'division', 'd');
+                /** @var Division $division */
+                $division = $this->hydrateJoin($row, 'division', 'd');
 
-            /** @var Venue $venue */
-            $venue = $this->hydrateJoin($row, 'venue', 'v');
+                /** @var Venue $venue */
+                $venue = $this->hydrateJoin($row, 'venue', 'v');
 
-            /** @var Team $homeTeam */
-            /** @var Team $awayTeam */
-            $homeTeam = $this->hydrateJoin($row, 'home_team', 'h');
-            $awayTeam = $this->hydrateJoin($row, 'away_team', 'a');
+                /** @var Team $homeTeam */
+                /** @var Team $awayTeam */
+                $homeTeam = $this->hydrateJoin($row, 'home_team', 'h');
+                $awayTeam = $this->hydrateJoin($row, 'away_team', 'a');
 
-            $match->setVenue($venue);
-            $match->setDivision($division);
-            $match->setHomeTeam($homeTeam);
-            $match->setAwayTeam($awayTeam);
+                $match->setVenue($venue);
+                $match->setDivision($division);
+                $match->setHomeTeam($homeTeam);
+                $match->setAwayTeam($awayTeam);
 
-            $collection->add($match);
+                $collection->setOffset($match->getId(), $match);
+            }
+
+            /* Append all Result instances as you go
+             */
+            if ($row['r.team_id']) {
+                if (!($collection->getOffset($matchId)->getResult()->getOffset($row['r.team_id']) instanceof Result)) {
+                    $result = $this->hydrateJoin($row, 'result', 'r');
+
+                    $collection->getOffset($matchId)->getResult()->setOffset($result->getTeam()->getId(), $result);
+                }
+            }
+
+            /* Append all ItineraryItems as you go
+             */
+            if ($row['i.id']) {
+                if (!($collection->getOffset($matchId)->getItinerary()->getOffset($row['i.id']) instanceof ItineraryItem)) {
+                    $itineraryItem = $this->hydrateJoin($row, 'itinerary', 'i');
+
+                    $collection->getOffset($matchId)->getItinerary()->setOffset($itineraryItem->getId(), $itineraryItem);
+                }
+            }
+        }
+
+        /* Order itinerary items in asc order
+         */
+        foreach ($collection as $current) {
+            $current->getItinerary()->sortBy('startAt', 'asc');
         }
 
         return $collection;

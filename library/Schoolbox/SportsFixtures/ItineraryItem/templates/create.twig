@@ -10,9 +10,11 @@
                     required: true,
                     min: 1
                 },
-                startAt: {
-                    required: true,
-                    min: 1
+                startAtDate: {
+                    required: true
+                },
+                startAtTime: {
+                    required: true
                 },
                 description: {
                     required: true,
@@ -21,7 +23,8 @@
             },
             messages: {
                 'matchId': 'Please choose a Match.',
-                'startAt': 'Please choose a Time',
+                'startAtDate': 'Please choose a Date',
+                'startAtTime': 'Please choose a Time',
                 'description': 'Please enter a name.'
             },
             errorPlacement: function(error, element) {

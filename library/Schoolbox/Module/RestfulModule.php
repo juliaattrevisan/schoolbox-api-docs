@@ -171,7 +171,7 @@ abstract class RestfulModule extends AlaressModule
      * @throws \Schoolbox\Application\Exception\Exception
      * @return object
      */
-    private function findEntityById($id)
+    protected function findEntityById($id)
     {
         return $this->findById($this->getMapper(), $id);
     }
@@ -181,7 +181,7 @@ abstract class RestfulModule extends AlaressModule
      * @throws \Schoolbox\Application\Exception\Exception
      * @return object
      */
-    private function findContextById($id)
+    protected function findContextById($id)
     {
         return $this->findById($this->context->getMapper(), $id);
     }

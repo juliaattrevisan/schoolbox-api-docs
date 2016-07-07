@@ -180,41 +180,6 @@
                     </div>
                 </fieldset>
 
-                {% if match.id %}
-                <fieldset class="content">
-                    <legend>Itinerary</legend>
-
-                    <div class="small-12 columns">
-                        {% if allItineraryItems|length %}
-                        <ul class="action-list">
-                            {% for currentItineraryItem in allItineraryItems %}
-                            <li class="actions-small-2">
-                                <div class="list-item">
-                                    <div class="small-12 card">
-                                        <p>{{ currentItineraryItem.startAt.local }}</p>
-                                        <p class="meta">{{ currentItineraryItem.description }}</p>
-                                    </div>
-                                </div>
-                                <nav>
-                                    <a href="{{ routeLookup('sportsfixturesItineraryItem.deleteEntity', {entityId: currentItineraryItem.id}) }}" class="icon-delete" title="Delete" data-itinerary-delete="{{ currentItineraryItem.id }}"></a>
-                                    <a href="{{ routeLookup('sportsfixturesItineraryItem.getModifyForm', {entityId: currentItineraryItem.id}) }}" class="icon-modify" title="Modify"></a>
-                                </nav>
-                            </li>
-                            {% endfor %}
-                        </ul>
-
-                        <a href="{{ routeLookup('sportsfixturesItineraryItem.getCreateForm', {contextId: match.id}) }}" class="full-width button icon-add">Add Itinerary Item</a>
-                        {% else %}
-                        <div class="empty-state">
-                            <i class="icon-itineraryitem"></i>
-                            <p>There are no items in this Match's Itinerary.</p>
-                            <p><a href="{{ routeLookup('sportsfixturesItineraryItem.getCreateForm', {contextId: match.id}) }}" title="Add an Itinerary Item">Add an Itinerary Item.</a></p>
-                        </div>
-                        {% endif %}
-                    </div>
-                </fieldset>
-                {% endif %}
-
                 <fieldset class="content">
                     <legend>Participating Teams</legend>
                     <div class="small-12 medium-6 columns">
@@ -230,6 +195,41 @@
                         <input id='awayTeam' name="awayTeamId" type='text' value='' placeholder="Search Teams" />
                     </div>
                 </fieldset>
+
+                {% if match.id %}
+                <fieldset class="content">
+                    <legend>Itinerary</legend>
+
+                    <div class="small-12 columns">
+                        {% if allItineraryItems|length %}
+                            <ul class="action-list">
+                                {% for currentItineraryItem in allItineraryItems %}
+                                    <li class="actions-small-2">
+                                        <div class="list-item">
+                                            <div class="small-12 card">
+                                                <p>{{ currentItineraryItem.startAt.local }}</p>
+                                                <p class="meta">{{ currentItineraryItem.description }}</p>
+                                            </div>
+                                        </div>
+                                        <nav>
+                                            <a href="{{ routeLookup('sportsfixturesItineraryItem.deleteEntity', {entityId: currentItineraryItem.id}) }}" class="icon-delete" title="Delete" data-itinerary-delete="{{ currentItineraryItem.id }}"></a>
+                                            <a href="{{ routeLookup('sportsfixturesItineraryItem.getModifyForm', {entityId: currentItineraryItem.id}) }}" class="icon-modify" title="Modify"></a>
+                                        </nav>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+
+                            <a href="{{ routeLookup('sportsfixturesItineraryItem.getCreateForm', {contextId: match.id}) }}" class="full-width button icon-add">Add Itinerary Item</a>
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="icon-itineraryitem"></i>
+                                <p>There are no items in this Match's Itinerary.</p>
+                                <p><a href="{{ routeLookup('sportsfixturesItineraryItem.getCreateForm', {contextId: match.id}) }}" title="Add an Itinerary Item">Add an Itinerary Item.</a></p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </fieldset>
+                {% endif %}
             </section>
 
             <input type="submit" value="{{ action }} Match" />
