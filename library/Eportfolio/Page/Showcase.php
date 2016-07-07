@@ -34,6 +34,7 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
         $this->getPage()->setTab('ePortfolio');
         $this->getPage()->setBlock(TEMPLATE_content, 'no_showcased_work', 'no_showcased_work_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'has_showcased_work', 'has_showcased_work_block');
+        $this->getPage()->setBlock('has_showcased_work', 'has_intro', 'has_intro_block');
         $this->getPage()->setBlock('has_showcased_work', 'showcased_work_subject', 'showcased_work_subject_block');
         $this->getPage()->setBlock('showcased_work_subject', 'showcased_work', 'showcased_work_block');
         $this->getPage()->setBlock('showcased_work', 'has_modify_form', 'has_modify_form_block');
@@ -50,9 +51,16 @@ class Eportfolio_Page_Showcase extends Eportfolio_Page_Abstract
                 'USER_LASTNAME' => $user->getLastname(),
             )
         );
-        
 
         $this->getPage()->setVar('no_showcased_work_block', '');
+
+        /* Intro text
+         */
+        if ($this->getEportfolioHandler()->getUserId() == $_SESSION['id']) {
+            $this->getPage()->parse('has_intro_block', 'has_intro');
+        } else {
+            $this->getPage()->setVar('has_intro_block', '');
+        }
 
         /* Render mime types
          */
