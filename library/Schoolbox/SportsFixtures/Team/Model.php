@@ -16,6 +16,7 @@ use \Schoolbox\ISoftDeletable;
 use \Schoolbox\User;
 use \Schoolbox\ValueLabelInterface;
 use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use \Schoolbox\SportsFixtures\Coach;
 use \Schoolbox\SportsFixtures\Division\Model as Division;
 
 class Model implements ISoftDeletable, ValueLabelInterface {
@@ -49,7 +50,7 @@ class Model implements ISoftDeletable, ValueLabelInterface {
     /**
      * Coaches within the team.
      *
-     * @var Collection|User[]
+     * @var Collection|Coach\Model[]
      */
     protected $coaches;
 
@@ -209,7 +210,7 @@ class Model implements ISoftDeletable, ValueLabelInterface {
     }
 
     /**
-     * @return Collection|User[]
+     * @return Collection|Coach\Model[]
      */
     public function getCoaches()
     {
@@ -217,7 +218,7 @@ class Model implements ISoftDeletable, ValueLabelInterface {
     }
 
     /**
-     * @param Collection|User[] $coaches
+     * @param Collection|Coach\Model[] $coaches
      * @return static
      */
     public function setCoaches($coaches)
