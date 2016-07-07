@@ -45,7 +45,7 @@ class Controller extends Base
      */
     public function postAddSchool() {
         $this->getSchoolTagCloudMapper()->getTagId($this->getRequest()->post["name"]);
-        
+
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesSchool.getList', []));
     }
 
