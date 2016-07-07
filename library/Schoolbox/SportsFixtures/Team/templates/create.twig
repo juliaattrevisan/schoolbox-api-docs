@@ -24,7 +24,8 @@
         // Selectize box for selecting one or more users
         // This box allows freetext entry, because of the requirement that
         // coaches won't always be Schoolbox users.
-        $('[data-role="userSelector"]')
+        var selector = $('[data-role="userSelector"]');
+        selector
             .selectizeSelector({
                 multiple: true,
                 ajax: {
@@ -39,7 +40,8 @@
                         freeEntry[this.settings.searchField] = input;
                         return freeEntry;
                     }
-                }
+                },
+                value: $.selectizeSelector.getValueFromSelect(selector)
             });
     });
 </script>
@@ -97,9 +99,9 @@
                         <label>
                             Coaches
                             <select type="text" data-role="userSelector" name="coach[]" multiple placeholder="Search Users">
-                            {#{% for coach in team.coaches %}#}
-                            {#<option value="{{ coach.identifier }}">{{ coach.name }}</option>#}
-                            {#{% endfor %}#}
+                            {% for coach in team.coaches %}
+                                <option selected value="{{ coach.formatId }}">{{ coach.name }}</option>
+                            {% endfor %}
                             </select>
                         </label>
                     </div>

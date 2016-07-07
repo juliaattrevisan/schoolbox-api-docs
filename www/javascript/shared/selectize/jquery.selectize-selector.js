@@ -10,6 +10,30 @@
  */
 (function($){
     "use strict";
+    $.selectizeSelector = {};
+
+    /**
+     * Helper method for retrieving a selectize's value from its select box.
+     * The selected options are pre-selected.
+     *
+     * @param select
+     * @param valueField
+     * @param searchField
+     * @returns {*[]}
+     */
+    $.selectizeSelector.getValueFromSelect = function(select, valueField, searchField) {
+        valueField  = valueField || 'id';
+        searchField = searchField || 'name';
+        return $(select).find(':selected')
+            .map(function() {
+                var returnVal = {};
+                returnVal[valueField]  = $(this).val();
+                returnVal[searchField] = $(this).text();
+                return returnVal;
+            })
+            .toArray();
+    };
+
     $.fn.selectizeSelector = function(options) {
         var element  = this;
         var settings = {}
