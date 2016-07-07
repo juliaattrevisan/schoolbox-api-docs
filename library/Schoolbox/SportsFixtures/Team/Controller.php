@@ -21,6 +21,7 @@ use \Schoolbox\SportsFixtures\Team\User\Model as TeamUserModel;
 use \Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
 use Schoolbox\UserMapper;
+use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
 
 class Controller extends AbstractController
 {
@@ -56,6 +57,11 @@ class Controller extends AbstractController
     protected $userMapper;
 
     /**
+     * @var TagCloudMapper
+     */
+    protected $schoolTagCloudMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -67,6 +73,7 @@ class Controller extends AbstractController
         $this->setTeamUserMapper(TeamUserMapper::getInstance());
         $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
+        $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
     }
 
     /**
@@ -110,6 +117,24 @@ class Controller extends AbstractController
             /** @var Team $currentTeam */
             foreach ($allTeams as $currentTeam) {
                 $teams[] = array_combine(['id', 'name'], $currentTeam->findValueLabelPair());
+            }
+
+            // If the 'schools' parameter is set we also want to add schools from the tag cloud
+
+            if ($this->getRequest()->query->get('schools') == 1) {
+                // Add schools from the tag cloud
+                $schools = $this->getSchoolTagCloudMapper()->getTagLike($query);
+
+                foreach ($schools as $school) {
+                    // Prefix their ID with the external school token, we will parse it later when saving a match
+                    $school['id'] = TagCloudMapper::SCHOOL_PREFIX . $school['id'];
+                    $teams[] = $school;
+                }
+
+                // Sort return array by name
+                uasort($teams, function ($a, $b) {
+                    return (strcmp($a['name'], $b['name']));
+                });
             }
 
             $this->getResponse()->content->set($this->buildJsonOutput($teams));
@@ -408,5 +433,21 @@ class Controller extends AbstractController
     {
         $this->userMapper = $userMapper;
         return $this;
+    }
+
+    /**
+     * @return TagCloudMapper
+     */
+    protected function getSchoolTagCloudMapper()
+    {
+        return $this->schoolTagCloudMapper;
+    }
+
+    /**
+     * @param TagCloudMapper $schoolTagCloudMapper
+     */
+    protected function setSchoolTagCloudMapper($schoolTagCloudMapper)
+    {
+        $this->schoolTagCloudMapper = $schoolTagCloudMapper;
     }
 }

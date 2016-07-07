@@ -103,7 +103,9 @@ CREATE TABLE `sportsfixtures_match` (
 	`division_id` INT NOT NULL,
 	`venue_id` INT NOT NULL,
 	`home_team_id` INT,
-	`away_team_id` INT,
+	`away_team_id` INT NULL,
+	`home_school_id` INT NULL,
+	`away_school_id` INT NULL,
 	`name` VARCHAR(255) NULL COMMENT '',
 	`start_at` DATETIME NULL COMMENT '',
 	`created_at` DATETIME NULL COMMENT '',
@@ -192,3 +194,13 @@ CREATE TABLE `sportsfixtures_team_position` (
 	ON DELETE CASCADE
 	ON UPDATE CASCADE
 ) ENGINE=InnoDB CHARACTER SET=utf8;
+
+/* Tag cloud of enemy schools */
+CREATE TABLE `sportsfixtures_school` (
+	`id` int(11) NOT NULL AUTO_INCREMENT,
+	`name` varchar(255) DEFAULT NULL,
+	`created_at` DATETIME NULL COMMENT '',
+	`updated_at` DATETIME NULL COMMENT '',
+	`deleted_at` DATETIME NULL COMMENT '',
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1

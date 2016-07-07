@@ -72,24 +72,30 @@
 
         $('#homeTeam').selectizeSelector({
             ajax: {
-                url:      '/sportsfixtures/divisions/{{ division.id }}/teams',
+                url:      '/sportsfixtures/divisions/{{ division.id }}/teams?schools=1',
                 type:     'GET',
                 dataType: 'json'
             },
             {% if match.homeTeam.id %}
             value: {"id":{{ match.homeTeam.id }},"name":"{{ match.homeTeam.name }}"},
             {% endif %}
+            {% if match.homeSchoolId %}
+            value: {"id":'{{ schoolToken }}{{ match.homeSchoolId }}',"name":"{{ schoolMapper.getTagName(match.homeSchoolId) }}"},
+            {% endif %}
             multiple: false
         });
 
         $('#awayTeam').selectizeSelector({
             ajax: {
-                url:      '/sportsfixtures/divisions/{{ division.id }}/teams',
+                url:      '/sportsfixtures/divisions/{{ division.id }}/teams?schools=1',
                 type:     'GET',
                 dataType: 'json'
             },
             {% if match.awayTeam.id %}
             value: {"id":{{ match.awayTeam.id }},"name":"{{ match.awayTeam.name }}"},
+            {% endif %}
+            {% if match.awaySchoolId %}
+            value: {"id":'{{ schoolToken }}{{ match.awaySchoolId }}',"name":"{{ schoolMapper.getTagName(match.awaySchoolId) }}"},
             {% endif %}
             multiple: false
         });

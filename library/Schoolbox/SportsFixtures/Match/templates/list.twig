@@ -51,9 +51,37 @@
                                 <div class="small-12 avatar card">
                                     {% if currentMatch.name %}
                                         <p>{{ currentMatch.name }}</p>
-                                        <p class="meta">{{ currentMatch.homeTeam.name }} vs {{ currentMatch.awayTeam.name }}</p>
+                                        <p class="meta">
+                                            {% if currentMatch.homeSchoolId == null %}
+                                                {{ currentMatch.homeTeam.name }}
+                                            {% else %}
+                                                {{ schoolMapper.getTagName(currentMatch.homeSchoolId) }}
+                                            {% endif %}
+                                            
+                                            vs
+
+                                            {% if currentMatch.awaySchoolId == null %}
+                                                {{ currentMatch.awayTeam.name }}
+                                            {% else %}
+                                                {{ schoolMapper.getTagName(currentMatch.awaySchoolId) }}
+                                            {% endif %}
+                                    </p>
                                     {% else %}
-                                        <p>{{ currentMatch.homeTeam.name }} vs {{ currentMatch.awayTeam.name }}</p>
+                                        <p>
+                                            {% if currentMatch.homeSchoolId == null %}
+                                                {{ currentMatch.homeTeam.name }}
+                                            {% else %}
+                                                {{ schoolMapper.getTagName(currentMatch.homeSchoolId) }}
+                                            {% endif %}
+
+                                            vs
+
+                                            {% if currentMatch.awaySchoolId == null %}
+                                                {{ currentMatch.awayTeam.name }}
+                                            {% else %}
+                                                {{ schoolMapper.getTagName(currentMatch.awaySchoolId) }}
+                                            {% endif %}
+                                        </p>
                                     {% endif %}
 
                                     <p class="meta">{{ currentMatch.startAt.getLocal }}</p>
