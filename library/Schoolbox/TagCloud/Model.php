@@ -20,6 +20,12 @@ class Model {
     protected $name;
 
     /** @var \Alaress_Date_Format */
+    protected $createdAt;
+
+    /** @var \Alaress_Date_Format */
+    protected $updatedAt;
+
+    /** @var \Alaress_Date_Format */
     protected $deletedAt;
 
     /**
@@ -62,6 +68,38 @@ class Model {
     }
 
     /**
+     * @param string $createdAt
+     * @return self
+     */
+    public function setCreatedAt($createdAt) {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreatedAt() {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param string $updatedAt
+     * @return self
+     */
+    public function setUpdatedAt($updatedAt) {
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUpdatedAt() {
+        return $this->updatedAt;
+    }
+
+    /**
      * @param string $deletedAt
      * @return self
      */
@@ -75,5 +113,5 @@ class Model {
      */
     public function getDeletedAt() {
         return $this->deletedAt;
-    }    
+    }
 }

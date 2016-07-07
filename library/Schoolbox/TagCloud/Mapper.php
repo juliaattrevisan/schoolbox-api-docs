@@ -28,9 +28,6 @@ class Mapper extends BaseMapper
 
     /** @var string $fieldName */
     protected $fieldName;
-    
-    /** @var \Alaress_Date_Format $deletedAt */
-    protected $deletedAt;
 
     /**
      * Mapper constructor.
@@ -129,7 +126,8 @@ class Mapper extends BaseMapper
     /**
      * Retrieve tag ID creating new tag if it does not already exist
      * @param $string
-     * @return int
+     * @param bool $create
+     * @return null|int
      */
     public function getTagId($string, $create = true) {
 
@@ -142,6 +140,8 @@ class Mapper extends BaseMapper
                 // Tag did not already exist, and we want to auto-create a new one
                 $tag = new Model();
                 $tag->setName($string);
+                $tag->setCreatedAt(\Alaress_Date_Format::now());
+                $tag->setUpdatedAt(\Alaress_Date_Format::now());
                 $this->save($tag);
 
                 return $tag->getId();

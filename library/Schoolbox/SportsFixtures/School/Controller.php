@@ -45,7 +45,6 @@ class Controller extends Base
      */
     public function postAddSchool() {
         $this->getSchoolTagCloudMapper()->getTagId($this->getRequest()->post["name"]);
-
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesSchool.getList', []));
     }
 
@@ -56,6 +55,7 @@ class Controller extends Base
 
         /** @var TagCloudModel $tag */
         $tag = $this->getSchoolTagCloudMapper()->findById($this->getRequest()->post["id"]);
+        $tag->setUpdatedAt(\Alaress_Date_Format::now());
         $tag->setName($this->getRequest()->post["name"]);
         $this->getSchoolTagCloudMapper()->save($tag);
 

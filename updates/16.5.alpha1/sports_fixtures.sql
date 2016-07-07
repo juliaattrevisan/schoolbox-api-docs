@@ -199,6 +199,8 @@ CREATE TABLE `sportsfixtures_team_position` (
 CREATE TABLE `sportsfixtures_school` (
 	`id` int(11) NOT NULL AUTO_INCREMENT,
 	`name` varchar(255) DEFAULT NULL,
+	`created_at` DATETIME NULL COMMENT '',
+	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1
