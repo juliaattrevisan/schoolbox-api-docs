@@ -188,6 +188,8 @@ class Controller extends AbstractController
      */
     public function getForm($entity, $context = null)
     {
+        // Load coaches into entity
+        $entity->setCoaches($this->getCoachMapper()->findForTeam($entity));
 
         if (empty($context)) {
             try {
