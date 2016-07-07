@@ -15,6 +15,8 @@ use Aura\Router\Router;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 
 class Module extends RestfulModule
@@ -93,10 +95,17 @@ class Module extends RestfulModule
 
         // these routes require that the entity exist
         $this->addRoutePreload($matcher, '(?:getCreateFormForTeam)', function ($params) {
+            try {
+                $team = TeamMapper::getInstance()->findById($params['teamId']);
+            }
+            catch (MapperException $e) {
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+            }
+
             return [
                 'entity' => $this->mapper->createModel(),
                 'context' => $this->findContextById($params['contextId']),
-                'team' => TeamMapper::getInstance()->findById($params['teamId'])
+                'team' => $team
             ];
         });
 
@@ -108,11 +117,19 @@ class Module extends RestfulModule
         });
 
         /* Result Page for a particular Team
+         * Check that the Team still exists
          */
         $this->addRoutePreload($matcher, '(?:getResultForTeam)', function ($params) {
+            try {
+                $team = TeamMapper::getInstance()->findById($params['teamId']);
+            }
+            catch (MapperException $e) {
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+            }
+
             return [
                 'context' => $this->findContextById($params['contextId']),
-                'team' => TeamMapper::getInstance()->findById($params['teamId'])
+                'team' => $team
             ];
         });
     }
