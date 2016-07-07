@@ -16,7 +16,6 @@
                 confirmEvent: function () {
                     $.post('{{ routeLookup('sportsfixturesSchool.postDeleteSchool') }}', {id: schoolId}, function() {
                         $(row).remove();
-                        console.log($('#schoolList li'));
                         if ($('#schoolList li').length == 0) {
                             $('#schoolEmpty').removeClass('hide');
                             $('#schoolList').addClass('hide');
