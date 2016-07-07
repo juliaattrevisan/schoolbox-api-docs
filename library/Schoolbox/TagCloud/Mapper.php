@@ -77,7 +77,7 @@ class Mapper extends BaseMapper
         $this->hasTable($this->tableName);
         $this->hasModel(Model::class);
         $this->uses($this->fieldId, self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
-        $this->uses($this->fieldValue, self::TYPE_STRING, null, 'value');
+        $this->uses($this->fieldValue, self::TYPE_STRING, null, 'name');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
@@ -120,7 +120,7 @@ class Mapper extends BaseMapper
         try {
             /** @var Model $row */
             $row = self::findOneByColumn($this->fieldId, $id);
-            return $row->getValue();
+            return $row->getName();
         } catch (MapperException $e) {
             return null;
         }

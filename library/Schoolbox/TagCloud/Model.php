@@ -17,7 +17,7 @@ class Model {
     protected $id;
 
     /** @var string */
-    protected $value;
+    protected $name;
 
     /** @var \Alaress_Date_Format */
     protected $deletedAt;
@@ -46,19 +46,19 @@ class Model {
     }
 
     /**
-     * @param string $value
+     * @param string $name
      * @return self
      */
-    public function setValue($value) {
-        $this->value = $value;
+    public function setName($name) {
+        $this->name = $name;
         return $this;
     }
 
     /**
      * @return string
      */
-    public function getValue() {
-        return $this->value;
+    public function getName() {
+        return $this->name;
     }
 
     /**
