@@ -173,8 +173,13 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
         }
 
-        $date = "{$this->getRequest()->post['startAtDate']} {$this->getRequest()->post['startAtTime']}";
-        $startAt = \Alaress_Date_Format::newLocal($date);
+        if (strlen($this->getRequest()->post['startAtDate']) && strlen($this->getRequest()->post['startAtTime'])) {
+            $date    = "{$this->getRequest()->post['startAtDate']} {$this->getRequest()->post['startAtTime']}";
+            $startAt = \Alaress_Date_Format::newLocal($date);
+        }
+        else {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_INFORMATION_MISSING);
+        }
 
         $this->saveItineraryItem($match, $this->getRequest()->post['description'], $startAt, $entity);
 
