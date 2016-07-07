@@ -46,43 +46,27 @@
             <section>
                 <ul class="action-list">
                     {% for currentMatch in allMatches %}
-                        <li class="actions-small-2">
-                            <div class="list-item">
-                                <div class="small-12 avatar card">
-                                    {% if currentMatch.name %}
-                                        <p>{{ currentMatch.name }}</p>
-                                        <p class="meta">
-                                            {% if currentMatch.homeSchoolId == null %}
-                                                <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: currentMatch.id, teamId: currentMatch.homeTeam.id}) }}">{{ currentMatch.homeTeam.name }}</a>
-                                            {% else %}
-                                                {{ schoolMapper.getTagName(currentMatch.homeSchoolId) }}
-                                            {% endif %}
+                        {% if currentMatch.homeSchoolId == null %}
+                            {% set homeTeamData = "<a href=" ~ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: currentMatch.id, teamId: currentMatch.homeTeam.id}) ~ ">" ~ currentMatch.homeTeam.name ~ "</a>" %}
+                        {% else %}
+                            {%  set homeTeamData = schoolMapper.getTagName(currentMatch.homeSchoolId) %}
+                        {% endif %}
 
-                                            vs
+                        {% if currentMatch.awaySchoolId == null %}
+                            {% set awayTeamData = "<a href=" ~ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: currentMatch.id, teamId: currentMatch.awayTeam.id}) ~ ">" ~ currentMatch.awayTeam.name ~ "</a>" %}
+                        {% else %}
+                            {% set awayTeamData = schoolMapper.getTagName(currentMatch.awaySchoolId) %}
+                        {% endif %}
 
-                                            {% if currentMatch.awaySchoolId == null %}
-                                                <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: currentMatch.id, teamId: currentMatch.awayTeam.id}) }}">{{ currentMatch.awayTeam.name }}</a>
-                                            {% else %}
-                                                {{ schoolMapper.getTagName(currentMatch.awaySchoolId) }}
-                                            {% endif %}
-                                        </p>
-                                    {% else %}
-                                        <p>
-                                            {% if currentMatch.homeSchoolId == null %}
-                                                <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: currentMatch.id, teamId: currentMatch.homeTeam.id}) }}">{{ currentMatch.homeTeam.name }}</a>
-                                            {% else %}
-                                                {{ schoolMapper.getTagName(currentMatch.homeSchoolId) }}
-                                            {% endif %}
-
-                                            vs
-
-                                            {% if currentMatch.awaySchoolId == null %}
-                                                <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: currentMatch.id, teamId: currentMatch.awayTeam.id}) }}">{{ currentMatch.awayTeam.name }}</a>
-                                            {% else %}
-                                                {{ schoolMapper.getTagName(currentMatch.awaySchoolId) }}
-                                            {% endif %}
-                                        </p>
-                                    {% endif %}
+                    <li class="actions-small-2">
+                        <div class="list-item">
+                            <div class="small-12 avatar card">
+                                {% if currentMatch.name %}
+                                <p>{{ currentMatch.name }}</p>
+                                <p class="meta">{{ homeTeamData|raw }} vs {{ awayTeamData|raw }}</p>
+                                {% else %}
+                                <p>{{ homeTeamData|raw }} vs {{ awayTeamData|raw }}</p>
+                                {% endif %}
 
                                 <p class="meta">{{ currentMatch.startAt.getLocal }}</p>
                             </div>
