@@ -1,3 +1,9 @@
+{# Use to generate the text for a Match Page heading
+ #
+ # Since the Match Name can be the actual name, or the amalgamation
+ # of its constituent team names (either by local or faceless teams)
+ # heaps of extra logic is required
+ #}
 {% macro generate(match, schoolMapper) %}
     {% if match.name %}
         {{ match.name }}

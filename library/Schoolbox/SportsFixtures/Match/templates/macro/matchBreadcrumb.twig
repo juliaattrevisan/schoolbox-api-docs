@@ -1,0 +1,34 @@
+{# Use to generate the text for a breadcrumb node, for a Match
+ #
+ # Since the Match Name can be the actual name, or the amalgamation
+ # of its constituent team names (either by local or faceless teams)
+ # heaps of extra logic is required
+ #
+ # The breadcrumb node href is determined elsewhere
+ #}
+{% macro generate(match, schoolMapper) %}
+    {% if match.name %}
+        {{ match.name }}
+    {% else %}
+
+        {# Detect whether it's a faceless team or not
+         # and thus display their name and link properly
+         #}
+
+        {# Home Team #}
+        {% if match.homeSchoolId == null %}
+            {% set homeTeamData = match.homeTeam.name %}
+        {% else %}
+            {%  set homeTeamData = schoolMapper.getTagName(match.homeSchoolId) %}
+        {% endif %}
+
+        {# Away Team #}
+        {% if match.awaySchoolId == null %}
+            {% set awayTeamData = match.awayTeam.name %}
+        {% else %}
+            {% set awayTeamData = schoolMapper.getTagName(match.awaySchoolId) %}
+        {% endif %}
+
+        {{ homeTeamData|raw }} vs {{ awayTeamData|raw }}
+    {% endif %}
+{% endmacro %}
