@@ -280,7 +280,7 @@ class UserMapper extends Mapper
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyUniqueUsername']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidUsername']);
-        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidRoleType']);
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidRole']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyHasCampus']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidFirstName']);
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyValidLocalEmail']);
@@ -667,9 +667,9 @@ class UserMapper extends Mapper
      * @return bool Always true, as long as it doesn't throw
      * @throws UnexpectedValueException if role type is null
      */
-    public function verifyValidRoleType(User $user)
+    public function verifyValidRole(User $user)
     {
-        if (!$user->getRole() instanceof Role || null === $user->getRole()->getType()) {
+        if (!$user->getRole() instanceof Role || null === $user->getRole()->getId()) {
             throw new UnexpectedValueException('User role cannot be null');
         }
         return true;

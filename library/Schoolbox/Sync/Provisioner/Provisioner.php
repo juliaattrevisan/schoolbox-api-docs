@@ -338,7 +338,7 @@ class Provisioner
     protected function sanityCheck(User $internalUser)
     {
         $this->userMapper->verifyValidUsername($internalUser);
-        $this->userMapper->verifyValidRoleType($internalUser);
+        $this->userMapper->verifyValidRole($internalUser);
         $this->userMapper->verifyHasCampus($internalUser);
         $this->userMapper->verifyValidFirstName($internalUser);
         $this->userMapper->verifyValidLocalEmail($internalUser);
