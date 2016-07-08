@@ -15,12 +15,14 @@ use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
+use Schoolbox\Permission\Access\UserAccess;
 use Twig_Loader_Chain;
 
 use Group;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
@@ -114,7 +116,7 @@ class Module extends BaseModule
          */
         $group = new Group();
 
-        if ($group->getPermission($params['courseId']) < WRITE_ACCESS) {
+        if ($group->getPermission($params['courseId']) < UserAccess::ACCESS_WRITE) {
             error(6);
         }
 
@@ -140,10 +142,11 @@ class Module extends BaseModule
          */
         if (isset($params['term'])) {
             try {
+                /** @var TermModel $term */
                 $term = $termMapper->findOneByColumn('code', $params['term']);
 
                 $from = $term->getStart();
-                $to = $term->getActualFinish();
+                $to   = $term->getActualFinish();
             }
             catch (\Exception $e) {
                 throw new Exception('Invalid date range.');
@@ -153,7 +156,7 @@ class Module extends BaseModule
             $term = $termMapper->createModel();
 
             $from = $termMapper->findOldest()->getStart();
-            $to   = \Alaress_Date_Format::now();
+            $to   = new \Alaress_Date_NullDate();
         }
 
         $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $from, $to);
@@ -217,7 +220,7 @@ class Module extends BaseModule
          */
         $group = new Group();
 
-        if ($group->getPermission($params['folderId']) < WRITE_ACCESS) {
+        if ($group->getPermission($params['folderId']) < UserAccess::ACCESS_WRITE) {
             error(6);
         }
 
@@ -246,7 +249,7 @@ class Module extends BaseModule
                 $term = $termMapper->findOneByColumn('code', $params['term']);
 
                 $from = $term->getStart();
-                $to = $term->getActualFinish();
+                $to   = $term->getActualFinish();
             }
             catch (\Exception $e) {
                 throw new Exception('Invalid date range.');
@@ -256,7 +259,7 @@ class Module extends BaseModule
             $term = $termMapper->createModel();
 
             $from = $termMapper->findOldest()->getStart();
-            $to   = \Alaress_Date_Format::now();
+            $to   = new \Alaress_Date_NullDate();
         }
 
         $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $from, $to);
