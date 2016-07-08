@@ -140,20 +140,20 @@ class UnitInstanceMapper extends BaseMapper {
     }
 
     /**
-     * Find all the folders which use a Unit that was spawned from
-     * the original Course folder, $folder.
+     * Find all folders with unit instances derived from units
+     * which belong to the specified course.
      *
-     * Currently uses the beginning of $from and the end of $to as
-     * the date range, so you can get statistics across terms.
+     * Optionally filter by unit instances with due dates between
+     * $to and $from, so that you can get statistics specific to terms.
      *
-     * @param Folder $folder
+     * @param Folder $course
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
      * @return Collection
      * @throws BaseMapper\Exception
      */
     public function findAllFoldersUsingCourse(
-        Folder $folder,
+        Folder $course,
         Alaress_Date_Format $from = null,
         Alaress_Date_Format $to = null
     ) {
@@ -162,7 +162,7 @@ class UnitInstanceMapper extends BaseMapper {
 
         // Allow null dates in from/to
         $dateFilter = '';
-        $params     = ['folderId' => $folder->getId(),];
+        $params     = ['folderId' => $course->getId(),];
         if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
             $dateFilter      = $dateFilter . ' AND ui.due_date >= :from';
             $params['from']  = $from->getDatabaseDate();
@@ -203,12 +203,12 @@ class UnitInstanceMapper extends BaseMapper {
                 }
             }
             else {
-                $folder = $folderMapper->hydrate($row, 'c');
+                $course = $folderMapper->hydrate($row, 'c');
                 $code = $code_mapper->hydrate($row, 'cc');
                 if ($code->getCategory()->getId()) {
-                    $folder->addCode($code);
+                    $course->addCode($code);
                 }
-                $collection->add($folder);
+                $collection->add($course);
             }
         }
         return $collection;

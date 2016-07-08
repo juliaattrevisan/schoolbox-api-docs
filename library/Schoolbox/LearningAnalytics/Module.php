@@ -202,8 +202,6 @@ class Module extends BaseModule
             'allFoldersUsingCourse' => $allFoldersUsingCourse,
             'allUnitInstances' => $allUnitInstances,
             'term' => $term,
-//            'from' => $from,
-//            'to' => $to
         );
     }
 
@@ -246,6 +244,7 @@ class Module extends BaseModule
          */
         if (isset($params['term'])) {
             try {
+                /** @var TermModel $term */
                 $term = $termMapper->findOneByColumn('code', $params['term']);
 
                 $from = $term->getStart();
@@ -287,8 +286,6 @@ class Module extends BaseModule
             'allFoldersUsingCourse' => $allFoldersUsingCourse,
             'allUnitInstances' => $allUnitInstances,
             'term' => $term,
-//            'from' => $from,
-//            'to' => $to
         );
     }
 
