@@ -23,6 +23,8 @@ use \Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
+use \Schoolbox\SportsFixtures\Team\Position\Model as TeamPosition;
+use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
 use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
 
 
@@ -64,6 +66,11 @@ class Controller extends AbstractController
     protected $teamUserMapper;
 
     /**
+     * @var TeamPositionMapper
+     */
+    protected $teamPositionMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -76,6 +83,7 @@ class Controller extends AbstractController
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
         $this->setTeamUserMapper(TeamUserMapper::getInstance());
+        $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
     }
 
     /**
@@ -247,6 +255,7 @@ class Controller extends AbstractController
          * Get away team player list, if applicable
          */
         $teamPlayers = new Collection();
+        $teamPositions = new Collection();
 
         if ($context->getHomeTeam()->getId()) {
             $teamPlayers->setOffset($context->getHomeTeam()->getId(), new Collection());
@@ -255,6 +264,14 @@ class Controller extends AbstractController
 
             foreach ($allPlayers as $currentPlayer) {
                 $teamPlayers->getOffset($context->getHomeTeam()->getId())->add($currentPlayer->getUser());
+            }
+
+            $teamPositions->setOffset($context->getHomeTeam()->getId(), new Collection());
+
+            $allPositions = $this->getTeamPositionMapper()->findByColumn('team_id', $context->getHomeTeam()->getId(), ['order' => ['user_id' => 'asc']]);
+
+            foreach ($allPositions as $currentPosition) {
+                $teamPositions->getOffset($context->getHomeTeam()->getId())->setOffset($currentPosition->getUser()->getId(), $currentPosition);
             }
         }
 
@@ -266,16 +283,25 @@ class Controller extends AbstractController
             foreach ($allPlayers as $currentPlayer) {
                 $teamPlayers->getOffset($context->getAwayTeam()->getId())->add($currentPlayer->getUser());
             }
+
+            $teamPositions->setOffset($context->getAwayTeam()->getId(), new Collection());
+
+            $allPositions = $this->getTeamPositionMapper()->findByColumn('team_id', $context->getAwayTeam()->getId(), ['order' => ['user_id' => 'asc']]);
+
+            foreach ($allPositions as $currentPosition) {
+                $teamPositions->getOffset($context->getAwayTeam()->getId())->setOffset($currentPosition->getUser()->getId(), $currentPosition);
+            }
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/team.twig', [
-            'sport'        => $sport,
-            'division'     => $division,
-            'match'        => $match,
-            'schoolMapper' => $this->getSchoolTagCloudMapper(),
-            'team'         => $team,
-            'teamPlayers'  => $teamPlayers,
-            'result'       => $context
+            'sport'         => $sport,
+            'division'      => $division,
+            'match'         => $match,
+            'schoolMapper'  => $this->getSchoolTagCloudMapper(),
+            'team'          => $team,
+            'teamPlayers'   => $teamPlayers,
+            'teamPositions' => $teamPositions,
+            'result'        => $context
         ]));
     }
 
@@ -459,6 +485,24 @@ class Controller extends AbstractController
     protected function setTeamUserMapper(TeamUserMapper $teamUserMapper)
     {
         $this->teamUserMapper = $teamUserMapper;
+        return $this;
+    }
+
+    /**
+     * @return TeamPositionMapper
+     */
+    protected function getTeamPositionMapper()
+    {
+        return $this->teamPositionMapper;
+    }
+
+    /**
+     * @param TeamPositionMapper $teamPositionMapper
+     * @return static
+     */
+    protected function setTeamPositionMapper(TeamPositionMapper $teamPositionMapper)
+    {
+        $this->teamPositionMapper = $teamPositionMapper;
         return $this;
     }
 }

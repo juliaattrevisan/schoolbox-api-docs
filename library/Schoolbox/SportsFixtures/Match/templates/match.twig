@@ -28,7 +28,7 @@
                             <img src="/portrait.php?userId={{ currentPlayer.externalId }}&size=square64" alt="View Profile" />
                             <p>{{ currentPlayer.fullname }}</p>
                         </a>
-                        <p class="meta"></p>
+                        <p class="meta">{{ teamPositions.offset(team.id).offset(currentPlayer.id).position.name }}</p>
                     </div>
                 </li>
                 {% endfor %}
