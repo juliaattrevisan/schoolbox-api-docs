@@ -14,7 +14,7 @@
  */
 class DB2Statement implements Iterator {
 
-    /** @var int $ptr zero-indexed */
+    /** @var int $ptr zero-indexed, used for row counting, not item retrieval */
     private $ptr = null;
 
     /** @var array|bool $current */
@@ -43,8 +43,9 @@ class DB2Statement implements Iterator {
     private $varMap;
 
     /**
-     * @param $queryString
-     * @param $statement
+     * @param string $queryString
+     * @param resource $statement
+     * @param array $varMap
      */
     public function __construct($queryString, $statement, array $varMap = null) {
         $this->queryString = $queryString;
@@ -74,8 +75,8 @@ class DB2Statement implements Iterator {
         $success = db2_execute($this->statement, $sequential);
 
         if($success) {
-            $this->ptr     = 0;
-            $this->current = $this->fetch();
+            $this->ptr     = -1;
+            $this->current = $this->fetchNext();
         }
         else {
             // non-fatal errors can occur here, so don't want them displayed but would like a log of them
@@ -89,29 +90,66 @@ class DB2Statement implements Iterator {
     }
 
     /**
-     * Fetches the next row from a result set
+     * Fetches the next row from a result set into $current, increments
+     * the pointer, and returns $current.
+     *
+     * @param int $fetch_style
+     * @return mixed
      */
-    public function fetch($fetch_style = DB2::FETCH_BOTH) {
+    private function fetchNext($fetch_style = DB2::FETCH_BOTH) {
+
+        ++$this->ptr;
+
         if($fetch_style == DB2::FETCH_ASSOC) {
-            $result = db2_fetch_assoc($this->statement);
+            $this->current = db2_fetch_assoc($this->statement);
         }
         elseif($fetch_style == DB2::FETCH_NUM) {
-            $result = db2_fetch_array($this->statement);
+            $this->current = db2_fetch_array($this->statement);
         }
         elseif($fetch_style == DB2::FETCH_OBJ) {
-            $result = db2_fetch_object($this->statement);
+            $this->current = db2_fetch_object($this->statement);
         }
         else {
-            $result = db2_fetch_both($this->statement);
+            $this->current = db2_fetch_both($this->statement);
         }
 
-        return $result;
+        return $this->current;
+    }
+
+    /**
+     * Fetches the current row from the result set, then increments
+     * the pointer and loads next result into $current
+     *
+     * @param int $fetch_style
+     * @return mixed
+     */
+    public function fetch($fetch_style = DB2::FETCH_BOTH) {
+
+        $old_current = $this->current;
+
+        ++$this->ptr;
+
+        if($fetch_style == DB2::FETCH_ASSOC) {
+            $this->current = db2_fetch_assoc($this->statement);
+        }
+        elseif($fetch_style == DB2::FETCH_NUM) {
+            $this->current = db2_fetch_array($this->statement);
+        }
+        elseif($fetch_style == DB2::FETCH_OBJ) {
+            $this->current = db2_fetch_object($this->statement);
+        }
+        else {
+            $this->current = db2_fetch_both($this->statement);
+        }
+
+        return $old_current;
     }
 
     /**
      * Returns an array containing all of the result set rows
      *
      * @param int $fetch_style
+     * @return array
      */
     public function fetchAll($fetch_style = DB2::FETCH_BOTH) {
         $result = array();
@@ -130,9 +168,12 @@ class DB2Statement implements Iterator {
      * @return string
      */
     public function fetchColumn($column_number = 0) {
-        $result = db2_fetch_array($this->statement);
 
-        return isset($result[$column_number]) ? $result[$column_number] : false;
+        $old_current = $this->current;
+
+        $this->current = db2_fetch_array($this->statement);
+
+        return isset($old_current[$column_number]) ? $old_current[$column_number] : false;
     }
 
     /**
@@ -159,6 +200,22 @@ class DB2Statement implements Iterator {
 
 
     /*** ITERATOR METHODS FOR MAXIMUM PDO COMPATIBILITY ***/
+    /*
+     * This is not completely trivial. A foreach loop calls the following methods:
+     *   rewind()
+     *   valid()
+     *   -- START LOOP --
+     *     current()
+     *     next()
+     *     valid()
+     *   -- END LOOP --
+     *
+     * Whereas while() repeatedly calls fetch(). That is, fetch() assumes initial pointer at -1
+     *
+     * To work-around, we fetch the first result on statement execution so we can determine valid(), and
+     * load this value into $current. We alter fetch() to logically return $current, then load the next value
+     * into $current, rather that load next and return it.
+     */
 
     /**
      * Return the current element
@@ -175,8 +232,7 @@ class DB2Statement implements Iterator {
      * @return void Any returned value is ignored.
      */
     public function next() {
-        ++$this->ptr;
-        $this->current = $this->fetch();
+        $this->current = $this->fetchNext();
     }
 
     /**
