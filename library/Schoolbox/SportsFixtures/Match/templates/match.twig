@@ -23,7 +23,7 @@
             {% if match.name %}
             <li class="icon-team" title="{{ matchHeading.generate(match, schoolMapper) }}">{{ matchHeading.generate(match, schoolMapper) }}</li>
             {% endif %}
-            <li class="icon-calendar" title="{{ match.startAt.local }}"> <span class='has-tip tip-top' title="{{ match.startAt.local }}" data-tooltip="">{{ match.startAt.relativeTime }}</span></li>
+            <li class="icon-calendar" title="{{ match.startAt.local }}">{{ match.startAt.local }} ({{ match.startAt.relativeTime }})</li>
             <li class="icon-location">{{ match.venue.name }}{% if match.venue.address %}<br />{{ match.venue.address }}{% endif %}</li>
         </ul>
     </div>
