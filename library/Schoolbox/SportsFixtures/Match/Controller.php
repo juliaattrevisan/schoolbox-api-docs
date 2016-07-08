@@ -170,30 +170,13 @@ class Controller extends AbstractController
      */
     public function getEntity($entity)
     {
-        try {
-            $division = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
-        }
 
-        try {
-            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
-        }
+        /* noop
+         *
+         * All match pages are on a per-team basis
+         */
 
-        try {
-            $venue = $this->getVenueMapper()->findById($entity->getVenue()->getId());
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
-        }
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/entity.twig', [
-            'sport'    => $sport,
-            'division' => $division,
-            'match'    => $entity,
-            'venue'    => $venue,
-        ]));
+        $this->getResponse()->redirect->to($this->getRouter()->generate('sportsfixtures.getLanding', []));
     }
 
     /**
