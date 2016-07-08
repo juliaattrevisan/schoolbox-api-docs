@@ -272,11 +272,16 @@ class Mapper extends FolderMapper
     {
         $facultyNode = $this->getFacultyNode();
 
-        if(0 === $facultyNode->getId()){
+        if (0 === $facultyNode->getId()) {
             return true;
         }
 
-        return $this->getAncestry()->hasParent($folder, $facultyNode);
+        try {
+            return $this->getAncestry()->hasParent($folder, $facultyNode);
+        } catch (MapperException $e) {
+            // a parent in the ancestry has been deleted - so no, this isn't in any area, because it technically doesn't exist
+            return false;
+        }
     }
 
     /**
@@ -288,10 +293,14 @@ class Mapper extends FolderMapper
     protected function containsCourses(Folder $folder)
     {
         foreach ($this->findAll() as $course) {
-            $ancestorIds = $this->getAncestry()->findParents($course)->getColumnValues('id');
-
-            if (in_array($folder->getId(), $ancestorIds)) {
-                return true;
+            try {
+                $ancestorIds = $this->getAncestry()->findParentsCheaply($course)->getColumnValues('id');
+                if (in_array($folder->getId(), $ancestorIds)) {
+                    return true;
+                }
+            } catch (MapperException $e) {
+                // an ancestor has been deleted, so ignore this course
+                continue;
             }
         }
 

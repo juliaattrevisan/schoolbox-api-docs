@@ -825,6 +825,13 @@ class Controller extends Base\Base
                 continue;
             }
 
+            try {
+                $data['lineage'][$currentCourse->getId()] = $this->getLineage($currentCourse);
+            } catch (MapperException $e) {
+                // somehow, against all odds, one of my ancestors has been deleted
+                continue;
+            }
+
             $data['courses'][] = $currentCourse;
 
             $allUnits = $this->getUnitMapper()->findByCourseId($currentCourse->getId());
@@ -841,7 +848,7 @@ class Controller extends Base\Base
 
             /* Also store the path to this Course
              */
-            $data['lineage'][$currentCourse->getId()] = $this->getLineage($currentCourse);
+
         }
 
         return $data;
@@ -2086,8 +2093,14 @@ class Controller extends Base\Base
 
         $lineages = [];
 
-        foreach ($allCourses as $course) {
-            $lineages[$course->getId()] = $this->getLineage($course);
+        foreach ($allCourses as $i => $course) {
+            try {
+                // if one of the ancestors is deleted, this will explode
+                $lineages[$course->getId()] = $this->getLineage($course);
+            } catch (MapperException $e) {
+                // this course exists in a deleted ancestor, so strictly speaking it no longer exists either...
+                unset($allCourses[$i]);
+            }
         }
 
         /* Find all the Units in this Folder; also includes
