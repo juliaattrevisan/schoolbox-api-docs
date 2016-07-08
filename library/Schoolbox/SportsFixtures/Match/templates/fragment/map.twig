@@ -1,3 +1,1 @@
-{% set mapUrl = 'https://maps.googleapis.com/maps/api/staticmap?center=' ~ match.venue.latitude ~ ',' ~ match.venue.longitude ~ '&maptype=roadmap&zoom=14&size=600x300&scale=2' %}
-
-<img src="{{ mapUrl }}" width="100%" />
+<iframe src="https://maps.google.com.au/maps?q={{ match.venue.latitude }},{{ match.venue.longitude }}&client=ubuntu&channel=cs&ie=UTF8&radius=15000&spn=0.006295,0.006295&t=h&output=embed" frameborder="0" width='100%' height='450' allowfullscreen="true"></iframe>
