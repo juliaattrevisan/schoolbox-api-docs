@@ -9,62 +9,39 @@
 
         <ul class="meta">
             <li class="icon-calendar">{{ match.startAt.local }}</li>
-            <li class="icon-location">{{ match.venue.name }}</li>
+            <li class="icon-location">{{ match.venue.name }}{% if match.venue.address %}<br />{{ match.venue.address }}{% endif %}</li>
         </ul>
     </div>
 </div>
 
 <div class="row">
-    <div class="small-12 island">
-        <h2 class="subheader">{{ match.name }}</h2>
-
-        <section class="content">
-            <div class="small-12 columns">
-                <dl>
-                    <dt>ID</dt>
-                    <dd>{{ match.id }}</dd>
-
-                    <dt>Name</dt>
-                    <dd>{{ match.name }}</dd>
-
-                    <dt>Venue</dt>
-                    <dd>{{ match.venue.name }}</dd>
-
-                    <dt>Starts</dt>
-                    <dd>{{ match.startAt.database }}</dd>
-
-                    {% if match.homeTeam.id and match.awayTeam.id %}
-                        <dt>Teams</dt>
-                        <dd>
-                            {{ match.homeTeam.name }} vs {{ match.awayTeam.name }}
-                        </dd>
-                    {% endif %}
-
-                    {% if match.itinerary|length %}
-                        <dt>Itinerary</dt>
-                        <dd>
-                            <ul class="information-list">
-                                {% for currentItineraryItem in match.itinerary %}
-                                    <li>
-                                        {{ currentItineraryItem.startAt.local }}:
-                                        {{ currentItineraryItem.description }}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </dd>
-                    {% endif %}
-
-                    <dt>Created</dt>
-                    <dd>{{ match.createdAt.database }}</dd>
-
-                    {% if not match.createdAt.eq(match.updatedAt) %}
-                        <dt>Last Updated</dt>
-                        <dd>{{ match.updatedAt.database }}</dd>
-                    {% endif %}
-                </dl>
-            </div>
+    <div class="small-6 island">
+    </div>
+    <div class="small-6 island">
+        {% if match.itinerary|length %}
+        <h2 class="subheader">Itinerary</h2>
+        <section>
+            <ul class="information-list">
+                {% for currentItineraryItem in match.itinerary %}
+                <li>
+                    <div class="list-item">
+                        <div class="card small-12 medium-6 large-4 wrap-down compact">
+                            <span>{{ currentItineraryItem.startAt.local }}</span>
+                        </div>
+                        <div class="card small-12 medium-6 large-8 wrap-down compact">
+                            <span class="meta">{{ currentItineraryItem.description }}</span>
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
         </section>
+        {% endif %}
+    </div>
+</div>
 
+<div class="row">
+    <div class="small-12 island">
         {% block results %}
         {% endblock %}
     </div>
