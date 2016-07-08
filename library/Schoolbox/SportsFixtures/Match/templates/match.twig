@@ -22,9 +22,8 @@
     </div>
 </div>
 <div class="row">
-    <div class="small-6 island">
+    <div class="small-12 medium-6 island">
         {% if teamMetadata.players.offset(team.id)|length %}
-
         <h2 class="subheader">{{ team.name }} Players</h2>
         <section>
             <ul class="information-list">
@@ -43,7 +42,7 @@
         </section>
         {% endif %}
     </div>
-    <div class="small-6 island">
+    <div class="small-12 medium-6 island">
         {% if match.itinerary|length %}
         <h2 class="subheader">Itinerary</h2>
         <section>
