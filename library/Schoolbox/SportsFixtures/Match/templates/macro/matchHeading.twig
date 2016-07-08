@@ -9,30 +9,18 @@
         {{ match.name }}
     {% else %}
 
-        {# Detect whether it's a faceless team or not
-         # and thus display their name and link properly
-         #}
-
         {# Home Team #}
-        {% if match.homeSchoolId == null %}
-            {% if match.homeTeam.url %}
-                {% set homeTeamData = "<a href='" ~ match.homeTeam.url ~ "'>" ~ match.homeTeam.name ~ "</a>" %}
-            {% else %}
-                {% set homeTeamData = match.homeTeam.name %}
-            {% endif %}
+        {% if match.homeTeam.url %}
+            {% set homeTeamData = "<a href='" ~ match.homeTeam.url ~ "'>" ~ match.homeTeam.name ~ "</a>" %}
         {% else %}
-            {%  set homeTeamData = schoolMapper.getTagName(match.homeSchoolId) %}
+            {% set homeTeamData = match.homeTeam.name %}
         {% endif %}
 
         {# Away Team #}
-        {% if match.awaySchoolId == null %}
-            {% if match.awayTeam.url %}
-                {% set awayTeamData = "<a href='" ~ match.awayTeam.url ~ "'>" ~ match.awayTeam.name ~ "</a>" %}
-            {% else %}
-                {% set awayTeamData = match.awayTeam.name %}
-            {% endif %}
+        {% if match.awayTeam.url %}
+            {% set awayTeamData = "<a href='" ~ match.awayTeam.url ~ "'>" ~ match.awayTeam.name ~ "</a>" %}
         {% else %}
-            {% set awayTeamData = schoolMapper.getTagName(match.awaySchoolId) %}
+            {% set awayTeamData = match.awayTeam.name %}
         {% endif %}
 
         {{ homeTeamData|raw }} vs {{ awayTeamData|raw }}
