@@ -8,7 +8,7 @@
         <h1>{{ matchHeading.generate(match, schoolMapper) }}</h1>
 
         <ul class="meta">
-            <li class="icon-calendar">{{ match.startAt.local }}</li>
+            <li class="icon-calendar" title="{{ match.startAt.local }}"> <span class='has-tip tip-top' title="{{ match.startAt.local }}" data-tooltip="">{{ match.startAt.relativeTime }}</span></li>
             <li class="icon-location">{{ match.venue.name }}{% if match.venue.address %}<br />{{ match.venue.address }}{% endif %}</li>
         </ul>
     </div>
