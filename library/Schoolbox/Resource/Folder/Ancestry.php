@@ -13,6 +13,7 @@ namespace Schoolbox\Resource\Folder;
 use OverflowException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Collection;
 
 class Ancestry
@@ -62,6 +63,7 @@ class Ancestry
      *
      * @param Model $folder
      * @param Model $parent
+     * @throws MapperException if one of the ancestors is deleted or missing somehow
      * @return bool
      */
     public function hasParent(Folder $folder, Folder $parent)
@@ -79,6 +81,7 @@ class Ancestry
      * @param Model $folder
      * @param Model $stopFolder
      * @throws OverflowException if the folder is its own parent somehow
+     * @throws MapperException if one of the ancestors is deleted or missing somehow
      * @return Collection
      */
     public function findParents(Folder $folder, Folder $stopFolder = null)
@@ -92,6 +95,7 @@ class Ancestry
      * @param Model $folder
      * @param Model $stopFolder
      * @throws OverflowException if the folder is its own parent somehow
+     * @throws MapperException if one of the ancestors is deleted or missing somehow
      * @return Collection
      */
     public function findParentsCheaply(Folder $folder, Folder $stopFolder = null)
@@ -109,6 +113,7 @@ class Ancestry
      *                                 above this category.
      * @param bool $cheaply If true, use the findCheaplyById() for speed
      * @throws OverflowException if the folder is its own parent somehow
+     * @throws MapperException if one of the ancestors is deleted or missing somehow
      * @return Collection
      */
     private function findParentAncestry(Folder $folder, Folder $stopFolder = null, $cheaply)

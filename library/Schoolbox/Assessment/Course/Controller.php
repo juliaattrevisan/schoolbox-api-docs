@@ -852,6 +852,7 @@ class Controller extends Base\Base
      * Convenience method
      *
      * @param Folder\Model $course
+     * @throws MapperException if one of the ancestors is deleted or missing somehow
      * @return Collection
      */
     protected function getLineage(Folder\Model $course)
