@@ -14,7 +14,6 @@ use OverflowException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Collection;
 
 class Ancestry
@@ -178,8 +177,18 @@ class Ancestry
                 array_unshift($stack, $this->findCachedNode($parent_id, $cheaply));
             } catch (MapperException $e) {
                 // Some folder was deleted somewhere in the hierarchy.
-                // The only thing I can do is:
-                break;
+
+                // Send this to NewRelic.
+                if ($e instanceof MapperException\Deleted) {
+                    $msg = "Deleted Ancestor contains non-deleted Descendants";
+                } else {
+                    $msg = "General Mapper Exception";
+                }
+
+                trigger_error("$msg: $e", E_USER_WARNING);
+
+                // Rethrow to be managed by callers further up the stack
+                throw $e;
             }
         }
 
