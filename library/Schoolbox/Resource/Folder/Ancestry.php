@@ -11,6 +11,7 @@
 namespace Schoolbox\Resource\Folder;
 
 use OverflowException;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Collection;
@@ -62,6 +63,7 @@ class Ancestry
      *
      * @param Model $folder
      * @param Model $parent
+     * @throws MapperException if one of the ancestors is deleted or missing somehow
      * @return bool
      */
     public function hasParent(Folder $folder, Folder $parent)
@@ -79,6 +81,7 @@ class Ancestry
      * @param Model $folder
      * @param Model $stopFolder
      * @throws OverflowException if the folder is its own parent somehow
+     * @throws MapperException if one of the ancestors is deleted or missing somehow
      * @return Collection
      */
     public function findParents(Folder $folder, Folder $stopFolder = null)
@@ -92,6 +95,7 @@ class Ancestry
      * @param Model $folder
      * @param Model $stopFolder
      * @throws OverflowException if the folder is its own parent somehow
+     * @throws MapperException if one of the ancestors is deleted or missing somehow
      * @return Collection
      */
     public function findParentsCheaply(Folder $folder, Folder $stopFolder = null)
@@ -109,6 +113,7 @@ class Ancestry
      *                                 above this category.
      * @param bool $cheaply If true, use the findCheaplyById() for speed
      * @throws OverflowException if the folder is its own parent somehow
+     * @throws MapperException if one of the ancestors is deleted or missing somehow
      * @return Collection
      */
     private function findParentAncestry(Folder $folder, Folder $stopFolder = null, $cheaply)
@@ -168,7 +173,23 @@ class Ancestry
 
             $ancestry[$parent_id] = true;
 
-            array_unshift($stack, $this->findCachedNode($parent_id, $cheaply));
+            try {
+                array_unshift($stack, $this->findCachedNode($parent_id, $cheaply));
+            } catch (MapperException $e) {
+                // Some folder was deleted somewhere in the hierarchy.
+
+                // Send this to NewRelic.
+                if ($e instanceof MapperException\Deleted) {
+                    $msg = "Deleted Ancestor contains non-deleted Descendants";
+                } else {
+                    $msg = "General Mapper Exception";
+                }
+
+                trigger_error("$msg: $e", E_USER_WARNING);
+
+                // Rethrow to be managed by callers further up the stack
+                throw $e;
+            }
         }
 
         // Remove the current category from the parent list first.

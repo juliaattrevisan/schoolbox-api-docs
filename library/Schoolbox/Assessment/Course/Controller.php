@@ -815,13 +815,25 @@ class Controller extends Base\Base
 
             // general search ignores Courses in Faculty
             if(NULL === $searchParam) {
-                if (!$this->getCourseMapper()->inFacultyArea($currentCourse)) {
+                try {
+                    if (!$this->getCourseMapper()->inFacultyArea($currentCourse)) {
+                        continue;
+                    }
+                } catch (MapperException $e) {
+                    // can't detect if it's in faculty area because an ancestor is deleted. For our purposes, consider this deleted / irrelevant
                     continue;
                 }
             }
 
             // confirm you at least have read access...
             if (!$this->confirmAccess($currentCourse->getId())) {
+                continue;
+            }
+
+            try {
+                $data['lineage'][$currentCourse->getId()] = $this->getLineage($currentCourse);
+            } catch (MapperException $e) {
+                // somehow, against all odds, one of my ancestors has been deleted
                 continue;
             }
 
@@ -841,7 +853,7 @@ class Controller extends Base\Base
 
             /* Also store the path to this Course
              */
-            $data['lineage'][$currentCourse->getId()] = $this->getLineage($currentCourse);
+
         }
 
         return $data;
@@ -852,6 +864,7 @@ class Controller extends Base\Base
      * Convenience method
      *
      * @param Folder\Model $course
+     * @throws MapperException if one of the ancestors is deleted or missing somehow
      * @return Collection
      */
     protected function getLineage(Folder\Model $course)
@@ -2085,8 +2098,14 @@ class Controller extends Base\Base
 
         $lineages = [];
 
-        foreach ($allCourses as $course) {
-            $lineages[$course->getId()] = $this->getLineage($course);
+        foreach ($allCourses as $i => $course) {
+            try {
+                // if one of the ancestors is deleted, this will explode
+                $lineages[$course->getId()] = $this->getLineage($course);
+            } catch (MapperException $e) {
+                // this course exists in a deleted ancestor, so strictly speaking it no longer exists either...
+                unset($allCourses[$i]);
+            }
         }
 
         /* Find all the Units in this Folder; also includes
