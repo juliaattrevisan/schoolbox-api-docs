@@ -60,9 +60,9 @@
     {% else %}
     <div class="empty-state">
         <i class="icon-result"></i>
-        <p>There are no Results for this Team.</p>
+        <p>There are no Results for {{ team.name }}.</p>
 
-        <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: team.id}) }}" title="Add Results">Add Results for this Team.</a></p>
+        <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: team.id}) }}" title="Add Results">Add Results for {{ team.name }}.</a></p>
     </div>
     {% endif %}
 {% endblock %}
