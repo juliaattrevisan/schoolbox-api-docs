@@ -10,6 +10,7 @@ namespace Schoolbox\SportsFixtures\Result;
 use Alaress\Web\Controller\Exception;
 use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
+use \Schoolbox\Collection;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
@@ -21,7 +22,9 @@ use \Schoolbox\SportsFixtures\Result\Model as Result;
 use \Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
+use \Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
 use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
+
 
 class Controller extends AbstractController
 {
@@ -56,6 +59,11 @@ class Controller extends AbstractController
     protected $schoolTagCloudMapper;
 
     /**
+     * @var TeamUserMapper
+     */
+    protected $teamUserMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -67,6 +75,7 @@ class Controller extends AbstractController
         $this->setTeamMapper(TeamMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
+        $this->setTeamUserMapper(TeamUserMapper::getInstance());
     }
 
     /**
@@ -233,13 +242,40 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
 
+        /* Team Lists
+         * Get home team player list, if applicable
+         * Get away team player list, if applicable
+         */
+        $teamPlayers = new Collection();
+
+        if ($context->getHomeTeam()->getId()) {
+            $teamPlayers->setOffset($context->getHomeTeam()->getId(), new Collection());
+
+            $allPlayers = $this->getTeamUserMapper()->findByColumn('team_id', $context->getHomeTeam()->getId(), ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]);
+
+            foreach ($allPlayers as $currentPlayer) {
+                $teamPlayers->getOffset($context->getHomeTeam()->getId())->add($currentPlayer->getUser());
+            }
+        }
+
+        if ($context->getAwayTeam()->getId()) {
+            $teamPlayers->setOffset($context->getAwayTeam()->getId(), new Collection());
+
+            $allPlayers = $this->getTeamUserMapper()->findByColumn('team_id', $context->getAwayTeam()->getId(), ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]);
+
+            foreach ($allPlayers as $currentPlayer) {
+                $teamPlayers->getOffset($context->getAwayTeam()->getId())->add($currentPlayer->getUser());
+            }
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/team.twig', [
-            'sport'    => $sport,
-            'division' => $division,
-            'match'    => $match,
+            'sport'        => $sport,
+            'division'     => $division,
+            'match'        => $match,
             'schoolMapper' => $this->getSchoolTagCloudMapper(),
-            'team'     => $team,
-            'result'   => $context
+            'team'         => $team,
+            'teamPlayers'  => $teamPlayers,
+            'result'       => $context
         ]));
     }
 
@@ -406,5 +442,23 @@ class Controller extends AbstractController
     protected function setSchoolTagCloudMapper($schoolTagCloudMapper)
     {
         $this->schoolTagCloudMapper = $schoolTagCloudMapper;
+    }
+
+    /**
+     * @return TeamUserMapper
+     */
+    protected function getTeamUserMapper()
+    {
+        return $this->teamUserMapper;
+    }
+
+    /**
+     * @param TeamUserMapper $teamUserMapper
+     * @return static
+     */
+    protected function setTeamUserMapper(TeamUserMapper $teamUserMapper)
+    {
+        $this->teamUserMapper = $teamUserMapper;
+        return $this;
     }
 }
