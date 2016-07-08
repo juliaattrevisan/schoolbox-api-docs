@@ -21,6 +21,7 @@ use \Schoolbox\SportsFixtures\Result\Model as Result;
 use \Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
+use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
 
 class Controller extends AbstractController
 {
@@ -50,6 +51,11 @@ class Controller extends AbstractController
     protected $errorMapper;
 
     /**
+     * @var TagCloudMapper
+     */
+    protected $schoolTagCloudMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -60,6 +66,7 @@ class Controller extends AbstractController
         $this->setMatchMapper(MatchMapper::getInstance());
         $this->setTeamMapper(TeamMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
+        $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
     }
 
     /**
@@ -230,6 +237,7 @@ class Controller extends AbstractController
             'sport'    => $sport,
             'division' => $division,
             'match'    => $match,
+            'schoolMapper' => $this->getSchoolTagCloudMapper(),
             'team'     => $team,
             'result'   => $context
         ]));
@@ -382,5 +390,21 @@ class Controller extends AbstractController
     protected function setErrorMapper($errorMapper)
     {
         $this->errorMapper = $errorMapper;
+    }
+
+    /**
+     * @return TagCloudMapper
+     */
+    protected function getSchoolTagCloudMapper()
+    {
+        return $this->schoolTagCloudMapper;
+    }
+
+    /**
+     * @param TagCloudMapper $schoolTagCloudMapper
+     */
+    protected function setSchoolTagCloudMapper($schoolTagCloudMapper)
+    {
+        $this->schoolTagCloudMapper = $schoolTagCloudMapper;
     }
 }

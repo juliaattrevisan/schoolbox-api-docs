@@ -3,7 +3,45 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Sports Fixtures</h1>
+        <h1>
+            {% if match.name %}
+            {{ match.name }}
+            {% else %}
+
+                {# Detect whether it's a faceless team or not
+                 # and thus display their name and link properly
+                 #}
+
+                {# Home Team #}
+                {% if match.homeSchoolId == null %}
+                    {% if match.homeTeam.url %}
+                        {% set homeTeamData = "<a href='" ~ match.homeTeam.url ~ "'>" ~ match.homeTeam.name ~ "</a>" %}
+                    {% else %}
+                        {% set homeTeamData = match.homeTeam.name %}
+                    {% endif %}
+                {% else %}
+                    {%  set homeTeamData = schoolMapper.getTagName(match.homeSchoolId) %}
+                {% endif %}
+
+                {# Away Team #}
+                {% if match.awaySchoolId == null %}
+                    {% if match.awayTeam.url %}
+                        {% set awayTeamData = "<a href='" ~ match.awayTeam.url ~ "'>" ~ match.awayTeam.name ~ "</a>" %}
+                    {% else %}
+                        {% set awayTeamData = match.awayTeam.name %}
+                    {% endif %}
+                {% else %}
+                    {% set awayTeamData = schoolMapper.getTagName(match.awaySchoolId) %}
+                {% endif %}
+
+                {{ homeTeamData|raw }} vs {{ awayTeamData|raw }}
+            {% endif %}
+        </h1>
+
+        <ul class="meta">
+            <li class="icon-calendar">{{ match.startAt.local }}</li>
+            <li class="icon-location">{{ match.venue.name }}</li>
+        </ul>
     </div>
 </div>
 
