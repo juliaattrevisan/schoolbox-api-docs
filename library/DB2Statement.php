@@ -127,20 +127,7 @@ class DB2Statement implements Iterator {
 
         $old_current = $this->current;
 
-        ++$this->ptr;
-
-        if($fetch_style == DB2::FETCH_ASSOC) {
-            $this->current = db2_fetch_assoc($this->statement);
-        }
-        elseif($fetch_style == DB2::FETCH_NUM) {
-            $this->current = db2_fetch_array($this->statement);
-        }
-        elseif($fetch_style == DB2::FETCH_OBJ) {
-            $this->current = db2_fetch_object($this->statement);
-        }
-        else {
-            $this->current = db2_fetch_both($this->statement);
-        }
+        $this->current = $this->fetchNext($fetch_style);
 
         return $old_current;
     }
