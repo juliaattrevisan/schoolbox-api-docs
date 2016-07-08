@@ -690,6 +690,44 @@ class UnitInstanceMapper extends BaseMapper {
     }
 
     /**
+     * For particular folders, find all the unit instances which have
+     * open dates occurring between $from and $to
+     *
+     * @param array               $folderIds An array of folderIds
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
+     * @return Collection
+     */
+    public function findForFolderDueBetween($folderIds, Alaress_Date_Format $from, Alaress_Date_Format $to)
+    {
+        // Allow null dates in from/to
+        $dateFilter = '';
+        $params     = ['folderIds' => implode(',', $folderIds)];
+
+        if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
+            $dateFilter      = $dateFilter . ' AND cui.due_date >= :from';
+            $params['from']  = $from->getDatabaseDate();
+        }
+        if ($to instanceof Alaress_Date_Format && !$to->isNull()) {
+            $dateFilter    = $dateFilter . ' AND cui.due_date <= :to';
+            $params['to']  = $to->getDatabaseDate();
+        }
+
+        $query = "
+            SELECT {$this->getColumnString('cui')}
+            FROM {$this->getTable()} cui
+            WHERE category_id IN (:folderIds)
+            $dateFilter
+            AND deleted_at IS NULL
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($params);
+
+        return $this->hydrateList($statement, 'cui');
+    }
+
+    /**
      * @param UnitInstance[]|Collection $unit_instance_list
      *
      * @return UnitInstance[]|Collection

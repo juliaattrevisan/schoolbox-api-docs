@@ -178,10 +178,10 @@ class Module extends BaseModule
                  */
                 $allCategoryIds = array_unique($allCategoryIds);
 
-                /* All the units associated with folders which used the same
-                 * $courseFolder as a source. Filter it based on $from and $to
+                /* All the unit instances associated with folders which used the same
+                 * $courseFolder as a source. Filter it based due dates between $from and $to
                  */
-                $allUnitInstances = $unitInstanceMapper->findForFolderOpeningBetween($allCategoryIds, $from, $to);
+                $allUnitInstances = $unitInstanceMapper->findForFolderDueBetween($allCategoryIds, $from, $to);
             }
             catch (Exception $e) {
                 error(159);
@@ -267,10 +267,10 @@ class Module extends BaseModule
          */
         try {
 
-            /* All the units associated with folders which used the same
-             * $courseFolder as a source. Filter it based on $from and $to
-             */
-            $allUnitInstances = $unitInstanceMapper->findForFolderOpeningBetween([$params['folderId']], $from, $to);
+            /* All the unit instances associated with the specified folder which used the same
+             * $courseFolder as a source. Filter it based due dates between $from and $to
+         */
+            $allUnitInstances = $unitInstanceMapper->findForFolderDueBetween([$params['folderId']], $from, $to);
         }
         catch (Exception $e) {
             error(159);
