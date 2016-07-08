@@ -246,9 +246,9 @@ class Controller extends AbstractController
         if (!$match->getHomeTeam()->getId()) {
             $name = $this->getSchoolTagCloudMapper()->getTagName($match->getHomeSchoolId());
 
-            $team = $this->getTeamMapper()->createModel()->setName($name);
+            $facelessTeam = $this->getTeamMapper()->createModel()->setName($name);
 
-            $match->setHomeTeam($team);
+            $match->setHomeTeam($facelessTeam);
         }
 
         /* Find faceless away team, ram it into a Team instance
@@ -257,9 +257,9 @@ class Controller extends AbstractController
         if (!$match->getAwayTeam()->getId()) {
             $name = $this->getSchoolTagCloudMapper()->getTagName($match->getAwaySchoolId());
 
-            $team = $this->getTeamMapper()->createModel()->setName($name);
+            $facelessTeam = $this->getTeamMapper()->createModel()->setName($name);
 
-            $match->setAwayTeam($team);
+            $match->setAwayTeam($facelessTeam);
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/team.twig', [
