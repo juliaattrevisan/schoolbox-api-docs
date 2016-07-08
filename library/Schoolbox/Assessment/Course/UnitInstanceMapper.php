@@ -667,6 +667,7 @@ class UnitInstanceMapper extends BaseMapper {
      * @param array               $folderIds An array of folderIds
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
+     * @deprecated As of 2016/07/08 this appears to not be used anywhere. Callers now use 'findForFolderDueBetween()'
      * @return Collection
      */
     public function findForFolderOpeningBetween($folderIds, Alaress_Date_Format $from, Alaress_Date_Format $to)
