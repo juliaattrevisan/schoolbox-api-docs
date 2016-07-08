@@ -1,0 +1,18 @@
+{% if teamMetadata.players.offset(team.id)|length %}
+    <h2 class="subheader">{{ team.name }} Players</h2>
+    <section>
+        <ul class="information-list">
+            {% for currentPlayer in teamMetadata.players.offset(team.id) %}
+                <li>
+                    <div class="card small-12">
+                        <a href="/search/user/{{ currentPlayer.id }}" title="View Profile">
+                            <img src="/portrait.php?userId={{ currentPlayer.externalId }}&size=square64" alt="View Profile" />
+                            <p>{{ currentPlayer.fullname }}</p>
+                        </a>
+                        <p class="meta">{{ teamMetadata.positions.offset(team.id).offset(currentPlayer.id).position.name }}</p>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endif %}

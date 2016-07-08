@@ -1,0 +1,19 @@
+{% if match.itinerary|length %}
+    <h2 class="subheader">Itinerary</h2>
+    <section>
+        <ul class="information-list">
+            {% for currentItineraryItem in match.itinerary %}
+                <li>
+                    <div class="list-item">
+                        <div class="card small-12 medium-6 large-4 wrap-down compact">
+                            <span>{{ currentItineraryItem.startAt.local }}</span>
+                        </div>
+                        <div class="card small-12 medium-6 large-8 wrap-down compact">
+                            <span class="meta">{{ currentItineraryItem.description }}</span>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endif %}
