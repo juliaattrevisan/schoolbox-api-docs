@@ -1,28 +1,20 @@
 {# Use to generate the text for a Match Page heading
- #
- # Since the Match Name can be the actual name, or the amalgamation
- # of its constituent team names (either by local or faceless teams)
- # heaps of extra logic is required
+ # If the Team has a url, hyperlink it
  #}
 {% macro generate(match, schoolMapper) %}
-    {% if match.name %}
-        {{ match.name }}
+    {# Home Team #}
+    {% if match.homeTeam.url %}
+        {% set homeTeamData = "<a href='" ~ match.homeTeam.url ~ "'>" ~ match.homeTeam.name ~ "</a>" %}
     {% else %}
-
-        {# Home Team #}
-        {% if match.homeTeam.url %}
-            {% set homeTeamData = "<a href='" ~ match.homeTeam.url ~ "'>" ~ match.homeTeam.name ~ "</a>" %}
-        {% else %}
-            {% set homeTeamData = match.homeTeam.name %}
-        {% endif %}
-
-        {# Away Team #}
-        {% if match.awayTeam.url %}
-            {% set awayTeamData = "<a href='" ~ match.awayTeam.url ~ "'>" ~ match.awayTeam.name ~ "</a>" %}
-        {% else %}
-            {% set awayTeamData = match.awayTeam.name %}
-        {% endif %}
-
-        {{ homeTeamData|raw }} vs {{ awayTeamData|raw }}
+        {% set homeTeamData = match.homeTeam.name %}
     {% endif %}
+
+    {# Away Team #}
+    {% if match.awayTeam.url %}
+        {% set awayTeamData = "<a href='" ~ match.awayTeam.url ~ "'>" ~ match.awayTeam.name ~ "</a>" %}
+    {% else %}
+        {% set awayTeamData = match.awayTeam.name %}
+    {% endif %}
+
+    {{ homeTeamData|raw }} vs {{ awayTeamData|raw }}
 {% endmacro %}
