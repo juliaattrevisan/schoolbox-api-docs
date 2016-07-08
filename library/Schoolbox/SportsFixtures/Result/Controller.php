@@ -10,21 +10,17 @@ namespace Schoolbox\SportsFixtures\Result;
 use Alaress\Web\Controller\Exception;
 use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
-use \Schoolbox\Collection;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
-use \Schoolbox\SportsFixtures\Division\Model as Division;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
-use Schoolbox\SportsFixtures\Match\Model as Match;
+use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use \Schoolbox\SportsFixtures\Result\Model as Result;
 use \Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use \Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
-use \Schoolbox\SportsFixtures\Team\Position\Model as TeamPosition;
-use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
+use \Schoolbox\SportsFixtures\Team\Metadata as TeamMetadata;
 use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
 
 
@@ -61,16 +57,6 @@ class Controller extends AbstractController
     protected $schoolTagCloudMapper;
 
     /**
-     * @var TeamUserMapper
-     */
-    protected $teamUserMapper;
-
-    /**
-     * @var TeamPositionMapper
-     */
-    protected $teamPositionMapper;
-
-    /**
      * Controller constructor.
      */
     public function __construct()
@@ -82,8 +68,6 @@ class Controller extends AbstractController
         $this->setTeamMapper(TeamMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
-        $this->setTeamUserMapper(TeamUserMapper::getInstance());
-        $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
     }
 
     /**
@@ -254,54 +238,16 @@ class Controller extends AbstractController
          * Get home team player list, if applicable
          * Get away team player list, if applicable
          */
-        $teamPlayers = new Collection();
-        $teamPositions = new Collection();
-
-        if ($context->getHomeTeam()->getId()) {
-            $teamPlayers->setOffset($context->getHomeTeam()->getId(), new Collection());
-
-            $allPlayers = $this->getTeamUserMapper()->findByColumn('team_id', $context->getHomeTeam()->getId(), ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]);
-
-            foreach ($allPlayers as $currentPlayer) {
-                $teamPlayers->getOffset($context->getHomeTeam()->getId())->add($currentPlayer->getUser());
-            }
-
-            $teamPositions->setOffset($context->getHomeTeam()->getId(), new Collection());
-
-            $allPositions = $this->getTeamPositionMapper()->findByColumn('team_id', $context->getHomeTeam()->getId(), ['order' => ['user_id' => 'asc']]);
-
-            foreach ($allPositions as $currentPosition) {
-                $teamPositions->getOffset($context->getHomeTeam()->getId())->setOffset($currentPosition->getUser()->getId(), $currentPosition);
-            }
-        }
-
-        if ($context->getAwayTeam()->getId()) {
-            $teamPlayers->setOffset($context->getAwayTeam()->getId(), new Collection());
-
-            $allPlayers = $this->getTeamUserMapper()->findByColumn('team_id', $context->getAwayTeam()->getId(), ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]);
-
-            foreach ($allPlayers as $currentPlayer) {
-                $teamPlayers->getOffset($context->getAwayTeam()->getId())->add($currentPlayer->getUser());
-            }
-
-            $teamPositions->setOffset($context->getAwayTeam()->getId(), new Collection());
-
-            $allPositions = $this->getTeamPositionMapper()->findByColumn('team_id', $context->getAwayTeam()->getId(), ['order' => ['user_id' => 'asc']]);
-
-            foreach ($allPositions as $currentPosition) {
-                $teamPositions->getOffset($context->getAwayTeam()->getId())->setOffset($currentPosition->getUser()->getId(), $currentPosition);
-            }
-        }
+        $teamMetadata = new TeamMetadata($context);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/team.twig', [
-            'sport'         => $sport,
-            'division'      => $division,
-            'match'         => $match,
-            'schoolMapper'  => $this->getSchoolTagCloudMapper(),
-            'team'          => $team,
-            'teamPlayers'   => $teamPlayers,
-            'teamPositions' => $teamPositions,
-            'result'        => $context
+            'sport'        => $sport,
+            'division'     => $division,
+            'match'        => $match,
+            'schoolMapper' => $this->getSchoolTagCloudMapper(),
+            'team'         => $team,
+            'teamMetadata' => $teamMetadata,
+            'result'       => $context
         ]));
     }
 
@@ -468,41 +414,5 @@ class Controller extends AbstractController
     protected function setSchoolTagCloudMapper($schoolTagCloudMapper)
     {
         $this->schoolTagCloudMapper = $schoolTagCloudMapper;
-    }
-
-    /**
-     * @return TeamUserMapper
-     */
-    protected function getTeamUserMapper()
-    {
-        return $this->teamUserMapper;
-    }
-
-    /**
-     * @param TeamUserMapper $teamUserMapper
-     * @return static
-     */
-    protected function setTeamUserMapper(TeamUserMapper $teamUserMapper)
-    {
-        $this->teamUserMapper = $teamUserMapper;
-        return $this;
-    }
-
-    /**
-     * @return TeamPositionMapper
-     */
-    protected function getTeamPositionMapper()
-    {
-        return $this->teamPositionMapper;
-    }
-
-    /**
-     * @param TeamPositionMapper $teamPositionMapper
-     * @return static
-     */
-    protected function setTeamPositionMapper(TeamPositionMapper $teamPositionMapper)
-    {
-        $this->teamPositionMapper = $teamPositionMapper;
-        return $this;
     }
 }
