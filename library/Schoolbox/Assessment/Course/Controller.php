@@ -815,7 +815,12 @@ class Controller extends Base\Base
 
             // general search ignores Courses in Faculty
             if(NULL === $searchParam) {
-                if (!$this->getCourseMapper()->inFacultyArea($currentCourse)) {
+                try {
+                    if (!$this->getCourseMapper()->inFacultyArea($currentCourse)) {
+                        continue;
+                    }
+                } catch (MapperException $e) {
+                    // can't detect if it's in faculty area because an ancestor is deleted. For our purposes, consider this deleted / irrelevant
                     continue;
                 }
             }
