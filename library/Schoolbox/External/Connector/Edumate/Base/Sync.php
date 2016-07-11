@@ -115,6 +115,7 @@ class Sync implements SyncInterface
      */
     public function findAllStaff()
     {
+        /** @var \DB2Statement $stmt */
         $stmt = $this->database->prepare('
             SELECT
                 STAFF_NUMBER  AS "staff_id",

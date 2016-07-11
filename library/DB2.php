@@ -59,6 +59,7 @@ class DB2 {
      * Prepares a statement for execution and returns a statement object
      *
      * @param $statement string
+     * @return mixed
      */
     public function prepare($statement) {
 

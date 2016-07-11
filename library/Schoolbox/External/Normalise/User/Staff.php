@@ -120,7 +120,7 @@ class Staff extends Base {
     /**
      * Set campus
      *
-     * @param null $campus
+     * @param \Schoolbox\Collection|Common\Campus[] $campus
      * @return $this
      */
     public function setCampus($campus)
@@ -132,7 +132,7 @@ class Staff extends Base {
     /**
      * Get campus
      *
-     * @return null
+     * @return \Schoolbox\Collection|Common\Campus[]
      */
     public function getCampus()
     {
