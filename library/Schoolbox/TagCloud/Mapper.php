@@ -165,4 +165,23 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     {
         return $this->getTagLike($keyword)->slice($offset, $limit);
     }
+
+    /**
+     * @param mixed $id
+     * @return null|string
+     */
+    public function findNameById($id)
+    {
+        return $this->getTagName($id);
+    }
+
+    /**
+     * @param string $name
+     * @param bool $create
+     * @return int|null
+     */
+    public function findByName($name, $create = false)
+    {
+        return $this->getTagId($name, $create);
+    }
 }
