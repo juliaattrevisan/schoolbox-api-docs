@@ -18,20 +18,6 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     private $groupHandler;
 
     /**
-     * An instance of Category
-     *
-     * @var \Schoolbox\Resource\Folder\Model
-     */
-    private $source;
-
-    /**
-     * Category Mapper
-     *
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private $categoryMapper = null;
-
-    /**
      * Template file to load
      *
      * @var string
@@ -41,22 +27,18 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
-        $this->groupHandler = new Group();
-        $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
-
-        $this->source = $this->getContext();
-
-        if (is_numeric($this->getConfig('src'))) {
-            try {
-                // remove any non-numeric values from the source config
-                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            } catch (\Exception $e) {
-            }
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
+        if(!$this->isSourceRenderable()){
+            return $this->hasContextWriteAccess();
         }
+
+        $this->groupHandler = new Group();
+        return true;
     }
 
     /**
@@ -74,69 +56,75 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
             return false;
         }
 
-        $this->parseConfig();
 
-        if ($this->contentPermission < READ_ACCESS) {
-            return false;
-        }
+        $this->parseConfig();
 
         /* Template rendering
          */
-        $this->setBlock($templateHandle, 'image_gallery', 'image_gallery_block');
-        $this->setBlock($templateHandle, 'submit_image_gallery', 'submit_image_gallery_block');
+        $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
+        $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
+        $this->setBlock('source_folder_exists', 'image_gallery', 'image_gallery_block');
+        $this->setBlock('source_folder_exists', 'submit_image_gallery', 'submit_image_gallery_block');
 
-        /* Prevent multiple galleries from other categories stacking up in the wrong place
-         * and initialise empty gallery by default
-         */
-        $this->setVar(
-            array(
-                'image_gallery_block' => ''
-            )
-        );
-
-        /* Set up component name
-         *
-         * Have update form point to the gallery's homepage, not this page (if this is from an alt source)
-         */
-        $this->setVar(
-            array(
-                'COMPONENT_NAME'           => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
-                'IMAGEGALLERY_CATEGORY_ID' => $this->getSource()->getId()
-            )
-        );
-
-        // Controls such as Post News
-        if ($this->contentPermission < WRITE_ACCESS) {
-            $this->setVar(
-                array(
-                    'submit_image_gallery_block' => ''
-                )
-            );
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailable();
         } else {
-            $this->parse('submit_image_gallery_block', 'submit_image_gallery');
-        }
+            $this->setVar('source_folder_deleted_block', '');
 
-        // Load images for the requested homepage
-        $allImages = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
-            [$this->getSource()->getId()],
-            [
-                'filter' => ['image'],
-                'size'   => $this->getConfig('size')
-            ]
-        );
-
-        // Iterate
-        foreach ($allImages as $currentImage) {
+            /* Prevent multiple galleries from other categories stacking up in the wrong place
+             * and initialise empty gallery by default
+             */
             $this->setVar(
                 array(
-                    'THUMBNAIL_ID'          => $currentImage->getId(),
-                    'THUMBNAIL_DESCRIPTION' => $currentImage->getTitle(),
-                    'THUMBNAIL_SIZE'        => Cfg::get('thumbnail_size'),
-                    'IMAGE_HEIGHT'          => Cfg::get('thumbnail_size'),
+                    'image_gallery_block' => ''
                 )
             );
 
-            $this->parse('image_gallery_block', 'image_gallery', true);
+            /* Set up component name
+             *
+             * Have update form point to the gallery's homepage, not this page (if this is from an alt source)
+             */
+            $this->setVar(
+                array(
+                    'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
+                    'IMAGEGALLERY_CATEGORY_ID' => $this->getSource()->getId()
+                )
+            );
+
+            // Controls such as Post News
+            if ($this->contentPermission < WRITE_ACCESS) {
+                $this->setVar(
+                    array(
+                        'submit_image_gallery_block' => ''
+                    )
+                );
+            } else {
+                $this->parse('submit_image_gallery_block', 'submit_image_gallery');
+            }
+
+            // Load images for the requested homepage
+            $allImages = Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
+                [$this->getSource()->getId()],
+                [
+                    'filter' => ['image'],
+                    'size' => $this->getConfig('size')
+                ]
+            );
+
+            // Iterate
+            foreach ($allImages as $currentImage) {
+                $this->setVar(
+                    array(
+                        'THUMBNAIL_ID' => $currentImage->getId(),
+                        'THUMBNAIL_DESCRIPTION' => $currentImage->getTitle(),
+                        'THUMBNAIL_SIZE' => Cfg::get('thumbnail_size'),
+                        'IMAGE_HEIGHT' => Cfg::get('thumbnail_size'),
+                    )
+                );
+
+                $this->parse('image_gallery_block', 'image_gallery', true);
+            }
+            $this->parse('source_folder_exists_block', 'source_folder_exists');
         }
 
         // everything went according to plan
@@ -145,26 +133,6 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
 
     /* Getters/Setters
      */
-
-    /**
-     * Set category mapper
-     *
-     * @param \Schoolbox\Resource\Folder\Mapper $categoryMapper
-     */
-    private function setCategoryMapper($categoryMapper)
-    {
-        $this->categoryMapper = $categoryMapper;
-    }
-
-    /**
-     * Get category mapper
-     *
-     * @return \Schoolbox\Resource\Folder\Mapper
-     */
-    private function getCategoryMapper()
-    {
-        return $this->categoryMapper;
-    }
 
     /**
      * Set template handle
@@ -184,25 +152,5 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
     protected function getTemplateHandle()
     {
         return $this->templateHandle;
-    }
-
-    /**
-     * Set source
-     *
-     * @param \Schoolbox\Resource\Folder\Model $source
-     */
-    protected function setSource($source)
-    {
-        $this->source = $source;
-    }
-
-    /**
-     * Get source
-     *
-     * @return \Schoolbox\Resource\Folder\Model
-     */
-    protected function getSource()
-    {
-        return $this->source;
     }
 }

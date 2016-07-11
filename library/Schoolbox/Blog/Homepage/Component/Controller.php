@@ -17,10 +17,7 @@ use Schoolbox\Blog\Homepage\Comment\Model as BlogCommentModel;
 use Schoolbox\Blog\Homepage\Image\Mapper as BlogImageMapper;
 use Schoolbox\Blog\Homepage\Post\Mapper as BlogMapper;
 use Schoolbox\Blog\Homepage\Post\Model as BlogModel;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use SitePage;
@@ -40,21 +37,10 @@ class Controller extends Component_Homepage_ControllerAbstract
         SitePage $sitepage
     ) {
         parent::__construct($instance, $user, $sitepage);
-        $this->setFolderMapper(FolderMapper::getInstance());
         $this->setBlogMapper(BlogMapper::getInstance());
         $this->setBlogImageMapper(BlogImageMapper::getInstance());
         $this->setBlogCommentMapper(BlogCommentMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
-    }
-
-    /**
-     * Loads the grid component into its set configuration.
-     *
-     * @return true
-     */
-    public function execute()
-    {
-        return true;
     }
 
     /**
@@ -63,60 +49,50 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        // Work out which folder we are in and grab a handle to it
-        // Check if using local or alt source
-        $folderId = $this->isUsingAltSource() ? $this->getConfig("src") : $this->getInstance()->getIdentifier();
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailableTwig($templateHandle);
+        } else {
 
-        try {
-            /** @var FolderModel $folder */
-            $folder = $this->getFolderMapper()->findById($folderId);
-        } catch (MapperException\Deleted $e) {
-            $folder = $e->getDeletedObject();
-            if(!($folder instanceof FolderModel)) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
-            }
-        }
+            // Limit to the number specified in blog component config (0 == 'ALL')
+            $limit = 0 == $this->getConfig('size') ? null : $this->getConfig('size');
 
+            // Get specified number of blog entries for this source
+            $blogs = $this->getBlogMapper()
+                ->findByColumn("folder_id", $this->getSource()->getId())
+                ->sortBy('createdAt', 'desc')
+                ->limit(0, $limit);
 
+            // Grab comments and image gallery items for each blog post
 
-        // Limit to the number specified in blog component config (0 == 'ALL')
-        $limit = 0 == $this->getConfig('size') ? null : $this->getConfig('size');
+            $blogComments = [];
+            $blogImages = [];
 
-        // Get specified number of blog entries for this source
-        $blogs = $this->getBlogMapper()
-            ->findByColumn("folder_id", $folderId)
-            ->sortBy('createdAt', 'desc')
-            ->limit(0, $limit);
+            /** @var BlogModel $blog */
+            foreach ($blogs as $blog) {
+                // Rehydrate
+                $user = $this->getUserMapper()->findByIdWithFallback($blog->getOwner()->getId());
+                $blog->setOwner($user);
 
-        // Grab comments and image gallery items for each blog post
+                $blogComments[$blog->getId()] = $this->getBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
+                $blogImages[$blog->getId()] = $this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId());
 
-        $blogComments = [];
-        $blogImages = [];
-
-        /** @var BlogModel $blog */
-        foreach ($blogs as $blog) {
-            // Rehydrate
-            $user = $this->getUserMapper()->findByIdWithFallback($blog->getOwner()->getId());
-            $blog->setOwner($user);
-
-            $blogComments[$blog->getId()] = $this->getBlogCommentMapper()->findByColumn('blog_id', $blog->getId());
-            $blogImages[$blog->getId()] = $this->getBlogImageMapper()->findByColumn("blog_id", $blog->getId());
-
-            // Hydrate owner of comments
-            /** @var BlogCommentModel $comment */
-            foreach ($blogComments[$blog->getId()] as $comment) {
-                $comment->setOwner($this->getUserMapper()->findByIdWithFallback($comment->getOwner()->getId()));
+                // Hydrate owner of comments
+                /** @var BlogCommentModel $comment */
+                foreach ($blogComments[$blog->getId()] as $comment) {
+                    $comment->setOwner($this->getUserMapper()->findByIdWithFallback($comment->getOwner()->getId()));
+                }
             }
         }
 
         // Render this component out
+
 
         return $this->renderTwigTemplate(
             $templateHandle,
             '@blog/component.twig',
             array(
                 'session'               => $_SESSION,
-                'folder'                => $folder,
+                'folder'                => $this->getSource(),
                 'blogs'                 => $blogs,
                 'blogComments'          => $blogComments,
                 'blogImages'            => $blogImages,
@@ -132,19 +108,9 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
 
     /**
-     * @var FolderMapper;
-     */
-    protected $folderMapper;
-
-    /**
      * @var BlogMapper;
      */
     protected $blogMapper;
-
-    /**
-     * @var ErrorMapper;
-     */
-    protected $errorMapper;
 
     /**
      * @var UserMapper;
@@ -162,24 +128,6 @@ class Controller extends Component_Homepage_ControllerAbstract
     protected $blogImageMapper;
 
     /**
-     * @return FolderMapper
-     */
-    public function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }
-
-    /**
-     * @param  FolderMapper $folderMapper
-     * @return $this
-     */
-    public function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-        return $this;
-    }
-
-    /**
      * @return BlogMapper
      */
     public function getBlogMapper()
@@ -194,24 +142,6 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function setBlogMapper($blogMapper)
     {
         $this->blogMapper = $blogMapper;
-        return $this;
-    }
-
-    /**
-     * @return ErrorMapper
-     */
-    public function getErrorMapper()
-    {
-        return $this->errorMapper;
-    }
-
-    /**
-     * @param  ErrorMapper $errorMapper
-     * @return $this
-     */
-    public function setErrorMapper($errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
         return $this;
     }
 

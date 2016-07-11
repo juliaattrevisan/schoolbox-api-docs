@@ -12,6 +12,11 @@ class Component_Homepage_Statistics_TopLinksController extends Component_Homepag
 
     private $links;
 
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
     public function execute()
     {
 

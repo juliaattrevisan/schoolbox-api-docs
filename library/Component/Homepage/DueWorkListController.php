@@ -23,15 +23,22 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
+        if(!$this->isSourceRenderable()){
+            return $this->hasContextWriteAccess();
+        }
+
         $this->submissionList = new Collection(
             SubmissionBoxMapper::getInstance()
                 ->getUpcomingActivities(null, $this->getConfig('size'), $this->getContext()->getId())
                 ->getColumnValues('submissionBox')
         );
+        return true;
     }
 
     /**

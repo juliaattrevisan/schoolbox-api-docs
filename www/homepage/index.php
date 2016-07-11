@@ -131,7 +131,9 @@ $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
 /* BUILD COMPONENTRY */
 $componentFactory = new Component_Homepage_Factory(new \Schoolbox\User(), $this);
-$componentFactory->setMaximumPermission($virtualPermission);
+if($_GET['readonly']) {
+    $componentFactory->setMaximumPermission($virtualPermission);
+}
 $componentCollection = $componentFactory->buildComponentList($category->getId());
 
 // Decide which of parent/student view butonyes to show, if either
@@ -417,12 +419,12 @@ foreach ($componentCollection as $component) {
     /** @var Component_Homepage_ControllerAbstract $component */
     $instance       = $component->getInstance();
     $templateTarget = "component_position_{$instance->getPosition()}";
-    $templateHandle = "component_{$instance->getDefinitionId()}";
+    $templateHandle = "component_{$instance->getId()}";
 
 
     $component->setup($category, $instance->getConfigArray());
 
-    if ($component->execute() !== false) {
+    if ($component->execute()) {
         if ($component->renderTemplate($templateHandle) !== false) {
             if (!in_array($instance->getPosition(), $occupiedPositionList)) {
                 $occupiedPositionList[] = $instance->getPosition();

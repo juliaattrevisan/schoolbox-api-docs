@@ -22,6 +22,12 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
+                <!-- BEGIN source_folder_deleted -->
+                {SOURCE_FOLDER_UNAVAILABLE}
+                <!-- END source_folder_deleted -->
+
+                <!-- BEGIN source_folder_exists -->
+
                 <!-- BEGIN text_editable -->
                 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
                 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
@@ -74,6 +80,7 @@
                 </div>
                 <!-- END create_text -->
                 <!-- END text_locked -->
+                <!-- END source_folder_exists -->
             </section>
         </div>
     </div>

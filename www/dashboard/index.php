@@ -22,10 +22,11 @@ foreach ($componentCollection as $component) {
     /** @var Component_Dashboard_ControllerAbstract $component */
     $instance = $component->getInstance();
     $templateTarget = "component_position_{$instance->getPosition()}";
-    $templateHandle = "component_{$instance->getDefinitionId()}";
+    $templateHandle = "component_{$instance->getId()}";
 
-    if ($component->execute() !== false) {
-        $component->setup(array(), array());
+    $component->setup(null, $instance->getConfigArray());
+
+    if ($component->execute()) {
         $component->parseConfig();
 
         if ($component->renderTemplate($templateHandle) !== false) {

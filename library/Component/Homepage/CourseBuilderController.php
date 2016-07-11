@@ -48,10 +48,18 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
     protected $categoryWithUnitList;
 
     /**
-     * {@inheritdoc}
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
+        if(!$this->isSourceRenderable()){
+            return $this->hasContextWriteAccess();
+        }
+
         $this->group_handler = new Group();
         $categoryId          = $this->getContext()->getId();
         if ($categoryId > 0) {
@@ -70,6 +78,7 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
                 }
             )
         );
+        return true;
     }
 
     /**

@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -18,10 +17,20 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
 
     /**
      * Prepares data for the render function. Business logic.
-     * @return void
+     *
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
+
+        if(!$this->isSourceRenderable()){
+            if(!$this->hasContextWriteAccess()){
+                return false;
+            }
+        }
+
         $this->groupHandler = new Group();
 
         try {
@@ -34,12 +43,13 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             $this->textbox = new \Schoolbox\Textbox\Model();
             $this->textbox
                 ->setHeading('Text Box')
-                ->setCategory(\Schoolbox\Resource\Folder\Mapper::getInstance()->createModel()->setId($this->getContext()->getId()));
+                ->setCategory(\Schoolbox\Resource\Folder\Mapper::getInstance()->createModel()->setId($this->getSource()->getId()));
         }
 
         if (!$this->getTextbox()->getHeading()) {
             $this->getTextbox()->setHeading('Text Box');
         }
+        return true;
     }
 
     /**
@@ -53,78 +63,78 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             return false;
         }
 
-        $this->setBlock($templateHandle, 'text_editable', 'text_editable_block');
-        $this->setBlock($templateHandle, 'text_locked', 'text_locked_block');
+        $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
+        $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
+        $this->setBlock('source_folder_exists', 'text_editable', 'text_editable_block');
+        $this->setBlock('source_folder_exists', 'text_locked', 'text_locked_block');
         $this->setBlock('text_locked', 'modify_text', 'modify_text_block');
         $this->setBlock('text_locked', 'create_text', 'create_text_block');
 
-        if ($this->textbox instanceof \Schoolbox\Textbox\Model) {
-            $sourceCategory = $this->textbox->getCategory()->getId();
+
+
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailable();
         } else {
-            $sourceCategory = $this->getContext()->getId();
-        }
+            $this->setVar('source_folder_deleted_block', '');
 
-        /* If user does not have access to the source, do not output anything */
-        if ($this->contentPermission < READ_ACCESS) {
-            return false;
-        }
+            /*
+             * Remember where the textBox came from - if you modify a streamed
+             * textBox which comes from another homepage, you were able to
+             * inadvertently steal ownership of it
+             */
+            $heading = Scrub::text($this->getTextbox()->getHeading());
+            $this->setComponentName($heading);
 
-        /* Remember where the texbox came from - if you modify a streamed
-         * textbox which comes from another homepage, you were able to
-         * inadvertently steal ownership of it
-         */
-        $heading = Scrub::text($this->getTextbox()->getHeading());
-        $this->setComponentName($heading);
+            $this->setVar(array(
+                'TEXTBOX_HEADING'     => $heading,
+                'TEXTBOX_BODY'        => Scrub::html($this->getTextbox()->getBody()),
+                'TEXTBOX_ID'          => $this->getTextbox()->getId(),
+                'ID'                  => $this->getContext()->getId(),
+                'TEXTBOX_CATEGORY_ID' => $this->getTextbox()->getCategory()->getId(),
+                'text_editable_block' => '',
+                'modify_text_block'   => '',
+                'create_text_block'   => '',
+                'text_locked_block'   => '',
+            ));
 
-        $output = array(
-            'TEXTBOX_HEADING'     => $heading,
-            'TEXTBOX_BODY'        => Scrub::html($this->getTextbox()->getBody()),
-            'TEXTBOX_ID'          => $this->getTextbox()->getId(),
-            'TEXTBOX_CATEGORY_ID' => $this->getTextbox()->getCategory()->getId(),
-            'text_editable_block' => '',
-            'modify_text_block'   => '',
-            'create_text_block'   => '',
-            'text_locked_block'   => '',
-        );
-
-        $this->setVar($output);
-
-        /* To edit someone else's textbox, you need write access to both homepages.
-         * To just edit one homepage's textbox, you need write access to that homepage.
-         */
-        $editing = false;
-        if ($this->contentPermission >= WRITE_ACCESS && $this->sitepage->arg[2] == $this->instance->getId()) {
-            if ($this->sitepage->arg[1] == 'textBoxModify') {
-                $editing = true;
-                $this->setVar(
-                    array(
-                        'TEXTBOX_BODY' => Scrub::text($this->getTextbox()->getBody()),
-                    )
-                );
-            } elseif ($this->sitepage->arg[1] == 'textBoxCreate') {
-                $editing = true;
-                $this->setVar(
-                    array(
-                        'TEXTBOX_HEADING'     => '',
-                        'TEXTBOX_BODY'        => '',
-                        'TEXTBOX_ID'          => '',
-                        'TEXTBOX_CATEGORY_ID' => $sourceCategory,
-                    )
-                );
-            }
-            $this->parse('text_editable_block', 'text_editable');
-        } else {
-            // modify links
-            if ($this->contentPermission >= WRITE_ACCESS) {
-                if ($this->getTextbox()->getId()) {
-                    $this->parse('modify_text_block', 'modify_text');
-                } else {
-                    $this->parse('create_text_block', 'create_text');
+            /* To edit someone else's textbox, you need write access to both homepages.
+             * To just edit one homepage's textbox, you need write access to that homepage.
+             */
+            $editing = false;
+            if ($this->contentPermission >= WRITE_ACCESS && $this->sitepage->arg[2] == $this->instance->getId()) {
+                if ($this->sitepage->arg[1] == 'textBoxModify') {
+                    $editing = true;
+                    $this->setVar(
+                        array(
+                            'TEXTBOX_BODY' => Scrub::text($this->getTextbox()->getBody()),
+                        )
+                    );
+                } elseif ($this->sitepage->arg[1] == 'textBoxCreate') {
+                    $editing = true;
+                    $this->setVar(
+                        array(
+                            'TEXTBOX_HEADING' => '',
+                            'TEXTBOX_BODY' => '',
+                            'TEXTBOX_ID' => '',
+                            'TEXTBOX_CATEGORY_ID' => $this->getSource()->getId(),
+                        )
+                    );
                 }
-            }
+                $this->parse('text_editable_block', 'text_editable');
+            } else {
+                // modify links
+                if ($this->contentPermission >= WRITE_ACCESS) {
+                    if ($this->getTextbox()->getId()) {
+                        $this->parse('modify_text_block', 'modify_text');
+                    } else {
+                        $this->parse('create_text_block', 'create_text');
+                    }
+                }
 
-            // formatted text
-            $this->parse('text_locked_block', 'text_locked');
+                // formatted text
+                $this->parse('text_locked_block', 'text_locked');
+            }
+            $this->parse('source_folder_exists_block', 'source_folder_exists');
         }
 
         /* Need title injected here
@@ -134,7 +144,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         }
         $this->parseConfig();
 
-        if ($this->contentPermission < WRITE_ACCESS && $this->getConfig('compactMode') ) {
+        if ($this->contentPermission < WRITE_ACCESS && $this->getConfig('compactMode')) {
             /* Remove headers */
             $this->setVar('CONFIGURATION', '');
             $this->setBlock($templateHandle, 'header', 'header_block');

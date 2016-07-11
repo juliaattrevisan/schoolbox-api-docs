@@ -11,6 +11,11 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
 {
     private $visitors;
 
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
     public function execute()
     {
         $visitors = array();
@@ -52,7 +57,7 @@ class Component_Homepage_Statistics_TopVisitorsController extends Component_Home
         }
 
         $this->visitors = $visitors;
-
+        return true;
     }
 
 

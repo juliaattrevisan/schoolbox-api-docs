@@ -11,6 +11,11 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
+                <!-- BEGIN source_folder_deleted -->
+                {SOURCE_FOLDER_UNAVAILABLE}
+                <!-- END source_folder_deleted -->
+
+                <!-- BEGIN source_folder_exists -->
                 <ul class="action-list">
                     <!-- BEGIN link -->
                     <li class="actions-small-1">
@@ -44,6 +49,7 @@
                     <a href="/cms/link/new/{LINK_CAT_ID}" class="button icon-add">Add Link</a>
                     <!-- END submit_link -->
                 </div>
+                <!-- END source_folder_exists -->
             </section>
         </div>
     </div>

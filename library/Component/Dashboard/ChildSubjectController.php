@@ -13,10 +13,14 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
 
     private $children;
 
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
     public function execute () {
         if ( is_array($_SESSION['children']) ) {
             $this->children = $_SESSION['children'];
-
             return true;
         }
         else {

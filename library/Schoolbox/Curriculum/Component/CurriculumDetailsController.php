@@ -26,12 +26,18 @@ class CurriculumDetailsController extends Component_Homepage_ControllerAbstract
     protected $curriculumNode = null;
 
     /**
-     * Loads the component's configuration.
+     * Prepares data for the render function. Business logic.
      *
-     * @return bool
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
+        if(!$this->isSourceRenderable()){
+            return $this->hasContextWriteAccess();
+        }
+
         // Show first curriculum for now
         /** @var Folder\Model $context */
         $context = $this->getContext();

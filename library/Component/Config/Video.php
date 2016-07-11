@@ -13,18 +13,19 @@ class Component_Config_Video extends Component_Config_Abstract
 
         /* Sort order
 		 */
-        $sortConfig = array();
-        $altSource  = null;
         if ($component instanceof Component_ControllerAbstract) {
             $sortConfig = array(
                 'sort' => $component->getConfig('sort'),
                 'sortdir' => $component->getConfig('sortdir')
             );
-            $altSource = $component->getConfig('src');
+            $sourceId = $component->getConfig('src');
+        } else {
+            $sortConfig = array();
+            $sourceId = $this->getCategory()->getId();
         }
 
         $videoMapper = new \Schoolbox\Video\ResourceVideoMapper();
-        $vidList = $videoMapper->findByCategory($altSource ?: $this->getCategory()->getId(), $sortConfig);
+        $vidList = $videoMapper->findByCategory($sourceId, $sortConfig);
 
         $page->setBlock($keyblock, 'video_select', 'video_select_block');
         $page->setVar('video_select_block', '');

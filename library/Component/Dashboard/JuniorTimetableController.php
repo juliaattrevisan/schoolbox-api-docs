@@ -34,14 +34,12 @@ class Component_Dashboard_JuniorTimetableController extends Component_Dashboard_
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
         $this->generateTimetables();
-
         $this->colourList = Timetable_ColourMapper::getInstance()->findAll();
-
         return true;
     }
 

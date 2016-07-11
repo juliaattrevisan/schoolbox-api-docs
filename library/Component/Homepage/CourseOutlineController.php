@@ -55,10 +55,18 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
     protected $readOnly;
 
     /**
-     * {@inheritdoc}
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
+        if(!$this->isSourceRenderable()){
+            return $this->hasContextWriteAccess();
+        }
+        
         // Get the list of students for this class (in which method?)
         $group_handler = new Group();
         $code          = $this->getContext()->getCodeString();

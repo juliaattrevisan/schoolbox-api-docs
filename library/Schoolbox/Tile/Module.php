@@ -165,8 +165,13 @@ class Module extends BaseModule
             function ($params) use ($catMapper) {
                 // augment params with homepage from category
                 if ($params['component']->getModule() == 'homepage') {
+
+                    // Support tile alt source to potentially soft-deleted homepage
+                    $folderId   = $params['component']->getIdentifier();
+                    $columnName = $catMapper->getIdentifier()['column'];
+
                     return array(
-                        'homepage' => $catMapper->findById($params['component']->getIdentifier()),
+                        'homepage' => $catMapper->findByColumn($columnName, $folderId, ['deleted' => true])->first(),
                     );
                 }
                 return array();

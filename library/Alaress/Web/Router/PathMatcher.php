@@ -92,6 +92,7 @@ class PathMatcher {
      * @param  array  $params Any params to pass as part of the route.
      * @param  array  $tags   If provided, run only actions added with one of
      *                        these tags.
+     * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
      * @return array
      */
     public function check($path, $params, $tags = array()) {
@@ -127,6 +128,7 @@ class PathMatcher {
      *
      * @param  callable $callback
      * @param  array    $params
+     * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
      * @return array    An array to override $params with, or null to leave
      *                  untouched.
      */

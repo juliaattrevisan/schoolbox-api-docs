@@ -11,17 +11,6 @@
 class Component_Eportfolio_ImageController extends Component_Eportfolio_ControllerAbstract {
 
 	/**
-	 * Prepares data for the render function. Business logic.
-	 *
-	 * Override this in subclasses
-	 *
-	 * @return void
-	 */
-	public function execute() {
-		// noop
-	}
-
-	/**
 	 * Outputs HTML template defined by config variable 'template'
 	 *
 	 * @param String $templateHandle

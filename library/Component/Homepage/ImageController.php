@@ -18,10 +18,16 @@ class Component_Homepage_ImageController extends Component_Homepage_ControllerAb
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return true
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
+        if(!$this->isSourceRenderable()){
+            return $this->hasContextWriteAccess();
+        }
+
         $this->db = DeprecatedDatabase::getInstance();
         return true;
     }

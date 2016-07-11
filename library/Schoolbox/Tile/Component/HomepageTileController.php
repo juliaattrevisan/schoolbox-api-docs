@@ -60,6 +60,12 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
      */
     public function execute()
     {
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
+        if(!$this->isSourceRenderable()){
+            return $this->hasContextWriteAccess();
+        }
+
         $this->setLayout($this->delegate->fetchLayout($this));
         return true;
     }
@@ -71,16 +77,18 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
      */
     public function renderTemplate($templateHandle)
     {
-        return $this->renderTwigTemplate(
-            $templateHandle,
-            '@tile/component/tile.twig',
-            array(
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailableTwig($templateHandle);
+        } else {
+            $twigTemplate = '@tile/component/tile.twig';
+            $twigData = array(
                 'component'                  => $this,
                 'showButtons'                => $this->hasWriteAccess(),
                 'tile_component_instance_id' => $this->getConfig('tileSource') ?: $this->getInstance()->getId(),
-            ),
-            $this->hasWriteAccess() || !$this->getConfig('compactMode') || ($this->isUsingAltSource() && $this->hasContextWriteAccess())
-        );
+            );
+            $renderHeader = $this->hasWriteAccess() || !$this->getConfig('compactMode') || $this->hasContextWriteAccess();
+            return $this->renderTwigTemplate($templateHandle, $twigTemplate, $twigData, $renderHeader);
+        }
     }
 
     /**

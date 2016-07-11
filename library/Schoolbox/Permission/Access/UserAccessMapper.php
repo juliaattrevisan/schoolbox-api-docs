@@ -508,10 +508,8 @@ class UserAccessMapper extends Mapper
         if ($serviceIdentifier != 0 && $service == HOMEPAGE_SERVICE) {
 
             // Find the NNIAN for the folder
-
-            $folder =  FolderMapper::getInstance()->findCheaplyById($serviceIdentifier);
+            $folder =  FolderMapper::getInstance()->findCheaplyById($serviceIdentifier, ['deleted' => true]);
             $folderNnian = FolderMapper::getInstance()->findNearestNonInheritingAncestralNode($folder);
-
             $serviceIdentifier = $folderNnian->getId();
         }
 
@@ -548,12 +546,9 @@ class UserAccessMapper extends Mapper
                     'uid' => $user->getId(),
                 )
             );
-
             // Found a result in UserAccess, cache it and return the permission object
-
             $this->cachedPermissions[$user->getId()][$service][$serviceIdentifier] = $result;
             return $result;
-
         } catch (\Exception $e) {
 
             // Exception thrown if not found. Noop

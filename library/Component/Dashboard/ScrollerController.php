@@ -19,39 +19,18 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
     private $groupHandler;
 
     /**
-     * Category Mapper
-     *
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private $categoryMapper = null;
-
-    /**
-     * A category
-     *
-     * @var \Schoolbox\Resource\Folder\Model
-     */
-    private $source;
-
-    /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
-        $this->groupHandler = new Group();
-        $this->setCategoryMapper(Schoolbox\Resource\Folder\Mapper::getInstance());
-
-        $this->source = $this->getCategoryMapper()->createModel();
-
-        if (is_numeric($this->getConfig('src'))) {
-            try {
-                // remove any non-numeric values from the source config
-                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            } catch (\Exception $e) {
-                // noop
-            }
+        if(!$this->isSourceRenderable()){
+            return false;
         }
+
+        $this->groupHandler = new Group();
+        return true;
     }
 
     /**
@@ -64,11 +43,12 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         if (!parent::loadTemplate($templateHandle, 'scroller')) {
             return false;
         }
-        $this->parseConfig();
 
-        if ($this->groupHandler->getPermission($this->source->getId()) < READ_ACCESS) {
+        if ($this->groupHandler->getPermission($this->getSource()->getId()) < READ_ACCESS) {
             return false;
         }
+
+        $this->parseConfig();
 
         $this->setBlock($templateHandle, 'image_scroller', 'image_scroller_block');
         $this->setBlock($templateHandle, 'has_header', 'has_header_block');
@@ -107,7 +87,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         $this->setVar('image_scroller_block', '');
 
         // Load images for the current homepage
-        $allFiles = $this->getCategoryMapper()->findImages($this->source, 0, true);
+        $allFiles = $this->getFolderMapper()->findImages($this->getSource(), 0, true);
 
         // Have update form to back to this homepage, not the gallery's homepage
         $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source->getId());
@@ -137,28 +117,5 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         }
 
         return true; // everything went according to plan
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set category mapper
-     *
-     * @param Schoolbox\Resource\Folder\Mapper $categoryMapper
-     */
-    private function setCategoryMapper($categoryMapper)
-    {
-        $this->categoryMapper = $categoryMapper;
-    }
-
-    /**
-     * Get category mapper
-     *
-     * @return Schoolbox\Resource\Folder\Mapper
-     */
-    private function getCategoryMapper()
-    {
-        return $this->categoryMapper;
     }
 }

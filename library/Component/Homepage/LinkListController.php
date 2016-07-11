@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
@@ -24,20 +23,6 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     private $linkMapper = null;
 
     /**
-     * An instance of Category
-     *
-     * @var \Schoolbox\Resource\Folder\Model
-     */
-    private $source;
-
-    /**
-     * Category Mapper
-     *
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private $categoryMapper = null;
-
-    /**
      * Available sort fields for this component.
      *
      * @var array
@@ -47,23 +32,19 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
+        if(!$this->isSourceRenderable()){
+            return $this->hasContextWriteAccess();
+        }
+        
         $this->groupHandler = new Group();
         $this->setLinkMapper(new \Schoolbox\Resource\LinkMapper());
-        $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
-
-        $this->source = $this->getContext();
-
-        if (is_numeric($this->getConfig('src'))) {
-            try {
-                // remove any non-numeric values from the source config
-                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            } catch (\Exception $e) {
-            }
-        }
+        return true;
     }
 
     /**
@@ -81,19 +62,15 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
 
         $this->setComponentName(strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName());
 
-        if ($this->contentPermission < READ_ACCESS) {
-            return false;
-        }
-
         // Set up component name
         $this->setVar(
             array(
                 // These are for the Select Alternate Source resourcebrowser
-                'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getId() == $this->getContext()->getId()
+                'COMPONENT_CONFIG_SRC_ID'   => $this->getSource()->getId(),
+                'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getId() == $this->getContext()->getId()
                         ? 'Local'
-                        : $this->source->getName(),
-                'LINK_CATEGORY_ID'          => $this->source->getId(),
+                        : $this->getSource()->getName(),
+                'LINK_CATEGORY_ID'          => $this->getSource()->getId(),
             )
         );
 
@@ -102,60 +79,70 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
         $this->parseConfig();
 
         //link output
-        $this->setBlock($templateHandle, 'link', 'link_block');
+        $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
+        $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
+        $this->setBlock('source_folder_exists', 'link', 'link_block');
+        $this->setBlock('source_folder_exists', "submit_link", "submit_link_block");
         $this->setBlock('link', 'modify_link', 'modify_link_block');
 
-        /** @var Schoolbox\Resource\Link[] $allLinks */
-        $allLinks = $this->getLinkMapper()->findAllInCategory(
-            $this->source,
-            array(
-                'size'    => $this->getConfig('size'),
-                'sort'    => $this->getConfig('sort'),
-                'sortdir' => $this->getConfig('sortdir'),
-            )
-        );
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailable();
+        } else {
+            $this->setVar('source_folder_deleted_block', '');
 
-        $this->setVar('link_block', '');
-
-        $j = 0;
-
-        foreach ($allLinks as $currentLink) {
-            if ($currentLink->getHidden() && $this->contentPermission < WRITE_ACCESS) {
-                continue;
-            }
-            $this->setVar(
+            /** @var Schoolbox\Resource\Link[] $allLinks */
+            $allLinks = $this->getLinkMapper()->findAllInCategory(
+                $this->getSource(),
                 array(
-                    'LINK_ID'           => $currentLink->getId(),
-                    'LINK_NAME'         => Scrub::text($currentLink->getDescription()),
-                    'LINK_URL'          => $currentLink->getHref(),
-                    'LINK_TARGET'       => $currentLink->getLinkTarget(),
-                    'LINK_POSTED_BY'    => $currentLink->getOwner()->formatName(),
-                    'LINK_POSTED_BY_ID' => $currentLink->getOwner()->getId(),
-                    'LINK_POSTED_DATE'  => $currentLink->getSubmitted()->getShort(),
-                    'LINK_COMMENT'      => nl2br(Scrub::text($currentLink->getComment())),
-                    'ON_OFF'            => ++$j % 2 ? '' : 'dark',
-                    'HIDDEN'            => $currentLink->getHidden() ? 'hidden' : '',
+                    'size' => $this->getConfig('size'),
+                    'sort' => $this->getConfig('sort'),
+                    'sortdir' => $this->getConfig('sortdir'),
                 )
             );
 
-            // Controls
-            if ($this->contentPermission < WRITE_ACCESS) {
-                $this->setVar('modify_link_block', '');
-            } else {
-                $this->parse('modify_link_block', 'modify_link');
+            $this->setVar('link_block', '');
+
+            $j = 0;
+
+            foreach ($allLinks as $currentLink) {
+                if ($currentLink->getHidden() && $this->contentPermission < WRITE_ACCESS) {
+                    continue;
+                }
+                $this->setVar(
+                    array(
+                        'LINK_ID' => $currentLink->getId(),
+                        'LINK_NAME' => Scrub::text($currentLink->getDescription()),
+                        'LINK_URL' => $currentLink->getHref(),
+                        'LINK_TARGET' => $currentLink->getLinkTarget(),
+                        'LINK_POSTED_BY' => $currentLink->getOwner()->formatName(),
+                        'LINK_POSTED_BY_ID' => $currentLink->getOwner()->getId(),
+                        'LINK_POSTED_DATE' => $currentLink->getSubmitted()->getShort(),
+                        'LINK_COMMENT' => nl2br(Scrub::text($currentLink->getComment())),
+                        'ON_OFF' => ++$j % 2 ? '' : 'dark',
+                        'HIDDEN' => $currentLink->getHidden() ? 'hidden' : '',
+                    )
+                );
+
+                // Controls
+                if ($this->contentPermission < WRITE_ACCESS) {
+                    $this->setVar('modify_link_block', '');
+                } else {
+                    $this->parse('modify_link_block', 'modify_link');
+                }
+
+                $this->parse("link_block", "link", true);
             }
 
-            $this->parse("link_block", "link", true);
-        }
+            //setup block for submission button
+            $this->setVar('LINK_CAT_ID', $this->source->getId());
 
-        //setup block for submission button
-        $this->setVar('LINK_CAT_ID', $this->source->getId());
-        $this->setBlock($templateHandle, "submit_link", "submit_link_block");
 
-        if ($this->contentPermission < WRITE_ACCESS) {
-            $this->setVar("submit_link_block", "");
-        } else {
-            $this->parse("submit_link_block", "submit_link");
+            if ($this->contentPermission < WRITE_ACCESS) {
+                $this->setVar("submit_link_block", "");
+            } else {
+                $this->parse("submit_link_block", "submit_link");
+            }
+            $this->parse('source_folder_exists_block','source_folder_exists');
         }
 
         return true;
@@ -182,25 +169,5 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
     private function getLinkMapper()
     {
         return $this->linkMapper;
-    }
-
-    /**
-     * Set category mapper
-     *
-     * @param \Schoolbox\Resource\Folder\Mapper $categoryMapper
-     */
-    private function setCategoryMapper($categoryMapper)
-    {
-        $this->categoryMapper = $categoryMapper;
-    }
-
-    /**
-     * Get category mapper
-     *
-     * @return \Schoolbox\Resource\Folder\Mapper
-     */
-    private function getCategoryMapper()
-    {
-        return $this->categoryMapper;
     }
 }

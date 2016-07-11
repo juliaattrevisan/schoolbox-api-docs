@@ -38,6 +38,11 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
      */
     protected $bookings;
 
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
     public function execute()
     {
         //Ensure ResourceBooking module is enabled

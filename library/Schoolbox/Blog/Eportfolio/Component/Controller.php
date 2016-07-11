@@ -40,22 +40,11 @@ class Controller extends Component_Eportfolio_ControllerAbstract
         SitePage $sitepage
     ) {
         parent::__construct($instance, $user, $sitepage);
-        $this->setFolderMapper(FolderMapper::getInstance());
         $this->setEportfolioBlogMapper(EportfolioBlogMapper::getInstance());
         $this->setEportfolioBlogImageMapper(EportfolioBlogImageMapper::getInstance());
         $this->setEportfolioBlogCommentMapper(EportfolioBlogCommentMapper::getInstance());
         $this->setEportfolioPageMapper(EportfolioPageMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
-    }
-
-    /**
-     * Loads the grid component into its set configuration.
-     *
-     * @return true
-     */
-    public function execute()
-    {
-        return true;
     }
 
     /**
@@ -124,19 +113,9 @@ class Controller extends Component_Eportfolio_ControllerAbstract
      */
 
     /**
-     * @var FolderMapper;
-     */
-    protected $folderMapper;
-
-    /**
      * @var EportfolioBlogMapper;
      */
     protected $blogMapper;
-
-    /**
-     * @var ErrorMapper;
-     */
-    protected $errorMapper;
 
     /**
      * @var UserMapper;
@@ -159,24 +138,6 @@ class Controller extends Component_Eportfolio_ControllerAbstract
     protected $eportfolioPageMapper;
 
     /**
-     * @return FolderMapper
-     */
-    public function getFolderMapper()
-    {
-        return $this->folderMapper;
-    }
-
-    /**
-     * @param  FolderMapper $folderMapper
-     * @return $this
-     */
-    public function setFolderMapper($folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-        return $this;
-    }
-
-    /**
      * @return EportfolioBlogMapper
      */
     public function getEportfolioBlogMapper()
@@ -191,24 +152,6 @@ class Controller extends Component_Eportfolio_ControllerAbstract
     public function setEportfolioBlogMapper($blogMapper)
     {
         $this->blogMapper = $blogMapper;
-        return $this;
-    }
-
-    /**
-     * @return ErrorMapper
-     */
-    public function getErrorMapper()
-    {
-        return $this->errorMapper;
-    }
-
-    /**
-     * @param  ErrorMapper $errorMapper
-     * @return $this
-     */
-    public function setErrorMapper($errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
         return $this;
     }
 

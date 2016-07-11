@@ -9,8 +9,23 @@
  *
  */
 
+use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use \Schoolbox\Permission\Access\UserAccess;
+
 abstract class Component_ControllerAbstract
 {
+    /* Reasons for showing a component empty state */
+    /** @const int EMPTY_STATE_REASON_UNKNOWN. Default. */
+    const EMPTY_STATE_REASON_UNKNOWN = 0;
+
+    /** @const int EMPTY_STATE_REASON_DENIED. No READ+ access to data source folder */
+    const EMPTY_STATE_REASON_DENIED  = 1;
+
+    /** @const int EMPTY_STATE_REASON_DELETED. Component's data source folder is deleted */
+    const EMPTY_STATE_REASON_DELETED = 2;
+
 
     /**
      * @var Component_Instance
@@ -33,6 +48,13 @@ abstract class Component_ControllerAbstract
      * @var \Schoolbox\Resource\Folder\Model
      */
     protected $context;
+
+    /**
+     * The folder the component pulls data from, if any.
+     *
+     * @var \Schoolbox\Resource\Folder\Model
+     */
+    protected $source;
 
     /**
      * @var array
@@ -98,6 +120,12 @@ abstract class Component_ControllerAbstract
      */
     protected $configurationTemplate = '';
 
+    /** @var FolderMapper $folderMapper */
+    protected $folderMapper;
+
+    /** @var ErrorMapper $errorMapper */
+    protected $errorMapper;
+
     /**
     * Constructor
     *
@@ -111,35 +139,64 @@ abstract class Component_ControllerAbstract
         $this->user     = $user;
         $this->sitepage = $sitepage;
         $this->config   = $instance->getConfigArray();
-        $this->context  = new \Schoolbox\Resource\Folder\Model();
+        $this->context  = new FolderModel();
+        $this->source   = new FolderModel();
+        $this->setFolderMapper(FolderMapper::getInstance());
+        $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
     /**
-     * Method to provide global config details to the component
+     * Provide global config details to the component in preparation for business logic.
+     *
+     * May perform setup operations common to all component types.
      *
      * @param mixed $context Type is clarified in subclasses
      * @param array $config
+     * @return void
      */
     public function setup($context = null, array $config = array())
     {
         $this->context = $context;
         $this->config  = $config;
+
+        if($this->isUsingAltSource()){
+            // remove any non-numeric values from the source config (legacy support)
+            $folderId = preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'));
+
+            // source may be deleted
+            try {
+                $source = $this->getFolderMapper()->findById($folderId);
+            } catch(\Schoolbox\Mapper\Exception\Deleted $e){
+                $source = $e->getDeletedObject();
+            }
+            if(!($source instanceof FolderModel)){
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+            }
+            $this->setSource($source);
+        } else {
+            $this->setSource($context);
+        }
+
+        $this->postConstruct();
+    }
+
+    /**
+     * Hook method for components to perform their own dynamic setup() amendments
+     */
+    protected function postConstruct()
+    {
     }
 
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @abstract
-     * @return void
+     * All permission checks, data retrieval & object creation should happen here.
+     *
+     * @return bool Whether to continue on and attempt Component render
      */
-    abstract function execute();
-
-    /**
-     * Hook method for components to perform their own dynamic
-     * setup() amendments
-     */
-    protected function postConstruct()
-    {
+    public function execute(){
+        // Default to no action
+        return true;
     }
 
     /**
@@ -159,7 +216,7 @@ abstract class Component_ControllerAbstract
         $output = array(
             'COMPONENT_INSTANCE_ID'   => $this->instance->getId(),
             'COMPONENT_DEFINITION_ID' => $this->instance->getDefinitionId(),
-            'COMPONENT_HANDLE'        => $templateHandle . '_' . $this->instance->getId()
+            'COMPONENT_HANDLE'        => $templateHandle
         );
 
         $this->setVar($output);
@@ -167,6 +224,13 @@ abstract class Component_ControllerAbstract
         return true;
     }
 
+    /**
+     * Gets a template's file name relative to system template folder
+     *
+     * @param string $templateName
+     * @param string $templatePath
+     * @return string
+     */
     protected function getTemplate($templateName = '', $templatePath = '')
     {
         if (empty($templateName)) {
@@ -186,44 +250,20 @@ abstract class Component_ControllerAbstract
     /**
      * Renders view using Component_AbstractController::$templateObject.
      *
+     * Responsible just for rendering objects already retrieved during execute()
+     *
+     * Should never be called if some sort of rendering is not to take place.
+     *
      * @param String $templateHandle
      * @return boolean
      */
     public function renderTemplate($templateHandle)
     {
-
         if (!$this->loadTemplate($templateHandle)) {
             return false;
         }
         return true;
     }
-
-    /**
-     * Allows calls to the sitepage object in this style:
-     * $this->setBlock();
-     * Exists to ease porting of existing components.
-     *
-     * @param String $method
-     * @param Array $argumentList
-     * @return mixed
-     */
-//    public function __call($method, $argumentList) {
-//        echo "USING BACKPORTING: " . get_called_class() . "->$method()</br>";
-//        if(method_exists($this, $method)) {
-//            $object = $this;
-//        }
-//        elseif(method_exists($this->sitepage, $method)) {
-//            $object = $this->sitepage;
-//        }
-//        if(!empty($object)) {
-//            $rm = new ReflectionMethod($object, $method);
-//            return $rm->invokeArgs($object, $argumentList);
-//        }
-//        throw new Exception("Method `$method` not found.");
-//    }
-
-
-    // ENCAPSULATION FOR SITEPAGE METHODS: __CALL() IS SLOW AND CAUSES PARSING ERRORS
 
     /**
      * @param $varname
@@ -625,6 +665,138 @@ abstract class Component_ControllerAbstract
     }
 
     /**
+     * If current user has WRITE+ access to current context, render an empty state, else render nothing.
+     *
+     * Used by phpLib-based components.
+     *
+     * @return bool
+     */
+    protected function renderSourceUnavailable(){
+        if($this->hasContextWriteAccess()) {
+            if(!$this->hasReadAccess()) {
+                $this->renderAltSourceDenied();
+            } else if($this->getSource()->isDeleted()) {
+                $this->renderAltSourceDeleted();
+            } else {
+                $this->renderEmptyState();
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * If current user has WRITE+ access to current context, render an empty state, else render nothing.
+     *
+     * Used by twig-based components.
+     *
+     * @param string $templateHandle
+     * @return bool
+     */
+    protected function renderSourceUnavailableTwig($templateHandle){
+        if($this->hasContextWriteAccess()) {
+            if(!$this->hasReadAccess()) {
+                return $this->renderTwigAltSourceDenied($templateHandle);
+            } else if($this->getSource()->isDeleted()) {
+                return $this->renderTwigAltSourceDeleted($templateHandle);
+            } else {
+                return $this->renderTwigEmptyState($templateHandle);
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Convenience method for twig-based Components to render the 'AltSourceDeleted' empty state
+     * @param string $templateHandle
+     * @return bool
+     */
+    protected function renderTwigAltSourceDeleted($templateHandle){
+        return $this->renderTwigEmptyState($templateHandle, self::EMPTY_STATE_REASON_DELETED);
+    }
+
+    /**
+     * Convenience method for twig-based Components to render the 'AltSourceDenied' empty state
+     * @param string $templateHandle
+     * @return bool
+     */
+    protected function renderTwigAltSourceDenied($templateHandle){
+        return $this->renderTwigEmptyState($templateHandle, self::EMPTY_STATE_REASON_DENIED);
+    }
+
+    /**
+     * Renders empty state into twig-based Components
+     *
+     * Normally, this should not be called directly, instead use convenience methods which
+     * define a consistent message.
+     *
+     * @param string $templateHandle
+     * @param int $reason Why we are unable to display this component's content.
+     * @return bool
+     */
+    protected function renderTwigEmptyState($templateHandle, $reason = self::EMPTY_STATE_REASON_UNKNOWN){
+
+        $isAltSourceDenied  = self::EMPTY_STATE_REASON_DENIED  === $reason;
+        $isAltSourceDeleted = self::EMPTY_STATE_REASON_DELETED === $reason;
+
+        return $this->renderTwigTemplate(
+            $templateHandle,
+            'sub/componentSourceUnavailable.twig',
+            array(
+                'componentInstanceId' => $this->getInstance()->getId(),
+                'isAltSourceDenied'   => $isAltSourceDenied,
+                'isAltSourceDeleted'  => $isAltSourceDeleted,
+            )
+        );
+    }
+
+    /**
+     * Convenience method for PHPLib-based Components to render the 'AltSourceDenied' empty state
+     * @return bool
+     */
+    protected function renderAltSourceDenied(){
+        return $this->renderEmptyState(self::EMPTY_STATE_REASON_DENIED);
+    }
+
+    /**
+     * Convenience method for PHPLib-based Components to render the 'AltSourceDeleted' empty state
+     * @return bool
+     */
+    protected function renderAltSourceDeleted(){
+        return $this->renderEmptyState(self::EMPTY_STATE_REASON_DELETED);
+    }
+
+    /**
+     * Renders empty state into PHPLib-based Components
+     *
+     * Normally, this should not be called directly, instead use convenience methods which
+     * define a consistent message.
+     *
+     * @param int $reason Why we are unable to display this component's content.
+     * @return true
+     */
+    protected function renderEmptyState($reason = self::EMPTY_STATE_REASON_UNKNOWN){
+
+        $isAltSourceDenied  = self::EMPTY_STATE_REASON_DENIED  === $reason;
+        $isAltSourceDeleted = self::EMPTY_STATE_REASON_DELETED === $reason;
+
+        $twigTemplate = 'sub/componentSourceUnavailable.twig';
+        $twigData = array(
+            'componentInstanceId' => $this->getInstance()->getId(),
+            'isAltSourceDenied'   => $isAltSourceDenied,
+            'isAltSourceDeleted'  => $isAltSourceDeleted,
+        );
+        $this->setVar('SOURCE_FOLDER_UNAVAILABLE', $this->sitepage->getTwig()->render($twigTemplate, $twigData));
+        $this->parse('source_folder_deleted_block','source_folder_deleted');
+        $this->setVar('source_folder_exists_block', '');
+        return true;
+    }
+
+ 
+    /**
      * @return \Schoolbox\Resource\Folder\Model
      */
     public function getContext()
@@ -634,6 +806,7 @@ abstract class Component_ControllerAbstract
 
     /**
      * @param string $key
+     * @param string $attr
      * @return mixed
      */
     public function getConfig($key = '', $attr = 'value')
@@ -720,7 +893,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasReadAccess()
     {
-        return $this->contentPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_READ;
+        return $this->contentPermission >= UserAccess::ACCESS_READ;
     }
 
     /**
@@ -730,7 +903,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasWriteAccess()
     {
-        return $this->contentPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
+        return $this->contentPermission >= UserAccess::ACCESS_WRITE;
     }
 
     /**
@@ -740,7 +913,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasFullAccess()
     {
-        return $this->contentPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
+        return $this->contentPermission >= UserAccess::ACCESS_FULL;
     }
 
     /**
@@ -750,7 +923,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasContextReadAccess()
     {
-        return $this->contextPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_READ;
+        return $this->contextPermission >= UserAccess::ACCESS_READ;
     }
 
     /**
@@ -760,7 +933,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasContextWriteAccess()
     {
-        return $this->contextPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_WRITE;
+        return $this->contextPermission >= UserAccess::ACCESS_WRITE;
     }
 
     /**
@@ -770,7 +943,7 @@ abstract class Component_ControllerAbstract
      */
     public function hasContextFullAccess()
     {
-        return $this->contextPermission >= \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
+        return $this->contextPermission >= UserAccess::ACCESS_FULL;
     }
 
     /**
@@ -781,6 +954,72 @@ abstract class Component_ControllerAbstract
     public function isUsingAltSource()
     {
         return intval($this->getConfig("src")) > 0;
+    }
+
+    /**
+     * Gets the Folder, if any, this component draws its data from
+     *
+     * @return Schoolbox\Resource\Folder\Model
+     */
+    public function getSource(){
+        return $this->source;
+    }
+
+    /**
+     * Sets the Folder, if any, this component draws its data from
+     *
+     * @param Schoolbox\Resource\Folder\Model $source
+     */
+    public function setSource($source){
+        $this->source = $source;
+    }
+
+    /**
+     * Return whether we are able to render this component's content for current user.
+     * False if lacks READ+ permission on content, or because content is deleted.
+     * @return bool
+     */
+    public function isSourceRenderable(){
+        if(!$this->hasReadAccess() || ($this->isUsingAltSource() && $this->getSource()->isDeleted())){
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * @return Schoolbox\Resource\Folder\Mapper
+     */
+    public function getFolderMapper()
+    {
+        return $this->folderMapper;
+    }
+
+    /**
+     * @param  Schoolbox\Resource\Folder\Mapper $folderMapper
+     * @return $this
+     */
+    public function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+        return $this;
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    public function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+    /**
+     * @param  ErrorMapper $errorMapper
+     * @return $this
+     */
+    public function setErrorMapper($errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
+        return $this;
     }
 
     /**

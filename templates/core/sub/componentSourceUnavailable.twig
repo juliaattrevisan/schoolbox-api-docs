@@ -1,0 +1,43 @@
+{# Component content displayed when component uses alt-data-source, and that alt-data-source's folder is soft-deleted #}
+
+<script type="text/javascript">
+    $(function() {
+        var $comp = $('#component{{ componentInstanceId }}');
+
+        // User clicks any alt-source deleted action
+        $comp.on('click','[data-deleted-source] [data-action]', function(event){
+
+            event.preventDefault();
+
+            // Leverage existing actions
+            var action = $(event.target).attr('data-action');
+            switch(action) {
+                case 'remove':
+                    $comp.find('[data-target="delete"]').trigger('click');
+                    break;
+                case 'select_source':
+                    $comp.find('[data-target="settings"][data-state="closed"]').trigger('click');
+                    $comp.find('#launch-browser-component_47_3697').trigger('click');
+                    break;
+            }
+        });
+    });
+</script>
+
+<div class="empty-state" data-deleted-source>
+    <i class="icon-info"></i>
+
+    {# Note: We show 'denied' before 'deleted' if both are true. Fallback to default if no reason set #}
+
+    {% if isAltSourceDenied %}
+        <p>You do not have permission to view this component's data source.</p>
+    {% elseif isAltSourceDeleted %}
+        <p>The alternative data source this component was using has been deleted.</p>
+    {% else %}
+        <p>Unable to display component data.</p>
+    {% endif %}
+    <p>You can either
+        <a href="#" title="Remove this Component" data-action="remove">Remove this Component</a>, or
+        <a href="#" title="Select Source" data-action="select_source">Select a new Data Source</a>
+    </p>
+</div>

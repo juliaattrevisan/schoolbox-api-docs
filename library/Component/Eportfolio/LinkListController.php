@@ -19,15 +19,11 @@ class Component_Eportfolio_LinkListController extends Component_Eportfolio_Contr
 	/**
 	 * Prepares data for the render function. Business logic.
 	 *
-	 * Override this in subclasses
-	 *
-	 * @return void
+	 * @return bool Whether to continue on and attempt Component render
 	 */
 	public function execute() {
 		$mapper = new \Component\Eportfolio\LinkListMapper();
-
 		$this->setMapperClass($mapper);
-
 		return true;
 	}
 

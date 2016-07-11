@@ -25,17 +25,29 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
      * @var Calendar
      */
     private $calendarHandler;
+    
+    /** @var  Alaress_Date_Format $start */
+    protected $start;
+
+    /** @var  Alaress_Date_Format $end */
+    protected $end;
 
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
+        if(!$this->isSourceRenderable()){
+            return $this->hasContextWriteAccess();
+        }
+
         $this->db              = DeprecatedDatabase::getInstance();
         $this->calendarHandler = new Calendar();
-
+        return true;
     }
 
     /**
@@ -66,7 +78,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
         }
 
         $now         = Alaress_Date_Format::now();
-        $prevDay = false;
+        $prevDay     = false;
         $this->start = $now->startOfDay();
         $this->end   = clone $this->start;
         $this->end->addDays($days);

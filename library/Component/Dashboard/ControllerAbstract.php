@@ -18,18 +18,27 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
      */
     public function setup($context = null, array $config = array())
     {
-        // if you're able to see the component, you're in admin mode so full access is granted
-        $this->contentPermission = FULL_ACCESS;
+        parent::setup(null, $config);
+
         $this->contextPermission = FULL_ACCESS;
 
-        // roll the config specified into what we already have
-        if (count($config)) {
-            foreach ($config as $k => $v) {
-                $this->config[$k] = $v;
-            }
+        if($this->isUsingAltSource()){
+            $g = new Group;
+            $this->contentPermission = min($g->getPermission($this->getSource()->getId()), $this->getMaximumPermission());
+        } else {
+            $this->contentPermission = FULL_ACCESS;
         }
+    }
 
-        $this->postConstruct();
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
+    public function execute()
+    {
+        // Hide Dashboard components if the folder they pull data from is soft-deleted
+        return (!$this->isUsingAltSource() || !$this->getSource()->isDeleted());
     }
 
     protected function getTemplate($templateName = '', $templatePath = '')

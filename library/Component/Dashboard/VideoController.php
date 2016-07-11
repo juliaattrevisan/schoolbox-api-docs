@@ -33,15 +33,6 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
     protected $sortFields = array('name', 'date');
 
     /**
-     * Prepares data for the render function. Business logic.
-     *
-     * @return void
-     */
-    public function execute()
-    {
-    }
-
-    /**
      * Renders the data into the SitePage. Presentation logic.
      * @param String $templateHandle
      * @return boolean

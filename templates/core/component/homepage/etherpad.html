@@ -4,6 +4,11 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
+                <!-- BEGIN source_folder_deleted -->
+                {SOURCE_FOLDER_UNAVAILABLE}
+                <!-- END source_folder_deleted -->
+
+                <!-- BEGIN source_folder_exists -->
                 <ul class="action-list">
                     <!-- BEGIN etherpad_pad -->
                     <li class="actions-small-2">
@@ -26,9 +31,10 @@
 
                 <div class="content">
                     <!-- BEGIN etherpad_has_create -->
-                    <a href="/collabdoc/create/{ID}" class="button icon-add">Create Document</a>
+                    <a href="/collabdoc/create/{SOURCE_ID}" class="button icon-add">Create Document</a>
                     <!-- END etherpad_has_create -->
                 </div>
+                <!-- END source_folder_exists -->
             </section>
         </div>
     </div>

@@ -11,14 +11,11 @@ use Calendar\Event\Collection\Lister;
 class Component_Homepage_EventListController extends Component_Homepage_ControllerAbstract
 {
 
-    /**
-     * Prepares data for the render function. Business logic.
-     *
-     * @return void
-     */
-    public function execute()
-    {
-    }
+    /** @var  Alaress_Date_Format $start */
+    protected $start;
+
+    /** @var  Alaress_Date_Format $end */
+    protected $end;
 
     /**
      * Renders the data into the SitePage. Presentation logic.
@@ -55,7 +52,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         }
 
         $now         = Alaress_Date_Format::now();
-        $prevDay = false;
+        $prevDay     = false;
         $this->start = $now->startOfDay();
         $this->end   = clone $this->start;
         $this->end->addDays($dayLimit);

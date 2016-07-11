@@ -131,4 +131,42 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
     {
         return $this->mapperClass;
     }
+
+    /**
+     * Gets the Eportfolio_Page_Instance this component draws its data from
+     *
+     * @return Eportfolio_Page_Instance
+     */
+    public function getSource(){
+        return $this->source;
+    }
+
+    /**
+     * Sets the Eportfolio_Page_Instance this component draws its data from
+     *
+     * @param Eportfolio_Page_Instance $source
+     */
+    public function setSource($source) {
+        $this->source = $source;
+    }
+
+    /**
+     * For now, Eportfolio Components are unable to use Alt Data Sources
+     *
+     * @throws DomainException
+     */
+    protected function renderAltSourceDenied(){
+        throw new DomainException('Eportfolio components do not currently allow alternative data sources');
+    }
+
+    /**
+     * For now, Eportfolio Components are unable to use Alt Data Sources
+     *
+     * @throws DomainException
+     */
+    protected function renderAltSourceDeleted(){
+        throw new DomainException('Eportfolio components do not currently allow alternative data sources');
+    }
+
+
 }

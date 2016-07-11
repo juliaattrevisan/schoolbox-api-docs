@@ -14,10 +14,6 @@ class Component_Homepage_Statistics_NavigatorController extends Component_Homepa
 
     const STAR_COUNT = 5;
 
-    public function execute()
-    {
-    }
-
     public function renderTemplate($templateHandle)
     {
         if (!parent::loadTemplate($templateHandle, 'navigator')) {

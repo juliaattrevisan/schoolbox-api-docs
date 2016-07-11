@@ -6,6 +6,11 @@
     <div class="row {CONFIG_COLLAPSED_CLASS}" data-collapsable='true' data-collapse-state="{CONFIG_COLLAPSED_STATE}">
         <div class="small-12 island">
             <section>
+                <!-- BEGIN source_folder_deleted -->
+                {SOURCE_FOLDER_UNAVAILABLE}
+                <!-- END source_folder_deleted -->
+
+                <!-- BEGIN source_folder_exists -->
                 <ul class="information-list">
                     <!-- BEGIN news -->
 
@@ -62,6 +67,7 @@
                     <a href="/news/homepage/new/{NEWS_CATEGORY_ID}" class="button icon-upload">Post News</a>
                     <!-- END submit_news -->
                 </div>
+                <!-- END source_folder_exists -->
             </section>
         </div>
     </div>

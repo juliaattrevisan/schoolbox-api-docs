@@ -13,11 +13,11 @@
 
 class Component_Dashboard_DailyQuoteController extends Component_Dashboard_ControllerAbstract {
 
-    /**
-     * Prepares data for the render function. Business logic.
-     *
-     * @return void
-     */
+	/**
+	 * Prepares data for the render function. Business logic.
+	 *
+	 * @return bool Whether to continue on and attempt Component render
+	 */
     public function execute() {
         return true;
     }

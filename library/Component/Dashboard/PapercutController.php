@@ -12,15 +12,6 @@
 class Component_Dashboard_PapercutController extends Component_Dashboard_ControllerAbstract {
 
 	/**
-	 * Prepares data for the render function. Business logic.
-	 *
-	 * @return void
-	 */
-	public function execute() {
-		return true;
-	}
-
-	/**
 	 * Outputs HTML template defined by config variable 'template'
 	 *
 	 * @param String $templateHandle

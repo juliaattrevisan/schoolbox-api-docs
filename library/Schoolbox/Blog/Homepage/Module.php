@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Blog\Homepage\Component;
+namespace Schoolbox\Blog\Homepage;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Failure\Unauthorized;

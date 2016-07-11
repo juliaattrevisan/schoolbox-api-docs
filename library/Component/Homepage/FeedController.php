@@ -21,17 +21,22 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
+        if(!$this->isSourceRenderable()){
+            return $this->hasContextWriteAccess();
+        }
 
         /** @var User $user */
         $user = $_SESSION['user'];
 
         $conf = \Schoolbox\Config\ConfigMapper::getInstance();
-
         $this->feed = new StandardFeed($conf, $this->getContext()->getId(), $user->getRole()->getType(), $this->getConfig('size'));
+        return true;
     }
 
     /**
@@ -55,7 +60,6 @@ class Component_Homepage_FeedController extends Component_Homepage_ControllerAbs
             return true;
         }
 
-        $j = 0;
         foreach ($this->feed->renderAsFeedArray() as $n) {
             $date = new Alaress_Date_Format($n['time'], 'U');
             $this->setVar(

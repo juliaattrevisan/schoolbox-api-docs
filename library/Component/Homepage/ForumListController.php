@@ -9,23 +9,10 @@
  */
 class Component_Homepage_ForumListController extends Component_Homepage_ControllerAbstract
 {
-
     /**
      * @var Group
      */
     private $groupHandler;
-
-    /**
-     * Category Mapper
-     *
-     * @var \Schoolbox\Resource\Folder\Mapper
-     */
-    private $categoryMapper = null;
-
-    /**
-     * @var array
-     */
-    private $source;
 
     /**
      * Available sort fields for this component.
@@ -37,22 +24,18 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
     /**
      * Prepares data for the render function. Business logic.
      *
-     * @return void
+     * @return bool Whether to continue on and attempt Component render
      */
     public function execute()
     {
-        $this->groupHandler = new Group();
-        $this->setCategoryMapper(new \Schoolbox\Resource\Folder\Mapper());
-
-        $this->source = $this->getContext();
-
-        if (is_numeric($this->getConfig('src'))) {
-            try {
-                // remove any non-numeric values from the source config
-                $this->source = $this->getCategoryMapper()->findById(preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src')));
-            } catch (\Exception $e) {
-            }
+        // If current user can't view component's source, only display the
+        // component if the user has context WRITE+ permission
+        if(!$this->isSourceRenderable()){
+            return $this->hasContextWriteAccess();
         }
+
+        $this->groupHandler = new Group();
+        return true;
     }
 
     /**
@@ -66,21 +49,12 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
             return false;
         }
 
-        // don't show forums to parents if they not a direct member of group
-        // (Allow parents to read, but not post, if a child is in group)
-        $is_post_allowed = !$this->groupHandler->hasChildAccessOnly($this->getContext()->getId());
-        if (!$is_post_allowed && Cfg::get('restrict_parent_forum_access')) {
-            return false;
-        }
-
         $this->parseConfig();
 
-        if ($this->contentPermission < READ_ACCESS) {
-            return false;
-        }
-
-        $this->setBlock($templateHandle, 'forum', 'forum_block');
-        $this->setBlock($templateHandle, 'forum_post', 'forum_post_block');
+        $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
+        $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
+        $this->setBlock('source_folder_exists', 'forum', 'forum_block');
+        $this->setBlock('source_folder_exists', 'forum_post', 'forum_post_block');
         $this->setBlock('forum', 'forum_reply', 'forum_reply_block');
 
         // Set up component name
@@ -93,81 +67,72 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
             )
         );
 
-        $this->setVar('forum_post_block', '');
-
-        if ($is_post_allowed) {
-            $this->parse('forum_post_block', 'forum_post');
-        }
-
-        /* Prevent multiple forum entries from other categories stacking up in the wrong place
-         * and initialise empty forum roll by default
-         */
-        $this->setVar("forum_block", '');
-
-        $forumHandler = new Forum();
-        $threadList   = $forumHandler->getRecentThreadList($this->source->getId(), $this->getConfig());
-
-        // Iterate
-        if (is_array($threadList)) {
-            $j           = 0;
-            $userHandler = new User();
-
-            foreach ($threadList as $thread) {
-                $user = array(
-                    'title'     => $thread['userTitle'],
-                    'firstname' => $thread['userFirstname'],
-                    'lastname'  => $thread['userLastname'],
-                );
-
-                $threadTime = new Alaress_Date_Format($thread['date'], 'Y-m-d H:i:s');
-
-                $this->setVar(
-                    array(
-                        'THREAD_ID'               => $thread['threadID'],
-                        'THREAD_USER'             => $userHandler->formatName($user),
-                        'THREAD_USER_ID'          => $thread['userID'],
-                        'THREAD_USER_EXTERNAL_ID' => $thread['synergy_id'],
-                        'THREAD_DATE'             => $threadTime->getRelativeTime(),
-                        'THREAD_TITLE'            => Scrub::text($thread['title']),
-                        'ON_OFF'                  => ++$j % 2 ? '' : 'dark',
-                    )
-                );
-
-                $this->setVar('forum_reply_block', '');
-
-                if ($is_post_allowed && ($thread['locked'] != 'true' || $this->contentPermission >= FULL_ACCESS)) {
-                    $this->parse('forum_reply_block', 'forum_reply');
-                }
-
-                $this->parse("forum_block", "forum", true);
-            }
+        if(!$this->isSourceRenderable()) {
+            return $this->renderSourceUnavailable();
         } else {
+            $this->setVar('source_folder_deleted_block', '');
+
+            $this->setVar('forum_post_block', '');
+
+            // don't show forums to parents if they not a direct member of group
+            // (Allow parents to read, but not post, if a child is in group)
+            $is_post_allowed = !$this->groupHandler->hasChildAccessOnly($this->getContext()->getId());
+            if (!$is_post_allowed && Cfg::get('restrict_parent_forum_access')) {
+                return false;
+            }
+
+            if ($is_post_allowed) {
+                $this->parse('forum_post_block', 'forum_post');
+            }
+
+            /* Prevent multiple forum entries from other categories stacking up in the wrong place
+             * and initialise empty forum roll by default
+             */
             $this->setVar("forum_block", '');
+
+            $forumHandler = new Forum();
+            $threadList = $forumHandler->getRecentThreadList($this->source->getId(), $this->getConfig());
+
+            // Iterate
+            if (is_array($threadList)) {
+                $j = 0;
+                $userHandler = new User();
+
+                foreach ($threadList as $thread) {
+                    $user = array(
+                        'title' => $thread['userTitle'],
+                        'firstname' => $thread['userFirstname'],
+                        'lastname' => $thread['userLastname'],
+                    );
+
+                    $threadTime = new Alaress_Date_Format($thread['date'], 'Y-m-d H:i:s');
+
+                    $this->setVar(
+                        array(
+                            'THREAD_ID' => $thread['threadID'],
+                            'THREAD_USER' => $userHandler->formatName($user),
+                            'THREAD_USER_ID' => $thread['userID'],
+                            'THREAD_USER_EXTERNAL_ID' => $thread['synergy_id'],
+                            'THREAD_DATE' => $threadTime->getRelativeTime(),
+                            'THREAD_TITLE' => Scrub::text($thread['title']),
+                            'ON_OFF' => ++$j % 2 ? '' : 'dark',
+                        )
+                    );
+
+                    $this->setVar('forum_reply_block', '');
+
+                    if ($is_post_allowed && ($thread['locked'] != 'true' || $this->contentPermission >= FULL_ACCESS)) {
+                        $this->parse('forum_reply_block', 'forum_reply');
+                    }
+
+                    $this->parse("forum_block", "forum", true);
+                }
+            } else {
+                $this->setVar("forum_block", '');
+            }
+            $this->parse('source_folder_exists_block','source_folder_exists');
         }
 
         return true;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Set category mapper
-     *
-     * @param null $categoryMapper
-     */
-    private function setCategoryMapper($categoryMapper)
-    {
-        $this->categoryMapper = $categoryMapper;
-    }
-
-    /**
-     * Get category mapper
-     *
-     * @return null
-     */
-    private function getCategoryMapper()
-    {
-        return $this->categoryMapper;
     }
 }

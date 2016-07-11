@@ -12,6 +12,11 @@ class Component_Homepage_Statistics_TopFilesController extends Component_Homepag
 
     private $files;
 
+    /**
+     * Prepares data for the render function. Business logic.
+     *
+     * @return bool Whether to continue on and attempt Component render
+     */
     public function execute()
     {
         $dateFilter = sprintf(
