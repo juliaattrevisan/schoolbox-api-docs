@@ -27,6 +27,16 @@
 
 		setupDeleteActions(config.deleteButton);
 
+		/* wtf
+		 */
+		$(config.element).on('change', 'select', function(event) {
+			$(config.element).validate().resetForm();
+		});
+
+		$(config.element).on('change', 'input', function(event) {
+			$(config.element).validate().resetForm();
+		});
+
 		/**
 		 * Initialise various configured params and determine a bunch
 		 * of ids and stuff that we'll probably use elsewhere
@@ -199,6 +209,7 @@
 					$('select[name=endPeriod]').val()
 				];
 
+				console.log(startDatetime, endDatetime);
 				for (var i = 0; i < startDatetime.length; i++) {
 					if (startDatetime[i] != endDatetime[i]) {
 						return true;
@@ -213,25 +224,28 @@
 			$.validator.addMethod("validateDatetimesCorrect", function(value, element) {
 				var settings = {
 					dateFormat: 'DD/MM/YYYY h:mm a',
-					startDate: $('input[name=startDate]'),
-					startHour: $('input[name=startHour]'),
-					startMinute: $('input[name=startMinute]'),
-					startPeriod: $('select[name=startPeriod]'),
-					endDate: $('input[name=endDate]'),
-					endHour: $('input[name=endHour]'),
-					endMinute: $('input[name=endMinute]'),
-					endPeriod: $('select[name=endPeriod]')
+					startDate: $('input[name=startDate]').val(),
+					startHour: $('input[name=startHour]').val(),
+					startMinute: $('input[name=startMinute]').val(),
+					startPeriod: $('select[name=startPeriod]').val().toString().toLowerCase(),
+					endDate: $('input[name=endDate]').val(),
+					endHour: $('input[name=endHour]').val(),
+					endMinute: $('input[name=endMinute]').val(),
+					endPeriod: $('select[name=endPeriod]').val().toString().toLowerCase()
 				};
 
-				var start = settings.startDate.val() + ' ' + settings.startHour.val() + ':' + settings.startMinute.val() + ' ' + settings.startPeriod.val().toString().toLowerCase();
-				var end = settings.endDate.val() + ' ' + settings.endHour.val() + ':' + settings.endMinute.val() + ' ' + settings.endPeriod.val().toString().toLowerCase();
+				var start = settings.startDate + ' ' + settings.startHour + ':' + settings.startMinute + ' ' + settings.startPeriod;
+				var end = settings.endDate + ' ' + settings.endHour + ':' + settings.endMinute + ' ' + settings.endPeriod;
 
 				var startDatetime = moment(start, settings.dateFormat);
 				var endDatetime   = moment(end, settings.dateFormat);
 
+				console.log(start, ' -- ', end, endDatetime.valueOf() - startDatetime.valueOf());
+
 				/* If both dates are valid and end date occurs before start
 				 */
 				if (startDatetime.isValid() && endDatetime.isValid()) {
+					console.log('is ok');
 					return endDatetime.valueOf() > startDatetime.valueOf();
 				}
 
