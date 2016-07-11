@@ -169,6 +169,9 @@ class External_Humanedge_User implements External_UserInterface
         if (empty($synergyIds)) {
             return [];
         }
+
+        $idString = implode(',', array_map([$this->getDatabase(), 'smartQuote'], $synergyIds));
+
         $query = "
             SELECT
                 s.Code AS StudentID,
@@ -177,10 +180,10 @@ class External_Humanedge_User implements External_UserInterface
             FROM Contact c
             INNER JOIN StudentContact sc ON c.ID = sc.ContactID
             INNER JOIN Student s ON sc.StudentID = s.ID
-            WHERE s.Code IN (%s)
+            WHERE s.Code IN ($idString)
             AND {$this->studentContactFilter}
         ";
-        $query  = sprintf($query, implode(',', array_map([$this->getDatabase(), 'smartQuote'], $synergyIds)));
+
         $result = [];
         foreach ($this->getDatabase()->getAll($query) as $row) {
             $result[$row['StudentID'].'-'.$row['ContactID']] = $row['Email'];
