@@ -23,7 +23,9 @@
         </div>
     </div>
     <nav>
+        {% if hasMatchModify %}
         <a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: match.id}) }}" class="icon-modify" title="Modify"></a>
+        {% endif %}
     </nav>
 </div>
 
@@ -87,11 +89,13 @@
 </div>
 
 {% if not hasResult %}
-<div class="row">
-    <div class="small-12 columns">
-        {% include '@sportsfixturesMatch/fragment/noResult.twig' %}
+    {% if hasMatchModify %}
+    <div class="row">
+        <div class="small-12 columns">
+            {% include '@sportsfixturesMatch/fragment/noResult.twig' %}
+        </div>
     </div>
-</div>
+    {% endif %}
 {% endif %}
 
 
