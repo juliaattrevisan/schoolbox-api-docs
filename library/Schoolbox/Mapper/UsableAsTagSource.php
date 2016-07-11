@@ -33,7 +33,24 @@ interface UsableAsTagSource
      * @param string $keyword Search string
      * @param int    $offset  Number of results to offset result by
      * @param int    $limit   Max number of results to retrieve
-     * @return Collection
+     * @return Collection|object[] A collection of objects.
      */
     public function findForTag(User $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT);
+
+    /**
+     * Retrieve name of tag given the ID number, or null if it doesn't exist.
+     *
+     * @param mixed $id
+     * @return null|string
+     */
+    public function findNameById($id);
+
+    /**
+     * Retrieve tag for a name, optionally creating a new tag if it does not already exist.
+     *
+     * @param string $name
+     * @param bool $create
+     * @return null|object
+     */
+    public function findByName($name, $create = false);
 }
