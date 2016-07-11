@@ -43,6 +43,13 @@ class Weather
     private $condition = '';
 
     /**
+     * Temperature to display
+     *
+     * @var string
+     */
+    private $temp = '';
+
+    /**
      * Did we find any data?
      * 
      * @var bool
@@ -72,6 +79,7 @@ class Weather
 
         $this->setIcon($this->parseIcon($forecast));
         $this->setCondition($forecast['conditions']);
+        $this->setTemp($forecast['temp']['high']);
     }
 
     /**
@@ -234,5 +242,21 @@ class Weather
     private function setIcon($icon)
     {
         $this->icon = $icon;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemp()
+    {
+        return $this->temp;
+    }
+
+    /**
+     * @param string $temp
+     */
+    private function setTemp($temp)
+    {
+        $this->temp = $temp;
     }
 }
