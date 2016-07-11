@@ -26,6 +26,11 @@ class Metadata
     /**
      * @var Collection
      */
+    private $coaches;
+
+    /**
+     * @var Collection
+     */
     private $positions;
 
     /**
@@ -45,6 +50,7 @@ class Metadata
     public function __construct(Match $match)
     {
         $this->setPlayers(new Collection());
+        $this->setCoaches(new Collection());
         $this->setPositions(new Collection());
         $this->setTeamUserMapper(TeamUserMapper::getInstance());
         $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
@@ -66,6 +72,9 @@ class Metadata
     private function collectForTeam(Team $team)
     {
         if ($team->getId()) {
+
+            /* Get a list of Players currently in the Team
+             */
             $this->getPlayers()->setOffset($team->getId(), new Collection());
 
             $allPlayers = $this->getTeamUserMapper()->findByColumn('team_id', $team->getId(), ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]);
@@ -74,12 +83,30 @@ class Metadata
                 $this->getPlayers()->getOffset($team->getId())->add($currentPlayer->getUser());
             }
 
+            /* Get all Positions used in a Team and arrange them
+             * for each Player, where applicable
+             */
             $this->getPositions()->setOffset($team->getId(), new Collection());
 
             $allPositions = $this->getTeamPositionMapper()->findByColumn('team_id', $team->getId(), ['order' => ['user_id' => 'asc']]);
 
             foreach ($allPositions as $currentPosition) {
                 $this->getPositions()->getOffset($team->getId())->setOffset($currentPosition->getUser()->getId(), $currentPosition);
+            }
+
+            /* Collect Coaches
+             */
+            $this->getCoaches()->setOffset($team->getId(), new Collection());
+
+            /* TODO: Extract actual Coaches
+             */
+            $userMapper = new \Schoolbox\UserMapper();
+            $allCoaches = [];
+            $allCoaches[] = $userMapper->findById(19);
+            $allCoaches[] = $userMapper->findById(3);
+
+            foreach ($allCoaches as $currentCoach) {
+                $this->getCoaches()->getOffset($team->getId())->add($currentCoach);
             }
         }
     }
@@ -101,6 +128,22 @@ class Metadata
     private function setPlayers($players)
     {
         $this->players = $players;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getCoaches()
+    {
+        return $this->coaches;
+    }
+
+    /**
+     * @param Collection $coaches
+     */
+    private function setCoaches($coaches)
+    {
+        $this->coaches = $coaches;
     }
 
     /**
