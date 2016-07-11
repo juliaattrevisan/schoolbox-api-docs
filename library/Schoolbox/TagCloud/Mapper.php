@@ -15,7 +15,7 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\User;
 use Schoolbox\Collection;
 
-class Mapper extends BaseMapper
+class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
 {
 
     const SCHOOL_PREFIX = 'school:';
@@ -152,5 +152,17 @@ class Mapper extends BaseMapper
                 return null;
             }
         }
+    }
+
+    /**
+     * @param User $user
+     * @param string $keyword
+     * @param int $offset
+     * @param int $limit
+     * @return Collection|Model[]
+     */
+    public function findForTag(User $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT)
+    {
+        return $this->getTagLike($keyword)->slice($offset, $limit);
     }
 }
