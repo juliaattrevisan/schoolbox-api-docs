@@ -13,6 +13,9 @@ use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\Config\ConfigMapper;
+use \Schoolbox\User;
+use \Schoolbox\Permission\Access\UserAccess;
+use \Schoolbox\Permission\Access\UserAccessMapper;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
@@ -290,22 +293,65 @@ class Controller extends AbstractController
         /** @var Match $match */
         $forecast = new MatchWeather($match);
 
+        /* Determine whether you've got write access or not
+         * when viewing this page
+         */
+        $hasMatchModify = $this->hasMatchModify();
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@sportsfixturesResult/team.twig',
                 [
-                    'sport'        => $sport,
-                    'division'     => $division,
-                    'match'        => $match,
-                    'schoolMapper' => $this->getSchoolTagCloudMapper(),
-                    'team'         => $team,
-                    'teamMetadata' => $teamMetadata,
-                    'result'       => $context,
-                    'googleApiKey' => $this->getConfigLoader()->get('googleapps_api_key'),
-                    'forecast'     => $forecast,
+                    'sport'          => $sport,
+                    'division'       => $division,
+                    'match'          => $match,
+                    'schoolMapper'   => $this->getSchoolTagCloudMapper(),
+                    'team'           => $team,
+                    'teamMetadata'   => $teamMetadata,
+                    'result'         => $context,
+                    'googleApiKey'   => $this->getConfigLoader()->get('googleapps_api_key'),
+                    'forecast'       => $forecast,
+                    'hasMatchModify' => $hasMatchModify
                 ]
             )
         );
+    }
+
+    /**
+     * Determine whether the logged-in user has write access
+     * to this Match page
+     *
+     * @return bool
+     */
+    private function hasMatchModify()
+    {
+        /** @var User $sessionUser */
+        $sessionUser = $_SESSION['user'];
+
+        /* Skip all other checks if you're superuser
+         */
+        if ($sessionUser->isSuperuser()) {
+            return true;
+        }
+
+        /* Otherwise continue checking against service assignations
+         * If you're a Sports Admin, also return true
+         */
+        $allUserAccess = UserAccessMapper::getInstance()->findUsersForService(
+            UserAccess::SERVICE_SPORTS_ADMINISTRATOR,
+            0,
+            UserAccess::ACCESS_WRITE
+        );
+
+        foreach($allUserAccess as $currentUserAccess) {
+            if ($currentUserAccess->getId() == $sessionUser->getId()) {
+                return true;
+            }
+        }
+
+        /* Nobody else can write/modify anything on the Match Result page
+         */
+        return false;
     }
 
     /**
