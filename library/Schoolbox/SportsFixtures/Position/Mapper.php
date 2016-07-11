@@ -56,7 +56,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
             LIMIT :limit OFFSET :offset
         ";
         $statement = $this->getDatabase()->prepare($query);
-        $statement->bindValue('search', $this->getDatabase()->quoteForLike($keyword).'%', \PDO::PARAM_STR);
+        $statement->bindValue('search', '%'.$this->getDatabase()->quoteForLike($keyword).'%', \PDO::PARAM_STR);
         $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
         $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
         $statement->execute();
