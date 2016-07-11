@@ -305,7 +305,7 @@ foreach ($userList as $user) {
     }
 }
 
-if (count($userList) > 1) {
+if ($numTimetables > 1) {
     $this->setVar(array(
         'NUM_PEOPLE_CLASS' => ''
     ));
