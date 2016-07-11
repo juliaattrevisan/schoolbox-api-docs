@@ -464,8 +464,24 @@
 .icon-eye:before {
 	content: "\e675";
 }
-.icon-weather:before {
-	content: "\e676";
+.icon-weather:before,
+.icon-mostly-cloudy:before{
+	content: "\e906";
+}
+.icon-thunder:before,
+.icon-storm:before{
+	content: "\e909";
+}
+.icon-rain:before {
+	content: "\e90a";
+}
+.icon-cloud:before,
+.icon-cloudy:before {
+	content: "\e907";
+}
+.icon-clear:before,
+.icon-sunny:before{
+	content: "\e908";
 }
 .icon-week-view:before {
 	content: "\e677";
