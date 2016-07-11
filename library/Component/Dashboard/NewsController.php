@@ -1,4 +1,5 @@
 <?php
+use Schoolbox\News\TopicMapper;
 
 /**
  *
@@ -72,6 +73,12 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
 
             $groupedList = [];
             $groupedList['All'] = [];
+
+            $topicsOrdered = TopicMapper::getInstance()->findAll()->sortBy('sequence', 'asc');
+
+            foreach ($topicsOrdered as $topic) {
+                $groupedList[$topic->getName()] = [];
+            }
 
             foreach ($this->headlineList as $item) {
                 $groupedList[$item['topicName']][] = $item;
