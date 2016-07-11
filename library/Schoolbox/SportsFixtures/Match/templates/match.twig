@@ -36,15 +36,8 @@
             <li class="icon-team" title="{{ matchHeading.generate(match, schoolMapper) }}">{{ matchHeading.generate(match, schoolMapper) }}</li>
             {% endif %}
             <li class="icon-calendar" title="{{ match.startAt.local }}">{{ match.startAt.local }} ({{ match.startAt.relativeTime }})</li>
-            <li class="icon-location">
-                <a href="{{ matchMap.generate(match.venue, googleApiKey) }}" title="Get Directions">{{ match.venue.name }}</a>
+            <li class="icon-location"><a href="{{ matchMap.generate(match.venue, googleApiKey) }}" title="Get Directions">{{ match.venue.name }}</a></li>
 
-                {#{% if match.venue.address %}<br />#}
-                    {#{{ match.venue.address }}#}
-                {#{% endif %}#}
-            </li>
-
-            {# Needs to have icons for weather #}
             {% if forecast.hasResults %}
             <li class="{{ forecast.icon }}" title="{{ forecast.condition }}">{{ forecast.condition }}, {{ forecast.temp }}&deg;C</li>
             {% endif %}
