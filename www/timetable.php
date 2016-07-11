@@ -50,7 +50,6 @@ if ($_SESSION['user']->getRole()->isParent()) {
             //
             // Was a specific child ID requested? show them only, otherwise
             // show everyone.
-            $checked_campus_list = array();
             if (!$child_id || ($child_id == $child['id'])) {
                 $userList[] = $userMapper->findById($child['id']);
             }
