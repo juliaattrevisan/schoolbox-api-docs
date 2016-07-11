@@ -10,9 +10,15 @@
 
 namespace Schoolbox\Preview\Registry\Decoder;
 
+use Component_InstanceMapper;
+use Group;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\UserMapper;
 
 class TaskRedir extends Base {
 
@@ -54,10 +60,78 @@ class TaskRedir extends Base {
                     // Redirect to the link if there is one, otherwise redirect back to the
                     // homepage this is on.
                     default:
-                        if (!$task->getRequiresConfirmation()) {
-                            Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
-                                $task->getId(), $_SESSION['id']
+
+                        // Make sure the user is actually a student in the class (either via group/class list) before
+                        // we mark it as completed.
+
+                        /** @var UnitInstance $unit_instance */
+                        $unit_instance = UnitInstanceMapper::getInstance()->findById($task->getUnitInstance()->getId());
+
+                        /** @var \Component_Instance $component */
+                        $component_id   = $unit_instance->getComponent()->getId();
+                        $component_list = Component_InstanceMapper::getInstance()->findByInstanceId($component_id);
+                        $component      = $component_list[$component_id];
+
+                        $folder = FolderMapper::getInstance()->findById($component->getIdentifier());
+
+                        $classStudentIdList = array();
+                        $groupStudentIdList = array();
+
+                        // Get students by class code
+
+                        $config = new ConfigLoader();
+
+                        if ($config->get('external_enable')) {
+                            $codes = explode(",", $folder->getCodeString());
+
+                            foreach ($codes as $code) {
+                                $class_handler = new \External_Class();
+                                $classStudentList = $class_handler->getStudents($code);
+
+                                if (is_array($classStudentList)) {
+                                    $externalIdList = array_map(
+                                        function ($student) {
+                                            return $student['synergy_id'];
+                                        },
+                                        $classStudentList
+                                    );
+
+                                    $list = UserMapper::getInstance()
+                                        ->findByColumn('synergy_id', $externalIdList)
+                                        ->getColumnValues('id');
+
+                                    $classStudentIdList = array_merge($classStudentIdList, $list);
+                                }
+                            }
+                        }
+
+                        // Get by group involvement
+
+                        $group_handler = new Group();
+                        $groupStudentList = $group_handler->getMemberList($folder->getId());
+                        if (is_array($groupStudentList)) {
+                            $groupStudentIdList = array_unique(
+                                array_map(
+                                    function ($student) {
+                                        return $student['uid'];
+                                    },
+                                    $groupStudentList
+                                )
                             );
+                        }
+
+                        // Merge them together
+
+                        $userCollection = array_merge($classStudentIdList, $groupStudentIdList);
+
+                        // Only proceed to marking if the logged in user is actually in the list of users
+
+                        if (in_array($_SESSION["id"], $userCollection)) {
+                            if (!$task->getRequiresConfirmation()) {
+                                Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
+                                    $task->getId(), $_SESSION['id']
+                                );
+                            }
                         }
 
                         $link = $task->getLink();
@@ -66,22 +140,13 @@ class TaskRedir extends Base {
                             return $link;
                         }
                         else {
-                            // Check permissions
-                            /** @var UnitInstance $unit_instance */
-                            $unit_instance = UnitInstanceMapper::getInstance()->findById($task->getUnitInstance()->getId());
-                            // * Ensure that user is in this class
-                            /** @var \Component_Instance $component */
-                            $component_id   = $unit_instance->getComponent()->getId();
-                            $component_list = \Component_InstanceMapper::getInstance()->findByInstanceId($component_id);
-                            $component      = $component_list[$component_id];
-
                             return '/homepage/'.$component->getIdentifier().'/#component'.$component_id;
                         }
 
                         break;
                 }
             }
-            catch (\Schoolbox\Mapper\Exception $e) {
+            catch (MapperException $e) {
                 return '';
             }
         }
