@@ -101,8 +101,14 @@ class Metadata
             /* TODO: Extract actual Coaches
              */
             $userMapper = new \Schoolbox\UserMapper();
+
+            $anonymous = new \Schoolbox\User();
+            $anonymous->setFirstname('Joe');
+            $anonymous->setLastname('Anonymous');
+
             $allCoaches = [];
             $allCoaches[] = $userMapper->findById(19);
+            $allCoaches[] = $anonymous;
             $allCoaches[] = $userMapper->findById(3);
 
             foreach ($allCoaches as $currentCoach) {

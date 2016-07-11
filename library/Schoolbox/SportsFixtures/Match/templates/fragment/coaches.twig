@@ -4,16 +4,18 @@
         <ul class="information-list">
             {% for currentCoach in teamMetadata.coaches.offset(team.id) %}
                 <li>
+                    {% if currentCoach.id %}
                     <div class="card small-12">
-                        {% if currentCoach.id %}
                         <a href="/search/user/{{ currentCoach.id }}" title="View Profile">
                             <img src="/portrait.php?userId={{ currentCoach.externalId }}&size=square64" alt="View Profile" />
                             <p>{{ currentCoach.fullname }}</p>
                         </a>
-                        {% else %}
-                        <p>{{ currentCoach.fullname }}</p>
-                        {% endif %}
                     </div>
+                    {% else %}
+                    <div class="card small-12 compact">
+                        <span class="meta">{{ currentCoach.fullname }}</span>
+                    </div>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>
