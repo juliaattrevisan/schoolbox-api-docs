@@ -45,6 +45,7 @@ class Mapper extends BaseMapper
 
     /**
      * Find the oldest term known
+     * @return Model
      */
     public function findOldest()
     {

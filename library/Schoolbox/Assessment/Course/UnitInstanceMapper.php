@@ -140,20 +140,20 @@ class UnitInstanceMapper extends BaseMapper {
     }
 
     /**
-     * Find all the folders which use a Unit that was spawned from
-     * the original Course folder, $folder.
+     * Find all folders with unit instances derived from units
+     * which belong to the specified course.
      *
-     * Currently uses the beginning of $from and the end of $to as
-     * the date range, so you can get statistics across terms.
+     * Optionally filter by unit instances with due dates between
+     * $to and $from, so that you can get statistics specific to terms.
      *
-     * @param Folder $folder
+     * @param Folder $course
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
      * @return Collection
      * @throws BaseMapper\Exception
      */
     public function findAllFoldersUsingCourse(
-        Folder $folder,
+        Folder $course,
         Alaress_Date_Format $from = null,
         Alaress_Date_Format $to = null
     ) {
@@ -162,7 +162,7 @@ class UnitInstanceMapper extends BaseMapper {
 
         // Allow null dates in from/to
         $dateFilter = '';
-        $params     = ['folderId' => $folder->getId(),];
+        $params     = ['folderId' => $course->getId(),];
         if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
             $dateFilter      = $dateFilter . ' AND ui.due_date >= :from';
             $params['from']  = $from->getDatabaseDate();
@@ -203,12 +203,12 @@ class UnitInstanceMapper extends BaseMapper {
                 }
             }
             else {
-                $folder = $folderMapper->hydrate($row, 'c');
+                $course = $folderMapper->hydrate($row, 'c');
                 $code = $code_mapper->hydrate($row, 'cc');
                 if ($code->getCategory()->getId()) {
-                    $folder->addCode($code);
+                    $course->addCode($code);
                 }
-                $collection->add($folder);
+                $collection->add($course);
             }
         }
         return $collection;
@@ -667,6 +667,7 @@ class UnitInstanceMapper extends BaseMapper {
      * @param array               $folderIds An array of folderIds
      * @param Alaress_Date_Format $from
      * @param Alaress_Date_Format $to
+     * @deprecated As of 2016/07/08 this appears to not be used anywhere. Callers now use 'findForFolderDueBetween()'
      * @return Collection
      */
     public function findForFolderOpeningBetween($folderIds, Alaress_Date_Format $from, Alaress_Date_Format $to)
@@ -685,6 +686,45 @@ class UnitInstanceMapper extends BaseMapper {
             'from' => $from->getDatabase(),
             'to' => $to->getDatabase()
         ]);
+
+        return $this->hydrateList($statement, 'cui');
+    }
+
+    /**
+     * For particular folders, find all the unit instances which have
+     * open dates occurring between $from and $to
+     *
+     * @param array               $folderIds An array of folderIds
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
+     * @return Collection
+     */
+    public function findForFolderDueBetween($folderIds, Alaress_Date_Format $from, Alaress_Date_Format $to)
+    {
+        // Allow null dates in from/to
+        $dateFilter = '';
+        $params = BaseMapper\PredicateBuilder::getArrayParameters($folderIds, 'folderId');
+        $arrayPlaceholders = BaseMapper\PredicateBuilder::getArrayPlaceholders($folderIds, 'folderId');
+
+        if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
+            $dateFilter      = $dateFilter . ' AND cui.due_date >= :from';
+            $params['from']  = $from->getDatabaseDate();
+        }
+        if ($to instanceof Alaress_Date_Format && !$to->isNull()) {
+            $dateFilter    = $dateFilter . ' AND cui.due_date <= :to';
+            $params['to']  = $to->getDatabaseDate();
+        }
+
+        $query = "
+            SELECT {$this->getColumnString('cui')}
+            FROM {$this->getTable()} cui
+            WHERE category_id IN {$arrayPlaceholders}
+            $dateFilter
+            AND deleted_at IS NULL
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($params);
 
         return $this->hydrateList($statement, 'cui');
     }

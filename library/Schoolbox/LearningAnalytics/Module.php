@@ -15,12 +15,14 @@ use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
+use Schoolbox\Permission\Access\UserAccess;
 use Twig_Loader_Chain;
 
 use Group;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
@@ -114,7 +116,7 @@ class Module extends BaseModule
          */
         $group = new Group();
 
-        if ($group->getPermission($params['courseId']) < WRITE_ACCESS) {
+        if ($group->getPermission($params['courseId']) < UserAccess::ACCESS_WRITE) {
             error(6);
         }
 
@@ -140,10 +142,11 @@ class Module extends BaseModule
          */
         if (isset($params['term'])) {
             try {
+                /** @var TermModel $term */
                 $term = $termMapper->findOneByColumn('code', $params['term']);
 
                 $from = $term->getStart();
-                $to = $term->getActualFinish();
+                $to   = $term->getActualFinish();
             }
             catch (\Exception $e) {
                 throw new Exception('Invalid date range.');
@@ -153,7 +156,7 @@ class Module extends BaseModule
             $term = $termMapper->createModel();
 
             $from = $termMapper->findOldest()->getStart();
-            $to   = \Alaress_Date_Format::now();
+            $to   = new \Alaress_Date_NullDate();
         }
 
         $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $from, $to);
@@ -175,10 +178,10 @@ class Module extends BaseModule
                  */
                 $allCategoryIds = array_unique($allCategoryIds);
 
-                /* All the units associated with folders which used the same
-                 * $courseFolder as a source. Filter it based on $from and $to
+                /* All the unit instances associated with folders which used the same
+                 * $courseFolder as a source. Filter it based due dates between $from and $to
                  */
-                $allUnitInstances = $unitInstanceMapper->findForFolderOpeningBetween($allCategoryIds, $from, $to);
+                $allUnitInstances = $unitInstanceMapper->findForFolderDueBetween($allCategoryIds, $from, $to);
             }
             catch (Exception $e) {
                 error(159);
@@ -199,8 +202,6 @@ class Module extends BaseModule
             'allFoldersUsingCourse' => $allFoldersUsingCourse,
             'allUnitInstances' => $allUnitInstances,
             'term' => $term,
-//            'from' => $from,
-//            'to' => $to
         );
     }
 
@@ -217,7 +218,7 @@ class Module extends BaseModule
          */
         $group = new Group();
 
-        if ($group->getPermission($params['folderId']) < WRITE_ACCESS) {
+        if ($group->getPermission($params['folderId']) < UserAccess::ACCESS_WRITE) {
             error(6);
         }
 
@@ -243,10 +244,11 @@ class Module extends BaseModule
          */
         if (isset($params['term'])) {
             try {
+                /** @var TermModel $term */
                 $term = $termMapper->findOneByColumn('code', $params['term']);
 
                 $from = $term->getStart();
-                $to = $term->getActualFinish();
+                $to   = $term->getActualFinish();
             }
             catch (\Exception $e) {
                 throw new Exception('Invalid date range.');
@@ -256,7 +258,7 @@ class Module extends BaseModule
             $term = $termMapper->createModel();
 
             $from = $termMapper->findOldest()->getStart();
-            $to   = \Alaress_Date_Format::now();
+            $to   = new \Alaress_Date_NullDate();
         }
 
         $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $from, $to);
@@ -265,10 +267,10 @@ class Module extends BaseModule
          */
         try {
 
-            /* All the units associated with folders which used the same
-             * $courseFolder as a source. Filter it based on $from and $to
-             */
-            $allUnitInstances = $unitInstanceMapper->findForFolderOpeningBetween([$params['folderId']], $from, $to);
+            /* All the unit instances associated with the specified folder which used the same
+             * $courseFolder as a source. Filter it based due dates between $from and $to
+         */
+            $allUnitInstances = $unitInstanceMapper->findForFolderDueBetween([$params['folderId']], $from, $to);
         }
         catch (Exception $e) {
             error(159);
@@ -284,8 +286,6 @@ class Module extends BaseModule
             'allFoldersUsingCourse' => $allFoldersUsingCourse,
             'allUnitInstances' => $allUnitInstances,
             'term' => $term,
-//            'from' => $from,
-//            'to' => $to
         );
     }
 
