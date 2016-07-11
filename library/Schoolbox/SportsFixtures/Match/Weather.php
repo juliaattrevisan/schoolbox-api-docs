@@ -29,13 +29,6 @@ class Weather
     private $forecastLength = 6;
 
     /**
-     * Path to our icon generator
-     *
-     * @var string
-     */
-    private $iconPrefix = '/weather/image.php?path=';
-
-    /**
      * The icon to display
      *
      * @var string
@@ -89,7 +82,33 @@ class Weather
      */
     private function parseIcon($forecast)
     {
-        return $this->getIconPrefix() . parse_url($forecast['styles']['wxug_icon'], PHP_URL_PATH);
+        /* Map of conditions => icon
+         */
+        $map = [
+            'chanceflurries' => 'icon-rain',
+            'chancerain' => 'icon-rain',
+            'chancesleet' => 'icon-rain',
+            'chancesnow' => 'icon-rain',
+            'chancetstorms' => 'icon-storm',
+            'clear' => 'icon-clear',
+            'cloudy' => 'icon-cloudy',
+            'flurries' => 'icon-rain',
+            'fog' => 'icon-cloudy',
+            'hazy' => 'icon-cloudy',
+            'mostlycloudy' => 'icon-mostly-cloudy',
+            'mostlysunny' => 'icon-clear',
+            'partlycloudy' => 'icon-mostly-cloudy',
+            'partlysunny' => 'icon-clear',
+            'rain' => 'icon-rain',
+            'sleet' => 'icon-rain',
+            'snow' => 'icon-rain',
+            'sunny' => 'icon-clear',
+            'tstorms' => 'icon-storm',
+        ];
+
+        $key = $forecast['styles']['foreground'];
+
+        return $map[$key];
     }
 
     /**
@@ -100,7 +119,6 @@ class Weather
      */
     private function findWeather(Match $match)
     {
-        $forecastLength = 6;
         $forecast = [];
 
         $matchDayDiff = \Alaress_Date_Format::now()->diffInDays($match->getStartAt(), false);
@@ -113,7 +131,7 @@ class Weather
             /* Extract all the datums
              * Don't bother if the match day is too far into the future (6 days)
              */
-            if ($matchDayDiff < $forecastLength) {
+            if ($matchDayDiff < $this->getForecastLength()) {
                 $weatherController = new \Weather_Wunderground();
                 $weatherController->guessLocation($match->getVenue()->getLatLong());
                 $forecast = $weatherController->getForecast();
@@ -168,22 +186,6 @@ class Weather
     private function setForecastLength($forecastLength)
     {
         $this->forecastLength = $forecastLength;
-    }
-
-    /**
-     * @return string
-     */
-    private function getIconPrefix()
-    {
-        return $this->iconPrefix;
-    }
-
-    /**
-     * @param string $iconPrefix
-     */
-    private function setIconPrefix($iconPrefix)
-    {
-        $this->iconPrefix = $iconPrefix;
     }
 
     /**
