@@ -67,6 +67,9 @@
                 },
                 lastname: {
                     require_from_group: [1, '[data-relation="name"]']
+                },
+                'campus[]': {
+                    required: true
                 }
             },
             messages: {
@@ -77,10 +80,13 @@
                     require_from_group: "Please enter either a first name or surname"
                 },
                 defaultCampus: "Please select a default campus",
-                alt_email: "If you are entering an alternative email, please ensure it's a valid address"
+                alt_email: "If you are entering an alternative email, please ensure it's a valid address",
+                'campus[]': {
+                    required: 'Users must be involved in at least one Campus'
+                }
             },
             errorPlacement: function(error, element) {
-                if (element.is('[data-role="defaultCampus"]')) {
+                if (element.is('[data-role="defaultCampus"]') || 'campus[]' === element.attr('name')) {
                     error.css('margin', 0);
                     error.insertAfter(element.closest('[data-role="campusList"]'));
                 } else {

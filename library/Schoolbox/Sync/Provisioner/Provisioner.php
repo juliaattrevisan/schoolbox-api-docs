@@ -176,6 +176,7 @@ class Provisioner
 
                     } catch (MapperException $e) {
                         $internalUser = $this->userMapper->createModel();
+                        $internalUser->getRole()->setType($roleType);
                         $this->logger->debug("No existing user to retrieve: new user", $commonContext);
                         $action = 'create';
                     }
@@ -249,22 +250,23 @@ class Provisioner
 
                     $this->logger->log($level, $message, $context);
 
-                    try {
-                        $this->sanityCheck($internalUser);
-                        $this->logger->debug("User record passes sanity check", $commonContext);
+                    try{                        
+                        if(!$update){
+                            // Dry Run
+                            $this->sanityCheck($internalUser);
+                            $this->logger->debug("User record passes sanity check", $commonContext);
+                        }
+                        else {
+                            // Save includes pre-save sanity check
+                            $this->userMapper->save($internalUser);
+                            $this->logger->debug("User record passes sanity check", $commonContext);
+                            $this->logger->debug("User record saved", $commonContext);
+                        }
                     } catch (UnexpectedValueException $e) {
                         $this->logger->warning(sprintf("User record fails sanity check (%s): skipping", $e->getMessage()), array_merge($commonContext, [ 'error' => $e ]));
                         continue;
-                    }
-
-                    // And save
-                    if ($update) {
-                        try {
-                            $this->userMapper->save($internalUser);
-                            $this->logger->debug("User record saved", $commonContext);
-                        } catch (\Exception $e) {
-                            $this->logger->error("User record save failed!", array_merge($commonContext, [ 'error' => $e ]));
-                        }
+                    } catch (\Exception $e) {
+                        $this->logger->error("User record save failed!", array_merge($commonContext, [ 'error' => $e ]));
                     }
                 }
 
@@ -330,36 +332,18 @@ class Provisioner
      *
      * Throws validation exceptions if it isn't.
      *
-     * @todo consider moving to mapper object, and having it introspect mapper's properties for validation (logged as SB-10763)
-     *
      * @param User $internalUser
      * @throws UnexpectedValueException if a value isn't what it should be
      */
     protected function sanityCheck(User $internalUser)
     {
-        if ($internalUser->getUsername() === null || !strlen($internalUser->getUsername())) {
-            throw new UnexpectedValueException('Username cannot be null');
-        }
-        if (!$internalUser->getRole() instanceof Role) {
-            throw new UnexpectedValueException('User role cannot be null');
-        }
-        if ($internalUser->getCampusCollection()->count() < 1 ) {
-            throw new UnexpectedValueException('User must have at least one campus');
-        }
-        if ($internalUser->getFirstname() === null || !strlen($internalUser->getFirstname())) {
-            throw new UnexpectedValueException('Firstname cannot be null');
-        }
-        if ($internalUser->getLocalEmail() === null) {
-            throw new UnexpectedValueException('Local email flag cannot be null');
-        }
-        if ($internalUser->getWebmail() === null) {
-            throw new UnexpectedValueException('Webmail flag cannot be null');
-        }
-        if ($internalUser->getUseInternalMail() === null) {
-            throw new UnexpectedValueException('Use internal mail flag cannot be null');
-        }
-        if ($internalUser->getEportfolioEnable() === null) {
-            throw new UnexpectedValueException('Eportfolio enabled flag cannot be null');
-        }
+        $this->userMapper->verifyValidUsername($internalUser);
+        $this->userMapper->verifyValidRole($internalUser);
+        $this->userMapper->verifyHasCampus($internalUser);
+        $this->userMapper->verifyValidFirstName($internalUser);
+        $this->userMapper->verifyValidLocalEmail($internalUser);
+        $this->userMapper->verifyValidWebmail($internalUser);
+        $this->userMapper->verifyValidInternalMail($internalUser);
+        $this->userMapper->verifyValidEportfolioEnabled($internalUser);
     }
 }
