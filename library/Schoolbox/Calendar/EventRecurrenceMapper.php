@@ -18,7 +18,6 @@ use Schoolbox\Collection;
 use Schoolbox\Notif\NotifInterface;
 use Schoolbox\Notif\SilentNotif;
 use Traversable;
-use Alaress\Lumberjack\Logger;
 
 class EventRecurrenceMapper
 {
@@ -81,10 +80,13 @@ class EventRecurrenceMapper
             return array();
         }
 
+        /** @var Alaress_Date_Format $dateFirst */
         $dateFirst = $series->first()->getStartDateTime();
         $dateFirst->startOfDay();
+        /** @var Alaress_Date_Format $dateNext */
         $dateNext  = $series->next()->current()->getStartDateTime();
         $dateNext->startOfDay();
+        /** @var Alaress_Date_Format $dateLast */
         $dateLast  = $series->last()->getStartDateTime();
         $dateLast->startOfDay();
 
@@ -205,6 +207,7 @@ class EventRecurrenceMapper
                 $eventRelations->resetRelations($event);
 
                 if (!$event->getSeriesId()) {
+                    $this->raiseNotification($event, Schoolbox\Mapper::METHOD_UPDATE, $previous);
                     return;
                 }
 
