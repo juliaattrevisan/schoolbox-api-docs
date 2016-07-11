@@ -25,6 +25,8 @@ class Component_Config_TextboxSearch extends Component_Config_Abstract
     {
         $mapper = new Mapper();
 
+        $page->setBlock($key, 'is_linked', 'is_linked_block');
+
         try {
             $textbox   = $mapper->findById($configValue);
             $allUsages = $mapper->findComponentUsage($textbox);
@@ -49,5 +51,11 @@ class Component_Config_TextboxSearch extends Component_Config_Abstract
                 'EDIT_URL'               => "/homepage/{$textbox->getCategory()->getId()}/textBoxModify/{$componentId}#component{$componentId}",
             )
         );
+
+        if($componentId) {
+            $page->parse('is_linked_block', 'is_linked');
+        } else {
+            $page->setVar('is_linked_block', '');
+        }
     }
 }
