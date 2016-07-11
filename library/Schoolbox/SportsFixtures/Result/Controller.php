@@ -12,6 +12,7 @@ use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
+use \Schoolbox\Config\ConfigMapper;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
@@ -105,22 +106,28 @@ class Controller extends AbstractController
         /* If results already exist, modify it instead
          */
         try {
-            $entity = $this->getMapper()->findOneByColumnList([
-                'match_id' => $context->getId(),
-                'team_id' => $team->getId()
-            ]);
-        }
-        catch (MapperException $e) {
+            $entity = $this->getMapper()->findOneByColumnList(
+                [
+                    'match_id' => $context->getId(),
+                    'team_id'  => $team->getId()
+                ]
+            );
+        } catch (MapperException $e) {
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/create.twig', [
-            'sport'    => $sport,
-            'division' => $division,
-            'match'    => $context,
-            'team'     => $team,
-            'result'   => $entity,
-            'action'   => $entity->getId() ? 'Modify' : 'Create'
-        ]));
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@sportsfixturesResult/create.twig',
+                [
+                    'sport'    => $sport,
+                    'division' => $division,
+                    'match'    => $context,
+                    'team'     => $team,
+                    'result'   => $entity,
+                    'action'   => $entity->getId() ? 'Modify' : 'Create'
+                ]
+            )
+        );
     }
 
     /**
@@ -146,20 +153,30 @@ class Controller extends AbstractController
         try {
             $allResults = $this->getMapper()->findByColumn('match_id', $context->getId());
 
-            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/list.twig', [
-                'sport'      => $sport,
-                'division'   => $division,
-                'match'      => $context,
-                'allResults' => $allResults
-            ]));
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput(
+                    '@sportsfixturesResult/list.twig',
+                    [
+                        'sport'      => $sport,
+                        'division'   => $division,
+                        'match'      => $context,
+                        'allResults' => $allResults
+                    ]
+                )
+            );
         } catch (MapperException $e) {
 
             /* No Results for this Match?
              * Prompt to spawn one
              */
-            $this->getResponse()->redirect->to($this->getRouter()->generate('sportsfixturesResult.getCreateForm', [
-                'contextId' => $context->getId()
-            ]));
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate(
+                    'sportsfixturesResult.getCreateForm',
+                    [
+                        'contextId' => $context->getId()
+                    ]
+                )
+            );
         }
     }
 
@@ -191,12 +208,17 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/entity.twig', [
-            'sport'    => $sport,
-            'division' => $division,
-            'match'    => $match,
-            'result'   => $entity
-        ]));
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@sportsfixturesResult/entity.twig',
+                [
+                    'sport'    => $sport,
+                    'division' => $division,
+                    'match'    => $match,
+                    'result'   => $entity
+                ]
+            )
+        );
     }
 
     /**
@@ -262,15 +284,21 @@ class Controller extends AbstractController
             $match->setAwayTeam($facelessTeam);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/team.twig', [
-            'sport'        => $sport,
-            'division'     => $division,
-            'match'        => $match,
-            'schoolMapper' => $this->getSchoolTagCloudMapper(),
-            'team'         => $team,
-            'teamMetadata' => $teamMetadata,
-            'result'       => $context
-        ]));
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@sportsfixturesResult/team.twig',
+                [
+                    'sport'        => $sport,
+                    'division'     => $division,
+                    'match'        => $match,
+                    'schoolMapper' => $this->getSchoolTagCloudMapper(),
+                    'team'         => $team,
+                    'teamMetadata' => $teamMetadata,
+                    'result'       => $context,
+                    'googleApiKey' => $this->getConfigLoader()->get('googleapps_api_key')
+                ]
+            )
+        );
     }
 
     /**
@@ -315,10 +343,15 @@ class Controller extends AbstractController
 
         $this->saveResult($match, $team, $this->getRequest()->post['description'], $entity);
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesResult.getResultForTeam', [
-            'contextId' => $matchId,
-            'teamId' => $team->getId()
-        ]));
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'sportsfixturesResult.getResultForTeam',
+                [
+                    'contextId' => $matchId,
+                    'teamId'    => $team->getId()
+                ]
+            )
+        );
     }
 
     /**
@@ -377,7 +410,7 @@ class Controller extends AbstractController
     /**
      * @return MatchMapper
      */
-    public function getMatchMapper()
+    protected function getMatchMapper()
     {
         return $this->matchMapper;
     }
@@ -385,7 +418,7 @@ class Controller extends AbstractController
     /**
      * @param MatchMapper $matchMapper
      */
-    public function setMatchMapper($matchMapper)
+    protected function setMatchMapper($matchMapper)
     {
         $this->matchMapper = $matchMapper;
     }
@@ -393,7 +426,7 @@ class Controller extends AbstractController
     /**
      * @return TeamMapper
      */
-    public function getTeamMapper()
+    protected function getTeamMapper()
     {
         return $this->teamMapper;
     }
@@ -401,7 +434,7 @@ class Controller extends AbstractController
     /**
      * @param TeamMapper $teamMapper
      */
-    public function setTeamMapper($teamMapper)
+    protected function setTeamMapper($teamMapper)
     {
         $this->teamMapper = $teamMapper;
     }

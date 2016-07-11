@@ -1,1 +1,1 @@
-<iframe src="https://maps.google.com.au/maps?q={{ match.venue.latitude }},{{ match.venue.longitude }}&client=ubuntu&channel=cs&ie=UTF8&radius=15000&spn=0.006295,0.006295&t=h&output=embed" frameborder="0" width='100%' height='450' allowfullscreen="true"></iframe>
+<iframe src="{{ matchMap.generate(match.venue, googleApiKey) }}" frameborder="0" width='100%' height='450' allowfullscreen="true"></iframe>

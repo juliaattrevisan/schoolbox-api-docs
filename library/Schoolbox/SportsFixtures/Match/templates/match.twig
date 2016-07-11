@@ -1,4 +1,5 @@
 {% import '@sportsfixturesMatch/macro/matchHeading.twig' as matchHeading %}
+{% import '@sportsfixturesMatch/macro/matchMap.twig' as matchMap %}
 
 {% if match.result.offset(team.id) %}
     {% set hasResult = true %}
@@ -24,7 +25,13 @@
             <li class="icon-team" title="{{ matchHeading.generate(match, schoolMapper) }}">{{ matchHeading.generate(match, schoolMapper) }}</li>
             {% endif %}
             <li class="icon-calendar" title="{{ match.startAt.local }}">{{ match.startAt.local }} ({{ match.startAt.relativeTime }})</li>
-            <li class="icon-location">{{ match.venue.name }}{% if match.venue.address %}<br />{{ match.venue.address }}{% endif %}</li>
+            <li class="icon-location">
+                <a href="{{ matchMap.generate(match.venue, googleApiKey) }}" title="Get Directions">{{ match.venue.name }}</a>
+
+                {% if match.venue.address %}<br />
+                    {{ match.venue.address }}
+                {% endif %}
+            </li>
         </ul>
     </div>
 </div>
