@@ -95,7 +95,7 @@ class Internal extends Base {
      */
     private function isStorage(Uri $url)
     {
-        if ($url->getPath() == '/storage/fetch.php') {
+        if ($url->getPath() == '/storage/fetch.php' || $url->getPath() == '/storage/image.php') {
             $query = $url->getQueryAsArray();
             return $query['hash'];
         }
