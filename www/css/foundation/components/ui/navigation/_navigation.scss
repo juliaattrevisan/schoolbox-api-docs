@@ -108,6 +108,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	.logo {
 		width: 5rem;
 		height: 5rem;
+		float: left;
 		@media #{$mediumwide-up} {
 			display: none !important;
 		}
@@ -129,11 +130,15 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	.tab-bar {
 		position: inherit;
 	}
+	.tab-bar-section{
+		width: 100%;
+		position: relative;
+	}
 	#search {
 		margin: 0;
 		position: absolute;
 		right: $tabbar-height;
-		height: 0;
+		top: 0;
 		padding-left: $tabbar-height;
 		@include placeholder-color(transparent, $font-weight-normal);
 		input[type="text"]{
@@ -196,12 +201,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		&:hover, &.focus{
 			padding-left: 0;
 		}
-	}
-
-	.tab-bar-section {
-		position: relative;
-		left: 0;
-		right: 0;
 	}
 
 	.icon-nav{
@@ -607,7 +606,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			padding-left: 5rem;
 		}
 	}
-	.tab-bar-section.middle {
+	.tab-bar-section {
 		padding-left: 5rem;
 	}
 }
