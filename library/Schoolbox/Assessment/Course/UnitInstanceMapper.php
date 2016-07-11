@@ -703,7 +703,8 @@ class UnitInstanceMapper extends BaseMapper {
     {
         // Allow null dates in from/to
         $dateFilter = '';
-        $params     = ['folderIds' => implode(',', $folderIds)];
+        $params = BaseMapper\PredicateBuilder::getArrayParameters($folderIds, 'folderId');
+        $arrayPlaceholders = BaseMapper\PredicateBuilder::getArrayPlaceholders($folderIds, 'folderId');
 
         if ($from instanceof Alaress_Date_Format && !$from->isNull()) {
             $dateFilter      = $dateFilter . ' AND cui.due_date >= :from';
@@ -717,7 +718,7 @@ class UnitInstanceMapper extends BaseMapper {
         $query = "
             SELECT {$this->getColumnString('cui')}
             FROM {$this->getTable()} cui
-            WHERE category_id IN (:folderIds)
+            WHERE category_id IN {$arrayPlaceholders}
             $dateFilter
             AND deleted_at IS NULL
         ";
