@@ -11,6 +11,7 @@
 namespace Schoolbox\Resource\Browser;
 
 
+use Scrub;
 use SitePage;
 
 class NodeRenderer
@@ -113,7 +114,7 @@ class NodeRenderer
         );
         if ($currentNode) {
             $output = array(
-                'NODE_NAME' => htmlspecialchars($currentNode['name']),
+                'NODE_NAME' => Scrub::text($currentNode['name']),
                 'NODE_ID'   => $currentNode['categoryId'],
                 'NODE_LINK' => '/homepage/' . $currentNode['categoryId'],
             );
@@ -136,7 +137,7 @@ class NodeRenderer
             $this->getPage()->setVar(array(
                 'BREADCRUMB_CLASS'       => (count($allBreadcrumbs) - 1 == $j) ? 'last' : '',
                 'BREADCRUMB_CATEGORY_ID' => $currentBreadcrumb['categoryId'],
-                'BREADCRUMB_NAME'        => $currentBreadcrumb['name']
+                'BREADCRUMB_NAME'        => Scrub::text($currentBreadcrumb['name'])
             ));
 
             $this->getPage()->parse('breadcrumb_block', 'breadcrumb', true);
@@ -187,7 +188,7 @@ class NodeRenderer
         $this->getPage()->setVar(array(
             'NODE_FILE_ON_OFF' => $i % 2 ? '' : 'dark',
             'NODE_FILE_ID'     => $currentRecord['fileId'],
-            'NODE_FILE_NAME'   => $currentRecord['name'],
+            'NODE_FILE_NAME'   => Scrub::text($currentRecord['name']),
             'NODE_FILE_ICON'   => $currentRecord['icon'],
             'NODE_MIME_TYPE'   => $currentRecord['mime'],
             'NODE_FILE_SIZE'   => $currentRecord['size']
@@ -208,7 +209,7 @@ class NodeRenderer
         $this->getPage()->setVar(array(
             'NODE_CATEGORY_ON_OFF' => $i % 2 ? '' : 'dark',
             'NODE_CATEGORY_ID'     => $currentRecord['categoryId'],
-            'NODE_CATEGORY_NAME'   => $currentRecord['name'],
+            'NODE_CATEGORY_NAME'   => Scrub::text($currentRecord['name']),
             'NODE_CATEGORY_TYPE'   => $currentRecord['folderType'],
         ));
 
