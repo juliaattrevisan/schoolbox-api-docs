@@ -18,6 +18,25 @@ class External_Humanedge_User implements External_UserInterface
     private $database;
 
     /**
+     * The filter for a student's contacts - this filters out anyone who's not
+     * a primary guardian or parent.
+     *
+     * @var string
+     */
+    protected $studentContactFilter = "(
+        sc.ResidentialGuardian = 'Y' OR
+        sc.Relationship = 'Father' OR
+        sc.Relationship = 'Mother' OR
+        sc.Relationship = 'Stepfather' OR
+        sc.Relationship = 'Stepmother' OR
+        sc.Relationship = 'Step Father' OR
+        sc.Relationship = 'Step Mother' OR
+        sc.Relationship LIKE '%Guardian%' OR
+        sc.Relationship LIKE 'Foster%' OR
+        sc.Relationship = 'Carer'
+    )";
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -121,6 +140,7 @@ class External_Humanedge_User implements External_UserInterface
             -- LEFT JOIN Family f ON cf.FamilyID = f.ID
             LEFT JOIN vw_Contact_Addresses ca ON c.ID = ca.ContactID
             WHERE s.Code = {$this->getDatabase()->smartQuote($externalUserId)}
+            AND {$this->studentContactFilter}
         ";
         return $this->getDatabase()->getAll($query);
     }
@@ -149,6 +169,9 @@ class External_Humanedge_User implements External_UserInterface
         if (empty($synergyIds)) {
             return [];
         }
+
+        $idString = implode(',', array_map([$this->getDatabase(), 'smartQuote'], $synergyIds));
+
         $query = "
             SELECT
                 s.Code AS StudentID,
@@ -157,9 +180,10 @@ class External_Humanedge_User implements External_UserInterface
             FROM Contact c
             INNER JOIN StudentContact sc ON c.ID = sc.ContactID
             INNER JOIN Student s ON sc.StudentID = s.ID
-            WHERE c.Code IN (%s)
+            WHERE s.Code IN ($idString)
+            AND {$this->studentContactFilter}
         ";
-        $query  = sprintf($query, implode(',', array_map([$this->getDatabase(), 'smartQuote'], $synergyIds)));
+
         $result = [];
         foreach ($this->getDatabase()->getAll($query) as $row) {
             $result[$row['StudentID'].'-'.$row['ContactID']] = $row['Email'];
@@ -377,18 +401,7 @@ class External_Humanedge_User implements External_UserInterface
             LEFT JOIN StudentContact sc ON s.ID = sc.StudentID
             LEFT JOIN Contact c ON sc.ContactID = c.ID
             WHERE c.Code = {$this->getDatabase()->smartQuote($externalUserId)}
-            AND (
-                sc.ResidentialGuardian = 'Y' OR
-                sc.Relationship = 'Father' OR
-                sc.Relationship = 'Mother' OR
-                sc.Relationship = 'Stepfather' OR
-                sc.Relationship = 'Stepmother' OR
-                sc.Relationship = 'Step Father' OR
-                sc.Relationship = 'Step Mother' OR
-                sc.Relationship LIKE '%Guardian%' OR
-                sc.Relationship LIKE 'Foster%' OR
-                sc.Relationship = 'Carer'
-            )
+            AND {$this->studentContactFilter}
         ";
         return $this->getDatabase()->getAll($query);
     }
