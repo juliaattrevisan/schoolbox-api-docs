@@ -61,7 +61,7 @@
                         />
                         <label for="{{ inputId }}">
                             <span class=rb-description>
-                                {{- descriptor.text|raw -}}
+                                {{- descriptor.text|nl2br|raw -}}
                             </span>
                             {% if descriptor.value is not null %}
                             <span class="rb-value">
