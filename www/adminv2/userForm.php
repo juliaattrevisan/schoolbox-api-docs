@@ -90,10 +90,7 @@ elseif ($_POST['modusername']) {
     $user->setFirstname($_POST['firstname']);
     $user->setLastname($_POST['lastname']);
     $user->setExternalId($_POST['database_id'] == '' ? null : $_POST['database_id']);
-    $user->setLocalEmail($_POST['local_email']);
-    $user->setUseInternalMail($_POST['mail_handler']);
     $user->setAltEmail($_POST['alt_email']);
-    $user->setWebmail($_POST['webmail']);
     $user->getRole()->setId($_POST['group']);
     foreach ($_POST['campus'] as $campusId) {
         /** @var \Schoolbox\Campus $campus */
@@ -111,6 +108,9 @@ elseif ($_POST['modusername']) {
     $user->setEportfolioEnable(!empty($_POST['eportfolio']));
     $user->setHideContacts(!empty($_POST['hide_contacts']));
     $user->setHideTimetable(!empty($_POST['hide_timetable']));
+    $user->setLocalEmail(!empty($_POST['local_email']));
+    $user->setUseInternalMail(!empty($_POST['mail_handler']));
+    $user->setWebmail(!empty($_POST['webmail']));
     $user->getSchoolHouse()->setId($_POST['house']);
     $user->getResidentialHouse()->setId($_POST['residential_house']);
     $user->setEnabled(isset($_POST['account_enabled']) ? $_POST['account_enabled'] : true);
