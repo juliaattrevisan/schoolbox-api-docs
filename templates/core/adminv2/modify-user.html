@@ -86,7 +86,6 @@
                 }
             },
             errorPlacement: function(error, element) {
-                console.log(element.attr('name'));
                 if (element.is('[data-role="defaultCampus"]') || 'campus[]' === element.attr('name')) {
                     error.css('margin', 0);
                     error.insertAfter(element.closest('[data-role="campusList"]'));
