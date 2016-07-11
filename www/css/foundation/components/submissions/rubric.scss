@@ -289,3 +289,14 @@ table.rb {
     }
 
 }
+
+
+
+@media print {
+    .rb-selected p,
+    .rb-selected aside{
+        font-size: 1rem;
+        font-weight: bold;
+        font-style: italic;
+    }
+}
