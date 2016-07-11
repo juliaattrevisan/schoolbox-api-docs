@@ -152,11 +152,6 @@ abstract class Evaluation_Question_Category_List
                     $selected = '';
                 }
 
-                if ($currentCategory['parent_id'] == '#')
-                    $this->getPage()->setVar('item_count_block', '');
-                else
-                    $this->getPage()->parse('item_count_block', 'item_count');
-
                 $this->getPage()->setVar(array(
                     'CATEGORY_LIST_ITEM_NODE' => 'node_' . $currentCategory['question_category_id'],
                     'CATEGORY_LIST_ITEM_ASSESS_ID' => $this->getSelectedAssess(),
@@ -165,6 +160,11 @@ abstract class Evaluation_Question_Category_List
                     'CATEGORY_LIST_ITEM_NUMQUESTIONS' => $currentCategory['numQuestions'],
                     'CATEGORY_LIST_ITEM_SELECTED' => $selected,
                 ));
+
+                if ($currentCategory['parent_id'] == '#')
+                    $this->getPage()->setVar('item_count_block', '');
+                else
+                    $this->getPage()->parse('item_count_block', 'item_count');
 
                 $this->getPage()->parse('category_list_item_block', 'category_list_item', true);
 
