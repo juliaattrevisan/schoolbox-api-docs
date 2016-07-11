@@ -47,7 +47,7 @@ class Component_Config_Src extends Component_Config_Abstract
                 $folder       = $folderMapper->findById($configValue);
                 $vars         = array(
                     'COMPONENT_CONFIG_SRC_ID'   => '/homepage/' . $folder->getId(),
-                    'COMPONENT_CONFIG_SRC_NAME' => $folder->getName(),
+                    'COMPONENT_CONFIG_SRC_NAME' => Scrub::text($folder->getName()),
                     'COMPONENT_CONFIG_SRC_CID'  => $folder->getId()
                 );
             } catch (\Exception $e) {
