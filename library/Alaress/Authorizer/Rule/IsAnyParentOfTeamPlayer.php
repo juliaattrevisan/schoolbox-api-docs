@@ -1,0 +1,102 @@
+<?php
+/**
+ * IsAnyParentOfUsers
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Alaress\Authorizer\Rule;
+
+use External_UserInterface;
+use Schoolbox\User;
+use Alaress\Authorizer\Failure\Base;
+use Alaress\Authorizer\Failure\Unauthorized;
+use \Schoolbox\SportsFixtures\Team\Metadata;
+
+class IsAnyParentOfTeamPlayer implements IAuthorizationRule
+{
+    /**
+     * The array key in $params that contains the user ID.
+     *
+     * @var string
+     */
+    protected $paramsKey = 'id';
+
+    /**
+     * The external user interface
+     *
+     * @var External_UserInterface
+     */
+    protected $externalDb;
+
+    /**
+     * IsAnyParentOfUsers constructor.
+     *
+     * @param External_UserInterface $externalDb
+     */
+    public function __construct(External_UserInterface $externalDb)
+    {
+        $this->setExternalDb($externalDb);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function authorize(array $params = array(), User $user = null)
+    {
+        /* Players in the Team specified
+         */
+        $teamMetadata = new Metadata($params['context']);
+
+        $allPlayers = $teamMetadata->getPlayers()->getOffset($params['teamId']);
+
+        $playerIds = [];
+
+        /** @var User $currentPlayer */
+        foreach ($allPlayers as $currentPlayer) {
+            $playerIds[] = $currentPlayer->getExternalId();
+        }
+
+        /* The children belonging to the Parent currently logged in
+         */
+        $externalChildren = $this->getExternalDb()->getEnrolledStudents($user->getExternalId()) ? : [];
+        $externalChildIds = [];
+
+        foreach ($externalChildren as $externalChild) {
+            $externalChildIds[] = $externalChild['RelatedID'];
+        }
+
+        /* Players who are in the Team currently being viewed
+         * and also in the Parent's external children list
+         */
+        $children = array_intersect($playerIds, $externalChildIds);
+
+        if (count($children)) {
+            return true;
+        }
+
+        throw new Unauthorized();
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return External_UserInterface
+     */
+    private function getExternalDb()
+    {
+        return $this->externalDb;
+    }
+
+    /**
+     * @param External_UserInterface $externalDb
+     */
+    private function setExternalDb($externalDb)
+    {
+        $this->externalDb = $externalDb;
+    }
+}

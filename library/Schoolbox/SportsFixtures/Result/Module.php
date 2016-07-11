@@ -12,16 +12,27 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use External_UserInterface;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 
 class Module extends RestfulModule
 {
     use StandardModuleTrait;
+
+    /**
+     * Dependency on external user database.
+     *
+     * Required for checking that the requesting user is the student's parent.
+     *
+     * @var External_UserInterface
+     */
+    protected $externalDb;
 
     /**
      * @param ContainerInterface $injector
@@ -39,20 +50,26 @@ class Module extends RestfulModule
      */
     public function initRoutePermissions(Authorizer $authorizer) {
 
-        /* Permissions requirements for being a Sports Administrator
+        /* Superusers can see this
+         * Sports Admin can see this
+         * All Staff and Students can see this
+         * Parents of a Player in the Team can see this
          */
-        $isSportsAdministrator = new Rule\All(
+        $canView = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
-                new Rule\HasServicePermission(UserAccess::SERVICE_SPORTS_ADMINISTRATOR, UserAccess::ACCESS_WRITE)
+                new Rule\HasServicePermission(UserAccess::SERVICE_SPORTS_ADMINISTRATOR, UserAccess::ACCESS_WRITE),
+                new Rule\HasRole(Role::STUDENT),
+                new Rule\HasRole(Role::STAFF),
+                new Rule\IsAnyParentOfTeamPlayer(new \External_User())
             )
         );
 
         /* Apply route permissions here as you add them to initRoutes()
          * Note that if the perms change you need to log out/log in to refresh
          */
-        $this->addRoutePermission($authorizer, '.*', $isSportsAdministrator);
+        $this->addRoutePermission($authorizer, 'getResultForTeam', $canView);
     }
 
     /**
