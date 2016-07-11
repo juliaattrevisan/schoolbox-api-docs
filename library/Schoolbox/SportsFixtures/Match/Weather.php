@@ -26,7 +26,7 @@ class Weather
      *
      * @var int
      */
-    private $forecastLength = 6;
+    private $forecastLength = 10;
 
     /**
      * The icon to display
@@ -135,7 +135,7 @@ class Weather
         if ($matchDayDiff > 0) {
 
             /* Extract all the datums
-             * Don't bother if the match day is too far into the future (6 days)
+             * Don't bother if the match day is too far into the future (10 days)
              */
             if ($matchDayDiff < $this->getForecastLength()) {
                 $weatherController = new \Weather_Wunderground();
