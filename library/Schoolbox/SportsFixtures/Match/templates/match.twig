@@ -32,6 +32,13 @@
                     {#{{ match.venue.address }}#}
                 {#{% endif %}#}
             </li>
+
+            {# Needs to have icons for weather #}
+            {% if forecast.hasResults %}
+            <li>
+                <img src="{{ forecast.icon }}" title="{{ forecast.condition }}" width="16" height="16" /> {{ forecast.condition }}
+            </li>
+            {% endif %}
         </ul>
     </div>
 </div>

@@ -17,6 +17,7 @@ use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
+use \Schoolbox\SportsFixtures\Match\Weather as MatchWeather;
 use \Schoolbox\SportsFixtures\Result\Model as Result;
 use \Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
@@ -284,6 +285,11 @@ class Controller extends AbstractController
             $match->setAwayTeam($facelessTeam);
         }
 
+        /* Tell me the weather
+         */
+        /** @var Match $match */
+        $forecast = new MatchWeather($match);
+
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
                 '@sportsfixturesResult/team.twig',
@@ -295,7 +301,8 @@ class Controller extends AbstractController
                     'team'         => $team,
                     'teamMetadata' => $teamMetadata,
                     'result'       => $context,
-                    'googleApiKey' => $this->getConfigLoader()->get('googleapps_api_key')
+                    'googleApiKey' => $this->getConfigLoader()->get('googleapps_api_key'),
+                    'forecast'     => $forecast,
                 ]
             )
         );
