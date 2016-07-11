@@ -120,15 +120,13 @@ class Weather
     }
 
     /**
-     * Find the weather forecase for this particular day
+     * Find the weather forecast for this particular day
      *
      * @param Match $match
      * @return array
      */
     private function findWeather(Match $match)
     {
-        $forecast = [];
-
         $matchDayDiff = \Alaress_Date_Format::now()->diffInDays($match->getStartAt(), false);
         $matchDay = $match->getStartAt()->getDatabaseDate();
 
@@ -152,13 +150,14 @@ class Weather
 
                     if ($adf->getDatabaseDate() == $matchDay) {
                         $this->setHasResults(true);
+
                         return $currentForecast;
                     }
                 }
             }
         }
 
-        return $forecast;
+        return [];
     }
 
     /* Getters/Setters
