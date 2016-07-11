@@ -348,6 +348,7 @@ $container-bg: white !default;
 	[class*=" icon-"]{
 		@extend .icon-32;
 		color: $aluminum;
+		&:before{ padding: 0; }
 	}
 
 	p,a{
