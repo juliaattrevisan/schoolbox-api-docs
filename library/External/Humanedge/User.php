@@ -157,7 +157,7 @@ class External_Humanedge_User implements External_UserInterface
             FROM Contact c
             INNER JOIN StudentContact sc ON c.ID = sc.ContactID
             INNER JOIN Student s ON sc.StudentID = s.ID
-            WHERE c.Code IN (%s)
+            WHERE s.Code IN (%s)
         ";
         $query  = sprintf($query, implode(',', array_map([$this->getDatabase(), 'smartQuote'], $synergyIds)));
         $result = [];
