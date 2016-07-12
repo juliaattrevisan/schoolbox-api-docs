@@ -31,28 +31,41 @@
             refreshEmptyStates();
         });
 
-        /* Submit asynchronously on change
+        /* Submit asynchronously on blur
          */
-        $('#allStatus').on('change', '[data-status]', function(event) {
+        $('#allStatus').on('blur', '[data-status]', function(event) {
             var element = $(this);
-            var statusId = element.attr('data-status');
 
-            var form = $('#allStatus').find('[data-status-form='+statusId+']');
-            var url = form.attr('action');
-
-            /* Status data
+            /* Only execute if there is data to send
              */
-            var data = {
-                name: element.val()
-            };
+            if (element.val()) {
+                var statusId = element.attr('data-status');
 
-            $.post(url, data, function(responseText) {
+                var form = $('#allStatus').find('[data-status-form='+statusId+']');
+                var url = form.attr('action');
 
-                /* If responseText has a length, assume it's the
-                 * id of the item just saved, otherwise assume error
+                /* Data package
                  */
-                console.log('submit the stuff: ' + responseText);
-            });
+                var data = {
+                    id: element.attr('data-status'),
+                    name: element.val()
+                };
+
+                $.post(url, data, function (newItem) {
+
+                    /* If responseText has a length, assume it's the
+                     * id of the item just saved, otherwise assume error
+                     */
+                    var parent = element.parents('[data-status-item]');
+
+                    /* Update all the controls and identifiers
+                     */
+                    parent.find('[data-status-form]').attr('data-status-form', newItem.id);
+                    parent.find('[data-delete]').attr('data-delete', newItem.id);
+                    parent.find('input[name=statusId]').val(newItem.id);
+                    element.attr('data-status', newItem.id);
+                });
+            }
         });
 
         /* Remove asynchronously upon confirm
@@ -128,7 +141,7 @@
                                 <section>
                                     <fieldset class="content">
                                         <div class="small-12 columns">
-                                            <input type="hidden" name="status" value="{{ currentStatus.id }}" />
+                                            <input type="hidden" name="statusId" value="{{ currentStatus.id }}" />
 
                                             <label>
                                                 <input type="text" name="name" value="{{ currentStatus.name }}" data-status="{{ currentStatus.id }}" />
@@ -160,7 +173,7 @@
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <input type="hidden" name="status" value="" />
+                            <input type="hidden" name="statusId" value="" />
 
                             <label>
                                 <input type="text" name="name" value="" data-status="" />

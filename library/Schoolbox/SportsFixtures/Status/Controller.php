@@ -88,6 +88,14 @@ class Controller extends AbstractController
     protected function persistEntity($entity)
     {
         $this->saveStatus($entity, $this->getRequest()->post['name']);
+
+        if ($this->getRequest()->isXhr()) {
+            $status = [
+                'id' => $entity->getId()
+            ];
+
+            $this->getResponse()->content->set($this->buildJsonOutput($status));
+        }
     }
 
     /**
