@@ -41,6 +41,10 @@
             var url = form.attr('action');
 
             $.post(url, {}, function(responseText) {
+
+                /* If responseText has a length, assume it's the
+                 * id of the item just saved, otherwise assume error
+                 */
                 console.log('submit the stuff: ' + responseText);
             });
         });
