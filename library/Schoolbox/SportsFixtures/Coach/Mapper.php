@@ -191,8 +191,14 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     public function findForTeam(Team\Model $team)
     {
         $query = "
-            {$this->getSelectString()}
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('user', 'u')},
+                {$this->getJoinColumnString('user.role', 'ur')}
+            FROM {$this->getTable()}
             INNER JOIN sportsfixtures_team_coach stc ON {$this->getTable()}.id = stc.sportsfixtures_coach_id
+            LEFT JOIN {$this->getJoinSql('user', '', 'u')}
+            LEFT JOIN {$this->getJoinSql('user.role', 'u', 'ur')}
             WHERE stc.sportsfixtures_team_id = :teamId
             ORDER BY name ASC
         ";

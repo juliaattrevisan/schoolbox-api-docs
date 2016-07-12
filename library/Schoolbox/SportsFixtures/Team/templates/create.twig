@@ -100,7 +100,7 @@
                             Coaches
                             <select type="text" data-role="userSelector" name="coach[]" multiple placeholder="Search Users">
                             {% for coach in team.coaches %}
-                                <option selected value="{{ coach.formatId }}">{{ coach.name }}</option>
+                                <option selected value="{{ coach.formatId }}">{{ coach.formatName }}</option>
                             {% endfor %}
                             </select>
                         </label>
