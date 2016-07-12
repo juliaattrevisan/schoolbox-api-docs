@@ -183,7 +183,9 @@ select {
 th, td{
 	input[type],
 	textarea,
-	select{
+	select,
+	input[type=radio]:not(.plain)+label.checkbox-label,
+	input[type=checkbox]:not(.plain)+label.checkbox-label {
 		margin: 0;
 	}
 }
