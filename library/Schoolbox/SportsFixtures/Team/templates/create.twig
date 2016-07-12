@@ -39,6 +39,20 @@
                         freeEntry[this.settings.valueField]  = 'newFromInput:'+input;
                         freeEntry[this.settings.searchField] = input;
                         return freeEntry;
+                    },
+                    render: {
+                        item: function (data, escape) {
+                            console.log(data);
+                            var klass = "item", title = '';
+                            if (!data.user.id) {
+                                // Not a SB user: put some icon there
+                                klass += ' icon-info';
+                                title = 'This user does not exist in Schoolbox.';
+                            }
+                            return '<div class="'+klass+'" title="'+title+'">'
+                                    + escape(data[this.settings.labelField])
+                                    + '</div>'
+                        }
                     }
                 },
                 value: $.selectizeSelector.getValueFromSelect(selector)
@@ -100,7 +114,7 @@
                             Coaches
                             <select type="text" data-role="userSelector" name="coach[]" multiple placeholder="Search Users">
                             {% for coach in team.coaches %}
-                                <option selected value="{{ coach.formatId }}">{{ coach.formatName }}</option>
+                                <option selected data-value-object="{{ coach|json_encode }}" value="{{ coach.formatId }}">{{ coach.formatName }}</option>
                             {% endfor %}
                             </select>
                         </label>

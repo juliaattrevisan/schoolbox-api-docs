@@ -16,6 +16,9 @@
      * Helper method for retrieving a selectize's value from its select box.
      * The selected options are pre-selected.
      *
+     * Also: if attribute `data-value-object` exists on the option, it's json
+     * parsed and it's set as the return value.
+     *
      * @param select
      * @param valueField
      * @param searchField
@@ -26,9 +29,14 @@
         searchField = searchField || 'name';
         return $(select).find(':selected')
             .map(function() {
-                var returnVal = {};
-                returnVal[valueField]  = $(this).val();
-                returnVal[searchField] = $(this).text();
+                var $this       = $(this),
+                    valueObject = $this.data('valueObject'),
+                    returnVal   = {};
+                if (typeof valueObject === 'object') {
+                    returnVal = valueObject;
+                }
+                returnVal[valueField]  = $this.val();
+                returnVal[searchField] = $this.text();
                 return returnVal;
             })
             .toArray();

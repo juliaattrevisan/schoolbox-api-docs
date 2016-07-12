@@ -133,6 +133,7 @@ class Model implements \JsonSerializable
         return [
             'id'   => $this->formatId(),
             'name' => $this->formatName(),
+            'user' => $this->getUser(),
         ];
     }
 }
