@@ -71,14 +71,7 @@
                     {% for currentStatus in allStatus %}
                         <li class="actions-small-1">
                             <div class="list-item">
-
-                                {% if currentStatus.id %}
-                                    {% set formUrl = routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) %}
-                                {% else %}
-                                    {% set formUrl = routeLookup('sportsfixturesStatus.createEntity') %}
-                                {% endif %}
-
-                                <form action="{{ formUrl }}" method="post" data-status-form="{{ currentStatus.id }}">
+                                <form action="{{ routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) }}" method="post" data-status-form="{{ currentStatus.id }}">
                                     <section>
                                         <fieldset class="content">
                                             <div class="small-12 columns">
