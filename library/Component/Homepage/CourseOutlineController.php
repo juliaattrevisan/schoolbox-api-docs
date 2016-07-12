@@ -85,11 +85,20 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 $this->accessList[$unitId] = \Schoolbox\Permission\Access\Access::getInstance()->getFolderAccess($_SESSION['user'], [ $unitId ]);
             }
 
-            $this->originalCourse = Folder\Mapper::getInstance()->findById(
-                Folder\Mapper::getInstance()->findCheaplyById(
-                    $this->unit_list[0]->getUnitCategory()->getId()
-                )->getParent()->getId()
-            );
+            // Try to get original course folder from each unit in course.
+            foreach ($this->unit_list as $unit) {
+                try {
+                    $this->originalCourse = Folder\Mapper::getInstance()->findById(
+                        Folder\Mapper::getInstance()->findCheaplyById($unit->getUnitCategory()->getId())
+                            ->getParent()->getId()
+                    );
+                    // I have a course folder, so:
+                    break;
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    // I don't have a course folder, so:
+                    continue;
+                }
+            }
 
             $classStudentIdList = array();
             $groupStudentIdList = array();
