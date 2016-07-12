@@ -18,9 +18,16 @@
         /* Spawn clone when trying to add new status
          */
         $('#allStatus').on('click', '[data-status-add]', function(event) {
+            var clone = $('#status-clone').clone();
+            clone.attr('id', '');
 
+            /* Append it to the list
+             */
+            $('#allStatus').find('[data-status-list]').append(clone);
         });
 
+        /* Submit asynchronously on change
+         */
         $('#allStatus').on('change', '[data-status]', function(event) {
             var element = $(this);
             var statusId = element.attr('data-status');
@@ -60,7 +67,7 @@
 
         {% if allStatus|length %}
             <section>
-                <ul class="action-list">
+                <ul class="action-list" data-status-list>
                     {% for currentStatus in allStatus %}
                         <li class="actions-small-1">
                             <div class="list-item">
@@ -103,7 +110,7 @@
 </div>
 
 <ul class="action-list hide">
-    <li class="actions-small-1" data-clone>
+    <li id='status-clone' class="actions-small-1">
         <div class="list-item">
             <form action="{{ routeLookup('sportsfixturesStatus.createEntity') }}" method="post" data-status-form="">
                 <section>
