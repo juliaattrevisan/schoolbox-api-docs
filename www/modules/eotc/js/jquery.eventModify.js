@@ -27,6 +27,20 @@
 
 		setupDeleteActions(config.deleteButton);
 
+		/* https://coderwall.com/p/zyrr2g/reset-jquery-form-validation-jquery-validate
+		 * but why...?
+		 */
+		$(config.element).on('change', 'select', function(event) {
+			$(config.element).validate().resetForm();
+		});
+
+		/* https://coderwall.com/p/zyrr2g/reset-jquery-form-validation-jquery-validate
+		 * but why...?
+		 */
+		$(config.element).on('change', 'input', function(event) {
+			$(config.element).validate().resetForm();
+		});
+
 		/**
 		 * Initialise various configured params and determine a bunch
 		 * of ids and stuff that we'll probably use elsewhere
@@ -213,18 +227,18 @@
 			$.validator.addMethod("validateDatetimesCorrect", function(value, element) {
 				var settings = {
 					dateFormat: 'DD/MM/YYYY h:mm a',
-					startDate: $('input[name=startDate]'),
-					startHour: $('input[name=startHour]'),
-					startMinute: $('input[name=startMinute]'),
-					startPeriod: $('select[name=startPeriod]'),
-					endDate: $('input[name=endDate]'),
-					endHour: $('input[name=endHour]'),
-					endMinute: $('input[name=endMinute]'),
-					endPeriod: $('select[name=endPeriod]')
+					startDate: $('input[name=startDate]').val(),
+					startHour: $('input[name=startHour]').val(),
+					startMinute: $('input[name=startMinute]').val(),
+					startPeriod: $('select[name=startPeriod]').val().toString().toLowerCase(),
+					endDate: $('input[name=endDate]').val(),
+					endHour: $('input[name=endHour]').val(),
+					endMinute: $('input[name=endMinute]').val(),
+					endPeriod: $('select[name=endPeriod]').val().toString().toLowerCase()
 				};
 
-				var start = settings.startDate.val() + ' ' + settings.startHour.val() + ':' + settings.startMinute.val() + ' ' + settings.startPeriod.val().toString().toLowerCase();
-				var end = settings.endDate.val() + ' ' + settings.endHour.val() + ':' + settings.endMinute.val() + ' ' + settings.endPeriod.val().toString().toLowerCase();
+				var start = settings.startDate + ' ' + settings.startHour + ':' + settings.startMinute + ' ' + settings.startPeriod;
+				var end = settings.endDate + ' ' + settings.endHour + ':' + settings.endMinute + ' ' + settings.endPeriod;
 
 				var startDatetime = moment(start, settings.dateFormat);
 				var endDatetime   = moment(end, settings.dateFormat);
