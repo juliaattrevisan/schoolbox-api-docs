@@ -30,6 +30,10 @@
              */
             $('#allStatus').find('[data-status-list]').append(clone);
 
+            /* Focus it, to save you needing to do it manually
+             */
+            $('#allStatus').find('input[name=name]').last().focus();
+
             refreshEmptyStates();
         }
 
