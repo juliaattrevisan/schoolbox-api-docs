@@ -14,6 +14,18 @@
                 }
             });
         });
+
+        $('#allStatus').on('change', '[data-status]', function(event) {
+            var element = $(this);
+            var statusId = element.attr('data-status');
+
+            var form = $('#allStatus').find('[data-status-form='+statusId+']');
+            var url = form.attr('action');
+
+            $.post(url, {}, function(responseText) {
+                console.log('submit the stuff: ' + responseText);
+            });
+        });
     });
 </script>
 <ul class="breadcrumb">
@@ -46,13 +58,29 @@
                     {% for currentStatus in allStatus %}
                         <li class="actions-small-1">
                             <div class="list-item">
-                                <div class="small-12 avatar card">
-                                    <p>{{ currentStatus.name }}</p>
-                                </div>
+
+                                {% if currentStatus.id %}
+                                    {% set formUrl = routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) %}
+                                {% else %}
+                                    {% set formUrl =  routeLookup('sportsfixturesStatus.createEntity') %}
+                                {% endif %}
+
+                                <form action="{{ formUrl }}" method="post" data-status-form="{{ currentStatus.id }}">
+                                    <section>
+                                        <fieldset class="content">
+                                            <div class="small-12 columns">
+                                                <input type="hidden" name="status" value="{{ currentStatus.id }}" />
+
+                                                <label>
+                                                    <input type="text" name="name" value="{{ currentStatus.name }}" data-status="{{ currentStatus.id }}" />
+                                                </label>
+                                            </div>
+                                        </fieldset>
+                                    </section>
+                                </form>
                             </div>
                             <nav>
                                 <a href="{{ routeLookup('sportsfixturesPosition.deleteEntity', {entityId: currentPosition.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentPosition.id }}"></a>
-                                <a href="{{ routeLookup('sportsfixturesPosition.getModifyForm', {entityId: currentPosition.id}) }}" class="icon-modify" title="Modify"></a>
                             </nav>
                         </li>
                     {% endfor %}
@@ -67,3 +95,5 @@
         {% endif %}
     </div>
 </div>
+
+

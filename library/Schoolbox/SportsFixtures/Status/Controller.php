@@ -45,7 +45,7 @@ class Controller extends AbstractController
             $allStatus = $this->mapper->findAll(
                 [
                     'order' => [
-                        'name' => 'asc'
+                        'created_at' => 'asc'
                     ]
                 ]
             );
