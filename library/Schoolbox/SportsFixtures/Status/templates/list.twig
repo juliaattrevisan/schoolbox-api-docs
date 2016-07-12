@@ -51,11 +51,11 @@
             /* Only execute if there is data to send
              */
             if (element.val()) {
-                var statusId = element.attr('data-item-element');
+                var identifier = element.attr('data-item-element');
 
                 /* Find destination route
                  */
-                var form = $('#allItems').find('[data-item-form='+statusId+']');
+                var form = $('#allItems').find('[data-item-form='+identifier+']');
                 var url = form.attr('data-action');
 
                 /* Data package
