@@ -161,7 +161,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
      * @param int $limit
      * @return Collection|Model[]
      */
-    public function findForTag(User $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT)
+    public function findForTag(User $user, $keyword, $offset = 0, $limit = 0)
     {
         return $this->getTagLike($keyword)->slice($offset, $limit);
     }

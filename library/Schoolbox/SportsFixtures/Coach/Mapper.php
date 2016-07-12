@@ -131,7 +131,7 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
      * @param int $limit
      * @return Collection|Model[]
      */
-    public function findForTag(UserModel $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT)
+    public function findForTag(UserModel $user, $keyword, $offset = 0, $limit = 0)
     {
         if (strlen($keyword) === 0) {
             return new Collection();
