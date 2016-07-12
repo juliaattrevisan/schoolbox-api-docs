@@ -40,7 +40,13 @@
             var form = $('#allStatus').find('[data-status-form='+statusId+']');
             var url = form.attr('action');
 
-            $.post(url, {}, function(responseText) {
+            /* Status data
+             */
+            var data = {
+                name: element.val()
+            };
+
+            $.post(url, data, function(responseText) {
 
                 /* If responseText has a length, assume it's the
                  * id of the item just saved, otherwise assume error
