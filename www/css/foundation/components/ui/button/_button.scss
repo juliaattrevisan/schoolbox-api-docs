@@ -79,6 +79,7 @@ a[disabled], a.disabled {
 		font-size: rem-calc($base-font-size - 3);
 		&:before {
 			margin-bottom: 0.25rem;
+			line-height: normal;
 		}
 	}
 }
@@ -161,11 +162,4 @@ ul.flex-list {
     button {
         width: 100%;
     }
-}
-
-/*
- * Hack for profile buttons on IE11/Win8.1
- */
-.button.fat:before, button.fat:before, input.fat[type="submit"]:before, a.fat.submit:before {
-	line-height: normal;
 }
