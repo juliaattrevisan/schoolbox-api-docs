@@ -79,6 +79,7 @@ a[disabled], a.disabled {
 		font-size: rem-calc($base-font-size - 3);
 		&:before {
 			margin-bottom: 0.25rem;
+			line-height: normal;
 		}
 	}
 }
