@@ -45,7 +45,7 @@
                 /* Find destination route
                  */
                 var form = $('#allStatus').find('[data-status-form='+statusId+']');
-                var url = form.attr('action');
+                var url = form.attr('data-action');
 
                 /* Data package
                  */
@@ -164,7 +164,7 @@
                 {% for currentStatus in allStatus %}
                     <li class="actions-small-1" data-status-item>
                         <div class="list-item">
-                            <form action="{{ routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) }}" method="post" data-status-form="{{ currentStatus.id }}">
+                            <div data-action="{{ routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) }}" data-status-form="{{ currentStatus.id }}">
                                 <section>
                                     <fieldset class="content">
                                         <div class="small-12 columns">
@@ -178,7 +178,7 @@
                                         </div>
                                     </fieldset>
                                 </section>
-                            </form>
+                            </div>
                         </div>
                         <nav>
                             <a href="{{ routeLookup('sportsfixturesStatus.deleteEntity', {entityId: currentStatus.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentStatus.id }}"></a>
@@ -198,7 +198,7 @@
 <ul class="action-list hide">
     <li id='status-clone' class="actions-small-1" data-status-item>
         <div class="list-item">
-            <form action="{{ routeLookup('sportsfixturesStatus.createEntity') }}" method="post" data-status-form="">
+            <div data-action="{{ routeLookup('sportsfixturesStatus.createEntity') }}" data-status-form="">
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
@@ -212,7 +212,7 @@
                         </div>
                     </fieldset>
                 </section>
-            </form>
+            </div>
         </div>
         <nav>
             <a href="" class="icon-delete" title="Delete" data-delete=""></a>
