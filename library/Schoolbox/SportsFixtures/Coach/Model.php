@@ -107,13 +107,20 @@ class Model implements \JsonSerializable
     /**
      * Formats the name of this model.
      *
-     * (If this model isn't saved yet, it returns the user's name.)
-     *
      * @return string
      */
     public function formatName()
     {
-        return $this->getName() ?: $this->getUser()->formatName();
+        if ($this->getUser()->getId()) {
+            // Format similarly to ajax user
+            $name = sprintf("%s - %s", $this->getUser()->formatName(), $this->getUser()->getRole()->getName());
+            if ($this->getUser()->getExternalId()) {
+                $name .= ' ('.$this->getUser()->getExternalId().')';
+            }
+            return $name;
+        } else {
+            return $this->getName();
+        }
     }
 
     /**
