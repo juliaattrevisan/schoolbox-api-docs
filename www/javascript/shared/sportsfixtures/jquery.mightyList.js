@@ -58,11 +58,24 @@
 
         /**
          * Spawn clone when trying to add new item
+         * If you already have an empty row, prompt to use it
          */
         function setupNewItems() {
             $(config.element).on('click', '[data-item-add]', function(event) {
-                spawnNewRow();
+                if (canSpawnRow()) {
+                    spawnNewRow();
+                }
+                else {
+                    $(config.element).find('input[name=name]').last().focus();
+                }
             });
+        }
+
+        /**
+         * Determine whether the last list item is empty
+         */
+        function canSpawnRow() {
+            return ($(config.element).find('input[name=name]').last().val() != '');
         }
 
         /**
@@ -123,7 +136,7 @@
                              * Spawn a new row automatically if there are no
                              * empty ones ready to utilise
                              */
-                            if ($(config.element).find('input[name=name]').last().val() != '') {
+                            if (canSpawnRow()) {
                                 spawnNewRow();
                             }
                         },
