@@ -185,7 +185,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      * @param int $now
      * @return int
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
     {
         $now = date('g:ia', $now ?: time());
 

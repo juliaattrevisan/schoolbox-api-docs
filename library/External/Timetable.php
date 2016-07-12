@@ -76,9 +76,10 @@ class External_Timetable implements External_TimetableInterface
      *
      * @param int|\Schoolbox\Campus $campus
      * @param Integer $now
+     * @param \Schoolbox\User $user     User we are getting the period for (only required by DF)
      * @return Integer
      */
-    function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
+    function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
     }

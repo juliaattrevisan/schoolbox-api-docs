@@ -59,7 +59,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         return 'Day ' . $dayNumber;
     }
 
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
     {
         return 0;
     }
