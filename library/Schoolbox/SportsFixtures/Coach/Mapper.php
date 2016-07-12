@@ -9,6 +9,7 @@ namespace Schoolbox\SportsFixtures\Coach;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Role;
 use Schoolbox\SportsFixtures\Team;
 use Schoolbox\UserMapper;
 use Schoolbox\User as UserModel;
@@ -64,6 +65,10 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
                 $user = $this->hydrateJoin($row, 'user', 'u');
                 if ($user instanceof UserModel) {
                     $model->setUser($user);
+                    $role = $this->hydrateJoin($row, 'user.role', 'ur');
+                    if ($role instanceof Role) {
+                        $user->setRole($role);
+                    }
                 }
             }
             $collection->add($model);
@@ -142,17 +147,22 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
         $selectPart = "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('user', 'u')}
+                {$this->getJoinColumnString('user', 'u')},
+                {$this->getJoinColumnString('user.role', 'ur')}
             FROM {$this->getTable()}
         ";
         $wherePart = "
             WHERE {$this->getTable()}.name LIKE :search
             OR    CONCAT(u.firstname, ' ', u.lastname) LIKE :search
         ";
+        $joinPart = "
+            JOIN {$this->getJoinSql('user', '', 'u')}
+            LEFT JOIN {$this->getJoinSql('user.role', 'u', 'ur')}
+        ";
         $query = "
-            ($selectPart LEFT JOIN {$this->getJoinSql('user', '', 'u')} $wherePart)
+            ($selectPart LEFT $joinPart $wherePart)
             UNION ALL
-            ($selectPart RIGHT JOIN {$this->getJoinSql('user', '', 'u')} $wherePart)
+            ($selectPart RIGHT $joinPart $wherePart)
             ORDER BY name ASC, `u.lastname` ASC, `u.firstname` ASC
         ";
         if ($offset > 0) {
