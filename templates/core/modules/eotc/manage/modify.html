@@ -8,8 +8,8 @@
 <script type="text/javascript" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.hourpicker.js"></script>
 <script type="text/javascript" src="/javascript/shared/datetime/jquery.minutepicker.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>
-<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>
+<!--<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker.js"></script>-->
+<!--<script type="text/javascript" src="/javascript/shared/datetime/attacher.datepicker-sync.js"></script>-->
 <script type="text/javascript" src="/javascript/shared/datetime/attacher.timepicker.js"></script>
 
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
@@ -76,6 +76,22 @@
             }
         });
 
+        /* https://bugs.jqueryui.com/ticket/7451
+         */
+        $('input[name=startDate]').datepicker({
+            onClose: function() {
+                $('input[name=startDate]').valid();
+            }
+        });
+
+        /* https://bugs.jqueryui.com/ticket/7451
+         */
+        $('input[name=endDate]').datepicker({
+            onClose: function() {
+                $('input[name=endDate]').valid();
+            }
+        });
+
         $('[data-form=event]').eventModify({
             functionLabel: "{FUNCTION}"
         });
@@ -127,7 +143,7 @@
                         <div class="small-12 large-6 columns">
                             <label>
                                 From
-                                <input name="startDate"  type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
+                                <input name="startDate" type="text" size="15" maxlength="30" value="{EVENT_START_DATE}"/>
                             </label>
                         </div>
 
@@ -166,7 +182,7 @@
                         <div class="small-12 large-6 columns">
                             <label>
                                 To
-                                <input name="endDate"  type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
+                                <input name="endDate" type="text" size="15" maxlength="30" value="{EVENT_END_DATE}"/>
                             </label>
                         </div>
 

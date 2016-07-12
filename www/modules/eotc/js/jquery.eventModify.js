@@ -27,12 +27,16 @@
 
 		setupDeleteActions(config.deleteButton);
 
-		/* wtf
+		/* https://coderwall.com/p/zyrr2g/reset-jquery-form-validation-jquery-validate
+		 * but why...?
 		 */
 		$(config.element).on('change', 'select', function(event) {
 			$(config.element).validate().resetForm();
 		});
 
+		/* https://coderwall.com/p/zyrr2g/reset-jquery-form-validation-jquery-validate
+		 * but why...?
+		 */
 		$(config.element).on('change', 'input', function(event) {
 			$(config.element).validate().resetForm();
 		});
@@ -209,7 +213,6 @@
 					$('select[name=endPeriod]').val()
 				];
 
-				console.log(startDatetime, endDatetime);
 				for (var i = 0; i < startDatetime.length; i++) {
 					if (startDatetime[i] != endDatetime[i]) {
 						return true;
@@ -240,12 +243,9 @@
 				var startDatetime = moment(start, settings.dateFormat);
 				var endDatetime   = moment(end, settings.dateFormat);
 
-				console.log(start, ' -- ', end, endDatetime.valueOf() - startDatetime.valueOf());
-
 				/* If both dates are valid and end date occurs before start
 				 */
 				if (startDatetime.isValid() && endDatetime.isValid()) {
-					console.log('is ok');
 					return endDatetime.valueOf() > startDatetime.valueOf();
 				}
 
