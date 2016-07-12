@@ -172,7 +172,8 @@ INSERT INTO `error` VALUES
     (175, 'The requested team could not be found.'),
     (176, 'The requested venue could not be found.'),
 		(177, 'The requested match could not be found.'),
-		(178, 'The requested position could not be found.');
+		(178, 'The requested position could not be found.'),
+		(179, 'The requested status could not be found.');
 
 /** Team players table **/
 CREATE TABLE `sportsfixtures_team_user` (

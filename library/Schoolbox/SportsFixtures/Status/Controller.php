@@ -41,29 +41,26 @@ class Controller extends AbstractController
      */
     public function getList($context = null)
     {
-//        try {
-//            $allPositions = $this->mapper->findByColumn(
-//                'sport_id',
-//                $context->getId(),
-//                [
-//                    'order' => [
-//                        'name' => 'asc'
-//                    ]
-//                ]
-//            );
-//
-//            $this->getResponse()->content->set(
-//                $this->buildHtmlOutput(
-//                    '@sportsfixturesPosition/list.twig',
-//                    [
-//                        'sport'        => $context,
-//                        'allPositions' => $allPositions
-//                    ]
-//                )
-//            );
-//        } catch (MapperException $e) {
-//            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
-//        }
+        try {
+            $allStatus = $this->mapper->findAll(
+                [
+                    'order' => [
+                        'name' => 'asc'
+                    ]
+                ]
+            );
+
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput(
+                    '@sportsfixturesStatus/list.twig',
+                    [
+                        'allStatus' => $allStatus
+                    ]
+                )
+            );
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_STATUS_NOT_FOUND);
+        }
     }
 
     /**
