@@ -7,15 +7,15 @@
          * Otherwise hide empty state/show list when items exist
          */
         function refreshEmptyStates() {
-            var numItems = $('#allStatus').find('[data-status-list]').find('[data-status-item]').length;
+            var numItems = $('#allItems').find('[data-item-list]').find('[data-item]').length;
 
             if (numItems) {
                 $('.empty-state').addClass('hide');
-                $('#allStatus').find('[data-status-list]').removeClass('hide');
+                $('#allItems').find('[data-item-list]').removeClass('hide');
             }
             else {
                 $('.empty-state').removeClass('hide');
-                $('#allStatus').find('[data-status-list]').addClass('hide');
+                $('#allItems').find('[data-item-list]').addClass('hide');
             }
         }
 
@@ -23,51 +23,51 @@
          * Spawn a new list row
          */
         function spawnNewRow() {
-            var clone = $('#status-clone').clone();
+            var clone = $('#item-clone').clone();
             clone.attr('id', '');
 
             /* Append it to the list
              */
-            $('#allStatus').find('[data-status-list]').append(clone);
+            $('#allItems').find('[data-item-list]').append(clone);
 
             /* Focus it, to save you needing to do it manually
              */
-            $('#allStatus').find('input[name=name]').last().focus();
+            $('#allItems').find('input[name=name]').last().focus();
 
             refreshEmptyStates();
         }
 
-        /* Spawn clone when trying to add new status
+        /* Spawn clone when trying to add new item
          */
-        $('#allStatus').on('click', '[data-status-add]', function(event) {
+        $('#allItems').on('click', '[data-item-add]', function(event) {
             spawnNewRow();
         });
 
         /* Submit asynchronously on blur
          */
-        $('#allStatus').on('blur', '[data-status]', function(event) {
+        $('#allItems').on('blur', '[data-item-element]', function(event) {
             var element = $(this);
 
             /* Only execute if there is data to send
              */
             if (element.val()) {
-                var statusId = element.attr('data-status');
+                var statusId = element.attr('data-item-element');
 
                 /* Find destination route
                  */
-                var form = $('#allStatus').find('[data-status-form='+statusId+']');
+                var form = $('#allItems').find('[data-item-form='+statusId+']');
                 var url = form.attr('data-action');
 
                 /* Data package
                  */
                 var data = {
-                    id: element.attr('data-status'),
+                    id: element.attr('data-item-element'),
                     name: element.val()
                 };
 
                 /* Parent container for this row
                  */
-                var parent = element.parents('[data-status-item]');
+                var parent = element.parents('[data-item]');
 
                 /* Indicator
                  */
@@ -85,10 +85,10 @@
 
                         /* Update all the controls and identifiers
                          */
-                        parent.find('[data-status-form]').attr('data-status-form', newItem.id);
-                        parent.find('[data-delete]').attr('data-delete', newItem.id);
+                        parent.find('[data-item-form]').attr('data-item-form', newItem.id);
+                        parent.find('[data-delete]').attr('data-delete', newItem.id).attr('href', newItem.delete);
                         parent.find('input[name=statusId]').val(newItem.id);
-                        element.attr('data-status', newItem.id);
+                        element.attr('data-item-element', newItem.id);
 
                         indicator.labelTimeout({
                             text: 'Saved',
@@ -99,7 +99,7 @@
                          * Spawn a new row automatically if there are no
                          * empty ones ready to utilise
                          */
-                        if ($('#allStatus').find('input[name=name]').last().val() != '') {
+                        if ($('#allItems').find('input[name=name]').last().val() != '') {
                             spawnNewRow();
                         }
                     },
@@ -115,11 +115,11 @@
 
         /* Remove asynchronously upon confirm
          */
-        $('#allStatus').on('click', '[data-delete]', function(event) {
+        $('#allItems').on('click', '[data-delete]', function(event) {
             event.preventDefault();
 
             var element = $(this);
-            var elementContainer = element.parents('[data-status-item]');
+            var elementContainer = element.parents('[data-item]');
 
             /* Just remove unsaved elements
              */
@@ -165,7 +165,7 @@
 </div>
 
 <div class="row">
-    <div class="small-12 island" id="allStatus">
+    <div class="small-12 island" id="allItems">
         <div class="actions-small-1 row">
             <div class="list-item">
                 <div class="small-12 columns">
@@ -173,23 +173,23 @@
                 </div>
             </div>
             <nav>
-                <a class="icon-add" title="Add Status" data-status-add></a>
+                <a class="icon-add" title="Add Status" data-item-add></a>
             </nav>
         </div>
 
         <section>
-            <ul class="information-list hide" data-status-list>
+            <ul class="information-list hide" data-item-list>
                 {% for currentStatus in allStatus %}
-                    <li class="actions-small-1" data-status-item>
+                    <li class="actions-small-1" data-item>
                         <div class="list-item">
-                            <div data-action="{{ routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) }}" data-status-form="{{ currentStatus.id }}">
+                            <div data-action="{{ routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) }}" data-item-form="{{ currentStatus.id }}">
                                 <section>
                                     <fieldset class="content">
                                         <div class="small-12 columns">
                                             <input type="hidden" name="statusId" value="{{ currentStatus.id }}" />
 
                                             <label>
-                                                <input type="text" name="name" value="{{ currentStatus.name }}" data-status="{{ currentStatus.id }}" />
+                                                <input type="text" name="name" value="{{ currentStatus.name }}" data-item-element="{{ currentStatus.id }}" />
                                             </label>
 
                                             <span class="label full-width hide" data-save-item></span>
@@ -208,22 +208,22 @@
         <div class="empty-state hide">
             <i class="icon-position"></i>
             <p>There are no Statuses.</p>
-            <p><a title="Add a Status" data-status-add>Add a Status</a></p>
+            <p><a title="Add a Status" data-item-add>Add a Status</a></p>
         </div>
     </div>
 </div>
 
 <ul class="action-list hide">
-    <li id='status-clone' class="actions-small-1" data-status-item>
+    <li id='item-clone' class="actions-small-1" data-item>
         <div class="list-item">
-            <div data-action="{{ routeLookup('sportsfixturesStatus.createEntity') }}" data-status-form="">
+            <div data-action="{{ routeLookup('sportsfixturesStatus.createEntity') }}" data-item-form="">
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <input type="hidden" name="statusId" value="" />
 
                             <label>
-                                <input type="text" name="name" value="" data-status="" />
+                                <input type="text" name="name" value="" data-item-element="" />
                             </label>
 
                             <span class="label full-width hide" data-save-item></span>

@@ -91,7 +91,10 @@ class Controller extends AbstractController
 
         if ($this->getRequest()->isXhr()) {
             $status = [
-                'id' => $entity->getId()
+                'id' => $entity->getId(),
+                'delete' => $this->getRouter()->generate('sportsfixturesStatus.deleteEntity', [
+                    'entityId' => $entity->getId()
+                ])
             ];
 
             $this->getResponse()->content->set($this->buildJsonOutput($status));
