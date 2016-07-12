@@ -752,6 +752,10 @@ nav {
 		[class*=" icon-"]:before{
 			float: none;
 		}
+		input[type=radio]:not(.plain)+label.checkbox-label,
+		input[type=checkbox]:not(.plain)+label.checkbox-label {
+			margin-top: 0.5rem;
+		}
 		.one-column{
 			@media #{$small-up} { @include grid-column(1); }
 		}

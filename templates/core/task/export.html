@@ -29,37 +29,36 @@
                         <span data-tooltip class="hint has-tip tip-top" title="Only classes that have not closed yet are displayed.">?</span>
                     </legend>
 
-                    <table>
-                    <!-- BEGIN exportable -->
-                        <thead>
-                            <tr>
-                                <th>
-                                    <input id="checkAll"
-                                           type="checkbox"
-                                           data-select-all
-                                           data-select-all-for-group="unit-instance" />
-                                    <label for="checkAll" class="checkbox-label"></label>
-                                </th>
-                                <th></th>
-                            </tr>
-                        </thead>
+                    <div class="small-12 columns no-pad">
+                        <!-- BEGIN exportable -->
+                        <ul class="information-list">
+                            <li>
+                                <div class="list-item">
+                                    <div class="small-1 columns">
+                                        <input id="checkAll"
+                                               type="checkbox"
+                                               data-select-all
+                                               data-select-all-for-group="unit-instance" />
+                                        <label for="checkAll" class="checkbox-label"></label>
+                                    </div>
+                                </div>
+                            </li>
 
-                        <tbody>
                             <!-- BEGIN class -->
-                            <tr>
-                                <td>
-                                    <!-- BEGIN class_import_checkbox -->
-                                    <input name="unit_instance[{UNIT_INSTANCE_ID}]" type="hidden" value="0" />
-                                    <input type="checkbox"
-                                           id="import-{UNIT_INSTANCE_ID}"
-                                           name="unit_instance[{UNIT_INSTANCE_ID}]"
-                                           value="1"
-                                           data-select-all-group="unit-instance" />
-                                    <label for="import-{UNIT_INSTANCE_ID}" class="checkbox-label"></label>
-                                    <!-- END class_import_checkbox -->
-                                </td>
-                                <td>
-                                    <div class="card small-12">
+                            <li>
+                                <div class="list-item">
+                                    <div class="small-1 columns">
+                                        <!-- BEGIN class_import_checkbox -->
+                                        <input name="unit_instance[{UNIT_INSTANCE_ID}]" type="hidden" value="0" />
+                                        <input type="checkbox"
+                                               id="import-{UNIT_INSTANCE_ID}"
+                                               name="unit_instance[{UNIT_INSTANCE_ID}]"
+                                               value="1"
+                                               data-select-all-group="unit-instance" />
+                                        <label for="import-{UNIT_INSTANCE_ID}" class="checkbox-label"></label>
+                                        <!-- END class_import_checkbox -->
+                                    </div>
+                                    <div class="card small-11">
                                         <a href="/homepage/{UNIT_CATEGORY_ID}">
                                             <span class="icon-32 icon-home"></span>
                                             <h3>{UNIT_CATEGORY_NAME}</h3>
@@ -83,18 +82,18 @@
                                             <!-- END class_import_exists -->
                                         </p>
                                     </div>
-                                </td>
-                            </tr>
+                                </div>
+                            </li>
                             <!-- END class -->
-                        </tbody>
-                    <!-- END exportable -->
-                    </table>
+                        </ul>
+                        <!-- END exportable -->
 
-                    <!-- BEGIN unexportable -->
-                    <div class="alert-box">
-                        There are no open classes that currently use this unit.
+                        <!-- BEGIN unexportable -->
+                        <div class="alert-box">
+                            There are no open classes that currently use this unit.
+                        </div>
+                        <!-- END unexportable -->
                     </div>
-                    <!-- END unexportable -->
                 </fieldset>
             </section>
 
