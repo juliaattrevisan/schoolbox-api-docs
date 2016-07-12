@@ -1,3 +1,4 @@
+<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript">
     $(function() {
 
@@ -41,6 +42,8 @@
             if (element.val()) {
                 var statusId = element.attr('data-status');
 
+                /* Find destination route
+                 */
                 var form = $('#allStatus').find('[data-status-form='+statusId+']');
                 var url = form.attr('action');
 
@@ -51,19 +54,43 @@
                     name: element.val()
                 };
 
-                $.post(url, data, function (newItem) {
+                /* Parent container for this row
+                 */
+                var parent = element.parents('[data-status-item]');
 
-                    /* If responseText has a length, assume it's the
-                     * id of the item just saved, otherwise assume error
-                     */
-                    var parent = element.parents('[data-status-item]');
+                /* Indicator
+                 */
+                var indicator = parent.find('[data-save-item]');
 
-                    /* Update all the controls and identifiers
-                     */
-                    parent.find('[data-status-form]').attr('data-status-form', newItem.id);
-                    parent.find('[data-delete]').attr('data-delete', newItem.id);
-                    parent.find('input[name=statusId]').val(newItem.id);
-                    element.attr('data-status', newItem.id);
+                console.log(indicator);
+                indicator.labelActivate({
+                    text: 'Saving'
+                });
+
+                $.ajax({
+                    type: "POST",
+                    url:  url,
+                    data: data,
+                    success: function (newItem) {
+
+                        /* Update all the controls and identifiers
+                         */
+                        parent.find('[data-status-form]').attr('data-status-form', newItem.id);
+                        parent.find('[data-delete]').attr('data-delete', newItem.id);
+                        parent.find('input[name=statusId]').val(newItem.id);
+                        element.attr('data-status', newItem.id);
+
+                        indicator.labelTimeout({
+                            text: 'Saved',
+                            css: 'success'
+                        });
+                    },
+                    error: function() {
+                        indicator.labelTimeout({
+                            text: 'Error!',
+                            css: 'alert'
+                        });
+                    }
                 });
             }
         });
@@ -133,7 +160,7 @@
         </div>
 
         <section>
-            <ul class="action-list hide" data-status-list>
+            <ul class="information-list hide" data-status-list>
                 {% for currentStatus in allStatus %}
                     <li class="actions-small-1" data-status-item>
                         <div class="list-item">
@@ -146,6 +173,8 @@
                                             <label>
                                                 <input type="text" name="name" value="{{ currentStatus.name }}" data-status="{{ currentStatus.id }}" />
                                             </label>
+
+                                            <span class="label full-width hide" data-save-item></span>
                                         </div>
                                     </fieldset>
                                 </section>
@@ -178,6 +207,8 @@
                             <label>
                                 <input type="text" name="name" value="" data-status="" />
                             </label>
+
+                            <span class="label full-width hide" data-save-item></span>
                         </div>
                     </fieldset>
                 </section>
