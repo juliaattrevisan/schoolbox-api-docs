@@ -75,15 +75,20 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
         if (strlen($keyword) === 0) {
             return new Collection();
         }
-        $query = "
-            {$this->getSelectString()}
-            WHERE name LIKE :search
-            LIMIT :limit OFFSET :offset
-        ";
+        $query = "{$this->getSelectString()} WHERE name LIKE :search";
+        if ($offset > 0) {
+            $query .= ' LIMIT :limit OFFSET :offset';
+        } elseif ($limit > 0) {
+            $query .= ' LIMIT :limit';
+        }
         $statement = $this->getDatabase()->prepare($query);
         $statement->bindValue('search', '%'.$this->getDatabase()->quoteForLike($keyword).'%', \PDO::PARAM_STR);
-        $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
-        $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
+        if ($offset > 0 || $limit > 0) {
+            $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
+        }
+        if ($limit > 0) {
+            $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
+        }
         $statement->execute();
         return $this->hydrateSelect($statement);
     }
