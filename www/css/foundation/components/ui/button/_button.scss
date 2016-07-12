@@ -162,3 +162,10 @@ ul.flex-list {
         width: 100%;
     }
 }
+
+/*
+ * Hack for profile buttons on IE11/Win8.1
+ */
+.button.fat:before, button.fat:before, input.fat[type="submit"]:before, a.fat.submit:before {
+	line-height: normal;
+}
