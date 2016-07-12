@@ -19,9 +19,10 @@
             }
         }
 
-        /* Spawn clone when trying to add new status
+        /**
+         * Spawn a new list row
          */
-        $('#allStatus').on('click', '[data-status-add]', function(event) {
+        function spawnNewRow() {
             var clone = $('#status-clone').clone();
             clone.attr('id', '');
 
@@ -30,6 +31,12 @@
             $('#allStatus').find('[data-status-list]').append(clone);
 
             refreshEmptyStates();
+        }
+
+        /* Spawn clone when trying to add new status
+         */
+        $('#allStatus').on('click', '[data-status-add]', function(event) {
+            spawnNewRow();
         });
 
         /* Submit asynchronously on blur
@@ -83,6 +90,14 @@
                             text: 'Saved',
                             css: 'success'
                         });
+
+                        /* Count number of empty rows at bottom
+                         * Spawn a new row automatically if there are no
+                         * empty ones ready to utilise
+                         */
+                        if ($('#allStatus').find('input[name=name]').last().val() != '') {
+                            spawnNewRow();
+                        }
                     },
                     error: function() {
                         indicator.labelTimeout({
