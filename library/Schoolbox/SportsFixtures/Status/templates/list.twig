@@ -15,6 +15,12 @@
             });
         });
 
+        /* Spawn clone when trying to add new status
+         */
+        $('#allStatus').on('click', '[data-status-add]', function(event) {
+
+        });
+
         $('#allStatus').on('change', '[data-status]', function(event) {
             var element = $(this);
             var statusId = element.attr('data-status');
@@ -48,7 +54,7 @@
                 </div>
             </div>
             <nav>
-                <a href='{{ routeLookup('sportsfixturesPosition.getCreateForm', {contextId: sport.id}) }}' class="icon-add" title="Add Position to {{ sport.name }}"></a>
+                <a class="icon-add" title="Add Status" data-status-add></a>
             </nav>
         </div>
 
@@ -62,7 +68,7 @@
                                 {% if currentStatus.id %}
                                     {% set formUrl = routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) %}
                                 {% else %}
-                                    {% set formUrl =  routeLookup('sportsfixturesStatus.createEntity') %}
+                                    {% set formUrl = routeLookup('sportsfixturesStatus.createEntity') %}
                                 {% endif %}
 
                                 <form action="{{ formUrl }}" method="post" data-status-form="{{ currentStatus.id }}">
@@ -96,4 +102,25 @@
     </div>
 </div>
 
+<ul class="action-list hide">
+    <li class="actions-small-1" data-clone>
+        <div class="list-item">
+            <form action="{{ routeLookup('sportsfixturesStatus.createEntity') }}" method="post" data-status-form="">
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <input type="hidden" name="status" value="" />
 
+                            <label>
+                                <input type="text" name="name" value="" data-status="" />
+                            </label>
+                        </div>
+                    </fieldset>
+                </section>
+            </form>
+        </div>
+        <nav>
+            <a href="" class="icon-delete" title="Delete" data-delete=""></a>
+        </nav>
+    </li>
+</ul>
