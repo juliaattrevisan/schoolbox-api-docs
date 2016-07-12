@@ -2,7 +2,8 @@
     $(function() {
 
         /**
-         * Refresh empty states
+         * Show empty state/hide list when no items
+         * Otherwise hide empty state/show list when items exist
          */
         function refreshEmptyStates() {
             var numItems = $('#allStatus').find('[data-status-list]').find('[data-status-item]').length;
@@ -26,6 +27,8 @@
             /* Append it to the list
              */
             $('#allStatus').find('[data-status-list]').append(clone);
+
+            refreshEmptyStates();
         });
 
         /* Submit asynchronously on change
@@ -54,6 +57,8 @@
              */
             if (element.attr('data-delete') == '') {
                 elementContainer.remove();
+
+                refreshEmptyStates();
             }
             /* Otherwise confirm deletion
              */
@@ -68,8 +73,6 @@
                              */
                             elementContainer.remove();
 
-                            /* Refresh empty state if there are no items
-                             */
                             refreshEmptyStates();
                         });
                     }
@@ -135,7 +138,7 @@
         <div class="empty-state hide">
             <i class="icon-position"></i>
             <p>There are no Statuses.</p>
-            <p><a href="{{ routeLookup('sportsfixturesStatus.getCreateForm', {}) }}" title="Add a Status">Add a Status</a></p>
+            <p><a title="Add a Status" data-status-add>Add a Status</a></p>
         </div>
     </div>
 </div>
