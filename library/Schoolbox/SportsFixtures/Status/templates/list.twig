@@ -1,6 +1,22 @@
 <script type="text/javascript">
     $(function() {
 
+        /**
+         * Refresh empty states
+         */
+        function refreshEmptyStates() {
+            var numItems = $('#allStatus').find('[data-status-list]').find('[data-status-item]').length;
+
+            if (numItems) {
+                $('.empty-state').addClass('hide');
+                $('#allStatus').find('[data-status-list]').removeClass('hide');
+            }
+            else {
+                $('.empty-state').removeClass('hide');
+                $('#allStatus').find('[data-status-list]').addClass('hide');
+            }
+        }
+
         /* Spawn clone when trying to add new status
          */
         $('#allStatus').on('click', '[data-status-add]', function(event) {
@@ -51,11 +67,19 @@
                              * Otherwise just remove the element upon completion
                              */
                             elementContainer.remove();
+
+                            /* Refresh empty state if there are no items
+                             */
+                            refreshEmptyStates();
                         });
                     }
                 });
             }
         });
+
+        /* Initial state
+         */
+        refreshEmptyStates();
     });
 </script>
 <ul class="breadcrumb">
@@ -82,40 +106,37 @@
             </nav>
         </div>
 
-        {% if allStatus|length %}
-            <section>
-                <ul class="action-list" data-status-list>
-                    {% for currentStatus in allStatus %}
-                        <li class="actions-small-1" data-status-item>
-                            <div class="list-item">
-                                <form action="{{ routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) }}" method="post" data-status-form="{{ currentStatus.id }}">
-                                    <section>
-                                        <fieldset class="content">
-                                            <div class="small-12 columns">
-                                                <input type="hidden" name="status" value="{{ currentStatus.id }}" />
+        <section>
+            <ul class="action-list hide" data-status-list>
+                {% for currentStatus in allStatus %}
+                    <li class="actions-small-1" data-status-item>
+                        <div class="list-item">
+                            <form action="{{ routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) }}" method="post" data-status-form="{{ currentStatus.id }}">
+                                <section>
+                                    <fieldset class="content">
+                                        <div class="small-12 columns">
+                                            <input type="hidden" name="status" value="{{ currentStatus.id }}" />
 
-                                                <label>
-                                                    <input type="text" name="name" value="{{ currentStatus.name }}" data-status="{{ currentStatus.id }}" />
-                                                </label>
-                                            </div>
-                                        </fieldset>
-                                    </section>
-                                </form>
-                            </div>
-                            <nav>
-                                <a href="{{ routeLookup('sportsfixturesStatus.deleteEntity', {entityId: currentStatus.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentStatus.id }}"></a>
-                            </nav>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        {% else %}
-            <div class="empty-state">
-                <i class="icon-position"></i>
-                <p>There are no Statuses.</p>
-                <p><a href="{{ routeLookup('sportsfixturesStatus.getCreateForm', {}) }}" title="Add a Status">Add a Status</a></p>
-            </div>
-        {% endif %}
+                                            <label>
+                                                <input type="text" name="name" value="{{ currentStatus.name }}" data-status="{{ currentStatus.id }}" />
+                                            </label>
+                                        </div>
+                                    </fieldset>
+                                </section>
+                            </form>
+                        </div>
+                        <nav>
+                            <a href="{{ routeLookup('sportsfixturesStatus.deleteEntity', {entityId: currentStatus.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentStatus.id }}"></a>
+                        </nav>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+        <div class="empty-state hide">
+            <i class="icon-position"></i>
+            <p>There are no Statuses.</p>
+            <p><a href="{{ routeLookup('sportsfixturesStatus.getCreateForm', {}) }}" title="Add a Status">Add a Status</a></p>
+        </div>
     </div>
 </div>
 
