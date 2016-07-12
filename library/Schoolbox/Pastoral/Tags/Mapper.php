@@ -83,10 +83,10 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
         }
         $statement = $this->getDatabase()->prepare($query);
         $statement->bindValue('search', '%'.$this->getDatabase()->quoteForLike($keyword).'%', \PDO::PARAM_STR);
-        if ($offset > 0 || $limit > 0) {
+        if ($offset > 0) {
             $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
-        }
-        if ($limit > 0) {
+            $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
+        } elseif ($limit > 0) {
             $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
         }
         $statement->execute();

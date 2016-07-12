@@ -82,20 +82,34 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
 
     /**
      * Retrieve all tags containing the specified string
-     * @param $string
+     * @param string $string
+     * @param int $offset
+     * @param int $limit
      * @return Collection
      */
-    public function getTagLike($string) {
+    public function getTagLike($string, $offset = 0, $limit = 0)
+    {
         $query = "
             SELECT {$this->getColumnString()}
             FROM {$this->getTable()} 
-            WHERE {$this->fieldName} LIKE ?
+            WHERE {$this->fieldName} LIKE :search
             AND `deleted_at` IS NULL
             ORDER BY {$this->fieldName} ASC
         ";
-
+        if ($offset > 0) {
+            $query .= ' LIMIT :limit OFFSET :offset';
+        } elseif ($limit > 0) {
+            $query .= ' LIMIT :limit';
+        }
         $statement = $this->getDatabase()->prepare($query);
-        $statement->execute(array("%{$string}%"));
+        $statement->bindValue('search', '%'.$this->getDatabase()->quoteForLike($string).'%', \PDO::PARAM_STR);
+        if ($offset > 0) {
+            $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
+            $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
+        } elseif ($limit > 0) {
+            $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
+        }
+        $statement->execute();
 
         $records = new Collection();
 
@@ -163,6 +177,6 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
      */
     public function findForTag(User $user, $keyword, $offset = 0, $limit = 0)
     {
-        return $this->getTagLike($keyword)->slice($offset, $limit);
+        return $this->getTagLike($keyword, $offset, $limit);
     }
 }
