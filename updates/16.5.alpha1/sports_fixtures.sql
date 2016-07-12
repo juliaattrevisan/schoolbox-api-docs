@@ -223,4 +223,15 @@ CREATE TABLE `sportsfixtures_school` (
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
+/* Match Status Table
+ */
+CREATE TABLE `sportsfixtures_status` (
+	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
+	`name` varchar(255) NULL COMMENT '',
+	`created_at` DATETIME NULL COMMENT '',
+	`updated_at` DATETIME NULL COMMENT '',
+	`deleted_at` DATETIME NULL COMMENT '',
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB CHARACTER SET=utf8;
+
 INSERT INTO `msg_namespace` (`slug`, `label`) VALUES ('sports_fixtures', 'Sports Fixtures');

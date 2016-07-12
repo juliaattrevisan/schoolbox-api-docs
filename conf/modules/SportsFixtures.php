@@ -20,6 +20,7 @@ use Schoolbox\SportsFixtures\Venue\Module as VenueModule;
 use Schoolbox\SportsFixtures\Match\Module as MatchModule;
 use Schoolbox\SportsFixtures\ItineraryItem\Module as ItineraryItemModule;
 use Schoolbox\SportsFixtures\Result\Module as ResultModule;
+use Schoolbox\SportsFixtures\Status\Module as StatusModule;
 
 class SportsFixtures implements ModuleConfigInterface
 {
@@ -64,5 +65,7 @@ class SportsFixtures implements ModuleConfigInterface
         $resultModule = new ResultModule($kernel->getDependencyInjector(), $matchModule);
         $resultModule->init("/$namespace");
 
+        $statusModule = new StatusModule($kernel->getDependencyInjector(), $resultModule);
+        $statusModule->init("/$namespace");
     }
 }
