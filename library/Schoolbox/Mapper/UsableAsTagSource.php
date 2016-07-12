@@ -37,20 +37,23 @@ interface UsableAsTagSource
      */
     public function findForTag(User $user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT);
 
-    /**
-     * Retrieve name of tag given the ID number, or null if it doesn't exist.
-     *
-     * @param mixed $id
-     * @return null|string
-     */
-    public function findNameById($id);
+    // Below methods removed from interface for now, as I no longer believe
+    // they are necessary.
 
-    /**
-     * Retrieve tag for a name, optionally creating a new tag if it does not already exist.
-     *
-     * @param string $name
-     * @param bool $create
-     * @return null|object
-     */
-    public function findByName($name, $create = false);
+//    /**
+//     * Retrieve name of tag given the ID number, or null if it doesn't exist.
+//     *
+//     * @param mixed $id
+//     * @return null|string
+//     */
+//    public function findNameById($id);
+//
+//    /**
+//     * Retrieve tag for a name, optionally creating a new tag if it does not already exist.
+//     *
+//     * @param string $name
+//     * @param bool $create
+//     * @return null|int
+//     */
+//    public function findIdByName($name, $create = false);
 }
