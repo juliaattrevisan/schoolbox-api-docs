@@ -1,3 +1,37 @@
+<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-attendees]').selectAll({
+            key: 'selectall',
+            checkboxName: 'selected[]'
+        });
+    });
+</script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('[data-studentsuggest]').selectizeSelector({
+            ajax: {
+                url:      '/ajax/user.php',
+                type:     'GET',
+                data:     {groupID: '{STUDENT_GROUP_TYPE_IDS}', showCampus: true},
+                dataType: 'json'
+            },
+            multiple: true
+        })
+    });
+</script>
+<script type="text/javascript" src="/modules/eotc/js/jquery.courseCodes.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('select[name=filetype]').externalClassCodes({
+            output: $('select[name=courseCode]'),
+            campus: {EVENT_CAMPUS_CODES}
+        });
+    });
+</script>
+
 <ul class="breadcrumb">
     <li><a href="/modules/eotc/myReview" title="EOTC">EOTC</a></li>
     <li><a href="/modules/eotc/manage/modify?eventID={EVENT_ID}" title="Modify {EVENT_NAME}">Modify {EVENT_NAME}</a></li>
@@ -107,41 +141,8 @@
     </div>
 </div>
 
-<script type="text/javascript" src="/javascript/shared/select-all/jquery.select-all.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $('[data-attendees]').selectAll({
-            key: 'selectall',
-            checkboxName: 'selected[]'
-        });
-    });
-</script>
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $('[data-studentsuggest]').selectizeSelector({
-            ajax: {
-                url:      '/ajax/user.php',
-                type:     'GET',
-                data:     {groupID: '{STUDENT_GROUP_TYPE_IDS}', showCampus: true},
-                dataType: 'json'
-            },
-            multiple: true
-        })
-    });
-</script>
-<script type="text/javascript" src="/modules/eotc/js/jquery.courseCodes.js"></script>
-<script type="text/javascript">
-    $(function() {
-        $('select[name=filetype]').externalClassCodes({
-            output: $('select[name=courseCode]'),
-            campus: {EVENT_CAMPUS_CODES}
-        });
-    });
-</script>
-
-
-
-
-
+<div class="row">
+    <div class="small-12 columns">
+        <a href="/modules/eotc/manage/modify?eventID={EVENT_ID}" class="button icon-back">Back</a>
+    </div>
+</div>
