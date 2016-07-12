@@ -83,7 +83,11 @@ if ($group->getPermission($category_id) < WRITE_ACCESS) {
                     $factory = new CollectorFactory();
                     $file = $factory->build($_POST['attachment'])->getFirst();
 
-                    $url = '/storage/fetch.php?hash=' . $file->getHash();
+                    if ($file->getMimetype()->isImage()) {
+                        $url = '/storage/image.php?hash=' . $file->getHash();
+                    } else {
+                        $url = '/storage/fetch.php?hash=' . $file->getHash();
+                    }
 
                 } catch (InvalidArgumentException $e) {
                     // noop - leave $url blank
