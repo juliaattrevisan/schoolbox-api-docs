@@ -296,17 +296,19 @@ WHERE s.namespace = @sportns;
 
 INSERT INTO `component_definition` (id, name, class, description, module, component_category, visible, multiple)
 VALUES (86, 'Sport Fixtures', 'Schoolbox\\SportsFixtures\\Homepage\\Component\\Controller', 'Shows sports fixtures', 'homepage', 1, 'true', 'true');
+INSERT INTO `component_definition` (name, class, description, module, component_category, visible, multiple)
+VALUES ('Sport Fixtures', 'Schoolbox\\SportsFixtures\\Homepage\\Component\\Controller', 'Shows sports fixtures', 'homepage', 1, 'true', 'true');
 
 INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
-VALUES (86, 'collapse', '0', 'Collapse Content', null);
+VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\SportsFixtures\\Homepage\\Component\\Controller'), 'collapse', '0', 'Collapse Content', null);
 
 INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
-VALUES (86, 'team', '0', 'Team To Display', null);
+VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\SportsFixtures\\Homepage\\Component\\Controller'), 'team', '0', 'Team To Display', null);
 
-INSERT INTO `component_definition` (id, name, class, description, module, component_category, visible, multiple)
-VALUES (87, 'Sport Fixtures', 'Schoolbox\\SportsFixtures\\Dashboard\\Component\\Controller', 'Shows sports fixtures', 'dashboard', null, 'true', 'true');
+INSERT INTO `component_definition` (name, class, description, module, component_category, visible, multiple)
+VALUES ('Sport Fixtures', 'Schoolbox\\SportsFixtures\\Dashboard\\Component\\Controller', 'Shows sports fixtures', 'dashboard', null, 'true', 'true');
 
 INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
-VALUES (87, 'collapse', '0', 'Collapse Content', null);
+VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\SportsFixtures\\Dashboard\\Component\\Controller'), 'collapse', '0', 'Collapse Content', null);
 
 
