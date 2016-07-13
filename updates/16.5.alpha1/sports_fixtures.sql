@@ -304,7 +304,7 @@ INSERT INTO `component_config_definition` (component_definition_id, `key`, defau
 VALUES (86, 'team', '0', 'Team To Display', null);
 
 INSERT INTO `component_definition` (id, name, class, description, module, component_category, visible, multiple)
-VALUES (87, 'Sport Fixtures', 'Schoolbox\\SportsFixtures\\Homepage\\Component\\Controller', 'Shows sports fixtures', 'dashboard', null, 'true', 'true');
+VALUES (87, 'Sport Fixtures', 'Schoolbox\\SportsFixtures\\Dashboard\\Component\\Controller', 'Shows sports fixtures', 'dashboard', null, 'true', 'true');
 
 INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
 VALUES (87, 'collapse', '0', 'Collapse Content', null);
