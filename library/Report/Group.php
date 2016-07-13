@@ -168,6 +168,7 @@ class Report_Group extends Report_Abstract implements Report_IReport
             LEFT JOIN `user_relation` `ur` ON `u`.`id`=`ur`.`user_id`
             LEFT JOIN `user` `child` ON `ur`.`relation_id`=`child`.`id`
             WHERE `u`.`group_id` = '$filterString'
+            AND   `u`.`deleted_at` IS NULL
             GROUP BY `u`.`id`
             ORDER BY $orderBy $orderDir
         ";
