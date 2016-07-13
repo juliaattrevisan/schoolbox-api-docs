@@ -78,18 +78,18 @@
 
                     /* Parent container for this row
                      */
-                    var parent = element.parents('[data-item]');
+                    var container = element.parents('[data-item]');
 
                     /* Data package
                      */
                     var data = {
-                        id: element.attr('data-item-element'),
+                        id: container.attr('data-item'),
                         name: element.val()
                     };
 
                     /* Indicator
                      */
-                    var indicator = parent.find('[data-save-item]');
+                    var indicator = container.find('[data-save-item]');
 
                     indicator.labelActivate({
                         text: 'Saving'
@@ -97,16 +97,15 @@
 
                     $.ajax({
                         type: "POST",
-                        url:  parent.find('[data-item-form]').attr('data-action'),
+                        url:  container.find('[data-item-form]').attr('data-action'),
                         data: data,
                         success: function (newItem) {
 
                             /* Update all the controls and identifiers when you spawn new rows
                              * This is so their controls will work correctly after persisting
                              */
-                            parent.find('[data-item-form]').attr('data-item-form', newItem.id);
-                            parent.find('[data-delete]').attr('data-delete', newItem.id).attr('href', newItem.delete);
-                            element.attr('data-item-element', newItem.id);
+                            container.attr('data-item', newItem.id);
+                            container.find('[data-delete]').attr('href', newItem.delete);
 
                             indicator.labelTimeout({
                                 text: 'Saved',
@@ -139,12 +138,12 @@
                 event.preventDefault();
 
                 var element = $(this);
-                var elementContainer = element.parents('[data-item]');
+                var container = element.parents('[data-item]');
 
                 /* Just remove unsaved elements
                  */
                 if (element.attr('data-delete') == '') {
-                    elementContainer.remove();
+                    container.remove();
 
                     refreshEmptyStates();
                 }
@@ -152,14 +151,14 @@
                  */
                 else {
                     $(this).confirmDialog({
-                        text: 'Are you sure you want to delete ' + elementContainer.find('[data-item-element]').val() + '?',
+                        text: 'Are you sure you want to delete ' + container.find('[data-item-element]').val() + '?',
                         confirmEvent: function () {
                             var data = [];
 
                             data[config.deleteKey] = element.attr('data-delete');
 
                             $.post(element.attr('href'), data, function() {
-                                elementContainer.remove();
+                                container.remove();
 
                                 refreshEmptyStates();
                             });

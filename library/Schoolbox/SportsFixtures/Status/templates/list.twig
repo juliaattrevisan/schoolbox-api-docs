@@ -34,14 +34,14 @@
         <section>
             <ul class="information-list hide" data-item-list>
                 {% for currentStatus in allStatus %}
-                    <li class="actions-small-1" data-item>
+                    <li class="actions-small-1" data-item="{{ currentStatus.id }}">
                         <div class="list-item">
-                            <div data-action="{{ routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) }}" data-item-form="{{ currentStatus.id }}">
+                            <div data-action="{{ routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) }}" data-item-form>
                                 <section>
                                     <fieldset class="content">
                                         <div class="small-12 columns">
                                             <label>
-                                                <input type="text" name="name" value="{{ currentStatus.name }}" data-item-element="{{ currentStatus.id }}" />
+                                                <input type="text" name="name" value="{{ currentStatus.name }}" data-item-element />
                                             </label>
 
                                             <span class="label full-width hide" data-save-item></span>
@@ -66,14 +66,14 @@
 </div>
 
 <ul class="information-list hide">
-    <li id='item-clone' class="actions-small-1" data-item>
+    <li id='item-clone' class="actions-small-1" data-item="">
         <div class="list-item">
             <div data-action="{{ routeLookup('sportsfixturesStatus.createEntity') }}" data-item-form="">
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
                             <label>
-                                <input type="text" name="name" value="" data-item-element="" />
+                                <input type="text" name="name" value="" data-item-element />
                             </label>
 
                             <span class="label full-width hide" data-save-item></span>
