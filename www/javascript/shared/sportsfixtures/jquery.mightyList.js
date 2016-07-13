@@ -29,11 +29,6 @@
             var defaults = {
                 element: element,
 
-                /* The entity name of the things you are managing
-                 * e.g. Status. Appears in confirmDialogs
-                 */
-                entityName: 'Item',
-
                 /* When deleting, this is the param containing the
                  * deleted item's id - used asynchronously
                  */
@@ -45,10 +40,7 @@
                 emptyState: $('.empty-state')
             };
 
-            var derived = {
-            };
-
-            return $.extend(defaults, derived, options);
+            return $.extend(defaults, options);
         }
 
         /**
@@ -166,7 +158,7 @@
                  */
                 else {
                     $(this).confirmDialog({
-                        text: 'Are you sure you want to delete this ' + config.entityName + '?',
+                        text: 'Are you sure you want to delete ' + elementContainer.find('[data-item-element]').val() + '?',
                         confirmEvent: function () {
                             var data = [];
 
