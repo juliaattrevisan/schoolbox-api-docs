@@ -69,12 +69,35 @@
          * Submit asynchronously on blur
          */
         function setupPersist() {
+
+            /* Remember original value
+             *
+             * Compare against this in onBlur event to determine whether anything
+             * changed and needs to be saved
+             */
+            $(config.element).on('enter', '[data-item-element]', function(event) {
+                var element = $(this);
+
+                /* Force trim
+                 */
+                element.val($.trim(element.val()));
+
+                element.attr('data-item-original-value', element.val());
+            });
+
             $(config.element).on('blur', '[data-item-element]', function(event) {
                 var element = $(this);
 
+                /* Force trim
+                 */
+                element.val($.trim(element.val()));
+
                 /* Only execute if there is data to send
                  */
-                if ($.trim(element.val())) {
+                var newData = element.val();
+                var originalData = element.attr('data-item-original-value');
+
+                if (newData && (newData != originalData)) {
 
                     /* Parent container for this row
                      */
@@ -84,7 +107,7 @@
                      */
                     var data = {
                         entityId: container.attr('data-item'),
-                        name: element.val()
+                        name: newData
                     };
 
                     /* Indicator
@@ -107,6 +130,7 @@
                             container.attr('data-item', newItem.id);
                             container.find('[data-delete]').attr('href', newItem.delete);
                             container.find('[data-action]').attr('data-action', newItem.update);
+                            element.attr('data-item-original-value', newData);
 
                             indicator.labelTimeout({
                                 text: 'Saved',
