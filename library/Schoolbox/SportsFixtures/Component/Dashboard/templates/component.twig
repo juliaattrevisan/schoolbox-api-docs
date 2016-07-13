@@ -19,12 +19,12 @@
                                     <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}">
                                         <img src="/portrait.php?userId={{ child.sid }}&amp;size=square64" alt="{{ child.name }}">
                                         <h3>
-                                            <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}">{{ match.name }} ({{ teams[match.homeTeam.id] }} vs {% if match.awayTeam.id == null %}Unspecified Team{% else %}{{ teams[match.awayTeam.id] }}{% endif %})</a>
+                                            <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}">{{ match.name }} ({{ match.homeTeam.name }} vs {{ match.awayTeam.name }})</a>
                                         </h3>
                                     </a>
                                     <p class="meta">
                                         <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span> |
-                                        {{ sports[match.division.sport.id] }} |
+                                        {{ match.division.sport.name }} |
                                         {{ match.division.name }} |
                                         {{ match.venue.name }}
                                     </p>
@@ -67,11 +67,11 @@
                                 <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}">
                                     <img src="/portrait.php?userId={{ user.externalId }}&amp;size=square64" alt="{{ child.name }}">
                                     <h3>
-                                        {{ match.name }} ({{ teams[match.homeTeam.id] }} vs {% if match.awayTeam.id == null %}Unspecified Team{% else %}{{ teams[match.awayTeam.id] }}{% endif %})
+                                        {{ match.name }} ({{ match.homeTeam.name }} vs {{ match.awayTeam.name }})
                                     </h3>
                                 </a>
                                 <p class="meta">
-                                    <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span> | {{ sports[match.division.sport.id] }} | {{ match.division.name }}
+                                    <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span> | {{ match.division.sport.name }} | {{ match.division.name }}
                                 </p>
                             </div>
                         </div>

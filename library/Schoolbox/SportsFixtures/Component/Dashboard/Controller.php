@@ -49,12 +49,15 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
-        if ($this->user->getRole()->isParent())
-            $data = $this->delegate->getParentData();
-        else if ($this->user->getRole()->isStudent())
-            $data = $this->delegate->getStudentData($this->user);
-        else
+        // Grab the relevant data depending on role type
+
+        if ($this->user->getRole()->isParent()) {
+            $data = $this->delegate->getParentDashboardData();
+        } else if ($this->user->getRole()->isStudent()) {
+            $data = $this->delegate->getStudentDashboardData($this->user);
+        } else {
             $data = [];
+        }
 
         return $this->renderTwigTemplate(
             $templateHandle,

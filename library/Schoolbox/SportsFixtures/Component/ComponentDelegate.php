@@ -26,6 +26,7 @@ use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use \Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
 use \Schoolbox\SportsFixtures\Venue\Mapper as VenueMapper;
+use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
 
 class ComponentDelegate
 {
@@ -73,7 +74,12 @@ class ComponentDelegate
      * @var ItineraryItemMapper
      */
     protected $itineraryItemMapper;
-    
+
+    /**
+     * @var TagCloudMapper
+     */
+    protected $schoolTagCloudMapper;
+
     /**
      * Delegate constructor.
      */
@@ -88,119 +94,26 @@ class ComponentDelegate
         $this->setItineraryItemMapper(ItineraryItemMapper::getInstance());
         $this->setVenueMapper(VenueMapper::getInstance());
         $this->setMatchMapper(MatchMapper::getInstance());
+        $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
     }
 
     /**
      * @return array
      */
-    public function getParentData()
+    public function getParentDashboardData()
     {
-        $teams = [];
-        $sports = [];
         $children = [];
 
         foreach ($_SESSION["children"] as $child) {
-
-            // Create array to hold childs matches
-            $child["matches"] = [];
-
-            try {
-                // Get the teams the child is on
-                $childTeams = $this->getTeamUserMapper()->findByColumn('user_id', $child["id"]);
-
-                /** @var TeamUser $team */
-                foreach ($childTeams as $team) {
-
-                    // Load the teams details if we haven't already
-                    if (!isset($teams[$team->getTeam()->getId()])) {
-                        $teams[$team->getTeam()->getId()] =
-                            $this->getTeamMapper()->findById($team->getTeam()->getId())->getName();
-                    }
-
-                    // Get all home and away matches for the current team
-                    $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getTeam()->getId());
-                    $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getTeam()->getId());
-
-                    // Create an array to hold these matches
-                    $child["matches"] = [];
-
-                    /** @var Match $match */
-                    foreach ($home_matches as $match) {
-                        // Only interested in future matches
-                        if ($match->getStartAt()->isFuture()) {
-                            $child["matches"][] = $match;
-
-                            // Load sport if we haven't already
-                            if (!isset($sports[$match->getDivision()->getSport()->getId()])) {
-                                $sports[$match->getDivision()->getSport()->getId()] =
-                                    $this->getSportMapper()->findById(
-                                        $match->getDivision()->getSport()->getId()
-                                    )->getName();
-                            }
-                            // Load team if we haven't already
-                            if (!isset($teams[$match->getAwayTeam()->getId()])) {
-                                $teams[$match->getAwayTeam()->getId()] =
-                                    $this->getTeamMapper()->findById(
-                                        $match->getAwayTeam()->getId()
-                                    )->getName();
-                            }
-                            if (!isset($teams[$match->getHomeTeam()->getId()])) {
-                                $teams[$match->getHomeTeam()->getId()] =
-                                    $this->getTeamMapper()->findById(
-                                        $match->getHomeTeam()->getId()
-                                    )->getName();
-                            }
-                        }
-                    }
-
-                    foreach ($away_matches as $match) {
-                        // Only interested in future matches
-                        if ($match->getStartAt()->isFuture()) {
-                            $child["matches"][] = $match;
-
-                            // Load sport if we haven't already
-                            if (!isset($sports[$match->getDivision()->getSport()->getId()])) {
-                                $sports[$match->getDivision()->getSport()->getId()] =
-                                    $this->getSportMapper()->findById(
-                                        $match->getDivision()->getSport()->getId()
-                                    )->getName();
-                            }
-
-                            // Load team if we haven't already
-                            if (!isset($teams[$match->getAwayTeam()->getId()])) {
-                                $teams[$match->getAwayTeam()->getId()] =
-                                    $this->getTeamMapper()->findById(
-                                        $match->getAwayTeam()->getId()
-                                    )->getName();
-                            }
-                            if (!isset($teams[$match->getHomeTeam()->getId()])) {
-                                $teams[$match->getHomeTeam()->getId()] =
-                                    $this->getTeamMapper()->findById(
-                                        $match->getHomeTeam()->getId()
-                                    )->getName();
-                            }
-                        }
-                    }
-                }
-
-            } catch (MapperException $e) {
-            }
-
-            // Sort matches by date order
-            usort($child["matches"], function($a, $b) {
-                /** @var Match $a */
-                /** @var Match $b */
-                return ($a->getStartAt()->compare($b->getStartAt()));
-            });
-
+            $child["matches"] = $this->getMatches(
+                $this->getTeamUserMapper()->findByColumn('user_id', $child["id"])
+            );
             $children[$child["id"]] = $child;
         }
 
         return [
             'role' => 'parent',
-            'children' => $children,
-            'teams' => $teams,
-            'sports' => $sports
+            'children' => $children
         ];
     }
 
@@ -208,93 +121,103 @@ class ComponentDelegate
      * @param User $user
      * @return array
      */
-    public function getStudentData($user)
+    public function getStudentDashboardData($user)
     {
+        // Get all teams the current user is in
+        $matches = $this->getMatches(
+            $this->getTeamUserMapper()->findByColumn('user_id', $user->getId())
+        );
+
+        return [
+            'user'      => $user,
+            'role'      => 'student',
+            'matches'   => $matches
+        ];
+    }
+
+    /**
+     * @param int $teamId
+     * @return array
+     */
+    public function getTeamData($teamId)
+    {
+        if ($teamId == 0) {
+            return [];
+        }
+
+        // Get current users role
+
         $matches = [];
-        $teams = [];
-        $sports = [];
 
-        try {
-            // Get all teams the current user is in
-            $childTeams = $this->getTeamUserMapper()->findByColumn('user_id', $user->getId());
+        // Get the team we are looking at
 
-            /** @var TeamUser $team */
-            foreach ($childTeams as $team) {
+        $team = $this->getTeamMapper()->findById($teamId);
 
-                // Load the teams details if we haven't already
-                if (!isset($teams[$team->getTeam()->getId()])) {
-                    $teams[$team->getTeam()->getId()] =
-                        $this->getTeamMapper()->findById($team->getTeam()->getId())->getName();
-                }
+        // Load all home and away matches for the team
 
-                // Get all home and away matches for the current team
-                $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getTeam()->getId());
-                $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getTeam()->getId());
+        $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getId());
+        $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getId());
 
-                // Whack all of the matches into an array
-                /** @var Match $match */
-                foreach ($home_matches as $match) {
-                    // Only interested in future matches
-                    if ($match->getStartAt()->isFuture()) {
-                        $matches[] = $match;
+        // Whack all of the matches into an array
 
-                        // Load sport if we haven't already
-                        if (!isset($sports[$match->getDivision()->getSport()->getId()])) {
-                            $sports[$match->getDivision()->getSport()->getId()] =
-                                $this->getSportMapper()->findById(
-                                    $match->getDivision()->getSport()->getId()
-                                )->getName();
-                        }
+        /** @var Match $match */
+        foreach ($home_matches as $match) {
+            if ($match->getStartAt()->isFuture()) {
+                $matches[] = $this->loadExternals($match);
+            }
+        }
 
-                        // Load team if we haven't already
-                        if (!isset($teams[$match->getAwayTeam()->getId()])) {
-                            $teams[$match->getAwayTeam()->getId()] =
-                                $this->getTeamMapper()->findById(
-                                    $match->getAwayTeam()->getId()
-                                )->getName();
-                        }
-                        if (!isset($teams[$match->getHomeTeam()->getId()])) {
-                            $teams[$match->getHomeTeam()->getId()] =
-                                $this->getTeamMapper()->findById(
-                                    $match->getHomeTeam()->getId()
-                                )->getName();
-                        }
-                    }
-                }
+        foreach ($away_matches as $match) {
+            if ($match->getStartAt()->isFuture()) {
+                $matches[] = $this->loadExternals($match);
+            }
+        }
 
-                foreach ($away_matches as $match) {
-                    // Only interested in future matches
-                    if ($match->getStartAt()->isFuture()) {
-                        $matches[] = $match;
+        return [
+            'matches' => $this->sortMatches($matches)
+        ];
+    }
 
-                        // Load sport if we haven't already
-                        if (!isset($sports[$match->getDivision()->getSport()->getId()])) {
-                            $sports[$match->getDivision()->getSport()->getId()] =
-                                $this->getSportMapper()->findById(
-                                    $match->getDivision()->getSport()->getId()
-                                )->getName();
-                        }
 
-                        // Load team if we haven't already
-                        if (!isset($teams[$match->getAwayTeam()->getId()])) {
-                            $teams[$match->getAwayTeam()->getId()] =
-                                $this->getTeamMapper()->findById(
-                                    $match->getAwayTeam()->getId()
-                                )->getName();
-                        }
-                        if (!isset($teams[$match->getHomeTeam()->getId()])) {
-                            $teams[$match->getHomeTeam()->getId()] =
-                                $this->getTeamMapper()->findById(
-                                    $match->getHomeTeam()->getId()
-                                )->getName();
-                        }
-                    }
+    /**
+     * @param $teamUsers
+     * @return array
+     */
+    public function getMatches($teamUsers) {
+        $matches = [];
+
+        /** @var TeamUser $teamUser */
+        foreach ($teamUsers as $teamUser) {
+
+            // Get all home and away matches for the current team
+            $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $teamUser->getTeam()->getId());
+            $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $teamUser->getTeam()->getId());
+
+            // Whack all of the matches into an array
+            /** @var Match $match */
+            foreach ($home_matches as $match) {
+                if ($match->getStartAt()->isFuture()) {
+                    $matches[] = $this->loadExternals($match);
                 }
             }
 
-        } catch (MapperException $e) {
+            foreach ($away_matches as $match) {
+                if ($match->getStartAt()->isFuture()) {
+                    $matches[] = $this->loadExternals($match);
+                }
+            }
         }
 
+        return $this->sortMatches($matches);
+    }
+
+    /**
+     * Sort matches chronologically
+     *
+     * @param array $matches
+     * @return mixed
+     */
+    public function sortMatches($matches) {
         // Sort matches by date order
         usort($matches, function($a, $b) {
             /** @var Match $a */
@@ -302,13 +225,32 @@ class ComponentDelegate
             return ($a->getStartAt()->compare($b->getStartAt()));
         });
 
-        return [
-            'user' => $user,
-            'role' => 'student',
-            'matches' => $matches,
-            'teams' => $teams,
-            'sports' => $sports
-        ];
+        return $matches;
+    }
+
+    /**
+     * Load external school names
+     * @param Match $match
+     * @return mixed
+     */
+    public function loadExternals($match) {
+        if ($match->getAwayTeam()->getId() == null) {
+            $match->getAwayTeam()->setName(
+                $this->getSchoolTagCloudMapper()->getTagName($match->getAwaySchoolId())
+            );
+        }
+
+        if ($match->getHomeTeam()->getId() == null) {
+            $match->getHomeTeam()->setName(
+                $this->getSchoolTagCloudMapper()->getTagName($match->getHomeSchoolId())
+            );
+        }
+
+        $match->getDivision()->getSport()->setName(
+            $this->getSportMapper()->findById($match->getDivision()->getSport()->getId())->getName()
+        );
+
+        return $match;
     }
 
     /**
@@ -465,5 +407,21 @@ class ComponentDelegate
     protected function setDivisionMapper($divisionMapper)
     {
         $this->divisionMapper = $divisionMapper;
-    }    
+    }
+
+    /**
+     * @return TagCloudMapper
+     */
+    protected function getSchoolTagCloudMapper()
+    {
+        return $this->schoolTagCloudMapper;
+    }
+
+    /**
+     * @param TagCloudMapper $schoolTagCloudMapper
+     */
+    protected function setSchoolTagCloudMapper($schoolTagCloudMapper)
+    {
+        $this->schoolTagCloudMapper = $schoolTagCloudMapper;
+    }
 }
