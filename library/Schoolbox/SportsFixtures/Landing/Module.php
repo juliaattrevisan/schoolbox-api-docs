@@ -6,7 +6,7 @@
  * @version     SVN: $Id$
  */
  
-namespace Schoolbox\SportsFixtures;
+namespace Schoolbox\SportsFixtures\Landing;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
@@ -35,10 +35,9 @@ class Module extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
-
         $routes = [
             'GET' => [
-                ''         => 'getLanding',
+                '' => 'getLanding',
             ],
             'POST' => [
             ]

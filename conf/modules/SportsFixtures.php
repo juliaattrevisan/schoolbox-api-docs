@@ -10,7 +10,7 @@ namespace Config\Modules;
 
 
 use Alaress\Application\Kernel;
-use Schoolbox\SportsFixtures\Module as LandingModule;
+use Schoolbox\SportsFixtures\Landing\Module as LandingModule;
 use Schoolbox\SportsFixtures\Sport\Module as SportModule;
 use Schoolbox\SportsFixtures\Division\Module as DivisionModule;
 use Schoolbox\SportsFixtures\Team\Module as TeamModule;
