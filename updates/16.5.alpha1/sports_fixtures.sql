@@ -301,14 +301,17 @@ VALUES ('Sport Fixtures', 'Schoolbox\\SportsFixtures\\Component\\Homepage\\Contr
 
 INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
 VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\SportsFixtures\\Component\\Homepage\\Controller'), 'collapse', '0', 'Collapse Content', null);
-
 INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
 VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\SportsFixtures\\Component\\Homepage\\Controller'), 'team', '0', 'Team To Display', null);
+INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
+VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\SportsFixtures\\Component\\Homepage\\Controller'), 'componentname', 'Sports Fixtures', 'Heading', null);
 
 INSERT INTO `component_definition` (name, class, description, module, component_category, visible, multiple)
 VALUES ('Sport Fixtures', 'Schoolbox\\SportsFixtures\\Component\\Dashboard\\Controller', 'Shows sports fixtures', 'dashboard', null, 'true', 'true');
 
 INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
 VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\SportsFixtures\\Component\\Dashboard\\Controller'), 'collapse', '0', 'Collapse Content', null);
+INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
+VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\SportsFixtures\\Component\\Dashboard\\Controller'), 'componentname', 'Sports Fixtures', 'Heading', null);
 
 
