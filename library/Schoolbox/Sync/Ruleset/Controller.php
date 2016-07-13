@@ -425,7 +425,12 @@ class Controller extends Base {
     }
 
     /**
-     * Update each Rule in the Ruleset
+     * Update a Rule in the Ruleset.
+     *
+     * Each call to this function should provide the sequence of all Rules, plus the
+     * contents for a single Rule in the Ruleset. Saving 'All Rules' would trigger
+     * multiple parallel asynchronous calls to this function. This is to avoid
+     * max_input_vars being breached.
      */
     public function update()
     {
@@ -439,10 +444,8 @@ class Controller extends Base {
             $this->updateEffects($ruleId, $ruleData['effect']);
         }
 
-        $this->updateRuleSequence(array_keys($postData['rule']));
+        $this->updateRuleSequence(($postData['sequence']));
         $this->updateCustomRules($roleType, $postData['customRule']);
-
-        $this->getResponse()->redirect->to("/adminv2/ups/$roleType");
     }
 
     /**

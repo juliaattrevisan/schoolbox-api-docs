@@ -15,6 +15,7 @@ set upsConfig = {
 
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.retry-promise.js"></script>
 <script type="text/javascript" src="/javascript/shared/ups/jquery.ups.js"></script>
 
 <script type="text/javascript">
@@ -63,8 +64,8 @@ set upsConfig = {
                 <a href="" class="close">×</a>
             </div>
         {% endif %}
-        <form id='ruleset' action='/adminv2/ups/ruleset/update' method="post">
-            <input type="hidden" name="rulesetId" value="{{ rulesetId }}" />
+        <div id='ruleset'>
+            <input type="hidden" name="rulesetId" id="rulesetId" value="{{ rulesetId }}" />
 
             <div class="actions-small-3">
                 <div class="list-item">
@@ -167,6 +168,8 @@ set upsConfig = {
                                 {% include allEffectStructures.containers[currentEffect.id] %}
                                 {% endfor %}
                             </ul>
+
+                            <input type="submit" value="Save Rule" data-ruleset-save-rule data-working="Saving Rule..." data-value="Save Rule">
                         </section>
                     </div>
 
@@ -184,6 +187,7 @@ set upsConfig = {
                         <li class="separator">Help</li>
                         <li><a class="icon-help" title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">About Tokens and Filters</a></li>
                     </ul>
+
                 </li>
                 {% endfor %}
             </ul>
@@ -242,8 +246,8 @@ set upsConfig = {
             {% endfor %}
             {% endif %}
 
-            <input type="submit" value="Save Rules" data-ruleset-save />
-        </form>
+            <input type="submit" value="Save Rules" data-ruleset-save data-working="Saving Rules..." data-value="Save Rules"/>
+        </div>
 
         <div id="token-list" class="reveal-modal" data-reveal>
             <div class="row">

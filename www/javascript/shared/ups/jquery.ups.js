@@ -28,6 +28,7 @@
          */
         var latestEffectInstance = 1;
 
+        initRuleUpdate();
         initRulesetUpdate();
 
         initRuleDelete();
@@ -99,6 +100,9 @@
                 /* Rule Settings
                  */
                 rule: {
+                    update: {
+                        url: '/adminv2/ups/ruleset/update',
+                    },
                     delete: {
                         url: '/adminv2/ups/rule/delete',
                         confirm: 'Are you sure you want to delete this Rule?',
@@ -129,6 +133,50 @@
         }
 
         /**
+         * Update a single Rule from Ruleset.
+         *
+         * This is to avoid max_input_vars being triggered.
+         *
+         * Enable all input fields for form submission, otherwise they
+         * don't get transmitted; then immediately disable them.
+         */
+        function initRuleUpdate() {
+            $(config.element).on('click', '[data-ruleset-save-rule]', function(event) {
+                event.preventDefault();
+
+                var $submit = $(this);
+                var $rule = $submit.closest('[data-rule]');
+                $submit.val($submit.attr('data-working'));
+                $rule.find(config.validInputTypes).attr('disabled', false);
+                $rule.find('option').removeAttr('disabled');
+
+                var $data = $('#rulesetId')
+                    .add($('[name="config[student][enabled]"]'))
+                    .add($rule.find(config.validInputTypes));
+
+                var dataArr = $data.serializeArray();
+
+                $('[data-rule]').each(function (idx, elem) {
+                    dataArr.push({name: 'sequence[]', value: $(elem).attr('data-rule')});
+                });
+
+                $.retryPromise(function(){
+                    return $.post(
+                        config.rule.update.url,
+                        dataArr,
+                        function(data, textStatus, jqXHR) {
+                            $submit.val($submit.attr('data-value'));
+                            $rule.find(config.validInputTypes).attr('disabled', false);
+                            $rule.find('option').removeAttr('disabled');
+                        })
+                });
+
+                $rule.find(config.validInputTypes).attr('disabled', true);
+            });
+            refreshSaveRulesetButtonAvailability();
+        }
+
+        /**
          * Update entire Ruleset
          *
          * Enable all input fields for form submission, otherwise they
@@ -138,9 +186,35 @@
             $(config.element).on('click', '[data-ruleset-save]', function(event) {
                 event.preventDefault();
 
-                $(config.element).find(config.validInputTypes).attr('disabled', false);
-                $(config.element).find('option').removeAttr('disabled');
-                $(config.element).submit();
+                var $submit = $(this);
+                $submit.val($submit.attr('data-working'));
+
+                var $rules = $(config.element).find('[data-rule]');
+
+                var ajaxes = [];
+
+                $rules.each(function(idx, elem){
+                    var $rule = $(elem);
+                    $rule.find(config.validInputTypes).attr('disabled', false);
+                    $rule.find('option').removeAttr('disabled');
+
+                    var $data = $('#rulesetId')
+                        .add($('[name="config[student][enabled]"]'))
+                        .add($rule.find(config.validInputTypes));
+                    var dataArr = $data.serializeArray();
+                    $rules.each(function (idx, elem) {
+                        dataArr.push({name: 'sequence[]', value: $(elem).attr('data-rule')});
+                    });
+                    ajaxes.push($.retryPromise(function(){return $.post(config.rule.update.url, dataArr)}))
+                });
+
+                $.when.apply(null, ajaxes)
+                .done(function(){
+                    $submit.val($submit.attr('data-value'));
+                    $(config.element).find(config.validInputTypes).attr('disabled', false);
+                    $(config.element).find('option').removeAttr('disabled');
+                })
+
                 $(config.element).find(config.validInputTypes).attr('disabled', true);
             });
             refreshSaveRulesetButtonAvailability();
