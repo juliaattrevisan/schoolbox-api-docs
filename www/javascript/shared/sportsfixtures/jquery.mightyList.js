@@ -97,7 +97,7 @@
 
                     $.ajax({
                         type: "POST",
-                        url:  container.find('[data-item-form]').attr('data-action'),
+                        url:  container.find('[data-action]').attr('data-action'),
                         data: data,
                         success: function (newItem) {
 

@@ -36,7 +36,7 @@
                 {% for currentStatus in allStatus %}
                     <li class="actions-small-1" data-item="{{ currentStatus.id }}">
                         <div class="list-item">
-                            <div data-action="{{ routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) }}" data-item-form>
+                            <div data-action="{{ routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) }}">
                                 <section>
                                     <fieldset class="content">
                                         <div class="small-12 columns">
@@ -51,7 +51,7 @@
                             </div>
                         </div>
                         <nav>
-                            <a href="{{ routeLookup('sportsfixturesStatus.deleteEntity', {entityId: currentStatus.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentStatus.id }}"></a>
+                            <a href="{{ routeLookup('sportsfixturesStatus.deleteEntity', {entityId: currentStatus.id}) }}" class="icon-delete" title="Delete" data-delete></a>
                         </nav>
                     </li>
                 {% endfor %}
@@ -68,7 +68,7 @@
 <ul class="information-list hide">
     <li id='item-clone' class="actions-small-1" data-item="">
         <div class="list-item">
-            <div data-action="{{ routeLookup('sportsfixturesStatus.createEntity') }}" data-item-form="">
+            <div data-action="{{ routeLookup('sportsfixturesStatus.createEntity') }}">
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
@@ -83,7 +83,7 @@
             </div>
         </div>
         <nav>
-            <a href="" class="icon-delete" title="Delete" data-delete=""></a>
+            <a href="" class="icon-delete" title="Delete" data-delete></a>
         </nav>
     </li>
 </ul>
