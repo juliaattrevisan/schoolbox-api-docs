@@ -75,12 +75,10 @@
                 /* Only execute if there is data to send
                  */
                 if (element.val()) {
-                    var identifier = element.attr('data-item-element');
 
-                    /* Find destination route
+                    /* Parent container for this row
                      */
-                    var form = $(config.element).find('[data-item-form='+identifier+']');
-                    var url = form.attr('data-action');
+                    var parent = element.parents('[data-item]');
 
                     /* Data package
                      */
@@ -88,10 +86,6 @@
                         id: element.attr('data-item-element'),
                         name: element.val()
                     };
-
-                    /* Parent container for this row
-                     */
-                    var parent = element.parents('[data-item]');
 
                     /* Indicator
                      */
@@ -103,11 +97,12 @@
 
                     $.ajax({
                         type: "POST",
-                        url:  url,
+                        url:  parent.find('[data-item-form]').attr('data-action'),
                         data: data,
                         success: function (newItem) {
 
-                            /* Update all the controls and identifiers
+                            /* Update all the controls and identifiers when you spawn new rows
+                             * This is so their controls will work correctly after persisting
                              */
                             parent.find('[data-item-form]').attr('data-item-form', newItem.id);
                             parent.find('[data-delete]').attr('data-delete', newItem.id).attr('href', newItem.delete);
@@ -118,8 +113,7 @@
                                 css: 'success'
                             });
 
-                            /* Count number of empty rows at bottom
-                             * Spawn a new row automatically if there are no
+                            /* Spawn a new row automatically if there are no
                              * empty ones ready to utilise
                              */
                             if (canSpawnRow()) {
