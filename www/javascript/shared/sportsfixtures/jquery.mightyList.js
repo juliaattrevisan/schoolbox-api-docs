@@ -32,7 +32,7 @@
                 /* The entity name of the things you are managing
                  * e.g. Status. Appears in confirmDialogs
                  */
-                name: 'Item',
+                entityName: 'Item',
 
                 /* The input element containing the unique id
                  * of each row item that exists
