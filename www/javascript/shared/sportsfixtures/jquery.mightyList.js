@@ -83,7 +83,7 @@
                     /* Data package
                      */
                     var data = {
-                        id: container.attr('data-item'),
+                        entityId: container.attr('data-item'),
                         name: element.val()
                     };
 
@@ -101,11 +101,12 @@
                         data: data,
                         success: function (newItem) {
 
-                            /* Update all the controls and identifiers when you spawn new rows
+                            /* Update all the links, controls and identifiers when you spawn new rows
                              * This is so their controls will work correctly after persisting
                              */
                             container.attr('data-item', newItem.id);
                             container.find('[data-delete]').attr('href', newItem.delete);
+                            container.find('[data-action]').attr('data-action', newItem.update);
 
                             indicator.labelTimeout({
                                 text: 'Saved',
