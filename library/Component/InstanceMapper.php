@@ -191,6 +191,10 @@ class Component_InstanceMapper extends Schoolbox\Mapper
         );
     }
 
+    /**
+     * @param $id
+     * @return array
+     */
     public function findByInstanceId($id)
     {
         $sql = '
