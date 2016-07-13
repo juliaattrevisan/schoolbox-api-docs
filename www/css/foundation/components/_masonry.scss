@@ -377,3 +377,11 @@ $masonry-drop-background: $input-focus-bg-color;
   @extend .icon-tiles;
   color: $icon-color-tiles;
 }
+.icon-masonry-Schoolbox_SportsFixtures_Component_Dashboard_Controller:before {
+   @extend .icon-sport;
+   color: $icon-color-sport;
+}
+.icon-masonry-Schoolbox_SportsFixtures_Component_Homepage_Controller:before {
+  @extend .icon-sport;
+  color: $icon-color-sport;
+}
