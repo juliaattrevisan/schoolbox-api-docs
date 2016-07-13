@@ -10,11 +10,11 @@ namespace Schoolbox\SportsFixtures\Component\Homepage;
 use Component_Homepage_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\SportsFixtures\Component\Delegate as ComponentDelegate;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use SitePage;
-use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
@@ -72,6 +72,11 @@ class Controller extends Component_Homepage_ControllerAbstract
     protected $itineraryItemMapper;
 
     /**
+     * @var ComponentDelegate
+     */
+    private $delegate;
+
+    /**
      * Injectable constructor
      *
      * @param Component_Instance $instance
@@ -89,6 +94,8 @@ class Controller extends Component_Homepage_ControllerAbstract
         $this->setItineraryItemMapper(ItineraryItemMapper::getInstance());
         $this->setVenueMapper(VenueMapper::getInstance());
         $this->setMatchMapper(MatchMapper::getInstance());
+
+        $this->delegate = new ComponentDelegate();
     }
 
     /**
