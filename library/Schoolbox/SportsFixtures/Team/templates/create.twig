@@ -42,9 +42,10 @@
                     },
                     render: {
                         item: function (data, escape) {
-                            console.log(data);
-                            var klass = "item", title = '';
-                            if (!data.user.id) {
+                            var klass   = "item",
+                                title   = '',
+                                hasUser = ('user' in data && 'id' in data.user && data.user.id);
+                            if (!hasUser) {
                                 // Not a SB user: put some icon there
                                 klass += ' icon-info';
                                 title = 'This user does not exist in Schoolbox.';
