@@ -132,7 +132,7 @@ class Controller extends AbstractController
                 }
 
                 // Sort return array by name
-                uasort($teams, function ($a, $b) {
+                usort($teams, function ($a, $b) {
                     return (strcmp($a['name'], $b['name']));
                 });
             }
