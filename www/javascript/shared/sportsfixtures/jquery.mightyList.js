@@ -74,7 +74,7 @@
 
                 /* Only execute if there is data to send
                  */
-                if (element.val()) {
+                if ($.trim(element.val())) {
 
                     /* Parent container for this row
                      */
