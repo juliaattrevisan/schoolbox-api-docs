@@ -73,11 +73,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
     protected $itineraryItemMapper;
 
     /**
-     * @var ErrorMapper
-     */
-    protected $errorMapper;
-
-    /**
      * Injectable constructor
      *
      * @param Component_Instance $instance
@@ -95,7 +90,6 @@ class Controller extends Component_Dashboard_ControllerAbstract
         $this->setItineraryItemMapper(ItineraryItemMapper::getInstance());
         $this->setVenueMapper(VenueMapper::getInstance());
         $this->setMatchMapper(MatchMapper::getInstance());
-        $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
     /**
@@ -495,21 +489,5 @@ class Controller extends Component_Dashboard_ControllerAbstract
     protected function setDivisionMapper($divisionMapper)
     {
         $this->divisionMapper = $divisionMapper;
-    }
-
-    /**
-     * @return ErrorMapper
-     */
-    protected function getErrorMapper()
-    {
-        return $this->errorMapper;
-    }
-
-    /**
-     * @param ErrorMapper $errorMapper
-     */
-    protected function setErrorMapper($errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
     }
 }
