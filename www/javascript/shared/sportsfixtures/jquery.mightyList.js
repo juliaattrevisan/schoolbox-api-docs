@@ -34,11 +34,6 @@
                  */
                 entityName: 'Item',
 
-                /* The input element containing the unique id
-                 * of each row item that exists
-                 */
-                identifierField: $('input[name=id]'),
-
                 /* When deleting, this is the param containing the
                  * deleted item's id - used asynchronously
                  */
@@ -124,7 +119,6 @@
                              */
                             parent.find('[data-item-form]').attr('data-item-form', newItem.id);
                             parent.find('[data-delete]').attr('data-delete', newItem.id).attr('href', newItem.delete);
-                            parent.find(config.identifierField).val(newItem.id);
                             element.attr('data-item-element', newItem.id);
 
                             indicator.labelTimeout({

@@ -4,7 +4,6 @@
     $(function() {
         $('#allItems').mightyList({
             entityName: 'Status',
-            identifierField: $('input[name=statusId]'),
             deleteKey: 'statusId'
         });
     });
@@ -42,8 +41,6 @@
                                 <section>
                                     <fieldset class="content">
                                         <div class="small-12 columns">
-                                            <input type="hidden" name="statusId" value="{{ currentStatus.id }}" />
-
                                             <label>
                                                 <input type="text" name="name" value="{{ currentStatus.name }}" data-item-element="{{ currentStatus.id }}" />
                                             </label>
@@ -76,8 +73,6 @@
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <input type="hidden" name="statusId" value="" />
-
                             <label>
                                 <input type="text" name="name" value="" data-item-element="" />
                             </label>
