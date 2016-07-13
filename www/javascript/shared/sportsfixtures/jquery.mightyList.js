@@ -142,7 +142,7 @@
 
                 /* Just remove unsaved elements
                  */
-                if (element.attr('data-delete') == '') {
+                if (container.attr('data-item') == '') {
                     container.remove();
 
                     refreshEmptyStates();
