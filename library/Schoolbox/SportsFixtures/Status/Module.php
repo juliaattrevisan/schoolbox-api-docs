@@ -13,7 +13,7 @@ use Aura\Di\ContainerInterface;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use Schoolbox\Permission\Access\UserAccess;
-
+use \Schoolbox\Mapper\Exception as MapperException;
 
 class Module extends RestfulModule
 {
@@ -48,5 +48,16 @@ class Module extends RestfulModule
          * Note that if the perms change you need to log out/log in to refresh
          */
         $this->addRoutePermission($authorizer, '.*', $isSportsAdministrator);
+    }
+
+    /**
+     * Specifically for this module, catch exceptions and hide them
+     *
+     * @param $id
+     * @return object
+     */
+    protected function findEntityById($id)
+    {
+        return $this->getMapper()->findById($id);
     }
 }
