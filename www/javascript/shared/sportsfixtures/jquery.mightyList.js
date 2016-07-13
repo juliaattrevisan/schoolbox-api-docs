@@ -182,10 +182,25 @@
 
                             data[config.deleteKey] = element.attr('data-delete');
 
-                            $.post(element.attr('href'), data, function() {
-                                container.remove();
+                            $.ajax({
+                                type: "POST",
+                                url: element.attr('href'),
+                                data: data,
+                                success: function() {
+                                    container.remove();
 
-                                refreshEmptyStates();
+                                    refreshEmptyStates();
+                                }
+                            }).fail(function(responseText) {
+
+                                /* Tried to delete an already-deleted item?
+                                 * Be compliant and just remove it
+                                 */
+                                if (responseText.status == 410) {
+                                    container.remove();
+
+                                    refreshEmptyStates();
+                                }
                             });
                         }
                     });
