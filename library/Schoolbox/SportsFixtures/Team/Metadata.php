@@ -11,7 +11,10 @@
 namespace Schoolbox\SportsFixtures\Team;
 
 use \Schoolbox\Collection;
+use \Schoolbox\UserMapper;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
+use \Schoolbox\SportsFixtures\Coach\Mapper as CoachMapper;
+use \Schoolbox\SportsFixtures\Coach\TagCloud as CoachTagCloud;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamUserMapper;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
@@ -44,6 +47,16 @@ class Metadata
     protected $teamPositionMapper;
 
     /**
+     * @var CoachMapper
+     */
+    protected $coachMapper;
+
+    /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
      * Metadata constructor.
      * @param Match $match
      */
@@ -54,6 +67,8 @@ class Metadata
         $this->setPositions(new Collection());
         $this->setTeamUserMapper(TeamUserMapper::getInstance());
         $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
+        $this->setCoachMapper(CoachMapper::getInstance());
+        $this->setUserMapper(UserMapper::getInstance());
 
         /** @var Team $homeTeam */
         /** @var Team $awayTeam */
@@ -98,18 +113,9 @@ class Metadata
              */
             $this->getCoaches()->setOffset($team->getId(), new Collection());
 
-            /* TODO: Extract actual Coaches
-             */
-            $userMapper = new \Schoolbox\UserMapper();
+            $coachTags = new CoachTagCloud($this->getCoachMapper(), $this->getUserMapper());
 
-            $anonymous = new \Schoolbox\User();
-            $anonymous->setFirstname('Joe');
-            $anonymous->setLastname('Anonymous');
-
-            $allCoaches = [];
-            $allCoaches[] = $userMapper->findById(19);
-            $allCoaches[] = $anonymous;
-            $allCoaches[] = $userMapper->findById(3);
+            $allCoaches = $coachTags->findForTeam($team);
 
             foreach ($allCoaches as $currentCoach) {
                 $this->getCoaches()->getOffset($team->getId())->add($currentCoach);
@@ -202,5 +208,37 @@ class Metadata
     {
         $this->teamPositionMapper = $teamPositionMapper;
         return $this;
+    }
+
+    /**
+     * @return CoachMapper
+     */
+    private function getCoachMapper()
+    {
+        return $this->coachMapper;
+    }
+
+    /**
+     * @param CoachMapper $coachMapper
+     */
+    private function setCoachMapper($coachMapper)
+    {
+        $this->coachMapper = $coachMapper;
+    }
+
+    /**
+     * @return UserMapper
+     */
+    private function getUserMapper()
+    {
+        return $this->userMapper;
+    }
+
+    /**
+     * @param UserMapper $userMapper
+     */
+    private function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
     }
 }
