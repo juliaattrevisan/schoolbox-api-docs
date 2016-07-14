@@ -60,6 +60,8 @@ class IsCoachOfTeam implements IAuthorizationRule
             $teamId = $result->getTeam()->getId();
         }
         else {
+            /* TODO: I have no identifying data when I'm creating a new result -_-
+             */
             throw new Unauthorized();
         }
 
