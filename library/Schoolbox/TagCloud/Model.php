@@ -11,8 +11,8 @@ namespace Schoolbox\TagCloud;
 
 use Schoolbox\User;
 
-class Model {
-
+class Model implements \JsonSerializable
+{
     /** @var int */
     protected $id;
 
@@ -39,7 +39,8 @@ class Model {
      * @param int $id
      * @return self
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -47,7 +48,8 @@ class Model {
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -55,7 +57,8 @@ class Model {
      * @param string $name
      * @return self
      */
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
         return $this;
     }
@@ -63,7 +66,8 @@ class Model {
     /**
      * @return string
      */
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
@@ -71,7 +75,8 @@ class Model {
      * @param string $createdAt
      * @return self
      */
-    public function setCreatedAt($createdAt) {
+    public function setCreatedAt($createdAt)
+    {
         $this->createdAt = $createdAt;
         return $this;
     }
@@ -79,7 +84,8 @@ class Model {
     /**
      * @return string
      */
-    public function getCreatedAt() {
+    public function getCreatedAt()
+    {
         return $this->createdAt;
     }
 
@@ -87,7 +93,8 @@ class Model {
      * @param string $updatedAt
      * @return self
      */
-    public function setUpdatedAt($updatedAt) {
+    public function setUpdatedAt($updatedAt)
+    {
         $this->updatedAt = $updatedAt;
         return $this;
     }
@@ -95,7 +102,8 @@ class Model {
     /**
      * @return string
      */
-    public function getUpdatedAt() {
+    public function getUpdatedAt()
+    {
         return $this->updatedAt;
     }
 
@@ -103,7 +111,8 @@ class Model {
      * @param string $deletedAt
      * @return self
      */
-    public function setDeletedAt($deletedAt) {
+    public function setDeletedAt($deletedAt)
+    {
         $this->deletedAt = $deletedAt;
         return $this;
     }
@@ -111,7 +120,19 @@ class Model {
     /**
      * @return string
      */
-    public function getDeletedAt() {
+    public function getDeletedAt()
+    {
         return $this->deletedAt;
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'id'   => $this->getId(),
+            'name' => $this->getName(),
+        ];
     }
 }

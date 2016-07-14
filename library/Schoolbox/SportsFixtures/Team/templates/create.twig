@@ -1,3 +1,5 @@
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function() {
         $('#teamForm').alaressValidate({
@@ -17,7 +19,45 @@
             errorPlacement: function(error, element) {
                 $.alaressValidate.defaultErrorPlacement(error, element);
             }
-        })
+        });
+
+        // Selectize box for selecting one or more users
+        // This box allows freetext entry, because of the requirement that
+        // coaches won't always be Schoolbox users.
+        var selector = $('[data-role="userSelector"]');
+        selector
+            .selectizeSelector({
+                multiple: true,
+                ajax: {
+                    url:      '/ajax/tags/sport_coach',
+                    type:     'GET',
+                    dataType: 'json'
+                },
+                selectize: {
+                    create: function(input) {
+                        var freeEntry = {};
+                        freeEntry[this.settings.valueField]  = 'newFromInput:'+input;
+                        freeEntry[this.settings.searchField] = input;
+                        return freeEntry;
+                    },
+                    render: {
+                        item: function (data, escape) {
+                            var klass   = "item",
+                                title   = '',
+                                hasUser = ('user' in data && 'id' in data.user && data.user.id);
+                            if (!hasUser) {
+                                // Not a SB user: put some icon there
+                                klass += ' icon-info';
+                                title = 'This user does not exist in Schoolbox.';
+                            }
+                            return '<div class="'+klass+'" title="'+title+'">'
+                                    + escape(data[this.settings.labelField])
+                                    + '</div>'
+                        }
+                    }
+                },
+                value: $.selectizeSelector.getValueFromSelect(selector)
+            });
     });
 </script>
 
@@ -65,6 +105,19 @@
                         <label>
                             Url
                             <input type="text" name="url" value="{{ team.url }}" />
+                        </label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Coaches
+                            <select type="text" data-role="userSelector" name="coach[]" multiple placeholder="Search Users">
+                            {% for coach in team.coaches %}
+                                <option selected data-value-object="{{ coach|json_encode }}" value="{{ coach.formatId }}">{{ coach.formatName }}</option>
+                            {% endfor %}
+                            </select>
                         </label>
                     </div>
                 </fieldset>

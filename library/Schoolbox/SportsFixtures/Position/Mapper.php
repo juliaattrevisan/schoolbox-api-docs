@@ -7,9 +7,11 @@
 
 namespace Schoolbox\SportsFixtures\Position;
 
+use Schoolbox\Collection;
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Position\Model as Position;
+use Schoolbox\User;
 
 
 /**
@@ -17,7 +19,7 @@ use Schoolbox\SportsFixtures\Position\Model as Position;
  * @method Position createModel(int $idValue = null)
  * @package Schoolbox\SportsFixtures\Position
  */
-class Mapper extends BaseMapper
+class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
 {
     /**
      * Setup mapping
@@ -36,5 +38,33 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
-
+    /**
+     * @param User $user
+     * @param string $keyword
+     * @param int $offset
+     * @param int $limit
+     * @return Collection|
+     */
+    public function findForTag(User $user, $keyword, $offset = 0, $limit = 0)
+    {
+        if (strlen($keyword) === 0) {
+            return new Collection();
+        }
+        $query = "{$this->getSelectString()} WHERE name LIKE :search";
+        if ($offset > 0) {
+            $query .= ' LIMIT :limit OFFSET :offset';
+        } elseif ($limit > 0) {
+            $query .= ' LIMIT :limit';
+        }
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->bindValue('search', '%'.$this->getDatabase()->quoteForLike($keyword).'%', \PDO::PARAM_STR);
+        if ($offset > 0) {
+            $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
+            $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
+        } elseif ($limit > 0) {
+            $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
+        }
+        $statement->execute();
+        return $this->hydrateSelect($statement);
+    }
 }

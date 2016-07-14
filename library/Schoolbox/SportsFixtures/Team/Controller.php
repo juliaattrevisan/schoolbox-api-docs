@@ -12,13 +12,14 @@ use Alaress\Web\Controller\Exception;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
+use \Schoolbox\SportsFixtures\Coach;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Division\Model as Division;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use \Schoolbox\SportsFixtures\Team\User\Model as TeamUserModel;
-use \Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
+use \Schoolbox\SportsFixtures\Team\Player\Model as TeamUserModel;
+use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamUserMapper;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
 use Schoolbox\UserMapper;
 use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
@@ -62,6 +63,11 @@ class Controller extends AbstractController
     protected $schoolTagCloudMapper;
 
     /**
+     * @var Coach\TagCloud
+     */
+    protected $coachCloud;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -74,6 +80,7 @@ class Controller extends AbstractController
         $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
+        $this->setCoachCloud(new Coach\TagCloud(Coach\Mapper::getInstance(), $this->getUserMapper()));
     }
 
     /**
@@ -89,6 +96,9 @@ class Controller extends AbstractController
     {
         $division = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
         $sport = $this->getSportMapper()->findById($division->getSport()->getId());
+
+        // Load coaches into entity
+        $entity->setCoaches($this->getCoachCloud()->findForTeam($entity));
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/entity.twig', [
             'sport'    => $sport,
@@ -123,7 +133,7 @@ class Controller extends AbstractController
 
             if ($this->getRequest()->query->get('schools') == 1) {
                 // Add schools from the tag cloud
-                $schools = $this->getSchoolTagCloudMapper()->getTagLike($query);
+                $schools = $this->getSchoolTagCloudMapper()->findForTag($this->getUser(), $query);
 
                 foreach ($schools as $school) {
                     // Prefix their ID with the external school token, we will parse it later when saving a match
@@ -178,6 +188,8 @@ class Controller extends AbstractController
      */
     public function getForm($entity, $context = null)
     {
+        // Load coaches into entity
+        $entity->setCoaches($this->getCoachCloud()->findForTeam($entity));
 
         if (empty($context)) {
             try {
@@ -217,7 +229,13 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
 
-        $this->saveTeam($division, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $entity);
+        $this->saveTeam(
+            $division,
+            $this->getRequest()->post['name'],
+            $this->getRequest()->post['url'],
+            $this->getRequest()->post->get('coach', []),
+            $entity
+        );
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesTeam.getList', [
             'contextId' => $divisionId
@@ -310,15 +328,18 @@ class Controller extends AbstractController
      * @param Division $division
      * @param string $name
      * @param string $url
+     * @param array $coaches
      * @param Team $team
      */
-    private function saveTeam(Division $division, $name, $url, Team $team)
+    private function saveTeam(Division $division, $name, $url, $coaches, Team $team)
     {
         $team->setName($name);
         $team->setUrl($url);
         $team->setDivision($division);
         $team->setUpdatedAt(\Alaress_Date_Format::now());
 
+        // Save each coach in the tag cloud too, and add to the team.
+        $team->setCoaches($this->getCoachCloud()->saveTagCloud($coaches));
         $this->getTeamMapper()->save($team);
     }
 
@@ -449,5 +470,23 @@ class Controller extends AbstractController
     protected function setSchoolTagCloudMapper($schoolTagCloudMapper)
     {
         $this->schoolTagCloudMapper = $schoolTagCloudMapper;
+    }
+
+    /**
+     * @return Coach\TagCloud
+     */
+    public function getCoachCloud()
+    {
+        return $this->coachCloud;
+    }
+
+    /**
+     * @param Coach\TagCloud $coachCloud
+     * @return static
+     */
+    public function setCoachCloud($coachCloud)
+    {
+        $this->coachCloud = $coachCloud;
+        return $this;
     }
 }

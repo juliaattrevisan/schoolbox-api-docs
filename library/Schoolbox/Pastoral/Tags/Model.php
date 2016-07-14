@@ -12,7 +12,8 @@ namespace Schoolbox\Pastoral\Tags;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
 
-class Model implements ISoftDeletable {
+class Model implements ISoftDeletable, \JsonSerializable
+{
 
     /** @var int */
     protected $id;
@@ -97,5 +98,16 @@ class Model implements ISoftDeletable {
      */
     public function isDeleted() {
         return !$this->getDeletedAt() instanceof \Alaress_Date_NullDate;
+    }
+
+    /**
+     * @return array
+     */
+    function jsonSerialize()
+    {
+        return [
+            'id'   => $this->getId(),
+            'name' => $this->getName(),
+        ];
     }
 }

@@ -9,6 +9,7 @@
  */
 
 use Schoolbox\Pastoral\Tags\Mapper as PastoralMapper;
+use Schoolbox\SportsFixtures\Coach;
 use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 
 if(!isset($this)) {
@@ -23,7 +24,14 @@ $di = $this->getDi();
 /* Note: Insert new tag types here. */
 $registry = [
     'pastoral'       => $di->lazyNew(PastoralMapper::class),
-    'sport_position' => $di->lazyNew(PositionMapper::class)
+    'sport_position' => $di->lazyNew(PositionMapper::class),
+    'sport_coach'    => $di->lazyNew(
+        Coach\TagCloud::class,
+        [
+            'mapper'     => $di->lazy([Coach\Mapper::class, 'getInstance']),
+            'userMapper' => $di->lazy([\Schoolbox\UserMapper::class, 'getInstance']),
+        ]
+    ),
 ];
 
 // Validate params
@@ -40,18 +48,15 @@ if(empty($registry[$this->arg[0]])){
 
 $tagsArray = [];
 
-if($errors){
+if ($errors) {
     header(':', true, 400);
 } else {
-    /** @var \Schoolbox\Mapper $mapper */
+    /** @var \Schoolbox\Mapper\UsableAsTagSource $mapper */
     $mapper = $registry[$this->arg[0]]();
-    $tags   = $mapper->findDistinct('name');
-    $query  = strtolower($_GET['query']);
-
-    foreach ($tags as $tag) {
-        if (strpos(strtolower($tag), $query) !== false) {
-            $tagsArray[] = ['id' => $tag, 'name' => $tag];
-        }
+    if ($mapper instanceof \Schoolbox\Mapper\UsableAsTagSource) {
+        $tagsArray = $mapper->findForTag($_SESSION['user'], $_GET['query']);
+    } else {
+        header(':', true, 500);
     }
 }
 

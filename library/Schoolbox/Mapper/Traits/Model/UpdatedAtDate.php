@@ -1,6 +1,6 @@
 <?php
 /**
- * Trait for model classes - adds a created date to the model.
+ * Trait for model classes - adds a modified date to the model.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
@@ -11,31 +11,31 @@ namespace Schoolbox\Mapper\Traits\Model;
 
 use Alaress_Date_Format;
 
-trait CreatedDate
+trait UpdatedAtDate
 {
     /**
-     * Created date
+     * Modified date
      *
      * @var Alaress_Date_Format
      */
-    protected $createdDate;
+    protected $updatedAt;
 
     /**
      * @return Alaress_Date_Format
      */
-    public function getCreatedDate()
+    public function getUpdatedAt()
     {
-        return $this->createdDate;
+        return $this->updatedAt;
     }
 
     /**
-     * @param  Alaress_Date_Format $createdDate
+     * @param  Alaress_Date_Format $updatedAt
      *
      * @return $this
      */
-    public function setCreatedDate($createdDate)
+    public function setUpdatedAt($updatedAt)
     {
-        $this->createdDate = $createdDate;
+        $this->updatedAt = $updatedAt;
         return $this;
     }
 }
