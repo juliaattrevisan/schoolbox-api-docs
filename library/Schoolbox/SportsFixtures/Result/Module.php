@@ -110,10 +110,17 @@ class Module extends RestfulModule
                 "/$context$collection/{teamId}/new" => 'getCreateFormForTeam',
                 "/$context$collection/{teamId}"     => 'getResultForTeam',
             ],
+            'POST' => [
+                "/match/{matchId}/team/{teamId}/$collection" => 'createResultForTeam',
+            ]
         ];
 
         foreach ($routes['GET'] as $path => $controllerMethod) {
             $this->addGetRoute($router, $controllerMethod, $basePath, $path)->setTokens([ 'contextId' => '\d+', 'entityId' => '\d+' ]);
+        }
+
+        foreach ($routes['POST'] as $path => $controllerMethod) {
+            $this->addPostRoute($router, $controllerMethod, $basePath, $path)->setTokens([ 'contextId' => '\d+', 'entityId' => '\d+' ]);
         }
     }
 
@@ -142,7 +149,7 @@ class Module extends RestfulModule
             ];
         });
 
-        $this->addRoutePreload($matcher, '(?:createEntity)', function () {
+        $this->addRoutePreload($matcher, '(?:createResultForTeam)', function ($params) {
             return [
                 'entity' => $this->mapper->createModel(),
                 'team' => TeamMapper::getInstance()->createModel()

@@ -135,6 +135,16 @@ class Controller extends AbstractController
     }
 
     /**
+     * @inheritdoc
+     *
+     * @param $entity
+     */
+    public function createResultForTeam($entity)
+    {
+        $this->persistEntity($entity);
+    }
+
+    /**
      * List of Results and the Match they are in
      *
      * @param Match $context
@@ -296,7 +306,7 @@ class Controller extends AbstractController
         /* Determine whether you've got write access or not
          * when viewing this page
          */
-        $hasMatchModify = $this->hasMatchModify();
+        $hasMatchModify = $this->hasMatchModify($teamMetadata->getCoaches()->getOffset($team->getId()));
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput(
@@ -323,7 +333,7 @@ class Controller extends AbstractController
      *
      * @return bool
      */
-    private function hasMatchModify()
+    private function hasMatchModify(\Schoolbox\Collection $allCoaches)
     {
         /** @var User $sessionUser */
         $sessionUser = $_SESSION['user'];
@@ -345,6 +355,14 @@ class Controller extends AbstractController
 
         foreach($allUserAccess as $currentUserAccess) {
             if ($currentUserAccess->getId() == $sessionUser->getId()) {
+                return true;
+            }
+        }
+
+        /* Coaches of this Team can add results
+         */
+        foreach ($allCoaches as $currentCoach) {
+            if ($currentCoach->getUser()->getId() == $sessionUser->getId()) {
                 return true;
             }
         }

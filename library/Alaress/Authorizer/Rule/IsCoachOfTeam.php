@@ -44,13 +44,13 @@ class IsCoachOfTeam implements IAuthorizationRule
     {
         /* Viewing the Team Match Page
          */
-        if ($params['contextId'] && $params['teamId']) {
+        if ($params['action'] == 'sportsfixturesResult.getResultForTeam') {
             $match = $params['context'];
             $teamId = $params['teamId'];
         }
-        /* When you're coming from the Modify Form
+        /* When you're viewing the Modify Form
          */
-        else if ($params['entityId']) {
+        else if ($params['action'] == 'sportsfixturesResult.getModifyForm') {
 
             /** @var Result $result */
             $result = $params['entity'];
@@ -59,9 +59,17 @@ class IsCoachOfTeam implements IAuthorizationRule
             $match = MatchMapper::getInstance()->findById($result->getMatch()->getId());
             $teamId = $result->getTeam()->getId();
         }
+        /* Persisting data
+         */
+        else if ($params['action'] == 'sportsfixturesResult.createResultForTeam') {
+
+            /** @var Match $match */
+            $match = MatchMapper::getInstance()->findById($params['matchId']);
+            $teamId = $params['teamId'];
+        }
+        /* Unknown state - die
+         */
         else {
-            /* TODO: I have no identifying data when I'm creating a new result -_-
-             */
             throw new Unauthorized();
         }
 
@@ -81,6 +89,8 @@ class IsCoachOfTeam implements IAuthorizationRule
             }
         }
 
+        /* If you aren't a coach, die
+         */
         throw new Unauthorized();
     }
 }
