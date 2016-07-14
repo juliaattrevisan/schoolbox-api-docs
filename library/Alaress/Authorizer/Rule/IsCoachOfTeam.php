@@ -31,7 +31,7 @@ class IsCoachOfTeam implements IAuthorizationRule
     protected $paramsKey = 'id';
 
     /**
-     * IsAnyParentOfUsers constructor.
+     * IsCoachOfTeam constructor.
      */
     public function __construct()
     {
@@ -59,7 +59,7 @@ class IsCoachOfTeam implements IAuthorizationRule
             $match = MatchMapper::getInstance()->findById($result->getMatch()->getId());
             $teamId = $result->getTeam()->getId();
         }
-        /* Persisting data
+        /* When you're persisting data from the Create form, for the first time
          */
         else if ($params['action'] == 'sportsfixturesResult.createResultForTeam') {
 
