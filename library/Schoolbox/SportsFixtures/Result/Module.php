@@ -85,8 +85,7 @@ class Module extends RestfulModule
             )
         );
 
-        $this->addRoutePermission($authorizer, 'getCreateForm|createEntity', $resultModifyFormAccess);
-
+        $this->addRoutePermission($authorizer, 'getCreateForm|createEntity|getModifyForm|updateEntity|deleteEntity', $resultModifyFormAccess);
     }
 
     /**
