@@ -80,7 +80,15 @@ class Notifier extends AbstractModuleNotifier
          */
         switch ($method) {
             case Mapper::METHOD_DELETE:
-                $bundle->attach(self::TRIGGER_REMOVED, self::IMMEDIATELY);
+                $team = $this->getTeamMapper()->findById($bundle->getEvent()->getObject()->getTeam()->getId());
+                $match = $this->getMatchMapper()->findNextMatch($team);
+
+                $diff = \Alaress_Date_Format::now()->diffInHours($match->getStartAt());
+
+                if ($diff > 0 && $diff < 24) {
+                    $bundle->attach(self::TRIGGER_REMOVED, self::IMMEDIATELY);
+                }
+
                 break;
         }
     }
@@ -99,7 +107,7 @@ class Notifier extends AbstractModuleNotifier
 
         $title = 'You were removed from :team';
         $params = [
-            'team' => new Param($team->getName(), $team->getUrl() . '?' . microtime(), Param::STACKING_APPEND)
+            'team' => new Param($team->getName(), $team->getUrl() . '?' . microtime(), Param::STACKING_REPLACE)
         ];
 
         $bob = $this->notifyRemoved($effector, $teamUser, $team, $title, $params)->build();
@@ -125,7 +133,7 @@ class Notifier extends AbstractModuleNotifier
         $title = ':user was removed from :team';
         $params = [
             'user' => new UserParam($teamUser->getUser(), Param::STACKING_IGNORE),
-            'team' => new Param($team->getName(), $team->getUrl() . '?' . microtime(), Param::STACKING_APPEND)
+            'team' => new Param($team->getName(), $team->getUrl() . '?' . microtime(), Param::STACKING_REPLACE)
         ];
 
         $bob = $this->notifyRemoved($effector, $teamUser, $team, $title, $params)->build();
@@ -147,12 +155,7 @@ class Notifier extends AbstractModuleNotifier
     private function notifyRemoved(User $effector, TeamUser $teamUser, Team $team, $title, array $params) {
         $this->log->info($effector->getFullname());
 
-        $homeTeamMatches = MatchMapper::getInstance()->findByColumn('home_team_id', $team->getId());
-        $awayTeamMatches = MatchMapper::getInstance()->findByColumn('away_team_id', $team->getId());
-
-        $homeTeamMatches->merge($awayTeamMatches)->sortBy('startAt', 'asc');
-
-        $match = $homeTeamMatches->first();
+        $match = $this->getMatchMapper()->findNextMatch($team);
 
         $bob = new Builder();
         $bob->setTitle($title)

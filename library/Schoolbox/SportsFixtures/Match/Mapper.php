@@ -216,4 +216,25 @@ class Mapper extends BaseMapper
 
         return $collection;
     }
+
+    /**
+     * Find the next match for a team
+     * The team can be either the home or away team
+     *
+     * @param Team $team
+     * @return mixed
+     */
+    public function findNextMatch(Team $team)
+    {
+        $homeTeamMatches = $this->findByColumn('home_team_id', $team->getId());
+        $awayTeamMatches = $this->findByColumn('away_team_id', $team->getId());
+
+        $homeTeamMatches->merge($awayTeamMatches)->sortBy('startAt', 'asc');
+
+        if ($homeTeamMatches->count()) {
+            return $homeTeamMatches->first();
+        }
+
+        throw new \OutOfBoundsException();
+    }
 }
