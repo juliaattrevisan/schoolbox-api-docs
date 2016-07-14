@@ -16,7 +16,7 @@ use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Coach\Mapper as CoachMapper;
 use \Schoolbox\SportsFixtures\Coach\TagCloud as CoachTagCloud;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
-use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamUserMapper;
+use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
 
 class Metadata
@@ -37,9 +37,9 @@ class Metadata
     private $positions;
 
     /**
-     * @var TeamUserMapper
+     * @var TeamPlayerMapper
      */
-    protected $teamUserMapper;
+    protected $teamPlayerMapper;
 
     /**
      * @var TeamPositionMapper
@@ -65,7 +65,7 @@ class Metadata
         $this->setPlayers(new Collection());
         $this->setCoaches(new Collection());
         $this->setPositions(new Collection());
-        $this->setTeamUserMapper(TeamUserMapper::getInstance());
+        $this->setTeamPlayerMapper(TeamPlayerMapper::getInstance());
         $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
         $this->setCoachMapper(CoachMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
@@ -92,7 +92,7 @@ class Metadata
              */
             $this->getPlayers()->setOffset($team->getId(), new Collection());
 
-            $allPlayers = $this->getTeamUserMapper()->findByColumn('team_id', $team->getId(), ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]);
+            $allPlayers = $this->getTeamPlayerMapper()->findByColumn('team_id', $team->getId(), ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]);
 
             foreach ($allPlayers as $currentPlayer) {
                 $this->getPlayers()->getOffset($team->getId())->add($currentPlayer->getUser());
@@ -175,20 +175,20 @@ class Metadata
     }
 
     /**
-     * @return TeamUserMapper
+     * @return TeamPlayerMapper
      */
-    private function getTeamUserMapper()
+    private function getTeamPlayerMapper()
     {
-        return $this->teamUserMapper;
+        return $this->teamPlayerMapper;
     }
 
     /**
-     * @param TeamUserMapper $teamUserMapper
+     * @param TeamPlayerMapper $teamPlayerMapper
      * @return static
      */
-    private function setTeamUserMapper(TeamUserMapper $teamUserMapper)
+    private function setTeamPlayerMapper(TeamPlayerMapper $teamPlayerMapper)
     {
-        $this->teamUserMapper = $teamUserMapper;
+        $this->teamPlayerMapper = $teamPlayerMapper;
         return $this;
     }
 

@@ -19,7 +19,7 @@ use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\SportsFixtures\Team\Player\Model as TeamUserModel;
-use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamUserMapper;
+use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
 use Schoolbox\UserMapper;
 use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
@@ -43,9 +43,9 @@ class Controller extends AbstractController
     protected $errorMapper;
 
     /**
-     * @var TeamUserMapper
+     * @var TeamPlayerMapper
      */
-    protected $teamUserMapper;
+    protected $teamPlayerMapper;
 
     /**
      * @var TeamPositionMapper
@@ -76,7 +76,7 @@ class Controller extends AbstractController
         $this->setSportMapper(SportMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
-        $this->setTeamUserMapper(TeamUserMapper::getInstance());
+        $this->setTeamPlayerMapper(TeamPlayerMapper::getInstance());
         $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
@@ -251,12 +251,12 @@ class Controller extends AbstractController
     {
         $teamUsers = [];
         foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
-            $teamUsers[] = $this->getTeamUserMapper()->createModel()
+            $teamUsers[] = $this->getTeamPlayerMapper()->createModel()
                 ->setTeam($team)
                 ->setUser($user)
                 ->setSequence(0);
         }
-        $this->getTeamUserMapper()->save($teamUsers);
+        $this->getTeamPlayerMapper()->save($teamUsers);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'sportsfixturesDivision.getLobby',
@@ -272,8 +272,8 @@ class Controller extends AbstractController
      */
     public function postRemovePlayers(Team $team)
     {
-        $this->getTeamUserMapper()->delete(
-            $this->getTeamUserMapper()->findByColumnList([
+        $this->getTeamPlayerMapper()->delete(
+            $this->getTeamPlayerMapper()->findByColumnList([
                 'user_id' => $this->getRequest()->post->get('userId'),
                 'team_id' => $team->getId(),
             ])
@@ -303,7 +303,7 @@ class Controller extends AbstractController
         foreach ($userIds as $userId) {
             try {
                 /** @var TeamUserModel $teamUser */
-                $teamUser = $this->getTeamUserMapper()->findOneByColumnList([
+                $teamUser = $this->getTeamPlayerMapper()->findOneByColumnList([
                     'user_id' => $userId,
                     'team_id' => $team->getId(),
                 ]);
@@ -313,7 +313,7 @@ class Controller extends AbstractController
                 continue;
             }
         }
-        $this->getTeamUserMapper()->save($teamUsers);
+        $this->getTeamPlayerMapper()->save($teamUsers);
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
                 'sportsfixturesDivision.getLobby',
@@ -403,20 +403,20 @@ class Controller extends AbstractController
     }
 
     /**
-     * @return TeamUserMapper
+     * @return TeamPlayerMapper
      */
-    protected function getTeamUserMapper()
+    protected function getTeamPlayerMapper()
     {
-        return $this->teamUserMapper;
+        return $this->teamPlayerMapper;
     }
 
     /**
-     * @param TeamUserMapper $teamUserMapper
+     * @param TeamPlayerMapper $teamPlayerMapper
      * @return static
      */
-    protected function setTeamUserMapper(TeamUserMapper $teamUserMapper)
+    protected function setTeamPlayerMapper(TeamPlayerMapper $teamPlayerMapper)
     {
-        $this->teamUserMapper = $teamUserMapper;
+        $this->teamPlayerMapper = $teamPlayerMapper;
         return $this;
     }
 

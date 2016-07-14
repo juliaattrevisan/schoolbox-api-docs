@@ -15,7 +15,7 @@ use Schoolbox\User as UserModel;
 use Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
-use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamUserMapper;
+use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\SportsFixtures\Team\Player\Model as TeamUserModel;
 
 /**
@@ -100,8 +100,8 @@ class Mapper extends BaseMapper
      */
     public function deleteTeamMembership(Model $model)
     {
-        TeamUserMapper::getInstance()->delete(
-            TeamUserMapper::getInstance()->findForUserInDivision(
+        TeamPlayerMapper::getInstance()->delete(
+            TeamPlayerMapper::getInstance()->findForUserInDivision(
                 $model->getUser(),
                 $model->getDivision()
             )

@@ -20,7 +20,7 @@ use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Position\Model as PositionModel;
 use \Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamUserMapper;
+use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use \Schoolbox\SportsFixtures\Team\Position\Model as TeamPositionModel;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
 use Schoolbox\SportsFixtures\Division\Model as Division;
@@ -64,9 +64,9 @@ class Controller extends AbstractController
     protected $divisionUserMapper;
 
     /**
-     * @var TeamUserMapper
+     * @var TeamPlayerMapper
      */
-    protected $teamUserMapper;
+    protected $teamPlayerMapper;
 
     /**
      * @var TeamPositionMapper
@@ -85,7 +85,7 @@ class Controller extends AbstractController
         $this->setPositionMapper(PositionMapper::getInstance());
         $this->setDivisionUserMapper(DivisionUserMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
-        $this->setTeamUserMapper(TeamUserMapper::getInstance());
+        $this->setTeamPlayerMapper(TeamPlayerMapper::getInstance());
         $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
     }
 
@@ -188,7 +188,7 @@ class Controller extends AbstractController
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
-        $teamPlayers = $this->getTeamUserMapper()->findByColumn(
+        $teamPlayers = $this->getTeamPlayerMapper()->findByColumn(
             'team_id',
             $teams->getColumnValues('id'),
             ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]
@@ -609,20 +609,20 @@ class Controller extends AbstractController
     }
 
     /**
-     * @return TeamUserMapper
+     * @return TeamPlayerMapper
      */
-    protected function getTeamUserMapper()
+    protected function getTeamPlayerMapper()
     {
-        return $this->teamUserMapper;
+        return $this->teamPlayerMapper;
     }
 
     /**
-     * @param TeamUserMapper $teamUserMapper
+     * @param TeamPlayerMapper $teamPlayerMapper
      * @return static
      */
-    protected function setTeamUserMapper(TeamUserMapper $teamUserMapper)
+    protected function setTeamPlayerMapper(TeamPlayerMapper $teamPlayerMapper)
     {
-        $this->teamUserMapper = $teamUserMapper;
+        $this->teamPlayerMapper = $teamPlayerMapper;
         return $this;
     }
 

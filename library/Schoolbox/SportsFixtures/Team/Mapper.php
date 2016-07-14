@@ -78,8 +78,8 @@ class Mapper extends BaseMapper
      */
     public function deletePlayers(Team $team)
     {
-        $teamUserMapper = Player\Mapper::getInstance();
-        $teamUserMapper->delete($teamUserMapper->findByColumn('team_id', $team->getId()));
+        $teamPlayerMapper = Player\Mapper::getInstance();
+        $teamPlayerMapper->delete($teamPlayerMapper->findByColumn('team_id', $team->getId()));
 
         /* TODO: Delete all Fixtures in this Team when this Team is deleted
          */
