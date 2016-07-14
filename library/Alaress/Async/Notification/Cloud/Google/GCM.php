@@ -11,8 +11,9 @@ namespace Alaress\Async\Notification\Cloud\Google;
 
 use Alaress\Async\Notification\Cloud\AbstractService;
 use Guzzle\Http\Client;
-use OutOfBoundsException;
+use Monolog\Logger;
 use OverflowException;
+use RuntimeException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\MobileApp\Registry;
 
@@ -58,6 +59,8 @@ class GCM extends AbstractService
      * @param array  $registrationIds
      * @param int    $id
      * @param string $title
+     * @throws RuntimeException if your API key is bad
+     * @throws OverflowException if the max payload size (4KB) is exceeded
      * @return bool
      */
     public function propagate(array $registrationIds, $id, $title)
@@ -93,9 +96,25 @@ class GCM extends AbstractService
             $rq = $client->post($apiUri, $headers, $payload);
 
             try {
-                $rq->send();
+                $rs = $rq->send();
 
-            } catch (OutOfBoundsException $e) {
+                if ($rs->getStatusCode() < 200 || $rs->getStatusCode() >= 300) {
+                    throw new RuntimeException("Non-200 response from GCM: {$rs->getStatusCode()}");
+                }
+
+                $body = json_decode($rs->getBody(true), true);
+
+                foreach ($body['results'] as $i => $result) {
+                    $regId = $registrationIds[$i];
+
+                    if (isset($result['error'])) {
+                        $this->report("$regId", $result['error'], Logger::INFO, '?');
+                    } else {
+                        $this->report("$regId", "All ok!", Logger::DEBUG);
+                    }
+                }
+
+            } catch (RuntimeException $e) {
                 if ($e->getCode() == 401) {
                     // your API key is bad: don't try to do anything else
                     throw $e;

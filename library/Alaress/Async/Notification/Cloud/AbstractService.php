@@ -82,7 +82,32 @@ abstract class AbstractService implements ServiceInterface
 
 
     /**
+     * @param string $token
+     * @param string $status
+     * @param int    $severity
+     * @param string $char
+     * @return void
+     */
+    protected function report($token, $status, $severity, $char = null)
+    {
+        $class = get_class($this);
+        $class = substr($class, strrpos($class, '\\') + 1);
+
+        $context = [];
+
+        if ($char) {
+            $context['char'] = $char;
+        }
+
+        $this->getLog()->log($severity, "$class response for $token: $status", $context);
+
+
+    }
+
+
+    /**
      * @param array $tokens
+     * @param int   $id
      * @param string $title
      * @return bool
      */
