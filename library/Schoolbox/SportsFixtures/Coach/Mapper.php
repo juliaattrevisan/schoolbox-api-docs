@@ -20,7 +20,7 @@ use Schoolbox\User as UserModel;
  * @method Model createModel()
  * @package Schoolbox\SportsFixtures\Coach
  */
-class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
+class Mapper extends BaseMapper
 {
     /**
      * Setup mapping
@@ -74,83 +74,5 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
             $collection->add($model);
         }
         return $collection;
-    }
-
-    /**
-     * Retrieves a list of items for a tag cloud.
-     *
-     * @param UserModel $user
-     * @param string $keyword
-     * @param int $offset
-     * @param int $limit
-     * @return Collection|Model[]
-     */
-    public function findForTag(UserModel $user, $keyword, $offset = 0, $limit = 0)
-    {
-        // Join side: tag w/o user is okay, so is user w/o tag - therefore FULL OUTER JOIN.
-        // But that doesn't exist in MySQL! Emulate with LEFT JOIN U RIGHT JOIN
-        // Search match: close enough to user AJAX search
-        $selectPart = "
-            SELECT
-                {$this->getColumnString()},
-                {$this->getJoinColumnString('user', 'u')},
-                {$this->getJoinColumnString('user.role', 'ur')}
-            FROM {$this->getTable()}
-        ";
-        $wherePart = "
-            WHERE {$this->getTable()}.name LIKE :search
-            OR    CONCAT(u.firstname, ' ', u.lastname) LIKE :search
-        ";
-        $joinPart = "
-            JOIN {$this->getJoinSql('user', '', 'u')}
-            LEFT JOIN {$this->getJoinSql('user.role', 'u', 'ur')}
-        ";
-        $query = "
-            ($selectPart LEFT $joinPart $wherePart)
-            UNION ALL
-            ($selectPart RIGHT $joinPart $wherePart)
-            ORDER BY name ASC, `u.lastname` ASC, `u.firstname` ASC
-        ";
-        if ($offset > 0) {
-            $query .= ' LIMIT :limit OFFSET :offset';
-        } elseif ($limit > 0) {
-            $query .= ' LIMIT :limit';
-        }
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->bindValue('search', '%'.$this->getDatabase()->quoteForLike($keyword).'%', \PDO::PARAM_STR);
-        if ($offset > 0) {
-            $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
-            $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
-        } elseif ($limit > 0) {
-            $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
-        }
-        $statement->execute();
-        return $this->hydrateSelect($statement);
-    }
-
-    /**
-     * Retrieves coaches for the given team.
-     *
-     * @param Team\Model $team
-     * @return Collection|Model[]
-     */
-    public function findForTeam(Team\Model $team)
-    {
-        $query = "
-            SELECT
-                {$this->getColumnString()},
-                {$this->getJoinColumnString('user', 'u')},
-                {$this->getJoinColumnString('user.role', 'ur')}
-            FROM {$this->getTable()}
-            INNER JOIN sportsfixtures_team_coach stc ON {$this->getTable()}.id = stc.sportsfixtures_coach_id
-            LEFT JOIN {$this->getJoinSql('user', '', 'u')}
-            LEFT JOIN {$this->getJoinSql('user.role', 'u', 'ur')}
-            WHERE stc.sportsfixtures_team_id = :teamId
-            ORDER BY name ASC
-        ";
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->bindValue('teamId', $team->getId(), \PDO::PARAM_INT);
-        $statement->execute();
-        return $this->hydrateSelect($statement);
     }
 }

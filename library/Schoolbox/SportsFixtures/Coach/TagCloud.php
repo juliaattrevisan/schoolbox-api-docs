@@ -147,10 +147,45 @@ class TagCloud implements BaseMapper\UsableAsTagSource
         if (strlen($keyword) === 0) {
             return new Collection();
         }
-        // This could retrieve a list of tags which like-match this keyword
-        // + a list of users which like-match
-        // Leave out user tags which are already found
-        return $this->mapper->findForTag($user, $keyword, $offset, $limit);
+        // Join side: tag w/o user is okay, so is user w/o tag - therefore FULL OUTER JOIN.
+        // But that doesn't exist in MySQL! Emulate with LEFT JOIN U RIGHT JOIN
+        // Search match: close enough to user AJAX search
+        $selectPart = "
+            SELECT
+                {$this->mapper->getColumnString()},
+                {$this->mapper->getJoinColumnString('user', 'u')},
+                {$this->mapper->getJoinColumnString('user.role', 'ur')}
+            FROM {$this->mapper->getTable()}
+        ";
+        $wherePart = "
+            WHERE {$this->mapper->getTable()}.name LIKE :search
+            OR    CONCAT(u.firstname, ' ', u.lastname) LIKE :search
+        ";
+        $joinPart = "
+            JOIN {$this->mapper->getJoinSql('user', '', 'u')}
+            LEFT JOIN {$this->mapper->getJoinSql('user.role', 'u', 'ur')}
+        ";
+        $query = "
+            ($selectPart LEFT $joinPart $wherePart)
+            UNION ALL
+            ($selectPart RIGHT $joinPart $wherePart)
+            ORDER BY name ASC, `u.lastname` ASC, `u.firstname` ASC
+        ";
+        if ($offset > 0) {
+            $query .= ' LIMIT :limit OFFSET :offset';
+        } elseif ($limit > 0) {
+            $query .= ' LIMIT :limit';
+        }
+        $statement = $this->mapper->getDatabase()->prepare($query);
+        $statement->bindValue('search', '%'.$this->mapper->getDatabase()->quoteForLike($keyword).'%', \PDO::PARAM_STR);
+        if ($offset > 0) {
+            $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
+            $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
+        } elseif ($limit > 0) {
+            $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
+        }
+        $statement->execute();
+        return $this->mapper->hydrateSelect($statement);
     }
 
     /**
@@ -161,6 +196,22 @@ class TagCloud implements BaseMapper\UsableAsTagSource
      */
     public function findForTeam(Team\Model $team)
     {
-        return $this->mapper->findForTeam($team);
+
+        $query = "
+            SELECT
+                {$this->mapper->getColumnString()},
+                {$this->mapper->getJoinColumnString('user', 'u')},
+                {$this->mapper->getJoinColumnString('user.role', 'ur')}
+            FROM {$this->mapper->getTable()}
+            INNER JOIN sportsfixtures_team_coach stc ON {$this->mapper->getTable()}.id = stc.sportsfixtures_coach_id
+            LEFT JOIN {$this->mapper->getJoinSql('user', '', 'u')}
+            LEFT JOIN {$this->mapper->getJoinSql('user.role', 'u', 'ur')}
+            WHERE stc.sportsfixtures_team_id = :teamId
+            ORDER BY name ASC
+        ";
+        $statement = $this->mapper->getDatabase()->prepare($query);
+        $statement->bindValue('teamId', $team->getId(), \PDO::PARAM_INT);
+        $statement->execute();
+        return $this->mapper->hydrateSelect($statement);
     }
 }

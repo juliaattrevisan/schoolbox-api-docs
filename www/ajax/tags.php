@@ -9,7 +9,7 @@
  */
 
 use Schoolbox\Pastoral\Tags\Mapper as PastoralMapper;
-use Schoolbox\SportsFixtures\Coach\Mapper as CoachMapper;
+use Schoolbox\SportsFixtures\Coach;
 use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 
 if(!isset($this)) {
@@ -25,7 +25,13 @@ $di = $this->getDi();
 $registry = [
     'pastoral'       => $di->lazyNew(PastoralMapper::class),
     'sport_position' => $di->lazyNew(PositionMapper::class),
-    'sport_coach'    => $di->lazyNew(CoachMapper::class),
+    'sport_coach'    => $di->lazyNew(
+        Coach\TagCloud::class,
+        [
+            'mapper'     => $di->lazy([Coach\Mapper::class, 'getInstance']),
+            'userMapper' => $di->lazy([\Schoolbox\UserMapper::class, 'getInstance']),
+        ]
+    ),
 ];
 
 // Validate params
