@@ -545,6 +545,12 @@ class Controller extends Base {
 
         if (is_array($effects)) {
             foreach ($effects as $effectId => $effectData) {
+
+                // Don't save undefined effects
+                if("" === $effectData['userProperty'] || "" === $effectData['type']){
+                    continue;
+                }
+
                 $effectArgs = (array)$effectData['arguments'];
 
                 // ensure this is in the right order
