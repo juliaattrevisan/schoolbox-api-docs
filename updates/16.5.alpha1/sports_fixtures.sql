@@ -235,4 +235,10 @@ CREATE TABLE `sportsfixtures_status` (
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
+INSERT INTO `sportsfixtures_status` VALUES
+(null,'Win',NOW(),NOW(),null),
+(null,'Loss',NOW(),NOW(),null),
+(null,'Draw',NOW(),NOW(),null),
+(null,'Cancelled',NOW(),NOW(),null);
+
 INSERT INTO `msg_namespace` (`slug`, `label`) VALUES ('sports_fixtures', 'Sports Fixtures');
