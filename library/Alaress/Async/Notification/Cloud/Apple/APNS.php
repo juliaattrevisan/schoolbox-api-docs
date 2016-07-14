@@ -14,6 +14,7 @@ use Alaress\Async\Notification\Cloud\AbstractService;
 use InvalidArgumentException;
 use Monolog\Logger;
 use Schoolbox\MobileApp\Registry;
+use Schoolbox\MobileApp\RegistryMapper;
 use ZendService\Apple\Apns\Client\Message as Client;
 use ZendService\Apple\Apns\Response\Message as Response;
 use ZendService\Apple\Apns\Message;
@@ -138,6 +139,10 @@ class APNS extends AbstractService
                     case Response::RESULT_INVALID_TOKEN:
                         // the token was invalid; remove it from your system
                         $this->report($prefix, "Invalid token", Logger::INFO, '?');
+                        // we need to delete this token, it will only break things
+                        // TODO remove the singletonness...
+                        RegistryMapper::getInstance()->deleteByColumn('app_token', $token);
+                        $this->client->close();
                         break;
                     case Response::RESULT_UNKNOWN_ERROR:
                         // apple didn't tell us what happened
