@@ -13,7 +13,7 @@ namespace Schoolbox\SportsFixtures\Team;
 use \Schoolbox\Collection;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
-use \Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
+use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamUserMapper;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
 
 class Metadata
