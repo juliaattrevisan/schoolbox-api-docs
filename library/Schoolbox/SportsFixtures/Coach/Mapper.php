@@ -77,6 +77,65 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     }
 
     /**
+     * Parses tag into its tag type and identifier.
+     *
+     * @param string $tag
+     * @return array A tag type - tag value tuple if this is a valid tag,
+     *               empty array if not.
+     */
+    public function parseTag($tag)
+    {
+        if (strpos($tag, ':') !== false) {
+            $tagTuple = explode(':', $tag, 2);
+            if (in_array($tagTuple[0], [Model::PREFIX_EXISTING_TAG, Model::PREFIX_NEW_FROM_USER, Model::PREFIX_NEW_FROM_INPUT])) {
+                return $tagTuple;
+            }
+        }
+        return [];
+    }
+
+    /**
+     * Retrieves a tag model from a tag.
+     *
+     * @param string $tag
+     * @return Model
+     * @throws \UnexpectedValueException if $tag isn't parseable.
+     * @throws BaseMapper\Exception if the tag model wasn't findable from the tag
+     */
+    public function findByTag($tag)
+    {
+        $tagTuple = $this->parseTag($tag);
+        if ($tagTuple) {
+            list($tagType, $identifier) = $tagTuple;
+            $newModel = null;
+            switch ($tagType) {
+                case Model::PREFIX_EXISTING_TAG:
+                    // This tag already exists. Fetch it and move on.
+                    // This throws an exception if no tag exists with this ID.
+                    return $this->findById($identifier);
+
+                case Model::PREFIX_NEW_FROM_INPUT:
+                    // This is a new tag, to be created from plain text input
+                    return $this->createModel()
+                        ->setName($identifier);
+
+                case Model::PREFIX_NEW_FROM_USER:
+                    // This is a new tag, to be created from an existing user.
+                    // This throws an exception if no user exists with this ID.
+                    /** @var UserModel $user */
+                    $user = $this->getJoinMapper('user')->findById($identifier);
+                    return $this->createModel()
+                        ->setName($user->formatName())
+                        ->setUser($user);
+
+                default:
+                    break;
+            }
+        }
+        throw new \UnexpectedValueException(sprintf('Tag "%s" could not be parsed', $tag));
+    }
+
+    /**
      * Saves a set of coaches.
      *
      * @param array|string[] $tags A list of tag names that can be parsed into
