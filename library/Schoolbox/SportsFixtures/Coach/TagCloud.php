@@ -11,6 +11,7 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\SportsFixtures\Team;
 use Schoolbox\User as UserModel;
+use Schoolbox\UserMapper;
 
 /**
  * The tag cloud for a sports fixtures coach.
@@ -20,18 +21,27 @@ use Schoolbox\User as UserModel;
 class TagCloud implements BaseMapper\UsableAsTagSource
 {
     /**
+     * The coach mapper
+     *
      * @var Mapper
      */
     protected $mapper;
 
     /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
      * Constructor
      *
-     * @param Mapper $mapper
+     * @param Mapper     $mapper
+     * @param UserMapper $userMapper
      */
-    public function __construct(Mapper $mapper)
+    public function __construct(Mapper $mapper, UserMapper $userMapper)
     {
-        $this->mapper = $mapper;
+        $this->mapper     = $mapper;
+        $this->userMapper = $userMapper;
     }
 
     /**
@@ -81,7 +91,7 @@ class TagCloud implements BaseMapper\UsableAsTagSource
                     // This is a new tag, to be created from an existing user.
                     // This throws an exception if no user exists with this ID.
                     /** @var UserModel $user */
-                    $user = $this->mapper->getJoinMapper('user')->findById($identifier);
+                    $user = $this->userMapper->findById($identifier);
                     return $this->mapper->createModel()
                         ->setName($user->formatName())
                         ->setUser($user);

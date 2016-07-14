@@ -80,7 +80,7 @@ class Controller extends AbstractController
         $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
-        $this->setCoachCloud(new Coach\TagCloud(Coach\Mapper::getInstance()));
+        $this->setCoachCloud(new Coach\TagCloud(Coach\Mapper::getInstance(), $this->getUserMapper()));
     }
 
     /**
