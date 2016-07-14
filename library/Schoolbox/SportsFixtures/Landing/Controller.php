@@ -6,7 +6,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\SportsFixtures;
+namespace Schoolbox\SportsFixtures\Landing;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper\Exception as MapperException;

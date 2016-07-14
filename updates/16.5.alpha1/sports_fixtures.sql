@@ -172,7 +172,8 @@ INSERT INTO `error` VALUES
     (175, 'The requested team could not be found.'),
     (176, 'The requested venue could not be found.'),
 		(177, 'The requested match could not be found.'),
-		(178, 'The requested position could not be found.');
+		(178, 'The requested position could not be found.'),
+		(179, 'The requested status could not be found.');
 
 /** Team players table **/
 CREATE TABLE `sportsfixtures_team_user` (
@@ -222,5 +223,22 @@ CREATE TABLE `sportsfixtures_school` (
 	`deleted_at` DATETIME NULL COMMENT '',
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB CHARACTER SET=utf8;
+
+/* Match Status Table
+ */
+CREATE TABLE `sportsfixtures_status` (
+	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
+	`name` varchar(255) NULL COMMENT '',
+	`created_at` DATETIME NULL COMMENT '',
+	`updated_at` DATETIME NULL COMMENT '',
+	`deleted_at` DATETIME NULL COMMENT '',
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB CHARACTER SET=utf8;
+
+INSERT INTO `sportsfixtures_status` VALUES
+(null,'Win',NOW(),NOW(),null),
+(null,'Loss',NOW(),NOW(),null),
+(null,'Draw',NOW(),NOW(),null),
+(null,'Cancelled',NOW(),NOW(),null);
 
 INSERT INTO `msg_namespace` (`slug`, `label`) VALUES ('sports_fixtures', 'Sports Fixtures');

@@ -18,6 +18,7 @@ use Aura\Di;
 use Aura\Router\Route;
 use ReflectionMethod;
 use RuntimeException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Zend\Uri\Uri;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
@@ -184,6 +185,19 @@ class Kernel extends \Alaress\Application\Kernel
                     ]);
                 } else {
                     $response->redirect->to('/login/?page='.urlencode($uri));
+                }
+            }
+            catch (Deleted $e) {
+                $response = $this->di->get('webFactory')->newResponse();
+                if ($controller->getRequest()->isXhr()) {
+                    // Fabricate an AJAX response. Don't redirect
+                    $response->status->setCode(410);
+                    $response->content->set([
+                        'format' => 'json',
+                        'data'   => ['error' => 'Object was deleted'],
+                    ]);
+                } else {
+                    error($e->getCode(), $e->getMessage(), 410);
                 }
             }
             catch (Forbidden $e) {
