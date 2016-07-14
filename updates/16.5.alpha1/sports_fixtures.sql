@@ -154,6 +154,7 @@ CREATE TABLE `sportsfixtures_result` (
 	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
 	`match_id` INT NOT NULL,
 	`team_id` INT NOT NULL,
+	`status_id` INT NULL,
 	`description` TEXT NULL COMMENT '',
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
@@ -162,7 +163,11 @@ CREATE TABLE `sportsfixtures_result` (
 	FOREIGN KEY (`match_id`)
 		REFERENCES `sportsfixtures_match`(`id`)
 			ON UPDATE NO ACTION
-			ON DELETE NO ACTION
+			ON DELETE NO ACTION,
+	FOREIGN KEY (`status_id`)
+	REFERENCES `sportsfixtures_status`(`id`)
+		ON UPDATE CASCADE
+		ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Error table entries */
