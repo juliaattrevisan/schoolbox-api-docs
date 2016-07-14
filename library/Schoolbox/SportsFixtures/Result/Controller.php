@@ -23,6 +23,7 @@ use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use \Schoolbox\SportsFixtures\Match\Weather as MatchWeather;
 use \Schoolbox\SportsFixtures\Result\Model as Result;
 use \Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
+use \Schoolbox\SportsFixtures\Status;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\SportsFixtures\Team\Metadata as TeamMetadata;
@@ -62,6 +63,11 @@ class Controller extends AbstractController
     protected $schoolTagCloudMapper;
 
     /**
+     * @var Status\Mapper
+     */
+    protected $statusMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -73,6 +79,7 @@ class Controller extends AbstractController
         $this->setTeamMapper(TeamMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
+        $this->setStatusMapper(Status\Mapper::getInstance());
     }
 
     /**
@@ -124,6 +131,7 @@ class Controller extends AbstractController
                 '@sportsfixturesResult/create.twig',
                 [
                     'sport'    => $sport,
+                    'statuses' => $this->getStatusMapper()->findAll(),
                     'division' => $division,
                     'match'    => $context,
                     'team'     => $team,
@@ -513,5 +521,23 @@ class Controller extends AbstractController
     protected function setSchoolTagCloudMapper($schoolTagCloudMapper)
     {
         $this->schoolTagCloudMapper = $schoolTagCloudMapper;
+    }
+
+    /**
+     * @return Status\Mapper
+     */
+    public function getStatusMapper()
+    {
+        return $this->statusMapper;
+    }
+
+    /**
+     * @param Status\Mapper $statusMapper
+     * @return static
+     */
+    public function setStatusMapper($statusMapper)
+    {
+        $this->statusMapper = $statusMapper;
+        return $this;
     }
 }
