@@ -448,10 +448,7 @@ class Controller extends Base {
 
         $this->updateCustomRules($roleType, $postData['customRule']);
 
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => $response,
-        ]);
+        $this->getResponse()->content->set($this->buildJsonOutput($response));
     }
 
     /**
