@@ -1,50 +1,49 @@
 {% if role == 'parent' %}
 
-    {% set match_count = 0 %}
+    {% for match in matches %}
 
-    {% for child in children %}
-
-        {% if child.matches | length %}
-
-            {% set match_count = match_count + child.matches | length %}
-
-            <div class="small-12 columns no-pad">
-                <ul class="action-list">
-
-                    {% for match in child.matches %}
-
-                        <li class="actions-small-1">
-                            <div class="list-item">
-                                <div class="card small-12">
+        <div class="small-12 columns no-pad">
+            <ul class="action-list">
+                <li class="actions-small-1">
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.match.division.id}) }}">
+                                <h3>
                                     <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}">
-                                        <img src="/portrait.php?userId={{ child.sid }}&amp;size=square64" alt="{{ child.name }}">
-                                        <h3>
-                                            <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}">{{ match.name }} ({{ match.homeTeam.name }} vs {{ match.awayTeam.name }})</a>
-                                        </h3>
+                                        {{ match.match.name }} ({{ match.match.homeTeam.name }} vs {{ match.match.awayTeam.name }})
                                     </a>
-                                    <p class="meta">
-                                        <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span> |
-                                        {{ match.division.sport.name }} |
-                                        {{ match.division.name }} |
-                                        {{ match.venue.name }}
-                                    </p>
-                                </div>
-                            </div>
-                            <nav>
-                                <a class="icon-view no-text" href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}" title="View Match Details"></a>
-                            </nav>
-                        </li>
+                                </h3>
+                            </a>
+                            <p class="meta">
+                                <span data-tooltip title="{{ match.match.startAt.getLong }}">{{ match.match.startAt.getRelativeTime }}</span> |
+                                {{ match.match.division.sport.name }} |
+                                {{ match.match.division.name }} |
+                                {{ match.match.venue.name }}
+                            </p>
+                            {% for team in match.teams %}
+                                <p class="meta icon-group">
+                                    {% for child in team.children %}
+                                        {% if not loop.first and not loop.last %},{% endif %}
+                                        {% if loop.last and not loop.first %}and{% endif %}
+                                        <a href="/search/user/{{ child.getId }}">{{ child.firstname }} {{  child.lastname }}</a>
 
-                    {% endfor %}
-
-                </ul>
-            </div>
-
-        {% endif %}
+                                        {% if loop.last and not loop.first %}are{% endif %}
+                                        {% if loop.last and loop.first %}is{% endif %}
+                                    {% endfor %} playing for {{ team.team.name }}
+                                </p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <nav>
+                        <a class="icon-view no-text" href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}" title="View Match Details"></a>
+                    </nav>
+                </li>
+            </ul>
+        </div>
 
     {% endfor %}
 
-    {% if match_count == 0 %}
+    {% if matches | length == 0 %}
 
         <div class="content">
             Your children do not have any upcoming matches scheduled.

@@ -102,18 +102,41 @@ class ComponentDelegate
      */
     public function getParentDashboardData()
     {
-        $children = [];
+        $matches = [];
 
         foreach ($_SESSION["children"] as $child) {
-            $child["matches"] = $this->getMatches(
-                $this->getTeamUserMapper()->findByColumn('user_id', $child["id"])
-            );
-            $children[$child["id"]] = $child;
+
+            $childTeams = $this->getTeamUserMapper()->findByColumn('user_id', $child["id"]);
+            $matchesForChild = $this->getMatches($childTeams);
+
+            foreach ($matchesForChild as $matchCurrent) {
+
+                if (!isset($matches[$matchCurrent->getId()])) {
+                    $matches[$matchCurrent->getId()] = [];
+                    $matches[$matchCurrent->getId()]["match"] = $matchCurrent;
+                    $matches[$matchCurrent->getId()]["teams"] = [];
+                }
+
+                foreach ($childTeams as $team) {
+
+                    if ($team->getTeam()->getId() == $matchCurrent->getHomeTeam()->getId() ||
+                        $team->getTeam()->getId() == $matchCurrent->getAwayTeam()->getId()) {
+
+                        if (!isset($matches[$matchCurrent->getId()]["teams"][$team->getId()])) {
+                            $matches[$matchCurrent->getId()]["teams"][$team->getId()] = [];
+                            $matches[$matchCurrent->getId()]["teams"][$team->getId()]["team"] = $team->getTeam();
+                            $matches[$matchCurrent->getId()]["teams"][$team->getId()]["children"] = [];
+                        }
+
+                        $matches[$matchCurrent->getId()]["teams"][$team->getId()]["children"][$team->getUser()->getId()] = $team->getUser();
+                    }
+                }
+            }
         }
 
         return [
             'role' => 'parent',
-            'children' => $children
+            'matches' => $matches
         ];
     }
 
