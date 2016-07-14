@@ -35,62 +35,8 @@ class PushHandler extends AbstractProcessingHandler
     {
         parent::__construct($level, $bubble);
 
-        $conf = ConfigMapper::getInstance();
-
-        $services = array();
-        if ($conf->get('push_notifications_enabled')) {
-            if ($conf->get('push_gcm_api_key')) {
-                $services[] = new Cloud\Google\GCM($conf->get('push_gcm_api_key'));
-            }
-            if ($conf->get('push_apns_cert_path')) {
-
-                // this is the only way I can think of that will be AWS S3 compatible
-                $tempCert = $this->getTempCertFilename();
-
-                // since this is on-construction, check the file in play and see if it needs updating
-                if ($this->apnsCertRequiresUpdate($conf->get('push_apns_cert_path'))) {
-                    // copy the cert from storage
-                    $fp = fopen($tempCert, 'w');
-                    Storage\Mapper::getInstance()->findByHash($conf->get('push_apns_cert_path'))->pipe($fp);
-                    fclose($fp);
-                }
-
-                $services[] = new Cloud\Apple\APNS(Apns\Client\Message::PRODUCTION_URI, $tempCert, $conf->get('push_apns_cert_key') ?: null);
-            }
-        }
-
-        $this->cloudManager = new MobileApp\ServiceManager($services, $log);
-    }
-
-
-    /**
-     * @param string $hashInStorage
-     * @return bool
-     */
-    protected function apnsCertRequiresUpdate($hashInStorage)
-    {
-        $tempCert = $this->getTempCertFilename();
-
-        if (!is_readable($tempCert)) {
-            return true;
-        }
-        if (!filesize($tempCert)) {
-            return true;
-        }
-        if (sha1_file($tempCert) != $hashInStorage) {
-            return true;
-        }
-
-        return false;
-    }
-
-
-    /**
-     * @return string
-     */
-    protected function getTempCertFilename()
-    {
-        return sys_get_temp_dir() . '/sbapns.pem';
+        $factory = new MobileApp\ServiceManagerFactory(ConfigMapper::getInstance(), $log);
+        $this->cloudManager = $factory->build([ MobileApp\Registry::PROVIDER_APPLE, MobileApp\Registry::PROVIDER_GOOGLE ]);
     }
 
     /**
