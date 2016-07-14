@@ -63,9 +63,9 @@ class Controller extends AbstractController
     protected $schoolTagCloudMapper;
 
     /**
-     * @var Coach\Mapper
+     * @var Coach\TagCloud
      */
-    protected $coachMapper;
+    protected $coachCloud;
 
     /**
      * Controller constructor.
@@ -80,7 +80,7 @@ class Controller extends AbstractController
         $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
-        $this->setCoachMapper(Coach\Mapper::getInstance());
+        $this->setCoachCloud(new Coach\TagCloud(Coach\Mapper::getInstance()));
     }
 
     /**
@@ -98,7 +98,7 @@ class Controller extends AbstractController
         $sport = $this->getSportMapper()->findById($division->getSport()->getId());
 
         // Load coaches into entity
-        $entity->setCoaches($this->getCoachMapper()->findForTeam($entity));
+        $entity->setCoaches($this->getCoachCloud()->findForTeam($entity));
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesTeam/entity.twig', [
             'sport'    => $sport,
@@ -189,7 +189,7 @@ class Controller extends AbstractController
     public function getForm($entity, $context = null)
     {
         // Load coaches into entity
-        $entity->setCoaches($this->getCoachMapper()->findForTeam($entity));
+        $entity->setCoaches($this->getCoachCloud()->findForTeam($entity));
 
         if (empty($context)) {
             try {
@@ -339,9 +339,7 @@ class Controller extends AbstractController
         $team->setUpdatedAt(\Alaress_Date_Format::now());
 
         // Save each coach in the tag cloud too, and add to the team.
-        $team->setCoaches(
-            $this->getCoachMapper()->findByColumn('id', $this->getCoachMapper()->saveTagCloud($coaches))
-        );
+        $team->setCoaches($this->getCoachCloud()->saveTagCloud($coaches));
         $this->getTeamMapper()->save($team);
     }
 
@@ -475,20 +473,20 @@ class Controller extends AbstractController
     }
 
     /**
-     * @return Coach\Mapper
+     * @return Coach\TagCloud
      */
-    public function getCoachMapper()
+    public function getCoachCloud()
     {
-        return $this->coachMapper;
+        return $this->coachCloud;
     }
 
     /**
-     * @param Coach\Mapper $coachMapper
+     * @param Coach\TagCloud $coachCloud
      * @return static
      */
-    public function setCoachMapper($coachMapper)
+    public function setCoachCloud($coachCloud)
     {
-        $this->coachMapper = $coachMapper;
+        $this->coachCloud = $coachCloud;
         return $this;
     }
 }
