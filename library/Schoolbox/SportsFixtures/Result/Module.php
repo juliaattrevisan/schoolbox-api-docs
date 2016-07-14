@@ -55,7 +55,7 @@ class Module extends RestfulModule
          * All Staff and Students can see this
          * Parents of a Player in the Team can see this
          */
-        $canView = new Rule\All(
+        $resultAccess = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
@@ -70,7 +70,23 @@ class Module extends RestfulModule
         /* Apply route permissions here as you add them to initRoutes()
          * Note that if the perms change you need to log out/log in to refresh
          */
-        $this->addRoutePermission($authorizer, 'getResultForTeam', $canView);
+        $this->addRoutePermission($authorizer, 'getResultForTeam', $resultAccess);
+
+        /* Superusers can see this
+         * Sports Admin can see this
+         * Coaches can see this
+         */
+        $resultModifyFormAccess = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_SPORTS_ADMINISTRATOR, UserAccess::ACCESS_WRITE),
+                new Rule\IsCoachOfTeam()
+            )
+        );
+
+        $this->addRoutePermission($authorizer, 'getCreateForm|createEntity', $resultModifyFormAccess);
+
     }
 
     /**
