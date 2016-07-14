@@ -5,10 +5,10 @@
 
             {% for match in matches %}
 
-                <li class="actions-small-1">
+                <li>
                     <div class="list-item">
                         <div class="card small-12">
-                            <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}">
+                            <a href="{{ routeLookup('sportsfixturesMatch.getEntity', {entityId: match.id}) }}">
                                 <h3>{{ match.name }} ({{ match.homeTeam.name }} vs {{ match.awayTeam.name }})</h3>
                             </a>
                             <p class="meta">
@@ -19,13 +19,9 @@
                             </p>
                         </div>
                     </div>
-                    <nav>
-                        <a class="icon-view no-text" href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: match.division.id}) }}" title="View Match Details"></a>
-                    </nav>
                 </li>
 
             {% endfor %}
-
         </ul>
     </div>
 
