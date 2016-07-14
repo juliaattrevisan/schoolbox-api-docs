@@ -434,18 +434,24 @@ class Controller extends Base {
      */
     public function update()
     {
+        $response = [];
         $postData = $this->getRequest()->post;
         $roleType = $postData['rulesetId'];
 
         $this->updateConfig($roleType, $postData['config'][$roleType]);
+        $this->updateRuleSequence(($postData['sequence']));
 
         foreach ($postData['rule'] as $ruleId => $ruleData) {
-            $this->updateConditions($ruleId, $ruleData['condition']);
-            $this->updateEffects($ruleId, $ruleData['effect']);
+            $response['condition'] = $this->updateConditions($ruleId, $ruleData['condition']);
+            $response['effect']    = $this->updateEffects($ruleId, $ruleData['effect']);
         }
 
-        $this->updateRuleSequence(($postData['sequence']));
         $this->updateCustomRules($roleType, $postData['customRule']);
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data'   => $response,
+        ]);
     }
 
     /**
@@ -479,11 +485,15 @@ class Controller extends Base {
     /**
      * @param int $ruleId
      * @param array $conditions
+     * @return array maps 'new-x' to newly assign id 'y'
      */
     protected function updateConditions($ruleId, $conditions)
     {
         // TODO DI
         $mapper = Condition\Mapper::getInstance();
+
+        // Map 'new-X' conditionId to newly assigned values
+        $results = [];
 
         if (is_array($conditions)) {
             foreach ($conditions as $conditionId => $conditionData) {
@@ -514,7 +524,9 @@ class Controller extends Base {
                 ];
 
                 try {
-                    $mapper->save($mapper->hydrate($condition));
+                    $model = $mapper->hydrate($condition);
+                    $mapper->save($model);
+                    $results[$conditionId] = $model->getId();
                 }
                 catch (\PDOException $e) {
                 }
@@ -526,16 +538,22 @@ class Controller extends Base {
             'rule_id'   => $ruleId,
             'arguments' => json_encode(null)
         ]);
+
+        return $results;
     }
 
     /**
      * @param int $ruleId
      * @param array $effects
+     * @return array maps 'new-x' to newly assign id 'y'
      */
     protected function updateEffects($ruleId, $effects)
     {
         // TODO DI
         $mapper = Effect\Mapper::getInstance();
+
+        // Map 'new-X' conditionId to newly assigned values
+        $results = [];
 
         /** @var EffectTypeMapper $effectTypeMapper */
         $effectTypeMapper = $mapper->getJoinMapper('effect_type_id');
@@ -630,8 +648,9 @@ class Controller extends Base {
                     $effect['arguments'] = json_encode([]);
                 }
 
-
-                $mapper->save($mapper->hydrate($effect));
+                $model = $mapper->hydrate($effect);
+                $mapper->save($model);
+                $results[$effectId] = $model->getId();
             }
         }
 
@@ -640,6 +659,8 @@ class Controller extends Base {
             'rule_id'         => $ruleId,
             'arguments'       => json_encode(null)
         ]);
+
+        return $results;
     }
 
 

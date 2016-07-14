@@ -253,13 +253,51 @@
                     return $.post(config.rule.update.url, ruleData, function( data, textStatus, jqXHR){
                         $rule.find('[data-label-status]').remove();
 
-                        // TODO - update new IDs
+                        // Update newly inserted conditions
+                        for (var oldId in data.condition) {
+                            var newId = data.condition[oldId];
+                            if(newId != oldId){
+                                updateDOM($('#condition-'+oldId), oldId, newId);
+                            }
+                        }
 
+                        // Update newly inserted effects
+                        for (var oldId in data.effect) {
+                            var newId = data.effect[oldId];
+                            if(newId != oldId){
+                                updateDOM($('#effect-'+oldId), oldId, newId);
+                            }
+                        }
                     });
                 }));
             });
             return $.when.apply(null, ajaxes);
         }
+
+        /**
+         * Update a condition's or effect's DOM attributes with newly assigned id
+         *
+         * For all sub-elements attributes, replace 'oldId' with 'newId'
+         *
+         * @param $elem DOM node to search below
+         * @param oldId
+         * @param newId
+         */
+        function updateDOM($elem, oldId, newId){
+
+            // We could either try to match specific elements, or apply a liberal replacement strategy.
+            // We elect the latter to avoid having to update this list each time the template changes.
+            $elem.add($elem.find('*')).each(function(idx,elem){
+                $.each(elem.attributes, function(i, attr){
+                    var name = attr.name;
+                    var value = attr.value;
+                    if(-1 !== value.indexOf(oldId)){
+                        $(elem).attr(name, value.replace(oldId,newId));
+                    }
+                });
+            });
+        }
+
 
         /**
          * Delete a Rule
