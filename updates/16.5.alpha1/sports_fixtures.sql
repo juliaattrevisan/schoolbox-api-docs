@@ -222,3 +222,5 @@ CREATE TABLE `sportsfixtures_school` (
 	`deleted_at` DATETIME NULL COMMENT '',
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB CHARACTER SET=utf8;
+
+INSERT INTO `msg_namespace` (`slug`, `label`) VALUES ('sports_fixtures', 'Sports Fixtures');
