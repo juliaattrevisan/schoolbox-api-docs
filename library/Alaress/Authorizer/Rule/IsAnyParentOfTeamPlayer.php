@@ -1,6 +1,6 @@
 <?php
 /**
- * IsAnyParentOfUsers
+ * IsAnyParentOfTeamPlayer
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd

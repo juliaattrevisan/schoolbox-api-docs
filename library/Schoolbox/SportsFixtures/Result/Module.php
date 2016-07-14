@@ -62,7 +62,8 @@ class Module extends RestfulModule
                 new Rule\HasServicePermission(UserAccess::SERVICE_SPORTS_ADMINISTRATOR, UserAccess::ACCESS_WRITE),
                 new Rule\HasRole(Role::STUDENT),
                 new Rule\HasRole(Role::STAFF),
-                new Rule\IsAnyParentOfTeamPlayer(new \External_User())
+                new Rule\IsAnyParentOfTeamPlayer(new \External_User()),
+                new Rule\IsCoachOfTeam()
             )
         );
 
