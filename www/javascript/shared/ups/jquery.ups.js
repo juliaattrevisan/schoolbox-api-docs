@@ -250,7 +250,12 @@
                 var ruleData = $.merge(dataCopy, $rule.find(config.validInputTypes).serializeArray());
 
                 ajaxes.push($.retryPromise(function(){
-                    return $.post(config.rule.update.url, ruleData);
+                    return $.post(config.rule.update.url, ruleData, function( data, textStatus, jqXHR){
+                        $rule.find('[data-label-status]').remove();
+
+                        // TODO - update new IDs
+
+                    });
                 }));
             });
             return $.when.apply(null, ajaxes);
