@@ -393,7 +393,19 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
 
-        $this->saveResult($match, $team, $this->getRequest()->post['description'], $entity);
+        // Save status (optional)
+        /** @var Status\Model $status */
+        $statusId = $this->getRequest()->post->get('statusId');
+        $status   = $this->getStatusMapper()->createModel();
+        if ($status) {
+            try {
+                $status = $this->getStatusMapper()->findById($statusId);
+            } catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+            }
+        }
+
+        $this->saveResult($match, $team, $status, $this->getRequest()->post['description'], $entity);
 
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
@@ -411,13 +423,15 @@ class Controller extends AbstractController
      *
      * @param Match $match
      * @param Team $team
+     * @param Status\Model $status
      * @param string $description
      * @param Result $result
      */
-    private function saveResult(Match $match, Team $team, $description, Result $result)
+    private function saveResult(Match $match, Team $team, Status\Model $status, $description, Result $result)
     {
         $result->setMatch($match);
         $result->setTeam($team);
+        $result->setStatus($status);
         $result->setDescription($description);
         $result->setUpdatedAt(Alaress_Date_Format::now());
 
