@@ -1,4 +1,4 @@
-<li id="condition-{{ currentCondition.id }}" class="actions-small-1 content" data-locked="{{ meta.condition[currentCondition.id].lock.status }}">
+<li id="condition-{{ currentCondition.id }}" class="actions-small-1 content" data-condition data-locked="{{ meta.condition[currentCondition.id].lock.status }}">
     <input type="hidden" name="rule[{{ currentCondition.rule.id }}][condition][{{ currentCondition.id }}][type]" value="{{ currentCondition.conditionType.id }}">
 
     {% include allConditionStructures.fragments[currentCondition.id].subfragments.fragment.getFilename() %}
