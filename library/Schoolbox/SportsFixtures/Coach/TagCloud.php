@@ -98,11 +98,11 @@ class TagCloud implements BaseMapper\UsableAsTagSource
      *
      * @param array|string[] $tags A list of tag names that can be parsed into
      *                             Model objects
-     * @return array|int[] A list of IDs of Model objects which match the tags.
+     * @return Collection|Model[] A list of Model objects which match the tags.
      */
     public function saveTagCloud($tags)
     {
-        $tagIds = [];
+        $tagModels = new Collection();
         foreach ($tags as $tag) {
             try {
                 $model = $this->findByTag($tag);
@@ -118,9 +118,9 @@ class TagCloud implements BaseMapper\UsableAsTagSource
             if (!$model->getId()) {
                 $this->mapper->save($model);
             }
-            $tagIds[] = $model->getId();
+            $tagModels->add($model);
         }
-        return $tagIds;
+        return $tagModels;
     }
 
     /**
