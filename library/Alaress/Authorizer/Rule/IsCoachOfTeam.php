@@ -48,6 +48,12 @@ class IsCoachOfTeam implements IAuthorizationRule
             $match = $params['context'];
             $teamId = $params['teamId'];
         }
+        /* When you're viewing the Create form
+         */
+        else if ($params['action'] == 'sportsfixturesResult.getCreateFormForTeam') {
+            $match = $params['context'];
+            $teamId = $params['teamId'];
+        }
         /* When you're viewing the Modify Form
          */
         else if ($params['action'] == 'sportsfixturesResult.getModifyForm') {
@@ -66,6 +72,17 @@ class IsCoachOfTeam implements IAuthorizationRule
             /** @var Match $match */
             $match = MatchMapper::getInstance()->findById($params['matchId']);
             $teamId = $params['teamId'];
+        }
+        /* When you're persisting data from the Update form
+         */
+        else if ($params['action'] == 'sportsfixturesResult.updateEntity') {
+
+            /** @var Result $result */
+            $result = $params['entity'];
+
+            /** @var Match $match */
+            $match = MatchMapper::getInstance()->findById($result->getMatch()->getId());
+            $teamId = $result->getTeam()->getId();
         }
         /* Unknown state - die
          */
