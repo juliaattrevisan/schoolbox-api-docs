@@ -116,7 +116,7 @@ insert  into `sportsfixtures_match_itineraryitem`(`id`,`match_id`,`description`,
 
 /* Results
  */
-insert  into `sportsfixtures_result`(`id`,`match_id`,`team_id`,`description`,`created_at`,`updated_at`,`deleted_at`) values (1,1,8,'<p><em><strong>We sportsed well.</strong></em></p>\r\n','2016-07-07 20:02:54','2016-07-07 20:02:54',NULL),(2,1,9,'<p><em>We didn&#39;t sports very well&nbsp;</em></p>\r\n\r\n<p><em>We should have sportsed better</em></p>\r\n','2016-07-07 20:03:22','2016-07-07 20:03:22',NULL);
+insert  into `sportsfixtures_result`(`id`,`status_id`,`match_id`,`team_id`,`description`,`created_at`,`updated_at`,`deleted_at`) values (1,1,1,8,'<p><em><strong>We sportsed well.</strong></em></p>\r\n','2016-07-07 20:02:54','2016-07-07 20:02:54',NULL),(2,2,1,9,'<p><em>We didn&#39;t sports very well&nbsp;</em></p>\r\n\r\n<p><em>We should have sportsed better</em></p>\r\n','2016-07-07 20:03:22','2016-07-07 20:03:22',NULL);
 
 
 
