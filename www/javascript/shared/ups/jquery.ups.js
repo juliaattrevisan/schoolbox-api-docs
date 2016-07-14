@@ -135,41 +135,29 @@
         /**
          * Update a single Rule from Ruleset.
          *
-         * This is to avoid max_input_vars being triggered.
+         * This is to avoid 'max_input_vars' being exceeded.
          *
          * Enable all input fields for form submission, otherwise they
          * don't get transmitted; then immediately disable them.
+         *
+         * On return, re-enable fields
          */
         function initRuleUpdate() {
             $(config.element).on('click', '[data-ruleset-save-rule]', function(event) {
                 event.preventDefault();
 
                 var $submit = $(this);
-                var $rule = $submit.closest('[data-rule]');
                 $submit.val($submit.attr('data-working'));
-                $rule.find(config.validInputTypes).attr('disabled', false);
-                $rule.find('option').removeAttr('disabled');
 
-                var $data = $('#rulesetId')
-                    .add($('[name="config[student][enabled]"]'))
-                    .add($rule.find(config.validInputTypes));
+                var $rule = $submit.closest('[data-rule]');
 
-                var dataArr = $data.serializeArray();
-
-                $('[data-rule]').each(function (idx, elem) {
-                    dataArr.push({name: 'sequence[]', value: $(elem).attr('data-rule')});
-                });
-
-                $.retryPromise(function(){
-                    return $.post(
-                        config.rule.update.url,
-                        dataArr,
-                        function(data, textStatus, jqXHR) {
-                            $submit.val($submit.attr('data-value'));
-                            $rule.find(config.validInputTypes).attr('disabled', false);
-                            $rule.find('option').removeAttr('disabled');
-                        })
-                });
+                saveRules($rule)
+                    .done(function( data, textStatus, jqXHR ) {
+                        $submit.val($submit.attr('data-value'));
+                        $rule.find(config.validInputTypes).attr('disabled', false);
+                        $rule.find('option').removeAttr('disabled');
+                        $rule.find('option').not('[value]').prop('disabled',true);
+                    });
 
                 $rule.find(config.validInputTypes).attr('disabled', true);
             });
@@ -191,33 +179,55 @@
 
                 var $rules = $(config.element).find('[data-rule]');
 
-                var ajaxes = [];
-
-                $rules.each(function(idx, elem){
-                    var $rule = $(elem);
-                    $rule.find(config.validInputTypes).attr('disabled', false);
-                    $rule.find('option').removeAttr('disabled');
-
-                    var $data = $('#rulesetId')
-                        .add($('[name="config[student][enabled]"]'))
-                        .add($rule.find(config.validInputTypes));
-                    var dataArr = $data.serializeArray();
-                    $rules.each(function (idx, elem) {
-                        dataArr.push({name: 'sequence[]', value: $(elem).attr('data-rule')});
+                saveRules($rules)
+                    .done(function( data, textStatus, jqXHR ){
+                        $submit.val($submit.attr('data-value'));
+                        $(config.element).find(config.validInputTypes).attr('disabled', false);
+                        $(config.element).find('option').removeAttr('disabled');
+                        $(config.element).find('option').not('[value]').prop('disabled',true);
                     });
-                    ajaxes.push($.retryPromise(function(){return $.post(config.rule.update.url, dataArr)}))
-                });
-
-                $.when.apply(null, ajaxes)
-                .done(function(){
-                    $submit.val($submit.attr('data-value'));
-                    $(config.element).find(config.validInputTypes).attr('disabled', false);
-                    $(config.element).find('option').removeAttr('disabled');
-                })
 
                 $(config.element).find(config.validInputTypes).attr('disabled', true);
             });
             refreshSaveRulesetButtonAvailability();
+        }
+
+        /**
+         * For each Rule passed, send config & the single rule's data to server.
+         *
+         * Multiple parallel AJAX posts, each less than 'max_input_vars'
+         *
+         * @param $rules
+         * @return Promise
+         */
+        function saveRules($rules){
+
+            var dataArr = [];
+
+            // Rule sequence
+            $('[data-rule]').each(function(idx,elem){
+                dataArr.push({name: 'sequence[]', value: $(elem).attr('data-rule')});
+            });
+
+            // Config
+            var $config = $('#rulesetId').add($('[name="config[student][enabled]"]'));
+
+            dataArr = $.merge($config.serializeArray(), dataArr);
+
+            var ajaxes = [];
+            $rules.each(function(idx, elem){
+                var $rule = $(elem);
+                $rule.find(config.validInputTypes).attr('disabled', false);
+                $rule.find('option').removeAttr('disabled');
+
+                var dataCopy = $.merge([], dataArr);
+                var ruleData = $.merge(dataCopy, $rule.find(config.validInputTypes).serializeArray());
+
+                ajaxes.push($.retryPromise(function(){
+                    return $.post(config.rule.update.url, ruleData);
+                }));
+            });
+            return $.when.apply(null, ajaxes);
         }
 
         /**

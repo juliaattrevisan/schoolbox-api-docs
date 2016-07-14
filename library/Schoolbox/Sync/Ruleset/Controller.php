@@ -425,9 +425,9 @@ class Controller extends Base {
     }
 
     /**
-     * Update a Rule in the Ruleset.
+     * Update a single Rule in the Ruleset.
      *
-     * Each call to this function should provide the sequence of all Rules, plus the
+     * Each call to this function must provide the sequence of all Rules, plus the
      * contents for a single Rule in the Ruleset. Saving 'All Rules' would trigger
      * multiple parallel asynchronous calls to this function. This is to avoid
      * max_input_vars being breached.
