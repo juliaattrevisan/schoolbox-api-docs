@@ -122,24 +122,19 @@ switch($to)
 
     case "storybox":
         $form="SchoolLoginForm_schoolsLoginForm";
-        $action="https://www.storyboxlibrary.com.au/schools/schoolsLoginForm";
+        $action="https://storyboxlibrary.com.au/schools/schoolsLoginForm";
         $method="POST";
         $formArray['AuthenticationMethod'] = 'SchoolAuthenticator';
         $formArray['Username'] ='Morris Hall';
         $formArray['ViewerPassword'] = 'mohalllibrary';
         break;
 
+
 default:
 	echo "Did not recognise the site";
 break;
 
 }
-
-
-
-
-
-
 ?>
 
 <html>
