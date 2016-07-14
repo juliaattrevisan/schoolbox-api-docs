@@ -204,35 +204,8 @@ class Controller extends AbstractController
      */
     public function getEntity($entity)
     {
-        try {
-            $match = $this->getMatchMapper()->findById($entity->getMatch()->getId());
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
-        }
-
-        try {
-            $division = $this->getDivisionMapper()->findById($match->getDivision()->getId());
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
-        }
-
-        try {
-            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
-        }
-
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput(
-                '@sportsfixturesResult/entity.twig',
-                [
-                    'sport'    => $sport,
-                    'division' => $division,
-                    'match'    => $match,
-                    'result'   => $entity
-                ]
-            )
-        );
+        /* noop
+         */
     }
 
     /**
