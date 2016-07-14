@@ -147,17 +147,32 @@
                 event.preventDefault();
 
                 var $submit = $(this);
-                $submit.val($submit.attr('data-working'));
-
                 var $rule = $submit.closest('[data-rule]');
+                var $label = $rule.find('[data-relation="response-message"]');
+
+                $label.labelActivate({
+                    text: 'Saving...'
+                });
+
 
                 saveRules($rule)
                     .done(function( data, textStatus, jqXHR ) {
-                        $submit.val($submit.attr('data-value'));
                         $rule.find(config.validInputTypes).attr('disabled', false);
                         $rule.find('option').removeAttr('disabled');
                         $rule.find('option').not('[value]').prop('disabled',true);
+                        $label.labelTimeout({
+                            text: 'Saved',
+                            css: 'success'
+                        });
+                    })
+                    .fail(function( jqXHR, textStatus, errorThrown){
+                        $label.labelTimeout({
+                            text: 'Error',
+                            css: 'alert'
+                        });
                     });
+
+
 
                 $rule.find(config.validInputTypes).attr('disabled', true);
             });
@@ -174,17 +189,28 @@
             $(config.element).on('click', '[data-ruleset-save]', function(event) {
                 event.preventDefault();
 
-                var $submit = $(this);
-                $submit.val($submit.attr('data-working'));
-
                 var $rules = $(config.element).find('[data-rule]');
+                var $label = $(config.element).find('[data-relation="response-message"]').last();
+
+                $label.labelActivate({
+                    text: 'Saving...'
+                });
 
                 saveRules($rules)
                     .done(function( data, textStatus, jqXHR ){
-                        $submit.val($submit.attr('data-value'));
                         $(config.element).find(config.validInputTypes).attr('disabled', false);
                         $(config.element).find('option').removeAttr('disabled');
                         $(config.element).find('option').not('[value]').prop('disabled',true);
+                        $label.labelTimeout({
+                            text: 'Saved',
+                            css: 'success'
+                        });
+                    })
+                    .fail(function( jqXHR, textStatus, errorThrown){
+                        $label.labelTimeout({
+                            text: 'Error',
+                            css: 'alert'
+                        });
                     });
 
                 $(config.element).find(config.validInputTypes).attr('disabled', true);

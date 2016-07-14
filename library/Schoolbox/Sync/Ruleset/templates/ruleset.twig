@@ -169,7 +169,8 @@ set upsConfig = {
                                 {% endfor %}
                             </ul>
 
-                            <input type="submit" value="Save Rule" data-ruleset-save-rule data-working="Saving Rule..." data-value="Save Rule">
+                            <input type="submit" value="Save Rule" data-ruleset-save-rule />
+                            <span class="label full-width hide" data-relation="response-message"></span>
                         </section>
                     </div>
 
@@ -246,7 +247,8 @@ set upsConfig = {
             {% endfor %}
             {% endif %}
 
-            <input type="submit" value="Save Rules" data-ruleset-save data-working="Saving Rules..." data-value="Save Rules"/>
+            <input type="submit" value="Save Rules" data-ruleset-save />
+            <span class="label full-width hide" data-relation="response-message"></span>
         </div>
 
         <div id="token-list" class="reveal-modal" data-reveal>
