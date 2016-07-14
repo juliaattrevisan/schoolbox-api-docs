@@ -87,9 +87,6 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
      */
     public function findForTag(UserModel $user, $keyword, $offset = 0, $limit = 0)
     {
-        if (strlen($keyword) === 0) {
-            return new Collection();
-        }
         // Join side: tag w/o user is okay, so is user w/o tag - therefore FULL OUTER JOIN.
         // But that doesn't exist in MySQL! Emulate with LEFT JOIN U RIGHT JOIN
         // Search match: close enough to user AJAX search
