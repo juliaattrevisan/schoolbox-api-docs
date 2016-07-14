@@ -146,42 +146,21 @@ class Mapper extends BaseMapper implements BaseMapper\UsableAsTagSource
     {
         $tagIds = [];
         foreach ($tags as $tag) {
-            if (strpos($tag, ':') !== false) {
-                list($prefix, $identifier) = explode(':', $tag, 2);
-                $newModel = null;
-                switch ($prefix) {
-                    case Model::PREFIX_EXISTING_TAG:
-                        // This tag already exists. Don't try to resave it.
-                        $tagIds[] = $identifier;
-                        break;
-
-                    case Model::PREFIX_NEW_FROM_INPUT:
-                        // This is a new tag, to be created from plain text input
-                        $newModel = $this->createModel()->setName($identifier);
-                        break;
-
-                    case Model::PREFIX_NEW_FROM_USER:
-                        // This is a new tag, to be created from an existing user
-                        try {
-                            /** @var UserModel $user */
-                            $user = $this->getJoinMapper('user')->findById($identifier);
-                        } catch (BaseMapper\Exception $e) {
-                            // User don't exist, so:
-                            break;
-                        }
-                        $newModel = $this->createModel()->setName($user->formatName())->setUser($user);
-                        break;
-
-                    default:
-                        break;
-                }
-
-                // save it if necessary
-                if ($newModel instanceof Model) {
-                    $this->save($newModel);
-                    $tagIds[] = $newModel->getId();
-                }
+            try {
+                $model = $this->findByTag($tag);
+            } catch (BaseMapper\Exception $e) {
+                // Tag or user doesn't exist:
+                continue;
+            } catch (\UnexpectedValueException $e) {
+                // Bad tag type:
+                continue;
             }
+
+            // save it if necessary
+            if (!$model->getId()) {
+                $this->save($model);
+            }
+            $tagIds[] = $model->getId();
         }
         return $tagIds;
     }
