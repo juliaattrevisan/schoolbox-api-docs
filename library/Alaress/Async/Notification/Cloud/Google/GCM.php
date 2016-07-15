@@ -16,6 +16,7 @@ use OverflowException;
 use RuntimeException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\MobileApp\Registry;
+use Schoolbox\MobileApp\RegistryMapper;
 
 
 /**
@@ -109,6 +110,13 @@ class GCM extends AbstractService
 
                     if (isset($result['error'])) {
                         $this->report("$regId", $result['error'], Logger::INFO, '?');
+
+                        if ($result['error'] == 'NotRegistered') {
+                            // we need to delete this token, it will only break things
+                            // TODO remove the singletonness...
+                            RegistryMapper::getInstance()->deleteByColumn('app_token', $regId);
+                        }
+
                     } else {
                         $this->report("$regId", "All ok!", Logger::DEBUG);
                     }
