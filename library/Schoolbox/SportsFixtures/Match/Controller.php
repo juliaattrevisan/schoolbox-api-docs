@@ -226,7 +226,7 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
         }
 
-        $this->saveMatch($entity, $division, $this->getRequest()->post['name'], $startAt, $homeTeam, $awayTeam, $homeSchoolId, $awaySchoolId, $venue);
+        $this->saveMatch($entity, $division, $this->getRequest()->post['name'], $startAt, $homeTeam, $awayTeam, $homeSchoolId, $awaySchoolId, $venue, $this->getRequest()->post['notes']);
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesMatch.getList', [
             'contextId' => $divisionId
@@ -246,7 +246,7 @@ class Controller extends AbstractController
      * @param int $awaySchoolId
      * @param Venue $venue
      */
-    private function saveMatch(Match $match, Division $division, $name, \Alaress_Date_Format $startAt, Team $homeTeam, Team $awayTeam, $homeSchoolId, $awaySchoolId, Venue $venue)
+    private function saveMatch(Match $match, Division $division, $name, \Alaress_Date_Format $startAt, Team $homeTeam, Team $awayTeam, $homeSchoolId, $awaySchoolId, Venue $venue, $notes)
     {
         $match->setDivision($division);
         $match->setName($name);
@@ -256,6 +256,7 @@ class Controller extends AbstractController
         $match->setHomeSchoolId($homeSchoolId);
         $match->setAwaySchoolId($awaySchoolId);
         $match->setVenue($venue);
+        $match->setNotes($notes);
         $match->setUpdatedAt(\Alaress_Date_Format::now());
 
         $this->getMapper()->save($match);

@@ -47,6 +47,9 @@ class Model implements ISoftDeletable {
     /** @var int $homeSchoolId */
     protected $homeSchoolId;
 
+    /** @var string $notes */
+    protected $notes;
+
     /** @var \Alaress_Date_Format */
     protected $startAt;
 
@@ -259,6 +262,22 @@ class Model implements ISoftDeletable {
     public function setStartAt($startAt)
     {
         $this->startAt = $startAt;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNotes()
+    {
+        return $this->notes;
+    }
+
+    /**
+     * @param string $notes
+     */
+    public function setNotes($notes)
+    {
+        $this->notes = $notes;
     }
 
     /**

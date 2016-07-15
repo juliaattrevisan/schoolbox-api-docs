@@ -53,6 +53,7 @@ class Mapper extends BaseMapper
         $this->joins('away_team_id', TeamMapper::class, 'id', null, null, 'awayTeam', 'away_team');
         $this->uses('home_school_id', self::TYPE_INTEGER);
         $this->uses('away_school_id', self::TYPE_INTEGER);
+        $this->uses('notes', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
