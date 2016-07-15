@@ -232,7 +232,6 @@ class Notifier extends AbstractModuleNotifier
 
         // Target home team
 
-        $this->log->info("ID: " . $match->getHomeTeam()->getId());
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getHomeTeam()->getId());
 
         /** @var TeamPlayerModel $teamPlayer */
