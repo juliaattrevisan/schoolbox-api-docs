@@ -1222,11 +1222,9 @@ ul.flex-list {
 	 * few rems, to accommodate the image/icon (only affects card)
 	 */
 	.row {
-		@media #{$medium-up} {
-			padding-left: 4rem;
-		}
+		padding-left: 1rem;
 		@media #{$small-only} {
-			padding-left: 3.5rem;
+			padding-left: 0.5rem;
 		}
 
 		/* A status label inside a row/col construct
@@ -1251,12 +1249,9 @@ ul.flex-list {
 			/* Align text within labels
 			 */
 			@media #{$small-only} {
-				margin-left: -1.5rem;
+				margin-left: -0.5rem;
 			}
 			@media #{$medium-up} {
-				margin-left: -0.875rem;
-			}
-			@media #{$large-up} {
 				margin-left: -0.875rem;
 			}
 
