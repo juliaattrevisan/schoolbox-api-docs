@@ -14,10 +14,11 @@ use Alaress\Async\Notification\Parameter\Param;
 
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
-use Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
-use Schoolbox\SportsFixtures\Team\User\Model as TeamUserModel;
+use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
+use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayerModel;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
@@ -44,8 +45,8 @@ class Notifier extends AbstractModuleNotifier
         if (empty($dependencies['sportMapper'])) {
             $dependencies['sportMapper'] = SportMapper::getInstance();
         }
-        if (empty($dependencies['teamUserMapper'])) {
-            $dependencies['teamUserMapper'] = TeamUserMapper::getInstance();
+        if (empty($dependencies['teamPlayerMapper'])) {
+            $dependencies['teamPlayerMapper'] = TeamPlayerMapper::getInstance();
         }
 
         parent::loadDependencies($dependencies);
@@ -150,8 +151,9 @@ class Notifier extends AbstractModuleNotifier
 
         $ts = date("U");
 
-        $bob->setTitle('Upcoming :sport Match :match')
+        $bob->setTitle(':child has an upcoming :sport match :match')
             ->setParams([
+                'child' => new UserParam($effector),
                 'sport' => new Param($sport->getName()),
                 'match'  => new Param($match->getName())
             ])
@@ -164,20 +166,20 @@ class Notifier extends AbstractModuleNotifier
 
         // Target home team parents
 
-        $teamUsers = $this->teamUserMapper->findByColumn("team_id", $match->getHomeTeam()->getId());
+        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getHomeTeam()->getId());
 
-        /** @var TeamUserModel $teamUser */
-        foreach ($teamUsers as $teamUser) {
-            $envelope->targetToParent($teamUser->getUser()->getId(), $bob->build());
+        /** @var TeamPlayerModel $teamPlayer */
+        foreach ($teamPlayers as $teamPlayer) {
+            $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
         }
 
         // Target away team parents
 
-        $teamUsers = $this->teamUserMapper->findByColumn("team_id", $match->getAwayTeam()->getId());
+        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getAwayTeam()->getId());
 
-        /** @var TeamUserModel $teamUser */
-        foreach ($teamUsers as $teamUser) {
-            $envelope->targetToParent($teamUser->getUser()->getId(), $bob->build());
+        /** @var TeamPlayerModel $teamPlayer */
+        foreach ($teamPlayers as $teamPlayer) {
+            $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
         }
 
         return $envelope;
@@ -200,7 +202,7 @@ class Notifier extends AbstractModuleNotifier
 
         $ts = date("U");
 
-        $bob->setTitle('Upcoming :sport Match :match')
+        $bob->setTitle('You have an upcoming :sport match :match')
             ->setParams([
                 'sport' => new Param($sport->getName(), $sport->getUrl()),
                 'match'  => new Param($match->getName(), "/sportsfixtures/match/{$match->getId()}?{$ts}", Param::STACKING_REPLACE)
@@ -215,20 +217,20 @@ class Notifier extends AbstractModuleNotifier
         // Target home team
 
         $this->log->info("ID: " . $match->getHomeTeam()->getId());
-        $teamUsers = $this->teamUserMapper->findByColumn("team_id", $match->getHomeTeam()->getId());
+        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getHomeTeam()->getId());
 
-        /** @var TeamUserModel $teamUser */
-        foreach ($teamUsers as $teamUser) {
-            $envelope->targetToUser($teamUser->getUser()->getId(), $bob->build());
+        /** @var TeamPlayerModel $teamPlayer */
+        foreach ($teamPlayers as $teamPlayer) {
+            $envelope->targetToUser($teamPlayer->getUser()->getId(), $bob->build());
         }
 
         // Target away team
 
-        $teamUsers = $this->teamUserMapper->findByColumn("team_id", $match->getAwayTeam()->getId());
+        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getAwayTeam()->getId());
 
-        /** @var TeamUserModel $teamUser */
-        foreach ($teamUsers as $teamUser) {
-            $envelope->targetToUser($teamUser->getUser()->getId(), $bob->build());
+        /** @var TeamPlayerModel $teamPlayer */
+        foreach ($teamPlayers as $teamPlayer) {
+            $envelope->targetToUser($teamPlayer->getUser()->getId(), $bob->build());
         }
 
         return $envelope;
@@ -271,8 +273,8 @@ class Notifier extends AbstractModuleNotifier
     /** @var SportMapper $sportMapper */
     protected $sportMapper;
 
-    /** @var TeamUserMapper $teamUserMapper */
-    protected $teamUserMapper;
+    /** @var TeamPlayerMapper $teamPlayerMapper */
+    protected $teamPlayerMapper;
 
     /**
      * @param $mapper
@@ -301,8 +303,8 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @param $mapper
      */
-    protected function setTeamUserMapper($mapper)
+    protected function setTeamPlayerMapper($mapper)
     {
-        $this->teamUserMapper = $mapper;
+        $this->teamPlayerMapper = $mapper;
     }
 }
