@@ -92,21 +92,30 @@ class Metadata
              */
             $this->getPlayers()->setOffset($team->getId(), new Collection());
 
-            $allPlayers = $this->getTeamPlayerMapper()->findByColumn('team_id', $team->getId(), ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]);
-
-            foreach ($allPlayers as $currentPlayer) {
-                $this->getPlayers()->getOffset($team->getId())->add($currentPlayer->getUser());
-            }
-
-            /* Get all Positions used in a Team and arrange them
-             * for each Player, where applicable
+            /* Collate everything
              */
-            $this->getPositions()->setOffset($team->getId(), new Collection());
-
+            $allPlayers = $this->getTeamPlayerMapper()->findByColumn('team_id', $team->getId(), ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]);
             $allPositions = $this->getTeamPositionMapper()->findByColumn('team_id', $team->getId(), ['order' => ['user_id' => 'asc']]);
 
-            foreach ($allPositions as $currentPosition) {
-                $this->getPositions()->getOffset($team->getId())->setOffset($currentPosition->getUser()->getId(), $currentPosition);
+            /* Sorry Matt
+             */
+            foreach ($allPlayers as $currentPlayer) {
+                $item = [
+                    'user' => $currentPlayer->getUser(),
+                    'positions' => new Collection()
+                ];
+
+                /* Get all the Positions for this Player
+                 */
+                foreach ($allPositions as $currentPosition) {
+                    if ($currentPosition->getUser()->getId() == $currentPlayer->getUser()->getId()) {
+                        $item['positions']->add($currentPosition);
+                    }
+                }
+
+                /* Stack up!
+                 */
+                $this->getPlayers()->getOffset($team->getId())->add($item);
             }
 
             /* Collect Coaches
