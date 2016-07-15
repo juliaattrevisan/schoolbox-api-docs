@@ -44,10 +44,10 @@
 
 <div class="row">
     <div class="small-12 island">
-        {% if result %}
+        {% if result.id %}
             {% set formUrl = routeLookup('sportsfixturesResult.updateEntity', {entityId: result.id}) %}
         {% else %}
-            {% set formUrl = routeLookup('sportsfixturesResult.createEntity') %}
+            {% set formUrl = routeLookup('sportsfixturesResult.createResultForTeam', {matchId: match.id, teamId: team.id}) %}
         {% endif %}
 
         <form id='resultForm' action="{{ formUrl }}" method="post">

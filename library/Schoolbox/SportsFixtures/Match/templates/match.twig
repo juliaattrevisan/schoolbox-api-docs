@@ -1,65 +1,94 @@
+{% import '@sportsfixturesMatch/macro/matchHeading.twig' as matchHeading %}
+{% import '@sportsfixturesMatch/macro/matchMap.twig' as matchMap %}
+
+{% if match.result.offset(team.id) %}
+    {% set hasResult = true %}
+{% else %}
+    {% set hasResult = false %}
+{% endif %}
+
 {% block breadcrumbs %}
 {% endblock %}
 
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>
+                {% if match.name %}
+                    {{ match.name }}
+                {% else %}
+                    {{ matchHeading.generate(match, schoolMapper, true) }}
+                {% endif %}
+            </h1>
+        </div>
+    </div>
+    <nav>
+        {% if hasMatchModify %}
+        <a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: match.id}) }}" class="icon-modify" title="Modify"></a>
+        {% endif %}
+    </nav>
+</div>
+
 <div class="row">
     <div class="small-12 columns">
-        <h1>Sports Fixtures</h1>
+        <ul class="meta">
+            {% if match.name %}{% spaceless %}
+            <li class="icon-team" title="{{ matchHeading.generate(match, schoolMapper, false) }}">{{ matchHeading.generate(match, schoolMapper, true) }}</li>
+            {% endspaceless %}{% endif %}
+            <li class="icon-calendar" title="{{ match.startAt.local }}">{{ match.startAt.local }} ({{ match.startAt.relativeTime }})</li>
+            <li class="icon-location">{{ match.venue.name }}</li>
+
+            {% if forecast.hasResults %}
+            <li class="{{ forecast.icon }}" title="{{ forecast.condition }}">{{ forecast.condition }}, {{ forecast.temp }}&deg;C</li>
+            {% endif %}
+        </ul>
     </div>
 </div>
 
+{% if hasResult %}
 <div class="row">
     <div class="small-12 island">
-        <h2 class="subheader">{{ match.name }}</h2>
-
-        <section class="content">
-            <div class="small-12 columns">
-                <dl>
-                    <dt>ID</dt>
-                    <dd>{{ match.id }}</dd>
-
-                    <dt>Name</dt>
-                    <dd>{{ match.name }}</dd>
-
-                    <dt>Venue</dt>
-                    <dd>{{ match.venue.name }}</dd>
-
-                    <dt>Starts</dt>
-                    <dd>{{ match.startAt.database }}</dd>
-
-                    {% if match.homeTeam.id and match.awayTeam.id %}
-                        <dt>Teams</dt>
-                        <dd>
-                            {{ match.homeTeam.name }} vs {{ match.awayTeam.name }}
-                        </dd>
-                    {% endif %}
-
-                    {% if match.itinerary|length %}
-                        <dt>Itinerary</dt>
-                        <dd>
-                            <ul class="information-list">
-                                {% for currentItineraryItem in match.itinerary %}
-                                    <li>
-                                        {{ currentItineraryItem.startAt.local }}:
-                                        {{ currentItineraryItem.description }}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </dd>
-                    {% endif %}
-
-                    <dt>Created</dt>
-                    <dd>{{ match.createdAt.database }}</dd>
-
-                    {% if not match.createdAt.eq(match.updatedAt) %}
-                        <dt>Last Updated</dt>
-                        <dd>{{ match.updatedAt.database }}</dd>
-                    {% endif %}
-                </dl>
-            </div>
-        </section>
-
-        {% block results %}
-        {% endblock %}
+        {% include '@sportsfixturesMatch/fragment/hasResult.twig' %}
     </div>
 </div>
+{% endif %}
+
+{% if not hasResult %}
+    <div class="row">
+        <div class="small-12 columns">
+            {% include '@sportsfixturesMatch/fragment/map.twig' %}
+        </div>
+    </div>
+{% endif %}
+
+<div class="row">
+    {% if hasResult %}
+        <div class="small-12 medium-6 island">
+            {% include '@sportsfixturesMatch/fragment/players.twig' %}
+            {% include '@sportsfixturesMatch/fragment/coaches.twig' %}
+        </div>
+        <div class="small-12 medium-6 island">
+            {% include '@sportsfixturesMatch/fragment/itinerary.twig' %}
+        </div>
+    {% else %}
+        <div class="small-12 medium-6 island">
+            {% include '@sportsfixturesMatch/fragment/itinerary.twig' %}
+        </div>
+        <div class="small-12 medium-6 island">
+            {% include '@sportsfixturesMatch/fragment/players.twig' %}
+            {% include '@sportsfixturesMatch/fragment/coaches.twig' %}
+        </div>
+    {% endif %}
+</div>
+
+{% if not hasResult %}
+    {% if hasMatchModify %}
+    <div class="row">
+        <div class="small-12 columns">
+            {% include '@sportsfixturesMatch/fragment/noResult.twig' %}
+        </div>
+    </div>
+    {% endif %}
+{% endif %}
+
 

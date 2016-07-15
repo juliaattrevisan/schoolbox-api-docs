@@ -1,4 +1,5 @@
 {% extends '@sportsfixturesMatch/match.twig' %}
+{% import '@sportsfixturesMatch/macro/matchBreadcrumb.twig' as matchBreadcrumb %}
 
 {% block breadcrumbs %}
     <ul class="breadcrumb">
@@ -6,11 +7,11 @@
         <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
         <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
         <li><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}">Matches in {{ division.name }}</a></li>
-        <li><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: team.id}) }}">{{ match.name }}</a></li>
 
         {% if match.id %}
-            <li class="active"><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: team.id}) }}">Results for {{ team.name }}</a></li>
+            <li class="active"><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: team.id}) }}">{{ matchBreadcrumb.generate(match, schoolMapper) }}</a></li>
         {% else %}
+            <li><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: team.id}) }}">{{ matchBreadcrumb.generate(match, schoolMapper) }}</a></li>
             <li class="active"><a href="#">{{ action }}</a></li>
         {% endif %}
     </ul>
@@ -59,9 +60,9 @@
     {% else %}
     <div class="empty-state">
         <i class="icon-result"></i>
-        <p>There are no Results for this Team.</p>
+        <p>There are no Results for {{ team.name }}.</p>
 
-        <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: team.id}) }}" title="Add Results">Add Results for this Team.</a></p>
+        <p><a href="{{ routeLookup('sportsfixturesResult.getCreateFormForTeam', {contextId: match.id, teamId: team.id}) }}" title="Add Results">Add Results for {{ team.name }}.</a></p>
     </div>
     {% endif %}
 {% endblock %}

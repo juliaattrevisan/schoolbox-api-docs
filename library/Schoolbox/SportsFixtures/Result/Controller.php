@@ -12,15 +12,22 @@ use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
+use \Schoolbox\Config\ConfigMapper;
+use \Schoolbox\User;
+use \Schoolbox\Permission\Access\UserAccess;
+use \Schoolbox\Permission\Access\UserAccessMapper;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
-use \Schoolbox\SportsFixtures\Division\Model as Division;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
-use Schoolbox\SportsFixtures\Match\Model as Match;
+use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
+use \Schoolbox\SportsFixtures\Match\Weather as MatchWeather;
 use \Schoolbox\SportsFixtures\Result\Model as Result;
 use \Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
+use \Schoolbox\SportsFixtures\Team\Metadata as TeamMetadata;
+use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
+
 
 class Controller extends AbstractController
 {
@@ -50,6 +57,11 @@ class Controller extends AbstractController
     protected $errorMapper;
 
     /**
+     * @var TagCloudMapper
+     */
+    protected $schoolTagCloudMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -60,6 +72,7 @@ class Controller extends AbstractController
         $this->setMatchMapper(MatchMapper::getInstance());
         $this->setTeamMapper(TeamMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
+        $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
     }
 
     /**
@@ -97,22 +110,38 @@ class Controller extends AbstractController
         /* If results already exist, modify it instead
          */
         try {
-            $entity = $this->getMapper()->findOneByColumnList([
-                'match_id' => $context->getId(),
-                'team_id' => $team->getId()
-            ]);
-        }
-        catch (MapperException $e) {
+            $entity = $this->getMapper()->findOneByColumnList(
+                [
+                    'match_id' => $context->getId(),
+                    'team_id'  => $team->getId()
+                ]
+            );
+        } catch (MapperException $e) {
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/create.twig', [
-            'sport'    => $sport,
-            'division' => $division,
-            'match'    => $context,
-            'team'     => $team,
-            'result'   => $entity,
-            'action'   => $entity->getId() ? 'Modify' : 'Create'
-        ]));
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@sportsfixturesResult/create.twig',
+                [
+                    'sport'    => $sport,
+                    'division' => $division,
+                    'match'    => $context,
+                    'team'     => $team,
+                    'result'   => $entity,
+                    'action'   => $entity->getId() ? 'Modify' : 'Create'
+                ]
+            )
+        );
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @param $entity
+     */
+    public function createResultForTeam($entity)
+    {
+        $this->persistEntity($entity);
     }
 
     /**
@@ -138,20 +167,30 @@ class Controller extends AbstractController
         try {
             $allResults = $this->getMapper()->findByColumn('match_id', $context->getId());
 
-            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/list.twig', [
-                'sport'      => $sport,
-                'division'   => $division,
-                'match'      => $context,
-                'allResults' => $allResults
-            ]));
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput(
+                    '@sportsfixturesResult/list.twig',
+                    [
+                        'sport'      => $sport,
+                        'division'   => $division,
+                        'match'      => $context,
+                        'allResults' => $allResults
+                    ]
+                )
+            );
         } catch (MapperException $e) {
 
             /* No Results for this Match?
              * Prompt to spawn one
              */
-            $this->getResponse()->redirect->to($this->getRouter()->generate('sportsfixturesResult.getCreateForm', [
-                'contextId' => $context->getId()
-            ]));
+            $this->getResponse()->redirect->to(
+                $this->getRouter()->generate(
+                    'sportsfixturesResult.getCreateForm',
+                    [
+                        'contextId' => $context->getId()
+                    ]
+                )
+            );
         }
     }
 
@@ -165,30 +204,8 @@ class Controller extends AbstractController
      */
     public function getEntity($entity)
     {
-        try {
-            $match = $this->getMatchMapper()->findById($entity->getMatch()->getId());
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
-        }
-
-        try {
-            $division = $this->getDivisionMapper()->findById($match->getDivision()->getId());
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
-        }
-
-        try {
-            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
-        }
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/entity.twig', [
-            'sport'    => $sport,
-            'division' => $division,
-            'match'    => $match,
-            'result'   => $entity
-        ]));
+        /* noop
+         */
     }
 
     /**
@@ -196,8 +213,8 @@ class Controller extends AbstractController
      * The same as getEntity() except that it only shows
      * the Results for the specified Team
      *
-     * @param $context
-     * @param $team
+     * @param Match $context
+     * @param Team $team
      */
     public function getResultForTeam($context, $team)
     {
@@ -226,13 +243,106 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesResult/team.twig', [
-            'sport'    => $sport,
-            'division' => $division,
-            'match'    => $match,
-            'team'     => $team,
-            'result'   => $context
-        ]));
+        /* Team Lists
+         * Get home team player list, if applicable
+         * Get away team player list, if applicable
+         */
+        $teamMetadata = new TeamMetadata($context);
+
+        /* Find faceless home team, ram it into a Team instance
+         * This saves endless shenanigans in front-end land
+         */
+        if (!$match->getHomeTeam()->getId()) {
+            $name = $this->getSchoolTagCloudMapper()->getTagName($match->getHomeSchoolId());
+
+            $facelessTeam = $this->getTeamMapper()->createModel()->setName($name);
+
+            $match->setHomeTeam($facelessTeam);
+        }
+
+        /* Find faceless away team, ram it into a Team instance
+         * This saves endless shenanigans in front-end land
+         */
+        if (!$match->getAwayTeam()->getId()) {
+            $name = $this->getSchoolTagCloudMapper()->getTagName($match->getAwaySchoolId());
+
+            $facelessTeam = $this->getTeamMapper()->createModel()->setName($name);
+
+            $match->setAwayTeam($facelessTeam);
+        }
+
+        /* Tell me the weather
+         */
+        /** @var Match $match */
+        $forecast = new MatchWeather($match);
+
+        /* Determine whether you've got write access or not
+         * when viewing this page
+         */
+        $hasMatchModify = $this->hasMatchModify($teamMetadata->getCoaches()->getOffset($team->getId()));
+
+        $this->getResponse()->content->set(
+            $this->buildHtmlOutput(
+                '@sportsfixturesResult/team.twig',
+                [
+                    'sport'          => $sport,
+                    'division'       => $division,
+                    'match'          => $match,
+                    'schoolMapper'   => $this->getSchoolTagCloudMapper(),
+                    'team'           => $team,
+                    'teamMetadata'   => $teamMetadata,
+                    'result'         => $context,
+                    'googleApiKey'   => $this->getConfigLoader()->get('googleapps_api_key'),
+                    'forecast'       => $forecast,
+                    'hasMatchModify' => $hasMatchModify
+                ]
+            )
+        );
+    }
+
+    /**
+     * Determine whether the logged-in user has write access
+     * to this Match page
+     *
+     * @return bool
+     */
+    private function hasMatchModify(\Schoolbox\Collection $allCoaches)
+    {
+        /** @var User $sessionUser */
+        $sessionUser = $_SESSION['user'];
+
+        /* Skip all other checks if you're superuser
+         */
+        if ($sessionUser->isSuperuser()) {
+            return true;
+        }
+
+        /* Otherwise continue checking against service assignations
+         * If you're a Sports Admin, also return true
+         */
+        $allUserAccess = UserAccessMapper::getInstance()->findUsersForService(
+            UserAccess::SERVICE_SPORTS_ADMINISTRATOR,
+            0,
+            UserAccess::ACCESS_WRITE
+        );
+
+        foreach($allUserAccess as $currentUserAccess) {
+            if ($currentUserAccess->getId() == $sessionUser->getId()) {
+                return true;
+            }
+        }
+
+        /* Coaches of this Team can add results
+         */
+        foreach ($allCoaches as $currentCoach) {
+            if ($currentCoach->getUser()->getId() == $sessionUser->getId()) {
+                return true;
+            }
+        }
+
+        /* Nobody else can write/modify anything on the Match Result page
+         */
+        return false;
     }
 
     /**
@@ -277,10 +387,15 @@ class Controller extends AbstractController
 
         $this->saveResult($match, $team, $this->getRequest()->post['description'], $entity);
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesResult.getResultForTeam', [
-            'contextId' => $matchId,
-            'teamId' => $team->getId()
-        ]));
+        $this->getResponse()->redirect->afterPost(
+            $this->getRouter()->generate(
+                'sportsfixturesResult.getResultForTeam',
+                [
+                    'contextId' => $matchId,
+                    'teamId'    => $team->getId()
+                ]
+            )
+        );
     }
 
     /**
@@ -339,7 +454,7 @@ class Controller extends AbstractController
     /**
      * @return MatchMapper
      */
-    public function getMatchMapper()
+    protected function getMatchMapper()
     {
         return $this->matchMapper;
     }
@@ -347,7 +462,7 @@ class Controller extends AbstractController
     /**
      * @param MatchMapper $matchMapper
      */
-    public function setMatchMapper($matchMapper)
+    protected function setMatchMapper($matchMapper)
     {
         $this->matchMapper = $matchMapper;
     }
@@ -355,7 +470,7 @@ class Controller extends AbstractController
     /**
      * @return TeamMapper
      */
-    public function getTeamMapper()
+    protected function getTeamMapper()
     {
         return $this->teamMapper;
     }
@@ -363,7 +478,7 @@ class Controller extends AbstractController
     /**
      * @param TeamMapper $teamMapper
      */
-    public function setTeamMapper($teamMapper)
+    protected function setTeamMapper($teamMapper)
     {
         $this->teamMapper = $teamMapper;
     }
@@ -382,5 +497,21 @@ class Controller extends AbstractController
     protected function setErrorMapper($errorMapper)
     {
         $this->errorMapper = $errorMapper;
+    }
+
+    /**
+     * @return TagCloudMapper
+     */
+    protected function getSchoolTagCloudMapper()
+    {
+        return $this->schoolTagCloudMapper;
+    }
+
+    /**
+     * @param TagCloudMapper $schoolTagCloudMapper
+     */
+    protected function setSchoolTagCloudMapper($schoolTagCloudMapper)
+    {
+        $this->schoolTagCloudMapper = $schoolTagCloudMapper;
     }
 }
