@@ -147,29 +147,29 @@ class Notifier extends AbstractModuleNotifier
         $division = $this->divisionMapper->findById($match->getDivision()->getId());
         $sport = $this->sportMapper->findById($division->getSport()->getId());
 
-        $bob = new Builder();
-
         $ts = date("U");
-
-        $bob->setTitle(':child has an upcoming :sport match :match')
-            ->setParams([
-                'child' => new UserParam($effector),
-                'sport' => new Param($sport->getName()),
-                'match'  => new Param($match->getName())
-            ])
-            ->setHref("/sportsfixtures/match/{$match->getId()}")
-            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
-            ->setSeverity(Logger::INFO)
-            ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
-            ->setNamespace($this->getSlug())
-        ;
 
         // Target home team parents
 
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getHomeTeam()->getId());
 
         /** @var TeamPlayerModel $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer) {
+        foreach ($teamPlayers as $teamPlayer)
+        {
+            $bob = new Builder();
+
+            $bob->setTitle('Upcoming :sport match :match for :child')
+                ->setParams([
+                    'sport' => new Param($sport->getName()),
+                    'match'  => new Param($match->getName()),
+                    'child' => new UserParam($teamPlayer->getUser())
+                ])
+                ->setHref("/sportsfixtures/match/{$match->getId()}")
+                ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
+                ->setSeverity(Logger::INFO)
+                ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
+                ->setNamespace($this->getSlug())
+            ;
             $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
         }
 
@@ -178,7 +178,23 @@ class Notifier extends AbstractModuleNotifier
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getAwayTeam()->getId());
 
         /** @var TeamPlayerModel $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer) {
+        foreach ($teamPlayers as $teamPlayer)
+        {
+            $bob = new Builder();
+
+            $bob->setTitle('Upcoming :sport match :match for :child')
+                ->setParams([
+                    'sport' => new Param($sport->getName()),
+                    'match'  => new Param($match->getName()),
+                    'child' => new UserParam($teamPlayer->getUser())
+                ])
+                ->setHref("/sportsfixtures/match/{$match->getId()}")
+                ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
+                ->setSeverity(Logger::INFO)
+                ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
+                ->setNamespace($this->getSlug())
+            ;
+
             $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
         }
 

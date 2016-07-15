@@ -109,7 +109,7 @@ insert  into `sportsfixtures_team_position`(`id`,`team_id`,`user_id`,`position_i
 /* Matches
  */
 insert  into `sportsfixtures_match`(`id`,`division_id`,`venue_id`,`home_team_id`,`away_team_id`,`home_school_id`,`away_school_id`,`name`,`start_at`,`created_at`,`updated_at`,`deleted_at`) values (1,4,6,8,9,NULL,NULL,'First Match Ever','2016-07-08 11:00:00','2016-07-07 19:57:35','2016-07-07 19:57:35',NULL),(2,4,3,8,NULL,NULL,2,'Grand Final','2016-07-30 16:00:00','2016-07-07 20:06:41','2016-07-07 20:06:41',NULL);
-a
+
 /* Itineraries
  */
 insert  into `sportsfixtures_match_itineraryitem`(`id`,`match_id`,`description`,`start_at`,`created_at`,`updated_at`,`deleted_at`) values (1,2,'Go to the place where the sportsing will happen','2016-07-30 15:00:00','2016-07-07 20:09:13','2016-07-07 20:09:13',NULL),(2,2,'Prepare for the sportsing','2016-07-30 15:30:00','2016-07-07 20:09:30','2016-07-07 20:09:30',NULL),(3,2,'Grand Final Sportsing','2016-07-30 16:00:00','2016-07-07 20:09:54','2016-07-07 20:09:54',NULL),(4,2,'Closing Ceremony of Sportsing','2016-07-30 18:30:00','2016-07-07 20:10:13','2016-07-07 20:10:13',NULL),(5,1,'Go to the place and do the thing','2016-07-08 10:30:00','2016-07-07 20:12:04','2016-07-07 20:12:04',NULL);
