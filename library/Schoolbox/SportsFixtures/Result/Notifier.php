@@ -63,7 +63,7 @@ class Notifier extends AbstractModuleNotifier
      */
     protected function getSlug()
     {
-        return NSMapper::NS_SPORTS_FIXTURES;
+        return NSMapper::NS_SPORTS_FIXTURES_RESULT;
     }
 
     /**
