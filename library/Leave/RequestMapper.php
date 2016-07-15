@@ -473,8 +473,8 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 				{$this->getJoinColumnString('host_type', 'ht')}
 			FROM {$this->getTable()} `lr`
 			RIGHT JOIN {$this->getJoinSql('user', 'lr', 'u')}
-				AND lr.start < :finish
-				AND lr.finish > :start
+				AND lr.start <= :finish
+				AND lr.finish >= :start
 				AND (lr.status = :statusApproved OR lr.status = :statusPending OR lr.status IS NULL)
 			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
 			LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}

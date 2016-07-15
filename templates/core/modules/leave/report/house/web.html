@@ -125,9 +125,9 @@
                     </div>
                     <div class="small-12 medium-6 large-2 columns">
                         <select name="reportPeriod">
-                            <option value="weekend">Weekend</option>
-                            <option value="day">Day</option>
-                            <option value="range">Date Range</option>
+                            <!-- BEGIN report_period -->
+                            <option value="{REPORT_PERIOD_VALUE}" {REPORT_PERIOD_SELECTED}>{REPORT_PERIOD_LABEL}</option>
+                            <!-- END report_period -->
                         </select>
                     </div>
                     <div class="small-12 medium-4 large-2 columns" data-date-start>

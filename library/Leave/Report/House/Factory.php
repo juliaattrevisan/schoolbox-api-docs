@@ -18,12 +18,10 @@ class Leave_Report_House_Factory {
 	 *
 	 * @param $page
 	 * @param $data
-	 * @param $range
 	 */
-	public function __construct($page, $data, $range) {
+	public function __construct($page, $data) {
 		$this->setPage($page);
 		$this->setData($data);
-		$this->setRange($range);
 		$this->setClassname(ucwords(Cfg::get('site_location')));
 	}
 
