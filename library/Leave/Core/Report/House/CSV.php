@@ -26,13 +26,13 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase {
 		'approvedEnd' => ' ',
 	);
 
-	/**
-	 * Set up blocks and stuff
-	 */
-	protected function setup() {
+    /**
+     * Setup Hook for descendant classes
+     * @param array $data extra data for descendant classes
+     * @return void
+     */
+    protected function setup(array $data){
 		$this->getPage()->setAjax(true);
-
-		$this->recombination();
 	}
 
 	/**

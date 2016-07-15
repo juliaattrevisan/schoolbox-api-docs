@@ -71,6 +71,11 @@
                     break;
                 case 'range':
                     $('[data-date-end]').removeClass('hide');
+
+                        // TODO - need a more elegant way to +3 days to currently displayed start date
+                    if('' === $('[name=reportDateEnd]').val()){
+                        $('[name=reportDateEnd]').val($('[name=reportDateStart]').val());
+                    }
                     break;
             }
         });

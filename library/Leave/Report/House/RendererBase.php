@@ -11,8 +11,24 @@
  */
 abstract class Leave_Report_House_RendererBase implements Leave_Report_House_RenderableInterface
 {
-    protected $page = null;
-    protected $data = array();
+    /** @var  SitePage */
+    protected $page;
+
+    /** @var  string */
+    protected $startDate;
+
+    /** @var  string */
+    protected $endDate;
+
+    /** @var string Enum from {'day','weekend','range'} */
+    protected $reportPeriod;
+
+    /** @var  Alaress_Date_Format */
+    protected $reportStart;
+
+    /** @var  Alaress_Date_Format */
+    protected $reportFinish;
+
     protected $requestList = array();
     protected $houseList = array();
     protected $range = -1;
@@ -41,25 +57,49 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     /**
      * Constructor
      *
-     * @param $page
-     * @param $data
-     * @param $range
+     * @param SitePage $page
+     * @param array $data
+     * @var HouseResidential      $data['house']
+     * @var string                $data['dateStart']
+     * @var string|null           $data['dateEnd']
+     * @var string                $data['reportPeriod']
+     * @var Alaress_Date_Format   $data['reportStart']
+     * @var Alaress_Date_Format   $data['reportFinish']
+     * @var \Schoolbox\Collection $data['requestList']
+     * @var Leave_Request         $data['requestList'][]
+     * @var \Schoolbox\Collection $data['houseList']
+     * @var HouseResidential      $data['houseList'][]
      */
-    public function __construct($page, $data, $range)
+    public function __construct($page, $data)
     {
         $this->setPage($page);
-        $this->setData($data);
-        $this->setRange($range);
-
-        /* Implied structure
-         */
+        $this->setCurrentHouse($data['house']);
+        $this->setReportStartDate($data['dateStart']);
+        $this->setReportEndDate($data['dateEnd']);
+        $this->setReportPeriod($data['reportPeriod']);
+        $this->setReportStart($data['reportStart']);
+        $this->setReportFinish($data['reportFinish']);
+        $this->setRange( $this->getReportFinish()->diffInDays($this->getReportStart(), true) + 1);
         $this->setRequestList($data['requestList']);
         $this->setHouseList($data['houseList']);
-        $this->setCurrentHouse($data['house']);
 
-        /* Setup hook
+        /* Execute data recombination
          */
-        $this->setup();
+        $this->recombination();
+
+        /* Setup hook if data bundle extended by descendants
+         */
+        $this->setup($data);
+    }
+
+
+    /**
+     * Setup Hook for descendant classes
+     * @param array $data extra data for descendant classes
+     * @return void
+     */
+    protected function setup(array $data){
+
     }
 
     /**
@@ -124,18 +164,16 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
                 * PM: 19:00:00 to 21:59:59
                 * Night: 22:00:00 to 9:59:59
              */
-            $data = $this->getData();
-
-            $morningStart = clone $data['reportStart'];
+            $morningStart = Alaress_Date_Format::newLocalShort($this->getReportStart());
             $morningStart->addHours($this->offsets['morningStart']);
 
-            $dayStart = clone $data['reportStart'];
+            $dayStart = Alaress_Date_Format::newLocalShort($this->getReportStart());
             $dayStart->addHours($this->offsets['dayStart']);
 
-            $nightStart = clone $data['reportStart'];
+            $nightStart = Alaress_Date_Format::newLocalShort($this->getReportStart());
             $nightStart->addHours($this->offsets['nightStart']);
 
-            $nightEnd = clone $data['reportStart'];
+            $nightEnd = Alaress_Date_Format::newLocalShort($this->getReportStart());
             $nightEnd->addHours($this->offsets['nightEnd']);
 
             $showStartTime = true;
@@ -278,32 +316,14 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     /* Getters/Setters
      */
 
-    /**
-     * Get report date
-     *
-     * @return mixed
-     */
-    protected function getReportDate()
-    {
-        return $this->data['date'];
-    }
 
-    /**
-     * Get report start date
-     *
-     * @return mixed
-     */
-    protected function getReportStart()
-    {
-        return $this->data['reportStart'];
-    }
 
     /**
      * Set page
      *
-     * @param $page
+     * @param SitePage $page
      */
-    protected function setPage($page)
+    protected function setPage(SitePage $page)
     {
         $this->page = $page;
     }
@@ -311,31 +331,11 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     /**
      * Get page
      *
-     * @return null
+     * @return SitePage
      */
     protected function getPage()
     {
         return $this->page;
-    }
-
-    /**
-     * Set data
-     *
-     * @param $data
-     */
-    protected function setData($data)
-    {
-        $this->data = $data;
-    }
-
-    /**
-     * Get data
-     *
-     * @return mixed
-     */
-    protected function getData()
-    {
-        return $this->data;
     }
 
     /**
@@ -476,6 +476,81 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     protected function getDecorationApprovedEnd()
     {
         return $this->decoration['approvedEnd'];
+    }
+
+    /**
+     * The startDate requested by user, may not equal report display start
+     * @param string $startDate
+     */
+    protected function setReportStartDate($startDate){
+        $this->startDate = $startDate;
+    }
+
+    /**
+     * Start Date requested by user, may not be equal to report's displayed start
+     * @return string
+     */
+    protected function getReportStartDate(){
+        return $this->startDate;
+    }
+
+    /**
+     * The endDate requested by user, may not equal report display finish
+     * @param string|null $endDate
+     */
+    protected function setReportEndDate($endDate){
+        $this->endDate = $endDate;
+    }
+
+    /**
+     * End Date requested by user, may not be equal to report's displayed finish
+     * @return string|null
+     */
+    protected function getReportEndDate(){
+        return $this->endDate;
+    }
+
+    /**
+     * @param string $reportPeriod Enum from {'day','weekend','range'}
+     */
+    protected function setReportPeriod($reportPeriod){
+        $this->reportPeriod = $reportPeriod;
+    }
+
+    /**
+     * Enum from {'day','weekend','range'}
+     * @return string
+     */
+    protected function getReportPeriod(){
+        return $this->reportPeriod;
+    }
+
+    /**
+     * @param Alaress_Date_Format $reportStart
+     */
+    protected function setReportStart(Alaress_Date_Format $reportStart){
+        $this->reportStart = $reportStart;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    protected function getReportStart(){
+        return $this->reportStart;
+    }
+
+    /**
+     * @param Alaress_Date_Format $reportFinish
+     */
+    protected function setReportFinish(Alaress_Date_Format $reportFinish){
+        $this->reportFinish = $reportFinish;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    protected function getReportFinish(){
+        return $this->reportFinish;
     }
 
 

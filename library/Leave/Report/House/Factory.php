@@ -8,9 +8,8 @@
  * @version	 SVN: $Id$
  */
 class Leave_Report_House_Factory {
-	private $page = null;
-	private $data = array();
-	private $range = -1;
+	private $page;
+	private $data;
 	private $classname = '';
 
 	/**
@@ -28,7 +27,7 @@ class Leave_Report_House_Factory {
 	/**
 	 * Produce a CSV report instance
 	 *
-	 * @return mixed
+	 * @return Leave_Report_House_RenderableInterface
 	 */
 	public function produceCSV() {
         $fullname = "Leave_{$this->getClassname()}_Report_House_CSV";
@@ -41,7 +40,7 @@ class Leave_Report_House_Factory {
 	/**
 	 * Produce a print report instance
 	 *
-	 * @return mixed
+	 * @return Leave_Report_House_RenderableInterface
 	 */
 	public function producePrint() {
         $fullname = "Leave_{$this->getClassname()}_Report_House_Print";
@@ -71,7 +70,7 @@ class Leave_Report_House_Factory {
 	 * @return mixed
 	 */
 	private function produce($fullClassname) {
-		return new $fullClassname($this->getPage(), $this->getData(), $this->getRange());
+		return new $fullClassname($this->getPage(), $this->getData());
 	}
 
 	/* Getters/Setters
@@ -129,23 +128,5 @@ class Leave_Report_House_Factory {
 	 */
 	private function getPage() {
 		return $this->page;
-	}
-
-	/**
-	 * Set range
-	 *
-	 * @param $range
-	 */
-	private function setRange($range) {
-		$this->range = $range;
-	}
-
-	/**
-	 * Get range
-	 *
-	 * @return int
-	 */
-	private function getRange() {
-		return $this->range;
 	}
 }

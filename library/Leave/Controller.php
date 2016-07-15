@@ -1425,6 +1425,7 @@ class Leave_Controller extends Controller
             'requestList'  => $requestList,
             'houseList'    => $houseList
         );
+
     }
 
     /**
@@ -1746,5 +1747,13 @@ class Leave_Controller extends Controller
      */
     public function getHostTypes() {
         return $this->hostTypes;
+    }
+
+    /**
+     * Get the enum list of report periods available
+     * @return array|string[]
+     */
+    public static function getReportPeriods(){
+        return [ self::REPORT_PERIOD_DAY, self::REPORT_PERIOD_WEEKEND, self::REPORT_PERIOD_RANGE ];
     }
 }

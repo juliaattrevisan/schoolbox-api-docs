@@ -29,11 +29,13 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
 
     /**
      * Set up blocks and stuff
+     * @param array $data extra data for descendant classes
+     * @return void
      */
-    protected function setup()
-    {
+    protected function setup(array $data) {
         $this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
         $this->getPage()->setBlock(TEMPLATE_content, 'house', 'house_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'report_period', 'report_period_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'row', 'row_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'request_period_total', 'request_period_total_block');
@@ -62,10 +64,6 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
          */
         $this->getPage()->setVar('no_requests_block', '');
         $this->getPage()->setVar('row_block', '');
-
-        /* Execute data recombination
-         */
-        $this->recombination();
     }
 
     /**
@@ -75,6 +73,7 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
     public function render()
     {
         $this->renderHouseList();
+        $this->renderPeriodList();
         $this->renderHeadings();
         $this->renderRequests();
         $this->renderMetaDetails();
@@ -226,13 +225,11 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
      */
     protected function renderHeadings()
     {
-        $data = $this->getData();
-
         if (count($this->getRequestList())) {
             /* Parse out the headings
              */
             for ($i = 0; $i < $this->getRange(); $i++) {
-                $headerDate = clone $data['reportStart'];
+                $headerDate = Alaress_Date_Format::newLocalShort($this->getReportStart());
                 $headerDate->addDays($i);
 
                 $this->getPage()->setVar(
@@ -303,6 +300,38 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
     }
 
     /**
+     * Render the options in the Report Period select
+     */
+    protected function renderPeriodList()
+    {
+            foreach(Leave_Controller::getReportPeriods() as $reportPeriod)
+            {
+                $periodSelected = $reportPeriod === $this->getReportPeriod();
+
+                switch($reportPeriod){
+                    case Leave_Controller::REPORT_PERIOD_DAY:
+                        $periodLabel = 'Single Day';
+                        break;
+                    case Leave_Controller::REPORT_PERIOD_RANGE:
+                        $periodLabel = 'Date Range';
+                        break;
+                    case Leave_Controller::REPORT_PERIOD_WEEKEND:
+                    default:
+                        $periodLabel = 'Weekend';
+                        break;
+                }
+
+                $this->getPage()->setVar([
+                    'REPORT_PERIOD_VALUE'    => $reportPeriod,
+                    'REPORT_PERIOD_SELECTED' => $periodSelected ? 'selected="selected"' : '',
+                    'REPORT_PERIOD_LABEL'    => $periodLabel,
+                ]);
+
+                $this->getPage()->parse('report_period_block', 'report_period', true);
+            }
+    }
+
+    /**
      * Render extra information about the report
      */
     protected function renderMetaDetails()
@@ -311,10 +340,14 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
 
         $this->getPage()->setVar(
             array(
-                'HOUSE_NAME'   => Scrub::text($this->getCurrentHouse()->getHouse()),
-                'HOUSE_ID'     => $this->getCurrentHouse()->getId(),
-                'GENERATED_AT' => $currentTime->getShort(),
-                'REPORT_DATE'  => $this->getReportDate(),
+                'HOUSE_NAME'        => Scrub::text($this->getCurrentHouse()->getHouse()),
+                'HOUSE_ID'          => $this->getCurrentHouse()->getId(),
+                'GENERATED_AT'      => $currentTime->getShort(),
+                'REPORT_DATE_START' => $this->getReportStartDate(),
+                'REPORT_DATE_END'   => $this->getReportEndDate(),
+                'CLASS_REPORT_DATE_END' => Leave_Controller::REPORT_PERIOD_RANGE === $this->getReportPeriod() ? '' : 'hide',
+                'DATE_DISPLAY_START' => $this->getReportStart()->getUsingFormat('d-m-Y'),
+                'DATE_DISPLAY_END'   => $this->getReportFinish()->getUsingFormat('d-m-Y'),
             )
         );
     }
