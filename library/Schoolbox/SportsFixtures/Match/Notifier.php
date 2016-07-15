@@ -147,7 +147,7 @@ class Notifier extends AbstractModuleNotifier
         $division = $this->divisionMapper->findById($match->getDivision()->getId());
         $sport = $this->sportMapper->findById($division->getSport()->getId());
 
-        $ts = \Alaress_Date_Format::now();
+        $ts = \Alaress_Date_Format::now()->getUnixTimeStamp();
 
         // Target home team parents
 
@@ -216,7 +216,7 @@ class Notifier extends AbstractModuleNotifier
 
         $bob = new Builder();
 
-        $ts = \Alaress_Date_Format::now();
+        $ts = \Alaress_Date_Format::now()->getUnixTimeStamp();
 
         $bob->setTitle('You have an upcoming :sport match :match')
             ->setParams([
