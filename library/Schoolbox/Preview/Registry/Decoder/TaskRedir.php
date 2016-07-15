@@ -17,6 +17,7 @@ use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\UserMapper;
 
@@ -74,55 +75,13 @@ class TaskRedir extends Base {
 
                         $folder = FolderMapper::getInstance()->findById($component->getIdentifier());
 
-                        $classStudentIdList = array();
-                        $groupStudentIdList = array();
+                        $students = UserAccessMapper::getInstance()->findStudentsInCategory($folder);
 
-                        // Get students by class code
+                        $userCollection = [];
 
-                        $config = new ConfigLoader();
-
-                        if ($config->get('external_enable')) {
-                            $codes = explode(",", $folder->getCodeString());
-
-                            foreach ($codes as $code) {
-                                $class_handler = new \External_Class();
-                                $classStudentList = $class_handler->getStudents($code);
-
-                                if (is_array($classStudentList)) {
-                                    $externalIdList = array_map(
-                                        function ($student) {
-                                            return $student['synergy_id'];
-                                        },
-                                        $classStudentList
-                                    );
-
-                                    $list = UserMapper::getInstance()
-                                        ->findByColumn('synergy_id', $externalIdList)
-                                        ->getColumnValues('id');
-
-                                    $classStudentIdList = array_merge($classStudentIdList, $list);
-                                }
-                            }
+                        foreach ($students as $student) {
+                            $userCollection[] = $student->getId();
                         }
-
-                        // Get by group involvement
-
-                        $group_handler = new Group();
-                        $groupStudentList = $group_handler->getMemberList($folder->getId());
-                        if (is_array($groupStudentList)) {
-                            $groupStudentIdList = array_unique(
-                                array_map(
-                                    function ($student) {
-                                        return $student['uid'];
-                                    },
-                                    $groupStudentList
-                                )
-                            );
-                        }
-
-                        // Merge them together
-
-                        $userCollection = array_merge($classStudentIdList, $groupStudentIdList);
 
                         // Only proceed to marking if the logged in user is actually in the list of users
 
