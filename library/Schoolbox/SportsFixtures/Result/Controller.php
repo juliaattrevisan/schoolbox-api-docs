@@ -213,8 +213,8 @@ class Controller extends AbstractController
      * The same as getEntity() except that it only shows
      * the Results for the specified Team
      *
-     * @param $context
-     * @param $team
+     * @param Match $context
+     * @param Team $team
      */
     public function getResultForTeam($context, $team)
     {
