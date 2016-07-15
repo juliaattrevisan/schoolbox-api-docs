@@ -31,28 +31,39 @@
         $(document).on('click', '[data-action]', function (event) {
             event.preventDefault();
 
-            var searchForm = $('form[data-form_type="search"]');
-            var houseId  = searchForm.find(':input[name="reportHouse"]').val();
-            var date     = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
-            var action   = $(this).data('action');
-            var location = '/modules/leave/report/house/' + houseId + '/' + date;
+            var searchForm = $('[data-form_type=search]');
+            var houseId    = searchForm.find(':input[name="reportHouse"]').val();
+            var dateStart  = searchForm.find(':input[name="reportDateStart"]').val().replace(/\//g, '-');
+            var action     = $(this).data('action');
+            var period     = searchForm.find('[name=reportPeriod]').val();
+            var location   = '/modules/leave/report/house/' + houseId + '/' + period + '/' + dateStart;
 
-            if (action == 'export') {
-                location += '/export';
+            if('range' === period){
+                var dateEnd  = searchForm.find(':input[name="reportDateEnd"]').val().replace(/\//g, '-');
+                location += '-'+dateEnd;
+            }
+
+            if ('search' !== action) {
+                location += '/' + action;
             }
 
             window.location.href = location;
         });
 
-        $('a[data-print]').click(function(e) {
-            e.preventDefault();
 
-            var searchForm = $('[data-form_type=search]');
-            var houseId  = searchForm.find(':input[name="reportHouse"]').val();
-            var date     = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
-            var location = '/modules/leave/report/house/' + houseId + '/' + date + '/print';
-            window.location.href = location;
-        })
+
+        // User selects a different report period from dropdown
+        $('[name=reportPeriod]').on('change',function(event){
+            switch($(this).val()){
+                case 'day':
+                case 'weekend':
+                    $('[data-date-end]').addClass('hide');
+                    break;
+                case 'range':
+                    $('[data-date-end]').removeClass('hide');
+                    break;
+            }
+        });
     });
 </script>
 <!-- END custom_head -->
@@ -71,8 +82,8 @@
         </div>
     </div>
     <nav>
-        <a class="icon-print" title="Print" data-print></a>
-        <a class="icon-export" data-action="export" title="Export"></a>
+        <a class="icon-print" title="Print" data-action="print"></a>
+        <a class="icon-export" title="Export" data-action="export"></a>
     </nav>
 </div>
 
@@ -95,17 +106,28 @@
             <section class="content">
                 <fieldset>
                     <legend>Search</legend>
-                    <div class="small-12 large-5 columns">
+                    <div class="small-12 medium-6 large-4 columns">
                         <select name="reportHouse">
                             <!-- BEGIN house -->
                             <option value="{HOUSE_ID}" {HOUSE_SELECTED}>{HOUSE_NAME}</option>
                             <!-- END house -->
                         </select>
                     </div>
-                    <div class="small-12 large-5 columns">
-                        <input data-datepicker name="reportDate" type="text" value="{REPORT_DATE}">
+                    <div class="small-12 medium-6 large-2 columns">
+                        <select name="reportPeriod">
+                            <option value="weekend">Weekend</option>
+                            <option value="day">Day</option>
+                            <option value="range">Date Range</option>
+                        </select>
                     </div>
-                    <div class="small-12 large-2 columns">
+                    <div class="small-12 medium-4 large-2 columns" data-date-start>
+                        <input data-datepicker name="reportDateStart" type="text" value="{REPORT_DATE_START}">
+                    </div>
+                    <div class="small-12 medium-4 large-2 columns {CLASS_REPORT_DATE_END}" data-date-end>
+                        <input data-datepicker name="reportDateEnd" type="text" value="{REPORT_DATE_END}">
+                    </div>
+
+                    <div class="small-12 medium-4 large-2 columns">
                         <input type="submit" title="Search" value='Search' data-action="search">
                     </div>
                 </fieldset>
