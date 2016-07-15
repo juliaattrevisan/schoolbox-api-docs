@@ -14,6 +14,7 @@ use Alaress\Async\Notification\Parameter\Param;
 
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
@@ -159,8 +160,9 @@ class Notifier extends AbstractModuleNotifier
 
         $ts = date("U");
 
-        $bob->setTitle(':sport Match :match Results Updated')
+        $bob->setTitle('Results have been updated for :child :sport match :match')
             ->setParams([
+                'child' => new Param("{$effector->getFirstname()} {$effector->getLastname()}'s"),
                 'sport' => new Param($sport->getName()),
                 'match'  => new Param($match->getName(), "/sportsfixtures/match/{$match->getId()}/results/{$result->getId()}?{$ts}", Param::STACKING_REPLACE)
             ])
