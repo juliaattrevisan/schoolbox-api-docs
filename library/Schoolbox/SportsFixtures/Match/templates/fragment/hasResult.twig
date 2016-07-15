@@ -21,7 +21,7 @@
 <section class="content">
     <div class="row">
         <div class="small-12 columns">
-            <div class="actions-small-1 row">
+            <div class="actions-small-2 row">
                 <div class="list-item">
                     <div class="small-12 columns">
                         <h4>{{ team.name }}</h4>
@@ -29,8 +29,10 @@
                     </div>
                 </div>
                 <nav>
+                    {% if hasMatchModify %}
                     <a href="{{ routeLookup('sportsfixturesResult.deleteEntity', {entityId: match.result[team.id].id}) }}" class="icon-delete" title="Delete" data-delete="{{ match.result[team.id].id }}"></a>
                     <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: match.result[team.id].id}) }}" class="icon-modify" title="Modify"></a>
+                    {% endif %}
                 </nav>
             </div>
         </div>
