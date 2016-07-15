@@ -8,8 +8,9 @@
  * @version     SVN: $Id$
  */
 
-namespace Alaress\Authorizer\Rule;
+namespace Schoolbox\SportsFixtures\Authorizer\Rule;
 
+use Alaress\Authorizer\Rule\IAuthorizationRule;
 use External_UserInterface;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Base;
