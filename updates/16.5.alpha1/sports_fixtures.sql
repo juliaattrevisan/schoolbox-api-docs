@@ -286,4 +286,4 @@ INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sp
 INSERT INTO `msg_route_perm`
 SELECT s.id src_id, g.id role_id, 'MU,IN,MO,EM', 'IN,MO' FROM msg_source s
 JOIN groups g ON g.group_type = s.role_type
-WHERE s.namespace = 19;
+WHERE s.namespace = @sportns;
