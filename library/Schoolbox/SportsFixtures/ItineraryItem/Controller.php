@@ -183,8 +183,8 @@ class Controller extends AbstractController
 
         $this->saveItineraryItem($match, $this->getRequest()->post['description'], $startAt, $entity);
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesItineraryItem.getList', [
-            'contextId' => $matchId
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesMatch.getModifyForm', [
+            'entityId' => $matchId
         ]));
     }
 
