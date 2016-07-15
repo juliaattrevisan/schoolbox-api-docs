@@ -44,20 +44,22 @@ class IsCoachOfTeam implements IAuthorizationRule
     public function authorize(array $params = array(), User $user = null)
     {
         /* Viewing the Team Match Page
+         * sportsfixturesResult.getResultForTeam
+         *
+         * When you're viewing the Create form
+         * sportsfixturesResult.getCreateFormForTeam
          */
-        if ($params['action'] == 'sportsfixturesResult.getResultForTeam') {
-            $match = $params['context'];
-            $teamId = $params['teamId'];
-        }
-        /* When you're viewing the Create form
-         */
-        else if ($params['action'] == 'sportsfixturesResult.getCreateFormForTeam') {
-            $match = $params['context'];
+        if (($params['context'] instanceof Match) && (is_numeric($params['teamId']))) {
+            $match  = $params['context'];
             $teamId = $params['teamId'];
         }
         /* When you're viewing the Modify Form
+         * sportsfixturesResult.getModifyForm
+         *
+         * When you're persisting data from the Update form
+         * sportsfixturesResult.updateEntity
          */
-        else if ($params['action'] == 'sportsfixturesResult.getModifyForm') {
+        else if ($params['entity'] instanceof Result) {
 
             /** @var Result $result */
             $result = $params['entity'];
@@ -66,27 +68,6 @@ class IsCoachOfTeam implements IAuthorizationRule
             $match = MatchMapper::getInstance()->findById($result->getMatch()->getId());
             $teamId = $result->getTeam()->getId();
         }
-        /* When you're persisting data from the Create form, for the first time
-         */
-        else if ($params['action'] == 'sportsfixturesResult.createResultForTeam') {
-
-            /** @var Match $match */
-            $match = MatchMapper::getInstance()->findById($params['matchId']);
-            $teamId = $params['teamId'];
-        }
-        /* When you're persisting data from the Update form
-         */
-        else if ($params['action'] == 'sportsfixturesResult.updateEntity') {
-
-            /** @var Result $result */
-            $result = $params['entity'];
-
-            /** @var Match $match */
-            $match = MatchMapper::getInstance()->findById($result->getMatch()->getId());
-            $teamId = $result->getTeam()->getId();
-        }
-        /* Unknown state - die
-         */
         else {
             throw new Unauthorized();
         }
