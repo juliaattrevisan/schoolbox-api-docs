@@ -1,0 +1,336 @@
+<?php
+/**
+ * @author      Andy Ryan <andy.ryan@alaress.com.au>
+ * @copyright   Copyright 2016, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ */
+
+
+/**
+ * Provides common behaviour for HTML-based rendering (Print or Browser)
+ */
+abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererBase {
+
+    /**
+     * @var string $templateFile
+     */
+    protected $templateFile = 'modules/leave/report/house/web.html';
+
+    /* Decorations to use on the little L's etc.
+     */
+    protected $decoration = array(
+        'pendingStart'  => "<span class='leave-pending'>",
+        'pendingEnd'    => "</span><br />",
+        'approvedStart' => "<span class='leave-approved'>",
+        'approvedEnd'   => "</span><br />",
+    );
+
+    protected $rangePeriods = array('morning', 'day', 'night');
+
+    /**
+     * Set up blocks and stuff
+     */
+    protected function setup()
+    {
+        $this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
+        $this->getPage()->setBlock(TEMPLATE_content, 'house', 'house_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'row', 'row_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'request_period_total', 'request_period_total_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'request_period_initial', 'request_period_initial_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'report_header', 'report_header_block');
+
+        $this->getPage()->setBlock(TEMPLATE_content, 'report_header_subtitle', 'report_header_subtitle_block');
+        $this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_show_am', 'report_header_subtitle_show_am_block');
+        $this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_show_day', 'report_header_subtitle_show_day_block');
+        $this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_show_pm', 'report_header_subtitle_show_pm_block');
+        $this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_hide_am', 'report_header_subtitle_hide_am_block');
+        $this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_hide_day', 'report_header_subtitle_hide_day_block');
+
+        $this->getPage()->setBlock('row', 'request', 'request_block');
+        $this->getPage()->setBlock('row', 'empty_request', 'empty_request_block');
+        $this->getPage()->setBlock('request', 'request_period', 'request_period_block');
+        $this->getPage()->setBlock('request', 'request_authorisation', 'request_authorisation_block');
+
+        $this->getPage()->setBlock('request_period', 'request_period_show_am', 'request_period_show_am_block');
+        $this->getPage()->setBlock('request_period', 'request_period_show_day', 'request_period_show_day_block');
+        $this->getPage()->setBlock('request_period', 'request_period_show_pm', 'request_period_show_pm_block');
+        $this->getPage()->setBlock('request_period', 'request_period_hide_am', 'request_period_hide_am_block');
+        $this->getPage()->setBlock('request_period', 'request_period_hide_day', 'request_period_hide_day_block');
+
+        /* Initial state
+         */
+        $this->getPage()->setVar('no_requests_block', '');
+        $this->getPage()->setVar('row_block', '');
+
+        /* Execute data recombination
+         */
+        $this->recombination();
+    }
+
+    /**
+     * Facade method
+     * Render house report
+     */
+    public function render()
+    {
+        $this->renderHouseList();
+        $this->renderHeadings();
+        $this->renderRequests();
+        $this->renderMetaDetails();
+    }
+
+    /**
+     * Render leave requests
+     */
+    protected function renderRequests()
+    {
+        if (count($this->getRequestList())) {
+            $allPeople   = $this->getCombined();
+            $totalPeople = count($allPeople);
+
+            // Create base totals for all ranges and periods
+            for ($j = 0; $j < $this->getRange(); $j++) {
+                $totals[] = array('morning' => $totalPeople, 'day' => $totalPeople, 'night' => $totalPeople);
+            }
+
+            if (is_array($allPeople) && $totalPeople) {
+                foreach ($allPeople as $currentPerson) {
+                    $hostTypes = array();
+
+                    foreach ($currentPerson['request_host_type'] as $currentHostType) {
+                        if (!empty($currentHostType)) {
+                            $hostTypes[] = $currentHostType;
+                        }
+                    }
+
+                    $this->getPage()->setVar(
+                        array(
+                            'USER_ID'              => $currentPerson['user_id'],
+                            'USER_NAME'            => $currentPerson['user_name'],
+                            'USER_YEAR'            => $currentPerson['user_year'],
+                            'USER_BOARDING_STATUS' => $currentPerson['user_boarding_status'],
+                            'REQUEST_STATUS'       => implode('<hr />', $currentPerson['request_status']),
+                            'REQUEST_HOST'         => implode('<hr />', $hostTypes),
+                            'REQUEST_ACTIVITY'     => implode('<hr />', $currentPerson['request_description']),
+                            'CLASS'                => implode(' ', $currentPerson['row_css_class']),
+                        )
+                    );
+
+                    /* Render out each authorisation user -_-
+                     */
+                    if (is_array($currentPerson['request_authorisation_user_id']) && count($currentPerson['request_authorisation_user_id'])) {
+                        foreach ($currentPerson['request_authorisation_user_id'] as $id => $name) {
+                            $this->getPage()->setVar(
+                                array(
+                                    'REQUEST_AUTHORISATION_USER_ID'   => $id,
+                                    'REQUEST_AUTHORISATION_USER_NAME' => $name,
+                                )
+                            );
+
+                            $this->getPage()->parse('request_authorisation_block', 'request_authorisation', true);
+                        }
+                    } else {
+                        $this->getPage()->setVar('request_authorisation_block', '');
+                    }
+
+                    /* Used to hide the first two blocks
+                     */
+                    $i = 0;
+
+                    foreach ($currentPerson['periods'] as $currentPeriod) {
+                        foreach ($this->rangePeriods as $section) {
+                            $requestOutput   = '';
+                            $removeFromTotal = false;
+
+                            foreach ($currentPeriod['request_period'][$section] as $request) {
+                                if ($request['status'] == Leave_Request::STATUS_PENDING && $request['display']) {
+                                    $requestOutput .= $this->getDecorationPendingStart() . $request['display'] . $this->getDecorationPendingEnd();
+
+                                } else {
+                                    if ($request['status'] == Leave_Request::STATUS_APPROVED && $request['display']) {
+                                        $requestOutput .= $this->getDecorationApprovedStart() . $request['display'] . $this->getDecorationApprovedEnd();
+
+                                        if ($request['direction'] == self::AWAY || $request['direction'] == self::RETURNING) {
+                                            $removeFromTotal = true;
+                                        }
+                                    }
+                                }
+                            }
+                            $this->getPage()->setVar('REQUEST_PERIOD_' . strtoupper($section), $requestOutput);
+                            $removeFromTotal ? $totals[$i][$section]-- : false;
+                        }
+
+
+                        if (!$i) {
+                            $this->getPage()->setVar('request_period_show_am_block', '');
+                            $this->getPage()->parse('request_period_show_day_block', 'request_period_show_day');
+                            $this->getPage()->parse('request_period_hide_am_block', 'request_period_hide_am');
+                            $this->getPage()->setVar('request_period_hide_day_block', '');
+                        } else {
+                            $this->getPage()->parse('request_period_show_am_block', 'request_period_show_am');
+                            $this->getPage()->parse('request_period_show_day_block', 'request_period_show_day');
+                            $this->getPage()->setVar('request_period_hide_am_block', '');
+                            $this->getPage()->setVar('request_period_hide_day_block', '');
+                        }
+
+                        $this->getPage()->parse('request_period_show_pm_block', 'request_period_show_pm');
+                        $this->getPage()->parse('request_period_block', 'request_period', true);
+
+                        /* Clear children after parsing out the parent
+                         */
+                        $this->getPage()->setVar('request_period_show_am_block', '');
+                        $this->getPage()->setVar('request_period_show_day_block', '');
+                        $this->getPage()->setVar('request_period_show_pm_block', '');
+                        $this->getPage()->setVar('request_period_hide_am_block', '');
+                        $this->getPage()->setVar('request_period_hide_day_block', '');
+
+                        $i++;
+                    }
+
+                    $this->getPage()->setVar('empty_request_block', '');
+                    $this->getPage()->parse('request_block', 'request');
+                    $this->getPage()->parse('row_block', 'row', true);
+
+                    /* Clear children after parsing out the parent
+                     */
+                    $this->getPage()->setVar('request_block', '');
+                    $this->getPage()->setVar('request_period_block', '');
+                    $this->getPage()->setVar('request_authorisation_block', '');
+                }
+            }
+        } /* This condition never occurs because of left join on users.
+         */
+        else {
+            $this->getPage()->parse('no_requests_block', 'no_requests');
+            $this->getPage()->setVar('row_block', '');
+        }
+
+        /* Output totals */
+        $periodCount = 0;
+        for ($j = 0; $j < $this->getRange(); $j++) {
+            foreach ($this->rangePeriods as $period) {
+                if (!($j == 0 && $period == 'morning')) {
+                    $periodCount++;
+                    $this->getPage()->setVar('PERIOD_TOTAL', $totals[$j][$period]);
+                    $this->getPage()->parse('request_period_total_block', 'request_period_total', true);
+                    $this->getPage()->parse('request_period_initial_block', 'request_period_initial', true);
+                }
+            }
+        }
+        $this->getPage()->setVar('PERIOD_COUNT', $periodCount);
+    }
+
+    /**
+     * Render headings for each day in the specified range
+     */
+    protected function renderHeadings()
+    {
+        $data = $this->getData();
+
+        if (count($this->getRequestList())) {
+            /* Parse out the headings
+             */
+            for ($i = 0; $i < $this->getRange(); $i++) {
+                $headerDate = clone $data['reportStart'];
+                $headerDate->addDays($i);
+
+                $this->getPage()->setVar(
+                    array(
+                        'REPORT_HEADER_WEEKDAY' => $headerDate->getUsingFormat('l'),
+                        'REPORT_HEADER_DATE'    => $headerDate->getLocalShort(),
+                    )
+                );
+
+                /* Hide the first two columns of the first group
+                 */
+                if (!$i) {
+                    $this->getPage()->setVar('REPORT_HEADER_COLSPAN', 2);
+                    $this->getPage()->setVar('report_header_subtitle_show_am_block', '');
+                    $this->getPage()->parse('report_header_subtitle_show_day_block', 'report_header_subtitle_show_day');
+                    $this->getPage()->parse('report_header_subtitle_hide_am_block', 'report_header_subtitle_hide_am');
+                    $this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
+                } else {
+                    $this->getPage()->setVar('REPORT_HEADER_COLSPAN', 3);
+                    $this->getPage()->parse('report_header_subtitle_show_am_block', 'report_header_subtitle_show_am');
+                    $this->getPage()->parse('report_header_subtitle_show_day_block', 'report_header_subtitle_show_day');
+                    $this->getPage()->setVar('report_header_subtitle_hide_am_block', '');
+                    $this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
+                }
+
+                $this->getPage()->parse('report_header_subtitle_show_pm_block', 'report_header_subtitle_show_pm');
+
+                $this->getPage()->parse('report_header_block', 'report_header', true);
+                $this->getPage()->parse('report_header_subtitle_block', 'report_header_subtitle', true);
+
+                /* Clear children after parsing out the parent
+                 */
+                $this->getPage()->setVar('report_header_subtitle_show_am_block', '');
+                $this->getPage()->setVar('report_header_subtitle_show_day_block', '');
+                $this->getPage()->setVar('report_header_subtitle_show_pm_block', '');
+                $this->getPage()->setVar('report_header_subtitle_hide_am_block', '');
+                $this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
+            }
+        } else {
+            $this->getPage()->setVar('report_header_block', '');
+            $this->getPage()->setVar('report_header_subtitle_block', '');
+        }
+    }
+
+    /**
+     * Render the house list dropdown selector
+     */
+    protected function renderHouseList()
+    {
+        if (count($this->getHouseList())) {
+            foreach ($this->getHouseList() as $house) {
+                $this->getPage()->setVar(
+                    array(
+                        'HOUSE_ID'   => $house->getId(),
+                        'HOUSE_NAME' => Scrub::text($house->getHouse())
+                    )
+                );
+
+                if ($house->getId() == $this->getCurrentHouse()->getId()) {
+                    $this->getPage()->setVar('HOUSE_SELECTED', 'selected="selected"');
+                } else {
+                    $this->getPage()->setVar('HOUSE_SELECTED', '');
+                }
+
+                $this->getPage()->parse('house_block', 'house', true);
+            }
+        }
+    }
+
+    /**
+     * Render extra information about the report
+     */
+    protected function renderMetaDetails()
+    {
+        $currentTime = new Alaress_Date_Format(time(), 'U');
+
+        $this->getPage()->setVar(
+            array(
+                'HOUSE_NAME'   => Scrub::text($this->getCurrentHouse()->getHouse()),
+                'HOUSE_ID'     => $this->getCurrentHouse()->getId(),
+                'GENERATED_AT' => $currentTime->getShort(),
+                'REPORT_DATE'  => $this->getReportDate(),
+            )
+        );
+    }
+
+
+    /* Getters/Setters
+     */
+
+
+    /**
+     * Get template file
+     *
+     * @return string
+     */
+    protected function getTemplateFile()
+    {
+        return $this->templateFile;
+    }
+}

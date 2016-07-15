@@ -9,7 +9,15 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Leave_Core_Report_House_CSV extends Leave_Core_Report_House_Web {
+
+
+class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase {
+
+    /**
+     * @var resource $stream
+     */
+    private $stream;
+
 	protected $decoration = array(
 		'pendingStart' => '',
 		'pendingEnd' => ' ',
@@ -34,7 +42,7 @@ class Leave_Core_Report_House_CSV extends Leave_Core_Report_House_Web {
 		header("Content-type: text/csv");
 		header("Cache-Control: no-store, no-cache");
 		header('Content-Disposition: attachment; filename="House Report.csv"');
-		$this->stream = fopen("php://output",'w');
+		$this->setStream(fopen("php://output",'w'));
 
 		$this->renderHeadings();
 		$this->renderSubheadings();
@@ -148,12 +156,19 @@ class Leave_Core_Report_House_CSV extends Leave_Core_Report_House_Web {
 	/* Getters/Setters
 	 */
 
+    /**
+     * @param resource $stream
+     */
+    protected function setStream($stream) {
+        $this->stream = $stream;
+    }
+
 	/**
 	 * Get stream
 	 *
 	 * @return mixed
 	 */
-	private function getStream() {
+    protected function getStream() {
 		return $this->stream;
 	}
 }

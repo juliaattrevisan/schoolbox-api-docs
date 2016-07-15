@@ -54,7 +54,7 @@ class Leave_Report_House_Factory {
 	/**
 	 * Produce a web report instance
 	 *
-	 * @return mixed
+	 * @return Leave_Report_House_RenderableInterface
 	 */
 	public function produceWeb() {
         $fullname = "Leave_{$this->getClassname()}_Report_House_Web";
