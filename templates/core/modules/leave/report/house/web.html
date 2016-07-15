@@ -28,18 +28,32 @@
             }
         });
 
+        // User clicks on 'search', 'print' or 'export'
         $(document).on('click', '[data-action]', function (event) {
             event.preventDefault();
 
+            var $table     = $('#requestList');
             var searchForm = $('[data-form_type=search]');
             var houseId    = searchForm.find(':input[name="reportHouse"]').val();
-            var dateStart  = searchForm.find(':input[name="reportDateStart"]').val().replace(/\//g, '-');
             var action     = $(this).data('action');
             var period     = searchForm.find('[name=reportPeriod]').val();
+
+            if('search' === action) {
+                var dateStart = searchForm.find(':input[name="reportDateStart"]').val().replace(/\//g, '-');
+            } else {
+                // Export and Print ignore search form
+                var dateStart = $table.attr('data-date-display-start');
+            }
+
             var location   = '/modules/leave/report/house/' + houseId + '/' + period + '/' + dateStart;
 
             if('range' === period){
-                var dateEnd  = searchForm.find(':input[name="reportDateEnd"]').val().replace(/\//g, '-');
+                if('search' === action) {
+                    var dateEnd  = searchForm.find(':input[name="reportDateEnd"]').val().replace(/\//g, '-');
+                } else {
+                    // Export and Print ignore search form
+                    var dateEnd = $table.attr('data-date-display-end');
+                }
                 location += '-'+dateEnd;
             }
 
@@ -140,7 +154,7 @@
 <div class="row">
     <div class="small-12 columns">
         <div class="scrollable">
-        <table data-topic="requestList" id="requestList" class="full-width">
+        <table data-topic="requestList" id="requestList" class="full-width" data-date-display-start="{DATE_DISPLAY_START}" data-date-display-end="{DATE_DISPLAY_END}">
             <colgroup>
                 <col width="15%">
                 <col width="3%">
