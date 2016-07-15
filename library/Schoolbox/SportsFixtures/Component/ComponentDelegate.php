@@ -20,8 +20,8 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use \Schoolbox\SportsFixtures\Team\User\Mapper as TeamUserMapper;
-use \Schoolbox\SportsFixtures\Team\User\Model as TeamUser;
+use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
+use \Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayer;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use \Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
@@ -56,9 +56,9 @@ class ComponentDelegate
     protected $teamMapper;
 
     /**
-     * @var TeamUserMapper
+     * @var TeamPlayerMapper
      */
-    protected $teamUserMapper;
+    protected $teamPlayerMapper;
 
     /**
      * @var MatchMapper
@@ -90,7 +90,7 @@ class ComponentDelegate
         $this->setSportMapper(SportMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
         $this->setTeamMapper(TeamMapper::getInstance());
-        $this->setTeamUserMapper(TeamUserMapper::getInstance());
+        $this->setTeamPlayerMapper(TeamPlayerMapper::getInstance());
         $this->setItineraryItemMapper(ItineraryItemMapper::getInstance());
         $this->setVenueMapper(VenueMapper::getInstance());
         $this->setMatchMapper(MatchMapper::getInstance());
@@ -106,7 +106,7 @@ class ComponentDelegate
 
         foreach ($_SESSION["children"] as $child) {
 
-            $childTeams = $this->getTeamUserMapper()->findByColumn('user_id', $child["id"]);
+            $childTeams = $this->getTeamPlayerMapper()->findByColumn('user_id', $child["id"]);
             $matchesForChild = $this->getMatches($childTeams);
 
             foreach ($matchesForChild as $matchCurrent) {
@@ -148,7 +148,7 @@ class ComponentDelegate
     {
         // Get all teams the current user is in
         $matches = $this->getMatches(
-            $this->getTeamUserMapper()->findByColumn('user_id', $user->getId())
+            $this->getTeamPlayerMapper()->findByColumn('user_id', $user->getId())
         );
 
         return [
@@ -203,18 +203,18 @@ class ComponentDelegate
 
 
     /**
-     * @param $teamUsers
+     * @param $teamPlayers
      * @return array
      */
-    public function getMatches($teamUsers) {
+    public function getMatches($teamPlayers) {
         $matches = [];
 
-        /** @var TeamUser $teamUser */
-        foreach ($teamUsers as $teamUser) {
+        /** @var TeamPlayer $teamPlayer */
+        foreach ($teamPlayers as $teamPlayer) {
 
             // Get all home and away matches for the current team
-            $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $teamUser->getTeam()->getId());
-            $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $teamUser->getTeam()->getId());
+            $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $teamPlayer->getTeam()->getId());
+            $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $teamPlayer->getTeam()->getId());
 
             // Whack all of the matches into an array
             /** @var Match $match */
@@ -281,20 +281,20 @@ class ComponentDelegate
      */
 
     /**
-     * @return TeamUserMapper
+     * @return TeamPlayerMapper
      */
-    public function getTeamUserMapper()
+    public function getTeamPlayerMapper()
     {
-        return $this->teamUserMapper;
+        return $this->teamPlayerMapper;
     }
 
     /**
-     * @param  TeamUserMapper $teamUserMapper
+     * @param  TeamPlayerMapper $teamPlayerMapper
      * @return $this
      */
-    public function setTeamUserMapper(TeamUserMapper $teamUserMapper)
+    public function setTeamPlayerMapper(TeamPlayerMapper $teamPlayerMapper)
     {
-        $this->teamUserMapper = $teamUserMapper;
+        $this->teamPlayerMapper = $teamPlayerMapper;
         return $this;
     }
 

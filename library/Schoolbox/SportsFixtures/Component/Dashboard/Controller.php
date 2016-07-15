@@ -56,7 +56,14 @@ class Controller extends Component_Dashboard_ControllerAbstract
         } else if ($this->user->getRole()->isStudent()) {
             $data = $this->delegate->getStudentDashboardData($this->user);
         } else {
-            $data = [];
+            // Unsupported role type, don't render the component
+            return false;
+        }
+
+        // If the child wasn't involved in any matches don't render the component
+
+        if (count($data["matches"]) == 0) {
+            return false;
         }
 
         return $this->renderTwigTemplate(
