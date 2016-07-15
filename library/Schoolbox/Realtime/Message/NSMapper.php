@@ -32,7 +32,6 @@ class NSMapper extends Mapper {
 	const NS_RESOURCE_BOOKING 		= 'resource_booking';
 	const NS_REPORT_CARD      		= 'report_card';
 	const NS_SPORTS_FIXTURES  		= 'sports_fixtures';
-	const NS_SPORTS_FIXTURES_RESULT = 'sports_fixtures_result';
 
 
 	protected function mapping() {

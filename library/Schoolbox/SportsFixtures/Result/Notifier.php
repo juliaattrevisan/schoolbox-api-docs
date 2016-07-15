@@ -14,7 +14,6 @@ use Alaress\Async\Notification\Parameter\Param;
 
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
-use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
@@ -64,7 +63,7 @@ class Notifier extends AbstractModuleNotifier
      */
     protected function getSlug()
     {
-        return NSMapper::NS_SPORTS_FIXTURES_RESULT;
+        return NSMapper::NS_SPORTS_FIXTURES;
     }
 
     /**
@@ -74,9 +73,6 @@ class Notifier extends AbstractModuleNotifier
     public function bundleTriggers($bundle)
     {
         $method = $bundle->getEvent()->getAction();
-
-        /** @var MatchModel $match */
-        $match = $bundle->getEvent()->getObject();
 
         switch ($method) {
             case Mapper::METHOD_CREATE:
@@ -195,7 +191,7 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * @param ResultModel $match
+     * @param ResultModel $result
      * @param User $effector
      * @return Envelope
      */
