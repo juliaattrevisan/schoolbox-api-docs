@@ -273,7 +273,7 @@ CREATE TABLE `sportsfixtures_team_coach` (
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 
-INSERT INTO `msg_namespace` (`slug`, `label`) VALUES ('sports_fixtures', 'Sports Fixtures');
+INSERT INTO `msg_namespace` (`slug`, `label`) VALUES ('sports_fixtures_result', 'Sports Fixtures Result');
 
 SET @sportns = LAST_INSERT_ID();
 
