@@ -38,23 +38,19 @@
             var action     = $(this).data('action');
             var period     = searchForm.find('[name=reportPeriod]').val();
 
-            if('search' === action) {
-                var dateStart = searchForm.find(':input[name="reportDateStart"]').val().replace(/\//g, '-');
-            } else {
-                // Export and Print ignore search form
-                var dateStart = $table.attr('data-date-display-start');
-            }
+            // 'Export' and 'Print' ignore search form and display values currently displayed in table
+            var dateStart = 'search' === action
+                    ? searchForm.find(':input[name="reportDateStart"]').val().replace(/\//g, '-')
+                    : $table.attr('data-date-display-start');
 
             var location   = '/modules/leave/report/house/' + houseId + '/' + period + '/' + dateStart;
 
             if('range' === period){
-                if('search' === action) {
-                    var dateEnd  = searchForm.find(':input[name="reportDateEnd"]').val().replace(/\//g, '-');
-                } else {
-                    // Export and Print ignore search form
-                    var dateEnd = $table.attr('data-date-display-end');
-                }
-                location += '-'+dateEnd;
+                // 'Export' and 'Print' ignore search form and display values currently displayed in table
+                var dateEnd = 'search' === action
+                        ? searchForm.find(':input[name="reportDateEnd"]').val().replace(/\//g, '-')
+                        : $table.attr('data-date-display-end');
+                location += '/' + dateEnd;
             }
 
             if ('search' !== action) {
