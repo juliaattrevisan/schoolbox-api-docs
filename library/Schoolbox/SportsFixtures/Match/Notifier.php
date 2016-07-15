@@ -147,7 +147,7 @@ class Notifier extends AbstractModuleNotifier
         $division = $this->divisionMapper->findById($match->getDivision()->getId());
         $sport = $this->sportMapper->findById($division->getSport()->getId());
 
-        $ts = date("U");
+        $ts = \Alaress_Date_Format::now();
 
         // Target home team parents
 
@@ -160,8 +160,8 @@ class Notifier extends AbstractModuleNotifier
 
             $bob->setTitle('Upcoming :sport match :match for :child')
                 ->setParams([
-                    'sport' => new Param($sport->getName()),
-                    'match'  => new Param($match->getName()),
+                    'sport' => new Param($sport->getName(), $sport->getUrl()),
+                    'match'  => new Param($match->getName(), "/sportsfixtures/match/{$match->getId()}?{$ts}", Param::STACKING_REPLACE),
                     'child' => new UserParam($teamPlayer->getUser())
                 ])
                 ->setHref("/sportsfixtures/match/{$match->getId()}")
@@ -184,8 +184,8 @@ class Notifier extends AbstractModuleNotifier
 
             $bob->setTitle('Upcoming :sport match :match for :child')
                 ->setParams([
-                    'sport' => new Param($sport->getName()),
-                    'match'  => new Param($match->getName()),
+                    'sport' => new Param($sport->getName(), $sport->getUrl()),
+                    'match'  => new Param($match->getName(), "/sportsfixtures/match/{$match->getId()}?{$ts}", Param::STACKING_REPLACE),
                     'child' => new UserParam($teamPlayer->getUser())
                 ])
                 ->setHref("/sportsfixtures/match/{$match->getId()}")
@@ -216,7 +216,7 @@ class Notifier extends AbstractModuleNotifier
 
         $bob = new Builder();
 
-        $ts = date("U");
+        $ts = \Alaress_Date_Format::now();
 
         $bob->setTitle('You have an upcoming :sport match :match')
             ->setParams([
