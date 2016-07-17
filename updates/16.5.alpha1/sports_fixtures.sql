@@ -275,7 +275,7 @@ CREATE TABLE `sportsfixtures_team_coach` (
 
 INSERT INTO `msg_namespace` (`slug`, `label`) VALUES ('sports_fixtures', 'Sports Fixtures');
 
-SET @sportns = LAST_INSERT_ID();
+SET @sportns = SELECT id FROM msg_namespace WHERE slug = 'sports_fixtures');
 
 INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sportns, 'created', 'student', 'a match is upcoming');
 INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sportns, 'updated', 'student', 'an upcoming match has been updated');
