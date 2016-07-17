@@ -62,7 +62,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
 
             $patternRedir  = '/clickv\.ie\/w\/([a-zA-Z0-9\-]+)/';
             $patternIframe = '/(\?|&)shareCode=([a-zA-Z0-9\-]+)/i';
-
+            $patternTime = '/clickv\.ie\/w\/[a-zA-Z0-9\-]+\?t=([0-9]+)\&et=([0-9]+)/';
 
             $matches = array();
 
@@ -75,6 +75,28 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             } elseif (preg_match($patternIframe, $this->getConfig('url'), $matches)) {
                 $this->setVar('VIDEO_ID', $matches[2]);
                 $this->parse('iframe_clickview_block', 'iframe_clickview');
+            } elseif (preg_match($patternTime, $this->getConfig('url'), $matches)) {
+                // Is there a start and end?
+                // https://clickv.ie/w/idGe?t=305&et=408&i=2
+
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $this->getConfig('url'));
+                curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER["HTTP_USER_AGENT"]);
+                curl_setopt($ch, CURLOPT_HEADER, 0);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+                curl_exec($ch);
+                $curlinfo = curl_getinfo($ch);
+
+                parse_str(parse_url($curlinfo['redirect_url'], PHP_URL_QUERY), $parts);
+                $parts = array_change_key_case($parts, CASE_LOWER);
+                if (isset($parts['sharecode'])) {
+                    $this->setVar('VIDEO_ID', $parts['sharecode']);
+                    // Pass in start/end time parameters
+                    $this->setVar('START', "&t={$matches[1]}");
+                    $this->setVar('END', "&et={$matches[2]}&i=2");
+                    $this->parse('iframe_clickview_block', 'iframe_clickview');
+                }
             } elseif (preg_match($patternRedir, $this->getConfig('url'), $matches)) {
                 //Fetch redirect headers from shorten URL for video ID
                 $ch = curl_init();
@@ -93,8 +115,6 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                     $this->setVar('VIDEO_ID', $parts['sharecode']);
                     $this->parse('iframe_clickview_block', 'iframe_clickview');
                 }
-                // Is there a start and end?
-
             }
         }
 
