@@ -96,24 +96,24 @@ class Notifier extends AbstractModuleNotifier
     /**
      * Message being sent to students
      *
-     * @param Model $teamUser
+     * @param Model $teamPlayer
      * @param User $effector
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentRemoved(TeamPlayer $teamUser, User $effector, array $diff = null)
+    public function notifyStudentRemoved(TeamPlayer $teamPlayer, User $effector, array $diff = null)
     {
-        $team = $this->getTeamMapper()->findById($teamUser->getTeam()->getId());
+        $team = $this->getTeamMapper()->findById($teamPlayer->getTeam()->getId());
 
         $title = 'You were removed from :team';
         $params = [
             'team' => new Param($team->getName(), $team->getUrl() . '?' . microtime(), Param::STACKING_REPLACE)
         ];
 
-        $bob = $this->notifyRemoved($effector, $teamUser, $team, $title, $params)->build();
+        $bob = $this->notifyRemovedFromTeam($effector, $teamPlayer, $team, $title, $params)->build();
 
         $envelope = new Envelope();
-        $envelope->targetToUser($teamUser->getUser()->getId(), $bob);
+        $envelope->targetToUser($teamPlayer->getUser()->getId(), $bob);
 
         return $envelope;
     }
@@ -121,40 +121,38 @@ class Notifier extends AbstractModuleNotifier
     /**
      * Message being sent to parents
      *
-     * @param Model $teamUser
+     * @param Model $teamPlayer
      * @param User $effector
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentRemoved(TeamPlayer $teamUser, User $effector, array $diff = null)
+    public function notifyParentRemoved(TeamPlayer $teamPlayer, User $effector, array $diff = null)
     {
-        $team = $this->getTeamMapper()->findById($teamUser->getTeam()->getId());
+        $team = $this->getTeamMapper()->findById($teamPlayer->getTeam()->getId());
 
         $title = ':user was removed from :team';
         $params = [
-            'user' => new UserParam($teamUser->getUser(), Param::STACKING_IGNORE),
+            'user' => new UserParam($teamPlayer->getUser(), Param::STACKING_IGNORE),
             'team' => new Param($team->getName(), $team->getUrl() . '?' . microtime(), Param::STACKING_REPLACE)
         ];
 
-        $bob = $this->notifyRemoved($effector, $teamUser, $team, $title, $params)->build();
+        $bob = $this->notifyRemovedFromTeam($effector, $teamPlayer, $team, $title, $params)->build();
 
         $envelope = new Envelope();
-        $envelope->targetToParent($teamUser->getUser()->getId(), $bob);
+        $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob);
 
         return $envelope;
     }
 
     /**
      * @param User $effector
-     * @param Model $teamUser
+     * @param Model $teamPlayer
      * @param Team $team
      * @param $title
      * @param array $params
      * @return Builder
      */
-    private function notifyRemoved(User $effector, TeamPlayer $teamUser, Team $team, $title, array $params) {
-        $this->log->info($effector->getFullname());
-
+    private function notifyRemovedFromTeam(User $effector, TeamPlayer $teamPlayer, Team $team, $title, array $params) {
         $match = $this->getMatchMapper()->findNextMatch($team);
 
         $bob = new Builder();
@@ -163,7 +161,7 @@ class Notifier extends AbstractModuleNotifier
             ->setHref($team->getUrl() ? : "/sportsfixtures/match/{$match->getId()}/results/{$team->getId()}")
             ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=64")
             ->setSeverity(Logger::INFO)
-            ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $teamUser->getId(), self::TRIGGER_REMOVED) ])
+            ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $teamPlayer->getId(), self::TRIGGER_REMOVED) ])
             ->setNamespace($this->getSlug())
         ;
 

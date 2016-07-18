@@ -226,13 +226,25 @@ class Mapper extends BaseMapper
      */
     public function findNextMatch(Team $team)
     {
-        $homeTeamMatches = $this->findByColumn('home_team_id', $team->getId());
-        $awayTeamMatches = $this->findByColumn('away_team_id', $team->getId());
+        $query = "
+            SELECT {$this->getColumnString()}
+            FROM {$this->getTable()}
+            WHERE start_at > NOW()
+            AND (home_team_id = :homeTeamId OR away_team_id = :awayTeamId)
+            ORDER BY start_at ASC
+            LIMIT 1
+        ";
 
-        $homeTeamMatches->merge($awayTeamMatches)->sortBy('startAt', 'asc');
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'homeTeamId' => $team->getId(),
+            'awayTeamId' => $team->getId()
+        ]);
 
-        if ($homeTeamMatches->count()) {
-            return $homeTeamMatches->first();
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        if ($row) {
+            return $this->hydrate($row);
         }
 
         throw new \OutOfBoundsException();
