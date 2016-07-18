@@ -143,10 +143,8 @@ class Notifier extends AbstractModuleNotifier
     public function notifyParents(MatchModel $match, User $effector, array $diff = null)
     {
         $envelope = new Envelope();
-
-        $match = $this->matchMapper->findById($match->getId());
-        $division = $this->divisionMapper->findById($match->getDivision()->getId());
-        $sport = $this->sportMapper->findById($division->getSport()->getId());
+        $match    = $this->hydrateMatch($match);
+        $sport    = $match->getDivision()->getSport();
 
         $ts = \Alaress_Date_Format::now()->getUnixTimeStamp();
 
@@ -203,6 +201,21 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
+     * @param MatchModel $match
+     * @return MatchModel
+     */
+    protected function hydrateMatch(MatchModel $match)
+    {
+        /** @var MatchModel $hydratedMatch */
+        $hydratedMatch = $this->matchMapper->findById($match->getId());
+        $division      = $this->divisionMapper->findById($match->getDivision()->getId());
+        $sport         = $this->sportMapper->findById($division->getSport()->getId());
+        $division->setSport($sport);
+        $hydratedMatch->setDivision($division);
+        return $hydratedMatch;
+    }
+
+    /**
      * @param Model $match
      * @param User $effector
      * @param array $diff
@@ -211,10 +224,8 @@ class Notifier extends AbstractModuleNotifier
     public function notifyStudents(MatchModel $match, User $effector, array $diff = null)
     {
         $envelope = new Envelope();
-
-        $match = $this->matchMapper->findById($match->getId());
-        $division = $this->divisionMapper->findById($match->getDivision()->getId());
-        $sport = $this->sportMapper->findById($division->getSport()->getId());
+        $match    = $this->hydrateMatch($match);
+        $sport    = $match->getDivision()->getSport();
 
         $bob = new Builder();
 
