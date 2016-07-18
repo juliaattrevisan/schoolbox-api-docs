@@ -92,9 +92,15 @@ class Notifier extends AbstractModuleNotifier
      * @param MatchModel $match
      * @return Envelope
      */
-    public function notifyStudentCreated(MatchModel $match, User $effector) {
-        // Diff will always be null for a new model
-        return $this->notifyStudents($match, $effector);
+    public function notifyStudentCreated(MatchModel $match, User $effector)
+    {
+        $match = $this->hydrateMatch($match);
+        return $this->targetToTeams(
+            new Envelope(),
+            $this->buildNotificationBuilder($match, $effector, self::TRIGGER_CREATED)
+                ->setTitle('You have an upcoming :sport match :match'),
+            $match
+        );
     }
 
     /**
