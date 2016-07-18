@@ -156,15 +156,15 @@ class Notifier extends AbstractModuleNotifier
         /** @var TeamPlayerModel $teamPlayer */
         foreach ($teamPlayers as $teamPlayer)
         {
-            $bob = new Builder();
-
+            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
+            $bob  = new Builder();
             $bob->setTitle('Upcoming :sport match :match for :child')
                 ->setParams([
                     'sport' => new Param($sport->getName(), $sport->getUrl()),
-                    'match'  => new Param($match->getName(), "/sportsfixtures/match/{$match->getId()}?{$ts}", Param::STACKING_REPLACE),
+                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE),
                     'child' => new UserParam($teamPlayer->getUser())
                 ])
-                ->setHref("/sportsfixtures/match/{$match->getId()}")
+                ->setHref($href)
                 ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
                 ->setSeverity(Logger::INFO)
                 ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
@@ -180,15 +180,15 @@ class Notifier extends AbstractModuleNotifier
         /** @var TeamPlayerModel $teamPlayer */
         foreach ($teamPlayers as $teamPlayer)
         {
-            $bob = new Builder();
-
+            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
+            $bob  = new Builder();
             $bob->setTitle('Upcoming :sport match :match for :child')
                 ->setParams([
                     'sport' => new Param($sport->getName(), $sport->getUrl()),
-                    'match'  => new Param($match->getName(), "/sportsfixtures/match/{$match->getId()}?{$ts}", Param::STACKING_REPLACE),
+                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE),
                     'child' => new UserParam($teamPlayer->getUser())
                 ])
-                ->setHref("/sportsfixtures/match/{$match->getId()}")
+                ->setHref($href)
                 ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
                 ->setSeverity(Logger::INFO)
                 ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
