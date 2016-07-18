@@ -117,8 +117,6 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase {
 				foreach($allPeople as $userId => $currentPerson) {
 					$fieldList = array();
 
-//if(185 == $userId) die('<pre>'.print_r($currentPerson,true));
-
 					/* Personal details
 					 */
 					$fieldList[] = $currentPerson['user_name'];
