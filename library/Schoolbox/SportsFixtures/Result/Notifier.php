@@ -152,17 +152,9 @@ class Notifier extends AbstractModuleNotifier
         /** @var SportModel $sport */
         $sport = $this->sportMapper->findById($division->getSport()->getId());
 
-        $href = "/sportsfixtures/matches/{$match->getId()}/results/{$result->getId()}";
-        $bob  = new Builder();
-        $ts   = \Alaress_Date_Format::now()->getUnixTimeStamp();
-
+        $bob = new Builder();
+        $ts  = \Alaress_Date_Format::now()->getUnixTimeStamp();
         $bob->setTitle('Results have been updated for :child :sport match :match')
-            ->setParams([
-                'child' => new Param("{$effector->getFirstname()} {$effector->getLastname()}'s"),
-                'sport' => new Param($sport->getName()),
-                'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
-            ])
-            ->setHref($href)
             ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
             ->setSeverity(Logger::INFO)
             ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
@@ -175,6 +167,13 @@ class Notifier extends AbstractModuleNotifier
 
         /** @var TeamPlayerModel $teamPlayer */
         foreach ($teamPlayers as $teamPlayer) {
+            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
+            $bob->setHref($href)
+                ->setParams([
+                    'child' => new Param("{$effector->getFirstname()} {$effector->getLastname()}'s"),
+                    'sport' => new Param($sport->getName()),
+                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
+                ]);
             $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
         }
 
@@ -184,6 +183,13 @@ class Notifier extends AbstractModuleNotifier
 
         /** @var TeamPlayerModel $teamPlayer */
         foreach ($teamPlayers as $teamPlayer) {
+            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
+            $bob->setHref($href)
+                ->setParams([
+                    'child' => new Param("{$effector->getFirstname()} {$effector->getLastname()}'s"),
+                    'sport' => new Param($sport->getName()),
+                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
+                ]);
             $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
         }
 
@@ -208,16 +214,9 @@ class Notifier extends AbstractModuleNotifier
         /** @var SportModel $sport */
         $sport = $this->sportMapper->findById($division->getSport()->getId());
 
-        $href = "/sportsfixtures/matches/{$match->getId()}/results/{$result->getId()}";
-        $bob  = new Builder();
-        $ts   = \Alaress_Date_Format::now()->getUnixTimeStamp();
-
+        $bob = new Builder();
+        $ts  = \Alaress_Date_Format::now()->getUnixTimeStamp();
         $bob->setTitle(':sport Match :match Results Updated')
-            ->setParams([
-                'sport' => new Param($sport->getName(), $sport->getUrl()),
-                'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
-            ])
-            ->setHref($href)
             ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
             ->setSeverity(Logger::INFO)
             ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
@@ -231,6 +230,12 @@ class Notifier extends AbstractModuleNotifier
 
         /** @var TeamPlayerModel $teamPlayer */
         foreach ($teamPlayers as $teamPlayer) {
+            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
+            $bob->setHref($href)
+                ->setParams([
+                    'sport' => new Param($sport->getName()),
+                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
+                ]);
             $envelope->targetToUser($teamPlayer->getUser()->getId(), $bob->build());
         }
 
@@ -240,6 +245,12 @@ class Notifier extends AbstractModuleNotifier
 
         /** @var TeamPlayerModel $teamPlayer */
         foreach ($teamPlayers as $teamPlayer) {
+            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
+            $bob->setHref($href)
+                ->setParams([
+                    'sport' => new Param($sport->getName()),
+                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
+                ]);
             $envelope->targetToUser($teamPlayer->getUser()->getId(), $bob->build());
         }
 
