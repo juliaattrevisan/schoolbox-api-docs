@@ -51,6 +51,16 @@ class Historic extends Base
      */
     protected function collectForTeam(Team $team)
     {
+        if ($team->getId()) {
+
+            /* Get a list of Players currently in the Team
+             */
+            $this->getPlayers()->setOffset($team->getId(), new Collection());
+
+            /* Collect Coaches
+             */
+            $this->getCoaches()->setOffset($team->getId(), new Collection());
+        }
     }
 
     /* Getters/Setters
