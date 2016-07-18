@@ -90,11 +90,11 @@ class Notifier extends AbstractModuleNotifier
      *
      * @param User $effector
      * @param MatchModel $match
-     * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentCreated(MatchModel $match, User $effector, array $diff = null) {
-        return $this->notifyStudents($match, $effector, $diff);
+    public function notifyStudentCreated(MatchModel $match, User $effector) {
+        // Diff will always be null for a new model
+        return $this->notifyStudents($match, $effector);
     }
 
     /**
@@ -114,11 +114,11 @@ class Notifier extends AbstractModuleNotifier
      *
      * @param User $effector
      * @param MatchModel $match
-     * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentCreated(MatchModel $match, User $effector, array $diff = null) {
-        return $this->notifyParents($match, $effector, $diff);
+    public function notifyParentCreated(MatchModel $match, User $effector) {
+        // Diff will always be null for a new model
+        return $this->notifyParents($match, $effector);
     }
 
     /**
