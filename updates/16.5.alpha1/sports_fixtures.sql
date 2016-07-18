@@ -284,6 +284,18 @@ CREATE TABLE `sportsfixtures_coach` (
 	INDEX `sportsfixtures_coach__user` (`user_id` ASC)
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
+/** Team Participant Coach */
+CREATE TABLE `sportsfixtures_team_participantcoach`(
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`match_id` INT(11) NOT NULL,
+	`team_id` INT(11) NOT NULL,
+	`user_id` INT(11) NOT NULL,
+	`coach_name` VARCHAR(255) NOT NULL,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`deleted_at` DATETIME, PRIMARY KEY (`id`)
+) ENGINE=InnoDB CHARACTER SET=utf8;
+
 /** Coaches/teams M2M join table **/
 CREATE TABLE `sportsfixtures_team_coach` (
 	`sportsfixtures_team_id` INT NOT NULL,
