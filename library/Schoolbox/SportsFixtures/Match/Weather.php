@@ -145,13 +145,15 @@ class Weather
                 /* Can probably find the data a little faster than spawning
                  * adf instances but there are not many to tests to conduct
                  */
-                foreach ($forecast['forecast'] as $currentForecast) {
-                    $adf = new \Alaress_Date_Format($currentForecast['datetime'], 'U');
+                if (count($forecast['forecast'])) {
+                    foreach ($forecast['forecast'] as $currentForecast) {
+                        $adf = new \Alaress_Date_Format($currentForecast['datetime'], 'U');
 
-                    if ($adf->getDatabaseDate() == $matchDay) {
-                        $this->setHasResults(true);
+                        if ($adf->getDatabaseDate() == $matchDay) {
+                            $this->setHasResults(true);
 
-                        return $currentForecast;
+                            return $currentForecast;
+                        }
                     }
                 }
             }
