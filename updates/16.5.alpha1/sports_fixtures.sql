@@ -225,7 +225,7 @@ CREATE TABLE `sportsfixtures_team_participantuser`(
 	`updated_at` DATETIME,
 	`deleted_at` DATETIME,
 PRIMARY KEY (`id`)
-) ENGINE=INNODB CHARSET=utf8;
+) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /** Team player positions **/
 CREATE TABLE `sportsfixtures_team_position` (
@@ -247,6 +247,17 @@ CREATE TABLE `sportsfixtures_team_position` (
 	REFERENCES `sportsfixtures_position` (`id`)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE
+) ENGINE=InnoDB CHARACTER SET=utf8;
+
+/** Team Participant Positions */
+CREATE TABLE `sportsfixtures_team_participantposition`(
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`team_id` INT(11) NOT NULL,
+	`user_id` INT(11) NOT NULL,
+	`position_name` VARCHAR(255),
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`deleted_at` DATETIME, PRIMARY KEY (`id`)
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Tag cloud of enemy schools */
