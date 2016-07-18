@@ -18,7 +18,6 @@ namespace Schoolbox\SportsFixtures\Team\Metadata\Strategy;
 
 use \Schoolbox\Collection;
 use \Schoolbox\UserMapper;
-use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Coach\Mapper as CoachMapper;
 use \Schoolbox\SportsFixtures\Coach\TagCloud as CoachTagCloud;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
@@ -37,11 +36,6 @@ class Historic extends Base implements IMetadataStrategy
      */
     protected $teamPositionParticipantMapper;
     
-    /**
-     * @var Match
-     */
-    protected $match;
-
     /**
      * Hook method
      */
@@ -115,22 +109,6 @@ class Historic extends Base implements IMetadataStrategy
     protected function setTeamParticipantMapper($teamParticipantMapper)
     {
         $this->teamParticipantMapper = $teamParticipantMapper;
-    }
-
-    /**
-     * @return Match
-     */
-    protected function getMatch()
-    {
-        return $this->match;
-    }
-
-    /**
-     * @param Match $match
-     */
-    protected function setMatch($match)
-    {
-        $this->match = $match;
     }
 
     /**
