@@ -34,7 +34,7 @@ class ParticipantMapper extends BaseMapper
         $this->joins('match_id', MatchMapper::class, 'id', null, null, 'match', 'match');
         $this->joins('team_id', TeamMapper::class, 'id', null, null, 'team', 'team');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
-        $this->uses('position_name', self::TYPE_STRING);
+        $this->uses('name', self::TYPE_STRING);
     }
 
     /**
@@ -86,7 +86,7 @@ class ParticipantMapper extends BaseMapper
             /* Is there a better way?
              */
             $position = PositionMapper::getInstance()->createModel();
-            $position->setName($row['position_name']);
+            $position->setName($row['name']);
 
             $model->setPosition($position);
 

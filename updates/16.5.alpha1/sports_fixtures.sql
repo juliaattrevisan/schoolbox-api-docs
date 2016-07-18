@@ -255,7 +255,7 @@ CREATE TABLE `sportsfixtures_team_participantposition`(
 	`match_id` INT(11) NOT NULL,
 	`team_id` INT(11) NOT NULL,
 	`user_id` INT(11) NOT NULL,
-	`position_name` VARCHAR(255),
+	`name` VARCHAR(255),
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`deleted_at` DATETIME, PRIMARY KEY (`id`)
@@ -290,7 +290,7 @@ CREATE TABLE `sportsfixtures_team_participantcoach`(
 	`match_id` INT(11) NOT NULL,
 	`team_id` INT(11) NOT NULL,
 	`user_id` INT(11) NOT NULL,
-	`coach_name` VARCHAR(255) NOT NULL,
+	`name` VARCHAR(255) NOT NULL,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,
 	`deleted_at` DATETIME, PRIMARY KEY (`id`)
