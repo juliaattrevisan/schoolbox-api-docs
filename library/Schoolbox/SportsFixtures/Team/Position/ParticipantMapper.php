@@ -16,6 +16,7 @@ use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\User as UserModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Team\Model as TeamModel;
 use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
@@ -30,6 +31,7 @@ class ParticipantMapper extends BaseMapper
         $this->hasTable('sportsfixtures_team_participantposition');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->joins('match_id', MatchMapper::class, 'id', null, null, 'match', 'match');
         $this->joins('team_id', TeamMapper::class, 'id', null, null, 'team', 'team');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('position_name', self::TYPE_STRING);

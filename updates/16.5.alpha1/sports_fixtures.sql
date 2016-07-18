@@ -252,6 +252,7 @@ CREATE TABLE `sportsfixtures_team_position` (
 /** Team Participant Positions */
 CREATE TABLE `sportsfixtures_team_participantposition`(
 	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`match_id` INT(11) NOT NULL,
 	`team_id` INT(11) NOT NULL,
 	`user_id` INT(11) NOT NULL,
 	`position_name` VARCHAR(255),

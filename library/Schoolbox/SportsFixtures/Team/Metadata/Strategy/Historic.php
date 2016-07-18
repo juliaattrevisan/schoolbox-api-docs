@@ -77,7 +77,14 @@ class Historic extends Base implements IMetadataStrategy
      */
     public function getAllPositions(Team $team)
     {
-        return $this->getTeamPositionParticipantMapper()->findByColumn('team_id', $team->getId(), ['order' => ['user_id' => 'asc']]);
+        return $this->getTeamPositionParticipantMapper()->findByColumnList([
+            'match_id' => $this->getMatch()->getId(),
+            'team_id' => $team->getId()
+        ], [
+            'order' => [
+                'user_id' => 'asc'
+            ]
+        ]);
     }
 
     /**
