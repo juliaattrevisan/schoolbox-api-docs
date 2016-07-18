@@ -400,7 +400,7 @@ class Controller extends AbstractController
             try {
                 $status = $this->getStatusMapper()->findById($statusId);
             } catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_STATUS_NOT_FOUND);
             }
         } else {
             $status = $this->getStatusMapper()->createModel();
