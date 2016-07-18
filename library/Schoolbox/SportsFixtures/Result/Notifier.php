@@ -14,6 +14,7 @@ use Alaress\Async\Notification\Parameter\Param;
 
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
+use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
@@ -170,7 +171,7 @@ class Notifier extends AbstractModuleNotifier
             $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
             $bob->setHref($href)
                 ->setParams([
-                    'child' => new Param("{$effector->getFirstname()} {$effector->getLastname()}'s"),
+                    'child' => new UserParam($teamPlayer->getUser()),
                     'sport' => new Param($sport->getName()),
                     'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
                 ]);
@@ -186,7 +187,7 @@ class Notifier extends AbstractModuleNotifier
             $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
             $bob->setHref($href)
                 ->setParams([
-                    'child' => new Param("{$effector->getFirstname()} {$effector->getLastname()}'s"),
+                    'child' => new UserParam($teamPlayer->getUser()),
                     'sport' => new Param($sport->getName()),
                     'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
                 ]);
