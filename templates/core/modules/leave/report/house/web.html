@@ -63,7 +63,8 @@
 
 
         // User selects a different report period from dropdown
-        $('[name=reportPeriod]').on('change',function(event){
+        var dateFormat = 'DD/MM/YYYY';
+        $('[name=reportTimespan]').on('change',function(event){
             switch($(this).val()){
                 case 'day':
                 case 'weekend':
@@ -71,10 +72,10 @@
                     break;
                 case 'range':
                     $('[data-date-end]').removeClass('hide');
-
-                        // TODO - need a more elegant way to +3 days to currently displayed start date
                     if('' === $('[name=reportDateEnd]').val()){
-                        $('[name=reportDateEnd]').val($('[name=reportDateStart]').val());
+                        var startDate = moment($('[name=reportDateStart]').val(), dateFormat);
+                        startDate.add('week',1);
+                        $('[name=reportDateEnd]').val(startDate.format(dateFormat));
                     }
                     break;
             }
@@ -129,10 +130,10 @@
                         </select>
                     </div>
                     <div class="small-12 medium-6 large-2 columns">
-                        <select name="reportPeriod">
-                            <!-- BEGIN report_period -->
-                            <option value="{REPORT_PERIOD_VALUE}" {REPORT_PERIOD_SELECTED}>{REPORT_PERIOD_LABEL}</option>
-                            <!-- END report_period -->
+                        <select name="reportTimespan">
+                            <!-- BEGIN report_timespan -->
+                            <option value="{REPORT_TIMESPAN_VALUE}" {REPORT_TIMESPAN_SELECTED}>{REPORT_TIMESPAN_LABEL}</option>
+                            <!-- END report_timespan -->
                         </select>
                     </div>
                     <div class="small-12 medium-4 large-2 columns" data-date-start>
@@ -159,8 +160,8 @@
             <colgroup>
                 <col width="15%">
                 <col width="3%">
-                <col width="7%">
-                <col span="10" class="multi-cell" width="6%">
+                <col width="3%">
+                <col span="{COUNT_DATA_COLUMNS}" class="multi-cell" width="6%">
                 <col width="15%">
             </colgroup>
             <thead>
@@ -177,7 +178,7 @@
                 <tr>
                     <th>Name</th>
                     <th class='leaveReportYear'>Year</th>
-                    <th></th>
+                    <th class='leaveReportBoardingStatus'></th>
                     <!-- BEGIN report_header_subtitle -->
                     <!-- BEGIN report_header_subtitle_show_am -->
                     <th class='leaveReportMeridiem leaveReportLeftBorder'>AM</th>
@@ -211,7 +212,7 @@
                 <tr class="{CLASS}">
                     <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
                     <td class='leaveReportYear'>{USER_YEAR}</td>
-                    <td>{USER_BOARDING_STATUS}</td>
+                    <td class='leaveReportBoardingStatus'>{USER_BOARDING_STATUS}</td>
                     <!-- BEGIN request_period -->
                     <!-- BEGIN request_period_show_am -->
                     <td class='leaveReportMeridiem leaveReportLeftBorder'>{REQUEST_PERIOD_MORNING}</td>

@@ -56,13 +56,13 @@ try {
                     : $_SESSION['houseId'];
 
                 $reportPeriods = [
-                    Leave_Controller::REPORT_PERIOD_DAY,
-                    Leave_Controller::REPORT_PERIOD_WEEKEND,
-                    Leave_Controller::REPORT_PERIOD_RANGE];
+                    Leave_Controller::REPORT_TIMESPAN_DAY,
+                    Leave_Controller::REPORT_TIMESPAN_WEEKEND,
+                    Leave_Controller::REPORT_TIMESPAN_RANGE];
 
                 $period = is_string($this->arg[3]) && in_array($this->arg[3], $reportPeriods)
                     ? $this->arg[3]
-                    : Leave_Controller::REPORT_PERIOD_WEEKEND;
+                    : Leave_Controller::REPORT_TIMESPAN_WEEKEND;
 
                 $dateStart = is_string($this->arg[4])
                     ? str_replace('-', '/', $this->arg[4])

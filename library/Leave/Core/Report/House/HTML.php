@@ -34,14 +34,110 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
      */
     protected function setup(array $data) {
         $this->getPage()->setFile(TEMPLATE_content, $this->getTemplateFile());
-        $this->getPage()->setBlock(TEMPLATE_content, 'house', 'house_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'report_period', 'report_period_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'row', 'row_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'request_period_total', 'request_period_total_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'request_period_initial', 'request_period_initial_block');
-        $this->getPage()->setBlock(TEMPLATE_content, 'report_header', 'report_header_block');
+    }
 
+    /**
+     * Facade method
+     * Render house report
+     */
+    public function render()
+    {
+        $this->renderMetaDetails();
+        $this->renderHouseList();
+        $this->renderTimespanOptions();
+        $this->renderTableHeaders();
+        $this->renderTableRowsAndFooter();
+    }
+
+    /**
+     * Render extra information about the report
+     */
+    protected function renderMetaDetails()
+    {
+        $currentTime = new Alaress_Date_Format(time(), 'U');
+
+        $this->getPage()->setVar(
+            array(
+                'HOUSE_NAME'        => Scrub::text($this->getCurrentHouse()->getHouse()),
+                'HOUSE_ID'          => $this->getCurrentHouse()->getId(),
+                'GENERATED_AT'      => $currentTime->getShort(),
+                'REPORT_DATE_START' => $this->getReportStartDate(),
+                'REPORT_DATE_END'   => $this->getReportEndDate(),
+                'CLASS_REPORT_DATE_END' => Leave_Controller::REPORT_TIMESPAN_RANGE === $this->getReportTimespan() ? '' : 'hide',
+                'DATE_DISPLAY_START' => $this->getReportStart()->getUsingFormat('d-m-Y'),
+                'DATE_DISPLAY_END'   => $this->getReportFinish()->getUsingFormat('d-m-Y'),
+                'COUNT_DATA_COLUMNS' => $this->getReportStart()->diffInDays($this->getReportFinish(), true) * 3 + 1,
+            )
+        );
+    }
+
+    /**
+     * Render the house list dropdown selector
+     */
+    protected function renderHouseList()
+    {
+        $this->getPage()->setBlock(TEMPLATE_content, 'house', 'house_block');
+
+        if (count($this->getHouseList())) {
+            foreach ($this->getHouseList() as $house) {
+                $this->getPage()->setVar(
+                    array(
+                        'HOUSE_ID'   => $house->getId(),
+                        'HOUSE_NAME' => Scrub::text($house->getHouse())
+                    )
+                );
+
+                if ($house->getId() == $this->getCurrentHouse()->getId()) {
+                    $this->getPage()->setVar('HOUSE_SELECTED', 'selected="selected"');
+                } else {
+                    $this->getPage()->setVar('HOUSE_SELECTED', '');
+                }
+
+                $this->getPage()->parse('house_block', 'house', true);
+            }
+        }
+    }
+
+    /**
+     * Render the options in the Report Period select
+     */
+    protected function renderTimespanOptions()
+    {
+        $this->getPage()->setBlock(TEMPLATE_content, 'report_timespan', 'report_timespan_block');
+
+        foreach(Leave_Controller::getTimespanOptions() as $timespanOption)
+        {
+            $optionSelected = $timespanOption === $this->getReportTimespan();
+
+            switch($timespanOption){
+                case Leave_Controller::REPORT_TIMESPAN_DAY:
+                    $timespanLabel = 'Single Day';
+                    break;
+                case Leave_Controller::REPORT_TIMESPAN_RANGE:
+                    $timespanLabel = 'Date Range';
+                    break;
+                case Leave_Controller::REPORT_TIMESPAN_WEEKEND:
+                default:
+                    $timespanLabel = 'Weekend';
+                    break;
+            }
+
+            $this->getPage()->setVar([
+                'REPORT_TIMESPAN_VALUE'    => $timespanOption,
+                'REPORT_TIMESPAN_SELECTED' => $optionSelected ? 'selected="selected"' : '',
+                'REPORT_TIMESPAN_LABEL'    => $timespanLabel,
+            ]);
+
+            $this->getPage()->parse('report_timespan_block', 'report_timespan', true);
+        }
+    }
+
+    /**
+     * Render headings for each day in the specified range
+     */
+    protected function renderTableHeaders()
+    {
+        $this->getPage()->setBlock(TEMPLATE_content, 'report_header', 'report_header_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'report_header_subtitle', 'report_header_subtitle_block');
         $this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_show_am', 'report_header_subtitle_show_am_block');
         $this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_show_day', 'report_header_subtitle_show_day_block');
@@ -49,6 +145,64 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
         $this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_hide_am', 'report_header_subtitle_hide_am_block');
         $this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_hide_day', 'report_header_subtitle_hide_day_block');
 
+        if (count($this->getRequestList())) {
+            /* Parse out the headings
+             */
+            for ($i = 0; $i < $this->getRange(); $i++) {
+                $headerDate = Alaress_Date_Format::newLocalShort($this->getReportStart());
+                $headerDate->addDays($i);
+
+                $this->getPage()->setVar(
+                    array(
+                        'REPORT_HEADER_WEEKDAY' => $headerDate->getUsingFormat('l'),
+                        'REPORT_HEADER_DATE'    => $headerDate->getLocalShort(),
+                    )
+                );
+
+                /* Hide the first two columns of the first group
+                 */
+                if (!$i) {
+                    $this->getPage()->setVar('REPORT_HEADER_COLSPAN', 2);
+                    $this->getPage()->setVar('report_header_subtitle_show_am_block', '');
+                    $this->getPage()->parse('report_header_subtitle_show_day_block', 'report_header_subtitle_show_day');
+                    $this->getPage()->parse('report_header_subtitle_hide_am_block', 'report_header_subtitle_hide_am');
+                    $this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
+                } else {
+                    $this->getPage()->setVar('REPORT_HEADER_COLSPAN', 3);
+                    $this->getPage()->parse('report_header_subtitle_show_am_block', 'report_header_subtitle_show_am');
+                    $this->getPage()->parse('report_header_subtitle_show_day_block', 'report_header_subtitle_show_day');
+                    $this->getPage()->setVar('report_header_subtitle_hide_am_block', '');
+                    $this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
+                }
+
+                $this->getPage()->parse('report_header_subtitle_show_pm_block', 'report_header_subtitle_show_pm');
+
+                $this->getPage()->parse('report_header_block', 'report_header', true);
+                $this->getPage()->parse('report_header_subtitle_block', 'report_header_subtitle', true);
+
+                /* Clear children after parsing out the parent
+                 */
+                $this->getPage()->setVar('report_header_subtitle_show_am_block', '');
+                $this->getPage()->setVar('report_header_subtitle_show_day_block', '');
+                $this->getPage()->setVar('report_header_subtitle_show_pm_block', '');
+                $this->getPage()->setVar('report_header_subtitle_hide_am_block', '');
+                $this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
+            }
+        } else {
+            $this->getPage()->setVar('report_header_block', '');
+            $this->getPage()->setVar('report_header_subtitle_block', '');
+        }
+    }
+
+    /**
+     * Render leave requests
+     */
+    protected function renderTableRowsAndFooter()
+    {
+        $this->getPage()->setBlock(TEMPLATE_content, 'no_requests', 'no_requests_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'row', 'row_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'request_period_total', 'request_period_total_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'request_period_initial', 'request_period_initial_block');
         $this->getPage()->setBlock('row', 'request', 'request_block');
         $this->getPage()->setBlock('row', 'empty_request', 'empty_request_block');
         $this->getPage()->setBlock('request', 'request_period', 'request_period_block');
@@ -60,31 +214,10 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
         $this->getPage()->setBlock('request_period', 'request_period_hide_am', 'request_period_hide_am_block');
         $this->getPage()->setBlock('request_period', 'request_period_hide_day', 'request_period_hide_day_block');
 
-        /* Initial state
-         */
-        $this->getPage()->setVar('no_requests_block', '');
-        $this->getPage()->setVar('row_block', '');
-    }
 
-    /**
-     * Facade method
-     * Render house report
-     */
-    public function render()
-    {
-        $this->renderHouseList();
-        $this->renderPeriodList();
-        $this->renderHeadings();
-        $this->renderRequests();
-        $this->renderMetaDetails();
-    }
-
-    /**
-     * Render leave requests
-     */
-    protected function renderRequests()
-    {
         if (count($this->getRequestList())) {
+            $this->getPage()->setVar('no_requests_block', '');
+
             $allPeople   = $this->getCombined();
             $totalPeople = count($allPeople);
 
@@ -220,137 +353,12 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
         $this->getPage()->setVar('PERIOD_COUNT', $periodCount);
     }
 
-    /**
-     * Render headings for each day in the specified range
-     */
-    protected function renderHeadings()
-    {
-        if (count($this->getRequestList())) {
-            /* Parse out the headings
-             */
-            for ($i = 0; $i < $this->getRange(); $i++) {
-                $headerDate = Alaress_Date_Format::newLocalShort($this->getReportStart());
-                $headerDate->addDays($i);
 
-                $this->getPage()->setVar(
-                    array(
-                        'REPORT_HEADER_WEEKDAY' => $headerDate->getUsingFormat('l'),
-                        'REPORT_HEADER_DATE'    => $headerDate->getLocalShort(),
-                    )
-                );
 
-                /* Hide the first two columns of the first group
-                 */
-                if (!$i) {
-                    $this->getPage()->setVar('REPORT_HEADER_COLSPAN', 2);
-                    $this->getPage()->setVar('report_header_subtitle_show_am_block', '');
-                    $this->getPage()->parse('report_header_subtitle_show_day_block', 'report_header_subtitle_show_day');
-                    $this->getPage()->parse('report_header_subtitle_hide_am_block', 'report_header_subtitle_hide_am');
-                    $this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
-                } else {
-                    $this->getPage()->setVar('REPORT_HEADER_COLSPAN', 3);
-                    $this->getPage()->parse('report_header_subtitle_show_am_block', 'report_header_subtitle_show_am');
-                    $this->getPage()->parse('report_header_subtitle_show_day_block', 'report_header_subtitle_show_day');
-                    $this->getPage()->setVar('report_header_subtitle_hide_am_block', '');
-                    $this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
-                }
 
-                $this->getPage()->parse('report_header_subtitle_show_pm_block', 'report_header_subtitle_show_pm');
 
-                $this->getPage()->parse('report_header_block', 'report_header', true);
-                $this->getPage()->parse('report_header_subtitle_block', 'report_header_subtitle', true);
 
-                /* Clear children after parsing out the parent
-                 */
-                $this->getPage()->setVar('report_header_subtitle_show_am_block', '');
-                $this->getPage()->setVar('report_header_subtitle_show_day_block', '');
-                $this->getPage()->setVar('report_header_subtitle_show_pm_block', '');
-                $this->getPage()->setVar('report_header_subtitle_hide_am_block', '');
-                $this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
-            }
-        } else {
-            $this->getPage()->setVar('report_header_block', '');
-            $this->getPage()->setVar('report_header_subtitle_block', '');
-        }
-    }
 
-    /**
-     * Render the house list dropdown selector
-     */
-    protected function renderHouseList()
-    {
-        if (count($this->getHouseList())) {
-            foreach ($this->getHouseList() as $house) {
-                $this->getPage()->setVar(
-                    array(
-                        'HOUSE_ID'   => $house->getId(),
-                        'HOUSE_NAME' => Scrub::text($house->getHouse())
-                    )
-                );
-
-                if ($house->getId() == $this->getCurrentHouse()->getId()) {
-                    $this->getPage()->setVar('HOUSE_SELECTED', 'selected="selected"');
-                } else {
-                    $this->getPage()->setVar('HOUSE_SELECTED', '');
-                }
-
-                $this->getPage()->parse('house_block', 'house', true);
-            }
-        }
-    }
-
-    /**
-     * Render the options in the Report Period select
-     */
-    protected function renderPeriodList()
-    {
-            foreach(Leave_Controller::getReportPeriods() as $reportPeriod)
-            {
-                $periodSelected = $reportPeriod === $this->getReportPeriod();
-
-                switch($reportPeriod){
-                    case Leave_Controller::REPORT_PERIOD_DAY:
-                        $periodLabel = 'Single Day';
-                        break;
-                    case Leave_Controller::REPORT_PERIOD_RANGE:
-                        $periodLabel = 'Date Range';
-                        break;
-                    case Leave_Controller::REPORT_PERIOD_WEEKEND:
-                    default:
-                        $periodLabel = 'Weekend';
-                        break;
-                }
-
-                $this->getPage()->setVar([
-                    'REPORT_PERIOD_VALUE'    => $reportPeriod,
-                    'REPORT_PERIOD_SELECTED' => $periodSelected ? 'selected="selected"' : '',
-                    'REPORT_PERIOD_LABEL'    => $periodLabel,
-                ]);
-
-                $this->getPage()->parse('report_period_block', 'report_period', true);
-            }
-    }
-
-    /**
-     * Render extra information about the report
-     */
-    protected function renderMetaDetails()
-    {
-        $currentTime = new Alaress_Date_Format(time(), 'U');
-
-        $this->getPage()->setVar(
-            array(
-                'HOUSE_NAME'        => Scrub::text($this->getCurrentHouse()->getHouse()),
-                'HOUSE_ID'          => $this->getCurrentHouse()->getId(),
-                'GENERATED_AT'      => $currentTime->getShort(),
-                'REPORT_DATE_START' => $this->getReportStartDate(),
-                'REPORT_DATE_END'   => $this->getReportEndDate(),
-                'CLASS_REPORT_DATE_END' => Leave_Controller::REPORT_PERIOD_RANGE === $this->getReportPeriod() ? '' : 'hide',
-                'DATE_DISPLAY_START' => $this->getReportStart()->getUsingFormat('d-m-Y'),
-                'DATE_DISPLAY_END'   => $this->getReportFinish()->getUsingFormat('d-m-Y'),
-            )
-        );
-    }
 
 
     /* Getters/Setters

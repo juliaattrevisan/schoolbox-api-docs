@@ -521,7 +521,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
      * Enum from {'day','weekend','range'}
      * @return string
      */
-    protected function getReportPeriod(){
+    protected function getReportTimespan(){
         return $this->reportPeriod;
     }
 

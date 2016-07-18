@@ -26,9 +26,9 @@ class Leave_Controller extends Controller
     /**
      * What sort of time period does a report display.
      */
-    const REPORT_PERIOD_DAY     = 'day';     // Single day          - eg '15/12/2016'
-    const REPORT_PERIOD_WEEKEND = 'weekend'; // Weekend starting on - eg '15/12/2016'
-    const REPORT_PERIOD_RANGE   = 'range';   // Two arbitrary dates - eg '15/12/2016' to '23/12/2016'
+    const REPORT_TIMESPAN_DAY     = 'day';     // Single day          - eg '15/12/2016'
+    const REPORT_TIMESPAN_WEEKEND = 'weekend'; // Weekend starting on - eg '15/12/2016'
+    const REPORT_TIMESPAN_RANGE   = 'range';   // Two arbitrary dates - eg '15/12/2016' to '23/12/2016'
 
     /**
 	 * Constants for days
@@ -36,12 +36,6 @@ class Leave_Controller extends Controller
     const FRIDAY   = 5;
     const SATURDAY = 6;
     const SUNDAY   = 7;
-
-    /**
-	 * Show leave requests over RANGE days
-     * Change
-     */
-    const RANGE = 3;
 
     /**
      * @var \Leave_RequestMapper
@@ -1367,17 +1361,17 @@ class Leave_Controller extends Controller
      * @param string $dateStart
      * @param string $dateEnd
      * @throws SchoolboxNotFoundException if house isn't found
-     * @return array return
-     * @var HouseResidential return['house']
-     * @var string return['dateStart']
-     * @var string return['dateEnd']
-     * @var string return['reportPeriod']
-     * @var Alaress_Date_Format return['reportStart']
-     * @var Alaress_Date_Format return['reportFinish']
-     * @var \Schoolbox\Collection return['requestList']
-     * @var Leave_Request return['requestList'][]
-     * @var \Schoolbox\Collection return['houseList']
-     * @var HouseResidential return['houseList'][]
+     * @return array              $return
+     * @var HouseResidential      $return['house']
+     * @var string                $return['dateStart']
+     * @var string                $return['dateEnd']
+     * @var string                $return['reportPeriod']
+     * @var Alaress_Date_Format   $return['reportStart']
+     * @var Alaress_Date_Format   $return['reportFinish']
+     * @var \Schoolbox\Collection $return['requestList']
+     * @var Leave_Request         $return['requestList'][]
+     * @var \Schoolbox\Collection $return['houseList']
+     * @var HouseResidential      $return['houseList'][]
      */
     public function executeHouseReport($houseId, $period, $dateStart, $dateEnd)
     {
@@ -1392,15 +1386,15 @@ class Leave_Controller extends Controller
         }
 
         switch($period){
-            case Leave_Controller::REPORT_PERIOD_DAY:
+            case Leave_Controller::REPORT_TIMESPAN_DAY:
                 $reportStart  = Alaress_Date_Format::newLocalShort($dateStart);
                 $reportFinish = Alaress_Date_Format::newLocalShort($reportStart);
                 break;
-            case Leave_Controller::REPORT_PERIOD_RANGE:
+            case Leave_Controller::REPORT_TIMESPAN_RANGE:
                 $reportStart  = Alaress_Date_Format::newLocalShort($dateStart);
                 $reportFinish = Alaress_Date_Format::newLocalShort($dateEnd);
                 break;
-            case Leave_Controller::REPORT_PERIOD_WEEKEND:
+            case Leave_Controller::REPORT_TIMESPAN_WEEKEND:
             default:
                 $reportStart  = Alaress_Date_Format::newLocalShort($dateStart);
                 $reportStart->addDays(self::FRIDAY - $reportStart->getWeekDayNumber());
@@ -1753,7 +1747,7 @@ class Leave_Controller extends Controller
      * Get the enum list of report periods available
      * @return array|string[]
      */
-    public static function getReportPeriods(){
-        return [ self::REPORT_PERIOD_DAY, self::REPORT_PERIOD_WEEKEND, self::REPORT_PERIOD_RANGE ];
+    public static function getTimespanOptions(){
+        return [ self::REPORT_TIMESPAN_DAY, self::REPORT_TIMESPAN_WEEKEND, self::REPORT_TIMESPAN_RANGE ];
     }
 }

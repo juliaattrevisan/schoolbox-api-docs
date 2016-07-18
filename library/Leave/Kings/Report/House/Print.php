@@ -24,6 +24,18 @@ class Leave_Kings_Report_House_Print extends Leave_Core_Report_House_Print {
         'nightEnd'     => 31,
     ];
 
+    /**
+     * Facade method
+     * Render house report
+     */
+    public function render()
+    {
+        $this->renderMetaDetails();
+        $this->renderTableHeaders();
+        $this->renderTableRowsAndFooter();
+    }
+
+
 	/**
 	 * Render extra information about the report
 	 *
@@ -32,7 +44,7 @@ class Leave_Kings_Report_House_Print extends Leave_Core_Report_House_Print {
 	protected function renderMetaDetails() {
 		parent::renderMetaDetails();
 
-		$weekEnding = Alaress_Date_Format::newLocalShort($this->getReportDate());
+		$weekEnding = Alaress_Date_Format::newLocalShort($this->getReportStartDate());
 		$weekEnding->addDays(Leave_Controller::SUNDAY - $weekEnding->getWeekDayNumber());
 
 		$this->getPage()->setVar(array(
