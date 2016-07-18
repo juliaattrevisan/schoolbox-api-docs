@@ -11,6 +11,8 @@
 namespace Schoolbox\SportsFixtures\Team\Metadata;
 
 use \Schoolbox\SportsFixtures\Match\Model as Match;
+use \Schoolbox\SportsFixtures\Team\Metadata\Strategy\Current as CurrentStrategy;
+use \Schoolbox\SportsFixtures\Team\Metadata\Strategy\Historic as HistoricStrategy;
 
 class Factory
 {
@@ -33,17 +35,17 @@ class Factory
      * If this is < 0, then the Match's start datetime is in the past
      * ie. it has already occurred
      *
-     * @return Base
+     * @return Metadata
      */
     public function produce()
     {
         $diff = \Alaress_Date_Format::now()->diffInSeconds($this->getMatch()->getStartAt(), false);
 
         if ($diff > 0) {
-            return new Current($this->getMatch());
+            return new Metadata($this->getMatch(), new CurrentStrategy());
         }
 
-        return new Historic($this->getMatch());
+        return new Metadata($this->getMatch(), new HistoricStrategy());
     }
 
     /* Getters/Setters
