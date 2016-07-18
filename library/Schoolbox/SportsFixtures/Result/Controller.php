@@ -396,13 +396,14 @@ class Controller extends AbstractController
         // Save status (optional)
         /** @var Status\Model $status */
         $statusId = $this->getRequest()->post->get('statusId');
-        $status   = $this->getStatusMapper()->createModel();
-        if ($status) {
+        if ($statusId) {
             try {
                 $status = $this->getStatusMapper()->findById($statusId);
             } catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
             }
+        } else {
+            $status = $this->getStatusMapper()->createModel();
         }
 
         $this->saveResult($match, $team, $status, $this->getRequest()->post['description'], $entity);
