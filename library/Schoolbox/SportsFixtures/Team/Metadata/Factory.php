@@ -42,10 +42,10 @@ class Factory
         $diff = \Alaress_Date_Format::now()->diffInSeconds($this->getMatch()->getStartAt(), false);
 
         if ($diff > 0) {
-            return new Metadata($this->getMatch(), new CurrentStrategy());
+            return new Metadata($this->getMatch(), new CurrentStrategy($this->getMatch()));
         }
 
-        return new Metadata($this->getMatch(), new HistoricStrategy());
+        return new Metadata($this->getMatch(), new HistoricStrategy($this->getMatch()));
     }
 
     /* Getters/Setters

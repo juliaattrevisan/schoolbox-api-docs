@@ -14,7 +14,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\SportsFixtures\Team\Metadata;
+namespace Schoolbox\SportsFixtures\Team\Metadata\Strategy;
 
 use \Schoolbox\Collection;
 use \Schoolbox\UserMapper;
@@ -25,7 +25,7 @@ use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Player\ParticipantMapper as TeamParticipantMapper;
 use \Schoolbox\SportsFixtures\Team\Position\ParticipantMapper as TeamPositionParticipantMapper;
 
-class Historic extends Base
+class Historic extends Base implements IMetadataStrategy
 {
     /**
      * @var TeamParticipantMapper
@@ -43,65 +43,52 @@ class Historic extends Base
     protected $match;
 
     /**
-     * Historic constructor.
-     * @param Match $match
+     * Hook method
      */
-    public function __construct(Match $match)
+    public function setup()
     {
         $this->setTeamParticipantMapper(TeamParticipantMapper::getInstance());
         $this->setTeamPositionParticipantMapper(TeamPositionParticipantMapper::getInstance());
-        $this->setMatch($match);
-
-        parent::__construct($match);
     }
 
     /**
-     * Collect metadata about a Team - its Players and their Positions
+     * @inheritdoc
      *
      * @param Team $team
+     * @return Collection
      */
-    protected function collectForTeam(Team $team)
+    public function getAllPlayers(Team $team)
     {
-        if ($team->getId()) {
+        return $this->getTeamParticipantMapper()->findByColumnList([
+            'match_id' => $this->getMatch()->getId(),
+            'team_id' => $team->getId()
+        ], [
+            'order' => [
+                'sequence' => 'asc'
+            ]
+        ]);
+    }
 
-            /* Get a list of Players currently in the Team
-             */
-            $this->getPlayers()->setOffset($team->getId(), new Collection());
+    /**
+     * @inheritdoc
+     *
+     * @param Team $team
+     * @return Collection
+     */
+    public function getAllPositions(Team $team)
+    {
+        return $this->getTeamPositionParticipantMapper()->findByColumn('team_id', $team->getId(), ['order' => ['user_id' => 'asc']]);
+    }
 
-            $allPlayers = $this->getTeamParticipantMapper()->findByColumnList([
-                'match_id' => $this->getMatch()->getId(),
-                'team_id' => $team->getId()
-            ], [
-                'order' => [
-                    'sequence' => 'asc'
-                ]
-            ]);
-
-            $allPositions = $this->getTeamPositionParticipantMapper()->findByColumn('team_id', $team->getId(), ['order' => ['user_id' => 'asc']]);
-
-            foreach ($allPlayers as $currentPlayer) {
-                $item = [
-                    'user'      => $currentPlayer->getUser(),
-                    'positions' => new Collection()
-                ];
-
-                /* Get all the Positions for this Player
-                 */
-                foreach ($allPositions as $currentPosition) {
-                    if ($currentPosition->getUser()->getId() == $currentPlayer->getUser()->getId()) {
-                        $item['positions']->add($currentPosition);
-                    }
-                }
-
-                /* Stack up!
-                 */
-                $this->getPlayers()->getOffset($team->getId())->add($item);
-            }
-
-            /* Collect Coaches
-             */
-            $this->getCoaches()->setOffset($team->getId(), new Collection());
-        }
+    /**
+     * @inheritdoc
+     *
+     * @param Team $team
+     * @return Collection
+     */
+    public function getAllCoaches(Team $team)
+    {
+        return new Collection();
     }
 
     /* Getters/Setters
