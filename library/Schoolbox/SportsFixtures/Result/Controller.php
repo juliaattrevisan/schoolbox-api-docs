@@ -27,8 +27,7 @@ use Schoolbox\SportsFixtures\Status\Mapper as StatusMapper;
 use Schoolbox\SportsFixtures\Status\Model as StatusModel;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use \Schoolbox\SportsFixtures\Team\Metadata\Current as CurrentTeamMetadata;
-use \Schoolbox\SportsFixtures\Team\Metadata\Historic as HistoricTeamMetadata;
+use \Schoolbox\SportsFixtures\Team\Metadata\Factory as TeamMetadataFactory;
 use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
 
 
@@ -257,10 +256,8 @@ class Controller extends AbstractController
          * Get home team player list, if applicable
          * Get away team player list, if applicable
          */
-
-        /* TODO: Factory to spawn appropriate Metadata instance (Current or Historic)
-         */
-        $teamMetadata = new CurrentTeamMetadata($context);
+        $factory = new TeamMetadataFactory($context);
+        $teamMetadata = $factory->produce();
 
         /* Find faceless home team, ram it into a Team instance
          * This saves endless shenanigans in front-end land
