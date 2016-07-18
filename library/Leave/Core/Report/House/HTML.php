@@ -225,10 +225,8 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
         $this->getPage()->setBlock(TEMPLATE_content, 'row', 'row_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'request_period_total', 'request_period_total_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'request_period_initial', 'request_period_initial_block');
-        $this->getPage()->setBlock('row', 'request', 'request_block');
-        $this->getPage()->setBlock('row', 'empty_request', 'empty_request_block');
-        $this->getPage()->setBlock('request', 'request_period', 'request_period_block');
-        $this->getPage()->setBlock('request', 'request_authorisation', 'request_authorisation_block');
+        $this->getPage()->setBlock('row', 'request_period', 'request_period_block');
+        $this->getPage()->setBlock('row', 'request_authorisation', 'request_authorisation_block');
 
         $this->getPage()->setBlock('request_period', 'request_period_show_am', 'request_period_show_am_block');
         $this->getPage()->setBlock('request_period', 'request_period_show_day', 'request_period_show_day_block');
@@ -334,8 +332,6 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
                         $i++;
                     }
 
-                    $this->getPage()->setVar('empty_request_block', '');
-                    $this->getPage()->parse('request_block', 'request');
                     $this->getPage()->parse('row_block', 'row', true);
 
                     /* Clear children after parsing out the parent

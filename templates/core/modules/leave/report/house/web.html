@@ -182,21 +182,14 @@
                     <th class='leaveReportYear'>Year</th>
                     <th class='leaveReportBoardingStatus'></th>
                     <!-- BEGIN report_header_subtitle -->
+
                     <!-- BEGIN report_header_subtitle_show_am -->
                     <th class='leaveReportMeridiem leaveReportLeftBorder'>AM</th>
                     <!-- END report_header_subtitle_show_am -->
 
-                    <!-- BEGIN report_header_subtitle_hide_am -->
-                    <!--<th class='leaveReportMeridiem leaveReportLeftBorder no-arrow leaveReportHide'></th>-->
-                    <!-- END report_header_subtitle_hide_am -->
-
                     <!-- BEGIN report_header_subtitle_show_day -->
                     <th class='leaveReportMeridiem'>PM</th>
                     <!-- END report_header_subtitle_show_day -->
-
-                    <!-- BEGIN report_header_subtitle_hide_day -->
-                    <!--<th class='leaveReportMeridiem no-arrow leaveReportHide'></th>-->
-                    <!-- END report_header_subtitle_hide_day -->
 
                     <!-- BEGIN report_header_subtitle_show_pm -->
                     <th class='leaveReportMeridiem leaveReportRightBorder'>Bed</th>
@@ -210,7 +203,6 @@
             </thead>
             <tbody>
                 <!-- BEGIN row -->
-                <!-- BEGIN request -->
                 <tr class="{CLASS}">
                     <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
                     <td class='leaveReportYear'>{USER_YEAR}</td>
@@ -241,18 +233,6 @@
                         <!-- END request_authorisation -->
                     </td>
                 </tr>
-                <!-- END request -->
-                <!-- BEGIN empty_request -->
-                <tr class="{CLASS}">
-                    <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
-                    <td>{USER_YEAR}</td>
-                    <td></td>
-                    <td colspan="1" class="leaveReportHide"></td>
-                    <td colspan="{PERIOD_COUNT}"></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <!-- END empty_request -->
                 <!-- END row -->
             </tbody>
             <tfoot>
