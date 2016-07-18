@@ -17,6 +17,7 @@ use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
+use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Team\Model as TeamModel;
 use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayerModel;
@@ -48,6 +49,9 @@ class Notifier extends AbstractModuleNotifier
         }
         if (empty($dependencies['teamPlayerMapper'])) {
             $dependencies['teamPlayerMapper'] = TeamPlayerMapper::getInstance();
+        }
+        if (empty($dependencies['teamMapper'])) {
+            $dependencies['teamMapper'] = TeamMapper::getInstance();
         }
 
         parent::loadDependencies($dependencies);
@@ -116,6 +120,33 @@ class Notifier extends AbstractModuleNotifier
         $envelope = new Envelope();
         $match    = $this->hydrateMatch($match);
 
+        // Send notifications for teams added/removed
+        $teamChanges = $this->extractTeamChangesFromDiff($diff);
+        foreach ($teamChanges['added'] as $addedTeamId) {
+            // A team was added to this match
+            $team = $this->teamMapper->findById($addedTeamId);
+            $href = $this->buildHrefForMatch($match, $team);
+            $this->postToTeam(
+                $envelope,
+                $this->buildBuilder($match, $effector, self::TRIGGER_UPDATED)
+                    ->setHref($href)
+                    ->setParam('match', $this->buildMatchParam($match, $team))
+                    ->setTitle('Your team is now participating in :sport match :match'),
+                $team
+            );
+        }
+        foreach ($teamChanges['removed'] as $removedTeamId) {
+            // A team was removed from this match
+            $this->postToTeam(
+                $envelope,
+                $this->buildBuilder($match, $effector, self::TRIGGER_UPDATED)
+                    ->setHref('#')
+                    ->setParam('match', new Param($match->getName()))
+                    ->setTitle('Your team is no longer participating in :sport match :match'),
+                $this->teamMapper->findById($removedTeamId)
+            );
+        }
+
         if (isset($diff['venue'])) {
             // Venue has changed
             $envelope = $this->postToTeams(
@@ -180,6 +211,33 @@ class Notifier extends AbstractModuleNotifier
         $envelope = new Envelope();
         $match    = $this->hydrateMatch($match);
 
+        // Send notifications for teams added/removed
+        $teamChanges = $this->extractTeamChangesFromDiff($diff);
+        foreach ($teamChanges['added'] as $addedTeamId) {
+            // A team was added to this match
+            $team = $this->teamMapper->findById($addedTeamId);
+            $href = $this->buildHrefForMatch($match, $team);
+            $this->postToParentsOfTeam(
+                $envelope,
+                $this->buildBuilder($match, $effector, self::TRIGGER_UPDATED)
+                    ->setHref($href)
+                    ->setParam('match', $this->buildMatchParam($match, $team))
+                    ->setTitle(':child\'s team is now participating in :sport match :match'),
+                $team
+            );
+        }
+        foreach ($teamChanges['removed'] as $removedTeamId) {
+            // A team was removed from this match
+            $this->postToParentsOfTeam(
+                $envelope,
+                $this->buildBuilder($match, $effector, self::TRIGGER_UPDATED)
+                    ->setHref('#')
+                    ->setParam('match', new Param($match->getName()))
+                    ->setTitle(':child\'s team is no longer participating in :sport match :match'),
+                $this->teamMapper->findById($removedTeamId)
+            );
+        }
+
         if (isset($diff['venue'])) {
             // Venue has changed
             $envelope = $this->postToParentsOfTeams(
@@ -230,6 +288,36 @@ class Notifier extends AbstractModuleNotifier
         $division->setSport($sport);
         $hydratedMatch->setDivision($division);
         return $hydratedMatch;
+    }
+
+    /**
+     * Extracts the teams that have been added and removed from the match.
+     *
+     * @param array $diff
+     * @return array
+     */
+    protected function extractTeamChangesFromDiff($diff)
+    {
+        $oldTeams = [];
+        $newTeams = [];
+        if (isset($diff['homeTeam'])) {
+            list($newTeam, $oldTeam) = $diff['homeTeam'];
+            $oldTeams[] = $oldTeam;
+            $newTeams[] = $newTeam;
+        }
+        if (isset($diff['awayTeam'])) {
+            list($newTeam, $oldTeam) = $diff['awayTeam'];
+            $oldTeams[] = $oldTeam;
+            $newTeams[] = $newTeam;
+        }
+        $oldTeams = array_filter($oldTeams);
+        $newTeams = array_filter($newTeams);
+
+        // Removed teams: old - new
+        return [
+            'added'   => array_diff($newTeams, $oldTeams),
+            'removed' => array_diff($oldTeams, $newTeams),
+        ];
     }
 
     /**
@@ -306,15 +394,15 @@ class Notifier extends AbstractModuleNotifier
         $ts = \Alaress_Date_Format::now()->getUnixTimeStamp();
 
         // Home
-        $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
+        $href = $this->buildHrefForMatch($match, $match->getHomeTeam());
         $bob->setHref($href)
-            ->setParam('match', new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE));
+            ->setParam('match', $this->buildMatchParam($match, $match->getHomeTeam()));
         $this->postToTeam($envelope, $bob, $match->getHomeTeam());
 
         // and away
-        $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
+        $href = $this->buildHrefForMatch($match, $match->getAwayTeam());
         $bob->setHref($href)
-            ->setParam('match', new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE));
+            ->setParam('match', $this->buildMatchParam($match, $match->getAwayTeam()));
         $this->postToTeam($envelope, $bob, $match->getAwayTeam());
 
         return $envelope;
@@ -333,18 +421,45 @@ class Notifier extends AbstractModuleNotifier
         $ts = \Alaress_Date_Format::now()->getUnixTimeStamp();
 
         // Home
-        $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
+        $href = $this->buildHrefForMatch($match, $match->getHomeTeam());
         $bob->setHref($href)
-            ->setParam('match', new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE));
+            ->setParam('match', $this->buildMatchParam($match, $match->getHomeTeam()));
         $this->postToParentsOfTeam($envelope, $bob, $match->getHomeTeam());
 
         // and away
-        $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
+        $href = $this->buildHrefForMatch($match, $match->getAwayTeam());
         $bob->setHref($href)
-            ->setParam('match', new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE));
+            ->setParam('match', $this->buildMatchParam($match, $match->getAwayTeam()));
         $this->postToParentsOfTeam($envelope, $bob, $match->getAwayTeam());
 
         return $envelope;
+    }
+
+    /**
+     * Builds the href for the results page for this match and team.
+     *
+     * @param Model $match
+     * @param TeamModel $team
+     * @return string
+     */
+    protected function buildHrefForMatch(MatchModel $match, TeamModel $team)
+    {
+        return "/sportsfixtures/matches/{$match->getId()}/results/{$team->getId()}";
+    }
+
+    /**
+     * Builds a parameter for this notifier's builder's "match" parameter.
+     *
+     * @param Model $match
+     * @param TeamModel $team
+     * @param int $stacking
+     * @return Param
+     */
+    protected function buildMatchParam(MatchModel $match, TeamModel $team, $stacking = Param::STACKING_REPLACE)
+    {
+        $ts   = \Alaress_Date_Format::now()->getUnixTimeStamp();
+        $href = $this->buildHrefForMatch($match, $team);
+        return new Param($match->getName(), "{$href}?{$ts}", $stacking);
     }
 
     /**
@@ -387,6 +502,9 @@ class Notifier extends AbstractModuleNotifier
     /** @var TeamPlayerMapper $teamPlayerMapper */
     protected $teamPlayerMapper;
 
+    /** @var TeamMapper $teamMapper */
+    protected $teamMapper;
+
     /**
      * @param $mapper
      */
@@ -417,5 +535,13 @@ class Notifier extends AbstractModuleNotifier
     protected function setTeamPlayerMapper($mapper)
     {
         $this->teamPlayerMapper = $mapper;
+    }
+
+    /**
+     * @param $mapper
+     */
+    protected function setTeamMapper($mapper)
+    {
+        $this->teamMapper = $mapper;
     }
 }
