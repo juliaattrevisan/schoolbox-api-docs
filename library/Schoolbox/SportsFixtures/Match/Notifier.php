@@ -223,7 +223,27 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * Creates a generic notification to a team's players.
+     * Creates a generic notification builder for this match.
+     *
+     * @param Model  $match
+     * @param User   $effector
+     * @param string $trigger
+     * @return Builder
+     */
+    protected function buildNotificationBuilder(MatchModel $match, User $effector, $trigger)
+    {
+        $bob = new Builder();
+        $bob->setParam('sport', new Param($match->getDivision()->getSport()->getName(), $match->getDivision()->getSport()->getUrl()))
+            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
+            ->setSeverity(Logger::INFO)
+            ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), $trigger) ])
+            ->setNamespace($this->getSlug())
+        ;
+        return $bob;
+    }
+
+    /**
+     * Creates a generic notification to a match's team's players.
      *
      * This can then be targeted to the parents of the players, or the players themselves.
      *
@@ -287,6 +307,33 @@ class Notifier extends AbstractModuleNotifier
                 $envelope->targetToParent($teamUser, $bob->build());
             }
         }
+        return $envelope;
+    }
+
+    /**
+     * Targets this notification to the parents of both teams.
+     *
+     * @param Envelope   $envelope
+     * @param Builder    $bob
+     * @param MatchModel $match
+     * @return Envelope
+     */
+    protected function targetToParentsOfTeams(Envelope $envelope, Builder $bob, MatchModel $match)
+    {
+        $ts = \Alaress_Date_Format::now()->getUnixTimeStamp();
+
+        // Home
+        $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
+        $bob->setHref($href)
+            ->setParam('match', new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE));
+        $this->targetToParentsOfTeam($envelope, $bob, $match->getHomeTeam());
+
+        // and away
+        $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
+        $bob->setHref($href)
+            ->setParam('match', new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE));
+        $this->targetToParentsOfTeam($envelope, $bob, $match->getAwayTeam());
+
         return $envelope;
     }
 
