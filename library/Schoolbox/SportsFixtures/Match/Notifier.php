@@ -148,29 +148,21 @@ class Notifier extends AbstractModuleNotifier
 
         // Target home team parents
 
-        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getHomeTeam()->getId());
-
-        $bob = $this->buildGenericNotificationBuilder($match, $match->getHomeTeam(), $effector, self::TRIGGER_CREATED)
-            ->setTitle('Upcoming :sport match :match for :child');
-
-        /** @var TeamPlayerModel $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer) {
-            $bob->setParam('child', new UserParam($teamPlayer->getUser()));
-            $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
-        }
+        $envelope = $this->targetToParentsOfTeam(
+            $envelope,
+            $this->buildGenericNotificationBuilder($match, $match->getHomeTeam(), $effector, self::TRIGGER_CREATED)
+                ->setTitle('Upcoming :sport match :match for :child'),
+            $match->getHomeTeam()
+        );
 
         // Target away team parents
 
-        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getAwayTeam()->getId());
-
-        $bob = $this->buildGenericNotificationBuilder($match, $match->getAwayTeam(), $effector, self::TRIGGER_CREATED)
-            ->setTitle('Upcoming :sport match :match for :child');
-
-        /** @var TeamPlayerModel $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer) {
-            $bob->setParam('child', new UserParam($teamPlayer->getUser()));
-            $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
-        }
+        $envelope = $this->targetToParentsOfTeam(
+            $envelope,
+            $this->buildGenericNotificationBuilder($match, $match->getAwayTeam(), $effector, self::TRIGGER_CREATED)
+                ->setTitle('Upcoming :sport match :match for :child'),
+            $match->getAwayTeam()
+        );
 
         return $envelope;
     }
@@ -213,6 +205,27 @@ class Notifier extends AbstractModuleNotifier
             ->setNamespace($this->getSlug())
         ;
         return $bob;
+    }
+
+    /**
+     * Targets this notification to the parents of an entire team.
+     *
+     * @param Envelope  $envelope
+     * @param Builder   $bob
+     * @param TeamModel $team
+     * @return Envelope
+     */
+    protected function targetToParentsOfTeam(Envelope $envelope, Builder $bob, TeamModel $team)
+    {
+        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $team->getId());
+        foreach ($teamPlayers as $teamPlayer) {
+            $teamUser = $teamPlayer->getUser();
+            if ($teamUser instanceof User) {
+                $bob->setParam('child', new UserParam($teamUser));
+                $envelope->targetToParent($teamUser, $bob->build());
+            }
+        }
+        return $envelope;
     }
 
     /**
