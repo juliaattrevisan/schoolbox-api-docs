@@ -73,12 +73,7 @@ class Javascript extends Base
                     'level'     => $this->getEvent()->getEventClasses(),
                     'completed' => '',
                 ),
-                'links'      => array(
-                    'category' => array(
-                        'id'   => $categoryId,
-                        'name' => $categoryName,
-                    )
-                ),
+                'links'      => array( ),
                 'styles'     => array(
                     'visible' => true,
                 ),
@@ -92,6 +87,9 @@ class Javascript extends Base
                     'modifyLink' => $this->getEvent()->getIsAssessment()
                         ? ('/assess/modify/' . $this->getEvent()->getEventId())
                         : ('/submission/createSubmission/modify/' . $this->getEvent()->getEventId()),
+                    'moreDetailsLink' => $this->getEvent()->getIsAssessment()
+                        ? ($this->getUser()->getId() === $this->getViewer()->getId() ? '/assess/intro/'.$this->getEvent()->getEventId() : '')
+                        : '/submission/submissionHistory/'.$this->getEvent()->getEventId().'/'.$this->getUser()->getId(),
                 )
             )
         );
