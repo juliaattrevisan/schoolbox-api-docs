@@ -4,6 +4,7 @@ if (!$_SESSION['user']->isSuperuser()) {
     error(19);
 }
 
+/** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'adminv2/calendar.html');
 $this->setTitle('Admin - Calendar');
 
