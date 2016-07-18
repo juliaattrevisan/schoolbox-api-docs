@@ -95,9 +95,9 @@ class Notifier extends AbstractModuleNotifier
     public function notifyStudentCreated(MatchModel $match, User $effector)
     {
         $match = $this->hydrateMatch($match);
-        return $this->targetToTeams(
+        return $this->postToTeams(
             new Envelope(),
-            $this->buildNotificationBuilder($match, $effector, self::TRIGGER_CREATED)
+            $this->buildBuilder($match, $effector, self::TRIGGER_CREATED)
                 ->setTitle('You have an upcoming :sport match :match'),
             $match
         );
@@ -118,9 +118,9 @@ class Notifier extends AbstractModuleNotifier
 
         if (isset($diff['venue'])) {
             // Venue has changed
-            $envelope = $this->targetToTeams(
+            $envelope = $this->postToTeams(
                 $envelope,
-                $this->buildNotificationBuilder($match, $effector, self::TRIGGER_UPDATED)
+                $this->buildBuilder($match, $effector, self::TRIGGER_UPDATED)
                     ->setTitle('Your upcoming :sport match :match has a new venue'),
                 $match
             );
@@ -128,9 +128,9 @@ class Notifier extends AbstractModuleNotifier
 
         if (isset($diff['startAt'])) {
             // Time has changed
-            $envelope = $this->targetToTeams(
+            $envelope = $this->postToTeams(
                 $envelope,
-                $this->buildNotificationBuilder($match, $effector, self::TRIGGER_UPDATED)
+                $this->buildBuilder($match, $effector, self::TRIGGER_UPDATED)
                     ->setTitle('Your upcoming :sport match :match has a new start time'),
                 $match
             );
@@ -138,9 +138,9 @@ class Notifier extends AbstractModuleNotifier
 
         if ($envelope->count() == 0 && count($diff)) {
             // Generic something has changed notification
-            $envelope = $this->targetToTeams(
+            $envelope = $this->postToTeams(
                 $envelope,
-                $this->buildNotificationBuilder($match, $effector, self::TRIGGER_UPDATED)
+                $this->buildBuilder($match, $effector, self::TRIGGER_UPDATED)
                     ->setTitle('Your upcoming :sport match :match has been updated'),
                 $match
             );
@@ -159,9 +159,9 @@ class Notifier extends AbstractModuleNotifier
     public function notifyParentCreated(MatchModel $match, User $effector)
     {
         $match = $this->hydrateMatch($match);
-        return $this->targetToParentsOfTeams(
+        return $this->postToParentsOfTeams(
             new Envelope(),
-            $this->buildNotificationBuilder($match, $effector, self::TRIGGER_CREATED)
+            $this->buildBuilder($match, $effector, self::TRIGGER_CREATED)
                 ->setTitle('Upcoming :sport match :match for :child'),
             $match
         );
@@ -182,9 +182,9 @@ class Notifier extends AbstractModuleNotifier
 
         if (isset($diff['venue'])) {
             // Venue has changed
-            $envelope = $this->targetToParentsOfTeams(
+            $envelope = $this->postToParentsOfTeams(
                 $envelope,
-                $this->buildNotificationBuilder($match, $effector, self::TRIGGER_UPDATED)
+                $this->buildBuilder($match, $effector, self::TRIGGER_UPDATED)
                     ->setTitle('Upcoming :sport match :match for :child has a new venue'),
                 $match
             );
@@ -192,9 +192,9 @@ class Notifier extends AbstractModuleNotifier
 
         if (isset($diff['startAt'])) {
             // Time has changed
-            $envelope = $this->targetToParentsOfTeams(
+            $envelope = $this->postToParentsOfTeams(
                 $envelope,
-                $this->buildNotificationBuilder($match, $effector, self::TRIGGER_UPDATED)
+                $this->buildBuilder($match, $effector, self::TRIGGER_UPDATED)
                     ->setTitle('Upcoming :sport match :match for :child has a new start time'),
                 $match
             );
@@ -202,9 +202,9 @@ class Notifier extends AbstractModuleNotifier
 
         if ($envelope->count() == 0 && count($diff)) {
             // Generic something has changed notification
-            $envelope = $this->targetToParentsOfTeams(
+            $envelope = $this->postToParentsOfTeams(
                 $envelope,
-                $this->buildNotificationBuilder($match, $effector, self::TRIGGER_UPDATED)
+                $this->buildBuilder($match, $effector, self::TRIGGER_UPDATED)
                     ->setTitle('Upcoming :sport match :match for :child has been updated'),
                 $match
             );
@@ -233,14 +233,14 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * Creates a generic notification builder for this match.
+     * Builds a generic notification builder for this match.
      *
      * @param Model  $match
      * @param User   $effector
      * @param string $trigger
      * @return Builder
      */
-    protected function buildNotificationBuilder(MatchModel $match, User $effector, $trigger)
+    protected function buildBuilder(MatchModel $match, User $effector, $trigger)
     {
         $bob = new Builder();
         $bob->setParam('sport', new Param($match->getDivision()->getSport()->getName(), $match->getDivision()->getSport()->getUrl()))
@@ -253,14 +253,14 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * Targets this notification to an entire team.
+     * Posts an envelope and contents to all players of a team.
      *
      * @param Envelope  $envelope
      * @param Builder   $bob
      * @param TeamModel $team
      * @return Envelope
      */
-    protected function targetToTeam(Envelope $envelope, Builder $bob, TeamModel $team)
+    protected function postToTeam(Envelope $envelope, Builder $bob, TeamModel $team)
     {
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $team->getId());
         foreach ($teamPlayers as $teamPlayer) {
@@ -273,14 +273,14 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * Targets this notification to the parents of an entire team.
+     * Posts an envelope and contents to all parents of players of a team.
      *
      * @param Envelope  $envelope
      * @param Builder   $bob
      * @param TeamModel $team
      * @return Envelope
      */
-    protected function targetToParentsOfTeam(Envelope $envelope, Builder $bob, TeamModel $team)
+    protected function postToParentsOfTeam(Envelope $envelope, Builder $bob, TeamModel $team)
     {
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $team->getId());
         foreach ($teamPlayers as $teamPlayer) {
@@ -294,14 +294,14 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * Targets this notification to both teams.
+     * Posts an envelope and contents to all players of both a match's teams.
      *
      * @param Envelope   $envelope
      * @param Builder    $bob
      * @param MatchModel $match
      * @return Envelope
      */
-    protected function targetToTeams(Envelope $envelope, Builder $bob, MatchModel $match)
+    protected function postToTeams(Envelope $envelope, Builder $bob, MatchModel $match)
     {
         $ts = \Alaress_Date_Format::now()->getUnixTimeStamp();
 
@@ -309,26 +309,26 @@ class Notifier extends AbstractModuleNotifier
         $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
         $bob->setHref($href)
             ->setParam('match', new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE));
-        $this->targetToTeam($envelope, $bob, $match->getHomeTeam());
+        $this->postToTeam($envelope, $bob, $match->getHomeTeam());
 
         // and away
         $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
         $bob->setHref($href)
             ->setParam('match', new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE));
-        $this->targetToTeam($envelope, $bob, $match->getAwayTeam());
+        $this->postToTeam($envelope, $bob, $match->getAwayTeam());
 
         return $envelope;
     }
 
     /**
-     * Targets this notification to the parents of both teams.
+     * Posts an envelope and contents to all parents of players of both a match's teams.
      *
      * @param Envelope   $envelope
      * @param Builder    $bob
      * @param MatchModel $match
      * @return Envelope
      */
-    protected function targetToParentsOfTeams(Envelope $envelope, Builder $bob, MatchModel $match)
+    protected function postToParentsOfTeams(Envelope $envelope, Builder $bob, MatchModel $match)
     {
         $ts = \Alaress_Date_Format::now()->getUnixTimeStamp();
 
@@ -336,13 +336,13 @@ class Notifier extends AbstractModuleNotifier
         $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
         $bob->setHref($href)
             ->setParam('match', new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE));
-        $this->targetToParentsOfTeam($envelope, $bob, $match->getHomeTeam());
+        $this->postToParentsOfTeam($envelope, $bob, $match->getHomeTeam());
 
         // and away
         $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
         $bob->setHref($href)
             ->setParam('match', new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE));
-        $this->targetToParentsOfTeam($envelope, $bob, $match->getAwayTeam());
+        $this->postToParentsOfTeam($envelope, $bob, $match->getAwayTeam());
 
         return $envelope;
     }
