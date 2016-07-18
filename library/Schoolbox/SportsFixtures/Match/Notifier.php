@@ -155,13 +155,13 @@ class Notifier extends AbstractModuleNotifier
             $buildGeneric = false;
             $envelope = $this->targetToParentsOfTeam(
                 $envelope,
-                $this->buildGenericNotificationBuilder($match, $match->getHomeTeam(), $effector, self::TRIGGER_UPDATED)
+                $this->buildNotificationBuilderForTeam($match, $match->getHomeTeam(), $effector, self::TRIGGER_UPDATED)
                     ->setTitle('Upcoming :sport match :match for :child has a new venue'),
                 $match->getHomeTeam()
             );
             $envelope = $this->targetToParentsOfTeam(
                 $envelope,
-                $this->buildGenericNotificationBuilder($match, $match->getAwayTeam(), $effector, self::TRIGGER_UPDATED)
+                $this->buildNotificationBuilderForTeam($match, $match->getAwayTeam(), $effector, self::TRIGGER_UPDATED)
                     ->setTitle('Upcoming :sport match :match for :child has a new venue'),
                 $match->getAwayTeam()
             );
@@ -171,13 +171,13 @@ class Notifier extends AbstractModuleNotifier
             $buildGeneric = false;
             $envelope = $this->targetToParentsOfTeam(
                 $envelope,
-                $this->buildGenericNotificationBuilder($match, $match->getHomeTeam(), $effector, self::TRIGGER_UPDATED)
+                $this->buildNotificationBuilderForTeam($match, $match->getHomeTeam(), $effector, self::TRIGGER_UPDATED)
                     ->setTitle('Upcoming :sport match :match for :child has a new start time'),
                 $match->getHomeTeam()
             );
             $envelope = $this->targetToParentsOfTeam(
                 $envelope,
-                $this->buildGenericNotificationBuilder($match, $match->getAwayTeam(), $effector, self::TRIGGER_UPDATED)
+                $this->buildNotificationBuilderForTeam($match, $match->getAwayTeam(), $effector, self::TRIGGER_UPDATED)
                     ->setTitle('Upcoming :sport match :match for :child has a new start time'),
                 $match->getAwayTeam()
             );
@@ -189,7 +189,7 @@ class Notifier extends AbstractModuleNotifier
 
             $envelope = $this->targetToParentsOfTeam(
                 $envelope,
-                $this->buildGenericNotificationBuilder($match, $match->getHomeTeam(), $effector, self::TRIGGER_CREATED)
+                $this->buildNotificationBuilderForTeam($match, $match->getHomeTeam(), $effector, self::TRIGGER_CREATED)
                     ->setTitle('Upcoming :sport match :match for :child'),
                 $match->getHomeTeam()
             );
@@ -198,7 +198,7 @@ class Notifier extends AbstractModuleNotifier
 
             $envelope = $this->targetToParentsOfTeam(
                 $envelope,
-                $this->buildGenericNotificationBuilder($match, $match->getAwayTeam(), $effector, self::TRIGGER_CREATED)
+                $this->buildNotificationBuilderForTeam($match, $match->getAwayTeam(), $effector, self::TRIGGER_CREATED)
                     ->setTitle('Upcoming :sport match :match for :child'),
                 $match->getAwayTeam()
             );
@@ -223,7 +223,9 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * Creates a generic notification for a parent regarding a match.
+     * Creates a generic notification to a team's players.
+     *
+     * This can then be targeted to the parents of the players, or the players themselves.
      *
      * @param Model     $match
      * @param TeamModel $team
@@ -231,7 +233,7 @@ class Notifier extends AbstractModuleNotifier
      * @param string    $trigger
      * @return Builder
      */
-    protected function buildGenericNotificationBuilder(MatchModel $match, TeamModel $team, User $effector, $trigger)
+    protected function buildNotificationBuilderForTeam(MatchModel $match, TeamModel $team, User $effector, $trigger)
     {
         $ts   = \Alaress_Date_Format::now()->getUnixTimeStamp();
         $href = "/sportsfixtures/matches/{$match->getId()}/results/{$team->getId()}";
@@ -303,7 +305,7 @@ class Notifier extends AbstractModuleNotifier
 
         $envelope = $this->targetToTeam(
             $envelope,
-                $this->buildGenericNotificationBuilder($match, $match->getHomeTeam(), $effector, self::TRIGGER_CREATED)
+            $this->buildNotificationBuilderForTeam($match, $match->getHomeTeam(), $effector, self::TRIGGER_CREATED)
                 ->setTitle('You have an upcoming :sport match :match'),
             $match->getHomeTeam()
         );
@@ -312,7 +314,7 @@ class Notifier extends AbstractModuleNotifier
 
         $envelope = $this->targetToTeam(
             $envelope,
-            $this->buildGenericNotificationBuilder($match, $match->getAwayTeam(), $effector, self::TRIGGER_CREATED)
+            $this->buildNotificationBuilderForTeam($match, $match->getAwayTeam(), $effector, self::TRIGGER_CREATED)
                 ->setTitle('You have an upcoming :sport match :match'),
             $match->getAwayTeam()
         );
