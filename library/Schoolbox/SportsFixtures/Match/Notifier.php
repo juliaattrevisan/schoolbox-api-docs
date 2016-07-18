@@ -208,6 +208,26 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
+     * Targets this notification to an entire team.
+     *
+     * @param Envelope  $envelope
+     * @param Builder   $bob
+     * @param TeamModel $team
+     * @return Envelope
+     */
+    protected function targetToTeam(Envelope $envelope, Builder $bob, TeamModel $team)
+    {
+        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $team->getId());
+        foreach ($teamPlayers as $teamPlayer) {
+            $teamUser = $teamPlayer->getUser();
+            if ($teamUser instanceof User) {
+                $envelope->targetToUser($teamUser, $bob->build());
+            }
+        }
+        return $envelope;
+    }
+
+    /**
      * Targets this notification to the parents of an entire team.
      *
      * @param Envelope  $envelope
@@ -241,25 +261,21 @@ class Notifier extends AbstractModuleNotifier
 
         // Target home team
 
-        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getHomeTeam()->getId());
-
-        $bob = $this->buildGenericNotificationBuilder($match, $match->getHomeTeam(), $effector, self::TRIGGER_CREATED)
-            ->setTitle('You have an upcoming :sport match :match');
-        /** @var TeamPlayerModel $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer) {
-            $envelope->targetToUser($teamPlayer->getUser()->getId(), $bob->build());
-        }
+        $envelope = $this->targetToTeam(
+            $envelope,
+                $this->buildGenericNotificationBuilder($match, $match->getHomeTeam(), $effector, self::TRIGGER_CREATED)
+                ->setTitle('You have an upcoming :sport match :match'),
+            $match->getHomeTeam()
+        );
 
         // Target away team
 
-        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getAwayTeam()->getId());
-
-        $bob = $this->buildGenericNotificationBuilder($match, $match->getAwayTeam(), $effector, self::TRIGGER_CREATED)
-            ->setTitle('You have an upcoming :sport match :match');
-        /** @var TeamPlayerModel $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer) {
-            $envelope->targetToUser($teamPlayer->getUser()->getId(), $bob->build());
-        }
+        $envelope = $this->targetToTeam(
+            $envelope,
+            $this->buildGenericNotificationBuilder($match, $match->getAwayTeam(), $effector, self::TRIGGER_CREATED)
+                ->setTitle('You have an upcoming :sport match :match'),
+            $match->getAwayTeam()
+        );
 
         return $envelope;
     }
