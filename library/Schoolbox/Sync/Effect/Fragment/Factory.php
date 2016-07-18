@@ -55,6 +55,7 @@ class Factory {
         'altEmail' => 'Alt Email Address',
 
         'campusCollection' => 'Campus Involvement',
+        'campusCollectionRemove' => 'Campus Involvement (Remove)',
 
         'residentialHouse' => 'Residential House',
         'schoolHouse' => 'School House',
@@ -66,7 +67,7 @@ class Factory {
         'webmail' => 'Enable Webmail Tab',
         'eportfolioEnable' => 'E-Portfolio Enabled',
         'hideContacts' => 'Hide Contact Details',
-        'hideTimetable' => 'Hide Timetable',
+        'hideTimetable' => 'Hide Timetable'
     ];
 
     /**
@@ -80,6 +81,7 @@ class Factory {
         'userAccessWrite' => 'groups',
         'userAccessRemove' => 'groups',
         'campusCollection' => 'campus',
+        'campusCollectionRemove' => 'campus',
     ];
 
     /**
@@ -203,7 +205,7 @@ class Factory {
          * userAccessRead and Write aren't found in UserMapper explicitly,
          * we've made that up; we need to assign a key/value pair accordingly
          */
-        $allSpecialCases = ['userAccessRead', 'userAccessWrite', 'userAccessRemove'];
+        $allSpecialCases = ['userAccessRead', 'userAccessWrite', 'userAccessRemove', 'campusCollectionRemove'];
 
         foreach ($allSpecialCases as $currentSpecialCase) {
             $allFields[$currentSpecialCase] = [

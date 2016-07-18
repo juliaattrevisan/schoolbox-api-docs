@@ -24,6 +24,14 @@ class User extends SchoolboxUser
     protected $accessRemoveList = [];
 
     /**
+     * A list of campus instances to remove for this
+     * particular user instance
+     *
+     * @var array
+     */
+    protected $campusRemoveList = [];
+
+    /**
      * Get user access read
      * A list of Groups to which this user has Read access
      *
@@ -83,6 +91,26 @@ class User extends SchoolboxUser
     public function setUserAccessRemove($userAccessRemove)
     {
         $this->accessRemoveList = $userAccessRemove;
+    }
+
+    /**
+     * Get campus collection remove
+     *
+     * @return mixed
+     */
+    public function getCampusCollectionRemove()
+    {
+        return $this->campusRemoveList;
+    }
+
+    /**
+     * Remove selected CampusCollection instances
+     *
+     * @param $campusCollectionRemove
+     */
+    public function setCampusCollectionRemove($campusCollectionRemove)
+    {
+        $this->campusRemoveList = $campusCollectionRemove;
     }
 
     /**
