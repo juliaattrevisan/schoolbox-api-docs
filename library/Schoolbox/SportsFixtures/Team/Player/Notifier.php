@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Schoolbox\SportsFixtures\Team\User;
+namespace Schoolbox\SportsFixtures\Team\Player;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
@@ -17,7 +17,7 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\User;
-use Schoolbox\SportsFixtures\Team\User\Model as TeamUser;
+use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayer;
 use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
@@ -101,7 +101,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentRemoved(TeamUser $teamUser, User $effector, array $diff = null)
+    public function notifyStudentRemoved(TeamPlayer $teamUser, User $effector, array $diff = null)
     {
         $team = $this->getTeamMapper()->findById($teamUser->getTeam()->getId());
 
@@ -126,7 +126,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentRemoved(TeamUser $teamUser, User $effector, array $diff = null)
+    public function notifyParentRemoved(TeamPlayer $teamUser, User $effector, array $diff = null)
     {
         $team = $this->getTeamMapper()->findById($teamUser->getTeam()->getId());
 
@@ -152,7 +152,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array $params
      * @return Builder
      */
-    private function notifyRemoved(User $effector, TeamUser $teamUser, Team $team, $title, array $params) {
+    private function notifyRemoved(User $effector, TeamPlayer $teamUser, Team $team, $title, array $params) {
         $this->log->info($effector->getFullname());
 
         $match = $this->getMatchMapper()->findNextMatch($team);
