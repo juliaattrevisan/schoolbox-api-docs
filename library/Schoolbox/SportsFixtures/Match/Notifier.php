@@ -93,7 +93,7 @@ class Notifier extends AbstractModuleNotifier
      * @return Envelope
      */
     public function notifyStudentCreated(MatchModel $match, User $effector, array $diff = null) {
-        return $this->notifyStudents($match, $effector);
+        return $this->notifyStudents($match, $effector, $diff);
     }
 
     /**
@@ -105,7 +105,7 @@ class Notifier extends AbstractModuleNotifier
      * @return Envelope
      */
     public function notifyStudentUpdated(MatchModel $match, User $effector, array $diff = null) {
-        return $this->notifyStudents($match, $effector);
+        return $this->notifyStudents($match, $effector, $diff);
     }
 
     /**
@@ -117,7 +117,7 @@ class Notifier extends AbstractModuleNotifier
      * @return Envelope
      */
     public function notifyParentCreated(MatchModel $match, User $effector, array $diff = null) {
-        return $this->notifyParents($match, $effector);
+        return $this->notifyParents($match, $effector, $diff);
     }
 
     /**
@@ -129,7 +129,7 @@ class Notifier extends AbstractModuleNotifier
      * @return Envelope
      */
     public function notifyParentUpdated(MatchModel $match, User $effector, array $diff = null) {
-        return $this->notifyParents($match, $effector);
+        return $this->notifyParents($match, $effector, $diff);
     }
 
     // Since update/create do pretty much the same thing, this is where the work actually happens
@@ -137,9 +137,10 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @param Model $match
      * @param User $effector
+     * @param array $diff
      * @return Envelope
      */
-    public function notifyParents(MatchModel $match, User $effector)
+    public function notifyParents(MatchModel $match, User $effector, array $diff = null)
     {
         $envelope = new Envelope();
 
@@ -204,9 +205,10 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @param Model $match
      * @param User $effector
+     * @param array $diff
      * @return Envelope
      */
-    public function notifyStudents(MatchModel $match, User $effector)
+    public function notifyStudents(MatchModel $match, User $effector, array $diff = null)
     {
         $envelope = new Envelope();
 
