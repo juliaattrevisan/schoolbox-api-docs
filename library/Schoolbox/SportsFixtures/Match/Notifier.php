@@ -116,9 +116,15 @@ class Notifier extends AbstractModuleNotifier
      * @param MatchModel $match
      * @return Envelope
      */
-    public function notifyParentCreated(MatchModel $match, User $effector) {
-        // Diff will always be null for a new model
-        return $this->notifyParents($match, $effector);
+    public function notifyParentCreated(MatchModel $match, User $effector)
+    {
+        $match = $this->hydrateMatch($match);
+        return $this->targetToParentsOfTeams(
+            new Envelope(),
+            $this->buildNotificationBuilder($match, $effector, self::TRIGGER_CREATED)
+                ->setTitle('Upcoming :sport match :match for :child'),
+            $match
+        );
     }
 
     /**
@@ -129,30 +135,13 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentUpdated(MatchModel $match, User $effector, array $diff = null) {
-        return $this->notifyParents($match, $effector, $diff);
-    }
-
-    // Since update/create do pretty much the same thing, this is where the work actually happens
-    
-    /**
-     * @param Model $match
-     * @param User $effector
-     * @param array $diff
-     * @return Envelope
-     */
-    public function notifyParents(MatchModel $match, User $effector, array $diff = null)
+    public function notifyParentUpdated(MatchModel $match, User $effector, array $diff = null)
     {
         $envelope = new Envelope();
         $match    = $this->hydrateMatch($match);
 
-        // Time and venue are separate notifications,
-        // both of which mean the generic notification doesn't get sent
-        $buildGeneric = true;
-        $this->log->info(serialize($diff));
         if (isset($diff['venue'])) {
             // Venue has changed
-            $buildGeneric = false;
             $envelope = $this->targetToParentsOfTeams(
                 $envelope,
                 $this->buildNotificationBuilder($match, $effector, self::TRIGGER_UPDATED)
@@ -160,9 +149,9 @@ class Notifier extends AbstractModuleNotifier
                 $match
             );
         }
+
         if (isset($diff['startAt'])) {
             // Time has changed
-            $buildGeneric = false;
             $envelope = $this->targetToParentsOfTeams(
                 $envelope,
                 $this->buildNotificationBuilder($match, $effector, self::TRIGGER_UPDATED)
@@ -171,12 +160,12 @@ class Notifier extends AbstractModuleNotifier
             );
         }
 
-        if ($buildGeneric) {
+        if ($envelope->count() == 0 && count($diff)) {
             // Generic something has changed notification
             $envelope = $this->targetToParentsOfTeams(
                 $envelope,
-                $this->buildNotificationBuilder($match, $effector, self::TRIGGER_CREATED)
-                    ->setTitle('Upcoming :sport match :match for :child'),
+                $this->buildNotificationBuilder($match, $effector, self::TRIGGER_UPDATED)
+                    ->setTitle('Upcoming :sport match :match for :child has been updated'),
                 $match
             );
         }
