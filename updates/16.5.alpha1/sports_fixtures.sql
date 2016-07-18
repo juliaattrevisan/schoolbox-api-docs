@@ -241,8 +241,6 @@ INSERT INTO `sportsfixtures_status` VALUES
 (null,'Draw',NOW(),NOW(),null),
 (null,'Cancelled',NOW(),NOW(),null);
 
-INSERT INTO `msg_namespace` (`slug`, `label`) VALUES ('sports_fixtures', 'Sports Fixtures');
-
 /** Coaches table **/
 CREATE TABLE `sportsfixtures_coach` (
 	`id` INT NOT NULL AUTO_INCREMENT,
@@ -273,3 +271,19 @@ CREATE TABLE `sportsfixtures_team_coach` (
 		ON DELETE CASCADE
 		ON UPDATE CASCADE
 ) ENGINE=InnoDB CHARACTER SET=utf8;
+
+
+INSERT INTO `msg_namespace` (`slug`, `label`) VALUES ('sports_fixtures', 'Sports Fixtures');
+
+SET @sportns = LAST_INSERT_ID();
+
+INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sportns, 'created', 'student', 'a match is upcoming');
+INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sportns, 'updated', 'student', 'an upcoming match has been updated');
+
+INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sportns, 'created', 'parent', 'a match is upcoming');
+INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sportns, 'updated', 'parent', 'an upcoming match has been updated');
+
+INSERT INTO `msg_route_perm`
+SELECT s.id src_id, g.id role_id, 'MU,IN,MO,EM', 'IN,MO' FROM msg_source s
+JOIN groups g ON g.group_type = s.role_type
+WHERE s.namespace = @sportns;
