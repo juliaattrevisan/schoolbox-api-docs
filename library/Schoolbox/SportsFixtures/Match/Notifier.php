@@ -17,6 +17,7 @@ use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
+use Schoolbox\SportsFixtures\Team\Model as TeamModel;
 use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayerModel;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
@@ -144,31 +145,17 @@ class Notifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
         $match    = $this->hydrateMatch($match);
-        $sport    = $match->getDivision()->getSport();
-
-        $ts = \Alaress_Date_Format::now()->getUnixTimeStamp();
 
         // Target home team parents
 
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getHomeTeam()->getId());
 
+        $bob = $this->buildGenericNotificationBuilder($match, $match->getHomeTeam(), $effector, self::TRIGGER_CREATED)
+            ->setTitle('Upcoming :sport match :match for :child');
+
         /** @var TeamPlayerModel $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer)
-        {
-            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
-            $bob  = new Builder();
-            $bob->setTitle('Upcoming :sport match :match for :child')
-                ->setParams([
-                    'sport' => new Param($sport->getName(), $sport->getUrl()),
-                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE),
-                    'child' => new UserParam($teamPlayer->getUser())
-                ])
-                ->setHref($href)
-                ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
-                ->setSeverity(Logger::INFO)
-                ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
-                ->setNamespace($this->getSlug())
-            ;
+        foreach ($teamPlayers as $teamPlayer) {
+            $bob->setParam('child', new UserParam($teamPlayer->getUser()));
             $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
         }
 
@@ -176,24 +163,12 @@ class Notifier extends AbstractModuleNotifier
 
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getAwayTeam()->getId());
 
-        /** @var TeamPlayerModel $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer)
-        {
-            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
-            $bob  = new Builder();
-            $bob->setTitle('Upcoming :sport match :match for :child')
-                ->setParams([
-                    'sport' => new Param($sport->getName(), $sport->getUrl()),
-                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE),
-                    'child' => new UserParam($teamPlayer->getUser())
-                ])
-                ->setHref($href)
-                ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
-                ->setSeverity(Logger::INFO)
-                ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
-                ->setNamespace($this->getSlug())
-            ;
+        $bob = $this->buildGenericNotificationBuilder($match, $match->getAwayTeam(), $effector, self::TRIGGER_CREATED)
+            ->setTitle('Upcoming :sport match :match for :child');
 
+        /** @var TeamPlayerModel $teamPlayer */
+        foreach ($teamPlayers as $teamPlayer) {
+            $bob->setParam('child', new UserParam($teamPlayer->getUser()));
             $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
         }
 
@@ -216,6 +191,31 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
+     * Creates a generic notification for a parent regarding a match.
+     *
+     * @param Model     $match
+     * @param TeamModel $team
+     * @param User      $effector
+     * @param string    $trigger
+     * @return Builder
+     */
+    protected function buildGenericNotificationBuilder(MatchModel $match, TeamModel $team, User $effector, $trigger)
+    {
+        $ts   = \Alaress_Date_Format::now()->getUnixTimeStamp();
+        $href = "/sportsfixtures/matches/{$match->getId()}/results/{$team->getId()}";
+        $bob  = new Builder();
+        $bob->setHref($href)
+            ->setParam('match', new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE))
+            ->setParam('sport', new Param($match->getDivision()->getSport()->getName(), $match->getDivision()->getSport()->getUrl()))
+            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
+            ->setSeverity(Logger::INFO)
+            ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), $trigger) ])
+            ->setNamespace($this->getSlug())
+        ;
+        return $bob;
+    }
+
+    /**
      * @param Model $match
      * @param User $effector
      * @param array $diff
@@ -225,31 +225,15 @@ class Notifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
         $match    = $this->hydrateMatch($match);
-        $sport    = $match->getDivision()->getSport();
-
-        $bob = new Builder();
-
-        $ts = \Alaress_Date_Format::now()->getUnixTimeStamp();
-
-        $bob->setTitle('You have an upcoming :sport match :match')
-            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
-            ->setSeverity(Logger::INFO)
-            ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
-            ->setNamespace($this->getSlug())
-        ;
 
         // Target home team
 
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getHomeTeam()->getId());
 
+        $bob = $this->buildGenericNotificationBuilder($match, $match->getHomeTeam(), $effector, self::TRIGGER_CREATED)
+            ->setTitle('You have an upcoming :sport match :match');
         /** @var TeamPlayerModel $teamPlayer */
         foreach ($teamPlayers as $teamPlayer) {
-            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
-            $bob->setHref($href)
-                ->setParams([
-                    'sport' => new Param($sport->getName(), $sport->getUrl()),
-                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
-                ]);
             $envelope->targetToUser($teamPlayer->getUser()->getId(), $bob->build());
         }
 
@@ -257,14 +241,10 @@ class Notifier extends AbstractModuleNotifier
 
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getAwayTeam()->getId());
 
+        $bob = $this->buildGenericNotificationBuilder($match, $match->getAwayTeam(), $effector, self::TRIGGER_CREATED)
+            ->setTitle('You have an upcoming :sport match :match');
         /** @var TeamPlayerModel $teamPlayer */
         foreach ($teamPlayers as $teamPlayer) {
-            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
-            $bob->setHref($href)
-                ->setParams([
-                    'sport' => new Param($sport->getName(), $sport->getUrl()),
-                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
-                ]);
             $envelope->targetToUser($teamPlayer->getUser()->getId(), $bob->build());
         }
 
