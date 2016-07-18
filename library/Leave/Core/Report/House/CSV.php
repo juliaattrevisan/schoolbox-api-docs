@@ -67,12 +67,12 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase {
 			$headerDate = new Alaress_Date_Format($this->getReportStart()->getUnixTimestamp(), 'U');
 			$headerDate->addDays($j);
 
-			/* Skip AM for Friday
+			/* Skip AM for Friday if using Weekend view
 			 */
 			$fieldList[] = $headerDate->getLongDateOnly();
 			$fieldList[] = '';
 
-			if ($j) {
+			if ($j || 1 === $this->getRange()) {
 				$fieldList[] = '';
 			}
 		}
@@ -90,10 +90,10 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase {
 	protected function renderSubheadings() {
 		$fieldList = array('', '', '');
 
-		/* Skip AM for Friday
+		/* Skip AM for Friday if not single-day view
 		 */
 		for ($j = 0; $j < $this->getRange(); $j++) {
-			if ($j) {
+			if ($j || 1 === $this->getRange()) {
 				$fieldList[] = 'AM';
 			}
 
@@ -114,8 +114,10 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase {
 			$allPeople = $this->getCombined();
 
 			if (is_array($allPeople) && count($allPeople)) {
-				foreach($allPeople as $currentPerson) {
+				foreach($allPeople as $userId => $currentPerson) {
 					$fieldList = array();
+
+//if(185 == $userId) die('<pre>'.print_r($currentPerson,true));
 
 					/* Personal details
 					 */
@@ -126,14 +128,14 @@ class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase {
 					/* Periods
 					 */
 					for ($j = 0; $j < count($currentPerson['periods']); $j++) {
-						$currentPeriod = $currentPerson['periods'][$j];
+						$currentPeriod = $currentPerson['periods'][$j]['request_period'];
 
-						if ($j) {
-							$fieldList[] = $currentPeriod['request_period_morning'];
+						if ($j || 1 === $this->getRange()) {
+							$fieldList[] = $currentPeriod['morning'][0]['display'];
 						}
 
-						$fieldList[] = $currentPeriod['request_period_day'];
-						$fieldList[] = $currentPeriod['request_period_night'];
+						$fieldList[] = $currentPeriod['day'][0]['display'];
+						$fieldList[] = $currentPeriod['night'][0]['display'];
 					}
 
 					/* Authorisation
