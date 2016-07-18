@@ -33,13 +33,18 @@ class Historic extends Base
     protected $teamParticipantMapper;
 
     /**
+     * @var Match
+     */
+    protected $match;
+
+    /**
      * Historic constructor.
      * @param Match $match
      */
     public function __construct(Match $match)
     {
-        /* Set up mappers etc
-         */
+        $this->setTeamParticipantMapper(TeamParticipantMapper::getInstance());
+        $this->setMatch($match);
 
         parent::__construct($match);
     }
@@ -56,6 +61,26 @@ class Historic extends Base
             /* Get a list of Players currently in the Team
              */
             $this->getPlayers()->setOffset($team->getId(), new Collection());
+
+            $allPlayers = $this->getTeamParticipantMapper()->findByColumnList([
+                'match_id' => $this->getMatch()->getId(),
+                'team_id' => $team->getId()
+            ], [
+                'order' => [
+                    'sequence' => 'asc'
+                ]
+            ]);
+
+            foreach ($allPlayers as $currentPlayer) {
+                $item = [
+                    'user'      => $currentPlayer->getUser(),
+                    'positions' => new Collection()
+                ];
+
+                /* Stack up!
+                 */
+                $this->getPlayers()->getOffset($team->getId())->add($item);
+            }
 
             /* Collect Coaches
              */
@@ -80,5 +105,21 @@ class Historic extends Base
     protected function setTeamParticipantMapper($teamParticipantMapper)
     {
         $this->teamParticipantMapper = $teamParticipantMapper;
+    }
+
+    /**
+     * @return Match
+     */
+    protected function getMatch()
+    {
+        return $this->match;
+    }
+
+    /**
+     * @param Match $match
+     */
+    protected function setMatch($match)
+    {
+        $this->match = $match;
     }
 }
