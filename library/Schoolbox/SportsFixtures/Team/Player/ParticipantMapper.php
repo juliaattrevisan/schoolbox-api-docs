@@ -13,13 +13,12 @@ namespace Schoolbox\SportsFixtures\Team\Player;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Mapper As BaseMapper;
-use Schoolbox\Role as RoleModel;
 use Schoolbox\User as UserModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Team\Model as TeamModel;
-use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
+use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayerModel;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 
 class ParticipantMapper extends BaseMapper
@@ -29,12 +28,12 @@ class ParticipantMapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('sportsfixtures_team_participant');
+        $this->hasTable('sportsfixtures_team_participantuser');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
+        $this->joins('match_id', MatchMapper::class, 'id', null, null, 'match', 'match');
         $this->joins('team_id', TeamMapper::class, 'id', null, null, 'team', 'team');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
-        $this->joins('match_id', MatchMapper::class, 'id', null, null, 'match', 'match');
         $this->uses('sequence', self::TYPE_INTEGER);
     }
 
@@ -65,7 +64,9 @@ class ParticipantMapper extends BaseMapper
     protected function hydrateSelect(PDOStatement $statement)
     {
         $collection = new Collection();
+
         foreach ($statement as $row) {
+            /** @var TeamPlayerModel $model */
             $model = $this->createModel()
                 ->setId($row['id'])
                 ->setSequence($row['sequence']);
@@ -85,6 +86,7 @@ class ParticipantMapper extends BaseMapper
 
             $collection->add($model);
         }
+
         return $collection;
     }
 }

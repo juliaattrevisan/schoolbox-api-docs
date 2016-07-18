@@ -214,6 +214,19 @@ CREATE TABLE `sportsfixtures_team_user` (
 		ON UPDATE CASCADE
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
+/** Team Participant table **/
+CREATE TABLE `sportsfixtures_team_participantuser`(
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`match_id` INT(11),
+	`team_id` INT(11),
+	`user_id` INT(11),
+	`sequence` INT(11),
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`deleted_at` DATETIME,
+PRIMARY KEY (`id`)
+) ENGINE=INNODB CHARSET=utf8;
+
 /** Team player positions **/
 CREATE TABLE `sportsfixtures_team_position` (
 	`id` INT NOT NULL AUTO_INCREMENT,
