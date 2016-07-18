@@ -146,23 +146,63 @@ class Notifier extends AbstractModuleNotifier
         $envelope = new Envelope();
         $match    = $this->hydrateMatch($match);
 
-        // Target home team parents
+        // Time and venue are separate notifications,
+        // both of which mean the generic notification doesn't get sent
+        $buildGeneric = true;
+        $this->log->info(serialize($diff));
+        if (isset($diff['venue'])) {
+            // Venue has changed
+            $buildGeneric = false;
+            $envelope = $this->targetToParentsOfTeam(
+                $envelope,
+                $this->buildGenericNotificationBuilder($match, $match->getHomeTeam(), $effector, self::TRIGGER_UPDATED)
+                    ->setTitle('Upcoming :sport match :match for :child has a new venue'),
+                $match->getHomeTeam()
+            );
+            $envelope = $this->targetToParentsOfTeam(
+                $envelope,
+                $this->buildGenericNotificationBuilder($match, $match->getAwayTeam(), $effector, self::TRIGGER_UPDATED)
+                    ->setTitle('Upcoming :sport match :match for :child has a new venue'),
+                $match->getAwayTeam()
+            );
+        }
+        if (isset($diff['startAt'])) {
+            // Time has changed
+            $buildGeneric = false;
+            $envelope = $this->targetToParentsOfTeam(
+                $envelope,
+                $this->buildGenericNotificationBuilder($match, $match->getHomeTeam(), $effector, self::TRIGGER_UPDATED)
+                    ->setTitle('Upcoming :sport match :match for :child has a new start time'),
+                $match->getHomeTeam()
+            );
+            $envelope = $this->targetToParentsOfTeam(
+                $envelope,
+                $this->buildGenericNotificationBuilder($match, $match->getAwayTeam(), $effector, self::TRIGGER_UPDATED)
+                    ->setTitle('Upcoming :sport match :match for :child has a new start time'),
+                $match->getAwayTeam()
+            );
+        }
 
-        $envelope = $this->targetToParentsOfTeam(
-            $envelope,
-            $this->buildGenericNotificationBuilder($match, $match->getHomeTeam(), $effector, self::TRIGGER_CREATED)
-                ->setTitle('Upcoming :sport match :match for :child'),
-            $match->getHomeTeam()
-        );
+        if ($buildGeneric) {
 
-        // Target away team parents
+            // Target home team parents
 
-        $envelope = $this->targetToParentsOfTeam(
-            $envelope,
-            $this->buildGenericNotificationBuilder($match, $match->getAwayTeam(), $effector, self::TRIGGER_CREATED)
-                ->setTitle('Upcoming :sport match :match for :child'),
-            $match->getAwayTeam()
-        );
+            $envelope = $this->targetToParentsOfTeam(
+                $envelope,
+                $this->buildGenericNotificationBuilder($match, $match->getHomeTeam(), $effector, self::TRIGGER_CREATED)
+                    ->setTitle('Upcoming :sport match :match for :child'),
+                $match->getHomeTeam()
+            );
+
+            // Target away team parents
+
+            $envelope = $this->targetToParentsOfTeam(
+                $envelope,
+                $this->buildGenericNotificationBuilder($match, $match->getAwayTeam(), $effector, self::TRIGGER_CREATED)
+                    ->setTitle('Upcoming :sport match :match for :child'),
+                $match->getAwayTeam()
+            );
+        }
 
         return $envelope;
     }
