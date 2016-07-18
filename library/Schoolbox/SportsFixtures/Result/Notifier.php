@@ -31,8 +31,8 @@ use Monolog\Logger;
 
 class Notifier extends AbstractModuleNotifier
 {
-    const TRIGGER_CREATED = 'created';
-    const TRIGGER_UPDATED = 'updated';
+    const TRIGGER_CREATED = 'result_created';
+    const TRIGGER_UPDATED = 'result_updated';
 
     /**
      * @param null $dependencies
