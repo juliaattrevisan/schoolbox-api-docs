@@ -1,7 +1,5 @@
 <?php
 /**
- * Calendar_Api_EventType_Event_Schoolbox_Group
- *
  * Like Calendar_Api_EventType_Event_Schoolbox_Default, but only returns events
  * for a given group.
  *
@@ -9,8 +7,6 @@
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-use Calendar\Event\Collection;
-
 class Calendar_Api_EventType_Event_Schoolbox_Group extends Calendar_Api_EventType_Event_Schoolbox_Default {
 
 	/**

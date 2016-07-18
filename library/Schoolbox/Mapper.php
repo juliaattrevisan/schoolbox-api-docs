@@ -1255,7 +1255,7 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
-     * Retreives a model by id
+     * Retrieves a model by id
      *
      * @throws Exception if no instance of model is found
      * @throws Exception\Deleted if the model was found but has been deleted

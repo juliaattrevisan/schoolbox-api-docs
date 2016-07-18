@@ -132,7 +132,7 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
      * @param $currentEventType
      * @param $currentConnector
      *
-     * @return array
+     * @return Calendar_Api_Config_Connector_Interface[]
      */
     public function getAllConfigs($currentEventType, $currentConnector)
     {
@@ -149,6 +149,7 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
         foreach ($configs as $currentConfig) {
             /* @var $currentConfig Calendar_Api_Config_Record */
             $config = $currentConfig->decodeConfig();
+            /** @var Calendar_Api_Config_Connector_Abstract $config */
             $config->setId($currentConfig->getId());
 
             $allConfigs[] = $config;
@@ -202,15 +203,15 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
     }
 
     /**
-     * Generate a tree of EventType/Connector pairs
+     * Generate a tree of EventSource/Connector pairs
      *
      * @return array
      */
     public function generateApiHierarchy()
     {
 
-        /* Figger out which Event Types are around, and which Connectors
-         * are available for each Event Type.
+        /* Figure out which Event Sources are around, and which Connectors
+         * are available for each Event Sources.
          */
         $path = '../library/Calendar/Api/EventType';
 

@@ -14,14 +14,13 @@
  */
 abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType_Interface
 {
-
     /**
      * The calendar_connector id from which this event was retrieved.
      * This is used to create a functioning event detail screen in Mobile.
      *
-     * @var string
+     * @var int
      */
-    protected $connectorId = '';
+    protected $connectorId;
 
     /**
      * An instance of User
@@ -36,7 +35,7 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
     /**
      * Set calendar_connector id
      *
-     * @param string $connectorId
+     * @param int $connectorId
      */
     public function setConnectorId($connectorId)
     {
@@ -46,7 +45,7 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
     /**
      * Get calendar_connector id
      *
-     * @return string
+     * @return int
      */
     public function getConnectorId()
     {
@@ -77,7 +76,7 @@ abstract class Calendar_Api_EventType_Abstract implements Calendar_Api_EventType
     /**
      * Helper method for loading this event type's calendar connector config.
      *
-     * @return Calendar_Api_Config_Record
+     * @return Calendar_Api_Config_Record|object
      */
     public function loadConnectorConfiguration()
     {

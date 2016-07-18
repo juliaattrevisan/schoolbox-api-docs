@@ -137,6 +137,7 @@ if (is_array($typeList)) {
 
                     /* Process each config for this kind of connector
                      */
+                    /** @var Calendar_Api_Config_Connector_Interface[] $allConfigs */
                     $allConfigs = Calendar_Api_Config_Mapper::getInstance()->getAllConfigs(
                         $currentEventType,
                         $currentConnector

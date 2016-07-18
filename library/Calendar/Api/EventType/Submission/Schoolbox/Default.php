@@ -52,6 +52,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
     {
         $stack = new Collection();
         // Configuration may not have been set, take this into account.
+// TODO - this is wrong!
         try {
             $eventType = $this->loadConnectorConfiguration()->decodeConfig()->getLuEventType();
         } catch (Schoolbox\Mapper\Exception $e) {

@@ -348,7 +348,7 @@ abstract class EventBase implements EventInterface
     /**
      * Set event type
      *
-     * @param $eventType
+     * @param string $eventType
      */
     public function setEventType($eventType)
     {
@@ -358,7 +358,7 @@ abstract class EventBase implements EventInterface
     /**
      * Get event type
      *
-     * @return null
+     * @return string
      */
     public function getEventType()
     {
