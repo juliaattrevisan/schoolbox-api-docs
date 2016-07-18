@@ -23,7 +23,8 @@ use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use \Schoolbox\SportsFixtures\Match\Weather as MatchWeather;
 use \Schoolbox\SportsFixtures\Result\Model as Result;
 use \Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
-use \Schoolbox\SportsFixtures\Status;
+use Schoolbox\SportsFixtures\Status\Mapper as StatusMapper;
+use Schoolbox\SportsFixtures\Status\Model as StatusModel;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\SportsFixtures\Team\Metadata as TeamMetadata;
@@ -63,7 +64,7 @@ class Controller extends AbstractController
     protected $schoolTagCloudMapper;
 
     /**
-     * @var Status\Mapper
+     * @var StatusMapper
      */
     protected $statusMapper;
 
@@ -79,7 +80,7 @@ class Controller extends AbstractController
         $this->setTeamMapper(TeamMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
-        $this->setStatusMapper(Status\Mapper::getInstance());
+        $this->setStatusMapper(StatusMapper::getInstance());
     }
 
     /**
@@ -394,7 +395,7 @@ class Controller extends AbstractController
         }
 
         // Save status (optional)
-        /** @var Status\Model $status */
+        /** @var StatusModel $status */
         $statusId = $this->getRequest()->post->get('statusId');
         if ($statusId) {
             try {
@@ -424,11 +425,11 @@ class Controller extends AbstractController
      *
      * @param Match $match
      * @param Team $team
-     * @param Status\Model $status
+     * @param StatusModel $status
      * @param string $description
      * @param Result $result
      */
-    private function saveResult(Match $match, Team $team, Status\Model $status, $description, Result $result)
+    private function saveResult(Match $match, Team $team, StatusModel $status, $description, Result $result)
     {
         $result->setMatch($match);
         $result->setTeam($team);
@@ -539,7 +540,7 @@ class Controller extends AbstractController
     }
 
     /**
-     * @return Status\Mapper
+     * @return StatusMapper
      */
     public function getStatusMapper()
     {
@@ -547,7 +548,7 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param Status\Mapper $statusMapper
+     * @param StatusMapper $statusMapper
      * @return static
      */
     public function setStatusMapper($statusMapper)
