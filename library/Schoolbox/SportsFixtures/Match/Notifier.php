@@ -253,33 +253,6 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * Creates a generic notification to a match's team's players.
-     *
-     * This can then be targeted to the parents of the players, or the players themselves.
-     *
-     * @param Model     $match
-     * @param TeamModel $team
-     * @param User      $effector
-     * @param string    $trigger
-     * @return Builder
-     */
-    protected function buildNotificationBuilderForTeam(MatchModel $match, TeamModel $team, User $effector, $trigger)
-    {
-        $ts   = \Alaress_Date_Format::now()->getUnixTimeStamp();
-        $href = "/sportsfixtures/matches/{$match->getId()}/results/{$team->getId()}";
-        $bob  = new Builder();
-        $bob->setHref($href)
-            ->setParam('match', new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE))
-            ->setParam('sport', new Param($match->getDivision()->getSport()->getName(), $match->getDivision()->getSport()->getUrl()))
-            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
-            ->setSeverity(Logger::INFO)
-            ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), $trigger) ])
-            ->setNamespace($this->getSlug())
-        ;
-        return $bob;
-    }
-
-    /**
      * Targets this notification to an entire team.
      *
      * @param Envelope  $envelope
