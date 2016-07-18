@@ -56,17 +56,46 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
     {
         $currentTime = new Alaress_Date_Format(time(), 'U');
 
+        // TODO - why is this not CSS ?
+        switch($this->getRange()){
+            case 1:
+                $countDataColumns = 3;
+                break;
+            case 2:
+                $countDataColumns = 5;
+                break;
+            default:
+                $countDataColumns = ($this->getRange() * 3) - 1;
+        }
+        $colWidthName           = 15;
+        $colWidthYear           =  3;
+        $colWidthBoardingStatus =  3;
+        $colWidthHost           =  8;
+        $colWidthActivity       =  8;
+        $colWidthApprover       = 12;
+
+        $widthDataColumns = round((100 - $colWidthName - $colWidthYear - $colWidthBoardingStatus
+                - $colWidthHost - $colWidthActivity - $colWidthApprover) / $countDataColumns,1);
+        $widthDataColumns = max($widthDataColumns, 6);
+
         $this->getPage()->setVar(
             array(
-                'HOUSE_NAME'        => Scrub::text($this->getCurrentHouse()->getHouse()),
-                'HOUSE_ID'          => $this->getCurrentHouse()->getId(),
-                'GENERATED_AT'      => $currentTime->getShort(),
-                'REPORT_DATE_START' => $this->getReportStartDate(),
-                'REPORT_DATE_END'   => $this->getReportEndDate(),
-                'CLASS_REPORT_DATE_END' => Leave_Controller::REPORT_TIMESPAN_RANGE === $this->getReportTimespan() ? '' : 'hide',
-                'DATE_DISPLAY_START' => $this->getReportStart()->getUsingFormat('d-m-Y'),
-                'DATE_DISPLAY_END'   => $this->getReportFinish()->getUsingFormat('d-m-Y'),
-                'COUNT_DATA_COLUMNS' => $this->getReportStart()->diffInDays($this->getReportFinish(), true) * 3 + 1,
+                'HOUSE_NAME'                => Scrub::text($this->getCurrentHouse()->getHouse()),
+                'HOUSE_ID'                  => $this->getCurrentHouse()->getId(),
+                'GENERATED_AT'              => $currentTime->getShort(),
+                'REPORT_DATE_START'         => $this->getReportStartDate(),
+                'REPORT_DATE_END'           => $this->getReportEndDate(),
+                'CLASS_REPORT_DATE_END'     => Leave_Controller::REPORT_TIMESPAN_RANGE === $this->getReportTimespan() ? '' : 'hide',
+                'DATE_DISPLAY_START'        => $this->getReportStart()->getUsingFormat('d-m-Y'),
+                'DATE_DISPLAY_END'          => $this->getReportFinish()->getUsingFormat('d-m-Y'),
+                'COUNT_DATA_COLUMNS'        => $countDataColumns,
+                'COL_WIDTH_NAME'            => $colWidthName,
+                'COL_WIDTH_YEAR'            => $colWidthYear,
+                'COL_WIDTH_BOARDING_STATUS' => $colWidthBoardingStatus,
+                'COL_WIDTH_DATA'            => $widthDataColumns,
+                'COL_WIDTH_HOST'            => $colWidthHost,
+                'COL_WIDTH_ACTIVITY'        => $colWidthActivity,
+                'COL_WIDTH_APPROVER'        => $colWidthApprover,
             )
         );
     }
@@ -142,8 +171,6 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
         $this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_show_am', 'report_header_subtitle_show_am_block');
         $this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_show_day', 'report_header_subtitle_show_day_block');
         $this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_show_pm', 'report_header_subtitle_show_pm_block');
-        $this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_hide_am', 'report_header_subtitle_hide_am_block');
-        $this->getPage()->setBlock('report_header_subtitle', 'report_header_subtitle_hide_day', 'report_header_subtitle_hide_day_block');
 
         if (count($this->getRequestList())) {
             /* Parse out the headings
@@ -159,20 +186,17 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
                     )
                 );
 
-                /* Hide the first two columns of the first group
+                /* Hide the first two columns of the first group (but not for single-day view)
                  */
-                if (!$i) {
+                $skipPeriod = 0 == $i && 1 !== $this->getRange();
+                if ($skipPeriod) {
                     $this->getPage()->setVar('REPORT_HEADER_COLSPAN', 2);
                     $this->getPage()->setVar('report_header_subtitle_show_am_block', '');
                     $this->getPage()->parse('report_header_subtitle_show_day_block', 'report_header_subtitle_show_day');
-                    $this->getPage()->parse('report_header_subtitle_hide_am_block', 'report_header_subtitle_hide_am');
-                    $this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
                 } else {
                     $this->getPage()->setVar('REPORT_HEADER_COLSPAN', 3);
                     $this->getPage()->parse('report_header_subtitle_show_am_block', 'report_header_subtitle_show_am');
                     $this->getPage()->parse('report_header_subtitle_show_day_block', 'report_header_subtitle_show_day');
-                    $this->getPage()->setVar('report_header_subtitle_hide_am_block', '');
-                    $this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
                 }
 
                 $this->getPage()->parse('report_header_subtitle_show_pm_block', 'report_header_subtitle_show_pm');
@@ -185,8 +209,6 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
                 $this->getPage()->setVar('report_header_subtitle_show_am_block', '');
                 $this->getPage()->setVar('report_header_subtitle_show_day_block', '');
                 $this->getPage()->setVar('report_header_subtitle_show_pm_block', '');
-                $this->getPage()->setVar('report_header_subtitle_hide_am_block', '');
-                $this->getPage()->setVar('report_header_subtitle_hide_day_block', '');
             }
         } else {
             $this->getPage()->setVar('report_header_block', '');
@@ -211,8 +233,6 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
         $this->getPage()->setBlock('request_period', 'request_period_show_am', 'request_period_show_am_block');
         $this->getPage()->setBlock('request_period', 'request_period_show_day', 'request_period_show_day_block');
         $this->getPage()->setBlock('request_period', 'request_period_show_pm', 'request_period_show_pm_block');
-        $this->getPage()->setBlock('request_period', 'request_period_hide_am', 'request_period_hide_am_block');
-        $this->getPage()->setBlock('request_period', 'request_period_hide_day', 'request_period_hide_day_block');
 
 
         if (count($this->getRequestList())) {
@@ -293,17 +313,13 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
                             $removeFromTotal ? $totals[$i][$section]-- : false;
                         }
 
-
-                        if (!$i) {
+                        $skipPeriod = 0 == $i && 1 !== $this->getRange();
+                        if ($skipPeriod) {
                             $this->getPage()->setVar('request_period_show_am_block', '');
                             $this->getPage()->parse('request_period_show_day_block', 'request_period_show_day');
-                            $this->getPage()->parse('request_period_hide_am_block', 'request_period_hide_am');
-                            $this->getPage()->setVar('request_period_hide_day_block', '');
                         } else {
                             $this->getPage()->parse('request_period_show_am_block', 'request_period_show_am');
                             $this->getPage()->parse('request_period_show_day_block', 'request_period_show_day');
-                            $this->getPage()->setVar('request_period_hide_am_block', '');
-                            $this->getPage()->setVar('request_period_hide_day_block', '');
                         }
 
                         $this->getPage()->parse('request_period_show_pm_block', 'request_period_show_pm');
@@ -314,8 +330,6 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
                         $this->getPage()->setVar('request_period_show_am_block', '');
                         $this->getPage()->setVar('request_period_show_day_block', '');
                         $this->getPage()->setVar('request_period_show_pm_block', '');
-                        $this->getPage()->setVar('request_period_hide_am_block', '');
-                        $this->getPage()->setVar('request_period_hide_day_block', '');
 
                         $i++;
                     }
@@ -342,9 +356,11 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
         $periodCount = 0;
         for ($j = 0; $j < $this->getRange(); $j++) {
             foreach ($this->rangePeriods as $period) {
-                if (!($j == 0 && $period == 'morning')) {
+                $skipFirstMorning = $j == 0 && $period == 'morning' && 1 !== $this->getRange();
+                if (!$skipFirstMorning) {
                     $periodCount++;
                     $this->getPage()->setVar('PERIOD_TOTAL', $totals[$j][$period]);
+                    $this->getPage()->setVar('CLASS_PERIOD_TOTAL', '');
                     $this->getPage()->parse('request_period_total_block', 'request_period_total', true);
                     $this->getPage()->parse('request_period_initial_block', 'request_period_initial', true);
                 }

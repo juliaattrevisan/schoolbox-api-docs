@@ -21,7 +21,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     protected $endDate;
 
     /** @var string Enum from {'day','weekend','range'} */
-    protected $reportPeriod;
+    protected $reportTimespan;
 
     /** @var  Alaress_Date_Format */
     protected $reportStart;
@@ -62,7 +62,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
      * @var HouseResidential      $data['house']
      * @var string                $data['dateStart']
      * @var string|null           $data['dateEnd']
-     * @var string                $data['reportPeriod']
+     * @var string                $data['reportTimespan']
      * @var Alaress_Date_Format   $data['reportStart']
      * @var Alaress_Date_Format   $data['reportFinish']
      * @var \Schoolbox\Collection $data['requestList']
@@ -76,7 +76,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
         $this->setCurrentHouse($data['house']);
         $this->setReportStartDate($data['dateStart']);
         $this->setReportEndDate($data['dateEnd']);
-        $this->setReportPeriod($data['reportPeriod']);
+        $this->setReportTimespan($data['reportTimespan']);
         $this->setReportStart($data['reportStart']);
         $this->setReportFinish($data['reportFinish']);
         $this->setRange( $this->getReportFinish()->diffInDays($this->getReportStart(), true) + 1);
@@ -145,15 +145,6 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
                 }
             }
 
-            /* Text color if request is still pending
-             */
-            if ($request->isPending()) {
-                $decorationStart = $this->getDecorationPendingStart();
-                $decorationEnd   = $this->getDecorationPendingEnd();
-            } else {
-                $decorationStart = $this->getDecorationApprovedStart();
-                $decorationEnd   = $this->getDecorationApprovedEnd();
-            }
 
             /* For each day that the person is on leave within the prescribed period of time, show an
              * icon. If they are starting or ending their leave on this day, show the time as well
@@ -511,10 +502,10 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     }
 
     /**
-     * @param string $reportPeriod Enum from {'day','weekend','range'}
+     * @param string $reportTimespan Enum from {'day','weekend','range'}
      */
-    protected function setReportPeriod($reportPeriod){
-        $this->reportPeriod = $reportPeriod;
+    protected function setReportTimespan($reportTimespan){
+        $this->reportTimespan = $reportTimespan;
     }
 
     /**
@@ -522,7 +513,7 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
      * @return string
      */
     protected function getReportTimespan(){
-        return $this->reportPeriod;
+        return $this->reportTimespan;
     }
 
     /**

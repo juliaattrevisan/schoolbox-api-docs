@@ -1357,7 +1357,7 @@ class Leave_Controller extends Controller
      * Get a list of leave requests between specified dates
      *
      * @param int $houseId
-     * @param string $period
+     * @param string $timespan
      * @param string $dateStart
      * @param string $dateEnd
      * @throws SchoolboxNotFoundException if house isn't found
@@ -1365,7 +1365,7 @@ class Leave_Controller extends Controller
      * @var HouseResidential      $return['house']
      * @var string                $return['dateStart']
      * @var string                $return['dateEnd']
-     * @var string                $return['reportPeriod']
+     * @var string                $return['reportTimespan']
      * @var Alaress_Date_Format   $return['reportStart']
      * @var Alaress_Date_Format   $return['reportFinish']
      * @var \Schoolbox\Collection $return['requestList']
@@ -1373,7 +1373,7 @@ class Leave_Controller extends Controller
      * @var \Schoolbox\Collection $return['houseList']
      * @var HouseResidential      $return['houseList'][]
      */
-    public function executeHouseReport($houseId, $period, $dateStart, $dateEnd)
+    public function executeHouseReport($houseId, $timespan, $dateStart, $dateEnd)
     {
         try {
             $house = $this->getHouseMapper()->findById($houseId);
@@ -1385,7 +1385,7 @@ class Leave_Controller extends Controller
             error(19);
         }
 
-        switch($period){
+        switch($timespan){
             case Leave_Controller::REPORT_TIMESPAN_DAY:
                 $reportStart  = Alaress_Date_Format::newLocalShort($dateStart);
                 $reportFinish = Alaress_Date_Format::newLocalShort($reportStart);
@@ -1410,14 +1410,14 @@ class Leave_Controller extends Controller
         $houseList = $this->getHouseMapper()->findAll();
 
         return array(
-            'house'        => $house,
-            'dateStart'    => $dateStart,
-            'dateEnd'      => $dateEnd,
-            'reportPeriod' => $period,
-            'reportStart'  => $reportStart,
-            'reportFinish' => $reportFinish,
-            'requestList'  => $requestList,
-            'houseList'    => $houseList
+            'house'          => $house,
+            'dateStart'      => $dateStart,
+            'dateEnd'        => $dateEnd,
+            'reportTimespan' => $timespan,
+            'reportStart'    => $reportStart,
+            'reportFinish'   => $reportFinish,
+            'requestList'    => $requestList,
+            'houseList'      => $houseList
         );
 
     }

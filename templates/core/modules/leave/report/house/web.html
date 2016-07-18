@@ -36,16 +36,16 @@
             var searchForm = $('[data-form_type=search]');
             var houseId    = searchForm.find(':input[name="reportHouse"]').val();
             var action     = $(this).data('action');
-            var period     = searchForm.find('[name=reportPeriod]').val();
+            var timespan   = searchForm.find('[name=reportTimespan]').val();
 
             // 'Export' and 'Print' ignore search form and display values currently displayed in table
             var dateStart = 'search' === action
                     ? searchForm.find(':input[name="reportDateStart"]').val().replace(/\//g, '-')
                     : $table.attr('data-date-display-start');
 
-            var location   = '/modules/leave/report/house/' + houseId + '/' + period + '/' + dateStart;
+            var location   = '/modules/leave/report/house/' + houseId + '/' + timespan + '/' + dateStart;
 
-            if('range' === period){
+            if('range' === timespan){
                 // 'Export' and 'Print' ignore search form and display values currently displayed in table
                 var dateEnd = 'search' === action
                         ? searchForm.find(':input[name="reportDateEnd"]').val().replace(/\//g, '-')
@@ -158,11 +158,13 @@
         <div class="scrollable">
         <table data-topic="requestList" id="requestList" class="full-width" data-date-display-start="{DATE_DISPLAY_START}" data-date-display-end="{DATE_DISPLAY_END}">
             <colgroup>
-                <col width="15%">
-                <col width="3%">
-                <col width="3%">
+                <col width="{COL_WIDTH_NAME}%">
+                <col width="{COL_WIDTH_YEAR}%">
+                <col width="{COL_WIDTH_BOARDING_STATUS}%">
                 <col span="{COUNT_DATA_COLUMNS}" class="multi-cell" width="6%">
-                <col width="15%">
+                <col width="{COL_WIDTH_HOST}%">
+                <col width="{COL_WIDTH_ACTIVITY}%">
+                <col width="{COL_WIDTH_APPROVER}%">
             </colgroup>
             <thead>
                 <tr>
@@ -214,21 +216,20 @@
                     <td class='leaveReportYear'>{USER_YEAR}</td>
                     <td class='leaveReportBoardingStatus'>{USER_BOARDING_STATUS}</td>
                     <!-- BEGIN request_period -->
+
                     <!-- BEGIN request_period_show_am -->
                     <td class='leaveReportMeridiem leaveReportLeftBorder'>{REQUEST_PERIOD_MORNING}</td>
                     <!-- END request_period_show_am -->
-                    <!-- BEGIN request_period_hide_am -->
-                    <!--<td class="leaveReportMeridiem leaveReportLeftBorder leaveReportNoRightBorder leaveReportHide"></td>-->
-                    <!-- END request_period_hide_am -->
+
                     <!-- BEGIN request_period_show_day -->
                     <td class='leaveReportMeridiem'>{REQUEST_PERIOD_DAY}</td>
                     <!-- END request_period_show_day -->
-                    <!-- BEGIN request_period_hide_day -->
-                    <!--<td class="leaveReportMeridiem leaveReportNoBorder leaveReportHide"></td>-->
-                    <!-- END request_period_hide_day -->
+
+
                     <!-- BEGIN request_period_show_pm -->
                     <td class='leaveReportMeridiem leaveReportRightBorder'>{REQUEST_PERIOD_NIGHT}</td>
                     <!-- END request_period_show_pm -->
+
                     <!-- END request_period -->
                     <td class="leaveReportNoPrint right-border">{REQUEST_HOST}</td>
 

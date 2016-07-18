@@ -55,12 +55,9 @@ try {
                     ? $this->arg[2]
                     : $_SESSION['houseId'];
 
-                $reportPeriods = [
-                    Leave_Controller::REPORT_TIMESPAN_DAY,
-                    Leave_Controller::REPORT_TIMESPAN_WEEKEND,
-                    Leave_Controller::REPORT_TIMESPAN_RANGE];
+                $timespanOptions = Leave_Controller::getTimespanOptions();
 
-                $period = is_string($this->arg[3]) && in_array($this->arg[3], $reportPeriods)
+                $timespan = is_string($this->arg[3]) && in_array($this->arg[3], $timespanOptions)
                     ? $this->arg[3]
                     : Leave_Controller::REPORT_TIMESPAN_WEEKEND;
 
@@ -68,11 +65,16 @@ try {
                     ? str_replace('-', '/', $this->arg[4])
                     : date('d/m/Y', time());
 
-                $dateEnd = ('range' === $period && isset($this->arg[5]))
+                $dateEnd = ('range' === $timespan && isset($this->arg[5]))
                     ? str_replace('-', '/', $this->arg[5])
                     : null;
 
-                $data = $leaveController->executeHouseReport($houseId, $period, $dateStart, $dateEnd );
+                // Cater for erroneous URLs
+                try {
+                    $data = $leaveController->executeHouseReport($houseId, $timespan, $dateStart, $dateEnd);
+                } catch (InvalidArgumentException $iae){
+                    error(156);
+                }
 
                 $argumentCount = count($this->arg);
 
