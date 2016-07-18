@@ -31,8 +31,8 @@ use Monolog\Logger;
 
 class Notifier extends AbstractModuleNotifier
 {
-    const TRIGGER_CREATED = 'result_created';
-    const TRIGGER_UPDATED = 'result_updated';
+    const TRIGGER_CREATED = 'resultCreated';
+    const TRIGGER_UPDATED = 'resultUpdated';
 
     /**
      * @param null $dependencies
@@ -92,7 +92,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentCreated(ResultModel $result, User $effector, array $diff = null) {
+    public function notifyStudentResultCreated(ResultModel $result, User $effector, array $diff = null) {
         return $this->notifyStudents($result, $effector);
     }
 
@@ -104,7 +104,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentUpdated(ResultModel $result, User $effector, array $diff = null) {
+    public function notifyStudentResultUpdated(ResultModel $result, User $effector, array $diff = null) {
         return $this->notifyStudents($result, $effector);
     }
 
@@ -116,7 +116,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentCreated(ResultModel $result, User $effector, array $diff = null) {
+    public function notifyParentResultCreated(ResultModel $result, User $effector, array $diff = null) {
         return $this->notifyParents($result, $effector);
     }
 
@@ -128,7 +128,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentUpdated(ResultModel $result, User $effector, array $diff = null) {
+    public function notifyParentResultUpdated(ResultModel $result, User $effector, array $diff = null) {
         return $this->notifyParents($result, $effector);
     }
 

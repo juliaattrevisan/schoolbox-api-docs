@@ -283,11 +283,11 @@ INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sp
 INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sportns, 'created', 'parent', 'a match is upcoming');
 INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sportns, 'updated', 'parent', 'an upcoming match has been updated');
 
-INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sportns, 'result_created', 'student', 'a match result has been entered');
-INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sportns, 'result_updated', 'student', 'a match result has been updated');
+INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sportns, 'resultCreated', 'student', 'a match result has been entered');
+INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sportns, 'resultUpdated', 'student', 'a match result has been updated');
 
-INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sportns, 'result_created', 'parent', 'a match result has been entered');
-INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sportns, 'result_updated', 'parent', 'a match result has been updated');
+INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sportns, 'resultCreated', 'parent', 'a match result has been entered');
+INSERT INTO `msg_source` (namespace, `key`, role_type, description ) VALUES (@sportns, 'resultUpdated', 'parent', 'a match result has been updated');
 
 INSERT INTO `msg_route_perm`
 SELECT s.id src_id, g.id role_id, 'MU,IN,MO,EM', 'IN,MO' FROM msg_source s
