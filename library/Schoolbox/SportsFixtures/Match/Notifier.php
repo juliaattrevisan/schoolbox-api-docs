@@ -111,8 +111,42 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentUpdated(MatchModel $match, User $effector, array $diff = null) {
-        return $this->notifyStudents($match, $effector, $diff);
+    public function notifyStudentUpdated(MatchModel $match, User $effector, array $diff = null)
+    {
+        $envelope = new Envelope();
+        $match    = $this->hydrateMatch($match);
+
+        if (isset($diff['venue'])) {
+            // Venue has changed
+            $envelope = $this->targetToTeams(
+                $envelope,
+                $this->buildNotificationBuilder($match, $effector, self::TRIGGER_UPDATED)
+                    ->setTitle('Your upcoming :sport match :match has a new venue'),
+                $match
+            );
+        }
+
+        if (isset($diff['startAt'])) {
+            // Time has changed
+            $envelope = $this->targetToTeams(
+                $envelope,
+                $this->buildNotificationBuilder($match, $effector, self::TRIGGER_UPDATED)
+                    ->setTitle('Your upcoming :sport match :match has a new start time'),
+                $match
+            );
+        }
+
+        if ($envelope->count() == 0 && count($diff)) {
+            // Generic something has changed notification
+            $envelope = $this->targetToTeams(
+                $envelope,
+                $this->buildNotificationBuilder($match, $effector, self::TRIGGER_UPDATED)
+                    ->setTitle('Your upcoming :sport match :match has been updated'),
+                $match
+            );
+        }
+
+        return $envelope;
     }
 
     /**
@@ -178,6 +212,10 @@ class Notifier extends AbstractModuleNotifier
 
         return $envelope;
     }
+
+    /**
+     * Here be helper methods
+     */
 
     /**
      * @param MatchModel $match
@@ -332,28 +370,6 @@ class Notifier extends AbstractModuleNotifier
         $bob->setHref($href)
             ->setParam('match', new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE));
         $this->targetToParentsOfTeam($envelope, $bob, $match->getAwayTeam());
-
-        return $envelope;
-    }
-
-    /**
-     * @param Model $match
-     * @param User $effector
-     * @param array $diff
-     * @return Envelope
-     */
-    public function notifyStudents(MatchModel $match, User $effector, array $diff = null)
-    {
-        $envelope = new Envelope();
-        $match    = $this->hydrateMatch($match);
-
-        // Generic notification
-        $envelope = $this->targetToTeams(
-            $envelope,
-            $this->buildNotificationBuilder($match, $effector, self::TRIGGER_CREATED)
-                ->setTitle('You have an upcoming :sport match :match'),
-            $match
-        );
 
         return $envelope;
     }
