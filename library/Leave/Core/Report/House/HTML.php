@@ -56,27 +56,7 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
     {
         $currentTime = new Alaress_Date_Format(time(), 'U');
 
-        // TODO - why is this not CSS ?
-        switch($this->getRange()){
-            case 1:
-                $countDataColumns = 3;
-                break;
-            case 2:
-                $countDataColumns = 5;
-                break;
-            default:
-                $countDataColumns = ($this->getRange() * 3) - 1;
-        }
-        $colWidthName           = 15;
-        $colWidthYear           =  3;
-        $colWidthBoardingStatus =  3;
-        $colWidthHost           =  8;
-        $colWidthActivity       =  8;
-        $colWidthApprover       = 12;
-
-        $widthDataColumns = round((100 - $colWidthName - $colWidthYear - $colWidthBoardingStatus
-                - $colWidthHost - $colWidthActivity - $colWidthApprover) / $countDataColumns,1);
-        $widthDataColumns = max($widthDataColumns, 6);
+        $countDataColumns = 1 === $this->getRange() ? 3 : 3 * $this->getRange() - 1;
 
         $this->getPage()->setVar(
             array(
@@ -89,13 +69,6 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
                 'DATE_DISPLAY_START'        => $this->getReportStart()->getUsingFormat('d-m-Y'),
                 'DATE_DISPLAY_END'          => $this->getReportFinish()->getUsingFormat('d-m-Y'),
                 'COUNT_DATA_COLUMNS'        => $countDataColumns,
-                'COL_WIDTH_NAME'            => $colWidthName,
-                'COL_WIDTH_YEAR'            => $colWidthYear,
-                'COL_WIDTH_BOARDING_STATUS' => $colWidthBoardingStatus,
-                'COL_WIDTH_DATA'            => $widthDataColumns,
-                'COL_WIDTH_HOST'            => $colWidthHost,
-                'COL_WIDTH_ACTIVITY'        => $colWidthActivity,
-                'COL_WIDTH_APPROVER'        => $colWidthApprover,
             )
         );
     }

@@ -65,7 +65,7 @@ try {
                     ? str_replace('-', '/', $this->arg[4])
                     : date('d/m/Y', time());
 
-                $dateEnd = ('range' === $timespan && isset($this->arg[5]))
+                $dateEnd = (Leave_Controller::REPORT_TIMESPAN_RANGE === $timespan && isset($this->arg[5]))
                     ? str_replace('-', '/', $this->arg[5])
                     : null;
 
