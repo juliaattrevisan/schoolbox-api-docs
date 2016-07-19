@@ -170,7 +170,7 @@ if (!empty($subjectList) && is_array($subjectList)) {
             /* If synergy code, get synergy students
              */
             $studentList = $synHandler->getStudents($curCategory->getCodeString());
-            $this->setVar('CATEGORY_CODE', urlencode($curCategory->getCodeString()));
+            $this->setVar('CATEGORY_CODE', urlencode(urlencode($curCategory->getCodeString())));
 
             $this->setVar('members_list_block' ,'');
             $this->parse('class_list_block','class_list');
