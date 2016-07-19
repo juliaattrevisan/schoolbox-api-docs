@@ -10,6 +10,13 @@
 namespace Alaress\Date;
 
 
+/**
+ * Class Clock
+ *
+ * This is the 'Standard Time' implementation of IClock.
+ *
+ * @package Alaress\Date
+ */
 class Clock implements IClock {
 
     /** @var int */
