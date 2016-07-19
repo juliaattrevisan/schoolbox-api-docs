@@ -18,7 +18,9 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
+use Schoolbox\SportsFixtures\Position\Model as Position;
+use Schoolbox\SportsFixtures\Team\Position\Model as TeamPosition;
+use Schoolbox\SportsFixtures\Team\Position\ParticipantModel as ParticipantPosition;
 
 class ParticipantMapper extends BaseMapper
 {
@@ -28,12 +30,15 @@ class ParticipantMapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('sportsfixtures_team_participantposition');
-        $this->hasModel(Model::class);
+        $this->hasModel(ParticipantPosition::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('match_id', MatchMapper::class, 'id', null, null, 'match', 'match');
         $this->joins('team_id', TeamMapper::class, 'id', null, null, 'team', 'team');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('name', self::TYPE_STRING);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**
@@ -62,27 +67,20 @@ class ParticipantMapper extends BaseMapper
     {
         $collection = new Collection();
         foreach ($statement as $row) {
-            /** @var Model $model */
-            $model = $this->createModel()
-                ->setId($row['id']);
+            $teamPosition = new TeamPosition();
+            $teamPosition->setId($row['id']);
 
             // set user, team and position only if retrieved properly
 
-            $user = $this->hydrateJoin($row, 'user', 'u');
+            $position = $this->hydrateJoin($row, 'position', 'p');
 
-            if ($user instanceof UserModel) {
-                $model->setUser($user);
+            if ($position instanceof Position) {
+                $teamPosition->setPosition($position);
             }
 
-            /* Is there a better way?
-             */
-            $position = PositionMapper::getInstance()->createModel();
-            $position->setName($row['name']);
-
-            $model->setPosition($position);
-
-            $collection->add($model);
+            $collection->add($teamPosition);
         }
+
         return $collection;
     }
 }

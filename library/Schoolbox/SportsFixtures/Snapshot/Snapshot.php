@@ -24,7 +24,7 @@ use \Schoolbox\SportsFixtures\Team\Metadata\Metadata;
 use \Schoolbox\SportsFixtures\Team\Metadata\Strategy\Current as CurrentStrategy;
 use \Schoolbox\SportsFixtures\Snapshot\Type\Coach as SnapshotCoach;
 use \Schoolbox\SportsFixtures\Snapshot\Type\Player as SnapshotPlayer;
-
+use \Schoolbox\SportsFixtures\Snapshot\Type\Position as SnapshotPosition;
 
 class Snapshot implements ISnapshot
 {
@@ -43,7 +43,7 @@ class Snapshot implements ISnapshot
     {
         $this->setRegistry(new Collection());
 
-        /* TODO: Add registry ammunition here
+        /* Add registry ammunition here
          * Get the current coach/player/position config, load it
          * into snapshot classes and fire away
          */
@@ -51,6 +51,7 @@ class Snapshot implements ISnapshot
 
         $this->getRegistry()->add(new SnapshotCoach($match, $metadata));
         $this->getRegistry()->add(new SnapshotPlayer($match, $metadata));
+        $this->getRegistry()->add(new SnapshotPosition($match, $metadata));
     }
 
     /**
