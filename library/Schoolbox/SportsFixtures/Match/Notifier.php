@@ -395,8 +395,6 @@ class Notifier extends AbstractModuleNotifier
      */
     protected function postToTeams(Envelope $envelope, Builder $bob, MatchModel $match)
     {
-        $ts = \Alaress_Date_Format::now()->getUnixTimeStamp();
-
         // Home
         $href = $this->buildHrefForMatch($match, $match->getHomeTeam());
         $bob->setHref($href)
@@ -422,8 +420,6 @@ class Notifier extends AbstractModuleNotifier
      */
     protected function postToParentsOfTeams(Envelope $envelope, Builder $bob, MatchModel $match)
     {
-        $ts = \Alaress_Date_Format::now()->getUnixTimeStamp();
-
         // Home
         $href = $this->buildHrefForMatch($match, $match->getHomeTeam());
         $bob->setHref($href)
