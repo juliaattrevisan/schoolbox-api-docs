@@ -44,6 +44,18 @@ class Position extends Base implements ISnapshot
         /** @var Team $currentTeam */
         foreach ($allTeams as $currentTeam) {
             if (is_numeric($currentTeam->getId())) {
+
+                /* Delete all the existing Positions for the Team
+                 * then re-add them, in case the snapshot already
+                 * existed and you need to refresh with a new one
+                 *
+                 * @param Team $team
+                 */
+                $this->getParticipantMapper()->deleteByColumnList([
+                    'match_id' => $this->getMatch()->getId(),
+                    'team_id' => $currentTeam->getId()
+                ]);
+
                 $allPositions = $this->getMetadata()->getStrategy()->getAllPositions($currentTeam);
 
                 /** @var CurrentPosition $currentPosition */
