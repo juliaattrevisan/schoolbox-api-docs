@@ -18,6 +18,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
+use Schoolbox\SportsFixtures\Coach\ParticipantModel as ParticipantCoach;
 use Schoolbox\SportsFixtures\Coach\Model as Coach;
 
 class ParticipantMapper extends BaseMapper
@@ -28,12 +29,15 @@ class ParticipantMapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('sportsfixtures_team_participantcoach');
-        $this->hasModel(Coach::class);
+        $this->hasModel(ParticipantCoach::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('match_id', MatchMapper::class, 'id', null, null, 'match', 'match');
         $this->joins('team_id', TeamMapper::class, 'id', null, null, 'team', 'team');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('name', self::TYPE_STRING);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**
@@ -64,7 +68,8 @@ class ParticipantMapper extends BaseMapper
 
         foreach ($statement as $row) {
             /** @var Coach $model */
-            $model = $this->createModel()
+            $coach = new Coach();
+            $coach
                 ->setId($row['id'])
                 ->setName($row['name']);
 
@@ -72,10 +77,10 @@ class ParticipantMapper extends BaseMapper
             $user = $this->hydrateJoin($row, 'user', 'u');
 
             if ($user instanceof UserModel) {
-                $model->setUser($user);
+                $coach->setUser($user);
             }
 
-            $collection->add($model);
+            $collection->add($coach);
         }
 
         return $collection;

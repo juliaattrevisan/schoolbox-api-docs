@@ -289,7 +289,7 @@ CREATE TABLE `sportsfixtures_team_participantcoach`(
 	`id` INT(11) NOT NULL AUTO_INCREMENT,
 	`match_id` INT(11) NOT NULL,
 	`team_id` INT(11) NOT NULL,
-	`user_id` INT(11) NOT NULL,
+	`user_id` INT(11) NULL,
 	`name` VARCHAR(255) NOT NULL,
 	`created_at` DATETIME,
 	`updated_at` DATETIME,

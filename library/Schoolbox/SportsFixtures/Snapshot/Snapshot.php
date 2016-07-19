@@ -27,10 +27,6 @@ use \Schoolbox\SportsFixtures\Snapshot\Coach as SnapshotCoach;
 
 class Snapshot implements ISnapshot
 {
-    /**
-     * @var Match
-     */
-    private $match;
 
     /**
      * @var Collection
@@ -44,16 +40,15 @@ class Snapshot implements ISnapshot
      */
     public function __construct(Match $match)
     {
-        $this->setMatch($match);
         $this->setRegistry(new Collection());
 
         /* TODO: Add registry ammunition here
          * Get the current coach/player/position config, load it
          * into snapshot classes and fire away
          */
-        $metadata = new Metadata($this->getMatch(), new CurrentStrategy($this->getMatch()));
+        $metadata = new Metadata($match, new CurrentStrategy($match));
 
-        $this->getRegistry()->add(new SnapshotCoach($metadata));
+        $this->getRegistry()->add(new SnapshotCoach($match, $metadata));
     }
 
     /**
@@ -69,22 +64,6 @@ class Snapshot implements ISnapshot
 
     /* Getters/Setters
      */
-
-    /**
-     * @return Match
-     */
-    private function getMatch()
-    {
-        return $this->match;
-    }
-
-    /**
-     * @param Match $match
-     */
-    private function setMatch($match)
-    {
-        $this->match = $match;
-    }
 
     /**
      * @return Collection
