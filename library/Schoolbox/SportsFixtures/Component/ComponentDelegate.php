@@ -113,6 +113,8 @@ class ComponentDelegate
 
                 if (!isset($matches[$matchCurrent->getId()])) {
                     $matches[$matchCurrent->getId()] = [];
+                    $matches[$matchCurrent->getId()]["home"]  = false;
+                    $matches[$matchCurrent->getId()]["away"]  = false;
                     $matches[$matchCurrent->getId()]["match"] = $matchCurrent;
                     $matches[$matchCurrent->getId()]["teams"] = [
                         $matchCurrent->getHomeTeam()->getId() => [
@@ -128,9 +130,15 @@ class ComponentDelegate
 
                 foreach ($childTeams as $team) {
                     $teamId = $team->getTeam()->getId();
-                    if ($teamId == $matchCurrent->getHomeTeam()->getId() ||
-                        $teamId == $matchCurrent->getAwayTeam()->getId()
-                    ) {
+                    $isHome = ($teamId == $matchCurrent->getHomeTeam()->getId());
+                    $isAway = ($teamId == $matchCurrent->getAwayTeam()->getId());
+                    if ($isHome) {
+                        $matches[$matchCurrent->getId()]["home"] = true;
+                    }
+                    if ($isAway) {
+                        $matches[$matchCurrent->getId()]["away"] = true;
+                    }
+                    if ($isHome || $isAway) {
                         $matches[$matchCurrent->getId()]["teams"][$teamId]["children"][$team->getUser()->getId()] = $team->getUser();
                     }
                 }
@@ -155,24 +163,25 @@ class ComponentDelegate
         $studentMatches = $this->getMatches($studentTeams);
         foreach ($studentMatches as $matchCurrent) {
             $matches[$matchCurrent->getId()] = [
+                'home'  => false,
+                'away'  => false,
                 'match' => $matchCurrent,
                 'teams' => [
                     $matchCurrent->getHomeTeam()->getId() => [
-                        'team'     => $matchCurrent->getHomeTeam(),
-                        'involved' => false,
+                        'team' => $matchCurrent->getHomeTeam(),
                     ],
                     $matchCurrent->getAwayTeam()->getId() => [
-                        'team'     => $matchCurrent->getAwayTeam(),
-                        'involved' => false,
+                        'team' => $matchCurrent->getAwayTeam(),
                     ],
                 ],
             ];
             foreach ($studentTeams as $team) {
                 $teamId = $team->getTeam()->getId();
-                if ($teamId == $matchCurrent->getHomeTeam()->getId() ||
-                    $teamId == $matchCurrent->getAwayTeam()->getId()
-                ) {
-                    $matches[$matchCurrent->getId()]["teams"][$teamId]["involved"] = true;
+                if ($teamId == $matchCurrent->getHomeTeam()->getId()) {
+                    $matches[$matchCurrent->getId()]["home"] = true;
+                }
+                if ($teamId == $matchCurrent->getAwayTeam()->getId()) {
+                    $matches[$matchCurrent->getId()]["away"] = true;
                 }
             }
         }
