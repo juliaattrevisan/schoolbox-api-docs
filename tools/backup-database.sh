@@ -54,7 +54,7 @@ backupdir=`readlink -f $backupdir/../`
 backupfile="$backupdir/$sqlver-`date +%Y-%m-%d_%H-%M-%S`.sql";
 
 mkdir -p $backupdir;
-mysqldump --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
+mysqldump -f --allow-keywords -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
 
 echo "Backup of database at version $sqlver located at: $backupfile";
 exit;
