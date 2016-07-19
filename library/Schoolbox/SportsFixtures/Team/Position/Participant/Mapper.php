@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\SportsFixtures\Coach;
+namespace Schoolbox\SportsFixtures\Team\Position\Participant;
 
 use PDOStatement;
 use Schoolbox\Collection;
@@ -16,20 +16,21 @@ use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\User as UserModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
-use Schoolbox\SportsFixtures\Coach\ParticipantModel as ParticipantCoach;
-use Schoolbox\SportsFixtures\Coach\Model as Coach;
+use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
+use Schoolbox\SportsFixtures\Position\Model as Position;
+use Schoolbox\SportsFixtures\Team\Position\Model as TeamPosition;
+use Schoolbox\SportsFixtures\Team\Position\Participant\Model as ParticipantPosition;
 
-class ParticipantMapper extends BaseMapper
+class Mapper extends BaseMapper
 {
     /**
      * Setup mapping
      */
     protected function mapping()
     {
-        $this->hasTable('sportsfixtures_team_participantcoach');
-        $this->hasModel(ParticipantCoach::class);
+        $this->hasTable('sportsfixtures_team_participantposition');
+        $this->hasModel(ParticipantPosition::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('match_id', MatchMapper::class, 'id', null, null, 'match', 'match');
         $this->joins('team_id', TeamMapper::class, 'id', null, null, 'team', 'team');
@@ -65,22 +66,19 @@ class ParticipantMapper extends BaseMapper
     protected function hydrateSelect(PDOStatement $statement)
     {
         $collection = new Collection();
-
         foreach ($statement as $row) {
-            /** @var Coach $model */
-            $coach = new Coach();
-            $coach
-                ->setId($row['id'])
-                ->setName($row['name']);
+            $teamPosition = new TeamPosition();
+            $teamPosition->setId($row['id']);
 
-            // set user and team only if retrieved properly
-            $user = $this->hydrateJoin($row, 'user', 'u');
+            // set user, team and position only if retrieved properly
 
-            if ($user instanceof UserModel) {
-                $coach->setUser($user);
+            $position = $this->hydrateJoin($row, 'position', 'p');
+
+            if ($position instanceof Position) {
+                $teamPosition->setPosition($position);
             }
 
-            $collection->add($coach);
+            $collection->add($teamPosition);
         }
 
         return $collection;

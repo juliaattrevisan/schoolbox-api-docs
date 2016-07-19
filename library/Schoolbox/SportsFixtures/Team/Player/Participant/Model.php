@@ -7,19 +7,19 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Schoolbox\SportsFixtures\Coach;
+namespace Schoolbox\SportsFixtures\Team\Player\Participant;
 
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
-use Schoolbox\SportsFixtures\Match\Model as Match;
-use Schoolbox\SportsFixtures\Team\Model as Team;
-use Schoolbox\User;
+use \Schoolbox\User;
+use \Schoolbox\SportsFixtures\Match\Model as Match;
+use \Schoolbox\SportsFixtures\Team\Model as Team;
 
 /**
- * Snapshot of Team Coaches
+ * Snapshot of Team Players
  *
- * @package Schoolbox\SportsFixtures\Coach
+ * @package Schoolbox\SportsFixtures\Team\Player\Participant
  */
-class ParticipantModel
+class Model
 {
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
@@ -37,18 +37,16 @@ class ParticipantModel
     protected $team;
 
     /**
-     * The user account (if any!) that this coach is associated with.
-     *
      * @var User
      */
     protected $user;
 
     /**
-     * The name of this coach.
+     * Order of this user within the division (higher value = higher rank)
      *
-     * @var string
+     * @var int
      */
-    protected $name;
+    protected $sequence;
 
     /**
      * Constructor
@@ -86,29 +84,12 @@ class ParticipantModel
     }
 
     /**
-     * @param Team $team
-     */
-    public function setTeam($team)
-    {
-        $this->team = $team;
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param string $name
+     * @param  Team $team
      * @return static
      */
-    public function setName($name)
+    public function setTeam(Team $team)
     {
-        $this->name = $name;
+        $this->team = $team;
         return $this;
     }
 
@@ -121,12 +102,30 @@ class ParticipantModel
     }
 
     /**
-     * @param User $user
+     * @param  User $user
      * @return static
      */
-    public function setUser($user)
+    public function setUser(User $user)
     {
         $this->user = $user;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSequence()
+    {
+        return $this->sequence;
+    }
+
+    /**
+     * @param  int $sequence
+     * @return static
+     */
+    public function setSequence($sequence)
+    {
+        $this->sequence = $sequence;
         return $this;
     }
 }

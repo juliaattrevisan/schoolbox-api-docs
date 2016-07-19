@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\SportsFixtures\Team\Player;
+namespace Schoolbox\SportsFixtures\Coach\Participant;
 
 use PDOStatement;
 use Schoolbox\Collection;
@@ -17,24 +17,24 @@ use Schoolbox\User as UserModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayerModel;
-use Schoolbox\SportsFixtures\Team\Player\ParticipantModel as ParticipantPlayer;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
+use Schoolbox\SportsFixtures\Coach\Participant\Model as ParticipantCoach;
+use Schoolbox\SportsFixtures\Coach\Model as Coach;
 
-class ParticipantMapper extends BaseMapper
+class Mapper extends BaseMapper
 {
     /**
      * Setup mapping
      */
     protected function mapping()
     {
-        $this->hasTable('sportsfixtures_team_participantuser');
-        $this->hasModel(ParticipantPlayer::class);
+        $this->hasTable('sportsfixtures_team_participantcoach');
+        $this->hasModel(ParticipantCoach::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('match_id', MatchMapper::class, 'id', null, null, 'match', 'match');
         $this->joins('team_id', TeamMapper::class, 'id', null, null, 'team', 'team');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
-        $this->uses('sequence', self::TYPE_INTEGER);
+        $this->uses('name', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -67,19 +67,20 @@ class ParticipantMapper extends BaseMapper
         $collection = new Collection();
 
         foreach ($statement as $row) {
-            /** @var TeamPlayerModel $model */
-            $teamPlayer = new TeamPlayerModel();
-            $teamPlayer->setId($row['id'])
-                ->setSequence($row['sequence']);
+            /** @var Coach $model */
+            $coach = new Coach();
+            $coach
+                ->setId($row['id'])
+                ->setName($row['name']);
 
             // set user and team only if retrieved properly
             $user = $this->hydrateJoin($row, 'user', 'u');
 
             if ($user instanceof UserModel) {
-                $teamPlayer->setUser($user);
+                $coach->setUser($user);
             }
 
-            $collection->add($teamPlayer);
+            $collection->add($coach);
         }
 
         return $collection;

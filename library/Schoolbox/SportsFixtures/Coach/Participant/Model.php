@@ -7,19 +7,19 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Schoolbox\SportsFixtures\Team\Position;
+namespace Schoolbox\SportsFixtures\Coach\Participant;
 
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
-use \Schoolbox\User as User;
-use \Schoolbox\SportsFixtures\Match\Model as Match;
-use \Schoolbox\SportsFixtures\Team\Model as Team;
+use Schoolbox\SportsFixtures\Match\Model as Match;
+use Schoolbox\SportsFixtures\Team\Model as Team;
+use Schoolbox\User;
 
 /**
- * Model for relation between teams and users.
+ * Snapshot of Team Coaches
  *
- * @package Schoolbox\SportsFixtures\Team\Player
+ * @package Schoolbox\SportsFixtures\Coach
  */
-class ParticipantModel
+class Model
 {
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
@@ -37,25 +37,25 @@ class ParticipantModel
     protected $team;
 
     /**
+     * The user account (if any!) that this coach is associated with.
+     *
      * @var User
      */
     protected $user;
 
     /**
-     * The Position Name
-     * Denormalised in case someone renames/repurposes original record
+     * The name of this coach.
      *
      * @var string
      */
     protected $name;
 
     /**
-     * Constructor - instantiate this object into minimum non-erroneous state.
+     * Constructor
      */
     public function __construct()
     {
         $this->setUser(new User());
-        $this->setTeam(new Team());
     }
 
     /* Getters/Setters
@@ -86,14 +86,13 @@ class ParticipantModel
     }
 
     /**
-     * @param  Team $team
-     * @return static
+     * @param Team $team
      */
-    public function setTeam(Team $team)
+    public function setTeam($team)
     {
         $this->team = $team;
-        return $this;
     }
+
 
     /**
      * @return string
@@ -105,10 +104,12 @@ class ParticipantModel
 
     /**
      * @param string $name
+     * @return static
      */
     public function setName($name)
     {
         $this->name = $name;
+        return $this;
     }
 
     /**
@@ -120,10 +121,10 @@ class ParticipantModel
     }
 
     /**
-     * @param  User $user
+     * @param User $user
      * @return static
      */
-    public function setUser(User $user)
+    public function setUser($user)
     {
         $this->user = $user;
         return $this;

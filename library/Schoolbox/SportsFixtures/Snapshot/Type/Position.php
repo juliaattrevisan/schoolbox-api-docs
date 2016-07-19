@@ -13,8 +13,8 @@ namespace Schoolbox\SportsFixtures\Snapshot\Type;
 use \Schoolbox\SportsFixtures\Snapshot\ISnapshot;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Position\Model as CurrentPosition;
-use \Schoolbox\SportsFixtures\Team\Position\ParticipantModel as ParticipantPosition;
-use \Schoolbox\SportsFixtures\Team\Position\ParticipantMapper as ParticipantPositionMapper;
+use \Schoolbox\SportsFixtures\Team\Position\Participant\Model as ParticipantPosition;
+use \Schoolbox\SportsFixtures\Team\Position\Participant\Mapper as ParticipantPositionMapper;
 
 class Position extends Base implements ISnapshot
 {

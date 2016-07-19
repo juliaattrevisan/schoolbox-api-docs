@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\SportsFixtures\Team\Position;
+namespace Schoolbox\SportsFixtures\Team\Player\Participant;
 
 use PDOStatement;
 use Schoolbox\Collection;
@@ -16,26 +16,25 @@ use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\User as UserModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use Schoolbox\SportsFixtures\Position\Model as Position;
-use Schoolbox\SportsFixtures\Team\Position\Model as TeamPosition;
-use Schoolbox\SportsFixtures\Team\Position\ParticipantModel as ParticipantPosition;
+use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayerModel;
+use Schoolbox\SportsFixtures\Team\Player\Participant\Model as ParticipantPlayer;
+use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 
-class ParticipantMapper extends BaseMapper
+class Mapper extends BaseMapper
 {
     /**
      * Setup mapping
      */
     protected function mapping()
     {
-        $this->hasTable('sportsfixtures_team_participantposition');
-        $this->hasModel(ParticipantPosition::class);
+        $this->hasTable('sportsfixtures_team_participantuser');
+        $this->hasModel(ParticipantPlayer::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('match_id', MatchMapper::class, 'id', null, null, 'match', 'match');
         $this->joins('team_id', TeamMapper::class, 'id', null, null, 'team', 'team');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
-        $this->uses('name', self::TYPE_STRING);
+        $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -66,19 +65,21 @@ class ParticipantMapper extends BaseMapper
     protected function hydrateSelect(PDOStatement $statement)
     {
         $collection = new Collection();
+
         foreach ($statement as $row) {
-            $teamPosition = new TeamPosition();
-            $teamPosition->setId($row['id']);
+            /** @var TeamPlayerModel $model */
+            $teamPlayer = new TeamPlayerModel();
+            $teamPlayer->setId($row['id'])
+                ->setSequence($row['sequence']);
 
-            // set user, team and position only if retrieved properly
+            // set user and team only if retrieved properly
+            $user = $this->hydrateJoin($row, 'user', 'u');
 
-            $position = $this->hydrateJoin($row, 'position', 'p');
-
-            if ($position instanceof Position) {
-                $teamPosition->setPosition($position);
+            if ($user instanceof UserModel) {
+                $teamPlayer->setUser($user);
             }
 
-            $collection->add($teamPosition);
+            $collection->add($teamPlayer);
         }
 
         return $collection;

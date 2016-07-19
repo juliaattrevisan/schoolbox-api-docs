@@ -7,19 +7,19 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Schoolbox\SportsFixtures\Team\Player;
+namespace Schoolbox\SportsFixtures\Team\Position\Participant;
 
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
-use \Schoolbox\User;
+use \Schoolbox\User as User;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 
 /**
- * Snapshot of Team Players
+ * Model for relation between teams and users.
  *
- * @package Schoolbox\SportsFixtures\Team\Player
+ * @package Schoolbox\SportsFixtures\Team\Player\Participant
  */
-class ParticipantModel
+class Model
 {
     use ModelTrait\Id;
     use ModelTrait\CreatedAtDate;
@@ -42,18 +42,20 @@ class ParticipantModel
     protected $user;
 
     /**
-     * Order of this user within the division (higher value = higher rank)
+     * The Position Name
+     * Denormalised in case someone renames/repurposes original record
      *
-     * @var int
+     * @var string
      */
-    protected $sequence;
+    protected $name;
 
     /**
-     * Constructor
+     * Constructor - instantiate this object into minimum non-erroneous state.
      */
     public function __construct()
     {
         $this->setUser(new User());
+        $this->setTeam(new Team());
     }
 
     /* Getters/Setters
@@ -94,6 +96,22 @@ class ParticipantModel
     }
 
     /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
      * @return User
      */
     public function getUser()
@@ -108,24 +126,6 @@ class ParticipantModel
     public function setUser(User $user)
     {
         $this->user = $user;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getSequence()
-    {
-        return $this->sequence;
-    }
-
-    /**
-     * @param  int $sequence
-     * @return static
-     */
-    public function setSequence($sequence)
-    {
-        $this->sequence = $sequence;
         return $this;
     }
 }
