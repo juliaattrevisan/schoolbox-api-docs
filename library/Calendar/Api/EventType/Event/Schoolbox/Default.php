@@ -1,14 +1,10 @@
 <?php
 /**
- * Calendar_Api_EventType_Event_Schoolbox_Default
- *
  * @author	  Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-use Calendar\Event\Collection;
-
 class Calendar_Api_EventType_Event_Schoolbox_Default extends Calendar_Api_EventType_Abstract {
 
 	/**

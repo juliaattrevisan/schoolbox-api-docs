@@ -161,6 +161,17 @@ function Calendar(id, bubbleId, opts) {
                 }
                 catch (e) {}
 
+                // Submission History Link
+                data.moreDetailsLink = '';
+                try {
+                    if(calEvent.data.custom.moreDetailsLink.length > 0) {
+                        data.moreDetailsLink =
+                            $('<a class="button icon-due-work">View More Details</a>')
+                                .attr('href', calEvent.data.custom.moreDetailsLink);
+                    }
+                }
+                catch (e) {}
+
                 $.each(calEvent.data.attendance, function(k, v) {
                     data['attendance' + k.capitalise()] = v
                 })

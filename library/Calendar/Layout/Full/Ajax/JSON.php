@@ -77,7 +77,7 @@ class Calendar_Layout_Full_Ajax_JSON extends Calendar_Layout_Full_Abstract {
 			$this->getViewer()
 		);
 
-		/* Render all registered event types
+		/* Render all registered events
 		 */
 		echo "[";
 		echo $renderer->renderAll('javascript');

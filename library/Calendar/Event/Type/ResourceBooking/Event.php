@@ -1,6 +1,6 @@
 <?php
 /**
- * Calendar event type for resource bookings.
+ * Calendar event for resource bookings.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd

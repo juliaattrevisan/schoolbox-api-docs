@@ -52,6 +52,7 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
     {
         $stack = new Collection();
         // Configuration may not have been set, take this into account.
+// TODO - this is wrong!
         try {
             $eventType = $this->loadConnectorConfiguration()->decodeConfig()->getLuEventType();
         } catch (Schoolbox\Mapper\Exception $e) {
@@ -60,21 +61,21 @@ class Calendar_Api_EventType_Submission_Schoolbox_Default extends Calendar_Api_E
 
         //
         // Use the mapper classes to get events for this day.
-        // Also, need the categories to filter on.
+        // Also, need the folders to filter on.
         // Don't like using session here but other event types use them, so meh.
-        $cat_mapper = Schoolbox\Resource\Folder\Mapper::getInstance();
-        $cat_mapper->setExternalUser(new External_User());
-        $category_id_list = array();
-        foreach ($cat_mapper->findForUser($this->getUser()) as $category) {
-            $category_id_list[] = $category->getId();
+        $folderMapper = Schoolbox\Resource\Folder\Mapper::getInstance();
+        $folderMapper->setExternalUser(new External_User());
+        $folder_id_list = array();
+        foreach ($folderMapper->findForUser($this->getUser()) as $folder) {
+            $folder_id_list[] = $folder->getId();
         }
 
         $box_mapper    = Schoolbox\Assessment\Component\SubmissionBoxMapper::getInstance();
         $assess_mapper = Schoolbox\Assessment\Component\OnlineAssessmentMapper::getInstance();
 
         /** @var \Schoolbox\Assessment\ActivityCollection|\Schoolbox\Assessment\Activity[] $activities */
-        $activities    = $box_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp);
-        $activities->merge($assess_mapper->getDueActivities($category_id_list, $startTimestamp, $endTimestamp));
+        $activities    = $box_mapper->getDueActivities($folder_id_list, $startTimestamp, $endTimestamp);
+        $activities->merge($assess_mapper->getDueActivities($folder_id_list, $startTimestamp, $endTimestamp));
 
         foreach ($activities as $activity) {
             $event = new Event();

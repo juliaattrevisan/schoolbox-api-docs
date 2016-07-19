@@ -1,6 +1,6 @@
 <?php
 /**
- * Event type for bookings that this user moderates.
+ * Event Source for bookings that this user moderates.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2014, Alaress Pty Ltd
