@@ -19,16 +19,18 @@
                                 {{ match.match.venue.name }}
                             </p>
                             {% for team in match.teams %}
-                                <p class="meta icon-group">
-                                    {% for child in team.children %}
-                                        {% if not loop.first and not loop.last %},{% endif %}
-                                        {% if loop.last and not loop.first %}and{% endif %}
-                                        <a href="/search/user/{{ child.getId }}">{{ child.firstname }} {{  child.lastname }}</a>
+                                {% if team.children is not empty %}
+                                    <p class="meta icon-group">
+                                        {% for child in team.children %}
+                                            {% if not loop.first and not loop.last %},{% endif %}
+                                            {% if loop.last and not loop.first %}and{% endif %}
+                                            <a href="/search/user/{{ child.getId }}">{{ child.formatName }}</a>
 
-                                        {% if loop.last and not loop.first %}are{% endif %}
-                                        {% if loop.last and loop.first %}is{% endif %}
-                                    {% endfor %} playing for {{ team.team.name }}
-                                </p>
+                                            {% if loop.last and not loop.first %}are{% endif %}
+                                            {% if loop.last and loop.first %}is{% endif %}
+                                        {% endfor %} playing for {{ team.team.name }}
+                                    </p>
+                                {% endif %}
                             {% endfor %}
                         </div>
                     </div>

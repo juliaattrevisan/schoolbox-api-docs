@@ -114,21 +114,24 @@ class ComponentDelegate
                 if (!isset($matches[$matchCurrent->getId()])) {
                     $matches[$matchCurrent->getId()] = [];
                     $matches[$matchCurrent->getId()]["match"] = $matchCurrent;
-                    $matches[$matchCurrent->getId()]["teams"] = [];
+                    $matches[$matchCurrent->getId()]["teams"] = [
+                        $matchCurrent->getHomeTeam()->getId() => [
+                            'team'     => $matchCurrent->getHomeTeam(),
+                            'children' => [],
+                        ],
+                        $matchCurrent->getAwayTeam()->getId() => [
+                            'team'     => $matchCurrent->getAwayTeam(),
+                            'children' => [],
+                        ],
+                    ];
                 }
 
                 foreach ($childTeams as $team) {
-
-                    if ($team->getTeam()->getId() == $matchCurrent->getHomeTeam()->getId() ||
-                        $team->getTeam()->getId() == $matchCurrent->getAwayTeam()->getId()) {
-
-                        if (!isset($matches[$matchCurrent->getId()]["teams"][$team->getId()])) {
-                            $matches[$matchCurrent->getId()]["teams"][$team->getId()] = [];
-                            $matches[$matchCurrent->getId()]["teams"][$team->getId()]["team"] = $team->getTeam();
-                            $matches[$matchCurrent->getId()]["teams"][$team->getId()]["children"] = [];
-                        }
-
-                        $matches[$matchCurrent->getId()]["teams"][$team->getId()]["children"][$team->getUser()->getId()] = $team->getUser();
+                    $teamId = $team->getTeam()->getId();
+                    if ($teamId == $matchCurrent->getHomeTeam()->getId() ||
+                        $teamId == $matchCurrent->getAwayTeam()->getId()
+                    ) {
+                        $matches[$matchCurrent->getId()]["teams"][$teamId]["children"][$team->getUser()->getId()] = $team->getUser();
                     }
                 }
             }
