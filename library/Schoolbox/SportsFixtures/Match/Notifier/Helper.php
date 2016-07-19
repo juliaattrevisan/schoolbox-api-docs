@@ -71,7 +71,7 @@ class Helper
     {
         /** @var MatchModel $hydratedMatch */
         $hydratedMatch = $this->matchMapper->findById($match->getId());
-        $division      = $this->divisionMapper->findById($match->getDivision()->getId());
+        $division      = $this->divisionMapper->findById($hydratedMatch->getDivision()->getId());
         $sport         = $this->sportMapper->findById($division->getSport()->getId());
         $division->setSport($sport);
         $hydratedMatch->setDivision($division);
