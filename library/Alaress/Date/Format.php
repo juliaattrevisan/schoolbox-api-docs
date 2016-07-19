@@ -12,6 +12,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Alaress\Date\Clock;
+use Alaress\Date\IClock;
 use Jenssegers\Date\Date as LaravelDate;
 
 class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
@@ -53,11 +55,14 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
      * Returns an instance of self at the current time.
      * Method gives precedence to REQUEST_TIME, but accepts that outside HTTP requests, it doesn't exist.
      *
+     * @param IClock $clock
      * @return static
      */
-    public static function now()
+    public static function now(IClock $clock = null)
     {
-        if (isset($_SERVER['REQUEST_TIME'])) {
+        if ($clock) {
+            $time = $clock->time();
+        } elseif (isset($_SERVER['REQUEST_TIME'])) {
             $time = $_SERVER['REQUEST_TIME'];
         } else {
             // @codeCoverageIgnoreStart
