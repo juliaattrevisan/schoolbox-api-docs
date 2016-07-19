@@ -34,8 +34,27 @@ use Monolog\Logger;
 class Helper
 {
     /**
-     * Here be helper methods
+     * Constructor
+     *
+     * @param MatchMapper      $matchMapper
+     * @param DivisionMapper   $divisionMapper
+     * @param SportMapper      $sportMapper
+     * @param TeamPlayerMapper $teamPlayerMapper
+     * @param TeamMapper       $teamMapper
      */
+    public function __construct(
+        MatchMapper $matchMapper,
+        DivisionMapper $divisionMapper,
+        SportMapper $sportMapper,
+        TeamPlayerMapper $teamPlayerMapper,
+        TeamMapper $teamMapper
+    ) {
+        $this->matchMapper      = $matchMapper;
+        $this->divisionMapper   = $divisionMapper;
+        $this->sportMapper      = $sportMapper;
+        $this->teamPlayerMapper = $teamPlayerMapper;
+        $this->teamMapper       = $teamMapper;
+    }
 
     /**
      * @param MatchModel $match
