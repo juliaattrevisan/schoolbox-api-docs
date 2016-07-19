@@ -10,15 +10,11 @@ namespace Schoolbox\SportsFixtures\Match\Notifier;
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 
-use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
-use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
-use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Team\Model as TeamModel;
 use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
-use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayerModel;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
