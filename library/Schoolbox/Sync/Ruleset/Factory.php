@@ -249,6 +249,7 @@ class Factory
         /* Order Conditions and Effects chronologically
          */
         foreach ($ruleset as $currentRule) {
+            /** @var Rule\Model $currentRule */
             $currentRule->getConditions()->sortBy('id', 'ASC');
             $currentRule->getEffects()->sortBy('id', 'ASC');
         }
