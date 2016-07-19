@@ -12,6 +12,7 @@ namespace Schoolbox\Realtime\Schedule\Trigger\Timetable;
 
 use Alaress\Date\Clock;
 use Alaress\Date\IClock;
+use Alaress\Scheduler\Event\EventInterface;
 use Alaress\Scheduler\Trigger\AbstractTrigger;
 use External_Timetable;
 use External_TimetableInterface;
@@ -202,5 +203,81 @@ abstract class TimetableTrigger extends AbstractTrigger
         return $timestamp;
     }
 
+
+    /**
+     * @param Campus $campus
+     * @return TimetableTrigger
+     */
+    public function setCampus(Campus $campus)
+    {
+        $this->campus = $campus;
+        return $this;
+    }
+
+
+    /**
+     * @param array $cache
+     * @return static
+     */
+    public function setCache(array $cache)
+    {
+        $this->cache = $cache;
+        return $this;
+    }
+
+
+    /**
+     * @param IClock $clock
+     * @return $this
+     */
+    protected function setClock(IClock $clock)
+    {
+        $this->clock = $clock;
+        return $this;
+    }
+
+
+    /**
+     * @param External_TimetableInterface $handler
+     * @return $this
+     */
+    protected function setHandler(External_TimetableInterface $handler)
+    {
+        $this->handler = $handler;
+        return $this;
+    }
+
+
+    /**
+     * @param WorkNotifier $notifier
+     * @return $this
+     */
+    protected function setNotifier(WorkNotifier $notifier)
+    {
+        $this->notifier = $notifier;
+        return $this;
+    }
+
+
+    /**
+     * @param EventInterface $event
+     * @return $this
+     */
+    protected function setEvent(EventInterface $event)
+    {
+        $this->event = $event;
+        return $this;
+    }
+
+
+    /**
+     * @param string $label
+     * @return $this
+     */
+    protected function setLabel($label)
+    {
+        $this->label = $label;
+        return $this;
+    }
 
 }
