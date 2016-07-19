@@ -85,6 +85,7 @@ class External_Tass_Class implements External_ClassInterface {
 					   AND ( $classQuery )";
 
 		$this->getDatabase()->query($query);
+        $teachers = [];
 		while($synrow = $this->getDatabase()->getNextArray() ) {
 			$teachers[] = $synrow['tch_code'];
 		}
