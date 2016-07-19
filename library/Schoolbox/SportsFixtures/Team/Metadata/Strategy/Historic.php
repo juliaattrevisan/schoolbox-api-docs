@@ -18,9 +18,9 @@ namespace Schoolbox\SportsFixtures\Team\Metadata\Strategy;
 
 use \Schoolbox\Collection;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
-use \Schoolbox\SportsFixtures\Team\Player\ParticipantMapper as TeamParticipantMapper;
-use \Schoolbox\SportsFixtures\Team\Position\ParticipantMapper as TeamPositionParticipantMapper;
-use \Schoolbox\SportsFixtures\Coach\ParticipantMapper as TeamCoachPositionParticipantMapper;
+use \Schoolbox\SportsFixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
+use \Schoolbox\SportsFixtures\Team\Position\Participant\Mapper as TeamPositionParticipantMapper;
+use \Schoolbox\SportsFixtures\Coach\Participant\Mapper as TeamCoachPositionParticipantMapper;
 
 class Historic extends Base implements IMetadataStrategy
 {
