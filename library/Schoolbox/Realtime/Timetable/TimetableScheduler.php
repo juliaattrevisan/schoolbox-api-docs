@@ -22,9 +22,7 @@ use RuntimeException;
 use Schoolbox\Campus;
 use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Realtime\Schedule\Trigger\Timetable\EndTrigger;
-use Schoolbox\Realtime\Schedule\Trigger\Timetable\StartTrigger;
-use Schoolbox\Realtime\Schedule\Trigger\Timetable\WarnTrigger;
+use Schoolbox\Realtime\Schedule\Trigger\Timetable\TriggerFactory;
 use Schoolbox\Realtime\Schedule\Trigger\Timetable\TimetableTrigger;
 
 class TimetableScheduler extends CronScheduler {
@@ -35,6 +33,8 @@ class TimetableScheduler extends CronScheduler {
     /** @var Collection|Campus[] */
     protected $campuses;
 
+    /** @var TriggerFactory */
+    protected $factory;
 
     /**
      * @param LoopInterface $loop
@@ -42,12 +42,15 @@ class TimetableScheduler extends CronScheduler {
      * @param Client $client
      * @param LoggerInterface $log
      * @param Collection|Campus[] $campuses
+     * @param TriggerFactory $factory
      * @param IConfigLoader $conf
      * @param IClock $clock
      */
-    public function __construct($loop, $dispatchStrategy, $client, $log, $campuses, $conf = null, $clock = null) {
+    public function __construct($loop, $dispatchStrategy, $client, $log, $campuses, $factory, $conf = null, $clock = null) {
         parent::__construct($loop, $dispatchStrategy, $log, $conf, $clock);
         $this->method = DefaultDispatchStrategy::TASK_TIMETABLE;
+        $this->factory = $factory;
+        $this->factory->setClock($this->clock);
 
         $this->campuses = $campuses;
 
@@ -79,14 +82,20 @@ class TimetableScheduler extends CronScheduler {
             unset($this->triggers[$k]);
         }
 
+        $labels = [
+            TimetableTrigger::TARGET_START,
+            TimetableTrigger::TARGET_WARN,
+            TimetableTrigger::TARGET_END
+        ];
+
         // read each campus, and schedule the next event based on it
         foreach($this->campuses as $campus) {
             // one each for start, start warning, end
             $id = $campus->getId();
             try {
-                $this->triggers["$id.start"] = new StartTrigger($campus, $this->clock);
-                $this->triggers["$id.end"]   = new EndTrigger($campus, $this->clock);
-                $this->triggers["$id.warn"] = new WarnTrigger($campus, $this->clock);
+                foreach ($labels as $label) {
+                    $this->triggers["$id.$label"] = $this->factory->buildTrigger($label, $campus);
+                }
             }
             catch(InvalidArgumentException $e) {
                 $this->log->error(get_class($e) . "in TimetableScheduler: " . $e->getMessage(), [ $e ]);
