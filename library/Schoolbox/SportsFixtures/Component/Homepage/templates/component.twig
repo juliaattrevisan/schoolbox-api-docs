@@ -5,11 +5,15 @@
 
             {% for match in matches %}
 
+                {% set cardHeader %}
+                    <h3>{{ match.name }} ({{ match.homeTeam.name }} vs {{ match.awayTeam.name }})</h3>
+                {% endset %}
+
                 <li>
                     <div class="list-item">
                         <div class="card small-12">
-                            <a href="{{ routeLookup('sportsfixturesMatch.getEntity', {entityId: match.id}) }}">
-                                <h3>{{ match.name }} ({{ match.homeTeam.name }} vs {{ match.awayTeam.name }})</h3>
+                            <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: teamId}) }}">
+                                {{ cardHeader|raw }}
                             </a>
                             <p class="meta">
                                 <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span> |

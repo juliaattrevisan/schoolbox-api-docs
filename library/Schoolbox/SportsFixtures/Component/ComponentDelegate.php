@@ -232,7 +232,8 @@ class ComponentDelegate
         }
 
         return [
-            'matches' => $this->sortMatches($matches)
+            'teamId'  => $teamId,
+            'matches' => $this->sortMatches($matches),
         ];
     }
 
