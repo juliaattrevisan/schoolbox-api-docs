@@ -83,7 +83,9 @@ if (count($affectedIds) == 1) {
 
     foreach ($connector->getEvent($event->getId()) as $calendarEvent) {
         // Only one event should ever be gotten here, so render that one only
-        $renderer = new Javascript(new SitePage(), $calendarEvent, $_SESSION['user'], new \Group, new \Calendar);
+        /** @var \Schoolbox\User $user */
+        $user     = $_SESSION['user'];
+        $renderer = new Javascript(new SitePage(), $calendarEvent, $user, new \Group(), new \Calendar(), $user);
         $output   = $renderer->render();
         echo substr($output,0,-1);
         break;
