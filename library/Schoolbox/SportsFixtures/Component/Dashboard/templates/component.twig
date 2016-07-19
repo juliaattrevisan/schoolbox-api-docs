@@ -7,11 +7,24 @@
                 <li>
                     <div class="list-item">
                         <div class="card small-12">
-                            <a href="{{ routeLookup('sportsfixturesMatch.getEntity', {entityId: match.match.id}) }}">
-                                <h3>
-                                    {{ match.match.name }} ({{ match.match.homeTeam.name }} vs {{ match.match.awayTeam.name }})
-                                </h3>
-                            </a>
+                            <h3>
+                                {{ match.match.name }}
+                                {% if match.home %}
+                                    (<a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.homeTeam.id}) }}">
+                                        {{ match.match.homeTeam.name }}
+                                    </a>
+                                {% else %}
+                                    ({{ match.match.homeTeam.name }}
+                                {% endif %}
+                                vs
+                                {% if match.away %}
+                                    <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.awayTeam.id}) }}">
+                                    {{ match.match.awayTeam.name }}
+                                    </a>)
+                                {% else %}
+                                    {{ match.match.awayTeam.name }})
+                                {% endif %}
+                            </h3>
                             <p class="meta">
                                 <span data-tooltip title="{{ match.match.startAt.getLong }}">{{ match.match.startAt.getRelativeTime }}</span> |
                                 {{ match.match.division.sport.name }} |
@@ -60,11 +73,24 @@
                     <li>
                         <div class="list-item">
                             <div class="card small-12">
-                                <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.homeTeam.id}) }}">
-                                    <h3>
-                                        {{ match.match.name }} ({{ match.match.homeTeam.name }} vs {{ match.match.awayTeam.name }})
-                                    </h3>
-                                </a>
+                                <h3>
+                                    {{ match.match.name }}
+                                    {% if match.home %}
+                                        (<a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.homeTeam.id}) }}">
+                                        {{ match.match.homeTeam.name }}
+                                        </a>
+                                    {% else %}
+                                        ({{ match.match.homeTeam.name }}
+                                    {% endif %}
+                                    vs
+                                    {% if match.away %}
+                                        <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.awayTeam.id}) }}">
+                                            {{ match.match.awayTeam.name }}
+                                        </a>)
+                                    {% else %}
+                                        {{ match.match.awayTeam.name }})
+                                    {% endif %}
+                                </h3>
                                 <p class="meta">
                                     <span data-tooltip title="{{ match.match.startAt.getLong }}">{{ match.match.startAt.getRelativeTime }}</span> | {{ match.match.division.sport.name }} | {{ match.match.division.name }}
                                 </p>
