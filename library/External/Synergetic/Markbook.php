@@ -109,39 +109,43 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         foreach($folder->getCodes() as $classCode) {
 
             $class = $externalClass->getClass($classCode->getCode(), $owner);
-            $staffID = $class['MultipleStaffMarkbookFlag'] > 0 ? $owner->getExternalId() : 0;
 
-            $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
-            $query = "INSERT INTO StaffAssessmentMarkBook (
-                        FileType,
-                        FileYear,
-                        FileSemester,
-                        StaffID,
-                        ClassCampus,
-                        ClassCode,
-                        MarkBookSeq,
-                        Heading,
-                        HdgAbbrev1,
-                        HdgAbbrev2,
-                        ResultType,
-                        MarkOutOf,
-                        WeightingFactor
-                    ) VALUES (
-                      '{$class['FileType']}',
-                      '{$fileYear}',
-                      '{$fileSemester}',
-                      '{$staffID}',
-                      '{$class['ClassCampus']}',
-                      '{$class['ClassCode']}',
-                      '',
-                      '{$assessmentFieldValues["Heading"]}',
-                      '{$assessmentFieldValues["HdgAbbrev1"]}',
-                      '{$assessmentFieldValues["HdgAbbrev2"]}',
-                      'OGRaw',
-                      '100',
-                      '{$assessmentFieldValues["WeightingFactor"]}'
-                    )";
-            $result = $this->getDatabase()->query($query);
+
+            if($class !== false) {
+                $staffID = $class['MultipleStaffMarkbookFlag'] > 0 ? $owner->getExternalId() : 0;
+
+                $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
+                $query = "INSERT INTO StaffAssessmentMarkBook (
+                            FileType,
+                            FileYear,
+                            FileSemester,
+                            StaffID,
+                            ClassCampus,
+                            ClassCode,
+                            MarkBookSeq,
+                            Heading,
+                            HdgAbbrev1,
+                            HdgAbbrev2,
+                            ResultType,
+                            MarkOutOf,
+                            WeightingFactor
+                        ) VALUES (
+                          '{$class['FileType']}',
+                          '{$fileYear}',
+                          '{$fileSemester}',
+                          '{$staffID}',
+                          '{$class['ClassCampus']}',
+                          '{$class['ClassCode']}',
+                          '',
+                          '{$assessmentFieldValues["Heading"]}',
+                          '{$assessmentFieldValues["HdgAbbrev1"]}',
+                          '{$assessmentFieldValues["HdgAbbrev2"]}',
+                          'OGRaw',
+                          '100',
+                          '{$assessmentFieldValues["WeightingFactor"]}'
+                        )";
+                $result = $this->getDatabase()->query($query);
+            }
         }
         return $result;
     }
