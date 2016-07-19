@@ -362,9 +362,9 @@
                                     </div>
                                 </div>
                                 <nav>
-                                    <a href="#" class="icon-more" data-dropdown="row-options-contact-{{ contact.StudentContactID }}" title="Actions"></a>
+                                    <a href="#" class="icon-more" data-dropdown="row-options-contact-{{ contact.StudentContactID | replace({'@':'-at-'}) }}" title="Actions"></a>
                                 </nav>
-                                <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ contact.StudentContactID }}">
+                                <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ contact.StudentContactID | replace({'@':'-at-'}) }}">
                                     {% if contact.StudentContactDefaultEmail and contact.StudentContactUseEmail != 'N' %}
                                     <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></li>
                                     {% endif %}
