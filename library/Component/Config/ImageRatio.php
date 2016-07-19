@@ -9,7 +9,7 @@
 class Component_Config_ImageRatio extends Component_Config_Abstract
 {
 
-    protected $options       = array('portrait','landscape','square');
+    protected $options       = array('portrait','square','landscape','panorama','banner');
     protected $showAllOption = true;
 
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
