@@ -46,11 +46,9 @@ class ParticipantMapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('user', 'u')},
-                {$this->getJoinColumnString('team', 't')}
+                {$this->getJoinColumnString('user', 'u')}
             FROM {$this->database->quoteIdentifier($this->table)}
             INNER JOIN {$this->getJoinSql('user', '', 'u')}
-            INNER JOIN {$this->getJoinSql('team', '', 't')}
         ";
     }
 

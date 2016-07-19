@@ -18,7 +18,6 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use Schoolbox\SportsFixtures\Team\Model as TeamModel;
 use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 
 class ParticipantMapper extends BaseMapper
@@ -47,11 +46,9 @@ class ParticipantMapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('user', 'u')},
-                {$this->getJoinColumnString('team', 't')}
+                {$this->getJoinColumnString('user', 'u')}
             FROM {$this->database->quoteIdentifier($this->table)}
             INNER JOIN {$this->getJoinSql('user', '', 'u')}
-            INNER JOIN {$this->getJoinSql('team', '', 't')}
         ";
     }
 
@@ -75,12 +72,6 @@ class ParticipantMapper extends BaseMapper
 
             if ($user instanceof UserModel) {
                 $model->setUser($user);
-            }
-
-            $team = $this->hydrateJoin($row, 'team', 't');
-
-            if ($team instanceof TeamModel) {
-                $model->setTeam($team);
             }
 
             /* Is there a better way?
