@@ -2,6 +2,7 @@
 
 /**
  * Snapshot
+ * Composite Design Pattern
  *
  * "Saves the game" for the current configuration of Team Coach,
  * Team Players, Team Positions. This is purely for historical
@@ -19,8 +20,12 @@ namespace Schoolbox\SportsFixtures\Snapshot;
 
 use \Schoolbox\Collection;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
+use \Schoolbox\SportsFixtures\Team\Metadata\Metadata;
+use \Schoolbox\SportsFixtures\Team\Metadata\Strategy\Current as CurrentStrategy;
+use \Schoolbox\SportsFixtures\Snapshot\Coach as SnapshotCoach;
 
-class Snapshot
+
+class Snapshot implements ISnapshot
 {
     /**
      * @var Match
@@ -43,7 +48,12 @@ class Snapshot
         $this->setRegistry(new Collection());
 
         /* TODO: Add registry ammunition here
+         * Get the current coach/player/position config, load it
+         * into snapshot classes and fire away
          */
+        $metadata = new Metadata($this->getMatch(), new CurrentStrategy($this->getMatch()));
+
+        $this->getRegistry()->add(new SnapshotCoach($metadata));
     }
 
     /**
