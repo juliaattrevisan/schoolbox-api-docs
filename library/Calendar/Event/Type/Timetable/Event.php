@@ -29,6 +29,11 @@ class Event extends DayEvent implements EventInterface {
     );
 
     /**
+     * @var string Timetable external definition code
+     */
+    protected $timetableCode;
+
+    /**
      * @var Class code as set in timetable
      */
     protected $code;
@@ -89,6 +94,22 @@ class Event extends DayEvent implements EventInterface {
     public function setPeriodName($periodName)
     {
         $this->periodName = $periodName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTimetableCode()
+    {
+        return $this->timetableCode;
+    }
+
+    /**
+     * @param string $timetable
+     */
+    public function setTimetableCode($timetable)
+    {
+        $this->timetableCode = $timetable;
     }
 
 

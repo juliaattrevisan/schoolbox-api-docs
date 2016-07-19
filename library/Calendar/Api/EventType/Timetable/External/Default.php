@@ -112,6 +112,7 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
                             $event->setPublishDate(null);
                             $event->setTitle(sprintf('%s (%s)', $period['description'], $code));
                             $event->setCampusList($campusId);
+                            $event->setTimetableCode($campus->getExtTimetableCode());
                             if ($period['staff'] instanceof Schoolbox\User) {
                                 $event->setAuthorId($period['staff']->getId());
                                 $event->setAuthorName($period['staff']->formatName());

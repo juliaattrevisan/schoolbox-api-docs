@@ -23,7 +23,7 @@ class Javascript extends Base
 
             /* Output list button */
             if($this->showAttendanceLink()) {
-                $hasListButton = "<a class='button icon-class-list' href='/modules/attendance/modify/{$this->event->getCode()}/{$this->event->getStartTime()->getDatabaseDate()}/{$this->event->getPeriod()}' title='Mark Attendance'>Attendance</a>";
+                $hasListButton = "<a class='button icon-class-list' href='/modules/attendance/modify/{$this->event->getCode()}/{$this->event->getStartTime()->getDatabaseDate()}/{$this->event->getPeriod()}/{$this->event->getTimetableCode()}' title='Mark Attendance'>Attendance</a>";
             }
             else {
                 $hasListButton = false;

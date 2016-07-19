@@ -81,13 +81,21 @@ if (!$_SESSION['user']->getRole()->isStaff()) {
  */
 $attendancePeriod = $this->arg[3];
 
+
+/* Check selected campus is one of users campus  */
+try {
+    $selectedCampus = \Schoolbox\CampusMapper::getInstance()->findOneByColumn('ext_timetable_code', $this->arg[4]);
+} catch (\Schoolbox\Mapper\Exception $e) {
+    error(148);
+}
+
 /* Get Period Definition */
 $externalTimetable = new External_Timetable();
-$timetableDay = $externalTimetable->getDayNumber($_SESSION['user']->getCampusCollection()->first(), $attendanceDate->getUnixTimestamp());
+$timetableDay = $externalTimetable->getDayNumber($selectedCampus, $attendanceDate->getUnixTimestamp());
 
 $definition = $externalTimetable->getTimetableDefinition(
     null,
-    $_SESSION['user']->getCampusCollection()->first(),
+    $selectedCampus,
     $timetableDay
 );
 $periods = array_keys($definition['number'], $attendancePeriod);
