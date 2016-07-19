@@ -89,10 +89,10 @@ class TimetableScheduler extends CronScheduler {
                 $this->triggers["$id.warn"] = new WarnTrigger($campus, $this->clock);
             }
             catch(InvalidArgumentException $e) {
-                $this->log->error(get_class($e) . "in TimetableScheduler: " . $e->getMessage());
+                $this->log->error(get_class($e) . "in TimetableScheduler: " . $e->getMessage(), [ $e ]);
             }
             catch(RuntimeException $e) {
-                $this->log->error(get_class($e) . "in TimetableScheduler: " . $e->getMessage());
+                $this->log->error(get_class($e) . "in TimetableScheduler: " . $e->getMessage(), [ $e ]);
             }
         }
 
@@ -101,10 +101,10 @@ class TimetableScheduler extends CronScheduler {
                 $this->scheduleNotification($trigger);
             }
             catch(InvalidArgumentException $e) {
-                $this->log->error(get_class($e) . "in TimetableScheduler: " . $e->getMessage());
+                $this->log->error(get_class($e) . "in TimetableScheduler: " . $e->getMessage(), [ $e ]);
             }
             catch(RuntimeException $e) {
-                $this->log->error(get_class($e) . "in TimetableScheduler: " . $e->getMessage());
+                $this->log->error(get_class($e) . "in TimetableScheduler: " . $e->getMessage(), [ $e ]);
             }
 
         }
