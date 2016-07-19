@@ -11,6 +11,8 @@ namespace Schoolbox\Realtime\Schedule\Trigger\Timetable;
 
 
 use Alaress\Date\IClock;
+use Alaress_Date_Format as ADF;
+use OutOfBoundsException;
 use Schoolbox\Campus;
 
 class EndTrigger extends TimetableTrigger {
@@ -38,29 +40,30 @@ class EndTrigger extends TimetableTrigger {
 
     /**
      * @param array $definition
-     * @param int   $timestamp
-     * @return int
+     * @param ADF   $now
+     * @return ADF
      */
-    protected function beforeSchool($definition, $timestamp)
+    protected function beforeSchool(array $definition, ADF $now)
     {
-        return strtotime($definition['end'][0], $timestamp);
+        return $this->extractPeriodEnd($definition, 0, $now);
     }
 
 
     /**
-     * @param int $start
-     * @param int $end
-     * @param int $timestamp
-     * @return int
+     * @param ADF $start
+     * @param ADF $end
+     * @param ADF $now
+     * @throws OutOfBoundsException if this period is not relevant
+     * @return ADF
      */
-    protected function testPeriod($start, $end, $timestamp)
+    protected function testPeriod(ADF $start, ADF $end, ADF $now)
     {
-        // if we're inside this period, return the end
-        if ($timestamp < $end && $timestamp > $start) {
+        // if we're inside this period, return its end
+        if ($now->lt($end) && $now->gt($start)) {
             return $end;
         }
 
-        return 0;
+        throw new OutOfBoundsException("Date not relevant");
     }
 
 }
