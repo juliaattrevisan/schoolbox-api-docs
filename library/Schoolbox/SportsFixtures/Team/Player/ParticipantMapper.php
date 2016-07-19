@@ -18,6 +18,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayerModel;
+use Schoolbox\SportsFixtures\Team\Player\ParticipantModel as ParticipantPlayer;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 
 class ParticipantMapper extends BaseMapper
@@ -28,12 +29,15 @@ class ParticipantMapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('sportsfixtures_team_participantuser');
-        $this->hasModel(Model::class);
+        $this->hasModel(ParticipantPlayer::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('match_id', MatchMapper::class, 'id', null, null, 'match', 'match');
         $this->joins('team_id', TeamMapper::class, 'id', null, null, 'team', 'team');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('sequence', self::TYPE_INTEGER);
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 
     /**
@@ -64,18 +68,18 @@ class ParticipantMapper extends BaseMapper
 
         foreach ($statement as $row) {
             /** @var TeamPlayerModel $model */
-            $model = $this->createModel()
-                ->setId($row['id'])
+            $teamPlayer = new TeamPlayerModel();
+            $teamPlayer->setId($row['id'])
                 ->setSequence($row['sequence']);
 
             // set user and team only if retrieved properly
             $user = $this->hydrateJoin($row, 'user', 'u');
 
             if ($user instanceof UserModel) {
-                $model->setUser($user);
+                $teamPlayer->setUser($user);
             }
 
-            $collection->add($model);
+            $collection->add($teamPlayer);
         }
 
         return $collection;

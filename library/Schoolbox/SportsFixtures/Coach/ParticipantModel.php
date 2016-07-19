@@ -1,10 +1,12 @@
 <?php
 /**
- * @author    Amri Sannang <amri.sannang@alaress.com.au>
- * @copyright Copyright 2016, Alaress Pty Ltd
- * @link      http://www.alaress.com.au/
+ * ParticipantModel
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
  */
-
 namespace Schoolbox\SportsFixtures\Coach;
 
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
@@ -13,7 +15,8 @@ use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\User;
 
 /**
- * Class Model
+ * Snapshot of Team Coaches
+ *
  * @package Schoolbox\SportsFixtures\Coach
  */
 class ParticipantModel
@@ -52,6 +55,7 @@ class ParticipantModel
      */
     public function __construct()
     {
+        $this->setUser(new User());
     }
 
     /* Getters/Setters

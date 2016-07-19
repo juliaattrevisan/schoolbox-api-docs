@@ -23,6 +23,7 @@ use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Team\Metadata\Metadata;
 use \Schoolbox\SportsFixtures\Team\Metadata\Strategy\Current as CurrentStrategy;
 use \Schoolbox\SportsFixtures\Snapshot\Type\Coach as SnapshotCoach;
+use \Schoolbox\SportsFixtures\Snapshot\Type\Player as SnapshotPlayer;
 
 
 class Snapshot implements ISnapshot
@@ -49,6 +50,7 @@ class Snapshot implements ISnapshot
         $metadata = new Metadata($match, new CurrentStrategy($match));
 
         $this->getRegistry()->add(new SnapshotCoach($match, $metadata));
+        $this->getRegistry()->add(new SnapshotPlayer($match, $metadata));
     }
 
     /**

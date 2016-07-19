@@ -65,7 +65,7 @@ class Coach extends Base implements ISnapshot
      */
 
     /**
-     * @return mixed
+     * @return ParticipantCoachMapper
      */
     private function getParticipantMapper()
     {
@@ -73,7 +73,7 @@ class Coach extends Base implements ISnapshot
     }
 
     /**
-     * @param mixed $participantMapper
+     * @param ParticipantCoachMapper $participantMapper
      */
     private function setParticipantMapper($participantMapper)
     {
