@@ -22,7 +22,7 @@ use \Schoolbox\Collection;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Team\Metadata\Metadata;
 use \Schoolbox\SportsFixtures\Team\Metadata\Strategy\Current as CurrentStrategy;
-use \Schoolbox\SportsFixtures\Snapshot\Coach as SnapshotCoach;
+use \Schoolbox\SportsFixtures\Snapshot\Type\Coach as SnapshotCoach;
 
 
 class Snapshot implements ISnapshot
