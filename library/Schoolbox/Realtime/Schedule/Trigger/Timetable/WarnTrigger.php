@@ -32,7 +32,6 @@ class WarnTrigger extends TimetableTrigger {
      */
     public function getCallbacks()
     {
-        echo "b";
         return array(array($this->notifier, 'processWarn'));
     }
 
