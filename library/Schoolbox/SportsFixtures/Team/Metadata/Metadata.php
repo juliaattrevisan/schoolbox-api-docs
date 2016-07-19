@@ -19,7 +19,9 @@ namespace Schoolbox\SportsFixtures\Team\Metadata;
 use Schoolbox\SportsFixtures\Team\Metadata\Strategy\IMetadataStrategy;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
+use \Schoolbox\SportsFixtures\Team\Position\Model as TeamPosition;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
+use \Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayer;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
 
 class Metadata
@@ -45,9 +47,10 @@ class Metadata
     protected $strategy;
 
     /**
-     * Base constructor.
+     * Metadata constructor.
      *
      * @param Match $match
+     * @param IMetadataStrategy $strategy
      */
     public function __construct(Match $match, IMetadataStrategy $strategy)
     {
@@ -97,6 +100,7 @@ class Metadata
 
             /* Sorry Matt
              */
+            /** @var TeamPlayer $currentPlayer */
             foreach ($allPlayers as $currentPlayer) {
                 $item = [
                     'user' => $currentPlayer->getUser(),
@@ -105,8 +109,11 @@ class Metadata
 
                 /* Get all the Positions for this Player
                  */
+                /** @var TeamPosition $currentPosition */
                 foreach ($allPositions as $currentPosition) {
                     if ($currentPosition->getUser()->getId() == $currentPlayer->getUser()->getId()) {
+
+                        /** @var Collection $item['positions'] */
                         $item['positions']->add($currentPosition);
                     }
                 }
