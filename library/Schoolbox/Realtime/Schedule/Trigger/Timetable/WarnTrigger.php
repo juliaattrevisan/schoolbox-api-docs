@@ -28,6 +28,16 @@ class WarnTrigger extends TimetableTrigger {
 
 
     /**
+     * @param ADF $adf
+     * @return ADF
+     */
+    protected function applyWindow(ADF $adf)
+    {
+        return $adf->addSeconds(-1 * self::START_WARNING_WINDOW);
+    }
+
+
+    /**
      * Return an array of callables that are appropriate for this trigger
      *
      * @return callable[]
@@ -41,11 +51,19 @@ class WarnTrigger extends TimetableTrigger {
     /**
      * @param array $definition
      * @param ADF   $now
+     * @throws OutOfBoundsException
      * @return ADF
      */
     protected function beforeSchool(array $definition, ADF $now)
     {
-        return $this->extractPeriodStart($definition, 0, $now)->addSeconds(-1 * self::START_WARNING_WINDOW);
+        $startMinusWindow = $this->applyWindow($this->extractPeriodStart($definition, 0, $now));
+
+        // Before the day starts
+        if ($startMinusWindow->gt($now)) {
+            return $this->applyWindow($this->extractPeriodStart($definition, 0, $now));
+        }
+
+        throw new OutOfBoundsException("Not before school");
     }
 
 
@@ -59,8 +77,7 @@ class WarnTrigger extends TimetableTrigger {
     protected function testPeriod(ADF $start, ADF $end, ADF $now)
     {
         // if we're not yet inside this period, return its start time minus the warning window
-        $warn = clone $start;
-        $warn->addSeconds(-1 * self::START_WARNING_WINDOW);
+        $warn = $this->applyWindow(clone $start);
 
         if ($now->lte($warn)) {
             return $warn;

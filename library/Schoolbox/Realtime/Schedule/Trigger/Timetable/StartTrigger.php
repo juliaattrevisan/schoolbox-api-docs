@@ -41,11 +41,16 @@ class StartTrigger extends TimetableTrigger {
     /**
      * @param array $definition
      * @param ADF   $now
+     * @throws OutOfBoundsException
      * @return ADF
      */
     protected function beforeSchool(array $definition, ADF $now)
     {
-        return $this->extractPeriodStart($definition, 0, $now);
+        if ($this->extractPeriodStart($definition, 0, $now)->gt($now)) {
+            return $this->extractPeriodStart($definition, 0, $now);
+        }
+
+        throw new OutOfBoundsException("Not before school");
     }
 
 

@@ -83,9 +83,15 @@ abstract class TimetableTrigger extends AbstractTrigger
         // retrieve the timetable definition relevant to our current time
         $definition = $this->getTimetableDefinition($now);
 
-        // Before the day starts
-        if ($this->extractPeriodStart($definition, 0, $now)->gt($now)) {
+        // if there is no timetable definition available, you're off the edge of the map.
+        if (!$definition) {
+            return PHP_INT_MAX;
+        }
+
+        try {
             return $this->beforeSchool($definition, $now)->getUnixTimeStamp();
+        } catch (OutOfBoundsException $e) {
+            // noop... carry on, as you were
         }
 
         // find a relevant time
