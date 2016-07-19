@@ -14,6 +14,7 @@ use Alaress\Date\Clock;
 use Alaress\Date\IClock;
 use Alaress\Scheduler\Trigger\AbstractTrigger;
 use External_Timetable;
+use External_TimetableInterface;
 use Schoolbox\Campus;
 use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Realtime\Timetable\TimetableNotifier;
@@ -34,6 +35,12 @@ abstract class TimetableTrigger extends AbstractTrigger
 
     /** @var WorkNotifier */
     protected $notifier;
+
+    /** @var External_TimetableInterface */
+    protected $handler;
+
+    /** @var IClock */
+    protected $clock;
 
     /**
      * @param Campus $campus the object to be acted on
