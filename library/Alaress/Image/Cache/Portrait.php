@@ -129,17 +129,21 @@ class Portrait extends BrokenFS
 
                 /**
                  * Options in protect_teacher_photo are;
-                 *  0 => Everyone can see photo
+                 *  0 => Staff, parents and students can see photo
                  *  1 => No one can see photo
                  *  2 => Staff and Parents can see photo
                  */
                 switch($this->getConfig()->get('protect_teacher_photo')) {
                     case 0:
-                        return true;
+                        if($this->getSessionUser()->getRole()->isStudent() || $this->getSessionUser()->getRole()->isParent()) {
+                            return true;
+                        } else {
+                            return false;
+                        }
                     case 1:
                         return false;
                     case 2:
-                        if($this->getSessionUser()->getRole()->isParent() || $this->getSessionUser()->getRole()->isStaff() ) {
+                        if($this->getSessionUser()->getRole()->isParent()) {
                             return true;
                         }
                         else {
