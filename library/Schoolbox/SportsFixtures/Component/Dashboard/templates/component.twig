@@ -1,9 +1,10 @@
-{% if role == 'parent' %}
+{% if matches | length %}
 
-    {% for match in matches %}
+    <div class="small-12 columns no-pad">
+        <ul class="action-list">
 
-        <div class="small-12 columns no-pad">
-            <ul class="action-list">
+            {% for match in matches %}
+
                 <li>
                     <div class="list-item">
                         <div class="card small-12">
@@ -11,7 +12,7 @@
                                 {{ match.match.name }}
                                 {% if match.home %}
                                     (<a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.homeTeam.id}) }}">
-                                        {{ match.match.homeTeam.name }}
+                                    {{ match.match.homeTeam.name }}
                                     </a>
                                 {% else %}
                                     ({{ match.match.homeTeam.name }}
@@ -19,7 +20,7 @@
                                 vs
                                 {% if match.away %}
                                     <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.awayTeam.id}) }}">
-                                    {{ match.match.awayTeam.name }}
+                                        {{ match.match.awayTeam.name }}
                                     </a>)
                                 {% else %}
                                     {{ match.match.awayTeam.name }})
@@ -28,87 +29,43 @@
                             <p class="meta">
                                 <span data-tooltip title="{{ match.match.startAt.getLong }}">{{ match.match.startAt.getRelativeTime }}</span> |
                                 {{ match.match.division.sport.name }} |
-                                {{ match.match.division.name }} |
-                                {{ match.match.venue.name }}
-                            </p>
-                            {% for team in match.teams %}
-                                {% if team.children is not empty %}
-                                    <p class="meta icon-group">
-                                        {% for child in team.children %}
-                                            {% if not loop.first and not loop.last %},{% endif %}
-                                            {% if loop.last and not loop.first %}and{% endif %}
-                                            <a href="/search/user/{{ child.getId }}">{{ child.formatName }}</a>
-
-                                            {% if loop.last and not loop.first %}are{% endif %}
-                                            {% if loop.last and loop.first %}is{% endif %}
-                                        {% endfor %} playing for {{ team.team.name }}
-                                    </p>
+                                {{ match.match.division.name }}
+                                {% if role == 'parent' %}
+                                | {{ match.match.venue.name }}
                                 {% endif %}
-                            {% endfor %}
+                            </p>
+                            {% if role == 'parent' %}
+                                {% for team in match.teams %}
+                                    {% if team.children is not empty %}
+                                        <p class="meta icon-group">
+                                            {% for child in team.children %}
+                                                {% if not loop.first and not loop.last %},{% endif %}
+                                                {% if loop.last and not loop.first %}and{% endif %}
+                                                <a href="/search/user/{{ child.getId }}">{{ child.formatName }}</a>
+
+                                                {% if loop.last and not loop.first %}are{% endif %}
+                                                {% if loop.last and loop.first %}is{% endif %}
+                                            {% endfor %} playing for {{ team.team.name }}
+                                        </p>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
                         </div>
                     </div>
                 </li>
-            </ul>
-        </div>
 
-    {% endfor %}
+            {% endfor %}
 
-    {% if matches | length == 0 %}
+        </ul>
+    </div>
 
-        <div class="content">
+{% else %}
+    <div class="content">
+        {% if role == 'parent' %}
             Your children do not have any upcoming matches scheduled.
-        </div>
-
-    {% endif %}
-
-{% elseif role == 'student' %}
-
-    {% if matches | length %}
-
-        <div class="small-12 columns no-pad">
-            <ul class="action-list">
-
-                {% for match in matches %}
-
-                    <li>
-                        <div class="list-item">
-                            <div class="card small-12">
-                                <h3>
-                                    {{ match.match.name }}
-                                    {% if match.home %}
-                                        (<a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.homeTeam.id}) }}">
-                                        {{ match.match.homeTeam.name }}
-                                        </a>
-                                    {% else %}
-                                        ({{ match.match.homeTeam.name }}
-                                    {% endif %}
-                                    vs
-                                    {% if match.away %}
-                                        <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.awayTeam.id}) }}">
-                                            {{ match.match.awayTeam.name }}
-                                        </a>)
-                                    {% else %}
-                                        {{ match.match.awayTeam.name }})
-                                    {% endif %}
-                                </h3>
-                                <p class="meta">
-                                    <span data-tooltip title="{{ match.match.startAt.getLong }}">{{ match.match.startAt.getRelativeTime }}</span> | {{ match.match.division.sport.name }} | {{ match.match.division.name }}
-                                </p>
-                            </div>
-                        </div>
-                    </li>
-
-                {% endfor %}
-
-            </ul>
-        </div>
-
-    {% else %}
-
-        <div class="content">
+        {% elseif role == 'student' %}
             You have no upcoming matches scheduled.
-        </div>
-
-    {% endif %}
+        {% endif %}
+    </div>
 
 {% endif %}
