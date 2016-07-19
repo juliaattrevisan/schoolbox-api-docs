@@ -1,0 +1,25 @@
+{% extends 'calendar/type/_base.twig' %}
+
+
+{% block eventBubbleSummary %}
+    <h3>{{ event.title }}</h3>
+    <ul class="meta">
+        <li class="icon-calendar" title="Date">{{ event.getPeriodName() }}: <time>{{ event.getEventSpan()|raw }}</time></li>
+
+        {% if event.location %}
+            <li class="icon-location" title="Location">{{ event.location }}</li>
+        {% endif %}
+    </ul>
+{% endblock eventBubbleSummary %}
+
+
+{% block eventBubbleButtons %}
+<div>
+    {% if renderer.showAttendanceLink() %}
+    <a class="button icon-class-list" href="https://staffportal.bne.catholic.edu.au/eMinerva/TeacherControlPanel.aspx" title="Mark Attendance">Attendance</a>
+    {% endif %}
+    {% if event.categoryId > 0 %}
+        <a class="button icon-home" href="/homepage/{{ event.categoryId }}">Homepage</a>
+    {% endif %}
+</div>
+{% endblock eventBubbleButtons %}
