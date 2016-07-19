@@ -5,27 +5,27 @@
 
             {% for match in matches %}
 
-                <li>
+                {% set cardHeader %}
+                    <h3>{{ match.match.name }} ({{ match.match.homeTeam.name }} vs {{ match.match.awayTeam.name }})</h3>
+                {% endset %}
+
+                {# both home and away - show link to results in jellytot #}
+                <li {% if match.home and match.away %}class="actions-small-1"{% endif %}>
                     <div class="list-item">
                         <div class="card small-12">
-                            <h3>
-                                {{ match.match.name }}
-                                {% if match.home %}
-                                    (<a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.homeTeam.id}) }}">
-                                    {{ match.match.homeTeam.name }}
-                                    </a>
-                                {% else %}
-                                    ({{ match.match.homeTeam.name }}
-                                {% endif %}
-                                vs
-                                {% if match.away %}
-                                    <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.awayTeam.id}) }}">
-                                        {{ match.match.awayTeam.name }}
-                                    </a>)
-                                {% else %}
-                                    {{ match.match.awayTeam.name }})
-                                {% endif %}
-                            </h3>
+                            {% if match.home and match.away %}
+                                {{ cardHeader|raw }}
+                            {% elseif match.home %}
+                                <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.homeTeam.id}) }}">
+                                    {{ cardHeader|raw }}
+                                </a>
+                            {% elseif match.away %}
+                                <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.awayTeam.id}) }}">
+                                    {{ cardHeader|raw }}
+                                </a>
+                            {% else %}
+                                {{ cardHeader|raw }}
+                            {% endif %}
                             <p class="meta">
                                 <span data-tooltip title="{{ match.match.startAt.getLong }}">{{ match.match.startAt.getRelativeTime }}</span> |
                                 {{ match.match.division.sport.name }} |
