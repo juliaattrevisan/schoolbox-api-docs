@@ -24,7 +24,7 @@ use Schoolbox\Realtime\WorkNotifier;
 abstract class TimetableTrigger extends AbstractTrigger
 {
     const START_WARNING_WINDOW = 300; // 5 minutes
-    const TARGET_WARN = 'warn';
+    const TARGET_WARN  = 'warn';
     const TARGET_START = 'start';
     const TARGET_END   = 'end';
 
@@ -50,13 +50,13 @@ abstract class TimetableTrigger extends AbstractTrigger
      */
     public function __construct($campus, $target, $clock = null)
     {
-        $this->cache    = array();
-        $this->campus   = $campus;
-        $this->label    = $campus->getId() . ".$target";
-        $this->event    = new Event(null, $target, $campus, null);
-        $this->notifier = new TimetableNotifier();
-        $this->handler  = new External_Timetable();
-        $this->clock    = $clock ?: new Clock();
+        $this->setCache([]);
+        $this->setCampus($campus);
+        $this->setLabel($campus->getId() . ".$target");
+        $this->setEvent(new Event(null, $target, $campus, null));
+        $this->setNotifier(new TimetableNotifier());
+        $this->setHandler(new External_Timetable());
+        $this->setClock($clock ?: new Clock()); // 1sec/sec from epoch if nothing specified
     }
 
     /**
