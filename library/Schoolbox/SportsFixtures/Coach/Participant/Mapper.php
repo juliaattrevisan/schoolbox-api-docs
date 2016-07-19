@@ -52,7 +52,7 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('user', 'u')}
             FROM {$this->database->quoteIdentifier($this->table)}
-            INNER JOIN {$this->getJoinSql('user', '', 'u')}
+            LEFT JOIN {$this->getJoinSql('user', '', 'u')}
         ";
     }
 
@@ -69,9 +69,7 @@ class Mapper extends BaseMapper
         foreach ($statement as $row) {
             /** @var Coach $model */
             $coach = new Coach();
-            $coach
-                ->setId($row['id'])
-                ->setName($row['name']);
+            $coach->setName($row['name']);
 
             // set user and team only if retrieved properly
             $user = $this->hydrateJoin($row, 'user', 'u');
