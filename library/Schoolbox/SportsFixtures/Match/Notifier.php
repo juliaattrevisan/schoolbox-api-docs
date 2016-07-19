@@ -152,7 +152,8 @@ class Notifier extends AbstractModuleNotifier
             $envelope = $this->postToTeams(
                 $envelope,
                 $this->buildBuilder($match, $effector, self::TRIGGER_UPDATED)
-                    ->setTitle('Your upcoming :sport match :match has a new venue'),
+                    ->setTitle('Your upcoming :sport match :match has a new :attribute')
+                    ->setParam('attribute', new Param('venue', null, Param::STACKING_APPEND)),
                 $match
             );
         }
@@ -162,7 +163,8 @@ class Notifier extends AbstractModuleNotifier
             $envelope = $this->postToTeams(
                 $envelope,
                 $this->buildBuilder($match, $effector, self::TRIGGER_UPDATED)
-                    ->setTitle('Your upcoming :sport match :match has a new start time'),
+                    ->setTitle('Your upcoming :sport match :match has a new :attribute')
+                    ->setParam('attribute', new Param('start time', null, Param::STACKING_APPEND)),
                 $match
             );
         }
@@ -243,7 +245,8 @@ class Notifier extends AbstractModuleNotifier
             $envelope = $this->postToParentsOfTeams(
                 $envelope,
                 $this->buildBuilder($match, $effector, self::TRIGGER_UPDATED)
-                    ->setTitle('Upcoming :sport match :match for :child has a new venue'),
+                    ->setTitle('Upcoming :sport match :match for :child has a new :attribute')
+                    ->setParam('attribute', new Param('venue', null, Param::STACKING_APPEND)),
                 $match
             );
         }
@@ -253,7 +256,8 @@ class Notifier extends AbstractModuleNotifier
             $envelope = $this->postToParentsOfTeams(
                 $envelope,
                 $this->buildBuilder($match, $effector, self::TRIGGER_UPDATED)
-                    ->setTitle('Upcoming :sport match :match for :child has a new start time'),
+                    ->setTitle('Upcoming :sport match :match for :child has a new :attribute')
+                    ->setParam('attribute', new Param('start time', null, Param::STACKING_APPEND)),
                 $match
             );
         }
