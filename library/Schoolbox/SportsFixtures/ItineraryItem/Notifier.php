@@ -114,7 +114,7 @@ class Notifier extends AbstractModuleNotifier
         return $this->notifierHelper->postToParentsOfTeams(
             new Envelope(),
             $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_CREATED)
-                 ->setTitle('Your upcoming :sport match :match itinerary has been changed'),
+                 ->setTitle(':child\'s upcoming :sport match :match itinerary has been changed'),
             $match
         );
     }
