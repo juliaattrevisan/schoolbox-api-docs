@@ -44,8 +44,9 @@ class Snapshot implements ISnapshot
         $this->setRegistry(new Collection());
 
         /* Add registry ammunition here
-         * Get the current coach/player/position config, load it
-         * into snapshot classes and fire away
+         *
+         * Get the current coach/player/position config (metadata)
+         * Load it into snapshot classes and fire away
          */
         $metadata = new Metadata($match, new CurrentStrategy($match));
 
