@@ -52,6 +52,23 @@
                             {% endif %}
                         </div>
                     </div>
+                    {% if match.home and match.away %}
+                    <nav>
+                        <a href="#" class="icon-more" data-dropdown="sportsfixtures-match-{{ match.match.id }}-actions"></a>
+                    </nav>
+                    <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-match-{{ match.match.id }}-actions">
+                        <li>
+                            <a class="icon-match" href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.homeTeam.id}) }}">
+                                {{ match.match.homeTeam.name }} Match Page
+                            </a>
+                        </li>
+                        <li>
+                            <a class="icon-match" href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.awayTeam.id}) }}">
+                                {{ match.match.awayTeam.name }} Match Page
+                            </a>
+                        </li>
+                    </ul>
+                    {% endif%}
                 </li>
 
             {% endfor %}
