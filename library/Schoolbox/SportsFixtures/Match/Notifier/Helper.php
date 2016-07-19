@@ -56,7 +56,7 @@ class Helper
      * @param MatchModel $match
      * @return MatchModel
      */
-    protected function hydrateMatch(MatchModel $match)
+    public function hydrateMatch(MatchModel $match)
     {
         /** @var MatchModel $hydratedMatch */
         $hydratedMatch = $this->matchMapper->findById($match->getId());
@@ -73,7 +73,7 @@ class Helper
      * @param array $diff
      * @return array
      */
-    protected function extractTeamChangesFromDiff($diff)
+    public function extractTeamChangesFromDiff($diff)
     {
         $oldTeams = [];
         $newTeams = [];
@@ -106,7 +106,7 @@ class Helper
      * @param string     $trigger
      * @return Builder
      */
-    protected function buildBuilder(MatchModel $match, User $effector, $namespace, $trigger)
+    public function buildBuilder(MatchModel $match, User $effector, $namespace, $trigger)
     {
         $bob = new Builder();
         $bob->setParam('sport', new Param($match->getDivision()->getSport()->getName(), $match->getDivision()->getSport()->getUrl()))
@@ -126,7 +126,7 @@ class Helper
      * @param TeamModel $team
      * @return Envelope
      */
-    protected function postToTeam(Envelope $envelope, Builder $bob, TeamModel $team)
+    public function postToTeam(Envelope $envelope, Builder $bob, TeamModel $team)
     {
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $team->getId());
         foreach ($teamPlayers as $teamPlayer) {
@@ -146,7 +146,7 @@ class Helper
      * @param TeamModel $team
      * @return Envelope
      */
-    protected function postToParentsOfTeam(Envelope $envelope, Builder $bob, TeamModel $team)
+    public function postToParentsOfTeam(Envelope $envelope, Builder $bob, TeamModel $team)
     {
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $team->getId());
         foreach ($teamPlayers as $teamPlayer) {
@@ -167,7 +167,7 @@ class Helper
      * @param MatchModel $match
      * @return Envelope
      */
-    protected function postToTeams(Envelope $envelope, Builder $bob, MatchModel $match)
+    public function postToTeams(Envelope $envelope, Builder $bob, MatchModel $match)
     {
         // Home
         $href = $this->buildHrefForMatch($match, $match->getHomeTeam());
@@ -192,7 +192,7 @@ class Helper
      * @param MatchModel $match
      * @return Envelope
      */
-    protected function postToParentsOfTeams(Envelope $envelope, Builder $bob, MatchModel $match)
+    public function postToParentsOfTeams(Envelope $envelope, Builder $bob, MatchModel $match)
     {
         // Home
         $href = $this->buildHrefForMatch($match, $match->getHomeTeam());
@@ -216,7 +216,7 @@ class Helper
      * @param TeamModel $team
      * @return string
      */
-    protected function buildHrefForMatch(MatchModel $match, TeamModel $team)
+    public function buildHrefForMatch(MatchModel $match, TeamModel $team)
     {
         return "/sportsfixtures/matches/{$match->getId()}/results/{$team->getId()}";
     }
@@ -229,7 +229,7 @@ class Helper
      * @param int $stacking
      * @return Param
      */
-    protected function buildMatchParam(MatchModel $match, TeamModel $team, $stacking = Param::STACKING_REPLACE)
+    public function buildMatchParam(MatchModel $match, TeamModel $team, $stacking = Param::STACKING_REPLACE)
     {
         $ts   = \Alaress_Date_Format::now()->getUnixTimeStamp();
         $href = $this->buildHrefForMatch($match, $team);
