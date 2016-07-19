@@ -71,6 +71,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
                 'COMPONENT_CONFIG_TIMING_VALUE_MS' => $this->getConfig('timing') ? $this->getConfig(
                     'timing'
                 ) * 1000 : '2000',
+                'COMPONENT_CONFIG_RANDOM_STARTING_SLIDE' => $this->getConfig('randomStartingSlide'),
                 'COMPONENT_CONFIG_IMAGE_RATIO'          => $this->getConfig('imageRatio') ? $this->getConfig('imageRatio') : 'square' ,
             )
         );
@@ -88,6 +89,12 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
 
         // Load images for the current homepage
         $allFiles = $this->getFolderMapper()->findImages($this->getSource(), 0, true);
+
+        if ($this->getConfig('randomStartingSlide')) {
+            $this->setVar('COMPONENT_RANDOM_SLIDE', rand(1, count($allFiles)));
+        } else {
+            $this->setVar('COMPONENT_RANDOM_SLIDE', 1);
+        }
 
         // Have update form to back to this homepage, not the gallery's homepage
         $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source->getId());
