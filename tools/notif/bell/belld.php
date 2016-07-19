@@ -6,6 +6,7 @@ use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
 use Schoolbox\Realtime\Schedule\Trigger\Timetable\TriggerFactory;
@@ -52,7 +53,8 @@ $kernel->run(function ($di, $loop, $log, $opts) {
      */
 
     try {
-        $conf = new \Schoolbox\Config\Loader();
+        /** @var IConfigLoader $conf */
+        $conf = $di->get('config');
 
         $clock = new \Alaress\Date\Clock();
 
