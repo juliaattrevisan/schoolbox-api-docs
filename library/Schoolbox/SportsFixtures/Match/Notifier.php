@@ -9,29 +9,29 @@
 
 namespace Schoolbox\SportsFixtures\Match;
 
-use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
-use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use Schoolbox\SportsFixtures\Team\Model as TeamModel;
 use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
-use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayerModel;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use Schoolbox\SportsFixtures\Match\Model as MatchModel;
 use Schoolbox\User;
-use Monolog\Logger;
 
 class Notifier extends AbstractModuleNotifier
 {
     const TRIGGER_CREATED = 'created';
     const TRIGGER_UPDATED = 'updated';
+
+    /**
+     * @var Notifier\Helper
+     */
+    protected $notifierHelper;
 
     /**
      * @param null $dependencies
@@ -115,7 +115,7 @@ class Notifier extends AbstractModuleNotifier
         $teamChanges = $this->notifierHelper->extractTeamChangesFromDiff($diff);
         foreach ($teamChanges['added'] as $addedTeamId) {
             // A team was added to this match
-            $team = $this->teamMapper->findById($addedTeamId);
+            $team = $this->notifierHelper->findTeam($addedTeamId);
             $href = $this->notifierHelper->buildHrefForMatch($match, $team);
             $this->notifierHelper->postToTeam(
                 $envelope,
@@ -134,7 +134,7 @@ class Notifier extends AbstractModuleNotifier
                     ->setHref('#')
                     ->setParam('match', new Param($match->getName()))
                     ->setTitle('Your team is no longer participating in :sport match :match'),
-                $this->teamMapper->findById($removedTeamId)
+                $this->notifierHelper->findTeam($removedTeamId)
             );
         }
 
@@ -208,7 +208,7 @@ class Notifier extends AbstractModuleNotifier
         $teamChanges = $this->notifierHelper->extractTeamChangesFromDiff($diff);
         foreach ($teamChanges['added'] as $addedTeamId) {
             // A team was added to this match
-            $team = $this->teamMapper->findById($addedTeamId);
+            $team = $this->notifierHelper->findTeam($addedTeamId);
             $href = $this->notifierHelper->buildHrefForMatch($match, $team);
             $this->notifierHelper->postToParentsOfTeam(
                 $envelope,
@@ -227,7 +227,7 @@ class Notifier extends AbstractModuleNotifier
                     ->setHref('#')
                     ->setParam('match', new Param($match->getName()))
                     ->setTitle(':child\'s team is no longer participating in :sport match :match'),
-                $this->teamMapper->findById($removedTeamId)
+                $this->notifierHelper->findTeam($removedTeamId)
             );
         }
 
@@ -264,93 +264,5 @@ class Notifier extends AbstractModuleNotifier
         }
 
         return $envelope;
-    }
-
-    /**
-     * Here be the mappers, nothing interesting to see past this point... (i promise)
-     *
-     *               ,---.
-     *            ,.'-.   \
-     *           ( ( ,'"""""-.
-     *           `,X          `.
-     *           /` `           `._
-     *          (            ,   ,_\
-     *          |          ,---.,'o `.
-     *          |         / o   \     )
-     *           \ ,.    (      .____,
-     *            \| \    \____,'     \
-     *          '`'\  \        _,____,'
-     *          \  ,--      ,-'     \
-     *            ( C     ,'         \
-     *             `--'  .'           |
-     *               |   |         .O |
-     *             __|    \        ,-'_
-     *            / `L     `._  _,'  ' `.
-     *           /    `--.._  `',.   _\  `
-     *           `-.       /\  | `. ( ,\  \
-     *          _/  `-._  /  \ |--'  (     \
-     *         '  `-.   `'    \/\`.   `.    )
-     *               \      -    \ `.  |    |
-     *
-     */
-
-    /**
-     * @var Notifier\Helper;
-     */
-    protected $notifierHelper;
-
-    /** @var MatchMapper $matchMapper */
-    protected $matchMapper;
-
-    /** @var DivisionMapper $divisionMapper */
-    protected $divisionMapper;
-
-    /** @var SportMapper $sportMapper */
-    protected $sportMapper;
-
-    /** @var TeamPlayerMapper $teamPlayerMapper */
-    protected $teamPlayerMapper;
-
-    /** @var TeamMapper $teamMapper */
-    protected $teamMapper;
-
-    /**
-     * @param $mapper
-     */
-    protected function setMatchMapper($mapper)
-    {
-        $this->matchMapper = $mapper;
-    }
-
-    /**
-     * @param $mapper
-     */
-    protected function setDivisionMapper($mapper)
-    {
-        $this->divisionMapper = $mapper;
-    }
-
-    /**
-     * @param $mapper
-     */
-    protected function setSportMapper($mapper)
-    {
-        $this->sportMapper = $mapper;
-    }
-
-    /**
-     * @param $mapper
-     */
-    protected function setTeamPlayerMapper($mapper)
-    {
-        $this->teamPlayerMapper = $mapper;
-    }
-
-    /**
-     * @param $mapper
-     */
-    protected function setTeamMapper($mapper)
-    {
-        $this->teamMapper = $mapper;
     }
 }

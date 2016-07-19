@@ -53,6 +53,17 @@ class Helper
     }
 
     /**
+     * Retrieves a team given a team ID.
+     *
+     * @param int $teamId
+     * @return TeamModel
+     */
+    public function findTeam($teamId)
+    {
+        return $this->teamMapper->findById($teamId);
+    }
+
+    /**
      * @param MatchModel $match
      * @return MatchModel
      */
