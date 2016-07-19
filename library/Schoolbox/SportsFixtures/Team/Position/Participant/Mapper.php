@@ -17,6 +17,7 @@ use Schoolbox\User as UserModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
+use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Position\Model as Position;
 use Schoolbox\SportsFixtures\Team\Position\Model as TeamPosition;
@@ -70,13 +71,22 @@ class Mapper extends BaseMapper
             $teamPosition = new TeamPosition();
             $teamPosition->setId($row['id']);
 
-            // set user, team and position only if retrieved properly
+            $user = $this->hydrateJoin($row, 'user', 'u');
 
-            $position = $this->hydrateJoin($row, 'position', 'p');
-
-            if ($position instanceof Position) {
-                $teamPosition->setPosition($position);
+            if ($user instanceof UserModel) {
+                $teamPosition->setUser($user);
             }
+
+            $team = $this->hydrateJoin($row, 'team', 't');
+
+            if ($team instanceof Team) {
+                $teamPosition->setTeam($team);
+            }
+
+            $position = new Position();
+            $position->setName($row['name']);
+
+            $teamPosition->setPosition($position);
 
             $collection->add($teamPosition);
         }
