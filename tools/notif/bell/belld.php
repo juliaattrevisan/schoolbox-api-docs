@@ -8,7 +8,7 @@ use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Notif\Notif;
 use Schoolbox\Notif\Notifactory;
-use Schoolbox\Realtime\Digest\DigestScheduler;
+use Schoolbox\Realtime\Schedule\Trigger\Timetable\TriggerFactory;
 use Schoolbox\Realtime\Timetable\TimetableScheduler;
 
 /**
@@ -65,9 +65,11 @@ $kernel->run(function ($di, $loop, $log, $opts) {
             'passcode'  => $conf->get('amqp_pass'),
         ));
 
+        $factory = new TriggerFactory();
+
         // TODO: for now, this is just hardcoded to Senior for MGGS: the scheduler will accept any Collection of Campuses to schedule
         $campusList = \Schoolbox\CampusMapper::getInstance()->findByColumn('ext_timetable_code', 'SEN');
-        new TimetableScheduler($loop, new DefaultDispatchStrategy($opts['flags']), $client, $log, $campusList, $conf, $clock);
+        new TimetableScheduler($loop, new DefaultDispatchStrategy($opts['flags']), $client, $log, $campusList, $factory, $conf, $clock);
     }
     catch(AMQPRuntimeException $e) {
         $log->alert("Unable to connect to RabbitMQ: server is offline.");
