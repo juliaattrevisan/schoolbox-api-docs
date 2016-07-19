@@ -110,7 +110,7 @@ class Sync implements SyncInterface
             AND   p.f_name IS NOT NULL
             AND   s.given_name IS NOT NULL
             AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
-            AND   pd.deceased_flg != 'Y'
+            AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
 
             UNION ALL
 
@@ -144,7 +144,7 @@ class Sync implements SyncInterface
             AND   p.m_name IS NOT NULL
             AND   s.given_name IS NOT NULL
             AND   (s.dol IS NULL OR CAST(s.dol AS DATE) >= CAST(GETDATE() AS DATE))
-            AND   pd.deceased_flg != 'Y'
+            AND   (pd.deceased_flg != 'Y' OR pd.deceased_flg IS NULL)
 
             ORDER BY student_contact_id ASC
         ";
