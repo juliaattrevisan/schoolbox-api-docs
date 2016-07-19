@@ -53,7 +53,11 @@ class Player extends Base implements ISnapshot
                  */
                 $this->getParticipantMapper()->deleteByColumnList([
                     'match_id' => $this->getMatch()->getId(),
-                    'team_id' => $currentTeam->getId()
+                    'team_id' => $currentTeam->getId(),
+
+                    /* Bug in deleteByColumnList?
+                     */
+                    'deleted_at' => null
                 ]);
 
                 $allPlayers = $this->getMetadata()->getStrategy()->getAllPlayers($currentTeam);

@@ -97,6 +97,8 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifySnapshotcreated(MatchModel $match, User $effector)
     {
+        $this->log->info("Creating snapshot for {$match->getId()} at {$match->getStartAt()->getDatabase()}");
+
         $snapshot = new Snapshot($match);
         $snapshot->snapshot();
     }
@@ -109,6 +111,8 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifySnapshotupdated(MatchModel $match, User $effector)
     {
+        $this->log->info("Updating snapshot for {$match->getId()} at {$match->getStartAt()->getDatabase()}");
+
         $snapshot = new Snapshot($match);
         $snapshot->snapshot();
     }
