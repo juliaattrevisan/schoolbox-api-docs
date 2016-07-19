@@ -60,13 +60,13 @@
                     <li>
                         <div class="list-item">
                             <div class="card small-12">
-                                <a href="{{ routeLookup('sportsfixturesMatch.getEntity', {entityId: match.id}) }}">
+                                <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.homeTeam.id}) }}">
                                     <h3>
-                                        {{ match.name }} ({{ match.homeTeam.name }} vs {{ match.awayTeam.name }})
+                                        {{ match.match.name }} ({{ match.match.homeTeam.name }} vs {{ match.match.awayTeam.name }})
                                     </h3>
                                 </a>
                                 <p class="meta">
-                                    <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span> | {{ match.division.sport.name }} | {{ match.division.name }}
+                                    <span data-tooltip title="{{ match.match.startAt.getLong }}">{{ match.match.startAt.getRelativeTime }}</span> | {{ match.match.division.sport.name }} | {{ match.match.division.name }}
                                 </p>
                             </div>
                         </div>

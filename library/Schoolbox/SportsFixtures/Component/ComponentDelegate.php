@@ -150,9 +150,32 @@ class ComponentDelegate
     public function getStudentDashboardData($user)
     {
         // Get all teams the current user is in
-        $matches = $this->getMatches(
-            $this->getTeamPlayerMapper()->findByColumn('user_id', $user->getId())
-        );
+        $matches        = [];
+        $studentTeams   = $this->getTeamPlayerMapper()->findByColumn('user_id', $user->getId());
+        $studentMatches = $this->getMatches($studentTeams);
+        foreach ($studentMatches as $matchCurrent) {
+            $matches[$matchCurrent->getId()] = [
+                'match' => $matchCurrent,
+                'teams' => [
+                    $matchCurrent->getHomeTeam()->getId() => [
+                        'team'     => $matchCurrent->getHomeTeam(),
+                        'involved' => false,
+                    ],
+                    $matchCurrent->getAwayTeam()->getId() => [
+                        'team'     => $matchCurrent->getAwayTeam(),
+                        'involved' => false,
+                    ],
+                ],
+            ];
+            foreach ($studentTeams as $team) {
+                $teamId = $team->getTeam()->getId();
+                if ($teamId == $matchCurrent->getHomeTeam()->getId() ||
+                    $teamId == $matchCurrent->getAwayTeam()->getId()
+                ) {
+                    $matches[$matchCurrent->getId()]["teams"][$teamId]["involved"] = true;
+                }
+            }
+        }
 
         return [
             'user'      => $user,
