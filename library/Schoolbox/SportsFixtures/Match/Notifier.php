@@ -21,6 +21,7 @@ use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use Schoolbox\SportsFixtures\Match\Model as MatchModel;
+use Schoolbox\SportsFixtures\Match\Notifier\Helper as NotifierHelper;
 use Schoolbox\User;
 
 class Notifier extends AbstractModuleNotifier
@@ -29,7 +30,7 @@ class Notifier extends AbstractModuleNotifier
     const TRIGGER_UPDATED = 'updated';
 
     /**
-     * @var Notifier\Helper
+     * @var NotifierHelper
      */
     protected $notifierHelper;
 
@@ -38,7 +39,7 @@ class Notifier extends AbstractModuleNotifier
      */
     public function loadDependencies($dependencies = null)
     {
-        $dependencies['notifierHelper'] = new Notifier\Helper(
+        $dependencies['notifierHelper'] = new NotifierHelper(
             MatchMapper::getInstance(),
             DivisionMapper::getInstance(),
             SportMapper::getInstance(),
@@ -264,5 +265,15 @@ class Notifier extends AbstractModuleNotifier
         }
 
         return $envelope;
+    }
+
+    /**
+     * @param NotifierHelper $notifierHelper
+     * @return $this
+     */
+    public function setNotifierHelper($notifierHelper)
+    {
+        $this->notifierHelper = $notifierHelper;
+        return $this;
     }
 }

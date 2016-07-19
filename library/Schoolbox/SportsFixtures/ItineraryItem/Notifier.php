@@ -118,4 +118,14 @@ class Notifier extends AbstractModuleNotifier
             $match
         );
     }
+
+    /**
+     * @param NotifierHelper $notifierHelper
+     * @return $this
+     */
+    public function setNotifierHelper($notifierHelper)
+    {
+        $this->notifierHelper = $notifierHelper;
+        return $this;
+    }
 }
