@@ -222,8 +222,6 @@ class Rmq2RedisHarness
 
         $this->log->info(sprintf("Generating test data for %d user%s", $count, $count == 1 ? '' : 's'));
 
-        $notif = new \Schoolbox\Notif\Notif();
-
         $conn = Connector::getInstance();
         $ctrl = new BunnyControl();
 
@@ -259,6 +257,7 @@ class Rmq2RedisHarness
             $this->userlist[] = $user;
         }
 
+        $config = \Schoolbox\Config\ConfigMapper::getInstance();
         foreach ($this->categories as $cat => $users) {
             $this->log->info("Creating notifications for category $cat");
 
@@ -270,8 +269,8 @@ class Rmq2RedisHarness
                 $this->log->debug("Sending category $cat notifications to user $userId");
 
                 // send each instance to the respective lists of each user
-                $notif->setTopic("instant.user.$userId")->notice("$instant");
-                $notif->setTopic("digest.user.$userId")->info("$digest");
+                \Schoolbox\Notif\Notifactory::create("instant.user.$userId", $config)->notice("$instant");
+                \Schoolbox\Notif\Notifactory::create("digest.user.$userId", $config)->info("$digest");
             }
 
             $this->instants[$cat][] = $instant;

@@ -91,7 +91,7 @@ $instance = $builder
 //	->setSeverity($values['severity'])
 //	->setTopics((array)$topic);
 
-$n = new \Schoolbox\Notif\Notif($topic);
+$n = \Schoolbox\Notif\Notifactory::create($topic, \Schoolbox\Config\ConfigMapper::getInstance());
 
 $n->log($values['severity'], "$instance");
 

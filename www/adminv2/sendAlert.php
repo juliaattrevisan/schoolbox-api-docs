@@ -44,7 +44,7 @@ $bob->setTitle($body)
     ->putMeta('ttl', 30)
     ->putMeta('title', 'Message from ' . $user->formatName());
 
-$n = new \Schoolbox\Notif\Notif("instant.user.$userId.alert");
+$n = \Schoolbox\Notif\Notifactory::create("instant.user.$userId.alert", \Schoolbox\Config\ConfigMapper::getInstance());
 
 $n->log(\Monolog\Logger::INFO, json_encode($bob->build()->jsonSerialize()));
 
