@@ -55,16 +55,8 @@ class EventRecurrenceMapper
 
         // silence!! but srsly, in this context, the event mapper needs to not raise notifications
         $eventMapper->setNotifier(new SilentNotif());
-
-        $this->setup();
     }
 
-    /**
-     * Hook method
-     */
-    protected function setup()
-    {
-    }
 
     /**
      * Get the series recurrence settings
@@ -385,15 +377,6 @@ class EventRecurrenceMapper
             }
         }
         return $collection;
-    }
-
-    /**
-     * Post-event save hook, for augmentation by subclasses
-     *
-     * @param Event $event
-     */
-    protected function saveHook(Event $event)
-    {
     }
 
     /* Getters/Setters
