@@ -67,6 +67,7 @@ class Renderer extends Handler
                     'USER_SEARCH_ID' => $user['id'],
                     'USER_SEARCH_SYNERGY_ID' => $user['synergy_id'],
                     'USER_SEARCH_NAME' => Scrub::text($userHandler->formatName($user)),
+                    'USER_SEARCH_USERNAME' => Scrub::text($user['username']),
                     'USER_SEARCH_COUNT' => $this->getCount($this->getType()),
                     'USER_SEARCH_YEAR' => empty($user['year']) ? '' : "Year {$user['year']}",
                     'USER_SEARCH_CAMPUS' => Scrub::text(

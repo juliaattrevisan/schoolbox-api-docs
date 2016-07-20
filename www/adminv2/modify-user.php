@@ -16,6 +16,9 @@ if(is_numeric($this->arg[0])) {
     $this->setBlock(TEMPLATE_content, 'campusPermsList','campusPermsList_block');
     $this->setBlock(TEMPLATE_content, 'residentialHousePermsList','residentialHousePermsList_block');
 
+    $this->setBlock(TEMPLATE_content, 'external_info','external_info_block');
+
+
     /* Output permissions
 	 */
     $this->setBlock(TEMPLATE_content, 'user_calendar', 'user_calendar_block');
@@ -31,16 +34,17 @@ if(is_numeric($this->arg[0])) {
     $nav = new AdminV2_Nav();
     $nav->parse($this, 'user');
 
-    $this->setVar([
-        'user_calendar_block'             => '',
-        'user_news_block'                 => '',
-        'user_cms_block'                  => '',
-        'user_housemaster_block'          => '',
-        'user_resource_booking_block'     => '',
-        'user_curriculum_block'           => '',
-        'user_pastoral_block'             => '',
+    $this->setVar(array(
+        'external_info_block' => '',
+        'user_calendar_block' => '',
+        'user_news_block' => '',
+        'user_cms_block'=> '',
+        'user_housemaster_block'=> '',
+        'user_resource_booking_block'=> '',
+        'user_curriculum_block'=> '',
+        'user_pastoral_block'=> '',
         'user_sports_administrator_block' => '',
-    ]);
+    ));
 
     /* Modify existing user
 	 */
@@ -133,6 +137,15 @@ if(is_numeric($this->arg[0])) {
 
             $this->setVar($outcampus);
             $this->parse('campus_block','campus',true);
+        }
+
+        /* Output external db info for debug purposes */
+        if(Cfg::get('external_enable') && Cfg::get('external_type') == 'synergetic' && $user['synergy_id'] > 0) {
+            $synuser = new External_Synergetic_User();
+            $this->setVar(array('FILE_YEAR' => $synuser->getCurrentSemester($user['synergy_id']),
+                                'FILE_SEMESTER' => $synuser->getCurrentYear($user['synergy_id']),
+            ));
+            $this->parse('external_info_block','external_info');
         }
 
          /* Output group list */
