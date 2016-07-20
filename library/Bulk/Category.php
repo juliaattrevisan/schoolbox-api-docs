@@ -79,23 +79,24 @@ class Bulk_Category extends Bulk_Abstract
                     /* Check if subject code already exists
 					 */
                     $codeExists = false;
-                    $code = array();
+                    $codes = array();
 
                     for ($i=2; $row[$i]; $i++) {
+                        $subjectCode = trim($row[$i]);
                         try {
-                            $category = $categoryMapper->findByCode($row[$i]);
+                            $category = $categoryMapper->findByCode($subjectCode);
 
                             $output[] = array(
-                                'category' => $row[$i],
+                                'category' => $row[1],
                                 'status' => 'Skipped',
-                                'error' => "Subject code already exists ({$row[$i]})",
+                                'error' => "Subject code already exists ($subjectCode)",
                             );
 
                             $codeExists = true;
                         } catch (\Exception $e) {
                         }
 
-                        $code[] = $row[$i];
+                        $codes[] = $subjectCode;
                     }
 
                     if ($codeExists) {
@@ -120,20 +121,20 @@ class Bulk_Category extends Bulk_Abstract
                     /* Set up new folder
                      */
                     $newFolder = new \Schoolbox\Resource\Folder\Model();
-                    $newFolder->setName($row[1]);
+                    $newFolder->setName(trim($row[1]));
                     $newFolder->setParent($parent);
                     $newFolder->setHomepage($homepageConfig);
 
                     /* Accumulate all folder codes
                      */
-                    foreach ($code as $currentCode) {
+                    foreach ($codes as $currentCode) {
                         $folderCode = new \Schoolbox\Resource\Folder\Code\Model();
                         $folderCode->setCode($currentCode);
 
                         $newFolder->getCodes()->add($folderCode);
                     }
 
-                    if (count($code) == 0 && $_POST["inherit"])
+                    if (count($codes) == 0 && $_POST["inherit"])
                         $newFolder->setInherit(true);
 
                     $categoryMapper->save($newFolder);
