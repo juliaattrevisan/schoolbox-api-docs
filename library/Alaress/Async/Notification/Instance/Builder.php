@@ -21,7 +21,8 @@ use OutOfBoundsException;
  *
  * @package Alaress\Async\Notification
  */
-class Builder {
+class Builder implements BuilderInterface
+{
 
     /** @var bool */
     protected $validate;
