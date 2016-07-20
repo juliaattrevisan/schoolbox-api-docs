@@ -60,11 +60,13 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
              * ></iframe>
              */
 
-            $patternRedir  = '/clickv\.ie\/w\/([a-zA-Z0-9\-]+)/';
+            $patternRedir  = '/clickv\.ie\/w\/[a-zA-Z0-9\-]+(?:(?:\?t=([0-9]+))?(?:\&et=([0-9]+))?)?/';
             $patternIframe = '/(\?|&)shareCode=([a-zA-Z0-9\-]+)/i';
 
-
             $matches = array();
+
+            $this->setVar('START', "");
+            $this->setVar('END', "");
 
             if (preg_match($pattern, $this->getConfig('url'), $matches)) {
                 $this->setVar('VIDEO_ID', $matches[2]);
@@ -76,7 +78,11 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                 $this->setVar('VIDEO_ID', $matches[2]);
                 $this->parse('iframe_clickview_block', 'iframe_clickview');
             } elseif (preg_match($patternRedir, $this->getConfig('url'), $matches)) {
-                //Fetch redirect headers from shorten URL for video ID
+                // Is there a start and end?
+                // https://clickv.ie/w/idGe?t=305&et=408&i=2
+                // https://clickv.ie/w/idGe
+
+
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, $this->getConfig('url'));
                 curl_setopt($ch, CURLOPT_USERAGENT, $_SERVER["HTTP_USER_AGENT"]);
@@ -89,12 +95,14 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                 parse_str(parse_url($curlinfo['redirect_url'], PHP_URL_QUERY), $parts);
                 $parts = array_change_key_case($parts, CASE_LOWER);
                 if (isset($parts['sharecode'])) {
-                    // TODO: store the video ID once it is known
                     $this->setVar('VIDEO_ID', $parts['sharecode']);
+                    // Pass in start/end time parameters
+                    if (count($matches) == 3) {
+                        $this->setVar('START', "&t={$matches[1]}");
+                        $this->setVar('END', "&et={$matches[2]}&i=2");
+                    }
                     $this->parse('iframe_clickview_block', 'iframe_clickview');
                 }
-                // Is there a start and end?
-
             }
         }
 
