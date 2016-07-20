@@ -15,6 +15,7 @@ set upsConfig = {
 
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.retry-promise.js"></script>
 <script type="text/javascript" src="/javascript/shared/ups/jquery.ups.js"></script>
 
 <script type="text/javascript">
@@ -63,8 +64,8 @@ set upsConfig = {
                 <a href="" class="close">×</a>
             </div>
         {% endif %}
-        <form id='ruleset' action='/adminv2/ups/ruleset/update' method="post">
-            <input type="hidden" name="rulesetId" value="{{ rulesetId }}" />
+        <div id='ruleset'>
+            <input type="hidden" name="rulesetId" id="rulesetId" value="{{ rulesetId }}" />
 
             <div class="actions-small-3">
                 <div class="list-item">
@@ -139,34 +140,34 @@ set upsConfig = {
                     <div class="small-12 columns no-pad">
                         <section class="content hide" data-collapsable="rule-{{ currentRule.id }}-contents" data-collapse-state="collapsed">
                             <h3>Conditions</h3>
-                            {% if  currentRule.conditions is empty  %}
-                            <div class="empty-state">
+                            <div class="empty-state {{ currentRule.conditions is empty ? '' : 'hide' }}" data-empty-state-conditions >
                                 <i class="icon-help"></i>
                                 <p>Conditions are optional, but you may prevent the effects below by creating one.</p>
                                 <p>You can <a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.general }}" data-condition-create="{{ currentRule.id }}">create a general condition</a>
                                     or if you prefer to run these rules only on initial user creation use the
                                     <a href="/adminv2/ups/condition/add/{{ currentRule.id }}/{{ upsConfig.condition.userExists }}" title="Create user exists condition" data-condition-create="{{ currentRule.id }}">user exists condition</a></p>
                             </div>
-                            {% endif %}
+
                             <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-conditions">
                                 {% for currentCondition in currentRule.conditions %}
                                 {% include allConditionStructures.fragments[currentCondition.id].fragment.getFilename() %}
                                 {% endfor %}
                             </ul>
                             <h3>Effects</h3>
-                            {% if  currentRule.effects is empty  %}
-                            <div class="empty-state">
+                            <div class="empty-state {{ currentRule.effects is empty ? '' : 'hide' }}" data-empty-state-effects>
                                 <i class="icon-help"></i>
                                 <p>Use effects to map data fields from your SIS to user account attributes.</p>
                                 <p>When <a href="/adminv2/ups/effect/add/{{ currentRule.id }}" title="Add new Effect" data-effect-create="{{ currentRule.id }}">creating a data mapping</a> they may either be directly copied, altered using <a title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">filters</a> or mapped using a lookup table.</p>
                                 <p>Start by selecting you user account field you wish to populate, then select a method and finally add a <a title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">token</a> to use as a modifier.</p>
                             </div>
-                            {% endif %}
                             <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-effects">
                                 {% for currentEffect in currentRule.effects %}
                                 {% include allEffectStructures.containers[currentEffect.id] %}
                                 {% endfor %}
                             </ul>
+
+                            <input type="submit" value="Save Rule" data-ruleset-save-rule />
+                            <span class="label full-width hide" data-relation="response-message"></span>
                         </section>
                     </div>
 
@@ -184,6 +185,7 @@ set upsConfig = {
                         <li class="separator">Help</li>
                         <li><a class="icon-help" title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">About Tokens and Filters</a></li>
                     </ul>
+
                 </li>
                 {% endfor %}
             </ul>
@@ -199,7 +201,7 @@ set upsConfig = {
             {% endif %}
             <div class="row {{ emptyRulesetAlert }}" id="emptyRulesetAlert">
                 <div class="small-12 island">
-                    <div class="empty-state">
+                    <div class="empty-state" data-empty-state-rules>
                         <i class="icon-info"></i>
                         <p>No rules, means no users will be synced</p>
                         <p><a href='/adminv2/ups/rule/add/{{ rulesetId }}' title="Add New Rule">Start by adding your first rule</a></p>
@@ -242,8 +244,9 @@ set upsConfig = {
             {% endfor %}
             {% endif %}
 
-            <input type="submit" value="Save Rules" data-ruleset-save />
-        </form>
+            <input type="submit" value="Save All Rules" data-ruleset-save />
+            <span class="label full-width hide" data-relation="response-message"></span>
+        </div>
 
         <div id="token-list" class="reveal-modal" data-reveal>
             <div class="row">

@@ -28,6 +28,7 @@
          */
         var latestEffectInstance = 1;
 
+        initRuleUpdate();
         initRulesetUpdate();
 
         initRuleDelete();
@@ -99,6 +100,9 @@
                 /* Rule Settings
                  */
                 rule: {
+                    update: {
+                        url: '/adminv2/ups/ruleset/update',
+                    },
                     delete: {
                         url: '/adminv2/ups/rule/delete',
                         confirm: 'Are you sure you want to delete this Rule?',
@@ -129,6 +133,53 @@
         }
 
         /**
+         * Update a single Rule from Ruleset.
+         *
+         * This is to avoid 'max_input_vars' being exceeded.
+         *
+         * Enable all input fields for form submission, otherwise they
+         * don't get transmitted; then immediately disable them.
+         *
+         * On return, re-enable fields
+         */
+        function initRuleUpdate() {
+            $(config.element).on('click', '[data-ruleset-save-rule]', function(event) {
+                event.preventDefault();
+
+                var $submit = $(this);
+                var $rule = $submit.closest('[data-rule]');
+                var $label = $rule.find('[data-relation="response-message"]');
+
+                $label.labelActivate({
+                    text: 'Saving...'
+                });
+
+
+                saveRules($rule)
+                    .done(function( data, textStatus, jqXHR ) {
+                        $rule.find(config.validInputTypes).attr('disabled', false);
+                        $rule.find('option').removeAttr('disabled');
+                        $rule.find('option').not('[value]').prop('disabled',true);
+                        $label.labelTimeout({
+                            text: 'Saved',
+                            css: 'success'
+                        });
+                    })
+                    .fail(function( jqXHR, textStatus, errorThrown){
+                        $label.labelTimeout({
+                            text: 'Error',
+                            css: 'alert'
+                        });
+                    });
+
+
+
+                $rule.find(config.validInputTypes).attr('disabled', true);
+            });
+            refreshSaveRulesetButtonAvailability();
+        }
+
+        /**
          * Update entire Ruleset
          *
          * Enable all input fields for form submission, otherwise they
@@ -138,13 +189,115 @@
             $(config.element).on('click', '[data-ruleset-save]', function(event) {
                 event.preventDefault();
 
-                $(config.element).find(config.validInputTypes).attr('disabled', false);
-                $(config.element).find('option').removeAttr('disabled');
-                $(config.element).submit();
+                var $rules = $(config.element).find('[data-rule]');
+                var $label = $(config.element).find('[data-relation="response-message"]').last();
+
+                $label.labelActivate({
+                    text: 'Saving...'
+                });
+
+                saveRules($rules)
+                    .done(function( data, textStatus, jqXHR ){
+                        $(config.element).find(config.validInputTypes).attr('disabled', false);
+                        $(config.element).find('option').removeAttr('disabled');
+                        $(config.element).find('option').not('[value]').prop('disabled',true);
+                        $label.labelTimeout({
+                            text: 'Saved',
+                            css: 'success'
+                        });
+                    })
+                    .fail(function( jqXHR, textStatus, errorThrown){
+                        $label.labelTimeout({
+                            text: 'Error',
+                            css: 'alert'
+                        });
+                    });
+
                 $(config.element).find(config.validInputTypes).attr('disabled', true);
             });
             refreshSaveRulesetButtonAvailability();
         }
+
+        /**
+         * For each Rule passed, send config & the single rule's data to server.
+         *
+         * Multiple parallel AJAX posts, each less than 'max_input_vars'
+         *
+         * @param $rules
+         * @return Promise
+         */
+        function saveRules($rules){
+
+            var dataArr = [];
+
+            // Rule sequence
+            $('[data-rule]').each(function(idx,elem){
+                dataArr.push({name: 'sequence[]', value: $(elem).attr('data-rule')});
+            });
+
+            // Config
+            var $config = $('#rulesetId').add($('[name="config[student][enabled]"]'));
+
+            dataArr = $.merge($config.serializeArray(), dataArr);
+
+            var ajaxes = [];
+            $rules.each(function(idx, elem){
+                var $rule = $(elem);
+                $rule.find(config.validInputTypes).attr('disabled', false);
+                $rule.find('option').removeAttr('disabled');
+
+                var dataCopy = $.merge([], dataArr);
+                var ruleData = $.merge(dataCopy, $rule.find(config.validInputTypes).serializeArray());
+
+                ajaxes.push($.retryPromise(function(){
+                    return $.post(config.rule.update.url, ruleData, function( data, textStatus, jqXHR){
+                        $rule.find('[data-label-status]').remove();
+
+                        // Update newly inserted conditions
+                        for (var oldId in data.condition) {
+                            var newId = data.condition[oldId];
+                            if(newId != oldId){
+                                updateDOM($('#condition-'+oldId), oldId, newId);
+                            }
+                        }
+
+                        // Update newly inserted effects
+                        for (var oldId in data.effect) {
+                            var newId = data.effect[oldId];
+                            if(newId != oldId){
+                                updateDOM($('#effect-'+oldId), oldId, newId);
+                            }
+                        }
+                    });
+                }));
+            });
+            return $.when.apply(null, ajaxes);
+        }
+
+        /**
+         * Update a condition's or effect's DOM attributes with newly assigned id
+         *
+         * For all sub-elements attributes, replace 'oldId' with 'newId'
+         *
+         * @param $elem DOM node to search below
+         * @param oldId
+         * @param newId
+         */
+        function updateDOM($elem, oldId, newId){
+
+            // We could either try to match specific elements, or apply a liberal replacement strategy.
+            // We elect the latter to avoid having to update this list each time the template changes.
+            $elem.add($elem.find('*')).each(function(idx,elem){
+                $.each(elem.attributes, function(i, attr){
+                    var name = attr.name;
+                    var value = attr.value;
+                    if(-1 !== value.indexOf(oldId)){
+                        $(elem).attr(name, value.replace(oldId,newId));
+                    }
+                });
+            });
+        }
+
 
         /**
          * Delete a Rule
@@ -214,6 +367,9 @@
             $(config.element).on('click', '[data-condition-create]', function(event) {
                 event.preventDefault();
 
+                // Exists if triggered via empty state link
+                var $emptyState = $(this).closest('[data-empty-state-conditions]');
+
                 /* The Rule into which the new Effect is injected
                  */
                 var ruleId = $(this).attr('data-condition-create');
@@ -265,6 +421,9 @@
                     /* Keep count
                      */
                     latestConditionInstance++;
+
+                    // Hide the empty state
+                    $emptyState.addClass('hide');
                 });
             });
         }
@@ -276,6 +435,7 @@
             $(config.element).on('click', '[data-condition-delete]', function(event) {
                 event.preventDefault();
 
+                var $rule = $(this).closest('[data-rule]');
                 var conditionId = $(this).attr('data-condition-delete');
                 var label = $('#condition-' + conditionId + '-status');
 
@@ -291,18 +451,24 @@
                          * as these don't require backend confirmation
                          */
                         if (conditionId.match(config.stubPrefix)) {
+
                             $('#condition-' + conditionId).remove();
+
+                            checkRemainingConditions($rule);
                         }
                         /* Delete asynchronously if successful; ignore if unsuccessful
                          */
                         else {
                             $.post(config.condition.delete.url, { conditionId: conditionId }, function(responseText) {
                                 if (responseText == config.success) {
+
                                     $('#condition-' + conditionId).remove();
 
                                     /* Indicator label gets removed with the condition so we
                                      * don't need to bother showing animation
                                      */
+
+                                    checkRemainingConditions($rule);
                                 }
                                 else {
 
@@ -315,9 +481,33 @@
                                 }
                             });
                         }
+
+
                     }
                 });
             });
+        }
+
+        /**
+         * If no conditions remain for this $rule, show the empty state
+         * @param $rule
+         */
+        function checkRemainingConditions($rule){
+            var $conditions = $rule.find('#rule-'+$rule.attr('data-rule')+'-conditions').find('[data-condition]');
+            if(0 === $conditions.length){
+                $rule.find('[data-empty-state-conditions]').removeClass('hide');
+            }
+        }
+
+        /**
+         * If no effects remain for this $rule, show the empty state
+         * @param $rule
+         */
+        function checkRemainingEffects($rule){
+            var $effects = $rule.find('#rule-'+$rule.attr('data-rule')+'-effects').find('[data-effect]');
+            if(0 === $effects.length){
+                $rule.find('[data-empty-state-effects]').removeClass('hide');
+            }
         }
 
         /**
@@ -335,6 +525,9 @@
                 /* The url from which new Effect are spawned
                  */
                 var url = $(this).attr('href');
+
+                // Exists if triggered via empty state link
+                var $emptyState = $(this).closest('[data-empty-state-effects]');
 
                 $.post(url, function(responseText) {
                     var effectId = config.stubPrefix + '-' + latestEffectInstance;
@@ -388,6 +581,9 @@
                     latestEffectInstance++;
 
                     refreshUserFieldAvailability(ruleId);
+
+                    // Hide the empty state
+                    $emptyState.addClass('hide');
                 });
             });
         }
@@ -458,6 +654,7 @@
             $(config.element).on('click', '[data-effect-delete]', function(event) {
                 event.preventDefault();
 
+                var $rule = $(this).closest('[data-rule]');
                 var effectId = $(this).attr('data-effect-delete');
                 var label = $('#effect-' + effectId + '-status');
 
@@ -474,6 +671,8 @@
                          */
                         if (effectId.match(config.stubPrefix)) {
                             $('#effect-' + effectId).remove();
+
+                            checkRemainingEffects($rule);
                         }
                         /* Delete asynchronously if successful; ignore if unsuccessful
                          */
@@ -481,6 +680,8 @@
                             $.post(config.effect.delete.url, { effectId: effectId }, function(responseText) {
                                 if (responseText == config.success) {
                                     $('#effect-' + effectId).remove();
+
+                                    checkRemainingEffects($rule);
 
                                     /* Indicator label gets removed with the condition so we
                                      * don't need to bother showing animation
