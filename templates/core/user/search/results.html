@@ -1,3 +1,11 @@
+<script type="text/javascript">
+	/* Log in as user via the jtm
+	 */
+	$('[data-assimilator]').click(function(event) {
+		event.preventDefault();
+		$(this).closest('form').submit();
+	});
+</script>
 <div class="row">
 	<div class="small-12 island">
 		<h2 class="subheader">People <!-- BEGIN count -->({USER_DISP_COUNT} / {USER_COUNT})<!-- END count --></h2>
@@ -21,6 +29,12 @@
 					<ul class="f-dropdown" data-dropdown-content="" id="overflowUser-{CURRENT_TAB}-{USER_SEARCH_ID}">
 						<!-- BEGIN modify -->
 						<li><a href="/adminv2/modify-user/{USER_SEARCH_ID}" class="icon-modify" title="Modify User">Modify</a></li>
+						<li><form method="POST" action="/adminv2/userForm.php" data-assimilator-form>
+								<a class="icon-staff-students" title="Log in as user" data-assimilator>Impersonate</a>
+								<input type="hidden" name="login" value="{USER_SEARCH_USERNAME}" />
+							</form>
+						</li>
+
 						<!-- END modify -->
 
 						<!-- BEGIN boarder_leave -->
@@ -52,6 +66,7 @@
 						<!-- END due_work -->
 
 					</ul>
+
 				</li>
 			    <!-- END user -->
 			</ul>
