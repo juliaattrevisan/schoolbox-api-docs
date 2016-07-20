@@ -261,8 +261,12 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
             /* Save this event and any recurring incidents too
              */
-			$eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper($eventMapper);
-			$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate, null, $eventRelations);
+			try {
+				$eventRecurrenceMapper = new \EOTC\EventRecurrenceMapper($eventMapper);
+				$eventRecurrenceMapper->save($event, $_POST['efficacy'], $_POST['repeat'], $until, $startDate, $endDate, null, $eventRelations);
+			} catch (InvalidArgumentException $e) {
+				error($e->getCode());
+			}
 
 			/* Superuser modifying some arbitrary event
 			 */

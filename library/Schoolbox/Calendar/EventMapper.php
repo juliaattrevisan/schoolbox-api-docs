@@ -21,6 +21,12 @@ use Schoolbox\User;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 
+/**
+ * Class EventMapper
+ *
+ * @package Schoolbox\Calendar
+ * @method Event hydrate(array $row, $alias = '', $callback = null)
+ */
 class EventMapper extends Schoolbox\Mapper
 {
     const ACCESS_PERSONAL = 1;
@@ -303,23 +309,12 @@ class EventMapper extends Schoolbox\Mapper
     */
     protected function postSave($event)
     {
-
-        // It's a bit late to check this in the post save event!
-        // Besides, this is the wrong place to check permissions.
-//		/* Deal with groupList and campusList separately
-//		 */
-//		$permissionLevel = $this->getPerm($event, $_SESSION['user']);
-//
-//		if ($permissionLevel < WRITE_ACCESS) {
-//			error(34);
-//		}
-
-        /* Clear bugalugs attendance if it has changed from true to false
-		 */
+        // Clear attendance if it has changed from true to false
         if ($event->getAttendanceDirty()) {
              $this->removeAttendanceByEvent($event);
         }
 
+        // reset permissions
         $this->deletePermissions($event);
         $this->createRoles($event);
         $this->createCampus($event);
@@ -430,67 +425,6 @@ class EventMapper extends Schoolbox\Mapper
         }
     }
 
-    /**
-    * Get a permission level for a particular event and user combination
-    *
-    * @deprecated is this function even used?
-    * @param Event $event
-    * @param User $user
-    * @return int
-    */
-    private function getPerm($event, $user)
-    {
-
-        /* Superuser exit
-		 */
-        if ($user->isSuperuser()) {
-            return UserAccess::ACCESS_FULL;
-        }
-
-        /* Personal events
-		 */
-        if ($event->isPersonalLevel()) {
-/* If you personally spawned this event, you can modify it
-			 */
-            if ($event->getAuthor()->getId() == $user->getId()) {
-                return UserAccess::ACCESS_WRITE;
-            } /* Otherwise, if this event is just related to you in some way,
-			 * you can only read it unless you are a staff member
-			 */
-            elseif ($event->getOwner() == $user->getId()) {
-                return $user->getRole()->getType() === 'staff' ? UserAccess::ACCESS_WRITE : UserAccess::ACCESS_READ;
-            }
-        } /* Group events
-		 */
-        elseif ($event->isGroupLevel()) {
-            $groupHandler = new \Group();
-
-            return $groupHandler->getPermission($event->getServiceId());
-        } /* Campus events
-		 */
-        elseif ($event->isCampusLevel()) {
-            $groupHandler = new \Group();
-
-            /* Find the highest permission level
-			 */
-            $maxPermission = UserAccess::ACCESS_DENY;
-
-            foreach ($event->getCampusCollection() as $currentCampus) {
-                $permission = $groupHandler->getPermission($currentCampus);
-
-                if ($permission > $maxPermission) {
-                    $maxPermission = $permission;
-                }
-            }
-
-            return $maxPermission;
-        }
-
-        /* If you somehow don't fit into any of the above,
-		 * you just...don't get anything.
-		 */
-        return UserAccess::ACCESS_DENY;
-    }
 
     /**
     * Prevent overlap on default event table
@@ -521,11 +455,19 @@ class EventMapper extends Schoolbox\Mapper
     */
     public function findEventsBetween($startDate, $endDate)
     {
+        /** @var Schoolbox\UserMapper $authorMapper */
         $authorMapper = $this->getJoinMapper('author');
+
+        /** @var EventTypeMapper $eventTypeMapper */
         $eventTypeMapper = $this->getJoinMapper('eventType');
 
+        /** @var Schoolbox\Calendar\Relation\PersonalMapper $personalMapper */
         $personalMapper = $this->getJoinMapper('personal');
+
+        /** @var Schoolbox\Calendar\Relation\CategoryMapper $categoryMapper */
         $categoryMapper = $this->getJoinMapper('category');
+
+        /** @var Schoolbox\Calendar\Relation\CampusMapper $campusMapper */
         $campusMapper = $this->getJoinMapper('campus');
 
         $query = "
