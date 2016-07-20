@@ -321,11 +321,10 @@ class EventRecurrenceMapper
               ->setAccess($access);
 
         foreach ($dates as $currentDate) {
-            $event->setId(null)
-                  ->setStartDate($currentDate['start'])
+            $event->setStartDate($currentDate['start'])
                   ->setEndDate($currentDate['end']);
 
-            $this->getEventMapper()->save($event);
+            $this->getEventMapper()->create($event);
 
             /* Remember first event id in a series
              */
@@ -373,41 +372,47 @@ class EventRecurrenceMapper
      *
      * @return Collection|Event[]
      */
-    public function getSequenceFromIterator(Event $event, $dateSource = null)
+    protected function getSequenceFromIterator(Event $event, $dateSource = null)
     {
-        $collection = new Collection();
-        if (!isset($dateSource)) {
+        if (empty($dateSource)) {
             // just get the single event
-            $collection->add($event);
-        } else {
-            // dateSource could be a datePeriod
-            // How many days are there between $start and $end?
-            $startDate = clone $event->getStartDateTime();
-            $endDate   = clone $event->getEndDateTime();
-            $startDate->startOfDay();
-            $endDate->startOfDay();
-            $dayDiff      = $startDate->diffInDays($endDate);
-            $seriesId  = $this->getEventMapper()->getUpperSeriesIndex();
-            foreach ($dateSource as $currentDate) {
-                $year  = $currentDate->format('Y');
-                $month = $currentDate->format('m');
-                $day   = $currentDate->format('d');
-
-                $newEvent = clone $event;
-
-                $newStart = clone $newEvent->getStartDateTime();
-                $newStart->setDate($year, $month, $day);
-
-                $newEnd = clone $newEvent->getEndDateTime();
-                $newEnd->setDate($year, $month, $day)->modify("+$dayDiff days");
-
-                $newEvent->setSeriesId($seriesId);
-                $newEvent->setId(null);
-                $newEvent->setStartDateTime($newStart);
-                $newEvent->setEndDateTime($newEnd);
-                $collection->add($newEvent);
-            }
+            return new Collection([ $event ]);
         }
+
+        // dateSource could be a datePeriod
+        // How many days are there between $start and $end?
+        $startDate = clone $event->getStartDateTime();
+        $endDate   = clone $event->getEndDateTime();
+
+        $startDate->startOfDay();
+        $endDate->startOfDay();
+
+        $dayDiff  = $startDate->diffInDays($endDate);
+        $seriesId = $this->getEventMapper()->getUpperSeriesIndex();
+
+        $collection = new Collection();
+
+        foreach ($dateSource as $currentDate) {
+            $year  = $currentDate->format('Y');
+            $month = $currentDate->format('m');
+            $day   = $currentDate->format('d');
+
+            $newEvent = clone $event;
+
+            $newStart = clone $newEvent->getStartDateTime();
+            $newStart->setDate($year, $month, $day);
+
+            $newEnd = clone $newEvent->getEndDateTime();
+            $newEnd->setDate($year, $month, $day)->addDays($dayDiff);
+
+            $newEvent->setSeriesId($seriesId);
+            $newEvent->setId(null);
+            $newEvent->setStartDateTime($newStart);
+            $newEvent->setEndDateTime($newEnd);
+
+            $collection->add($newEvent);
+        }
+
         return $collection;
     }
 
