@@ -34,7 +34,7 @@ class DilatedClock implements IClock
     public function __construct($dilation = 1.0, $now = 'now')
     {
         $this->dilation = $dilation;
-        $this->start    = time();
+        $this->start    = microtime(true);
         $this->offset   = strtotime($now) - $this->start;
     }
 
