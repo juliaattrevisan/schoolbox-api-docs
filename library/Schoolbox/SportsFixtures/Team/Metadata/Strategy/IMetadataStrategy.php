@@ -11,6 +11,7 @@
 namespace Schoolbox\SportsFixtures\Team\Metadata\Strategy;
 
 use \Schoolbox\Collection;
+use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 
 interface IMetadataStrategy
@@ -38,4 +39,12 @@ interface IMetadataStrategy
      * @return Collection
      */
     public function getAllCoaches(Team $team);
+
+    /**
+     * Get the Match for which Players, Positions and Coaches
+     * were accumulated
+     *
+     * @return Match
+     */
+    public function getMatch();
 }

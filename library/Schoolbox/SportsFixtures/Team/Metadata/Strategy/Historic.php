@@ -167,15 +167,15 @@ class Historic implements IMetadataStrategy
     }
 
     /**
-     * @return mixed
+     * @return Match
      */
-    private function getMatch()
+    public function getMatch()
     {
         return $this->match;
     }
 
     /**
-     * @param mixed $match
+     * @param Match $match
      */
     private function setMatch($match)
     {
