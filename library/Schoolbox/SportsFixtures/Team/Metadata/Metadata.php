@@ -27,6 +27,11 @@ use \Schoolbox\SportsFixtures\Match\Model as Match;
 class Metadata
 {
     /**
+     * @var Match
+     */
+    protected $match;
+
+    /**
      * @var Collection
      */
     protected $players;
@@ -54,6 +59,7 @@ class Metadata
      */
     public function __construct(Match $match, IMetadataStrategy $strategy)
     {
+        $this->setMatch($match);
         $this->setPlayers(new Collection());
         $this->setCoaches(new Collection());
         $this->setPositions(new Collection());
@@ -149,7 +155,7 @@ class Metadata
     /**
      * @param Collection $players
      */
-    protected function setPlayers($players)
+    private function setPlayers($players)
     {
         $this->players = $players;
     }
@@ -165,7 +171,7 @@ class Metadata
     /**
      * @param Collection $coaches
      */
-    protected function setCoaches($coaches)
+    private function setCoaches($coaches)
     {
         $this->coaches = $coaches;
     }
@@ -181,7 +187,7 @@ class Metadata
     /**
      * @param Collection $positions
      */
-    protected function setPositions($positions)
+    private function setPositions($positions)
     {
         $this->positions = $positions;
     }
@@ -197,8 +203,24 @@ class Metadata
     /**
      * @param mixed $strategy
      */
-    public function setStrategy($strategy)
+    private function setStrategy($strategy)
     {
         $this->strategy = $strategy;
+    }
+
+    /**
+     * @return Match
+     */
+    public function getMatch()
+    {
+        return $this->match;
+    }
+
+    /**
+     * @param Match $match
+     */
+    private function setMatch($match)
+    {
+        $this->match = $match;
     }
 }
