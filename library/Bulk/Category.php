@@ -82,20 +82,21 @@ class Bulk_Category extends Bulk_Abstract
                     $code = array();
 
                     for ($i=2; $row[$i]; $i++) {
+                        $subjectCode = trim($row[$i]);
                         try {
-                            $category = $categoryMapper->findByCode($row[$i]);
+                            $category = $categoryMapper->findByCode($subjectCode);
 
                             $output[] = array(
                                 'category' => $row[$i],
                                 'status' => 'Skipped',
-                                'error' => "Subject code already exists ({$row[$i]})",
+                                'error' => "Subject code already exists ($subjectCode)",
                             );
 
                             $codeExists = true;
                         } catch (\Exception $e) {
                         }
 
-                        $code[] = $row[$i];
+                        $code[] = $subjectCode;
                     }
 
                     if ($codeExists) {
@@ -120,7 +121,7 @@ class Bulk_Category extends Bulk_Abstract
                     /* Set up new folder
                      */
                     $newFolder = new \Schoolbox\Resource\Folder\Model();
-                    $newFolder->setName($row[1]);
+                    $newFolder->setName(trim($row[1]));
                     $newFolder->setParent($parent);
                     $newFolder->setHomepage($homepageConfig);
 
