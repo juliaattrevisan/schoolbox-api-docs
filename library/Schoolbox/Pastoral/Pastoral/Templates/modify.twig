@@ -252,10 +252,6 @@
                                                     checked
                                                 {% endif %}
                                             {% endfor %}
-                                        {% else %}
-                                            {% if role.getType == 'staff' %}
-                                                checked
-                                            {% endif %}
                                         {% endif %}
                                     />
                                     <label for="role[{{ role.getId }}]" class="checkbox-label">{{ role.getName }} {% if role.getType == 'parent' %}of student{% endif %}</label>
