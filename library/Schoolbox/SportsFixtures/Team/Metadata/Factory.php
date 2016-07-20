@@ -51,15 +51,36 @@ class Factory
         $diff = \Alaress_Date_Format::now()->diffInSeconds($this->getMatch()->getStartAt(), false);
 
         if ($diff > 0) {
-            return new Metadata($this->getMatch(), new CurrentStrategy(
-                $this->getMatch(),
-                UserMapper::getInstance(),
-                TeamPlayerMapper::getInstance(),
-                TeamPositionMapper::getInstance(),
-                CoachMapper::getInstance()
-            ));
+            return $this->produceCurrent();
         }
 
+        return $this->produceHistoric();
+    }
+
+    /**
+     * Produce a Metadata using the Current Strategy
+     *
+     * You can call this explicitly to bypass the Match Start check
+     */
+    public function produceCurrent()
+    {
+        return new Metadata($this->getMatch(), new CurrentStrategy(
+            $this->getMatch(),
+            UserMapper::getInstance(),
+            TeamPlayerMapper::getInstance(),
+            TeamPositionMapper::getInstance(),
+            CoachMapper::getInstance()
+        ));
+    }
+
+    /**
+     * Produce a Metadata using the Historic Strategy
+     *
+     * You can call this explicitly to bypass the Match Start check
+     * forcing Metadata to read from the snapshot tables
+     */
+    public function produceHistoric()
+    {
         return new Metadata($this->getMatch(), new HistoricStrategy(
             $this->getMatch(),
             TeamParticipantMapper::getInstance(),

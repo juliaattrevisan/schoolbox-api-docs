@@ -20,8 +20,7 @@ namespace Schoolbox\SportsFixtures\Snapshot;
 
 use \Schoolbox\Collection;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
-use \Schoolbox\SportsFixtures\Team\Metadata\Metadata;
-use \Schoolbox\SportsFixtures\Team\Metadata\Strategy\Current as CurrentStrategy;
+use \Schoolbox\SportsFixtures\Team\Metadata\Factory;
 use \Schoolbox\SportsFixtures\Snapshot\Type\Coach as SnapshotCoach;
 use \Schoolbox\SportsFixtures\Snapshot\Type\Player as SnapshotPlayer;
 use \Schoolbox\SportsFixtures\Snapshot\Type\Position as SnapshotPosition;
@@ -48,7 +47,8 @@ class Snapshot implements ISnapshot
          * Get the current coach/player/position config (metadata)
          * Load it into snapshot classes and fire away
          */
-        $metadata = new Metadata($match, new CurrentStrategy($match));
+        $factory = new Factory($match);
+        $metadata = $factory->produceCurrent();
 
         $this->getRegistry()->add(new SnapshotCoach($match, $metadata));
         $this->getRegistry()->add(new SnapshotPlayer($match, $metadata));
