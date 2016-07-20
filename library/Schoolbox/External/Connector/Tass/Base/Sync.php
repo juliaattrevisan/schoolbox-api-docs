@@ -79,6 +79,8 @@ class Sync implements SyncInterface
         // Attempt to create separate accounts for parent and spouse
         // Not yet supported: children from split families
         $companyCode = $this->database->smartQuote($this->companyCode);
+
+        // Single Tuple contains data for [P]arent and [S]pouse
         $query = "
             SELECT DISTINCT
                 'P' + p.par_code AS student_contact_id,
