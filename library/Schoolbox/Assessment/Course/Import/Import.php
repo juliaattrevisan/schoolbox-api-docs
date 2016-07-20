@@ -56,17 +56,15 @@ class Import
         /* Swap keys for selectize compatibility -_-
          */
         foreach ($allFolders as $currentFolder) {
-            if (!$currentFolder->isDeleted()) {
-                $name = $currentFolder->getName();
-                if ($currentFolder->getCodeString()) {
-                    $name .= " ({$currentFolder->getCodeString()})";
-                }
-
-                $data[] = [
-                    'id' => $currentFolder->getId(),
-                    'name' => $name,
-                ];
+            $name = $currentFolder->getName();
+            if ($currentFolder->getCodeString()) {
+                $name .= " ({$currentFolder->getCodeString()})";
             }
+
+            $data[] = [
+                'id' => $currentFolder->getId(),
+                'name' => $name,
+            ];
         }
 
         return $data;

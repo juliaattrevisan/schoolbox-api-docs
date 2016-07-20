@@ -593,7 +593,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 			WHERE (
 			    c.name LIKE :nameLike
 			    OR cc.code LIKE :codeLike
-            )
+            ) AND c.deleted_at IS NULL
         ";
 
         /* Don't know why codeLike contained / and not a trailing %
