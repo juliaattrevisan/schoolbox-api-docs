@@ -12,7 +12,9 @@ namespace Alaress\Async\Notification\Cloud\Apple;
 use Alaress\Async\Notification\Cloud\AbstractService;
 
 use InvalidArgumentException;
+use Monolog\Logger;
 use Schoolbox\MobileApp\Registry;
+use Schoolbox\MobileApp\RegistryMapper;
 use ZendService\Apple\Apns\Client\Message as Client;
 use ZendService\Apple\Apns\Response\Message as Response;
 use ZendService\Apple\Apns\Message;
@@ -98,48 +100,53 @@ class APNS extends AbstractService
                 // ensure there's a connection here, then push the message
                 $this->ensureConnection();
 
-                $response = $this->client->send($message);
-                $prefix   = "{$response->getId()}@$token";
+                $rs     = $this->client->send($message);
+                $id     = strlen($rs->getId()) ? $rs->getId() : '?';
+                $prefix = "$id@$token";
 
-                switch ($response->getCode()) {
+                switch ($rs->getCode()) {
                     case Response::RESULT_OK:
-                        $this->getLog()->info("$prefix: All ok!", [ 'char' => '+' ]);
+                        $this->report($prefix, "All ok!", Logger::DEBUG);
                         break;
                     case Response::RESULT_PROCESSING_ERROR:
                         // you may want to retry
-                        $this->getLog()->notice("$prefix: Processing error", [ 'char' => '?' ]);
+                        $this->report($prefix, "Processing error", Logger::INFO, '?');
                         break;
                     case Response::RESULT_MISSING_TOKEN:
                         // you were missing a token
-                        $this->getLog()->notice("$prefix: Missing token", [ 'char' => '?' ]);
+                        $this->report($prefix, "Missing token", Logger::INFO, '?');
                         break;
                     case Response::RESULT_MISSING_TOPIC:
                         // you are missing a message id
-                        $this->getLog()->notice("$prefix: Missing topic", [ 'char' => '?' ]);
+                        $this->report($prefix, "Missing topic", Logger::INFO, '?');
                         break;
                     case Response::RESULT_MISSING_PAYLOAD:
                         // you need to send a payload
-                        $this->getLog()->notice("$prefix: Missing payload", [ 'char' => '?' ]);
+                        $this->report($prefix, "Missing payload", Logger::INFO, '?');
                         break;
                     case Response::RESULT_INVALID_TOKEN_SIZE:
                         // the token provided was not of the proper size
-                        $this->getLog()->notice("$prefix: Invalid token size", [ 'char' => '?' ]);
+                        $this->report($prefix, "Invalid token size", Logger::INFO, '?');
                         break;
                     case Response::RESULT_INVALID_TOPIC_SIZE:
                         // the topic was too long
-                        $this->getLog()->notice("$prefix: Invalid topic size", [ 'char' => '?' ]);
+                        $this->report($prefix, "Invalid topic size", Logger::INFO, '?');
                         break;
                     case Response::RESULT_INVALID_PAYLOAD_SIZE:
                         // the payload was too large
-                        $this->getLog()->notice("$prefix: Invalid payload size", [ 'char' => '?' ]);
+                        $this->report($prefix, "Invalid payload size", Logger::INFO, '?');
                         break;
                     case Response::RESULT_INVALID_TOKEN:
                         // the token was invalid; remove it from your system
-                        $this->getLog()->notice("$prefix: Invalid token", [ 'char' => '?' ]);
+                        $this->report($prefix, "Invalid token", Logger::INFO, '?');
+                        // we need to delete this token, it will only break things
+                        // TODO remove the singletonness...
+                        RegistryMapper::getInstance()->deleteByColumn('app_token', $token);
+                        $this->client->close();
                         break;
                     case Response::RESULT_UNKNOWN_ERROR:
                         // apple didn't tell us what happened
-                        $this->getLog()->notice("$prefix: No idea what went wrong", [ 'char' => '?' ]);
+                        $this->report($prefix, "No idea what went wrong", Logger::NOTICE, '?');
                         break;
                 }
 

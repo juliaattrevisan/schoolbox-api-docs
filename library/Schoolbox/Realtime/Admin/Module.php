@@ -31,6 +31,7 @@ class Module extends BaseModule
     {
         $this->addGetRoute($router, 'customConfig', $basePath, "/configure/custom");
         $this->addGetRoute($router, 'configure', $basePath, "/configure{/roletype}");
+        $this->addGetRoute($router, 'testPush', $basePath, '/puush{/userId}');
         $this->addPostRoute($router, 'saveConfig', $basePath, "/configure{/roletype}");
     }
 

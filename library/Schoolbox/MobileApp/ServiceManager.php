@@ -90,6 +90,11 @@ class ServiceManager
     {
         $registered = $this->registryMapper->findByColumn('user_id', $userId)->groupBy('provider');
 
+        if (count($registered) == 0) {
+            $this->log->notice("Received push for user $userId, but they have no devices registered");
+            return;
+        }
+
         foreach ($registered as $provider => $registries) {
             try {
                 $service = $this->getService($provider);

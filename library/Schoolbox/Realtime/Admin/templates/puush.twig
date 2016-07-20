@@ -1,0 +1,13 @@
+<div class="row">
+    <div class="small-12 island">
+        <h1>Push Notifications</h1>
+        <h2 class="subheader">{% if userId %}Attempting push to user {{ userId }}{% else %}Configuration Result{% endif %}</h2>
+        <section class="content">
+            <ul class="no-margin">
+                {% for line in logs %}
+                    <li><pre>{{ line }}</pre></li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>

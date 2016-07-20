@@ -9,7 +9,9 @@
 
 namespace Schoolbox\Realtime\Admin;
 
+use Alaress\Lumberjack\Logger;
 use Alaress\Web\Controller\Base as BaseController;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Realtime\Config;
 use Schoolbox\Realtime\Message\NS;
 use Schoolbox\Realtime\Message\NSMapper;
@@ -18,6 +20,12 @@ use Schoolbox\Realtime\Message\RoutePermissionMapper;
 use Schoolbox\Realtime\Message\Source;
 use Schoolbox\Realtime\Message\SourceMapper;
 use Schoolbox\RoleMapper;
+use Alaress\Async\Notification\Cloud;
+use Alaress\Redis;
+use Schoolbox\MobileApp;
+use Schoolbox\Resource\Storage;
+use Schoolbox\UserMapper;
+use ZendService\Apple\Apns;
 
 class Controller extends BaseController
 {
@@ -307,6 +315,80 @@ class Controller extends BaseController
             'format' => 'json'
         ]);
     }
+
+
+    /**
+     * @param int $userId
+     */
+    public function testPush($userId = null)
+    {
+        /** @var IConfigLoader $conf */
+        $conf = $this->getDi()->get('config');
+
+        $write = fopen('php://memory', 'r+');
+
+        $log = new Logger($write, $write, \Monolog\Logger::DEBUG, [], true);
+
+        $factory = new MobileApp\ServiceManagerFactory($conf, $log);
+        $cloudManager = $factory->build([ MobileApp\Registry::PROVIDER_APPLE, MobileApp\Registry::PROVIDER_GOOGLE ]);
+
+        $redis = Redis::getClientInstance();
+        $keys  = $redis->keys('msg*:m:*');
+        $data  = $redis->get($keys[1]);
+
+        if ($userId) {
+            try {
+                $user = UserMapper::getInstance()->findById($userId);
+                $cloudManager->push($user->getId(), [ gzuncompress($data) ]);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                $log->warning("Failed to retrieve user $userId: {$e->getMessage()}", [ $e ]);
+            }
+        }
+
+        $log->warning("-- END --");
+        rewind($write);
+
+        $this->getResponse()->content->set([
+            'template' => '@adminMessages/puush.twig',
+            'data'     => [
+                'logs'   => explode("\n", trim(stream_get_contents($write))),
+                'userId' => $userId
+            ]
+        ]);
+
+    }
+
+
+    /**
+     * @param string $hashInStorage
+     * @return bool
+     */
+    function _apnsCertRequiresUpdate($hashInStorage)
+    {
+        $tempCert = $this->_getTempCertFilename();
+
+        if (!is_readable($tempCert)) {
+            return true;
+        }
+        if (!filesize($tempCert)) {
+            return true;
+        }
+        if (sha1_file($tempCert) != $hashInStorage) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @return string
+     */
+    function _getTempCertFilename()
+    {
+        return sys_get_temp_dir() . '/sbapns.pem';
+    }
+
 
 
 }
