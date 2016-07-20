@@ -147,7 +147,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     /**
     * Get number of elements in collection.
     *
-    * @return array
+    * @return int
     */
     public function count()
     {
