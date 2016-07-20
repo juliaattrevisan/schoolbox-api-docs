@@ -247,7 +247,7 @@ class External_Tass_User implements External_UserInterface
             return array();
         }
 
-        // remove the P prefix
+        // remove the P|S prefix
         $id = substr($tassID, 1);
         $splitParentLength = Config::get('external_tass_parent_id_length') + 1;
         if (strlen($id) == $splitParentLength) {
