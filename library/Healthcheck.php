@@ -12,13 +12,18 @@
  */
 class Healthcheck
 {
-
-    private $school;
+    /**
+     * @var resource Contains DB connection string
+     */
     private $db;
+
+    /**
+     * @var string Contains log of check output
+     */
+    private $log;
 
     public function __construct($school, $db = '')
     {
-        $this->school = $school;
         $this->db = ($db) ? $db : ucfirst(strtolower(Config::get('external_type')));
 
         // check for remapping the Schoolbox db type to be External (which refers to CSV digestion)
@@ -40,20 +45,21 @@ class Healthcheck
                 $this->$meth();
             }
         }
+        return $this->log;
     }
 
     /* all private methods with 'Schoolbox' or the current db name will be picked up by the reflection in run() */
 
     private function MssqlConnection()
     {
-        echo "  MSSQL : ";
+        $this->log .= "  MSSQL : ";
         $db = new MSSQL();
         $db->debug = true;
         $result = $db->query("SELECT @@VERSION");
         if ($result) {
-            echo "OK\n";
+            $this->log .= "OK\n";
         } else {
-            echo "\n    Failed - ".mssql_get_last_message()."\n";
+            $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
         }
         unset($db,$result);
     }
@@ -82,56 +88,56 @@ class Healthcheck
 
     private function Db2Connection()
     {
-        echo "  DB2 : ";
+        $this->log .= "  DB2 : ";
         $eec = new External_Edumate_Connection();
         $db = $eec->getDatabase();
         $result = $db->query("SELECT * FROM TABLE(SYSPROC.ENV_GET_INST_INFO());");
 
-        echo $result ? "OK\n" : "\n    Failed - ".db2_conn_errormsg()."\n";
+        $this->log .= $result ? "OK\n" : "\n    Failed - ".db2_conn_errormsg()."\n";
     }
 
     private function EdumateCheckConnection()
     {
-        echo "\nEdumate Connection Check\n";
+        $this->log .= "\nEdumate Connection Check\n";
         $this->Db2Connection();
     }
 
     private function TassCheckConnection()
     {
-        echo "\nTass Connection Check\n";
+        $this->log .= "\nTass Connection Check\n";
         $this->MssqlConnection();
     }
 
     private function SynergeticCheckConnection()
     {
-        echo "\nSynergetic Connection Check\n";
+        $this->log .= "\nSynergetic Connection Check\n";
         $this->MssqlConnection();
     }
 
     private function SchoolproCheckConnection()
     {
-        echo "\nSchoolpro Connection Check\n";
+        $this->log .= "\nSchoolpro Connection Check\n";
         $this->MssqlConnection();
     }
 
     private function MazeCheckConnection()
     {
-        echo "\nMaze Connection Check\n";
+        $this->log .= "\nMaze Connection Check\n";
         $this->MssqlConnection();
     }
 
     private function HumanedgeCheckConnection()
     {
-        echo "\nHumanedge Connection Check\n";
-        echo "  MSSQL (SAS connection) : ";
+        $this->log .= "\nHumanedge Connection Check\n";
+        $this->log .= "  MSSQL (SAS connection) : ";
         $this->MssqlConnection();
-        echo "  MSSQL (A+ connection) : ";
+        $this->log .= "  MSSQL (A+ connection) : ";
         $db = $this->getMssqlAPlusConnection();
         $result = $db->query("SELECT @@VERSION");
         if ($result) {
-            echo "OK\n";
+            $this->log .= "OK\n";
         } else {
-            echo "\n    Failed - ".mssql_get_last_message()."\n";
+            $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
         }
         unset($db,$result);
     }
@@ -141,7 +147,7 @@ class Healthcheck
      */
     private function Denbigh2CheckConnection()
     {
-        echo "\nDenbigh2 Connnection Check\n";
+        $this->log .= "\nDenbigh2 Connnection Check\n";
 
         $list[] = 'Enrolments';
         $list[] = 'Students';
@@ -154,19 +160,19 @@ class Healthcheck
             $api = new External_Denbigh2_Api($currentApi, array());
 
             if (!$api->hasErrors()) {
-                echo "OK\n";
+                $this->log .= "OK\n";
             } else {
                 $error = $api->getErrors();
                 $firstError = $error[0];
 
-                echo "\n    Failed - {$firstError}\n";
+                $this->log .= "\n    Failed - {$firstError}\n";
             }
         }
     }
 
     private function TassCheckTables()
     {
-        echo "\nTass Permission Check - Tables\n";
+        $this->log .= "\nTass Permission Check - Tables\n";
         $list[] = 'studsub';
         $list[] = 'student';
         $list[] = 'tchsub';
@@ -190,14 +196,14 @@ class Healthcheck
         sort($list);
 
         foreach ($list as $table) {
-            echo "  $table : ";
+            $this->log .= "  $table : ";
             $db = new MSSQL();
             $db->debug = true;
             $result = $db->query("SELECT TOP 1 * FROM $table");
             if ($result) {
-                echo "OK\n";
+                $this->log .= "OK\n";
             } else {
-                echo "\n    Failed - ".mssql_get_last_message()."\n";
+                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
             }
             unset($db,$result);
         }
@@ -205,7 +211,7 @@ class Healthcheck
 
     private function MazeCheckTables()
     {
-        echo "\nMaze Permission Check - Tables\n";
+        $this->log .= "\nMaze Permission Check - Tables\n";
         $list[] = 'DF';
         $list[] = 'KCT';
         $list[] = 'KCY';
@@ -226,14 +232,14 @@ class Healthcheck
         sort($list);
 
         foreach ($list as $table) {
-            echo "  $table : ";
+            $this->log .= "  $table : ";
             $db = new MSSQL();
             $db->debug = true;
             $result = $db->query("SELECT TOP 1 * FROM $table");
             if ($result) {
-                echo "OK\n";
+                $this->log .= "OK\n";
             } else {
-                echo "\n    Failed - ".mssql_get_last_message()."\n";
+                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
             }
             unset($db,$result);
         }
@@ -241,7 +247,7 @@ class Healthcheck
 
     private function SynergeticCheckTables()
     {
-        echo "\nSynergetic Permission Check - Tables\n";
+        $this->log .= "\nSynergetic Permission Check - Tables\n";
         $list[] = 'Addresses';
         $list[] = 'CalendarEvents';
         $list[] = 'Community';
@@ -283,14 +289,14 @@ class Healthcheck
         sort($list);
 
         foreach ($list as $table) {
-            echo "  $table : ";
+            $this->log .= "  $table : ";
             $db = new MSSQL();
             $db->debug = true;
             $result = $db->query("SELECT TOP 1 * FROM $table");
             if ($result) {
-                echo "OK\n";
+                $this->log .= "OK\n";
             } else {
-                echo "\n    Failed - ".mssql_get_last_message()."\n";
+                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
             }
             unset($db,$result);
         }
@@ -298,7 +304,7 @@ class Healthcheck
 
     private function SynergeticCheckViews()
     {
-        echo "\nSynergetic Permission Check - Views\n";
+        $this->log .= "\nSynergetic Permission Check - Views\n";
         $list[] = 'vCommunityAddresses';
         $list[] = 'vPhotos';
         $list[] = 'vStaff';
@@ -310,14 +316,14 @@ class Healthcheck
         sort($list);
 
         foreach ($list as $view) {
-            echo "  $view : ";
+            $this->log .= "  $view : ";
             $db = new MSSQL();
             $db->debug = true;
             $result = $db->query("SELECT TOP 1 * FROM $view");
             if ($result) {
-                echo "OK\n";
+                $this->log .= "OK\n";
             } else {
-                echo "\n    Failed - ".mssql_get_last_message()."\n";
+                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
             }
             unset($db,$result);
         }
@@ -325,7 +331,7 @@ class Healthcheck
 
     private function SynergeticCheckStoredProcedures()
     {
-        echo "\nSynergetic Permission Check - Stored Procedures\n";
+        $this->log .= "\nSynergetic Permission Check - Stored Procedures\n";
         $date = new Alaress_Date_Format();
         $db = new MSSQL();
         $db->debug = true;
@@ -365,20 +371,20 @@ class Healthcheck
     private function SynergeticCheckMarkbook()
     {
         // Attendance Specifc (Optional)
-        echo "\nSynergetic Permission Check - Markbook - Tables (Optional)\n";
+        $this->log .= "\nSynergetic Permission Check - Markbook - Tables (Optional)\n";
         $list[] = 'StaffAssessmentMarkBook';
         $list[] = 'StudentAssessmentMarkBook';
         sort($list);
 
         foreach ($list as $table) {
-            echo "  $table : ";
+            $this->log .= "  $table : ";
             $db = new MSSQL();
             $db->debug = true;
             $result = $db->query("SELECT TOP 1 * FROM $table");
             if ($result) {
-                echo "OK\n";
+                $this->log .= "OK\n";
             } else {
-                echo "\n    Failed - ".mssql_get_last_message()."\n";
+                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
             }
             unset($db,$result);
         }
@@ -387,15 +393,15 @@ class Healthcheck
 
     private function SynergeticCheckCommunityPortal()
     {
-        echo "\nSynergetic Permission Check - Community Portal - Tables (Optional)\n";
-        echo "  CommunityLogins : ";
+        $this->log .= "\nSynergetic Permission Check - Community Portal - Tables (Optional)\n";
+        $this->log .= "  CommunityLogins : ";
         $db = new MSSQL();
         $db->debug = true;
         $result = $db->query("UPDATE CommunityLogins SET Password = '' WHERE 1 = 0");
         if ($result) {
-            echo "OK\n";
+            $this->log .= "OK\n";
         } else {
-            echo "\n    Failed - ".mssql_get_last_message()."\n";
+            $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
         }
         unset($db,$result);
     }
@@ -403,7 +409,7 @@ class Healthcheck
     private function SynergeticCheckAttendance()
     {
         // Attendance Specifc (Optional)
-        echo "\nSynergetic Permission Check - Attendance - Tables (Optional)\n";
+        $this->log .= "\nSynergetic Permission Check - Attendance - Tables (Optional)\n";
         $list[] = 'luAbsenceReason';
         $list[] = 'luAbsenceType';
         $list[] = 'TimetableSubstitutes';
@@ -413,38 +419,38 @@ class Healthcheck
         sort($list);
 
         foreach ($list as $table) {
-            echo "  $table : ";
+            $this->log .= "  $table : ";
             $db = new MSSQL();
             $db->debug = true;
             $result = $db->query("SELECT TOP 1 * FROM $table");
             if ($result) {
-                echo "OK\n";
+                $this->log .= "OK\n";
             } else {
-                echo "\n    Failed - ".mssql_get_last_message()."\n";
+                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
             }
             unset($db,$result);
         }
         unset($list);
 
-        echo "\nSynergetic Permission Check - Attendance - Views (Optional)\n";
+        $this->log .= "\nSynergetic Permission Check - Attendance - Views (Optional)\n";
         $list[] = 'pvTimetableDefinitionAll';
         sort($list);
 
         foreach ($list as $view) {
-            echo "  $view : ";
+            $this->log .= "  $view : ";
             $db = new MSSQL();
             $db->debug = true;
             $result = $db->query("SELECT TOP 1 * FROM $view");
             if ($result) {
-                echo "OK\n";
+                $this->log .= "OK\n";
             } else {
-                echo "\n    Failed - ".mssql_get_last_message()."\n";
+                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
             }
             unset($db,$result);
         }
         unset($list);
 
-        echo "\nSynergetic Permission Check - Attendance - Stored Procedures (Optional)\n";
+        $this->log .= "\nSynergetic Permission Check - Attendance - Stored Procedures (Optional)\n";
         $db = new MSSQL();
         $db->debug = true;
         $list[] = array(
@@ -506,7 +512,7 @@ class Healthcheck
     */
     private function SchoolproCheckStoredProcedures()
     {
-        echo "\nSchoolpro Permission Check - Stored Procedures\n";
+        $this->log .= "\nSchoolpro Permission Check - Stored Procedures\n";
         $db = new MSSQL();
         $db->debug = true;
         $splist[] = array(
@@ -649,7 +655,7 @@ class Healthcheck
 
     private function EdumateCheckViews()
     {
-        echo "\nEdumate Permission Check - Views\n";
+        $this->log .= "\nEdumate Permission Check - Views\n";
         $list[] = 'classes';
         $list[] = 'parents';
         $list[] = 'report_periods';
@@ -667,12 +673,12 @@ class Healthcheck
 
         foreach ($list as $view) {
             $viewname = "db2inst1.schoolbox_$view";
-            echo "  $viewname : ";
+            $this->log .= "  $viewname : ";
             $result = $db->query("SELECT * FROM $viewname FETCH FIRST 1 ROWS ONLY");
             if ($result) {
-                echo "OK\n";
+                $this->log .= "OK\n";
             } else {
-                echo "\n    Failed - ".db2_stmt_errormsg()."\n";
+                $this->log .= "\n    Failed - ".db2_stmt_errormsg()."\n";
             }
         }
 
@@ -683,7 +689,7 @@ class Healthcheck
      */
     private function HumanedgeCheckSasTables()
     {
-        echo "\nHumanedge Permission Check - SAS Tables\n";
+        $this->log .= "\nHumanedge Permission Check - SAS Tables\n";
         $tables = [
             'Contact',
             'Staff',
@@ -692,14 +698,14 @@ class Healthcheck
             'vw_Contact_Addresses',
         ];
         foreach ($tables as $table) {
-            echo "  $table : ";
+            $this->log .= "  $table : ";
             $db        = new MSSQL();
             $db->debug = true;
             $result = $db->query("SELECT TOP 1 * FROM $table");
             if ($result) {
-                echo "OK\n";
+                $this->log .= "OK\n";
             } else {
-                echo "\n    Failed - ".mssql_get_last_message()."\n";
+                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
             }
             unset($db, $result);
         }
@@ -710,7 +716,7 @@ class Healthcheck
      */
     private function HumanedgeCheckAPlusTables()
     {
-        echo "\nHumanedge Permission Check - SAS Tables\n";
+        $this->log .= "\nHumanedge Permission Check - SAS Tables\n";
         $tables = [
             'tblAllocation',
             'tblBlockItem',
@@ -725,13 +731,13 @@ class Healthcheck
             'tblTeacher',
         ];
         foreach ($tables as $table) {
-            echo "  $table : ";
+            $this->log .= "  $table : ";
             $db     = $this->getMssqlAPlusConnection();
             $result = $db->query("SELECT TOP 1 * FROM $table");
             if ($result) {
-                echo "OK\n";
+                $this->log .= "OK\n";
             } else {
-                echo "\n    Failed - ".mssql_get_last_message()."\n";
+                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
             }
             unset($db, $result);
         }
@@ -749,15 +755,15 @@ class Healthcheck
     private function executeProcedure(MSSQL $db, $proc, $params)
     {
         $result = $db->executeProcedure($proc, $params);
-        echo "  ".$proc." : ";
+        $this->log .= "  ".$proc." : ";
         if ($result['success']) {
             if ($result['message']) {
-                echo "OK - {$result['message']}\n";
+                $this->log .= "OK - {$result['message']}\n";
             } else {
-                echo "OK\n";
+                $this->log .= "OK\n";
             }
         } else {
-            echo "\n    Failed - ".mssql_get_last_message()."\n";
+            $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
         }
     }
 }
