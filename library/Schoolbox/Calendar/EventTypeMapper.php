@@ -12,7 +12,12 @@ namespace Schoolbox\Calendar;
 
 use Schoolbox;
 
-
+/**
+ * Class EventTypeMapper
+ *
+ * @package Schoolbox\Calendar
+ * @method EventType hydrate(array $row, $alias = '', $callback = null)
+ */
 class EventTypeMapper extends Schoolbox\Mapper
 {
 

@@ -21,6 +21,12 @@ use Schoolbox\User;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
 
+/**
+ * Class EventMapper
+ *
+ * @package Schoolbox\Calendar
+ * @method Event hydrate(array $row, $alias = '', $callback = null)
+ */
 class EventMapper extends Schoolbox\Mapper
 {
     const ACCESS_PERSONAL = 1;
@@ -449,11 +455,19 @@ class EventMapper extends Schoolbox\Mapper
     */
     public function findEventsBetween($startDate, $endDate)
     {
+        /** @var Schoolbox\UserMapper $authorMapper */
         $authorMapper = $this->getJoinMapper('author');
+
+        /** @var EventTypeMapper $eventTypeMapper */
         $eventTypeMapper = $this->getJoinMapper('eventType');
 
+        /** @var Schoolbox\Calendar\Relation\PersonalMapper $personalMapper */
         $personalMapper = $this->getJoinMapper('personal');
+
+        /** @var Schoolbox\Calendar\Relation\CategoryMapper $categoryMapper */
         $categoryMapper = $this->getJoinMapper('category');
+
+        /** @var Schoolbox\Calendar\Relation\CampusMapper $campusMapper */
         $campusMapper = $this->getJoinMapper('campus');
 
         $query = "
