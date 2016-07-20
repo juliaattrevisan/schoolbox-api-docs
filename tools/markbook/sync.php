@@ -20,8 +20,10 @@ use Alaress\Lumberjack\Logger;
 
 require_once __DIR__ . '/../../library/Bootstrap.php';
 
-$options          = getopt('p::h', array('update-only', 'dry-run'));
+$options          = getopt('p::h', array('start::', 'end::', 'update-only', 'dry-run'));
 $parentId         = isset($options['p']) ? $options['p'] : 0;
+$start            = isset($options['start']) ? $options['start'] : false;
+$end            = isset($options['end']) ? $options['end'] : false;
 $updateOnly   = isset($options['update-only']);
 $dryRun           = isset($options['dry-run']);
 
@@ -30,7 +32,9 @@ if (isset($options['h'])) {
 Syncs existing markbook data from Schoolbox into remote system
 
 Usage: sync.php -p[folderID] [--dry-run] [--update-only]
-    -p:                  the ID of parent folder to start the traversal, defaults to 0
+    -p:                  the ID of parent folder to start the traversal, defaults to 0 
+    --start              work due after this date, format 2016-04-20, defaults to current semester
+    --end                work due before this date, format 2016-08-15, defualts to current semester
     --dry-run:           if set, don't actually update anything, but show what
                          would be updated.
     --update-only:       if set, will not create any new items in the remote system, only
@@ -55,7 +59,12 @@ $log = new Logger;
 $now = Alaress_Date_Format::now();
 $startTime = new Alaress_Date_Format;
 $endTime = new Alaress_Date_Format;
-if($now->getUsingFormat('m') > 6) {
+
+if($start && $end) {
+    $startTime->setFromFormat($start, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+    $endTime->setFromFormat($end, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+}
+else if($now->getUsingFormat('m') > 6) {
     $startTime->setDate(date('Y'),7,1)->setTime(0,0,0);
     $endTime->setDate(date('Y'),12,30)->setTime(23,59,59);
 }
