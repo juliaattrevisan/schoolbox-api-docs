@@ -294,7 +294,7 @@ CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
                                 type: 'text',
                                 id: 'schoolboxiframe-height',
                                 label: 'Height',
-                                default: '500',
+                                'default': '500',
 
                                 /* Editing an existing element
                                  */
@@ -319,7 +319,7 @@ CKEDITOR.dialog.add('schoolboxiframeDialog', function (editorInstance) {
                         type: 'checkbox',
                         id: 'schoolboxiframe-fullwidth',
                         label: 'Fullwidth',
-                        default: true,
+                        'default': true,
 
                         /* Editing an existing element
                          */
