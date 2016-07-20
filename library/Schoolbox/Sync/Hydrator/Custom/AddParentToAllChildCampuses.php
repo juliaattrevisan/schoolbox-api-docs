@@ -48,7 +48,7 @@ class AddParentToAllChildCampuses extends AbstractLoggableHydrator
         if ($input instanceof ExternalParent) {
             // Don't attempt to parse campuses of children from $input.
             // Just get all this parent's children, and their campi.
-            $childIds = $this->externalUserHandler->getEnrolledStudents($previous->getExternalId());
+            $childIds = $this->externalUserHandler->getEnrolledStudents($input->getId());
 
             if (is_array($childIds)) {
 
