@@ -1,6 +1,6 @@
 <?php
 /**
- * HistoricMetadata
+ * Metadata - Historic
  *
  * Gets team composition for a Match that has already occurred
  * Uses cached values instead of the dynamic composition tables
@@ -20,33 +20,45 @@ use \Schoolbox\Collection;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
 use \Schoolbox\SportsFixtures\Team\Position\Participant\Mapper as TeamPositionParticipantMapper;
-use \Schoolbox\SportsFixtures\Coach\Participant\Mapper as TeamCoachPositionParticipantMapper;
+use \Schoolbox\SportsFixtures\Coach\Participant\Mapper as TeamCoachParticipantMapper;
+use \Schoolbox\SportsFixtures\Match\Model as Match;
 
-class Historic extends Base implements IMetadataStrategy
+class Historic implements IMetadataStrategy
 {
+    /**
+     * @var Match
+     */
+    private $match;
+
     /**
      * @var TeamParticipantMapper
      */
-    protected $teamParticipantMapper;
+    private $teamParticipantMapper;
 
     /**
      * @var TeamPositionParticipantMapper
      */
-    protected $teamPositionParticipantMapper;
+    private $teamPositionParticipantMapper;
 
     /**
-     * @var TeamCoachPositionParticipantMapper
+     * @var TeamCoachParticipantMapper
      */
-    protected $teamCoachParticipantMapper;
+    private $teamCoachParticipantMapper;
 
     /**
-     * Hook method
+     * Historic constructor.
+     *
+     * @param Match $match
+     * @param TeamParticipantMapper $teamParticipantMapper
+     * @param TeamPositionParticipantMapper $teamPositionParticipantMapper
+     * @param TeamCoachParticipantMapper $teamCoachParticipantMapper
      */
-    public function setup()
+    public function __construct(Match $match, TeamParticipantMapper $teamParticipantMapper, TeamPositionParticipantMapper $teamPositionParticipantMapper, TeamCoachParticipantMapper $teamCoachParticipantMapper)
     {
-        $this->setTeamParticipantMapper(TeamParticipantMapper::getInstance());
-        $this->setTeamPositionParticipantMapper(TeamPositionParticipantMapper::getInstance());
-        $this->setTeamCoachParticipantMapper(TeamCoachPositionParticipantMapper::getInstance());
+        $this->setMatch($match);
+        $this->setTeamParticipantMapper($teamParticipantMapper);
+        $this->setTeamPositionParticipantMapper($teamPositionParticipantMapper);
+        $this->setTeamCoachParticipantMapper($teamCoachParticipantMapper);
     }
 
     /**
@@ -109,7 +121,7 @@ class Historic extends Base implements IMetadataStrategy
     /**
      * @return TeamParticipantMapper
      */
-    protected function getTeamParticipantMapper()
+    private function getTeamParticipantMapper()
     {
         return $this->teamParticipantMapper;
     }
@@ -117,7 +129,7 @@ class Historic extends Base implements IMetadataStrategy
     /**
      * @param TeamParticipantMapper $teamParticipantMapper
      */
-    protected function setTeamParticipantMapper($teamParticipantMapper)
+    private function setTeamParticipantMapper($teamParticipantMapper)
     {
         $this->teamParticipantMapper = $teamParticipantMapper;
     }
@@ -125,7 +137,7 @@ class Historic extends Base implements IMetadataStrategy
     /**
      * @return TeamPositionParticipantMapper
      */
-    protected function getTeamPositionParticipantMapper()
+    private function getTeamPositionParticipantMapper()
     {
         return $this->teamPositionParticipantMapper;
     }
@@ -133,24 +145,40 @@ class Historic extends Base implements IMetadataStrategy
     /**
      * @param TeamPositionParticipantMapper $teamPositionParticipantMapper
      */
-    protected function setTeamPositionParticipantMapper($teamPositionParticipantMapper)
+    private function setTeamPositionParticipantMapper($teamPositionParticipantMapper)
     {
         $this->teamPositionParticipantMapper = $teamPositionParticipantMapper;
     }
 
     /**
-     * @return TeamCoachPositionParticipantMapper
+     * @return TeamCoachParticipantMapper
      */
-    protected function getTeamCoachParticipantMapper()
+    private function getTeamCoachParticipantMapper()
     {
         return $this->teamCoachParticipantMapper;
     }
 
     /**
-     * @param TeamCoachPositionParticipantMapper $teamCoachParticipantMapper
+     * @param TeamCoachParticipantMapper $teamCoachParticipantMapper
      */
-    protected function setTeamCoachParticipantMapper($teamCoachParticipantMapper)
+    private function setTeamCoachParticipantMapper($teamCoachParticipantMapper)
     {
         $this->teamCoachParticipantMapper = $teamCoachParticipantMapper;
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getMatch()
+    {
+        return $this->match;
+    }
+
+    /**
+     * @param mixed $match
+     */
+    private function setMatch($match)
+    {
+        $this->match = $match;
     }
 }

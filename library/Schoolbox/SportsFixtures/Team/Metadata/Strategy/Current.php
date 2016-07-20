@@ -1,6 +1,10 @@
 <?php
 /**
- * Metadata
+ * Metadata - Current
+ * Strategy Class
+ *
+ * This handles the accumulation of Players, Positions and Coaches
+ * for a Team for the current team/player/position/coach configuration.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -10,38 +14,58 @@
 
 namespace Schoolbox\SportsFixtures\Team\Metadata\Strategy;
 
+use \Schoolbox\UserMapper;
 use \Schoolbox\Collection;
 use \Schoolbox\SportsFixtures\Coach\Mapper as CoachMapper;
 use \Schoolbox\SportsFixtures\Coach\TagCloud as CoachTagCloud;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
+use Schoolbox\SportsFixtures\Match\Model as Match;
 
-class Current extends Base implements IMetadataStrategy
+class Current implements IMetadataStrategy
 {
+    /**
+     * @var Match
+     */
+    private $match;
+
+    /**
+     * @var UserMapper
+     */
+    private $userMapper;
+
     /**
      * @var TeamPlayerMapper
      */
-    protected $teamPlayerMapper;
+    private $teamPlayerMapper;
 
     /**
      * @var TeamPositionMapper
      */
-    protected $teamPositionMapper;
+    private $teamPositionMapper;
 
     /**
      * @var CoachMapper
      */
-    protected $coachMapper;
+    private $coachMapper;
 
     /**
-     * Hook method
+     * Current constructor.
+     *
+     * @param Match $match
+     * @param UserMapper $userMapper
+     * @param TeamPlayerMapper $teamPlayerMapper
+     * @param TeamPositionMapper $teamPositionMapper
+     * @param CoachMapper $coachMapper
      */
-    public function setup()
+    public function __construct(Match $match, UserMapper $userMapper, TeamPlayerMapper $teamPlayerMapper, TeamPositionMapper $teamPositionMapper, CoachMapper $coachMapper)
     {
-        $this->setTeamPlayerMapper(TeamPlayerMapper::getInstance());
-        $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
-        $this->setCoachMapper(CoachMapper::getInstance());
+        $this->setMatch($match);
+        $this->setUserMapper($userMapper);
+        $this->setTeamPlayerMapper($teamPlayerMapper);
+        $this->setTeamPositionMapper($teamPositionMapper);
+        $this->setCoachMapper($coachMapper);
     }
 
     /**
@@ -136,5 +160,35 @@ class Current extends Base implements IMetadataStrategy
         $this->coachMapper = $coachMapper;
     }
 
+    /**
+     * @return UserMapper
+     */
+    private function getUserMapper()
+    {
+        return $this->userMapper;
+    }
 
+    /**
+     * @param UserMapper $userMapper
+     */
+    private function setUserMapper($userMapper)
+    {
+        $this->userMapper = $userMapper;
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getMatch()
+    {
+        return $this->match;
+    }
+
+    /**
+     * @param mixed $match
+     */
+    private function setMatch($match)
+    {
+        $this->match = $match;
+    }
 }

@@ -10,9 +10,18 @@
 
 namespace Schoolbox\SportsFixtures\Team\Metadata;
 
-use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Team\Metadata\Strategy\Current as CurrentStrategy;
 use \Schoolbox\SportsFixtures\Team\Metadata\Strategy\Historic as HistoricStrategy;
+use \Schoolbox\SportsFixtures\Match\Model as Match;
+
+use \Schoolbox\UserMapper;
+use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
+use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
+use \Schoolbox\SportsFixtures\Coach\Mapper as CoachMapper;
+
+use \Schoolbox\SportsFixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
+use \Schoolbox\SportsFixtures\Team\Position\Participant\Mapper as TeamPositionParticipantMapper;
+use \Schoolbox\SportsFixtures\Coach\Participant\Mapper as TeamCoachParticipantMapper;
 
 class Factory
 {
@@ -26,7 +35,7 @@ class Factory
      *
      * @param $match
      */
-    public function __construct($match)
+    public function __construct(Match $match)
     {
         $this->setMatch($match);
     }
@@ -42,10 +51,21 @@ class Factory
         $diff = \Alaress_Date_Format::now()->diffInSeconds($this->getMatch()->getStartAt(), false);
 
         if ($diff > 0) {
-            return new Metadata($this->getMatch(), new CurrentStrategy($this->getMatch()));
+            return new Metadata($this->getMatch(), new CurrentStrategy(
+                $this->getMatch(),
+                UserMapper::getInstance(),
+                TeamPlayerMapper::getInstance(),
+                TeamPositionMapper::getInstance(),
+                CoachMapper::getInstance()
+            ));
         }
 
-        return new Metadata($this->getMatch(), new HistoricStrategy($this->getMatch()));
+        return new Metadata($this->getMatch(), new HistoricStrategy(
+            $this->getMatch(),
+            TeamParticipantMapper::getInstance(),
+            TeamPositionParticipantMapper::getInstance(),
+            TeamCoachParticipantMapper::getInstance()
+        ));
     }
 
     /* Getters/Setters
