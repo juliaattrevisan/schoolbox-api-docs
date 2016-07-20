@@ -101,6 +101,14 @@ class Component_Dashboard_NewsController extends Component_Dashboard_ControllerA
                 }
             }
 
+            // Remove empty topics
+
+            foreach ($groupedList as $key => $value) {
+                if (count($groupedList[$key]) == 0) {
+                    unset($groupedList[$key]);
+                }
+            }
+
             $topicList = array_keys($groupedList);
 
             $userFormatter = new User();
