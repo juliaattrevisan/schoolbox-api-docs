@@ -93,6 +93,13 @@
         /* Collapse content on components
          */
         $('[data-component]').find('[data-collapser=true]').collapsable();
+
+        // Adds page to my links
+        $('#postToMyLinks').click( function (event) {
+            event.preventDefault();
+            $.post("/cms/myLinksForm.php", { url: "{HOMEPAGE_URL}", description: "{HEADING}"} );
+            location.reload();
+        });
     });
 </script>
 
@@ -201,13 +208,6 @@
                     folder: {ID}
                 }
             }
-        });
-
-        // Adds page to my links
-        $('#postToMyLinks').click( function (event) {
-            event.preventDefault();
-            $.post("/cms/myLinksForm.php", { url: "{HOMEPAGE_URL}", description: "{HEADING}"} );
-            location.reload();
         });
 
     });
