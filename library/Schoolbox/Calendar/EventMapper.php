@@ -303,23 +303,12 @@ class EventMapper extends Schoolbox\Mapper
     */
     protected function postSave($event)
     {
-
-        // It's a bit late to check this in the post save event!
-        // Besides, this is the wrong place to check permissions.
-//		/* Deal with groupList and campusList separately
-//		 */
-//		$permissionLevel = $this->getPerm($event, $_SESSION['user']);
-//
-//		if ($permissionLevel < WRITE_ACCESS) {
-//			error(34);
-//		}
-
-        /* Clear bugalugs attendance if it has changed from true to false
-		 */
+        // Clear attendance if it has changed from true to false
         if ($event->getAttendanceDirty()) {
              $this->removeAttendanceByEvent($event);
         }
 
+        // reset permissions
         $this->deletePermissions($event);
         $this->createRoles($event);
         $this->createCampus($event);
