@@ -53,9 +53,9 @@ class Snapshot implements ISnapshot
         $factory = new Factory($match);
         $metadata = $factory->produceCurrent();
 
-        $this->getRegistry()->add(new SnapshotCoach($match, $metadata, ParticipantCoachMapper::getInstance()));
-        $this->getRegistry()->add(new SnapshotPlayer($match, $metadata, ParticipantPlayerMapper::getInstance()));
-        $this->getRegistry()->add(new SnapshotPosition($match, $metadata, ParticipantPositionMapper::getInstance()));
+        $this->getRegistry()->add(new SnapshotCoach($metadata, ParticipantCoachMapper::getInstance()));
+        $this->getRegistry()->add(new SnapshotPlayer($metadata, ParticipantPlayerMapper::getInstance()));
+        $this->getRegistry()->add(new SnapshotPosition($metadata, ParticipantPositionMapper::getInstance()));
     }
 
     /**
