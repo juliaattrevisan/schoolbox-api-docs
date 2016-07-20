@@ -189,7 +189,9 @@
         <a class="icon-more" title="Actions" data-dropdown="header-options"></a>
     </nav>
     <ul id="header-options" class="f-dropdown" data-dropdown-content>
+        <li><a class="icon-staff-students" title="{ASSUME_PROMPT}" data-assimilator>Impersonate</a></li>
         <li><a class="icon-delete" title="Delete User" data-delete>Delete User</a></li>
+        <li><a href="/search/user/{USERID}" class="icon-staff-students">View Profile</a></li>
     </ul>
 </div>
 
@@ -315,6 +317,22 @@
         </section>
     </div>
 </div>
+
+<!-- BEGIN external_info -->
+<div class="row">
+    <div class="small-12 island">
+        <h3 class="subheader">Synergetic Info</h3>
+        <section>
+        <dl class="profile">
+            <dt>Year:</dt>
+            <dd>{FILE_YEAR}</dd>
+            <dt>Semester:</dt>
+            <dd>{FILE_SEMESTER}</dd>
+        </dl>
+        </section>
+    </div>
+</div>
+<!-- END external_info -->
 
 <div class="row">
     <div class="small-12 island">
