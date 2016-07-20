@@ -22,6 +22,9 @@ use Traversable;
 class EventRecurrenceMapper
 {
 
+    const EFFICACY_SELF   = 'self';
+    const EFFICACY_SERIES = 'series';
+
     /**
      * An instance of \Schoolbox\Calendar\EventMapper
      *
@@ -145,7 +148,7 @@ class EventRecurrenceMapper
             /* Update details of an already-existing set of recurring event incidents
              * (Change details of each instance of a recurring event, for example)
              */
-            if ($efficacy == 'series') {
+            if ($efficacy == self::EFFICACY_SERIES) {
                 $series = $this->getEventMapper()->getAllInSeries($event);
 
                 if ($series->count() == 0) {
@@ -182,7 +185,7 @@ class EventRecurrenceMapper
                 // yes. this is cheating.
                 $this->raiseNotification($event, Schoolbox\Mapper::METHOD_UPDATE, $previous);
             } // Modify an existing event and add recurring incidents
-            elseif ($efficacy == 'self') {
+            elseif ($efficacy == self::EFFICACY_SELF) {
                 // If there's any recurrence: update first only, and create the
                 // rest from scratch.
                 $first_date_set = $eventRecurrence->getDateCollection()->first();
