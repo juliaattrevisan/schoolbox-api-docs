@@ -69,8 +69,8 @@ class EventRecurrenceMapper
      */
     public function getSeriesRecurrence($event)
     {
-        $series = $this->getEventMapper()
-                       ->getAllInSeries($event);
+        $series = $this->getEventMapper()->getAllInSeries($event);
+
         if (count($series) <= 1) {
             return array();
         }
@@ -144,10 +144,10 @@ class EventRecurrenceMapper
 
             $previous = $this->getEventMapper()->findById($event->getId());
 
-            /* Update details of an already-existing set of recurring event incidents
-             * (Change details of each instance of a recurring event, for example)
-             */
             if ($efficacy == self::EFFICACY_SERIES) {
+                /* Update details of an already-existing set of recurring event incidents
+                 * (Change details of each instance of a recurring event, for example)
+                 */
                 $series = $this->getEventMapper()->getAllInSeries($event);
 
                 if ($series->count() == 0) {
@@ -183,8 +183,10 @@ class EventRecurrenceMapper
                 // seriesEvent will currently be the last event from the iteration, which will be compared to the last event as retrieved from the DB
                 // yes. this is cheating.
                 $this->raiseNotification($event, Schoolbox\Mapper::METHOD_UPDATE, $previous);
-            } // Modify an existing event and add recurring incidents
-            elseif ($efficacy == self::EFFICACY_SELF) {
+
+            } elseif ($efficacy == self::EFFICACY_SELF) {
+
+                // Modify an existing event and add recurring incidents
                 // If there's any recurrence: update first only, and create the
                 // rest from scratch.
                 $first_date_set = $eventRecurrence->getDateCollection()->first();
@@ -201,6 +203,7 @@ class EventRecurrenceMapper
                 $eventRelations->resetRelations($event);
 
                 if (!$event->getSeriesId()) {
+                    // there is no series ID, so we have nothing further to save. Raise a notification and get out.
                     $this->raiseNotification($event, Schoolbox\Mapper::METHOD_UPDATE, $previous);
                     return;
                 }
@@ -219,13 +222,14 @@ class EventRecurrenceMapper
                     $previous
                 );
             }
-        } /* Create N recurring events which are wholly new
-		 *
-		 * When you save a model through a mapper, it gives that model's instance the
-		 * affectedId (that is, the id it will have in the db). To save clones of event
-		 * with different dates, need to set the primary key to null explicitly
-		 */
-        else {
+
+        } else {
+            /* Create N recurring events which are wholly new
+             *
+             * When you save a model through a mapper, it gives that model's instance the
+             * affectedId (that is, the id it will have in the db). To save clones of event
+             * with different dates, need to set the primary key to null explicitly
+             */
             $this->persist($event, $eventRecurrence->getDateCollection(), $eventRecurrence->getSeriesId(), $eventRelations, $access);
         }
     }
@@ -316,7 +320,7 @@ class EventRecurrenceMapper
      * date source to create dates.
      *
      * @param Event                   $event
-     * @param DateTime[]|\Traversable $dateSource
+     * @param DateTime[]|Traversable  $dateSource
      * @param EventRelations          $eventRelations
      * @return Collection|Event[]
      */
@@ -326,12 +330,15 @@ class EventRecurrenceMapper
         EventRelations $eventRelations = null
     ) {
         $sequence = $this->getSequenceFromIterator($event, $dateSource);
+
         foreach ($sequence as $event) {
             $this->getEventMapper()->save($event);
+
             if ($eventRelations instanceof EventRelations) {
                 $eventRelations->resetRelations($event);
             }
         }
+
         return $sequence;
     }
 
