@@ -419,67 +419,6 @@ class EventMapper extends Schoolbox\Mapper
         }
     }
 
-    /**
-    * Get a permission level for a particular event and user combination
-    *
-    * @deprecated is this function even used?
-    * @param Event $event
-    * @param User $user
-    * @return int
-    */
-    private function getPerm($event, $user)
-    {
-
-        /* Superuser exit
-		 */
-        if ($user->isSuperuser()) {
-            return UserAccess::ACCESS_FULL;
-        }
-
-        /* Personal events
-		 */
-        if ($event->isPersonalLevel()) {
-/* If you personally spawned this event, you can modify it
-			 */
-            if ($event->getAuthor()->getId() == $user->getId()) {
-                return UserAccess::ACCESS_WRITE;
-            } /* Otherwise, if this event is just related to you in some way,
-			 * you can only read it unless you are a staff member
-			 */
-            elseif ($event->getOwner() == $user->getId()) {
-                return $user->getRole()->getType() === 'staff' ? UserAccess::ACCESS_WRITE : UserAccess::ACCESS_READ;
-            }
-        } /* Group events
-		 */
-        elseif ($event->isGroupLevel()) {
-            $groupHandler = new \Group();
-
-            return $groupHandler->getPermission($event->getServiceId());
-        } /* Campus events
-		 */
-        elseif ($event->isCampusLevel()) {
-            $groupHandler = new \Group();
-
-            /* Find the highest permission level
-			 */
-            $maxPermission = UserAccess::ACCESS_DENY;
-
-            foreach ($event->getCampusCollection() as $currentCampus) {
-                $permission = $groupHandler->getPermission($currentCampus);
-
-                if ($permission > $maxPermission) {
-                    $maxPermission = $permission;
-                }
-            }
-
-            return $maxPermission;
-        }
-
-        /* If you somehow don't fit into any of the above,
-		 * you just...don't get anything.
-		 */
-        return UserAccess::ACCESS_DENY;
-    }
 
     /**
     * Prevent overlap on default event table
