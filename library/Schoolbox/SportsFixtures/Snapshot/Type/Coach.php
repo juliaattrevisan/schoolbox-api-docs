@@ -21,11 +21,6 @@ use \Schoolbox\SportsFixtures\Match\Model as Match;
 class Coach implements ISnapshot
 {
     /**
-     * @var Match
-     */
-    private $match;
-
-    /**
      * @var Metadata
      */
     private $metadata;
@@ -38,13 +33,11 @@ class Coach implements ISnapshot
     /**
      * Coach constructor.
      *
-     * @param Match $match
      * @param Metadata $metadata
      * @param ParticipantCoachMapper $participantMapper
      */
-    public function __construct(Match $match, Metadata $metadata, ParticipantCoachMapper $participantMapper)
+    public function __construct(Metadata $metadata, ParticipantCoachMapper $participantMapper)
     {
-        $this->setMatch($match);
         $this->setMetadata($metadata);
         $this->setParticipantMapper($participantMapper);
     }
@@ -57,7 +50,10 @@ class Coach implements ISnapshot
      */
     public function snapshot()
     {
-        $allTeams = [$this->getMatch()->getHomeTeam(), $this->getMatch()->getAwayTeam()];
+        /** @var Match $match */
+        $match = $this->getMetadata()->getMatch();
+
+        $allTeams = [$match->getHomeTeam(), $match->getAwayTeam()];
 
         /** @var Team $currentTeam */
         foreach ($allTeams as $currentTeam) {
@@ -70,7 +66,7 @@ class Coach implements ISnapshot
                  * @param Team $team
                  */
                 $this->getParticipantMapper()->deleteByColumnList([
-                    'match_id' => $this->getMatch()->getId(),
+                    'match_id' => $match->getId(),
                     'team_id' => $currentTeam->getId(),
 
                     /* Bug in deleteByColumnList?
@@ -84,7 +80,7 @@ class Coach implements ISnapshot
                 /** @var ParticipantCoach $participantCoach */
                 foreach ($allCoaches as $currentCoach) {
                     $participantCoach = $this->getParticipantMapper()->createModel();
-                    $participantCoach->setMatch($this->getMatch());
+                    $participantCoach->setMatch($match));
                     $participantCoach->setTeam($currentTeam);
                     $participantCoach->setUser($currentCoach->getUser());
                     $participantCoach->setName($currentCoach->getName());
@@ -112,22 +108,6 @@ class Coach implements ISnapshot
     private function setParticipantMapper($participantMapper)
     {
         $this->participantMapper = $participantMapper;
-    }
-
-    /**
-     * @return Match
-     */
-    private function getMatch()
-    {
-        return $this->match;
-    }
-
-    /**
-     * @param Match $match
-     */
-    private function setMatch($match)
-    {
-        $this->match = $match;
     }
 
     /**

@@ -21,11 +21,6 @@ use \Schoolbox\SportsFixtures\Match\Model as Match;
 class Player implements ISnapshot
 {
     /**
-     * @var Match
-     */
-    private $match;
-
-    /**
      * @var Metadata
      */
     private $metadata;
@@ -38,13 +33,11 @@ class Player implements ISnapshot
     /**
      * Player constructor.
      *
-     * @param Match $match
      * @param Metadata $metadata
      * @param ParticipantPlayerMapper $participantMapper
      */
-    public function __construct(Match $match, Metadata $metadata, ParticipantPlayerMapper $participantMapper)
+    public function __construct(Metadata $metadata, ParticipantPlayerMapper $participantMapper)
     {
-        $this->setMatch($match);
         $this->setMetadata($metadata);
         $this->setParticipantMapper($participantMapper);
     }
@@ -57,7 +50,10 @@ class Player implements ISnapshot
      */
     public function snapshot()
     {
-        $allTeams = [$this->getMatch()->getHomeTeam(), $this->getMatch()->getAwayTeam()];
+        /** @var Match $match */
+        $match = $this->getMetadata()->getMatch();
+
+        $allTeams = [$match->getHomeTeam(), $match->getAwayTeam()];
 
         /** @var Team $currentTeam */
         foreach ($allTeams as $currentTeam) {
@@ -70,7 +66,7 @@ class Player implements ISnapshot
                  * @param Team $team
                  */
                 $this->getParticipantMapper()->deleteByColumnList([
-                    'match_id' => $this->getMatch()->getId(),
+                    'match_id' => $match->getId(),
                     'team_id' => $currentTeam->getId(),
 
                     /* Bug in deleteByColumnList?
@@ -84,7 +80,7 @@ class Player implements ISnapshot
                 /** @var ParticipantPlayer $participantPlayer */
                 foreach ($allPlayers as $currentPlayer) {
                     $participantPlayer = $this->getParticipantMapper()->createModel();
-                    $participantPlayer->setMatch($this->getMatch());
+                    $participantPlayer->setMatch($match);
                     $participantPlayer->setTeam($currentTeam);
                     $participantPlayer->setUser($currentPlayer->getUser());
                     $participantPlayer->setSequence($currentPlayer->getSequence());
@@ -112,22 +108,6 @@ class Player implements ISnapshot
     private function setParticipantMapper($participantMapper)
     {
         $this->participantMapper = $participantMapper;
-    }
-
-    /**
-     * @return Match
-     */
-    protected function getMatch()
-    {
-        return $this->match;
-    }
-
-    /**
-     * @param Match $match
-     */
-    protected function setMatch($match)
-    {
-        $this->match = $match;
     }
 
     /**
