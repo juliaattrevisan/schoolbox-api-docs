@@ -1,6 +1,8 @@
 <?php
 /**
- * Adds this child's campuses to the parent.
+ * Adds a parent's children's campuses to the parent.
+ *
+ * Also sets the parent's default campus to their oldest child's default campus.
  *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2015, Alaress Pty Ltd
@@ -12,7 +14,9 @@ namespace Schoolbox\Sync\Hydrator\Custom;
 use External_User;
 use Monolog\Logger;
 use Schoolbox\Campus;
+use Schoolbox\CampusCollection;
 use Schoolbox\CampusMapper;
+use Schoolbox\Collection;
 use Schoolbox\External\Normalise\User\Base as ExternalUser;
 use Schoolbox\External\Normalise\User\Guardian as ExternalParent;
 use Schoolbox\User as InternalUser;
@@ -54,6 +58,8 @@ class AddParentToAllChildCampuses extends AbstractLoggableHydrator
 
                 $oldCampuses = $newCampuses = $previous->getCampusCollection()->getColumnValues('id');
 
+                $children = new Collection();
+
                 foreach ($childIds as $childId) {
                     try {
                         $childUser = $this->userMapper->findByExternalId($childId['RelatedID']);
@@ -61,6 +67,8 @@ class AddParentToAllChildCampuses extends AbstractLoggableHydrator
                         // noop
                         continue;
                     }
+                    $children->add($childUser);
+
                     foreach ($childUser->getCampusCollection() as $campus) {
                         $campusId = $campus->getId();
                         if (!in_array($campusId, $newCampuses)) {
@@ -83,9 +91,37 @@ class AddParentToAllChildCampuses extends AbstractLoggableHydrator
                         ]
                     ];
                 }
-
                 $this->log(Logger::INFO, $message, $input, $previous, $context);
 
+
+                // If children have campuses, select one as default for parent
+                if (!empty($newCampuses)) {
+
+                    $children->sortBy('year','desc');
+
+                    // Make storm happy :/
+                    $campus = null;
+
+                    /** @var InternalUser $child */
+                    foreach($children as $child){
+
+                        // Prefer default Campus
+                        if($campus = $child->getDefaultCampus()){
+                            break;
+                        }
+
+                        // Fallback to first campus
+                        if($campus = $child->getCampusCollection()->first()){
+                            break;
+                        }
+                    }
+
+                    $previous->setDefaultCampus($campus);
+                    $message = "Assigning default campus to parent";
+                    $context = ['campusId' => $campus->getId()];
+
+                    $this->log(Logger::INFO, $message, $input, $previous, $context);
+                }
             }
         }
         return $previous;
