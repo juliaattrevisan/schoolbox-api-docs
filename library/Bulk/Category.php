@@ -87,7 +87,7 @@ class Bulk_Category extends Bulk_Abstract
                             $category = $categoryMapper->findByCode($subjectCode);
 
                             $output[] = array(
-                                'category' => $row[$i],
+                                'category' => $row[1],
                                 'status' => 'Skipped',
                                 'error' => "Subject code already exists ($subjectCode)",
                             );
