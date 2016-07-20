@@ -745,7 +745,9 @@ class UserMapper extends Mapper
     public function verifyValidInternalMail(User $user)
     {
         if ($user->getUseInternalMail() === null) {
-            throw new UnexpectedValueException('Use internal mail flag cannot be null');
+            // While the code refers to this as 'Internal Mail', it's displayed as 'External Mail Client'
+            // eg see UPS Effects and user modify screens
+            throw new UnexpectedValueException('Use External Mail Client flag cannot be null');
         }
         return true;
     }
