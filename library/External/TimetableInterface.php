@@ -33,7 +33,6 @@ interface External_TimetableInterface
      *
      * @param Schoolbox\Campus $campus
      * @param int $date
-     * @internal param $campusId
      * @return int
      */
     public function getDayNumber(\Schoolbox\Campus $campus, $date = 0);
@@ -57,7 +56,6 @@ interface External_TimetableInterface
      *
      * @param Schoolbox\Campus $campus
      * @param int $now
-     * @internal param $campusId
      * @return array
      */
 	public function getPeriodNumber (\Schoolbox\Campus $campus, $now = 0);
@@ -171,7 +169,6 @@ interface External_TimetableInterface
      * @param $externalUserId
      * @param $userId
      * @param Schoolbox\Campus $campus
-     * @internal param $campusId
      * @return mixed
      */
 	public function getFullTimetable ($externalUserId, $userId, \Schoolbox\Campus $campus);

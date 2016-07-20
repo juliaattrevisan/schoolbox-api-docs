@@ -12,8 +12,13 @@ namespace Schoolbox\Realtime\Schedule\Trigger\Timetable;
 
 use Alaress\Date\Clock;
 use Alaress\Date\IClock;
+use Alaress\Scheduler\Event\EventInterface;
+use Alaress_Date_Format as ADF;
 use Alaress\Scheduler\Trigger\AbstractTrigger;
+use BadMethodCallException;
 use External_Timetable;
+use External_TimetableInterface;
+use OutOfBoundsException;
 use Schoolbox\Campus;
 use Schoolbox\Realtime\Schedule\Event;
 use Schoolbox\Realtime\Timetable\TimetableNotifier;
@@ -22,7 +27,7 @@ use Schoolbox\Realtime\WorkNotifier;
 abstract class TimetableTrigger extends AbstractTrigger
 {
     const START_WARNING_WINDOW = 300; // 5 minutes
-    const TARGET_WARN = 'warn';
+    const TARGET_WARN  = 'warn';
     const TARGET_START = 'start';
     const TARGET_END   = 'end';
 
@@ -35,6 +40,12 @@ abstract class TimetableTrigger extends AbstractTrigger
     /** @var WorkNotifier */
     protected $notifier;
 
+    /** @var External_TimetableInterface */
+    protected $handler;
+
+    /** @var IClock */
+    protected $clock;
+
     /**
      * @param Campus $campus the object to be acted on
      * @param string $target the mode in which to run (start or end)
@@ -42,13 +53,13 @@ abstract class TimetableTrigger extends AbstractTrigger
      */
     public function __construct($campus, $target, $clock = null)
     {
-        $this->cache    = array();
-        $this->campus   = $campus;
-        $this->label    = $campus->getId() . ".$target";
-        $this->event    = new Event(null, $target, $campus, null);
-        $this->notifier = new TimetableNotifier();
-        $this->handler  = new External_Timetable();
-        $this->clock    = $clock ?: new Clock();
+        $this->setCache([]);
+        $this->setCampus($campus);
+        $this->setLabel($campus->getId() . ".$target");
+        $this->setEvent(new Event(null, $target, $campus, null));
+        $this->setNotifier(new TimetableNotifier());
+        $this->setHandler(new External_Timetable());
+        $this->setClock($clock ?: new Clock()); // 1sec/sec from epoch if nothing specified
     }
 
     /**
@@ -58,102 +69,203 @@ abstract class TimetableTrigger extends AbstractTrigger
      */
     public function getTimestamp()
     {
-        return $this->getTimetable($this->clock->time());
+        return $this->getTimetable(ADF::now($this->clock));
     }
 
 
     /**
-     * @param int  $timestamp
+     * @param ADF  $now
      * @param bool $lookAhead
      * @return int
      */
-    protected function getTimetable($timestamp, $lookAhead = true)
+    protected function getTimetable(ADF $now, $lookAhead = true)
     {
-        $definition = $this->getTimetableDefinition($timestamp);
-        $len  = count($definition['number']);
+        // retrieve the timetable definition relevant to our current time
+        $definition = $this->getTimetableDefinition($now);
 
-        // Before the day starts
-
-        if (strtotime($definition['start'][0], $timestamp) > $timestamp) {
-            return $this->beforeSchool($definition, $timestamp);
+        // if there is no timetable definition available, you're off the edge of the map.
+        if (!$definition) {
+            return PHP_INT_MAX;
         }
 
-        // Give a separate warning message 5 minutes before the start next period
-
-        for ($i = 1; $i < $len; ++$i) {
-            $start = strtotime($definition['start'][$i], $timestamp);
-
-            if ($x = $this->testPeriod($start, $end, $timestamp)) {
-                $warning_time = $x;
-                break;
-            }
+        try {
+            return $this->beforeSchool($definition, $now)->getUnixTimeStamp();
+        } catch (OutOfBoundsException $e) {
+            // noop... carry on, as you were
         }
 
-        // Hunt down the next start or end time, accounting for being *between* classes
+        // find a relevant time
+        $relevantTime = $this->getRelevantTime($definition, $now);
 
-        for ($i = 1; $i < $len; ++$i) {
-            $start = strtotime($definition['start'][$i], $timestamp);
-            $end   = strtotime($definition['end'][$i], $timestamp);
-
-            if ($x = $this->testPeriod($start, $end, $timestamp)) {
-                $start_end_time = $x;
-                break;
-            }
-        }
-
-        // Work out of we should return the the period start/end time or the 5 minute warning time (whichever is earlier)
-        // This could probably be truncated somehow
-
-        if (isset($start_end_time ) && isset($warning_time)) {
-            if ($warning_time < $start_end_time ) {
-                return $warning_time;
-            } else {
-                return $start_end_time;
-            }
-        } else if (isset($start_end_time )) {
-            return $start_end_time ;
-        } else if (isset($warning_time)) {
-            return $warning_time;
+        if (!$relevantTime->isNull()) {
+            // if it's not null, return it
+            return $relevantTime->getUnixTimeStamp();
         }
 
         // You're off the edge of the map here, matey. Here there be monsters. Are they big scary monsters, or more
-        // Monsters Inc. style monsters?
+        // Monsters Inc. style monsters? They're big scary monsters, to be sure.
 
         if (!$lookAhead) {
             return PHP_INT_MAX;
         }
 
         // Try again with the new time, but do not attempt to look ahead next time
+        return $this->getTimetable($this->nextValidTimestamp($now), false);
+    }
 
-        return $this->getTimetable($this->nextValidTimestamp($timestamp), false);
+
+    /**
+     * Give a separate warning message 5 minutes before the start next period
+     *
+     * @param array $definition
+     * @param ADF   $now
+     * @return ADF
+     */
+    protected function getWarningTime(array $definition, $now)
+    {
+        $len  = count($definition['number']);
+
+        for ($i = 1; $i < $len; ++$i) {
+            $start = $this->extractPeriodStart($definition, $i, $now);
+
+            try {
+                return $this->testPeriod($start, new \Alaress_Date_NullDate(), $now);
+
+            } catch (BadMethodCallException $e) {
+                continue;
+
+            } catch (OutOfBoundsException $e) {
+                continue;
+            }
+        }
+
+        return new \Alaress_Date_NullDate();
+    }
+
+
+    /**
+     * Hunt down the next start or end time, accounting for being *between* classes
+     *
+     * @param array $definition
+     * @param ADF    $now
+     * @return ADF
+     */
+    protected function getStartEndTime(array $definition, $now)
+    {
+        $len  = count($definition['number']);
+
+        for ($i = 1; $i < $len; ++$i) {
+            $start = $this->extractPeriodStart($definition, $i, $now);
+            $end   = $this->extractPeriodEnd($definition, $i, $now);
+
+            try {
+                return $this->testPeriod($start, $end, $now);
+
+            } catch (OutOfBoundsException $e) {
+                continue;
+            }
+        }
+
+        return new \Alaress_Date_NullDate();
+    }
+
+
+    /**
+     * Work out of we should return the the period start/end time or the 5 minute warning time (whichever is earlier)
+     *
+     * @param array $definition
+     * @param ADF   $now
+     * @return ADF
+     */
+    protected function getRelevantTime(array $definition, ADF $now)
+    {
+        $warningTime  = $this->getWarningTime($definition, $now);
+        $startEndTime = $this->getStartEndTime($definition, $now);
+
+        // if they're both null, just return null
+        if ($warningTime->isNull() && $startEndTime->isNull()) {
+            return $warningTime;
+        }
+
+        // otherwise, if just warning is null, return startEnd
+        if ($warningTime->isNull()) {
+            return $startEndTime;
+        }
+
+        // conversely, if just startEnd is null, return warning
+        if ($startEndTime->isNull()) {
+            return $warningTime;
+        }
+
+        // neither is null: return the earlier of the two
+        return $warningTime->lt($startEndTime) ? $warningTime : $startEndTime;
     }
 
 
     /**
      * @param array $definition
-     * @param int $timestamp
-     * @return int
+     * @param int   $periodIndex
+     * @param ADF   $now
+     * @return ADF
      */
-    protected abstract function beforeSchool($definition, $timestamp);
+    protected function extractPeriodStart(array $definition, $periodIndex, ADF $now)
+    {
+        return $this->extractPeriodTime($definition, $periodIndex, 'start', $now);
+    }
 
 
     /**
-     * @param int $start
-     * @param int $end
-     * @param int $timestamp
-     * @return int
+     * @param array $definition
+     * @param int   $periodIndex
+     * @param ADF   $now
+     * @return ADF
      */
-    protected abstract function testPeriod($start, $end, $timestamp);
+    protected function extractPeriodEnd(array $definition, $periodIndex, ADF $now)
+    {
+        return $this->extractPeriodTime($definition, $periodIndex, 'end', $now);
+    }
+
+
+    /**
+     * @param array  $definition
+     * @param string $label
+     * @param int    $periodIndex
+     * @param ADF    $now
+     * @return ADF
+     */
+    protected function extractPeriodTime(array $definition, $periodIndex, $label, ADF $now)
+    {
+        return new ADF(strtotime($definition[$label][$periodIndex], $now->getUnixTimeStamp()), 'U');
+    }
+
+
+    /**
+     * @param array $definition
+     * @param ADF   $now
+     * @return ADF
+     */
+    protected abstract function beforeSchool(array $definition, ADF $now);
+
+
+    /**
+     * @param ADF $start
+     * @param ADF $end
+     * @param ADF $now
+     * @throws OutOfBoundsException if this period is not relevant
+     * @return ADF
+     */
+    protected abstract function testPeriod(ADF $start, ADF $end, ADF $now);
+
 
     /**
      * Since this will be called n times a day, it's far more efficient to cache it
      *
-     * @param int $timestamp
-     * @return array
+     * @param ADF $now
+     * @return array which is a timetable definition for the day associated with the given ADF
      */
-    protected function getTimetableDefinition($timestamp)
+    protected function getTimetableDefinition(ADF $now)
     {
-        $key = date('Y.m.d', $timestamp);
+        $key = $now->getUsingFormat('Y.m.d');
 
         if (empty($this->cache[$key])) {
 
@@ -163,7 +275,7 @@ abstract class TimetableTrigger extends AbstractTrigger
                 array_pop($this->cache);
             }
 
-            $dayNumber         = $this->handler->getDayNumber($this->campus, $timestamp);
+            $dayNumber         = $this->handler->getDayNumber($this->campus, $now->getUnixTimeStamp());
             $this->cache[$key] = $this->handler->getTimetableDefinition(null, $this->campus, $dayNumber);
         }
 
@@ -172,11 +284,16 @@ abstract class TimetableTrigger extends AbstractTrigger
 
 
     /**
-     * @param int  $timestamp
-     * @return int
+     * Return an ADF that represents ~1am on the next available weekday
+     *
+     * @param ADF $now
+     * @return ADF
      */
-    protected function nextValidTimestamp($timestamp)
+    protected function nextValidTimestamp(ADF $now)
     {
+        // because dates are not immutable, clone it before we play with it
+        $now = clone($now);
+
         // we got here? that means we're off the end of the timetable,
         // so we want to schedule the first period of the next timetabled day
 
@@ -184,16 +301,92 @@ abstract class TimetableTrigger extends AbstractTrigger
         // we can't just go "tomorrow", because if the ExternalTimetable sees
         // a non-school day, it will return the generic 'day 0' timetable,
         // which we don't want
-        $timestamp -= (date('H', $timestamp) - 1) * 3600;
+        $now->setHour(1);
 
         do {
             // increment in days until we're off the weekend
-            $timestamp += 86400;
-        } while (date('N', $timestamp) > 5);
+            $now->addDays(1);
+        } while ($now->isWeekend());
 
         // return new timestamp
-        return $timestamp;
+        return $now;
     }
 
+
+    /**
+     * @param Campus $campus
+     * @return TimetableTrigger
+     */
+    public function setCampus(Campus $campus)
+    {
+        $this->campus = $campus;
+        return $this;
+    }
+
+
+    /**
+     * @param array $cache
+     * @return static
+     */
+    public function setCache(array $cache)
+    {
+        $this->cache = $cache;
+        return $this;
+    }
+
+
+    /**
+     * @param IClock $clock
+     * @return $this
+     */
+    protected function setClock(IClock $clock)
+    {
+        $this->clock = $clock;
+        return $this;
+    }
+
+
+    /**
+     * @param External_TimetableInterface $handler
+     * @return $this
+     */
+    protected function setHandler(External_TimetableInterface $handler)
+    {
+        $this->handler = $handler;
+        return $this;
+    }
+
+
+    /**
+     * @param WorkNotifier $notifier
+     * @return $this
+     */
+    protected function setNotifier(WorkNotifier $notifier)
+    {
+        $this->notifier = $notifier;
+        return $this;
+    }
+
+
+    /**
+     * @param EventInterface $event
+     * @return $this
+     */
+    protected function setEvent(EventInterface $event)
+    {
+        $this->event = $event;
+        return $this;
+    }
+
+
+    /**
+     * @param string $label
+     * @return $this
+     */
+    protected function setLabel($label)
+    {
+        $this->label = $label;
+        return $this;
+    }
 
 }
