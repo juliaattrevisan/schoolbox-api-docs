@@ -13,7 +13,7 @@ namespace Schoolbox\SportsFixtures\Team\Metadata\Strategy;
 use \Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Match\Model as Match;
 
-class Base
+abstract class Base
 {
     /**
      * @var UserMapper
