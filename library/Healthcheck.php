@@ -22,7 +22,7 @@ class Healthcheck
      */
     private $log;
 
-    public function __construct($school, $db = '')
+    public function __construct($db = '')
     {
         $this->db = ($db) ? $db : ucfirst(strtolower(Config::get('external_type')));
 

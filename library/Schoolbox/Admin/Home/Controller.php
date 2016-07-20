@@ -252,7 +252,7 @@ class Controller extends Base
      * Provides a view of the current external DB health, linked from the admin dashboard
      */
     public function getHealthcheck() {
-        $healthCheck = new Healthcheck(ConfigMapper::getInstance()->get('site_location'));
+        $healthCheck = new Healthcheck();
         $this->getResponse()->content->set(
             array(
                 'template' => '@adminHome/healthcheck.twig',
