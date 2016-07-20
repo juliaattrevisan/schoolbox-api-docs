@@ -111,7 +111,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $class = $externalClass->getClass($classCode->getCode(), $owner);
 
 
-            if($class !== false) {
+            if (!empty($class)) {
                 $staffID = $class['MultipleStaffMarkbookFlag'] > 0 ? $owner->getExternalId() : 0;
 
                 $assessmentFieldValues = $this->getAssessmentFieldValues($assessment);
