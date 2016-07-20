@@ -12,6 +12,7 @@ namespace Schoolbox\Calendar;
 
 
 use Alaress_Date_Format;
+use InvalidArgumentException;
 use Schoolbox\Collection;
 
 class EventRecurrence {
@@ -69,7 +70,7 @@ class EventRecurrence {
 	 *
 	 * @var string
 	 */
-	private $efficacyValues = array('series', 'self');
+	private $efficacyValues = [ EventRecurrenceMapper::EFFICACY_SERIES, EventRecurrenceMapper::EFFICACY_SELF ];
 
 	/**
 	 * The chosen frequency of event recurrence (daily, weekly, etc)
@@ -125,18 +126,9 @@ class EventRecurrence {
 		if (in_array($efficacy, $this->getEfficacyValues())) {
 			$this->setEfficacy($efficacy);
 		}
-	}
 
-	/**
-	 * Set up recurring events
-	 * Return an array of Alaress_Date_Format instances
-	 *
-	 * @return array
-	 */
-	public function setup() {
-
-		// repeat specified, and and enddate also, populate the dates to be set
 		if ($this->isValidInterval() && $this->getUntil()->getUnixTimestamp()) {
+			// repeat specified, and and enddate also, populate the dates to be set
 			$this->setSeriesId($this->getCalendarHandler()->getUpperSeriesIndex());
 
 			$start_timestamp = $this->getStartDate()->getUnixTimeStamp();
@@ -158,23 +150,20 @@ class EventRecurrence {
 				$start_timestamp = strtotime($this->intervalValue(), $start_timestamp);
 				$end_timestamp = strtotime($this->intervalValue(), $end_timestamp);
 			}
-		}
 
-		// if repeat is set, but no enddate was specified, bail out
-		// "not enough data submitted to the form"
-		else if($this->isValidInterval() && (!$this->getUntil()->getUnixTimestamp())) {
-			error(2);
-		}
+		} elseif ($this->isValidInterval() && (!$this->getUntil()->getUnixTimestamp())) {
+			// if repeat is set, but no enddate was specified, bail out
+			// "not enough data submitted to the form"
+			throw new InvalidArgumentException("Repeat was set but no end-date specified", \Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
 
-		// no repeat
-		else {
+		} else {
+			// no repeat
 			$this->getDateCollection()->add(array(
 				'start' => $this->getStartDate()->getDatabaseDate(),
 				'end' => $this->getEndDate()->getDatabaseDate(),
 			));
 		}
 
-		return $this;
 	}
 
 	/**
