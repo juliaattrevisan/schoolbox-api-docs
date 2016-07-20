@@ -42,7 +42,7 @@ class Metadata
     protected $positions;
 
     /**
-     * @var Strategy\Base
+     * @var IMetadataStrategy
      */
     protected $strategy;
 
