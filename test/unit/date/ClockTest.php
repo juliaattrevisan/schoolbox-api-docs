@@ -34,7 +34,7 @@ class ClockTest extends PHPUnit_Framework_TestCase
     /**
      * Verifies that a clock for future keeps the correct time.
      */
-    public function testClockInFutuer()
+    public function testClockInFuture()
     {
         $clock = new Clock('+1 year');
         sleep(1);
