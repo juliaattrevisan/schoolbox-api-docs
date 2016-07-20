@@ -18,6 +18,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayerModel;
+use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\SportsFixtures\Team\Player\Participant\Model as ParticipantPlayer;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 
@@ -68,7 +69,7 @@ class Mapper extends BaseMapper
 
         foreach ($statement as $row) {
             /** @var TeamPlayerModel $model */
-            $teamPlayer = new TeamPlayerModel();
+            $teamPlayer = TeamPlayerMapper::getInstance()->createModel();
             $teamPlayer->setId($row['id'])
                 ->setSequence($row['sequence']);
 

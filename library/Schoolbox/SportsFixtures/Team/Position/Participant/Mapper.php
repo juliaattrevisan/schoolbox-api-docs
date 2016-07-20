@@ -20,7 +20,7 @@ use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Position\Model as Position;
-use Schoolbox\SportsFixtures\Team\Position\Model as TeamPosition;
+use Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
 use Schoolbox\SportsFixtures\Team\Position\Participant\Model as ParticipantPosition;
 
 class Mapper extends BaseMapper
@@ -68,7 +68,7 @@ class Mapper extends BaseMapper
     {
         $collection = new Collection();
         foreach ($statement as $row) {
-            $teamPosition = new TeamPosition();
+            $teamPosition = TeamPositionMapper::getInstance()->createModel();
             $teamPosition->setId($row['id']);
 
             $user = $this->hydrateJoin($row, 'user', 'u');

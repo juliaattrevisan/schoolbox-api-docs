@@ -19,7 +19,7 @@ use Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use Schoolbox\SportsFixtures\Coach\Participant\Model as ParticipantCoach;
-use Schoolbox\SportsFixtures\Coach\Model as Coach;
+use Schoolbox\SportsFixtures\Coach\Mapper as CoachMapper;
 
 class Mapper extends BaseMapper
 {
@@ -67,8 +67,7 @@ class Mapper extends BaseMapper
         $collection = new Collection();
 
         foreach ($statement as $row) {
-            /** @var Coach $model */
-            $coach = new Coach();
+            $coach = CoachMapper::getInstance()->createModel();
             $coach->setName($row['name']);
 
             // set user and team only if retrieved properly
