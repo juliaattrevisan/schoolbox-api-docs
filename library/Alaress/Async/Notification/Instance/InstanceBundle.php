@@ -37,7 +37,7 @@ class InstanceBundle {
 
 		// If we accidentally passed a builder object (ie. forgot to call build()),
 		// just accept it and build the instance on the fly.
-		if($instance instanceof Builder) {
+		if($instance instanceof BuilderInterface) {
 			$instance = $instance->build();
 		}
 
