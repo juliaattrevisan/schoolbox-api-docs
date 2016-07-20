@@ -80,7 +80,7 @@ class Coach implements ISnapshot
                 /** @var ParticipantCoach $participantCoach */
                 foreach ($allCoaches as $currentCoach) {
                     $participantCoach = $this->getParticipantMapper()->createModel();
-                    $participantCoach->setMatch($match));
+                    $participantCoach->setMatch($match);
                     $participantCoach->setTeam($currentTeam);
                     $participantCoach->setUser($currentCoach->getUser());
                     $participantCoach->setName($currentCoach->getName());
