@@ -64,23 +64,19 @@ class Metadata
         $this->setCoaches(new Collection());
         $this->setPositions(new Collection());
         $this->setStrategy($strategy);
-
-        $this->collect($match);
     }
 
     /**
      * Collect team composition
      *
      * The players, their positions, and coaches
-     *
-     * @param Match $match
      */
-    protected function collect(Match $match)
+    public function collect()
     {
         /** @var Team $homeTeam */
         /** @var Team $awayTeam */
-        $homeTeam = $match->getHomeTeam();
-        $awayTeam = $match->getAwayTeam();
+        $homeTeam = $this->getMatch()->getHomeTeam();
+        $awayTeam = $this->getMatch()->getAwayTeam();
 
         $this->collectForTeam($homeTeam);
         $this->collectForTeam($awayTeam);

@@ -51,10 +51,20 @@ class Factory
         $diff = \Alaress_Date_Format::now()->diffInSeconds($this->getMatch()->getStartAt(), false);
 
         if ($diff > 0) {
-            return $this->produceCurrent();
+            $metadata = $this->produceCurrent();
+        }
+        else {
+            $metadata = $this->produceHistoric();
         }
 
-        return $this->produceHistoric();
+        /* Jump start the Metadata with collect();
+         *
+         * It's pretty useless without it...and doing it
+         * here saves you having to do it everywhere else
+         */
+        $metadata->collect();
+
+        return $metadata;
     }
 
     /**
