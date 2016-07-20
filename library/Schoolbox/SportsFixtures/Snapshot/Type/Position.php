@@ -15,20 +15,38 @@ use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Position\Model as CurrentPosition;
 use \Schoolbox\SportsFixtures\Team\Position\Participant\Model as ParticipantPosition;
 use \Schoolbox\SportsFixtures\Team\Position\Participant\Mapper as ParticipantPositionMapper;
+use \Schoolbox\SportsFixtures\Team\Metadata\Metadata;
+use \Schoolbox\SportsFixtures\Match\Model as Match;
 
-class Position extends Base implements ISnapshot
+class Position implements ISnapshot
 {
+    /**
+     * @var Match
+     */
+    private $match;
+
+    /**
+     * @var Metadata
+     */
+    private $metadata;
+
     /**
      * @var ParticipantPositionMapper
      */
     private $participantMapper;
 
     /**
-     * Hook method
+     * Position constructor.
+     *
+     * @param Match $match
+     * @param Metadata $metadata
+     * @param ParticipantPositionMapper $participantMapper
      */
-    protected function setup()
+    public function __construct(Match $match, Metadata $metadata, ParticipantPositionMapper $participantMapper)
     {
-        $this->setParticipantMapper(ParticipantPositionMapper::getInstance());
+        $this->setMatch($match);
+        $this->setMetadata($metadata);
+        $this->setParticipantMapper($participantMapper);
     }
 
     /**
@@ -94,5 +112,37 @@ class Position extends Base implements ISnapshot
     private function setParticipantMapper($participantMapper)
     {
         $this->participantMapper = $participantMapper;
+    }
+
+    /**
+     * @return Match
+     */
+    private function getMatch()
+    {
+        return $this->match;
+    }
+
+    /**
+     * @param Match $match
+     */
+    private function setMatch($match)
+    {
+        $this->match = $match;
+    }
+
+    /**
+     * @return Metadata
+     */
+    private function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * @param Metadata $metadata
+     */
+    private function setMetadata($metadata)
+    {
+        $this->metadata = $metadata;
     }
 }

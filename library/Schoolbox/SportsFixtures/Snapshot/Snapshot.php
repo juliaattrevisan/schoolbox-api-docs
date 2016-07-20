@@ -24,6 +24,9 @@ use \Schoolbox\SportsFixtures\Team\Metadata\Factory;
 use \Schoolbox\SportsFixtures\Snapshot\Type\Coach as SnapshotCoach;
 use \Schoolbox\SportsFixtures\Snapshot\Type\Player as SnapshotPlayer;
 use \Schoolbox\SportsFixtures\Snapshot\Type\Position as SnapshotPosition;
+use \Schoolbox\SportsFixtures\Coach\Participant\Mapper as ParticipantCoachMapper;
+use \Schoolbox\SportsFixtures\Team\Player\Participant\Mapper as ParticipantPlayerMapper;
+use \Schoolbox\SportsFixtures\Team\Position\Participant\Mapper as ParticipantPositionMapper;
 
 class Snapshot implements ISnapshot
 {
@@ -50,9 +53,9 @@ class Snapshot implements ISnapshot
         $factory = new Factory($match);
         $metadata = $factory->produceCurrent();
 
-        $this->getRegistry()->add(new SnapshotCoach($match, $metadata));
-        $this->getRegistry()->add(new SnapshotPlayer($match, $metadata));
-        $this->getRegistry()->add(new SnapshotPosition($match, $metadata));
+        $this->getRegistry()->add(new SnapshotCoach($match, $metadata, ParticipantCoachMapper::getInstance()));
+        $this->getRegistry()->add(new SnapshotPlayer($match, $metadata, ParticipantPlayerMapper::getInstance()));
+        $this->getRegistry()->add(new SnapshotPosition($match, $metadata, ParticipantPositionMapper::getInstance()));
     }
 
     /**

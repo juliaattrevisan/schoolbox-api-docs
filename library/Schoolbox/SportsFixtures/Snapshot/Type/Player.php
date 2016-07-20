@@ -15,20 +15,38 @@ use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Player\Model as CurrentPlayer;
 use \Schoolbox\SportsFixtures\Team\Player\Participant\Model as ParticipantPlayer;
 use \Schoolbox\SportsFixtures\Team\Player\Participant\Mapper as ParticipantPlayerMapper;
+use \Schoolbox\SportsFixtures\Team\Metadata\Metadata;
+use \Schoolbox\SportsFixtures\Match\Model as Match;
 
-class Player extends Base implements ISnapshot
+class Player implements ISnapshot
 {
+    /**
+     * @var Match
+     */
+    private $match;
+
+    /**
+     * @var Metadata
+     */
+    private $metadata;
+
     /**
      * @var ParticipantPlayerMapper
      */
     private $participantMapper;
 
     /**
-     * Hook method
+     * Player constructor.
+     *
+     * @param Match $match
+     * @param Metadata $metadata
+     * @param ParticipantPlayerMapper $participantMapper
      */
-    protected function setup()
+    public function __construct(Match $match, Metadata $metadata, ParticipantPlayerMapper $participantMapper)
     {
-        $this->setParticipantMapper(ParticipantPlayerMapper::getInstance());
+        $this->setMatch($match);
+        $this->setMetadata($metadata);
+        $this->setParticipantMapper($participantMapper);
     }
 
     /**
@@ -94,5 +112,37 @@ class Player extends Base implements ISnapshot
     private function setParticipantMapper($participantMapper)
     {
         $this->participantMapper = $participantMapper;
+    }
+
+    /**
+     * @return Match
+     */
+    protected function getMatch()
+    {
+        return $this->match;
+    }
+
+    /**
+     * @param Match $match
+     */
+    protected function setMatch($match)
+    {
+        $this->match = $match;
+    }
+
+    /**
+     * @return Metadata
+     */
+    protected function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * @param Metadata $metadata
+     */
+    protected function setMetadata($metadata)
+    {
+        $this->metadata = $metadata;
     }
 }
