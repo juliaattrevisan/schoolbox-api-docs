@@ -148,12 +148,30 @@ CREATE TABLE `sportsfixtures_match_itineraryitem` (
 			ON DELETE NO ACTION
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
+/* Match Status Table (add before sportsfixtures_result)
+ */
+CREATE TABLE `sportsfixtures_status` (
+	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
+	`name` varchar(255) NULL COMMENT '',
+	`created_at` DATETIME NULL COMMENT '',
+	`updated_at` DATETIME NULL COMMENT '',
+	`deleted_at` DATETIME NULL COMMENT '',
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB CHARACTER SET=utf8;
+
+INSERT INTO `sportsfixtures_status` VALUES
+	(null,'Win',NOW(),NOW(),null),
+	(null,'Loss',NOW(),NOW(),null),
+	(null,'Draw',NOW(),NOW(),null),
+	(null,'Cancelled',NOW(),NOW(),null);
+
 /* Match Result Table
  */
 CREATE TABLE `sportsfixtures_result` (
 	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
 	`match_id` INT NOT NULL,
 	`team_id` INT NOT NULL,
+	`status_id` INT NULL,
 	`description` TEXT NULL COMMENT '',
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
@@ -162,7 +180,11 @@ CREATE TABLE `sportsfixtures_result` (
 	FOREIGN KEY (`match_id`)
 		REFERENCES `sportsfixtures_match`(`id`)
 			ON UPDATE NO ACTION
-			ON DELETE NO ACTION
+			ON DELETE NO ACTION,
+	FOREIGN KEY (`status_id`)
+	REFERENCES `sportsfixtures_status`(`id`)
+		ON UPDATE CASCADE
+		ON DELETE SET NULL
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Error table entries */
@@ -223,23 +245,6 @@ CREATE TABLE `sportsfixtures_school` (
 	`deleted_at` DATETIME NULL COMMENT '',
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB CHARACTER SET=utf8;
-
-/* Match Status Table
- */
-CREATE TABLE `sportsfixtures_status` (
-	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
-	`name` varchar(255) NULL COMMENT '',
-	`created_at` DATETIME NULL COMMENT '',
-	`updated_at` DATETIME NULL COMMENT '',
-	`deleted_at` DATETIME NULL COMMENT '',
-	PRIMARY KEY (`id`)
-) ENGINE=InnoDB CHARACTER SET=utf8;
-
-INSERT INTO `sportsfixtures_status` VALUES
-(null,'Win',NOW(),NOW(),null),
-(null,'Loss',NOW(),NOW(),null),
-(null,'Draw',NOW(),NOW(),null),
-(null,'Cancelled',NOW(),NOW(),null);
 
 /** Coaches table **/
 CREATE TABLE `sportsfixtures_coach` (

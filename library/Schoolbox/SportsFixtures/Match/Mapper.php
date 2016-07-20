@@ -121,7 +121,8 @@ class Mapper extends BaseMapper
 				{$this->getJoinColumnString('division', 'd')},
 				{$this->getJoinColumnString('venue', 'v')},
 				{$this->getJoinColumnString('itinerary', 'i')},
-				{$this->getJoinColumnString('result', 'r')}
+				{$this->getJoinColumnString('result', 'r')},
+				{$this->getJoinColumnString('result.status', 'rs')}
         ";
     }
 
@@ -140,6 +141,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('venue', null, 'v')}
             LEFT JOIN {$this->getJoinSql('itinerary', null, 'i')}
             LEFT JOIN {$this->getJoinSql('result', null, 'r')}
+            LEFT JOIN {$this->getJoinSql('result.status', 'r', 'rs')}
         ";
     }
 
@@ -187,7 +189,9 @@ class Mapper extends BaseMapper
              */
             if ($row['r.team_id']) {
                 if (!($collection->getOffset($matchId)->getResult()->getOffset($row['r.team_id']) instanceof Result)) {
+                    /** @var Result $result */
                     $result = $this->hydrateJoin($row, 'result', 'r');
+                    $result->setStatus($this->hydrateJoin($row, 'result.status', 'rs'));
 
                     $collection->getOffset($matchId)->getResult()->setOffset($result->getTeam()->getId(), $result);
                 }

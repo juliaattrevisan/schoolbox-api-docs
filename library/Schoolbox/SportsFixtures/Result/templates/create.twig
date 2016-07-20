@@ -61,6 +61,18 @@
                         <input type="hidden" name="resultId" value="{{ result.id }}"/>
 
                         <label>
+                            Match Status
+                            <select name="statusId">
+                                <option value="">-- no status yet --</option>
+                                {% for status in statuses %}
+                                    <option {% if result.status.id == status.id %}selected{% endif %}
+                                            value="{{ status.id }}"
+                                            label="{{ status.name }}">{{ status.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+
+                        <label>
                             Description
                         </label>
 

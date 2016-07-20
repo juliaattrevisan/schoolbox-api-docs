@@ -12,6 +12,7 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use \Alaress_Date_Format;
 use Schoolbox\SportsFixtures\Match\Model as Match;
 use Schoolbox\SportsFixtures\Team\Model as Team;
+use Schoolbox\SportsFixtures\Status;
 
 
 /**
@@ -32,6 +33,9 @@ class Model implements ISoftDeletable
 
     /** @var Team $team */
     protected $team;
+
+    /** @var Status\Model $status */
+    protected $status;
 
     /** @var string */
     protected $description;
@@ -114,6 +118,24 @@ class Model implements ISoftDeletable
     public function setMatch($match)
     {
         $this->match = $match;
+    }
+
+    /**
+     * @return Status\Model
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param Status\Model $status
+     * @return static
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+        return $this;
     }
 
     /**

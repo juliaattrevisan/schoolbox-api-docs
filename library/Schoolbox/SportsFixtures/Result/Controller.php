@@ -23,6 +23,8 @@ use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use \Schoolbox\SportsFixtures\Match\Weather as MatchWeather;
 use \Schoolbox\SportsFixtures\Result\Model as Result;
 use \Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
+use Schoolbox\SportsFixtures\Status\Mapper as StatusMapper;
+use Schoolbox\SportsFixtures\Status\Model as StatusModel;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\SportsFixtures\Team\Metadata as TeamMetadata;
@@ -62,6 +64,11 @@ class Controller extends AbstractController
     protected $schoolTagCloudMapper;
 
     /**
+     * @var StatusMapper
+     */
+    protected $statusMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -73,6 +80,7 @@ class Controller extends AbstractController
         $this->setTeamMapper(TeamMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
+        $this->setStatusMapper(StatusMapper::getInstance());
     }
 
     /**
@@ -124,6 +132,7 @@ class Controller extends AbstractController
                 '@sportsfixturesResult/create.twig',
                 [
                     'sport'    => $sport,
+                    'statuses' => $this->getStatusMapper()->findAll(),
                     'division' => $division,
                     'match'    => $context,
                     'team'     => $team,
@@ -385,7 +394,20 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
 
-        $this->saveResult($match, $team, $this->getRequest()->post['description'], $entity);
+        // Save status (optional)
+        /** @var StatusModel $status */
+        $statusId = $this->getRequest()->post->get('statusId');
+        if ($statusId) {
+            try {
+                $status = $this->getStatusMapper()->findById($statusId);
+            } catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_STATUS_NOT_FOUND);
+            }
+        } else {
+            $status = $this->getStatusMapper()->createModel();
+        }
+
+        $this->saveResult($match, $team, $status, $this->getRequest()->post['description'], $entity);
 
         $this->getResponse()->redirect->afterPost(
             $this->getRouter()->generate(
@@ -403,13 +425,15 @@ class Controller extends AbstractController
      *
      * @param Match $match
      * @param Team $team
+     * @param StatusModel $status
      * @param string $description
      * @param Result $result
      */
-    private function saveResult(Match $match, Team $team, $description, Result $result)
+    private function saveResult(Match $match, Team $team, StatusModel $status, $description, Result $result)
     {
         $result->setMatch($match);
         $result->setTeam($team);
+        $result->setStatus($status);
         $result->setDescription($description);
         $result->setUpdatedAt(Alaress_Date_Format::now());
 
@@ -513,5 +537,23 @@ class Controller extends AbstractController
     protected function setSchoolTagCloudMapper($schoolTagCloudMapper)
     {
         $this->schoolTagCloudMapper = $schoolTagCloudMapper;
+    }
+
+    /**
+     * @return StatusMapper
+     */
+    public function getStatusMapper()
+    {
+        return $this->statusMapper;
+    }
+
+    /**
+     * @param StatusMapper $statusMapper
+     * @return static
+     */
+    public function setStatusMapper($statusMapper)
+    {
+        $this->statusMapper = $statusMapper;
+        return $this;
     }
 }
