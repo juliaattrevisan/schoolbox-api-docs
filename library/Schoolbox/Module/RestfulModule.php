@@ -15,6 +15,7 @@ use Aura\Router\Router;
 use Schoolbox\Mapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Alaress\Module\Module as AlaressModule;
+use \Schoolbox\Error\Mapper as ErrorMapper;
 
 /**
  * Class RestfulModule
@@ -198,7 +199,7 @@ abstract class RestfulModule extends AlaressModule
         try {
             return $mapper->findById($id);
         } catch (MapperException $e) {
-            throw \Schoolbox\Error\Mapper::getInstance()->generateException(101);
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
     }
 }
