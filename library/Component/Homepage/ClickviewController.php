@@ -99,7 +99,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
                     // Pass in start/end time parameters
                     if (count($matches) == 3) {
                         $this->setVar('START', "&t={$matches[1]}");
-                        $this->setVar('END', "&et={$matches[2]}&i=2");
+                        $this->setVar('END', "&et={$matches[2]}");
                     }
                     $this->parse('iframe_clickview_block', 'iframe_clickview');
                 }
