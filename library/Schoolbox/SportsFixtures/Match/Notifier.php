@@ -9,22 +9,20 @@
 
 namespace Schoolbox\SportsFixtures\Match;
 
-use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 
 use Schoolbox\Realtime\Message\NSMapper;
 use Schoolbox\Realtime\Notification\Envelope;
-use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
+use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
-use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayerModel;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use Schoolbox\SportsFixtures\Match\Model as MatchModel;
+use Schoolbox\SportsFixtures\Match\Notifier\Helper as NotifierHelper;
 use Schoolbox\User;
-use Monolog\Logger;
 
 class Notifier extends AbstractModuleNotifier
 {
@@ -32,23 +30,22 @@ class Notifier extends AbstractModuleNotifier
     const TRIGGER_UPDATED = 'updated';
 
     /**
+     * @var NotifierHelper
+     */
+    protected $notifierHelper;
+
+    /**
      * @param null $dependencies
      */
     public function loadDependencies($dependencies = null)
     {
-        if (empty($dependencies['matchMapper'])) {
-            $dependencies['matchMapper'] = MatchMapper::getInstance();
-        }
-        if (empty($dependencies['divisionMapper'])) {
-            $dependencies['divisionMapper'] = DivisionMapper::getInstance();
-        }
-        if (empty($dependencies['sportMapper'])) {
-            $dependencies['sportMapper'] = SportMapper::getInstance();
-        }
-        if (empty($dependencies['teamPlayerMapper'])) {
-            $dependencies['teamPlayerMapper'] = TeamPlayerMapper::getInstance();
-        }
-
+        $dependencies['notifierHelper'] = new NotifierHelper(
+            MatchMapper::getInstance(),
+            DivisionMapper::getInstance(),
+            SportMapper::getInstance(),
+            TeamPlayerMapper::getInstance(),
+            TeamMapper::getInstance()
+        );
         parent::loadDependencies($dependencies);
     }
 
@@ -72,7 +69,8 @@ class Notifier extends AbstractModuleNotifier
         $match = $bundle->getEvent()->getObject();
 
         // Notify 24 hours before the match start time
-        $notifyTime = $match->getStartAt()->addHours(-24)->getUnixTimeStamp();
+        $notifyTime = clone $match->getStartAt();
+        $notifyTime = $notifyTime->addHours(-24)->getUnixTimeStamp();
 
         switch ($method) {
             case Mapper::METHOD_CREATE:
@@ -89,11 +87,17 @@ class Notifier extends AbstractModuleNotifier
      *
      * @param User $effector
      * @param MatchModel $match
-     * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentCreated(MatchModel $match, User $effector, array $diff = null) {
-        return $this->notifyStudents($match, $effector);
+    public function notifyStudentCreated(MatchModel $match, User $effector)
+    {
+        $match = $this->notifierHelper->hydrateMatch($match);
+        return $this->notifierHelper->postToTeams(
+            new Envelope(),
+            $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_CREATED)
+                ->setTitle('You have an upcoming :sport match :match'),
+            $match
+        );
     }
 
     /**
@@ -104,8 +108,79 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentUpdated(MatchModel $match, User $effector, array $diff = null) {
-        return $this->notifyStudents($match, $effector);
+    public function notifyStudentUpdated(MatchModel $match, User $effector, array $diff = null)
+    {
+        $envelope = new Envelope();
+        $match    = $this->notifierHelper->hydrateMatch($match);
+
+        // Send notifications for teams added/removed
+        $teamChanges = $this->notifierHelper->extractTeamChangesFromDiff($diff);
+        foreach ($teamChanges['added'] as $addedTeamId) {
+            // A team was added to this match
+            $team = $this->notifierHelper->findTeam($addedTeamId);
+            $this->notifierHelper->postToTeam(
+                $envelope,
+                $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
+                    ->setMatchHref($match, $team)
+                    ->setMatchParam($match, $team)
+                    ->setTitle('Your team is now participating in :sport match :match'),
+                $team
+            );
+        }
+        foreach ($teamChanges['removed'] as $removedTeamId) {
+            // A team was removed from this match
+            $this->notifierHelper->postToTeam(
+                $envelope,
+                $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
+                    ->setHref('#')
+                    ->setParam('match', new Param($match->getName()))
+                    ->setTitle('Your team is no longer participating in :sport match :match'),
+                $this->notifierHelper->findTeam($removedTeamId)
+            );
+        }
+
+        if (isset($diff['venue']) && isset($diff['startAt'])) {
+            // Both time and venue have changed
+            // TODO: fix event stacking so that changing start and venue in one action stacks to "venue and start time"
+            $envelope = $this->notifierHelper->postToTeams(
+                $envelope,
+                $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
+                    ->setTitle('Your upcoming :sport match :match has a new :time and :attribute')
+                    ->setParam('time', new Param('start time', null, Param::STACKING_APPEND))
+                    ->setParam('attribute', new Param('venue', null, Param::STACKING_APPEND)),
+                $match
+            );
+        } elseif (isset($diff['venue'])) {
+            // Venue has changed
+            $envelope = $this->notifierHelper->postToTeams(
+                $envelope,
+                $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
+                    ->setTitle('Your upcoming :sport match :match has a new :attribute')
+                    ->setParam('attribute', new Param('venue', null, Param::STACKING_APPEND)),
+                $match
+            );
+        } elseif (isset($diff['startAt'])) {
+            // Time has changed
+            $envelope = $this->notifierHelper->postToTeams(
+                $envelope,
+                $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
+                    ->setTitle('Your upcoming :sport match :match has a new :attribute')
+                    ->setParam('attribute', new Param('start time', null, Param::STACKING_APPEND)),
+                $match
+            );
+        }
+
+        if ($envelope->count() == 0 && count($diff)) {
+            // Generic something has changed notification
+            $envelope = $this->notifierHelper->postToTeams(
+                $envelope,
+                $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
+                    ->setTitle('Your upcoming :sport match :match has been updated'),
+                $match
+            );
+        }
+
+        return $envelope;
     }
 
     /**
@@ -113,11 +188,17 @@ class Notifier extends AbstractModuleNotifier
      *
      * @param User $effector
      * @param MatchModel $match
-     * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentCreated(MatchModel $match, User $effector, array $diff = null) {
-        return $this->notifyParents($match, $effector);
+    public function notifyParentCreated(MatchModel $match, User $effector)
+    {
+        $match = $this->notifierHelper->hydrateMatch($match);
+        return $this->notifierHelper->postToParentsOfTeams(
+            new Envelope(),
+            $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_CREATED)
+                ->setTitle('Upcoming :sport match :match for :child'),
+            $match
+        );
     }
 
     /**
@@ -128,205 +209,88 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentUpdated(MatchModel $match, User $effector, array $diff = null) {
-        return $this->notifyParents($match, $effector);
-    }
-
-    // Since update/create do pretty much the same thing, this is where the work actually happens
-    
-    /**
-     * @param Model $match
-     * @param User $effector
-     * @return Envelope
-     */
-    public function notifyParents(MatchModel $match, User $effector)
+    public function notifyParentUpdated(MatchModel $match, User $effector, array $diff = null)
     {
         $envelope = new Envelope();
+        $match    = $this->notifierHelper->hydrateMatch($match);
 
-        $match = $this->matchMapper->findById($match->getId());
-        $division = $this->divisionMapper->findById($match->getDivision()->getId());
-        $sport = $this->sportMapper->findById($division->getSport()->getId());
-
-        $ts = \Alaress_Date_Format::now()->getUnixTimeStamp();
-
-        // Target home team parents
-
-        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getHomeTeam()->getId());
-
-        /** @var TeamPlayerModel $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer)
-        {
-            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
-            $bob  = new Builder();
-            $bob->setTitle('Upcoming :sport match :match for :child')
-                ->setParams([
-                    'sport' => new Param($sport->getName(), $sport->getUrl()),
-                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE),
-                    'child' => new UserParam($teamPlayer->getUser())
-                ])
-                ->setHref($href)
-                ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
-                ->setSeverity(Logger::INFO)
-                ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
-                ->setNamespace($this->getSlug())
-            ;
-            $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
+        // Send notifications for teams added/removed
+        $teamChanges = $this->notifierHelper->extractTeamChangesFromDiff($diff);
+        foreach ($teamChanges['added'] as $addedTeamId) {
+            // A team was added to this match
+            $team = $this->notifierHelper->findTeam($addedTeamId);
+            $this->notifierHelper->postToParentsOfTeam(
+                $envelope,
+                $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
+                    ->setMatchHref($match, $team)
+                    ->setMatchParam($match, $team)
+                    ->setTitle(':child\'s team is now participating in :sport match :match'),
+                $team
+            );
+        }
+        foreach ($teamChanges['removed'] as $removedTeamId) {
+            // A team was removed from this match
+            $this->notifierHelper->postToParentsOfTeam(
+                $envelope,
+                $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
+                    ->setHref('#')
+                    ->setParam('match', new Param($match->getName()))
+                    ->setTitle(':child\'s team is no longer participating in :sport match :match'),
+                $this->notifierHelper->findTeam($removedTeamId)
+            );
         }
 
-        // Target away team parents
+        if (isset($diff['venue']) && isset($diff['startAt'])) {
+            // Both time and venue have changed
+            // TODO: fix event stacking so that changing start and venue in one action stacks to "venue and start time"
+            $envelope = $this->notifierHelper->postToParentsOfTeams(
+                $envelope,
+                $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
+                    ->setTitle('Upcoming :sport match :match for :child has a new :time and :attribute')
+                    ->setParam('time', new Param('start time', null, Param::STACKING_APPEND))
+                    ->setParam('attribute', new Param('venue', null, Param::STACKING_APPEND)),
+                $match
+            );
+        } elseif (isset($diff['venue'])) {
+            // Venue has changed
+            $envelope = $this->notifierHelper->postToParentsOfTeams(
+                $envelope,
+                $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
+                    ->setTitle('Upcoming :sport match :match for :child has a new :attribute')
+                    ->setParam('attribute', new Param('venue', null, Param::STACKING_APPEND)),
+                $match
+            );
+        } elseif (isset($diff['startAt'])) {
+            // Time has changed
+            $envelope = $this->notifierHelper->postToParentsOfTeams(
+                $envelope,
+                $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
+                    ->setTitle('Upcoming :sport match :match for :child has a new :attribute')
+                    ->setParam('attribute', new Param('start time', null, Param::STACKING_APPEND)),
+                $match
+            );
+        }
 
-        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getAwayTeam()->getId());
-
-        /** @var TeamPlayerModel $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer)
-        {
-            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
-            $bob  = new Builder();
-            $bob->setTitle('Upcoming :sport match :match for :child')
-                ->setParams([
-                    'sport' => new Param($sport->getName(), $sport->getUrl()),
-                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE),
-                    'child' => new UserParam($teamPlayer->getUser())
-                ])
-                ->setHref($href)
-                ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
-                ->setSeverity(Logger::INFO)
-                ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
-                ->setNamespace($this->getSlug())
-            ;
-
-            $envelope->targetToParent($teamPlayer->getUser()->getId(), $bob->build());
+        if ($envelope->count() == 0 && count($diff)) {
+            // Generic something has changed notification
+            $envelope = $this->notifierHelper->postToParentsOfTeams(
+                $envelope,
+                $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
+                    ->setTitle('Upcoming :sport match :match for :child has been updated'),
+                $match
+            );
         }
 
         return $envelope;
     }
 
     /**
-     * @param Model $match
-     * @param User $effector
-     * @return Envelope
+     * @param NotifierHelper $notifierHelper
+     * @return $this
      */
-    public function notifyStudents(MatchModel $match, User $effector)
+    public function setNotifierHelper($notifierHelper)
     {
-        $envelope = new Envelope();
-
-        $match = $this->matchMapper->findById($match->getId());
-        $division = $this->divisionMapper->findById($match->getDivision()->getId());
-        $sport = $this->sportMapper->findById($division->getSport()->getId());
-
-        $bob = new Builder();
-
-        $ts = \Alaress_Date_Format::now()->getUnixTimeStamp();
-
-        $bob->setTitle('You have an upcoming :sport match :match')
-            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
-            ->setSeverity(Logger::INFO)
-            ->setTopics([ sprintf('%s.%d.%s', $this->getSlug(), $match->getId(), self::TRIGGER_CREATED) ])
-            ->setNamespace($this->getSlug())
-        ;
-
-        // Target home team
-
-        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getHomeTeam()->getId());
-
-        /** @var TeamPlayerModel $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer) {
-            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
-            $bob->setHref($href)
-                ->setParams([
-                    'sport' => new Param($sport->getName(), $sport->getUrl()),
-                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
-                ]);
-            $envelope->targetToUser($teamPlayer->getUser()->getId(), $bob->build());
-        }
-
-        // Target away team
-
-        $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getAwayTeam()->getId());
-
-        /** @var TeamPlayerModel $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer) {
-            $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
-            $bob->setHref($href)
-                ->setParams([
-                    'sport' => new Param($sport->getName(), $sport->getUrl()),
-                    'match' => new Param($match->getName(), "{$href}?{$ts}", Param::STACKING_REPLACE)
-                ]);
-            $envelope->targetToUser($teamPlayer->getUser()->getId(), $bob->build());
-        }
-
-        return $envelope;
-    }
-
-    /**
-     * Here be the mappers, nothing interesting to see past this point... (i promise)
-     *
-     *               ,---.
-     *            ,.'-.   \
-     *           ( ( ,'"""""-.
-     *           `,X          `.
-     *           /` `           `._
-     *          (            ,   ,_\
-     *          |          ,---.,'o `.
-     *          |         / o   \     )
-     *           \ ,.    (      .____,
-     *            \| \    \____,'     \
-     *          '`'\  \        _,____,'
-     *          \  ,--      ,-'     \
-     *            ( C     ,'         \
-     *             `--'  .'           |
-     *               |   |         .O |
-     *             __|    \        ,-'_
-     *            / `L     `._  _,'  ' `.
-     *           /    `--.._  `',.   _\  `
-     *           `-.       /\  | `. ( ,\  \
-     *          _/  `-._  /  \ |--'  (     \
-     *         '  `-.   `'    \/\`.   `.    )
-     *               \      -    \ `.  |    |
-     *
-     */
-
-    /** @var MatchMapper $matchMapper */
-    protected $matchMapper;
-
-    /** @var DivisionMapper $divisionMapper */
-    protected $divisionMapper;
-
-    /** @var SportMapper $sportMapper */
-    protected $sportMapper;
-
-    /** @var TeamPlayerMapper $teamPlayerMapper */
-    protected $teamPlayerMapper;
-
-    /**
-     * @param $mapper
-     */
-    protected function setMatchMapper($mapper)
-    {
-        $this->matchMapper = $mapper;
-    }
-
-    /**
-     * @param $mapper
-     */
-    protected function setDivisionMapper($mapper)
-    {
-        $this->divisionMapper = $mapper;
-    }
-
-    /**
-     * @param $mapper
-     */
-    protected function setSportMapper($mapper)
-    {
-        $this->sportMapper = $mapper;
-    }
-
-    /**
-     * @param $mapper
-     */
-    protected function setTeamPlayerMapper($mapper)
-    {
-        $this->teamPlayerMapper = $mapper;
+        $this->notifierHelper = $notifierHelper;
+        return $this;
     }
 }
