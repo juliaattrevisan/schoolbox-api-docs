@@ -6,7 +6,13 @@
             {% for match in matches %}
 
                 {% set cardHeader %}
-                    <h3>{{ match.name }} ({{ match.homeTeam.name }} vs {{ match.awayTeam.name }})</h3>
+                    <h3>
+                        {% if match.name|length %}
+                            {{ match.name }} ({{ match.homeTeam.name }} vs {{ match.awayTeam.name }})
+                        {% else %}
+                            {{ match.homeTeam.name }} vs {{ match.awayTeam.name }}
+                        {% endif %}
+                    </h3>
                 {% endset %}
 
                 <li>

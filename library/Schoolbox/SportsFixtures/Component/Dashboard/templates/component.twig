@@ -6,7 +6,13 @@
             {% for match in matches %}
 
                 {% set cardHeader %}
-                    <h3>{{ match.match.name }} ({{ match.match.homeTeam.name }} vs {{ match.match.awayTeam.name }})</h3>
+                    <h3>
+                        {% if match.match.name|length %}
+                            {{ match.match.name }} ({{ match.match.homeTeam.name }} vs {{ match.match.awayTeam.name }})
+                        {% else %}
+                            {{ match.match.homeTeam.name }} vs {{ match.match.awayTeam.name }}
+                        {% endif %}
+                    </h3>
                 {% endset %}
                 {% set showJellytot = match.home and match.away and match.match.homeTeam.id != match.match.awayTeam.id %}
 
