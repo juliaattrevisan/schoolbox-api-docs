@@ -117,11 +117,10 @@ class Notifier extends AbstractModuleNotifier
         foreach ($teamChanges['added'] as $addedTeamId) {
             // A team was added to this match
             $team = $this->notifierHelper->findTeam($addedTeamId);
-            $href = $this->notifierHelper->buildHrefForMatch($match, $team);
             $this->notifierHelper->postToTeam(
                 $envelope,
                 $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
-                    ->setHref($href)
+                    ->setMatchHref($match, $team)
                     ->setMatchParam($match, $team)
                     ->setTitle('Your team is now participating in :sport match :match'),
                 $team
@@ -210,11 +209,10 @@ class Notifier extends AbstractModuleNotifier
         foreach ($teamChanges['added'] as $addedTeamId) {
             // A team was added to this match
             $team = $this->notifierHelper->findTeam($addedTeamId);
-            $href = $this->notifierHelper->buildHrefForMatch($match, $team);
             $this->notifierHelper->postToParentsOfTeam(
                 $envelope,
                 $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
-                    ->setHref($href)
+                    ->setMatchHref($match, $team)
                     ->setMatchParam($match, $team)
                     ->setTitle(':child\'s team is now participating in :sport match :match'),
                 $team

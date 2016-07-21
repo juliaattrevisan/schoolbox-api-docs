@@ -55,6 +55,17 @@ class Builder implements BuilderInterface
      * @param TeamModel $team
      * @return self
      */
+    public function setMatchHref(MatchModel $match, TeamModel $team)
+    {
+        $this->setHref($this->buildHrefForMatch($match, $team));
+        return $this;
+    }
+
+    /**
+     * @param MatchModel $match
+     * @param TeamModel $team
+     * @return self
+     */
     public function setMatchParam(MatchModel $match, TeamModel $team)
     {
         $this->internalBuilder->setParam('match', $this->buildMatchParam($match, $team));

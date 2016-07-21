@@ -179,14 +179,12 @@ class Helper
     public function postToTeams(Envelope $envelope, Builder $bob, MatchModel $match)
     {
         // Home
-        $href = $this->buildHrefForMatch($match, $match->getHomeTeam());
-        $bob->setHref($href)
+        $bob->setMatchHref($match, $match->getHomeTeam())
             ->setMatchParam($match, $match->getHomeTeam());
         $this->postToTeam($envelope, $bob, $match->getHomeTeam());
 
         // and away
-        $href = $this->buildHrefForMatch($match, $match->getAwayTeam());
-        $bob->setHref($href)
+        $bob->setMatchHref($match, $match->getAwayTeam())
             ->setMatchParam($match, $match->getAwayTeam());
         $this->postToTeam($envelope, $bob, $match->getAwayTeam());
 
@@ -204,45 +202,16 @@ class Helper
     public function postToParentsOfTeams(Envelope $envelope, Builder $bob, MatchModel $match)
     {
         // Home
-        $href = $this->buildHrefForMatch($match, $match->getHomeTeam());
-        $bob->setHref($href)
+        $bob->setMatchHref($match, $match->getHomeTeam())
             ->setMatchParam($match, $match->getHomeTeam());
         $this->postToParentsOfTeam($envelope, $bob, $match->getHomeTeam());
 
         // and away
-        $href = $this->buildHrefForMatch($match, $match->getAwayTeam());
-        $bob->setHref($href)
+        $bob->setMatchHref($match, $match->getAwayTeam())
             ->setMatchParam($match, $match->getAwayTeam());
         $this->postToParentsOfTeam($envelope, $bob, $match->getAwayTeam());
 
         return $envelope;
-    }
-
-    /**
-     * Builds the href for the results page for this match and team.
-     *
-     * @param MatchModel $match
-     * @param TeamModel $team
-     * @return string
-     */
-    public function buildHrefForMatch(MatchModel $match, TeamModel $team)
-    {
-        return "/sportsfixtures/matches/{$match->getId()}/results/{$team->getId()}";
-    }
-
-    /**
-     * Builds a parameter for this notifier's builder's "match" parameter.
-     *
-     * @param MatchModel $match
-     * @param TeamModel $team
-     * @param int $stacking
-     * @return Param
-     */
-    public function buildMatchParam(MatchModel $match, TeamModel $team, $stacking = Param::STACKING_REPLACE)
-    {
-        $ts   = \Alaress_Date_Format::now()->getUnixTimeStamp();
-        $href = $this->buildHrefForMatch($match, $team);
-        return new Param($match->getName(), "{$href}?{$ts}", $stacking);
     }
 
     /**
