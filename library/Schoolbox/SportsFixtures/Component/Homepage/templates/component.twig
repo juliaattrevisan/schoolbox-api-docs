@@ -1,0 +1,38 @@
+{% if matches | length %}
+
+    <div class="small-12 columns no-pad">
+        <ul class="action-list">
+
+            {% for match in matches %}
+
+                {% set cardHeader %}
+                    <h3>{{ match.name }} ({{ match.homeTeam.name }} vs {{ match.awayTeam.name }})</h3>
+                {% endset %}
+
+                <li>
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: teamId}) }}">
+                                {{ cardHeader|raw }}
+                            </a>
+                            <p class="meta">
+                                <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span> |
+                                {{ match.division.sport.name }} |
+                                {{ match.division.name }} |
+                                {{ match.venue.name }}
+                            </p>
+                        </div>
+                    </div>
+                </li>
+
+            {% endfor %}
+        </ul>
+    </div>
+
+{% else %}
+
+    <div class="content">
+        You have no upcoming matches scheduled.
+    </div>
+
+{% endif %}

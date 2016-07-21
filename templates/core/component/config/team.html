@@ -1,0 +1,34 @@
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript">
+    $(function () {
+        var options = {
+            ajax: {
+                url:      '/sportsfixtures/divisions/*/teams',
+                type:     'GET',
+                data:     {},
+                dataType: 'json'
+            }
+        }
+
+        var id = $('#teamSearch{COMPONENT_TEAM_ID}').val();
+
+        if (id != 0) {
+            options.value = {
+                id:   id,
+                name: $('#team_search{COMPONENT_TEAM_ID}').val()
+            }
+        }
+
+        $('#team_search{COMPONENT_TEAM_ID}').selectizeSelector(options)
+                .on('selectize.item_add', function(event, value) {
+                    $('#teamSearch{COMPONENT_TEAM_ID}').val(value);
+                })
+                .on('selectize.item_remove', function() {
+                    $('#teamSearch{COMPONENT_TEAM_ID}').val('');
+                });
+    });
+</script>
+
+<input type="text" id="team_search{COMPONENT_TEAM_ID}" value="{COMPONENT_TEAM_NAME}" placeholder="Search Teams">
+<input type="hidden" id="teamSearch{COMPONENT_TEAM_ID}" name="team" value="{COMPONENT_TEAM_ID}">

@@ -19,6 +19,8 @@ use Schoolbox\SportsFixtures\Position\Module as PositionModule;
 use Schoolbox\SportsFixtures\Venue\Module as VenueModule;
 use Schoolbox\SportsFixtures\Match\Module as MatchModule;
 use Schoolbox\SportsFixtures\ItineraryItem\Module as ItineraryItemModule;
+use Schoolbox\SportsFixtures\Component\Homepage\Module as HomepageModule;
+use Schoolbox\SportsFixtures\Component\Dashboard\Module as DashboardModule;
 use Schoolbox\SportsFixtures\Result\Module as ResultModule;
 use Schoolbox\SportsFixtures\Status\Module as StatusModule;
 
@@ -34,6 +36,12 @@ class SportsFixtures implements ModuleConfigInterface
     public function configure($kernel)
     {
         $namespace = 'sportsfixtures';
+
+        $homepageModule = new HomepageModule($kernel->getDependencyInjector());
+        $homepageModule->init("/$namespace");
+
+        $dashboardModule = new DashboardModule($kernel->getDependencyInjector());
+        $dashboardModule->init("/$namespace");        
 
         $landingModule = new LandingModule($kernel->getDependencyInjector());
         $landingModule->init("/$namespace");

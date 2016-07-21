@@ -120,7 +120,12 @@ class Controller extends AbstractController
 
             /** @var TeamMapper $mapper */
             $mapper   = $this->getMapper();
-            $allTeams = $mapper->findByName($context->getId(), $query);
+
+            if ($context == null) {
+                $allTeams = $mapper->findByColumn('~name', "%{$query}%");
+            } else {
+                $allTeams = $mapper->findByName($context->getId(), $query);
+            }
 
             $teams = [];
 

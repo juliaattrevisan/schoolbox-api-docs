@@ -106,7 +106,7 @@ abstract class RestfulModule extends AlaressModule
         ];
 
         foreach ($routes['GET'] as $path => $controllerMethod) {
-            $this->addGetRoute($router, $controllerMethod, $basePath, $path)->setTokens([ 'contextId' => '\d+', 'entityId' => '\d+' ]);
+            $this->addGetRoute($router, $controllerMethod, $basePath, $path)->setTokens([ 'contextId' => '\d+|\*', 'entityId' => '\d+' ]);
         }
 
         foreach ($routes['POST'] as $path => $controllerMethod) {
@@ -195,6 +195,10 @@ abstract class RestfulModule extends AlaressModule
      */
     private function findById(Mapper $mapper, $id)
     {
+        if ($id == "*") {
+            return null;
+        }
+
         try {
             return $mapper->findById($id);
         } catch (MapperException $e) {
