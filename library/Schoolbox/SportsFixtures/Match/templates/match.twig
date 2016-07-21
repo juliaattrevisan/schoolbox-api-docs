@@ -17,7 +17,7 @@
                 {% if match.name %}
                     {{ match.name }}
                 {% else %}
-                    {{ matchHeading.generate(match, schoolMapper, true) }}
+                    {{ matchHeading.generate(match, true) }}
                 {% endif %}
             </h1>
         </div>
@@ -33,7 +33,7 @@
     <div class="small-12 columns">
         <ul class="meta">
             {% if match.name %}{% spaceless %}
-            <li class="icon-team" title="{{ matchHeading.generate(match, schoolMapper, false) }}">{{ matchHeading.generate(match, schoolMapper, true) }}</li>
+            <li class="icon-team" title="{{ matchHeading.generate(match, false) }}">{{ matchHeading.generate(match, true) }}</li>
             {% endspaceless %}{% endif %}
             <li class="icon-calendar" title="{{ match.startAt.local }}">{{ match.startAt.local }} ({{ match.startAt.relativeTime }})</li>
             <li class="icon-location">{{ match.venue.name }}</li>

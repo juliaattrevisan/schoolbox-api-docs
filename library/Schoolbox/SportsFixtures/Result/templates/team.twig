@@ -9,9 +9,9 @@
         <li><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}">Matches in {{ division.name }}</a></li>
 
         {% if match.id %}
-            <li class="active"><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: team.id}) }}">{{ matchBreadcrumb.generate(match, schoolMapper) }}</a></li>
+            <li class="active"><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: team.id}) }}">{{ matchBreadcrumb.generate(match) }}</a></li>
         {% else %}
-            <li><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: team.id}) }}">{{ matchBreadcrumb.generate(match, schoolMapper) }}</a></li>
+            <li><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: team.id}) }}">{{ matchBreadcrumb.generate(match) }}</a></li>
             <li class="active"><a href="#">{{ action }}</a></li>
         {% endif %}
     </ul>

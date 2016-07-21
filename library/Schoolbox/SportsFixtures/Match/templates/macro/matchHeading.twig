@@ -3,7 +3,7 @@
  #
  # @var bool $decorated If true, includes html rendering for team urls
  #}
-{% macro generate(match, schoolMapper, decorated) %}
+{% macro generate(match, decorated) %}
 
     {# Home Team #}
     {% if match.homeTeam.url and decorated %}
