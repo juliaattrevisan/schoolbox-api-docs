@@ -1160,10 +1160,8 @@ ul.flex-list {
     }
 
     /*
-     * Displays an icon, or a profile picture, in the left column
-     * Right column contains text, metadata, or a variety of other
-     * interface elements
-     *
+     * Displays an image to the left,
+     * then follows text, metadata, or a variety of other interface elements.
      * Can be used in conjunction with lists
      */
 	img, [class^="icon-"] {
@@ -1184,6 +1182,15 @@ ul.flex-list {
 		&:before {
 			padding-right: 0;
 		}
+	}
+
+	/* The rare case of a mime file icon.
+	 * 60x60px
+	 * Needs diff margin to look correct
+	 */
+	img.mime {
+		margin: 0rem 1rem 0.5rem -0.5rem;
+		width: 3.75rem;
 	}
 
 	/* .card .label is used in viewSubmission.html and
@@ -1270,15 +1277,6 @@ ul.flex-list {
 
 	p, ul {
 		line-height: 1.25rem;
-	}
-
-	img.mime {
-		@media #{$small-only} {
-			padding: 0.5rem !important;
-		}
-		@media #{$medium-up} {
-			padding: 0.75rem !important;
-		}
 	}
 
 	/* Progress Meters for Card List Items.
