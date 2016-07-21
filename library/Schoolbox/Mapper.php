@@ -1051,6 +1051,10 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function deleteByColumnList($columnList, $options = array())
     {
+        // as an OH&S measure, the column list MUST NOT be empty (and thus match all records)
+        if (empty($columnList)) {
+            return 0;
+        }
         return $this->delete($this->findByColumnList($columnList, $options));
     }
 
