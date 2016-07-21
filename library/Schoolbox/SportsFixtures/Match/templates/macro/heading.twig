@@ -5,14 +5,14 @@
  #}
 {% macro generateWithResultLink(match) %}
 
-     Home Team
+    {# Home Team #}
     {% if match.homeTeam.id %}
         {% set homeTeamData = "<a href='" ~ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.homeTeam.id}) ~ "'>" ~ match.homeTeam.name ~ "</a>" %}
     {% else %}
         {% set homeTeamData = match.homeTeam.name %}
     {% endif %}
 
-    {#&#123;&#35; Away Team &#35;&#125;#}
+    {# Away Team #}
     {% if match.awayTeam.id %}
         {% set awayTeamData = "<a href='" ~ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.awayTeam.id}) ~ "'>" ~ match.awayTeam.name ~ "</a>" %}
     {% else %}

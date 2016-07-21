@@ -1,3 +1,5 @@
+{% import '@sportsfixturesMatch/macro/heading.twig' as matchHeading %}
+
 <script type="text/javascript">
     $(function() {
         $('#allSports').on('click', '[data-delete]', function(event) {
@@ -46,26 +48,14 @@
             <section>
                 <ul class="action-list">
                     {% for currentMatch in allMatches %}
-                        {% if currentMatch.homeSchoolId == null %}
-                            {% set homeTeamData = "<a href=" ~ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: currentMatch.id, teamId: currentMatch.homeTeam.id}) ~ ">" ~ currentMatch.homeTeam.name ~ "</a>" %}
-                        {% else %}
-                            {%  set homeTeamData = schoolMapper.getTagName(currentMatch.homeSchoolId) %}
-                        {% endif %}
-
-                        {% if currentMatch.awaySchoolId == null %}
-                            {% set awayTeamData = "<a href=" ~ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: currentMatch.id, teamId: currentMatch.awayTeam.id}) ~ ">" ~ currentMatch.awayTeam.name ~ "</a>" %}
-                        {% else %}
-                            {% set awayTeamData = schoolMapper.getTagName(currentMatch.awaySchoolId) %}
-                        {% endif %}
-
                     <li class="actions-small-2">
                         <div class="list-item">
                             <div class="small-12 avatar card">
                                 {% if currentMatch.name %}
-                                <p>{{ currentMatch.name }}</p>
-                                <p class="meta">{{ homeTeamData|raw }} vs {{ awayTeamData|raw }}</p>
+                                    <p>{{ currentMatch.name }}</p>
+                                    <p class="meta">{{ matchHeading.generateWithResultLink(currentMatch) }}</p>
                                 {% else %}
-                                <p>{{ homeTeamData|raw }} vs {{ awayTeamData|raw }}</p>
+                                    <p>{{ matchHeading.generateWithResultLink(currentMatch) }}</p>
                                 {% endif %}
 
                                 <p class="meta">{{ currentMatch.startAt.getLocal }}</p>
