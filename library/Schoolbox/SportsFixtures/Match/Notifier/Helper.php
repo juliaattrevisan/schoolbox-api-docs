@@ -119,8 +119,7 @@ class Helper
     public function buildBuilder(MatchModel $match, User $effector, $namespace, $trigger)
     {
         $bob = new Builder($effector);
-        $bob->setParam('sport', new Param($match->getDivision()->getSport()->getName(), $match->getDivision()->getSport()->getUrl()))
-            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
+        $bob->setSportParam($match->getDivision()->getSport())
             ->setSeverity(Logger::INFO)
             ->setTopics([ sprintf('%s.%d.%s', $namespace, $match->getId(), $trigger) ])
             ->setNamespace($namespace)

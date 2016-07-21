@@ -40,10 +40,12 @@ class Builder implements BuilderInterface
 
     /**
      * @param SportModel $sport
+     * @return self
      */
     public function setSportParam(SportModel $sport)
     {
         $this->internalBuilder->setParam('sport', new Param($sport->getName(), $sport->getUrl()));
+        return $this;
     }
 
     /** Pass-through to internal builder's setters */
