@@ -100,25 +100,29 @@ class AddParentToAllChildCampuses extends AbstractLoggableHydrator
                     $children->sortBy('year','desc');
 
                     // Make storm happy :/
-                    $campus = null;
+                    $defaultCampus = null;
 
                     /** @var InternalUser $child */
                     foreach($children as $child){
 
                         // Prefer default Campus
-                        if($campus = $child->getDefaultCampus()){
+                        if($child->getDefaultCampus() instanceof Campus){
+                            $defaultCampus = $child->getDefaultCampus();
                             break;
                         }
 
-                        // Fallback to first campus
-                        if($campus = $child->getCampusCollection()->first()){
-                            break;
+                        // Fallback to first actual campus
+                        foreach($child->getCampusCollection() as $campus){
+                            if($campus instanceof Campus){
+                                $defaultCampus = $campus;
+                                break;
+                            }
                         }
                     }
 
-                    $previous->setDefaultCampus($campus);
+                    $previous->setDefaultCampus($defaultCampus);
                     $message = "Assigning default campus to parent";
-                    $context = ['campusId' => $campus->getId()];
+                    $context = ['campusId' => $defaultCampus->getId()];
 
                     $this->log(Logger::INFO, $message, $input, $previous, $context);
                 }
