@@ -86,7 +86,7 @@ class HomepageTileController extends Component_Homepage_ControllerAbstract imple
                 'showButtons'                => $this->hasWriteAccess(),
                 'tile_component_instance_id' => $this->getConfig('tileSource') ?: $this->getInstance()->getId(),
             );
-            $renderHeader = $this->hasWriteAccess() || !$this->getConfig('compactMode') || $this->hasContextWriteAccess();
+            $renderHeader = !$this->getConfig('compactMode') || $this->hasContextWriteAccess();
             return $this->renderTwigTemplate($templateHandle, $twigTemplate, $twigData, $renderHeader);
         }
     }
