@@ -115,13 +115,15 @@ class Controller extends AbstractController
 
         /* Accumulate faceless schools
          */
+        /** @var Match $currentMatch */
         foreach ($allMatches as $currentMatch) {
-            if (!$currentMatch->getHomeTeam()->getId()) {
+
+            if ($currentMatch->getHomeSchoolId()) {
                 $facelessTeam = $this->getTeamMapper()->createModel()->setName($this->getSchoolTagCloudMapper()->getTagName($currentMatch->getHomeSchoolId()));
                 $currentMatch->setHomeTeam($facelessTeam);
             }
 
-            if (!$currentMatch->getAwayTeam()->getId()) {
+            if ($currentMatch->getAwaySchoolId()) {
                 $facelessTeam = $this->getTeamMapper()->createModel()->setName($this->getSchoolTagCloudMapper()->getTagName($currentMatch->getAwaySchoolId()));
                 $currentMatch->setAwayTeam($facelessTeam);
             }
