@@ -100,7 +100,7 @@
             event.preventDefault();
             $(this).ajaxForm({
                 url: "/cms/myLinksForm.php",
-                data: { url: "{HOMEPAGE_URL}", description: "{HEADING}"},
+                data: { url: {HOMEPAGE_URL_JS}, description: {HEADING_JS}},
                 type: 'post'
             }).on('done.ajaxForm', function() {
                 location.reload();

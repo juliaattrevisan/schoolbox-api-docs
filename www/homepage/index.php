@@ -339,6 +339,7 @@ else {
 $allWidths = $homepageHandler->getColumnWidths();
 $this->setVar(array(
     'HEADING' => Scrub::text($category->getName()) . ($codeString ? ' (' . $codeString . ')' : ''),
+    'HEADING_JS' => json_encode($category->getName() . ($codeString ? ' (' . $codeString . ')' : '')),
     'CODE' => urlencode(urlencode($category->getCodeString())),
     'ID' => $category->getId(),
     'USER_TOKEN' => $_SESSION['key'],
