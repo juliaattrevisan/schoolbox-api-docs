@@ -79,11 +79,13 @@
 
 {% else %}
     <div class="content">
-        {% if role == 'parent' %}
-            Your children do not have any upcoming matches scheduled.
-        {% elseif role == 'student' %}
-            You have no upcoming matches scheduled.
-        {% endif %}
+        <p>
+            {% if role == 'parent' %}
+                Your children do not have any upcoming matches scheduled.
+            {% elseif role == 'student' %}
+                You have no upcoming matches scheduled.
+            {% endif %}
+        </p>
     </div>
 
 {% endif %}
