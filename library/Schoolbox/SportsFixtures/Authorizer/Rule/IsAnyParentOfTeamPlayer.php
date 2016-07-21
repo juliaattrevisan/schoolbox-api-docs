@@ -56,9 +56,10 @@ class IsAnyParentOfTeamPlayer implements IAuthorizationRule
 
         $playerIds = [];
 
-        /** @var User $currentPlayer */
         foreach ($allPlayers as $currentPlayer) {
-            $playerIds[] = $currentPlayer->getExternalId();
+            if ($currentPlayer['user'] instanceof User) {
+                $playerIds[] = $currentPlayer['user']->getExternalId();
+            }
         }
 
         /* The children belonging to the Parent currently logged in
