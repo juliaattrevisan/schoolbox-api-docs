@@ -9,9 +9,11 @@ namespace Schoolbox\SportsFixtures\Notification\Instance;
 
 use Alaress\Async\Notification\Instance\Builder as InternalBuilder;
 use Alaress\Async\Notification\Instance\BuilderInterface;
+use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\User as UserModel;
+use Schoolbox\SportsFixtures\Sport\Model as SportModel;
 
 /**
  * Sports fixtures customized wrapper for the notification instance builder.
@@ -34,6 +36,14 @@ class Builder implements BuilderInterface
         $this->internalBuilder
             ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
             ->setSeverity(Logger::INFO);
+    }
+
+    /**
+     * @param SportModel $sport
+     */
+    public function setSportParam(SportModel $sport)
+    {
+        $this->internalBuilder->setParam('sport', new Param($sport->getName(), $sport->getUrl()));
     }
 
     /** Pass-through to internal builder's setters */
