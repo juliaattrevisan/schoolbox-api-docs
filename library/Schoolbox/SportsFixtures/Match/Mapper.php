@@ -216,4 +216,37 @@ class Mapper extends BaseMapper
 
         return $collection;
     }
+
+    /**
+     * Find the next match for a team
+     * The team can be either the home or away team
+     *
+     * @param Team $team
+     * @return mixed
+     */
+    public function findNextMatch(Team $team)
+    {
+        $query = "
+            SELECT {$this->getColumnString()}
+            FROM {$this->getTable()}
+            WHERE start_at > NOW()
+            AND (home_team_id = :homeTeamId OR away_team_id = :awayTeamId)
+            ORDER BY start_at ASC
+            LIMIT 1
+        ";
+
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute([
+            'homeTeamId' => $team->getId(),
+            'awayTeamId' => $team->getId()
+        ]);
+
+        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+
+        if ($row) {
+            return $this->hydrate($row);
+        }
+
+        throw new \OutOfBoundsException();
+    }
 }
