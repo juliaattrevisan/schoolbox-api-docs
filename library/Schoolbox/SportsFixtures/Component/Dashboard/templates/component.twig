@@ -6,7 +6,13 @@
             {% for match in matches %}
 
                 {% set cardHeader %}
-                    <h3>{{ match.match.name }} ({{ match.match.homeTeam.name }} vs {{ match.match.awayTeam.name }})</h3>
+                    <h3>
+                        {% if match.match.name|length %}
+                            {{ match.match.name }} ({{ match.match.homeTeam.name }} vs {{ match.match.awayTeam.name }})
+                        {% else %}
+                            {{ match.match.homeTeam.name }} vs {{ match.match.awayTeam.name }}
+                        {% endif %}
+                    </h3>
                 {% endset %}
                 {% set showJellytot = match.home and match.away and match.match.homeTeam.id != match.match.awayTeam.id %}
 
@@ -28,12 +34,7 @@
                                 {{ cardHeader|raw }}
                             {% endif %}
                             <p class="meta">
-                                <span data-tooltip title="{{ match.match.startAt.getLong }}">{{ match.match.startAt.getRelativeTime }}</span> |
-                                {{ match.match.division.sport.name }} |
-                                {{ match.match.division.name }}
-                                {% if role == 'parent' %}
-                                | {{ match.match.venue.name }}
-                                {% endif %}
+                                <span data-tooltip title="{{ match.match.startAt.getLong }}">{{ match.match.startAt.getRelativeTime }}</span>
                             </p>
                             {% if role == 'parent' %}
                                 {% for team in match.teams %}
@@ -79,11 +80,13 @@
 
 {% else %}
     <div class="content">
-        {% if role == 'parent' %}
-            Your children do not have any upcoming matches scheduled.
-        {% elseif role == 'student' %}
-            You have no upcoming matches scheduled.
-        {% endif %}
+        <p>
+            {% if role == 'parent' %}
+                Your children do not have any upcoming matches scheduled.
+            {% elseif role == 'student' %}
+                You have no upcoming matches scheduled.
+            {% endif %}
+        </p>
     </div>
 
 {% endif %}

@@ -302,8 +302,6 @@ SELECT s.id src_id, g.id role_id, 'MU,IN,MO,EM', 'IN,MO' FROM msg_source s
 JOIN groups g ON g.group_type = s.role_type
 WHERE s.namespace = @sportns;
 
-INSERT INTO `component_definition` (id, name, class, description, module, component_category, visible, multiple)
-VALUES (86, 'Sport Fixtures', 'Schoolbox\\SportsFixtures\\Homepage\\Component\\Controller', 'Shows sports fixtures', 'homepage', 1, 'true', 'true');
 INSERT INTO `component_definition` (name, class, description, module, component_category, visible, multiple)
 VALUES ('Sport Fixtures', 'Schoolbox\\SportsFixtures\\Component\\Homepage\\Controller', 'Shows sports fixtures', 'homepage', 1, 'true', 'true');
 
@@ -321,5 +319,3 @@ INSERT INTO `component_config_definition` (component_definition_id, `key`, defau
 VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\SportsFixtures\\Component\\Dashboard\\Controller'), 'collapse', '0', 'Collapse Content', null);
 INSERT INTO `component_config_definition` (component_definition_id, `key`, default_value, label, description)
 VALUES ((SELECT id from `component_definition` WHERE class='Schoolbox\\SportsFixtures\\Component\\Dashboard\\Controller'), 'componentname', 'Sports Fixtures', 'Heading', null);
-
-
