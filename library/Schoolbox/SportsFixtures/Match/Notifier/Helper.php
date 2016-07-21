@@ -7,9 +7,7 @@
 
 namespace Schoolbox\SportsFixtures\Match\Notifier;
 
-use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
-
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
@@ -19,6 +17,7 @@ use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use Schoolbox\SportsFixtures\Match\Model as MatchModel;
+use Schoolbox\SportsFixtures\Notification\Instance\Builder;
 use Schoolbox\User;
 use Monolog\Logger;
 
@@ -119,7 +118,7 @@ class Helper
      */
     public function buildBuilder(MatchModel $match, User $effector, $namespace, $trigger)
     {
-        $bob = new Builder();
+        $bob = new Builder($effector);
         $bob->setParam('sport', new Param($match->getDivision()->getSport()->getName(), $match->getDivision()->getSport()->getUrl()))
             ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
             ->setSeverity(Logger::INFO)
