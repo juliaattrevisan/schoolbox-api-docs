@@ -93,37 +93,52 @@ class AddParentToAllChildCampuses extends AbstractLoggableHydrator
                 }
                 $this->log(Logger::INFO, $message, $input, $previous, $context);
 
-
-                // If children have campuses, select one as default for parent
+                // This will run if user either:
+                //   has children with campuses, or
+                //   has own campus collection
                 if (!empty($newCampuses)) {
 
                     $children->sortBy('year','desc');
 
                     // Make storm happy :/
-                    $defaultCampus = null;
+                    $seniorChildCampus = null;
 
                     /** @var InternalUser $child */
                     foreach($children as $child){
 
                         // Prefer default Campus
                         if($child->getDefaultCampus() instanceof Campus){
-                            $defaultCampus = $child->getDefaultCampus();
+                            $seniorChildCampus = $child->getDefaultCampus();
                             break;
                         }
 
                         // Fallback to first actual campus
                         foreach($child->getCampusCollection() as $campus){
                             if($campus instanceof Campus){
-                                $defaultCampus = $campus;
+                                $seniorChildCampus = $campus;
                                 break;
                             }
                         }
                     }
 
-                    $previous->setDefaultCampus($defaultCampus);
-                    $message = "Assigning default campus to parent";
-                    $context = ['campusId' => $defaultCampus->getId()];
+                    // Did we find a senior child campus
+                    if($seniorChildCampus instanceof Campus){
+                        $previous->setDefaultCampus($seniorChildCampus);
+                    } else {
+                        // else no children, so user must have already had a campus collection set
+                        // But do they have a default?
+                        if(!$previous->getDefaultCampus() instanceof Campus){
+                            foreach($previous->getCampusCollection() as $campus){
+                                if($campus instanceof Campus){
+                                    $previous->setDefaultCampus($campus);
+                                    break;
+                                }
+                            }
+                        }
+                    }
 
+                    $message = "Assigning default campus to parent";
+                    $context = ['campusId' => $previous->getDefaultCampus()->getId()];
                     $this->log(Logger::INFO, $message, $input, $previous, $context);
                 }
             }
