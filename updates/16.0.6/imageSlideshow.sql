@@ -1,4 +1,4 @@
-INSERT INTO schoolbox.component_config_definition
+INSERT INTO component_config_definition
 (
   component_definition_id,
   `key`,
