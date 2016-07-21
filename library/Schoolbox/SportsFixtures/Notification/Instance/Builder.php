@@ -96,7 +96,7 @@ class Builder implements BuilderInterface
      */
     public function buildMatchParam(MatchModel $match, TeamModel $team, $stacking = Param::STACKING_REPLACE)
     {
-        $ts = \Alaress_Date_Format::now()->getUnixTimeStamp();
+        $ts   = microtime(true);
         $href = $this->buildHrefForMatch($match, $team);
         return new Param($match->getName(), "{$href}?{$ts}", $stacking);
     }
