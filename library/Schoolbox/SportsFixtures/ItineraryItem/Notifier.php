@@ -70,7 +70,8 @@ class Notifier extends AbstractModuleNotifier
         $match = $bundle->getEvent()->getObject();
 
         // Notify 24 hours before the match start time
-        $notifyTime = $match->getStartAt()->addHours(-24)->getUnixTimeStamp();
+        $notifyTime = clone $match->getStartAt();
+        $notifyTime = $notifyTime->addHours(-24)->getUnixTimeStamp();
 
         switch ($method) {
             case Mapper::METHOD_CREATE:
