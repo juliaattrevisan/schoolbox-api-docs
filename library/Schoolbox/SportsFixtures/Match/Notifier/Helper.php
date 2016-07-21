@@ -181,13 +181,13 @@ class Helper
         // Home
         $href = $this->buildHrefForMatch($match, $match->getHomeTeam());
         $bob->setHref($href)
-            ->setParam('match', $this->buildMatchParam($match, $match->getHomeTeam()));
+            ->setMatchParam($match, $match->getHomeTeam());
         $this->postToTeam($envelope, $bob, $match->getHomeTeam());
 
         // and away
         $href = $this->buildHrefForMatch($match, $match->getAwayTeam());
         $bob->setHref($href)
-            ->setParam('match', $this->buildMatchParam($match, $match->getAwayTeam()));
+            ->setMatchParam($match, $match->getAwayTeam());
         $this->postToTeam($envelope, $bob, $match->getAwayTeam());
 
         return $envelope;
@@ -206,13 +206,13 @@ class Helper
         // Home
         $href = $this->buildHrefForMatch($match, $match->getHomeTeam());
         $bob->setHref($href)
-            ->setParam('match', $this->buildMatchParam($match, $match->getHomeTeam()));
+            ->setMatchParam($match, $match->getHomeTeam());
         $this->postToParentsOfTeam($envelope, $bob, $match->getHomeTeam());
 
         // and away
         $href = $this->buildHrefForMatch($match, $match->getAwayTeam());
         $bob->setHref($href)
-            ->setParam('match', $this->buildMatchParam($match, $match->getAwayTeam()));
+            ->setMatchParam($match, $match->getAwayTeam());
         $this->postToParentsOfTeam($envelope, $bob, $match->getAwayTeam());
 
         return $envelope;

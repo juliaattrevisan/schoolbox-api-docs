@@ -122,7 +122,7 @@ class Notifier extends AbstractModuleNotifier
                 $envelope,
                 $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
                     ->setHref($href)
-                    ->setParam('match', $this->notifierHelper->buildMatchParam($match, $team))
+                    ->setMatchParam($match, $team)
                     ->setTitle('Your team is now participating in :sport match :match'),
                 $team
             );
@@ -215,7 +215,7 @@ class Notifier extends AbstractModuleNotifier
                 $envelope,
                 $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
                     ->setHref($href)
-                    ->setParam('match', $this->notifierHelper->buildMatchParam($match, $team))
+                    ->setMatchParam($match, $team)
                     ->setTitle(':child\'s team is now participating in :sport match :match'),
                 $team
             );

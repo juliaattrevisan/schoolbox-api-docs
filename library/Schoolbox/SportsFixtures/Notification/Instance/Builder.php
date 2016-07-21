@@ -13,7 +13,9 @@ use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
 use Schoolbox\User as UserModel;
+use Schoolbox\SportsFixtures\Match\Model as MatchModel;
 use Schoolbox\SportsFixtures\Sport\Model as SportModel;
+use Schoolbox\SportsFixtures\Team\Model as TeamModel;
 
 /**
  * Sports fixtures customized wrapper for the notification instance builder.
@@ -46,6 +48,44 @@ class Builder implements BuilderInterface
     {
         $this->internalBuilder->setParam('sport', new Param($sport->getName(), $sport->getUrl()));
         return $this;
+    }
+
+    /**
+     * @param MatchModel $match
+     * @param TeamModel $team
+     * @return self
+     */
+    public function setMatchParam(MatchModel $match, TeamModel $team)
+    {
+        $this->internalBuilder->setParam('match', $this->buildMatchParam($match, $team));
+        return $this;
+    }
+
+    /**
+     * Builds the href for the results page for this match and team.
+     *
+     * @param MatchModel $match
+     * @param TeamModel $team
+     * @return string
+     */
+    public function buildHrefForMatch(MatchModel $match, TeamModel $team)
+    {
+        return "/sportsfixtures/matches/{$match->getId()}/results/{$team->getId()}";
+    }
+
+    /**
+     * Builds a parameter for this notifier's builder's "match" parameter.
+     *
+     * @param MatchModel $match
+     * @param TeamModel $team
+     * @param int $stacking
+     * @return Param
+     */
+    public function buildMatchParam(MatchModel $match, TeamModel $team, $stacking = Param::STACKING_REPLACE)
+    {
+        $ts = \Alaress_Date_Format::now()->getUnixTimeStamp();
+        $href = $this->buildHrefForMatch($match, $team);
+        return new Param($match->getName(), "{$href}?{$ts}", $stacking);
     }
 
     /** Pass-through to internal builder's setters */
