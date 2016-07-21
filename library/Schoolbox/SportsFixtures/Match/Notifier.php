@@ -139,7 +139,18 @@ class Notifier extends AbstractModuleNotifier
             );
         }
 
-        if (isset($diff['venue'])) {
+        if (isset($diff['venue']) && isset($diff['startAt'])) {
+            // Both time and venue have changed
+            // TODO: fix event stacking so that changing start and venue in one action stacks to "venue and start time"
+            $envelope = $this->notifierHelper->postToTeams(
+                $envelope,
+                $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
+                    ->setTitle('Your upcoming :sport match :match has a new :time and :attribute')
+                    ->setParam('time', new Param('start time', null, Param::STACKING_APPEND))
+                    ->setParam('attribute', new Param('venue', null, Param::STACKING_APPEND)),
+                $match
+            );
+        } elseif (isset($diff['venue'])) {
             // Venue has changed
             $envelope = $this->notifierHelper->postToTeams(
                 $envelope,
@@ -148,9 +159,7 @@ class Notifier extends AbstractModuleNotifier
                     ->setParam('attribute', new Param('venue', null, Param::STACKING_APPEND)),
                 $match
             );
-        }
-
-        if (isset($diff['startAt'])) {
+        } elseif (isset($diff['startAt'])) {
             // Time has changed
             $envelope = $this->notifierHelper->postToTeams(
                 $envelope,
@@ -231,7 +240,18 @@ class Notifier extends AbstractModuleNotifier
             );
         }
 
-        if (isset($diff['venue'])) {
+        if (isset($diff['venue']) && isset($diff['startAt'])) {
+            // Both time and venue have changed
+            // TODO: fix event stacking so that changing start and venue in one action stacks to "venue and start time"
+            $envelope = $this->notifierHelper->postToParentsOfTeams(
+                $envelope,
+                $this->notifierHelper->buildBuilder($match, $effector, $this->getSlug(), self::TRIGGER_UPDATED)
+                    ->setTitle('Upcoming :sport match :match for :child has a new :time and :attribute')
+                    ->setParam('time', new Param('start time', null, Param::STACKING_APPEND))
+                    ->setParam('attribute', new Param('venue', null, Param::STACKING_APPEND)),
+                $match
+            );
+        } elseif (isset($diff['venue'])) {
             // Venue has changed
             $envelope = $this->notifierHelper->postToParentsOfTeams(
                 $envelope,
@@ -240,9 +260,7 @@ class Notifier extends AbstractModuleNotifier
                     ->setParam('attribute', new Param('venue', null, Param::STACKING_APPEND)),
                 $match
             );
-        }
-
-        if (isset($diff['startAt'])) {
+        } elseif (isset($diff['startAt'])) {
             // Time has changed
             $envelope = $this->notifierHelper->postToParentsOfTeams(
                 $envelope,
