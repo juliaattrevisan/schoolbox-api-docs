@@ -73,7 +73,9 @@ $(function() {
 
     // Disable form submit to prevent multiple message batches
     $('body').on('submit', 'form[data-disable-on-submit]', function() {
-        $(this).find(':submit').prop('disabled', true);
+        var $submit = $(this).find(':submit');
+        $submit.prop('disabled', true);
+        $submit.val($submit.attr('data-working'));
     });
 });
 </script>
@@ -138,7 +140,7 @@ $(function() {
                     </div>
                 </fieldset>
             </section>
-            <input type="submit" name="submit" value="Send" />
+            <input type="submit" name="submit" value="Send" data-working="Sending..."/>
         </form>
     </div>
 </div>
