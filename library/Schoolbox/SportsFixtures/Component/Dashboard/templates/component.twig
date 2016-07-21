@@ -28,12 +28,7 @@
                                 {{ cardHeader|raw }}
                             {% endif %}
                             <p class="meta">
-                                <span data-tooltip title="{{ match.match.startAt.getLong }}">{{ match.match.startAt.getRelativeTime }}</span> |
-                                {{ match.match.division.sport.name }} |
-                                {{ match.match.division.name }}
-                                {% if role == 'parent' %}
-                                | {{ match.match.venue.name }}
-                                {% endif %}
+                                <span data-tooltip title="{{ match.match.startAt.getLong }}">{{ match.match.startAt.getRelativeTime }}</span>
                             </p>
                             {% if role == 'parent' %}
                                 {% for team in match.teams %}
