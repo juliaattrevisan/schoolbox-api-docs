@@ -62,6 +62,16 @@ class Builder implements BuilderInterface
     }
 
     /**
+     * @param string $title
+     * @return self
+     */
+    public function setTitle($title)
+    {
+        $this->internalBuilder = $this->internalBuilder->setTitle($title);
+        return $this;
+    }
+
+    /**
      * @param string $icon
      * @return self
      */
