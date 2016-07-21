@@ -8,12 +8,13 @@
                 {% set cardHeader %}
                     <h3>{{ match.match.name }} ({{ match.match.homeTeam.name }} vs {{ match.match.awayTeam.name }})</h3>
                 {% endset %}
+                {% set showJellytot = match.home and match.away and match.match.homeTeam.id != match.match.awayTeam.id %}
 
                 {# both home and away - show link to results in jellytot #}
-                <li {% if match.home and match.away %}class="actions-small-1"{% endif %}>
+                <li {% if showJellytot %}class="actions-small-1"{% endif %}>
                     <div class="list-item">
                         <div class="card small-12">
-                            {% if match.home and match.away %}
+                            {% if showJellytot %}
                                 {{ cardHeader|raw }}
                             {% elseif match.home %}
                                 <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.homeTeam.id}) }}">
@@ -52,7 +53,7 @@
                             {% endif %}
                         </div>
                     </div>
-                    {% if match.home and match.away %}
+                    {% if showJellytot %}
                     <nav>
                         <a href="#" class="icon-more" data-dropdown="sportsfixtures-match-{{ match.match.id }}-actions"></a>
                     </nav>
