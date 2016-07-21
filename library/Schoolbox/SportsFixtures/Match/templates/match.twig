@@ -1,4 +1,4 @@
-{% import '@sportsfixturesMatch/macro/matchHeading.twig' as matchHeading %}
+{% import '@sportsfixturesMatch/macro/heading.twig' as matchHeading %}
 {% import '@sportsfixturesMatch/macro/matchMap.twig' as matchMap %}
 
 {% if match.result.offset(team.id) %}
@@ -17,7 +17,7 @@
                 {% if match.name %}
                     {{ match.name }}
                 {% else %}
-                    {{ matchHeading.generate(match, true) }}
+                    {{ matchHeading.generateWithTeamLink(match) }}
                 {% endif %}
             </h1>
         </div>
@@ -33,7 +33,7 @@
     <div class="small-12 columns">
         <ul class="meta">
             {% if match.name %}{% spaceless %}
-            <li class="icon-team" title="{{ matchHeading.generate(match, false) }}">{{ matchHeading.generate(match, true) }}</li>
+            <li class="icon-team" title="{{ matchHeading.generate(match) }}">{{ matchHeading.generateWithTeamLink(match) }}</li>
             {% endspaceless %}{% endif %}
             <li class="icon-calendar" title="{{ match.startAt.local }}">{{ match.startAt.local }} ({{ match.startAt.relativeTime }})</li>
             <li class="icon-location">{{ match.venue.name }}</li>

@@ -1,0 +1,69 @@
+{# Use to generate the text for a Component list element
+ #
+ # If the Team has an appropriate Match Result page,
+ # hyperlink it
+ #}
+{% macro generateWithResultLink(match) %}
+
+     Home Team
+    {% if match.homeTeam.id %}
+        {% set homeTeamData = "<a href='" ~ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.homeTeam.id}) ~ "'>" ~ match.homeTeam.name ~ "</a>" %}
+    {% else %}
+        {% set homeTeamData = match.homeTeam.name %}
+    {% endif %}
+
+    {#&#123;&#35; Away Team &#35;&#125;#}
+    {% if match.awayTeam.id %}
+        {% set awayTeamData = "<a href='" ~ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.awayTeam.id}) ~ "'>" ~ match.awayTeam.name ~ "</a>" %}
+    {% else %}
+        {% set awayTeamData = match.awayTeam.name %}
+    {% endif %}
+
+    {{ homeTeamData|raw }} vs {{ awayTeamData|raw }}
+{% endmacro %}
+
+{# Use to generate the text for a Match Page heading
+ #
+ # If the Team has an appropriate Team homepage,
+ # hyperlink it
+ #}
+{% macro generateWithTeamLink(match) %}
+
+    {# Home Team #}
+    {% if match.homeTeam.url %}
+        {% set homeTeamData = "<a href='" ~ match.homeTeam.url ~ "'>" ~ match.homeTeam.name ~ "</a>" %}
+    {% else %}
+        {% set homeTeamData = match.homeTeam.name %}
+    {% endif %}
+
+    {# Away Team #}
+    {% if match.awayTeam.url %}
+        {% set awayTeamData = "<a href='" ~ match.awayTeam.url ~ "'>" ~ match.awayTeam.name ~ "</a>" %}
+    {% else %}
+        {% set awayTeamData = match.awayTeam.name %}
+    {% endif %}
+
+    {{ homeTeamData|raw }} vs {{ awayTeamData|raw }}
+{% endmacro %}
+
+
+{# Use to generate the text suitable for a tooltip attribute
+ # (no html, just text, as vanilla as it can get)
+ #
+ # If the Team has an appropriate Match Result page,
+ # hyperlink it
+ #}
+{% macro generate(match) %}
+
+    {# Home Team #}
+    {% set homeTeamData = match.homeTeam.name %}
+
+    {# Away Team #}
+    {% set awayTeamData = match.awayTeam.name %}
+
+    {{ homeTeamData|raw }} vs {{ awayTeamData|raw }}
+{% endmacro %}
+
+
+
+
