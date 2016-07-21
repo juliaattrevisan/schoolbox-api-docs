@@ -6,8 +6,12 @@
  */
 
 namespace Schoolbox\SportsFixtures\Notification\Instance;
+
 use Alaress\Async\Notification\Instance\Builder as InternalBuilder;
 use Alaress\Async\Notification\Instance\BuilderInterface;
+use Alaress\Async\Notification\Parameter\ParameterInterface;
+use Monolog\Logger;
+use Schoolbox\User as UserModel;
 
 /**
  * Sports fixtures customized wrapper for the notification instance builder.
@@ -23,15 +27,79 @@ class Builder implements BuilderInterface
      */
     protected $internalBuilder;
 
-    /**
-     * Constructor
-     *
-     * @param bool $validate
-     */
-    public function __construct($validate = true)
+    public function __construct(UserModel $effector, $validate = true)
     {
-        $this->internalBuilder = new Builder($validate);
+        $this->internalBuilder = new InternalBuilder($validate);
+        // Set some defaults into the builder
+        $this->internalBuilder
+            ->setIcon("/portrait.php?userId={$effector->getExternalId()}&size=square64")
+            ->setSeverity(Logger::INFO);
     }
+
+    /** Pass-through to internal builder's setters */
+
+    /**
+     * @param string             $token
+     * @param ParameterInterface $param
+     * @return self
+     */
+    public function setParam($token, ParameterInterface $param)
+    {
+        $this->internalBuilder = $this->internalBuilder->setParam($token, $param);
+        return $this;
+    }
+
+    /**
+     * @param string $icon
+     * @return self
+     */
+    public function setIcon($icon)
+    {
+        $this->internalBuilder = $this->internalBuilder->setIcon($icon);
+        return $this;
+    }
+
+    /**
+     * @param int $timestamp
+     * @return self
+     */
+    public function setTimestamp($timestamp)
+    {
+        $this->internalBuilder = $this->internalBuilder->setTimestamp($timestamp);
+        return $this;
+    }
+
+    /**
+     * @param int $severity
+     * @return self
+     */
+    public function setSeverity($severity)
+    {
+        $this->internalBuilder = $this->internalBuilder->setSeverity($severity);
+        return $this;
+    }
+
+    /**
+     * @param string $namespace
+     * @return self
+     */
+    public function setNamespace($namespace)
+    {
+        $this->internalBuilder = $this->internalBuilder->setNamespace($namespace);
+        return $this;
+    }
+
+    /**
+     * @param string $href
+     * @return self
+     */
+    public function setHref($href)
+    {
+        $this->internalBuilder = $this->internalBuilder->setHref($href);
+        return $this;
+    }
+
+    /** Interface methods */
 
     /**
      * @inheritdoc
