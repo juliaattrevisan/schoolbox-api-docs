@@ -42,11 +42,12 @@ class Builder implements BuilderInterface
 
     /**
      * @param SportModel $sport
+     * @param int $stacking
      * @return self
      */
-    public function setSportParam(SportModel $sport)
+    public function setSportParam(SportModel $sport, $stacking = Param::STACKING_REPLACE)
     {
-        $this->internalBuilder->setParam('sport', new Param($sport->getName(), $sport->getUrl()));
+        $this->internalBuilder->setParam('sport', new Param($sport->getName(), $sport->getUrl(), $stacking));
         return $this;
     }
 
@@ -64,11 +65,12 @@ class Builder implements BuilderInterface
     /**
      * @param MatchModel $match
      * @param TeamModel $team
+     * @param int $stacking
      * @return self
      */
-    public function setMatchParam(MatchModel $match, TeamModel $team)
+    public function setMatchParam(MatchModel $match, TeamModel $team, $stacking = Param::STACKING_REPLACE)
     {
-        $this->internalBuilder->setParam('match', $this->buildMatchParam($match, $team));
+        $this->internalBuilder->setParam('match', $this->buildMatchParam($match, $team, $stacking));
         return $this;
     }
 

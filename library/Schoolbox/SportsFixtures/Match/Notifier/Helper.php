@@ -174,18 +174,19 @@ class Helper
      * @param Envelope   $envelope
      * @param Builder    $bob
      * @param MatchModel $match
+     * @param int        $stacking The stacking setting to use for the match parameter
      * @return Envelope
      */
-    public function postToTeams(Envelope $envelope, Builder $bob, MatchModel $match)
+    public function postToTeams(Envelope $envelope, Builder $bob, MatchModel $match, $stacking = Param::STACKING_REPLACE)
     {
         // Home
         $bob->setMatchHref($match, $match->getHomeTeam())
-            ->setMatchParam($match, $match->getHomeTeam());
+            ->setMatchParam($match, $match->getHomeTeam(), $stacking);
         $this->postToTeam($envelope, $bob, $match->getHomeTeam());
 
         // and away
         $bob->setMatchHref($match, $match->getAwayTeam())
-            ->setMatchParam($match, $match->getAwayTeam());
+            ->setMatchParam($match, $match->getAwayTeam(), $stacking);
         $this->postToTeam($envelope, $bob, $match->getAwayTeam());
 
         return $envelope;
@@ -197,18 +198,19 @@ class Helper
      * @param Envelope   $envelope
      * @param Builder    $bob
      * @param MatchModel $match
+     * @param int        $stacking The stacking setting to use for the match parameter
      * @return Envelope
      */
-    public function postToParentsOfTeams(Envelope $envelope, Builder $bob, MatchModel $match)
+    public function postToParentsOfTeams(Envelope $envelope, Builder $bob, MatchModel $match, $stacking = Param::STACKING_REPLACE)
     {
         // Home
         $bob->setMatchHref($match, $match->getHomeTeam())
-            ->setMatchParam($match, $match->getHomeTeam());
+            ->setMatchParam($match, $match->getHomeTeam(), $stacking);
         $this->postToParentsOfTeam($envelope, $bob, $match->getHomeTeam());
 
         // and away
         $bob->setMatchHref($match, $match->getAwayTeam())
-            ->setMatchParam($match, $match->getAwayTeam());
+            ->setMatchParam($match, $match->getAwayTeam(), $stacking);
         $this->postToParentsOfTeam($envelope, $bob, $match->getAwayTeam());
 
         return $envelope;
