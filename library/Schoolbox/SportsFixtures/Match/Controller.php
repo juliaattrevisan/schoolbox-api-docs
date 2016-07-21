@@ -113,11 +113,24 @@ class Controller extends AbstractController
             ]
         ]);
 
+        /* Accumulate faceless schools
+         */
+        foreach ($allMatches as $currentMatch) {
+            if (!$currentMatch->getHomeTeam()->getId()) {
+                $facelessTeam = $this->getTeamMapper()->createModel()->setName($this->getSchoolTagCloudMapper()->getTagName($currentMatch->getHomeSchoolId()));
+                $currentMatch->setHomeTeam($facelessTeam);
+            }
+
+            if (!$currentMatch->getAwayTeam()->getId()) {
+                $facelessTeam = $this->getTeamMapper()->createModel()->setName($this->getSchoolTagCloudMapper()->getTagName($currentMatch->getAwaySchoolId()));
+                $currentMatch->setAwayTeam($facelessTeam);
+            }
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/list.twig', [
             'sport' => $sport,
             'division' => $context,
             'allMatches' => $allMatches,
-            'schoolMapper' => $this->getSchoolTagCloudMapper()
         ]));
     }
 
