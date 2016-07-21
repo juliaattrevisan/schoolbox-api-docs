@@ -1055,7 +1055,11 @@ abstract class Mapper implements IMapper, Serializable
         if (empty($columnList)) {
             return 0;
         }
-        return $this->delete($this->findByColumnList($columnList, $options));
+        $resultset = $this->findByColumnList($columnList, $options);
+        if ($this->delete($resultset)) {
+            return count($resultset);
+        }
+        return 0;
     }
 
 
