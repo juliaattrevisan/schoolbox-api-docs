@@ -61,7 +61,7 @@ class DashboardTileController extends Component_Dashboard_ControllerAbstract imp
      */
     public function execute()
     {
-        if(!$this->isSourceRenderable()){
+        if($this->isUsingAltSource() && $this->getSource()->isDeleted()){
             return false;
         }
 
