@@ -1,41 +1,23 @@
-{% if matches | length %}
+{% import '@sportsfixturesMatch/macro/heading.twig' as matchHeading %}
 
+{% if matches | length %}
     <div class="small-12 columns no-pad">
         <ul class="action-list">
 
             {% for match in matches %}
-
-                {% set cardHeader %}
-                    <h3>
-                        {% if match.match.name|length %}
-                            {{ match.match.name }} ({{ match.match.homeTeam.name }} vs {{ match.match.awayTeam.name }})
-                        {% else %}
-                            {{ match.match.homeTeam.name }} vs {{ match.match.awayTeam.name }}
-                        {% endif %}
-                    </h3>
-                {% endset %}
-                {% set showJellytot = match.home and match.away and match.match.homeTeam.id != match.match.awayTeam.id %}
-
-                {# both home and away - show link to results in jellytot #}
-                <li {% if showJellytot %}class="actions-small-1"{% endif %}>
+                <li>
                     <div class="list-item">
                         <div class="card small-12">
-                            {% if showJellytot %}
-                                {{ cardHeader|raw }}
-                            {% elseif match.home %}
-                                <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.homeTeam.id}) }}">
-                                    {{ cardHeader|raw }}
-                                </a>
-                            {% elseif match.away %}
-                                <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.awayTeam.id}) }}">
-                                    {{ cardHeader|raw }}
-                                </a>
+                            {% if match.match.name|length %}
+                                <h3>{{ match.match.name }}: {{ matchHeading.generateWithResultLink(match.match) }}</h3>
                             {% else %}
-                                {{ cardHeader|raw }}
+                                <h3>{{ matchHeading.generateWithResultLink(match.match) }}</h3>
                             {% endif %}
+
                             <p class="meta">
                                 <span data-tooltip title="{{ match.match.startAt.getLong }}">{{ match.match.startAt.getRelativeTime }}</span>
                             </p>
+
                             {% if role == 'parent' %}
                                 {% for team in match.teams %}
                                     {% if team.children is not empty %}
@@ -54,30 +36,10 @@
                             {% endif %}
                         </div>
                     </div>
-                    {% if showJellytot %}
-                    <nav>
-                        <a href="#" class="icon-more" data-dropdown="sportsfixtures-match-{{ match.match.id }}-actions"></a>
-                    </nav>
-                    <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-match-{{ match.match.id }}-actions">
-                        <li>
-                            <a class="icon-match" href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.homeTeam.id}) }}">
-                                {{ match.match.homeTeam.name }} Match Page
-                            </a>
-                        </li>
-                        <li>
-                            <a class="icon-match" href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.match.id, teamId: match.match.awayTeam.id}) }}">
-                                {{ match.match.awayTeam.name }} Match Page
-                            </a>
-                        </li>
-                    </ul>
-                    {% endif%}
                 </li>
-
             {% endfor %}
-
         </ul>
     </div>
-
 {% else %}
     <div class="content">
         <p>
@@ -88,5 +50,4 @@
             {% endif %}
         </p>
     </div>
-
 {% endif %}

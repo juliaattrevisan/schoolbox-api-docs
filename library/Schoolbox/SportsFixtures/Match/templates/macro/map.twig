@@ -1,0 +1,5 @@
+{# Google Map vars #}
+
+{% macro generate(venue, key) %}
+    https://www.google.com/maps/embed/v1/place?q={{ venue.latitude }}%2C{{ venue.longitude }}&zoom=16&key={{ key }}
+{% endmacro %}

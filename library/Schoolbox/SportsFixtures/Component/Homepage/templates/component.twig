@@ -1,43 +1,32 @@
-{% if matches | length %}
+{% import '@sportsfixturesMatch/macro/heading.twig' as matchHeading %}
 
+{% if matches | length %}
     <div class="small-12 columns no-pad">
         <ul class="action-list">
 
             {% for match in matches %}
-
-                {% set cardHeader %}
-                    <h3>
-                        {% if match.name|length %}
-                            {{ match.name }} ({{ match.homeTeam.name }} vs {{ match.awayTeam.name }})
-                        {% else %}
-                            {{ match.homeTeam.name }} vs {{ match.awayTeam.name }}
-                        {% endif %}
-                    </h3>
-                {% endset %}
-
                 <li>
                     <div class="list-item">
                         <div class="card small-12">
-                            <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: teamId}) }}">
-                                {{ cardHeader|raw }}
-                            </a>
+                            {% if match.name|length %}
+                                <h3>{{ match.name }}: {{ matchHeading.generateWithResultLink(match) }}</h3>
+                            {% else %}
+                                <h3>{{ matchHeading.generateWithResultLink(match) }}</h3>
+                            {% endif %}
+
                             <p class="meta">
                                 <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span>
                             </p>
                         </div>
                     </div>
                 </li>
-
             {% endfor %}
         </ul>
     </div>
-
 {% else %}
-
     <div class="content">
         <p>
             You have no upcoming matches scheduled.
         </p>
     </div>
-
 {% endif %}
