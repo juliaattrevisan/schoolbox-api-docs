@@ -7,14 +7,18 @@
 
     {# Home Team #}
     {% if match.homeTeam.id %}
-        {% set homeTeamData = "<a href='" ~ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.homeTeam.id}) ~ "'>" ~ match.homeTeam.name ~ "</a>" %}
+        {% set homeTeamData %}
+            <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}">{{ match.homeTeam.name }}</a>
+        {% endset %}
     {% else %}
         {% set homeTeamData = match.homeTeam.name %}
     {% endif %}
 
     {# Away Team #}
     {% if match.awayTeam.id %}
-        {% set awayTeamData = "<a href='" ~ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.awayTeam.id}) ~ "'>" ~ match.awayTeam.name ~ "</a>" %}
+        {% set awayTeamData %}
+            <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}">{{ match.awayTeam.name }}</a>
+        {% endset %}
     {% else %}
         {% set awayTeamData = match.awayTeam.name %}
     {% endif %}
@@ -32,14 +36,19 @@
 
     {# Home Team #}
     {% if match.homeTeam.url %}
-        {% set homeTeamData = "<a href='" ~ match.homeTeam.url ~ "'>" ~ match.homeTeam.name ~ "</a>" %}
+        {% set homeTeamData %}
+            <a href="{{ match.homeTeam.url }}">{{ match.homeTeam.name }}</a>
+        {% endset %}
+        {% set homeTeamData = "" %}
     {% else %}
         {% set homeTeamData = match.homeTeam.name %}
     {% endif %}
 
     {# Away Team #}
     {% if match.awayTeam.url %}
-        {% set awayTeamData = "<a href='" ~ match.awayTeam.url ~ "'>" ~ match.awayTeam.name ~ "</a>" %}
+        {% set awayTeamData %}
+            <a href="{{ match.awayTeam.url }}">{{ match.awayTeam.name }}</a>
+        {% endset %}
     {% else %}
         {% set awayTeamData = match.awayTeam.name %}
     {% endif %}
@@ -55,14 +64,7 @@
  # hyperlink it
  #}
 {% macro generate(match) %}
-
-    {# Home Team #}
-    {% set homeTeamData = match.homeTeam.name %}
-
-    {# Away Team #}
-    {% set awayTeamData = match.awayTeam.name %}
-
-    {{ homeTeamData|raw }} vs {{ awayTeamData|raw }}
+    {{ match.homeTeam.name }} vs {{ match.awayTeam.name }}
 {% endmacro %}
 
 
