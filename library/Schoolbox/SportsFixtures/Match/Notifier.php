@@ -22,12 +22,15 @@ use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use Schoolbox\SportsFixtures\Match\Model as MatchModel;
 use Schoolbox\SportsFixtures\Match\Notifier\Helper as NotifierHelper;
+use Schoolbox\SportsFixtures\Snapshot\Snapshot;
 use Schoolbox\User;
 
 class Notifier extends AbstractModuleNotifier
 {
     const TRIGGER_CREATED = 'created';
     const TRIGGER_UPDATED = 'updated';
+    const TRIGGER_SNAPSHOT_CREATED = 'snapshotcreated';
+    const TRIGGER_SNAPSHOT_UPDATED = 'snapshotupdated';
 
     /**
      * @var NotifierHelper
@@ -68,6 +71,8 @@ class Notifier extends AbstractModuleNotifier
         /** @var MatchModel $match */
         $match = $bundle->getEvent()->getObject();
 
+        $startAt = $match->getStartAt()->getUnixTimestamp();
+
         // Notify 24 hours before the match start time
         $notifyTime = clone $match->getStartAt();
         $notifyTime = $notifyTime->addHours(-24)->getUnixTimeStamp();
@@ -75,11 +80,49 @@ class Notifier extends AbstractModuleNotifier
         switch ($method) {
             case Mapper::METHOD_CREATE:
                 $bundle->attach(self::TRIGGER_CREATED, $notifyTime);
+                $bundle->attach(self::TRIGGER_SNAPSHOT_CREATED, $startAt);
                 break;
             case Mapper::METHOD_UPDATE:
                 $bundle->attach(self::TRIGGER_UPDATED, $notifyTime);
+                $bundle->attach(self::TRIGGER_SNAPSHOT_UPDATED, $startAt);
                 break;
         }
+    }
+
+    /**
+     * Execute snapshot create
+     *
+     * @param Model $match
+     * @param User $effector
+     */
+    public function notifySnapshotcreated(MatchModel $match, User $effector)
+    {
+        $snapshot = new Snapshot($match);
+        $snapshot->snapshot();
+    }
+
+    /**
+     * Execute snapshot update
+     *
+     * @param Model $match
+     * @param User $effector
+     */
+    public function notifySnapshotupdated(MatchModel $match, User $effector)
+    {
+        $snapshot = new Snapshot($match);
+        $snapshot->snapshot();
+    }
+
+    public function retrieveCallbacks($label)
+    {
+        $callbacks = parent::retrieveCallbacks($label);
+        $method    = 'notifySnapshot' . ucfirst($label);
+
+        if (method_exists($this, $method)) {
+            $callbacks[] = array($this, $method);
+        }
+
+        return $callbacks;
     }
 
     /**
