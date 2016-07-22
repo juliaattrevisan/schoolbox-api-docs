@@ -149,6 +149,8 @@ class Mapper extends BaseMapper
     const ERROR_SPORTSFIXTURES_POSITION_NOT_FOUND = 178;
     const ERROR_SPORTSFIXTURES_STATUS_NOT_FOUND = 179;
 
+    const ERROR_GENERIC_NOT_FOUND = 180;
+
     public function mapping()
     {
         $this->hasTable('error');
