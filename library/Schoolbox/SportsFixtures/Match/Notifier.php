@@ -95,9 +95,9 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $match
      * @param User $effector
      */
-    public function notifySnapshotcreated(MatchModel $match, User $effector)
+    public function notifySnapshotCreated(MatchModel $match, User $effector)
     {
-        $this->log->info("Creating snapshot for {$match->getId()} at {$match->getStartAt()->getDatabase()}");
+        $this->log->info("\nCreating snapshot for Match {$match->getId()} at {$match->getStartAt()->getDatabase()}\n\n");
 
         $snapshot = new Snapshot($match);
         $snapshot->snapshot();
@@ -109,14 +109,21 @@ class Notifier extends AbstractModuleNotifier
      * @param Model $match
      * @param User $effector
      */
-    public function notifySnapshotupdated(MatchModel $match, User $effector)
+    public function notifySnapshotUpdated(MatchModel $match, User $effector)
     {
-        $this->log->info("Updating snapshot for {$match->getId()} at {$match->getStartAt()->getDatabase()}");
+        $this->log->info("\nUpdating snapshot for Match {$match->getId()} at {$match->getStartAt()->getDatabase()}\n\n");
 
         $snapshot = new Snapshot($match);
         $snapshot->snapshot();
     }
 
+    /**
+     * Custom callbacks that break away from the established pattern
+     *
+     * @param string $label
+     * @return array
+     * @throws \Schoolbox\Realtime\Schedule\ScheduleException
+     */
     public function retrieveCallbacks($label)
     {
         $callbacks = parent::retrieveCallbacks($label);
