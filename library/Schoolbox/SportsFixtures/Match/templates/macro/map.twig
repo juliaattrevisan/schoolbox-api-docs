@@ -1,14 +1,5 @@
 {# Google Map vars #}
 
 {% macro generate(venue, key) %}
-    {% set map = {
-        'latLong': venue.latitude ~ '%2C' ~ venue.longitude,
-        'zoom': 16,
-        'key': key
-    }
-    %}
-
-    {% set mapUrl = 'https://www.google.com/maps/embed/v1/place?q=' ~ map.latLong ~ '&zoom=' ~ map.zoom ~ '&key=' ~ map.key %}
-
-    {{ mapUrl }}
+    https://www.google.com/maps/embed/v1/place?q={{ venue.latitude }}%2C{{ venue.longitude }}&zoom=16&key={{ key }}
 {% endmacro %}
