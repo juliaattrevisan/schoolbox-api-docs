@@ -11,24 +11,24 @@
             }
         }
 
-        var id = $('#teamSearch{COMPONENT_TEAM_ID}').val();
+        var id = $('#teamSearch{COMPONENT_HANDLE}').val();
 
         if (id != 0) {
             options.value = {
                 id:   id,
-                name: $('#team_search{COMPONENT_TEAM_ID}').val()
+                name: $('#team_search{COMPONENT_HANDLE}').val()
             }
         }
 
-        $('#team_search{COMPONENT_TEAM_ID}').selectizeSelector(options)
+        $('#team_search{COMPONENT_HANDLE}').selectizeSelector(options)
                 .on('selectize.item_add', function(event, value) {
-                    $('#teamSearch{COMPONENT_TEAM_ID}').val(value);
+                    $('#teamSearch{COMPONENT_HANDLE}').val(value);
                 })
                 .on('selectize.item_remove', function() {
-                    $('#teamSearch{COMPONENT_TEAM_ID}').val('');
+                    $('#teamSearch{COMPONENT_HANDLE}').val('');
                 });
     });
 </script>
 
-<input type="text" id="team_search{COMPONENT_TEAM_ID}" value="{COMPONENT_TEAM_NAME}" placeholder="Search Teams">
-<input type="hidden" id="teamSearch{COMPONENT_TEAM_ID}" name="team" value="{COMPONENT_TEAM_ID}">
+<input type="text" id="team_search{COMPONENT_HANDLE}" value="{COMPONENT_TEAM_NAME}" placeholder="Search Teams">
+<input type="hidden" id="teamSearch{COMPONENT_HANDLE}" name="team" value="{COMPONENT_TEAM_ID}">
