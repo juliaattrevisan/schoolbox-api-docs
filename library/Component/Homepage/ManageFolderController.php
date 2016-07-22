@@ -61,6 +61,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
             $this->setVar('addmylinks_block', '');
         } else {
             $this->setVar('HOMEPAGE_URL', $url);
+            $this->setVar('HOMEPAGE_URL_JS', json_encode($url));
             $this->parse('addmylinks_block', 'addmylinks');
         }
         if ($this->contentPermission >= FULL_ACCESS) {

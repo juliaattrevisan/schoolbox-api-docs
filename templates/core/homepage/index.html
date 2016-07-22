@@ -88,6 +88,7 @@
 <link rel="alternate" type="application/rss+xml" title="RSS" href="/homepage/rss/{ID}/{USER_TOKEN}" />
 
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.ajax-form.js"></script>
 <script type="text/javascript">
     $(function() {
         /* Collapse content on components
@@ -97,8 +98,13 @@
         // Adds page to my links
         $('#postToMyLinks').click( function (event) {
             event.preventDefault();
-            $.post("/cms/myLinksForm.php", { url: "{HOMEPAGE_URL}", description: "{HEADING}"} );
-            location.reload();
+            $(this).ajaxForm({
+                url: "/cms/myLinksForm.php",
+                data: { url: {HOMEPAGE_URL_JS}, description: {HEADING_JS}},
+                type: 'post'
+            }).on('done.ajaxForm', function() {
+                location.reload();
+            });
         });
     });
 </script>
