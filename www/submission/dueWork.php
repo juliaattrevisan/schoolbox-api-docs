@@ -408,9 +408,19 @@ foreach ($categoryList as $category) {
 
     // calculate grade averages and trending
     $this->setFile('subjectTpl', 'activity/subjectlist.html');
+    $this->setBlock('subjectTpl', 'subject_name_link', 'subject_name_link_block');
+    $this->setBlock('subjectTpl', 'subject_name_no_link', 'subject_name_no_link_block');
     $this->setBlock('subjectTpl', 'teacher', 'teacher_block');
     $this->setBlock('subjectTpl', 'subject_grade', 'subject_grade_block');
 //    $this->setBlock('subjectTpl', 'icon', 'icon_block');
+
+    if(!$restrict_grades){
+        $this->parse('subject_name_link_block', 'subject_name_link');
+        $this->setVar('subject_name_no_link_block', '');
+    } else {
+        $this->parse('subject_name_no_link_block', 'subject_name_no_link');
+        $this->setVar('subject_name_link_block', '');
+    }
 
     $output = array(
         'SUBJ_CAT_ID'       => $categoryID,
