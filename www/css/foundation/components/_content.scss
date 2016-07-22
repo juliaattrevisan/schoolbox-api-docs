@@ -969,6 +969,7 @@ nav {
 
 	input:checked + label {
 		background-color: $content-ui-submit-background;
+		font-weight: $font-weight-normal;
 		a {
 			color: $content-ui-submit-foreground;
 		}
