@@ -675,6 +675,7 @@ class Controller extends Base
                 'data'     => array(
                     'session'           => $_SESSION,
                     'record'            => $record,
+                    'allowParents'      => $this->getDi()->get('config')->get('pastoral_parent_access'),
                     'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
                     'categories'        => $this->getPastoralCategoryMapper()->findAll()->sortBy('name', 'asc'),
                     'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
