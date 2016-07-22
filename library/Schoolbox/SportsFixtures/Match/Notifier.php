@@ -127,7 +127,7 @@ class Notifier extends AbstractModuleNotifier
     public function retrieveCallbacks($label)
     {
         $callbacks = parent::retrieveCallbacks($label);
-        $method    = 'notifySnapshot' . ucfirst($label);
+        $method    = "notify{$label}";
 
         if (method_exists($this, $method)) {
             $callbacks[] = array($this, $method);
