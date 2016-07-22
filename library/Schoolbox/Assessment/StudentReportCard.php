@@ -25,7 +25,7 @@ use Schoolbox\Assessment\StudentReportCard\ContextSelector;
 class StudentReportCard
 {
 
-    // available permissions
+    // available permissions - (array keys for $this->permissionSet)
     const CAN_SUBMIT             = 0;
     const CAN_PUBLISH            = 1;
     const CAN_EMAIL_TEACHER      = 2;
@@ -1002,8 +1002,19 @@ class StudentReportCard
         // we need to inject content into subject_container_block rather than use its template
         $page->setFile('subjectListTpl', 'submission/allWorkOverview.html');
         $page->setFile('subjectTpl', 'activity/subjectlist.html');
+        $page->setBlock('subjectTpl', 'subject_name_link', 'subject_name_link_block');
+        $page->setBlock('subjectTpl', 'subject_name_no_link', 'subject_name_no_link_block');
         $page->setBlock('subjectTpl', 'teacher', 'teacher_block');
         $page->setBlock('subjectTpl', 'subject_grade', 'subject_grade_block');
+
+        if($this->checkPermission(self::CAN_VIEW_SHOWCASE)){
+            $page->parse('subject_name_link_block', 'subject_name_link');
+            $page->setVar('subject_name_no_link_block', '');
+        } else {
+            $page->parse('subject_name_no_link_block', 'subject_name_no_link');
+            $page->setVar('subject_name_link_block', '');
+        }
+
         /**
          * @var $returnMapper  SubmissionBox\ReturnedWorkMapper
          * @var $attemptMapper OnlineAssessment\AttemptMapper
