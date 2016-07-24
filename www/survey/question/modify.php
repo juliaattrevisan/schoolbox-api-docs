@@ -68,9 +68,8 @@ if (!empty($_POST)) {
 	$questionHandler->update($data);
     $answerHandler->update($_POST);
 
-    /* Create new question
-     */
-    SitePage::localRedir('/survey/question/create/' . $section['section_id']);
+    // Form is AJAX submitted so redirection is handled by javascript
+    exit;
 }
 else {
     if (!is_numeric($this->arg[0])) {

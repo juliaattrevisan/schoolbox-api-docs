@@ -71,9 +71,8 @@ if (!empty($_POST)) {
     $questionHandler->update($data);
     $answerHandler->update($_POST);
 
-    /* Create new question
-     */
-    SitePage::localRedir('/assess/question/create/' . $section['section_id'] . $return_url);
+    // Form is AJAX submitted so redirection is handled by javascript
+    exit;
 
 } else {
 

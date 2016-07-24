@@ -9,6 +9,7 @@
 <div class="row">
     <div class="small-12 island">
         <form id="createQuestionForm" action="/{ASSESS_KIND_LC}/question/create" method="post">
+            <input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
             <input name="section_id" type="hidden" value="{SECTION_ID}" />
             <input name="sequence" type="hidden" value="{SEQUENCE}" />
             <input name="return_url" type="hidden" value="{RETURN_URL}" />

@@ -9,6 +9,7 @@
 <div class="row">
     <div class="small-12 island">
         <form id="createQuestionForm" action="/assess/question/modify" class="top" method="post">
+            <input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
             <input name="section_id" type="hidden" value="{SECTION_ID}" />
             <input name="question_id" type="hidden" value="{QUESTION_ID}" />
             <input name="answer_id" type="hidden" value="{ANSWER_ID}" />
