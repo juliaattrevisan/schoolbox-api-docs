@@ -7,6 +7,8 @@
  * @link      http://www.alaress.com.au/
  */
 
+use \Schoolbox\Resource\Folder\Model as FolderModel;
+
 class Component_Config_TileSource extends Component_Config_Abstract
 {
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
@@ -18,7 +20,10 @@ class Component_Config_TileSource extends Component_Config_Abstract
         $page->setBlock('tile_select', 'tile_option', 'tile_option_block');
         $page->setVar('tile_select_block', '');
         if ($component instanceof Component_ControllerAbstract) {
-            $source = $component->getConfig('src') ?: $component->getInstance()->getId();
+            $source = ($component->getSource() instanceof FolderModel && !$component->getSource()->isDeleted())
+                ? $component->getSource()->getId()
+                : $component->getInstance()->getId();
+
             /** @var Component_Instance[] $components */
             $components = Component_InstanceMapper::getInstance()->findByContextAndClass(
                 'homepage',

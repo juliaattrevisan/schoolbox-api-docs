@@ -61,7 +61,7 @@ foreach ($componentFactory->buildComponentList($templateList[0]['id']) as $compo
         $this->setFile($position, 'adminv2/component/placeholder.html');
     }
 
-    $component->setup(null, array());
+    $component->setup(null, $component->getInstance()->getConfigArray());
 
     $this->setVar(array(
         'COMPONENT_INSTANCE_ID'     => $instance_id,

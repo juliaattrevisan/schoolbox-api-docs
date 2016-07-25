@@ -14,6 +14,7 @@ if (!$_SESSION['user']->isSuperuser()) {
     error(19);
 }
 
+/** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'adminv2/dashboard.html');
 $this->setTitle('Admin - Dashboard');
 
@@ -64,8 +65,10 @@ foreach ($componentFactory->buildComponentList($groupList[0]['id']) as $componen
     }
 
     $this->setVar(array(
+        'ID'                        => '',
         'COMPONENT_INSTANCE_ID'     => $instance_id,
         'COMPONENT_HANDLE'          => $instance_id,
+        'COMPONENT_DEFINITION_ID'   => $defintionId,
         'component.instance.id'     => $instance_id,
         'component.definition.id'   => $defintionId,
         'component.definition.name' => Scrub::text($defintionName),

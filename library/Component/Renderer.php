@@ -35,7 +35,7 @@ class Component_Renderer
                 $page->setFile($position, 'adminv2/component/placeholder.html');
             }
 
-            $component->setup(null, array());
+            $component->setup(null, $component->getInstance()->getConfigArray());
 
             $page->setVar(array(
                 'ID'                        => $instance_no,
@@ -74,7 +74,7 @@ class Component_Renderer
     {
         $page->setFile(TEMPLATE_body, 'adminv2/component/placeholder.html');
 
-        $component->setup(null, array());
+        $component->setup(null, $component->getInstance()->getConfigArray());
 
         $instance_no  = $component->getInstance()->getId();
         $definitionId = $component->getInstance()->getDefinition()->getId();
