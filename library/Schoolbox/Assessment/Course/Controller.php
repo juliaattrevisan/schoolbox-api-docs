@@ -1215,14 +1215,6 @@ class Controller extends Base\Base
         /** @var Folder\Model[] $unitCache */
         $unitCache = [];
 
-        /* Format this into a convenient structure for now
-         */
-        $preprocessedUnitDates = [];
-
-        foreach ($unitDates as $currentUnitDate) {
-            $preprocessedUnitDates[$currentUnitDate['unit_id']] = $currentUnitDate;
-        }
-
         /* Make a local cache for unit information
          */
         foreach ($unitDates as $unit) {
@@ -1323,13 +1315,6 @@ class Controller extends Base\Base
                          */
                         $temp->add($currentInstanceCoursework);
 
-                        /* Retain an associative array of dates that we can summon
-                         */
-                        $key = $unitInstance->getUnitCategory()->getId();
-
-                        $preprocessedUnitDates[$key]['open_date'] = $unitInstance->getOpenDate()->getLocalShort();
-                        $preprocessedUnitDates[$key]['due_date']  = $unitInstance->getDueDate()->getLocalShort();
-
                         break;
                     }
                 }
@@ -1339,6 +1324,20 @@ class Controller extends Base\Base
                  */
                 if (!in_array($currentAbstractCoursework->getId(), $found)) {
                     $temp->add($currentAbstractCoursework);
+                }
+            }
+
+            /* Find any customisations to the imported course
+             *
+             * Take advantage of the fact that:
+             * $currentInstanceCoursework->getTask()->getId() = $currentAbstractCoursework->getId() = elements of $found
+             *
+             * So we can find all the $currentInstanceCoursework that weren't superpositioned
+             * because there are no abstracts for them (ie. customisations)
+             */
+            foreach ($instancesCoursework as $currentInstanceCoursework) {
+                if (!in_array($currentInstanceCoursework->getTask()->getId(), $found)) {
+                    $temp->add($currentInstanceCoursework);
                 }
             }
 
@@ -1389,8 +1388,7 @@ class Controller extends Base\Base
         }
 
         return [
-            'units' => $units,
-            'preprocessedUnitDates' => $preprocessedUnitDates
+            'units' => $units
         ];
     }
 
