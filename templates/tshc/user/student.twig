@@ -1,12 +1,9 @@
 {% extends '@core/user/student.twig' %}
 
-{#{% if showEmail %}#}
-    {#{% block details_email %}#}
-    {#{% if user.getEmail() %}#}
-    {#<dt class="no-margin small-6 medium-3">Email</dt>#}
-    {#<dd class="no-margin small-6 medium-9">#}
-        {#<a href="{{ session.mailhandle }}{{ user.getEmail() }}">{{ user.getEmail() }}</a>#}
-    {#</dd>#}
-    {#{% endif %}#}
-    {#{% endblock details_email %}#}
-{#{% endif %}#}
+{% if showEmail %}
+    {% block details_email %}
+    {% if user.getEmail() %}
+    {# Hide student email #}
+    {% endif %}
+    {% endblock details_email %}
+{% endif %}
