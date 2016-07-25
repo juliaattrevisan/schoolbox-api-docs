@@ -1342,6 +1342,20 @@ class Controller extends Base\Base
                 }
             }
 
+            /* Find any customisations to the imported course
+             *
+             * Take advantage of the fact that:
+             * $currentInstanceCoursework->getTask()->getId() = $currentAbstractCoursework->getId() = elements of $found
+             *
+             * So we can find all the $currentInstanceCoursework that weren't superpositioned
+             * because there are no abstracts for them (ie. customisations)
+             */
+            foreach ($instancesCoursework as $currentInstanceCoursework) {
+                if (!in_array($currentInstanceCoursework->getTask()->getId(), $found)) {
+                    $temp->add($currentInstanceCoursework);
+                }
+            }
+
             /* Sort by Created At for now, until manual sequencing
              * is added to the ui so teachers can sort it themselves
              */
