@@ -171,7 +171,9 @@
                 });
 
             singletonModal.on('click', '.cancel[role=button]', function (e) {
+                e.preventDefault();
                 window.top.postMessage(JSON.stringify({ data: [] }), location.origin);
+                singletonModal.foundation('reveal', 'close');
             });
         }
     };
