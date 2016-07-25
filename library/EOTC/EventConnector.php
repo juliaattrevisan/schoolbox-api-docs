@@ -288,7 +288,7 @@ class EventConnector extends EventMapper
 
         foreach ($statement as $row) {
 
-            /** @var Event $eventItem */
+            /** @var \EOTC\Event $eventItem */
             $eventItem = $this->hydrate($row, 'e');
 
             /** @var User $authorItem */
