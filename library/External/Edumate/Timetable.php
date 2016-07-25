@@ -340,9 +340,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
                 WHERE c.student_number = :sn
             ";
         } elseif ($this->getGroupHandler()->isStaff($userId)) {
-            $join = "
-                WHERE t.staff_number = :sn
-            ";
+            $join = "LEFT JOIN db2inst1.schoolbox_teacherclass c ON t.class_code = c.class_code";
         } else {
             return false;
         }
@@ -355,23 +353,41 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             $campusSql = "campus = :campus";
         }
 
-        $stmt = $this->getDatabase()->prepare(
-            "
-            SELECT period_number, t.day_number, t.class_code AS code, t.staff_number AS staffID, room, cl.class
-            FROM db2inst1.schoolbox_timetable t
-            LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code
-            $join
-            AND $campusSql
-            AND day_number <= :d
-        "
-        );
+        $sql = "
+                SELECT 
+        
+                t.period_number, 
+                t.day_number,
+                t.class_code AS code, 
+                c.staff_number AS staffID, 
+                room, 
+                cl.class 
+        
+                FROM db2inst1.schoolbox_timetable t 
+        
+                LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code 
+                {$join} 
+        
+                WHERE 
+                
+                c.staff_number = :sn AND 
+                day_number <= :d AND 
+                ( campus = :campus OR campus = :campus2 )
+        ";
+
+        $stmt = $this->getDatabase()->prepare($sql);
+
+        // Can't be having campus = NULL (causes SQL error) so just coalescing them to an impossible ID
+
+        if ($campusCode[0] == null) $campusCode[0] = -1;
+        if ($campusCode[1] == null) $campusCode[1] = -1;
 
         $stmt->execute(
             array(
                 'sn' => $externalUserId,
+                'd' => $this->getCycleLength($campus),
                 'campus' => $campusCode[0],
                 'campus2' => $campusCode[1],
-                'd' => $this->getCycleLength($campus),
             )
         );
 
