@@ -130,13 +130,14 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                     var fields = dialogFields(dialog);
 
                                     var domId = $(this).attr('domId');
-                                    $('#'+domId).closest('.cke_editor_body_dialog').addClass('hide');
+                                    var previousModel = $('#'+domId).closest('.cke_dialog');
+                                    previousModel.addClass('hide');
 
                                     /* Select something from the Resource Browser
                                      */
                                     $.fn.schoolboxResource({
                                         allowedFilesystems: 'internal',
-                                        previousModal: $('#'+domId).closest('.cke_editor_body_dialog')
+                                        previousModal: previousModel
                                     });
 
                                     $(window).unbind('message').on('message', function(event) {
