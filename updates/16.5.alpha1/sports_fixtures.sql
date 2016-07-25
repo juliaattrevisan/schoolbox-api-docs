@@ -216,6 +216,19 @@ CREATE TABLE `sportsfixtures_team_user` (
 		ON UPDATE CASCADE
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
+/** Team Participant table **/
+CREATE TABLE `sportsfixtures_team_participantuser`(
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`match_id` INT(11),
+	`team_id` INT(11),
+	`user_id` INT(11),
+	`sequence` INT(11),
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`deleted_at` DATETIME,
+PRIMARY KEY (`id`)
+) ENGINE=InnoDB CHARACTER SET=utf8;
+
 /** Team player positions **/
 CREATE TABLE `sportsfixtures_team_position` (
 	`id` INT NOT NULL AUTO_INCREMENT,
@@ -236,6 +249,18 @@ CREATE TABLE `sportsfixtures_team_position` (
 	REFERENCES `sportsfixtures_position` (`id`)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE
+) ENGINE=InnoDB CHARACTER SET=utf8;
+
+/** Team Participant Positions */
+CREATE TABLE `sportsfixtures_team_participantposition`(
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`match_id` INT(11) NOT NULL,
+	`team_id` INT(11) NOT NULL,
+	`user_id` INT(11) NOT NULL,
+	`name` VARCHAR(255),
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`deleted_at` DATETIME, PRIMARY KEY (`id`)
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Tag cloud of enemy schools */
@@ -259,6 +284,18 @@ CREATE TABLE `sportsfixtures_coach` (
 	PRIMARY KEY (`id`),
 	INDEX `sportsfixtures_coach__name` (`name` ASC),
 	INDEX `sportsfixtures_coach__user` (`user_id` ASC)
+) ENGINE=InnoDB CHARACTER SET=utf8;
+
+/** Team Participant Coach */
+CREATE TABLE `sportsfixtures_team_participantcoach`(
+	`id` INT(11) NOT NULL AUTO_INCREMENT,
+	`match_id` INT(11) NOT NULL,
+	`team_id` INT(11) NOT NULL,
+	`user_id` INT(11) NULL,
+	`name` VARCHAR(255) NOT NULL,
+	`created_at` DATETIME,
+	`updated_at` DATETIME,
+	`deleted_at` DATETIME, PRIMARY KEY (`id`)
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /** Coaches/teams M2M join table **/

@@ -15,7 +15,7 @@ use External_UserInterface;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Base;
 use Alaress\Authorizer\Failure\Unauthorized;
-use \Schoolbox\SportsFixtures\Team\Metadata;
+use \Schoolbox\SportsFixtures\Team\Metadata\Factory;
 
 class IsAnyParentOfTeamPlayer implements IAuthorizationRule
 {
@@ -50,12 +50,14 @@ class IsAnyParentOfTeamPlayer implements IAuthorizationRule
     {
         /* Players in the Team specified
          */
-        $teamMetadata = new Metadata($params['context']);
+        $factory = new Factory($params['context']);
+        $teamMetadata = $factory->produce();
 
         $allPlayers = $teamMetadata->getPlayers()->getOffset($params['teamId']);
 
         $playerIds = [];
 
+        /** @var User $currentPlayer */
         foreach ($allPlayers as $currentPlayer) {
             if ($currentPlayer['user'] instanceof User) {
                 $playerIds[] = $currentPlayer['user']->getExternalId();

@@ -19,7 +19,7 @@ use \Schoolbox\SportsFixtures\Coach\Model as Coach;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use \Schoolbox\SportsFixtures\Result\Model as Result;
-use \Schoolbox\SportsFixtures\Team\Metadata;
+use \Schoolbox\SportsFixtures\Team\Metadata\Factory;
 
 
 class IsCoachOfTeam implements IAuthorizationRule
@@ -74,7 +74,8 @@ class IsCoachOfTeam implements IAuthorizationRule
 
         /* Coaches of the Team specified
          */
-        $teamMetadata = new Metadata($match);
+        $factory = new Factory($match);
+        $teamMetadata = $factory->produce();
 
         $allCoaches = $teamMetadata->getCoaches()->getOffset($teamId);
 

@@ -2,78 +2,81 @@
 /**
  * Metadata
  *
+ * Strategy Design Pattern
+ *
+ * Determines whether to show the Current dynamic team composition
+ * or to show the snapshot (Historic) composition as saved at Match
+ * start time; uses Factory to load Strategy
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\SportsFixtures\Team;
+namespace Schoolbox\SportsFixtures\Team\Metadata;
 
+use Schoolbox\SportsFixtures\Team\Metadata\Strategy\IMetadataStrategy;
+use \Schoolbox\User;
 use \Schoolbox\Collection;
-use \Schoolbox\UserMapper;
-use \Schoolbox\SportsFixtures\Match\Model as Match;
-use \Schoolbox\SportsFixtures\Coach\Mapper as CoachMapper;
-use \Schoolbox\SportsFixtures\Coach\TagCloud as CoachTagCloud;
+use \Schoolbox\SportsFixtures\Team\Position\Model as TeamPosition;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
-use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
-use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
+use \Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayer;
+use \Schoolbox\SportsFixtures\Match\Model as Match;
 
 class Metadata
 {
     /**
-     * @var Collection
+     * @var Match
      */
-    private $players;
+    protected $match;
 
     /**
      * @var Collection
      */
-    private $coaches;
+    protected $players;
 
     /**
      * @var Collection
      */
-    private $positions;
+    protected $coaches;
 
     /**
-     * @var TeamPlayerMapper
+     * @var Collection
      */
-    protected $teamPlayerMapper;
+    protected $positions;
 
     /**
-     * @var TeamPositionMapper
+     * @var IMetadataStrategy
      */
-    protected $teamPositionMapper;
-
-    /**
-     * @var CoachMapper
-     */
-    protected $coachMapper;
-
-    /**
-     * @var UserMapper
-     */
-    protected $userMapper;
+    protected $strategy;
 
     /**
      * Metadata constructor.
+     *
      * @param Match $match
+     * @param IMetadataStrategy $strategy
      */
-    public function __construct(Match $match)
+    public function __construct(Match $match, IMetadataStrategy $strategy)
     {
+        $this->setMatch($match);
         $this->setPlayers(new Collection());
         $this->setCoaches(new Collection());
         $this->setPositions(new Collection());
-        $this->setTeamPlayerMapper(TeamPlayerMapper::getInstance());
-        $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
-        $this->setCoachMapper(CoachMapper::getInstance());
-        $this->setUserMapper(UserMapper::getInstance());
+        $this->setStrategy($strategy);
+    }
 
+    /**
+     * Collect team composition
+     *
+     * The players, their positions, and coaches
+     */
+    public function collect()
+    {
         /** @var Team $homeTeam */
         /** @var Team $awayTeam */
-        $homeTeam = $match->getHomeTeam();
-        $awayTeam = $match->getAwayTeam();
+        $homeTeam = $this->getMatch()->getHomeTeam();
+        $awayTeam = $this->getMatch()->getAwayTeam();
 
         $this->collectForTeam($homeTeam);
         $this->collectForTeam($awayTeam);
@@ -82,9 +85,9 @@ class Metadata
     /**
      * Collect metadata about a Team - its Players and their Positions
      *
-     * @param Model $team
+     * @param Team $team
      */
-    private function collectForTeam(Team $team)
+    protected function collectForTeam(Team $team)
     {
         if ($team->getId()) {
 
@@ -94,11 +97,12 @@ class Metadata
 
             /* Collate everything
              */
-            $allPlayers = $this->getTeamPlayerMapper()->findByColumn('team_id', $team->getId(), ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]);
-            $allPositions = $this->getTeamPositionMapper()->findByColumn('team_id', $team->getId(), ['order' => ['user_id' => 'asc']]);
+            $allPlayers = $this->getStrategy()->getAllPlayers($team);
+            $allPositions = $this->getStrategy()->getAllPositions($team);
 
             /* Sorry Matt
              */
+            /** @var TeamPlayer $currentPlayer */
             foreach ($allPlayers as $currentPlayer) {
                 $item = [
                     'user' => $currentPlayer->getUser(),
@@ -107,8 +111,11 @@ class Metadata
 
                 /* Get all the Positions for this Player
                  */
+                /** @var TeamPosition $currentPosition */
                 foreach ($allPositions as $currentPosition) {
                     if ($currentPosition->getUser()->getId() == $currentPlayer->getUser()->getId()) {
+
+                        /** @var Collection $item['positions'] */
                         $item['positions']->add($currentPosition);
                     }
                 }
@@ -122,9 +129,7 @@ class Metadata
              */
             $this->getCoaches()->setOffset($team->getId(), new Collection());
 
-            $coachTags = new CoachTagCloud($this->getCoachMapper(), $this->getUserMapper());
-
-            $allCoaches = $coachTags->findForTeam($team);
+            $allCoaches = $this->getStrategy()->getAllCoaches($team);
 
             foreach ($allCoaches as $currentCoach) {
                 $this->getCoaches()->getOffset($team->getId())->add($currentCoach);
@@ -184,70 +189,34 @@ class Metadata
     }
 
     /**
-     * @return TeamPlayerMapper
+     * @return mixed
      */
-    private function getTeamPlayerMapper()
+    public function getStrategy()
     {
-        return $this->teamPlayerMapper;
+        return $this->strategy;
     }
 
     /**
-     * @param TeamPlayerMapper $teamPlayerMapper
-     * @return static
+     * @param mixed $strategy
      */
-    private function setTeamPlayerMapper(TeamPlayerMapper $teamPlayerMapper)
+    private function setStrategy($strategy)
     {
-        $this->teamPlayerMapper = $teamPlayerMapper;
-        return $this;
+        $this->strategy = $strategy;
     }
 
     /**
-     * @return TeamPositionMapper
+     * @return Match
      */
-    private function getTeamPositionMapper()
+    public function getMatch()
     {
-        return $this->teamPositionMapper;
+        return $this->match;
     }
 
     /**
-     * @param TeamPositionMapper $teamPositionMapper
-     * @return static
+     * @param Match $match
      */
-    private function setTeamPositionMapper(TeamPositionMapper $teamPositionMapper)
+    private function setMatch($match)
     {
-        $this->teamPositionMapper = $teamPositionMapper;
-        return $this;
-    }
-
-    /**
-     * @return CoachMapper
-     */
-    private function getCoachMapper()
-    {
-        return $this->coachMapper;
-    }
-
-    /**
-     * @param CoachMapper $coachMapper
-     */
-    private function setCoachMapper($coachMapper)
-    {
-        $this->coachMapper = $coachMapper;
-    }
-
-    /**
-     * @return UserMapper
-     */
-    private function getUserMapper()
-    {
-        return $this->userMapper;
-    }
-
-    /**
-     * @param UserMapper $userMapper
-     */
-    private function setUserMapper($userMapper)
-    {
-        $this->userMapper = $userMapper;
+        $this->match = $match;
     }
 }
