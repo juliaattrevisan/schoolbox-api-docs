@@ -161,36 +161,101 @@ class EventConnector extends EventMapper
         $eventTypeMapper       = $this->getJoinMapper('eventType');
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
-        $query = "
-            SELECT
-                {$this->getColumnString('e')},
-                {$authorMapper->getColumnString('a')},
-                {$teacherInChargeMapper->getColumnString('c')},
-                {$eventTypeMapper->getColumnString('t')},
+        /* Superusers see everything
+         */
+        if ($this->getUser()->isSuperuser()) {
+            $query = "
+                SELECT
+                    {$this->getColumnString('e')},
+                    {$authorMapper->getColumnString('a')},
+                    {$teacherInChargeMapper->getColumnString('c')},
+                    {$eventTypeMapper->getColumnString('t')},
+                    (
+                        SELECT COUNT(*) FROM eotc_event
+                        LEFT JOIN eotc_event_metadata ON eotc_event.id = eotc_event_metadata.event_id
+                        LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
+                        LEFT JOIN eotc_metadata_student ON eotc_metadata_student.metadata_id = eotc_metadata.id
+                        WHERE eotc_metadata.id = e.id
+                    ) AS numStudents,
+                    (
+                        SELECT COUNT(*)+1 FROM eotc_event
+                        LEFT JOIN eotc_event_metadata ON eotc_event.id = eotc_event_metadata.event_id
+                        LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
+                        LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.metadata_id = eotc_metadata.id
+                        WHERE eotc_metadata.id = e.id
+                    ) AS numStaff
+                FROM `{$this->table}` e
+                LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
+                LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
+                LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+                LEFT JOIN eotc_metadata on eotc_metadata.id = e.id
+                WHERE
+                    DATE(e.end_datetime) >= DATE(FROM_UNIXTIME(:startTimestamp))
+                    AND
+                    DATE(e.start_datetime) <= DATE(FROM_UNIXTIME(:endTimestamp))
+                ORDER BY e.start_datetime, e.end_datetime
+            ";
 
-                (SELECT COUNT(*) FROM eotc_event e
-                LEFT JOIN eotc_metadata ON eotc_metadata.id = `e`.`id`
-                LEFT JOIN eotc_metadata_student ON eotc_metadata_student.`metadata_id` = eotc_metadata.`id` WHERE eotc_metadata_student.`user_id` IS NOT NULL) AS numStudents,
+            $params = [
+                'startTimestamp' => $startTimestamp,
+                'endTimestamp' => $endTimestamp,
+            ];
+        }
+        /* For all other user types:
+         * Only show events where $user is either staff or student attendee
+         *
+         * This saves us from having to subquery these attendees separately,
+         * by initially only getting events that are relevant to $user
+         */
+        else {
+            $query = "
+                SELECT
+                    {$this->getColumnString('e')},
+                    {$authorMapper->getColumnString('a')},
+                    {$teacherInChargeMapper->getColumnString('c')},
+                    {$eventTypeMapper->getColumnString('t')},
+                    eotc_metadata_student.user_id as studentUserId,
+                    eotc_metadata_staff.user_id as staffUserId,
+                    (
+                        SELECT COUNT(*) FROM eotc_event
+                        LEFT JOIN eotc_event_metadata ON eotc_event.id = eotc_event_metadata.event_id
+                        LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
+                        LEFT JOIN eotc_metadata_student ON eotc_metadata_student.metadata_id = eotc_metadata.id
+                        WHERE eotc_metadata.id = e.id
+                    ) AS numStudents,
+                    (
+                        SELECT COUNT(*)+1 FROM eotc_event
+                        LEFT JOIN eotc_event_metadata ON eotc_event.id = eotc_event_metadata.event_id
+                        LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
+                        LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.metadata_id = eotc_metadata.id
+                        WHERE eotc_metadata.id = e.id
+                    ) AS numStaff
+                FROM `{$this->table}` e
+                LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
+                LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
+                LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
+                LEFT JOIN eotc_metadata on eotc_metadata.id = e.id
+                LEFT JOIN eotc_metadata_student ON eotc_metadata_student.`metadata_id` = eotc_metadata.`id` AND eotc_metadata_student.user_id = :studentUserId
+                LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.`metadata_id` = eotc_metadata.`id` AND eotc_metadata_staff.user_id = :staffUserId
+                WHERE
+                    DATE(e.end_datetime) >= DATE(FROM_UNIXTIME(:startTimestamp))
+                    AND
+                    DATE(e.start_datetime) <= DATE(FROM_UNIXTIME(:endTimestamp))
+                    AND (eotc_metadata_student.user_id IS NOT NULL OR eotc_metadata_staff.user_id IS NOT NULL OR e.teacher_in_charge_id = :ticId)
+                ORDER BY e.start_datetime, e.end_datetime
+            ";
 
-                (SELECT COUNT(*)+1 FROM eotc_event e
-                LEFT JOIN eotc_metadata ON eotc_metadata.id = `e`.`id`
-                LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.`metadata_id` = eotc_metadata.`id` WHERE eotc_metadata_staff.`user_id` IS NOT NULL) AS numStaff
-
-            FROM `{$this->table}` e
-            LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
-            LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
-            LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-            WHERE
-                DATE(e.end_datetime) >= DATE(FROM_UNIXTIME(:startTimestamp))
-                AND
-                DATE(e.start_datetime) <= DATE(FROM_UNIXTIME(:endTimestamp))
-            ORDER BY e.start_datetime, e.end_datetime
-        ";
+            $params = [
+                'startTimestamp' => $startTimestamp,
+                'endTimestamp' => $endTimestamp,
+                'studentUserId' => $this->getUser()->getId(),
+                'staffUserId' => $this->getUser()->getId(),
+                'ticId' => $this->getUser()->getId(),
+            ];
+        }
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(":startTimestamp", $startTimestamp);
-        $statement->bindParam(":endTimestamp", $endTimestamp);
-        $statement->execute();
+        $statement->execute($params);
 
         $collection = new Collection();
 
@@ -215,6 +280,7 @@ class EventConnector extends EventMapper
         }
 
         foreach ($statement as $row) {
+
             /** @var Event $eventItem */
             $eventItem = $this->hydrate($row, 'e');
 
@@ -251,16 +317,6 @@ class EventConnector extends EventMapper
                 if ($eventItem->getMetadata()->getStatus()->isRejected()) {
                     continue;
                 }
-
-                /* Accumulate staff attendees for this event
-                 */
-                $allStaffAttendees = $metadataMapper->findStaffAttendees($eventItem->getMetadata()->getId());
-                $eventItem->getMetadata()->setStaffAttendees($allStaffAttendees);
-
-                /* Accumulate student attendees for this event
-                 */
-                $allStudentAttendees = $metadataMapper->findStudentAttendees($eventItem->getMetadata()->getId());
-                $eventItem->getMetadata()->setStudentAttendees($allStudentAttendees);
             }
 
             /* For filters
@@ -277,57 +333,24 @@ class EventConnector extends EventMapper
              *
              * Save some hassle if you're already an EOTC manager, skip all
              * this other mapper stuff
+             *
+             *  - Superusers can always see it
+             *  - Creators can always see it
+             *  - Teachers in Charge should see it in translucent form
+             *  - Staff members should see it in translucent form
+             *  - Students should only see this event if it's Approved and
+             *    if they are assigned to it as an attendee
              */
             $isAttendee = false;
 
-            if (!$isEOTCManager) {
-
-                /* Superusers can always see it
-                 */
-                if (!$isAttendee) {
-                    if ($user->isSuperuser()) {
-                        $isAttendee = true;
-                    }
-                }
-
-                /* Creators can always see it
-                 */
-                if (!$isAttendee) {
-                    if ($eventItem->getAuthor()->getId() == $user->getId()) {
-                        $isAttendee = true;
-                    }
-                }
-
-                /* Teachers in Charge should see it in translucent form
-                 */
-                if (!$isAttendee) {
-                    $isAttendee = $user->getId() == $eventItem->getTeacherInCharge()->getId();
-                }
-
-                /* Staff members should see it in translucent form
-                 */
-                if (!$isAttendee) {
-                    foreach ($eventItem->getMetadata()->getStaffAttendees() as $currentStaff) {
-                        if ($currentStaff->getId() == $user->getId()) {
-                            $isAttendee = true;
-                            break;
-                        }
-                    }
-                }
-
-                /* Students should only see this event if it's Approved and
-                 * if they are assigned to it as an attendee
-                 */
-                if (!$isAttendee) {
-                    if ($eventItem->getMetadata()->getStatus()->isApproved()) {
-                        foreach ($eventItem->getMetadata()->getStudentAttendees() as $currentStudent) {
-                            if ($currentStudent->getId() == $user->getId()) {
-                                $isAttendee = true;
-                                break;
-                            }
-                        }
-                    }
-                }
+            if (
+                $user->isSuperuser() ||
+                $eventItem->getAuthor()->getId() == $user->getId() ||
+                $user->getId() == $eventItem->getTeacherInCharge()->getId() ||
+                $row['staffUserId'] == $this->getUser()->getId() ||
+                ($eventItem->getMetadata()->getStatus()->isApproved()) && ($row['studentUserId'] == $this->getUser()->getId())
+            ) {
+                $isAttendee = true;
             }
 
             if ($isEOTCManager || $isAttendee || $eventItem->getMetadata()->getStatus()->isApproved()) {
@@ -350,6 +373,8 @@ class EventConnector extends EventMapper
                 $event->setType($eventItem->getType()->getId());
 
                 /* Augment title with student counts
+                 *
+                 * TODO: Probably will include students + staff + 1 TIC
                  */
                 $event->setTitle("{$eventItem->getTitle()} ({$row['numStudents']})");
 
@@ -373,11 +398,9 @@ class EventConnector extends EventMapper
 
                 /* Custom data
                  */
-                $event->setCustom(
-                    array(
-                        'approved' => $eventItem->getMetadata()->getStatus()->isApproved()
-                    )
-                );
+                $event->setCustom([
+                    'approved' => $eventItem->getMetadata()->getStatus()->isApproved()
+                ]);
 
                 /* Derive publishDate settings for front-end classes
                  * If it's approved, set the publishDate in the past
