@@ -1,6 +1,8 @@
 <script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 
 <script type="text/javascript">
     $(function() {
@@ -107,6 +109,8 @@
             {% endif %}
             multiple: false
         });
+
+        $('textarea').alaressEditor();
     });
 </script>
 
@@ -226,6 +230,13 @@
                     </div>
                 </fieldset>
                 {% endif %}
+
+                <fieldset class="content">
+                    <legend>Notes</legend>
+                    <div class="small-12 columns">
+                        <textarea name="notes">{{ match.notes }}</textarea>
+                    </div>
+                </fieldset>
             </section>
 
             <input type="submit" value="{{ action }} Match" />

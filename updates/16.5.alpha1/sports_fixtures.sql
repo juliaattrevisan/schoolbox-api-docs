@@ -108,6 +108,7 @@ CREATE TABLE `sportsfixtures_match` (
 	`home_school_id` INT NULL,
 	`away_school_id` INT NULL,
 	`name` VARCHAR(255) NULL COMMENT '',
+	`notes` TEXT NULL COMMENT '',
 	`start_at` DATETIME NULL COMMENT '',
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
