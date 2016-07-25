@@ -236,9 +236,13 @@
             });
 
             // Config
-            var $config = $('#rulesetId').add($('[name="config[student][enabled]"]'));
+            var $config = $('#rulesetId').add($('[data-ruleset-enabled] [name]'));
 
             dataArr = $.merge($config.serializeArray(), dataArr);
+
+            // Custom Rules
+            var $customRules = $('[data-custom-rule] [name]');
+            dataArr = $.merge($customRules.serializeArray(), dataArr);
 
             var ajaxes = [];
             $rules.each(function(idx, elem){
