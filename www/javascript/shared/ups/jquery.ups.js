@@ -97,11 +97,18 @@
                     }
                 },
 
+                // Ruleset Settings
+                ruleset:{
+                    update: {
+                        url: '/adminv2/ups/ruleset/update',
+                    }
+                },
+
                 /* Rule Settings
                  */
                 rule: {
                     update: {
-                        url: '/adminv2/ups/ruleset/update',
+                        url: '/adminv2/ups/ruleset/rule/update',
                     },
                     delete: {
                         url: '/adminv2/ups/rule/delete',
@@ -219,7 +226,7 @@
         }
 
         /**
-         * For each Rule passed, send config & the single rule's data to server.
+         * Save config and each rule in parallel
          *
          * Multiple parallel AJAX posts, each less than 'max_input_vars'
          *
@@ -228,48 +235,48 @@
          */
         function saveRules($rules){
 
-            var dataArr = [];
+            // Config + Custom Rules
+            var $config = $('#rulesetId')
+                .add($('[data-ruleset-enabled] [name]'))
+                .add($('[data-custom-rule] [name]'));
+
+            var configArr = $config.serializeArray();
 
             // Rule sequence
             $('[data-rule]').each(function(idx,elem){
-                dataArr.push({name: 'sequence[]', value: $(elem).attr('data-rule')});
+                configArr.push({name: 'sequence[]', value: $(elem).attr('data-rule')});
             });
 
-            // Config
-            var $config = $('#rulesetId').add($('[data-ruleset-enabled] [name]'));
+            // Add Ruleset config
+            var ajaxes = [$.retryPromise(function(){
+                return $.post(config.ruleset.update.url, configArr);
+            })];
 
-            dataArr = $.merge($config.serializeArray(), dataArr);
-
-            // Custom Rules
-            var $customRules = $('[data-custom-rule] [name]');
-            dataArr = $.merge($customRules.serializeArray(), dataArr);
-
-            var ajaxes = [];
+            // Add each Rule
             $rules.each(function(idx, elem){
                 var $rule = $(elem);
                 $rule.find(config.validInputTypes).attr('disabled', false);
                 $rule.find('option').removeAttr('disabled');
 
-                var dataCopy = $.merge([], dataArr);
-                var ruleData = $.merge(dataCopy, $rule.find(config.validInputTypes).serializeArray());
+                var ruleData = $rule.find(config.validInputTypes).serializeArray();
 
                 ajaxes.push($.retryPromise(function(){
                     return $.post(config.rule.update.url, ruleData, function( data, textStatus, jqXHR){
                         $rule.find('[data-label-status]').remove();
 
                         // Update newly inserted conditions
-                        for (var oldId in data.condition) {
-                            var newId = data.condition[oldId];
-                            if(newId != oldId){
-                                updateDOM($('#condition-'+oldId), oldId, newId);
+                        for (var oldConditionId in data.condition) {
+                            var newConditionId = data.condition[oldConditionId];
+                            if(newConditionId != oldConditionId){
+                                updateDOM($('#condition-'+oldConditionId), oldConditionId, newConditionId);
                             }
                         }
 
                         // Update newly inserted effects
-                        for (var oldId in data.effect) {
-                            var newId = data.effect[oldId];
-                            if(newId != oldId){
-                                updateDOM($('#effect-'+oldId), oldId, newId);
+                        for (var oldEffectId in data.effect) {
+                            var newEffectId = data.effect[oldEffectId];
+                            if(newEffectId != oldEffectId){
+                                updateDOM($('#effect-'+oldEffectId), oldEffectId, newEffectId);
                             }
                         }
                     });

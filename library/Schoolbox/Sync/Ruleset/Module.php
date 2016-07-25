@@ -38,7 +38,8 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'log', $basePath, "/log/{logId}");
         $this->addGetRoute($router, 'intro', $basePath, "");
         $this->addGetRoute($router, 'read', $basePath, "/{rulesetId}");
-        $this->addPostRoute($router, 'update', $basePath, "/ruleset/update");
+        $this->addPostRoute($router, 'updateRuleset', $basePath, "/ruleset/update");
+        $this->addPostRoute($router, 'updateRule', $basePath, "/ruleset/rule/update");
         $this->addGetRoute($router, 'dryRun', $basePath, "/{rulesetId}/dry-run");
     }
 

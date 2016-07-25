@@ -425,28 +425,39 @@ class Controller extends Base {
     }
 
     /**
-     * Update a single Rule in the Ruleset.
-     *
-     * Each call to this function must provide the sequence of all Rules, plus the
-     * contents for a single Rule in the Ruleset. Saving 'All Rules' would trigger
-     * multiple parallel asynchronous calls to this function. This is to avoid
-     * max_input_vars being breached.
+     * Update the settings for a Ruleset (student, parent, staff)
      */
-    public function update()
+    public function updateRuleset()
     {
-        $response = [];
         $postData = $this->getRequest()->post;
         $roleType = $postData['rulesetId'];
 
         $this->updateConfig($roleType, $postData['config'][$roleType]);
         $this->updateRuleSequence(($postData['sequence']));
+        $this->updateCustomRules($roleType, $postData['customRule']);
+
+        $this->getResponse()->content->set([
+            'format' => 'json',
+            'data'   => 200,
+        ]);
+    }
+
+    /**
+     * Update a single Rule in the Ruleset.
+     *
+     * Each call to this function must provide the contents for a single Rule in
+     * the Ruleset. Saving 'All Rules' would trigger multiple parallel asynchronous
+     * calls to this function. This is to avoid max_input_vars being breached.
+     */
+    public function updateRule(){
+
+        $response = [];
+        $postData = $this->getRequest()->post;
 
         foreach ($postData['rule'] as $ruleId => $ruleData) {
             $response['condition'] = $this->updateConditions($ruleId, $ruleData['condition']);
             $response['effect']    = $this->updateEffects($ruleId, $ruleData['effect']);
         }
-
-        $this->updateCustomRules($roleType, $postData['customRule']);
 
         $this->getResponse()->content->set($this->buildJsonOutput($response));
     }
