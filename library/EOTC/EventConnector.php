@@ -162,6 +162,7 @@ class EventConnector extends EventMapper
         $teacherInChargeMapper = $this->getJoinMapper('teacherInCharge');
 
         /* Superusers see everything
+         * Skip Rejected events
          */
         if ($this->getUser()->isSuperuser()) {
             $query = "
@@ -193,12 +194,14 @@ class EventConnector extends EventMapper
                     DATE(e.end_datetime) >= DATE(FROM_UNIXTIME(:startTimestamp))
                     AND
                     DATE(e.start_datetime) <= DATE(FROM_UNIXTIME(:endTimestamp))
+                    AND eotc_metadata.status_id != :rejected
                 ORDER BY e.start_datetime, e.end_datetime
             ";
 
             $params = [
                 'startTimestamp' => $startTimestamp,
                 'endTimestamp' => $endTimestamp,
+                'rejected' => EventStatusMapper::STATUS_REJECTED,
             ];
         }
         /* For all other user types:
@@ -206,6 +209,8 @@ class EventConnector extends EventMapper
          *
          * This saves us from having to subquery these attendees separately,
          * by initially only getting events that are relevant to $user
+         *
+         * Skip Rejected events
          */
         else {
             $query = "
@@ -242,6 +247,7 @@ class EventConnector extends EventMapper
                     AND
                     DATE(e.start_datetime) <= DATE(FROM_UNIXTIME(:endTimestamp))
                     AND (eotc_metadata_student.user_id IS NOT NULL OR eotc_metadata_staff.user_id IS NOT NULL OR e.teacher_in_charge_id = :ticId)
+                    AND eotc_metadata.status_id != :rejected
                 ORDER BY e.start_datetime, e.end_datetime
             ";
 
@@ -251,6 +257,7 @@ class EventConnector extends EventMapper
                 'studentUserId' => $this->getUser()->getId(),
                 'staffUserId' => $this->getUser()->getId(),
                 'ticId' => $this->getUser()->getId(),
+                'rejected' => EventStatusMapper::STATUS_REJECTED,
             ];
         }
 
@@ -304,20 +311,6 @@ class EventConnector extends EventMapper
              * Only use the first record
              */
             $eventItem->setMetadata($this->findMetadata($eventItem->getId())->first());
-
-            /* Determine current status
-             */
-            if ($eventItem->getMetadata()) {
-                $metadataMapper = EventMetadataMapper::getInstance();
-                $metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
-
-                /* Skip over rejected events so they don't display in the calendar grid,
-                 * obscuring your vision, occupying your real estate
-                 */
-                if ($eventItem->getMetadata()->getStatus()->isRejected()) {
-                    continue;
-                }
-            }
 
             /* For filters
              */
