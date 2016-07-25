@@ -312,6 +312,13 @@ class EventConnector extends EventMapper
              */
             $eventItem->setMetadata($this->findMetadata($eventItem->getId())->first());
 
+            /* Determine current status
+             */
+            if ($eventItem->getMetadata()) {
+                $metadataMapper = EventMetadataMapper::getInstance();
+                $metadataMapper->loadJoinedModel('status', $eventItem->getMetadata());
+            }
+
             /* For filters
              */
             $campusIds = array();

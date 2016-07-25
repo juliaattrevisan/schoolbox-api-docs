@@ -11,6 +11,10 @@ namespace Calendar\Event\Type\EOTC;
 
 use Calendar\Event\Type\Day;
 use Calendar\Event\Type\EventInterface;
+use EOTC\EventMetadata;
+use Schoolbox\Calendar\EventType;
+use Schoolbox\Collection;
+use Schoolbox\User;
 
 
 class Event extends Day\Event implements EventInterface {
@@ -36,6 +40,30 @@ class Event extends Day\Event implements EventInterface {
      */
     protected $custom = [];
 
+    /**
+     * @var User
+     */
+    protected $author;
+
+    /**
+     * @var User
+     */
+    protected $teacherInCharge;
+
+    /**
+     * @var EventType
+     */
+    protected $type;
+
+    /**
+     * @var Collection
+     */
+    protected $campusCollection;
+
+    /**
+     * @var EventMetadata
+     */
+    protected $metadata;
 
     /**
      * Can someone attend this event
@@ -143,4 +171,87 @@ class Event extends Day\Event implements EventInterface {
         $this->custom = $custom;
         return $this;
     }
+
+    /**
+     * @return User
+     */
+    public function getAuthor()
+    {
+        return $this->author;
+    }
+
+    /**
+     * @param User $author
+     */
+    public function setAuthor($author)
+    {
+        $this->author = $author;
+    }
+
+    /**
+     * @return User
+     */
+    public function getTeacherInCharge()
+    {
+        return $this->teacherInCharge;
+    }
+
+    /**
+     * @param User $teacherInCharge
+     */
+    public function setTeacherInCharge($teacherInCharge)
+    {
+        $this->teacherInCharge = $teacherInCharge;
+    }
+
+    /**
+     * @return EventType
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param EventType $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getCampusCollection()
+    {
+        return $this->campusCollection;
+    }
+
+    /**
+     * @param Collection $campusCollection
+     */
+    public function setCampusCollection($campusCollection)
+    {
+        $this->campusCollection = $campusCollection;
+    }
+
+    /**
+     * @return EventMetadata
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * @param EventMetadata $metadata
+     */
+    public function setMetadata($metadata)
+    {
+        $this->metadata = $metadata;
+    }
+
+
 }
+
