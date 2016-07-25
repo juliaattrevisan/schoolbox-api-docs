@@ -189,7 +189,7 @@ class EventConnector extends EventMapper
                 LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
                 LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
                 LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-                LEFT JOIN eotc_metadata on eotc_metadata.id = e.id
+                INNER JOIN eotc_metadata on eotc_metadata.id = e.id
                 WHERE
                     DATE(e.end_datetime) >= DATE(FROM_UNIXTIME(:startTimestamp))
                     AND
@@ -239,7 +239,7 @@ class EventConnector extends EventMapper
                 LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
                 LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
                 LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
-                LEFT JOIN eotc_metadata on eotc_metadata.id = e.id
+                INNER JOIN eotc_metadata on eotc_metadata.id = e.id
                 LEFT JOIN eotc_metadata_student ON eotc_metadata_student.`metadata_id` = eotc_metadata.`id` AND eotc_metadata_student.user_id = :studentUserId
                 LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.`metadata_id` = eotc_metadata.`id` AND eotc_metadata_staff.user_id = :staffUserId
                 WHERE
