@@ -58,8 +58,9 @@ $data = {
 
         });
 
-        {# Did I submit an attachment? Remove it from the modal to enable reuse -#}
-        form.on('submit',function(){
+        {# Did I submit an attachment? Remove it from the modal to enable reuse
+           Ensure that the form is cleared AFTER you get asked if you want to add task to classes -#}
+        form.on('submitCopy.courseTaskList, submitNoCopy.courseTaskList',function(){
             form.find('[data-attachment="attach"]').find('[data-dz-remove]').each(function() {
                 var event = new CustomEvent('click');
                 this.dispatchEvent(event);
