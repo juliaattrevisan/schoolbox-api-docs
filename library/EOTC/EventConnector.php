@@ -37,11 +37,15 @@ class EventConnector extends EventMapper
         $authorMapper    = $this->getJoinMapper('author');
         $eventTypeMapper = $this->getJoinMapper('eventType');
 
+        /* Include two separate counts for
+         * Number of Student Attendees
+         * Number of Staff Attendees (includes +1 for Teacher In Charge)
+         */
         $query = "
             SELECT
                 {$this->getColumnString('e')},
                 {$authorMapper->getColumnString('a')},
-                {$eventTypeMapper->getColumnString('t')}
+                {$eventTypeMapper->getColumnString('t')},
             FROM `{$this->table}` e
             LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
             LEFT JOIN {$this->getJoinSql('eventType', 'e', 't')}
@@ -94,7 +98,6 @@ class EventConnector extends EventMapper
              * in calendar filters
              */
             $event->setType($eventItem->getType()->getId());
-            $event->setTitle($eventItem->getTitle());
             $event->setAccess($eventItem->getAccess());
             $event->setEventType($eventItem->getType()->getType());
             $event->setColour($eventItem->getType()->getColor());
@@ -163,7 +166,16 @@ class EventConnector extends EventMapper
                 {$this->getColumnString('e')},
                 {$authorMapper->getColumnString('a')},
                 {$teacherInChargeMapper->getColumnString('c')},
-                {$eventTypeMapper->getColumnString('t')}
+                {$eventTypeMapper->getColumnString('t')},
+
+                (SELECT COUNT(*) FROM eotc_event e
+                LEFT JOIN eotc_metadata ON eotc_metadata.id = `e`.`id`
+                LEFT JOIN eotc_metadata_student ON eotc_metadata_student.`metadata_id` = eotc_metadata.`id` WHERE eotc_metadata_student.`user_id` IS NOT NULL) AS numStudents,
+
+                (SELECT COUNT(*)+1 FROM eotc_event e
+                LEFT JOIN eotc_metadata ON eotc_metadata.id = `e`.`id`
+                LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.`metadata_id` = eotc_metadata.`id` WHERE eotc_metadata_staff.`user_id` IS NOT NULL) AS numStaff
+
             FROM `{$this->table}` e
             LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
             LEFT JOIN {$this->getJoinSql('teacherInCharge', 'e', 'c')}
@@ -266,8 +278,9 @@ class EventConnector extends EventMapper
              * Save some hassle if you're already an EOTC manager, skip all
              * this other mapper stuff
              */
+            $isAttendee = false;
+
             if (!$isEOTCManager) {
-                $isAttendee = false;
 
                 /* Superusers can always see it
                  */
@@ -318,9 +331,10 @@ class EventConnector extends EventMapper
             }
 
             if ($isEOTCManager || $isAttendee || $eventItem->getMetadata()->getStatus()->isApproved()) {
+
                 /* Translate an \EOTC\Event type into a
-                                 * Calendar_Event_Type_Abstract type
-                                 */
+                 * Calendar_Event_Type_Abstract type
+                 */
                 $event = new Event();
                 $event->setAuthorName($eventItem->getAuthor()->getFullname());
                 $event->setAuthorId($eventItem->getAuthor()->getId());
@@ -334,7 +348,11 @@ class EventConnector extends EventMapper
                  * in calendar filters
                  */
                 $event->setType($eventItem->getType()->getId());
-                $event->setTitle($eventItem->getTitle());
+
+                /* Augment title with student counts
+                 */
+                $event->setTitle("{$eventItem->getTitle()} ({$row['numStudents']})");
+
                 $event->setAccess($eventItem->getAccess());
                 $event->setEventType($eventItem->getType()->getType());
                 $event->setColour($eventItem->getType()->getColor());
