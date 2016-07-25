@@ -126,17 +126,17 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                 label: 'Browse',
                                 className: 'schoolboxresource-button',
                                 onClick: function() {
-console.log(this);
-var domId = $(this).attr('domId');
-$('#'+domId).closest('.cke_editor_body_dialog').addClass('hide');
-
                                     var dialog = this.getDialog();
                                     var fields = dialogFields(dialog);
+
+                                    var domId = $(this).attr('domId');
+                                    $('#'+domId).closest('.cke_editor_body_dialog').addClass('hide');
 
                                     /* Select something from the Resource Browser
                                      */
                                     $.fn.schoolboxResource({
-                                        allowedFilesystems: 'internal'
+                                        allowedFilesystems: 'internal',
+                                        previousModal: $('#'+domId).closest('.cke_editor_body_dialog')
                                     });
 
                                     $(window).unbind('message').on('message', function(event) {

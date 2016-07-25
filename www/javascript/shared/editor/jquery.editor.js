@@ -168,6 +168,9 @@
                         singletonModal.detach();
                         singletonModal = null;
                     }
+                    if(undefined !== config.previousModal) {
+                        config.previousModal.removeClass('hide');
+                    }
                 });
 
             singletonModal.on('click', '.cancel[role=button]', function (e) {
