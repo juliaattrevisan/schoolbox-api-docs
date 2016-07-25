@@ -435,11 +435,6 @@ class Controller extends Base {
         $this->updateConfig($roleType, $postData['config'][$roleType]);
         $this->updateRuleSequence(($postData['sequence']));
         $this->updateCustomRules($roleType, $postData['customRule']);
-
-        $this->getResponse()->content->set([
-            'format' => 'json',
-            'data'   => 200,
-        ]);
     }
 
     /**
