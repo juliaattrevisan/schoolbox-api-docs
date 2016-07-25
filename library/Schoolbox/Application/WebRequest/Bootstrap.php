@@ -298,12 +298,14 @@ class Bootstrap implements BootstrapInterface {
 
 		// Web output class - currently uses Sitepage
 		$di->setters[Output\Html::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
+        $di->setters[Output\Stream::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
 		$di->setters[Output\ThemedHtml::class]['setSitepage'] = $di->lazyGet('layoutEngine');
 		$di->set('webOutput:base', $di->lazyNew(Output\Base::class));
 		$di->set('webOutput:html', $di->lazyNew(Output\ThemedHtml::class));
 		$di->set('webOutput:nochrome', $di->lazyNew(Output\Html::class));
 		$di->set('webOutput:json', $di->lazyNew(Output\Json::class));
 		$di->set('webOutput:file', $di->lazyNew(Output\File::class));
+        $di->set('webOutput:stream', $di->lazyNew(Output\Stream::class));
 
 		// Mapper notifications:
 		// They rely upon the session being injected into them, so do that.
