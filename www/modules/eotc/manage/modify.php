@@ -61,9 +61,19 @@ if (is_numeric($_GET['eventID'])) {
     $isAuthor = (($event->getAuthor()->getId() == $sessionUser->getId()) && $authenticator->isEOTCCreator($sessionUser));
     $isTeacherInCharge = ($event->getTeacherInCharge() instanceof \Schoolbox\User) && ($event->getTeacherInCharge()->getId() == $sessionUser->getId());
 
+    /* Authors cannot view an event that is in Final Approval
+     * Instead redirect to a different place
+     *
+     * Unless you're an EOTC administrator, then you can still
+     * modify it (provided you've the appropriate permissions)
+     */
+    if ($isAuthor && !$canAdminister && $event->getMetadata()->getStatus()->isApproved()) {
+        $this->localRedir("/modules/eotc/status/modify/{$event->getId()}");
+    }
     /* EOTC Administrators and event authors can edit this event
 	 */
-    if ($canAdminister || $isAuthor || $isTeacherInCharge) {
+    else if ($canAdminister || $isAuthor || $isTeacherInCharge) {
+
         /* Do a check for missing metadata
 		 */
         if (!$event->getMetadata()) {

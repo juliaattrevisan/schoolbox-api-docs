@@ -62,6 +62,16 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				$metadata->setStatus($metadataStatus);
 			}
 
+			/* Cannot submit modification data if event is Approved and you
+			 * are its author, and you haven't got the Approved permission
+			 */
+			$isAuthor = (($event->getAuthor()->getId() == $owner->getId()) && $authenticator->isEOTCCreator($owner));
+			$canAdminister = $authenticator->isEOTCAdministrator($owner, $event);
+
+			if ($isAuthor && !$canAdminister && $event->getMetadata()->getStatus()->isApproved()) {
+				$page->localRedir("/modules/eotc/status/modify/{$event->getId()}");
+			}
+
 			/* NO RETREAT
 			 * NO SURRENDER
 			 */

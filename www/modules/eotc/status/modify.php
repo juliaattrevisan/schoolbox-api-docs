@@ -35,6 +35,7 @@ $authenticator = new \EOTC\Authenticator();
 $isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
 $isCanSelfPromote = $authenticator->canSelfPromote($sessionUser, $event);
 $isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
+$isAuthor = (($event->getAuthor()->getId() == $sessionUser->getId()) && $authenticator->isEOTCCreator($sessionUser));
 
 /* All EOTC Administrators can see Approved/Rejected events
  */
@@ -292,62 +293,67 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
      * If you don't have permissions to the status of the event, you don't get
      * access to this section anymore
      */
+    $this->setVar([
+        'has_change_event_status_block' => ''
+    ]);
 
-    /* Status Comment
+    /* Authors cannot view an event that is in Final Approval
+     * Instead redirect to a different place
+     *
+     * Unless you're an EOTC administrator, then you can still
+     * modify it (provided you've the appropriate permissions)
      */
-    $this->setVar(
-        array(
+    if ($isAuthor && !$isEOTCAdministrator && $event->getMetadata()->getStatus()->isApproved()) {
+
+        /* noop
+         */
+    }
+    else {
+
+        /* Status Comment
+         */
+        $this->setVar([
             'EVENT_COMMENT' => $event->getMetadata()->getComment(),
-        )
-    );
+        ]);
 
-    if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
-        $eventStatusMapper = \EOTC\EventStatusMapper::getInstance();
+        if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
+            $eventStatusMapper = \EOTC\EventStatusMapper::getInstance();
 
-        /* Soops have access to all statuses
-         */
-        if ($sessionUser->isSuperuser()) {
-            $allEventStatus = $eventStatusMapper->findAll();
-        } else {
-            $allEventStatus = $eventStatusMapper->findAvailableStatuses($event);
-        }
+            /* Soops have access to all statuses
+             */
+            if ($sessionUser->isSuperuser()) {
+                $allEventStatus = $eventStatusMapper->findAll();
+            } else {
+                $allEventStatus = $eventStatusMapper->findAvailableStatuses($event);
+            }
 
-        /* Status Dropdown
-         *
-         * Limited to the current status and the next one
-         *
-         * Limited also by user's ability to set that status, as defined
-         * in the EOTC permissions
-         */
-        foreach ($allEventStatus as $currentStatus) {
-            $this->setVar(
-                array(
+            /* Status Dropdown
+             *
+             * Limited to the current status and the next one
+             *
+             * Limited also by user's ability to set that status, as defined
+             * in the EOTC permissions
+             */
+            foreach ($allEventStatus as $currentStatus) {
+                $this->setVar([
                     'EVENT_STATUS_ID'       => $currentStatus->getId(),
                     'EVENT_STATUS_NAME'     => $currentStatus->getName(),
                     'EVENT_STATUS_SELECTED' => '',
-                )
-            );
+                ]);
 
-            /* Preselect
-             */
-            if ($currentStatus->getId() == $event->getMetadata()->getStatus()->getId()) {
-                $this->setVar(
-                    array(
+                /* Preselect
+                 */
+                if ($currentStatus->getId() == $event->getMetadata()->getStatus()->getId()) {
+                    $this->setVar([
                         'EVENT_STATUS_SELECTED' => 'selected="selected"',
-                    )
-                );
+                    ]);
+                }
+
+                $this->parse('event_status_block', 'event_status', true);
             }
 
-            $this->parse('event_status_block', 'event_status', true);
+            $this->parse('has_change_event_status_block', 'has_change_event_status');
         }
-
-        $this->parse('has_change_event_status_block', 'has_change_event_status');
-    } else {
-        $this->setVar(
-            array(
-                'has_change_event_status_block' => ''
-            )
-        );
     }
 }
 else {

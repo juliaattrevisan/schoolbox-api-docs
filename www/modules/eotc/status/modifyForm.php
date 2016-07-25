@@ -35,13 +35,25 @@ $authenticator = new \EOTC\Authenticator();
  * events where creators can self-promote this status into the next.
  */
 $isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
+$isAuthor = (($event->getAuthor()->getId() == $sessionUser->getId()) && $authenticator->isEOTCCreator($sessionUser));
 $isCanSelfPromote = $authenticator->canSelfPromote($sessionUser, $event);
 
 /* All EOTC Administrators can alter Approved/Rejected events
  */
 $isCanFinalise = $authenticator->canFinalise($sessionUser, $event);
 
-if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
+/* Authors cannot view an event that is in Final Approval
+ * Instead redirect to a different place
+ *
+ * Unless you're an EOTC administrator, then you can still
+ * modify it (provided you've the appropriate permissions)
+ */
+if ($isAuthor && !$canAdminister && $event->getMetadata()->getStatus()->isApproved()) {
+	$page->localRedir("/modules/eotc/status/modify/{$event->getId()}");
+}
+/* EOTC Administrators and event authors can edit this event
+ */
+else if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
 
 	/* Remember original states so we know which obs to spawn
 	 */
