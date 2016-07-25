@@ -26,6 +26,16 @@ $data = {
             form   = modal.children('form'),
             submit = form.find(':submit');
 
+        /**
+         * Clears all the attachments out of the form.
+         */
+        var clearAttachments = function() {
+            form.find('[data-attachment="attach"]').find('[data-dz-remove]').each(function() {
+                var event = new CustomEvent('click');
+                this.dispatchEvent(event);
+            });
+        };
+
         {# Task editor - prevent empty inputs -#}
         modal.on('change, keyup', 'input[name="title"]', function () {
             var title = this.value.replace(/^\s+|\s+$/g, '');
@@ -50,22 +60,15 @@ $data = {
                     tell the attacher to clear any attachments by simulating clicking of all the (one...) delete buttons
                     not jQuery.detach() - it can't trigger dropzone's event listener
                 -#}
-                form.find('[data-attachment="attach"]').find('[data-dz-remove]').each(function() {
-                    var event = new CustomEvent('click');
-                    this.dispatchEvent(event);
-                });
+                clearAttachments();
             }
 
         });
 
         {# Did I submit an attachment? Remove it from the modal to enable reuse
            Ensure that the form is cleared AFTER you get asked if you want to add task to classes -#}
-        form.on('submitCopy.courseTaskList, submitNoCopy.courseTaskList',function(){
-            form.find('[data-attachment="attach"]').find('[data-dz-remove]').each(function() {
-                var event = new CustomEvent('click');
-                this.dispatchEvent(event);
-            });
-        });
+        form.on('submitCopy.courseTaskList', clearAttachments);
+        form.on('submitNoCopy.courseTaskList', clearAttachments);
 
         {# Did I remove an attachment? Remove the URL too -#}
         modal.on('click', 'a[data-dz-remove]', function() {
