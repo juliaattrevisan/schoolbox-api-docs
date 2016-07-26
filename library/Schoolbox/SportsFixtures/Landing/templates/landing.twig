@@ -8,13 +8,86 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="small-12 island">
-        <section class="content">
-            <a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">Sports</a><br>
-            <a href="{{ routeLookup('sportsfixturesVenue.getList', {}) }}">Venues</a><br>
-            <a href="{{ routeLookup('sportsfixturesSchool.getList', {}) }}">External Schools</a><br>
-            <a href="{{ routeLookup('sportsfixturesStatus.getList', {}) }}">Match Status</a><br>
+<style type="text/css">
+    .sportsfixtures-landing .card {
+        padding: 0;
+    }
+
+    .sportsfixtures-landing .card a {
+        min-height: 6rem;
+        padding-right: 1rem;
+        display: block;
+        color: inherit;
+    }
+
+    .sportsfixtures-landing .card a p {
+        padding-bottom: 1rem;
+    }
+
+    .sportsfixtures-landing .card .icon-64 {
+        margin: 1rem;
+        padding: 0;
+    }
+
+    .sportsfixtures-landing .card h3 {
+        padding-top: 0.75rem;
+    }
+</style>
+
+<div class="row sportsfixtures-landing">
+    <div class="small-12 medium-6 island">
+        <section>
+            <div class="list-item sport">
+                <div class="card small-12 wrap-down">
+                    <a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">
+                        <div class="icon-sport icon-64"></div>
+                        <h3>Sports</h3>
+                        <p>Louis, and thousands more like her, who has the grades, has the drive, has the will, but doesn't have the money to go to college.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="small-12 medium-6 island">
+        <section>
+            <div class="list-item venue">
+                <div class="card small-12 wrap-down">
+                    <a href="{{ routeLookup('sportsfixturesVenue.getList', {}) }}">
+                        <div class="icon-venue icon-64"></div>
+                        <h3>Venues</h3>
+                        <p>Louis, and thousands more like her, who has the grades, has the drive, has the will, but doesn't have the money to go to college.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="small-12 medium-6 island">
+        <section>
+            <div class="list-item school">
+                <div class="card small-12 wrap-down">
+                    <a href="{{ routeLookup('sportsfixturesSchool.getList', {}) }}">
+                        <div class="icon-home icon-64"></div>
+                        <h3>External Schools</h3>
+                        <p>Louis, and thousands more like her, who has the grades, has the drive, has the will, but doesn't have the money to go to college.</p>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="small-12 medium-6 island">
+        <section>
+            <div class="list-item status">
+                <div class="card small-12 wrap-down">
+                    <a href="{{ routeLookup('sportsfixturesStatus.getList', {}) }}">
+                        <div class="icon-progress icon-64"></div>
+                        <h3>Match Status</h3>
+                        <p>Louis, and thousands more like her, who has the grades, has the drive, has the will, but doesn't have the money to go to college.</p>
+                    </a>
+                </div>
+            </div>
         </section>
     </div>
 </div>
