@@ -177,6 +177,7 @@ class EventConnector extends EventMapper
                         LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
                         LEFT JOIN eotc_metadata_student ON eotc_metadata_student.metadata_id = eotc_metadata.id
                         WHERE eotc_event_metadata.event_id = e.id
+                        AND eotc_metadata_student.user_id IS NOT NULL
                     ) AS numStudents,
                     (
                         SELECT COUNT(*)+1
@@ -184,6 +185,7 @@ class EventConnector extends EventMapper
                         LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
                         LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.metadata_id = eotc_metadata.id
                         WHERE eotc_event_metadata.event_id = e.id
+                        AND eotc_metadata_staff.user_id IS NOT NULL
                     ) AS numStaff
                 FROM `{$this->table}` e
                 LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
@@ -228,6 +230,7 @@ class EventConnector extends EventMapper
                         LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
                         LEFT JOIN eotc_metadata_student ON eotc_metadata_student.metadata_id = eotc_metadata.id
                         WHERE eotc_event_metadata.event_id = e.id
+                        AND eotc_metadata_student.user_id IS NOT NULL
                     ) AS numStudents,
                     (
                         SELECT COUNT(*)+1
@@ -235,6 +238,7 @@ class EventConnector extends EventMapper
                         LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
                         LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.metadata_id = eotc_metadata.id
                         WHERE eotc_event_metadata.event_id = e.id
+                        AND eotc_metadata_staff.user_id IS NOT NULL
                     ) AS numStaff
                 FROM `{$this->table}` e
                 LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
@@ -248,7 +252,6 @@ class EventConnector extends EventMapper
                     DATE(e.end_datetime) >= DATE(FROM_UNIXTIME(:startTimestamp))
                     AND
                     DATE(e.start_datetime) <= DATE(FROM_UNIXTIME(:endTimestamp))
---                    AND (eotc_metadata_student.user_id IS NOT NULL OR eotc_metadata_staff.user_id IS NOT NULL OR e.teacher_in_charge_id = :ticId)
                     AND eotc_metadata.status_id != :rejected
                 ORDER BY e.start_datetime, e.end_datetime
             ";
@@ -258,7 +261,6 @@ class EventConnector extends EventMapper
                 'endTimestamp' => $endTimestamp,
                 'studentUserId' => $this->getUser()->getId(),
                 'staffUserId' => $this->getUser()->getId(),
-                'ticId' => $this->getUser()->getId(),
                 'rejected' => EventStatusMapper::STATUS_REJECTED,
             ];
         }
