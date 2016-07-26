@@ -172,18 +172,18 @@ class EventConnector extends EventMapper
                     {$teacherInChargeMapper->getColumnString('c')},
                     {$eventTypeMapper->getColumnString('t')},
                     (
-                        SELECT COUNT(*) FROM eotc_event
-                        LEFT JOIN eotc_event_metadata ON eotc_event.id = eotc_event_metadata.event_id
+                        SELECT COUNT(*)
+                        FROM eotc_event_metadata
                         LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
                         LEFT JOIN eotc_metadata_student ON eotc_metadata_student.metadata_id = eotc_metadata.id
-                        WHERE eotc_metadata.id = e.id
+                        WHERE eotc_event_metadata.event_id = e.id
                     ) AS numStudents,
                     (
-                        SELECT COUNT(*)+1 FROM eotc_event
-                        LEFT JOIN eotc_event_metadata ON eotc_event.id = eotc_event_metadata.event_id
+                        SELECT COUNT(*)+1
+                        FROM eotc_event_metadata
                         LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
                         LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.metadata_id = eotc_metadata.id
-                        WHERE eotc_metadata.id = e.id
+                        WHERE eotc_event_metadata.event_id = e.id
                     ) AS numStaff
                 FROM `{$this->table}` e
                 LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
@@ -222,18 +222,18 @@ class EventConnector extends EventMapper
                     eotc_metadata_student.user_id as studentUserId,
                     eotc_metadata_staff.user_id as staffUserId,
                     (
-                        SELECT COUNT(*) FROM eotc_event
-                        LEFT JOIN eotc_event_metadata ON eotc_event.id = eotc_event_metadata.event_id
+                        SELECT COUNT(*)
+                        FROM eotc_event_metadata
                         LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
                         LEFT JOIN eotc_metadata_student ON eotc_metadata_student.metadata_id = eotc_metadata.id
-                        WHERE eotc_metadata.id = e.id
+                        WHERE eotc_event_metadata.event_id = e.id
                     ) AS numStudents,
                     (
-                        SELECT COUNT(*)+1 FROM eotc_event
-                        LEFT JOIN eotc_event_metadata ON eotc_event.id = eotc_event_metadata.event_id
+                        SELECT COUNT(*)+1
+                        FROM eotc_event_metadata
                         LEFT JOIN eotc_metadata ON eotc_metadata.id = eotc_event_metadata.metadata_id
                         LEFT JOIN eotc_metadata_staff ON eotc_metadata_staff.metadata_id = eotc_metadata.id
-                        WHERE eotc_metadata.id = e.id
+                        WHERE eotc_event_metadata.event_id = e.id
                     ) AS numStaff
                 FROM `{$this->table}` e
                 LEFT JOIN {$this->getJoinSql('author', 'e', 'a')}
