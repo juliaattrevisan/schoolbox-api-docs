@@ -5,6 +5,7 @@
                 <li>
                     <div class="list-item">
                         <div class="small-8 card">
+                            <!-- BEGIN subject_name_link -->
                             <a href="/submission/allWork/{WORK_USER_ID}/{WORK_TERM}/{SUBJ_CAT_ID}" title="View Grades">
                                 <!-- BEGIN icon -->
                                 <span class="icon-home icon-32" title="{SUBJ_SUBJECT_NAME}"></span>
@@ -12,6 +13,11 @@
 
                                 <p>{SUBJ_SUBJECT_NAME}</p>
                             </a>
+                            <!-- END subject_name_link -->
+                            <!-- BEGIN subject_name_no_link -->
+                            <span class="icon-home icon-32" title="{SUBJ_SUBJECT_NAME}"></span>
+                            <p>{SUBJ_SUBJECT_NAME}</p>
+                            <!-- END subject_name_no_link -->
                             <p class="meta">{SUBJ_SUBJECT_CODE}</p>
                         </div>
                         <div class="small-4 columns no-pad">
