@@ -266,7 +266,7 @@ class Provisioner
                         $this->logger->warning(sprintf("User record fails sanity check (%s): skipping", $e->getMessage()), array_merge($commonContext, [ 'error' => $e ]));
                         continue;
                     } catch (\Exception $e) {
-                        $this->logger->error("User record save failed!", array_merge($commonContext, [ 'error' => $e ]));
+                        $this->logger->error("User record save failed!", array_merge($commonContext, [ 'error' => $e->getMessage() ]));
                     }
                 }
 
