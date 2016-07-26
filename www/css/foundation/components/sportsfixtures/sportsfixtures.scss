@@ -21,5 +21,46 @@
         h3 {
             padding-top: 0.75rem;
         }
+
+        /* Leathery Red, for the colour of balls
+         */
+        &.sport {
+            a, .icon-64 {
+                color: #bf1f2e;
+            }
+
+            background-color: lighten(#bf1f2e, 50%)
+        }
+
+        /* Green, for the colour of grass
+         */
+        &.venue {
+            a, .icon-64 {
+                color: #1c9e1c;
+            }
+
+            background-color: lighten(#1c9e1c, 55%)
+        }
+
+        /* Teal, for faceless opponents
+         * (Yellow was unreadable)
+         */
+        &.school {
+            a, .icon-64 {
+                color: #009eb2;
+            }
+
+            background-color: lighten(#009eb2, 60%)
+        }
+
+        /* Purple, for no valid reason
+         */
+        &.status {
+            a, .icon-64 {
+                color: #6900b0;
+            }
+
+            background-color: lighten(#6900b0, 60%)
+        }
     }
 }
