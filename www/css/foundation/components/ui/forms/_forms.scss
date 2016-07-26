@@ -337,6 +337,10 @@ th, td{
 		}
 	}
 
+	+ label {
+		font-weight: $font-weight-normal;
+	}
+
 	&:hover {
 		+ #{$label-selector} {
 			background-color: $hover-background-color;
