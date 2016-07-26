@@ -72,7 +72,12 @@ if (!empty($_POST)) {
     $answerHandler->update($_POST);
 
     // Form is AJAX submitted so redirection is handled by javascript
-    exit;
+    if($this->detectAjax()) {
+        exit;
+    }
+    else {
+        SitePage::localRedir('/assess/summary/' . $section['assess_id'] . $return_url);
+    }
 
 } else {
 

@@ -21,7 +21,7 @@ abstract class Evaluation_Factory extends DeprecatedModel
      * Spawn a Question type.
      *
      * @param  $type_id
-     * @return class
+     * @return Evaluation_Question
      */
     public function createQuestionModel($type_id)
     {
