@@ -111,6 +111,16 @@
 
             $('[data-form=event]').submit();
         });
+
+        /* Manage Resources submits form and redirects
+         */
+        $('#manage-resources').on('click', function(event) {
+            event.preventDefault();
+
+            $('#redirect').val('resources');
+
+            $('[data-form=event]').submit();
+        });
     });
 </script>
 
@@ -390,7 +400,7 @@
                         <!-- END resource -->
                     </ul>
 
-                    <a href="/modules/eotc/manage/resources/list/{EVENT_ID}" class="button icon-modify" title="Manage resource bookings for this event. This will open in a new tab/window." target="_blank">Manage Resource Bookings</a>
+                    <a href="/modules/eotc/manage/resources/list/{EVENT_ID}" class="button icon-modify" title="Manage resource bookings for this event. This will open in a new tab/window." id="manage-resources">Manage Resource Bookings</a>
                 </div>
             </fieldset>
             <!-- END can_add_resources -->

@@ -271,15 +271,24 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 			/* Superuser modifying some arbitrary event
 			 */
-			if ($_POST['redirect'] == 'attendances') {
-				$page->localRedir(
-					'/modules/eotc/manage/attendance/list/' . $eventRecurrenceMapper->getFirstEventIdInSeries()
-				);
-			}
-			else {
-				$page->localRedir(
-					'/modules/eotc/manage/modify?eventID=' . $eventRecurrenceMapper->getFirstEventIdInSeries()
-				);
+			switch ($_POST['redirect']) {
+				case 'attendances':
+					$page->localRedir(
+						'/modules/eotc/manage/attendance/list/' . $eventRecurrenceMapper->getFirstEventIdInSeries()
+					);
+					break;
+
+				case 'resources':
+					$page->localRedir(
+						'/modules/eotc/manage/resources/list/' . $eventRecurrenceMapper->getFirstEventIdInSeries()
+					);
+					break;
+
+				default:
+					$page->localRedir(
+						'/modules/eotc/manage/modify?eventID=' . $eventRecurrenceMapper->getFirstEventIdInSeries()
+					);
+					break;
 			}
 
 			break;
