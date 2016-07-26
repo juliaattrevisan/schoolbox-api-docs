@@ -1,0 +1,25 @@
+.sportsfixtures-landing {
+    .card {
+        padding: 0;
+
+        a {
+            min-height: 6rem;
+            padding-right: 1rem;
+            display: block;
+            color: inherit;
+
+            p {
+                padding-bottom: 1rem;
+            }
+        }
+
+        .icon-64 {
+            margin: 1rem;
+            padding: 0;
+        }
+
+        h3 {
+            padding-top: 0.75rem;
+        }
+    }
+}
