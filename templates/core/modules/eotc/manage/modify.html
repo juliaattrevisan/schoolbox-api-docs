@@ -101,6 +101,16 @@
         $('[data-collapser=true]').collapsable({
             container: '[data-collapsable-container]'
         });
+
+        /* Manage Attendances submits form and redirects
+         */
+        $('#manage-attendances').on('click', function(event) {
+            event.preventDefault();
+
+            $('#redirect').val('attendances');
+
+            $('[data-form=event]').submit();
+        });
     });
 </script>
 
@@ -122,7 +132,8 @@
     <input name="authorId" type="hidden" value="{EVENT_AUTHOR_ID}" />
     <input name="return" type="hidden" value="{EVENT_REDIRECT}" />
     <input id="efficacy" name="efficacy" type="hidden" value="self" />
-    <input id="action" name="action" type="hidden" value="" />
+    <input id="action" name="action" type="hidden" value="{FUNCTION}" />
+    <input id="redirect" name="redirect" type="hidden" value="" />
     <input type="hidden" name="allday" value="0" />
 
     <fieldset class="small-12 island">
@@ -361,7 +372,7 @@
                         {EVENT_CURRENT_STUDENTS}
                     </p>
 
-                    <a href="/modules/eotc/manage/attendance/list/{EVENT_ID}" class="button icon-modify" title="Manage student attendances for this event. This will open in a new tab/window." target="_blank">Manage Attendances</a>
+                    <a href="/modules/eotc/manage/attendance/list/{EVENT_ID}" class="button icon-modify" title="Manage student attendances for this event. This will open in a new tab/window." id="manage-attendances">Manage Attendances</a>
                 </div>
                 <!-- END can_add_students -->
             </fieldset>
