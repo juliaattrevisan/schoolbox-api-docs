@@ -42,7 +42,11 @@ class Calendar_Api_EventType_Custom_EOTC_Default extends Calendar_Api_EventType_
      */
     public function getEvents($startTimestamp, $endTimestamp)
     {
+        $start = microtime(true);
         $collection = $this->getCalendarHandler()->getDayEvents($startTimestamp, $endTimestamp);
+        $end = microtime(true);
+
+        echo "$end\t$start\t" . ($end - $start) . "\t\t";
 
         /* Give the calendar_connector id so this event knows where it came from
          * This allows you to create an event detail screen in Mobile
