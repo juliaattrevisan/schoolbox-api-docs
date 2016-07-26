@@ -1,9 +1,5 @@
 {% extends '@core/user/student.twig' %}
 
-{% if showEmail %}
-    {% block details_email %}
-    {% if user.getEmail() %}
+{% block details_email %}
     {# Hide student email #}
-    {% endif %}
-    {% endblock details_email %}
-{% endif %}
+{% endblock details_email %}
