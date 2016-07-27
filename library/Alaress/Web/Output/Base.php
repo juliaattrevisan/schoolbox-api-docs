@@ -163,7 +163,7 @@ class Base implements OutputInterface
             header('Content-Encoding: none');
             header("Content-Length: ".strlen($output));
             header('Connection: close');
-            ignore_user_abort();
+            ignore_user_abort(); // this appears to do nothing. With no param, this is a getter, not setter...
             flush();
             session_write_close();
 

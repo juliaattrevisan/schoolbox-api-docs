@@ -208,10 +208,11 @@ class Controller extends Base {
             $template = 'lines';
             $format   = 'nochrome';
         } elseif ($format == 'html') {
-            // no limit
-            $linesPerPage = PHP_INT_MAX;
-            $template = 'html';
-            $format   = 'nochrome';
+            // $linesPerPage = PHP_INT_MAX;
+            // $template  = 'html';
+            // $format    = 'nochrome';
+            $template     = 'line';
+            $format       = 'stream';
             $useInlineCSS = true;
         } else {
             $template = 'detail';
@@ -226,40 +227,63 @@ class Controller extends Base {
         try {
             $model  = Log\Mapper::getInstance()->findById($logId);
 
-            $log = [
-                'timestamp' => $model->getStorage()->getCreatedAt(),
-                'roleType'  => $model->getRoleType(),
-                'dryRun'    => $model->isDry(),
-                'created'   => $model->getUsersCreated(),
-                'updated'   => $model->getUsersUpdated(),
-                'skipped'   => $model->getUsersSkipped(),
-                'lines'     => $this->getLogPartial($model->getStorage(), $page, $this->parseFilterString($filter), $linesPerPage)
-            ];
+            if('stream' === $format) {
+                $this->getResponse()->content->set([
+                    'header'    => "@upsRuleset/log/stream-header.twig",
+                    'template'  => $template,
+                    'footer'    => "@upsRuleset/log/stream-footer.twig",
+                    'format'    => $format,
+                    'data' => [
+                        'id'            => $logId,
+                        'filterSummary' => $filter ? ('Filter applied: ' . str_replace(';', '; ', $filter)) : '',
+                        'useInlineCSS'  => true,
+                    ],
+                    'callback'  => [ $this, 'streamLog' ],
+                    'param_arr' => [
+                        'stream'          => $model->getStorage()->readStream(),
+                        'filter'          => $this->parseFilterString($filter),
+                        'filterBlacklist' => ['rulestring'],
+                    ],
+                ]);
+            } else {
+                $log = [
+                    'timestamp' => $model->getStorage()->getCreatedAt(),
+                    'roleType' => $model->getRoleType(),
+                    'dryRun' => $model->isDry(),
+                    'created' => $model->getUsersCreated(),
+                    'updated' => $model->getUsersUpdated(),
+                    'skipped' => $model->getUsersSkipped(),
+                    'lines' => $this->getLogPartial($model->getStorage(), $page, $this->parseFilterString($filter),
+                        $linesPerPage)
+                ];
 
-            $allBreadcrumbs = new Navigator(
-                new Node('Home', '/adminv2/home', false),
-                new Node('User Provisioning System', $this->getBasePath(), false),
-                new Node('Logs', $this->getBasePath() . '/logs', false),
-                new Node("{$log['timestamp']->getDatabase()} ({$log['roleType']})", $this->getBasePath() . "/log/$logId", true)
-            );
+                $allBreadcrumbs = new Navigator(
+                    new Node('Home', '/adminv2/home', false),
+                    new Node('User Provisioning System', $this->getBasePath(), false),
+                    new Node('Logs', $this->getBasePath() . '/logs', false),
+                    new Node("{$log['timestamp']->getDatabase()} ({$log['roleType']})",
+                        $this->getBasePath() . "/log/$logId", true)
+                );
 
-            $data = [
-                'id'              => $logId,
-                'filterBlacklist' => [ 'rulestring' ],
-                'log'             => $log,
-                'allBreadcrumbs'  => $allBreadcrumbs->getAllNodes(),
-                'filterSummary'   => $filter ? ('Filter applied: ' . str_replace(';', '; ', $filter)) : '',
-            ];
+                $data = [
+                    'id' => $logId,
+                    'filterBlacklist' => ['rulestring'],
+                    'log' => $log,
+                    'allBreadcrumbs' => $allBreadcrumbs->getAllNodes(),
+                    'filterSummary' => $filter ? ('Filter applied: ' . str_replace(';', '; ', $filter)) : '',
+                ];
 
-            if (isset($useInlineCSS) && $useInlineCSS) {
-                $data['useInlineCSS'] = true;
+                if (isset($useInlineCSS) && $useInlineCSS) {
+                    $data['useInlineCSS'] = true;
+                }
+
+                $this->getResponse()->content->set([
+                    'template' => $template,
+                    'format'   => $format,
+                    'data'     => $data
+                ]);
             }
 
-            $this->getResponse()->content->set([
-                'template' => $template,
-                'format'   => $format,
-                'data'     => $data
-            ]);
 
         } catch (Mapper\Exception $e) {
             // 404 on the log - we have no aura way of doing this!! :(
@@ -280,6 +304,55 @@ class Controller extends Base {
                 $this->getResponse()->redirect->to($this->getRouteIfAuthorized('upsRuleset.log', [ 'logId' => $logId ]));
             }
         }
+    }
+
+
+    /**
+     * Reads and returns a line from the stream
+     *
+     * @param resource $stream
+     * @param array $filter
+     * @param array $filterBlacklist
+     * @param int $counter
+     * @return array|bool
+     */
+    public function streamLog($stream, $filter, $filterBlacklist, $counter)
+    {
+        $line = fgets($stream);
+
+        if(!$line){
+            return false;
+        }
+
+        $lineData = json_decode($line, true);
+        $result   = [
+            'line' => $lineData,
+            'lineNumber' => $counter,
+            'filterBlacklist' => $filterBlacklist,
+        ];
+
+        // apply the filter if there is one
+        if ($filter) {
+            // we'll be reading context for the keypair values
+            $context = $lineData['context'];
+
+            $exclude = false;
+            // the filter has to pass *all* given keys, not just *any*
+            foreach ($filter as $key => $value) {
+                if (!array_key_exists($key, $context) || $context[$key] != $value) {
+                    $exclude = true;
+                    break;
+                }
+            }
+
+            // excluded lines don't count toward the total either
+            if ($exclude) {
+                $result['increment_counter'] = false;
+                $result['render_item'] = false;
+            }
+        }
+
+        return $result;
     }
 
 

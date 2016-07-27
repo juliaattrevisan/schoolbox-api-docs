@@ -35,9 +35,6 @@ class Html extends Base
      */
     protected function outputResponseBody() {
 
-        // TODO - this is just a temp hack until a streaming solution is implemented.
-        ini_set('memory_limit','256M');
-
         echo $this->getAsString();
     }
 
