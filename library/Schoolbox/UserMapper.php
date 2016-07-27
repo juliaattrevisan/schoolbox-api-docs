@@ -25,9 +25,11 @@ use UnexpectedValueException;
 class UserMapper extends Mapper
 {
     /**
-     * Maps 'username' => true.
-     * If we save a record, we must update the cache to ensure integrity.
-     * @var array|null $usernameCache
+     * If in use (ie not null), this should mirror all non-softDeleted users in DB.
+     * If we save, delete, soft-delete, or restore a user, we must update the
+     * cache via callbacks to ensure integrity.
+     *
+     * @var array|null $usernameCache Maps 'username' => 'id'.
      */
     protected $usernameCache;
 
@@ -297,7 +299,13 @@ class UserMapper extends Mapper
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateDefaultCampus']);
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'synchroniseUsernameCache']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'addUsernameToCache']);
+
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeUsernameFromCache']);
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeUsernameFromCache']);
+
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'addUsernameToCache']);
     }
 
     /**
@@ -636,8 +644,8 @@ class UserMapper extends Mapper
     /**
      * Pre-save callback for verifying whether a user's name is unique.
      *
-     * For data-integrity, this method relies on the post-save
-     * callback 'checkUsernameCache' to add any new users to the cache.
+     * For data-integrity, this method relies on a post-save/restore
+     * callback to add any new users to the cache.
      *
      * @param  User $user
      * @return bool Always true, as long as it doesn't throw
@@ -669,14 +677,32 @@ class UserMapper extends Mapper
     }
 
     /**
-     * Post-save callback to ensure username cache is up-to-date
+     * Post-save + Post-restore callback to ensure username cache is up-to-date
      *
      * @param User $user
      */
-    public function synchroniseUsernameCache(User $user){
+    public function addUsernameToCache(User $user){
         // Is cache in use?
         if(is_array($this->usernameCache)){
             $this->usernameCache[$user->getUsername()] = $user->getId();
+        }
+    }
+
+    /**
+     * Post-delete + Post-softDelete callback to ensure username cache is up-to-date
+     *
+     * @param User $user
+     */
+    public function removeUsernameFromCache(User $user){
+        // Is cache in use?
+        if(is_array($this->usernameCache)){
+            // Is username in cache?
+            if(isset($this->usernameCache[$user->getUsername()])){
+                // Does cache record belong to this user?
+                if($this->usernameCache[$user->getUsername()] == $user->getId()){
+                    unset($this->usernameCache[$user->getUsername()]);
+                }
+            }
         }
     }
 
