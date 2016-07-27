@@ -36,7 +36,21 @@ class External_Doublefirst_Helper
     }
 
     /**
-     * @param $date
+     * This is a function that works out the current school day number. DoubleFirst does not seem to provide any stored
+     * procedure like Synergetic to work out the current day number so we need to calculate this ourselves. We do this
+     * by working out what term we are in (using 'SchoolTerms' table), we then have to assume that the Monday of the
+     * week in which term starts is Day 1 (because there is nothing in DoubleFirst that actually says which day the term
+     * starts on). We then loop through all of the days from the start of term until the specified date incrementing a
+     * day number counter.
+     *
+     * Every sunday we increment a week counter. If the week counter is greater than the number of schools timetable
+     * weeks ('TimetableWeekLength' from the 'TimetableParameters' table) then we set the day number back to 0 and start
+     * counting again.
+     *
+     * To make looping a bit easier we use julian dates, this is the calendar date as an integer
+     * (eg. 28 July 2016 = 16210, 29 July 2016 = 16211, 30 July 2016 = 16212, 31 July 2016 = 16213, 1 August 2016 = 16214)
+     *
+     * @param \Alaress_Date_Format $date The date we want to get the school day number for
      * @return int
      */
     public function getDayNumber($date)
@@ -87,7 +101,7 @@ class External_Doublefirst_Helper
         $week = 1;
         $day = date("w", strtotime($term['StartDate']));
 
-        // We convert the date fo julian so we can iterate days easily in a for loop
+        // We convert the date fo julian so we can iterate days easily in a for loop.
 
         $current = gregoriantojd($date->getMonth(), $date->getDay(), $date->getYear());
         $start = gregoriantojd($start->getMonth(), $start->getDay(), $start->getYear());
