@@ -7,6 +7,7 @@
 <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
 <script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.disable-on-submit.js"></script>
 <script type="text/javascript">
 $(function() {
 
@@ -71,12 +72,7 @@ $(function() {
         ignore: ':hidden:not([class~=selectized]),:hidden > .selectized, .selectize-control .selectize-input input'
     });
 
-    // Disable form submit to prevent multiple message batches
-    $('body').on('submit', 'form[data-disable-on-submit]', function() {
-        var $submit = $(this).find(':submit');
-        $submit.prop('disabled', true);
-        $submit.val($submit.attr('data-working'));
-    });
+
 });
 </script>
 <!-- END custom_head -->
