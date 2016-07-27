@@ -54,6 +54,8 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     $this->setBlock('has_change_event_status', 'event_status', 'event_status_block');
     $this->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
     $this->setBlock(TEMPLATE_content, 'event_resourcebooking', 'event_resourcebooking_block');
+    $this->setBlock(TEMPLATE_content, 'has_modify_event', 'has_modify_event_block');
+
 
     $this->setVar(
         array(
@@ -286,6 +288,19 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
      */
     if ($i) {
         $this->parse('has_event_activity_log_block', 'has_event_activity_log');
+    }
+
+
+    /* Modify Event button
+     * Special case for authors of approved events who aren't eotc admins
+     */
+    if ($isAuthor && !$isEOTCAdministrator && $event->getMetadata()->getStatus()->isApproved()) {
+        $this->setVar([
+            'has_modify_event_block' => ''
+        ]);
+    }
+    else {
+        $this->parse('has_modify_event_block', 'has_modify_event');
     }
 
     /* Status section
