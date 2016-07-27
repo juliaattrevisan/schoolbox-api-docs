@@ -27,22 +27,22 @@ class Controller extends Component_Homepage_ControllerAbstract
     /**
      * @var Group
      */
-    private $groupHandler;
+    protected $groupHandler;
 
     /**
      * @var CategoryNews
      */
-    private $newsHandler;
+    protected $newsHandler;
 
     /**
      * @var \Schoolbox\Resource\Folder\Model
      */
-    private $source;
+    protected $source;
 
     /**
      * @var FolderMapper
      */
-    private $folderMapper = null;    
+    protected $folderMapper = null;    
 
     /**
      * Injectable constructor
@@ -114,21 +114,18 @@ class Controller extends Component_Homepage_ControllerAbstract
     }
 
     /**
-     * Set category mapper
-     *
      * @param FolderMapper $folderMapper
+     * @return FolderMapper
      */
-    private function setFolderMapper($folderMapper)
+    public function setFolderMapper($folderMapper)
     {
         $this->folderMapper = $folderMapper;
     }
 
     /**
-     * Get category mapper
-     *
      * @return FolderMapper
      */
-    private function getFolderMapper()
+    public function getFolderMapper()
     {
         return $this->folderMapper;
     }    
