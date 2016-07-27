@@ -238,7 +238,7 @@ class Controller extends Base {
                         'filterSummary' => $filter ? ('Filter applied: ' . str_replace(';', '; ', $filter)) : '',
                         'useInlineCSS'  => true,
                     ],
-                    'callback'  => [ __NAMESPACE__.'\Controller', 'streamLog' ],
+                    'callback'  => [ $this, 'streamLog' ],
                     'param_arr' => [
                         'stream'          => $model->getStorage()->readStream(),
                         'filter'          => $this->parseFilterString($filter),
