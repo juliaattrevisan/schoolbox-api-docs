@@ -19,7 +19,8 @@ class External_Isams_Batch_Reader_Iterator_Timetable_Map extends External_Isams_
         $id      = (string)$result->attributes()->Id;
         if ($current->matches('//TimetableManager/Structure/Week')) {
             // Assume that campus is first initials in name
-            $campusCode = preg_replace('|^(\\S+).*|', '$1', "$result->Name");
+            //$campusCode = preg_replace('|^(\\S+).*|', '$1', "$result->Name");
+            $campusCode = $result->ShortName;
             // Assume that every week has the same number of days
             // Offsets:
             // Week 1: offset by 0 days
@@ -27,8 +28,9 @@ class External_Isams_Batch_Reader_Iterator_Timetable_Map extends External_Isams_
             // Week 3: offset by $numberOfDays * 2 days
             // etc.
             $days       = $result->Days[0];
-            $weekNumber = (int)$result->Ordinal;
-            $offset     = ($weekNumber - 1) * $days->children()->count();
+            //$weekNumber = (int)$result->Ordinal;
+            //$offset     = ($weekNumber - 1) * $days->children()->count();
+            $offset = 0;
             return [
                 'RecordType'          => 'Week',
                 'TimetableCampusName' => $campusCode,
