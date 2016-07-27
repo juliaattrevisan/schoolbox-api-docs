@@ -545,8 +545,6 @@ class Controller extends Base {
      */
     protected function updateConfig($roleType, $config)
     {
-        var_dump($roleType); var_dump($config);
-        die($roleType.' '.$config);
         // TODO DI all of this
         $mapper = Config\Mapper::getInstance();
         $model  = $mapper->findById($roleType);
