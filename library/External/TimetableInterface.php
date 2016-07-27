@@ -56,9 +56,10 @@ interface External_TimetableInterface
      *
      * @param Schoolbox\Campus $campus
      * @param int $now
+	 * @param \Schoolbox\User $user     
      * @return array
      */
-	public function getPeriodNumber (\Schoolbox\Campus $campus, $now = 0);
+	public function getPeriodNumber (\Schoolbox\Campus $campus, $now = 0, $user = null);
 
     /**
      * Return a user's timetable for a specific day
