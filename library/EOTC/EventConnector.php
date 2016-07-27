@@ -380,7 +380,7 @@ class EventConnector extends EventMapper
                  *
                  * TODO: Probably will include students + staff + 1 TIC
                  */
-                $event->setTitle("{$eventItem->getTitle()} ({$row['numStudents']})");
+                $event->setTitle("{$eventItem->getTitle()} ({$row['numStudents']},{$row['numStaff']})");
 
                 $event->setAccess($eventItem->getAccess());
                 $event->setEventType($eventItem->getType()->getType());
