@@ -1,5 +1,11 @@
 /**
- * Prevents multiple form submission
+ * Prevents a form being submitted multiple times.
+ *
+ * Usages:
+ *   1. Include this script on a page, it will automatically attach to
+ *      forms with the 'data-disable-on-submit' attribute, or
+ *   2. Include this script on a page, then manually call on a form with
+ *      $(selector).disableOnSubmit(options)
  *
  * @author      Andy Ryan <andy.ryan@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
@@ -9,23 +15,25 @@
     "use strict";
 
     var defaults = {
-        attrDataWorking:  'data-working',
+        dataAttrWorking:  'data-working',
     };
 
+    var settings;
 
     $.fn.disableOnSubmit = function(options){
-        options = options || {};
 
-        // Init
-        this.settings = init(options);
+        // Setup
+        settings = init(options || {});
 
-        // Enable chaining
+        // Enable chaining and multiple forms per page
         return this.each(function(idx, elem){
-
             $(elem).on('submit', function(){
-                var $submit = $(this).find(':submit');
-                $submit.prop('disabled', true);
-                $submit.val($submit.attr(settings.attrDataWorking));
+                // Is the submitted form valid?
+                if('function' !== typeof $(elem).valid || $(elem).valid()) {
+                    var $submit = $(this).find(':submit');
+                    $submit.prop('disabled', true);
+                    $submit.val($submit.attr(settings.dataAttrWorking));
+                }
             });
         });
     }
@@ -41,6 +49,8 @@
     }
 
     // Run automatically
-    $('[data-disable-on-submit]').disableOnSubmit();
+    $(function() {
+        $('[data-disable-on-submit]').disableOnSubmit();
+    });
 
 })(jQuery, window, document);
