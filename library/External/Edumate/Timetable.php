@@ -273,7 +273,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             $timetable[$x]['periodSequence'] = $definition['sequence'][$x];
             $timetable[$x]['class']          = array();
         }
-  
+
         // Add classes for each day into it
         while ($desc = $stmt->fetch(PDO::FETCH_ASSOC)) {
             foreach ($timetable as $x => $timetablePeriod) {
@@ -354,30 +354,30 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         }
 
         $sql = "
-                SELECT 
-        
-                t.period_number, 
-                t.day_number,
-                t.class_code AS code, 
-                c.staff_number AS staffID, 
-                room, 
-                cl.class 
-        
-                FROM db2inst1.schoolbox_timetable t 
-        
-                LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code 
-                {$join} 
-        
-                WHERE 
-                
-                c.staff_number = :sn AND 
-                day_number <= :d AND 
-                ( campus = :campus OR campus = :campus2 )
-        ";
+		SELECT 
+	
+		t.period_number, 
+		t.day_number,
+		t.class_code AS code, 
+		c.staff_number AS staffID, 
+		room, 
+		cl.class 
+	
+		FROM db2inst1.schoolbox_timetable t 
+	
+		LEFT JOIN db2inst1.schoolbox_classes cl ON t.class_code = cl.class_code 
+		{$join} 
+	
+		WHERE 
+		
+		c.staff_number = :sn AND 
+		day_number <= :d AND 
+		( campus = :campus OR campus = :campus2 )
+	";
 
         $stmt = $this->getDatabase()->prepare($sql);
 
-        // Can't be having campus = NULL (causes SQL error) so just coalescing them to an impossible ID
+        // Can't be having campus = NULL (causes SQL error)
 
         if ($campusCode[0] == null) $campusCode[0] = -1;
         if ($campusCode[1] == null) $campusCode[1] = -1;
