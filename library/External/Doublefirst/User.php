@@ -1,10 +1,11 @@
 <?php
+
 /**
  * DoubleFirst User Object
  *
- * @author	    Damian Sloane <damian.sloane@alaress.com.au>
+ * @author        Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
- * @link		http://www.alaress.com.au/
+ * @link        http://www.alaress.com.au/
  *
  *         ,--.--._
  * ------" _, \___)
@@ -13,7 +14,6 @@
  * ------\     (__)
  *        `-----"
  */
-
 class External_Doublefirst_User implements External_UserInterface
 {
     /**
@@ -42,14 +42,13 @@ class External_Doublefirst_User implements External_UserInterface
         // Start by searching for a student photo
 
         $query =
-        "
+            "
             SELECT  LastUpdated
             FROM    PupilPhoto
             WHERE   PupilID = '" . $this->getDatabase()->quote($externalUserId) . "'
         ";
 
-        if ($photo = $this->getDatabase()->getRow($query))
-        {
+        if ($photo = $this->getDatabase()->getRow($query)) {
             $photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
 
             // TODO: Delete photos on rollover
@@ -61,11 +60,10 @@ class External_Doublefirst_User implements External_UserInterface
              * version, or if the cache version doesn't already exist.
              */
 
-            $cacheTime    = @filemtime($photoPath);
+            $cacheTime = @filemtime($photoPath);
             $modifiedTime = strtotime($photo['ModifiedDate']);
 
-            if (!file_exists($photoPath) || ($cacheTime < $modifiedTime))
-            {
+            if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
                 $query = "
                     SELECT  Photo
                     FROM    PupilPhoto
@@ -79,20 +77,17 @@ class External_Doublefirst_User implements External_UserInterface
             }
 
             return $photoPath;
-        }
-        else
-        {
+        } else {
             // Couldn't find student photo, try staff
 
             $query =
-            "
+                "
                 SELECT  LastUpdated
                 FROM    StaffPersonalDetails
                 WHERE   StaffID = '" . $this->getDatabase()->quote($externalUserId) . "'
             ";
 
-            if ($photo = $this->getDatabase()->getRow($query))
-            {
+            if ($photo = $this->getDatabase()->getRow($query)) {
                 $photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
 
                 // TODO: Delete photos on rollover
@@ -104,13 +99,12 @@ class External_Doublefirst_User implements External_UserInterface
                  * version, or if the cache version doesn't already exist.
                  */
 
-                $cacheTime    = @filemtime($photoPath);
+                $cacheTime = @filemtime($photoPath);
                 $modifiedTime = strtotime($photo['ModifiedDate']);
 
-                if (!file_exists($photoPath) || ($cacheTime < $modifiedTime))
-                {
+                if (!file_exists($photoPath) || ($cacheTime < $modifiedTime)) {
                     $query = "
-                    SELECT  StaffPhoto as Photo
+                    SELECT  StaffPhoto AS Photo
                     FROM    StaffPersonalDetails
                     WHERE   StaffID = '" . $this->getDatabase()->quote($externalUserId) . "'
                 ";
@@ -136,11 +130,11 @@ class External_Doublefirst_User implements External_UserInterface
      * @return mixed
      */
     public function getParent($externalUserId)
-    { 
+    {
         $externalUserId = $this->database->quote($externalUserId);
 
         $query =
-        "
+            "
             SELECT TOP 1
                 c.Title                     AS Title,
                 cm.Greeting                 AS Preferred,
@@ -205,21 +199,19 @@ class External_Doublefirst_User implements External_UserInterface
 
         $spouseNameArray = explode("&", trim($parent["Surname"]), 1);
 
-        if (count($spouseNameArray) > 1)
-        {
+        if (count($spouseNameArray) > 1) {
             $spouseNameArray["Surname"] = $spouseNameArray[0];
             $spouseNameArray["SpouseSurname"] = $spouseNameArray[1];
-        }
-        else
-        {
+        } else {
             // That didn't work, try looking for spaces in spouse name
 
             $spouseNameArray = explode(" ", trim($parent["SpousePreferred"]), 1);
 
-            if (count($spouseNameArray) > 1)
+            if (count($spouseNameArray) > 1) {
                 $spouseNameArray["SpouseSurname"] = $spouseNameArray[1];
-            else
+            } else {
                 $spouseNameArray["SpouseSurname"] = $parent["Surname"];
+            }
         }
 
         return $parent;
@@ -237,10 +229,11 @@ class External_Doublefirst_User implements External_UserInterface
      */
     public function getParentSync($externalUserId)
     {
-        if (is_array($externalUserId))
+        if (is_array($externalUserId)) {
             $assignation = " IN ('" . implode("','", array_map([$this->database, 'quote'], $externalUserId)) . "')";
-        else
+        } else {
             $assignation = " =  '" . $this->database->quote($externalUserId) . "'";
+        }
 
         $externalUserId = $this->database->quote($externalUserId);
 
@@ -276,8 +269,9 @@ class External_Doublefirst_User implements External_UserInterface
             ORDER BY    pc.Priority
         ";
 
-        if (is_array($externalUserId))
+        if (is_array($externalUserId)) {
             return $this->getDatabase()->getAll($query);
+        }
 
         return $this->getDatabase()->getRow($query);
     }
@@ -292,13 +286,14 @@ class External_Doublefirst_User implements External_UserInterface
     public function getParentEmails($synergyIds)
     {
         $emailList = array();
-        $id_list   = implode(',', array_map('intval', $synergyIds));
+        $id_list = implode(',', array_map('intval', $synergyIds));
 
-        if (empty($id_list))
+        if (empty($id_list)) {
             return array();
+        }
 
         $query =
-        "
+            "
             SELECT DISTINCT   pc.ContactID            AS RelatedID,
                               cei.EmailID             AS DefaultEmail
             FROM              VLPupilContact          pc
@@ -312,8 +307,9 @@ class External_Doublefirst_User implements External_UserInterface
         $this->getDatabase()->query($query);
 
         while ($row = $this->getDatabase()->getNextArray()) {
-            if (!isset($emailList[$row['RelatedID']]))
+            if (!isset($emailList[$row['RelatedID']])) {
                 $emailList[$row['RelatedID']] = $row['DefaultEmail'];
+            }
         }
 
         return $emailList;
@@ -330,7 +326,7 @@ class External_Doublefirst_User implements External_UserInterface
         // We will retrieve a list of all possible primary emergency contacts- they all seem to contain 'EM Contact 1' in the description
 
         $ecQuery =
-        "
+            "
             SELECT LookupDetailsID 
             FROM LookupDetails                
             WHERE LookupID = 2100 AND Description LIKE '%EM Contact 1%';
@@ -398,7 +394,7 @@ class External_Doublefirst_User implements External_UserInterface
             LEFT JOIN ContactTelephoneInformation ecmPhoneMobile4   ON ecmPhoneMobile4.ContactID = ecm.ContactID AND ecmPhoneMobile4.TelephoneType = '005'
             LEFT JOIN ContactTelephoneInformation ecmPhoneMobile5   ON ecmPhoneMobile5.ContactID = ecm.ContactID AND ecmPhoneMobile5.TelephoneType = '006'
             LEFT JOIN ContactTelephoneInformation ecmPhoneHome      ON ecmPhoneHome.ContactID = ecm.ContactID AND ecmPhoneHome.TelephoneType = 'H'
-            WHERE p.PupilID = '".$this->database->quote($externalUserId)."';
+            WHERE p.PupilID = '" . $this->database->quote($externalUserId) . "';
         ";
 
         $student = [];
@@ -428,7 +424,7 @@ class External_Doublefirst_User implements External_UserInterface
     public function getStaff($externalUserId)
     {
         $query =
-        "
+            "
             SELECT          s.EmployeeID AS SchoolStaffCode,
                             '' AS StaffBuilding,
                             '' AS StaffRoom,
@@ -464,7 +460,7 @@ class External_Doublefirst_User implements External_UserInterface
     public function getStudentContactListExtended($yearlevel, $name, $boardingStatus, $form)
     {
         $query =
-        "
+            "
             SELECT      p.PupilID AS StudentID,
                         p.ForeName AS StudentGiven1,
                         p.Surname AS StudentSurname,
@@ -568,7 +564,7 @@ class External_Doublefirst_User implements External_UserInterface
             LEFT JOIN PupilCurrentSchool            pcs ON pcs.PupilID = p.PupilID
             LEFT JOIN VLContactAddress              a ON a.ContactID = pc.ContactID AND a.AddressType = 'Current'
             LEFT JOIN VLContact                     c ON c.ContactID = pc.ContactID
-            LEFT JOIN ContactMaster                 cm on cm.ContactID = pc.ContactID
+            LEFT JOIN ContactMaster                 cm ON cm.ContactID = pc.ContactID
             LEFT JOIN ContactTelephoneInformation cmPhoneMobile    ON cmPhoneMobile.ContactID = pc.ContactID AND cmPhoneMobile.TelephoneType = 'M'
             LEFT JOIN ContactTelephoneInformation cmPhoneMobile2   ON cmPhoneMobile2.ContactID = pc.ContactID AND cmPhoneMobile2.TelephoneType = '003'
             LEFT JOIN ContactTelephoneInformation cmPhoneMobile3   ON cmPhoneMobile3.ContactID = pc.ContactID AND cmPhoneMobile3.TelephoneType = '004'
@@ -665,7 +661,7 @@ class External_Doublefirst_User implements External_UserInterface
     public function getStudentContactList($externalUserId)
     {
         $query =
-        "
+            "
             SELECT    c.ContactID AS StudentContactID,
                       c.Title AS StudentContactTitle,
                       cm.Greeting AS StudentContactPreferred,
@@ -776,7 +772,7 @@ class External_Doublefirst_User implements External_UserInterface
             }
         }
 
-      return $contactList;
+        return $contactList;
     }
 
     /**
@@ -816,12 +812,11 @@ class External_Doublefirst_User implements External_UserInterface
 
         $year = $this->getCurrentYear();
 
-        if ($this->getGroup()->isStudent($userID))
-        {
+        if ($this->getGroup()->isStudent($userID)) {
             // Get student subjects
 
             $sql =
-            "
+                "
               SELECT DISTINCT     ssb.BlockName + ' - ' + ssbr.RoomName AS Room, 
                                   sm.Name AS name, 
                                   ygsd.SubjectDivisionName AS ClassCode, 
@@ -842,13 +837,11 @@ class External_Doublefirst_User implements External_UserInterface
               WHERE               tcr.AcademicYear = '{$year}' AND 
                                   ps.PupilID = '{$synergyID}' 
             ";
-        }
-        else
-        {
+        } else {
             // Get staff subjects
 
             $sql =
-            "
+                "
                 SELECT DISTINCT     s.SubjectID         AS ClassCode,
                                     ''                  AS ClassCampus,
                                     s.Name              AS name,
@@ -863,9 +856,9 @@ class External_Doublefirst_User implements External_UserInterface
 
         while ($subject = $this->getDatabase()->getNextArray()) {
             $subjectList[] = array(
-                'code'       => $subject['ClassCode'],
-                'name'       => $subject['name'],
-                'classType'  => $subject['classType'],
+                'code' => $subject['ClassCode'],
+                'name' => $subject['name'],
+                'classType' => $subject['classType'],
                 'campusCode' => $subject['ClassCampus']
             );
         }
@@ -886,7 +879,7 @@ class External_Doublefirst_User implements External_UserInterface
     public function getEnrolledStudents($externalUserId)
     {
         $query =
-        "
+            "
             SELECT  pcs.PupilID as RelatedID 
             FROM    PupilCurrentSchool pcs 
             JOIN    VLPupilContact vpc ON vpc.PupilID = pcs.PupilID 
@@ -922,7 +915,7 @@ class External_Doublefirst_User implements External_UserInterface
     public function getEmail($id)
     {
         $query =
-        "
+            "
           SELECT  TOP 1 EmailID 
           FROM    ContactEmailInformation 
           WHERE   ContactID = '{$id}' AND 
@@ -967,7 +960,7 @@ class External_Doublefirst_User implements External_UserInterface
     public function getParentUserAccountInfo()
     {
         $query =
-        "
+            "
             SELECT DISTINCT
                 ''                          AS StudentContactNetworkLogin,
                 c.ContactID                 AS StudentContactID,
@@ -985,11 +978,11 @@ class External_Doublefirst_User implements External_UserInterface
                 ''                          AS StudentCampus,
                 LEFT(pbi.Gender, 1)         AS StudentGender
             FROM        VLPupilContact      pc
-            LEFT JOIN   VLContact           c on c.ContactID = pc.ContactID
-            LEFT JOIN   ContactMaster       cm on c.ContactID = cm.ContactID
-            LEFT JOIN   VLContactEmail      ce on ce.ContactID = pc.ContactID
-            LEFT JOIN   VLContactTelephone  ct on ct.ContactID = pc.ContactID 
-            JOIN        V_PupilBasicInformation pbi on pbi.PupilID = pc.PupilID
+            LEFT JOIN   VLContact           c ON c.ContactID = pc.ContactID
+            LEFT JOIN   ContactMaster       cm ON c.ContactID = cm.ContactID
+            LEFT JOIN   VLContactEmail      ce ON ce.ContactID = pc.ContactID
+            LEFT JOIN   VLContactTelephone  ct ON ct.ContactID = pc.ContactID 
+            JOIN        V_PupilBasicInformation pbi ON pbi.PupilID = pc.PupilID
             WHERE       pc.IsContactParental = 1 
         ";
 
@@ -1000,8 +993,7 @@ class External_Doublefirst_User implements External_UserInterface
         // first space is their surname), or mashed into a single surname field (in which case we'll assume anything
         // after "&" is the spouses surname, and anything before is the primarys surname)
 
-        foreach ($parents as $parent) 
-        {
+        foreach ($parents as $parent) {
             // Start by checking for "&"
 
             $spouseNameArray = explode("&", trim($parent["Surname"]), 1);
@@ -1033,7 +1025,7 @@ class External_Doublefirst_User implements External_UserInterface
     public function getStaffUserAccountInfo()
     {
         $query =
-        "
+            "
             SELECT      spd.StaffID,
                         spd.UserID            AS NetworkLogin,
                         1 AS ActiveFlag,
@@ -1050,7 +1042,7 @@ class External_Doublefirst_User implements External_UserInterface
             FROM        StaffPersonalDetails spd
             JOIN        CurrentStaff cs ON cs.StaffID = spd.StaffID
             LEFT JOIN   StaffTelephones stw ON stw.StaffID = spd.StaffID AND stw.TelephoneType = 'W'
-            LEFT JOIN   StaffEmailInformation seiw ON seiw.StaffID = spd.StaffID and seiw.PrimaryEmail = 1 AND seiw.EmailType = '2'
+            LEFT JOIN   StaffEmailInformation seiw ON seiw.StaffID = spd.StaffID AND seiw.PrimaryEmail = 1 AND seiw.EmailType = '2'
             LEFT JOIN   LookupDetails cat ON cat.LookupID = '1203' AND cat.LookupDetailsID = spd.StaffCategory
             LEFT JOIN   LookupDetails title ON title.LookupID = '3012' AND title.LookupDetailsID = spd.Title
             ORDER BY    spd.SurName, 
@@ -1072,7 +1064,7 @@ class External_Doublefirst_User implements External_UserInterface
     public function getStaffContactListExtended()
     {
         $query =
-        "
+            "
             SELECT      spd.StaffID,
                         spd.EmployeeID        AS SchoolStaffCode,
                         title.Description     AS StaffTitle,
@@ -1093,7 +1085,7 @@ class External_Doublefirst_User implements External_UserInterface
             FROM        StaffPersonalDetails spd
 	        JOIN        CurrentStaff cs ON cs.StaffID = spd.StaffID
             LEFT JOIN   StaffTelephones stw ON stw.StaffID = spd.StaffID AND stw.TelephoneType = 'W'
-            LEFT JOIN   StaffEmailInformation seiw ON seiw.StaffID = spd.StaffID and seiw.PrimaryEmail = 1 AND seiw.EmailType = '2'
+            LEFT JOIN   StaffEmailInformation seiw ON seiw.StaffID = spd.StaffID AND seiw.PrimaryEmail = 1 AND seiw.EmailType = '2'
             LEFT JOIN   LookupDetails cat ON cat.LookupID = '1203' AND cat.LookupDetailsID = spd.StaffCategory
             LEFT JOIN   LookupDetails title ON title.LookupID = '3012' AND title.LookupDetailsID = spd.Title
             ORDER BY    spd.SurName, 
@@ -1142,7 +1134,7 @@ class External_Doublefirst_User implements External_UserInterface
     public function getStudentForms()
     {
         $query =
-        "
+            "
             SELECT DISTINCT   Form AS Code,
                               Form AS Description
             FROM              V_PupilBasicInformation

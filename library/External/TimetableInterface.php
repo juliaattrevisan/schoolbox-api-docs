@@ -56,7 +56,7 @@ interface External_TimetableInterface
      *
      * @param Schoolbox\Campus $campus
      * @param int $now
-	 * @param \Schoolbox\User $user     
+	 * @param \Schoolbox\User $user
      * @return array
      */
 	public function getPeriodNumber (\Schoolbox\Campus $campus, $now = 0, $user = null);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DoubleFirst Class Object
  *
@@ -13,7 +14,6 @@
  * ------\     (__)
  *        `-----"
  */
-
 class External_Doublefirst_Class implements External_ClassInterface
 {
 
@@ -48,10 +48,9 @@ class External_Doublefirst_Class implements External_ClassInterface
 
         $arrayCodes = explode(",", $subCode);
 
-        foreach ($arrayCodes as $code)
-        {
+        foreach ($arrayCodes as $code) {
             $query =
-            "
+                "
                 SELECT DISTINCT pbi.Surname as lastname, pbi.ForeName as firstname, pbi.YearGroup as yearlevel, pbi.House as house, CAST(pbi.UrgentNotes as NVARCHAR(max)) as StudentMedicalAlert, 0 as StudentSpecialNeedsFlag, pbi.PupilID as synergy_id, null AS ClassCampus 
                 FROM PupilSubjects ps JOIN V_PupilBasicInformation pbi ON pbi.PupilID = ps.PupilID 
                 LEFT JOIN YearGroupSubjectDivision ygsd ON ygsd.DivisionID = ps.DivisionID AND ygsd.SubjectID = ps.SubjectID AND ygsd.YearGroup = ps.YearGroup AND ygsd.AcademicYear = ps.SchoolYear 
@@ -63,8 +62,9 @@ class External_Doublefirst_Class implements External_ClassInterface
 
             $rows = $this->getDatabase()->getAll($query);
 
-            if ($rows)
+            if ($rows) {
                 return $rows;
+            }
         }
 
         return [];
@@ -76,12 +76,12 @@ class External_Doublefirst_Class implements External_ClassInterface
      * @param null $user
      * @return array
      */
-    public function getTeacherName($subCode, $user=null)
+    public function getTeacherName($subCode, $user = null)
     {
         $year = date("Y");
 
         $query =
-        "
+            "
             SELECT DISTINCT tcs.StaffID, ygsd.SubjectDivisionName
             FROM PupilSubjects ps 
             JOIN TimeTableClassStaff tcs ON tcs.SchoolID = ps.SchoolID AND tcs.YearGroup = ps.YearGroup AND tcs.DivisionID = ps.DivisionID AND tcs.AcademicYear = ps.SchoolYear AND tcs.BatchID = ps.BatchID
@@ -93,13 +93,15 @@ class External_Doublefirst_Class implements External_ClassInterface
 
         $rows = $this->getDatabase()->getAll($query);
 
-        if (!$rows)
+        if (!$rows) {
             return [];
+        }
 
         $teachers = array();
 
-        foreach ($rows as $row)
+        foreach ($rows as $row) {
             $teachers[] = $row['StaffID'];
+        }
 
         return $teachers;
     }

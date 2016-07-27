@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DoubleFirst Ping Object
  *
@@ -13,8 +14,7 @@
  * ------\     (__)
  *        `-----"
  */
-
 class External_Doublefirst_Ping implements External_PingInterface
 {
-	use External_MssqlPingTrait;
+    use External_MssqlPingTrait;
 }
