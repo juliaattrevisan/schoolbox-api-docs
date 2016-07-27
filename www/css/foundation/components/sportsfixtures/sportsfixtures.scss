@@ -5,11 +5,11 @@
         /* Leathery Red, for the colour of balls
          */
         &.sport {
+            background-color: lighten(#bf1f2e, 50%);
+
             &:hover {
                 background-color: lighten(#bf1f2e, 52%);
             }
-
-            background-color: lighten(#bf1f2e, 50%);
 
             a, .icon-64 {
                 color: #bf1f2e;
@@ -19,11 +19,11 @@
         /* Green, for the colour of grass
          */
         &.venue {
+            background-color: lighten(#1c9e1c, 53%);
+
             &:hover {
                 background-color: lighten(#1c9e1c, 56%);
             }
-
-            background-color: lighten(#1c9e1c, 53%);
 
             a, .icon-64 {
                 color: #1c9e1c;
@@ -34,11 +34,11 @@
          * (Yellow was unreadable)
          */
         &.school {
+            background-color: lighten(#009eb2, 58%);
+
             &:hover {
                 background-color: lighten(#009eb2, 60%);
             }
-
-            background-color: lighten(#009eb2, 58%);
 
             a, .icon-64 {
                 color: #009eb2;
@@ -48,11 +48,11 @@
         /* Purple, for no valid reason
          */
         &.status {
+            background-color: lighten(#6900b0, 60%);
+
             &:hover {
                 background-color: lighten(#6900b0, 61%);
             }
-
-            background-color: lighten(#6900b0, 60%);
 
             a, .icon-64 {
                 color: #6900b0;
@@ -77,6 +77,10 @@
         .icon-64 {
             margin: 1rem;
             padding: 0;
+
+            @media #{$small-up} {
+                margin-right: 2rem;
+            }
         }
     }
 }
