@@ -71,7 +71,7 @@ class External_Doublefirst_Class implements External_ClassInterface
     }
 
     /**
-     * Retreieve teacher external IDs for a particular class (great function naming)
+     * Retrieve teacher external IDs for a particular class (great function naming)
      * @param $subCode
      * @param null $user
      * @return array

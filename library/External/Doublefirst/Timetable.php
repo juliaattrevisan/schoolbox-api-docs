@@ -19,14 +19,10 @@ use Schoolbox\CampusMapper;
 
 class External_Doublefirst_Timetable implements External_TimetableInterface
 {
-    /**
-     * @var MSSQL $database
-     */
+    /** @var MSSQL $database */
     private $database;
 
-    /**
-     * @var External_UserInterface
-     */
+    /** @var External_UserInterface */
     private $externalUser;
 
     /** @var Group */
@@ -73,11 +69,8 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
          * "Devotions", so I'm just taking the first year level in that campus)
          */
 
-        if ($campus->getId() == 2) {
-            $yearGroups = "004"; //,005,006,007,008,009"; <-- These are the other year levels in that campus
-        } else {
-            $yearGroups = "010"; //,011,012,013,014,015";
-        }
+        $arrayTimetableCodes = explode(",", $campus->getExtTimetableCode());
+        $yearGroups = $arrayTimetableCodes[0];
 
         // If we didn't get any hits in the student table, try the staff one
 
@@ -509,11 +502,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
          * TODO: Total hack for campuses. There is no concept of campus, so we just use a list of year level IDs
          */
 
-        if ($campus->getId() == 2) {
-            $yearGroups = "004,005,006,007,008,009";
-        } else {
-            $yearGroups = "010,011,012,013,014,015";
-        }
+        $yearGroups = $campus->getExtTimetableCode();
 
         // Work out if the externalID is that of a teacher/student
 
@@ -731,6 +720,8 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         /**
          * TODO: Total hack for campuses
          */
+
+        $yearGroups = $campus->getExtTimetableCode();
 
         if ($campus->getId() == 2) {
             $yearGroups = "004,005,006,007,008,009";
