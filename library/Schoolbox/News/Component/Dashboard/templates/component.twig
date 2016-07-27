@@ -1,0 +1,86 @@
+<h2 class="subheader">{{ heading }}</h2>
+<div class="row">
+    <div class="small-12 island">
+
+        {# Tabs #}
+
+        <dl class="tabs" data-tab="">
+
+            {# Display topic tabs #}
+
+            {% for topic in topics %}
+
+                {# Only display topic if there is actually news in it #}
+
+                {% if news[topic.id] | length %}
+                    <dd {% if loop.first %}class="active"{% endif %}>
+                        <a href="#component{{ componentInstanceId }}-{{ topic.id }}">{{ topic.name }}</a>
+                    </dd>
+                {% endif %}
+
+            {% endfor %}
+
+            {# Display special 'All' grouping #}
+
+            <dd>
+                <a href="#component{{ componentInstanceId }}-all">All</a>
+            </dd>
+        </dl>
+
+        {# Articles #}
+
+        <section>
+            <div class="tabs-content">
+
+                {# Articles grouped by topic #}
+
+                {% for topic in topics %}
+                    <ul class="news-list content {%  if loop.first %}active{% endif %}" id="component{{ componentInstanceId }}-{{ topic.id }}">
+                        {% for item in news[topic.id] %}
+                            <li>
+                                <div class="list-item">
+                                    <div class="avatar card small-12">
+
+                                        <a href="/news/item/{{ item.id }}" title="{{ item.heading }}">
+
+                                            <img src="/storage/image.php?hash={{ item.image }}&size=square64">
+
+                                            <h3>{{ item.heading }}</h3>
+                                        </a>
+
+                                        <p class="meta">
+                                            Posted by <a href="/search/user/{{ item.uid }}">{{ item.author }}</a> {{ item.date.getRelativeTime }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <article>{{ item.blurb | raw }}</article>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endfor %}
+
+                {# Special 'All' grouping with every article#}
+
+                <ul class="news-list content" id="component{{ componentInstanceId }}-all">
+                    {% for item in newsAll %}
+                        <li>
+                            <div class="list-item">
+                                <div class="avatar card small-12">
+                                    <a href="/news/item/{{ item.id }}" title="{{ item.heading }}">
+                                        <img src="/storage/image.php?hash={{ item.image }}&size=square64">
+                                        <h3>{{ item.heading }}</h3>
+                                    </a>
+                                    <p class="meta">
+                                        Posted by <a href="/search/user/{{ item.uid }}">{{ item.author }}</a> {{ item.date.getRelativeTime }}
+                                    </p>
+                                </div>
+                            </div>
+                            <article>{{ item.blurb | raw }}</article>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </section>
+    </div>
+</div>
