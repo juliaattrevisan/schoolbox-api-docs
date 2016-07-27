@@ -187,15 +187,10 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             }
         }
 
-        /**
-         * TODO: If there needs to be more than one timetable week day the following query could possibly be used to
-         * get the week length, however MECS works on a 5 day timetable
-         *
-         *      $query = "SELECT TimetableWeekLength FROM TimetableParameters WHERE AcademicYear = {$year}";
-         *      $weekLength = $this->getDatabase()->getRow($query);
-         */
+        $query = "SELECT TimetableWeekLength FROM TimetableParameters WHERE AcademicYear = {$fileYear} ORDER BY LastUpdated DESC";
+        $weekLength = $this->getDatabase()->getRow($query);
 
-        $definitionArray['dayCount'] = 5;
+        $definitionArray['dayCount'] = 5 * $weekLength['TimetableWeekLength'];
         $definitionArray['periodCount'] = $times['NoOfPeriods'];;
 
         return $definitionArray;
