@@ -667,7 +667,10 @@ class UserMapper extends Mapper
         if(array_key_exists($user->getUsername(), $this->usernameCache)) {
             if($this->usernameCache[$user->getUsername()] != $user->getId()){
                 throw new UnexpectedValueException(
-                    sprintf('A user with username "%s" already exists.', $user->getUsername() )
+                    sprintf('A user with username "%s" already exists. Existing user id: "%s"',
+                        $user->getUsername(),
+                        $this->usernameCache[$user->getUsername()]
+                    )
                 );
             }
         }
