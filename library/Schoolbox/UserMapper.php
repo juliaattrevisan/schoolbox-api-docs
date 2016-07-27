@@ -297,6 +297,7 @@ class UserMapper extends Mapper
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateDefaultCampus']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'synchroniseUsernameCache']);
     }
 
     /**
@@ -635,6 +636,9 @@ class UserMapper extends Mapper
     /**
      * Pre-save callback for verifying whether a user's name is unique.
      *
+     * For data-integrity, this method relies on the post-save
+     * callback 'checkUsernameCache' to add any new users to the cache.
+     *
      * @param  User $user
      * @return bool Always true, as long as it doesn't throw
      * @throws UnexpectedValueException if it isn't unique
@@ -662,6 +666,18 @@ class UserMapper extends Mapper
 
         // No duplicates
         return true;
+    }
+
+    /**
+     * Post-save callback to ensure username cache is up-to-date
+     *
+     * @param User $user
+     */
+    public function synchroniseUsernameCache(User $user){
+        // Is cache in use?
+        if(is_array($this->usernameCache)){
+            $this->usernameCache[$user->getUsername()] = $user->getId();
+        }
     }
 
     /**
