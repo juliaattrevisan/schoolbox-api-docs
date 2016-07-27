@@ -53,7 +53,6 @@ class Stream extends Base {
             // Should we render this item?
             if(!isset($data['render_item']) || $data['render_item']) {
                 echo $this->getTemplateEngine()->render($response['template'], $data);
-                ob_flush();
             }
         }
 
