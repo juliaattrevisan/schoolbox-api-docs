@@ -56,10 +56,10 @@ interface External_TimetableInterface
      *
      * @param Schoolbox\Campus $campus
      * @param int $now
-	 * @param \Schoolbox\User $user
+     * @param \Schoolbox\User $user
      * @return array
      */
-	public function getPeriodNumber (\Schoolbox\Campus $campus, $now = 0, $user = null);
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null);
 
     /**
      * Return a user's timetable for a specific day
@@ -88,7 +88,7 @@ interface External_TimetableInterface
      * @param $dayNumber
      * @return mixed
      */
-	public function getDayTimetable ($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber);
+    public function getDayTimetable($externalUserId, $userId, \Schoolbox\Campus $campus, $dayNumber);
 
 
     /**
@@ -121,7 +121,7 @@ interface External_TimetableInterface
      * @param Alaress_Date_Format $date
      * @return mixed
      */
-    public function getTimetableForDate ($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date);
+    public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date);
 
 
     /**
@@ -172,13 +172,13 @@ interface External_TimetableInterface
      * @param Schoolbox\Campus $campus
      * @return mixed
      */
-	public function getFullTimetable ($externalUserId, $userId, \Schoolbox\Campus $campus);
+    public function getFullTimetable($externalUserId, $userId, \Schoolbox\Campus $campus);
 
-	/**
-	 * Gets the timetable for the given room.
-	 *
-	 * @param  array|string $roomCodes
-	 * @return array
-	 */
-	public function getRoomTimetable($roomCodes);
+    /**
+     * Gets the timetable for the given room.
+     *
+     * @param  array|string $roomCodes
+     * @return array
+     */
+    public function getRoomTimetable($roomCodes);
 }
