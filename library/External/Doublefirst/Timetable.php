@@ -295,8 +295,8 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             p.PeriodID = m.PeriodNumber
             
             WHERE 
-            n.AcademicYear = '" . date("Y") . "' AND
-            n.YearGroupID = '" . $campus->getExtTimetableCode() . "' AND
+            n.AcademicYear = '{$this->helper->getCurrentYear()}' AND
+            n.YearGroupID = '{$campus->getExtTimetableCode()}' AND
             m.DayOfWeek = 1
             
             UNION
@@ -312,8 +312,8 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             AttendanceBreaks
             
             WHERE
-            AcademicYear = '" . date("Y") . "' AND
-            YearGroup = '" . $campus->getExtTimetableCode() . "' AND
+            AcademicYear = '{$this->helper->getCurrentYear()}' AND
+            YearGroup = '{$campus->getExtTimetableCode()}' AND
             DayOfWeek = 1
             
             ORDER BY 
