@@ -78,14 +78,18 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
         // If we didn't get any hits in the student table, try the staff one
 
-        if (!$studentDetails) {
-            $query = "SELECT * FROM VLStaff WHERE StaffId = '{$externalUserId}'";
-            $studentDetails = $this->getDatabase()->getRow($query);
-            $type = 'staff';
-        } else {
+        if ($studentDetails) {
             $type = 'student';
-        }
+        } else {
+            $query = "SELECT * FROM VLStaff WHERE StaffId = '{$externalUserId}'";
+            $staffDetails = $this->getDatabase()->getRow($query);
 
+            if ($staffDetails) {
+                $type = 'staff';
+            } else {
+                return [];
+            }
+        }
         // Get period information from database
 
         $query =
