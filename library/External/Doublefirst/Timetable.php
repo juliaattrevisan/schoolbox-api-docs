@@ -325,8 +325,6 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
         // Get the time the day starts
 
-        $year = date("Y");
-
         $query = "SELECT * FROM V_PupilBasicInformation WHERE PupilID = " . $user->getExternalId();
         $studentDetails = $this->getDatabase()->getRow($query);
 
@@ -335,7 +333,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             SELECT TOP 1 SchoolStartTime
             FROM AttendancePeriodStructure 
             WHERE YearGroup = '{$studentDetails['YearGroupID']}'
-            AND AcademicYear = '{$year}'
+            AND AcademicYear = '{$this->helper->getCurrentYear()}'
             AND DayOfWeek = 1                    
         ";
 
