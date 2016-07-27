@@ -81,9 +81,14 @@ if (!empty($_POST)) {
         error(132);
     }
 
-    /* Need to keep this so non-ajaxed questions still redirect
-     */
-    SitePage::localRedir('/survey/question/create/' . $_POST['section_id']);
+    // Form is AJAX submitted so redirection is handled by javascript
+    if($this->detectAjax()) {
+        exit;
+    }
+    else {
+        SitePage::localRedir('/survey/question/create/' . $_POST['section_id']);
+    }
+
 } else {
     if (!is_numeric($this->arg[0])) {
         error(51);

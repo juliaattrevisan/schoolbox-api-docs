@@ -413,7 +413,8 @@
                     /* Create in Quiz/Survey
                      */
                     if (config.mode == 'create') {
-                        data.type_id = theForm.find('select[name=type_id]').val(),
+                        data.type_id = theForm.find('select[name=type_id]').val();
+                        data.assess_id = theForm.find('input[name=assess_id]').val();
                         data.section_id = theForm.find('input[name=section_id]').val();
 
                         redirect = '/' + config.availability + '/question/create/' + data.section_id + '/create';
@@ -422,11 +423,12 @@
                         /* Modify in Quiz/Survey
                          */
                         if ((typeof config.questionBank == "undefined") || (config.questionBank === false)) {
-                            data.type_id = theForm.find('input[name=type_id]').val(),
-                            data.section_id = theForm.find('input[name=section_id]').val(),
-                            data.question_id = theForm.find('input[name=question_id]').val(),
+                            data.assess_id = theForm.find('input[name=assess_id]').val();
+                            data.type_id = theForm.find('input[name=type_id]').val();
+                            data.section_id = theForm.find('input[name=section_id]').val();
+                            data.question_id = theForm.find('input[name=question_id]').val();
 
-                            redirect = '/' + config.availability + '/question/modify/' + data.question_id;
+                            redirect = '/' + config.availability + '/summary/' + data.assess_id;
                         }
                         /* Modify directly in the Question Bank
                          */

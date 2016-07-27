@@ -9,6 +9,7 @@
 <div class="row">
     <div class="small-12 island">
         <form id="createQuestionForm" action="/assess/question/modify" class="top" method="post">
+            <input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
             <input name="section_id" type="hidden" value="{SECTION_ID}" />
             <input name="question_id" type="hidden" value="{QUESTION_ID}" />
             <input name="answer_id" type="hidden" value="{ANSWER_ID}" />
@@ -20,18 +21,21 @@
             <section>
                 <fieldset class="content">
                     <div class="column small-12">
-                        <h3>{QUESTIONTYPE_DESCRIPTION}</h3>
-                        <label>
-                            Question
-                            <textarea name="question" id="question">{QUESTION}</textarea>
-                        </label>
+                        <legend>Question Type</legend>
+                        <p>{QUESTIONTYPE_DESCRIPTION}</p>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="column small-12">
+                        <legend>Question</legend>
+                        <textarea name="question" id="question">{QUESTION}</textarea>
                     </div>
                 </fieldset>
 
                 <!-- BEGIN has_answer_configuration -->
-                <fieldset>
-                    <legend>Configuration Options</legend>
-                    <div class="small-12 column">
+                <fieldset class="content">
+                    <div class="column small-12">
+                        <legend>Configuration Options</legend>
                     <!-- BEGIN answer_configuration -->
 
                     <!-- END answer_configuration -->
@@ -54,7 +58,7 @@
             </section>
             <div class="row">
                 <div class="small-12 columns">
-                    <input type="submit" value="Modify" />
+                    <input type="submit" value="Modify Question" />
                 </div>
             </div>
         </form>

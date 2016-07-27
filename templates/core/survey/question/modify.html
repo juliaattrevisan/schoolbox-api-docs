@@ -29,6 +29,7 @@
 <div class="row">
     <div class="small-12 island">
         <form id="createQuestionForm" action="/survey/question/modify" class="top" method="post">
+            <input name="assess_id" type="hidden" value="{ASSESS_ASSESS_ID}" />
             <input name="section_id" type="hidden" value="{SECTION_ID}" />
             <input name="question_id" type="hidden" value="{QUESTION_ID}" />
             <input name="answer_id" type="hidden" value="{ANSWER_ID}" />
@@ -36,34 +37,38 @@
             <input name="type_id" type="hidden" value="{QUESTIONTYPE_TYPE_ID}" />
 
             <h2 class="subheader">Modify Question</h2>
-            <section class="content">
-                <h3>{QUESTIONTYPE_DESCRIPTION}</h3>
-
-                <label>
-                    Question
-                    <textarea name="question" id="question">{QUESTION}</textarea>
-                </label>
+            <section>
+                <fieldset class="content">
+                    <div class="column small-12">
+                        <legend>Question Type</legend>
+                        <p>{QUESTIONTYPE_DESCRIPTION}</p>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="column small-12">
+                        <legend>Question</legend>
+                        <textarea name="question" id="question">{QUESTION}</textarea>
+                    </div>
+                </fieldset>
 
                 <!-- BEGIN has_answer_configuration -->
-                <fieldset>
-                    <legend>Configuration Options</legend>
-                    <div class="small-12 column">
-                    <!-- BEGIN answer_configuration -->
+                <fieldset class="content">
+                    <div class="column small-12">
+                        <legend>Configuration Options</legend>
+                        <!-- BEGIN answer_configuration -->
 
-                    <!-- END answer_configuration -->
+                        <!-- END answer_configuration -->
                     </div>
                 </fieldset>
                 <!-- END has_answer_configuration -->
 
-                <div>
-                    <!-- BEGIN answerInputs -->
+                <!-- BEGIN answerInputs -->
 
-                    <!-- END answerInputs -->
-                </div>
+                <!-- END answerInputs -->
             </section>
             <div class="row">
                 <div class="small-12 columns">
-                    <input type="submit" value="Modify" />
+                    <input type="submit" value="Modify Question" />
                 </div>
             </div>
         </form>
