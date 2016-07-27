@@ -31,6 +31,9 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     /** @var CampusMapper */
     private $campusMapper;
 
+    /** @var External_Doublefirst_Helper */
+    private $helper;
+
     /**
      * External_Doublefirst_Timetable constructor.
      */
@@ -40,6 +43,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         $this->externalUser = new External_User('doublefirst');
         $this->groupHandler = new Group();
         $this->campusMapper = new CampusMapper();
+        $this->helper = new External_Doublefirst_Helper();
     }
 
     /**
@@ -170,8 +174,8 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
                 // Convert the start/end time which are in minutes from midnight into a readable time string
 
-                $definition["start"] = (floor($period_start / 60)) . ":" . ($period_start % 60 < 10 ? '0' . $period_start % 60 : $period_start % 60);
-                $definition["end"] = (floor($period_end / 60)) . ":" . ($period_end % 60 < 10 ? '0' . $period_end % 60 : $period_end % 60);
+                $definition["start"] = $this->helper->getTimeFromMinutes($period_start);
+                $definition["end"] = $this->helper->getTimeFromMinutes($period_end);
                 $definition["number"] = $period["PeriodNumber"];
                 $definition["sequence"] = $period["PeriodNumberSeq"];
 
@@ -205,26 +209,13 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
      */
     public function getDayNumber(CampusModel $campus, $date = 0)
     {
-        /**
-         * TODO: If we need to move to a multiple week will have to take term dates into account to work out week number
-         *
-         *        if ($date != 0)
-         *          $where = ' WHERE StartDate < $date AND EndDate > $date';
-         *
-         *        $query = "SELECT StartDate, EndDate FROM SchoolTerms {$where};";
-         *        $this->getDatabase()->getAll($query);
-         *
-         *        ... Can't find somewhere that indicates the week the term starts on, could just assume all terms
-         *        start on Day 1- but you know what they say about people who assume ...
-         */
-
-        // For now as we are only working with one week timetables we can just default to the day of week number
-
-        if ($date > 0) {
-            return date("w", $date);
+        if ($date == 0) {
+            $date = \Alaress_Date_Format::now();
         } else {
-            return date("w");
+            $date = new \Alaress_Date_Format($date, "U");
         }
+
+        return $this->helper->getDayNumber($date);
     }
 
     /**
@@ -360,8 +351,8 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
                 // Lets do some time based gymnastics because someone thought it'd be smart to store time as an integer
 
-                $time_from = (floor($period_start / 60)) . ":" . ($period_start % 60 < 10 ? '0' . $period_start % 60 : $period_start % 60);
-                $time_to = (floor($period_end / 60)) . ":" . ($period_end % 60 < 10 ? '0' . $period_end % 60 : $period_end % 60);
+                $time_from = $this->helper->getTimeFromMinutes($period_start);
+                $time_to = $this->helper->getTimeFromMinutes($period_end);
 
                 return ([
                     'TimeFrom' => $time_from,
@@ -390,81 +381,8 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
      */
     public function getTimetableForDate($externalUserId, $userId, CampusModel $campus, Alaress_Date_Format $date)
     {
-        // Work out what day of the week the term started on
-
-        $query =
-            "
-            SELECT      StartDate, 
-                        EndDate 
-            FROM        SchoolTerms 
-            WHERE       StartDate <= '" . $date->getDatabaseDate() . " 23:59:59' AND 
-                        EndDate >= '" . $date->getDatabaseDate() . " 00:00:00'
-        ";
-
-        $term = $this->getDatabase()->getRow($query);
-
-        // If we couldn't find a matching term in Doublefirst, just bomb out here.
-
-        if (!$term) {
-
-            // TODO: Remove hack, this just picks the last term that was open for testing purposes during the holidays.
-
-            $query =
-                "
-	            SELECT      TOP 1 StartDate, 
-	                        EndDate 
-	            FROM        SchoolTerms 
-	            WHERE       StartDate <= '" . $date->getDatabaseDate() . " 23:59:59'  
-			    ORDER BY 	StartDate DESC
-	        ";
-
-            $term = $this->getDatabase()->getRow($query);
-        }
-
-        $start = new \Alaress_Date_Format();
-        $start->setFromFormat(strtotime($term['StartDate']), 'U');
-
-        // Grab the year for use in later query
-
-        $year = $start->getYear();
-
-        /**
-         * TODO: We are going to assume all terms start on week 1 as there doesn't appear to be any field that says it could
-         * be otherwise. Need to look into this.
-         */
-
-        $week = 1;
-        $day = date("w", strtotime($term['StartDate']));
-
-        // We convert the date fo julian so we can iterate days easily in a for loop
-
-        $current = gregoriantojd($date->getMonth(), $date->getDay(), $date->getYear());
-        $start = gregoriantojd($start->getMonth(), $start->getDay(), $start->getYear());
-
-        // Work out which day/week we ware in
-
-        $query = "SELECT TimetableWeekLength FROM TimetableParameters WHERE AcademicYear = {$year}";
-        $weekLength = $this->getDatabase()->getRow($query);
-
-        for ($i = $start; $i <= $current; $i++) {
-            $day++;
-
-            // Roll over weeks each Sunday
-
-            if ($day > 6) {
-                $day = 0;
-
-                // Roll over weeks based on information from the database
-
-                $week++;
-
-                if ($week > $weekLength["TimeTableWeekLength"]) {
-                    $week = 1;
-                }
-            }
-        }
-
-        return $this->getDayTimetable($externalUserId, $userId, $campus, (($week - 1) * 5) + $day, $date);
+        $day = $this->helper->getDayNumber($date);
+        return $this->getDayTimetable($externalUserId, $userId, $campus, $day, $date);
     }
 
     /**
@@ -718,12 +636,6 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
         $yearGroups = $campus->getExtTimetableCode();
 
-        if ($campus->getId() == 2) {
-            $yearGroups = "004,005,006,007,008,009";
-        } else {
-            $yearGroups = "010,011,012,013,014,015";
-        }
-
         // Work out if the externalID is that of a teacher/student
 
         $query = "SELECT * FROM V_PupilBasicInformation WHERE PupilID = '{$externalUserId}'";
@@ -732,7 +644,6 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         // If we didn't get any hits in the student table, try the staff one
 
         if (!$studentDetails) {
-            $query = "SELECT * FROM VLStaff WHERE StaffId = '{$externalUserId}'";
             $type = 'staff';
         } else {
             $query = "SELECT * FROM VLPupilDetails WHERE PupilId = '{$externalUserId}'";
