@@ -738,10 +738,16 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
         if (!$studentDetails) {
             $query = "SELECT * FROM VLStaff WHERE StaffId = '{$externalUserId}'";
-            $studentDetails = $this->getDatabase()->getRow($query);
             $type = 'staff';
         } else {
-            $type = 'student';
+            $query = "SELECT * FROM VLPupilDetails WHERE PupilId = '{$externalUserId}'";
+            $studentDetails = $this->getDatabase()->getRow($query);
+
+            if ($studentDetails) {
+                $type = 'student';
+            } else {
+                return false;
+            }
         }
 
         $fileYear = $this->database->quote($this->externalUser->getCurrentYear($externalUserId));
