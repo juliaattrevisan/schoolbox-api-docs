@@ -24,6 +24,13 @@ use UnexpectedValueException;
  */
 class UserMapper extends Mapper
 {
+    /**
+     * Maps 'username' => true.
+     * If we save a record, we must update the cache to ensure integrity.
+     * @var array|null $usernameCache
+     */
+    protected $usernameCache;
+
     protected function mapping()
     {
 
@@ -634,14 +641,26 @@ class UserMapper extends Mapper
      */
     public function verifyUniqueUsername(User $user)
     {
-        if (!$this->isUnique(['username' => $user->getUsername(),], $user->getId())) {
-            throw new UnexpectedValueException(
-                sprintf(
-                    'A user with username "%s" already exists.',
-                    $user->getUsername()
-                )
-            );
+        // Load cache on first invocation
+        if(!is_array($this->usernameCache)){
+            $this->usernameCache = [];
+            $query = $this->selectScalarByColumnList("{$this->getTable()}.id, {$this->getTable()}.username", []);
+            $query->execute();
+            while($row = $query->fetch(\PDO::FETCH_ASSOC)){
+                $this->usernameCache[$row['username']] = $row['id'];
+            }
         }
+
+        // Check cache
+        if(array_key_exists($user->getUsername(), $this->usernameCache)) {
+            if($this->usernameCache[$user->getUsername()] != $user->getId()){
+                throw new UnexpectedValueException(
+                    sprintf('A user with username "%s" already exists.', $user->getUsername() )
+                );
+            }
+        }
+
+        // No duplicates
         return true;
     }
 
