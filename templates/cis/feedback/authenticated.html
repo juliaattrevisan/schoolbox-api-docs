@@ -1,0 +1,92 @@
+<!-- BEGIN custom_head -->
+<script language="JavaScript" type="text/javascript">
+$(function () {
+
+	$('#feedbackForm').submit(function ($event) {
+
+		var message = '', form = $(this);
+		if ($('#name').val() == '')
+			message += 'Please enter your name.\n';
+		
+		if ($('#email').val() == '')
+			message += 'Please enter your email address.\n';
+		
+        if ($('#message').val() == '')
+            message += 'Please enter a message.\n';
+
+        if ($('#recaptcha_response_field').val() == '')
+            message += 'Please enter the two corresponding words for the human checker.\n';
+
+		if (message != '') {
+			alert(message);
+            return false;
+        }
+	});
+
+});
+</script>
+<!-- END custom_head -->
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>{TITLE}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <form id="feedbackForm" action="/emailForm.php" method="post" class="top">
+            <input type="hidden" name="template" value="feedback.html" />
+            <input type="hidden" name="confirmation" value="/thank-you.php" />
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Your Name
+                            <input type="text" name="name" id="name" size="35" value="{NAME}" />
+                        </label>
+
+                        <label>
+                            Email
+                            <input type="text" name="email" id="email" size="35"  value="{EMAIL}" />
+                        </label>
+
+                        <label>
+                            Support Area
+                            <select name="subject" id="subject">
+                                <option></option>
+                                <option value="Website">Website (cis.edu.sg)</option>
+                                <option value="MyCIS">My.CIS (my.cis.edu.sg)</option>
+                                <option value="Mobile App">Mobile App</option>
+                                <option value="Campus Online">Campus Online or Sodexo</option>
+                                <option value="Student Records">Student Records Management</option>
+                                <option value="Conference Registration">Conference registration</option>
+                                <option value="Activities">Activities and sports registration</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Details
+                            <textarea id="message" name="message" rows="10"></textarea>
+                        </label>
+
+                        <!-- BEGIN recaptcha -->
+                        <label>
+                            Human Checker
+                            <span class="hint has-tip tip-top" data-tooltip title="Please enter the text below so that we know you're not a bot.">?</span>
+                            {RECAPTCHA}
+                        </label>
+                        <!-- END recaptcha -->
+                    </div>
+                </fieldset>
+            </section>
+            <div class="row">
+                <div class="small-12 columns">
+                    <input type="submit" value="Submit Support Request"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
