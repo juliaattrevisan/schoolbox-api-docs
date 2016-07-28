@@ -86,8 +86,7 @@ class External_Doublefirst_Helper
             $term = $this->getDatabase()->getRow($query);
         }
 
-        $start = new \Alaress_Date_Format();
-        $start->setFromFormat(strtotime($term['StartDate']), 'U');
+        $start = new \Alaress_Date_Format(strtotime($term['StartDate']), 'U');
 
         // Grab the year for use in later query
 
