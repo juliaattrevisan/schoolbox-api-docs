@@ -68,9 +68,13 @@
                             var marker;
 
                             function initMap() {
+                                {% set gLat  = venue.latitude ?: location.lat %}
+                                {% set gLon  = venue.longitude ?: location.lon %}
+                                {% set gZoom = zoom ?: (venue.latitude ? 16 : 13) %}
+
                                 var map = new google.maps.Map(document.getElementById('map'), {
-                                    zoom: {{ venue.latitude ? 16 : 13 }},
-                                    center: { lat: {{ venue.latitude ?: location.lat }}, lng: {{ venue.longitude ?: location.lon }} },
+                                    zoom: {{ gZoom }},
+                                    center: { lat: {{ gLat }}, lng: {{ gLon }} },
                                     streetViewControl: false
                                 });
                                 var geocoder = new google.maps.Geocoder;

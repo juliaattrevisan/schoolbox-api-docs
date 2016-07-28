@@ -111,12 +111,26 @@ class Controller extends AbstractController
      */
     protected function getForm($entity, $context = null)
     {
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesVenue/create.twig', [
+        $data = [
             'venue'  => $entity,
-            // default the location to roughly where the school is, as defined by their weather config.......
-            'location' => (new \Weather_Wunderground())->getLocation(),
             'action' => $entity->getId() ? 'Modify' : 'Create'
-        ]));
+        ];
+
+        // if there's a better way than using the weather config....
+        $location = (new \Weather_Wunderground())->getLocation();
+
+        // compensate for failed API call
+        if ($location['lat'] && $location['lon']) {
+            $data['location'] = $location;
+        } else {
+            $data['location'] = [
+                'lat' => '-27.299860',
+                'lon' => '133.622357'
+            ];
+            $data['zoom'] = 5;
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesVenue/create.twig', $data));
     }
 
     /**
