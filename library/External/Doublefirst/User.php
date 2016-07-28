@@ -24,11 +24,15 @@ class External_Doublefirst_User implements External_UserInterface
     /** @var Group */
     private $groupHandler;
 
+    /** @var External_Doublefirst_Helper */
+    private $helper;
+
     /** Constructor */
     public function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
         $this->setGroup(new Group());
+        $this->helper = new External_Doublefirst_Helper();
     }
 
     /**
@@ -49,7 +53,7 @@ class External_Doublefirst_User implements External_UserInterface
         ";
 
         if ($photo = $this->getDatabase()->getRow($query)) {
-            $photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
+            $photoPath = $this->helper->getPhotoPath($externalUserId);
 
             // TODO: Delete photos on rollover
 
@@ -88,7 +92,7 @@ class External_Doublefirst_User implements External_UserInterface
             ";
 
             if ($photo = $this->getDatabase()->getRow($query)) {
-                $photoPath = realpath(Config::get('portrait_dir')) . '/' . $externalUserId . '.jpg';
+                $photoPath = $this->helper->getPhotoPath($externalUserId);
 
                 // TODO: Delete photos on rollover
 
