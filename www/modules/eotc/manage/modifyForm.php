@@ -62,14 +62,24 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				$metadata->setStatus($metadataStatus);
 			}
 
+			/* Cannot submit modification data if event is Approved and you
+			 * are its author, and you haven't got the Approved permission
+			 */
+			if ($_POST['action'] == 'Update') {
+				$isAuthor = (($event->getAuthor()->getId() == $owner->getId()) && $authenticator->isEOTCCreator($owner));
+				$canAdminister = $authenticator->isEOTCAdministrator($owner, $event);
+
+				if ($isAuthor && !$canAdminister && $event->getMetadata()->getStatus()->isApproved()) {
+					$page->localRedir("/modules/eotc/status/modify/{$event->getId()}");
+				}
+			}
+
 			/* NO RETREAT
 			 * NO SURRENDER
 			 */
 
 			/* Author
 			 */
-			$userMapper = \Schoolbox\UserMapper::getInstance();
-
 			try {
 				/** @var \Schoolbox\User $author */
 				$author = $userMapper->findById($_POST['authorId']);

@@ -35,6 +35,7 @@ $authenticator = new \EOTC\Authenticator();
 $isEOTCAdministrator = $authenticator->isEOTCAdministrator($sessionUser, $event);
 $isCanSelfPromote = $authenticator->canSelfPromote($sessionUser, $event);
 $isSubscribedUser = $authenticator->isSubscribedUser($sessionUser, $event);
+$isAuthor = (($event->getAuthor()->getId() == $sessionUser->getId()) && $authenticator->isEOTCCreator($sessionUser));
 
 /* All EOTC Administrators can see Approved/Rejected events
  */
@@ -53,6 +54,8 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
     $this->setBlock('has_change_event_status', 'event_status', 'event_status_block');
     $this->setBlock(TEMPLATE_content, 'recurring_reminder', 'recurring_reminder_block');
     $this->setBlock(TEMPLATE_content, 'event_resourcebooking', 'event_resourcebooking_block');
+    $this->setBlock(TEMPLATE_content, 'has_modify_event', 'has_modify_event_block');
+
 
     $this->setVar(
         array(
@@ -287,67 +290,85 @@ if ($isEOTCAdministrator || $isCanSelfPromote || $isSubscribedUser || $isCanFina
         $this->parse('has_event_activity_log_block', 'has_event_activity_log');
     }
 
+
+    /* Modify Event button
+     * Special case for authors of approved events who aren't eotc admins
+     */
+    if ($isAuthor && !$isEOTCAdministrator && $event->getMetadata()->getStatus()->isApproved()) {
+        $this->setVar([
+            'has_modify_event_block' => ''
+        ]);
+    }
+    else {
+        $this->parse('has_modify_event_block', 'has_modify_event');
+    }
+
     /* Status section
      *
      * If you don't have permissions to the status of the event, you don't get
      * access to this section anymore
      */
+    $this->setVar([
+        'has_change_event_status_block' => ''
+    ]);
 
-    /* Status Comment
+    /* Authors cannot view an event that is in Final Approval
+     * Instead redirect to a different place
+     *
+     * Unless you're an EOTC administrator, then you can still
+     * modify it (provided you've the appropriate permissions)
      */
-    $this->setVar(
-        array(
+    if ($isAuthor && !$isEOTCAdministrator && $event->getMetadata()->getStatus()->isApproved()) {
+
+        /* noop
+         */
+    }
+    else {
+
+        /* Status Comment
+         */
+        $this->setVar([
             'EVENT_COMMENT' => $event->getMetadata()->getComment(),
-        )
-    );
+        ]);
 
-    if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
-        $eventStatusMapper = \EOTC\EventStatusMapper::getInstance();
+        if ($isEOTCAdministrator || $isCanSelfPromote || $isCanFinalise) {
+            $eventStatusMapper = \EOTC\EventStatusMapper::getInstance();
 
-        /* Soops have access to all statuses
-         */
-        if ($sessionUser->isSuperuser()) {
-            $allEventStatus = $eventStatusMapper->findAll();
-        } else {
-            $allEventStatus = $eventStatusMapper->findAvailableStatuses($event);
-        }
+            /* Soops have access to all statuses
+             */
+            if ($sessionUser->isSuperuser()) {
+                $allEventStatus = $eventStatusMapper->findAll();
+            } else {
+                $allEventStatus = $eventStatusMapper->findAvailableStatuses($event);
+            }
 
-        /* Status Dropdown
-         *
-         * Limited to the current status and the next one
-         *
-         * Limited also by user's ability to set that status, as defined
-         * in the EOTC permissions
-         */
-        foreach ($allEventStatus as $currentStatus) {
-            $this->setVar(
-                array(
+            /* Status Dropdown
+             *
+             * Limited to the current status and the next one
+             *
+             * Limited also by user's ability to set that status, as defined
+             * in the EOTC permissions
+             */
+            foreach ($allEventStatus as $currentStatus) {
+                $this->setVar([
                     'EVENT_STATUS_ID'       => $currentStatus->getId(),
                     'EVENT_STATUS_NAME'     => $currentStatus->getName(),
                     'EVENT_STATUS_SELECTED' => '',
-                )
-            );
+                ]);
 
-            /* Preselect
-             */
-            if ($currentStatus->getId() == $event->getMetadata()->getStatus()->getId()) {
-                $this->setVar(
-                    array(
+                /* Preselect
+                 */
+                if ($currentStatus->getId() == $event->getMetadata()->getStatus()->getId()) {
+                    $this->setVar([
                         'EVENT_STATUS_SELECTED' => 'selected="selected"',
-                    )
-                );
+                    ]);
+                }
+
+                $this->parse('event_status_block', 'event_status', true);
             }
 
-            $this->parse('event_status_block', 'event_status', true);
+            $this->parse('has_change_event_status_block', 'has_change_event_status');
         }
-
-        $this->parse('has_change_event_status_block', 'has_change_event_status');
-    } else {
-        $this->setVar(
-            array(
-                'has_change_event_status_block' => ''
-            )
-        );
     }
 }
 else {
