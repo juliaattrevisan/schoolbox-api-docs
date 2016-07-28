@@ -261,7 +261,7 @@ ul.tileList {
             @media #{$large-up}    { right: 2rem; }
         }
     }
-    .avatar.card {
+    .card {
         @include absolute (auto, auto, 0, auto);
         margin: 0rem 1rem 0 0rem;
         .wrap{
