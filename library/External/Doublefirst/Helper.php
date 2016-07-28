@@ -155,7 +155,7 @@ class External_Doublefirst_Helper
             }
         }
 
-        return (($week - 1) * 5) + $day;
+        return (($week - 1) * 5) + $day - 1;
     }
 
     /* Getters/Setters
