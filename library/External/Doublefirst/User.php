@@ -150,15 +150,13 @@ class External_Doublefirst_User implements External_UserInterface
                 
                 LTRIM(
                   RTRIM(
-                    COALESCE(NULLIF(ct.Mobile, ''), 
-                      COALESCE(NULLIF(ctPhoneMobile.TelephoneNumber + ' (Hers)', ' (Hers)'), 
-                        COALESCE(NULLIF(ctPhoneMobile2.TelephoneNumber + ' (Hers)', ' (Hers)'), 
-                          COALESCE(NULLIF(ctPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
-                            COALESCE(NULLIF(ctPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'), 
-                              COALESCE(NULLIF(ctPhoneMobile5.TelephoneNumber, ''), ''))
-                          )
-                        )
-                      )
+                    COALESCE(
+                      NULLIF(ct.Mobile, ''), 
+                      NULLIF(ctPhoneMobile.TelephoneNumber + ' (Hers)', ' (Hers)'), 
+                      NULLIF(ctPhoneMobile2.TelephoneNumber + ' (Hers)', ' (Hers)'), 
+                      NULLIF(ctPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
+                      NULLIF(ctPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'), 
+                      NULLIF(ctPhoneMobile5.TelephoneNumber, '')
                     ) 
                   )
                 ) AS MobilePhone, 
@@ -371,14 +369,12 @@ class External_Doublefirst_User implements External_UserInterface
                 ecm.ContactName                                     AS StudentEmergencyName,
                 LTRIM(
                   RTRIM(
-                    COALESCE(NULLIF(ecmPhoneMobile.TelephoneNumber + ' (Hers)', ' (Hers)'), 
-                      COALESCE(NULLIF(ecmPhoneMobile2.TelephoneNumber + ' (Hers)', ' (Hers)'), 
-                        COALESCE(NULLIF(ecmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
-                          COALESCE(NULLIF(ecmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'), 
-                            COALESCE(NULLIF(ecmPhoneMobile5.TelephoneNumber, ''), '')
-                          )
-                        )
-                      )
+                    COALESCE(
+                      NULLIF(ecmPhoneMobile.TelephoneNumber + ' (Hers)', ' (Hers)'), 
+                      NULLIF(ecmPhoneMobile2.TelephoneNumber + ' (Hers)', ' (Hers)'), 
+                      NULLIF(ecmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
+                      NULLIF(ecmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'), 
+                      NULLIF(ecmPhoneMobile5.TelephoneNumber, '')                      
                     ) 
                   )
                 )                                                   AS StudentEmergencyPhone, 
@@ -499,34 +495,27 @@ class External_Doublefirst_User implements External_UserInterface
                         
                         LTRIM(
                           RTRIM(
-                            COALESCE(NULLIF(cp.Mobile, ''), 
-                              COALESCE(NULLIF(cmPhoneMobile.TelephoneNumber + ' (Hers)', ' (Hers)'), 
-                                COALESCE(NULLIF(cmPhoneMobile2.TelephoneNumber + ' (Hers)', ' (Hers)'), 
-                                  COALESCE(NULLIF(cmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
-                                    COALESCE(NULLIF(cmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'), 
-                                      COALESCE(NULLIF(cmPhoneMobile5.TelephoneNumber, ''), '')
-                                    )
-                                  )
-                                )
-                              )
+                            COALESCE(
+                              NULLIF(cp.Mobile, ''), 
+                              NULLIF(cmPhoneMobile.TelephoneNumber + ' (Hers)', ' (Hers)'), 
+                              NULLIF(cmPhoneMobile2.TelephoneNumber + ' (Hers)', ' (Hers)'), 
+                              NULLIF(cmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
+                              NULLIF(cmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'), 
+                              NULLIF(cmPhoneMobile5.TelephoneNumber, '')
                             )
                           )
                         ) AS StudentContactMobilePhone, 
                         
                         LTRIM(
                           RTRIM(
-                            COALESCE(NULLIF(cp.Mobile, ''), 
-                              COALESCE(NULLIF(cmPhoneWork.TelephoneNumber + '', ''), 
-                                COALESCE(NULLIF(cmPhoneWork2.TelephoneNumber + '', ''), 
-                                  COALESCE(NULLIF(cmPhoneWork3.TelephoneNumber + '', ''), 
-                                    COALESCE(NULLIF(cmPhoneWork4.TelephoneNumber + ' (Hers Work)', ' (Hers Work)'), 
-                                      COALESCE(NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'), 
-                                        COALESCE(NULLIF(cmPhoneWork6.TelephoneNumber + '', ''), '')
-                                      )
-                                    )
-                                  )
-                                )
-                              )
+                            COALESCE(
+                              NULLIF(cp.Mobile, ''), 
+                              NULLIF(cmPhoneWork.TelephoneNumber + '', ''), 
+                              NULLIF(cmPhoneWork2.TelephoneNumber + '', ''), 
+                              NULLIF(cmPhoneWork3.TelephoneNumber + '', ''), 
+                              NULLIF(cmPhoneWork4.TelephoneNumber + ' (Hers Work)', ' (Hers Work)'), 
+                              NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'), 
+                              NULLIF(cmPhoneWork6.TelephoneNumber + '', '')
                             )
                           )
                         ) AS StudentContactOccupPhone, 
@@ -539,16 +528,18 @@ class External_Doublefirst_User implements External_UserInterface
 
                         LTRIM(
                           RTRIM(
-                            COALESCE(NULLIF(cmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
-                              COALESCE(NULLIF(cmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'), '')
+                            COALESCE(
+                              NULLIF(cmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
+                              NULLIF(cmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)')
                             )
                           )
                         ) AS StudentContactSpouseMobilePhone, 
     
                         LTRIM(
                           RTRIM(
-                            COALESCE(NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'), 
-                              COALESCE(NULLIF(cmPhoneWork6.TelephoneNumber + '', ''), '')
+                            COALESCE(
+                              NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'), 
+                              NULLIF(cmPhoneWork6.TelephoneNumber + '', '')
                             ) 
                           )
                         ) AS StudentContactSpouseOccupPhone, 
@@ -682,34 +673,27 @@ class External_Doublefirst_User implements External_UserInterface
                       
                       LTRIM(
                         RTRIM(
-                          COALESCE(NULLIF(cp.Mobile, ''), 
-                            COALESCE(NULLIF(cmPhoneMobile.TelephoneNumber + ' (Hers)', ' (Hers)'), 
-                              COALESCE(NULLIF(cmPhoneMobile2.TelephoneNumber + ' (Hers)', ' (Hers)'), 
-                                COALESCE(NULLIF(cmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
-                                  COALESCE(NULLIF(cmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'), 
-                                    COALESCE(NULLIF(cmPhoneMobile5.TelephoneNumber, ''), '')
-                                  )
-                                )
-                              )
-                            )
+                          COALESCE(
+                            NULLIF(cp.Mobile, ''), 
+                            NULLIF(cmPhoneMobile.TelephoneNumber + ' (Hers)', ' (Hers)'), 
+                            NULLIF(cmPhoneMobile2.TelephoneNumber + ' (Hers)', ' (Hers)'), 
+                            NULLIF(cmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
+                            NULLIF(cmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'), 
+                            NULLIF(cmPhoneMobile5.TelephoneNumber, '')
                           )
                         )
                       ) AS StudentContactMobilePhone, 
 
                       LTRIM(
                         RTRIM(
-                          COALESCE(NULLIF(cp.Mobile, ''), 
-                            COALESCE(NULLIF(cmPhoneWork.TelephoneNumber + '', ''), 
-                              COALESCE(NULLIF(cmPhoneWork2.TelephoneNumber + '', ''), 
-                                COALESCE(NULLIF(cmPhoneWork3.TelephoneNumber + '', ''), 
-                                  COALESCE(NULLIF(cmPhoneWork4.TelephoneNumber + ' (Hers Work)', ' (Hers Work)'), 
-                                    COALESCE(NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'), 
-                                      COALESCE(NULLIF(cmPhoneWork6.TelephoneNumber + '', ''), '')
-                                    )
-                                  )
-                                )
-                              )
-                            )
+                          COALESCE(
+                            NULLIF(cp.Mobile, ''), 
+                            NULLIF(cmPhoneWork.TelephoneNumber + '', ''), 
+                            NULLIF(cmPhoneWork2.TelephoneNumber + '', ''), 
+                            NULLIF(cmPhoneWork3.TelephoneNumber + '', ''), 
+                            NULLIF(cmPhoneWork4.TelephoneNumber + ' (Hers Work)', ' (Hers Work)'), 
+                            NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'), 
+                            NULLIF(cmPhoneWork6.TelephoneNumber + '', '')
                           )
                         )
                       ) AS StudentContactOccupPhone, 
@@ -722,16 +706,18 @@ class External_Doublefirst_User implements External_UserInterface
 
                       LTRIM(
                         RTRIM(
-                          COALESCE(NULLIF(cmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
-                            COALESCE(NULLIF(cmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)'), '')
+                          COALESCE(
+                            NULLIF(cmPhoneMobile3.TelephoneNumber + ' (His)', ' (His)'), 
+                            NULLIF(cmPhoneMobile4.TelephoneNumber + ' (His)', ' (His)')
                           )
                         )
                       ) AS StudentContactSpouseMobilePhone, 
 
                       LTRIM(
                         RTRIM(
-                          COALESCE(NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'), 
-                            COALESCE(NULLIF(cmPhoneWork6.TelephoneNumber + '', ''), '')
+                          COALESCE(
+                            NULLIF(cmPhoneWork5.TelephoneNumber + ' (His Work)', ' (His Work)'), 
+                            NULLIF(cmPhoneWork6.TelephoneNumber + '', '')
                           )
                         )
                       ) AS StudentContactSpouseOccupPhone, 
