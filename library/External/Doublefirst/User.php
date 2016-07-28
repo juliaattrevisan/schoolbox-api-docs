@@ -598,10 +598,26 @@ class External_Doublefirst_User implements External_UserInterface
         if ($boardingStatus == '') {
             // Noop
         } elseif ($boardingStatus == 'yes') {
-            $query .= " {$whereAnd} pcs.BoarderStatus IN ('6', '7', 'B') ";
+            $codes = "";
+            foreach ($this->helper->getBoardingStatuses() as $status) {
+                $status = $this->getDatabase()->smartQuote($status);
+                if ($codes != "") {
+                    $codes .= ",";
+                }
+                $codes .= $status;
+            }
+            $query .= " {$whereAnd} pcs.BoarderStatus IN ({$codes})";
             $whereAnd = " AND ";
         } else {
-            $query .= " {$whereAnd} pcs.BoarderStatus NOT IN ('6', '7', 'B') ";
+            $codes = "";
+            foreach ($this->helper->getBoardingStatuses() as $status) {
+                $status = $this->getDatabase()->smartQuote($status);
+                if ($codes != "") {
+                    $codes .= ",";
+                }
+                $codes .= $status;
+            }
+            $query .= " {$whereAnd} pcs.BoarderStatus NOT IN ({$codes})";
             $whereAnd = " AND ";
         }
 

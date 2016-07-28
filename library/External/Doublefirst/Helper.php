@@ -17,6 +17,14 @@ class External_Doublefirst_Helper
     }
 
     /**
+     * Returns array of student boarding statuses
+     * @return array
+     */
+    public function getBoardingStatuses() {
+        return ['B', 'FB', 'WB'];
+    }
+
+    /**
      * Returns the current academic year
      * @return int
      */
