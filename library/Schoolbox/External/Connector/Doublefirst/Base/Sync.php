@@ -97,7 +97,7 @@ class Sync implements SyncInterface
                         cm.Greeting                 AS student_contact_preferred,
                         cm.Greeting                 AS student_contact_given_name,
                         c.Surname                   AS student_contact_surname,
-                        ce.HomeEmailAddress         AS student_contact_default_email,
+                        cei.EmailID                 AS student_contact_default_email,
                         ce.WorkEmailAddress         AS student_contact_work_email,
                         pc.PupilID                  AS student_id,
                         ''                          AS student_campus,
@@ -110,6 +110,7 @@ class Sync implements SyncInterface
             LEFT JOIN   VLContact                   c on c.ContactID = pc.ContactID
             LEFT JOIN   ContactMaster               cm on c.ContactID = cm.ContactID
             LEFT JOIN   VLContactEmail              ce on ce.ContactID = pc.ContactID
+            LEFT JOIN   ContactEmailInformation     cei ON cei.ContactID = pc.ContactID AND cei.PrimaryEmail = 1
             LEFT JOIN   VLContactTelephone          ct on ct.ContactID = pc.ContactID 
             LEFT JOIN   V_PupilBasicInformation     p ON p.PupilID = pc.PupilID
             WHERE       pc.IsContactParental = 1 
