@@ -170,6 +170,7 @@ if (!empty($subjectList) && is_array($subjectList)) {
             /* If synergy code, get synergy students
              */
             $studentList = $synHandler->getStudents($curCategory->getCodeString());
+            $this->setVar('STUDENTS', count($studentList));
             $this->setVar('CATEGORY_CODE', urlencode(urlencode($curCategory->getCodeString())));
 
             $this->setVar('members_list_block' ,'');
@@ -178,11 +179,10 @@ if (!empty($subjectList) && is_array($subjectList)) {
             /* Retrieve student list from group membership
              */
             $studentList = $groupHandler->getMemberList($curCategory->getId());
+            $this->setVar('STUDENTS', count($studentList));
             $this->setVar('class_list_block' ,'');
             $this->parse('members_list_block','members_list');
         }
-
-        $this->setVar('STUDENTS', count($studentList));
 
         if (count($curCategory->getCodes()) > 0) {
             $this->setVar('CATEGORY', Scrub::text($curCategory->getName()) . " (" . $curCategory->getCodeString() . ")");
