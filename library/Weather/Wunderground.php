@@ -290,7 +290,10 @@ class Weather_Wunderground implements Weather_Interface {
             $data = json_decode($json, true);
             return $data['location'];
         } else {
-            return $json;
+            return [
+                'lat' => null,
+                'lon' => null
+            ];
         }
     }
 
