@@ -11,6 +11,10 @@ namespace Calendar\Event\Type\EOTC;
 
 use Calendar\Event\Type\Day;
 use Calendar\Event\Type\EventInterface;
+use EOTC\EventMetadata;
+use Schoolbox\Calendar\EventType;
+use Schoolbox\Collection;
+use Schoolbox\User;
 
 
 class Event extends Day\Event implements EventInterface {
@@ -35,7 +39,6 @@ class Event extends Day\Event implements EventInterface {
      * @var array
      */
     protected $custom = [];
-
 
     /**
      * Can someone attend this event
@@ -144,3 +147,4 @@ class Event extends Day\Event implements EventInterface {
         return $this;
     }
 }
+
