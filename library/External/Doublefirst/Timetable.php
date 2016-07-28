@@ -34,6 +34,9 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     /** @var External_Doublefirst_Helper */
     private $helper;
 
+    /** @var int $daysPerWeek The number of timetabled days each week (5 = Mon-Fri) */
+    private $daysPerWeek = 5;
+
     /**
      * External_Doublefirst_Timetable constructor.
      */
@@ -198,7 +201,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         $query = "SELECT TimetableWeekLength FROM TimetableParameters WHERE AcademicYear = {$fileYear} ORDER BY LastUpdated DESC";
         $weekLength = $this->getDatabase()->getRow($query);
 
-        $definitionArray['dayCount'] = 5 * $weekLength['TimetableWeekLength'];
+        $definitionArray['dayCount'] = {$this->daysPerWeek} * $weekLength['TimetableWeekLength'];
         $definitionArray['periodCount'] = $times['NoOfPeriods'];;
 
         return $definitionArray;
@@ -439,7 +442,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             SELECT DISTINCT
             ssb.BlockName + ' - ' + ssbr.RoomName AS Room,
             sm.Name AS Description,
-            tm.DayOfWeek + ((tm.WeekNumber - 1) * 5) AS DayNumber,
+            tm.DayOfWeek + ((tm.WeekNumber - 1) * {$this->daysPerWeek}) AS DayNumber,
             tm.PeriodNumber,
             '{$campus->getExtTimetableCode()}' AS Campus,
             ygsd.SubjectDivisionName AS ClassCode,
@@ -497,7 +500,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
                 
                 WHERE tcr.AcademicYear = '{$fileYear}'
                 AND ps.PupilID = '{$externalUserId}'
-                AND tm.DayOfWeek + ((tm.WeekNumber - 1) * 5) = {$dayNumber}
+                AND tm.DayOfWeek + ((tm.WeekNumber - 1) * {$this->daysPerWeek}) = {$dayNumber}
                 
                 ORDER BY DayNumber, PeriodNumber
             ";
@@ -558,7 +561,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
                 WHERE tcr.AcademicYear = '{$fileYear}'
                 AND tcs.StaffID = '{$externalUserId}'
                 AND tcr.YearGroup IN ({$yearGroups})    
-                AND tm.DayOfWeek + ((tm.WeekNumber - 1) * 5) = {$dayNumber}
+                AND tm.DayOfWeek + ((tm.WeekNumber - 1) * {$this->daysPerWeek}) = {$dayNumber}
                 ORDER BY DayNumber, PeriodNumber
             ";
         }
@@ -665,7 +668,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
             SELECT DISTINCT
             ssb.BlockName + ' - ' + ssbr.RoomName AS Room,
             sm.Name AS Description,
-            tm.DayOfWeek + ((tm.WeekNumber - 1) * 5) AS DayNumber,
+            tm.DayOfWeek + ((tm.WeekNumber - 1) * {$this->daysPerWeek}) AS DayNumber,
             tm.PeriodNumber,
             '{$campus->getExtTimetableCode()}' AS Campus,
             ygsd.SubjectDivisionName AS ClassCode,
@@ -882,7 +885,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
 
             sm.Name AS Description,
             ssbr.RoomID AS RoomCode,
-            tm.DayOfWeek + ((tm.WeekNumber - 1) * 5) AS DayNumber,
+            tm.DayOfWeek + ((tm.WeekNumber - 1) * {$this->daysPerWeek}) AS DayNumber,
             tm.PeriodNumber,
             YearGroup AS TimetableGroup,
             '' AS ClassCampus,
