@@ -847,13 +847,16 @@ class External_Doublefirst_User implements External_UserInterface
             // Get staff subjects
 
             $sql =
-                "
-                SELECT DISTINCT     s.SubjectID         AS ClassCode,
-                                    ''                  AS ClassCampus,
-                                    s.Name              AS name,
-                                    ''                  AS classType
-                FROM                SubjectMaster s
-                INNER JOIN          PupilSubjects ps    ON ps.SubjectID = s.SubjectID AND ps.SchoolYear = {$year} AND ps.PupilID = '{$synergyID}'
+            "
+                SELECT DISTINCT 
+                ygsd.SubjectDivisionName AS ClassCode, 
+                '' AS ClassCampus, s.Name AS name, 
+                '' AS classType FROM SubjectMaster s 
+                
+                JOIN PupilSubjects ps ON ps.SubjectID = s.SubjectID AND ps.SchoolYear = {$year} 
+                JOIN TimetableClassStaff tcs ON tcs.SubjectID = s.SubjectID AND tcs.AcademicYear = ps.SchoolYear
+                JOIN YearGroupSubjectDivision ygsd ON ygsd.DivisionID = tcs.DivisionID AND ygsd.SubjectID = ps.SubjectID AND ygsd.YearGroup = ps.YearGroup AND ygsd.AcademicYear = tcs.AcademicYear 
+                WHERE tcs.StaffID = '{$synergyID}'
             ";
         }
 
