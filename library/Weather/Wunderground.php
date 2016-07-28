@@ -279,4 +279,19 @@ class Weather_Wunderground implements Weather_Interface {
 	        }
     }
 
+
+    /**
+     * @return array
+     */
+    public function getLocation()
+    {
+        $json = $this->getWundergroundData([ 'geolookup' ]);
+        if ($json) {
+            $data = json_decode($json, true);
+            return $data['location'];
+        } else {
+            return $json;
+        }
+    }
+
 }
