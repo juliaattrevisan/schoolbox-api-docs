@@ -49,6 +49,7 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 				$event = new \EOTC\Event();
 			}
 
+
 			/* Spawn and assign metadata record to event
 			 */
 			try {
@@ -280,7 +281,25 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
 
 			/* Superuser modifying some arbitrary event
 			 */
-			$page->localRedir('/modules/eotc/manage/modify?eventID=' . $eventRecurrenceMapper->getFirstEventIdInSeries());
+			switch ($_POST['redirect']) {
+				case 'attendances':
+					$page->localRedir(
+						'/modules/eotc/manage/attendance/list/' . $eventRecurrenceMapper->getFirstEventIdInSeries()
+					);
+					break;
+
+				case 'resources':
+					$page->localRedir(
+						'/modules/eotc/manage/resources/list/' . $eventRecurrenceMapper->getFirstEventIdInSeries()
+					);
+					break;
+
+				default:
+					$page->localRedir(
+						'/modules/eotc/manage/modify?eventID=' . $eventRecurrenceMapper->getFirstEventIdInSeries()
+					);
+					break;
+			}
 
 			break;
 
