@@ -546,14 +546,14 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
                                     var fields = dialogFields(dialog);
 
                                     var domId = $(this).attr('domId');
-                                    var previousModel = $('#'+domId).closest('.cke_dialog');
-                                    previousModel.addClass('hide');
+                                    var previousModal = $('#'+domId).closest('.cke_dialog');
+                                    previousModal.addClass('hide');
 
                                     /* Select something from the Resource Browser
                                      */
                                     $.fn.schoolboxResource({
                                         allowedFiles: 'image/*,audio/*,video/*',
-                                        previousModal: previousModel
+                                        previousModal: previousModal
                                     });
 
                                     $(window).unbind('message').on('message', function(event) {
