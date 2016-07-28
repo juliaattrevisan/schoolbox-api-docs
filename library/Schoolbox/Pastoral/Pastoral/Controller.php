@@ -539,7 +539,15 @@ class Controller extends Base
 
         // Get the pastoral care record
 
-        $pastoral = $this->getPastoralMapper()->findById($id);
+        try {
+            $pastoral = $this->getPastoralMapper()->findById($id);
+        } catch (MapperException $e) {
+            if ($e->getCode() == 401) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
+            } else {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+            }
+        }
 
         if ($pastoral->getPrivate()) {
             if (!$this->getPastoralMapper()->hasPrivatePermission($pastoral)) {
