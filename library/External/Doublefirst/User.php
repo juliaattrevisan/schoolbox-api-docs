@@ -977,7 +977,7 @@ class External_Doublefirst_User implements External_UserInterface
                 ''                          AS StudentContactSpouseNetworkLogin,
                 ''                          AS StudentContactSpouseID,
                 ''                          AS StudentContactSpouseTitle,
-                cm.FirstName2               AS StudentContactSpousePreferred,
+                ''                          AS StudentContactSpousePreferred,
                 ''                          AS StudentContactSpouseSurname,
                 ''                          AS StudentContactSpouseDefaultEmail,
                 pbi.YearGroup               AS StudentYearLevel,
@@ -992,35 +992,7 @@ class External_Doublefirst_User implements External_UserInterface
             WHERE       pc.IsContactParental = 1 
         ";
 
-        $parents = $this->getDatabase()->getAll($query);
-
-        // HACK: Apparently the DoubleFirst database schema is setup to believe all couples share the same surname, so
-        // the partners surname is either mashed into their first name (in which case we assume anything after the
-        // first space is their surname), or mashed into a single surname field (in which case we'll assume anything
-        // after "&" is the spouses surname, and anything before is the primarys surname)
-
-        foreach ($parents as $parent) {
-            // Start by checking for "&"
-
-            $spouseNameArray = explode("&", trim($parent["Surname"]), 1);
-
-            if (count($spouseNameArray) > 1) {
-                $spouseNameArray["Surname"] = $spouseNameArray[0];
-                $spouseNameArray["SpouseSurname"] = $spouseNameArray[1];
-            } else {
-                // That didn't work, try looking for spaces in spouse name
-
-                $spouseNameArray = explode(" ", trim($parent["SpousePreferred"]), 1);
-
-                if (count($spouseNameArray) > 1) {
-                    $spouseNameArray["SpouseSurname"] = $spouseNameArray[1];
-                } else {
-                    $spouseNameArray["SpouseSurname"] = $parent["Surname"];
-                }
-            }
-        }
-
-        return $parents;
+        return $this->getDatabase()->getAll($query);
     }
 
     /**
