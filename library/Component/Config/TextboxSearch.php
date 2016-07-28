@@ -43,16 +43,21 @@ class Component_Config_TextboxSearch extends Component_Config_Abstract
          */
         $componentId = $allUsages->first()->getId();
 
+        // Is this component linked to a TextBox yet?
+        $isLinked = 0 != $configValue;
+
         $page->setVar(
             array(
-                'COMPONENT_TEXTBOX_ID'   => $configValue,
+                'COMPONENT_INSTANCE_ID'  => $component->getInstance()->getId(),
+                'LINKED_TEXTBOX_ID'      => $configValue,
+                'VAR_IS_LINKED'          => $isLinked ? 'true' : 'false',
                 'COMPONENT_TEXTBOX_NAME' => $textbox->getHeading(),
                 'VIEW_URL'               => "/homepage/{$textbox->getCategory()->getId()}#component{$componentId}",
                 'EDIT_URL'               => "/homepage/{$textbox->getCategory()->getId()}/textBoxModify/{$componentId}#component{$componentId}",
             )
         );
 
-        if($componentId) {
+        if($isLinked) {
             $page->parse('is_linked_block', 'is_linked');
         } else {
             $page->setVar('is_linked_block', '');
