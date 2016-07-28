@@ -1094,7 +1094,11 @@ class External_Doublefirst_User implements External_UserInterface
      */
     public function determineBoarderType($boarderValue)
     {
-        return '';
+        if (in_array($this->helper->getBoardingStatuses(), $boarderValue)) {
+            return "Boarder";
+        } else {
+            return "Day Student";
+        }
     }
 
     /**
