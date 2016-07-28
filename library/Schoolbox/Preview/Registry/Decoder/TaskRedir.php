@@ -19,6 +19,7 @@ use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 class TaskRedir extends Base {
@@ -38,6 +39,8 @@ class TaskRedir extends Base {
      */
     public function decode($url) {
         if ($id = $this->isThisDecoder($url)) {
+            /** @var User $user */
+            $user = $_SESSION['user'];
             try {
 
                 // This should populate unit instance, task, component and all that too.
@@ -48,7 +51,7 @@ class TaskRedir extends Base {
                     // redirect to due work item
                     // When the due work item is complete, mark task as complete.
                     case Task::TYPE_DUE_WORK:
-                        return '/submission/submissionHistory/'.$task->getSubmissionBox()->getId().'/'.$_SESSION['id'];
+                        return '/submission/submissionHistory/'.$task->getSubmissionBox()->getId().'/'.$user->getId();
                         break;
 
                     // redirect to online assessment item
@@ -73,23 +76,20 @@ class TaskRedir extends Base {
                         $component_list = Component_InstanceMapper::getInstance()->findByInstanceId($component_id);
                         $component      = $component_list[$component_id];
 
-                        $folder = FolderMapper::getInstance()->findById($component->getIdentifier());
+                        // Only proceed to marking if the logged in user is actually in this folder
 
-                        $students = UserAccessMapper::getInstance()->findStudentsInCategory($folder);
+                        if (!$task->getRequiresConfirmation()) {
 
-                        $userCollection = [];
+                            $folder = FolderMapper::getInstance()->findById($component->getIdentifier());
 
-                        foreach ($students as $student) {
-                            $userCollection[] = $student->getId();
-                        }
-
-                        // Only proceed to marking if the logged in user is actually in the list of users
-
-                        if (in_array($_SESSION["id"], $userCollection)) {
-                            if (!$task->getRequiresConfirmation()) {
-                                Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
-                                    $task->getId(), $_SESSION['id']
-                                );
+                            foreach (FolderMapper::getInstance()->findForUser($user) as $userFolder) {
+                                if ($userFolder->getId() == $folder->getId()) {
+                                    Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
+                                        $task->getId(),
+                                        $user->getId()
+                                    );
+                                    break;
+                                }
                             }
                         }
 
