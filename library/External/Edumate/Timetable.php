@@ -37,10 +37,10 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             ORDER BY td.start_time ASC
         ');
 
-        $campusCode = explode(',',$campus->getExtTimetableCode());
+        $campusCode = explode(',', $campus->getExtTimetableCode());
 
         $stmt->execute(array(
-            'day'    => $day ?: 1, // there is no day 0 in this definition
+            'day' => $day ?: 1, // there is no day 0 in this definition
             'campus' => $campusCode[0]
         ));
 
@@ -92,9 +92,9 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             FETCH FIRST 1 ROW ONLY
         ');
 
-        $campusCode = explode(',',$campus->getExtTimetableCode());
+        $campusCode = explode(',', $campus->getExtTimetableCode());
         $params = array(
-            'date'   => date('Y-m-d'),
+            'date' => date('Y-m-d'),
             'campus' => $campusCode[0],
         );
 
@@ -127,9 +127,9 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             $date = $time;
         }
 
-        $campusCode = explode(',',$campus->getExtTimetableCode());
+        $campusCode = explode(',', $campus->getExtTimetableCode());
         $params = array(
-            'date'   => date('Y-m-d', $date),
+            'date' => date('Y-m-d', $date),
             'campus' => $campusCode[0],
         );
 
@@ -237,8 +237,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             return false;
         }
 
-        $campusCode = explode(',',$campus->getExtTimetableCode());
-        if (count($campusCode) > 1){
+        $campusCode = explode(',', $campus->getExtTimetableCode());
+        if (count($campusCode) > 1) {
             $campus = "( campus = :campus OR campus = :campus2 )";
         } else {
             $campus = "campus = :campus";
@@ -257,8 +257,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         $stmt->execute(
             array(
                 'sn' => $externalUserId,
-                'd'  => $dayNumber,
-                'campus' =>  $campusCode[0],
+                'd' => $dayNumber,
+                'campus' => $campusCode[0],
                 'campus2' => $campusCode[1],
             )
         );
@@ -266,12 +266,12 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         // Build the timetable
         $timetable = array();
         foreach ($definition['desc'] as $x => $name) {
-            $timetable[$x]['periodName']     = $definition['desc'][$x];
-            $timetable[$x]['periodStart']    = $definition['start'][$x];
-            $timetable[$x]['periodEnd']      = $definition['end'][$x];
-            $timetable[$x]['periodNumber']   = $definition['number'][$x];
+            $timetable[$x]['periodName'] = $definition['desc'][$x];
+            $timetable[$x]['periodStart'] = $definition['start'][$x];
+            $timetable[$x]['periodEnd'] = $definition['end'][$x];
+            $timetable[$x]['periodNumber'] = $definition['number'][$x];
             $timetable[$x]['periodSequence'] = $definition['sequence'][$x];
-            $timetable[$x]['class']          = array();
+            $timetable[$x]['class'] = array();
         }
 
         // Add classes for each day into it
@@ -281,11 +281,11 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
                     && !isset($timetable[$x]['class'][$desc['CODE']])
                 ) {
                     $timetable[$x]['class'][$desc['CODE']] = array(
-                        'description'    => $desc['CLASS'],
-                        'code'           => $desc['CODE'],
-                        'campus'         => $desc['CAMPUS'],
-                        'room'           => $desc['ROOM'],
-                        'staffID'        => $desc['STAFFID'],
+                        'description' => $desc['CLASS'],
+                        'code' => $desc['CODE'],
+                        'campus' => $desc['CAMPUS'],
+                        'room' => $desc['ROOM'],
+                        'staffID' => $desc['STAFFID'],
                     );
                     break;
                 }
@@ -311,7 +311,8 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      */
     public function getTimetableForDate($externalUserId, $userId, \Schoolbox\Campus $campus, Alaress_Date_Format $date)
     {
-        return $this->getDayTimetable($externalUserId, $userId, $campus, $this->getDayNumber($campus, $date->getUnixTimeStamp()));
+        return $this->getDayTimetable($externalUserId, $userId, $campus,
+            $this->getDayNumber($campus, $date->getUnixTimeStamp()));
     }
 
     /**
@@ -341,16 +342,16 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             ";
         } elseif ($this->getGroupHandler()->isStaff($userId)) {
             $join = "
-LEFT JOIN db2inst1.schoolbox_teacherclass c ON t.class_code = c.class_code
-            WHERE c.staff_number = :sn  
+                LEFT JOIN db2inst1.schoolbox_teacherclass c ON t.class_code = c.class_code
+                WHERE c.staff_number = :sn  
             ";
         } else {
             return false;
         }
 
-        $campusCode = explode(',',$campus->getExtTimetableCode());
+        $campusCode = explode(',', $campus->getExtTimetableCode());
 
-        if (count($campusCode) > 1){
+        if (count($campusCode) > 1) {
             $campusSql = "( campus = :campus OR campus = :campus2 )";
         } else {
             $campusSql = "campus = :campus";
@@ -379,13 +380,13 @@ LEFT JOIN db2inst1.schoolbox_teacherclass c ON t.class_code = c.class_code
         // Build the timetable
         $timetable = array();
         foreach ($definition['desc'] as $x => $name) {
-            $timetable[$x]['periodName']     = $definition['desc'][$x];
-            $timetable[$x]['periodStart']    = $definition['start'][$x];
-            $timetable[$x]['periodEnd']      = $definition['end'][$x];
-            $timetable[$x]['periodNumber']   = $definition['number'][$x];
+            $timetable[$x]['periodName'] = $definition['desc'][$x];
+            $timetable[$x]['periodStart'] = $definition['start'][$x];
+            $timetable[$x]['periodEnd'] = $definition['end'][$x];
+            $timetable[$x]['periodNumber'] = $definition['number'][$x];
             $timetable[$x]['periodSequence'] = $definition['sequence'][$x];
             // Fill in each day with blanks
-            $timetable[$x]['day']            = array_fill(1, $dayCount, array());
+            $timetable[$x]['day'] = array_fill(1, $dayCount, array());
         }
 
         // Add classes for each day into it
@@ -395,10 +396,10 @@ LEFT JOIN db2inst1.schoolbox_teacherclass c ON t.class_code = c.class_code
                     && !isset($timetable[$x]['day'][$desc['DAY_NUMBER']][$desc['CODE']])
                 ) {
                     $timetable[$x]['day'][$desc['DAY_NUMBER']][$desc['CODE']] = array(
-                        'description'    => $desc['CLASS'],
-                        'code'           => $desc['CODE'],
-                        'room'           => $desc['ROOM'],
-                        'staffID'        => $desc['STAFFID'],
+                        'description' => $desc['CLASS'],
+                        'code' => $desc['CODE'],
+                        'room' => $desc['ROOM'],
+                        'staffID' => $desc['STAFFID'],
                     );
                     break;
                 }
