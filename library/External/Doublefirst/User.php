@@ -267,7 +267,7 @@ class External_Doublefirst_User implements External_UserInterface
             LEFT JOIN   VLContactEmail      ce on ce.ContactID = pc.ContactID
             LEFT JOIN   VLContactTelephone  ct on ct.ContactID = pc.ContactID 
             WHERE       pc.IsContactParental = 1 
-            AND         pc.ContactID = {$assignation} 
+            AND         pc.ContactID {$assignation} 
             ORDER BY    pc.Priority
         ";
 
