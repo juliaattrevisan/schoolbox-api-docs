@@ -113,6 +113,8 @@ class Controller extends AbstractController
     {
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesVenue/create.twig', [
             'venue'  => $entity,
+            // default the location to roughly where the school is, as defined by their weather config.......
+            'location' => (new \Weather_Wunderground())->getLocation(),
             'action' => $entity->getId() ? 'Modify' : 'Create'
         ]));
     }

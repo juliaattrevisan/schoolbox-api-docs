@@ -55,23 +55,85 @@
 
                         <label>
                             Name
+                            <span data-tooltip class="hint has-tip tip-top" title="Internally, what this venue is known as.">?</span>
                             <input type="text" name="name" value="{{ venue.name }}"/>
                         </label>
 
                         <label>
-                            Latitude
-                            <input type="number" name="latitude" value="{{ venue.latitude }}" maxlength="11" min="-90.000000" max="90.000000"/>
+                            Location
+                            <span data-tooltip class="hint has-tip tip-top" title="Select the venue by clicking its location on the map, scrolling and zooming as required.">?</span>
                         </label>
+                        <div id="map" style="height:50vh;"></div>
+                        <script>
+                            var marker;
+
+                            function initMap() {
+                                var map = new google.maps.Map(document.getElementById('map'), {
+                                    zoom: {{ venue.latitude ? 16 : 13 }},
+                                    center: { lat: {{ venue.latitude ?: location.lat }}, lng: {{ venue.longitude ?: location.lon }} },
+                                    streetViewControl: false
+                                });
+                                var geocoder = new google.maps.Geocoder;
+
+                                {% if venue.latitude %}
+                                marker = new google.maps.Marker({
+                                    position: { lat: {{ venue.latitude }}, lng: {{ venue.longitude }} },
+                                    map: map
+                                });
+                                {% endif %}
+
+                                map.addListener('click', function(e) {
+                                    placeMarkerAndPanTo(e.latLng, map);
+                                    geocodeLatLng(geocoder, map);
+                                });
+                            }
+
+                            function placeMarkerAndPanTo(latLng, map) {
+                                // remove any previous marker
+                                if (marker) {
+                                    marker.setMap(null);
+                                }
+
+                                marker = new google.maps.Marker({
+                                    position: latLng,
+                                    map: map
+                                });
+
+                                map.panTo(latLng);
+
+                                $('[name=latitude]').val(latLng.lat());
+                                $('[name=longitude]').val(latLng.lng());
+                            }
+
+                            function geocodeLatLng(geocoder, map) {
+                                var latlng = {lat: parseFloat($('[name=latitude]').val()), lng: parseFloat($('[name=longitude]').val())};
+                                geocoder.geocode({'location': latlng}, function(results, status) {
+                                    if (status === google.maps.GeocoderStatus.OK) {
+                                        if (results[0]) {
+                                            $('[name=address]').val(results[0].formatted_address);
+                                        } else {
+                                            window.alert('No results found');
+                                        }
+                                    } else {
+                                        window.alert('Geocoder failed due to: ' + status);
+                                    }
+                                });
+                            }
+
+                        </script>
+                        <script async defer
+                                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaiH38otDLfJKqbN9oNZ25ceNwRJVW_fI&callback=initMap">
+                        </script>
+
+                        <input type="hidden" name="latitude" value="{{ venue.latitude }}" />
+                        <input type="hidden" name="longitude" value="{{ venue.longitude }}" />
 
                         <label>
-                            Longitude
-                            <input type="number" name="longitude" value="{{ venue.longitude }}" maxlength="12" min="-180.000000" max="180.000000"/>
-                        </label>
-
-                        <label>
-                            Address
+                            Closest Street Address
+                            <span data-tooltip class="hint has-tip tip-top" title="This will automatically update when you click a point on the map, but you can override it if you need to.">?</span>
                             <input type="text" name="address" value="{{ venue.address }}" maxlength="255"/>
                         </label>
+
                     </div>
                 </fieldset>
             </section>
