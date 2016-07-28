@@ -201,7 +201,7 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
         $query = "SELECT TimetableWeekLength FROM TimetableParameters WHERE AcademicYear = {$fileYear} ORDER BY LastUpdated DESC";
         $weekLength = $this->getDatabase()->getRow($query);
 
-        $definitionArray['dayCount'] = {$this->daysPerWeek} * $weekLength['TimetableWeekLength'];
+        $definitionArray['dayCount'] = $this->daysPerWeek * $weekLength['TimetableWeekLength'];
         $definitionArray['periodCount'] = $times['NoOfPeriods'];;
 
         return $definitionArray;
