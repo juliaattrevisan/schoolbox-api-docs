@@ -11,7 +11,7 @@ if (!isset($this)) {
     SitePage::localRedir('/timetable/');
 }
 
-//synergy not enabled do not display page
+// If External_DB not enabled do not display page
 if (!Cfg::get('external_enable')) {
     error(19);
 }
