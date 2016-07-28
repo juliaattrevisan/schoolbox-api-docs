@@ -9,6 +9,12 @@ class External_Doublefirst_Helper
     private $database = null;
 
     /**
+     * Cache for current year
+     * @var int
+     */
+    private $currentYear = null;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -30,7 +36,11 @@ class External_Doublefirst_Helper
      */
     public function getCurrentYear()
     {
-        return date("Y");
+        if ($this->currentYear == null) {
+            $this->currentYear = $this->getDatabase()->getOne("SELECT CurrentAcademicYear FROM ClusterMaster");
+        }
+
+        return $this->currentYear;
     }
 
     /**
