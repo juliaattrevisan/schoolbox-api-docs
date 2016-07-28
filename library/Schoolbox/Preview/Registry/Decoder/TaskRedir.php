@@ -10,9 +10,17 @@
 
 namespace Schoolbox\Preview\Registry\Decoder;
 
+use Component_InstanceMapper;
+use Group;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
+use Schoolbox\Config\Loader as ConfigLoader;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\User;
+use Schoolbox\UserMapper;
 
 class TaskRedir extends Base {
 
@@ -31,6 +39,8 @@ class TaskRedir extends Base {
      */
     public function decode($url) {
         if ($id = $this->isThisDecoder($url)) {
+            /** @var User $user */
+            $user = $_SESSION['user'];
             try {
 
                 // This should populate unit instance, task, component and all that too.
@@ -41,7 +51,7 @@ class TaskRedir extends Base {
                     // redirect to due work item
                     // When the due work item is complete, mark task as complete.
                     case Task::TYPE_DUE_WORK:
-                        return '/submission/submissionHistory/'.$task->getSubmissionBox()->getId().'/'.$_SESSION['id'];
+                        return '/submission/submissionHistory/'.$task->getSubmissionBox()->getId().'/'.$user->getId();
                         break;
 
                     // redirect to online assessment item
@@ -54,10 +64,33 @@ class TaskRedir extends Base {
                     // Redirect to the link if there is one, otherwise redirect back to the
                     // homepage this is on.
                     default:
+
+                        // Make sure the user is actually a student in the class (either via group/class list) before
+                        // we mark it as completed.
+
+                        /** @var UnitInstance $unit_instance */
+                        $unit_instance = UnitInstanceMapper::getInstance()->findById($task->getUnitInstance()->getId());
+
+                        /** @var \Component_Instance $component */
+                        $component_id   = $unit_instance->getComponent()->getId();
+                        $component_list = Component_InstanceMapper::getInstance()->findByInstanceId($component_id);
+                        $component      = $component_list[$component_id];
+
+                        // Only proceed to marking if the logged in user is actually in this folder
+
                         if (!$task->getRequiresConfirmation()) {
-                            Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
-                                $task->getId(), $_SESSION['id']
-                            );
+
+                            $folder = FolderMapper::getInstance()->findById($component->getIdentifier());
+
+                            foreach (FolderMapper::getInstance()->findForUser($user) as $userFolder) {
+                                if ($userFolder->getId() == $folder->getId()) {
+                                    Task\InstanceCompletionMapper::getInstance()->markAsCompleted(
+                                        $task->getId(),
+                                        $user->getId()
+                                    );
+                                    break;
+                                }
+                            }
                         }
 
                         $link = $task->getLink();
@@ -66,22 +99,13 @@ class TaskRedir extends Base {
                             return $link;
                         }
                         else {
-                            // Check permissions
-                            /** @var UnitInstance $unit_instance */
-                            $unit_instance = UnitInstanceMapper::getInstance()->findById($task->getUnitInstance()->getId());
-                            // * Ensure that user is in this class
-                            /** @var \Component_Instance $component */
-                            $component_id   = $unit_instance->getComponent()->getId();
-                            $component_list = \Component_InstanceMapper::getInstance()->findByInstanceId($component_id);
-                            $component      = $component_list[$component_id];
-
                             return '/homepage/'.$component->getIdentifier().'/#component'.$component_id;
                         }
 
                         break;
                 }
             }
-            catch (\Schoolbox\Mapper\Exception $e) {
+            catch (MapperException $e) {
                 return '';
             }
         }
