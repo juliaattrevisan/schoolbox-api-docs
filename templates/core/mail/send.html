@@ -7,6 +7,7 @@
 <script type="text/javascript" src="/javascript/components/zeroclipboard/dist/ZeroClipboard.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.clipboard-selector.js"></script>
 <script type="text/javascript" src="/javascript/shared/calendar/jquery.calendar.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.disable-on-submit.js"></script>
 <script type="text/javascript">
 $(function() {
 
@@ -77,7 +78,7 @@ $(function() {
 <div class="row">
     <div class="small-12 island">
         <h1>Compose Email</h1>
-        <form action="send.php" method="post" enctype="multipart/form-data" id="mailForm">
+        <form action="send.php" method="post" enctype="multipart/form-data" id="mailForm" data-disable-on-submit>
             <section>
                 <fieldset class="content">
                     <div class="small-10 large-11 columns">
@@ -133,7 +134,7 @@ $(function() {
                     </div>
                 </fieldset>
             </section>
-            <input type="submit" name="submit" value="Send" />
+            <input type="submit" name="submit" value="Send" data-working="Sending..."/>
         </form>
     </div>
 </div>
