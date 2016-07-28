@@ -1,0 +1,42 @@
+<ul class="breadcrumb">
+    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesVenue.getList', {}) }}">All Venues</a></li>
+    <li class="active"><a href="{{ routeLookup('sportsfixturesVenue.getEntity', {entityId: venue.id}) }}">{{ venue.name }}</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sports Fixtures</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+        <h2 class="subheader">{{ venue.name }}</h2>
+
+        <section class="content">
+            <div class="small-12 columns">
+                <dl>
+                    <dt>ID</dt>
+                    <dd>{{ venue.id }}</dd>
+
+                    <dt>Location</dt>
+                    <dd>
+                        <img src='https://maps.googleapis.com/maps/api/staticmap?center={{ venue.latitude }},{{ venue.longitude }}&maptype=roadmap&zoom=14&size=600x300&scale=2' />
+                    </dd>
+
+                    <dt>Nearest Street Address</dt>
+                    <dd>{{ venue.address }}</dd>
+
+                    <dt>Created</dt>
+                    <dd>{{ venue.createdAt.database }}</dd>
+
+                    {% if not venue.createdAt.eq(venue.updatedAt) %}
+                        <dt>Last Updated</dt>
+                        <dd>{{ venue.updatedAt.database }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </section>
+    </div>
+</div>
