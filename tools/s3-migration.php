@@ -5,13 +5,18 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Storage;
 
+$options = getopt("v");
+
 require_once __DIR__ . '/../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
-$kernel = new Schoolbox\Application\Daemon\Kernel('S3 Storage Migration', []);
+$kernel = new Schoolbox\Application\Daemon\Kernel('S3 Storage Migration', [
+    'verbose' => isset($options['v']) ? $options['v'] : null
+]);
 
 $kernel->run(function ($di, $loop, $log, $opts) {
 
-    echo "\n----------------------------------------------------------------------------------------------------------------------------------------------------------------\nAmazon S3 Migration\n----------------------------------------------------------------------------------------------------------------------------------------------------------------\n\n";
+    $line = str_repeat('-', 150);
+    $log->info($line);
 
     // Grab local storage directory
 
@@ -49,7 +54,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
                 {
                     // File was found locally, write it to S3
 
-                    echo "Uploading:\t\t\t{$filepath} (" . floor(filesize($filepath)/1024) . " KB)... ";
+                    $log->info("Uploading:\t\t\t{$filepath} (" . floor(filesize($filepath)/1024) . " KB)");
                     $file->write(file_get_contents($filepath));
                     $countUploaded++;
 
@@ -57,7 +62,7 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
                     unlink($filepath);
 
-                    echo "DONE\n";
+                    $log->info("Upload Completed");
 
                     // Recursively delete empty folders we might have created since deleting the file
 
@@ -78,24 +83,24 @@ $kernel->run(function ($di, $loop, $log, $opts) {
                 }
                 else
                 {
-                    echo "Unknown File:\t\t\t{$file->getFilename()}\n";
+                    $log->info("Unknown File:\t\t\t{$file->getFilename()}");
                     $countUnknown++;
                 }
             }
             else
             {
-                echo "Skipping File:\t\t\t{$file->getFilename()}\n";
+                $log->info("Skipping File:\t\t\t{$file->getFilename()}");
             }
         }
         else
         {
-            echo "Error: Unexpected file adapter - " . get_class($file->getFilesystem()->getAdapter()) . "\n\n";
+            $log->error("Error: Unexpected file adapter - " . get_class($file->getFilesystem()->getAdapter()));
             exit;
         }
     }
 
-    echo "\n----------------------------------------------------------------------------------------------------------------------------------------------------------------\nMigration Completed\n----------------------------------------------------------------------------------------------------------------------------------------------------------------\n\n";
-    echo "Files In Storage Table:\t\t{$count}\n";
-    echo "Files Orphaned:\t\t\t{$countUnknown}\n";
-    echo "Files Uploaded:\t\t\t{$countUploaded}\n\n";
+    $log->info($line);
+    $log->info("Files In Storage Table:\t\t{$count}");
+    $log->info("Files Orphaned:\t\t\t{$countUnknown}");
+    $log->info("Files Uploaded:\t\t\t{$countUploaded}");
 });
