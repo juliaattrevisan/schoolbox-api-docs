@@ -115,18 +115,14 @@
                                     if (status === google.maps.GeocoderStatus.OK) {
                                         if (results[0]) {
                                             $('[name=address]').val(results[0].formatted_address);
-                                        } else {
-                                            window.alert('No results found');
                                         }
-                                    } else {
-                                        window.alert('Geocoder failed due to: ' + status);
                                     }
                                 });
                             }
 
                         </script>
                         <script async defer
-                                src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaiH38otDLfJKqbN9oNZ25ceNwRJVW_fI&callback=initMap">
+                                src="https://maps.googleapis.com/maps/api/js?key={{ googleApiKey }}&callback=initMap">
                         </script>
 
                         <input type="hidden" name="latitude" value="{{ venue.latitude }}" />

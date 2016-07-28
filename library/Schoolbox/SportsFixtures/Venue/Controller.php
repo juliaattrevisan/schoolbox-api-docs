@@ -113,7 +113,8 @@ class Controller extends AbstractController
     {
         $data = [
             'venue'  => $entity,
-            'action' => $entity->getId() ? 'Modify' : 'Create'
+            'action' => $entity->getId() ? 'Modify' : 'Create',
+            'googleApiKey' => $this->getConfigLoader()->get('googleapps_api_key'),
         ];
 
         // if there's a better way than using the weather config....
