@@ -308,6 +308,15 @@
                                         <img src="/portrait.php?userId={{ playerData.player.externalId }}&amp;size=square64" />
                                         <h3>{{ playerData.player.formatName() }}</h3>
                                     </a>
+                                    {% for currentTeam in playerData.teams %}
+                                        {% if loop.first %}
+                                            <span class="meta">
+                                        {% endif %}
+                                        {{ currentTeam.name }}{% if not loop.last %}, {% endif %}
+                                        {% if loop.last %}
+                                            </span>
+                                        {% endif %}
+                                    {% endfor %}
                                 </div>
                             </div>
                             <nav>
@@ -396,11 +405,11 @@
                                             <img src="/portrait.php?userId={{ teamPlayer.externalId }}&amp;size=square64" />
                                             <h3>{{ teamPlayer.formatName() }}</h3>
                                         </a>
-                                        <p>
+                                        <span class="meta">
                                             {% for currentPosition in teamData.positions[teamPlayer.id] %}
                                                 {{ currentPosition.position.name }}{% if not loop.last %}, {% endif %}
                                             {% endfor %}
-                                        </p>
+                                        </span>
                                     </div>
 
                                 </div>
