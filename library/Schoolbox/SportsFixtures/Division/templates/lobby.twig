@@ -303,20 +303,11 @@
                         <li class="actions-small-1" data-player="{{ playerData.player.id }}">
                             <div class="list-item">
                                 <div class="grip"></div>
-                                <div class="small-11 avatar card">
+                                <div class="small-11 compact card wrap-down">
                                     <a href="/search/user/{{ playerData.player.id }}">
                                         <img src="/portrait.php?userId={{ playerData.player.externalId }}&amp;size=square64" />
                                         <h3>{{ playerData.player.formatName() }}</h3>
                                     </a>
-                                    {% for currentTeam in playerData.teams %}
-                                        {% if loop.first %}
-                                            <p class="meta icon-sport">
-                                        {% endif %}
-                                        {{ currentTeam.name }}{% if not loop.last %}, {% endif %}
-                                        {% if loop.last %}
-                                            </p>
-                                        {% endif %}
-                                    {% endfor %}
                                 </div>
                             </div>
                             <nav>
@@ -382,7 +373,7 @@
                         data-reorder-players-action="{{ routeLookup('sportsfixturesTeam.postReorderPlayers', {entityId: teamData.team.id}) }}">
                         <li class="actions-small-1">
                             <div class="list-item">
-                                <div class="small-12 avatar card">
+                                <div class="small-12 compact card wrap-down">
                                     <h3>{{ teamData.team.name }}</h3>
                                     <p class="meta icon-group">
                                         {{ teamData.players|length }}
@@ -400,7 +391,7 @@
                             <li class="actions-small-2" data-player="{{ teamPlayer.id }}">
                                 <div class="list-item">
                                     <div class="grip"></div>
-                                    <div class="small-10 avatar card">
+                                    <div class="small-10 compact card">
                                         <a href="/search/user/{{ teamPlayer.id }}">
                                             <img src="/portrait.php?userId={{ teamPlayer.externalId }}&amp;size=square64" />
                                             <h3>{{ teamPlayer.formatName() }}</h3>
