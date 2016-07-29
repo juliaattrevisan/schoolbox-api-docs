@@ -373,12 +373,12 @@
                         data-reorder-players-action="{{ routeLookup('sportsfixturesTeam.postReorderPlayers', {entityId: teamData.team.id}) }}">
                         <li class="actions-small-1">
                             <div class="list-item">
-                                <div class="small-12 compact card wrap-down">
+                                <div class="small-12 card wrap-down">
                                     <h3>{{ teamData.team.name }}</h3>
-                                    <p class="meta icon-group">
+                                    <span class="meta icon-group no-pad">
                                         {{ teamData.players|length }}
                                         {{ teamData.players|length == 1 ? 'player in team' : 'players in team'}}
-                                    </p>
+                                    </span>
                                 </div>
                             </div>
                             <nav>
@@ -391,14 +391,14 @@
                             <li class="actions-small-2" data-player="{{ teamPlayer.id }}">
                                 <div class="list-item">
                                     <div class="grip compact"></div>
-                                    <div class="small-10 compact card">
+                                    <div class="small-10 compact card wrap-down">
                                         <a href="/search/user/{{ teamPlayer.id }}">
                                             <img src="/portrait.php?userId={{ teamPlayer.externalId }}&amp;size=square64" />
                                             <h3>{{ teamPlayer.formatName() }}</h3>
                                         </a>
                                         <p>
-                                            {% for teamPosition in teamData.positions if teamPosition.user.id == teamPlayer.id %}
-                                                {{ teamPosition.position.name }}<br>
+                                            {% for currentPosition in teamData.positions[teamPlayer.id] %}
+                                                {{ currentPosition.position.name }}{% if not loop.last %}, {% endif %}
                                             {% endfor %}
                                         </p>
                                     </div>
