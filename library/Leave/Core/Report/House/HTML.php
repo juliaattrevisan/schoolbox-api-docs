@@ -191,6 +191,10 @@ abstract class Leave_Core_Report_House_HTML extends Leave_Report_House_RendererB
 
     /**
      * Render leave requests
+     * TODO: The current implementation tries to combine multiple requests for a single
+     * TODO:   user into one table row. Propose that the default version of this function render each request per row
+     * TODO:   and schools that wish to change (eg kings) can override this method
+     * TODO:   Or have a config whether to render each per own row.
      */
     protected function renderTableRowsAndFooter()
     {
