@@ -201,10 +201,10 @@ $table-head-bg: $table-bg;
 $table-head-font-size: rem-calc(($base-font-size - 2));
 $table-head-font-color: $black;
 $table-head-font-weight: $font-weight-bold;
-$table-head-padding: rem-calc(($base-font-size - 2));
+$table-head-padding: rem-calc(($base-font-size - 6));
 
 // These control the row padding and font styles
-$table-row-padding: rem-calc(($base-font-size - 2));
+$table-row-padding: rem-calc(($base-font-size - 6));
 $table-row-font-size: rem-calc(($base-font-size - 2));
 $table-row-font-color: $black;
 // $table-line-height: rem-calc(18);
@@ -399,6 +399,9 @@ section {
 table{
 	border-collapse: collapse;
 	width: 100%;
+	.card{
+		padding: 0;
+	}
 }
 thead tr th, .row-header, .island table.dataTable thead th {
 	border-bottom: 2px solid $body-bg;
@@ -749,6 +752,10 @@ nav {
 		[class^="icon-"]:before,
 		[class*=" icon-"]:before{
 			float: none;
+		}
+		input[type=radio]:not(.plain)+label.checkbox-label,
+		input[type=checkbox]:not(.plain)+label.checkbox-label {
+			margin-top: 0.5rem;
 		}
 		.one-column{
 			@media #{$small-up} { @include grid-column(1); }
@@ -1167,6 +1174,9 @@ ul.flex-list {
 	img, [class^="icon-"] {
 		float: left;
 		margin: -0.5rem 1rem 0 -1rem;
+	}
+
+	img{
 		width: (3 * rem-calc($base-font-size));
 		@media #{$medium-up} {
 			width: (4 * rem-calc($base-font-size));

@@ -38,7 +38,7 @@
         <table>
             <thead>
             <tr>
-                <th>Table Header</th>
+                <th><input id="checkbox-table1" type="checkbox"><label for="checkbox-table1" class="checkbox-label"></label></th>
                 <th>Table Header</th>
                 <th>Table Header</th>
                 <th><!-- action column --></th>
@@ -56,6 +56,37 @@
             <tr>
                 <td><input id="checkbox-table" type="checkbox"><label for="checkbox-table" class="checkbox-label"></label></td>
                 <td>This is longer Content Goes Here Donec id elit non mi porta gravida at eget metus.</td>
+                <td>Content Goes Here</td>
+                <td class="actions-small-1">
+                    <nav><a class="icon-calendar"></a></nav>
+                </td>
+            </tr>
+            <tr>
+                <td><input id="checkbox-table" type="checkbox"><label for="checkbox-table" class="checkbox-label"></label></td>
+                <td>
+                    <div class="card small-12">
+                        <a href="/homepage/{UNIT_CATEGORY_ID}">
+                            <span class="icon-32 icon-home"></span>
+                            <h3>Card inside table</h3>
+                        </a>
+                        <p class="meta">
+                            <time title="{CLASS_OPEN_TITLE}" datetime="{CLASS_OPEN_DATETIME}">This would normally be a time value</time>
+                        </p>
+                        <p class="meta">
+                            <!-- BEGIN class_import_allowed -->
+                            This task does not exist in this class.
+                            <!-- END class_import_allowed -->
+
+                            <!-- BEGIN class_import_forbidden -->
+                            You don't have write permission for this class.
+                            <!-- END class_import_forbidden -->
+
+                            <!-- BEGIN class_import_exists -->
+                            This task already exists in this class.
+                            <!-- END class_import_exists -->
+                        </p>
+                    </div>
+                </td>
                 <td>Content Goes Here</td>
                 <td class="actions-small-1">
                     <nav><a class="icon-calendar"></a></nav>
