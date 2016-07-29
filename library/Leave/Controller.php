@@ -30,6 +30,12 @@ class Leave_Controller extends Controller
     const REPORT_TIMESPAN_WEEKEND = 'weekend'; // Weekend starting on - eg '15/12/2016'
     const REPORT_TIMESPAN_RANGE   = 'range';   // Two arbitrary dates - eg '15/12/2016' to '23/12/2016'
 
+    protected static $timespanOptions = [
+        self::REPORT_TIMESPAN_DAY,
+        self::REPORT_TIMESPAN_WEEKEND,
+        self::REPORT_TIMESPAN_RANGE
+    ];
+
     /**
 	 * Constants for days
      */
@@ -1748,6 +1754,6 @@ class Leave_Controller extends Controller
      * @return array|string[]
      */
     public static function getTimespanOptions(){
-        return [ self::REPORT_TIMESPAN_DAY, self::REPORT_TIMESPAN_WEEKEND, self::REPORT_TIMESPAN_RANGE ];
+        return self::$timespanOptions;
     }
 }
