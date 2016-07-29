@@ -308,7 +308,6 @@
                                         <img src="/portrait.php?userId={{ playerData.player.externalId }}&amp;size=square64" />
                                         <h3>{{ playerData.player.formatName() }}</h3>
                                     </a>
-                                    <p class="meta">{{ playerData.player.formatMetadata() }}</p>
                                     {% for currentTeam in playerData.teams %}
                                         {% if loop.first %}
                                             <p class="meta icon-sport">
@@ -406,7 +405,6 @@
                                             <img src="/portrait.php?userId={{ teamPlayer.externalId }}&amp;size=square64" />
                                             <h3>{{ teamPlayer.formatName() }}</h3>
                                         </a>
-                                        <p class="meta">{{ teamPlayer.formatMetadata() }}</p>
                                         <p>
                                             {% for teamPosition in teamData.positions if teamPosition.user.id == teamPlayer.id %}
                                                 {{ teamPosition.position.name }}<br>
