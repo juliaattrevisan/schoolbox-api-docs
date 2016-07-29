@@ -302,7 +302,7 @@
                     {% for playerData in players %}
                         <li class="actions-small-1" data-player="{{ playerData.player.id }}">
                             <div class="list-item">
-                                <div class="grip"></div>
+                                <div class="grip compact"></div>
                                 <div class="small-11 compact card wrap-down">
                                     <a href="/search/user/{{ playerData.player.id }}">
                                         <img src="/portrait.php?userId={{ playerData.player.externalId }}&amp;size=square64" />
@@ -390,7 +390,7 @@
                         {% for teamPlayer in teamData.players %}
                             <li class="actions-small-2" data-player="{{ teamPlayer.id }}">
                                 <div class="list-item">
-                                    <div class="grip"></div>
+                                    <div class="grip compact"></div>
                                     <div class="small-10 compact card">
                                         <a href="/search/user/{{ teamPlayer.id }}">
                                             <img src="/portrait.php?userId={{ teamPlayer.externalId }}&amp;size=square64" />
