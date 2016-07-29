@@ -50,9 +50,10 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
 
 
     // Types of leave directions
-    const LEAVING   = 1;
-    const AWAY      = 2;
-    const RETURNING = 3;
+    const LEAVING               = 1;
+    const AWAY                  = 2;
+    const RETURNING             = 3;
+    const LEAVING_AND_RETURNING = 4;  // Leave and return in same day section (eg 1hr leave during morning)
 
     /**
      * Constructor
@@ -149,12 +150,15 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
             /* For each day that the person is on leave within the prescribed period of time, show an
              * icon. If they are starting or ending their leave on this day, show the time as well
              *
-             * Render 3 columns each day for 3 days
+             * Render 3 columns per day
              *
-                * AM: 10:00:00 to 18:59:59
-                * PM: 19:00:00 to 21:59:59
+                * AM:    10:00:00 to 18:59:59
+                * PM:    19:00:00 to 21:59:59
                 * Night: 22:00:00 to 9:59:59
              */
+            $priorNightEnd = Alaress_Date_Format::newLocalShort($this->getReportStart());
+            $priorNightEnd->addHours($this->offsets['nightEnd'])->addDays(-1);
+
             $morningStart = Alaress_Date_Format::newLocalShort($this->getReportStart());
             $morningStart->addHours($this->offsets['morningStart']);
 
@@ -167,107 +171,104 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
             $nightEnd = Alaress_Date_Format::newLocalShort($this->getReportStart());
             $nightEnd->addHours($this->offsets['nightEnd']);
 
-            $showStartTime = true;
+            $nextMorningStart = Alaress_Date_Format::newLocalShort($this->getReportStart());
+            $nextMorningStart->addHours($this->offsets['morningStart'])->addDays(1);;
 
+            // For each day in our timespan
             for ($j = 0; $j < $this->getRange(); $j++) {
-                /* If this person is on leave during the morning
-                 */
-                if ($request->getOccupancy($morningStart, $dayStart)) {
-                    /* Check whether next segment is occupied; if not, also show the time
-                     */
-                    if ($showStartTime) {
-                        /* If $showStartTime == true and he's not on leave in the next period
-                         * then he left and returned in the same period
-                         */
-                        if (!$request->getOccupancy($dayStart, $nightStart)) {
-                            $requestPeriodMorning          = $request->getStart()->getTimeOnly() . ' ' . $request->getFinish()->getTimeOnly();
-                            $requestPeriodMorningDirection = self::LEAVING;
-                        } else {
-                            /* Specifically check for this day, to account for multi-week leave
-                             */
-                            if ($request->getStart()->getDatabaseDate() == $morningStart->getDatabaseDate()) {
-                                $requestPeriodMorning          = $request->getStart()->getTimeOnly();
-                                $requestPeriodMorningDirection = self::LEAVING;
-                            } else {
-                                $requestPeriodMorning          = 'L';
-                                $requestPeriodMorningDirection = self::AWAY;
-                            }
-                        }
 
-                        $showStartTime = false;
-                    } else {
-                        if (!$showStartTime && !$request->getOccupancy($dayStart, $nightStart)) {
-                            $requestPeriodMorning          = $request->getFinish()->getTimeOnly();
-                            $requestPeriodMorningDirection = self::RETURNING;
-                        } else {
-                            $requestPeriodMorning          = 'L';
-                            $requestPeriodMorningDirection = self::AWAY;
-                        }
+                // Is this person is on leave during the morning section ?
+                if ($request->getOccupancy($morningStart, $dayStart)) {
+
+                    $onLeavePreviousNight = $request->getOccupancy($priorNightEnd, $morningStart);
+                    $onLeaveThisDay       = $request->getOccupancy($dayStart, $nightStart);
+
+                    // Leave continues through this morning
+                    if($onLeavePreviousNight && $onLeaveThisDay){
+                        $requestPeriodMorning          = 'L';
+                        $requestPeriodMorningDirection = self::AWAY;
                     }
+                    // Leave ends this morning
+                    else if($onLeavePreviousNight && !$onLeaveThisDay){
+                        $requestPeriodMorning          = $request->getFinish()->getTimeOnly();
+                        $requestPeriodMorningDirection = self::RETURNING;
+                    }
+                    // Leave starts this morning
+                    else if(!$onLeavePreviousNight && $onLeaveThisDay){
+                        $requestPeriodMorning          = $request->getStart()->getTimeOnly();
+                        $requestPeriodMorningDirection = self::LEAVING;
+                    }
+                    // Leave starts and ends in this morning section
+                    else {
+                        $requestPeriodMorning          = $request->getStart()->getTimeOnly() . ' ' . $request->getFinish()->getTimeOnly();
+                        $requestPeriodMorningDirection = self::LEAVING_AND_RETURNING;
+                    }
+                } else {
+                    $requestPeriodMorning = null;
+                    $requestPeriodMorningDirection = null;
                 }
 
-                /* If this person is on leave during the day
-                 */
+                // Is this person is on leave during the day ?
                 if ($request->getOccupancy($dayStart, $nightStart)) {
-                    if ($showStartTime) {
-                        if (!$request->getOccupancy($nightStart, $nightEnd)) {
-                            $requestPeriodDay          = $request->getStart()->getTimeOnly() . ' ' . $request->getFinish()->getTimeOnly();
-                            $requestPeriodDayDirection = self::LEAVING;
-                        } else {
-                            if ($request->getStart()->getDatabaseDate() == $dayStart->getDatabaseDate()) {
-                                $requestPeriodDay          = $request->getStart()->getTimeOnly();
-                                $requestPeriodDayDirection = self::LEAVING;
-                            } else {
-                                $requestPeriodDay          = 'L';
-                                $requestPeriodDayDirection = self::AWAY;
-                            }
-                        }
 
-                        $showStartTime = false;
-                    } else {
-                        if (!$showStartTime && !$request->getOccupancy($nightStart, $nightEnd)) {
-                            $requestPeriodDay          = $request->getFinish()->getTimeOnly();
-                            $requestPeriodDayDirection = self::RETURNING;
-                        } else {
-                            $requestPeriodDay          = 'L';
-                            $requestPeriodDayDirection = self::AWAY;
-                        }
+                    $onLeaveThisMorning = $request->getOccupancy($morningStart, $dayStart);
+                    $onLeaveThisNight   = $request->getOccupancy($nightStart, $nightEnd);
+
+                    // Leave continues through this day
+                    if($onLeaveThisMorning && $onLeaveThisNight){
+                        $requestPeriodDay          = 'L';
+                        $requestPeriodDayDirection = self::AWAY;
                     }
+                    // Leave ends this day
+                    else if($onLeaveThisMorning && !$onLeaveThisNight){
+                        $requestPeriodDay          = $request->getFinish()->getTimeOnly();
+                        $requestPeriodDayDirection = self::RETURNING;
+                    }
+                    // Leave starts this day
+                    else if(!$onLeaveThisMorning && $onLeaveThisNight){
+                        $requestPeriodDay          = $request->getStart()->getTimeOnly();
+                        $requestPeriodDayDirection = self::LEAVING;
+                    }
+                    // Leave starts and ends in this day section
+                    else {
+                        $requestPeriodDay          = $request->getStart()->getTimeOnly() . ' ' . $request->getFinish()->getTimeOnly();
+                        $requestPeriodDayDirection = self::LEAVING_AND_RETURNING;
+                    }
+                } else {
+                    $requestPeriodDay = null;
+                    $requestPeriodDayDirection = null;
                 }
 
                 /* If this person is on leave during the night
                  */
                 if ($request->getOccupancy($nightStart, $nightEnd)) {
-                    /* Check whether the next morning is occupied
-                     */
-                    $nextMorning = clone $dayStart;
-                    $nextMorning->addDays(1);
 
-                    if ($showStartTime) {
-                        if (!$request->getOccupancy($nightEnd, $nextMorning)) {
-                            $requestPeriodNight          = $request->getStart()->getTimeOnly() . ' ' . $request->getFinish()->getTimeOnly();
-                            $requestPeriodNightDirection = self::LEAVING;
-                        } else {
-                            if ($request->getStart()->getDatabaseDate() == $nightStart->getDatabaseDate()) {
-                                $requestPeriodNight          = $request->getStart()->getTimeOnly();
-                                $requestPeriodNightDirection = self::LEAVING;
-                            } else {
-                                $requestPeriodNight          = 'L';
-                                $requestPeriodNightDirection = self::AWAY;
-                            }
-                        }
+                    $onLeaveThisDay     = $request->getOccupancy($dayStart, $nightStart);
+                    $onLeaveNextMorning = $request->getOccupancy($nightEnd, $nextMorningStart);
 
-                        $showStartTime = false;
-                    } else {
-                        if (!$showStartTime && !$request->getOccupancy($nightEnd, $nextMorning)) {
-                            $requestPeriodNight          = $request->getFinish()->getTimeOnly();
-                            $requestPeriodNightDirection = self::RETURNING;
-
-                        } else {
-                            $requestPeriodNight          = 'L';
-                            $requestPeriodNightDirection = self::AWAY;
-                        }
+                    // Leave continues through this night
+                    if($onLeaveThisDay && $onLeaveNextMorning){
+                        $requestPeriodNight          = 'L';
+                        $requestPeriodNightDirection = self::AWAY;
                     }
+                    // Leave ends this night
+                    else if($onLeaveThisDay && !$onLeaveNextMorning){
+                        $requestPeriodNight          = $request->getFinish()->getTimeOnly();
+                        $requestPeriodNightDirection = self::RETURNING;
+                    }
+                    // Leave starts this night
+                    else if(!$onLeaveThisDay && $onLeaveNextMorning){
+                        $requestPeriodNight          = $request->getStart()->getTimeOnly();
+                        $requestPeriodNightDirection = self::LEAVING;
+                    }
+                    // Leave starts and ends in this night section
+                    else {
+                        $requestPeriodNight          = $request->getStart()->getTimeOnly() . ' ' . $request->getFinish()->getTimeOnly();
+                        $requestPeriodNightDirection = self::LEAVING_AND_RETURNING;
+                    }
+                } else {
+                    $requestPeriodNight = null;
+                    $requestPeriodNightDirection = null;
                 }
 
                 /* Display icon and time where appropriate
@@ -291,12 +292,12 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
 
                 /* Iteration reset
                  */
+                $priorNightEnd->addDays(1);
                 $morningStart->addDays(1);
                 $dayStart->addDays(1);
                 $nightStart->addDays(1);
                 $nightEnd->addDays(1);
-
-                unset($requestPeriodMorning, $requestPeriodDay, $requestPeriodNight, $requestPeriodMorningDirection, $requestPeriodDayDirection, $requestPeriodNightDirection);
+                $nextMorningStart->addDays(1);
             }
         }
 
