@@ -1028,14 +1028,15 @@ abstract class Mapper implements IMapper, Serializable
      * Deletes (whether hard or soft) all records that match the given column value
      * Returns the number of records deleted.
      *
-     * @param $columnName
-     * @param $columnValue
+     * @param string $columnName
+     * @param string $columnValue
+     * @param array  $options @see findByColumnList() $options param
      *
      * @return int
      */
-    public function deleteByColumn($columnName, $columnValue)
+    public function deleteByColumn($columnName, $columnValue, $options = array())
     {
-        return $this->deleteByColumnList(array($columnName => $columnValue));
+        return $this->deleteByColumnList(array($columnName => $columnValue), $options);
     }
 
 
@@ -1044,12 +1045,21 @@ abstract class Mapper implements IMapper, Serializable
      * Returns the number of records deleted.
      *
      * @param array $columnList
+     * @param array $options @see findByColumnList() $options param
      *
      * @return int
      */
-    public function deleteByColumnList($columnList)
+    public function deleteByColumnList($columnList, $options = array())
     {
-        return $this->executeDelete($this->getDeleteString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList);
+        // as an OH&S measure, the column list MUST NOT be empty (and thus match all records)
+        if (empty($columnList)) {
+            return 0;
+        }
+        $resultset = $this->findByColumnList($columnList, $options);
+        if ($this->delete($resultset)) {
+            return count($resultset);
+        }
+        return 0;
     }
 
 
