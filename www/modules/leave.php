@@ -57,14 +57,17 @@ try {
 
                 $timespanOptions = Leave_Controller::getTimespanOptions();
 
+                // Determine requested report timespan type
                 $timespan = is_string($this->arg[3]) && in_array($this->arg[3], $timespanOptions)
                     ? $this->arg[3]
                     : Leave_Controller::REPORT_TIMESPAN_WEEKEND;
 
+                // Determine requested report start
                 $dateStart = is_string($this->arg[4])
                     ? str_replace('-', '/', $this->arg[4])
                     : date('d/m/Y', time());
 
+                // Determine requested report end
                 $dateEnd = (Leave_Controller::REPORT_TIMESPAN_RANGE === $timespan && isset($this->arg[5]))
                     ? str_replace('-', '/', $this->arg[5])
                     : null;
