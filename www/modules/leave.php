@@ -72,8 +72,9 @@ try {
                     ? str_replace('-', '/', $this->arg[5])
                     : null;
 
-                // Cater for erroneous URLs
+                // Catch malformed URLs
                 try {
+                    /** @var array $data */
                     $data = $leaveController->executeHouseReport($houseId, $timespan, $dateStart, $dateEnd);
                 } catch (InvalidArgumentException $iae){
                     error(156);
