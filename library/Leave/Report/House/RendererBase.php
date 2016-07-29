@@ -50,8 +50,8 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
 
 
     // Types of leave directions
-    const LEAVING = 1;
-    const AWAY = 2;
+    const LEAVING   = 1;
+    const AWAY      = 2;
     const RETURNING = 3;
 
     /**
@@ -427,46 +427,6 @@ abstract class Leave_Report_House_RendererBase implements Leave_Report_House_Ren
     protected function getCurrentHouse()
     {
         return $this->currentHouse;
-    }
-
-    /**
-     * Get start of pending decoration
-     *
-     * @return mixed
-     */
-    protected function getDecorationPendingStart()
-    {
-        return $this->decoration['pendingStart'];
-    }
-
-    /**
-     * Get end of pending decoration
-     *
-     * @return mixed
-     */
-    protected function getDecorationPendingEnd()
-    {
-        return $this->decoration['pendingEnd'];
-    }
-
-    /**
-     * Get start of approved decoration
-     *
-     * @return mixed
-     */
-    protected function getDecorationApprovedStart()
-    {
-        return $this->decoration['approvedStart'];
-    }
-
-    /**
-     * Get end of approved decoration
-     *
-     * @return mixed
-     */
-    protected function getDecorationApprovedEnd()
-    {
-        return $this->decoration['approvedEnd'];
     }
 
     /**
