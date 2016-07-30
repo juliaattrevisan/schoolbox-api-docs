@@ -15,6 +15,7 @@ use Scrub;
 use TextFormatter;
 use Alaress_Date_Format;
 use Alaress_Byte_Format;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Renderer extends Handler
 {
@@ -38,7 +39,7 @@ class Renderer extends Handler
      */
     public function render()
     {
-        $categoryStd = new \Category();
+        $folderMapper = new FolderMapper();
         $userHandler = new \User();
 
         $result = $this->getResult($this->getType());
@@ -53,8 +54,12 @@ class Renderer extends Handler
             ));
 
             foreach ($result as $file) {
-                foreach ($categoryStd->breadcrumb($file['category']) as $i => $breadcrumb) {
-                    $file['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
+
+                //TODO remove when folder is properly hydrate with blog
+                $folder = $folderMapper->findCheaplyById($file['category']);
+
+                foreach ($folderMapper->breadcrumb($folder) as $i => $breadcrumb) {
+                    $file['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">" . Scrub::text($breadcrumb->getName()) . "</a>";
                 }
                 $createdTime = new Alaress_Date_Format($file['submitted'], 'Y-m-d H:i:s');
 

@@ -31,13 +31,12 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     protected $templateFile = 'timetable';
 
-    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Group $group, Category $category, External_Timetable $externalTimetable)
+    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Group $group, External_Timetable $externalTimetable)
     {
         parent::__construct($instance, $user, $sitepage);
 
         $this->externalTimetable = $externalTimetable;
         $this->group = $group;
-        $this->category = $category;
     }
 
     /**
@@ -216,7 +215,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                                 $this->setVar('PERIOD_COLOUR', '#' . Scrub::text($subjectColourMap[$class['code']]));
 
-                                $cat     = $this->category->getByCode($class['code']);
+                                $cat     = $this->getFolderMapper()->findByCode($class['code']);
                                 $hasLink = $cat['id'] && $this->group->getPermission($cat['id']) >= READ_ACCESS;
 
                                 // Link to Attendance Records

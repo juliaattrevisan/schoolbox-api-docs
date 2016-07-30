@@ -35,12 +35,12 @@ class Result extends Base
 			SELECT
 				{$mapper->getColumnString('l')},
 				{$mapper->getJoinMapper('user')->getColumnString('u')},
-				{$mapper->getJoinMapper('category')->getColumnString('c')},
+				{$mapper->getJoinMapper('folder')->getColumnString('c')},
 				MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()}) AS `score`
 			FROM
 				`{$mapper->getTable()}` `l`
 				LEFT JOIN {$mapper->getJoinSql('user', 'l', 'u')}
-				INNER JOIN {$mapper->getJoinSql('category', 'l', 'c')}
+				INNER JOIN {$mapper->getJoinSql('folder', 'l', 'c')}
 				LEFT JOIN {$mapper->getJoinSql('perms', 'l', 'p')}
 					AND p.gid = :role_id
 					AND p.type >= :min_access
@@ -68,9 +68,9 @@ class Result extends Base
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $link = $mapper->hydrate($row, 'l');
             $owner = $mapper->hydrateJoin($row, 'user', 'u');
-            $category = $mapper->hydrateJoin($row, 'category', 'c');
+            $folder = $mapper->hydrateJoin($row, 'folder', 'c');
 
-            $link->setOwner($owner)->setFolder($category);
+            $link->setOwner($owner)->setFolder($folder);
 
             $collection->add($link);
         }
@@ -94,7 +94,7 @@ class Result extends Base
 			FROM
 				`{$mapper->getTable()}` `l`
 				LEFT JOIN {$mapper->getJoinSql('user', 'l', 'u')}
-				INNER JOIN {$mapper->getJoinSql('category', 'l', 'c')}
+				INNER JOIN {$mapper->getJoinSql('folder', 'l', 'c')}
 				LEFT JOIN {$mapper->getJoinSql('perms', 'l', 'p')}
 					AND p.gid = :role_id
 					AND p.type >= :min_access

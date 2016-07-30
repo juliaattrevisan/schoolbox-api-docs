@@ -14,7 +14,8 @@ use Schoolbox\Resource\Search\Renderer\Handler;
 use Scrub;
 use TextFormatter;
 use Alaress_Date_Format;
-use DateTime;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
 
 class Renderer extends Handler
 {
@@ -46,7 +47,7 @@ class Renderer extends Handler
      */
     public function render()
     {
-        $categoryStd = new \Category();
+        $folderMapper = new FolderMapper();
         $userHandler = new \User();
 
         $result = $this->getResult($this->getType());
@@ -60,8 +61,11 @@ class Renderer extends Handler
             ));
 
             foreach ($result as $news) {
-                foreach ($categoryStd->breadcrumb($news['code']) as $i => $breadcrumb) {
-                    $news['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb['id']}\">{$breadcrumb['name']}</a>";
+                //TODO remove when folder is properly hydrate with blog
+                $folder = $folderMapper->findCheaplyById($news['ccde']);
+
+                foreach ($folderMapper->breadcrumb($folder) as $i => $breadcrumb) {
+                    $news['breadcrumb'] .= ($i != 0 ? ' > ' : '') . "<a href=\"/homepage/{$breadcrumb->getId()}\">". Scrub::text( $breadcrumb->getName() ) ."</a>";
                 }
 
                 $now = Alaress_Date_Format::now();

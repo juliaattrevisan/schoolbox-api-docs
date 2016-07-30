@@ -46,7 +46,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
                 'column'   => 'category',
                 'property' => 'folder',
                 'type'     => self::TYPE_MODEL,
-                'join'     => 'category'
+                'join'     => 'folder'
             )
         );
         $this->hasMap(
@@ -123,7 +123,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
             )
         );
         $this->hasJoin(
-            'category', array(
+            'folder', array(
                 'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
                 'this_key'  => 'category',
                 'other_key' => 'id'
@@ -161,10 +161,10 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         return "
             SELECT {$this->getColumnString()},
                    {$this->getJoinColumnString('user', 'u')},
-                   {$this->getJoinColumnString('category', 'c')}
+                   {$this->getJoinColumnString('folder', 'c')}
             FROM `$table`
             LEFT JOIN {$this->getJoinSql('user', $table, 'u')}
-            LEFT JOIN {$this->getJoinSql('category', $table, 'c')}
+            LEFT JOIN {$this->getJoinSql('folder', $table, 'c')}
         ";
     }
 
@@ -178,7 +178,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
             $link = $this->hydrate($r);
             $link->setOwner($this->hydrateJoin($r, 'user', 'u'));
-            $link->setFolder($this->hydrateJoin($r, 'category', 'c'));
+            $link->setFolder($this->hydrateJoin($r, 'folder', 'c'));
             $c->add($link);
         }
         return $c;
@@ -191,9 +191,9 @@ class LinkMapper extends Mapper implements ILocator, Searchable
      * @param $options
      * @return Collection
      */
-    public function findAllInCategory(FolderModel $category, $options)
+    public function findAllInCategory(FolderModel $folder, $options)
     {
-        $categoryMapper = $this->getJoinMapper('category');
+        $folderMapper = $this->getJoinMapper('folder');
         $userMapper     = $this->getJoinMapper('user');
 
         /* Special case misrepresentations in db
@@ -211,10 +211,10 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         $query = "
             SELECT
             	{$this->getColumnString('l')},
-            	{$categoryMapper->getColumnString('c')},
+            	{$folderMapper->getColumnString('c')},
             	{$userMapper->getColumnString('o')}
             FROM `{$this->table}` l
-            LEFT JOIN {$this->getJoinSql('category', 'l', 'c')}
+            LEFT JOIN {$this->getJoinSql('folder', 'l', 'c')}
             LEFT JOIN {$this->getJoinSql('user', 'l', 'o')}
             WHERE l.category = :categoryId
             AND l.deleted_at IS NULL
@@ -226,7 +226,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         }
 
         $statement = $this->database->prepare($query);
-        $statement->bindParam(':categoryId', $category->getId());
+        $statement->bindParam(':categoryId', $folder->getId());
         $statement->execute();
 
         /* Manually construct hierarchy of blog items and their comments
@@ -236,7 +236,7 @@ class LinkMapper extends Mapper implements ILocator, Searchable
         foreach ($statement as $row) {
             $link = $this->hydrate($row, 'l');
 
-            $link->setFolder($categoryMapper->hydrate($row, 'c'));
+            $link->setFolder($folderMapper->hydrate($row, 'c'));
             $link->setOwner($userMapper->hydrate($row, 'o'));
 
             $collection->add($link);
