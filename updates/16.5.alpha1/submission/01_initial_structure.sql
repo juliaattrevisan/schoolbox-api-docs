@@ -18,7 +18,7 @@ CREATE TABLE `course` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `folder_id` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `folder_id_UNIQUE` (`folder_id` ASC),
+  INDEX `fk_course_folder_id_idx` (`folder_id` ASC),
   CONSTRAINT `fk_course_folder_id`
     FOREIGN KEY (`folder_id`)
     REFERENCES `folder` (`id`)
@@ -59,13 +59,13 @@ CREATE TABLE `assessment` (
   `publish_date` DATETIME NULL,
   `due_date` DATETIME NULL,
   `sequence` TINYINT NULL,
-  PRIMARY KEY (`id`))
+  PRIMARY KEY (`id`),
   INDEX `fk_asessment_project_id_idx` (`project_id` ASC),
 CONSTRAINT `fk_asessment_project_id`
   FOREIGN KEY (`project_id`)
   REFERENCES `project` (`id`)
   ON DELETE NO ACTION
-  ON UPDATE NO ACTION;
+  ON UPDATE NO ACTION)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_general_ci;
@@ -85,7 +85,7 @@ CREATE TABLE `project_folder` (
     FOREIGN KEY (`project_id`)
     REFERENCES `project` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
@@ -93,17 +93,17 @@ CREATE TABLE `project_course_unit_instance` (
   `project_id` INT UNSIGNED NOT NULL,
   `course_unit_instance_id` INT UNSIGNED NOT NULL,
   INDEX `fk_project_course_unit_instance_project_id_idx` (`project_id` ASC),
-  INDEX `fk_project_course_unit_instance_course_unit_instance_id_idx` (`course_unit_instance_id` ASC);
+  INDEX `fk_project_course_unit_instance_course_unit_instance_id_idx` (`course_unit_instance_id` ASC),
   CONSTRAINT `fk_project_course_unit_instance_project_id`
     FOREIGN KEY (`project_id`)
     REFERENCES `project` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION,
  CONSTRAINT `fk_project_course_unit_instance_course_unit_instance_id`
    FOREIGN KEY (`course_unit_instance_id`)
    REFERENCES `course_unit_instance` (`id`)
    ON DELETE NO ACTION
-   ON UPDATE NO ACTION;
+   ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
@@ -132,4 +132,4 @@ ALTER TABLE `task_instance`
 ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `id`;
 
 ALTER TABLE `submission_box`
-ADD COLUMN `assessment_id` `assessment_id` INT UNSIGNED NOT NULL AFTER `id`;
+ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `id`;
