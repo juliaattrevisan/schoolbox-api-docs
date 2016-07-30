@@ -18,7 +18,7 @@ class Model implements ISoftDeletable
     /**
      * @var Folder\Model
      */
-    protected $category;
+    protected $folder;
 
     /**
      * @var string
@@ -31,21 +31,21 @@ class Model implements ISoftDeletable
     protected $deletedAt;
 
     /**
-     * @param  Folder\Model $category
+     * @param  Folder\Model $folder
      * @return $this
      */
-    public function setCategory($category)
+    public function setFolder($folder)
     {
-        $this->category = $category;
+        $this->folder = $folder;
         return $this;
     }
 
     /**
      * @return Folder\Model
      */
-    public function getCategory()
+    public function getFolder()
     {
-        return $this->category;
+        return $this->folder;
     }
 
     /**

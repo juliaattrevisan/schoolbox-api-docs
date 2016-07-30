@@ -98,7 +98,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         parent::mapping();
 
         $this->hasModel(Model::class);
-        $this->hasTable('category');
+        $this->hasTable('folder');
 
         $this->uses('inherit', self::TYPE_BOOLEAN);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
@@ -109,7 +109,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 'multiple'  => true,
                 'mapper'    => '\\Schoolbox\\Resource\\Folder\\Code\\Mapper',
                 'this_key'  => 'id',
-                'other_key' => 'categoryID',
+                'other_key' => 'folder_id',
             )
         );
 
@@ -195,7 +195,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param bool $excludeWork
      * @return File\Model[]|Collection
      */
-    public function findImages(Model $category, $limit = 0, $excludeWork = false)
+    public function findImages(Model $folder, $limit = 0, $excludeWork = false)
     {
         /** @var File\Mapper $fileMapper */
         $fileMapper = $this->getJoinMapper('files');
@@ -208,7 +208,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             $opts['size'] = $limit;
         }
 
-        return $fileMapper->findForFolders([ $category->getId() ], $opts);
+        return $fileMapper->findForFolders([ $folder->getId() ], $opts);
     }
 
     /**
@@ -227,7 +227,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $collisions = $collisions->filterByCallback(
             function ($code) use ($id) {
                 /** @var Code\Model $code */
-                return $code->getCategory()->getId() != $id;
+                return $code->getFolder()->getId() != $id;
             }
         );
 
@@ -284,7 +284,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
         // bind the given codes to this category
         foreach ($model->getCodes() as $code) {
-            $code->setCategory($model);
+            $code->setFolder($model);
         }
 
         // persist the Code objects
@@ -406,7 +406,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             if ($existingCat->count()) {
                 //Folder already exists in collection
                 $code = $code_mapper->hydrate($row, 'cc');
-                if ($code->getCategory()->getId()) {
+                if ($code->getFolder()->getId()) {
                     $existingCat->first()->addCode($code);
                 }
             } else {
@@ -425,7 +425,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
 
                 /** @var \Schoolbox\Resource\Folder\Code\Model $code */
                 $code = $code_mapper->hydrate($row, 'cc');
-                if ($code->getCategory()->getId()) {
+                if ($code->getFolder()->getId()) {
                     $category->addCode($code);
                 }
                 $collection->add($category);
@@ -667,7 +667,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             // Hydrate class codes (avoiding duplicates) and cache
             $code = $code_mapper->hydrate($row, 'cc');
 
-            if ($code->getCategory()->getId()) {
+            if ($code->getFolder()->getId()) {
                 $addedClassCodes[$testId][$code->getCode()] = $code;
             }
 

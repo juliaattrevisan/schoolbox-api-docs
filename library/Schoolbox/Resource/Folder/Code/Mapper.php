@@ -18,13 +18,13 @@ class Mapper extends \Schoolbox\Mapper
     protected function mapping()
     {
         $this->hasModel('\\Schoolbox\\Resource\\Folder\\Code\\Model');
-        $this->hasTable('categoryCode');
+        $this->hasTable('folder_code');
         $this->hasMap(
             array(
-                'column'     => 'categoryID',
-                'property'   => 'category',
+                'column'     => 'folder_id',
+                'property'   => 'folder',
                 'type'       => self::TYPE_MODEL,
-                'join'       => 'category',
+                'join'       => 'folder',
                 'identifier' => true,
             )
         );
@@ -43,9 +43,9 @@ class Mapper extends \Schoolbox\Mapper
             )
         );
         $this->hasJoin(
-            'category', array(
+            'folder', array(
                 'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
-                'this_key'  => 'category',
+                'this_key'  => 'folder_id',
                 'other_key' => 'id',
             )
         );
@@ -68,25 +68,25 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Retrieves category codes for a given set of categories.
      *
-     * @param array $category_ids
+     * @param array $folder_ids
      *
      * @return \Schoolbox\Collection|Model[]
      */
-    public function findForCategories($category_ids)
+    public function findForCategories($folder_ids)
     {
         //
         // no IDs? return early so no invalid query is called.
         if (empty($category_ids)) {
             return $this->hydrateList(array());
         }
-        $params    = $this->getArrayParameters($category_ids, 'id');
+        $params    = $this->getArrayParameters($folder_ids, 'id');
         $statement = $this->database->prepare(
             "
             SELECT {$this->getColumnString()}
             FROM {$this->table}
-            WHERE categoryID IN {$this->getArrayPlaceholders($category_ids, 'id')}
+            WHERE folder_id IN {$this->getArrayPlaceholders($folder_ids, 'id')}
             AND deleted_at IS NULL
-            ORDER BY code ASC, categoryID ASC
+            ORDER BY code ASC, folder_id ASC
         "
         );
         $statement->execute($params);
@@ -118,23 +118,23 @@ class Mapper extends \Schoolbox\Mapper
         }
 
         //
-        // Get each category ID, and then get each code from the category.
+        // Get each folder ID, and then get each code from the folder.
         foreach ($collection as $item) {
             $cat_id_list[] = $retrieve_function($item)->getId();
         }
         $grouped_codes = array();
         foreach ($this->findForCategories(array_unique($cat_id_list)) as $code) {
-            $grouped_codes[$code->getCategory()->getId()][] = $code;
+            $grouped_codes[$code->getFolder()->getId()][] = $code;
         }
 
         //
-        // Add codes to each category
+        // Add codes to each folder
         foreach ($collection as $item) {
-            $category = $retrieve_function($item);
-            $cat_id   = $category->getId();
+            $folder = $retrieve_function($item);
+            $cat_id   = $folder->getId();
             if (!empty($grouped_codes[$cat_id])) {
                 foreach ($grouped_codes[$cat_id] as $code) {
-                    $category->addCode($code);
+                    $folder->addCode($code);
                 }
             }
         }
