@@ -134,7 +134,7 @@ class Mapper extends \Schoolbox\Mapper
      */
     public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'cname', $sort_dir = 'ASC')
     {
-        $categoryMapper = new FolderMapper();
+        $folderMapper = new FolderMapper();
 
         $offset     = (int)$offset;
         $limit      = (int)$limit;
@@ -157,7 +157,7 @@ class Mapper extends \Schoolbox\Mapper
         /* Search for matching in join's columns
          */
         if (!$found) {
-            foreach ($categoryMapper->map as $m) {
+            foreach ($folderMapper->map as $m) {
                 if ($m['column'] == $sort_by) {
                     $sortBy = "c.{$sort_by}";
                     break;
@@ -168,7 +168,7 @@ class Mapper extends \Schoolbox\Mapper
         $query = "
              SELECT
             	{$this->getColumnString('t')},
-            	{$categoryMapper->getColumnString('c')}
+            	{$folderMapper->getColumnString('c')}
             FROM `{$this->table}` t
             LEFT JOIN {$this->getJoinSql('category', 't', 'c')}
             WHERE t.heading LIKE :like
@@ -186,9 +186,9 @@ class Mapper extends \Schoolbox\Mapper
 
         foreach ($statement as $row) {
             $textbox  = $this->hydrate($row, 't');
-            $category = $categoryMapper->hydrate($row, 'c');
+            $folder = $folderMapper->hydrate($row, 'c');
 
-            $textbox->setCategory($category);
+            $textbox->setCategory($folder);
 
             $collection->add($textbox);
         }

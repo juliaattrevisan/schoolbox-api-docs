@@ -37,14 +37,14 @@ class Result extends Base
 			    {$mapper->getJoinColumnString('hash', 's')},
 			    {$mapper->getJoinMapper('hash')->getJoinColumnString('allowedFileExtension', 'e')},
                 {$mapper->getJoinColumnString('owner', 'o')},
-				{$mapper->getJoinColumnString('category', 'c')},
+				{$mapper->getJoinColumnString('folder', 'c')},
 				MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()}) AS `score`
 			FROM
 				`{$mapper->getTable()}` `f`
 				LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
 				LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
 				LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
-				INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
+				INNER JOIN {$mapper->getJoinSql('folder', 'f', 'c')}
 				LEFT JOIN `perms` p ON `f`.category = `p`.cid
 					AND p.gid = :role_id
 					AND p.type >= :min_access
@@ -75,11 +75,11 @@ class Result extends Base
             $storage = $mapper->hydrateJoin($row, 'hash', 's');
             $mime = $mapper->getJoinMapper('hash')->hydrateJoin($row, 'allowedFileExtension', 'e');
             $owner = $mapper->hydrateJoin($row, 'owner', 'o');
-            $category = $mapper->hydrateJoin($row, 'category', 'c');
+            $folder = $mapper->hydrateJoin($row, 'folder', 'c');
 
             $storage->setMimetype($mime);
             $file->setStorage($storage);
-            $file->setOwner($owner)->setFolder($category);
+            $file->setOwner($owner)->setFolder($folder);
 
             $collection->add($file);
         }
@@ -105,7 +105,7 @@ class Result extends Base
 				LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
 				LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
 				LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
-				INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
+				INNER JOIN {$mapper->getJoinSql('folder', 'f', 'c')}
 				LEFT JOIN `perms` p ON `f`.category = `p`.cid
 					AND p.gid = :role_id
 					AND p.type >= :min_access

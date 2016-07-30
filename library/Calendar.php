@@ -426,13 +426,13 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
             $query = "
 				SELECT
-					DISTINCT category.name AS category, category.id as cid, GROUP_CONCAT(co.code) AS synergyCode, submission_box.name, submission_box.description,
+					DISTINCT folder.name AS category, folder.id as cid, GROUP_CONCAT(co.code) AS synergyCode, submission_box.name, submission_box.description,
 					submission_box.owner, submission_box.id, user.firstname, user.lastname, user.title,
 					DATE_FORMAT(submission_box.date, '%w') as dayIndex,
 					DATE_FORMAT(submission_box.date, '" . Cfg::get('calendar_time_format') . "') as dueTime,
 					submission_box.accept_submission, submission_box.open_date, submission_box.date, submission_box.late_date, submission_box.created
 				FROM (category, submission_box )
-				LEFT JOIN categoryCode co ON co.categoryID = category.id AND co.deleted_at IS NULL
+				LEFT JOIN categoryCode co ON co.categoryID = folder.id AND co.deleted_at IS NULL
 				LEFT JOIN user ON user.id = submission_box.owner ";
 
             /* If you aren't part of any categories, don't try to
@@ -440,13 +440,13 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
              */
             if (count($catQuery)) {
                 $query .= "
-					WHERE category.id = submission_box.category
+					WHERE folder.id = submission_box.category
 					AND submission_box.category IN (" . implode(',', $catQuery) . ")
 					AND submission_box.deleted = 0
 					AND	DATE(submission_box.date) >= DATE(FROM_UNIXTIME('{$startTimestamp}'))
 					AND DATE(submission_box.date) < DATE(FROM_UNIXTIME('{$endTimestamp}'))
 					AND submission_box.task_id IS NULL
-					GROUP BY submission_box.id, category.id
+					GROUP BY submission_box.id, folder.id
 					ORDER BY submission_box.date
 				";
             } else {
@@ -732,7 +732,7 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 				user.id as uid, user.title as userTitle, firstname, lastname,
 				eventType, eventColour,
 				event.publish_date,
-				category.id AS categoryId, category.name AS categoryName,
+				folder.id AS categoryId, folder.name AS categoryName,
 				event.completed, author_id
 			FROM event
 			LEFT JOIN user ON event.author_id = user.id
@@ -740,7 +740,7 @@ class Calendar extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 			LEFT JOIN resource_booking ON event.id = resource_booking.event_id
 			LEFT JOIN event_user ON event.id = event_user.event_id
 			LEFT JOIN event_category ON event.id = event_category.event_id
-			LEFT JOIN category ON event_category.category_id = category.id AND event_category.category_id IS NOT NULL
+			LEFT JOIN folder ON event_category.category_id = folder.id AND event_category.category_id IS NOT NULL
 			LEFT JOIN event_group ON event.id = event_group.event_id
 			LEFT JOIN event_campus ON event.id = event_campus.event_id
 			WHERE

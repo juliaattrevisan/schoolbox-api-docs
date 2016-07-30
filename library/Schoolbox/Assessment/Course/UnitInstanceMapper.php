@@ -180,7 +180,7 @@ class UnitInstanceMapper extends BaseMapper {
             LEFT JOIN {$this->getJoinSql('unit_category', 'ui', 'uc')}
             LEFT JOIN {$this->getJoinSql('course_folder', 'uc', 'cf')}
             INNER JOIN {$this->getJoinSql('category', 'ui', 'c')}
-            LEFT JOIN categoryCode cc ON c.id = cc.categoryID
+            LEFT JOIN folder_code cc ON c.id = cc.folder_id
             WHERE `cf`.`id` = :folderId
                 AND c.deleted_at IS NULL
                 AND ui.deleted_at IS NULL

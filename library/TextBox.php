@@ -55,11 +55,11 @@ class TextBox extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
     public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'cname', $sort_dir = 'ASC') {
 
         // TODO add full search capabilities, currently just used by ajax
-        $query = "SELECT textBoxID, categoryID, heading, body, category.name as cname
+        $query = "SELECT textBoxID, categoryID, heading, body, folder.name as cname
                      FROM " . $this->_table . "
-                    JOIN category ON categoryID = category.id
+                    JOIN folder ON categoryID = folder.id
                   WHERE textBox.deleted = 'false' AND heading like '%" . $this->db->quote($keyword) . "%'
-                  AND category.deleted_at IS NULL
+                  AND folder.deleted_at IS NULL
                   ORDER BY $sort_by $sort_dir
                   LIMIT $offset, $limit";
 

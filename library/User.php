@@ -411,7 +411,7 @@ class User extends DeprecatedModel
     {
         $query = "SELECT object, action, time, c.name AS folder, f.description AS file, l.description AS link
                     FROM cmsLog
-                    LEFT JOIN category c ON c.id = objectId
+                    LEFT JOIN folder c ON c.id = objectId
                     LEFT JOIN file f ON f.id = objectId
                     LEFT JOIN link l ON l.id = objectId
                     WHERE user = $uid

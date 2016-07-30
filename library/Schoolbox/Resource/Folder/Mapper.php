@@ -277,7 +277,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         // first drop the previous code(s) connected to this category
         try {
             Code\Mapper::getInstance()->delete(
-                Code\Mapper::getInstance()->findByColumn('categoryID', $model->getId())
+                Code\Mapper::getInstance()->findByColumn('folder_id', $model->getId())
             );
         } catch (\Exception $e) {
         }
@@ -328,7 +328,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function hardDeleteCategoryCodes(Model $object)
     {
         $codeMapper = $this->getJoinMapper('codes');
-        $codeMapper->hardDelete($codeMapper->findByColumn('categoryID', $object->getId()));
+        $codeMapper->hardDelete($codeMapper->findByColumn('folder_id', $object->getId()));
     }
 
     /**
@@ -341,7 +341,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function softDeleteCategoryCodes(Model $object)
     {
         $codeMapper = $this->getJoinMapper('codes');
-        $codeMapper->softDelete($codeMapper->findByColumn('categoryID', $object->getId()));
+        $codeMapper->softDelete($codeMapper->findByColumn('folder_id', $object->getId()));
     }
 
     /**
@@ -479,7 +479,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $categories = $this->findByColumn($column, $value);
 
         foreach ($categories as $category) {
-            $category->setCodes($this->getJoinMapper('codes')->findByColumn('categoryID', $category->getId()));
+            $category->setCodes($this->getJoinMapper('codes')->findByColumn('folder_id', $category->getId()));
         }
 
         return $categories;
@@ -714,7 +714,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $query = "
             {$this->getSelectString()}
             {$this->getFromString()}
-            WHERE category.deleted_at IS NULL
+            WHERE folder.deleted_at IS NULL
             AND (cc.code = :code OR cc.code LIKE :codeLike)
         ";
         $statement = $this->database->prepare($query);
@@ -734,7 +734,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         // because the above query won't fetch codes for this category that
         // don't match the above where part.
         $model->setCodes(
-            $this->getJoinMapper('codes')->findByColumn('categoryID', $model->getId())
+            $this->getJoinMapper('codes')->findByColumn('folder_id', $model->getId())
         );
         return $model;
     }
