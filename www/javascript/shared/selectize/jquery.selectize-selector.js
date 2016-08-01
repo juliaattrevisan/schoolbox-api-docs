@@ -80,7 +80,7 @@
                 },
                 onInitialize: function() {
                     // Initialize: clear existing options, and add items from
-                    // setttings.value
+                    // settings.value
                     var self = this
                     self.clear();
                     self.clearOptions();
@@ -136,12 +136,12 @@
             'type',
 //            'load',
 //            'destroy'
-        ]
+        ];
 
         // Set up selectize on all elements
         element.each(function() {
-            var singleElement = $(this)
-            singleElement.val('').selectize(settings.selectize)
+            var singleElement = $(this);
+            singleElement.val('').selectize(settings.selectize);
             $.each(selectizeEvents, function(i,event) {
                 singleElement.data('selectize').on(
                     event,
@@ -150,7 +150,7 @@
                     }
                 )
             })
-        })
+        });
 
         // Chain me
         return this;
