@@ -216,7 +216,7 @@
 
                             /* ha
                              */
-                            uniqueCollapserInitialState(to.attr('data-team-player-list'), to.parents('[data-team]').attr('data-collapse-state'));
+                            uniqueCollapserInitialState($('#allTeams').find('[data-team]'));
                             uniqueCollapser();
                         })
                         .done(function() {
@@ -242,7 +242,7 @@
 
                             /* ha
                              */
-                            uniqueCollapserInitialState(to.attr('data-team-player-list'), to.parents('[data-team]').attr('data-collapse-state'));
+                            uniqueCollapserInitialState($('#allTeams').find('[data-team]'));
                             uniqueCollapser();
                         })
                         .done(function() {
@@ -265,7 +265,7 @@
 
                             /* ha
                              */
-                            uniqueCollapserInitialState(to.attr('data-team-player-list'), to.parents('[data-team]').attr('data-collapse-state'));
+                            uniqueCollapserInitialState($('#allTeams').find('[data-team]'));
                             uniqueCollapser();
                         })
                         .done(function() {
@@ -290,7 +290,7 @@
          * elements inside if its current state is uncollapsed; if its
          * current state is collapsed, show all the data-player elements
          */
-        function uniqueCollapser() {
+        function uniqueCollapser(allTeams) {
             $('#allTeams').find('[data-collapser]').each(function (index, element) {
                 $(element).on('click', function () {
                     var teamId = $(element).attr('data-collapser');
@@ -314,28 +314,23 @@
 
         /**
          * Collapser for a particular team
-         * Sets initial state
-         *
-         * @param teamId
-         * @param collapseState
+         * Sets initial state and *maintains it*
          */
-        function uniqueCollapserInitialState(teamId, collapseState) {
-            var teamContainer = $('[data-team=' + teamId + ']');
+        function uniqueCollapserInitialState(allTeams) {
+            allTeams.each(function(index, element) {
+                var teamContainer = $(element);
 
-            teamContainer.data('data-collapse-state', collapseState);
+                var isCollapsed = teamContainer.data('data-collapse-state') == 'collapsed';
 
-            var isCollapsed = teamContainer.data('data-collapse-state') == 'collapsed';
-
-            if (isCollapsed) {
-                teamContainer.attr('id', teamId);
-                teamContainer.find('[data-player]').show();
-                teamContainer.data('data-collapse-state', 'uncollapsed');
-            }
-            else {
-                teamContainer.attr('id', teamId);
-                teamContainer.find('[data-player]').hide();
-                teamContainer.data('data-collapse-state', 'collapsed');
-            }
+                if (isCollapsed) {
+                    teamContainer.find('[data-player]').hide();
+                    teamContainer.data('data-collapse-state', 'collapsed');
+                }
+                else {
+                    teamContainer.find('[data-player]').show();
+                    teamContainer.data('data-collapse-state', 'uncollapsed');
+                }
+            });
         }
     });
 </script>
