@@ -138,6 +138,15 @@
 //            'destroy'
         ];
 
+        // Unlock modal if one of the following are clicked
+        var closeSelectors = [
+            '.close-reveal-modal',
+            'a',
+            'button',
+            'input[type=button]',
+            'input[type=submit]'
+        ];
+
         // Set up selectize on all elements
         element.each(function() {
             var singleElement = $(this);
@@ -150,14 +159,6 @@
                     Foundation.libs.reveal.locked = true;
                 });
 
-                //Unlock modal if one of the following are clicked
-                var closeSelectors = [
-                    '.close-reveal-modal',
-                    'a',
-                    'button',
-                    'input[type=button]',
-                    'input[type=submit]'
-                ];
                 $('[data-reveal]').find(closeSelectors.join()).on('click', function(){
                     Foundation.libs.reveal.locked = false;
                 });
