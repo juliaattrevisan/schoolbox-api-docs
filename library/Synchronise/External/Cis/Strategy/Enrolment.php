@@ -131,15 +131,34 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
                 array_filter($newItem['ClassTeachers'])
             )
         );
-        foreach ($teachers as $teacher) {
-            foreach ($newItem['ClassPeriods'] as $classPeriod) {
+
+        foreach ($newItem['ClassPeriods'] as $classPeriod) {
+            try {
+                /** @var \Schoolbox\External\TimetablePeriod $timetablePeriod */
+                $timetablePeriod = \Schoolbox\External\TimetablePeriodMapper::getInstance()->findById($classPeriod['ClassPeriodID']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                printf("No timetable period \"%s\" found\n", $classPeriod['ClassPeriodID']);
+                continue;
+            }
+            // No teachers at all? Add a period for a null teacher
+            if (count($teachers) === 0) {
+                /** @var ClassPeriod $period */
+                $period = $periodMapper->createModel();
+                $periods->add(
+                    $period
+                        ->setClass($class)
+                        ->setPeriod($timetablePeriod)
+                        ->setRoom($classPeriod['ClassRoomCode'])
+                );
+            }
+            foreach ($teachers as $teacher) {
                 /** @var ClassPeriod $period */
                 $period = $periodMapper->createModel();
                 $periods->add(
                     $period
                         ->setClass($class)
                         ->setTeacher($teacher)
-                        ->setPeriod($classPeriod['ClassPeriodID'])
+                        ->setPeriod($timetablePeriod)
                         ->setRoom($classPeriod['ClassRoomCode'])
                 );
             }
