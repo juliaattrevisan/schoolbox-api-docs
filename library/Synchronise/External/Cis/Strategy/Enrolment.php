@@ -27,6 +27,14 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
     protected $title    = "Update Schoolbox Enrolment Details Synchronisation";
 
     /**
+     * The class enrolments and periods that have been removed by this sync.
+     *
+     * Class enrolments and periods may be added more than once per sync - this
+     * ensures that they only get removed before the first time it's added.
+     */
+    protected $deletedClasses = [];
+
+    /**
      * {@inheritdoc}
      */
     public function generateList()
@@ -100,6 +108,13 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
 
         if ($this->perform_update) {
             $classMapper->save($class);
+            $classId = $class->getId();
+            if (!array_key_exists($classId, $this->deletedClasses)) {
+                // Clear the existing teachers and students for this class
+                $this->deletedClasses[$classId] = true;
+                ClassPeriodMapper::getInstance()->deleteByColumn('class_id', $classId);
+                ClassInvolvementMapper::getInstance()->deleteByColumn('class_id', $classId);
+            }
             $this->createUpdateClassPeriods($new_item, $class);
             $this->createUpdateClassEnrolments($new_item, $class);
         }
@@ -117,9 +132,6 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
     public function createUpdateClassPeriods($newItem, ClassEntry $class)
     {
         $periodMapper = ClassPeriodMapper::getInstance();
-
-        // Clear the existing teachers for this class
-        $periodMapper->deleteByColumn('class_id', $class->getId());
 
         // Re-add teachers in this class
         $periods = new \Schoolbox\Collection();
@@ -178,9 +190,6 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
     {
         $enrolmentMapper = ClassInvolvementMapper::getInstance();
 
-        // Clear the existing enrolments for this class
-        $enrolmentMapper->deleteByColumn('class_id', $class->getId());
-
         // Re-add enrolments in this class
         $enrolments = new \Schoolbox\Collection();
         /** @var User[] $teachers */
@@ -219,6 +228,5 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
             );
         }
         $enrolmentMapper->save($enrolments);
-
     }
 }
