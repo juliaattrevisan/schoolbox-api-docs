@@ -302,11 +302,13 @@
                         teamContainer.attr('id', teamId);
                         teamContainer.find('[data-player]').show();
                         teamContainer.data('data-collapse-state', 'uncollapsed');
+                        $(element).removeClass().addClass('icon-down-arrow');
                     }
                     else {
                         teamContainer.attr('id', teamId);
                         teamContainer.find('[data-player]').hide();
                         teamContainer.data('data-collapse-state', 'collapsed');
+                        $(element).removeClass().addClass('icon-up-arrow');
                     }
                 });
             });
@@ -325,10 +327,12 @@
                 if (isCollapsed) {
                     teamContainer.find('[data-player]').hide();
                     teamContainer.data('data-collapse-state', 'collapsed');
+                    $(element).removeClass().addClass('icon-up-arrow');
                 }
                 else {
                     teamContainer.find('[data-player]').show();
                     teamContainer.data('data-collapse-state', 'uncollapsed');
+                    $(element).removeClass().addClass('icon-down-arrow');
                 }
             });
         }
