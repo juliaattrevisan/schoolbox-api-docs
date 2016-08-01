@@ -213,6 +213,11 @@
                         })
                         .done(function(response) {
                             refreshPlayerList(response);
+
+                            /* ha
+                             */
+                            uniqueCollapserInitialState(to.attr('data-team-player-list'), to.parents('[data-team]').attr('data-collapse-state'));
+                            uniqueCollapser();
                         })
                         .done(function() {
                             fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
@@ -238,6 +243,7 @@
                             /* ha
                              */
                             uniqueCollapserInitialState(to.attr('data-team-player-list'), to.parents('[data-team]').attr('data-collapse-state'));
+                            uniqueCollapser();
                         })
                         .done(function() {
                             toFeedback.labelTimeout({text: 'Added!', css: 'success'});
@@ -257,6 +263,10 @@
                         .done(function(response) {
                             refreshPlayerList(response);
 
+                            /* ha
+                             */
+                            uniqueCollapserInitialState(to.attr('data-team-player-list'), to.parents('[data-team]').attr('data-collapse-state'));
+                            uniqueCollapser();
                         })
                         .done(function() {
                             fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
