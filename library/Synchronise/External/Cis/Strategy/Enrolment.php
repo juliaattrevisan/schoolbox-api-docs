@@ -127,10 +127,8 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
         $teachers = UserMapper::getInstance()->findByColumn(
             'synergy_id',
             array_map(
-                function ($v) {
-                    return 'T-'.$v;
-                },
-                $newItem['ClassTeachers']
+                function ($v) { return 'T-'.$v; },
+                array_filter($newItem['ClassTeachers'])
             )
         );
         foreach ($teachers as $teacher) {
@@ -170,10 +168,8 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
         $teachers = UserMapper::getInstance()->findByColumn(
             'synergy_id',
             array_map(
-                function ($v) {
-                    return 'T-'.$v;
-                },
-                $newItem['ClassTeachers']
+                function ($v) { return 'T-'.$v; },
+                array_filter($newItem['ClassTeachers'])
             )
         );
         foreach ($teachers as $teacher) {
@@ -190,10 +186,8 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
         $students = UserMapper::getInstance()->findByColumn(
             'synergy_id',
             array_map(
-                function ($v) {
-                    return 'S-'.$v;
-                },
-                $newItem['ClassStudents']
+                function ($v) { return 'S-'.$v; },
+                array_filter($newItem['ClassStudents'])
             )
         );
         foreach ($students as $student) {
