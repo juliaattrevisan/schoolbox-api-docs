@@ -15,6 +15,8 @@ use Schoolbox\External\ClassInvolvement;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\TimetablePeriod;
+use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -146,8 +148,8 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
 
         foreach ($newItem['ClassPeriods'] as $classPeriod) {
             try {
-                /** @var \Schoolbox\External\TimetablePeriod $timetablePeriod */
-                $timetablePeriod = \Schoolbox\External\TimetablePeriodMapper::getInstance()->findById($classPeriod['ClassPeriodID']);
+                /** @var TimetablePeriod $timetablePeriod */
+                $timetablePeriod = TimetablePeriodMapper::getInstance()->findById($classPeriod['ClassPeriodID']);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 printf("No timetable period \"%s\" found\n", $classPeriod['ClassPeriodID']);
                 continue;
