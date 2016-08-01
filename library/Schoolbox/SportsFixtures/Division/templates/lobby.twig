@@ -381,7 +381,7 @@
                         data-add-players-action="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: teamData.team.id}) }}"
                         data-remove-players-action="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: teamData.team.id}) }}"
                         data-reorder-players-action="{{ routeLookup('sportsfixturesTeam.postReorderPlayers', {entityId: teamData.team.id}) }}">
-                        <li class="actions-small-1">
+                        <li class="actions-small-2">
                             <div class="list-item">
                                 <div class="small-12 avatar card">
                                     <h3>{{ teamData.team.name }}</h3>
@@ -392,6 +392,8 @@
                                 </div>
                             </div>
                             <nav>
+                                <a href="#" class="icon-down-arrow" data-collapser="team-{{ teamData.team.id }}-contents" title="Expand/Collapse Content"></a>
+
                                 <a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: teamData.team.id}) }}"
                                    class="icon-modify"
                                    title="Modify Team"></a>
