@@ -105,6 +105,7 @@
                 });
                 oldList.empty().append(newList.children());
             });
+
             connectPlayerPositionButtons();
         };
 
@@ -226,12 +227,17 @@
                     // Move from division to team (add to team, reorder team)
                     // Add first as player must be in team before reordering
                     toFeedback.labelActivate({text: 'Adding to team...'});
+
                     postPlayer(dragged.data('player'), to.data('addPlayersAction'))
                         .then(function() {
                             return saveOrdering(to);
                         })
                         .done(function(response) {
                             refreshPlayerList(response);
+
+                            /* ha
+                             */
+                            uniqueCollapserInitialState(to.attr('data-team-player-list'), to.parents('[data-team]').attr('data-collapse-state'));
                         })
                         .done(function() {
                             toFeedback.labelTimeout({text: 'Added!', css: 'success'});
@@ -250,6 +256,7 @@
                         })
                         .done(function(response) {
                             refreshPlayerList(response);
+
                         })
                         .done(function() {
                             fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
@@ -264,6 +271,62 @@
         });
 
         connectPlayerPositionButtons();
+        uniqueCollapser();
+
+        /**
+         *  Make a unique collapser
+         *
+         * For every data-collapser that exists, hide all the data-player
+         * elements inside if its current state is uncollapsed; if its
+         * current state is collapsed, show all the data-player elements
+         */
+        function uniqueCollapser() {
+            $('#allTeams').find('[data-collapser]').each(function (index, element) {
+                $(element).on('click', function () {
+                    var teamId = $(element).attr('data-collapser');
+                    var teamContainer = $('[data-team=' + teamId + ']');
+
+                    var isCollapsed = teamContainer.data('data-collapse-state') == 'collapsed';
+
+                    if (isCollapsed) {
+                        teamContainer.attr('id', teamId);
+                        teamContainer.find('[data-player]').show();
+                        teamContainer.data('data-collapse-state', 'uncollapsed');
+                    }
+                    else {
+                        teamContainer.attr('id', teamId);
+                        teamContainer.find('[data-player]').hide();
+                        teamContainer.data('data-collapse-state', 'collapsed');
+                    }
+                });
+            });
+        }
+
+        /**
+         * Collapser for a particular team
+         * Sets initial state
+         *
+         * @param teamId
+         * @param collapseState
+         */
+        function uniqueCollapserInitialState(teamId, collapseState) {
+            var teamContainer = $('[data-team=' + teamId + ']');
+
+            teamContainer.data('data-collapse-state', collapseState);
+
+            var isCollapsed = teamContainer.data('data-collapse-state') == 'collapsed';
+
+            if (isCollapsed) {
+                teamContainer.attr('id', teamId);
+                teamContainer.find('[data-player]').show();
+                teamContainer.data('data-collapse-state', 'uncollapsed');
+            }
+            else {
+                teamContainer.attr('id', teamId);
+                teamContainer.find('[data-player]').hide();
+                teamContainer.data('data-collapse-state', 'collapsed');
+            }
+        }
     });
 </script>
 <ul class="breadcrumb">
@@ -362,7 +425,7 @@
         {% endif %}
     </div>
 
-    <div class="hide-for-small medium-6 island">
+    <div class="hide-for-small medium-6 island" id="allTeams">
         <div class="actions-small-1 row">
             <div class="list-item">
                 <div class="small-12 column">
@@ -375,8 +438,8 @@
         </div>
         {% if teams is not empty %}
             {% for teamData in teams %}
-                <section data-team="{{ teamData.team.id }}">
-                    <ul class="information-list sortable"
+                <section data-team="{{ teamData.team.id }}" data-collapse-state="uncollapsed">
+                    <ul id='team-{{ teamData.team.id }}' class="information-list sortable"
                         data-team-player-list="{{ teamData.team.id }}"
                         data-add-players-action="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: teamData.team.id}) }}"
                         data-remove-players-action="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: teamData.team.id}) }}"
@@ -392,7 +455,7 @@
                                 </div>
                             </div>
                             <nav>
-                                <a href="#" class="icon-down-arrow" data-collapser="team-{{ teamData.team.id }}-contents" title="Expand/Collapse Content"></a>
+                                <a href="#" class="icon-down-arrow" data-collapser="{{ teamData.team.id }}" title="Expand/Collapse Content"></a>
 
                                 <a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: teamData.team.id}) }}"
                                    class="icon-modify"
