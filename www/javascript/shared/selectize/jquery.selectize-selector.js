@@ -159,7 +159,7 @@
                     Foundation.libs.reveal.locked = true;
                 });
 
-                $('[data-reveal]').find(closeSelectors.join()).on('click', function(){
+                $('[data-reveal]').on('click', closeSelectors.join(), function(){
                     Foundation.libs.reveal.locked = false;
                 });
             }
