@@ -1,0 +1,24 @@
+{% extends '@core/user/student.twig' %}
+{% block details_formTeacher %}
+{% if showClasses %}
+    {% if formTeacher %}
+    <dt class="no-margin small-6 medium-3">Form Teacher</dt>
+    <dd class="no-margin small-6 medium-9">
+        {% if formTeacher.getId() %}
+        <a href="{{ session.mailhandle }}{{ formTeacher.getEmail() }}">{{ formTeacher.formatName() }}</a>
+        {% else %}
+        {{ formTeacher.formatName() }}
+        {% endif %}
+    </dd>
+    {% endif %}
+{% endif %}
+{% endblock details_formTeacher %}
+
+{% block details_studentForm %}
+{% if showClasses %}
+    {% if externalUser.StudentForm %}
+    <dt class="no-margin small-6 medium-3">Form</dt>
+    <dd class="no-margin small-6 medium-9">{{ externalUser.StudentForm }}</dd>
+    {% endif %}
+{% endif %}
+{% endblock details_studentForm %}
