@@ -142,6 +142,27 @@
         element.each(function() {
             var singleElement = $(this);
             singleElement.val('').selectize(settings.selectize);
+
+            // Is this selectize inside a foundation modal ?
+            if( function(){ return singleElement.parent('[data-reveal]').length; } ){
+                // Lock modal when dropdown appears
+                singleElement.data('selectize').on('dropdown_open', function(){
+                    Foundation.libs.reveal.locked = true;
+                });
+
+                //Unlock modal if one of the following are clicked
+                var closeSelectors = [
+                    '.close-reveal-modal',
+                    'a',
+                    'button',
+                    'input[type=button]',
+                    'input[type=submit]'
+                ];
+                $('[data-reveal]').find(closeSelectors.join()).on('click', function(){
+                    Foundation.libs.reveal.locked = false;
+                });
+            }
+
             $.each(selectizeEvents, function(i,event) {
                 singleElement.data('selectize').on(
                     event,
