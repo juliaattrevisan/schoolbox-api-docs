@@ -142,8 +142,8 @@ if(is_numeric($this->arg[0])) {
         /* Output external db info for debug purposes */
         if(Cfg::get('external_enable') && Cfg::get('external_type') == 'synergetic' && $user['synergy_id'] > 0) {
             $synuser = new External_Synergetic_User();
-            $this->setVar(array('FILE_YEAR' => $synuser->getCurrentSemester($user['synergy_id']),
-                                'FILE_SEMESTER' => $synuser->getCurrentYear($user['synergy_id']),
+            $this->setVar(array('FILE_SEMESTER' => $synuser->getCurrentSemester($user['synergy_id']),
+                                'FILE_YEAR' => $synuser->getCurrentYear($user['synergy_id']),
             ));
             $this->parse('external_info_block','external_info');
         }
