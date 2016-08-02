@@ -73,6 +73,7 @@
 
                         /* Save new sequence
                          */
+                        console.log('save new sequence');
                     }
                     /* Dragging from division to a team
                      */
@@ -84,15 +85,19 @@
                         toId = to.parents('[data-test-team]').attr('data-test-team');
                         console.log('dragging player from division to team ' + toId);
 
+                        /* If dragged onto a proxy element, remove the player drag helper
+                         * after team list is respawned
+                         */
+                        if (isTeamPlayerListProxy(to)) {
+                            console.log('hide helper');
+                        }
+
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
                         toFeedback.labelTimeout({text: 'Added!', css: 'success'});
                     }
                     /* Dragging players between teams
                      */
                     else if (isTeamPlayerList(from) && isTeamPlayerList(to)) {
-
-                        console.log(isTeamPlayerList(from), isTeamPlayerList(to));
-
                         fromFeedback.labelActivate({text: 'Removing from team...'});
                         toFeedback.labelActivate({text: 'Adding to team...'});
 
@@ -101,6 +106,13 @@
                         fromId = from.parents('[data-test-team]').attr('data-test-team');
                         toId = to.parents('[data-test-team]').attr('data-test-team');
                         console.log('dragging between teams - from: ' + fromId + ', to: ' + toId);
+
+                        /* If dragged onto a proxy element, remove the player drag helper
+                         * after team list is respawned
+                         */
+                        if (isTeamPlayerListProxy(to)) {
+                            console.log('hide helper');
+                        }
 
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
                         toFeedback.labelTimeout({text: 'Added!', css: 'success'});
@@ -122,7 +134,7 @@
 
                     /* Reapply filter settings to division player list
                      */
-                    console.log('over');
+                    console.log('reapply filters');
                 }
             });
         }
