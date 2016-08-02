@@ -12,6 +12,7 @@ namespace Schoolbox\SportsFixtures\Match;
 
 
 use PDOStatement;
+use \UnexpectedValueException;
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Resource\Storage;
@@ -19,6 +20,8 @@ use Schoolbox\User;
 use Schoolbox\SportsFixtures\Match\Model as Match;
 use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\SportsFixtures\Season\Model as Season;
+use Schoolbox\SportsFixtures\Season\Mapper as SeasonMapper;
 use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Venue\Model as Venue;
@@ -74,8 +77,42 @@ class Mapper extends BaseMapper
             'other_key' => 'match_id',
         ));
 
+        $this->registerCallback(self::CALLBACK_PRESAVE, array($this, 'validateStartAtDate'));
+
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteItineraryItems'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteResults'));
+    }
+
+    /**
+     * Ensures the proposed match start_at date occurs within the season
+     *
+     * @param Model $match
+     * @throws UnexpectedValueException
+     * @return true unless error thrown
+     */
+    public function validateStartAtDate(Match $match)
+    {
+        // Hydration acrobatics...
+        $season = $match->getDivision()->getSeason();
+        if(!$season instanceof Season){
+            $season = DivisionMapper::getInstance()->findById($match->getDivision()->getId())->getSeason();
+        }
+
+        if(!$season->getStart() instanceof \Alaress_Date_Format){
+            $season = SeasonMapper::getInstance()->findById($season->getId());
+        }
+
+        // Is match scheduled before season start ?
+        if($match->getStartAt()->compareDateOnly($season->getStart()) < 0){
+            throw new UnexpectedValueException(sprintf("Match cannot be scheduled before season begins: %s",$season->getStart()->getLocalShort()));
+        }
+
+        // Is match scheduled after season end ?
+        if($match->getStartAt()->compareDateOnly($season->getEnd()) > 0){
+            throw new UnexpectedValueException(sprintf("Match cannot be scheduled after season ends: %s",$season->getEnd()->getLocalShort()));
+        }
+
+        return true;
     }
 
     /**

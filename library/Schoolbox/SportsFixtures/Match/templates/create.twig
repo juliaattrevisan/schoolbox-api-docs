@@ -18,7 +18,9 @@
                 },
                 startAtDate: {
                     required: true,
-                    minlength: 1
+                    minlength: 1,
+                    minDate: "{{ division.season.start.getLocalShort }}",
+                    maxDate: "{{ division.season.end.getLocalShort }}"
                 },
                 startAtTime: {
                     required: true,
@@ -37,7 +39,12 @@
                 'divisionId': 'Please choose a Division.',
                 'venueId': 'Please choose a Venue.',
                 'name': 'Please enter a Match name.',
-                'startAtDate': 'Please choose a date.',
+                startAtDate: {
+                    required: 'Please choose a date.',
+                    minlength: 'Please choose a date.',
+                    minDate: 'Date must be on or after {{ division.season.start.getLocalShort }}',
+                    maxDate: 'Date must be on or before {{ division.season.end.getLocalShort }}'
+                },
                 'startAtTime': 'Please choose a time.'
             },
             errorPlacement: function(error, element) {
@@ -60,7 +67,11 @@
             });
         });
 
-        $('#matchForm').find('[data-datepicker]').datepicker();
+        // Ensure match is scheduled within the season
+        $('#startAtDate').datepicker( {
+            minDate: "{{ division.season.start.getLocalShort }}",
+            maxDate: "{{ division.season.end.getLocalShort }}"
+        });
 
         $('#matchForm').find('[data-timepicker]').timepicker({
             appendTo: function ($input) {
@@ -159,7 +170,8 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Date
-                            <input type="text" name="startAtDate" placeholder="Date" data-datepicker value="{{ match.startAt.getLocalShort }}">
+                            <span data-tooltip class="has-tip tip-top hint" title="Season runs {{ division.season.start.getLocalShort }} to {{ division.season.end.getLocalShort }}">?</span>
+                            <input type="text" id="startAtDate" name="startAtDate" placeholder="Date" data-datepicker value="{{ match.startAt.getLocalShort }}">
                         </label>
                     </div>
 

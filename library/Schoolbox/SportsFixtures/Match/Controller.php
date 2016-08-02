@@ -13,6 +13,7 @@ use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
+use \Schoolbox\SportsFixtures\Season\Mapper as SeasonMapper;
 use \Schoolbox\SportsFixtures\Division\Model as Division;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
@@ -30,6 +31,11 @@ class Controller extends AbstractController
      * @var SportMapper
      */
     protected $sportMapper;
+
+    /**
+     * @var SeasonMapper
+     */
+    protected $seasonMapper;
 
     /**
      * @var DivisionMapper
@@ -73,6 +79,7 @@ class Controller extends AbstractController
     {
         parent::__construct(MatchMapper::getInstance());
         $this->setSportMapper(SportMapper::getInstance());
+        $this->setSeasonMapper(SeasonMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
         $this->setTeamMapper(TeamMapper::getInstance());
         $this->setItineraryItemMapper(ItineraryItemMapper::getInstance());
@@ -84,7 +91,7 @@ class Controller extends AbstractController
     /**
      * List of Matches
      *
-     * @param null $context
+     * @param Division $context
      */
     public function getList($context = null)
     {
@@ -92,7 +99,6 @@ class Controller extends AbstractController
          * but I'll set it up anyway just in case
          */
         try {
-            /** @var Division $context */
             $sport = $this->getSportMapper()->findById($context->getSport()->getId());
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
@@ -138,7 +144,7 @@ class Controller extends AbstractController
 
     /**
      * @param Match $entity
-     * @param object $context
+     * @param Division $context
      * @return void
      */
     protected function getForm($entity, $context = null)
@@ -156,6 +162,14 @@ class Controller extends AbstractController
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
+
+
+        try {
+            $context->setSeason($this->getSeasonMapper()->findById($context->getSeason()->getId()));
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
+        }
+
 
         $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $entity->getId(), [
             'order' => [
@@ -294,6 +308,22 @@ class Controller extends AbstractController
     protected function setSportMapper($sportMapper)
     {
         $this->sportMapper = $sportMapper;
+    }
+
+    /**
+     * @return SeasonMapper
+     */
+    protected function getSeasonMapper()
+    {
+        return $this->seasonMapper;
+    }
+
+    /**
+     * @param SeasonMapper $seasonMapper
+     */
+    protected function setSeasonMapper($seasonMapper)
+    {
+        $this->seasonMapper = $seasonMapper;
     }
 
     /**
