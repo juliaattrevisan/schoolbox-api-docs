@@ -158,6 +158,14 @@ $kernel->run
         VALUES (:student_id, :box_id, (SELECT criterion_id FROM rubric_descriptor WHERE id = :desc_id), :desc_id, :tstamp)
     ");
 
+    $updateReturnRecordStmt = $db->prepare("
+        UPDATE submission_return 
+        SET mark = :visibleMark
+        WHERE returned = :tstamp
+        AND box_id = :box_id
+        AND owner = :student_id
+    ");
+
     $notBefore = new Alaress_Date_Format('2016-01-01 00:00:00', 'Y-m-d H:i:s');
     $notAfter  = new Alaress_Date_Format('2016-07-01 00:00:00', 'Y-m-d H:i:s');
 
@@ -420,6 +428,15 @@ $kernel->run
                     }
 
                     $log->debug(json_encode($avg));
+
+                    $log->info("Updating student-visible mark to $newNum / $newDenom [box_id,student_id,tstamp]($instanceBoxId,$studentId,$stamp)");
+
+                    $updateReturnRecordStmt->execute([
+                        'visibleMark' => "$newNum / $newDenom",
+                        'tstamp'      => $stamp,
+                        'box_id'      => $instanceBoxId,
+                        'student_id'  => $studentId
+                    ]);
 
                 }
                 $log->debug("COMMIT TX$instanceBoxId");
