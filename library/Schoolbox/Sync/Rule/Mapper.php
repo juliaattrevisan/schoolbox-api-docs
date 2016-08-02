@@ -100,7 +100,7 @@ class Mapper extends Schoolbox\Mapper
      */
     public function updateRuleSequence($sequencing)
     {
-        $identifierName = $this->getIdentifier()['column'];
+        $identifierName = $this->getIdentifierColumn();
 
         $statement = $this->database->prepare("
             UPDATE `{$this->table}`

@@ -125,9 +125,9 @@ class Mapper extends FolderMapper
         $statement->execute();
         $units = [];
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
-            $courseId = $row[$this->getIdentifier()['column']];
+            $courseId = $row[$this->getIdentifierColumn()];
             // Hydrate units (avoiding duplicates) and cache
-            $unitId = $row['unit.'.$this->getIdentifier()['column']];
+            $unitId = $row['unit.'.$this->getIdentifierColumn()];
             if(!isset($units[$courseId][$unitId])){
                 $unit = $this->hydrateJoin($row, 'unit', 'unit');
                 $units[$courseId][$unit->getId()] = $unit;

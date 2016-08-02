@@ -411,7 +411,7 @@ class Controller extends Base
             $finder = $tables[$table]['findAllMethod'];
             $rows = $mapper->$finder();
         } else {
-            $orderArr = array($mapper->getIdentifier()['column'] => 'ASC');
+            $orderArr = array($mapper->getIdentifierColumn() => 'ASC');
             $rows = $mapper->findAll(array('order' => $orderArr));
         }
 
