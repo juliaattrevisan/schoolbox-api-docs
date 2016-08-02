@@ -65,13 +65,16 @@
                     /* Reordering within the same sortable
                      */
                     if (from.is(to)) {
+
+                        /* Save new sequence
+                         */
                     }
                     /* Dragging from division to a team
                      */
                     else if (isDivisionList(from) && isTeamPlayerList(to)) {
                         toFeedback.labelActivate({text: 'Adding to team...'});
 
-                        /* Execute db transaciton
+                        /* Execute db transaction
                          */
                         console.log('dragging player from division to team ' + to.parents('[data-test-team]').attr('data-test-team'));
 
@@ -84,7 +87,7 @@
                         fromFeedback.labelActivate({text: 'Removing from team...'});
                         toFeedback.labelActivate({text: 'Adding to team...'});
 
-                        /* Execute db transaciton
+                        /* Execute db transaction
                          */
                         console.log('dragging between teams - from: ' + from.parents('[data-test-team]').attr('data-test-team') + ', to: ' + to.parents('[data-test-team]').attr('data-test-team'));
 
@@ -96,7 +99,7 @@
                     else if (isTeamPlayerList(from) && isDivisionList(to)) {
                         fromFeedback.labelActivate({text: 'Removing from team...'});
 
-                        /* Execute db transaciton
+                        /* Execute db transaction
                          */
                         console.log('remove a player from team ' + from.parents('[data-test-team]').attr('data-test-team'));
 
@@ -129,9 +132,24 @@
          * @param element
          */
         function isTeamPlayerList(element) {
-            var attr = element.attr('data-test-team-player-list');
+            var attr = [
+                element.attr('data-test-team-player-list'),
 
-            return (typeof attr !== typeof undefined && attr !== false);
+                /* Dragging into the title of the team requires a check on this element
+                 *
+                 * Functions equivalently to dragging into player list itself, but this
+                 * provides us with a way of determining where the player was dragged
+                 */
+                element.attr('data-test-team-player-list-proxy')
+            ];
+
+            for (var i = 0; i < attr.length; i++) {
+                if (typeof attr !== typeof undefined && attr !== false) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /**
