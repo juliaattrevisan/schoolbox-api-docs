@@ -133,35 +133,44 @@
          * @param element
          */
         function isDivisionList(element) {
-            var attr = element.attr('data-test-division-player-list');
-
-            return (typeof attr !== typeof undefined && attr !== false);
+            return hasAttr(element, 'data-test-division-player-list');
         }
 
         /**
          * $element is a team's player list sortable
          *
+         * Dragging into the title of the team requires a check on this element:
+         * data-test-team-player-list-proxy
+         *
+         * Functions equivalently to dragging into player list itself, but this
+         * provides us with a way of determining where the player was dragged
+         *
          * @param element
          */
         function isTeamPlayerList(element) {
-            var attr = [
-                element.attr('data-test-team-player-list'),
+            return (hasAttr(element, 'data-test-team-player-list') || hasAttr(element, 'data-test-team-player-list-proxy'));
+        }
 
-                /* Dragging into the title of the team requires a check on this element
-                 *
-                 * Functions equivalently to dragging into player list itself, but this
-                 * provides us with a way of determining where the player was dragged
-                 */
-                element.attr('data-test-team-player-list-proxy')
-            ];
+        /**
+         * $element is a team's player list proxy (alternate drag destination)
+         *
+         * @param element
+         * @returns {boolean}
+         */
+        function isTeamPlayerListProxy(element) {
+            return hasAttr(element, 'data-test-team-player-list-proxy');
+        }
 
-            for (var i = 0; i < attr.length; i++) {
-                if (typeof attr[i] !== typeof undefined && attr[i] !== false) {
-                    return true;
-                }
-            }
-
-            return false;
+        /**
+         * Check whether a data attribute is set on an element
+         * http://stackoverflow.com/questions/1318076/jquery-hasattr-checking-to-see-if-there-is-an-attribute-on-an-element
+         *
+         * @param element
+         * @param attribute
+         * @returns {boolean}
+         */
+        function hasAttr(element, attribute) {
+            return (typeof element.attr(attribute) !== typeof undefined && element.attr(attribute) !== false);
         }
 
         /**
