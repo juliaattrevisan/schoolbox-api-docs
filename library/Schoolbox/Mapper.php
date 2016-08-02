@@ -1069,6 +1069,13 @@ abstract class Mapper implements IMapper, Serializable
             return 0;
         }
 
+        // Don't re-delete already deleted rows
+        $postCallback = self::CALLBACK_POSTDELETE;
+        if (isset($this->soft_delete_column)) {
+            $postCallback = self::CALLBACK_POSTSOFTDELETE;
+            $columnList[$this->soft_delete_column] = $this->soft_delete_undeleted_value;
+        }
+
         try {
             // Build WHERE part
             $predicate->addColumnList($columnList);
@@ -1077,11 +1084,24 @@ abstract class Mapper implements IMapper, Serializable
             return 0;
         }
 
+        // Call pre-delete hooks
+        $deletedItems = $this->findByColumnList($columnList);
+        foreach ($deletedItems as $model) {
+            if (!($this->triggerCallbacks(self::CALLBACK_PREDELETE, $model))) {
+                return 0;
+            }
+        }
+
         // build query
         $query = $deleteString . ' WHERE ' . implode(' AND ', $predicate->getWhere());
 
         // execute with predicate params
         $statement = $this->getDatabase()->query($query, $predicate->getParams());
+
+        // Call post-delete hooks
+        foreach ($deletedItems as $model) {
+            $this->triggerCallbacks($postCallback, $model);
+        }
 
         // return the number of rows deleted
         return $statement->rowCount();
