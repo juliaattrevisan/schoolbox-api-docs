@@ -14,6 +14,7 @@
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="/javascript/shared/sportsfixtures/jquery.division-lobby.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript">
     $(function() {
@@ -347,58 +348,7 @@
 
 <script type="text/javascript">
     $(function() {
-
-        /* Every sortable is connected to every other sortable
-         * This enables you to drag:
-         *     within a sortable;
-         *     between division and team sortables;
-         *     between team and other team sortables
-         */
-        var allSortables = $('[data-test-division-player-list], [data-test-team-player-list]');
-
-        allSortables.sortable({
-            handle: '.icon-grip',
-            helper: 'clone',
-            connectWith: allSortables,
-            start: function(event, ui) {
-
-                /* Always show the person being dragged away
-                 */
-                $(ui.item).show();
-            },
-            stop: function(event, ui) {
-                var player = ui.item;
-                var from = $(event.target);
-                var to = player.closest('ul');
-
-                /* Indicators
-                 */
-                var fromFeedback = from.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
-                var toFeedback = from.closest('[data-team], [data-division]').find('[data-relation="save-label"]');
-
-                /* Dragging from division to a team
-                 */
-                if (from.attr('data-test-division-player-list') && to.attr('data-test-team-player-list')) {
-                    console.log('dragging player from division to team ' + to.attr('data-test-team-player-list'));
-                }
-                /* Dragging players between teams
-                 */
-                else if (from.attr('data-test-team-player-list') && to.attr('data-test-team-player-list')) {
-                    console.log('dragging between teams - from: ' + from.attr('data-test-team-player-list') + ', to: ' + to.attr('data-test-team-player-list'));
-                }
-                /* Remove a player from a team
-                 */
-                else {
-                    console.log('remove a player from team ' + from.attr('data-test-team-player-list'));
-                }
-            },
-            over: function(event, ui) {
-
-                /* Reapply filter settings to division player list
-                 */
-                console.log('over');
-            }
-        });
+        $('[data-test-division-player-list], [data-test-team-player-list]').divisionLobby();
     });
 </script>
 
