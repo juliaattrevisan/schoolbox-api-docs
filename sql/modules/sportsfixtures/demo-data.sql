@@ -1,3 +1,48 @@
+/* Make script idempotent (Reverse order of CREATE) */
+DELETE FROM sportsfixtures_team_coach;
+DELETE FROM sportsfixtures_team_participantcoach;
+DELETE FROM sportsfixtures_coach;
+DELETE FROM sportsfixtures_school;
+DELETE FROM sportsfixtures_team_participantposition;
+DELETE FROM sportsfixtures_team_position;
+DELETE FROM sportsfixtures_team_participantuser;
+DELETE FROM sportsfixtures_team_user;
+DELETE FROM sportsfixtures_result;
+DELETE FROM sportsfixtures_status;
+DELETE FROM sportsfixtures_match_itineraryitem;
+DELETE FROM sportsfixtures_match;
+DELETE FROM sportsfixtures_venue;
+DELETE FROM sportsfixtures_division_user;
+DELETE FROM sportsfixtures_position;
+DELETE FROM sportsfixtures_team;
+DELETE FROM sportsfixtures_division;
+DELETE FROM sportsfixtures_season;
+DELETE FROM sportsfixtures_sport;
+
+ALTER TABLE sportsfixtures_team_coach AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_team_participantcoach AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_coach AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_school AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_team_participantposition AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_team_position AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_team_participantuser AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_team_user AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_result AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_status AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_match_itineraryitem AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_match AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_venue AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_division_user AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_position AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_team AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_division AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_season AUTO_INCREMENT = 1;
+ALTER TABLE sportsfixtures_sport AUTO_INCREMENT = 1;
+
+
+
+
+
 /* Add some Sports
  */
 INSERT INTO `sportsfixtures_sport` (`name`, `url`, `created_at`, `updated_at`) VALUES ('Soccer', 'https://www.youtube.com/watch?v=L4aBqvbP_MM', NOW(), NOW());
