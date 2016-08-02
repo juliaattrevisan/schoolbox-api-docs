@@ -30,6 +30,7 @@ CREATE TABLE `sportsfixtures_season` (
 CREATE TABLE `sportsfixtures_division` (
 	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
 	`sport_id` INT NULL COMMENT '',
+	`season_id` INT NOT NULL,
 	`name` VARCHAR(255) NULL COMMENT '',
 	`url` VARCHAR(2048) NULL COMMENT '',
 	`created_at` DATETIME NULL COMMENT '',
@@ -39,7 +40,11 @@ CREATE TABLE `sportsfixtures_division` (
 	FOREIGN KEY (`sport_id`)
 	REFERENCES `sportsfixtures_sport`(`id`)
 		ON UPDATE NO ACTION
-		ON DELETE NO ACTION
+		ON DELETE NO ACTION,
+	FOREIGN KEY (`season_id`)
+	REFERENCES `sportsfixtures_season`(`id`)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Team Table
