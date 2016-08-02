@@ -13,12 +13,9 @@ use \Alaress_Date_Format;
 use \Schoolbox\ValueLabelInterface;
 
 /**
- * Represents a Position a player may take in some Sport.
- * Eg, 'Full Forward' or 'Full Back' in Aussie Rules Football
+ * Represents a Venue where sports are conducted.
  *
- * For the time being, a participant may only be assigned 0 or 1 position
- *
- * @package Schoolbox\SportsFixtures\Position
+ * @package Schoolbox\SportsFixtures\Venue
  */
 class Model implements ISoftDeletable, ValueLabelInterface
 {
