@@ -65,7 +65,8 @@ class Controller extends AbstractController
                 $allSeasons = $this->mapper->findAll(
                     [
                         'order' => [
-                            'start' => 'desc'
+                            'start' => 'desc',
+                            'end' => 'desc',
                         ]
                     ]
                 );
@@ -112,7 +113,7 @@ class Controller extends AbstractController
     protected function getForm($entity, $context = null)
     {
         $data = [
-            'season'  => $entity,
+            'season' => $entity,
             'action' => $entity->getId() ? 'Modify' : 'Create',
         ];
 
@@ -152,7 +153,7 @@ class Controller extends AbstractController
      * @param Alaress_Date_Format $start
      * @param Alaress_Date_Format $end
      */
-    private function saveSeason(Season $season, $name, $start, $end)
+    private function saveSeason(Season $season, $name, Alaress_Date_Format $start, Alaress_Date_Format $end)
     {
         $season->setName($name);
         $season->setStart($start);

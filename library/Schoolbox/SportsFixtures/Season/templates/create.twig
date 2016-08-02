@@ -6,7 +6,7 @@
             rules: {
                 name: {
                     required: true,
-                    minlength: 2
+                    minlength: 1
                 },
                 start: {
                     required: true,
@@ -18,18 +18,16 @@
                 }
             },
             messages: {
-                name: 'Please enter a Season name.',
+                name:  'Please enter a Season name.',
                 start: 'Please select a season start date.',
-                end: 'Please select a season end date.'
-            },
-            errorPlacement: function(error, element) {
-                $.alaressValidate.defaultErrorPlacement(error, element);
+                end:   'Please select a season end date.'
             }
         })
 
+        // Create date-pickers
         $('#seasonForm').find('[data-datepicker]').datepicker();
 
-        // Ensure end date is after start date
+        // Ensure season ends on or after it begins
         $('#start').syncDates({
             endDate: $('#end')
         });

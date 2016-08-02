@@ -131,7 +131,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
      * @param Alaress_Date_Format $createdAt
      * @return self
      */
-    public function setCreatedAt($createdAt) {
+    public function setCreatedAt(Alaress_Date_Format $createdAt) {
         $this->createdAt = $createdAt;
         return $this;
     }
@@ -147,7 +147,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
      * @param Alaress_Date_Format $updatedAt
      * @return self
      */
-    public function setUpdatedAt($updatedAt) {
+    public function setUpdatedAt(Alaress_Date_Format $updatedAt) {
         $this->updatedAt = $updatedAt;
         return $this;
     }
