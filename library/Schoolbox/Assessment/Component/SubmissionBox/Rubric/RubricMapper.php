@@ -213,7 +213,7 @@ class RubricMapper
         // why 20? because it's not 0.
         $groupId = 20;
 
-        $groups = $criteria = $descriptors = [];
+        $groups = $criteria = [];
 
         $groupIdMap = [];
 
@@ -243,22 +243,8 @@ class RubricMapper
         // umm... I have *never* had to do this before... how does the while() loop break if not EOF??
         $criteriaStatement->closeCursor();
 
-        /** @var Collection|SubmissionBox\Rubric\Descriptor[] $descriptorCollection */
-        $descriptorCollection = SubmissionBox\Rubric\DescriptorMapper::getInstance()->findByColumnList([
-            'submission_box_id' => $box->getId(),
-            'valid'             => true
-        ]);
-
-        foreach ($descriptorCollection as $d) {
-            // only populate if a description is given
-            $descriptors[$d->getCriterion()->getId()][$d->getLevel()->getSequence()] = [
-                'id'     => $d->getId(),
-                'text'   => $d->getDescription(),
-                'points' => $d->getValue() || $d->getDescription() ? $d->getValue() : ''
-            ];
-        }
-
-        $levelList = $this->generateLevelList($box, $descriptors, $criteria);
+        $descriptors = $this->findDescriptors($box);
+        $levelList   = $this->generateLevelList($box, $descriptors, $criteria);
 
         // setup the data structure to match what the factory expects
         $postdata = [$box->getId() => [
@@ -270,6 +256,33 @@ class RubricMapper
 
         // use the factory to produce the rubric object
         return $this->factory->buildFromPostData($postdata, $forceTaskMode || $editMode)->setSubmissionBox($box);
+    }
+
+
+    /**
+     * @param SubmissionBox $box
+     * @return array
+     */
+    protected function findDescriptors(SubmissionBox $box)
+    {
+        /** @var Collection|SubmissionBox\Rubric\Descriptor[] $descriptorCollection */
+        $descriptorCollection = SubmissionBox\Rubric\DescriptorMapper::getInstance()->findByColumnList([
+            'submission_box_id' => $box->getId(),
+            'valid'             => true
+        ]);
+
+        $descriptors = [];
+
+        foreach ($descriptorCollection as $d) {
+            // only populate if a description is given
+            $descriptors[$d->getCriterion()->getId()][$d->getLevel()->getSequence()] = [
+                'id'     => $d->getId(),
+                'text'   => $d->getDescription(),
+                'points' => $d->getValue() || $d->getDescription() ? $d->getValue() : ''
+            ];
+        }
+
+        return $descriptors;
     }
 
 
