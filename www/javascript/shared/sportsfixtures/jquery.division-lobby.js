@@ -53,13 +53,7 @@
 
                     return li.clone();
                 },
-                start: function(event, ui) {
-
-                    /* Always show the person being dragged away
-                     */
-                    //$(ui.item).show();
-                },
-                receive: function(e,ui) {
+                receive: function(event, ui) {
                     copyHelper = null;
                 },
                 stop: function(event, ui) {
@@ -67,7 +61,7 @@
 
                     var player = ui.item;
                     var from = $(event.target);
-                    var to = player.closest('ul');
+                    var to = player.closest('[data-test-team-player-list]');
 
                     /* Indicators
                      */
@@ -92,7 +86,7 @@
                     else if (isDivisionList(from) && isTeamPlayerList(to)) {
                         toFeedback.labelActivate({text: 'Adding to team...'});
 
-                        /* Execute db transaction (debugging)
+                        /* TODO: Execute db transaction (debugging)
                          */
                         toId = to.parents('[data-test-team]').attr('data-test-team');
                         console.log('dragging player from division to team ' + toId);
@@ -122,7 +116,7 @@
                         fromFeedback.labelActivate({text: 'Removing from team...'});
                         toFeedback.labelActivate({text: 'Adding to team...'});
 
-                        /* Execute db transaction (debugging)
+                        /* TODO: Execute db transaction (debugging)
                          */
                         fromId = from.parents('[data-test-team]').attr('data-test-team');
                         toId = to.parents('[data-test-team]').attr('data-test-team');
@@ -152,7 +146,7 @@
                     else if (isTeamPlayerList(from) && isDivisionList(to)) {
                         fromFeedback.labelActivate({text: 'Removing from team...'});
 
-                        /* Execute db transaction (debugging)
+                        /* TODO: Execute db transaction (debugging)
                          */
                         fromId = from.parents('[data-test-team]').attr('data-test-team');
                         console.log('remove a player from team ' + fromId);
