@@ -13,6 +13,18 @@ CREATE TABLE `sportsfixtures_sport` (
 	`deleted_at` DATETIME NULL COMMENT '',
 PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
 
+/* Season Table */
+CREATE TABLE `sportsfixtures_season` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(255) NOT NULL,
+	`start` DATE NOT NULL,
+	`end` DATE NOT NULL,
+	`created_at` DATETIME NULL,
+	`updated_at` DATETIME NULL,
+	`deleted_at` DATETIME NULL,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB CHARACTER SET=utf8;
+
 /* Division Table
  */
 CREATE TABLE `sportsfixtures_division` (
