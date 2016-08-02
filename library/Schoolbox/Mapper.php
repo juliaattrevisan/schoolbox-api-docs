@@ -962,8 +962,8 @@ abstract class Mapper implements IMapper, Serializable
             $collection,
             $this->soft_delete_column,
             $this->soft_delete_deleted_value,
-            'preSoftDelete',
-            'postSoftDelete'
+            self::CALLBACK_PRESOFTDELETE,
+            self::CALLBACK_POSTSOFTDELETE
         );
         if ($success) {
             // raise delete notification
@@ -993,7 +993,7 @@ abstract class Mapper implements IMapper, Serializable
 		"
         );
         foreach ($collection as $model) {
-            if (!($this->triggerCallbacks('preDelete', $model))) {
+            if (!($this->triggerCallbacks(self::CALLBACK_PREDELETE, $model))) {
                 return false;
             }
         }
@@ -1012,7 +1012,7 @@ abstract class Mapper implements IMapper, Serializable
         }
         $this->database->commit();
         foreach ($collection as $model) {
-            $this->triggerCallbacks('postDelete', $model);
+            $this->triggerCallbacks(self::CALLBACK_POSTDELETE, $model);
         }
         // raise delete notification
         foreach ($collection as $model) {
