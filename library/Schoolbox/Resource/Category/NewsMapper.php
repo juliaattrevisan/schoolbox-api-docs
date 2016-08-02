@@ -126,7 +126,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 	 */
 	public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC') {
 
-		$sortBy = isset($this->map[$sortProperty]) ? $this->map[$sortProperty]['field'] : $this->identifier['field'];
+		$sortBy = isset($this->map[$sortProperty]) ? $this->map[$sortProperty]['field'] : $this->getIdentifier()['field'];
 		$sortDir = strtoupper($sortDirection) == 'DESC' ? 'DESC' : 'ASC';
 
 		$offset = (int)$offset;

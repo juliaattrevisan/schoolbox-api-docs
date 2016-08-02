@@ -758,7 +758,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function joinsVia($viaTable, $foreignMapper, $foreignKey, $viaForeign, $viaLocal, $localKey = null, $hydrator = null, $options = null, $property = null)
     {
-        if (!$localKey && !$this->identifier) {
+        if (!$localKey && !$this->getIdentifier()) {
             throw new Exception("No identifier specified, either provide one or declare a primary key first");
         }
         $type = $hydrator ?: self::TYPE_COLLECTION;
@@ -768,7 +768,7 @@ abstract class Mapper implements IMapper, Serializable
         $map['join'] = $viaTable;
         $map['join_def'] = [
             'mapper'    => $foreignMapper,
-            'this_key'  => $localKey ?: $this->identifier['column'],
+            'this_key'  => $localKey ?: $this->getIdentifier()['column'],
             'other_key' => $foreignKey,
             'multi'     => [
                 'via_table'  => $viaTable,
@@ -846,7 +846,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         if (isset($map['identifier'])) {
-            $this->identifier = $map;
+            $this->setIdentifier($map);
         }
 
         $this->map->setOffset($map['property'], $map);
@@ -985,8 +985,9 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function hardDelete($object)
     {
-        $identifierName     = $this->identifier['column'];
-        $identifierProperty = $this->identifier['property'];
+        $identifier         = $this->getIdentifier();
+        $identifierName     = $identifier['column'];
+        $identifierProperty = $identifier['property'];
         $collection         = $this->getModelAsCollection($object);
         $statement          = $this->database->prepare(
             "
@@ -1234,6 +1235,29 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
+     * Sets identifier for this mapper.
+     *
+     * @param array
+     * @return $this
+     */
+    protected function setIdentifier($identifier)
+    {
+        $this->identifier = $identifier;
+        return $this;
+    }
+
+    /**
+     * Does this mapper have an identifier? If it doesn't, that makes updates
+     * and deletes problematic.
+     *
+     * @return bool
+     */
+    public function hasIdentifier()
+    {
+        return !empty($this->getIdentifier());
+    }
+
+    /**
      * TODO: PDO Array support for using WHERE IN
      *
      * @deprecated findByColumn/findByColumnList now have array support
@@ -1276,7 +1300,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function findById($identifierValue)
     {
-        return $this->findOneByColumn($this->identifier['column'], $identifierValue);
+        return $this->findOneByColumn($this->getIdentifier()['column'], $identifierValue);
     }
 
     /**
@@ -1807,7 +1831,7 @@ abstract class Mapper implements IMapper, Serializable
     {
         $collection = $this->getModelAsCollection($object);
         foreach ($collection as $model) {
-            $this->setModelProperty($model, $this->identifier['property'], null);
+            $this->setModelProperty($model, $this->getIdentifier()['property'], null);
         }
         return $this->save($collection);
     }
@@ -2327,7 +2351,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         if ($idValue) {
-            $this->setModelProperty($model, $this->identifier['property'], $idValue);
+            $this->setModelProperty($model, $this->getIdentifier()['property'], $idValue);
         }
 
         return $model;
@@ -2607,7 +2631,7 @@ abstract class Mapper implements IMapper, Serializable
             }
         } else {
             // retrieve current DB version
-            $objectB = $this->findById($this->getModelProperty($objectA, $this->identifier['property']));
+            $objectB = $this->findById($this->getModelProperty($objectA, $this->getIdentifier()['property']));
         }
 
         $diff = array();
