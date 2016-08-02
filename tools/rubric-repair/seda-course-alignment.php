@@ -73,6 +73,63 @@ $kernel->run(function($di, $loop, $log, $opts) {
         ORDER BY fullname ASC
     ");
 
+    $invalidateMarkStmt = $db->prepare("
+        UPDATE rubric_mark
+        SET valid = FALSE
+        WHERE criterion_id = :criterion_id
+        AND submission_box_id = :submission_box_id
+    ");
+
+    $hardDeleteUsageStmt = $db->prepare("
+        DELETE FROM rubric_usage
+        WHERE criterion_id = :criterion_id
+        AND submission_box_id = :submission_box_id
+    ");
+
+    $invalidateDescriptorStmt = $db->prepare("
+        UPDATE rubric_descriptor
+        SET valid = FALSE
+        WHERE criterion_id = :criterion_id
+        AND submission_box_id = :submission_box_id
+    ");
+
+    $duplicateCriterionStmt = $db->prepare("
+        INSERT INTO rubric_criterion (grouping, `name`, parent_id, parent_type)
+        SELECT grouping, `name`, :parent_id, 'category'
+        FROM rubric_criterion
+        WHERE id = :criterion_id
+    ");
+
+    $findSourceDescriptors = $db->prepare("
+        SELECT d.id, `value`, description, l.sequence
+        FROM rubric_descriptor d
+        INNER JOIN rubric_level l ON d.level_id = l.id
+        RIGHT JOIN rubric_criterion c ON d.criterion_id = c.id
+        WHERE c.id = :source_crit_id 
+        AND d.submission_box_id = :source_box_id
+    ");
+
+    $findLevelIdStmt = $db->prepare("
+        SELECT id
+        FROM rubric_level
+        WHERE box_id = :box_id
+        ORDER BY sequence ASC
+        LIMIT 1 OFFSET :nth
+    ");
+
+    $insertDescriptorStmt = $db->prepare("
+        INSERT INTO rubric_descriptor (criterion_id, submission_box_id, level_id, `value`, description, valid)
+        VALUES (:crit_id, :box_id, :level_id, :val, :des, 1)
+    ");
+
+    $findNextAvailableSequenceStmt = $db->prepare("
+      SELECT MAX(sequence) + 1 FROM rubric_usage WHERE submission_box_id = :box_id
+    ");
+
+    $insertRubricUsageStmt = $db->prepare("
+        INSERT INTO rubric_usage VALUES (:crit_id, :box_id, :seq)
+    ");
+
     $notBefore = new Alaress_Date_Format('2016-01-01 00:00:00', 'Y-m-d H:i:s');
     $notAfter  = new Alaress_Date_Format('2016-07-01 00:00:00', 'Y-m-d H:i:s');
 
@@ -96,6 +153,7 @@ $kernel->run(function($di, $loop, $log, $opts) {
         AND c2.deleted_at IS NULL
         AND b1.use_rubric IS TRUE
         AND b2.use_rubric IS TRUE
+                                                -- and ui.id = 1062
         GROUP BY ui.id;
     ", [
         'opendate' => $notBefore->getDatabase(),
@@ -186,11 +244,16 @@ $kernel->run(function($di, $loop, $log, $opts) {
             // return count check
             if ($instanceReturns->count() == 0) {
                 $log->debug(sprintf(
-                    "No returns exist for [class.instance.box](%d.%d.%d): skipping",
+                    "[class.instance.box](%d.%d.%d): no returns exist; skipping",
                     $class->getId(), $classTaskInstance->getId(), $instanceBoxId
                 ));
                 continue;
             }
+
+            $log->debug(sprintf(
+                "[class.instance.box](%d.%d.%d): %d returns exist",
+                $class->getId(), $classTaskInstance->getId(), $instanceBoxId, $instanceReturns->count()
+            ));
 
             $log->debug(sprintf(
                 "Checking rubric data on [unit.task.box](%d.%d.%d) against [class.instance.box](%d.%d.%d)",
@@ -219,61 +282,70 @@ $kernel->run(function($di, $loop, $log, $opts) {
                 $instance->getId(), $sourceBoxId, $instanceBoxId, count($instanceBoxIndicators), count($add), count($del), count($sourceBoxIndicators)
             ));
 
-            foreach ($del as $deletion) {
-                $log->info(sprintf("DEL indicator %5d from box %5d: %s", $deletion['id'], $instanceBoxId, $deletion['fullname']), [ 'char' => '-' ]);
-                // TODO
+            try {
+                $log->debug("BEGIN TX$instanceBoxId");
+                $db->beginTransaction();
 
-                // INVALIDATE all rubric_mark records for this indicator
-                // HARDDELETE the rubric_usage record for this indicator
-                // INVALIDATE all rubric_descriptor records attached to this indicator
-            }
-
-            foreach ($add as $addition) {
-                $log->info(sprintf("ADD indicator %5d into box %5d: %s", $addition['id'], $instanceBoxId, $addition['fullname']), [ 'char' => '+' ]);
-                // TODO
-
-                // DUPLICATE the rubric_criterion record from the unit folder into the class folder, compensating for parent_id
-                // TRANSPOSE the rubric_descriptor records from the unit indicator to the class indicator, compensating for criterion_id, submission_box_id and level_id
-                // INSERT  a new rubric_usage record for the new indicator against the box
-            }
-
-            $grid = (new SubmissionBox\Rubric\RubricMapper)->findBySubmissionBox($instanceBox);
-
-            $log->debug("Verifying integrity of returns");
-
-            $userSeen = [];
-
-            // iterate the list of returns for this box
-            foreach ($instanceReturns as $return) {
-
-                $studentId = $return->getOwner()->getId();
-
-                // skip students we've already checked the most recent of
-                if (isset($userSeen[$studentId])) {
-                    continue;
+                foreach ($del as $deletion) {
+                    removeIndicators($deletion, $instanceBoxId, $invalidateMarkStmt, $hardDeleteUsageStmt, $invalidateDescriptorStmt, $log);
                 }
 
-                // add to seen list so we don't parse them again
-                $userSeen[$studentId] = true;
-
-                // load into cache if absent
-                if (empty($userCache[$studentId])) {
-                    $userCache[$studentId] = Schoolbox\UserMapper::getInstance()->findById($studentId);
+                try {
+                    foreach ($add as $addition) {
+                        insertIndicators(
+                            $addition, $instanceBoxId, $sourceBoxId, $class->getId(),
+                            $duplicateCriterionStmt, $findSourceDescriptors, $findLevelIdStmt,
+                            $insertDescriptorStmt, $findNextAvailableSequenceStmt, $insertRubricUsageStmt, $db, $log
+                        );
+                    }
+                } catch (InvalidArgumentException $e) {
+                    throw new PDOException("Could not insert new indicators: ".$e->getMessage(), 0, $e);
                 }
 
-                $student = $userCache[$studentId];
+                $grid = (new SubmissionBox\Rubric\RubricMapper)->findBySubmissionBox($instanceBox);
 
-                // if the student-visible grade on this return is "X / Y" (total mark), we need to update it to match the rubric
-                // in all other cases, we do nothing
-                if (!preg_match('`\d+ ?/ ?\d+`', $return->getMark())) {
-                    continue;
+                $log->debug("Verifying integrity of returns");
+
+                $userSeen = [];
+
+                // iterate the list of returns for this box
+                foreach ($instanceReturns as $return) {
+
+                    $studentId = $return->getOwner()->getId();
+
+                    // skip students we've already checked the most recent of
+                    if (isset($userSeen[$studentId])) {
+                        continue;
+                    }
+
+                    // add to seen list so we don't parse them again
+                    $userSeen[$studentId] = true;
+
+                    // load into cache if absent
+                    if (empty($userCache[$studentId])) {
+                        $userCache[$studentId] = Schoolbox\UserMapper::getInstance()->findById($studentId);
+                    }
+
+                    $student = $userCache[$studentId];
+
+                    // if the student-visible grade on this return is "X / Y" (total mark), we need to update it to match the rubric
+                    // in all other cases, we do nothing
+                    if (!preg_match('`\d+ ?/ ?\d+`', $return->getMark())) {
+                        continue;
+                    }
+
+                    SubmissionBox\Rubric\RubricMapper::getInstance()->applyStudentMark($grid, $student);
+
+                    $newMark = $grid->getHumanReadableMark();
+
+                    $log->info(sprintf("Box %5d student %5d: update %7s to %7s [%s]", $instanceBoxId, $studentId, $return->getMark(), $newMark, $student->formatName()));
                 }
-
-                SubmissionBox\Rubric\RubricMapper::getInstance()->applyStudentMark($grid, $student);
-
-                $newMark = $grid->getHumanReadableMark();
-
-                $log->info(sprintf("Box %5d student %5d: update %7s to %7s [%s]", $instanceBoxId, $studentId, $return->getMark(), $newMark, $student->formatName()));
+                $log->debug("COMMIT TX$instanceBoxId");
+                $db->commit();
+            } catch (PDOException $e) {
+                $log->error('PDOException: ' . $e->getMessage());
+                $log->debug("ABORT TX$instanceBoxId");
+                $db->rollBack();
             }
         }
 
@@ -281,6 +353,123 @@ $kernel->run(function($di, $loop, $log, $opts) {
 
 });
 
+/**
+ * @param array           $deletion
+ * @param int             $instanceBoxId
+ * @param PDOStatement    $invalidateMarkStmt
+ * @param PDOStatement    $hardDeleteUsageStmt
+ * @param PDOStatement    $invalidateDescriptorStmt
+ * @param LoggerInterface $log
+ */
+function removeIndicators(
+    array $deletion,
+    $instanceBoxId,
+    PDOStatement $invalidateMarkStmt,
+    PDOStatement $hardDeleteUsageStmt,
+    PDOStatement $invalidateDescriptorStmt,
+    LoggerInterface $log
+) {
+    $log->notice(sprintf("DEL indicator %5d from box %5d: %s", $deletion['id'], $instanceBoxId, $deletion['fullname']), [ 'char' => '-' ]);
+
+    $selection = [
+        'submission_box_id' => $instanceBoxId,
+        'criterion_id'      => $deletion['id']
+    ];
+
+    $logSelection = sprintf("[%s](%s)", implode(',', array_keys($selection)), implode(',', $selection));
+
+    // INVALIDATE all rubric_mark records for this indicator
+    $log->info("INVALIDATE rubric_mark $logSelection");
+    $invalidateMarkStmt->execute($selection);
+
+    // HARDDELETE the rubric_usage record for this indicator
+    $log->info("HARDDELETE rubric_usage $logSelection");
+    $hardDeleteUsageStmt->execute($selection);
+
+    // INVALIDATE all rubric_descriptor records attached to this indicator
+    $log->info("INVALIDATE rubric_descriptor $logSelection");
+    $invalidateDescriptorStmt->execute($selection);
+}
+
+
+/**
+ * @param array           $addition
+ * @param                 $instanceBoxId
+ * @param                 $sourceBoxId
+ * @param                 $classId
+ * @param PDOStatement    $duplicateCriterionStmt
+ * @param PDOStatement    $findSourceDescriptors
+ * @param PDOStatement    $findLevelIdStmt
+ * @param PDOStatement    $insertDescriptorStmt
+ * @param PDOStatement    $findNextAvailableSequenceStmt
+ * @param PDOStatement    $insertRubricUsageStmt
+ * @param Database        $db
+ * @param LoggerInterface $log
+ * @throws InvalidArgumentException
+ */
+function insertIndicators(
+    array $addition,
+    $instanceBoxId,
+    $sourceBoxId,
+    $classId,
+    PDOStatement $duplicateCriterionStmt,
+    PDOStatement $findSourceDescriptors,
+    PDOStatement $findLevelIdStmt,
+    PDOStatement $insertDescriptorStmt,
+    PDOStatement $findNextAvailableSequenceStmt,
+    PDOStatement $insertRubricUsageStmt,
+    Database $db,
+    LoggerInterface $log
+) {
+    $log->notice(sprintf("ADD indicator %5d into box %5d: %s", $addition['id'], $instanceBoxId, $addition['fullname']), [ 'char' => '+' ]);
+    // TODO
+
+    // DUPLICATE the rubric_criterion record from the unit folder into the class folder, compensating for parent_id
+    $log->info("DUPLICATE rubric_criterion {$addition['id']} into folder $classId");
+    $duplicateCriterionStmt->execute([ 'criterion_id' => $addition['id'], 'parent_id' => $classId ]);
+    $newCriterionId = $db->lastInsertId();
+
+    // TRANSPOSE the rubric_descriptor records from the unit indicator to the class indicator, compensating for criterion_id, submission_box_id and level_id
+    $log->info("TRANSPOSE rubric_descriptor (criterion_id,submission_box_id)[{$addition['id']},$sourceBoxId] into submission_box [id]($instanceBoxId)");
+    // step 1: retrieve value, description, and the SEQUENCE of the level of the source descriptors
+    $findSourceDescriptors->execute([ 'source_crit_id' => $addition['id'], 'source_box_id' => $sourceBoxId ]);
+
+    // step 2: iterate results and insert with new criterion, box and level values
+    while ($r = $findSourceDescriptors->fetch(PDO::FETCH_NUM)) {
+        list ($id, $value, $description, $levelSequence) = $r;
+
+        if ($levelSequence == 0) {
+            throw new InvalidArgumentException("Level sequence cannot be zero: failed to retrieve sequence for [descriptor_id]($id)");
+        }
+
+        $offset = $levelSequence - 1;
+
+        $findLevelIdStmt->bindValue(':nth', $offset, PDO::PARAM_INT);
+        $findLevelIdStmt->bindValue(':box_id', $instanceBoxId);
+        $findLevelIdStmt->execute();
+
+        $levelId = $findLevelIdStmt->fetchColumn();
+
+        if ($levelId == 0) {
+            throw new InvalidArgumentException("Level ID cannot be zero: failed to retrieve an ID for [box,desc,seq]($instanceBoxId,$id,$levelSequence)");
+        }
+
+        $insertDescriptorStmt->execute([
+            'crit_id'  => $newCriterionId,
+            'box_id'   => $instanceBoxId,
+            'level_id' => $levelId,
+            'val'      => $value,
+            'des'      => $description
+        ]);
+    }
+
+    // find the next available sequence
+    $findNextAvailableSequenceStmt->execute([ 'box_id' => $instanceBoxId ]);
+    $nextSequence = $findNextAvailableSequenceStmt->fetchColumn();
+
+    // INSERT  a new rubric_usage record for the new indicator against the box
+    $insertRubricUsageStmt->execute([ 'crit_id' => $newCriterionId, 'box_id' => $instanceBoxId, 'seq' => $nextSequence ]);
+}
 
 /**
  * @param \Schoolbox\Resource\Folder\Model $folder
