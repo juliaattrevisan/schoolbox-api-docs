@@ -19,9 +19,9 @@ CREATE TABLE `sportsfixtures_season` (
 	`name` VARCHAR(255) NOT NULL,
 	`start` DATE NOT NULL,
 	`end` DATE NOT NULL,
-	`created_at` DATETIME NULL,
-	`updated_at` DATETIME NULL,
-	`deleted_at` DATETIME NULL,
+	`created_at` DATETIME NOT NULL,
+	`updated_at` DATETIME NOT NULL,
+	`deleted_at` DATETIME NULL DEFAULT NULL,
 	PRIMARY KEY (`id`)
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
