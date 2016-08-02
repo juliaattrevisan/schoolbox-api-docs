@@ -1162,7 +1162,7 @@ abstract class Mapper implements IMapper, Serializable
             if (isset($property_map)) {
                 $this->setModelProperty($model, $property_map['property'], $value);
             }
-            $id_values[] = $this->getModelProperty($model, $identifier['property']);
+            $id_values[] = $this->getModelProperty($model, $this->getIdentifierProperty());
         }
         if (empty($id_values)) {
             return false;
@@ -1232,6 +1232,16 @@ abstract class Mapper implements IMapper, Serializable
     public function getIdentifier()
     {
         return $this->identifier;
+    }
+
+    /**
+     * Retrieves identifier property name.
+     *
+     * @return string
+     */
+    public function getIdentifierProperty()
+    {
+        return $this->getIdentifier()['property'];
     }
 
     /**
@@ -1830,8 +1840,10 @@ abstract class Mapper implements IMapper, Serializable
     public function create($object)
     {
         $collection = $this->getModelAsCollection($object);
-        foreach ($collection as $model) {
-            $this->setModelProperty($model, $this->getIdentifier()['property'], null);
+        if ($this->hasIdentifier()) {
+            foreach ($collection as $model) {
+                $this->setModelProperty($model, $this->getIdentifierProperty(), null);
+            }
         }
         return $this->save($collection);
     }
@@ -1869,7 +1881,7 @@ abstract class Mapper implements IMapper, Serializable
             }
         }
         $identifier      = $this->getIdentifier();
-        $id_property     = $identifier['property'];
+        $id_property     = $this->getIdentifierProperty();
         $existingObjects = array();
         if (isset($identifier['column'])) {
             // retrieve the objects as they currently exist so we can perform a diff if we need to
@@ -1946,7 +1958,7 @@ abstract class Mapper implements IMapper, Serializable
                             if ($value instanceof $otherModelExample) {
                                 $otherKey = $otherMapper->getModelProperty(
                                     $value,
-                                    $otherMapper->getIdentifier()['property']
+                                    $this->getIdentifierProperty()
                                 );
                             } else {
                                 $otherKey = $value;
@@ -2351,7 +2363,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         if ($idValue) {
-            $this->setModelProperty($model, $this->getIdentifier()['property'], $idValue);
+            $this->setModelProperty($model, $this->getIdentifierProperty(), $idValue);
         }
 
         return $model;
@@ -2631,7 +2643,7 @@ abstract class Mapper implements IMapper, Serializable
             }
         } else {
             // retrieve current DB version
-            $objectB = $this->findById($this->getModelProperty($objectA, $this->getIdentifier()['property']));
+            $objectB = $this->findById($this->getModelProperty($objectA, $this->getIdentifierProperty()));
         }
 
         $diff = array();
