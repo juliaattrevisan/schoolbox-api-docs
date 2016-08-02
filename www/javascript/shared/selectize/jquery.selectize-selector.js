@@ -153,7 +153,7 @@
             singleElement.val('').selectize(settings.selectize);
 
             // Is this selectize inside a foundation modal ?
-            if( function(){ return singleElement.parent('[data-reveal]').length; } ){
+            if( singleElement.closest('[data-reveal]').length ){
                 // Lock modal when dropdown appears
                 singleElement.data('selectize').on('dropdown_open', function(){
                     Foundation.libs.reveal.locked = true;
