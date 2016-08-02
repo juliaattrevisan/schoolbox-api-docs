@@ -214,6 +214,42 @@ class RubricMapper
         // umm... I have *never* had to do this before... how does the while() loop break if not EOF??
         $criteriaStatement->closeCursor();
 
+        // ensure any descriptors already in play get priority
+        $stmt = $this->database->query("
+            SELECT DISTINCT c.id, c.grouping, c.name
+            FROM rubric_descriptor d
+            RIGHT JOIN rubric_criterion c ON d.criterion_id = c.id
+            WHERE d.submission_box_id = :box_id
+            AND d.valid IS TRUE
+            AND c.deleted_at IS NULL
+        ", [
+            'box_id' => $box->getId()
+        ]);
+
+        while ($r = $stmt->fetch(PDO::FETCH_NUM)) {
+            list ($id, $grouping, $name) = $r;
+
+            if (!empty($criteria[$id])) {
+                // ensure it gets flagged as active... in theory this *should* happen every time
+                $criteria[$id]['on'] = true;
+                continue;
+            }
+
+            if (empty($groupIdMap[$grouping])) {
+                ++$groupId;
+
+                $groupIdMap[$grouping] = $groupId;
+                $groups[$groupId] = [ 'name' => $grouping ];
+            }
+
+            $criteria[$id] = [
+                'groupId'  => $groupId,
+                'on'       => true,
+                'name'     => $name,
+                'readonly' => true // we can only assume at this point...
+            ];
+        }
+
         return [ $groups, $criteria ];
     }
 
