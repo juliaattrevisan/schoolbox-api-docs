@@ -17,6 +17,7 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\SportsFixtures\Sport\Model as Sport;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
+use Schoolbox\SportsFixtures\Season\Mapper as SeasonMapper;
 use \Schoolbox\SportsFixtures\Position\Model as PositionModel;
 use \Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
@@ -38,6 +39,11 @@ class Controller extends AbstractController
      * @var SportMapper
      */
     protected $sportMapper;
+
+    /**
+     * @var SeasonMapper
+     */
+    protected $seasonMapper;
 
     /**
      * @var ErrorMapper
@@ -91,6 +97,7 @@ class Controller extends AbstractController
     {
         parent::__construct(DivisionMapper::getInstance());
         $this->setSportMapper(SportMapper::getInstance());
+        $this->setSeasonMapper(SeasonMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setTeamMapper(TeamMapper::getInstance());
         $this->setPositionMapper(PositionMapper::getInstance());
@@ -155,6 +162,10 @@ class Controller extends AbstractController
         if (empty($context)) {
             $context = $this->getSportMapper()->findById($entity->getSport()->getId());
         }
+        $entity->setSport($context);
+
+        $season = $this->getSeasonMapper()->findById($entity->getSeason()->getId());
+        $entity->setSeason($season);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesDivision/create.twig', [
             'division' => $entity,
@@ -491,6 +502,25 @@ class Controller extends AbstractController
     protected function setSportMapper(SportMapper $sportMapper)
     {
         $this->sportMapper = $sportMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return SeasonMapper
+     */
+    protected function getSeasonMapper()
+    {
+        return $this->seasonMapper;
+    }
+
+    /**
+     * @param SeasonMapper $seasonMapper
+     * @return self
+     */
+    protected function setSeasonMapper(SeasonMapper $seasonMapper)
+    {
+        $this->seasonMapper = $seasonMapper;
         return $this;
     }
 
