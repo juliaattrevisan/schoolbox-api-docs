@@ -62,6 +62,11 @@
                     var fromFeedback = findIndicator(from);
                     var toFeedback = findIndicator(to);
 
+                    /* For debugging only
+                     */
+                    var fromId;
+                    var toId;
+
                     /* Reordering within the same sortable
                      */
                     if (from.is(to)) {
@@ -76,7 +81,8 @@
 
                         /* Execute db transaction
                          */
-                        console.log('dragging player from division to team ' + to.parents('[data-test-team]').attr('data-test-team'));
+                        toId = to.parents('[data-test-team]').attr('data-test-team');
+                        console.log('dragging player from division to team ' + toId);
 
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
                         toFeedback.labelTimeout({text: 'Added!', css: 'success'});
@@ -84,12 +90,17 @@
                     /* Dragging players between teams
                      */
                     else if (isTeamPlayerList(from) && isTeamPlayerList(to)) {
+
+                        console.log(isTeamPlayerList(from), isTeamPlayerList(to));
+
                         fromFeedback.labelActivate({text: 'Removing from team...'});
                         toFeedback.labelActivate({text: 'Adding to team...'});
 
                         /* Execute db transaction
                          */
-                        console.log('dragging between teams - from: ' + from.parents('[data-test-team]').attr('data-test-team') + ', to: ' + to.parents('[data-test-team]').attr('data-test-team'));
+                        fromId = from.parents('[data-test-team]').attr('data-test-team');
+                        toId = to.parents('[data-test-team]').attr('data-test-team');
+                        console.log('dragging between teams - from: ' + fromId + ', to: ' + toId);
 
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
                         toFeedback.labelTimeout({text: 'Added!', css: 'success'});
@@ -101,7 +112,8 @@
 
                         /* Execute db transaction
                          */
-                        console.log('remove a player from team ' + from.parents('[data-test-team]').attr('data-test-team'));
+                        fromId = from.parents('[data-test-team]').attr('data-test-team');
+                        console.log('remove a player from team ' + fromId);
 
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
                     }
@@ -144,7 +156,7 @@
             ];
 
             for (var i = 0; i < attr.length; i++) {
-                if (typeof attr !== typeof undefined && attr !== false) {
+                if (typeof attr[i] !== typeof undefined && attr[i] !== false) {
                     return true;
                 }
             }
