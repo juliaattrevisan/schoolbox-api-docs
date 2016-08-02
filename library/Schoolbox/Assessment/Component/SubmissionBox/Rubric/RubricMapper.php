@@ -158,12 +158,33 @@ class RubricMapper
      */
     public function findBySubmissionBox($box, $forceTaskMode = false, $editMode = false)
     {
+        list ($groups, $criteria) = $this->findCriteria($box, $forceTaskMode);
+        $descriptors = $this->findDescriptors($box);
+        $levelList   = $this->generateLevelList($box, $descriptors, $criteria);
+
+        // setup the data structure to match what the factory expects
+        $postdata = [$box->getId() => [
+            'level'      => $levelList,
+            'group'      => $groups,
+            'criterion'  => $criteria,
+            'descriptor' => $descriptors,
+        ]];
+
+        // use the factory to produce the rubric object
+        return $this->factory->buildFromPostData($postdata, $forceTaskMode || $editMode)->setSubmissionBox($box);
+    }
+
+
+    /**
+     * @param SubmissionBox $box
+     * @param bool          $forceTaskMode
+     * @return array
+     */
+    protected function findCriteria(SubmissionBox $box, $forceTaskMode)
+    {
         // why 20? because it's not 0.
-        $groupId = 20;
-
-        $groups = $criteria = [];
-
-        $groupIdMap = [];
+        $groupId    = 20;
+        $groupIdMap = $groups = $criteria = [];
 
         $criteriaStatement = $this->generateCriteriaStatement($box, $forceTaskMode);
 
@@ -193,21 +214,8 @@ class RubricMapper
         // umm... I have *never* had to do this before... how does the while() loop break if not EOF??
         $criteriaStatement->closeCursor();
 
-        $descriptors = $this->findDescriptors($box);
-        $levelList   = $this->generateLevelList($box, $descriptors, $criteria);
-
-        // setup the data structure to match what the factory expects
-        $postdata = [$box->getId() => [
-            'level'      => $levelList,
-            'group'      => $groups,
-            'criterion'  => $criteria,
-            'descriptor' => $descriptors,
-        ]];
-
-        // use the factory to produce the rubric object
-        return $this->factory->buildFromPostData($postdata, $forceTaskMode || $editMode)->setSubmissionBox($box);
+        return [ $groups, $criteria ];
     }
-
 
     /**
      * @param SubmissionBox $box
