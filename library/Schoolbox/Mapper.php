@@ -558,8 +558,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getGetIdentifierMethodName()
     {
-        $identifier = $this->getIdentifier();
-        return $this->getGetMethodName($identifier['property']);
+        return $this->getGetMethodName($this->getIdentifierProperty());
     }
 
     /**
@@ -569,8 +568,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getSetIdentifierMethodName()
     {
-        $identifier = $this->getIdentifier();
-        return $this->getSetMethodName($identifier['property']);
+        return $this->getSetMethodName($this->getIdentifierProperty());
     }
 
     /**
@@ -758,7 +756,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function joinsVia($viaTable, $foreignMapper, $foreignKey, $viaForeign, $viaLocal, $localKey = null, $hydrator = null, $options = null, $property = null)
     {
-        if (!$localKey && !$this->getIdentifier()) {
+        if (!$localKey && !$this->hasIdentifier()) {
             throw new Exception("No identifier specified, either provide one or declare a primary key first");
         }
         $type = $hydrator ?: self::TYPE_COLLECTION;
