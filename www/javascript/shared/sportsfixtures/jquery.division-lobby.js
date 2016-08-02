@@ -91,10 +91,15 @@
                     else if (isDivisionList(from) && isTeamPlayerList(to)) {
                         toFeedback.labelActivate({text: 'Adding to team...'});
 
-                        /* Execute db transaction
+                        /* Execute db transaction (debugging)
                          */
                         toId = to.parents('[data-test-team]').attr('data-test-team');
                         console.log('dragging player from division to team ' + toId);
+                        console.log($('[data-test-team='+toId+']'));
+
+                        /* TODO: Refresh player list
+                         */
+                        $('[data-test-team='+toId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
 
                         /* If dragged onto a proxy element, remove the player drag helper
                          * after team list is respawned
@@ -112,11 +117,16 @@
                         fromFeedback.labelActivate({text: 'Removing from team...'});
                         toFeedback.labelActivate({text: 'Adding to team...'});
 
-                        /* Execute db transaction
+                        /* Execute db transaction (debugging)
                          */
                         fromId = from.parents('[data-test-team]').attr('data-test-team');
                         toId = to.parents('[data-test-team]').attr('data-test-team');
                         console.log('dragging between teams - from: ' + fromId + ', to: ' + toId);
+
+                        /* TODO: Refresh player list
+                         */
+                        $('[data-test-team='+fromId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
+                        $('[data-test-team='+toId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
 
                         /* If dragged onto a proxy element, remove the player drag helper
                          * after team list is respawned
@@ -133,10 +143,14 @@
                     else if (isTeamPlayerList(from) && isDivisionList(to)) {
                         fromFeedback.labelActivate({text: 'Removing from team...'});
 
-                        /* Execute db transaction
+                        /* Execute db transaction (debugging)
                          */
                         fromId = from.parents('[data-test-team]').attr('data-test-team');
                         console.log('remove a player from team ' + fromId);
+
+                        /* TODO: Refresh player list
+                         */
+                        $('[data-test-team='+fromId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
 
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
                     }
