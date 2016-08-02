@@ -10,6 +10,8 @@ namespace Schoolbox\SportsFixtures\Season;
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\SportsFixtures\Season\Model as Season;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+
 
 /**
  * Class Mapper
@@ -34,6 +36,22 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteDivisions'));
+    }
+
+    /**
+     * Soft-Delete all Divisions associated with this Season when it's being deleted
+     *
+     * @param Season $season
+     */
+    public function deleteDivisions(Season $season)
+    {
+        $allDivisions = DivisionMapper::getInstance()->findByColumn('season_id', $season->getId());
+
+        foreach ($allDivisions as $currentDivision) {
+            DivisionMapper::getInstance()->delete($currentDivision);
+        }
     }
 
     /**

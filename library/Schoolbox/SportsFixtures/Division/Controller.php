@@ -17,6 +17,7 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\SportsFixtures\Sport\Model as Sport;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
+use Schoolbox\SportsFixtures\Season\Model as Season;
 use Schoolbox\SportsFixtures\Season\Mapper as SeasonMapper;
 use \Schoolbox\SportsFixtures\Position\Model as PositionModel;
 use \Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
@@ -230,7 +231,9 @@ class Controller extends AbstractController
         try {
             $sport = $this->getSportMapper()->findById($this->getRequest()->post['sportId']);
 
-            $this->saveDivision($sport, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $entity);
+            $season = $this->getSeasonMapper()->findById($this->getRequest()->post['seasonId']);
+
+            $this->saveDivision($sport, $season, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $entity);
 
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesDivision.getList', [
                 'contextId' => $sport->getId()
@@ -440,16 +443,18 @@ class Controller extends AbstractController
     /**
      * Save Division data to db
      *
-     * @param $sport
-     * @param $name
-     * @param $url
-     * @param DivisionModel $division
+     * @param Sport $sport
+     * @param Season $season
+     * @param string $name
+     * @param string $url
+     * @param Division $division
      */
-    private function saveDivision($sport, $name, $url, DivisionModel $division)
+    private function saveDivision(Sport $sport, Season $season, $name, $url, Division $division)
     {
+        $division->setSport($sport);
+        $division->setSeason($season);
         $division->setName($name);
         $division->setUrl($url);
-        $division->setSport($sport);
         $division->setUpdatedAt(\Alaress_Date_Format::now());
 
         $this->getDivisionMapper()->save($division);
