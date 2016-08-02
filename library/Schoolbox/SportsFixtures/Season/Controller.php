@@ -79,7 +79,7 @@ class Controller extends AbstractController
                     )
                 );
             } catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
             }
         }
     }
@@ -140,7 +140,7 @@ class Controller extends AbstractController
 
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesSeason.getList'));
         } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
         }
     }
 
