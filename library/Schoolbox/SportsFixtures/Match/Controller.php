@@ -13,6 +13,7 @@ use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
+use \Schoolbox\SportsFixtures\Season\Model as Season;
 use \Schoolbox\SportsFixtures\Season\Mapper as SeasonMapper;
 use \Schoolbox\SportsFixtures\Division\Model as Division;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
@@ -149,42 +150,53 @@ class Controller extends AbstractController
      */
     protected function getForm($entity, $context = null)
     {
-        if (empty($context)) {
+        // For clarity
+        $match = $entity;
+        $division = $context;
+
+        // If an update
+        if($match->getSeason() instanceof Season){
+            // Hydrate the match's season
+            $match->setSeason($this->getSeasonMapper()->findById($match->getSeason()->getId()));
+        }
+
+        if (empty($division)) {
             try {
-                $context = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
+                $division = $this->getDivisionMapper()->findById($match->getDivision()->getId());
             } catch (MapperException $e) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
             }
         }
 
         try {
-            $sport = $this->getSportMapper()->findById($context->getSport()->getId());
+            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
 
         try {
-            $context->setSeason($this->getSeasonMapper()->findById($context->getSeason()->getId()));
+            $division->setSeason($this->getSeasonMapper()->findById($division->getSeason()->getId()));
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
         }
 
 
-        $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $entity->getId(), [
+        $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $match->getId(), [
             'order' => [
                 'start_at' => 'asc'
             ]
         ]);
 
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/create.twig', [
             'sport'             => $sport,
-            'division'          => $context,
-            'match'             => $entity,
+            'division'          => $division,
+            'match'             => $match,
             'schoolMapper'      => $this->getSchoolTagCloudMapper(),
             'schoolToken'       => TagCloudMapper::SCHOOL_PREFIX,
             'allItineraryItems' => $allItineraryItems,
-            'action'            => $entity->getId() ? 'Modify' : 'Create'
+            'action'            => $match->getId() ? 'Modify' : 'Create'
         ]));
     }
 

@@ -16,11 +16,13 @@
                     required: true,
                     min: 1
                 },
+                seasonId: {
+                    required: true,
+                    minlength: 1
+                },
                 startAtDate: {
                     required: true,
-                    minlength: 1,
-                    minDate: "{{ division.season.start.getLocalShort }}",
-                    maxDate: "{{ division.season.end.getLocalShort }}"
+                    minlength: 1
                 },
                 startAtTime: {
                     required: true,
@@ -39,12 +41,8 @@
                 'divisionId': 'Please choose a Division.',
                 'venueId': 'Please choose a Venue.',
                 'name': 'Please enter a Match name.',
-                startAtDate: {
-                    required: 'Please choose a date.',
-                    minlength: 'Please choose a date.',
-                    minDate: 'Date must be on or after {{ division.season.start.getLocalShort }}',
-                    maxDate: 'Date must be on or before {{ division.season.end.getLocalShort }}'
-                },
+                'seasonId': 'Please choose a Season',
+                'startAtDate': 'Please choose a date.',
                 'startAtTime': 'Please choose a time.'
             },
             errorPlacement: function(error, element) {
@@ -67,11 +65,22 @@
             });
         });
 
-        // Ensure match is scheduled within the season
-        $('#startAtDate').datepicker( {
-            minDate: "{{ division.season.start.getLocalShort }}",
-            maxDate: "{{ division.season.end.getLocalShort }}"
+        $('#season').selectizeSelector({
+            ajax: {
+                url: '/sportsfixtures/seasons',
+                type: 'GET',
+                dataType: 'json'
+            },
+            {% if match.id %}
+            value: {"id":{{ match.season.id }}, "name": "{{ match.season.name }} - {{ match.season.start.getLocalShort }} to {{ match.season.end.getLocalShort }}"},
+            {% else %}
+            value: {"id":{{ division.season.id }}, "name": "{{ division.season.name }} - {{ division.season.start.getLocalShort }} to {{ division.season.end.getLocalShort }}"},
+            {% endif %}
+            multiple: false
         });
+
+        // Ensure match is scheduled within the season
+        $('[data-datepicker]').datepicker( );
 
         $('#matchForm').find('[data-timepicker]').timepicker({
             appendTo: function ($input) {
@@ -157,25 +166,31 @@
 
             <section>
                 <fieldset class="content">
-                    <div class="small-12 columns">
-                        <input type="hidden" name="divisionId" value="{{ division.id }}"/>
-                        <input type="hidden" name="matchId" value="{{ match.id }}"/>
+                    <input type="hidden" name="divisionId" value="{{ division.id }}"/>
+                    <input type="hidden" name="matchId" value="{{ match.id }}"/>
 
+                    <div class="small-12 columns">
                         <label>
                             Name
                             <input type="text" name="name" value="{{ match.name }}"/>
                         </label>
                     </div>
 
-                    <div class="column small-12 medium-6">
+                    <div class="column small-12 medium-4">
                         <label>
-                            Date
-                            <span data-tooltip class="has-tip tip-top hint" title="Season runs {{ division.season.start.getLocalShort }} to {{ division.season.end.getLocalShort }}">?</span>
-                            <input type="text" id="startAtDate" name="startAtDate" placeholder="Date" data-datepicker value="{{ match.startAt.getLocalShort }}">
+                            Season
+                            <input id='season' name="seasonId" type='text' value='' placeholder="Search Seasons" />
                         </label>
                     </div>
 
-                    <div class="column small-12 medium-6">
+                    <div class="column small-12 medium-4">
+                        <label>
+                            Date
+                            <input type="text" name="startAtDate" placeholder="Date" data-datepicker value="{{ match.startAt.getLocalShort }}">
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-4">
                         <div class="timepick">
                             <label>
                                 Time

@@ -16,6 +16,7 @@ use Schoolbox\User;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\SportsFixtures\Division\Model as Division;
+use Schoolbox\SportsFixtures\Season\Model as Season;
 use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Venue\Model as Venue;
 use Schoolbox\SportsFixtures\Result\Model as Result;
@@ -28,6 +29,9 @@ class Model implements ISoftDeletable {
 
     /** @var Division */
     protected $division;
+
+    /** @var Season */
+    protected $season;
 
     /** @var string */
     protected $name;
@@ -178,10 +182,30 @@ class Model implements ISoftDeletable {
 
     /**
      * @param Division $division
+     * @return self
      */
     public function setDivision($division)
     {
         $this->division = $division;
+        return $this;
+    }
+
+    /**
+     * @return Season
+     */
+    public function getSeason()
+    {
+        return $this->season;
+    }
+
+    /**
+     * @param Season $season
+     * @return self
+     */
+    public function setSeason(Season $season)
+    {
+        $this->season = $season;
+        return $this;
     }
 
     /**
@@ -210,10 +234,12 @@ class Model implements ISoftDeletable {
 
     /**
      * @param Venue $venue
+     * @return self
      */
     public function setVenue($venue)
     {
         $this->venue = $venue;
+        return $this;
     }
 
     /**
@@ -226,10 +252,12 @@ class Model implements ISoftDeletable {
 
     /**
      * @param Collection $result
+     * @return self
      */
     public function setResult($result)
     {
         $this->result = $result;
+        return $this;
     }
 
     /**
@@ -242,10 +270,12 @@ class Model implements ISoftDeletable {
 
     /**
      * @param Collection $itinerary
+     * @return self
      */
     public function setItinerary($itinerary)
     {
         $this->itinerary = $itinerary;
+        return $this;
     }
 
     /**
@@ -258,10 +288,12 @@ class Model implements ISoftDeletable {
 
     /**
      * @param Alaress_Date_Format $startAt
+     * @return self
      */
     public function setStartAt($startAt)
     {
         $this->startAt = $startAt;
+        return $this;
     }
 
     /**
@@ -274,10 +306,12 @@ class Model implements ISoftDeletable {
 
     /**
      * @param string $notes
+     * @return self
      */
     public function setNotes($notes)
     {
         $this->notes = $notes;
+        return $this;
     }
 
     /**

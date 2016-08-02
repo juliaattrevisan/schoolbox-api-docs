@@ -16,6 +16,7 @@ use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 /**
  * Class Mapper
  * @method Season createModel(int $idValue = null)
+ * @method Season findById($identifierValue)
  * @package Schoolbox\SportsFixtures\Season
  */
 class Mapper extends BaseMapper

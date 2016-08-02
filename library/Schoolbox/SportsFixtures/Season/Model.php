@@ -56,7 +56,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
     {
         return [
             'value' => $this->getId(),
-            'label' => $this->getName()
+            'label' => "{$this->getName()} - {$this->getStart()->getLocalShort()} to {$this->getEnd()->getLocalShort()}"
         ];
     }
 
