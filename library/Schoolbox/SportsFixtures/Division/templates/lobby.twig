@@ -464,13 +464,45 @@ data-remove-team-player
                             <span class="label full-width hide" data-test-team-indicator></span>
                         </li>
                         <li>
-                            <ul class="test information-list sortable" data-test-team-player-list data-collapsable="team-{{ teamData.team.id }}">
-                                <li>mog</li>
-                                <li>mog</li>
-                                <li>mog</li>
-                                <li>mog</li>
-                                <li>mog</li>
-                                <li>mog</li>
+                            <ul class="information-list sortable" data-test-team-player-list data-collapsable="team-{{ teamData.team.id }}">
+
+                                {% for teamPlayer in teamData.players %}
+                                <li class="actions-small-2" data-player="{{ teamPlayer.id }}">
+                                    <div class="list-item">
+                                        <div class="grip"></div>
+                                        <div class="small-10 avatar card">
+                                            <a href="/search/user/{{ teamPlayer.id }}">
+                                                <img src="/portrait.php?userId={{ teamPlayer.externalId }}&amp;size=square64" />
+                                                <h3>{{ teamPlayer.formatName() }}</h3>
+                                            </a>
+                                            <p class="meta">{{ teamPlayer.formatMetadata() }}</p>
+                                            <p>
+                                                {% for teamPosition in teamData.positions if teamPosition.user.id == teamPlayer.id %}
+                                                    {{ teamPosition.position.name }}<br>
+                                                {% endfor %}
+                                            </p>
+                                        </div>
+
+                                    </div>
+                                    <nav>
+                                        <a href="#"
+                                           data-reveal-id="editPlayerPositions"
+                                           class="icon-position"
+                                           title="Change Player Positions"
+                                           data-player-positions-name="{{ teamPlayer.formatName() }}"
+                                           data-player-positions-team-name="{{ teamData.team.name }}"
+                                           data-player-positions-user="{{ teamPlayer.id }}"
+                                           data-player-positions-team="{{ teamData.team.id }}"
+                                           data-player-positions="{% for teamPosition in teamData.positions if teamPosition.user.id == teamPlayer.id %}{% if not loop.first %},{% endif %}{{ teamPosition.position.id }}{% endfor %}"
+                                        ></a>
+                                        <a href="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: teamData.team.id}) }}"
+                                           class="icon-close"
+                                           title="Remove Player from {{ teamData.team.name }}"
+                                           data-remove-team-player="{{ teamPlayer.id }}"></a>
+                                    </nav>
+                                </li>
+                                {% endfor %}
+
                             </ul>
                         </li>
                     </ul>
