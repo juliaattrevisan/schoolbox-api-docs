@@ -90,7 +90,7 @@ class Mapper extends Folder\Mapper
         // append the custom predicates from the select string
         $predicate->equals('cd.class', Component_Homepage_CourseBuilderController::class);
 
-        if ($options['delete'] == false) {
+        if (empty($options['delete']) || $options['delete'] == false) {
             $predicate->isNull('course.deleted_at');
         }
 
