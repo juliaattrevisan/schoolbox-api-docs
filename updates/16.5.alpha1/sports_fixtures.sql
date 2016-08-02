@@ -119,6 +119,7 @@ CREATE TABLE `sportsfixtures_venue` (
 CREATE TABLE `sportsfixtures_match` (
 	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
 	`division_id` INT NOT NULL,
+	`season_id` INT NOT NULL,
 	`venue_id` INT NOT NULL,
 	`home_team_id` INT,
 	`away_team_id` INT NULL,
@@ -135,6 +136,10 @@ CREATE TABLE `sportsfixtures_match` (
 		REFERENCES `sportsfixtures_division`(`id`)
 			ON UPDATE NO ACTION
 			ON DELETE NO ACTION,
+	FOREIGN KEY (`season_id`)
+	  REFERENCES `sportsfixtures_season`(`id`)
+		  ON UPDATE RESTRICT
+		  ON DELETE RESTRICT,
 	FOREIGN KEY (`venue_id`)
 		REFERENCES `sportsfixtures_venue`(`id`)
 			ON UPDATE NO ACTION
