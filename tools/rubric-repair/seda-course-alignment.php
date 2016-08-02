@@ -38,7 +38,8 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Rubric Course Realignment', a
     'errors'  => E_ALL,
 ));
 
-$kernel->run(function($di, $loop, $log, $opts) {
+$kernel->run
+(function($di, $loop, $log, $opts) {
     /**
      * @var Di\Container    $di
      * @var LoopInterface   $loop
@@ -130,6 +131,33 @@ $kernel->run(function($di, $loop, $log, $opts) {
         INSERT INTO rubric_usage VALUES (:crit_id, :box_id, :seq)
     ");
 
+    $findUnmarkedCriteriaStmt = $db->prepare("
+        SELECT DISTINCT criterion_id
+        FROM rubric_descriptor d
+        WHERE d.submission_box_id = :box_id
+        AND criterion_id NOT IN (
+            SELECT criterion_id
+            FROM rubric_mark m
+            WHERE m.student_id = :student_id
+            AND m.submission_box_id = :box_id
+            AND m.valid IS TRUE
+        )
+    ");
+
+    $getLatestStampStmt = $db->prepare("
+        SELECT tstamp
+        FROM rubric_mark
+        WHERE submission_box_id = :box_id
+        AND student_id = :student_id
+        ORDER BY tstamp DESC
+        LIMIT 1
+    ");
+
+    $insertMarkStmt = $db->prepare("
+        INSERT INTO rubric_mark (`student_id`, `submission_box_id`, `criterion_id`, `descriptor_id`, `tstamp`)
+        VALUES (:student_id, :box_id, (SELECT criterion_id FROM rubric_descriptor WHERE id = :desc_id), :desc_id, :tstamp)
+    ");
+
     $notBefore = new Alaress_Date_Format('2016-01-01 00:00:00', 'Y-m-d H:i:s');
     $notAfter  = new Alaress_Date_Format('2016-07-01 00:00:00', 'Y-m-d H:i:s');
 
@@ -153,7 +181,7 @@ $kernel->run(function($di, $loop, $log, $opts) {
         AND c2.deleted_at IS NULL
         AND b1.use_rubric IS TRUE
         AND b2.use_rubric IS TRUE
-                                                -- and ui.id = 1062
+                                                -- and ui.id = 743
         GROUP BY ui.id;
     ", [
         'opendate' => $notBefore->getDatabase(),
@@ -330,18 +358,73 @@ $kernel->run(function($di, $loop, $log, $opts) {
 
                     // if the student-visible grade on this return is "X / Y" (total mark), we need to update it to match the rubric
                     // in all other cases, we do nothing
-                    if (!preg_match('`\d+ ?/ ?\d+`', $return->getMark())) {
+                    if (!preg_match('`(\d+) ?/ ?(\d+)`', $return->getMark(), $matches)) {
                         continue;
                     }
 
+                    list (, $numerator, $denominator) = $matches;
+
+                    $percentageToMaintain = $numerator / $denominator;
+
                     SubmissionBox\Rubric\RubricMapper::getInstance()->applyStudentMark($grid, $student);
 
-                    $newMark = $grid->getHumanReadableMark();
 
-                    $log->info(sprintf("Box %5d student %5d: update %7s to %7s [%s]", $instanceBoxId, $studentId, $return->getMark(), $newMark, $student->formatName()));
+                    $rubricNumerator = $grid->getSum();
+
+                    $newDenom  = $grid->getTotal();
+                    $newNum    = round($newDenom * $percentageToMaintain);
+                    $deltaMark = $newNum - $rubricNumerator;
+
+                    $log->info(sprintf(
+                        "Box %5d student %5d: update %7s -> (%0.2f%%) -> %7s [%s]",
+                        $instanceBoxId, $studentId, $return->getMark(), $percentageToMaintain * 100, "$newNum / $newDenom", $student->formatName()
+                    ));
+
+                    // obtain the set of unmarked criteria for this student
+                    $findUnmarkedCriteriaStmt->execute([ 'box_id' => $instanceBoxId, 'student_id' => $studentId ]);
+
+                    $unmarkedCount = $findUnmarkedCriteriaStmt->rowCount();
+
+                    $log->debug("Distribute $deltaMark marks across $unmarkedCount indicators");
+
+                    $unmarkedCritIds = $findUnmarkedCriteriaStmt->fetchAll(PDO::FETCH_COLUMN);
+
+                    /** @var Collection|SubmissionBox\Rubric\Descriptor[] $descriptors */
+                    $descriptors = SubmissionBox\Rubric\DescriptorMapper::getInstance()->findByColumnList([
+                        'submission_box_id' => $instanceBoxId,
+                        'criterion_id'   => $unmarkedCritIds
+                    ]);
+
+                    $set = [];
+
+                    foreach ($descriptors as $d) {
+                        $set[$d->getCriterion()->getId()][$d->getValue()] = $d->getId();
+                    }
+
+                    $avg = findClosestMatch($set, $deltaMark);
+
+                    $getLatestStampStmt->execute([
+                        'box_id' => $instanceBoxId,
+                        'student_id' => $studentId
+                    ]);
+
+                    $stamp = $getLatestStampStmt->fetchColumn();
+
+                    foreach ($avg as $descriptorId => $descriptorValue) {
+                        $insertMarkStmt->execute([
+                            'student_id' => $studentId,
+                            'box_id'     => $instanceBoxId,
+                            'desc_id'    => $descriptorId,
+                            'tstamp'     => $stamp
+                        ]);
+                    }
+
+                    $log->debug(json_encode($avg));
+
                 }
                 $log->debug("COMMIT TX$instanceBoxId");
                 $db->commit();
+
             } catch (PDOException $e) {
                 $log->error('PDOException: ' . $e->getMessage());
                 $log->debug("ABORT TX$instanceBoxId");
@@ -352,6 +435,125 @@ $kernel->run(function($di, $loop, $log, $opts) {
     }
 
 });
+
+//$cmad = findClosestMatch([
+//    [ 0 => 1,  4 => 2,  5 => 3,  6 => 4,  7 => 5,  8 => 6  ],
+//    [ 0 => 7,  4 => 8,  5 => 9,  6 => 10, 7 => 11, 8 => 12 ],
+//    [ 0 => 13, 4 => 14, 5 => 15, 6 => 17, 7 => 18, 8 => 19 ],
+//], 25);
+//
+//$soln = [ 6 => 8, 12 => 8, 19 => 8 ];
+//
+//var_dump($cmad);
+//var_dump($soln);
+//var_dump($cmad == $soln);
+
+/**
+ * @param array $set
+ * @param int   $targetValue
+ * @return array
+ */
+function findClosestMatch(array $set, $targetValue)
+{
+    $result = computeMostAveragestDelta($set, $targetValue);
+
+    if (empty($result)) {
+        foreach ($set as $row) {
+
+            $cacheVal = $cacheId = 0;
+
+            foreach ($row as $val => $id) {
+
+                if ($val > $cacheVal) {
+                    $cacheVal = $val;
+                    $cacheId = $id;
+                }
+            }
+
+            $result[$cacheId] = $cacheVal;
+        }
+    }
+
+    return $result;
+}
+
+
+/**
+ * This is the definition of insanity.
+ * From the given 2-dimensional set, return a 1-dimensional set representing which values would add to the given target.
+ *
+ * @param array $set
+ * @param int   $targetValue
+ * @param array $append
+ * @return array
+ */
+function computeMostAveragestDelta(array $set, $targetValue, $append = [])
+{
+    if (array_sum($append) == $targetValue) {
+        return $append;
+    }
+
+    // no work can be achieved
+    if (count($set) == 0) {
+//        echo "NO CAN DO WORK\n";
+        return $append;
+    }
+
+    $average = $targetValue / count($set);
+//    echo "AVERAGE computed is $average\n";
+
+    foreach ($set as $critId => $values) {
+
+        // obtain set diff
+        $reducedSet = $set;
+        unset($reducedSet[$critId]);
+
+        // sort by value proximity to the average for best fit
+        uksort($values, function ($a, $b) use ($average) {
+            $dA = abs($a - $average);
+            $dB = abs($b - $average);
+
+            if ($dA == $dB) {
+                return 0;
+            }
+
+            return $dA > $dB ? 1 : -1;
+        });
+
+        foreach ($values as $dVal => $dId) {
+            if ($dVal == $targetValue) {
+                // if this is a perfect match, just return it
+//                echo "RETURNING EXACT, value is $dVal\n";
+                $append[$dId] = $dVal;
+                return $append;
+            }
+            if ($dVal > $targetValue) {
+//                echo "$dVal IS BIGGER THAN $targetValue, TOO BIG TO USE\n";
+                continue;
+            }
+
+            // recurse with the reduced set, accommodating our currently-selected value
+            $reducedTarget = $targetValue - $dVal;
+//            echo "RECURSING with $targetValue - $dVal = $reducedTarget...\n";
+
+            $append = computeMostAveragestDelta($reducedSet, $reducedTarget, $append);
+
+            $targetValue -= array_sum($append);
+
+            if ($dVal == $targetValue) {
+                // if this is a perfect match, just return it
+//                echo "RETURNING EXACT, value is $dVal\n";
+                $append[$dId] = $dVal;
+                return $append;
+            }
+
+        }
+
+    }
+
+//    echo "FINAL RETURN with sum of " . array_sum($append). "\n";
+    return $append;
+}
 
 /**
  * @param array           $deletion
