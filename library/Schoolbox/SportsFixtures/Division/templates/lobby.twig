@@ -373,15 +373,72 @@
     </div>
 </div>
 
-<div class="row">
-    <div class="small-6 columns">
-        <ul class="test information-list sortable" data-test-division-player-list="4">
-            <li data-player="111" data-assigned="0"><span class="icon-grip"></span> Bill</li>
-            <li data-player="222" data-assigned="1"><span class="icon-grip"></span> Saul</li>
-            <li data-player="333" data-assigned="1"><span class="icon-grip"></span> Lee</li>
-        </ul>
+{#
 
-        <span class="label full-width hide" data-test-division-indicator></span>
+Vars that I need to deal with:
+
+data-add-team-player
+data-remove-player
+data-remove-team-player
+#}
+
+<div class="row">
+    <div class="small-6 island">
+        <section>
+            <ul class="information-list sortable" data-test-division-player-list="{{ division.id }}">
+
+                {% for playerData in players %}
+                <li class="actions-small-1" data-player="{{ playerData.player.id }}" data-assigned="0">
+                    <div class="list-item">
+                        <div class="grip"></div>
+                        <div class="small-11 avatar card">
+                            <a href="/search/user/{{ playerData.player.id }}">
+                                <img src="/portrait.php?userId={{ playerData.player.externalId }}&amp;size=square64" />
+                                <h3>{{ playerData.player.formatName() }}</h3>
+                            </a>
+                            <p class="meta">{{ playerData.player.formatMetadata() }}</p>
+                            {% for currentTeam in playerData.teams %}
+                                {% if loop.first %}
+                                    <p class="meta icon-sport">
+                                {% endif %}
+                                {{ currentTeam.name }}{% if not loop.last %}, {% endif %}
+                                {% if loop.last %}
+                                    </p>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <nav>
+                        <a href="#" class="icon-more" data-dropdown="sportsfixtures-player-{{ playerData.player.id }}-actions"></a>
+                    </nav>
+                    <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-player-{{ playerData.player.id }}-actions">
+                        {% for currentTeam in teams %}
+                            {% if loop.first %}
+                                <li class="separator">Team Membership</li>
+                            {% endif %}
+                            <li>
+                                {% if currentTeam.team in playerData.teams %}
+                                    <a href="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: currentTeam.team.id}) }}"
+                                       class="icon-close"
+                                       data-remove-team-player="{{ playerData.player.id }}">Remove Player from {{ currentTeam.team.name }}</a>
+                                {% else %}
+                                    <a href="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.team.id}) }}"
+                                       class="icon-add"
+                                       data-add-team-player="{{ playerData.player.id }}">Add Player to {{ currentTeam.team.name }}</a>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                        <li class="separator">Division Membership</li>
+                        <li><a href="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.id}) }}"
+                               class="icon-delete"
+                               data-remove-player="{{ playerData.player.id }}">Remove Player From Division</a></li>
+                    </ul>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <span class="label full-width hide" data-test-division-indicator></span>
+        </section>
     </div>
     <div class="small-6 columns">
         <div class="row">

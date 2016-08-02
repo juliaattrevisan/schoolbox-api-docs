@@ -47,7 +47,7 @@
 
             $(config.element).sortable({
                 connectWith: $(config.element),
-                handle: '.icon-grip',
+                handle: '.grip',
                 helper: function(e,li) {
                     copyHelper = li.clone().insertAfter(li);
 
@@ -61,7 +61,7 @@
 
                     var player = ui.item;
                     var from = $(event.target);
-                    var to = player.closest('[data-test-team-player-list]');
+                    var to = player.closest('[data-test-team-player-list], [data-test-team-player-list-proxy]');
 
                     /* Indicators
                      */
@@ -160,6 +160,9 @@
                         reapplyPlayerFilter();
 
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
+                    }
+                    else {
+                        //console.log(from, to);
                     }
                 }
             });
