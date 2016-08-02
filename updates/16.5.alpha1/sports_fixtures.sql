@@ -39,12 +39,12 @@ CREATE TABLE `sportsfixtures_division` (
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`sport_id`)
 	REFERENCES `sportsfixtures_sport`(`id`)
-		ON UPDATE NO ACTION
-		ON DELETE NO ACTION,
+		ON UPDATE RESTRICT
+		ON DELETE RESTRICT,
 	FOREIGN KEY (`season_id`)
 	REFERENCES `sportsfixtures_season`(`id`)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE
+		ON UPDATE RESTRICT
+		ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Team Table
@@ -60,8 +60,8 @@ CREATE TABLE `sportsfixtures_team` (
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`division_id`)
 	REFERENCES `sportsfixtures_division`(`id`)
-		ON UPDATE NO ACTION
-		ON DELETE NO ACTION
+		ON UPDATE RESTRICT
+		ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Position Table
@@ -76,8 +76,8 @@ CREATE TABLE `sportsfixtures_position` (
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`sport_id`)
 	REFERENCES `sportsfixtures_sport`(`id`)
-		ON UPDATE NO ACTION
-		ON DELETE NO ACTION
+		ON UPDATE RESTRICT
+		ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 
@@ -94,8 +94,8 @@ CREATE TABLE `sportsfixtures_division_user` (
 	CONSTRAINT `fk_sportsfixtures_division_user__division`
 	FOREIGN KEY (`division_id`)
 	REFERENCES `sportsfixtures_division` (`id`)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
+		ON DELETE RESTRICT
+		ON UPDATE RESTRICT
 	) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Venue Table */
@@ -134,24 +134,24 @@ CREATE TABLE `sportsfixtures_match` (
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`division_id`)
 		REFERENCES `sportsfixtures_division`(`id`)
-			ON UPDATE NO ACTION
-			ON DELETE NO ACTION,
+			ON UPDATE RESTRICT
+			ON DELETE RESTRICT,
 	FOREIGN KEY (`season_id`)
 	  REFERENCES `sportsfixtures_season`(`id`)
 		  ON UPDATE RESTRICT
 		  ON DELETE RESTRICT,
 	FOREIGN KEY (`venue_id`)
 		REFERENCES `sportsfixtures_venue`(`id`)
-			ON UPDATE NO ACTION
-			ON DELETE NO ACTION,
+			ON UPDATE RESTRICT
+			ON DELETE RESTRICT,
 	FOREIGN KEY (`home_team_id`)
 		REFERENCES `sportsfixtures_team`(`id`)
-			ON UPDATE NO ACTION
-			ON DELETE NO ACTION,
+			ON UPDATE RESTRICT
+			ON DELETE RESTRICT,
 	FOREIGN KEY (`away_team_id`)
 		REFERENCES `sportsfixtures_team`(`id`)
-			ON UPDATE NO ACTION
-			ON DELETE NO ACTION
+			ON UPDATE RESTRICT
+			ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Match ItineraryItem Table
@@ -167,8 +167,8 @@ CREATE TABLE `sportsfixtures_match_itineraryitem` (
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`match_id`)
 		REFERENCES `sportsfixtures_match`(`id`)
-			ON UPDATE NO ACTION
-			ON DELETE NO ACTION
+			ON UPDATE RESTRICT
+			ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Match Status Table (add before sportsfixtures_result)
@@ -202,12 +202,12 @@ CREATE TABLE `sportsfixtures_result` (
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`match_id`)
 		REFERENCES `sportsfixtures_match`(`id`)
-			ON UPDATE NO ACTION
-			ON DELETE NO ACTION,
+			ON UPDATE RESTRICT
+			ON DELETE RESTRICT,
 	FOREIGN KEY (`status_id`)
 	REFERENCES `sportsfixtures_status`(`id`)
-		ON UPDATE CASCADE
-		ON DELETE SET NULL
+		ON UPDATE RESTRICT
+		ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Error table entries */
@@ -234,8 +234,8 @@ CREATE TABLE `sportsfixtures_team_user` (
 	CONSTRAINT `fk_sportsfixtures_team_user__team`
 	FOREIGN KEY (`team_id`)
 	REFERENCES `sportsfixtures_team` (`id`)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
+		ON DELETE RESTRICT
+		ON UPDATE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /** Team Participant table **/
@@ -265,12 +265,12 @@ CREATE TABLE `sportsfixtures_team_position` (
 	CONSTRAINT `fk_sportsfixtures_team_position__team`
 	FOREIGN KEY (`team_id`)
 	REFERENCES `sportsfixtures_team` (`id`)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE,
+		ON DELETE RESTRICT
+		ON UPDATE RESTRICT,
 	FOREIGN KEY (`position_id`)
 	REFERENCES `sportsfixtures_position` (`id`)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE
+	ON DELETE RESTRICT
+	ON UPDATE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /** Team Participant Positions */
@@ -329,13 +329,13 @@ CREATE TABLE `sportsfixtures_team_coach` (
 	CONSTRAINT `fk_sportsfixtures_team_coach__team`
 	FOREIGN KEY (`sportsfixtures_team_id`)
 	REFERENCES `sportsfixtures_team` (`id`)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE,
+		ON DELETE RESTRICT
+		ON UPDATE RESTRICT,
 	CONSTRAINT `fk_sportsfixtures_team_coach__coach`
 	FOREIGN KEY (`sportsfixtures_coach_id`)
 	REFERENCES `sportsfixtures_coach` (`id`)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
+		ON DELETE RESTRICT
+		ON UPDATE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 
