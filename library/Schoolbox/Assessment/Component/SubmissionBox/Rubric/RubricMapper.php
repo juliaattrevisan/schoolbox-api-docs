@@ -158,17 +158,6 @@ class RubricMapper
      */
     public function findBySubmissionBox($box, $forceTaskMode = false, $editMode = false)
     {
-        $levelCollection = LevelMapper::getInstance()->findByColumn('box_id', $box->getId(), [ 'order' => [ 'sequence' => 'ASC' ] ]);
-
-        $levelList = [];
-
-        foreach ($levelCollection as $level) {
-            $levelList[$level->getSequence()] = [
-                'id'   => $level->getId(),
-                'name' => $level->getName()
-            ];
-        }
-
         $args = [
             'boxId' => $box->getId(),
             'folderId' => $box->getCategory()->getId()
@@ -269,6 +258,40 @@ class RubricMapper
             ];
         }
 
+        $levelList = $this->generateLevelList($box, $descriptors, $criteria);
+
+        // setup the data structure to match what the factory expects
+        $postdata = [$box->getId() => [
+            'level'      => $levelList,
+            'group'      => $groups,
+            'criterion'  => $criteria,
+            'descriptor' => $descriptors,
+        ]];
+
+        // use the factory to produce the rubric object
+        return $this->factory->buildFromPostData($postdata, $forceTaskMode || $editMode)->setSubmissionBox($box);
+    }
+
+
+    /**
+     * @param SubmissionBox $box
+     * @param array         $descriptors
+     * @param array         $criteria
+     * @return array
+     */
+    protected function generateLevelList(SubmissionBox $box, array $descriptors, array $criteria)
+    {
+        $levelList = [];
+
+        $levelCollection = LevelMapper::getInstance()->findByColumn('box_id', $box->getId(), [ 'order' => [ 'sequence' => 'ASC' ] ]);
+
+        foreach ($levelCollection as $level) {
+            $levelList[$level->getSequence()] = [
+                'id'   => $level->getId(),
+                'name' => $level->getName()
+            ];
+        }
+
         // mokay. so if at this point you've got no descriptors, check to see if there should be a resultSet we should use
         if (count($descriptors) == 0) {
             // misnomer much
@@ -299,16 +322,7 @@ class RubricMapper
             $levelList[] = [ 'name' => '' ];
         }
 
-        // setup the data structure to match what the factory expects
-        $postdata = [$box->getId() => [
-            'level'      => $levelList,
-            'group'      => $groups,
-            'criterion'  => $criteria,
-            'descriptor' => $descriptors,
-        ]];
-
-        // use the factory to produce the rubric object
-        return $this->factory->buildFromPostData($postdata, $forceTaskMode || $editMode)->setSubmissionBox($box);
+        return $levelList;
     }
 
 
