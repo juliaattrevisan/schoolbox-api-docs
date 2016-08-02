@@ -105,8 +105,7 @@ class Sanitiser
             $this->setSortBy(self::SCORE_COLUMN);
             $this->setSortOnTableColumn(false);
         } else {
-            $mappingDefinition = $mapper->getIdentifier();
-            $this->setSortBy($mappingDefinition['column']);
+            $this->setSortBy($mapper->getIdentifierColumn());
             $this->setSortOnTableColumn(true);
         }
 
