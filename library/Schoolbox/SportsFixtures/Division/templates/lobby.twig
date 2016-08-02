@@ -15,6 +15,7 @@
 <script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript" src="/javascript/shared/sportsfixtures/jquery.division-lobby.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript">
     $(function() {
@@ -349,6 +350,10 @@
 <script type="text/javascript">
     $(function() {
         $('[data-test-division-player-list], [data-test-team-player-list]').divisionLobby();
+
+        $('[data-collapser]').collapsable({
+            container: '[data-test-team-player-list]'
+        });
     });
 </script>
 
@@ -373,27 +378,54 @@
         <div class="row">
             <div class="small-12 island">
                 <section data-test-team="1">
+                    <p>Red Team</p>
+                    <a href="#" class="icon-down-arrow" title="Expand/Collapse Content" data-collapser="team-1"></a>
+
                     <span class="label full-width hide" data-test-team-indicator></span>
 
-                    <ul class="test information-list sortable" data-test-team-player-list="1">
+                    <ul class="test information-list sortable" data-test-team-player-list="1" data-collapsable="team-1">
+                        <li>mog</li>
+                        <li>mog</li>
+                        <li>mog</li>
+                        <li>mog</li>
+                        <li>mog</li>
+                        <li>mog</li>
                     </ul>
                 </section>
             </div>
 
             <div class="small-12 island">
                 <section data-test-team="2">
+                    <p>Blue Team</p>
+                    <a href="#" class="icon-down-arrow" title="Expand/Collapse Content" data-collapser="team-2"></a>
+
                     <span class="label full-width hide" data-test-team-indicator></span>
 
-                    <ul class="test information-list sortable" data-test-team-player-list="2">
+                    <ul class="test information-list sortable" data-test-team-player-list="2" data-collapsable="team-2">
+                        <li>mog</li>
+                        <li>mog</li>
+                        <li>mog</li>
+                        <li>mog</li>
+                        <li>mog</li>
+                        <li>mog</li>
                     </ul>
                 </section>
             </div>
 
             <div class="small-12 island">
                 <section data-test-team="3">
+                    <p>Green Team</p>
+                    <a href="#" class="icon-down-arrow" title="Expand/Collapse Content" data-collapser="team-3"></a>
+
                     <span class="label full-width hide" data-test-team-indicator></span>
 
-                    <ul class="test information-list sortable" data-test-team-player-list="3">
+                    <ul class="test information-list sortable" data-test-team-player-list="3" data-collapsable="team-3">
+                        <li>mog</li>
+                        <li>mog</li>
+                        <li>mog</li>
+                        <li>mog</li>
+                        <li>mog</li>
+                        <li>mog</li>
                     </ul>
                 </section>
             </div>
