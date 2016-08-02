@@ -42,17 +42,28 @@
          * Start up the sortable plugin
          */
         function initSortables() {
+            var copyHelper;
+
             $(config.element).sortable({
-                handle: '.icon-grip',
-                helper: 'clone',
                 connectWith: $(config.element),
+                handle: '.icon-grip',
+                helper: function(e,li) {
+                    copyHelper = li.clone().insertAfter(li);
+
+                    return li.clone();
+                },
                 start: function(event, ui) {
 
                     /* Always show the person being dragged away
                      */
-                    $(ui.item).show();
+                    //$(ui.item).show();
+                },
+                receive: function(e,ui) {
+                    copyHelper = null;
                 },
                 stop: function(event, ui) {
+                    copyHelper && copyHelper.remove();
+
                     var player = ui.item;
                     var from = $(event.target);
                     var to = player.closest('ul');
