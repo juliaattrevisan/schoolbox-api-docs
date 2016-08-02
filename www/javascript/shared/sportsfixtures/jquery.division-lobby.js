@@ -15,6 +15,7 @@
         var config = init(options, $(this));
 
         initSortables();
+        initPlayerFilter();
 
         /**
          * Init
@@ -108,6 +109,10 @@
                             removeProxyHelperClone(to);
                         }
 
+                        /* Reapply filter settings to division player list
+                         */
+                        reapplyPlayerFilter();
+
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
                         toFeedback.labelTimeout({text: 'Added!', css: 'success'});
                     }
@@ -135,6 +140,10 @@
                             removeProxyHelperClone(to);
                         }
 
+                        /* Reapply filter settings to division player list
+                         */
+                        reapplyPlayerFilter();
+
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
                         toFeedback.labelTimeout({text: 'Added!', css: 'success'});
                     }
@@ -152,16 +161,55 @@
                          */
                         $('[data-test-team='+fromId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
 
+                        /* Reapply filter settings to division player list
+                         */
+                        reapplyPlayerFilter();
+
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
                     }
-                },
-                over: function(event, ui) {
-
-                    /* Reapply filter settings to division player list
-                     */
-                    console.log('reapply filters');
                 }
             });
+        }
+
+        /**
+         * Init event listener for player filter
+         */
+        function initPlayerFilter() {
+            $('#player-filter').on('change', function() {
+                reapplyPlayerFilter();
+            });
+        }
+
+        /**
+         * Reapply the Player Filter setting to all the folks
+         * in the division player list
+         */
+        function reapplyPlayerFilter() {
+            var divisionPlayerList = $('[data-test-division-player-list]');
+
+            switch (parseInt($('#player-filter').val())) {
+
+                /* Hide everyone, show Unassigned
+                 */
+                case 1:
+                    divisionPlayerList.find('[data-player]').hide();
+                    divisionPlayerList.find('[data-assigned=0]').show();
+                    break;
+
+                /* Hide everyone, show Assigned
+                 */
+                case 2:
+                    divisionPlayerList.find('[data-player]').hide();
+                    divisionPlayerList.find('[data-assigned=1]').show();
+                    break;
+
+                /* Show Everyone
+                 */
+                case 0:
+                default:
+                    divisionPlayerList.find('[data-player]').show();
+                    break;
+            }
         }
 
         /**
