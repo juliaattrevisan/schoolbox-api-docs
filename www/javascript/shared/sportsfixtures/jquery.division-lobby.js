@@ -27,7 +27,7 @@
             var defaults = {
 
                 /* A list of all the connected sortables
-                 * The division lobby and all its destination teams
+                 * The division lobby and all its destination teams and all the destination teams' proxies
                  */
                 element: element
             };
@@ -89,7 +89,7 @@
                          * after team list is respawned
                          */
                         if (isTeamPlayerListProxy(to)) {
-                            console.log('hide helper');
+                            removeProxyHelperClone(to);
                         }
 
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
@@ -111,7 +111,7 @@
                          * after team list is respawned
                          */
                         if (isTeamPlayerListProxy(to)) {
-                            console.log('hide helper');
+                            removeProxyHelperClone(to);
                         }
 
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
@@ -137,6 +137,16 @@
                     console.log('reapply filters');
                 }
             });
+        }
+
+        /**
+         * If you dragged a player on the team title (player list proxy) it'll stay there
+         * in a weird place until you manually remove them
+         *
+         * @param to
+         */
+        function removeProxyHelperClone(to) {
+            to.parents('[data-test-team]').find('[data-test-team-player-list-proxy]').find('[data-player]').remove();
         }
 
         /**
