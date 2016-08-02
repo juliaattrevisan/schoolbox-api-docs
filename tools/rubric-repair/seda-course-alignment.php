@@ -158,12 +158,19 @@ $kernel->run
         VALUES (:student_id, :box_id, (SELECT criterion_id FROM rubric_descriptor WHERE id = :desc_id), :desc_id, :tstamp)
     ");
 
+    $getLatestReturnStmt = $db->prepare("
+        SELECT id
+        FROM submission_return
+        WHERE `owner` = :student_id
+        AND box_id = :box_id
+        ORDER BY returned DESC
+        LIMIT 1
+    ");
+
     $updateReturnRecordStmt = $db->prepare("
         UPDATE submission_return 
         SET mark = :visibleMark
-        WHERE returned = :tstamp
-        AND box_id = :box_id
-        AND owner = :student_id
+        WHERE id = :return_id
     ");
 
     $notBefore = new Alaress_Date_Format('2016-01-01 00:00:00', 'Y-m-d H:i:s');
@@ -189,7 +196,6 @@ $kernel->run
         AND c2.deleted_at IS NULL
         AND b1.use_rubric IS TRUE
         AND b2.use_rubric IS TRUE
-                                                -- and ui.id = 743
         GROUP BY ui.id;
     ", [
         'opendate' => $notBefore->getDatabase(),
@@ -429,13 +435,18 @@ $kernel->run
 
                     $log->debug(json_encode($avg));
 
-                    $log->info("Updating student-visible mark to $newNum / $newDenom [box_id,student_id,tstamp]($instanceBoxId,$studentId,$stamp)");
+                    $getLatestReturnStmt->execute([
+                        'student_id' => $studentId,
+                        'box_id' => $instanceBoxId
+                    ]);
+
+                    $returnId = $getLatestReturnStmt->fetchColumn();
+
+                    $log->info("Updating student-visible mark to $newNum / $newDenom [return_id,box_id,student_id]($returnId,$instanceBoxId,$studentId)");
 
                     $updateReturnRecordStmt->execute([
                         'visibleMark' => "$newNum / $newDenom",
-                        'tstamp'      => $stamp,
-                        'box_id'      => $instanceBoxId,
-                        'student_id'  => $studentId
+                        'return_id'   => $returnId
                     ]);
 
                 }
