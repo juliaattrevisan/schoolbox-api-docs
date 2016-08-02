@@ -105,8 +105,6 @@ $kernel->run(function($di, $loop, $log, $opts) {
     // check every instance for cohesiveness
     foreach ($searchStmt as $row) {
 
-        $log->debug(sprintf("%d | %d | %d", $row['id'], $row['unit_boxes'], $row['class_boxes']));
-
         /** @var UnitInstance $instance */
         $instance = UnitInstanceMapper::getInstance()->hydrate($row);
 
@@ -175,7 +173,10 @@ $kernel->run(function($di, $loop, $log, $opts) {
             }
 
             /** @var Collection|SubmissionBox\ReturnedWork[] $instanceReturns */
-            $instanceReturns = SubmissionBox\ReturnedWorkMapper::getInstance()->findByColumn('box_id', $instanceBoxId, [
+            $instanceReturns = SubmissionBox\ReturnedWorkMapper::getInstance()->findByColumnList([
+                'box_id' => $instanceBoxId,
+                'is_confirmation_of_submission' => false
+            ], [
                 'deleted' => false,
                 'order'   => [
                     'returned' => 'DESC'
