@@ -73,7 +73,7 @@
 
                         /* Execute db transaciton
                          */
-                        //console.log('dragging player from division to team ' + to.attr('data-test-team-player-list'));
+                        console.log('dragging player from division to team ' + to.parents('[data-test-team]').attr('data-test-team'));
 
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
                         toFeedback.labelTimeout({text: 'Added!', css: 'success'});
@@ -86,7 +86,7 @@
 
                         /* Execute db transaciton
                          */
-                        //console.log('dragging between teams - from: ' + from.attr('data-test-team-player-list') + ', to: ' + to.attr('data-test-team-player-list'));
+                        console.log('dragging between teams - from: ' + from.parents('[data-test-team]').attr('data-test-team') + ', to: ' + to.parents('[data-test-team]').attr('data-test-team'));
 
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
                         toFeedback.labelTimeout({text: 'Added!', css: 'success'});
@@ -98,7 +98,7 @@
 
                         /* Execute db transaciton
                          */
-                        //console.log('remove a player from team ' + from.attr('data-test-team-player-list'));
+                        console.log('remove a player from team ' + from.parents('[data-test-team]').attr('data-test-team'));
 
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
                     }
@@ -107,7 +107,7 @@
 
                     /* Reapply filter settings to division player list
                      */
-                    //console.log('over');
+                    console.log('over');
                 }
             });
         }
@@ -118,7 +118,9 @@
          * @param element
          */
         function isDivisionList(element) {
-            return element.attr('data-test-division-player-list');
+            var attr = element.attr('data-test-division-player-list');
+
+            return (typeof attr !== typeof undefined && attr !== false);
         }
 
         /**
@@ -127,7 +129,9 @@
          * @param element
          */
         function isTeamPlayerList(element) {
-            return element.attr('data-test-team-player-list')
+            var attr = element.attr('data-test-team-player-list');
+
+            return (typeof attr !== typeof undefined && attr !== false);
         }
 
         /**
