@@ -158,6 +158,65 @@ class RubricMapper
      */
     public function findBySubmissionBox($box, $forceTaskMode = false, $editMode = false)
     {
+        // why 20? because it's not 0.
+        $groupId = 20;
+
+        $groups = $criteria = [];
+
+        $groupIdMap = [];
+
+        $criteriaStatement = $this->generateCriteriaStatement($box, $forceTaskMode);
+
+        while ($r = $criteriaStatement->fetch(PDO::FETCH_ASSOC)) {
+
+            $groupName = $r['grouping'];
+
+            if (empty($groupIdMap[$groupName])) {
+                ++$groupId;
+
+                $groupIdMap[$groupName] = $groupId;
+                $groups[$groupId] = [ 'name' => $groupName ];
+            }
+
+            // check for usage
+            $usedElsewhere = ($r['usages'] - $r['selected']) > 0;
+
+            $criteria[$r['crit_id']] = [
+                'groupId'  => $groupIdMap[$groupName],
+                'on'       => $r['selected'] > 0,
+                'name'     => $r['name'],
+                'readonly' => $usedElsewhere
+            ];
+
+        }
+
+        // umm... I have *never* had to do this before... how does the while() loop break if not EOF??
+        $criteriaStatement->closeCursor();
+
+        $descriptors = $this->findDescriptors($box);
+        $levelList   = $this->generateLevelList($box, $descriptors, $criteria);
+
+        // setup the data structure to match what the factory expects
+        $postdata = [$box->getId() => [
+            'level'      => $levelList,
+            'group'      => $groups,
+            'criterion'  => $criteria,
+            'descriptor' => $descriptors,
+        ]];
+
+        // use the factory to produce the rubric object
+        return $this->factory->buildFromPostData($postdata, $forceTaskMode || $editMode)->setSubmissionBox($box);
+    }
+
+
+    /**
+     * @param SubmissionBox $box
+     * @param bool          $forceTaskMode
+     * @throws \Schoolbox\Mapper\Exception
+     * @return \PDOStatement
+     */
+    protected function generateCriteriaStatement(SubmissionBox $box, $forceTaskMode)
+    {
         $args = [
             'boxId' => $box->getId(),
             'folderId' => $box->getCategory()->getId()
@@ -210,52 +269,7 @@ class RubricMapper
         ", $args);
 
 
-        // why 20? because it's not 0.
-        $groupId = 20;
-
-        $groups = $criteria = [];
-
-        $groupIdMap = [];
-
-        while ($r = $criteriaStatement->fetch(PDO::FETCH_ASSOC)) {
-
-            $groupName = $r['grouping'];
-
-            if (empty($groupIdMap[$groupName])) {
-                ++$groupId;
-
-                $groupIdMap[$groupName] = $groupId;
-                $groups[$groupId] = [ 'name' => $groupName ];
-            }
-
-            // check for usage
-            $usedElsewhere = ($r['usages'] - $r['selected']) > 0;
-
-            $criteria[$r['crit_id']] = [
-                'groupId'  => $groupIdMap[$groupName],
-                'on'       => $r['selected'] > 0,
-                'name'     => $r['name'],
-                'readonly' => $usedElsewhere
-            ];
-
-        }
-
-        // umm... I have *never* had to do this before... how does the while() loop break if not EOF??
-        $criteriaStatement->closeCursor();
-
-        $descriptors = $this->findDescriptors($box);
-        $levelList   = $this->generateLevelList($box, $descriptors, $criteria);
-
-        // setup the data structure to match what the factory expects
-        $postdata = [$box->getId() => [
-            'level'      => $levelList,
-            'group'      => $groups,
-            'criterion'  => $criteria,
-            'descriptor' => $descriptors,
-        ]];
-
-        // use the factory to produce the rubric object
-        return $this->factory->buildFromPostData($postdata, $forceTaskMode || $editMode)->setSubmissionBox($box);
+        return $criteriaStatement;
     }
 
 
