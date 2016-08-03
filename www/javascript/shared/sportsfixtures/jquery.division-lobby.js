@@ -84,8 +84,16 @@
                 stop: function(event, ui) {
                     copyHelper && copyHelper.remove();
 
+                    /* The player element that was dragged
+                     */
                     var player = ui.item;
+
+                    /* The sortable from which $player was dragged
+                      */
                     var from = $(event.target);
+
+                    /* The three possible destinations into which $player can drop
+                     */
                     var to = player.closest('[data-test-team-player-list], [data-test-team-player-list-proxy], [data-test-division-player-list]');
 
                     /* Indicators
@@ -95,8 +103,10 @@
 
                     /* For debugging only
                      */
-                    var fromId;
-                    var toId;
+                    if (config.debugging) {
+                        var fromId;
+                        var toId;
+                    }
 
                     /* Reordering within the same sortable
                      */
@@ -232,24 +242,35 @@
                          */
                         fromFeedback.labelActivate({text: 'Removing from team...'});
 
-                        /* TODO: Execute db transaction - ajax call here
+                        /* Execute db transaction - ajax call here
                          */
-                        console.log(player.data('player'), from.data('removePlayersAction'));
+                        $.post(from.data('removePlayersAction'), [{name: 'userId[]', value: player.data('player')}])
+                            .then(function(response) {
 
-                        /* TODO: Refresh player list
-                         */
-                        $('[data-test-team='+fromId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
+                                /* TODO: Save new team player order
+                                 * This is a secondary ajax call which doesn't really need to happen, but ok
+                                 */
+                                return response;
+                            })
+                            .then(function(response) {
+                                if (config.debugging) {
+                                    console.log('DB: removing ' + player.data('player') + ' from ' + from.data('removePlayersAction'));
+                                }
 
-                        /* Activate indicators
-                         */
-                        fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
+                                /* TODO: Refresh player list
+                                 */
+                                $('[data-test-team='+fromId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
+                            })
+                            .done(function() {
 
-                        /* Reapply filter settings to division player list
-                         */
-                        applyPlayerFilter();
-                    }
-                    else {
-                        //console.log(from, to);
+                                /* Activate indicators
+                                 */
+                                fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
+
+                                /* Reapply filter settings to division player list
+                                 */
+                                applyPlayerFilter();
+                            });
                     }
                 }
             });
