@@ -348,6 +348,12 @@
     <li class="active"><a href="{{ routeLookup('sportsfixturesDivision.getLobby', {entityId: division.id}) }}">{{ division.name }} Lobby</a></li>
 </ul>
 
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Sports Fixtures</h1>
+    </div>
+</div>
+
 <script type="text/javascript">
     $(function() {
         $('[data-test-division-player-list], [data-test-team-player-list], [data-test-team-player-list-proxy]').divisionLobby();
@@ -489,7 +495,8 @@ data-remove-team-player
                             <ul class="information-list sortable"
                                 data-add-players-action="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: teamData.team.id}) }}"
                                 data-remove-players-action="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: teamData.team.id}) }}"
-                                data-test-team-player-list data-collapsable="team-{{ teamData.team.id }}">
+                                data-test-team-player-list
+                                data-collapsable="team-{{ teamData.team.id }}">
 
                                 {% for teamPlayer in teamData.players %}
                                 <li class="actions-small-2" data-player="{{ teamPlayer.id }}">
@@ -563,12 +570,6 @@ data-remove-team-player
 
 
 
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Sports Fixtures</h1>
-    </div>
-</div>
 
 <div class="row">
     <div class="small-12 medium-6 island">

@@ -280,6 +280,13 @@
             });
         }
 
+        function saveOrdering() {
+            var data = sortable.find('[data-player]').map(function() {
+                return {name: 'userId[]', value: $(this).data('player')};
+            });
+            return $.post(sortable.data('reorderPlayersAction'), data)
+        }
+
         /**
          * Init event listener for player filter
          */
