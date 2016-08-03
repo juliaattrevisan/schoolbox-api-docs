@@ -43,6 +43,7 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteDivisions'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteMatches'));
     }
 
     /**
@@ -56,6 +57,20 @@ class Mapper extends BaseMapper
 
         foreach ($allDivisions as $currentDivision) {
             DivisionMapper::getInstance()->delete($currentDivision);
+        }
+    }
+
+    /**
+     * Soft-Delete all Matches associated with this Season when it's being deleted
+     *
+     * @param Season $season
+     */
+    public function deleteMatches(Season $season)
+    {
+        $allMatches = MatchMapper::getInstance()->findByColumn('season_id', $season->getId());
+
+        foreach ($allMatches as $currentMatch) {
+            MatchMapper::getInstance()->delete($currentMatch);
         }
     }
 
