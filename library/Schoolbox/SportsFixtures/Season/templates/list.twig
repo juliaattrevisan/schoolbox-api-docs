@@ -10,22 +10,19 @@
         // Archive / Restore / Delete AJAX actions
         $('#allSeasons').on('click', 'a[data-action]', function(event) {
             event.preventDefault();
-            var     button = $(this),
-                    action = button.data('action'),
-                    season = button.closest('[data-season]'),
-                    text;
+            var     button        = $(this),
+                    action        = button.data('action'),
+                    season        = button.closest('[data-season]'),
+                    divisionCount = season.data('divisionCount'),
+                    divisionClass = 0 == divisionCount ? 'gradient-10' : 'gradient-1',
+                    matchCount    = season.data('matchCount'),
+                    matchClass    = 0 == matchCount ? 'gradient-10' : 'gradient-1',
+                    tenseClause   = action == 'restore' ? 'that were' : 'currently';
 
-            switch (action) {
-                case 'delete':
-                    text = 'Are you sure you want to delete this Season? This will delete any divisions and matches currently linked to this Season.';
-                    break;
-                case 'archive':
-                    text = 'Are you sure you want to archive this Season? This will archive any divisions and matches currently linked to this Season.';
-                    break;
-                case 'restore':
-                    text = 'Are you sure you want to restore this Season? This will restore any divisions and matches that were linked to this Season.';
-                    break;
-            }
+            var text = 'Are you sure you want to <strong>'+action+'</strong> this season?<br>' +
+                'This will <strong>'+action+'</strong> <span class="'+divisionClass+'">'+divisionCount+'</span> divisions and <span class="'+matchClass+'">'+matchCount+'</span> matches '+tenseClause+' linked to this season, ' +
+                'along with all their subsidiary entities';
+
 
             button.confirmDialog({
                 text: text,
@@ -80,15 +77,15 @@
             <section>
                 <ul class="information-list">
                     {% for currentSeason in allSeasons %}
-                        <li class="actions-small-1" data-season data-season-division-count="2" data-season-match-count="10">
+                        <li class="actions-small-1" data-season data-division-count="{{ divisionCounts[currentSeason.id] }}" data-match-count="{{ matchCounts[currentSeason.id]  }}">
                             <div class="list-item">
                                 <div class="small-12 avatar card">
                                     <h3>
                                         <a href="{{ routeLookup('sportsfixturesSeason.getEntity', {entityId: currentSeason.id}) }}">
                                             {% if currentSeason.isArchived %}
-                                            <del class="icon icon-archive" title="This season is archived, and will be de-emphasised in selectors.">{{ currentSeason.name }}</del>
+                                                <del class="icon icon-archive" title="This season is archived, and will be de-emphasised in selectors.">{{ currentSeason.name }}</del>
                                             {% else %}
-                                            {{ currentSeason.name }}
+                                                {{ currentSeason.name }}
                                             {% endif %}
                                         </a>
                                     </h3>

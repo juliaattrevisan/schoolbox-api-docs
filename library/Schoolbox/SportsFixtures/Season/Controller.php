@@ -14,7 +14,11 @@ use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Season\Model as Season;
 use \Schoolbox\SportsFixtures\Season\Mapper as SeasonMapper;
 
-
+/**
+ * Class Controller
+ * @method SeasonMapper getMapper()
+ * @package Schoolbox\SportsFixtures\Season
+ */
 class Controller extends AbstractController
 {
     /**
@@ -67,6 +71,7 @@ class Controller extends AbstractController
         }
         else {
             try {
+                /** @var Collection|Season[] $allSeasons */
                 $allSeasons = $this->mapper->findAll(
                     [
                         'order' => [
@@ -76,11 +81,28 @@ class Controller extends AbstractController
                     ]
                 );
 
+                // Get number of division attached to each season to inform
+                // user of impact of archive/delete/restore actions.
+                $divisionCounts = $this->getMapper()->getDivisionCounts();
+                $matchCounts    = $this->getMapper()->getMatchCounts();
+
+                // Ensure all seasons have keys for twig to access
+                foreach($allSeasons as $season){
+                    if(!isset($divisionCounts[$season->getId()])){
+                        $divisionCounts[$season->getId()] = 0;
+                    }
+                    if(!isset($matchCounts[$season->getId()])){
+                        $matchCounts[$season->getId()] = 0;
+                    }
+                }
+
                 $this->getResponse()->content->set(
                     $this->buildHtmlOutput(
                         '@sportsfixturesSeason/list.twig',
                         [
-                            'allSeasons' => $allSeasons
+                            'allSeasons'     => $allSeasons,
+                            'divisionCounts' => $divisionCounts,
+                            'matchCounts'    => $matchCounts,
                         ]
                     )
                 );
@@ -160,10 +182,11 @@ class Controller extends AbstractController
      */
     private function saveSeason(Season $season, $name, Alaress_Date_Format $start, Alaress_Date_Format $end)
     {
-        $season->setName($name);
-        $season->setStart($start);
-        $season->setEnd($end);
-        $season->setUpdatedAt(Alaress_Date_Format::now());
+        $season
+            ->setName($name)
+            ->setStart($start)
+            ->setEnd($end)
+            ->setUpdatedAt(Alaress_Date_Format::now());
 
         $this->mapper->save($season);
     }
@@ -181,9 +204,11 @@ class Controller extends AbstractController
 
     /**
      * @param ErrorMapper $errorMapper
+     * @return static
      */
     protected function setErrorMapper($errorMapper)
     {
         $this->errorMapper = $errorMapper;
+        return $this;
     }
 }

@@ -7,10 +7,13 @@
 
 namespace Schoolbox\SportsFixtures\Season;
 
+
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\SportsFixtures\Season\Model as Season;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
+use Schoolbox\Mapper\PredicateBuilder;
 
 
 /**
@@ -67,5 +70,95 @@ class Mapper extends BaseMapper
     {
         return $this->findByColumn('~name', "%{$this->database->quoteForLike($keyword)}%");
     }
+
+
+    /**
+     * Returns the number of divisions attached to each of the specified seasons.
+     *
+     * @param array|null $seasonIds      If supplied, apply filter
+     * @param bool $getDeletedSeasons    Whether to retrieve deleted seasons
+     * @param bool $getDeletedDivisions  Whether to count deleted divisions
+     * @return int[]
+     */
+    public function getDivisionCounts(array $seasonIds = null, $getDeletedSeasons = false, $getDeletedDivisions = false)
+    {
+
+        $query = "
+            SELECT s.id AS 'season_id', COUNT(d.id) AS 'division_count'
+            FROM sportsfixtures_division d
+            RIGHT JOIN sportsfixtures_season s ON s.id = d.season_id
+            WHERE true";
+
+        if(!$getDeletedDivisions){
+            $query .= " AND ".DivisionMapper::getInstance()->getSoftDeleteSql(null, 'd');
+        }
+
+        if(!$getDeletedSeasons){
+            $query .= " AND ".$this->getSoftDeleteSql(null, 's');
+        }
+
+        if(count($seasonIds)){
+            $query .= " AND s.id IN ". PredicateBuilder::getArrayPlaceholders($seasonIds);
+        }
+
+        $query .= " GROUP BY s.id";
+
+        $statement = $this->database->prepare($query);
+
+        $statement->execute(count($seasonIds) ? BaseMapper\PredicateBuilder::getArrayParameters($seasonIds) : null);
+
+        $seasonDivisionCounts = [];
+        while($row = $statement->fetch(\PDO::FETCH_ASSOC)){
+            $seasonDivisionCounts[$row['season_id']] = $row['division_count'];
+        }
+
+        return $seasonDivisionCounts;
+    }
+
+    /**
+     * Returns the number of matches attached to each of the specified seasons.
+     *
+     * @param array|null $seasonIds      If supplied, apply filter
+     * @param bool $getDeletedSeasons    Whether to retrieve deleted seasons
+     * @param bool $getDeletedMatches    Whether to count deleted matches
+     * @return int[]
+     */
+    public function getMatchCounts(array $seasonIds = null, $getDeletedSeasons = false, $getDeletedMatches = false)
+    {
+
+        $query = "
+            SELECT s.id AS 'season_id', COUNT(m.id) AS 'match_count'
+            FROM sportsfixtures_match m
+            RIGHT JOIN sportsfixtures_season s ON s.id = m.season_id
+            WHERE true";
+
+        if(!$getDeletedMatches){
+            $query .= " AND ".MatchMapper::getInstance()->getSoftDeleteSql(null, 'm');
+        }
+
+        if(!$getDeletedSeasons){
+            $query .= " AND ".$this->getSoftDeleteSql(null, 's');
+        }
+
+        if(count($seasonIds)){
+            $query .= " AND s.id IN ". PredicateBuilder::getArrayPlaceholders($seasonIds);
+        }
+
+        $query .= " GROUP BY s.id";
+
+        $statement = $this->database->prepare($query);
+
+        $statement->execute(count($seasonIds) ? BaseMapper\PredicateBuilder::getArrayParameters($seasonIds) : null);
+
+        $seasonMatchCounts = [];
+        while($row = $statement->fetch(\PDO::FETCH_ASSOC)){
+            $seasonMatchCounts[$row['season_id']] = $row['match_count'];
+        }
+
+        return $seasonMatchCounts;
+    }
+
+
+
 
 }
