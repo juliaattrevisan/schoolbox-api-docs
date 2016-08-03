@@ -122,7 +122,6 @@ class Controller extends AbstractController
         ]);
 
 
-
         /* Accumulate faceless schools
          */
         /** @var Match $currentMatch */
@@ -140,7 +139,7 @@ class Controller extends AbstractController
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/list.twig', [
-            'sport' => $sport,
+            'sport' => $division->getSport(),
             'division' => $context,
             'allMatches' => $allMatches,
         ]));
