@@ -21,6 +21,7 @@
         initAddPlayerToTeam();
         initRemovePlayerFromTeam();
         initRemovePlayerFromDivision();
+        initAddPlayerToDivisionSelectize();
 
         /* Glossary of data vars
 
@@ -287,6 +288,22 @@
                 }
             });
         }
+
+        /**
+         * Selectize box for selecting one or more users
+         */
+        function initAddPlayerToDivisionSelectize() {
+            $('[data-role="userSelector"]')
+                .selectizeSelector({
+                    multiple: true,
+                    ajax: {
+                        url: '/ajax/user.php',
+                        type: 'GET',
+                        data: {groupID: 0},
+                        dataType: 'json'
+                    }
+                });
+        };
 
         /**
          * Add a player to a team via tot
