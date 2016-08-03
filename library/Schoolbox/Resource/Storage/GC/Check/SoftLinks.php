@@ -126,7 +126,7 @@ class SoftLinks implements Check
                   OR data_type LIKE '%text'
                   OR (
                         data_type = 'varchar'
-                    AND character_maximum_length >= 255
+                    AND character_maximum_length >= 40
                   )
                 )
                 AND table_name NOT IN ('$blacklist')
