@@ -177,18 +177,24 @@ class Controller extends AbstractController
         $division = $this->augmentDivisionWithPlayers($division);
         $division = $this->augmentDivisionWithTeams($division);
 
-        // Create file upload zone
-        $zone     = new Zone("uploadZone");
-        $zone->setMimeFilter('text/csv')->setAttachPrompt('upload a list of players');
-
         // Create twig-friendly data model
-        $dataModel               = $this->buildDivisionTemplateDataModel($division);
-        $dataModel['user']       = $this->getUser();
-        $dataModel['uploadZone'] = $zone;
+        $dataModel = $this->buildDivisionTemplateDataModel($division);
 
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@sportsfixturesDivision/lobby.twig', $dataModel)
-        );
+        if ($this->getRequest()->isXhr()) {
+            // Output as XHR data model
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput($dataModel)
+            );
+        } else {
+            // Create file upload zone
+            $zone = new Zone("uploadZone");
+            $zone->setMimeFilter('text/csv')->setAttachPrompt('upload a list of players');
+            $dataModel['user']       = $this->getUser();
+            $dataModel['uploadZone'] = $zone;
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput('@sportsfixturesDivision/lobby.twig', $dataModel)
+            );
+        }
     }
 
     /**
