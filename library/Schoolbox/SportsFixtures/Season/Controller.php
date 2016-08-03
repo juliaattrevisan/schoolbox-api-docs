@@ -142,6 +142,11 @@ class Controller extends AbstractController
      */
     protected function getForm($entity, $context = null)
     {
+        // Don't permit edit of archived season
+        if($entity->getId() && $entity->isArchived()){
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
+        }
+
         $data = [
             'season' => $entity,
             'action' => $entity->getId() ? 'Modify' : 'Create',
