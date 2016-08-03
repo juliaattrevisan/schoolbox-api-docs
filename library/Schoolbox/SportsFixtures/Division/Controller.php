@@ -172,37 +172,9 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
-        // Load players into division
-        // TODO add players into division model as a M2M join
-        /** @var DivisionUserModel[] $players */
-        $players = $this->getDivisionUserMapper()->findByColumn('division_id', $entityId, ['order' => ['sequence' => 'desc']]);
-        foreach ($players as $player) {
-            $division->getPlayers()->add($player->getUser());
-        }
-
-        // Load players into teams, and teams into division
-        // TODO add players into team model as a M2M join
-        try {
-            $teams = $this->getTeamMapper()->findByColumn('division_id', $entityId);
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
-        }
-        $teamPlayers = $this->getTeamPlayerMapper()->findByColumn(
-            'team_id',
-            $teams->getColumnValues('id'),
-            ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]
-        );
-        foreach ($teamPlayers as $teamPlayer) {
-            $teamPlayerTeamId = $teamPlayer->getTeam()->getId();
-            foreach ($teams as $team) {
-                $teamId = $team->getId();
-                if ($teamPlayerTeamId == $teamId) {
-                    $team->getPlayers()->add($teamPlayer->getUser());
-                }
-            }
-        }
-        $division->setTeams($teams);
+        // Add players and teams into the division
+        $division = $this->augmentDivisionWithPlayers($division, $entityId);
+        $division = $this->augmentDivisionWithTeams($division, $entityId);
 
         // Create file upload zone
         $zone     = new Zone("uploadZone");
@@ -650,5 +622,55 @@ class Controller extends AbstractController
     {
         $this->teamPositionMapper = $teamPositionMapper;
         return $this;
-    }    
+    }
+
+    /**
+     * @param Division $division
+     * @param int      $entityId
+     * @return Division
+     */
+    protected function augmentDivisionWithPlayers(Division $division, $entityId)
+    {
+        // Load players into division
+        // TODO add players into division model as a M2M join
+        /** @var DivisionUserModel[] $players */
+        $players = $this->getDivisionUserMapper()->findByColumn('division_id', $entityId, ['order' => ['sequence' => 'desc']]);
+        foreach ($players as $player) {
+            $division->getPlayers()->add($player->getUser());
+        }
+        return $division;
+    }
+
+    /**
+     * @param Division $division
+     * @param int      $entityId
+     * @return Division
+     */
+    protected function augmentDivisionWithTeams(Division $division, $entityId)
+    {
+        // Load players into teams, and teams into division
+        // TODO add players into team model as a M2M join
+        try {
+            $teams = $this->getTeamMapper()->findByColumn('division_id', $entityId);
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+        }
+
+        $teamPlayers = $this->getTeamPlayerMapper()->findByColumn(
+            'team_id',
+            $teams->getColumnValues('id'),
+            ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]
+        );
+        foreach ($teamPlayers as $teamPlayer) {
+            $teamPlayerTeamId = $teamPlayer->getTeam()->getId();
+            foreach ($teams as $team) {
+                $teamId = $team->getId();
+                if ($teamPlayerTeamId == $teamId) {
+                    $team->getPlayers()->add($teamPlayer->getUser());
+                }
+            }
+        }
+        $division->setTeams($teams);
+        return $division;
+    }
 }
