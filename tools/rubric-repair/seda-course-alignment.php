@@ -173,9 +173,6 @@ $kernel->run
         WHERE id = :return_id
     ");
 
-    $notBefore = new Alaress_Date_Format('2016-01-01 00:00:00', 'Y-m-d H:i:s');
-    $notAfter  = new Alaress_Date_Format('2016-07-01 00:00:00', 'Y-m-d H:i:s');
-
     $searchStmt = $db->query("
         SELECT COUNT(t.box_id) unit_boxes, COUNT(ti.box_id) class_boxes, ui.* 
         FROM course_unit_instance ui
@@ -190,18 +187,12 @@ $kernel->run
         AND ti.box_id IS NOT NULL
         AND t.deleted_at IS NULL
         AND ti.deleted_at IS NULL
-        AND ui.open_date >= :opendate
-        AND ui.due_date <= :duedate
         AND c1.deleted_at IS NULL
         AND c2.deleted_at IS NULL
         AND b1.use_rubric IS TRUE
         AND b2.use_rubric IS TRUE
---                                                AND ui.id = 2510
         GROUP BY ui.id;
-    ", [
-        'opendate' => $notBefore->getDatabase(),
-        'duedate'  => $notAfter->getDatabase()
-    ]);
+    ");
 
     // check every instance for cohesiveness
     foreach ($searchStmt as $row) {
@@ -266,12 +257,6 @@ $kernel->run
             $instanceBox   = fullyHydrateBox($classTaskInstance->getSubmissionBox());
 
             $instanceBoxId = $instanceBox->getId();
-
-            // date bounds check
-            if ($instanceBox->getDueDate()->lt($notBefore) || $instanceBox->getDueDate()->gt($notAfter)) {
-                $log->debug("Instance box $instanceBoxId outside given dates: skipping.");
-                continue;
-            }
 
             /** @var Collection|SubmissionBox\ReturnedWork[] $instanceReturns */
             $instanceReturns = SubmissionBox\ReturnedWorkMapper::getInstance()->findByColumnList([
