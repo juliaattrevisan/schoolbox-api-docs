@@ -30,7 +30,11 @@
                 /* A list of all the connected sortables
                  * The division lobby and all its destination teams and all the destination teams' proxies
                  */
-                element: element
+                element: element,
+
+                /* Show console.log output
+                 */
+                debugging: true
             };
 
             var derived = {
@@ -61,7 +65,7 @@
 
                     var player = ui.item;
                     var from = $(event.target);
-                    var to = player.closest('[data-test-team-player-list], [data-test-team-player-list-proxy]');
+                    var to = player.closest('[data-test-team-player-list], [data-test-team-player-list-proxy], [data-test-division-player-list]');
 
                     /* Indicators
                      */
@@ -84,13 +88,18 @@
                     /* Dragging from division to a team
                      */
                     else if (isDivisionList(from) && isTeamPlayerList(to)) {
+                        if (config.debugging) {
+                            toId = to.parents('[data-test-team]').attr('data-test-team');
+                            console.log('dragging player from division to team ' + toId);
+                        }
+
+                        /* Activate indicators
+                         */
                         toFeedback.labelActivate({text: 'Adding to team...'});
 
-                        /* TODO: Execute db transaction (debugging)
+                        /* TODO: Execute db transaction - ajax call here
                          */
-                        toId = to.parents('[data-test-team]').attr('data-test-team');
-                        console.log('dragging player from division to team ' + toId);
-                        console.log($('[data-test-team='+toId+']'));
+                        console.log(player.data('player'), to.data('addPlayersAction'));
 
                         /* TODO: Refresh player list
                          */
@@ -103,24 +112,33 @@
                             removeProxyHelperClone(to);
                         }
 
+                        /* Activate indicators
+                         */
+                        fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
+                        toFeedback.labelTimeout({text: 'Added!', css: 'success'});
+
                         /* Reapply filter settings to division player list
                          */
                         applyPlayerFilter();
-
-                        fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
-                        toFeedback.labelTimeout({text: 'Added!', css: 'success'});
                     }
                     /* Dragging players between teams
                      */
                     else if (isTeamPlayerList(from) && isTeamPlayerList(to)) {
+                        if (config.debugging) {
+                            fromId = from.parents('[data-test-team]').attr('data-test-team');
+                            toId = to.parents('[data-test-team]').attr('data-test-team');
+                            console.log('dragging between teams - from: ' + fromId + ', to: ' + toId);
+                        }
+
+                        /* Activate indicators
+                         */
                         fromFeedback.labelActivate({text: 'Removing from team...'});
                         toFeedback.labelActivate({text: 'Adding to team...'});
 
-                        /* TODO: Execute db transaction (debugging)
+                        /* TODO: Execute db transaction - ajax call here
                          */
-                        fromId = from.parents('[data-test-team]').attr('data-test-team');
-                        toId = to.parents('[data-test-team]').attr('data-test-team');
-                        console.log('dragging between teams - from: ' + fromId + ', to: ' + toId);
+                        console.log(player.data('player'), from.data('removePlayersAction'));
+                        console.log(player.data('player'), to.data('addPlayersAction'));
 
                         /* TODO: Refresh player list
                          */
@@ -134,32 +152,42 @@
                             removeProxyHelperClone(to);
                         }
 
+                        /* Activate indicators
+                         */
+                        fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
+                        toFeedback.labelTimeout({text: 'Added!', css: 'success'});
+
                         /* Reapply filter settings to division player list
                          */
                         applyPlayerFilter();
-
-                        fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
-                        toFeedback.labelTimeout({text: 'Added!', css: 'success'});
                     }
                     /* Remove a player from a team
                      */
                     else if (isTeamPlayerList(from) && isDivisionList(to)) {
+                        if (config.debugging) {
+                            fromId = from.parents('[data-test-team]').attr('data-test-team');
+                            console.log('remove a player from team ' + fromId);
+                        }
+
+                        /* Activate indicators
+                         */
                         fromFeedback.labelActivate({text: 'Removing from team...'});
 
-                        /* TODO: Execute db transaction (debugging)
+                        /* TODO: Execute db transaction - ajax call here
                          */
-                        fromId = from.parents('[data-test-team]').attr('data-test-team');
-                        console.log('remove a player from team ' + fromId);
+                        console.log(player.data('player'), from.data('removePlayersAction'));
 
                         /* TODO: Refresh player list
                          */
                         $('[data-test-team='+fromId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
 
+                        /* Activate indicators
+                         */
+                        fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
+
                         /* Reapply filter settings to division player list
                          */
                         applyPlayerFilter();
-
-                        fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
                     }
                     else {
                         //console.log(from, to);

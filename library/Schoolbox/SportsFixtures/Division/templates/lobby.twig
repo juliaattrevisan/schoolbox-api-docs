@@ -389,7 +389,10 @@ data-remove-team-player
         </div>
 
         <section>
-            <ul class="information-list sortable" data-test-division-player-list="{{ division.id }}">
+            <ul class="information-list sortable"
+                data-add-players-action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {entityId: division.id}) }}"
+                data-remove-players-action="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.id}) }}"
+                data-test-division-player-list="{{ division.id }}">
 
                 {% for playerData in players %}
                 <li class="actions-small-1" data-player="{{ playerData.player.id }}" data-assigned="0">
@@ -460,7 +463,11 @@ data-remove-team-player
                 {% if teams is not empty %}
                 {% for teamData in teams %}
                 <section data-test-team="{{ teamData.team.id }}">
-                    <ul class="information-list sortable" data-test-team-player-list-proxy>
+                    <ul class="information-list sortable"
+                        data-add-players-action="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: teamData.team.id}) }}"
+                        data-remove-players-action="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: teamData.team.id}) }}"
+                        data-test-team-player-list-proxy>
+
                         <li class="actions-small-2">
                             <div class="list-item">
                                 <div class="small-12 avatar card">
@@ -478,7 +485,10 @@ data-remove-team-player
                             <span class="label full-width hide" data-test-team-indicator></span>
                         </li>
                         <li>
-                            <ul class="information-list sortable" data-test-team-player-list data-collapsable="team-{{ teamData.team.id }}">
+                            <ul class="information-list sortable"
+                                data-add-players-action="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: teamData.team.id}) }}"
+                                data-remove-players-action="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: teamData.team.id}) }}"
+                                data-test-team-player-list data-collapsable="team-{{ teamData.team.id }}">
 
                                 {% for teamPlayer in teamData.players %}
                                 <li class="actions-small-2" data-player="{{ teamPlayer.id }}">
