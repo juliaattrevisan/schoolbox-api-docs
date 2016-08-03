@@ -65,7 +65,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
 
     /**
      * @param int $id
-     * @return self
+     * @return static
      */
     public function setId($id) {
         $this->id = $id;
@@ -81,7 +81,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
 
     /**
      * @param string $name
-     * @return self
+     * @return static
      */
     public function setName($name) {
         $this->name = $name;
@@ -97,7 +97,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
 
     /**
      * @param Alaress_Date_Format $start
-     * @return self
+     * @return static
      */
     public function setStart(Alaress_Date_Format $start) {
         $this->start = $start;
@@ -113,7 +113,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
 
     /**
      * @param Alaress_Date_Format $end
-     * @return self
+     * @return static
      */
     public function setEnd(Alaress_Date_Format $end) {
         $this->end = $end;
@@ -129,7 +129,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
 
     /**
      * @param Alaress_Date_Format $createdAt
-     * @return self
+     * @return static
      */
     public function setCreatedAt(Alaress_Date_Format $createdAt) {
         $this->createdAt = $createdAt;
@@ -145,7 +145,7 @@ class Model implements ISoftDeletable, ValueLabelInterface
 
     /**
      * @param Alaress_Date_Format $updatedAt
-     * @return self
+     * @return static
      */
     public function setUpdatedAt(Alaress_Date_Format $updatedAt) {
         $this->updatedAt = $updatedAt;
