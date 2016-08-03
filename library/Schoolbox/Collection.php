@@ -343,21 +343,23 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
 
                 if ($a_value instanceof \IComparable && $b_value instanceof \IComparable) {
                     $result = $a_value->compare($b_value);
-                    if(0 != $result){
-                        break;
-                    }
                 } elseif ($a_value !== $b_value) {
                     if ($isCallable[$i]) {
                         $result = $compareFunctions[$i]($a_value, $b_value);
                     } else {
                         $result = $a_value < $b_value ? -1 : 1;
                     }
-                    if(0 != $result){
-                        break;
-                    }
+                }
+
+                // Have we determined a result ?
+                if(0 !== $result){
+                    break;
                 }
             }
-            return $is_asc[$i] ? $result : -$result;
+
+            // At this point, if $result is 0, we didn't break and $i has incremented past the end of array.
+            // Otherwise we broke at $i and return result at that position with requested polarity.
+            return 0 === $result ? 0 : ($is_asc[$i] ? $result : -$result);
         };
 
         return $this->sortByCallback($callback);
