@@ -102,7 +102,7 @@ INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `update
  */
 INSERT INTO `sportsfixtures_division` (`sport_id`, `season_id`, `name`, `created_at`, `updated_at`) VALUES ('1', 2, 'Open', NOW(), NOW());
 INSERT INTO `sportsfixtures_division` (`sport_id`, `season_id`, `name`, `created_at`, `updated_at`) VALUES ('1', 2, 'Year 9', NOW(), NOW());
-INSERT INTO `sportsfixtures_division` (`sport_id`, `season_id`, `name`, `created_at`, `updated_at`) VALUES ('1', 2, 'Year 8', NOW(), NOW());
+INSERT INTO `sportsfixtures_division` (`sport_id`, `season_id`, `name`, `created_at`, `updated_at`) VALUES ('1', 3, 'Year 8', NOW(), NOW());
 
 /* Three Teams for Soccer Open
  */
@@ -198,8 +198,8 @@ INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `update
 /* Three Divisions for Rowing
  */
 INSERT INTO `sportsfixtures_division` (`sport_id`, `season_id`, `name`, `created_at`, `updated_at`) VALUES ('3', 2, 'Open', NOW(), NOW());
-INSERT INTO `sportsfixtures_division` (`sport_id`, `season_id`, `name`, `created_at`, `updated_at`) VALUES ('3', 2, 'Year 9', NOW(), NOW());
-INSERT INTO `sportsfixtures_division` (`sport_id`, `season_id`, `name`, `created_at`, `updated_at`) VALUES ('3', 2, 'Year 8', NOW(), NOW());
+INSERT INTO `sportsfixtures_division` (`sport_id`, `season_id`, `name`, `created_at`, `updated_at`) VALUES ('3', 4, 'Year 9', NOW(), NOW());
+INSERT INTO `sportsfixtures_division` (`sport_id`, `season_id`, `name`, `created_at`, `updated_at`) VALUES ('3', 4, 'Year 8', NOW(), NOW());
 
 /* Three Teams for Rowing Open
  */
