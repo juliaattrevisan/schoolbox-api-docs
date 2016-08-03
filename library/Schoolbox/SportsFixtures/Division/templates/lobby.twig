@@ -384,7 +384,11 @@
         </div>
         {% if teams is not empty %}
             {% for teamData in teams %}
-                {% include '@sportsfixturesDivision/lobby/team.twig' with { teamData: teamData } only %}
+                {% include '@sportsfixturesDivision/lobby/team.twig' with {
+                    team: teamData.team,
+                    players: teamData.players,
+                    positions: teamData.positions
+                } only %}
             {% endfor %}
         {% else %}
             <div class="empty-state">
