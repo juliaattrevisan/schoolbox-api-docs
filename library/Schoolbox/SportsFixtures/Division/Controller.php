@@ -165,9 +165,6 @@ class Controller extends AbstractController
         }
         $entity->setSport($context);
 
-        $season = $this->getSeasonMapper()->findById($entity->getSeason()->getId());
-        $entity->setSeason($season);
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesDivision/create.twig', [
             'division' => $entity,
             'sport'    => $context,
@@ -190,12 +187,6 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
 
-        try {
-            $division->setSport($this->getSportMapper()->findById($division->getSport()->getId()));
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
-        }
 
         // Add players and teams into the division
         $division = $this->getDivisionCollector()->collectPlayers($division);
@@ -229,8 +220,7 @@ class Controller extends AbstractController
     protected function persistEntity($entity)
     {
         try {
-            $sport = $this->getSportMapper()->findById($this->getRequest()->post['sportId']);
-
+            $sport  = $this->getSportMapper()->findById($this->getRequest()->post['sportId']);
             $season = $this->getSeasonMapper()->findById($this->getRequest()->post['seasonId']);
 
             $this->saveDivision($sport, $season, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $entity);
@@ -451,11 +441,12 @@ class Controller extends AbstractController
      */
     private function saveDivision(Sport $sport, Season $season, $name, $url, Division $division)
     {
-        $division->setSport($sport);
-        $division->setSeason($season);
-        $division->setName($name);
-        $division->setUrl($url);
-        $division->setUpdatedAt(\Alaress_Date_Format::now());
+        $division
+            ->setSport($sport)
+            ->setSeason($season)
+            ->setName($name)
+            ->setUrl($url)
+            ->setUpdatedAt(\Alaress_Date_Format::now());
 
         $this->getDivisionMapper()->save($division);
     }
@@ -521,7 +512,7 @@ class Controller extends AbstractController
 
     /**
      * @param SeasonMapper $seasonMapper
-     * @return self
+     * @return static
      */
     protected function setSeasonMapper(SeasonMapper $seasonMapper)
     {
