@@ -186,11 +186,11 @@ class Controller extends AbstractController
         }
 
         // Add players and teams into the division
-        $division = $this->augmentDivisionWithPlayers($division);
-        $division = $this->augmentDivisionWithTeams($division);
+        $division = $this->getMetadataCollector()->augmentDivisionWithPlayers($division);
+        $division = $this->getMetadataCollector()->augmentDivisionWithTeams($division);
 
         // Create twig-friendly data model
-        $dataModel = $this->buildDivisionTemplateDataModel($division);
+        $dataModel = $this->getMetadataTranslator()->buildDivisionTemplateDataModel($division);
 
         if ($this->getRequest()->isXhr()) {
             // Output as XHR data model
@@ -442,6 +442,33 @@ class Controller extends AbstractController
         $this->getDivisionMapper()->save($division);
     }
 
+    /**
+     * Outputs the response from an add player method.
+     *
+     * @param DivisionModel $division
+     */
+    protected function renderPostAddPlayersResponse(DivisionModel $division)
+    {
+        if ($this->getRequest()->isXhr()) {
+            // Output a XHR data model + HTML output
+            $division = $this->getMetadataCollector()->augmentDivisionWithPlayers($division);
+            $division = $this->getMetadataCollector()->augmentDivisionWithTeams($division);
+            $dataModel = $this->getMetadataTranslator()->buildDivisionTemplateDataModel($division);
+            $dataModel['html'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/division.twig', $dataModel)->getAsString();
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput($dataModel)
+            );
+        } else {
+            // Redirect back to lobby
+            $this->getResponse()->redirect->afterPost(
+                $this->getRouter()->generate(
+                    'sportsfixturesDivision.getLobby',
+                    ['entityId' => $division->getId(),]
+                )
+            );
+        }
+    }
+
     /* Getters/Setters
      */
 
@@ -595,134 +622,6 @@ class Controller extends AbstractController
     {
         $this->teamPositionMapper = $teamPositionMapper;
         return $this;
-    }
-
-    /**
-     * @param DivisionModel $division
-     * @return DivisionModel
-     */
-    protected function augmentDivisionWithPlayers(DivisionModel $division)
-    {
-        // Load players into division
-        // TODO add players into division model as a M2M join
-        /** @var DivisionUserModel[] $players */
-        $players = $this->getDivisionUserMapper()->findByColumn('division_id', $division->getId(), ['order' => ['sequence' => 'desc']]);
-        foreach ($players as $player) {
-            $division->getPlayers()->add($player->getUser());
-        }
-        return $division;
-    }
-
-    /**
-     * @param DivisionModel $division
-     * @return DivisionModel
-     */
-    protected function augmentDivisionWithTeams(DivisionModel $division)
-    {
-        // Load players into teams, and teams into division
-        // TODO add players into team model as a M2M join
-        try {
-            $teams = $this->getTeamMapper()->findByColumn('division_id', $division->getId());
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
-        }
-
-        $teamPlayers = $this->getTeamPlayerMapper()->findByColumn(
-            'team_id',
-            $teams->getColumnValues('id'),
-            ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]
-        );
-        foreach ($teamPlayers as $teamPlayer) {
-            $teamPlayerTeamId = $teamPlayer->getTeam()->getId();
-            foreach ($teams as $team) {
-                $teamId = $team->getId();
-                if ($teamPlayerTeamId == $teamId) {
-                    $team->getPlayers()->add($teamPlayer->getUser());
-                }
-            }
-        }
-        $division->setTeams($teams);
-        return $division;
-    }
-
-    /**
-     * @param DivisionModel $division
-     * @return array
-     */
-    protected function buildDivisionTemplateDataModel(DivisionModel $division)
-    {
-        $dataModel = [
-            'division'  => $division,
-            'players'   => [],
-            'teams'     => [],
-            'positions' => [],
-        ];
-        foreach ($division->getPlayers() as $player) {
-            $playerDataModel = [
-                'player' => $player,
-                'teams'  => [],
-            ];
-            foreach ($division->getTeams() as $team) {
-                if ($team->isPlayerInTeam($player)) {
-                    $playerDataModel['teams'][] = $team;
-                }
-            }
-            $dataModel['players'][] = $playerDataModel;
-        }
-        foreach ($division->getTeams() as $team) {
-            $dataModel['teams'][] = $this->buildTeamTemplateDataModel($team);
-        }
-
-        $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
-        return $dataModel;
-    }
-
-    /**
-     * @param TeamModel $team
-     * @return array
-     */
-    protected function buildTeamTemplateDataModel(TeamModel $team)
-    {
-        $positions = $this->getTeamPositionMapper()->findByColumn('team_id', $team->getId());
-
-        $playerPosition = [];
-
-        /* Organise positions by player id
-         */
-        foreach ($positions as $currentPosition) {
-            $playerPosition[$currentPosition->getUser()->getId()][] = $currentPosition;
-        }
-
-        return [
-            'team'      => $team,
-            'players'   => $team->getPlayers(),
-            'positions' => $playerPosition,
-        ];
-    }
-
-    /**
-     * @param DivisionModel $division
-     */
-    protected function renderPostAddPlayersResponse(DivisionModel $division)
-    {
-        if ($this->getRequest()->isXhr()) {
-            // Output a XHR data model + HTML output
-            $division = $this->augmentDivisionWithPlayers($division);
-            $division = $this->augmentDivisionWithTeams($division);
-            $dataModel = $this->buildDivisionTemplateDataModel($division);
-            $dataModel['html'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/division.twig', $dataModel)->getAsString();
-            $this->getResponse()->content->set(
-                $this->buildJsonOutput($dataModel)
-            );
-        } else {
-            // Redirect back to lobby
-            $this->getResponse()->redirect->afterPost(
-                $this->getRouter()->generate(
-                    'sportsfixturesDivision.getLobby',
-                    ['entityId' => $division->getId(),]
-                )
-            );
-        }
     }
 
     /**
