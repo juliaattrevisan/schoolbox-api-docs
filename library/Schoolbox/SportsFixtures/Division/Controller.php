@@ -75,14 +75,14 @@ class Controller extends AbstractController
     protected $teamPositionMapper;
 
     /**
-     * @var Metadata\Collector
+     * @var Helper\Collector
      */
-    protected $metadataCollector;
+    protected $divisionCollector;
 
     /**
-     * @var Metadata\Translator
+     * @var Helper\Translator
      */
-    protected $metadataTranslator;
+    protected $divisionTranslator;
 
     /**
      * Controller constructor.
@@ -98,8 +98,8 @@ class Controller extends AbstractController
         $this->setUserMapper(UserMapper::getInstance());
         $this->setTeamPlayerMapper(TeamPlayerMapper::getInstance());
         $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
-        $this->setMetadataCollector(new Metadata\Collector());
-        $this->setMetadataTranslator(new Metadata\Translator());
+        $this->setDivisionCollector(new Helper\Collector());
+        $this->setDivisionTranslator(new Helper\Translator());
     }
 
     /**
@@ -186,11 +186,11 @@ class Controller extends AbstractController
         }
 
         // Add players and teams into the division
-        $division = $this->getMetadataCollector()->collectPlayers($division);
-        $division = $this->getMetadataCollector()->collectTeams($division);
+        $division = $this->getDivisionCollector()->collectPlayers($division);
+        $division = $this->getDivisionCollector()->collectTeams($division);
 
         // Create twig-friendly data model
-        $dataModel = $this->getMetadataTranslator()->translateDivision($division);
+        $dataModel = $this->getDivisionTranslator()->translateDivision($division);
 
         if ($this->getRequest()->isXhr()) {
             // Output as XHR data model
@@ -451,9 +451,9 @@ class Controller extends AbstractController
     {
         if ($this->getRequest()->isXhr()) {
             // Output a XHR data model + HTML output
-            $division = $this->getMetadataCollector()->collectPlayers($division);
-            $division = $this->getMetadataCollector()->collectTeams($division);
-            $dataModel = $this->getMetadataTranslator()->translateDivision($division);
+            $division = $this->getDivisionCollector()->collectPlayers($division);
+            $division = $this->getDivisionCollector()->collectTeams($division);
+            $dataModel = $this->getDivisionTranslator()->translateDivision($division);
             $dataModel['html'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/division.twig', $dataModel)->getAsString();
             $this->getResponse()->content->set(
                 $this->buildJsonOutput($dataModel)
@@ -625,38 +625,38 @@ class Controller extends AbstractController
     }
 
     /**
-     * @return Metadata\Collector
+     * @return Helper\Collector
      */
-    public function getMetadataCollector()
+    public function getDivisionCollector()
     {
-        return $this->metadataCollector;
+        return $this->divisionCollector;
     }
 
     /**
-     * @param Metadata\Collector $metadataCollector
+     * @param Helper\Collector $divisionCollector
      * @return static
      */
-    public function setMetadataCollector($metadataCollector)
+    public function setDivisionCollector($divisionCollector)
     {
-        $this->metadataCollector = $metadataCollector;
+        $this->divisionCollector = $divisionCollector;
         return $this;
     }
 
     /**
-     * @return Metadata\Translator
+     * @return Helper\Translator
      */
-    public function getMetadataTranslator()
+    public function getDivisionTranslator()
     {
-        return $this->metadataTranslator;
+        return $this->divisionTranslator;
     }
 
     /**
-     * @param Metadata\Translator $metadataTranslator
+     * @param Helper\Translator $divisionTranslator
      * @return static
      */
-    public function setMetadataTranslator($metadataTranslator)
+    public function setDivisionTranslator($divisionTranslator)
     {
-        $this->metadataTranslator = $metadataTranslator;
+        $this->divisionTranslator = $divisionTranslator;
         return $this;
     }
 

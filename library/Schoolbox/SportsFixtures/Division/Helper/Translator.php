@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\SportsFixtures\Division\Metadata;
+namespace Schoolbox\SportsFixtures\Division\Helper;
 
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
