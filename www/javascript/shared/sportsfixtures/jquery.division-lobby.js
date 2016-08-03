@@ -17,6 +17,9 @@
         initSortables();
         initPlayerFilter();
 
+        initRemovePlayerFromDivision();
+        initRemovePlayerFromTeam();
+
         /* Glossary of data vars
 
          Dragon drop receiving elements
@@ -280,6 +283,72 @@
                             });
                     }
                 }
+            });
+        }
+
+        /**
+         * Remove a player from a team
+         */
+        function initRemovePlayerFromTeam() {
+            $(config.element).on('click', '[data-remove-team-player]', function(e) {
+                e.preventDefault();
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you wish to remove this player from this team?',
+                    confirmEvent: function(el) {
+                        var feedback = findIndicator(el.parents('[data-test-team-player-list]'));
+                        feedback.labelActivate({text: 'Removing from team...'});
+
+                        $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removeTeamPlayer')}])
+                            .done(function(response) {
+
+                                /* Just remove him from the dom
+                                 */
+                                el.parents('[data-player]').remove();
+                            })
+                            .done(function() {
+                                feedback.labelTimeout({text: 'Removed!', css: 'success'});
+                            })
+                            .fail(function() {
+                                feedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
+                            });
+                    }
+                });
+            });
+        }
+
+        /**
+         * Remove a player from division lobby
+         * Also removes this player from all teams they are currently in
+         */
+        function initRemovePlayerFromDivision() {
+            $(config.element).on('click', '[data-remove-player]', function(e) {
+                e.preventDefault();
+
+                $(this).confirmDialog({
+                    text: 'Are you sure you wish to remove this player from this division, and all teams within this division?',
+                    confirmEvent: function(el) {
+                        var feedback = findIndicator(el.parents('[data-test-division-player-list]'));
+                        feedback.labelActivate({text: 'Removing from division...'});
+
+                        $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removePlayer')}])
+                            .done(function(response) {
+
+                                /* Remove player from Division List
+                                 * Remove player from all teams in which they existed
+                                 */
+                                var playerId = el.parents('[data-player]').attr('data-player');
+
+                                $('[data-test-division-player-list], [data-test-team-player-list]').find('[data-player='+playerId+']').remove();
+                            })
+                            .done(function() {
+                                feedback.labelTimeout({text: 'Removed!', css: 'success'});
+                            })
+                            .fail(function() {
+                                feedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
+                            });
+                    }
+                });
             });
         }
 
