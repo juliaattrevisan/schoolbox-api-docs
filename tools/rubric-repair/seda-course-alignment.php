@@ -405,6 +405,11 @@ $kernel->run
 
 //                    $log->debug("Existing mark given: " . $grid->getSum() . " / $markedDenominator");
 
+                    if ($markedDenominator == 0) {
+                        // div by zero, no marks given: skip!
+                        continue;
+                    }
+
                     $averageGiven = $grid->getSum() / $markedDenominator;
 
                     $marksToApply = round($averageGiven * $unmarkedDenominator);
