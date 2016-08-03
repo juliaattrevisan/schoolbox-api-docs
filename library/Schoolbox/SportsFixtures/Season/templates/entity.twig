@@ -29,6 +29,11 @@
                     <dt>End Date</dt>
                     <dd>{{ season.end.getDatabaseDate }}</dd>
 
+                    {% if season.isArchived %}
+                        <dt>Archived</dt>
+                        <dd>{{ season.archivedAt.database }}</dd>
+                    {% endif %}
+
                     <dt>Created</dt>
                     <dd>{{ season.createdAt.database }}</dd>
 

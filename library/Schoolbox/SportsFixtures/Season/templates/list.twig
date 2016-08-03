@@ -42,11 +42,13 @@
                             <div class="list-item">
                                 <div class="small-12 avatar card">
                                     <h3>
-                                        {% if currentSeason.isArchived %}
-                                        <del class="icon icon-archive" title="This season is archived, and will be de-emphasised in selectors.">{{ currentSeason.name }}</del>
-                                        {% else %}
-                                        {{ currentSeason.name }}
-                                        {% endif %}
+                                        <a href="{{ routeLookup('sportsfixturesSeason.getEntity', {entityId: currentSeason.id}) }}">
+                                            {% if currentSeason.isArchived %}
+                                            <del class="icon icon-archive" title="This season is archived, and will be de-emphasised in selectors.">{{ currentSeason.name }}</del>
+                                            {% else %}
+                                            {{ currentSeason.name }}
+                                            {% endif %}
+                                        </a>
                                     </h3>
                                     <p class="meta">{{ currentSeason.start.getDateOnly }}—{{ currentSeason.end.getDateOnly }}</p>
                                 </div>
