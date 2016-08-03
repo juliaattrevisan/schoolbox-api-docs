@@ -375,7 +375,19 @@ data-remove-team-player
 #}
 
 <div class="row">
-    <div class="small-6 island">
+    <div class="small-12 medium-6 island">
+        <div class="actions-small-2 row">
+            <div class="list-item">
+                <div class="small-12 column">
+                    <h2 class="subheader">Players</h2>
+                </div>
+            </div>
+            <nav>
+                <a href="#" class="icon-add" title="Add Players" data-reveal-id="addPlayersModal"></a>
+                <a href="#" class="icon-upload" title="Upload Player List" data-reveal-id="uploadPlayersModal"></a>
+            </nav>
+        </div>
+
         <section>
             <ul class="information-list sortable" data-test-division-player-list="{{ division.id }}">
 
@@ -431,9 +443,20 @@ data-remove-team-player
             <span class="label full-width hide" data-test-division-indicator></span>
         </section>
     </div>
-    <div class="small-6 columns">
+    <div class="small-12 medium-6 columns">
         <div class="row">
             <div class="small-12 island">
+                <div class="actions-small-1 row">
+                    <div class="list-item">
+                        <div class="small-12 column">
+                            <h2 class="subheader">Teams</h2>
+                        </div>
+                    </div>
+                    <nav>
+                        <a href="{{ routeLookup('sportsfixturesTeam.getCreateForm', {contextId: division.id}) }}" class="icon-add" title="Add Team"></a>
+                    </nav>
+                </div>
+
                 {% if teams is not empty %}
                 {% for teamData in teams %}
                 <section data-test-team="{{ teamData.team.id }}">
