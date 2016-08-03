@@ -52,9 +52,18 @@
                                 </div>
                             </div>
                             <nav>
-                                <a href="{{ routeLookup('sportsfixturesSeason.deleteEntity', {entityId: currentSeason.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentSeason.id }}"></a>
                                 <a href="{{ routeLookup('sportsfixturesSeason.getModifyForm', {entityId: currentSeason.id}) }}" class="icon-modify" title="Modify"></a>
+                                {% if currentSeason.isArchived %}
+                                    <a href="#" data-term-action="restore" data-post-action="{{ routeLookup('sportsfixturesSeason.restoreEntity', {entityId: currentSeason.id}) }}" class="icon-undo" title="Restore"></a>
+                                {% else %}
+                                    <a href="#" data-term-action="archive" data-post-action="{{ routeLookup('sportsfixturesSeason.archiveEntity', {entityId: currentSeason.id}) }}" class="icon-archive" title="Archive"></a>
+                                {% endif %}
+                                <a href="#" class="icon-more" data-dropdown="sportsfixtures-season-{{ currentSeason.getId() }}-actions"></a>
                             </nav>
+
+                            <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-season-{{ currentSeason.getId() }}-actions">
+                                <li><a href="{{ routeLookup('sportsfixturesSeason.deleteEntity', {entityId: currentSeason.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentSeason.id }}">Delete</a></li>
+                            </ul>
                         </li>
                     {% endfor %}
                 </ul>
