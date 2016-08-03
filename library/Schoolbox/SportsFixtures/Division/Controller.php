@@ -24,7 +24,7 @@ use \Schoolbox\SportsFixtures\Team\Model as TeamModel;
 use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use \Schoolbox\SportsFixtures\Team\Position\Model as TeamPositionModel;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
-use Schoolbox\SportsFixtures\Division\Model as Division;
+use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Division\User\Model as DivisionUserModel;
 use \Schoolbox\SportsFixtures\Division\User\Mapper as DivisionUserMapper;
@@ -95,7 +95,7 @@ class Controller extends AbstractController
      *  - in the format provided in the request Accepts header
      * If entity is deleted, respond with '210 Gone'
      *
-     * @param Division $entity
+     * @param DivisionModel $entity
      * @throws Exception
      * @return void
      */
@@ -134,8 +134,8 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param Division $entity
-     * @param Sport    $context
+     * @param DivisionModel $entity
+     * @param Sport         $context
      * @return void
      */
     protected function getForm($entity, $context = null)
@@ -198,7 +198,7 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param Division $entity
+     * @param DivisionModel $entity
      * @return void
      */
     protected function persistEntity($entity)
@@ -220,9 +220,9 @@ class Controller extends AbstractController
     /**
      * Add players to a Division
      *
-     * @param Division $division
+     * @param DivisionModel $division
      */
-    public function postAddPlayers(Division $division)
+    public function postAddPlayers(DivisionModel $division)
     {
         $divisionUsers = [];
         foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
@@ -238,9 +238,9 @@ class Controller extends AbstractController
     /**
      * Uploads players from a CSV into a Division
      *
-     * @param Division $division
+     * @param DivisionModel $division
      */
-    public function postUploadPlayers(Division $division)
+    public function postUploadPlayers(DivisionModel $division)
     {
         $divisionUsers = [];
 
@@ -287,9 +287,9 @@ class Controller extends AbstractController
     /**
      * Remove players from a Division
      *
-     * @param Division $division
+     * @param DivisionModel $division
      */
-    public function postRemovePlayers(Division $division)
+    public function postRemovePlayers(DivisionModel $division)
     {
         $this->getDivisionUserMapper()->delete(
             $this->getDivisionUserMapper()->findByColumnList([
@@ -307,9 +307,9 @@ class Controller extends AbstractController
     /**
      * Reorder players within a Division
      *
-     * @param Division $division
+     * @param DivisionModel $division
      */
-    public function postReorderPlayers(Division $division)
+    public function postReorderPlayers(DivisionModel $division)
     {
         $userIds       = $this->getRequest()->post->get('userId');
         $divisionUsers = [];
@@ -418,9 +418,9 @@ class Controller extends AbstractController
      * @param $sport
      * @param $name
      * @param $url
-     * @param Division $division
+     * @param DivisionModel $division
      */
-    private function saveDivision($sport, $name, $url, Division $division)
+    private function saveDivision($sport, $name, $url, DivisionModel $division)
     {
         $division->setName($name);
         $division->setUrl($url);
@@ -586,10 +586,10 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param Division $division
-     * @return Division
+     * @param DivisionModel $division
+     * @return DivisionModel
      */
-    protected function augmentDivisionWithPlayers(Division $division)
+    protected function augmentDivisionWithPlayers(DivisionModel $division)
     {
         // Load players into division
         // TODO add players into division model as a M2M join
@@ -602,10 +602,10 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param Division $division
-     * @return Division
+     * @param DivisionModel $division
+     * @return DivisionModel
      */
-    protected function augmentDivisionWithTeams(Division $division)
+    protected function augmentDivisionWithTeams(DivisionModel $division)
     {
         // Load players into teams, and teams into division
         // TODO add players into team model as a M2M join
@@ -634,10 +634,10 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param Division $division
+     * @param DivisionModel $division
      * @return array
      */
-    protected function buildDivisionTemplateDataModel(Division $division)
+    protected function buildDivisionTemplateDataModel(DivisionModel $division)
     {
         $dataModel = [
             'division'  => $division,
@@ -689,9 +689,9 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param Model $division
+     * @param DivisionModel $division
      */
-    protected function renderPostAddPlayersResponse(Division $division)
+    protected function renderPostAddPlayersResponse(DivisionModel $division)
     {
         if ($this->getRequest()->isXhr()) {
             // Output a XHR data model + HTML output
