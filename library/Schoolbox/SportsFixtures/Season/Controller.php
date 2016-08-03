@@ -46,7 +46,6 @@ class Controller extends AbstractController
      */
     public function getList($context = null)
     {
-
         /* ajax a list of seasons
          */
         if ($this->getRequest()->isXhr()) {
@@ -65,7 +64,10 @@ class Controller extends AbstractController
 
             /** @var Season $currentSeason */
             foreach ($allSeasons as $currentSeason) {
-                $seasons[] = array_combine(['id', 'name'], $currentSeason->findValueLabelPair());
+                // Filter out archive seasons
+                if(!$currentSeason->isArchived()){
+                    $seasons[] = array_combine(['id', 'name'], $currentSeason->findValueLabelPair());
+                }
             }
 
             $this->getResponse()->content->set($this->buildJsonOutput($seasons));
@@ -209,7 +211,6 @@ class Controller extends AbstractController
         }
     }
 
-
     /**
      * POST action for archiving a season
      *
@@ -306,7 +307,7 @@ class Controller extends AbstractController
      *
      * @throws Exception If not an AJAX request, pass $e down the chain.
      */
-    protected function outputPostError(Season $season, \Exception $e)
+    protected function outputPostError(Season $season, Exception $e)
     {
         if ($this->getRequest()->isXhr()) {
             // Dump out an AJAX error
