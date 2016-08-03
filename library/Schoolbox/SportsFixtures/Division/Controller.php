@@ -231,13 +231,7 @@ class Controller extends AbstractController
                 ->setUser($user)
                 ->setSequence(0);
         }
-        $this->getDivisionUserMapper()->save($divisionUsers);
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
-                'sportsfixturesDivision.getLobby',
-                ['entityId' => $division->getId(),]
-            )
-        );
+        $this->renderPostAddPlayersResponse($division);
     }
 
 
@@ -287,12 +281,7 @@ class Controller extends AbstractController
 
         // and save
         $this->getDivisionUserMapper()->save($divisionUsers);
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
-                'sportsfixturesDivision.getLobby',
-                ['entityId' => $division->getId(),]
-            )
-        );
+        $this->renderPostAddPlayersResponse($division);
     }
 
     /**
@@ -697,5 +686,30 @@ class Controller extends AbstractController
             'players'   => $team->getPlayers(),
             'positions' => $playerPosition,
         ];
+    }
+
+    /**
+     * @param Model $division
+     */
+    protected function renderPostAddPlayersResponse(Division $division)
+    {
+        if ($this->getRequest()->isXhr()) {
+            // Output a XHR data model + HTML output
+            $division = $this->augmentDivisionWithPlayers($division);
+            $division = $this->augmentDivisionWithTeams($division);
+            $dataModel = $this->buildDivisionTemplateDataModel($division);
+            $dataModel['html'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/division.twig', $dataModel)->getAsString();
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput($dataModel)
+            );
+        } else {
+            // Redirect back to lobby
+            $this->getResponse()->redirect->afterPost(
+                $this->getRouter()->generate(
+                    'sportsfixturesDivision.getLobby',
+                    ['entityId' => $division->getId(),]
+                )
+            );
+        }
     }
 }
