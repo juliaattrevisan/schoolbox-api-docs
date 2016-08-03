@@ -39,6 +39,12 @@ ALTER TABLE sportsfixtures_division AUTO_INCREMENT = 1;
 ALTER TABLE sportsfixtures_season AUTO_INCREMENT = 1;
 ALTER TABLE sportsfixtures_sport AUTO_INCREMENT = 1;
 
+/** Re-add default statuses */
+INSERT INTO `sportsfixtures_status` VALUES
+  (null,'Win',NOW(),NOW(),null),
+  (null,'Loss',NOW(),NOW(),null),
+  (null,'Draw',NOW(),NOW(),null),
+  (null,'Cancelled',NOW(),NOW(),null);
 
 
 
