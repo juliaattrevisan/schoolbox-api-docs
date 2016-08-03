@@ -1,3 +1,12 @@
+<style type="text/css">
+    .tkn {
+        max-width: 500px;
+        display: block;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
 <div class="row">
     <div class="small-12 island">
         <h1>Push Notifications</h1>
@@ -25,7 +34,7 @@
                 {% for reg in registry %}
                     <tr>
                         <td><a href="{{ routeLookup('adminMessages.testPush', { userId: reg.user.id }) }}">{{ reg.user.formatName }}</a></td>
-                        <td>{{ reg.token }}</td>
+                        <td><span class="tkn">{{ reg.token }}</span></td>
                         <td>{{ reg.deviceId }} ({{ reg.provider }})</td>
                         <td>{{ reg.createdAt.local }}</td>
                         <td>{{ reg.touchedAt.local }}</td>
