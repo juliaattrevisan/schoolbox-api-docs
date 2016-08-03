@@ -238,6 +238,10 @@
                             console.log('remove a player from team ' + fromId);
                         }
 
+                        /* Unique case: remove the clone from the division list
+                         */
+                        $('[data-test-division-player-list]').find(player).remove();
+
                         /* Activate indicators
                          */
                         fromFeedback.labelActivate({text: 'Removing from team...'});
