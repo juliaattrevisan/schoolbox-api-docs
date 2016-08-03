@@ -14,11 +14,13 @@
 
         var config = init(options, $(this));
 
+        /* haha
+         */
         initSortables();
         initPlayerFilter();
-
-        initRemovePlayerFromDivision();
+        initAddPlayerToTeam();
         initRemovePlayerFromTeam();
+        initRemovePlayerFromDivision();
 
         /* Glossary of data vars
 
@@ -287,7 +289,34 @@
         }
 
         /**
-         * Remove a player from a team
+         * Add a player to a team via tot
+         */
+        function initAddPlayerToTeam() {
+            $(config.element).on('click', '[data-add-team-player]', function(e) {
+                e.preventDefault();
+                var el       = $(this);
+
+                var feedback = findIndicator(el.parents('[data-test-division-player-list]'));
+                feedback.labelActivate({text: 'Adding to team...'});
+
+                $.post(el.attr('href'), [{name: 'userId[]', value: el.data('addTeamPlayer')}])
+                    .done(function(response) {
+
+                        /* TODO: Refresh player list
+                         * $('[data-test-team='+toId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
+                         */
+                    })
+                    .done(function() {
+                        feedback.labelTimeout({text: 'Added!', css: 'success'});
+                    })
+                    .fail(function() {
+                        feedback.labelTimeout({text: 'Add failed!', css: 'alert'});
+                    });
+            });
+        }
+
+        /**
+         * Remove a player from a team via tot
          */
         function initRemovePlayerFromTeam() {
             $(config.element).on('click', '[data-remove-team-player]', function(e) {
@@ -318,7 +347,7 @@
         }
 
         /**
-         * Remove a player from division lobby
+         * Remove a player from division lobby via tot
          * Also removes this player from all teams they are currently in
          */
         function initRemovePlayerFromDivision() {
