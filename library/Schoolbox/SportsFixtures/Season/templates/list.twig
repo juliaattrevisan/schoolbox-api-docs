@@ -1,18 +1,60 @@
+<div id="errorModal" class="reveal-modal" data-reveal aria-labelledby="errorModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="errorModalTitle">Error</h2>
+    <p class="alert alert-box icon-alert">Something went wrong - maybe try reloading your page and trying again?</p>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
 <script type="text/javascript">
     $(function() {
-        $('#allSeasons').on('click', '[data-delete]', function(event) {
+
+        // Archive / Restore / Delete AJAX actions
+        $('#allSeasons').on('click', 'a[data-action]', function(event) {
             event.preventDefault();
+            var     button = $(this),
+                    action = button.data('action'),
+                    season = button.closest('[data-season]'),
+                    text;
 
-            var element = $(this);
+            switch (action) {
+                case 'delete':
+                    text = 'Are you sure you want to delete this Season? This will delete any divisions and matches currently linked to this Season.';
+                    break;
+                case 'archive':
+                    text = 'Are you sure you want to archive this Season? This will archive any divisions and matches currently linked to this Season.';
+                    break;
+                case 'restore':
+                    text = 'Are you sure you want to restore this Season? This will restore any divisions and matches that were linked to this Season.';
+                    break;
+            }
 
-            $(this).confirmDialog({
-                text: 'Are you sure you want to delete this Season? This will delete any divisions currently linked to this Season.',
-                confirmEvent: function() {
-                    $.post(element.attr('href'), {seasonId: element.attr('data-delete')}, function() {
-                        window.location.href = window.location.href;
-                    });
+            button.confirmDialog({
+                text: text,
+                format: 'html',
+                confirmEvent: function(el) {
+                    // AJAX, then update DOM
+                    // Archive/restore: refresh
+                    // Delete: remove completely
+                    $.post(el.data('postAction'))
+                            .done(function(data) {
+                                switch (action) {
+                                    case 'delete':
+                                        season.fadeOut({ done: season.remove });
+                                        break;
+                                    case 'archive':
+                                    case 'restore':
+                                    default:
+                                        var newDom  = $(data);
+                                        // Replace infocard and jellytot
+                                        season.find('[data-term-infocard]').replaceWith(newDom.find('[data-term-infocard]'));
+                                        season.find('[data-term-dropdown]').replaceWith(newDom.find('[data-term-dropdown]'));
+                                        break;
+                                }
+                            })
+                            .fail(function() {
+                                $('#errorModal').foundation('reveal', 'open');
+                            });
                 }
-            });
+            })
         });
     });
 </script>
@@ -38,7 +80,7 @@
             <section>
                 <ul class="information-list">
                     {% for currentSeason in allSeasons %}
-                        <li class="actions-small-1">
+                        <li class="actions-small-1" data-season data-season-division-count="2" data-season-match-count="10">
                             <div class="list-item">
                                 <div class="small-12 avatar card">
                                     <h3>
@@ -56,15 +98,15 @@
                             <nav>
                                 <a href="{{ routeLookup('sportsfixturesSeason.getModifyForm', {entityId: currentSeason.id}) }}" class="icon-modify" title="Modify"></a>
                                 {% if currentSeason.isArchived %}
-                                    <a href="#" data-term-action="restore" data-post-action="{{ routeLookup('sportsfixturesSeason.restoreEntity', {entityId: currentSeason.id}) }}" class="icon-undo" title="Restore"></a>
+                                    <a href="#" data-action="restore" data-post-action="{{ routeLookup('sportsfixturesSeason.restoreEntity', {entityId: currentSeason.id}) }}" class="icon-undo" title="Restore"></a>
                                 {% else %}
-                                    <a href="#" data-term-action="archive" data-post-action="{{ routeLookup('sportsfixturesSeason.archiveEntity', {entityId: currentSeason.id}) }}" class="icon-archive" title="Archive"></a>
+                                    <a href="#" data-action="archive" data-post-action="{{ routeLookup('sportsfixturesSeason.archiveEntity', {entityId: currentSeason.id}) }}" class="icon-archive" title="Archive"></a>
                                 {% endif %}
                                 <a href="#" class="icon-more" data-dropdown="sportsfixtures-season-{{ currentSeason.getId() }}-actions"></a>
                             </nav>
 
                             <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-season-{{ currentSeason.getId() }}-actions">
-                                <li><a href="{{ routeLookup('sportsfixturesSeason.deleteEntity', {entityId: currentSeason.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentSeason.id }}">Delete</a></li>
+                                <li><a href="#" data-action="delete" data-post-action="{{ routeLookup('sportsfixturesSeason.deleteEntity', {entityId: currentSeason.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentSeason.id }}">Delete</a></li>
                             </ul>
                         </li>
                     {% endfor %}
@@ -79,3 +121,5 @@
         {% endif %}
     </div>
 </div>
+
+
