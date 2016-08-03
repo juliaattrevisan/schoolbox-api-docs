@@ -52,7 +52,7 @@ class Translator
      * @param Division $division
      * @return array
      */
-    protected function buildDivisionTemplateDataModel(Division $division)
+    public function buildDivisionTemplateDataModel(Division $division)
     {
         $dataModel = [
             'division'  => $division,
@@ -86,7 +86,7 @@ class Translator
      * @param Team $team
      * @return array
      */
-    protected function buildTeamTemplateDataModel(Team $team)
+    public function buildTeamTemplateDataModel(Team $team)
     {
         $positions = $this->getTeamPositionMapper()->findByColumn('team_id', $team->getId());
 
