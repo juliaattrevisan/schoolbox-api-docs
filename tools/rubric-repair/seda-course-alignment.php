@@ -196,6 +196,7 @@ $kernel->run
         AND c2.deleted_at IS NULL
         AND b1.use_rubric IS TRUE
         AND b2.use_rubric IS TRUE
+--                                                AND ui.id = 2510
         GROUP BY ui.id;
     ", [
         'opendate' => $notBefore->getDatabase(),
@@ -370,36 +371,55 @@ $kernel->run
 
                     $student = $userCache[$studentId];
 
-                    // if the student-visible grade on this return is "X / Y" (total mark), we need to update it to match the rubric
-                    // in all other cases, we do nothing
-                    if (!preg_match('`(\d+) ?/ ?(\d+)`', $return->getMark(), $matches)) {
-                        continue;
-                    }
-
-                    list (, $numerator, $denominator) = $matches;
-
-                    $percentageToMaintain = $numerator / $denominator;
-
                     SubmissionBox\Rubric\RubricMapper::getInstance()->applyStudentMark($grid, $student);
 
+                    $array = $grid->toContext();
 
-                    $rubricNumerator = $grid->getSum();
+                    $markedDenominator   = 0;
+                    $unmarkedCount       = 0;
+                    $markedCount         = 0;
+                    $unmarkedDenominator = 0;
+
+                    foreach ($array['groups'] as $gid => $group) {
+                        foreach ($group['criteria'] as $critId => $criterion) {
+
+//                            $log->debug("TEST Criterion $critId");
+
+                            $critMax    = $criterion['total'];
+                            $critMarked = $criterion['sum'] > 0;
+
+                            if ($critMarked) {
+
+//                                $log->debug("Crit $critId is marked, adding to running total");
+
+                                $markedDenominator += $critMax;
+                                ++$markedCount;
+                            } else {
+//                                $log->debug("Crit $critId NOT marked");
+
+                                ++$unmarkedCount;
+                                $unmarkedDenominator += $critMax;
+                            }
+                        }
+                    }
+
+//                    $log->debug("Existing mark given: " . $grid->getSum() . " / $markedDenominator");
+
+                    $averageGiven = $grid->getSum() / $markedDenominator;
+
+                    $marksToApply = round($averageGiven * $unmarkedDenominator);
+//                    $log->debug("Marks to apply: $marksToApply");
 
                     $newDenom  = $grid->getTotal();
-                    $newNum    = round($newDenom * $percentageToMaintain);
-                    $deltaMark = $newNum - $rubricNumerator;
+                    $newNum    = $grid->getSum() + $marksToApply;
 
-                    $log->info(sprintf(
-                        "Box %5d student %5d: update %7s -> (%0.2f%%) -> %7s [%s]",
-                        $instanceBoxId, $studentId, $return->getMark(), $percentageToMaintain * 100, "$newNum / $newDenom", $student->formatName()
-                    ));
+//                    $newVisibleMark = "$newNum / $newDenom";
+//                    $log->debug("New mark: $newVisibleMark");
 
                     // obtain the set of unmarked criteria for this student
                     $findUnmarkedCriteriaStmt->execute([ 'box_id' => $instanceBoxId, 'student_id' => $studentId ]);
 
-                    $unmarkedCount = $findUnmarkedCriteriaStmt->rowCount();
-
-                    $log->debug("Distribute $deltaMark marks across $unmarkedCount indicators");
+                    $log->debug("Distribute $marksToApply marks across $unmarkedCount indicators");
 
                     $unmarkedCritIds = $findUnmarkedCriteriaStmt->fetchAll(PDO::FETCH_COLUMN);
 
@@ -415,7 +435,7 @@ $kernel->run
                         $set[$d->getCriterion()->getId()][$d->getValue()] = $d->getId();
                     }
 
-                    $avg = findClosestMatch($set, $deltaMark);
+                    $avg = findClosestMatch($set, $marksToApply);
 
                     $getLatestStampStmt->execute([
                         'box_id' => $instanceBoxId,
