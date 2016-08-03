@@ -18,6 +18,7 @@
          */
         initSortables();
         initPlayerFilter();
+        initCollapsables();
         initAddPlayerToTeam();
         initRemovePlayerFromTeam();
         initRemovePlayerFromDivision();
@@ -291,6 +292,13 @@
                     }
                 }
             });
+        }
+
+        /**
+         * Every team is a collapsable
+         */
+        function initCollapsables() {
+            $('[data-collapser]').collapsable();
         }
 
         /**
