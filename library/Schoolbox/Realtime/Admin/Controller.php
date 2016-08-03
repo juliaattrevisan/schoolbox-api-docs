@@ -336,26 +336,31 @@ class Controller extends BaseController
         $keys  = $redis->keys('msg*:m:*');
         $data  = $redis->get($keys[1]);
 
+        $content = [
+            'template' => '@adminMessages/puush.twig',
+            'data'     => []
+        ];
+
         if ($userId) {
             try {
                 $user = UserMapper::getInstance()->findById($userId);
+
+                $content['data']['user'] = $user;
+
                 $cloudManager->push($user->getId(), [ gzuncompress($data) ]);
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $log->warning("Failed to retrieve user $userId: {$e->getMessage()}", [ $e ]);
             }
+        } else {
+            $content['data']['registry'] = MobileApp\RegistryMapper::getInstance()->findAll();
         }
 
         $log->warning("-- END --");
         rewind($write);
 
-        $this->getResponse()->content->set([
-            'template' => '@adminMessages/puush.twig',
-            'data'     => [
-                'logs'   => explode("\n", trim(stream_get_contents($write))),
-                'userId' => $userId
-            ]
-        ]);
+        $content['data']['logs'] = explode("\n", trim(stream_get_contents($write)));
 
+        $this->getResponse()->content->set($content);
     }
 
 

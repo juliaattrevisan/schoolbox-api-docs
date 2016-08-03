@@ -1,7 +1,7 @@
 <div class="row">
     <div class="small-12 island">
         <h1>Push Notifications</h1>
-        <h2 class="subheader">{% if userId %}Attempting push to user {{ userId }}{% else %}Configuration Result{% endif %}</h2>
+        <h2 class="subheader">{% if user.id %}Attempting push to {{ user.formatName }} (user {{ user.id }}){% else %}Configuration Result{% endif %}</h2>
         <section class="content">
             <ul class="no-margin">
                 {% for line in logs %}
@@ -9,5 +9,30 @@
                 {% endfor %}
             </ul>
         </section>
+        {% if registry %}
+            <h2 class="subheader">Applications Registered</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>User</th>
+                    <th>App Token</th>
+                    <th>Device</th>
+                    <th>Created</th>
+                    <th>Last Used</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for reg in registry %}
+                    <tr>
+                        <td><a href="{{ routeLookup('adminMessages.testPush', { userId: reg.user.id }) }}">{{ reg.user.formatName }}</a></td>
+                        <td>{{ reg.token }}</td>
+                        <td>{{ reg.deviceId }} ({{ reg.provider }})</td>
+                        <td>{{ reg.createdAt.local }}</td>
+                        <td>{{ reg.touchedAt.local }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
     </div>
 </div>
