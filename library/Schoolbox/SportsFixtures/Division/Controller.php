@@ -231,10 +231,18 @@ class Controller extends AbstractController
         foreach ($division->getTeams() as $team) {
             $positions = $this->getTeamPositionMapper()->findByColumn('team_id', $team->getId());
 
+            $playerPosition = [];
+
+            /* Organise positions by player id
+             */
+            foreach ($positions as $currentPosition) {
+                $playerPosition[$currentPosition->getUser()->getId()][] = $currentPosition;
+            }
+
             $dataModel['teams'][] = [
                 'team'      => $team,
                 'players'   => $team->getPlayers(),
-                'positions' => $positions
+                'positions' => $playerPosition
             ];
         }
 

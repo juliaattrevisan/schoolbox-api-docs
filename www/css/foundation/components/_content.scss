@@ -1314,7 +1314,7 @@ ul.flex-list {
 		}
 
 		img {
-			width: 2rem;
+			width: 2.5rem;
 
 			&.mime {
 				padding: 0 0 0 0.5rem !important;
@@ -1430,6 +1430,12 @@ ul.flex-list {
         width: #{'calc(100% - 4rem)'};
         max-width: #{'calc(100% - 4rem)'};
     }
+}
+
+/* Grip sizing for Compact Cards
+ */
+.information-list.sortable .grip.compact:before {
+	line-height: 2rem;
 }
 
 p{
