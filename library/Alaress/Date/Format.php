@@ -16,7 +16,7 @@ use Alaress\Date\Clock;
 use Alaress\Date\IClock;
 use Jenssegers\Date\Date as LaravelDate;
 
-class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface
+class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, IComparable
 {
     /**
      * @var LaravelDate
