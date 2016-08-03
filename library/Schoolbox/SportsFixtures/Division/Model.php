@@ -10,6 +10,7 @@
 
 namespace Schoolbox\SportsFixtures\Division;
 
+use \Alaress_Date_Format;
 use Schoolbox\Collection;
 use \Schoolbox\ISoftDeletable;
 use \Schoolbox\User;
@@ -36,10 +37,10 @@ class Model implements ISoftDeletable {
     /** @var string */
     protected $url;
 
-    /** @var \Alaress_Date_Format */
+    /** @var Alaress_Date_Format */
     protected $createdAt;
 
-    /** @var \Alaress_Date_Format */
+    /** @var Alaress_Date_Format */
     protected $updatedAt;
 
     /**
@@ -198,32 +199,32 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @param \Alaress_Date_Format $createdAt
+     * @param Alaress_Date_Format $createdAt
      * @return self
      */
-    public function setCreatedAt(\Alaress_Date_Format $createdAt) {
+    public function setCreatedAt(Alaress_Date_Format $createdAt) {
         $this->createdAt = $createdAt;
         return $this;
     }
 
     /**
-     * @return \Alaress_Date_Format $createdAt
+     * @return Alaress_Date_Format $createdAt
      */
     public function getCreatedAt() {
         return $this->createdAt;
     }
 
     /**
-     * @param \Alaress_Date_Format $updatedAt
+     * @param Alaress_Date_Format $updatedAt
      * @return self
      */
-    public function setUpdatedAt(\Alaress_Date_Format $updatedAt) {
+    public function setUpdatedAt(Alaress_Date_Format $updatedAt) {
         $this->updatedAt = $updatedAt;
         return $this;
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
     public function getUpdatedAt() {
         return $this->updatedAt;
