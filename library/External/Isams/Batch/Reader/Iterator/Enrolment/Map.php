@@ -33,6 +33,7 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Map extends External_Isams_
                 'ClassYear'       => (string)$result->attributes()->YearId,
                 'ClassCode'       => "$result->SetCode",
                 'ClassName'       => "$result->Name",
+                'RoomID'          => "$result->RoomId",
                 'ClassTeacherIds' => $this->parseTeachers($result->Teachers[0]),
             ];
         } elseif ($current->matches('//SchoolManager/Forms/Form')) {

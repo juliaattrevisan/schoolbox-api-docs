@@ -15,6 +15,8 @@ use Schoolbox\External\ClassInvolvement;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\TimetablePeriod;
+use Schoolbox\External\TimetablePeriodMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 
@@ -25,6 +27,14 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
     protected $location = '';
     protected $columns  = array();
     protected $title    = "Update Schoolbox Enrolment Details Synchronisation";
+
+    /**
+     * The class enrolments and periods that have been removed by this sync.
+     *
+     * Class enrolments and periods may be added more than once per sync - this
+     * ensures that they only get removed before the first time it's added.
+     */
+    protected $deletedClasses = [];
 
     /**
      * {@inheritdoc}
@@ -100,6 +110,13 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
 
         if ($this->perform_update) {
             $classMapper->save($class);
+            $classId = $class->getId();
+            if (!array_key_exists($classId, $this->deletedClasses)) {
+                // Clear the existing teachers and students for this class
+                $this->deletedClasses[$classId] = true;
+                ClassPeriodMapper::getInstance()->deleteByColumn('class_id', $classId);
+                ClassInvolvementMapper::getInstance()->deleteByColumn('class_id', $classId);
+            }
             $this->createUpdateClassPeriods($new_item, $class);
             $this->createUpdateClassEnrolments($new_item, $class);
         }
@@ -118,30 +135,44 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
     {
         $periodMapper = ClassPeriodMapper::getInstance();
 
-        // Clear the existing teachers for this class
-        $periodMapper->deleteByColumn('class_id', $class->getId());
-
         // Re-add teachers in this class
         $periods = new \Schoolbox\Collection();
         /** @var User[] $teachers */
         $teachers = UserMapper::getInstance()->findByColumn(
             'synergy_id',
             array_map(
-                function ($v) {
-                    return 'T-'.$v;
-                },
-                $newItem['ClassTeachers']
+                function ($v) { return 'T-'.$v; },
+                array_filter($newItem['ClassTeachers'])
             )
         );
-        foreach ($teachers as $teacher) {
-            foreach ($newItem['ClassPeriods'] as $classPeriod) {
+
+        foreach ($newItem['ClassPeriods'] as $classPeriod) {
+            try {
+                /** @var TimetablePeriod $timetablePeriod */
+                $timetablePeriod = TimetablePeriodMapper::getInstance()->findById($classPeriod['ClassPeriodID']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                printf("No timetable period \"%s\" found\n", $classPeriod['ClassPeriodID']);
+                continue;
+            }
+            // No teachers at all? Add a period for a null teacher
+            if (count($teachers) === 0) {
+                /** @var ClassPeriod $period */
+                $period = $periodMapper->createModel();
+                $periods->add(
+                    $period
+                        ->setClass($class)
+                        ->setPeriod($timetablePeriod)
+                        ->setRoom($classPeriod['ClassRoomCode'])
+                );
+            }
+            foreach ($teachers as $teacher) {
                 /** @var ClassPeriod $period */
                 $period = $periodMapper->createModel();
                 $periods->add(
                     $period
                         ->setClass($class)
                         ->setTeacher($teacher)
-                        ->setPeriod($classPeriod['ClassPeriodID'])
+                        ->setPeriod($timetablePeriod)
                         ->setRoom($classPeriod['ClassRoomCode'])
                 );
             }
@@ -161,19 +192,14 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
     {
         $enrolmentMapper = ClassInvolvementMapper::getInstance();
 
-        // Clear the existing enrolments for this class
-        $enrolmentMapper->deleteByColumn('class_id', $class->getId());
-
         // Re-add enrolments in this class
         $enrolments = new \Schoolbox\Collection();
         /** @var User[] $teachers */
         $teachers = UserMapper::getInstance()->findByColumn(
             'synergy_id',
             array_map(
-                function ($v) {
-                    return 'T-'.$v;
-                },
-                $newItem['ClassTeachers']
+                function ($v) { return 'T-'.$v; },
+                array_filter($newItem['ClassTeachers'])
             )
         );
         foreach ($teachers as $teacher) {
@@ -190,10 +216,8 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
         $students = UserMapper::getInstance()->findByColumn(
             'synergy_id',
             array_map(
-                function ($v) {
-                    return 'S-'.$v;
-                },
-                $newItem['ClassStudents']
+                function ($v) { return 'S-'.$v; },
+                array_filter($newItem['ClassStudents'])
             )
         );
         foreach ($students as $student) {
@@ -206,6 +230,5 @@ class Synchronise_External_Cis_Strategy_Enrolment extends Synchronise_Base_Strat
             );
         }
         $enrolmentMapper->save($enrolments);
-
     }
 }
