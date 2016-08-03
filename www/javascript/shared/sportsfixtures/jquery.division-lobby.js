@@ -114,7 +114,7 @@
 
                         /* Save new sequence
                          */
-                        console.log('save new sequence');
+                        saveOrdering(from);
                     }
                     /* Dragging from division to a team
                      */
@@ -133,9 +133,10 @@
                         $.post(to.data('addPlayersAction'), [{name: 'userId[]', value: player.data('player')}])
                             .then(function(response) {
 
-                                /* TODO: Save new team player order
-                                 * This is a secondary ajax call which doesn't really need to happen, but ok
+                                /* Save new team player order
                                  */
+                                saveOrdering(to);
+
                                 return response;
                             })
                             .then(function(response) {
@@ -195,9 +196,10 @@
                             })
                         ).then(function(response) {
 
-                                /* TODO: Save new team player order
-                                 * This is a secondary ajax call which doesn't really need to happen, but ok
+                                /* Save new team player order
                                  */
+                                saveOrdering(to);
+
                                 return response;
                             })
                             .then(function(response) {
@@ -251,9 +253,10 @@
                         $.post(from.data('removePlayersAction'), [{name: 'userId[]', value: player.data('player')}])
                             .then(function(response) {
 
-                                /* TODO: Save new team player order
-                                 * This is a secondary ajax call which doesn't really need to happen, but ok
+                                /* Save new team player order
                                  */
+                                saveOrdering(to);
+
                                 return response;
                             })
                             .then(function(response) {
@@ -280,10 +283,26 @@
             });
         }
 
-        function saveOrdering() {
+        /**
+         * Save new order of players in $sortable
+         *
+         * @param sortable
+         * @returns {*}
+         */
+        function saveOrdering(sortable) {
+            if (config.debugging) {
+                if (isDivisionList(sortable)) {
+                    console.log('Saving new sequence for division ' + sortable.attr('data-test-division-player-list'));
+                }
+                else {
+                    console.log('Saving new sequence for team ' + sortable.parents('[data-test-team]').attr('data-test-team'));
+                }
+            }
+
             var data = sortable.find('[data-player]').map(function() {
                 return {name: 'userId[]', value: $(this).data('player')};
             });
+
             return $.post(sortable.data('reorderPlayersAction'), data)
         }
 
