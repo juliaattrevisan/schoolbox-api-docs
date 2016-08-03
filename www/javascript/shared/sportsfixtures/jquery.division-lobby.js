@@ -22,6 +22,7 @@
         initRemovePlayerFromTeam();
         initRemovePlayerFromDivision();
         initAddPlayerToDivisionSelectize();
+        initApplyPositionSelector();
 
         /* Glossary of data vars
 
@@ -151,6 +152,7 @@
                                 }
 
                                 /* TODO: Refresh player list
+                                 * TODO: Reapply position selector
                                  */
                                 $('[data-test-team='+toId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
                             })
@@ -215,6 +217,7 @@
                                 }
 
                                 /* TODO: Refresh player list
+                                 * TODO: Reapply position selector
                                  */
                                 $('[data-test-team='+fromId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
                                 $('[data-test-team='+toId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
@@ -271,6 +274,7 @@
                                 }
 
                                 /* TODO: Refresh player list
+                                 * TODO: Reapply position selector
                                  */
                                 $('[data-test-team='+fromId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
                             })
@@ -419,6 +423,36 @@
             });
 
             return $.post(sortable.data('reorderPlayersAction'), data)
+        }
+
+        /**
+         * When the player clicks the edit positions button
+         */
+        function initApplyPositionSelector() {
+            $('[data-player-positions-user]').on('click', function() {
+
+                // Set the form data with the team/user IDs
+                $('#playerPositionName').html($(this).attr('data-player-positions-team-name') + ' - ' + $(this).attr('data-player-positions-name'));
+                $('#playerPositionUserId').val($(this).attr('data-player-positions-user'));
+                $('#playerPositionTeamId').val($(this).attr('data-player-positions-team'));
+
+                // Get the players current positions and split into array
+                var positions = $(this).attr('data-player-positions').split(',');
+
+                $('[data-position]').each(function () {
+                    // Deselect position
+                    $(this).prop('checked', false);
+
+                    // Iterate all position checkboxes and find out if we should check it
+                    for (var i = 0; i < positions.length; i++) {
+                        if ($(this).val() == positions[i]) {
+                            // Player was in this position, check it
+                            $(this).prop('checked', true);
+                            break;
+                        }
+                    }
+                });
+            });
         }
 
         /**
