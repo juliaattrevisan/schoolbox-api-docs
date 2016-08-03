@@ -104,42 +104,44 @@ class ComponentDelegate
     {
         $matches = [];
 
-        foreach ($_SESSION["children"] as $child) {
+        if(is_array($_SESSION["children"])){
+            foreach ($_SESSION["children"] as $child) {
 
-            $childTeams = $this->getTeamPlayerMapper()->findByColumn('user_id', $child["id"]);
-            $matchesForChild = $this->getMatches($childTeams);
+                $childTeams = $this->getTeamPlayerMapper()->findByColumn('user_id', $child["id"]);
+                $matchesForChild = $this->getMatches($childTeams);
 
-            foreach ($matchesForChild as $matchCurrent) {
+                foreach ($matchesForChild as $matchCurrent) {
 
-                if (!isset($matches[$matchCurrent->getId()])) {
-                    $matches[$matchCurrent->getId()] = [];
-                    $matches[$matchCurrent->getId()]["home"]  = false;
-                    $matches[$matchCurrent->getId()]["away"]  = false;
-                    $matches[$matchCurrent->getId()]["match"] = $matchCurrent;
-                    $matches[$matchCurrent->getId()]["teams"] = [
-                        $matchCurrent->getHomeTeam()->getId() => [
-                            'team'     => $matchCurrent->getHomeTeam(),
-                            'children' => [],
-                        ],
-                        $matchCurrent->getAwayTeam()->getId() => [
-                            'team'     => $matchCurrent->getAwayTeam(),
-                            'children' => [],
-                        ],
-                    ];
-                }
-
-                foreach ($childTeams as $team) {
-                    $teamId = $team->getTeam()->getId();
-                    $isHome = ($teamId == $matchCurrent->getHomeTeam()->getId());
-                    $isAway = ($teamId == $matchCurrent->getAwayTeam()->getId());
-                    if ($isHome) {
-                        $matches[$matchCurrent->getId()]["home"] = true;
+                    if (!isset($matches[$matchCurrent->getId()])) {
+                        $matches[$matchCurrent->getId()] = [];
+                        $matches[$matchCurrent->getId()]["home"]  = false;
+                        $matches[$matchCurrent->getId()]["away"]  = false;
+                        $matches[$matchCurrent->getId()]["match"] = $matchCurrent;
+                        $matches[$matchCurrent->getId()]["teams"] = [
+                            $matchCurrent->getHomeTeam()->getId() => [
+                                'team'     => $matchCurrent->getHomeTeam(),
+                                'children' => [],
+                            ],
+                            $matchCurrent->getAwayTeam()->getId() => [
+                                'team'     => $matchCurrent->getAwayTeam(),
+                                'children' => [],
+                            ],
+                        ];
                     }
-                    if ($isAway) {
-                        $matches[$matchCurrent->getId()]["away"] = true;
-                    }
-                    if ($isHome || $isAway) {
-                        $matches[$matchCurrent->getId()]["teams"][$teamId]["children"][$team->getUser()->getId()] = $team->getUser();
+
+                    foreach ($childTeams as $team) {
+                        $teamId = $team->getTeam()->getId();
+                        $isHome = ($teamId == $matchCurrent->getHomeTeam()->getId());
+                        $isAway = ($teamId == $matchCurrent->getAwayTeam()->getId());
+                        if ($isHome) {
+                            $matches[$matchCurrent->getId()]["home"] = true;
+                        }
+                        if ($isAway) {
+                            $matches[$matchCurrent->getId()]["away"] = true;
+                        }
+                        if ($isHome || $isAway) {
+                            $matches[$matchCurrent->getId()]["teams"][$teamId]["children"][$team->getUser()->getId()] = $team->getUser();
+                        }
                     }
                 }
             }
