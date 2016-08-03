@@ -170,31 +170,55 @@
                         fromFeedback.labelActivate({text: 'Removing from team...'});
                         toFeedback.labelActivate({text: 'Adding to team...'});
 
-                        /* TODO: Execute db transaction - ajax call here
+                        /* Execute db transaction - ajax call here
                          */
-                        console.log(player.data('player'), from.data('removePlayersAction'));
-                        console.log(player.data('player'), to.data('addPlayersAction'));
+                        var fromTeamConfiguration;
+                        var toTeamConfiguration;
 
-                        /* TODO: Refresh player list
-                         */
-                        $('[data-test-team='+fromId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
-                        $('[data-test-team='+toId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
+                        $.when(
+                            $.post(from.data('removePlayersAction'), [{name: 'userId[]', value: player.data('player')}], function(response) {
+                                fromTeamConfiguration = response;
+                            }),
 
-                        /* If dragged onto a proxy element, remove the player drag helper
-                         * after team list is respawned
-                         */
-                        if (isTeamPlayerListProxy(to)) {
-                            removeProxyHelperClone(to);
-                        }
+                            $.post(to.data('addPlayersAction'), [{name: 'userId[]', value: player.data('player')}], function(response) {
+                                toTeamConfiguration = response;
+                            })
+                        ).then(function(response) {
 
-                        /* Activate indicators
-                         */
-                        fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
-                        toFeedback.labelTimeout({text: 'Added!', css: 'success'});
+                                /* TODO: Save new team player order
+                                 * This is a secondary ajax call which doesn't really need to happen, but ok
+                                 */
+                                return response;
+                            })
+                            .then(function(response) {
+                                if (config.debugging) {
+                                    console.log('DB: removing ' + player.data('player') + ' from ' + from.data('removePlayersAction'));
+                                    console.log('DB: adding ' + player.data('player') + ' to ' + to.data('addPlayersAction'));
+                                }
 
-                        /* Reapply filter settings to division player list
-                         */
-                        applyPlayerFilter();
+                                /* TODO: Refresh player list
+                                 */
+                                $('[data-test-team='+fromId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
+                                $('[data-test-team='+toId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
+                            })
+                            .done(function() {
+
+                                /* If dragged onto a proxy element, remove the player drag helper
+                                 * after team list is respawned
+                                 */
+                                if (isTeamPlayerListProxy(to)) {
+                                    removeProxyHelperClone(to);
+                                }
+
+                                /* Activate indicators
+                                 */
+                                fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
+                                toFeedback.labelTimeout({text: 'Added!', css: 'success'});
+
+                                /* Reapply filter settings to division player list
+                                 */
+                                applyPlayerFilter();
+                            });
                     }
                     /* Remove a player from a team
                      */
