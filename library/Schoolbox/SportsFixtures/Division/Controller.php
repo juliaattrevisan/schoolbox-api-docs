@@ -181,44 +181,9 @@ class Controller extends AbstractController
         $zone->setMimeFilter('text/csv')->setAttachPrompt('upload a list of players');
 
         // Create twig-friendly data model
-        $dataModel = [
-            'division'   => $division,
-            'players'    => [],
-            'teams'      => [],
-            'user'       => $this->getUser(),
-            'uploadZone' => $zone,
-        ];
-        foreach ($division->getPlayers() as $player) {
-            $playerDataModel = [
-                'player' => $player,
-                'teams'  => [],
-            ];
-            foreach ($division->getTeams() as $team) {
-                if ($team->isPlayerInTeam($player)) {
-                    $playerDataModel['teams'][] = $team;
-                }
-            }
-            $dataModel['players'][] = $playerDataModel;
-        }
-        foreach ($division->getTeams() as $team) {
-            $positions = $this->getTeamPositionMapper()->findByColumn('team_id', $team->getId());
-
-            $playerPosition = [];
-
-            /* Organise positions by player id
-             */
-            foreach ($positions as $currentPosition) {
-                $playerPosition[$currentPosition->getUser()->getId()][] = $currentPosition;
-            }
-
-            $dataModel['teams'][] = [
-                'team'      => $team,
-                'players'   => $team->getPlayers(),
-                'positions' => $playerPosition
-            ];
-        }
-
-        $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
+        $dataModel               = $this->buildDivisionTemplateDataModel($division);
+        $dataModel['user']       = $this->getUser();
+        $dataModel['uploadZone'] = $zone;
 
         $this->getResponse()->content->set(
             $this->buildHtmlOutput('@sportsfixturesDivision/lobby.twig', $dataModel)
@@ -672,5 +637,51 @@ class Controller extends AbstractController
         }
         $division->setTeams($teams);
         return $division;
+    }
+
+    /**
+     * @param Division $division
+     * @return array
+     */
+    protected function buildDivisionTemplateDataModel(Division $division)
+    {
+        $dataModel = [
+            'division'  => $division,
+            'players'   => [],
+            'teams'     => [],
+            'positions' => [],
+        ];
+        foreach ($division->getPlayers() as $player) {
+            $playerDataModel = [
+                'player' => $player,
+                'teams'  => [],
+            ];
+            foreach ($division->getTeams() as $team) {
+                if ($team->isPlayerInTeam($player)) {
+                    $playerDataModel['teams'][] = $team;
+                }
+            }
+            $dataModel['players'][] = $playerDataModel;
+        }
+        foreach ($division->getTeams() as $team) {
+            $positions = $this->getTeamPositionMapper()->findByColumn('team_id', $team->getId());
+
+            $playerPosition = [];
+
+            /* Organise positions by player id
+             */
+            foreach ($positions as $currentPosition) {
+                $playerPosition[$currentPosition->getUser()->getId()][] = $currentPosition;
+            }
+
+            $dataModel['teams'][] = [
+                'team'      => $team,
+                'players'   => $team->getPlayers(),
+                'positions' => $playerPosition,
+            ];
+        }
+
+        $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
+        return $dataModel;
     }
 }
