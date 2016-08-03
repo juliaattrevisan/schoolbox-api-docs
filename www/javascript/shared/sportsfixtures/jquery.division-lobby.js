@@ -105,7 +105,7 @@
 
                         /* Reapply filter settings to division player list
                          */
-                        reapplyPlayerFilter();
+                        applyPlayerFilter();
 
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
                         toFeedback.labelTimeout({text: 'Added!', css: 'success'});
@@ -136,7 +136,7 @@
 
                         /* Reapply filter settings to division player list
                          */
-                        reapplyPlayerFilter();
+                        applyPlayerFilter();
 
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
                         toFeedback.labelTimeout({text: 'Added!', css: 'success'});
@@ -157,7 +157,7 @@
 
                         /* Reapply filter settings to division player list
                          */
-                        reapplyPlayerFilter();
+                        applyPlayerFilter();
 
                         fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
                     }
@@ -173,15 +173,15 @@
          */
         function initPlayerFilter() {
             $('#player-filter').on('change', function() {
-                reapplyPlayerFilter();
+                applyPlayerFilter();
             });
         }
 
         /**
-         * Reapply the Player Filter setting to all the folks
+         * Apply the Player Filter setting to all the folks
          * in the division player list
          */
-        function reapplyPlayerFilter() {
+        function applyPlayerFilter() {
             var divisionPlayerList = $('[data-test-division-player-list]');
 
             switch (parseInt($('#player-filter').val())) {
