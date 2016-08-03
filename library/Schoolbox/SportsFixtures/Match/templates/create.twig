@@ -76,7 +76,15 @@
             {% else %}
             value: {"id":{{ division.season.id }}, "name": "{{ division.season.name }} - {{ division.season.start.getLocalShort }} to {{ division.season.end.getLocalShort }}"},
             {% endif %}
-            multiple: false
+            multiple: false,
+            selectize: {
+                score: function(search) {
+                    return function(item) {
+                        // Simply filter list, don't reorder
+                        return -1 === item.name.indexOf(search) ? 0 : 1;
+                    };
+                },
+            }
         });
 
         // Ensure match is scheduled within the season
