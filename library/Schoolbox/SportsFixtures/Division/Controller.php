@@ -174,8 +174,8 @@ class Controller extends AbstractController
         }
 
         // Add players and teams into the division
-        $division = $this->augmentDivisionWithPlayers($division, $entityId);
-        $division = $this->augmentDivisionWithTeams($division, $entityId);
+        $division = $this->augmentDivisionWithPlayers($division);
+        $division = $this->augmentDivisionWithTeams($division);
 
         // Create file upload zone
         $zone     = new Zone("uploadZone");
@@ -592,15 +592,14 @@ class Controller extends AbstractController
 
     /**
      * @param Division $division
-     * @param int      $entityId
      * @return Division
      */
-    protected function augmentDivisionWithPlayers(Division $division, $entityId)
+    protected function augmentDivisionWithPlayers(Division $division)
     {
         // Load players into division
         // TODO add players into division model as a M2M join
         /** @var DivisionUserModel[] $players */
-        $players = $this->getDivisionUserMapper()->findByColumn('division_id', $entityId, ['order' => ['sequence' => 'desc']]);
+        $players = $this->getDivisionUserMapper()->findByColumn('division_id', $division->getId(), ['order' => ['sequence' => 'desc']]);
         foreach ($players as $player) {
             $division->getPlayers()->add($player->getUser());
         }
@@ -609,15 +608,14 @@ class Controller extends AbstractController
 
     /**
      * @param Division $division
-     * @param int      $entityId
      * @return Division
      */
-    protected function augmentDivisionWithTeams(Division $division, $entityId)
+    protected function augmentDivisionWithTeams(Division $division)
     {
         // Load players into teams, and teams into division
         // TODO add players into team model as a M2M join
         try {
-            $teams = $this->getTeamMapper()->findByColumn('division_id', $entityId);
+            $teams = $this->getTeamMapper()->findByColumn('division_id', $division->getId());
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
