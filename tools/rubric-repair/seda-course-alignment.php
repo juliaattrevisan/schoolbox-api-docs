@@ -483,6 +483,11 @@ $kernel->run
  */
 function findClosestMatch(array $set, $targetValue)
 {
+    if ($targetValue <= 0) {
+        // failfast: can't do anything with zero or negatives
+        return [];
+    }
+
     $result = computeMostAveragestDelta($set, $targetValue);
 
     if (empty($result)) {
