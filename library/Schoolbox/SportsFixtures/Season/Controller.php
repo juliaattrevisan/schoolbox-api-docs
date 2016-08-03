@@ -7,6 +7,7 @@
 
 namespace Schoolbox\SportsFixtures\Season;
 
+use \Exception;
 use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
@@ -191,6 +192,58 @@ class Controller extends AbstractController
         $this->mapper->save($season);
     }
 
+    /**
+     * Delete the given entity. Deletion is considered to be an idempotent method,
+     * so do not return an error on repeat attempts to delete an entity.
+     *
+     * @param Season $entity
+     * @return void
+     */
+    public function deleteEntity($entity)
+    {
+        try {
+            $this->getMapper()->delete($entity);
+            $this->outputPostSuccess($entity);
+        } catch (Exception $e) {
+            $this->outputPostError($entity, $e);
+        }
+    }
+
+
+    /**
+     * POST action for archiving a season
+     *
+     * @param Season $season
+     */
+    public function archiveEntity(Season $season)
+    {
+        $season->setArchivedAt(Alaress_Date_Format::now());
+        try {
+            $this->getMapper()->save($season);
+            $this->outputPostSuccess($season);
+        } catch (Exception $e) {
+            $this->outputPostError($season, $e);
+        }
+    }
+
+    /**
+     * POST action for restoring a previously archived season
+     *
+     * Deliberately named 'unArchive' (cf. 'restore') to distinguish it from 'unDelete'.
+     *
+     * @param Season $season
+     */
+    public function unArchiveEntity(Season $season)
+    {
+        $season->setArchivedAt(new \Alaress_Date_NullDate());
+        try {
+            $this->getMapper()->save($season);
+            $this->outputPostSuccess($season);
+        } catch (Exception $e) {
+            $this->outputPostError($season, $e);
+        }
+    }
+
     /* Getters/Setters
      */
 
@@ -210,5 +263,60 @@ class Controller extends AbstractController
     {
         $this->errorMapper = $errorMapper;
         return $this;
+    }
+
+    /**
+     * POST action success method.
+     *
+     * @param Season $season
+     */
+    protected function outputPostSuccess(Season $season)
+    {
+        if ($this->getRequest()->isXhr()) {
+
+            $divisionCounts = $this->getMapper()->getDivisionCounts();
+            if(!isset($divisionCounts[$season->getId()])){
+                $divisionCounts[$season->getId()] = 0;
+            }
+
+            $matchCounts = $this->getMapper()->getMatchCounts();
+            if(!isset($matchCounts[$season->getId()])){
+                $matchCounts[$season->getId()] = 0;
+            }
+
+            $this->getResponse()->content->set([
+                'template' => "@sportsfixturesSeason/listItem.twig",
+                'format'   => 'nochrome',
+                'data'     => [
+                    'currentSeason'  => $season,
+                    'divisionCounts' => $divisionCounts,
+                    'matchCounts'    => $matchCounts,
+                ]
+            ]);
+        } else {
+            $this->getResponse()->redirect->to($this->getRouter()->generate('sportsfixturesSeason.getList'));
+        }
+    }
+
+    /**
+     * Outputs a POST error, perhaps via AJAX
+     *
+     * @param Season $season
+     * @param Exception $e    The exception which caused the error.
+     *
+     * @throws Exception If not an AJAX request, pass $e down the chain.
+     */
+    protected function outputPostError(Season $season, \Exception $e)
+    {
+        if ($this->getRequest()->isXhr()) {
+            // Dump out an AJAX error
+            $this->getResponse()->status->setCode(500);
+            $this->getResponse()->content->set([
+                'format' => 'json',
+                'data'   => $e->getMessage(),
+            ]);
+        } else {
+            throw $e;
+        }
     }
 }

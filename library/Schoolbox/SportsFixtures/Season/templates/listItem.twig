@@ -1,0 +1,29 @@
+<li class="actions-small-1" data-season="{{ currentSeason.id }}" data-division-count="{{ divisionCounts[currentSeason.id] }}" data-match-count="{{ matchCounts[currentSeason.id]  }}">
+    <div class="list-item">
+        <div class="small-12 avatar card">
+            <h3>
+                <a href="{{ routeLookup('sportsfixturesSeason.getEntity', {entityId: currentSeason.id}) }}">
+                    {% if currentSeason.isArchived %}
+                        <del class="icon icon-archive" title="This season is archived, and will be de-emphasised in selectors.">{{ currentSeason.name }}</del>
+                    {% else %}
+                        {{ currentSeason.name }}
+                    {% endif %}
+                </a>
+            </h3>
+            <p class="meta">{{ currentSeason.start.getDateOnly }}—{{ currentSeason.end.getDateOnly }}</p>
+        </div>
+    </div>
+    <nav>
+        <a href="{{ routeLookup('sportsfixturesSeason.getModifyForm', {entityId: currentSeason.id}) }}" class="icon-modify" title="Modify"></a>
+        {% if currentSeason.isArchived %}
+            <a href="#" data-action="restore" data-post-action="{{ routeLookup('sportsfixturesSeason.unArchiveEntity', {entityId: currentSeason.id}) }}" class="icon-undo" title="Restore"></a>
+        {% else %}
+            <a href="#" data-action="archive" data-post-action="{{ routeLookup('sportsfixturesSeason.archiveEntity', {entityId: currentSeason.id}) }}" class="icon-archive" title="Archive"></a>
+        {% endif %}
+        <a href="#" class="icon-more" data-dropdown="sportsfixtures-season-{{ currentSeason.getId() }}-actions"></a>
+    </nav>
+
+    <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-season-{{ currentSeason.getId() }}-actions">
+        <li><a href="#" data-action="delete" data-post-action="{{ routeLookup('sportsfixturesSeason.deleteEntity', {entityId: currentSeason.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentSeason.id }}">Delete</a></li>
+    </ul>
+</li>

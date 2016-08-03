@@ -9,6 +9,7 @@ namespace Schoolbox\SportsFixtures\Season;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Module\RestfulModule;
@@ -45,17 +46,40 @@ class Module extends RestfulModule
 
         $collection = $this->getCollectionName();
 
+        // Deliberately named 'unArchive' rather than 'restore' to distinguish from 'unDelete'
         $routes = [
             'POST' => [
-                "/$collection/{entityId}/archive" => 'archiveEntity',
-                "/$collection/{entityId}/restore" => 'restoreEntity',
+                "/$collection/{entityId}/archive"   => 'archiveEntity',
+                "/$collection/{entityId}/unArchive" => 'unArchiveEntity',
             ]
         ];
 
         foreach ($routes['POST'] as $path => $controllerMethod) {
-            $this->addPostRoute($router, $controllerMethod, $basePath, $path)->setTokens([ 'contextId' => '\d+', 'entityId' => '\d+' ]);
+            $this->addPostRoute($router, $controllerMethod, $basePath, $path)->addTokens([ 'contextId' => '\d+', 'entityId' => '\d+' ]);
         }
 
+    }
+
+
+    /**
+     * Initializes any preloads on routes for this module.
+     *
+     * Preloads adjust route params before they are passed to the controller.
+     * Usually, they're used to load a single item into the route's params,
+     * which is then passed directly as a parameter to the action.
+     *
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        parent::initRoutePreloads($matcher);
+
+        // these routes require that the entity exist
+        $this->addRoutePreload($matcher, '(?:archiveEntity|unArchiveEntity)', function ($params) {
+            return [
+                'season' => $this->findEntityById($params['entityId'])
+            ];
+        });
     }
 
     /**
