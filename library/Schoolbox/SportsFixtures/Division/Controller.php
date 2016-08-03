@@ -186,11 +186,11 @@ class Controller extends AbstractController
         }
 
         // Add players and teams into the division
-        $division = $this->getMetadataCollector()->augmentDivisionWithPlayers($division);
-        $division = $this->getMetadataCollector()->augmentDivisionWithTeams($division);
+        $division = $this->getMetadataCollector()->collectPlayers($division);
+        $division = $this->getMetadataCollector()->collectTeams($division);
 
         // Create twig-friendly data model
-        $dataModel = $this->getMetadataTranslator()->buildDivisionTemplateDataModel($division);
+        $dataModel = $this->getMetadataTranslator()->translateDivision($division);
 
         if ($this->getRequest()->isXhr()) {
             // Output as XHR data model
@@ -451,9 +451,9 @@ class Controller extends AbstractController
     {
         if ($this->getRequest()->isXhr()) {
             // Output a XHR data model + HTML output
-            $division = $this->getMetadataCollector()->augmentDivisionWithPlayers($division);
-            $division = $this->getMetadataCollector()->augmentDivisionWithTeams($division);
-            $dataModel = $this->getMetadataTranslator()->buildDivisionTemplateDataModel($division);
+            $division = $this->getMetadataCollector()->collectPlayers($division);
+            $division = $this->getMetadataCollector()->collectTeams($division);
+            $dataModel = $this->getMetadataTranslator()->translateDivision($division);
             $dataModel['html'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/division.twig', $dataModel)->getAsString();
             $this->getResponse()->content->set(
                 $this->buildJsonOutput($dataModel)

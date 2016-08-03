@@ -67,7 +67,7 @@ class Collector
      * @param Division $division
      * @return Division
      */
-    public function augmentDivisionWithPlayers(Division $division)
+    public function collectPlayers(Division $division)
     {
         // Load players into division
         // TODO add players into division model as a M2M join
@@ -85,7 +85,7 @@ class Collector
      * @param Division $division
      * @return Division
      */
-    public function augmentDivisionWithTeams(Division $division)
+    public function collectTeams(Division $division)
     {
         // Load players into teams, and teams into division
         // TODO add players into team model as a M2M join

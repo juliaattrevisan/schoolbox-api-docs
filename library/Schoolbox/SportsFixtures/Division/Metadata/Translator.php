@@ -7,17 +7,11 @@
 
 namespace Schoolbox\SportsFixtures\Division\Metadata;
 
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
-use Schoolbox\SportsFixtures\Team\Model as Team;
-use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
-use Schoolbox\SportsFixtures\Team\Position\Model as TeamPositionModel;
+use Schoolbox\SportsFixtures\Team\Model as TeamModel;
 use Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
-use Schoolbox\SportsFixtures\Division\Model as Division;
-use Schoolbox\SportsFixtures\Division\User\Model as DivisionUserModel;
-use Schoolbox\SportsFixtures\Division\User\Mapper as DivisionUserMapper;
+use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
 
 /**
  * Translates a Division object into a data format that is suitable for use in
@@ -49,10 +43,10 @@ class Translator
     /**
      * Builds a template friendly data model from a division.
      *
-     * @param Division $division
+     * @param DivisionModel $division
      * @return array
      */
-    public function buildDivisionTemplateDataModel(Division $division)
+    public function translateDivision(DivisionModel $division)
     {
         $dataModel = [
             'division'  => $division,
@@ -73,7 +67,7 @@ class Translator
             $dataModel['players'][] = $playerDataModel;
         }
         foreach ($division->getTeams() as $team) {
-            $dataModel['teams'][] = $this->buildTeamTemplateDataModel($team);
+            $dataModel['teams'][] = $this->translateTeam($team);
         }
 
         $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
@@ -83,10 +77,10 @@ class Translator
     /**
      * Builds a template friendly data model from a team.
      *
-     * @param Team $team
+     * @param TeamModel $team
      * @return array
      */
-    public function buildTeamTemplateDataModel(Team $team)
+    public function translateTeam(TeamModel $team)
     {
         $positions = $this->getTeamPositionMapper()->findByColumn('team_id', $team->getId());
 
