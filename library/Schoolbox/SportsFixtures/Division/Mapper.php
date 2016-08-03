@@ -24,6 +24,7 @@ use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
  * Class Mapper
  * @method Division createModel()
  * @method Model findById($id)
+ * @method Collection|Division[] findByColumn($columnName, $columnValue, $options = array())
  * @package Schoolbox\SportsFixtures\Division
  */
 class Mapper extends BaseMapper

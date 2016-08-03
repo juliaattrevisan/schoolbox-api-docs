@@ -11,6 +11,7 @@ namespace Schoolbox\SportsFixtures\Division;
 use Alaress\Csv\Reader;
 use Alaress\Web\Controller\Exception;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
+use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -143,9 +144,18 @@ class Controller extends AbstractController
                 ]
             ]);
 
+            $nonArchivedDivisions = new Collection();
+
+            // Filter out divisions belonging to archived season
+            foreach($allDivisions as $division){
+                if(!$division->getSeason()->isArchived()){
+                    $nonArchivedDivisions->add($division);
+                }
+            }
+
             $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesDivision/list.twig', [
                 'sport'        => $context,
-                'allDivisions' => $allDivisions
+                'allDivisions' => $nonArchivedDivisions
             ]));
         }
         catch (MapperException $e) {
