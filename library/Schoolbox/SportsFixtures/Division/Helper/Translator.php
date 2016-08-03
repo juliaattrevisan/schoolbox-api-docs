@@ -9,6 +9,7 @@ namespace Schoolbox\SportsFixtures\Division\Helper;
 
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
+use Schoolbox\SportsFixtures\Team\Helper\Translator as TeamTranslator;
 use Schoolbox\SportsFixtures\Team\Model as TeamModel;
 use Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
 use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
@@ -32,12 +33,18 @@ class Translator
     protected $teamPositionMapper;
 
     /**
+     * @var TeamTranslator
+     */
+    protected $teamTranslator;
+
+    /**
      * Constructor - populates required mappers.
      */
     public function __construct()
     {
         $this->setPositionMapper(PositionMapper::getInstance());
         $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
+        $this->setTeamTranslator(new TeamTranslator());
     }
 
     /**
@@ -67,36 +74,11 @@ class Translator
             $dataModel['players'][] = $playerDataModel;
         }
         foreach ($division->getTeams() as $team) {
-            $dataModel['teams'][] = $this->translateTeam($team);
+            $dataModel['teams'][] = $this->getTeamTranslator()->translateTeam($team);
         }
 
         $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
         return $dataModel;
-    }
-
-    /**
-     * Builds a template friendly data model from a team.
-     *
-     * @param TeamModel $team
-     * @return array
-     */
-    public function translateTeam(TeamModel $team)
-    {
-        $positions = $this->getTeamPositionMapper()->findByColumn('team_id', $team->getId());
-
-        $playerPosition = [];
-
-        /* Organise positions by player id
-         */
-        foreach ($positions as $currentPosition) {
-            $playerPosition[$currentPosition->getUser()->getId()][] = $currentPosition;
-        }
-
-        return [
-            'team'      => $team,
-            'players'   => $team->getPlayers(),
-            'positions' => $playerPosition,
-        ];
     }
 
     /* Getters/setters */
@@ -134,6 +116,24 @@ class Translator
     public function setTeamPositionMapper($teamPositionMapper)
     {
         $this->teamPositionMapper = $teamPositionMapper;
+        return $this;
+    }
+
+    /**
+     * @return TeamTranslator
+     */
+    public function getTeamTranslator()
+    {
+        return $this->teamTranslator;
+    }
+
+    /**
+     * @param TeamTranslator $teamTranslator
+     * @return static
+     */
+    public function setTeamTranslator($teamTranslator)
+    {
+        $this->teamTranslator = $teamTranslator;
         return $this;
     }
 }
