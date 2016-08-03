@@ -45,6 +45,8 @@
 
         /**
          * Start up the sortable plugin
+         *
+         * copyHelper: http://stackoverflow.com/questions/6940390/how-do-i-duplicate-item-when-using-jquery-sortable
          */
         function initSortables() {
             var copyHelper;
@@ -52,10 +54,10 @@
             $(config.element).sortable({
                 connectWith: $(config.element),
                 handle: '.grip',
-                helper: function(e,li) {
-                    copyHelper = li.clone().insertAfter(li);
+                helper: function(event, ui) {
+                    copyHelper = ui.clone().insertAfter(ui);
 
-                    return li.clone();
+                    return ui.clone();
                 },
                 receive: function(event, ui) {
                     copyHelper = null;
