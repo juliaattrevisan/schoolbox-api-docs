@@ -94,7 +94,7 @@ class Model implements ISoftDeletable {
 
     /**
      * @param int $id
-     * @return self
+     * @return static
      */
     public function setId($id) {
         $this->id = $id;
@@ -118,10 +118,12 @@ class Model implements ISoftDeletable {
 
     /**
      * @param Team $homeTeam
+     * @return static
      */
-    public function setHomeTeam($homeTeam)
+    public function setHomeTeam(Team $homeTeam)
     {
         $this->homeTeam = $homeTeam;
+        return $this;
     }
 
     /**
@@ -134,10 +136,12 @@ class Model implements ISoftDeletable {
 
     /**
      * @param Team $awayTeam
+     * @return static
      */
-    public function setAwayTeam($awayTeam)
+    public function setAwayTeam(Team $awayTeam)
     {
         $this->awayTeam = $awayTeam;
+        return $this;
     }
 
     /**
@@ -150,10 +154,12 @@ class Model implements ISoftDeletable {
 
     /**
      * @param int $awaySchoolId
+     * @return static
      */
     public function setAwaySchoolId($awaySchoolId)
     {
         $this->awaySchoolId = $awaySchoolId;
+        return $this;
     }
 
     /**
@@ -166,10 +172,12 @@ class Model implements ISoftDeletable {
 
     /**
      * @param int $homeSchoolId
+     * @return static
      */
     public function setHomeSchoolId($homeSchoolId)
     {
         $this->homeSchoolId = $homeSchoolId;
+        return $this;
     }
 
     /**
@@ -182,7 +190,7 @@ class Model implements ISoftDeletable {
 
     /**
      * @param Division $division
-     * @return self
+     * @return static
      */
     public function setDivision($division)
     {
@@ -200,7 +208,7 @@ class Model implements ISoftDeletable {
 
     /**
      * @param Season $season
-     * @return self
+     * @return static
      */
     public function setSeason(Season $season)
     {
@@ -209,19 +217,19 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @param string $name
-     * @return self
-     */
-    public function setName($name) {
-        $this->name = $name;
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getName() {
         return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return static
+     */
+    public function setName($name) {
+        $this->name = $name;
+        return $this;
     }
 
     /**
@@ -234,7 +242,7 @@ class Model implements ISoftDeletable {
 
     /**
      * @param Venue $venue
-     * @return self
+     * @return static
      */
     public function setVenue($venue)
     {
@@ -252,7 +260,7 @@ class Model implements ISoftDeletable {
 
     /**
      * @param Collection $result
-     * @return self
+     * @return static
      */
     public function setResult($result)
     {
@@ -270,7 +278,7 @@ class Model implements ISoftDeletable {
 
     /**
      * @param Collection $itinerary
-     * @return self
+     * @return static
      */
     public function setItinerary($itinerary)
     {
@@ -288,7 +296,7 @@ class Model implements ISoftDeletable {
 
     /**
      * @param Alaress_Date_Format $startAt
-     * @return self
+     * @return static
      */
     public function setStartAt($startAt)
     {
@@ -306,7 +314,7 @@ class Model implements ISoftDeletable {
 
     /**
      * @param string $notes
-     * @return self
+     * @return static
      */
     public function setNotes($notes)
     {
@@ -316,7 +324,7 @@ class Model implements ISoftDeletable {
 
     /**
      * @param \Alaress_Date_Format $createdAt
-     * @return self
+     * @return static
      */
     public function setCreatedAt($createdAt) {
         $this->createdAt = $createdAt;
@@ -332,7 +340,7 @@ class Model implements ISoftDeletable {
 
     /**
      * @param \Alaress_Date_Format $updatedAt
-     * @return self
+     * @return static
      */
     public function setUpdatedAt($updatedAt) {
         $this->updatedAt = $updatedAt;

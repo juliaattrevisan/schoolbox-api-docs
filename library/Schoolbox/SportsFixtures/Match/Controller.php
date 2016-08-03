@@ -8,6 +8,7 @@
 
 namespace Schoolbox\SportsFixtures\Match;
 
+use Alaress_Date_Format;
 use Alaress\Web\Controller\Exception;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
@@ -96,18 +97,18 @@ class Controller extends AbstractController
      */
     public function getList($context = null)
     {
-        /* TODO: Not sure if we need this here
-         * but I'll set it up anyway just in case
-         */
-        try {
-            $sport = $this->getSportMapper()->findById($context->getSport()->getId());
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
-        }
+        $division = $context;
 
-        try {
-            $division = $this->getDivisionMapper()->findById($context->getId());
-        } catch (MapperException $e) {
+        // Division/Match Season extant/deleted/archived logic for list view:
+        //
+        //     matchSeason:    {extant/archived/deleted}
+        //     divisionSeason: {extant/archived/deleted}
+        //
+        // If the division season is deleted or archived, 404 the list.
+        // For each match, if attached to archived season, show it greyed out, without modify action buttons.
+
+        // Don't display divisions attached to archived seasons
+        if($division->getSeason()->isArchived()){
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
 
@@ -119,6 +120,8 @@ class Controller extends AbstractController
                 'start_at' => 'asc'
             ]
         ]);
+
+
 
         /* Accumulate faceless schools
          */
@@ -144,43 +147,58 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param Match $entity
-     * @param Division $context
+     * @param Match $match
+     * @param Division $division
      * @return void
      */
-    protected function getForm($entity, $context = null)
+    protected function getForm($match, $division = null)
     {
-        // For clarity
-        $match = $entity;
-        $division = $context;
+        // Is this an update of an extant match ?
+        if($match->getId()){
+            $division = $match->getDivision();
 
-        // If an update
-        if($match->getSeason() instanceof Season){
-            // Hydrate the match's season
-            $match->setSeason($this->getSeasonMapper()->findById($match->getSeason()->getId()));
-        }
-
-        if (empty($division)) {
-            try {
-                $division = $this->getDivisionMapper()->findById($match->getDivision()->getId());
+            try{
+                $division->setSeason(SeasonMapper::getInstance()->findById($division->getSeason()->getId()));
             } catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
+            }
+
+            try {
+                $division->setSport(SportMapper::getInstance()->findById($division->getSport()->getId()));
+            } catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
             }
         }
-
-        try {
-            $sport = $this->getSportMapper()->findById($division->getSport()->getId());
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
+        // Else creating new match
+        else {
+            $match->setSeason($division->getSeason());
         }
 
+        $match->setDivision($division);
 
-        try {
-            $division->setSeason($this->getSeasonMapper()->findById($division->getSeason()->getId()));
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
+        // Division/Match Season extant/deleted/archived logic for detailed view:
+        //
+        //     action:         {create/update}
+        //     matchSeason:    {extant/archived/deleted}
+        //     divisionSeason: {extant/archived/deleted}
+        //
+        // We use the 'archived' as a view filter. They exist but their details can't be accessed. In some views we
+        // show them greyed out when it may be confusing otherwise (see below).
+
+        // Case 1: division season is archived or deleted
+        if($division->getSeason()->isArchived()){
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
 
+        // Case 2: division season is extant, but match season is archived
+        // In this case, we would still show the match in the list view, but it would be greyed out
+        // with no modify link to indicate you should not get here.
+        if($match->getSeason()->isArchived()){
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
+        }
+
+        // Case 3: division and match seasons are extant
+        // continue...
 
         $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $match->getId(), [
             'order' => [
@@ -190,8 +208,8 @@ class Controller extends AbstractController
 
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/create.twig', [
-            'sport'             => $sport,
-            'division'          => $division,
+            'sport'             => $division->getSport(),
+            'division'          => $match->getDivision(),
             'match'             => $match,
             'schoolMapper'      => $this->getSchoolTagCloudMapper(),
             'schoolToken'       => TagCloudMapper::SCHOOL_PREFIX,
@@ -227,16 +245,35 @@ class Controller extends AbstractController
      */
     public function persistEntity($entity)
     {
+        // Division
         try {
-            $divisionId = $this->getRequest()->post['divisionId'];
-            $division   = $this->getDivisionMapper()->findById($divisionId);
+            $division = DivisionMapper::getInstance()->findById($this->getRequest()->post['divisionId']);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
 
-        $date    = "{$this->getRequest()->post['startAtDate']} {$this->getRequest()->post['startAtTime']}";
-        $startAt = \Alaress_Date_Format::newLocal($date);
+        // Name
+        $name = $this->getRequest()->post['name'];
 
+        // Season
+        try {
+            $season = SeasonMapper::getInstance()->findById($this->getRequest()->post['seasonId']);
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
+        }
+
+        // Start At
+        $dateTime = "{$this->getRequest()->post['startAtDate']} {$this->getRequest()->post['startAtTime']}";
+        $startAt  = \Alaress_Date_Format::newLocal($dateTime);
+
+        // Venue
+        try {
+            $venue   = $this->getVenueMapper()->findById($this->getRequest()->post['venueId']);
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
+        }
+
+        // Teams
         try {
             if (preg_match("/" . TagCloudMapper::SCHOOL_PREFIX . "(.*)/", $this->getRequest()->post['homeTeamId'], $matches)) {
                 // Home team is a faceless school, save the team as null
@@ -259,18 +296,13 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
 
-        try {
-            /** @var Venue $venue */
-            $venueId = $this->getRequest()->post['venueId'];
-            $venue   = $this->getVenueMapper()->findById($venueId);
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_VENUE_NOT_FOUND);
-        }
+        // Notes
+        $notes = $this->getRequest()->post['notes'];
 
-        $this->saveMatch($entity, $division, $this->getRequest()->post['name'], $startAt, $homeTeam, $awayTeam, $homeSchoolId, $awaySchoolId, $venue, $this->getRequest()->post['notes']);
+        $this->saveMatch($entity, $division, $name, $season, $startAt, $homeTeam, $awayTeam, $homeSchoolId, $awaySchoolId, $venue, $notes);
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesMatch.getList', [
-            'contextId' => $divisionId
+            'contextId' => $division->getId()
         ]));
     }
 
@@ -279,26 +311,30 @@ class Controller extends AbstractController
      *
      * @param Model $match
      * @param Division $division
-     * @param $name
-     * @param \Alaress_Date_Format $startAt
+     * @param string $name
+     * @param Season $season,
+     * @param Alaress_Date_Format $startAt
      * @param Team $homeTeam
      * @param Team $awayTeam
      * @param int $homeSchoolId
      * @param int $awaySchoolId
      * @param Venue $venue
+     * @param string $notes
      */
-    private function saveMatch(Match $match, Division $division, $name, \Alaress_Date_Format $startAt, Team $homeTeam, Team $awayTeam, $homeSchoolId, $awaySchoolId, Venue $venue, $notes)
+    private function saveMatch(Match $match, Division $division, $name, Season $season, Alaress_Date_Format $startAt, Team $homeTeam, Team $awayTeam, $homeSchoolId, $awaySchoolId, Venue $venue, $notes)
     {
-        $match->setDivision($division);
-        $match->setName($name);
-        $match->setStartAt($startAt);
-        $match->setHomeTeam($homeTeam);
-        $match->setAwayTeam($awayTeam);
-        $match->setHomeSchoolId($homeSchoolId);
-        $match->setAwaySchoolId($awaySchoolId);
-        $match->setVenue($venue);
-        $match->setNotes($notes);
-        $match->setUpdatedAt(\Alaress_Date_Format::now());
+        $match
+            ->setDivision($division)
+            ->setName($name)
+            ->setSeason($season)
+            ->setStartAt($startAt)
+            ->setHomeTeam($homeTeam)
+            ->setAwayTeam($awayTeam)
+            ->setHomeSchoolId($homeSchoolId)
+            ->setAwaySchoolId($awaySchoolId)
+            ->setVenue($venue)
+            ->setNotes($notes)
+            ->setUpdatedAt(\Alaress_Date_Format::now());
 
         $this->getMapper()->save($match);
     }

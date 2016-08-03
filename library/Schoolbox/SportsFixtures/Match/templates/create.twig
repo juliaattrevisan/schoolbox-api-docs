@@ -71,11 +71,7 @@
                 type: 'GET',
                 dataType: 'json'
             },
-            {% if match.id %}
             value: {"id":{{ match.season.id }}, "name": "{{ match.season.name }} - {{ match.season.start.getLocalShort }} to {{ match.season.end.getLocalShort }}"},
-            {% else %}
-            value: {"id":{{ division.season.id }}, "name": "{{ division.season.name }} - {{ division.season.start.getLocalShort }} to {{ division.season.end.getLocalShort }}"},
-            {% endif %}
             multiple: false,
             selectize: {
                 score: function(search) {
