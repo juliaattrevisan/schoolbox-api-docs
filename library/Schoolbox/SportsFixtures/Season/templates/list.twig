@@ -41,8 +41,14 @@
                         <li class="actions-small-1">
                             <div class="list-item">
                                 <div class="small-12 avatar card">
-                                    <p>{{ currentSeason.name }}</p>
-                                    <p class="meta">{{ currentSeason.address }}</p>
+                                    <h3>
+                                        {% if currentSeason.isArchived %}
+                                        <del class="icon icon-archive" title="This season is archived, and will be de-emphasised in selectors.">{{ currentSeason.name }}</del>
+                                        {% else %}
+                                        {{ currentSeason.name }}
+                                        {% endif %}
+                                    </h3>
+                                    <p class="meta">{{ currentSeason.start.getDateOnly }}—{{ currentSeason.end.getDateOnly }}</p>
                                 </div>
                             </div>
                             <nav>

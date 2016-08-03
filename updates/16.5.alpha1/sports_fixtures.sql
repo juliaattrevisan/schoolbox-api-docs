@@ -19,6 +19,7 @@ CREATE TABLE `sportsfixtures_season` (
 	`name` VARCHAR(255) NOT NULL,
 	`start` DATE NOT NULL,
 	`end` DATE NOT NULL,
+	`archived_at` DATETIME NULL DEFAULT NULL,
 	`created_at` DATETIME NOT NULL,
 	`updated_at` DATETIME NOT NULL,
 	`deleted_at` DATETIME NULL DEFAULT NULL,

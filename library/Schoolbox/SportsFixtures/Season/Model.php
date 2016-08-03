@@ -35,6 +35,9 @@ class Model implements ISoftDeletable, ValueLabelInterface
     protected $end;
 
     /** @var Alaress_Date_Format */
+    protected $archivedAt;
+
+    /** @var Alaress_Date_Format */
     protected $createdAt;
 
     /** @var Alaress_Date_Format */
@@ -58,6 +61,14 @@ class Model implements ISoftDeletable, ValueLabelInterface
             'value' => $this->getId(),
             'label' => "{$this->getName()} - {$this->getStart()->getLocalShort()} to {$this->getEnd()->getLocalShort()}"
         ];
+    }
+
+    /**
+     * Return whether this season has been archived
+     * @return bool
+     */
+    public function isArchived(){
+        return !$this->getArchivedAt()->isNull();
     }
 
     /* Getters/Setters
@@ -125,6 +136,22 @@ class Model implements ISoftDeletable, ValueLabelInterface
      */
     public function getEnd() {
         return $this->end;
+    }
+
+    /**
+     * @param Alaress_Date_Format $archivedAt
+     * @return static
+     */
+    public function setArchivedAt(Alaress_Date_Format $archivedAt) {
+        $this->archivedAt = $archivedAt;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getArchivedAt() {
+        return $this->archivedAt;
     }
 
     /**

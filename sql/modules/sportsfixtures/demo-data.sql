@@ -58,10 +58,14 @@ INSERT INTO `sportsfixtures_sport` (`name`, `url`, `created_at`, `updated_at`) V
 INSERT INTO `sportsfixtures_sport` (`name`, `url`, `created_at`, `updated_at`) VALUES ('Tiddlywinks Everything Empty', 'https://www.youtube.com/watch?v=09TSwVSl3ZM', NOW(), NOW());
 
 /* Add some seasons */
-INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `created_at`, `updated_at`) VALUES ('Summer 2016', '2016-01-01', '2016-06-30', NOW(), NOW());
-INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `created_at`, `updated_at`) VALUES ('Winter 2016', '2016-07-01', '2016-12-31', NOW(), NOW());
-INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `created_at`, `updated_at`) VALUES ('Summer 2017', '2017-01-01', '2017-06-30', NOW(), NOW());
-INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `created_at`, `updated_at`) VALUES ('Winter 2017', '2017-07-01', '2017-12-31', NOW(), NOW());
+INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES ('Summer 2015', '2015-01-01', '2015-06-30', '2016-01-01 00:00:00', NOW(), NOW());
+INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES ('Winter 2015', '2015-07-01', '2015-12-31', '2016-01-01 00:00:00', NOW(), NOW());
+INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES ('Summer 2016', '2016-01-01', '2016-06-30', NULL, NOW(), NOW());
+INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES ('Winter 2016', '2016-07-01', '2016-12-31', NULL, NOW(), NOW());
+INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES ('Summer 2017', '2017-01-01', '2017-06-30', NULL, NOW(), NOW());
+INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES ('Winter 2017', '2017-07-01', '2017-12-31', NULL, NOW(), NOW());
+INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES ('Winter 2017 (1st half)', '2017-07-01', '2017-09-30', NULL, NOW(), NOW());
+INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES ('Winter 2017 (2nd half)', '2017-10-01', '2017-12-31', NULL, NOW(), NOW());
 
 
 /* Add some Venues
