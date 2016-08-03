@@ -118,29 +118,43 @@
                          */
                         toFeedback.labelActivate({text: 'Adding to team...'});
 
-                        /* TODO: Execute db transaction - ajax call here
+                        /* Execute db transaction - ajax call here
                          */
-                        console.log(player.data('player'), to.data('addPlayersAction'));
+                        $.post(to.data('addPlayersAction'), [{name: 'userId[]', value: player.data('player')}])
+                            .then(function(response) {
 
-                        /* TODO: Refresh player list
-                         */
-                        $('[data-test-team='+toId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
+                                /* TODO: Save new team player order
+                                 * This is a secondary ajax call which doesn't really need to happen, but ok
+                                 */
+                                return response;
+                            })
+                            .then(function(response) {
+                                if (config.debugging) {
+                                    console.log('DB: adding ' + player.data('player') + ' to ' + to.data('addPlayersAction'));
+                                }
 
-                        /* If dragged onto a proxy element, remove the player drag helper
-                         * after team list is respawned
-                         */
-                        if (isTeamPlayerListProxy(to)) {
-                            removeProxyHelperClone(to);
-                        }
+                                /* TODO: Refresh player list
+                                 */
+                                $('[data-test-team='+toId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
+                            })
+                            .done(function() {
 
-                        /* Activate indicators
-                         */
-                        fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
-                        toFeedback.labelTimeout({text: 'Added!', css: 'success'});
+                                /* If dragged onto a proxy element, remove the player drag helper
+                                 * after team list is respawned
+                                 */
+                                if (isTeamPlayerListProxy(to)) {
+                                    removeProxyHelperClone(to);
+                                }
 
-                        /* Reapply filter settings to division player list
-                         */
-                        applyPlayerFilter();
+                                /* Activate indicators
+                                 */
+                                fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
+                                toFeedback.labelTimeout({text: 'Added!', css: 'success'});
+
+                                /* Reapply filter settings to division player list
+                                 */
+                                applyPlayerFilter();
+                            });
                     }
                     /* Dragging players between teams
                      */

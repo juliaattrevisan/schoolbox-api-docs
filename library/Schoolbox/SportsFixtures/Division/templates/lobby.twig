@@ -230,7 +230,8 @@
                             toFeedback.labelTimeout({text: 'Add failed!', css: 'alert'});
                         });
 
-                } else if (from.is('[data-division-player-list]') && to.is('[data-team-player-list]')) {
+                }
+                else if (from.is('[data-division-player-list]') && to.is('[data-team-player-list]')) {
                     // Move from division to team (add to team, reorder team)
                     // Add first as player must be in team before reordering
                     toFeedback.labelActivate({text: 'Adding to team...'});
