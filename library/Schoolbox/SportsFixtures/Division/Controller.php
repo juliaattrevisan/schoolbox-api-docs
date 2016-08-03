@@ -20,6 +20,7 @@ use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Position\Model as PositionModel;
 use \Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
+use \Schoolbox\SportsFixtures\Team\Model as TeamModel;
 use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use \Schoolbox\SportsFixtures\Team\Position\Model as TeamPositionModel;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
@@ -664,24 +665,33 @@ class Controller extends AbstractController
             $dataModel['players'][] = $playerDataModel;
         }
         foreach ($division->getTeams() as $team) {
-            $positions = $this->getTeamPositionMapper()->findByColumn('team_id', $team->getId());
-
-            $playerPosition = [];
-
-            /* Organise positions by player id
-             */
-            foreach ($positions as $currentPosition) {
-                $playerPosition[$currentPosition->getUser()->getId()][] = $currentPosition;
-            }
-
-            $dataModel['teams'][] = [
-                'team'      => $team,
-                'players'   => $team->getPlayers(),
-                'positions' => $playerPosition,
-            ];
+            $dataModel['teams'][] = $this->buildTeamTemplateDataModel($team);
         }
 
         $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
         return $dataModel;
+    }
+
+    /**
+     * @param TeamModel $team
+     * @return array
+     */
+    protected function buildTeamTemplateDataModel(TeamModel $team)
+    {
+        $positions = $this->getTeamPositionMapper()->findByColumn('team_id', $team->getId());
+
+        $playerPosition = [];
+
+        /* Organise positions by player id
+         */
+        foreach ($positions as $currentPosition) {
+            $playerPosition[$currentPosition->getUser()->getId()][] = $currentPosition;
+        }
+
+        return [
+            'team'      => $team,
+            'players'   => $team->getPlayers(),
+            'positions' => $playerPosition,
+        ];
     }
 }
