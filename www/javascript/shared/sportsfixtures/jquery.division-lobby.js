@@ -17,6 +17,25 @@
         initSortables();
         initPlayerFilter();
 
+        /* Glossary of data vars
+
+         Dragon drop receiving elements
+             data-test-division-player-list
+             data-test-team-player-list
+             data-test-team-player-list-proxy
+                (behaves like data-test-team-player-list, but needs extra handling)
+
+         Using dragon drop to add/remove players from teams and/or divisions
+         These contain routes to backend
+             data-add-players-action
+             data-remove-players-action
+
+         Using tots to add/remove players from teams and/or divisions
+             data-add-team-player
+             data-remove-team-player
+             data-remove-player
+         */
+
         /**
          * Init
          *
