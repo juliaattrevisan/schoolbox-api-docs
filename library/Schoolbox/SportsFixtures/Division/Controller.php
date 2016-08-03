@@ -75,6 +75,16 @@ class Controller extends AbstractController
     protected $teamPositionMapper;
 
     /**
+     * @var Metadata\Collector
+     */
+    protected $metadataCollector;
+
+    /**
+     * @var Metadata\Translator
+     */
+    protected $metadataTranslator;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -88,6 +98,8 @@ class Controller extends AbstractController
         $this->setUserMapper(UserMapper::getInstance());
         $this->setTeamPlayerMapper(TeamPlayerMapper::getInstance());
         $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
+        $this->setMetadataCollector(new Metadata\Collector());
+        $this->setMetadataTranslator(new Metadata\Translator());
     }
 
     /**
@@ -712,4 +724,41 @@ class Controller extends AbstractController
             );
         }
     }
+
+    /**
+     * @return Metadata\Collector
+     */
+    public function getMetadataCollector()
+    {
+        return $this->metadataCollector;
+    }
+
+    /**
+     * @param Metadata\Collector $metadataCollector
+     * @return static
+     */
+    public function setMetadataCollector($metadataCollector)
+    {
+        $this->metadataCollector = $metadataCollector;
+        return $this;
+    }
+
+    /**
+     * @return Metadata\Translator
+     */
+    public function getMetadataTranslator()
+    {
+        return $this->metadataTranslator;
+    }
+
+    /**
+     * @param Metadata\Translator $metadataTranslator
+     * @return static
+     */
+    public function setMetadataTranslator($metadataTranslator)
+    {
+        $this->metadataTranslator = $metadataTranslator;
+        return $this;
+    }
+
 }
