@@ -138,7 +138,7 @@ class Controller extends AbstractController
     public function getList($context = null)
     {
         try {
-            $allDivisions = $this->getDivisionMapper()->findByColumn('sport_id', $context->getId(), [
+            $allDivisions = $this->getMapper()->findByColumn('sport_id', $context->getId(), [
                 'order' => [
                     'name' => 'asc'
                 ]
@@ -196,7 +196,7 @@ class Controller extends AbstractController
     {
         try {
             // Load division
-            $division = $this->getDivisionMapper()->findById($entityId);
+            $division = $this->getMapper()->findById($entityId);
         }
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
@@ -463,7 +463,7 @@ class Controller extends AbstractController
             ->setUrl($url)
             ->setUpdatedAt(\Alaress_Date_Format::now());
 
-        $this->getDivisionMapper()->save($division);
+        $this->getMapper()->save($division);
     }
 
     /**
@@ -533,14 +533,6 @@ class Controller extends AbstractController
     {
         $this->seasonMapper = $seasonMapper;
         return $this;
-    }
-
-    /**
-     * @return DivisionMapper
-     */
-    protected function getDivisionMapper()
-    {
-        return $this->mapper;
     }
 
     /**
