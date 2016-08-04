@@ -7,7 +7,7 @@
             data-test-division-player-list="{{ division.id }}">
 
             {% for playerData in players %}
-                <li class="actions-small-1" data-player="{{ playerData.player.id }}" data-assigned="1111111111">
+                <li class="actions-small-1" data-player="{{ playerData.player.id }}" data-assigned="{% if playerData.player.id in assigned %}1{% else %}0{% endif %}">
                     <div class="list-item">
                         <div class="grip compact"></div>
                         <div class="small-11 compact card wrap-down">

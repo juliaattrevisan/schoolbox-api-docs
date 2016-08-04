@@ -78,6 +78,17 @@ class Translator
 
         }
         $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
+
+        /* A list of assigned ids
+         */
+        $dataModel['assigned'] = [];
+
+        foreach ($division->getTeams() as $currentTeam) {
+            foreach ($currentTeam->getPlayers() as $currentPlayer) {
+                $dataModel['assigned'][] = $currentPlayer->getId();
+            }
+        }
+
         return $dataModel;
     }
 

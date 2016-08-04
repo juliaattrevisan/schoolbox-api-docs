@@ -388,7 +388,8 @@
             {% include '@sportsfixturesDivision/lobby/division.twig' with {
                 division: division,
                 players: players,
-                teams: teams
+                teams: teams,
+                assigned: assigned
             } only %}
         {% else %}
             <div class="empty-state">
