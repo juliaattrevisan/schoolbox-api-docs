@@ -9,8 +9,7 @@
                 <div class="small-12 card wrap-down">
                     <h3>{{ team.name }}</h3>
                     <p class="meta icon-group">
-                        {{ players|length }}
-                        {{ players|length == 1 ? 'player in team' : 'players in team'}}
+                        <span data-player-count>{{ players|length }}</span> player(s) in team
                     </p>
                 </div>
             </div>
