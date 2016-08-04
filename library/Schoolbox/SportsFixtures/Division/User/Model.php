@@ -8,7 +8,7 @@
 namespace Schoolbox\SportsFixtures\Division\User;
 
 use \Schoolbox\User as User;
-use \Schoolbox\SportsFixtures\Division\Division as Division;
+use \Schoolbox\SportsFixtures\Division\Model as Division;
 
 /**
  * Model for relation between divisions and users.

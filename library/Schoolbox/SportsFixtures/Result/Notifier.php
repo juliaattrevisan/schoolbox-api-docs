@@ -20,7 +20,7 @@ use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayer;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
-use Schoolbox\SportsFixtures\Division\Division as Division;
+use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Sport\Model as Sport;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;

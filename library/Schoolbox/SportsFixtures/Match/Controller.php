@@ -17,7 +17,7 @@ use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Season\Model as Season;
 use \Schoolbox\SportsFixtures\Season\Mapper as SeasonMapper;
-use \Schoolbox\SportsFixtures\Division\Division as Division;
+use \Schoolbox\SportsFixtures\Division\Model as Division;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;

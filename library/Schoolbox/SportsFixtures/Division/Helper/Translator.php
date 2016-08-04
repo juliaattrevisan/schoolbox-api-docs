@@ -11,7 +11,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 use Schoolbox\SportsFixtures\Team\Helper\Translator as TeamTranslator;
 use Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
-use Schoolbox\SportsFixtures\Division\Division as Division;
+use Schoolbox\SportsFixtures\Division\Model as Division;
 
 /**
  * Translates a Division object into a data format that is suitable for use in

@@ -15,7 +15,7 @@ use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use Schoolbox\SportsFixtures\Division\Division as Division;
+use Schoolbox\SportsFixtures\Division\Model as Division;
 
 /**
  * Mapper for the relation between teams and users.

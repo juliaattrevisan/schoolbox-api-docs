@@ -12,7 +12,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
-use Schoolbox\SportsFixtures\Division\Division as Division;
+use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Division\User\Model as DivisionUser;
 use Schoolbox\SportsFixtures\Division\User\Mapper as DivisionUserMapper;
 

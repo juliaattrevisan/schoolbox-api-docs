@@ -12,13 +12,10 @@ namespace Schoolbox\SportsFixtures\Match;
 
 
 use PDOStatement;
-use \UnexpectedValueException;
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage;
-use Schoolbox\User;
 use Schoolbox\SportsFixtures\Match\Model as Match;
-use Schoolbox\SportsFixtures\Division\Division as Division;
+use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Season\Model as Season;
 use Schoolbox\SportsFixtures\Season\Mapper as SeasonMapper;
