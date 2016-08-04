@@ -34,10 +34,10 @@
                 {% for reg in registry %}
                     <tr>
                         <td><a href="{{ routeLookup('adminMessages.testPush', { userId: reg.user.id }) }}">{{ reg.user.formatName }}</a></td>
-                        <td><span class="tkn">{{ reg.token }}</span></td>
-                        <td>{{ reg.deviceId }} ({{ reg.provider }})</td>
-                        <td>{{ reg.createdAt.local }}</td>
-                        <td>{{ reg.touchedAt.local }}</td>
+                        <td><span class="tkn" title="{{ reg.token }}">{{ reg.token }}</span></td>
+                        <td><span class="tkn" title="{{ reg.deviceId }}">{{ reg.deviceId }}</span> ({{ reg.provider }})</td>
+                        <td title="{{ reg.createdAt.database }}">{{ reg.createdAt.local }}</td>
+                        <td title="{{ reg.touchedAt.database }}">{{ reg.touchedAt.local }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
