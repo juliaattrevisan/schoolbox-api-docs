@@ -35,7 +35,7 @@ CREATE TABLE `course_unit` (
   INDEX `fk_course_unit_course_id_idx` (`course_id` ASC),
   CONSTRAINT `fk_course_unit_course_id`
     FOREIGN KEY (`course_id`)
-    REFERENCES `course` (`folder_id`)
+    REFERENCES `course` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
