@@ -188,29 +188,15 @@ class Controller extends AbstractController
 
         $match->setDivision($division);
 
-        // Division/Match Season extant/deleted/archived logic for detailed view:
-        //
-        //     action:         {create/update}
-        //     matchSeason:    {extant/archived/deleted}
-        //     divisionSeason: {extant/archived/deleted}
-        //
-        // We use the 'archived' as a view filter. They exist but their details can't be accessed. In some views we
-        // show them greyed out when it may be confusing otherwise (see below).
-
-        // Case 1: division season is archived or deleted
-        if($division->getSeason()->isArchived()){
+        // Can't modify an archived match
+        if($match->getId() && $match->getSeason()->isArchived()){
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
         }
 
-        // Case 2: division season is extant, but match season is archived
-        // In this case, we would still show the match in the list view, but it would be greyed out
-        // with no modify link to indicate you should not get here.
-        if($match->getSeason()->isArchived()){
+        // Can't create a match in archived season
+        if(!$match->getId() && $division->getSeason()->isArchived()){
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
         }
-
-        // Case 3: division and match seasons are extant
-        // continue...
 
         $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $match->getId(), [
             'order' => [
