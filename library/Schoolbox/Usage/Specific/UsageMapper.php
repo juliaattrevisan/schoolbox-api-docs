@@ -337,7 +337,7 @@ class UsageMapper
         $mimeJoin    = self::MIMETYPE_JOIN;
         $boxJoin     = "
             INNER JOIN `submission_box` `b` ON `f`.`box_id` = `b`.`id`
-            INNER JOIN `category` `c` ON `b`.`category` = `c`.`id`
+            INNER JOIN `folder` `c` ON `b`.`category` = `c`.`id`
         ";
         $query = "
             SELECT *
@@ -353,7 +353,7 @@ class UsageMapper
                     `c`.`id` AS categoryId,
                     `c`.`name` AS categoryName
                 FROM `file` `f`
-                LEFT JOIN category `c` ON `f`.`category` = `c`.`id`
+                LEFT JOIN folder `c` ON `f`.`category` = `c`.`id`
                 $storageJoin
                 $mimeJoin
                 WHERE `f`.`owner` = :userId
