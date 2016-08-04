@@ -434,3 +434,56 @@
         </div>
     </div>
 </div>
+
+<div id="addPlayersModal" class="reveal-modal" data-reveal aria-labelledby="addPlayersModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="addPlayersModalTitle">Add Players</h2>
+    <form action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {entityId: division.id}) }}" method="post">
+        <select data-role="userSelector" name="userId[]" multiple placeholder="Search Users"></select>
+        <input type="submit" class="full-width" value="Add" />
+    </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+{# Change player positions modal #}
+
+<div id="editPlayerPositions" class="reveal-modal" data-reveal aria-labelledby="editPlayerPositionsModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="editPlayerPositionsModalTitle">Change Player Positions</h2>
+    <form action="{{ routeLookup('sportsfixturesDivision.postPlayerPositions', {entityId: division.id}) }}" method="post">
+        <input type="hidden" name="team_id" id="playerPositionTeamId">
+        <input type="hidden" name="user_id" id="playerPositionUserId">
+        <fieldset class="checklist" data-equalizer-watch="">
+            <legend id="playerPositionName"></legend>
+            {% for position in positions %}
+                <input data-position id="position-{{ position.id }}" name="positions[]" value="{{ position.id }}" type="checkbox"><label for="position-{{ position.id }}">{{ position.name }}</label>
+            {% endfor %}
+        </fieldset>
+        <input type="submit" class="full-width" value="Save Changes" />
+    </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<div id="uploadPlayersModal" class="reveal-modal" data-reveal aria-labelledby="uploadPlayersModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="uploadPlayersModalTitle">Upload Player List</h2>
+    <form action="{{ routeLookup('sportsfixturesDivision.postUploadPlayers', {entityId: division.id}) }}" method="post">
+        <p>
+            You may upload a list of Schoolbox User IDs, usernames or external IDs into this division.
+            Make sure that it conforms to the <a href="/sportsfixtures/import/userTemplate.csv">template</a> provided.
+        </p>
+
+        {% if user.isSuperuser %}
+            {# Show only superusers the role report link, as only they can see it #}
+            <p>
+                You may also download a report from the
+                <a href="/adminv2/home" target="_blank">Role Statistics section in Administration</a>,
+                and use it as the list of users to upload.
+            </p>
+        {% endif %}
+
+        {% include 'sub/attachzone.twig' with { attachzone: uploadZone.twigContext } %}
+        <ul class="flex-list buttons">
+            <li><a href="/sportsfixtures/import/userTemplate.csv" class="button">Download Template</a></li>
+            <li><input type="submit" class="full-width" value="Upload" /></li>
+        </ul>
+    </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>

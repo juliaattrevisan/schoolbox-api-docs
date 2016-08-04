@@ -152,8 +152,6 @@
                                     console.log('DB: adding ' + player.data('player') + ' to ' + to.data('addPlayersAction'));
                                 }
 
-                                /* TODO: Reapply position selector
-                                 */
                                 /* Refresh Player List for this team
                                  * Refresh Player Count for this team
                                  */
@@ -319,7 +317,7 @@
                         dataType: 'json'
                     }
                 });
-        };
+        }
 
         /**
          * Add a player to a team via tot
