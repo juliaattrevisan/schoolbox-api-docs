@@ -424,6 +424,8 @@
                 else {
                     console.log('Saving new sequence for team ' + sortable.parents('[data-test-team]').attr('data-test-team'));
                 }
+
+                console.log(sortable.data('reorderPlayersAction'));
             }
 
             var data = sortable.find('[data-player]').map(function() {
