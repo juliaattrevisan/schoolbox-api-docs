@@ -414,6 +414,22 @@ foreach ($categoryList as $category) {
     $this->setBlock('subjectTpl', 'subject_grade', 'subject_grade_block');
 //    $this->setBlock('subjectTpl', 'icon', 'icon_block');
 
+    $output = array(
+        'SUBJ_CAT_ID'       => $categoryID,
+        'SUBJ_SUBJECT_NAME' => Scrub::text($category['name']),
+        'SUBJ_SUBJECT_ICON' => '/images/mime/60x60/man.png',
+        'SUBJ_SUBJECT_CODE' => $categoryCode,
+        'SUBJ_SUBJECT_URL'  => '/homepage/' . $categoryID,
+        // This isn't used in activity/subjectlist.html
+//        'SUBJ_TOTAL'        => $summary[$category['id']]['total'],
+        'WORK_TERM'         => $targetTerm->getCode(),
+        'SUBJ_TREND_DIR'    => $trendDir,
+        'SUBJ_TREND_AMT'    => $trendAmt,
+        'SUBJ_HAS_GRADE'    => $show_grades ? 'grade' : '',
+        'DARK'              => ++$j % 2 ? '' : 'dark'
+    );
+    $this->setVar($output);
+
     if(!$restrict_grades){
         $this->parse('subject_name_link_block', 'subject_name_link');
         $this->setVar('subject_name_no_link_block', '');
@@ -421,21 +437,6 @@ foreach ($categoryList as $category) {
         $this->parse('subject_name_no_link_block', 'subject_name_no_link');
         $this->setVar('subject_name_link_block', '');
     }
-
-    $output = array(
-        'SUBJ_CAT_ID'       => $categoryID,
-        'SUBJ_SUBJECT_NAME' => Scrub::Text($category['name']),
-        'SUBJ_SUBJECT_ICON' => '/images/mime/60x60/man.png',
-        'SUBJ_SUBJECT_CODE' => $categoryCode,
-        'SUBJ_SUBJECT_URL'  => '/homepage/' . $categoryID,
-        // This isn't used in activity/subjectlist.html
-//        'SUBJ_TOTAL'        => $summary[$category['id']]['total'],
-        'SUBJ_TREND_DIR'    => $trendDir,
-        'SUBJ_TREND_AMT'    => $trendAmt,
-        'SUBJ_HAS_GRADE'    => $show_grades ? 'grade' : '',
-        'DARK'              => ++$j % 2 ? '' : 'dark'
-    );
-    $this->setVar($output);
 
     if ($gradeAvg == -1) {
         $this->setVar('subject_grade_block', '');
