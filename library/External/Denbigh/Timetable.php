@@ -258,6 +258,14 @@ class External_Denbigh_Timetable implements External_TimetableInterface
             return [];
         }
 
+        // Get the first timetable group, that's the best I can do
+        // (because Denbigh lessons don't have a campus)
+        $campusQuery = $this->getInternalDatabase()->query('SELECT ext_timetable_code FROM luCampus LIMIT 1');
+        if ($campusQuery->rowCount() == 0) {
+            return [];
+        }
+        $timetableGroup = $campusQuery->fetchColumn();
+
         $query = "SELECT l.day AS DayNumber, 
                         l.period AS PeriodNumber, 
                         startTime AS PeriodStart, 
@@ -266,7 +274,7 @@ class External_Denbigh_Timetable implements External_TimetableInterface
                         l.staffCode AS StaffID, 
                         l.room AS RoomCode, 
                         co.subjectName AS Description,
-                        'SEN' AS TimetableGroup
+                        :timetableGroup AS TimetableGroup
                         FROM Lessons l 
                         RIGHT JOIN Classes cl ON cl.classCode = l.classCode
                         RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
@@ -275,7 +283,8 @@ class External_Denbigh_Timetable implements External_TimetableInterface
         $query = strtr(
             $query,
             array(
-                ':rooms'    => implode(',', array_map([$this->externalDatabase, 'quote'], $roomCodes)),
+                ':timetableGroup' => $this->externalDatabase->quote($timetableGroup),
+                ':rooms'          => implode(',', array_map([$this->externalDatabase, 'quote'], $roomCodes)),
             )
         );
 
