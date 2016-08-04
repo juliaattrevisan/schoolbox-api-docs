@@ -247,6 +247,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $student = UserMapper::getInstance()->findById($result->getOwner()->getId());
             $mark = $result->getNormalizedMark();
             $comment = $result->getComment();
+            $dueDate = $box->getDueDate();
         } elseif ($result instanceof Attempt) {
             /* Handle quiz attempt */
             $quiz = \Schoolbox\Assessment\Component\OnlineAssessmentMapper::getInstance()->findByID($result->getAssessment()->getId());
@@ -261,6 +262,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $actual = $evAttempt->getMarksForAttempt($result->getId());
             $mark = ($actual / $total)*100;
             $comment = '';
+            $dueDate = $quiz->getFinish();
         }
         else {
             throw new \Exception('Unknown object passed');
@@ -354,7 +356,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                                     '{$assessmentRemote['MarkBookSeq']}',
                                     '{$mark}',
                                     '".$this->getDatabase()->quote($comment)."',
-                                    CURRENT_TIMESTAMP,
+                                    CONVERT( datetime, '".$dueDate->getDatabase()."', 20)),  
                                     '".$marker->getExternalId()."',
                                     CURRENT_TIMESTAMP
                                   )
