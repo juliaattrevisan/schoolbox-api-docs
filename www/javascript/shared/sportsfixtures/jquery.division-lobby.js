@@ -372,10 +372,8 @@
 
                         $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removeTeamPlayer')}])
                             .done(function(response) {
-
-                                /* Just remove him from the dom
-                                 */
-                                el.parents('[data-player]').remove();
+                                updateTeamMetadata($('[data-test-team='+el.attr('data-affected-team')+']'), response);
+                                updateDivisionLobby(response.divisionLobby);
                             })
                             .done(function() {
                                 feedback.labelTimeout({text: 'Removed!', css: 'success'});
