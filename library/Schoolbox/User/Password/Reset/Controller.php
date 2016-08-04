@@ -161,7 +161,7 @@ class Controller extends Base
 
                     $email->setFrom($config->get('password_change_email_from'), $config->get('mail_from_name'));
                     $email->setSubject($config->get('title') . ' Password Reset');
-                    $email->setContext(['user' => $user, 'reset' => $reset,]);
+                    $email->setContext(['user' => $user, 'reset' => $reset, 'hideUnsubscribe' => true]);
                     $email->send(['name' => $user->formatName(), 'email' => $emailAddress,]);
                 }
             } else {
