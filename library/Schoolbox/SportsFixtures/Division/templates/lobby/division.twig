@@ -1,12 +1,12 @@
-{% if players is not empty %}
-    <section data-division="{{ division.id }}">
+
+    <section>
         <ul class="information-list sortable"
-            data-division-player-list="{{ division.id }}"
             data-add-players-action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {entityId: division.id}) }}"
             data-remove-players-action="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.id}) }}"
-            data-reorder-players-action="{{ routeLookup('sportsfixturesDivision.postReorderPlayers', {entityId: division.id}) }}">
+            data-test-division-player-list="{{ division.id }}">
+
             {% for playerData in players %}
-                <li class="actions-small-1" data-player="{{ playerData.player.id }}">
+                <li class="actions-small-1" data-player="{{ playerData.player.id }}" data-assigned="1111111111">
                     <div class="list-item">
                         <div class="grip compact"></div>
                         <div class="small-11 compact card wrap-down">
@@ -53,15 +53,5 @@
                 </li>
             {% endfor %}
         </ul>
-        <span class="label full-width hide" data-relation="save-label"></span>
+        <span class="label full-width hide" data-test-division-indicator></span>
     </section>
-{% else %}
-    <div class="empty-state">
-        <i class="icon-group"></i>
-        <p>There are no Players in {{ division.name }}.</p>
-        <p>
-            You may <a href="#" title="Add Players" data-reveal-id="addPlayersModal">add players by name</a>,
-            or <a href="#" title="Upload Player List" data-reveal-id="uploadPlayersModal">upload a list</a>.
-        </p>
-    </div>
-{% endif %}

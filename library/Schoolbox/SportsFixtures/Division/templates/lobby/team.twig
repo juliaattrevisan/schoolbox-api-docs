@@ -1,62 +1,34 @@
-<section data-team="{{ team.id }}" data-collapse-state="uncollapsed">
-    <ul id='team-{{ team.id }}' class="information-list sortable"
-        data-team-player-list="{{ team.id }}"
+<section data-test-team="{{ team.id }}">
+    <ul class="information-list sortable"
         data-add-players-action="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: team.id}) }}"
         data-remove-players-action="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: team.id}) }}"
-        data-reorder-players-action="{{ routeLookup('sportsfixturesTeam.postReorderPlayers', {entityId: team.id}) }}">
+        data-test-team-player-list-proxy>
+
         <li class="actions-small-2">
             <div class="list-item">
                 <div class="small-12 card wrap-down">
                     <h3>{{ team.name }}</h3>
-                    <span class="meta icon-group no-pad">
+                    <p class="meta icon-group">
                         {{ players|length }}
                         {{ players|length == 1 ? 'player in team' : 'players in team'}}
-                    </span>
+                    </p>
                 </div>
             </div>
             <nav>
-                <a href="#" class="icon-down-arrow" data-collapser="{{ team.id }}" title="Expand/Collapse Content"></a>
-
-                <a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: team.id}) }}"
-                   class="icon-modify"
-                   title="Modify Team"></a>
+                <a href="#" class="icon-up-arrow" title="Expand/Collapse Content" data-collapser="team-{{ team.id }}"></a>
+                <a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: team.id}) }}" class="icon-modify" title="Modify Team"></a>
             </nav>
+            <span class="label full-width hide" data-test-team-indicator></span>
         </li>
-        {% for teamPlayer in players %}
-            <li class="actions-small-2" data-player="{{ teamPlayer.id }}">
-                <div class="list-item">
-                    <div class="grip compact"></div>
-                    <div class="small-10 compact card wrap-down">
-                        <a href="/search/user/{{ teamPlayer.id }}">
-                            <img src="/portrait.php?userId={{ teamPlayer.externalId }}&amp;size=square64" />
-                            <h3>{{ teamPlayer.formatName() }}</h3>
-                        </a>
-                        <span class="meta">
-                            {% for currentPosition in positions[teamPlayer.id] %}
-                                {{ currentPosition.position.name }}{% if not loop.last %}, {% endif %}
-                            {% endfor %}
-                        </span>
-                    </div>
+        <li>
+            <ul class="information-list sortable"
+                data-add-players-action="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: team.id}) }}"
+                data-remove-players-action="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: team.id}) }}"
+                data-test-team-player-list
+                data-collapsable="team-{{ team.id }}">
 
-                </div>
-                <nav>
-                    <a href="#"
-                       data-reveal-id="editPlayerPositions"
-                       class="icon-position"
-                       title="Change Player Positions"
-                       data-player-positions-name="{{ teamPlayer.formatName() }}"
-                       data-player-positions-team-name="{{ team.name }}"
-                       data-player-positions-user="{{ teamPlayer.id }}"
-                       data-player-positions-team="{{ team.id }}"
-                       data-player-positions="{% for teamPosition in positions if teamPosition.user.id == teamPlayer.id %}{% if not loop.first %},{% endif %}{{ teamPosition.position.id }}{% endfor %}"
-                    ></a>
-                    <a href="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: team.id}) }}"
-                       class="icon-close"
-                       title="Remove Player from {{ team.name }}"
-                       data-remove-team-player="{{ teamPlayer.id }}"></a>
-                </nav>
-            </li>
-        {% endfor %}
+                {% include '@sportsfixturesDivision/lobby/teamPlayerList.twig' %}
+            </ul>
+        </li>
     </ul>
-    <span class="label full-width hide" data-relation="save-label"></span>
 </section>

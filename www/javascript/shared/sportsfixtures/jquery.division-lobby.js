@@ -155,7 +155,7 @@
                                 /* TODO: Refresh player list
                                  * TODO: Reapply position selector
                                  */
-                                $('[data-test-team='+toId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
+                                $('[data-test-team='+toId+']').find('[data-test-team-player-list]').html($(response.html));
                             })
                             .done(function() {
 
@@ -511,7 +511,7 @@
          * @param to
          */
         function removeProxyHelperClone(to) {
-            to.parents('[data-test-team]').find('[data-test-team-player-list-proxy]').find('[data-player]').remove();
+            to.parents('[data-test-team]').find('[data-test-team-player-list-proxy]').children('[data-player]').remove();
         }
 
         /**

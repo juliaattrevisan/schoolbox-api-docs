@@ -75,8 +75,8 @@ class Translator
         }
         foreach ($division->getTeams() as $team) {
             $dataModel['teams'][] = $this->getTeamTranslator()->translateTeam($team);
-        }
 
+        }
         $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
         return $dataModel;
     }
