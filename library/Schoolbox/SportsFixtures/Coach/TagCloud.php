@@ -10,7 +10,7 @@ namespace Schoolbox\SportsFixtures\Coach;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\SportsFixtures\Team;
-use Schoolbox\User as UserModel;
+use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 
 /**
@@ -90,7 +90,7 @@ class TagCloud implements BaseMapper\UsableAsTagSource
                 case Model::PREFIX_NEW_FROM_USER:
                     // This is a new tag, to be created from an existing user.
                     // This throws an exception if no user exists with this ID.
-                    /** @var UserModel $user */
+                    /** @var User $user */
                     $user = $this->userMapper->findById($identifier);
                     return $this->mapper->createModel()
                         ->setName($user->formatName())
@@ -136,13 +136,13 @@ class TagCloud implements BaseMapper\UsableAsTagSource
     /**
      * Retrieves a list of items for a tag cloud.
      *
-     * @param UserModel $user
+     * @param User $user
      * @param string $keyword
      * @param int $offset
      * @param int $limit
      * @return Collection|Model[]
      */
-    public function findForTag(UserModel $user, $keyword, $offset = 0, $limit = 0)
+    public function findForTag(User $user, $keyword, $offset = 0, $limit = 0)
     {
         if (strlen($keyword) === 0) {
             return new Collection();

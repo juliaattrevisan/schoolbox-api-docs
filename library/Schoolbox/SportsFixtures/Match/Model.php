@@ -15,7 +15,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\User;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
-use Schoolbox\SportsFixtures\Division\Model as Division;
+use Schoolbox\SportsFixtures\Division\Division as Division;
 use Schoolbox\SportsFixtures\Season\Model as Season;
 use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Venue\Model as Venue;

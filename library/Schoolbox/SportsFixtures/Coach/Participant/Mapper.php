@@ -13,8 +13,7 @@ namespace Schoolbox\SportsFixtures\Coach\Participant;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Mapper As BaseMapper;
-use Schoolbox\User as UserModel;
-use Schoolbox\User;
+use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
@@ -73,7 +72,7 @@ class Mapper extends BaseMapper
             // set user and team only if retrieved properly
             $user = $this->hydrateJoin($row, 'user', 'u');
 
-            if ($user instanceof UserModel) {
+            if ($user instanceof User) {
                 $coach->setUser($user);
             }
 

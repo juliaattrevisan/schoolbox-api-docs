@@ -17,7 +17,7 @@ use \Schoolbox\User;
 use \Schoolbox\ValueLabelInterface;
 use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use \Schoolbox\SportsFixtures\Coach;
-use \Schoolbox\SportsFixtures\Division\Model as Division;
+use \Schoolbox\SportsFixtures\Division\Division as Division;
 
 class Model implements ISoftDeletable, ValueLabelInterface {
     use DeletedAtDate;

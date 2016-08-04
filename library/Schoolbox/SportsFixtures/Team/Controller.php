@@ -14,11 +14,11 @@ use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Coach;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
-use \Schoolbox\SportsFixtures\Division\Model as Division;
+use \Schoolbox\SportsFixtures\Division\Division as Division;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use \Schoolbox\SportsFixtures\Team\Player\Model as TeamUserModel;
+use \Schoolbox\SportsFixtures\Team\Player\Model as TeamUser;
 use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
 use Schoolbox\UserMapper;
@@ -311,7 +311,7 @@ class Controller extends AbstractController
         $sequenceNo = count($userIds);
         foreach ($userIds as $userId) {
             try {
-                /** @var TeamUserModel $teamUser */
+                /** @var TeamUser $teamUser */
                 $teamUser = $this->getTeamPlayerMapper()->findOneByColumnList([
                     'user_id' => $userId,
                     'team_id' => $team->getId(),

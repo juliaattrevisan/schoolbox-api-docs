@@ -20,7 +20,7 @@ use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
-use Schoolbox\SportsFixtures\Match\Model as MatchModel;
+use Schoolbox\SportsFixtures\Match\Model as Match;
 use Schoolbox\SportsFixtures\Match\Notifier\Helper as NotifierHelper;
 use Schoolbox\SportsFixtures\Snapshot\Snapshot;
 use Schoolbox\User;
@@ -68,7 +68,7 @@ class Notifier extends AbstractModuleNotifier
     {
         $method = $bundle->getEvent()->getAction();
 
-        /** @var MatchModel $match */
+        /** @var Match $match */
         $match = $bundle->getEvent()->getObject();
 
         $startAt = $match->getStartAt()->getUnixTimestamp();
@@ -92,10 +92,10 @@ class Notifier extends AbstractModuleNotifier
     /**
      * Execute snapshot create
      *
-     * @param Model $match
+     * @param Match $match
      * @param User $effector
      */
-    public function notifySnapshotCreated(MatchModel $match, User $effector)
+    public function notifySnapshotCreated(Match $match, User $effector)
     {
         $this->log->info("Creating snapshot for Match {$match->getId()} at {$match->getStartAt()->getDatabase()}", ['char' => '+']);
 
@@ -106,10 +106,10 @@ class Notifier extends AbstractModuleNotifier
     /**
      * Execute snapshot update
      *
-     * @param Model $match
+     * @param Match $match
      * @param User $effector
      */
-    public function notifySnapshotUpdated(MatchModel $match, User $effector)
+    public function notifySnapshotUpdated(Match $match, User $effector)
     {
         $this->log->info("Updating snapshot for Match {$match->getId()} at {$match->getStartAt()->getDatabase()}", ['char' => '+']);
 
@@ -140,10 +140,10 @@ class Notifier extends AbstractModuleNotifier
      * Setup upcoming match notification when new match created (Students)
      *
      * @param User $effector
-     * @param MatchModel $match
+     * @param Match $match
      * @return Envelope
      */
-    public function notifyStudentCreated(MatchModel $match, User $effector)
+    public function notifyStudentCreated(Match $match, User $effector)
     {
         $match = $this->notifierHelper->hydrateMatch($match);
         return $this->notifierHelper->postToTeams(
@@ -158,11 +158,11 @@ class Notifier extends AbstractModuleNotifier
      * Setup upcoming match notification when existing match updated (Students)
      *
      * @param User $effector
-     * @param MatchModel $match
+     * @param Match $match
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentUpdated(MatchModel $match, User $effector, array $diff = null)
+    public function notifyStudentUpdated(Match $match, User $effector, array $diff = null)
     {
         $envelope = new Envelope();
         $match    = $this->notifierHelper->hydrateMatch($match);
@@ -241,10 +241,10 @@ class Notifier extends AbstractModuleNotifier
      * Setup upcoming match notification when new match created (Parents of players)
      *
      * @param User $effector
-     * @param MatchModel $match
+     * @param Match $match
      * @return Envelope
      */
-    public function notifyParentCreated(MatchModel $match, User $effector)
+    public function notifyParentCreated(Match $match, User $effector)
     {
         $match = $this->notifierHelper->hydrateMatch($match);
         return $this->notifierHelper->postToParentsOfTeams(
@@ -259,11 +259,11 @@ class Notifier extends AbstractModuleNotifier
      * Setup upcoming match notification when existing match updated (Parents of players)
      *
      * @param User $effector
-     * @param MatchModel $match
+     * @param Match $match
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentUpdated(MatchModel $match, User $effector, array $diff = null)
+    public function notifyParentUpdated(Match $match, User $effector, array $diff = null)
     {
         $envelope = new Envelope();
         $match    = $this->notifierHelper->hydrateMatch($match);

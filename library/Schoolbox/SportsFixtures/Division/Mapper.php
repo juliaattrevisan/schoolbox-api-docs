@@ -18,12 +18,13 @@ use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Sport\Model as Sport;
 use Schoolbox\SportsFixtures\Season\Mapper as SeasonMapper;
 use Schoolbox\SportsFixtures\Season\Model as Season;
-use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
+use Schoolbox\SportsFixtures\Division\Model as Division;
+
 /**
  * Class Mapper
  * @method Division createModel()
- * @method Model findById($id)
+ * @method Division findById($id)
  * @method Collection|Division[] findByColumn($columnName, $columnValue, $options = array())
  * @package Schoolbox\SportsFixtures\Division
  */

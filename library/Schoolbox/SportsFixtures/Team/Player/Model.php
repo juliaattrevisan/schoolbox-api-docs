@@ -7,8 +7,8 @@
 
 namespace Schoolbox\SportsFixtures\Team\Player;
 
-use \Schoolbox\User as UserModel;
-use \Schoolbox\SportsFixtures\Team\Model as TeamModel;
+use \Schoolbox\User as User;
+use \Schoolbox\SportsFixtures\Team\Model as Team;
 
 /**
  * Model for relation between teams and users.
@@ -27,14 +27,14 @@ class Model
     /**
      * Team part of the user/team relation.
      *
-     * @var TeamModel
+     * @var Team
      */
     protected $team;
 
     /**
      * User part of the user/team relation.
      *
-     * @var UserModel
+     * @var User
      */
     protected $user;
 
@@ -50,8 +50,8 @@ class Model
      */
     public function __construct()
     {
-        $this->user = new UserModel();
-        $this->team = new TeamModel();
+        $this->user = new User();
+        $this->team = new Team();
     }
 
     /**
@@ -73,7 +73,7 @@ class Model
     }
 
     /**
-     * @return TeamModel
+     * @return Team
      */
     public function getTeam()
     {
@@ -81,17 +81,17 @@ class Model
     }
 
     /**
-     * @param  TeamModel $team
+     * @param  Team $team
      * @return static
      */
-    public function setTeam(TeamModel $team)
+    public function setTeam(Team $team)
     {
         $this->team = $team;
         return $this;
     }
 
     /**
-     * @return UserModel
+     * @return User
      */
     public function getUser()
     {
@@ -99,10 +99,10 @@ class Model
     }
 
     /**
-     * @param  UserModel $user
+     * @param  User $user
      * @return static
      */
-    public function setUser(UserModel $user)
+    public function setUser(User $user)
     {
         $this->user = $user;
         return $this;

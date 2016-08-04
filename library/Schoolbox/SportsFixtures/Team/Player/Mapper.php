@@ -10,13 +10,12 @@ namespace Schoolbox\SportsFixtures\Team\Player;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Mapper As BaseMapper;
-use Schoolbox\Role as RoleModel;
-use Schoolbox\User as UserModel;
-use Schoolbox\User;
+use Schoolbox\Role as Role;
+use Schoolbox\User as User;
 use Schoolbox\UserMapper;
+use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use Schoolbox\SportsFixtures\Team\Model as TeamModel;
-use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
+use Schoolbox\SportsFixtures\Division\Division as Division;
 
 /**
  * Mapper for the relation between teams and users.
@@ -78,17 +77,17 @@ class Mapper extends BaseMapper
 
             // set user and team only if retrieved properly
             $user = $this->hydrateJoin($row, 'user', 'u');
-            if ($user instanceof UserModel) {
+            if ($user instanceof User) {
                 $role = $this->hydrateJoin($row, 'user.role', 'ur');
-                if ($role instanceof RoleModel) {
+                if ($role instanceof Role) {
                     $user->setRole($role);
                 }
                 $model->setUser($user);
             }
             $team = $this->hydrateJoin($row, 'team', 't');
-            if ($team instanceof TeamModel) {
+            if ($team instanceof Team) {
                 $division = $this->hydrateJoin($row, 'team.division', 'td');
-                if ($division instanceof DivisionModel) {
+                if ($division instanceof Division) {
                     $team->setDivision($division);
                 }
                 $model->setTeam($team);
@@ -101,11 +100,11 @@ class Mapper extends BaseMapper
     /**
      * Finds all team memberships for a user in a division.
      *
-     * @param User          $user
-     * @param DivisionModel $division
+     * @param User     $user
+     * @param Division $division
      * @return Collection|Model[]
      */
-    public function findForUserInDivision(User $user, DivisionModel $division)
+    public function findForUserInDivision(User $user, Division $division)
     {
         $query = $this->getSelectString().' WHERE td.id = :divisionId AND u.id = :userId';
         $stmt  = $this->getDatabase()->prepare($query);

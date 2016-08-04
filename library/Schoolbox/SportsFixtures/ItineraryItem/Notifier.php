@@ -16,7 +16,7 @@ use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
-use Schoolbox\SportsFixtures\Match\Model as MatchModel;
+use Schoolbox\SportsFixtures\Match\Model as Match;
 use Schoolbox\SportsFixtures\Match\Notifier\Helper as NotifierHelper;
 use Schoolbox\User;
 
@@ -66,7 +66,7 @@ class Notifier extends AbstractModuleNotifier
     {
         $method = $bundle->getEvent()->getAction();
 
-        /** @var MatchModel $match */
+        /** @var Match $match */
         $match = $bundle->getEvent()->getObject();
 
         // Notify 24 hours before the match start time

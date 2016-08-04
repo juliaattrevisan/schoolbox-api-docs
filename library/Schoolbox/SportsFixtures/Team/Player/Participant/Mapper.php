@@ -13,11 +13,10 @@ namespace Schoolbox\SportsFixtures\Team\Player\Participant;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Mapper As BaseMapper;
-use Schoolbox\User as UserModel;
-use Schoolbox\User;
+use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayerModel;
+use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayer;
 use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\SportsFixtures\Team\Player\Participant\Model as ParticipantPlayer;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
@@ -68,7 +67,7 @@ class Mapper extends BaseMapper
         $collection = new Collection();
 
         foreach ($statement as $row) {
-            /** @var TeamPlayerModel $model */
+            /** @var TeamPlayer $model */
             $teamPlayer = TeamPlayerMapper::getInstance()->createModel();
             $teamPlayer->setId($row['id'])
                 ->setSequence($row['sequence']);
@@ -76,7 +75,7 @@ class Mapper extends BaseMapper
             // set user and team only if retrieved properly
             $user = $this->hydrateJoin($row, 'user', 'u');
 
-            if ($user instanceof UserModel) {
+            if ($user instanceof User) {
                 $teamPlayer->setUser($user);
             }
 

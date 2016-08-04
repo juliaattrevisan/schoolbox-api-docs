@@ -18,15 +18,15 @@ use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
-use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayerModel;
+use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayer;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
-use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
+use Schoolbox\SportsFixtures\Division\Division as Division;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
-use Schoolbox\SportsFixtures\Sport\Model as SportModel;
+use Schoolbox\SportsFixtures\Sport\Model as Sport;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
-use Schoolbox\SportsFixtures\Match\Model as MatchModel;
+use Schoolbox\SportsFixtures\Match\Model as Match;
 use Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
-use Schoolbox\SportsFixtures\Result\Model as ResultModel;
+use Schoolbox\SportsFixtures\Result\Model as Result;
 use Schoolbox\User;
 use Monolog\Logger;
 
@@ -88,69 +88,69 @@ class Notifier extends AbstractModuleNotifier
     /**
      * Setup upcoming match notification when new match created (Students)
      *
-     * @param User $effector
-     * @param ResultModel $result
+     * @param User       $effector
+     * @param Result     $result
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentResultcreated(ResultModel $result, User $effector, array $diff = null) {
+    public function notifyStudentResultcreated(Result $result, User $effector, array $diff = null) {
         return $this->notifyStudents($result, $effector);
     }
 
     /**
      * Setup upcoming match notification when existing match updated (Students)
      *
-     * @param User $effector
-     * @param ResultModel $result
+     * @param User       $effector
+     * @param Result     $result
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentResultupdated(ResultModel $result, User $effector, array $diff = null) {
+    public function notifyStudentResultupdated(Result $result, User $effector, array $diff = null) {
         return $this->notifyStudents($result, $effector);
     }
 
     /**
      * Setup upcoming match notification when new match created (Parents of players)
      *
-     * @param User $effector
-     * @param ResultModel $result
+     * @param User       $effector
+     * @param Result     $result
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentResultcreated(ResultModel $result, User $effector, array $diff = null) {
+    public function notifyParentResultcreated(Result $result, User $effector, array $diff = null) {
         return $this->notifyParents($result, $effector);
     }
 
     /**
      * Setup upcoming match notification when existing match updated (Parents of players)
      *
-     * @param User $effector
-     * @param ResultModel $result
+     * @param User       $effector
+     * @param Result     $result
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentResultupdated(ResultModel $result, User $effector, array $diff = null) {
+    public function notifyParentResultupdated(Result $result, User $effector, array $diff = null) {
         return $this->notifyParents($result, $effector);
     }
 
     // Since update/create do pretty much the same thing, this is where the work actually happens
 
     /**
-     * @param ResultModel $result
+     * @param Result $result
      * @param User $effector
      * @return Envelope
      */
-    public function notifyParents(ResultModel $result, User $effector)
+    public function notifyParents(Result $result, User $effector)
     {
         $envelope = new Envelope();
 
-        /** @var ResultModel $result */
+        /** @var Result $result */
         $result = $this->resultMapper->findById($result->getId());
-        /** @var MatchModel $match */
+        /** @var Match $match */
         $match = $this->matchMapper->findById($result->getMatch()->getId());
-        /** @var DivisionModel $division */
+        /** @var Division $division */
         $division = $this->divisionMapper->findById($match->getDivision()->getId());
-        /** @var SportModel $sport */
+        /** @var Sport $sport */
         $sport = $this->sportMapper->findById($division->getSport()->getId());
 
         $bob = new Builder();
@@ -166,7 +166,7 @@ class Notifier extends AbstractModuleNotifier
 
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getHomeTeam()->getId());
 
-        /** @var TeamPlayerModel $teamPlayer */
+        /** @var TeamPlayer $teamPlayer */
         foreach ($teamPlayers as $teamPlayer) {
             $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
             $bob->setHref($href)
@@ -182,7 +182,7 @@ class Notifier extends AbstractModuleNotifier
 
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getAwayTeam()->getId());
 
-        /** @var TeamPlayerModel $teamPlayer */
+        /** @var TeamPlayer $teamPlayer */
         foreach ($teamPlayers as $teamPlayer) {
             $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
             $bob->setHref($href)
@@ -198,21 +198,21 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * @param ResultModel $result
+     * @param Result $result
      * @param User $effector
      * @return Envelope
      */
-    public function notifyStudents(ResultModel $result, User $effector)
+    public function notifyStudents(Result $result, User $effector)
     {
         $envelope = new Envelope();
 
-        /** @var ResultModel $result */
+        /** @var Result $result */
         $result = $this->resultMapper->findById($result->getId());
-        /** @var MatchModel $match */
+        /** @var Match $match */
         $match = $this->matchMapper->findById($result->getMatch()->getId());
-        /** @var DivisionModel $division */
+        /** @var Division $division */
         $division = $this->divisionMapper->findById($match->getDivision()->getId());
-        /** @var SportModel $sport */
+        /** @var Sport $sport */
         $sport = $this->sportMapper->findById($division->getSport()->getId());
 
         $bob = new Builder();
@@ -229,7 +229,7 @@ class Notifier extends AbstractModuleNotifier
         $this->log->info("ID: " . $match->getHomeTeam()->getId());
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getHomeTeam()->getId());
 
-        /** @var TeamPlayerModel $teamPlayer */
+        /** @var TeamPlayer $teamPlayer */
         foreach ($teamPlayers as $teamPlayer) {
             $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getHomeTeam()->getId()}";
             $bob->setHref($href)
@@ -244,7 +244,7 @@ class Notifier extends AbstractModuleNotifier
 
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $match->getAwayTeam()->getId());
 
-        /** @var TeamPlayerModel $teamPlayer */
+        /** @var TeamPlayer $teamPlayer */
         foreach ($teamPlayers as $teamPlayer) {
             $href = "/sportsfixtures/matches/{$match->getId()}/results/{$match->getAwayTeam()->getId()}";
             $bob->setHref($href)

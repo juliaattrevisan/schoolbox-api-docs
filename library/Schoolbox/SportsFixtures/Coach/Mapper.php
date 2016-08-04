@@ -10,9 +10,8 @@ namespace Schoolbox\SportsFixtures\Coach;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Role;
-use Schoolbox\SportsFixtures\Team;
 use Schoolbox\UserMapper;
-use Schoolbox\User as UserModel;
+use Schoolbox\User as User;
 
 /**
  * The mapper for a sports fixtures coach.
@@ -63,7 +62,7 @@ class Mapper extends BaseMapper
             $model = $this->hydrate($row);
             if (isset($row['u.id'])) {
                 $user = $this->hydrateJoin($row, 'user', 'u');
-                if ($user instanceof UserModel) {
+                if ($user instanceof User) {
                     $model->setUser($user);
                     $role = $this->hydrateJoin($row, 'user.role', 'ur');
                     if ($role instanceof Role) {

@@ -11,7 +11,6 @@ namespace Schoolbox\SportsFixtures\Division;
 use Alaress\Csv\Reader;
 use Alaress\Web\Controller\Exception;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
-use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -20,18 +19,16 @@ use Schoolbox\SportsFixtures\Sport\Model as Sport;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Season\Model as Season;
 use Schoolbox\SportsFixtures\Season\Mapper as SeasonMapper;
-use \Schoolbox\SportsFixtures\Position\Model as PositionModel;
+use \Schoolbox\SportsFixtures\Position\Model as Position;
 use \Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use \Schoolbox\SportsFixtures\Team\Model as TeamModel;
 use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
-use \Schoolbox\SportsFixtures\Team\Position\Model as TeamPositionModel;
+use \Schoolbox\SportsFixtures\Team\Position\Model as TeamPosition;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
-use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
-use \Schoolbox\SportsFixtures\Division\User\Model as DivisionUserModel;
+use \Schoolbox\SportsFixtures\Division\User\Model as DivisionUser;
 use \Schoolbox\SportsFixtures\Division\User\Mapper as DivisionUserMapper;
-use Schoolbox\User as UserModel;
+use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 
 class Controller extends AbstractController
@@ -116,7 +113,7 @@ class Controller extends AbstractController
      *  - in the format provided in the request Accepts header
      * If entity is deleted, respond with '210 Gone'
      *
-     * @param DivisionModel $entity
+     * @param Division $entity
      * @throws Exception
      * @return void
      */
@@ -155,7 +152,7 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param DivisionModel $entity
+     * @param Division $entity
      * @param Sport         $context
      * @return void
      */
@@ -220,7 +217,7 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param DivisionModel $entity
+     * @param Division $entity
      * @return void
      */
     protected function persistEntity($entity)
@@ -243,9 +240,9 @@ class Controller extends AbstractController
     /**
      * Add players to a Division
      *
-     * @param DivisionModel $division
+     * @param Division $division
      */
-    public function postAddPlayers(DivisionModel $division)
+    public function postAddPlayers(Division $division)
     {
         $divisionUsers = [];
         foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
@@ -262,9 +259,9 @@ class Controller extends AbstractController
     /**
      * Uploads players from a CSV into a Division
      *
-     * @param DivisionModel $division
+     * @param Division $division
      */
-    public function postUploadPlayers(DivisionModel $division)
+    public function postUploadPlayers(Division $division)
     {
         $divisionUsers = [];
 
@@ -295,7 +292,7 @@ class Controller extends AbstractController
             } catch (MapperException $e) {
                 // noop
             }
-            if ($user instanceof UserModel) {
+            if ($user instanceof User) {
                 $divisionUsers[] = $this->getDivisionUserMapper()->createModel()
                     ->setDivision($division)
                     ->setUser($user)
@@ -311,9 +308,9 @@ class Controller extends AbstractController
     /**
      * Remove players from a Division
      *
-     * @param DivisionModel $division
+     * @param Division $division
      */
-    public function postRemovePlayers(DivisionModel $division)
+    public function postRemovePlayers(Division $division)
     {
         $this->getDivisionUserMapper()->delete(
             $this->getDivisionUserMapper()->findByColumnList([
@@ -331,16 +328,16 @@ class Controller extends AbstractController
     /**
      * Reorder players within a Division
      *
-     * @param DivisionModel $division
+     * @param Division $division
      */
-    public function postReorderPlayers(DivisionModel $division)
+    public function postReorderPlayers(Division $division)
     {
         $userIds       = $this->getRequest()->post->get('userId');
         $divisionUsers = [];
         $sequenceNo    = count($userIds);
         foreach ($userIds as $userId) {
             try {
-                /** @var DivisionUserModel $divisionUser */
+                /** @var DivisionUser $divisionUser */
                 $divisionUser = $this->getDivisionUserMapper()->findOneByColumnList([
                     'user_id'     => $userId,
                     'division_id' => $division->getId(),
@@ -406,7 +403,7 @@ class Controller extends AbstractController
 
                 if (!isset($positionCache[$position])) {
                     // Haven't got this position, load it and shove into cache
-                    /** @var PositionModel $positionModel */
+                    /** @var Position $positionModel */
                     try {
                         $positionModel = $this->getPositionMapper()->findById($position);
                         $positionCache[$position] = $positionModel;
@@ -418,7 +415,7 @@ class Controller extends AbstractController
                     $positionModel = $positionCache[$position];
                 }
 
-                $teamPosition = new TeamPositionModel();
+                $teamPosition = new TeamPosition();
                 $teamPosition->setTeam($team);
                 $teamPosition->setUser($player);
                 $teamPosition->setPosition($positionModel);
@@ -460,9 +457,9 @@ class Controller extends AbstractController
     /**
      * Outputs the response from an add player method.
      *
-     * @param DivisionModel $division
+     * @param Division $division
      */
-    protected function renderPostAddPlayersResponse(DivisionModel $division)
+    protected function renderPostAddPlayersResponse(Division $division)
     {
         if ($this->getRequest()->isXhr()) {
             // Output a XHR data model + HTML output

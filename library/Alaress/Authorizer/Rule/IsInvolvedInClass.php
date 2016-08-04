@@ -12,7 +12,7 @@ namespace Alaress\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthorized;
 use External_UserInterface;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 class IsInvolvedInClass extends All
@@ -33,7 +33,7 @@ class IsInvolvedInClass extends All
      * * A CategoryModel object (which contains class codes)
      * * A callable that returns one of the above
      *
-     * @var array|callable|FolderModel
+     * @var array|callable|Folder
      */
     protected $classCodeSource;
 
@@ -41,7 +41,7 @@ class IsInvolvedInClass extends All
      * Constructor (obviously)
      *
      * @param External_UserInterface  $externalDb
-     * @param array|callable|FolderModel $classCodeSource
+     * @param array|callable|Folder $classCodeSource
      */
     public function __construct(External_UserInterface $externalDb, $classCodeSource)
     {
@@ -66,7 +66,7 @@ class IsInvolvedInClass extends All
 
             // And translate to codes (with a little magic if necessary)
             $classCodes = array();
-            if ($classCodeSource instanceof FolderModel) {
+            if ($classCodeSource instanceof Folder) {
                 foreach ($classCodeSource->getCodes() as $code) {
                     $classCodes[] = $code->getCode();
                 }

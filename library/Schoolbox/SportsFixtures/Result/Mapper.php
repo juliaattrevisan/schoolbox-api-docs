@@ -14,8 +14,8 @@ use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Result\Model as Result;
+use Schoolbox\SportsFixtures\Status\Model as Status;
 use Schoolbox\SportsFixtures\Status\Mapper as StatusMapper;
-use Schoolbox\SportsFixtures\Status\Model as StatusModel;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Collection;
 
@@ -94,7 +94,7 @@ class Mapper extends BaseMapper
 
             $result->setTeam($team);
 
-            /** @var StatusModel $status */
+            /** @var Status $status */
             $status = $this->hydrateJoin($row, 'status', 's');
             $result->setStatus($status);
 
