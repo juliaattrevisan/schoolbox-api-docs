@@ -37,9 +37,11 @@
                     <h2 class="subheader">{{ division.name }}</h2>
                 </div>
             </div>
+            {% if not division.season.isArchived %}
             <nav>
                 <a href='{{ routeLookup('sportsfixturesTeam.getCreateForm', {contextId: division.id}) }}' class="icon-add" title="Add Team to {{ division.name }}"></a>
             </nav>
+            {% endif %}
         </div>
 
         {% if allTeams|length %}

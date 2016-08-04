@@ -199,9 +199,6 @@ class Controller extends AbstractController
      */
     public function getForm($entity, $context = null)
     {
-        // Load coaches into entity
-        $entity->setCoaches($this->getCoachCloud()->findForTeam($entity));
-
         if (empty($context)) {
             try {
                 $context = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
@@ -210,6 +207,17 @@ class Controller extends AbstractController
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
             }
         }
+
+        // Don't permit creation of modification of teams in archived divisions
+        if($context->getSeason()->isArchived()){
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
+        }
+
+
+        // Load coaches into entity
+        $entity->setCoaches($this->getCoachCloud()->findForTeam($entity));
+
+
 
         try {
             $sport = $this->getSportMapper()->findById($context->getSport()->getId());
