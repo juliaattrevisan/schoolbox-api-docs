@@ -11,6 +11,7 @@ namespace Schoolbox\SportsFixtures\Match;
 use Alaress_Date_Format;
 use Alaress\Web\Controller\Exception;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
+use Schoolbox\Collection;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
@@ -99,30 +100,23 @@ class Controller extends AbstractController
     {
         $division = $context;
 
-        // Division/Match Season extant/deleted/archived logic for list view:
-        //
-        //     matchSeason:    {extant/archived/deleted}
-        //     divisionSeason: {extant/archived/deleted}
-        //
-        // If the division season is deleted or archived, 404 the list.
-        // For each match, if attached to archived season, show it greyed out, without modify action buttons.
-
-        // Don't display divisions attached to archived seasons
-        if($division->getSeason()->isArchived()){
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
-        }
-
-        /** @var MatchMapper $mapper */
-        $mapper = $this->getMapper();
-
-        $allMatches = $mapper->findByColumn('division_id', $division->getId(), [
+        $allMatches = $this->getMapper()->findByColumn('division_id', $division->getId(), [
             'order' => [
                 'start_at' => 'asc'
             ]
         ]);
 
+        /** @var Collection|Season[] $allSeasons */
+        $allSeasons = new Collection();
 
-        /* Accumulate faceless schools
+        /**
+         * Each item is a Collection of matches, indexed by seasonId
+         *
+         * @var Collection[]|Match[][] $seasonMatches
+         */
+        $seasonMatches = new Collection();
+
+        /* Accumulate faceless schools and group by season
          */
         /** @var Match $currentMatch */
         foreach ($allMatches as $currentMatch) {
@@ -136,12 +130,31 @@ class Controller extends AbstractController
                 $facelessTeam = $this->getTeamMapper()->createModel()->setName($this->getSchoolTagCloudMapper()->getTagName($currentMatch->getAwaySchoolId()));
                 $currentMatch->setAwayTeam($facelessTeam);
             }
+
+            // Is is the first time we've seen this season ?
+            if(!$seasonMatches->getOffset($currentMatch->getSeason()->getId()) instanceof Collection){
+                $seasonMatches->setOffset($currentMatch->getSeason()->getId(), new Collection());
+                $allSeasons->add($currentMatch->getSeason());
+            }
+
+            $seasonMatches->getOffset($currentMatch->getSeason()->getId())->add($currentMatch);
+        }
+
+        // Sort seasons by start then end dates
+        $allSeasons->sortByMultiFields([
+            ['start','desc'],
+            ['end','desc']
+        ]);
+
+        // Sort matches within seasons by startAt datetime
+        foreach($seasonMatches as $matches){
+            $matches->sortBy('startAt','desc');
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/list.twig', [
-            'sport' => $division->getSport(),
-            'division' => $context,
-            'allMatches' => $allMatches,
+            'division'   => $division,
+            'allSeasons' => $allSeasons,
+            'allMatches' => $seasonMatches
         ]));
     }
 

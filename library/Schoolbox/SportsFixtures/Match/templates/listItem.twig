@@ -11,7 +11,7 @@
                 {% endif %}
             {% else %}
                 {% if currentMatch.name %}
-                    <p><del class="icon icon-archive" title="Division season is extant, but match's season is archived.">{{ currentMatch.name }}</del></p>
+                    <p><del class="icon icon-archive" title="This match's season is archived.">{{ currentMatch.name }}</del></p>
                     <p class="meta">{{ matchHeading.generateWithResultLink(currentMatch) }}</p>
                 {% else %}
                     <p>{{ matchHeading.generateWithResultLink(currentMatch) }}</p>
@@ -22,9 +22,12 @@
         </div>
     </div>
     <nav>
-        <a href="{{ routeLookup('sportsfixturesMatch.deleteEntity', {entityId: currentMatch.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentMatch.id }}"></a>
         {% if not currentMatch.season.isArchived %}
             <a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: currentMatch.id}) }}" class="icon-modify" title="Modify"></a>
         {% endif %}
+        <a href="#" class="icon-more" data-dropdown="sportsfixtures-match-{{ currentMatch.getId() }}-actions"></a>
     </nav>
+    <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-match-{{ currentMatch.getId() }}-actions">
+        <li><a href="{{ routeLookup('sportsfixturesMatch.deleteEntity', {entityId: currentMatch.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentMatch.id }}">Delete</a></li>
+    </ul>
 </li>
