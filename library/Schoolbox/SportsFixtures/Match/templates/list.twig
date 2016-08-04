@@ -124,10 +124,13 @@
             {% for currentSeason in allSeasons %}
                 <div data-season="{{ currentSeason.id }}" {% if currentSeason.getId != division.season.getId %} class="hide" {% endif %} >
                     <h2 class="subheader"><a href="{{ routeLookup('sportsfixturesSeason.getEntity', {entityId: currentSeason.id}) }}">
+                        {% set seasonName %}
+                            {{ currentSeason.name }} {% if currentSeason.getId == division.season.getId %} (current) {% endif %}
+                        {% endset %}
                         {% if currentSeason.isArchived %}
-                            <del class="icon icon-archive" title="Season has been archived.">{{ currentSeason.name }}</del>
+                            <del class="icon icon-archive" title="Season has been archived.">{{ seasonName }}</del>
                         {% else %}
-                            {{ currentSeason.name }}
+                            {{ seasonName }}
                         {% endif %}
                     </a></h2>
                     <section>
