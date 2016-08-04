@@ -363,13 +363,33 @@ class Controller extends AbstractController
      */
     protected function getForm($entity, $context = null)
     {
+        // For clarity
+        $result = $entity;
+        $match  = $context;
+
+        // If updating existing results
+        if($result->getId()){
+            $match = MatchMapper::getInstance()->findById($result->getMatch()->getId());
+            $result->setMatch($match);
+
+            // Don't permit update of archived results
+            if($match->getSeason()->isArchived()){
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
+            }
+        }
+
+        // Don't permit creation of results for archived matches
+        if(!$result->getId() && $match->getSeason()->isArchived()){
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
+        }
+
         try {
             $team = $this->getTeamMapper()->findById($entity->getTeam()->getId());
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
 
-        $this->getCreateFormForTeam($entity, $team, $context);
+        $this->getCreateFormForTeam($result, $team, $match);
     }
 
     /**

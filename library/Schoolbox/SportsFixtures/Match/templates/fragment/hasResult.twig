@@ -30,7 +30,7 @@
                     </div>
                 </div>
                 <nav>
-                    {% if hasMatchModify %}
+                    {% if hasMatchModify and not match.season.isArchived %}
                     <a href="{{ routeLookup('sportsfixturesResult.deleteEntity', {entityId: teamResult.id}) }}" class="icon-delete" title="Delete" data-delete="{{ match.result[team.id].id }}"></a>
                     <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: teamResult.id}) }}" class="icon-modify" title="Modify"></a>
                     {% endif %}

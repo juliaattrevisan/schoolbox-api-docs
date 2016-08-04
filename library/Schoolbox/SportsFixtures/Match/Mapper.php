@@ -35,6 +35,7 @@ use Schoolbox\Collection;
 /**
  * Class Mapper
  * @method Model createModel()
+ * @method Model findById($identifierValue)
  * @package Schoolbox\SportsFixtures\Match
  */
 class Mapper extends BaseMapper
