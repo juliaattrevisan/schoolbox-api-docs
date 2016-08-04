@@ -352,7 +352,7 @@ class Controller extends BaseController
                 $log->warning("Failed to retrieve user $userId: {$e->getMessage()}", [ $e ]);
             }
         } else {
-            $content['data']['registry'] = MobileApp\RegistryMapper::getInstance()->findAll();
+            $content['data']['registry'] = MobileApp\RegistryMapper::getInstance()->findAll([ 'order' => [ 'user_id' => 'asc' ] ]);
         }
 
         $log->warning("-- END --");
