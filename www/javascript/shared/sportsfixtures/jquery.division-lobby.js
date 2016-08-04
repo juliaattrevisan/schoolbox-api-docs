@@ -297,7 +297,7 @@
          * @param newDivisionLobby
          */
         function updateDivisionLobby(newDivisionLobby) {
-            $('[data-division]').html(newDivisionLobby);
+            $('[data-test-division-player-list]').html($(newDivisionLobby).find('[data-test-division-player-list]').html());
         }
 
         /**
