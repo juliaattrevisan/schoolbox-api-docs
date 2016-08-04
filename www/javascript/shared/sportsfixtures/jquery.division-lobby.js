@@ -345,10 +345,8 @@
 
                 $.post(el.attr('href'), [{name: 'userId[]', value: el.data('addTeamPlayer')}])
                     .done(function(response) {
-
-                        /* TODO: Refresh player list
-                         * $('[data-test-team='+toId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
-                         */
+                        updateTeamMetadata($('[data-test-team='+el.attr('data-affected-team')+']'), response);
+                        updateDivisionLobby(response.divisionLobby);
                     })
                     .done(function() {
                         feedback.labelTimeout({text: 'Added!', css: 'success'});

@@ -38,11 +38,13 @@
                                 {% if currentTeam.team in playerData.teams %}
                                     <a href="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: currentTeam.team.id}) }}"
                                        class="icon-close"
-                                       data-remove-team-player="{{ playerData.player.id }}">Remove Player from {{ currentTeam.team.name }}</a>
+                                       data-remove-team-player="{{ playerData.player.id }}"
+                                       data-affected-team="{{ currentTeam.team.id }}">Remove Player from {{ currentTeam.team.name }}</a>
                                 {% else %}
                                     <a href="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.team.id}) }}"
                                        class="icon-add"
-                                       data-add-team-player="{{ playerData.player.id }}">Add Player to {{ currentTeam.team.name }}</a>
+                                       data-add-team-player="{{ playerData.player.id }}"
+                                       data-affected-team="{{ currentTeam.team.id }}">Add Player to {{ currentTeam.team.name }}</a>
                                 {% endif %}
                             </li>
                         {% endfor %}
