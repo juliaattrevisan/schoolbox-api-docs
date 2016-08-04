@@ -68,6 +68,11 @@ class Controller extends AbstractController
     protected $coachCloud;
 
     /**
+     * @var Helper\Translator
+     */
+    protected $teamTranslator;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -81,6 +86,7 @@ class Controller extends AbstractController
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
         $this->setCoachCloud(new Coach\TagCloud(Coach\Mapper::getInstance(), $this->getUserMapper()));
+        $this->setTeamTranslator(new Helper\Translator());
     }
 
     /**
@@ -262,12 +268,7 @@ class Controller extends AbstractController
                 ->setSequence(0);
         }
         $this->getTeamPlayerMapper()->save($teamUsers);
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
-                'sportsfixturesDivision.getLobby',
-                ['entityId' => $team->getDivision()->getId()]
-            )
-        );
+        $this->renderPostAddPlayersResponse($team);
     }
 
     /**
@@ -287,12 +288,7 @@ class Controller extends AbstractController
             'user_id' => $this->getRequest()->post->get('userId'),
             'team_id' => $team->getId(),
         ]);
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
-                'sportsfixturesDivision.getLobby',
-                ['entityId' => $team->getDivision()->getId()]
-            )
-        );
+        $this->renderPostAddPlayersResponse($team);
     }
 
     /**
@@ -319,12 +315,7 @@ class Controller extends AbstractController
             }
         }
         $this->getTeamPlayerMapper()->save($teamUsers);
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
-                'sportsfixturesDivision.getLobby',
-                ['entityId' => $team->getDivision()->getId()]
-            )
-        );
+        $this->renderPostAddPlayersResponse($team);
     }
 
     /**
@@ -346,6 +337,31 @@ class Controller extends AbstractController
         // Save each coach in the tag cloud too, and add to the team.
         $team->setCoaches($this->getCoachCloud()->saveTagCloud($coaches));
         $this->getTeamMapper()->save($team);
+    }
+
+    /**
+     * Outputs the response from an add player method.
+     *
+     * @param Team $team
+     */
+    protected function renderPostAddPlayersResponse(Team $team)
+    {
+        if ($this->getRequest()->isXhr()) {
+            // Output a XHR data model + HTML output
+            $dataModel = $this->getTeamTranslator()->translateTeam($team);
+            $dataModel['html'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/team.twig', $dataModel)->getAsString();
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput($dataModel)
+            );
+        } else {
+            // Redirect back to lobby
+            $this->getResponse()->redirect->afterPost(
+                $this->getRouter()->generate(
+                    'sportsfixturesDivision.getLobby',
+                    ['entityId' => $team->getDivision()->getId()]
+                )
+            );
+        }
     }
 
     /* Getters/Setters
@@ -492,6 +508,24 @@ class Controller extends AbstractController
     public function setCoachCloud($coachCloud)
     {
         $this->coachCloud = $coachCloud;
+        return $this;
+    }
+
+    /**
+     * @return Helper\Translator
+     */
+    public function getTeamTranslator()
+    {
+        return $this->teamTranslator;
+    }
+
+    /**
+     * @param Helper\Translator $teamTranslator
+     * @return static
+     */
+    public function setTeamTranslator($teamTranslator)
+    {
+        $this->teamTranslator = $teamTranslator;
         return $this;
     }
 }

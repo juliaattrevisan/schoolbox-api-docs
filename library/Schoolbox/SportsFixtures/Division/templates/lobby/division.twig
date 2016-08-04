@@ -1,0 +1,67 @@
+{% if players is not empty %}
+    <section data-division="{{ division.id }}">
+        <ul class="information-list sortable"
+            data-division-player-list="{{ division.id }}"
+            data-add-players-action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {entityId: division.id}) }}"
+            data-remove-players-action="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.id}) }}"
+            data-reorder-players-action="{{ routeLookup('sportsfixturesDivision.postReorderPlayers', {entityId: division.id}) }}">
+            {% for playerData in players %}
+                <li class="actions-small-1" data-player="{{ playerData.player.id }}">
+                    <div class="list-item">
+                        <div class="grip compact"></div>
+                        <div class="small-11 compact card wrap-down">
+                            <a href="/search/user/{{ playerData.player.id }}">
+                                <img src="/portrait.php?userId={{ playerData.player.externalId }}&amp;size=square64" />
+                                <h3>{{ playerData.player.formatName() }}</h3>
+                            </a>
+                            {% for currentTeam in playerData.teams %}
+                                {% if loop.first %}
+                                    <span class="meta">
+                                {% endif %}
+                                {{ currentTeam.name }}{% if not loop.last %}, {% endif %}
+                                {% if loop.last %}
+                                    </span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <nav>
+                        <a href="#" class="icon-more" data-dropdown="sportsfixtures-player-{{ playerData.player.id }}-actions"></a>
+                    </nav>
+                    <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-player-{{ playerData.player.id }}-actions">
+                        {% for currentTeam in teams %}
+                            {% if loop.first %}
+                                <li class="separator">Team Membership</li>
+                            {% endif %}
+                            <li>
+                                {% if currentTeam.team in playerData.teams %}
+                                    <a href="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: currentTeam.team.id}) }}"
+                                       class="icon-close"
+                                       data-remove-team-player="{{ playerData.player.id }}">Remove Player from {{ currentTeam.team.name }}</a>
+                                {% else %}
+                                    <a href="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.team.id}) }}"
+                                       class="icon-add"
+                                       data-add-team-player="{{ playerData.player.id }}">Add Player to {{ currentTeam.team.name }}</a>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                        <li class="separator">Division Membership</li>
+                        <li><a href="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.id}) }}"
+                               class="icon-delete"
+                               data-remove-player="{{ playerData.player.id }}">Remove Player From Division</a></li>
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
+        <span class="label full-width hide" data-relation="save-label"></span>
+    </section>
+{% else %}
+    <div class="empty-state">
+        <i class="icon-group"></i>
+        <p>There are no Players in {{ division.name }}.</p>
+        <p>
+            You may <a href="#" title="Add Players" data-reveal-id="addPlayersModal">add players by name</a>,
+            or <a href="#" title="Upload Player List" data-reveal-id="uploadPlayersModal">upload a list</a>.
+        </p>
+    </div>
+{% endif %}

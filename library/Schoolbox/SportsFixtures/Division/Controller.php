@@ -20,10 +20,11 @@ use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Position\Model as PositionModel;
 use \Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
+use \Schoolbox\SportsFixtures\Team\Model as TeamModel;
 use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use \Schoolbox\SportsFixtures\Team\Position\Model as TeamPositionModel;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
-use Schoolbox\SportsFixtures\Division\Model as Division;
+use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Division\User\Model as DivisionUserModel;
 use \Schoolbox\SportsFixtures\Division\User\Mapper as DivisionUserMapper;
@@ -74,6 +75,16 @@ class Controller extends AbstractController
     protected $teamPositionMapper;
 
     /**
+     * @var Helper\Collector
+     */
+    protected $divisionCollector;
+
+    /**
+     * @var Helper\Translator
+     */
+    protected $divisionTranslator;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
@@ -87,6 +98,8 @@ class Controller extends AbstractController
         $this->setUserMapper(UserMapper::getInstance());
         $this->setTeamPlayerMapper(TeamPlayerMapper::getInstance());
         $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
+        $this->setDivisionCollector(new Helper\Collector());
+        $this->setDivisionTranslator(new Helper\Translator());
     }
 
     /**
@@ -94,7 +107,7 @@ class Controller extends AbstractController
      *  - in the format provided in the request Accepts header
      * If entity is deleted, respond with '210 Gone'
      *
-     * @param Division $entity
+     * @param DivisionModel $entity
      * @throws Exception
      * @return void
      */
@@ -133,8 +146,8 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param Division $entity
-     * @param Sport    $context
+     * @param DivisionModel $entity
+     * @param Sport         $context
      * @return void
      */
     protected function getForm($entity, $context = null)
@@ -172,89 +185,32 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
         }
 
-        // Load players into division
-        // TODO add players into division model as a M2M join
-        /** @var DivisionUserModel[] $players */
-        $players = $this->getDivisionUserMapper()->findByColumn('division_id', $entityId, ['order' => ['sequence' => 'desc']]);
-        foreach ($players as $player) {
-            $division->getPlayers()->add($player->getUser());
-        }
-
-        // Load players into teams, and teams into division
-        // TODO add players into team model as a M2M join
-        try {
-            $teams = $this->getTeamMapper()->findByColumn('division_id', $entityId);
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
-        }
-        $teamPlayers = $this->getTeamPlayerMapper()->findByColumn(
-            'team_id',
-            $teams->getColumnValues('id'),
-            ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]
-        );
-        foreach ($teamPlayers as $teamPlayer) {
-            $teamPlayerTeamId = $teamPlayer->getTeam()->getId();
-            foreach ($teams as $team) {
-                $teamId = $team->getId();
-                if ($teamPlayerTeamId == $teamId) {
-                    $team->getPlayers()->add($teamPlayer->getUser());
-                }
-            }
-        }
-        $division->setTeams($teams);
-
-        // Create file upload zone
-        $zone     = new Zone("uploadZone");
-        $zone->setMimeFilter('text/csv')->setAttachPrompt('upload a list of players');
+        // Add players and teams into the division
+        $division = $this->getDivisionCollector()->collectPlayers($division);
+        $division = $this->getDivisionCollector()->collectTeams($division);
 
         // Create twig-friendly data model
-        $dataModel = [
-            'division'   => $division,
-            'players'    => [],
-            'teams'      => [],
-            'user'       => $this->getUser(),
-            'uploadZone' => $zone,
-        ];
-        foreach ($division->getPlayers() as $player) {
-            $playerDataModel = [
-                'player' => $player,
-                'teams'  => [],
-            ];
-            foreach ($division->getTeams() as $team) {
-                if ($team->isPlayerInTeam($player)) {
-                    $playerDataModel['teams'][] = $team;
-                }
-            }
-            $dataModel['players'][] = $playerDataModel;
+        $dataModel = $this->getDivisionTranslator()->translateDivision($division);
+
+        if ($this->getRequest()->isXhr()) {
+            // Output as XHR data model
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput($dataModel)
+            );
+        } else {
+            // Create file upload zone
+            $zone = new Zone("uploadZone");
+            $zone->setMimeFilter('text/csv')->setAttachPrompt('upload a list of players');
+            $dataModel['user']       = $this->getUser();
+            $dataModel['uploadZone'] = $zone;
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput('@sportsfixturesDivision/lobby.twig', $dataModel)
+            );
         }
-        foreach ($division->getTeams() as $team) {
-            $positions = $this->getTeamPositionMapper()->findByColumn('team_id', $team->getId());
-
-            $playerPosition = [];
-
-            /* Organise positions by player id
-             */
-            foreach ($positions as $currentPosition) {
-                $playerPosition[$currentPosition->getUser()->getId()][] = $currentPosition;
-            }
-
-            $dataModel['teams'][] = [
-                'team'      => $team,
-                'players'   => $team->getPlayers(),
-                'positions' => $playerPosition
-            ];
-        }
-
-        $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
-
-        $this->getResponse()->content->set(
-            $this->buildHtmlOutput('@sportsfixturesDivision/lobby.twig', $dataModel)
-        );
     }
 
     /**
-     * @param Division $entity
+     * @param DivisionModel $entity
      * @return void
      */
     protected function persistEntity($entity)
@@ -276,9 +232,9 @@ class Controller extends AbstractController
     /**
      * Add players to a Division
      *
-     * @param Division $division
+     * @param DivisionModel $division
      */
-    public function postAddPlayers(Division $division)
+    public function postAddPlayers(DivisionModel $division)
     {
         $divisionUsers = [];
         foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
@@ -287,22 +243,16 @@ class Controller extends AbstractController
                 ->setUser($user)
                 ->setSequence(0);
         }
-        $this->getDivisionUserMapper()->save($divisionUsers);
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
-                'sportsfixturesDivision.getLobby',
-                ['entityId' => $division->getId(),]
-            )
-        );
+        $this->renderPostAddPlayersResponse($division);
     }
 
 
     /**
      * Uploads players from a CSV into a Division
      *
-     * @param Division $division
+     * @param DivisionModel $division
      */
-    public function postUploadPlayers(Division $division)
+    public function postUploadPlayers(DivisionModel $division)
     {
         $divisionUsers = [];
 
@@ -343,20 +293,15 @@ class Controller extends AbstractController
 
         // and save
         $this->getDivisionUserMapper()->save($divisionUsers);
-        $this->getResponse()->redirect->afterPost(
-            $this->getRouter()->generate(
-                'sportsfixturesDivision.getLobby',
-                ['entityId' => $division->getId(),]
-            )
-        );
+        $this->renderPostAddPlayersResponse($division);
     }
 
     /**
      * Remove players from a Division
      *
-     * @param Division $division
+     * @param DivisionModel $division
      */
-    public function postRemovePlayers(Division $division)
+    public function postRemovePlayers(DivisionModel $division)
     {
         $this->getDivisionUserMapper()->delete(
             $this->getDivisionUserMapper()->findByColumnList([
@@ -374,9 +319,9 @@ class Controller extends AbstractController
     /**
      * Reorder players within a Division
      *
-     * @param Division $division
+     * @param DivisionModel $division
      */
-    public function postReorderPlayers(Division $division)
+    public function postReorderPlayers(DivisionModel $division)
     {
         $userIds       = $this->getRequest()->post->get('userId');
         $divisionUsers = [];
@@ -485,9 +430,9 @@ class Controller extends AbstractController
      * @param $sport
      * @param $name
      * @param $url
-     * @param Division $division
+     * @param DivisionModel $division
      */
-    private function saveDivision($sport, $name, $url, Division $division)
+    private function saveDivision($sport, $name, $url, DivisionModel $division)
     {
         $division->setName($name);
         $division->setUrl($url);
@@ -495,6 +440,33 @@ class Controller extends AbstractController
         $division->setUpdatedAt(\Alaress_Date_Format::now());
 
         $this->getDivisionMapper()->save($division);
+    }
+
+    /**
+     * Outputs the response from an add player method.
+     *
+     * @param DivisionModel $division
+     */
+    protected function renderPostAddPlayersResponse(DivisionModel $division)
+    {
+        if ($this->getRequest()->isXhr()) {
+            // Output a XHR data model + HTML output
+            $division = $this->getDivisionCollector()->collectPlayers($division);
+            $division = $this->getDivisionCollector()->collectTeams($division);
+            $dataModel = $this->getDivisionTranslator()->translateDivision($division);
+            $dataModel['html'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/division.twig', $dataModel)->getAsString();
+            $this->getResponse()->content->set(
+                $this->buildJsonOutput($dataModel)
+            );
+        } else {
+            // Redirect back to lobby
+            $this->getResponse()->redirect->afterPost(
+                $this->getRouter()->generate(
+                    'sportsfixturesDivision.getLobby',
+                    ['entityId' => $division->getId(),]
+                )
+            );
+        }
     }
 
     /* Getters/Setters
@@ -650,5 +622,42 @@ class Controller extends AbstractController
     {
         $this->teamPositionMapper = $teamPositionMapper;
         return $this;
-    }    
+    }
+
+    /**
+     * @return Helper\Collector
+     */
+    public function getDivisionCollector()
+    {
+        return $this->divisionCollector;
+    }
+
+    /**
+     * @param Helper\Collector $divisionCollector
+     * @return static
+     */
+    public function setDivisionCollector($divisionCollector)
+    {
+        $this->divisionCollector = $divisionCollector;
+        return $this;
+    }
+
+    /**
+     * @return Helper\Translator
+     */
+    public function getDivisionTranslator()
+    {
+        return $this->divisionTranslator;
+    }
+
+    /**
+     * @param Helper\Translator $divisionTranslator
+     * @return static
+     */
+    public function setDivisionTranslator($divisionTranslator)
+    {
+        $this->divisionTranslator = $divisionTranslator;
+        return $this;
+    }
+
 }
