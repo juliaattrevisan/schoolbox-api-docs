@@ -83,14 +83,21 @@ class Calendar_Api_EventType_Timetable_Room extends Calendar_Api_EventType_Abstr
                             $timetableCode
                         );
                     } catch (Schoolbox\Mapper\Exception $e) {
+                        trigger_error(
+                            sprintf('Campus code "%s" does not exist - no timetabled classes will be displayed', $timetableCode),
+                            E_USER_WARNING
+                        );
                         $campusList[$timetableCode] = null;
                     }
                 }
-                $campus   = null;
-                $campusId = null;
+
+                // Only load timetabled classes for rooms which are in a campus that exists.
+                // Without a known campus I can't figure out what day to apply the room timetable to.
                 if ($campusList[$timetableCode] instanceof Schoolbox\Campus) {
                     $campus   = $campusList[$timetableCode];
                     $campusId = $campusList[$timetableCode]->getId();
+                } else {
+                    continue;
                 }
 
                 // Cache lookups for external timetable
