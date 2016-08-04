@@ -10,9 +10,18 @@
 namespace Schoolbox\MobileApp;
 
 
+use PDOStatement;
+use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\UserMapper;
 
+/**
+ * Class RegistryMapper
+ *
+ * @package Schoolbox\MobileApp
+ * @method Collection|Registry[] findAll($options = [])
+ * @method Registry hydrate(array $row, $alias = '', $callback = null)
+ */
 class RegistryMapper extends Mapper
 {
 
@@ -50,5 +59,54 @@ class RegistryMapper extends Mapper
             'provider'  => $provider,
         ));
     }
+
+
+    /**
+     * Return the first part of the string required to select from this mapper
+     *
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT {$this->getColumnString()},
+            {$this->getJoinColumnString('user_id', 'u')}
+        ";
+    }
+
+
+    /**
+     * It seems we're going down this road...
+     * To prevent cataclysmic backward-incompatibility, in the core, the FROM is absorbed into the SELECT... for now...
+     *
+     * @return string
+     */
+    protected function getFromString()
+    {
+        return "
+            FROM {$this->table}
+            LEFT JOIN {$this->getJoinSql('user_id', '', 'u', true)}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        $c = new Collection();
+
+        while ($r = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $reg = $this->hydrate($r);
+            $reg->setUser($this->hydrateJoin($r, 'user_id', 'u'));
+
+            $c->add($reg);
+        }
+
+        return $c;
+    }
+
 
 }

@@ -1,7 +1,16 @@
+<style type="text/css">
+    .tkn {
+        max-width: 500px;
+        display: block;
+        overflow-x: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
 <div class="row">
     <div class="small-12 island">
         <h1>Push Notifications</h1>
-        <h2 class="subheader">{% if userId %}Attempting push to user {{ userId }}{% else %}Configuration Result{% endif %}</h2>
+        <h2 class="subheader">{% if user.id %}Attempting push to {{ user.formatName }} (user {{ user.id }}){% else %}Configuration Result{% endif %}</h2>
         <section class="content">
             <ul class="no-margin">
                 {% for line in logs %}
@@ -9,5 +18,30 @@
                 {% endfor %}
             </ul>
         </section>
+        {% if registry %}
+            <h2 class="subheader">Applications Registered</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>User</th>
+                    <th>App Token</th>
+                    <th>Device</th>
+                    <th>Created</th>
+                    <th>Last Used</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for reg in registry %}
+                    <tr>
+                        <td><a href="{{ routeLookup('adminMessages.testPush', { userId: reg.user.id }) }}">{{ reg.user.formatName }}</a></td>
+                        <td><span class="tkn" title="{{ reg.token }}">{{ reg.token }}</span></td>
+                        <td><span class="tkn" title="{{ reg.deviceId }}">{{ reg.deviceId }}</span> ({{ reg.provider }})</td>
+                        <td title="{{ reg.createdAt.database }}">{{ reg.createdAt.local }}</td>
+                        <td title="{{ reg.touchedAt.database }}">{{ reg.touchedAt.local }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
     </div>
 </div>
