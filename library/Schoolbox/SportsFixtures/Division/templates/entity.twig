@@ -31,6 +31,11 @@
                     <dt>Season</dt>
                     <dd>{{ division.season.name }}</dd>
 
+                    {% if division.season.isArchived %}
+                        <dt>Season Archived at</dt>
+                        <dd>{{ division.season.archivedAt.database }}</dd>
+                    {% endif %}
+
                     <dt>Url</dt>
                     <dd>{{ division.url }}</dd>
 

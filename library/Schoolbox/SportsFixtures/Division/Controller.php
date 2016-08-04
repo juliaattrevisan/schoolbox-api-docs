@@ -144,18 +144,9 @@ class Controller extends AbstractController
                 ]
             ]);
 
-            $nonArchivedDivisions = new Collection();
-
-            // Filter out divisions belonging to archived season
-            foreach($allDivisions as $division){
-                if(!$division->getSeason()->isArchived()){
-                    $nonArchivedDivisions->add($division);
-                }
-            }
-
             $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesDivision/list.twig', [
                 'sport'        => $context,
-                'allDivisions' => $nonArchivedDivisions
+                'allDivisions' => $allDivisions
             ]));
         }
         catch (MapperException $e) {
