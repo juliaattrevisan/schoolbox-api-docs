@@ -152,21 +152,16 @@
                                     console.log('DB: adding ' + player.data('player') + ' to ' + to.data('addPlayersAction'));
                                 }
 
-                                /* Refresh Player List for this team
-                                 * Refresh Player Count for this team
-                                 */
-                                var teamContainer = $('[data-test-team='+toId+']');
-                                teamContainer.find('[data-test-team-player-list]').html($(response.html));
-                                teamContainer.find('[data-player-count]').text(teamContainer.find('[data-player]').length);
-                            })
-                            .done(function() {
-
                                 /* If dragged onto a proxy element, remove the player drag helper
                                  * after team list is respawned
                                  */
                                 if (isTeamPlayerListProxy(to)) {
                                     removeProxyHelperClone(to);
                                 }
+
+                                updateTeamMetadata($('[data-test-team='+toId+']'), response);
+                            })
+                            .done(function() {
 
                                 /* Activate indicators
                                  */
@@ -219,20 +214,17 @@
                                     console.log('DB: adding ' + player.data('player') + ' to ' + to.data('addPlayersAction'));
                                 }
 
-                                /* TODO: Refresh player list
-                                 * TODO: Reapply position selector
-                                 */
-                                $('[data-test-team='+fromId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
-                                $('[data-test-team='+toId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
-                            })
-                            .done(function() {
-
                                 /* If dragged onto a proxy element, remove the player drag helper
                                  * after team list is respawned
                                  */
                                 if (isTeamPlayerListProxy(to)) {
                                     removeProxyHelperClone(to);
                                 }
+
+                                updateTeamMetadata($('[data-test-team='+fromId+']'), fromTeamConfiguration);
+                                updateTeamMetadata($('[data-test-team='+toId+']'), toTeamConfiguration);
+                            })
+                            .done(function() {
 
                                 /* Activate indicators
                                  */
@@ -276,10 +268,7 @@
                                     console.log('DB: removing ' + player.data('player') + ' from ' + from.data('removePlayersAction'));
                                 }
 
-                                /* TODO: Refresh player list
-                                 * TODO: Reapply position selector
-                                 */
-                                $('[data-test-team='+fromId+']').find('[data-test-team-player-list]').html('<li>Refresh with contents from db</li>');
+                                updateTeamMetadata($('[data-test-team='+fromId+']'), response);
                             })
                             .done(function() {
 
@@ -294,6 +283,15 @@
                     }
                 }
             });
+        }
+
+        /**
+         * Updates the Team's new player list
+         * Updates the Team's player count
+         */
+        function updateTeamMetadata(teamContainer, response) {
+            teamContainer.find('[data-test-team-player-list]').html($(response.html));
+            teamContainer.find('[data-player-count]').text(teamContainer.find('[data-player]').length);
         }
 
         /**
