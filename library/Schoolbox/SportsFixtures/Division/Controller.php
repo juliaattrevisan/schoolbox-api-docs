@@ -175,9 +175,9 @@ class Controller extends AbstractController
         }
         $entity->setSport($context);
 
-        // Block edit of divisions belonging to archived seasons
+        // Do not permit modification of divisions belonging to archived seasons
         if($entity->getId() && $entity->getSeason()->isArchived()){
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesDivision/create.twig', [

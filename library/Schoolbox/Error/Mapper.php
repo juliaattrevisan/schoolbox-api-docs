@@ -150,6 +150,8 @@ class Mapper extends BaseMapper
     const ERROR_SPORTSFIXTURES_STATUS_NOT_FOUND = 179;
     const ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND = 181;
 
+    const ERROR_SPORTSFIXTURES_SEASON_ARCHIVED = 182;
+
     const ERROR_GENERIC_NOT_FOUND = 180;
 
     public function mapping()

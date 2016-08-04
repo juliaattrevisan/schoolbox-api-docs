@@ -144,7 +144,7 @@ class Controller extends AbstractController
     {
         // Don't permit edit of archived season
         if($entity->getId() && $entity->isArchived()){
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
         }
 
         $data = [

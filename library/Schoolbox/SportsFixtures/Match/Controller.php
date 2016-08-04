@@ -109,7 +109,7 @@ class Controller extends AbstractController
 
         // Don't display divisions attached to archived seasons
         if($division->getSeason()->isArchived()){
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
         }
 
         /** @var MatchMapper $mapper */
@@ -186,14 +186,14 @@ class Controller extends AbstractController
 
         // Case 1: division season is archived or deleted
         if($division->getSeason()->isArchived()){
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
         }
 
         // Case 2: division season is extant, but match season is archived
         // In this case, we would still show the match in the list view, but it would be greyed out
         // with no modify link to indicate you should not get here.
         if($match->getSeason()->isArchived()){
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_MATCH_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
         }
 
         // Case 3: division and match seasons are extant

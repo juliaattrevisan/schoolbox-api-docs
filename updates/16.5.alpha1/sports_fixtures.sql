@@ -221,7 +221,8 @@ INSERT INTO `error` VALUES
 		(178, 'The requested position could not be found.'),
 		(179, 'The requested status could not be found.'),
 		(180, 'That which you are looking for could not be found.'),
-		(181, 'The requested season could not be found.');;
+		(181, 'The requested season could not be found.'),
+		(182, 'The requested item has been archived.');
 
 /** Team players table **/
 CREATE TABLE `sportsfixtures_team_user` (
