@@ -84,7 +84,7 @@
 </div>
 
 {% if not hasResult %}
-    {% if hasMatchModify %}
+    {% if hasMatchModify and not match.season.isArchived %}
     <div class="row">
         <div class="small-12 columns">
             {% include '@sportsfixturesMatch/fragment/noResult.twig' %}
