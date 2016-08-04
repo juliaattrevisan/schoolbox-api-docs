@@ -414,14 +414,6 @@ foreach ($categoryList as $category) {
     $this->setBlock('subjectTpl', 'subject_grade', 'subject_grade_block');
 //    $this->setBlock('subjectTpl', 'icon', 'icon_block');
 
-    if(!$restrict_grades){
-        $this->parse('subject_name_link_block', 'subject_name_link');
-        $this->setVar('subject_name_no_link_block', '');
-    } else {
-        $this->parse('subject_name_no_link_block', 'subject_name_no_link');
-        $this->setVar('subject_name_link_block', '');
-    }
-
     $output = array(
         'SUBJ_CAT_ID'       => $categoryID,
         'SUBJ_SUBJECT_NAME' => Scrub::Text($category['name']),
@@ -436,6 +428,14 @@ foreach ($categoryList as $category) {
         'DARK'              => ++$j % 2 ? '' : 'dark'
     );
     $this->setVar($output);
+
+    if(!$restrict_grades){
+        $this->parse('subject_name_link_block', 'subject_name_link');
+        $this->setVar('subject_name_no_link_block', '');
+    } else {
+        $this->parse('subject_name_no_link_block', 'subject_name_no_link');
+        $this->setVar('subject_name_link_block', '');
+    }
 
     if ($gradeAvg == -1) {
         $this->setVar('subject_grade_block', '');
