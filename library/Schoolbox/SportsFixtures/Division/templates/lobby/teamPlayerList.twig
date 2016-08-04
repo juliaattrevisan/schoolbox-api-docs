@@ -28,7 +28,8 @@
             <a href="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: team.id}) }}"
                class="icon-close"
                title="Remove Player from {{ team.name }}"
-               data-remove-team-player="{{ teamPlayer.id }}"></a>
+               data-remove-team-player="{{ teamPlayer.id }}"
+               data-affected-team="{{ team.id }}"></a>
         </nav>
     </li>
 {% endfor %}
