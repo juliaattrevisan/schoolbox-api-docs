@@ -77,7 +77,6 @@ class Translator
             $dataModel['teams'][] = $this->getTeamTranslator()->translateTeam($team);
 
         }
-        $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
 
         /* A list of assigned ids
          */

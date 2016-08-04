@@ -160,6 +160,7 @@
                                 }
 
                                 updateTeamMetadata($('[data-test-team='+toId+']'), response);
+                                updateDivisionLobby(response.divisionLobby);
                             })
                             .done(function() {
 
@@ -223,6 +224,7 @@
 
                                 updateTeamMetadata($('[data-test-team='+fromId+']'), fromTeamConfiguration);
                                 updateTeamMetadata($('[data-test-team='+toId+']'), toTeamConfiguration);
+                                updateDivisionLobby(toTeamConfiguration.divisionLobby);
                             })
                             .done(function() {
 
@@ -269,6 +271,7 @@
                                 }
 
                                 updateTeamMetadata($('[data-test-team='+fromId+']'), response);
+                                updateDivisionLobby(response.divisionLobby);
                             })
                             .done(function() {
 
@@ -283,6 +286,18 @@
                     }
                 }
             });
+        }
+
+        /**
+         * Replaces existing division lobby with new one
+         *
+         * This occurs every time a player moves into,
+         * between, or out of a team
+         *
+         * @param newDivisionLobby
+         */
+        function updateDivisionLobby(newDivisionLobby) {
+            $('[data-division]').html(newDivisionLobby);
         }
 
         /**

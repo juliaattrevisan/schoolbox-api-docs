@@ -191,6 +191,7 @@ class Controller extends AbstractController
 
         // Create twig-friendly data model
         $dataModel = $this->getDivisionTranslator()->translateDivision($division);
+        $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
 
         if ($this->getRequest()->isXhr()) {
             // Output as XHR data model
@@ -454,6 +455,8 @@ class Controller extends AbstractController
             $division = $this->getDivisionCollector()->collectPlayers($division);
             $division = $this->getDivisionCollector()->collectTeams($division);
             $dataModel = $this->getDivisionTranslator()->translateDivision($division);
+
+            $dataModel['positions'] = $this->getPositionMapper()->findByColumn('sport_id', $division->getSport()->getId());
             $dataModel['html'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/division.twig', $dataModel)->getAsString();
             $this->getResponse()->content->set(
                 $this->buildJsonOutput($dataModel)
