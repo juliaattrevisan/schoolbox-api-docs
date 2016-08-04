@@ -17,6 +17,8 @@ use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Collection;
 use Schoolbox\UserMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+
 
 class Unit {
 
@@ -147,10 +149,14 @@ class Unit {
                             if ($currentUser['maxMark'] > 0) {
                                 $normalised = 100 * $currentUser['totalMarks']/$currentUser['maxMark'];
 
-                                $allValues[$currentTask->getTask()->getId()]->add(array(
-                                    'user' => $this->getUserMapper()->findById($currentUser['user_id']),
-                                    'value' => $normalised
-                                ));
+                                try {
+                                    $allValues[$currentTask->getTask()->getId()]->add(array(
+                                        'user' => $this->getUserMapper()->findById($currentUser['user_id']),
+                                        'value' => $normalised
+                                    ));
+                                } catch (MapperException $e) {
+                                    //no user found, noop
+                                }
                             }
                         }
                     }
