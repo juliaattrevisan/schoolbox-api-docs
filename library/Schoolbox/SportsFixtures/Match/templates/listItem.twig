@@ -11,7 +11,7 @@
                 {% endif %}
             {% else %}
                 {% if currentMatch.name %}
-                    <p><del class="icon icon-archive" title="This match's season is archived.">{{ currentMatch.name }}</del></p>
+                    <p><del class="icon icon-archive" title="Division season is extant, but match's season is archived.">{{ currentMatch.name }}</del></p>
                     <p class="meta">{{ matchHeading.generateWithResultLink(currentMatch) }}</p>
                 {% else %}
                     <p>{{ matchHeading.generateWithResultLink(currentMatch) }}</p>
