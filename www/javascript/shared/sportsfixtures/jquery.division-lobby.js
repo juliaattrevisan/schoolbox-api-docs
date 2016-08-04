@@ -152,10 +152,14 @@
                                     console.log('DB: adding ' + player.data('player') + ' to ' + to.data('addPlayersAction'));
                                 }
 
-                                /* TODO: Refresh player list
-                                 * TODO: Reapply position selector
+                                /* TODO: Reapply position selector
                                  */
-                                $('[data-test-team='+toId+']').find('[data-test-team-player-list]').html($(response.html));
+                                /* Refresh Player List for this team
+                                 * Refresh Player Count for this team
+                                 */
+                                var teamContainer = $('[data-test-team='+toId+']');
+                                teamContainer.find('[data-test-team-player-list]').html($(response.html));
+                                teamContainer.find('[data-player-count]').text(teamContainer.find('[data-player]').length);
                             })
                             .done(function() {
 
