@@ -11,7 +11,7 @@ if (!isset($this)) {
     SitePage::localRedir('/timetable/');
 }
 
-//synergy not enabled do not display page
+// If External_DB not enabled do not display page
 if (!Cfg::get('external_enable')) {
     error(19);
 }
@@ -246,7 +246,7 @@ foreach ($userList as $user) {
                                         'PERIOD_CODE'   => '(' . Scrub::Text($class['code']) . ')',
                                         'PERIOD_ROOM'   => Scrub::Text($class['room']),
                                         'PERIOD_STAFF'  => Scrub::Text($period_staff),
-                                        'PERIOD_COLOUR' => '#' . Scrub::text($subjectColourMap[$class['code']]),
+                                        'PERIOD_COLOUR' => Scrub::text($subjectColourMap[$class['code']]),
                                     );
 
                                     /* Lookup subject code and check permissions, if read access provide a link to the user */

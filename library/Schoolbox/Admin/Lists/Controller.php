@@ -147,7 +147,6 @@ class Controller extends Base
     /**
      * Show options
      *
-     * @param string $tab
      * @param string $table
      */
     public function getIndex($table)
