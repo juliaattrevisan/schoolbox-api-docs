@@ -199,10 +199,10 @@ class Group extends DeprecatedModel
     function getAllByType($type)
     {
         $query = "SELECT name, id, userAccess.type accessType
-				  FROM (category, userGroups )
+				  FROM (folder, userGroups )
 				  LEFT JOIN userAccess ON cid = sid AND service = " . HOMEPAGE_SERVICE . " AND uid = '" . $_SESSION['id'] . "'
 				  WHERE cid = id
-				  AND category.deleted_at IS NULL
+				  AND folder.deleted_at IS NULL
 				  AND userGroups.type = '$type'";
         return $this->db->getAll($query);
     }
@@ -228,9 +228,9 @@ class Group extends DeprecatedModel
     {
         $query = "
             SELECT name, id
-            FROM category, userGroups
+            FROM folder, userGroups
             WHERE cid = id
-            AND category.deleted_at IS NULL
+            AND folder.deleted_at IS NULL
             ORDER BY name
         ";
         return $this->db->getAll($query);
@@ -637,12 +637,12 @@ class Group extends DeprecatedModel
     function involvedInGroup($uid, $cid)
     {
         //returns true on user being involved in group
-        $query = "SELECT userAccess.type FROM userAccess, category
+        $query = "SELECT userAccess.type FROM userAccess, folder
 			WHERE userAccess.service = '" . $this->_service . "'
 			AND userAccess.uid = '$uid'
-			AND userAccess.sid = category.id
-			AND category.deleted_at IS NULL
-			AND category.id = '$cid'";
+			AND userAccess.sid = folder.id
+			AND folder.deleted_at IS NULL
+			AND folder.id = '$cid'";
         return $this->db->getOne($query);
     }
 
@@ -751,21 +751,21 @@ class Group extends DeprecatedModel
             }
         }
         $exclude_part = !empty($excluded_id_list)
-            ? ('AND category.id NOT IN (' . implode(',', $excluded_id_list) . ')')
+            ? ('AND folder.id NOT IN (' . implode(',', $excluded_id_list) . ')')
             : '';
         $query = "
 			SELECT
-			category.name, category.id, type,
+			folder.name, folder.id, type,
 			GROUP_CONCAT(cc.code) as code
-			FROM userAccess, category LEFT JOIN categoryCode cc ON category.id = categoryID AND cc.deleted_at IS NULL
+			FROM userAccess, folder LEFT JOIN folder_code cc ON folder.id = cc.folder_id AND cc.deleted_at IS NULL
 			WHERE userAccess.uid = '$userID'
-			AND userAccess.sid = category.id
+			AND userAccess.sid = folder.id
 			AND userAccess.service = '" . $this->_service . "'
 			AND userAccess.type >= '$accessType'
-			AND category.deleted_at IS NULL
+			AND folder.deleted_at IS NULL
 			$exclude_part
-			GROUP BY category.id
-			ORDER BY category.name
+			GROUP BY folder.id
+			ORDER BY folder.name
 		";
 
         $this->db->query($query);
@@ -788,7 +788,7 @@ class Group extends DeprecatedModel
         if (is_array($subjects)) {
             foreach ($subjects as $subject) {
                 //convert code to id and get name
-                $query = "SELECT name, id, cc.code FROM category JOIN categoryCode cc ON id = categoryID WHERE cc.code = '" . $subject['code'] . "'";
+                $query = "SELECT name, id, cc.code FROM folder JOIN folder_code cc ON id = cc.folder_id WHERE cc.code = '" . $subject['code'] . "'";
                 if (is_array($catTmp = $this->db->getRow($query))) {
                     $catList[] = $catTmp;
                 }
@@ -796,14 +796,14 @@ class Group extends DeprecatedModel
         }
 
         //get list of groups involved in
-        $query = "SELECT category.name, category.id, type, GROUP_CONCAT(cc.code) as code
-        FROM userAccess, category
-        LEFT JOIN categoryCode cc ON category.id = categoryID AND cc.deleted_at IS NULL
-		WHERE userAccess.uid = '$id' AND userAccess.sid = category.id AND userAccess.service = '" . $this->_service . "'
+        $query = "SELECT folder.name, folder.id, type, GROUP_CONCAT(cc.code) as code
+        FROM userAccess, folder
+        LEFT JOIN folder_code cc ON folder.id = cc.folder_id AND cc.deleted_at IS NULL
+		WHERE userAccess.uid = '$id' AND userAccess.sid = folder.id AND userAccess.service = '" . $this->_service . "'
 		AND userAccess.type >= '$accessType'
-		AND category.deleted_at IS NULL
-		GROUP BY category.id
-		ORDER BY category.name";
+		AND folder.deleted_at IS NULL
+		GROUP BY folder.id
+		ORDER BY folder.name";
 
         $this->db->query($query);
         while ($result = $this->db->getNextArray()) {

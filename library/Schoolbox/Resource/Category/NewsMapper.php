@@ -74,7 +74,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 			'column'     => 'code',
 			'property'   => 'category',
 			'type'       => self::TYPE_MODEL,
-			'join'       => 'category'
+			'join'       => 'folder'
 		));
 
 		$this->hasMap(array(
@@ -90,7 +90,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 			'other_key' => 'id'
 		));
 
-		$this->hasJoin('category', array(
+		$this->hasJoin('folder', array(
 			'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
 			'this_key'  => 'code',
 			'other_key' => 'id'
@@ -136,12 +136,13 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 			SELECT
 				{$this->getColumnString('n')},
 				{$this->getJoinMapper('owner')->getColumnString('u')},
-				{$this->getJoinMapper('category')->getColumnString('c')},
+				{$this->getJoinMapper('folder')->getColumnString('c')},
+				{$this->getJoinMapper('foldercart')->getColumnString('c')},
 				MATCH(`heading`,`body`) AGAINST (:keyword) AS `score`
 			FROM
 				`{$this->getTable()}` `n`
 				LEFT JOIN {$this->getJoinSql('owner',      'n', 'u')}
-				INNER JOIN {$this->getJoinSql('category',   'n', 'c')}
+				INNER JOIN {$this->getJoinSql('folder',   'n', 'c')}
 				LEFT JOIN {$this->getJoinSql('perms',      'n', 'p')}
 					AND p.gid = :role_id
 					AND p.type > :min_access
@@ -175,7 +176,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 			$collection->add(
 				$this->hydrate($r, 'n')
 					->setOwner($this->hydrateJoin($r,'owner','u'))
-					->setCategory($this->hydrateJoin($r, 'category', 'c'))
+					->setCategory($this->hydrateJoin($r, 'folder', 'c'))
 			);
 		}
 
@@ -198,11 +199,11 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 		$stmt = $this->database->prepare("
 			SELECT
 				{$this->getColumnString('n')},
-				{$this->getJoinColumnString('category', 'c')},
+				{$this->getJoinColumnString('folder', 'c')},
 				{$this->getJoinColumnString('owner', 'u')}
 			FROM
 				`{$this->getTable()}` `n`
-				INNER JOIN {$this->getJoinSql('category', 'n', 'c')}
+				INNER JOIN {$this->getJoinSql('folder', 'n', 'c')}
 				LEFT JOIN {$this->getJoinSql('owner', 'n', 'u')}
 			WHERE
 				`n`.`deleted` = FALSE
@@ -222,7 +223,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 			/** @var News $news */
 			$news = $this->hydrate($r, 'n');
 			$news->setOwner($this->hydrateJoin($r, 'owner', 'u'));
-			$news->setCategory($this->hydrateJoin($r, 'category', 'c'));
+			$news->setCategory($this->hydrateJoin($r, 'folder', 'c'));
 			$c->add($news);
 		}
 		return $c;
@@ -237,11 +238,11 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 		$stmt = $this->database->prepare("
 			SELECT
 				{$this->getColumnString('n')},
-				{$this->getJoinColumnString('category', 'c')},
+				{$this->getJoinColumnString('folder', 'c')},
 				{$this->getJoinColumnString('owner', 'u')}
 			FROM
 				`{$this->getTable()}` `n`
-				INNER JOIN {$this->getJoinSql('category', 'n', 'c')}
+				INNER JOIN {$this->getJoinSql('folder', 'n', 'c')}
 				LEFT JOIN {$this->getJoinSql('owner', 'n', 'u')}
 			WHERE
 				`n`.`deleted` = FALSE
@@ -257,7 +258,7 @@ class NewsMapper extends Mapper implements Searchable, FeedableMapperInterface {
 		/** @var News $news */
 		$news = $this->hydrate($r, 'n');
 		$news->setOwner($this->hydrateJoin($r, 'owner', 'u'));
-		$news->setCategory($this->hydrateJoin($r, 'category', 'c'));
+		$news->setCategory($this->hydrateJoin($r, 'folder', 'c'));
 
 		return $news;
 	}

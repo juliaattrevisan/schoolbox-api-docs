@@ -91,7 +91,7 @@ class Feed {
 				  LEFT JOIN allowedFileExtension afe ON s.ext = afe.extension
 				  LEFT JOIN allowedFileTypes af ON afe.extension = af.fileTypeID
 				  LEFT JOIN user u ON u.id = f.owner
-				  LEFT JOIN category c ON c.id = f.category
+				  LEFT JOIN folder c ON c.id = f.category
 				  WHERE f.category $where AND f.hidden = 0 AND f.deleted_at IS NULL
 				  ORDER BY f.submitted DESC LIMIT 0, $limit";
 
@@ -137,7 +137,7 @@ class Feed {
         $query = "SELECT l.id, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, UNIX_TIMESTAMP(l.submitted) submitted, description as name, url, c.name as cat_name, c.id as cat_id
 				  FROM link l
 				  LEFT JOIN user u ON u.id = l.owner
-				  LEFT JOIN category c ON c.id = l.category
+				  LEFT JOIN folder c ON c.id = l.category
 				  WHERE category $where AND l.hidden = 0
 				  ORDER BY l.submitted DESC LIMIT 0, $limit";
 
@@ -197,7 +197,7 @@ class Feed {
               user.id AS uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
           FROM assess
           LEFT JOIN user ON assess.user_id = user.id
-          LEFT JOIN category c ON c.id = assess.category_id
+          LEFT JOIN folder c ON c.id = assess.category_id
           WHERE assess.category_id $where
           AND assess.start < NOW()
           AND assess.deleted_at IS NULL
@@ -251,7 +251,7 @@ class Feed {
               user.id AS uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
           FROM assess
           LEFT JOIN user ON assess.user_id = user.id
-          LEFT JOIN category c ON c.id = assess.category_id
+          LEFT JOIN folder c ON c.id = assess.category_id
           WHERE assess.category_id $where
           AND assess.start < NOW()
           AND assess.deleted_at IS NULL
@@ -301,7 +301,7 @@ class Feed {
         $query = "SELECT sn.id, heading, UNIX_TIMESTAMP(datetime_posted) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
 					FROM subject_news sn
 					JOIN user u ON owner = u.id
-					LEFT JOIN category c ON c.id = sn.code
+					LEFT JOIN folder c ON c.id = sn.code
 					WHERE sn.code $where AND deleted = 0
 					ORDER BY datetime_posted DESC LIMIT 0, $limit";
 
@@ -337,9 +337,9 @@ class Feed {
 
         $query = "SELECT c.id, c.name, UNIX_TIMESTAMP(time) submitted, action, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, pc.name as cat_name, pc.id as cat_id
 					FROM cmsLog
-					JOIN category c ON objectId = c.id
+					JOIN folder c ON objectId = c.id
 					JOIN user u ON user = u.id
-					JOIN category pc ON pc.id = c.parent
+					JOIN folder pc ON pc.id = c.parent
 					WHERE c.parent $where AND object = 'folder' AND action = 'create'
 					ORDER BY time DESC LIMIT 0, $limit";
         
@@ -378,7 +378,7 @@ class Feed {
         $query = "SELECT f.threadID, f.title as heading,  UNIX_TIMESTAMP(`date`) submitted, u.firstname, u.lastname, u.title, u.id as uid, synergy_id as external_id, c.name as cat_name, c.id as cat_id
 					FROM forumThread f
                     JOIN user u ON u.id = f.userID
-                    LEFT JOIN category c ON c.id = f.categoryID
+                    LEFT JOIN folder c ON c.id = f.categoryID
 					WHERE f.deleted = 'false' AND f.categoryID $where
 					ORDER BY `date` DESC LIMIT 0, $limit";
 
@@ -429,7 +429,7 @@ class Feed {
 					FROM wikiRevision r
 						JOIN wiki w ON w.wikiID = r.wikiID
 						JOIN user u ON u.id = r.userID
-						LEFT JOIN category c ON c.id = w.categoryID
+						LEFT JOIN folder c ON c.id = w.categoryID
 				  	WHERE w.deleted = 'false' AND w.categoryID $where
 					ORDER BY r.created DESC LIMIT 0, $limit";
 
@@ -477,7 +477,7 @@ class Feed {
 			FROM user u
 			JOIN blog b
 			ON u.id = b.owner_id
-			LEFT JOIN category c ON c.id = folder_id
+			LEFT JOIN folder c ON c.id = folder_id
 			WHERE folder_id $where
 			AND b.deleted_at IS NULL
 			ORDER BY submitted LIMIT 0, $limit";
@@ -527,7 +527,7 @@ class Feed {
 			FROM `user` u
 			JOIN blog_comment bc ON u.id = bc.owner_id
 			JOIN blog b ON bc.blog_id = b.id
-			LEFT JOIN category c ON c.id = folder_id
+			LEFT JOIN folder c ON c.id = folder_id
 			WHERE folder_id $where
 			AND b.deleted_at IS NULL
 			ORDER BY submitted LIMIT 0, $limit";

@@ -66,7 +66,7 @@ class Mapper extends Folder\Mapper
 
         return "
             FROM $c
-            LEFT JOIN category course ON $c.parent = course.id
+            LEFT JOIN folder AS course ON $c.parent = course.id
             RIGHT JOIN component_instance ci ON ci.identifier = $c.id AND ci.module = :module
             LEFT JOIN component_definition cd ON ci.component_definition_id = cd.id
             LEFT JOIN {$this->getJoinSql('task', '', 't')}

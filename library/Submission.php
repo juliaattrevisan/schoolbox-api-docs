@@ -71,8 +71,8 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
               s.*, GROUP_CONCAT(cc.code) `code`, c.name AS categoryName, c.id AS cid, '' AS comment, ft.name typeName,
               smt.slug mark_type_slug
             FROM submission_box s
-            JOIN category c ON s.category = c.id
-            LEFT JOIN categoryCode cc ON cc.categoryID = c.id AND cc.deleted_at IS NULL
+            JOIN folder c ON s.category = c.id
+            LEFT JOIN folder_code cc ON cc.folder_id = c.id AND cc.deleted_at IS NULL
             LEFT JOIN lu_submission_type ft ON s.type = ft.id
             LEFT JOIN submission_mark_type smt ON s.mark_type = smt.mark_type_id
             WHERE $field $conditional
@@ -237,7 +237,7 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
                     submission_box.category catid,
                     submission_box.mark_visibility
                 FROM submission_box
-                JOIN category ON submission_box.category = category.id AND category.deleted_at IS NULL
+                JOIN folder ON submission_box.category = folder.id AND folder.deleted_at IS NULL
                 WHERE submission_box.owner = '$userID'
                 AND submission_box.deleted = '0'
                 AND submission_box.task_id IS NULL
@@ -253,7 +253,7 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
                     assess.category_id AS catid,
                     assess.mark_visibility
                 FROM assess
-                JOIN category ON assess.category_id = category.id AND  category.deleted_at IS NULL
+                JOIN folder ON assess.category_id = folder.id AND  folder.deleted_at IS NULL
                 WHERE assess.deleted_at IS NULL
                 AND assess.task_id IS NULL
                 AND assess.availability = 'assess'
@@ -290,8 +290,8 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
                             '' AS availability
                         FROM student_submission ss
                         LEFT JOIN submission_box sb ON ss.box_id = sb.id
-                        LEFT JOIN category c ON c.id = sb.category
-                        LEFT JOIN categoryCode co ON co.categoryID = c.id AND co.deleted_at IS NULL
+                        LEFT JOIN folder c ON c.id = sb.category
+                        LEFT JOIN folder_code co ON co.folder_id = c.id AND co.deleted_at IS NULL
                         WHERE sb.owner = '$userID'
                         AND sb.deleted = '0'
                         AND (DATE_SUB(NOW(), INTERVAL {$threshold} MONTH) <= submitted)
@@ -312,8 +312,8 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
                             a.availability
                         FROM assess_attempt aa
                         LEFT JOIN assess a ON a.assess_id = aa.assess_id
-                        LEFT JOIN category c ON c.id = a.category_id
-                        LEFT JOIN categoryCode co ON co.categoryID = c.id AND co.deleted_at IS NULL
+                        LEFT JOIN folder c ON c.id = a.category_id
+                        LEFT JOIN folder_code co ON co.folder_id = c.id AND co.deleted_at IS NULL
                         WHERE a.availability = 'assess'
                         AND aa.finish != '0000-00-00 00:00'
                         AND a.user_id = '$userID'
@@ -470,18 +470,18 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
             $parts[]  = "(DATE(ss.submitted) BETWEEN $fromDate AND $toDate OR DATE(sr.returned) BETWEEN $fromDate AND $toDate)";
         }
         $wherePart = implode(' AND ', $parts);
-        $sql       = "SELECT category.name, category.id, GROUP_CONCAT(cc.code) AS `code`
-                FROM category
-                LEFT JOIN categoryCode cc ON category.id = categoryID AND cc.deleted_at IS NULL
-                WHERE category.id IN (
+        $sql       = "SELECT folder.name, folder.id, GROUP_CONCAT(cc.code) AS `code`
+                FROM folder
+                LEFT JOIN folder_code cc ON folder.id = cc.folder_id AND cc.deleted_at IS NULL
+                WHERE folder.id IN (
                     SELECT DISTINCT sb.category
                     FROM submission_box sb
                     LEFT JOIN student_submission ss ON ss.`box_id` = sb.`id`
                     LEFT JOIN submission_return sr ON sb.id = sr.`box_id`
                     WHERE $wherePart
                 )
-                GROUP BY category.id
-                ORDER BY category.name";
+                GROUP BY folder.id
+                ORDER BY folder.name";
 
         return $this->db->getAll($sql);
 
@@ -540,7 +540,7 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
               c.`name` subj_name, c.id subj_id, sb.accept_submission submittable, sb.multi_submission multi_submit, COUNT(ss.id) submit_count
             FROM submission_box sb
             LEFT JOIN lu_submission_type ft ON ft.id = sb.type
-            LEFT JOIN category c ON c.`id` = sb.`category`
+            LEFT JOIN folder c ON c.`id` = sb.`category`
             LEFT JOIN student_submission ss ON sb.id = ss.box_id AND ss.owner = '$studentID' AND ss.draft IS FALSE
             LEFT JOIN submission_return sr ON sb.id = sr.box_id AND sr.owner = '$studentID'
             WHERE c.id $conditional AND sb.deleted IS FALSE
@@ -562,7 +562,7 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
               c.`name` subj_name, c.id subj_id, a.max_attempts, COUNT(aa.attempt_id) attempt_count
             FROM assess a
             LEFT JOIN lu_submission_type ft ON ft.id = a.`type`
-            LEFT JOIN category c ON c.`id` = a.`category_id`
+            LEFT JOIN folder c ON c.`id` = a.`category_id`
             LEFT JOIN assess_attempt aa ON a.`assess_id` = aa.`assess_id` AND aa.user_id = '$studentID'
             WHERE c.id $conditional
             AND a.availability = 'assess'

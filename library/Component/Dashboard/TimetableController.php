@@ -7,6 +7,9 @@
  * @link        http://www.alaress.com.au
  *
  */
+
+use Schoolbox\Mapper\Exception as MapperException;
+
 class Component_Dashboard_TimetableController extends Component_Dashboard_ControllerAbstract
 {
     private $externalTimetable;
@@ -31,13 +34,12 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     protected $templateFile = 'timetable';
 
-    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Group $group, Category $category, External_Timetable $externalTimetable)
+    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Group $group, External_Timetable $externalTimetable)
     {
         parent::__construct($instance, $user, $sitepage);
 
         $this->externalTimetable = $externalTimetable;
         $this->group = $group;
-        $this->category = $category;
     }
 
     /**
@@ -216,8 +218,13 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                                 $this->setVar('PERIOD_COLOUR', '#' . Scrub::text($subjectColourMap[$class['code']]));
 
-                                $cat     = $this->category->getByCode($class['code']);
-                                $hasLink = $cat['id'] && $this->group->getPermission($cat['id']) >= READ_ACCESS;
+                                try {
+                                    $folder = $this->getFolderMapper()->findByCode($class['code']);
+                                    $hasLink = $this->group->getPermission($folder->getId()) >= READ_ACCESS;
+                                }
+                                catch (MapperException $e) {
+                                    $hasLink = false;
+                                }
 
                                 // Link to Attendance Records
                                 if (strlen($class['code'])

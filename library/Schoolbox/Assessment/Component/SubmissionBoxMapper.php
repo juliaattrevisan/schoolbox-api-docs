@@ -392,18 +392,18 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         }
         $wherePart = implode(' AND ', $parts);
         $query     = "
-			SELECT category.id, category.name, GROUP_CONCAT(cc.code) AS code
-			FROM category
-			LEFT JOIN categoryCode cc ON category.id = cc.categoryID AND cc.deleted_at IS NULL
-			WHERE category.id IN (
+			SELECT folder.id, folder.name, GROUP_CONCAT(cc.code) AS code
+			FROM folder
+			LEFT JOIN folder_code cc ON folder.id = cc.folder_id AND cc.deleted_at IS NULL
+			WHERE folder.id IN (
 				SELECT DISTINCT sb.category
 				FROM submission_box sb
 				LEFT JOIN student_submission ss ON ss.box_id = sb.id
 				LEFT JOIN submission_return  sr ON sr.box_id = sb.id
 				WHERE $wherePart
 			)
-			GROUP BY category.id
-			ORDER BY category.name";
+			GROUP BY folder.id
+			ORDER BY folder.name";
 
         $statement = $this->database->prepare($query);
         $statement->execute($params);
@@ -460,7 +460,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
 			b.mark_visibility,
 			b.created, s.submitted, r.returned
 			FROM submission_box b
-			LEFT JOIN category c ON c.id = b.category
+			LEFT JOIN folder c ON c.id = b.category
 			LEFT JOIN student_submission s ON s.box_id = b.id AND (s.owner = :user_id OR s.owner IS NULL)
 			LEFT JOIN submission_return  r ON r.box_id = b.id AND (r.owner = :user_id OR r.owner IS NULL)
 			LEFT JOIN lu_submission_type f ON b.type = f.id
