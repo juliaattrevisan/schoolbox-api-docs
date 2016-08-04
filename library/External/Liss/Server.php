@@ -104,6 +104,9 @@ class External_Liss_Server {
 			'liss.getRooms' => array(
 				'function' => 'External_Liss_Server::getRooms'
 			),
+			'liss.getHello' => array(
+				'function' => 'External_Liss_Server::getRooms'
+			),
 			'liss.publishStudents' => array(
 				'function' => 'External_Liss_Server::publishStudents',
 			),
@@ -172,8 +175,8 @@ class External_Liss_Server {
 				$struct = $currentData->me['struct'];
 
 				try {
-					$user = $userMapper->findByExternalId((string)$struct['StudentId']->me['string']);
-					$class = $classEntryMapper->findOneByColumn('code', (string)$struct['ClassCode']->me['string']);
+					$user = $userMapper->findByExternalId(trim((string)$struct['StudentId']->me['string']));
+					$class = $classEntryMapper->findOneByColumn('code', trim((string)$struct['ClassCode']->me['string']));
 
 					$classInvolvement = new \Schoolbox\External\ClassInvolvement();
 					$classInvolvement->setClass($class);
@@ -187,6 +190,7 @@ class External_Liss_Server {
 
 			return new xmlrpcresp(new xmlrpcval('Class Memberships imported', 'string'));
 		}
+		return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
 	}
 
 	/**
@@ -267,6 +271,7 @@ class External_Liss_Server {
 
 			return new xmlrpcresp(new xmlrpcval('Teachers Imported', 'string'));
 		}
+		return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
 	}
 
 	/**
@@ -343,6 +348,7 @@ class External_Liss_Server {
 
 			return new xmlrpcresp(new xmlrpcval('Students Imported', 'string'));
 		}
+		return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
 	}
 
 	/**
@@ -369,7 +375,7 @@ class External_Liss_Server {
 
 				$classEntry = new \Schoolbox\External\ClassEntry();
 				$classEntry->setName((string)$struct['CourseName']->me['string']);
-				$classEntry->setCode((string)$struct['ClassCode']->me['string']);
+				$classEntry->setCode(trim((string)$struct['ClassCode']->me['string']));
 				$classEntry->setDescription('');
 
 				$classEntryMapper->save($classEntry);
@@ -377,6 +383,7 @@ class External_Liss_Server {
 
 			return new xmlrpcresp(new xmlrpcval('Classes Imported', 'string'));
 		}
+		return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
 	}
 
 	/**
@@ -400,7 +407,7 @@ class External_Liss_Server {
 
 			/* TODO: Default user for testing
 			 */
-			$defaultUser = $userMapper->findById(19);
+			$defaultUser = $userMapper->findById(1); // changed to alaress user for testing
 
 			$allData = $message->params[1]->me['array'];
 
@@ -416,7 +423,7 @@ class External_Liss_Server {
 
 				/* Find the Class
 				 */
-				$allClasses = $classEntryMapper->findByColumn('code', $struct['ClassCode']->me['string']);
+				$allClasses = $classEntryMapper->findByColumn('code', trim($struct['ClassCode']->me['string']));
 
 				/* Find the Teacher
 				 */
@@ -450,6 +457,7 @@ class External_Liss_Server {
 
 			return new xmlrpcresp(new xmlrpcval('Timetable Imported', 'string'));
 		}
+		return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
 	}
 
 	/**
@@ -513,5 +521,6 @@ class External_Liss_Server {
 
 			return new xmlrpcresp(new xmlrpcval('BellTimes Imported', 'string'));
 		}
+		return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
 	}
 }
