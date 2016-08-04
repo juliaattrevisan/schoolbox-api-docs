@@ -241,18 +241,12 @@ foreach ($userList as $user) {
                                         }
                                     } // staff, or external_db is disabled
 
-                                    // Support both prepended (v16) and non-prepended (v15.6) storage styles
-                                    // TODO: A SQL script is scheduled for 16.0.7 which should ensure all records
-                                    // TODO:  have a prepended # char. Therefore post 16.0.7 this can be simplified.
-                                    $periodColour = '#' . Scrub::text($subjectColourMap[$class['code']]);
-                                    $periodColour = str_replace('##','#',$periodColour);
-
                                     $outputPeriod = array(
                                         'PERIOD_DESC'   => Scrub::Text($class['description']),
                                         'PERIOD_CODE'   => '(' . Scrub::Text($class['code']) . ')',
                                         'PERIOD_ROOM'   => Scrub::Text($class['room']),
                                         'PERIOD_STAFF'  => Scrub::Text($period_staff),
-                                        'PERIOD_COLOUR' => $periodColour,
+                                        'PERIOD_COLOUR' => Scrub::text($subjectColourMap[$class['code']]),
                                     );
 
                                     /* Lookup subject code and check permissions, if read access provide a link to the user */
