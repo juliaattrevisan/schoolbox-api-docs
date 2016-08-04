@@ -28,10 +28,10 @@ ENGINE = InnoDB;
 
 CREATE TABLE `course_unit` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `component_id` INT UNSIGNED NOT NULL,
+  `folder_id` INT UNSIGNED NOT NULL,
   `course_id` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `component_id_UNIQUE` (`component_id` ASC),
+  UNIQUE INDEX `folder_id_UNIQUE` (`folder_id` ASC),
   INDEX `fk_course_unit_course_id_idx` (`course_id` ASC),
   CONSTRAINT `fk_course_unit_course_id`
     FOREIGN KEY (`course_id`)
