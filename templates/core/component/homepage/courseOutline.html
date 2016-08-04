@@ -32,12 +32,8 @@
                     form.find('input[name=url]').val('').prop('readonly', type == 'attach');
 
                     if (type == 'url') {
-                        // tell the attacher to clear any attachments by simulating clicking of all the (one...) delete buttons
-                        // not jQuery.detach() - it can't trigger dropzone's event listener
-                        form.find('.post-attachment.attach').find('p.actions a.delete').each(function() {
-                            var event = new CustomEvent('click');
-                            this.dispatchEvent(event);
-                        });
+                        // tell the attacher to clear any attachments
+                        form.find('.attachzone').data('plugin_resourceAttach').dropzone.removeAllFiles();
                     }
 
                 });

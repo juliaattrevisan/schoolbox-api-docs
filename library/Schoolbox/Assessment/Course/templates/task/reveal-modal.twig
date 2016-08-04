@@ -30,10 +30,7 @@ $data = {
          * Clears all the attachments out of the form.
          */
         var clearAttachments = function() {
-            form.find('[data-attachment="attach"]').find('[data-dz-remove]').each(function() {
-                var event = new CustomEvent('click');
-                this.dispatchEvent(event);
-            });
+            form.find('.attachzone').data('plugin_resourceAttach').dropzone.removeAllFiles();
         };
 
         {# Task editor - prevent empty inputs -#}
