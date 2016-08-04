@@ -46,11 +46,14 @@
                         </div>
                     </div>
                     <nav>
-                        <a href="{{ routeLookup('sportsfixturesSport.deleteEntity', {entityId: currentSport.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentSport.id }}"></a>
                         <a href="{{ routeLookup('sportsfixturesSport.getModifyForm', {entityId: currentSport.id}) }}" class="icon-modify" title="Modify"></a>
                         <a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: currentSport.id}) }}" class="icon-division" title="Manage Divisions in {{ currentSport.name }}"></a>
                         <a href="{{ routeLookup('sportsfixturesPosition.getList', {contextId: currentSport.id}) }}" class="icon-position" title="Manage Positions in {{ currentSport.name }}"></a>
+                        <a href="#" class="icon-more" data-dropdown="sportsfixtures-sport-{{ currentSport.getId() }}-actions"></a>
                     </nav>
+                    <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-sport-{{ currentSport.getId() }}-actions">
+                        <li><a href="#" data-action="delete" data-post-action="{{ routeLookup('sportsfixturesSport.deleteEntity', {entityId: currentSport.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentSport.id }}">Delete</a></li>
+                    </ul>
                 </li>
                 {% endfor %}
             </ul>
