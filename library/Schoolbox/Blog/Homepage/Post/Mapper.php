@@ -102,7 +102,7 @@ class Mapper extends BaseMapper implements Searchable, FeedableMapperInterface
         $sortDirection = 'DESC'
     ) {
 
-        $sortBy = isset($this->map[$sortProperty]) ? $this->map[$sortProperty]['field'] : $this->identifier['field'];
+        $sortBy = isset($this->map[$sortProperty]) ? $this->map[$sortProperty]['field'] : $this->getIdentifierColumn();
         $sortDir = strtoupper($sortDirection) == 'DESC' ? 'DESC' : 'ASC';
 
         $offset = (int)$offset;

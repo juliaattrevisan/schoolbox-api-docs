@@ -475,7 +475,7 @@ abstract class Mapper implements IMapper, Serializable
             // Load all parents of $collection in one query
             $parents = [];
             foreach ($this->loadAncestors(
-                $this->findByColumn($this->getIdentifier()['column'], $parentIds),
+                $this->findByColumn($this->getIdentifierColumn(), $parentIds),
                 $parentField,
                 $currentDepth+1
             ) as $parent) {
@@ -558,8 +558,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getGetIdentifierMethodName()
     {
-        $identifier = $this->getIdentifier();
-        return $this->getGetMethodName($identifier['property']);
+        return $this->getGetMethodName($this->getIdentifierProperty());
     }
 
     /**
@@ -569,8 +568,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function getSetIdentifierMethodName()
     {
-        $identifier = $this->getIdentifier();
-        return $this->getSetMethodName($identifier['property']);
+        return $this->getSetMethodName($this->getIdentifierProperty());
     }
 
     /**
@@ -758,7 +756,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     protected function joinsVia($viaTable, $foreignMapper, $foreignKey, $viaForeign, $viaLocal, $localKey = null, $hydrator = null, $options = null, $property = null)
     {
-        if (!$localKey && !$this->identifier) {
+        if (!$localKey && !$this->hasIdentifier()) {
             throw new Exception("No identifier specified, either provide one or declare a primary key first");
         }
         $type = $hydrator ?: self::TYPE_COLLECTION;
@@ -768,7 +766,7 @@ abstract class Mapper implements IMapper, Serializable
         $map['join'] = $viaTable;
         $map['join_def'] = [
             'mapper'    => $foreignMapper,
-            'this_key'  => $localKey ?: $this->identifier['column'],
+            'this_key'  => $localKey ?: $this->getIdentifierColumn(),
             'other_key' => $foreignKey,
             'multi'     => [
                 'via_table'  => $viaTable,
@@ -846,7 +844,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         if (isset($map['identifier'])) {
-            $this->identifier = $map;
+            $this->setIdentifier($map);
         }
 
         $this->map->setOffset($map['property'], $map);
@@ -964,8 +962,8 @@ abstract class Mapper implements IMapper, Serializable
             $collection,
             $this->soft_delete_column,
             $this->soft_delete_deleted_value,
-            'preSoftDelete',
-            'postSoftDelete'
+            self::CALLBACK_PRESOFTDELETE,
+            self::CALLBACK_POSTSOFTDELETE
         );
         if ($success) {
             // raise delete notification
@@ -985,8 +983,8 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function hardDelete($object)
     {
-        $identifierName     = $this->identifier['column'];
-        $identifierProperty = $this->identifier['property'];
+        $identifierName     = $this->getIdentifierColumn();
+        $identifierProperty = $this->getIdentifierProperty();
         $collection         = $this->getModelAsCollection($object);
         $statement          = $this->database->prepare(
             "
@@ -995,7 +993,7 @@ abstract class Mapper implements IMapper, Serializable
 		"
         );
         foreach ($collection as $model) {
-            if (!($this->triggerCallbacks('preDelete', $model))) {
+            if (!($this->triggerCallbacks(self::CALLBACK_PREDELETE, $model))) {
                 return false;
             }
         }
@@ -1014,7 +1012,7 @@ abstract class Mapper implements IMapper, Serializable
         }
         $this->database->commit();
         foreach ($collection as $model) {
-            $this->triggerCallbacks('postDelete', $model);
+            $this->triggerCallbacks(self::CALLBACK_POSTDELETE, $model);
         }
         // raise delete notification
         foreach ($collection as $model) {
@@ -1051,15 +1049,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function deleteByColumnList($columnList, $options = array())
     {
-        // as an OH&S measure, the column list MUST NOT be empty (and thus match all records)
-        if (empty($columnList)) {
-            return 0;
-        }
-        $resultset = $this->findByColumnList($columnList, $options);
-        if ($this->delete($resultset)) {
-            return count($resultset);
-        }
-        return 0;
+        return $this->executeDelete($this->getDeleteString(), new PredicateBuilder($this->getDatabase(), $this->getTable()), $columnList);
     }
 
 
@@ -1079,6 +1069,13 @@ abstract class Mapper implements IMapper, Serializable
             return 0;
         }
 
+        // Don't re-delete already deleted rows
+        $postCallback = self::CALLBACK_POSTDELETE;
+        if (isset($this->soft_delete_column)) {
+            $postCallback = self::CALLBACK_POSTSOFTDELETE;
+            $columnList[$this->soft_delete_column] = $this->soft_delete_undeleted_value;
+        }
+
         try {
             // Build WHERE part
             $predicate->addColumnList($columnList);
@@ -1087,11 +1084,24 @@ abstract class Mapper implements IMapper, Serializable
             return 0;
         }
 
+        // Call pre-delete hooks
+        $deletedItems = $this->findByColumnList($columnList);
+        foreach ($deletedItems as $model) {
+            if (!($this->triggerCallbacks(self::CALLBACK_PREDELETE, $model))) {
+                return 0;
+            }
+        }
+
         // build query
         $query = $deleteString . ' WHERE ' . implode(' AND ', $predicate->getWhere());
 
         // execute with predicate params
         $statement = $this->getDatabase()->query($query, $predicate->getParams());
+
+        // Call post-delete hooks
+        foreach ($deletedItems as $model) {
+            $this->triggerCallbacks($postCallback, $model);
+        }
 
         // return the number of rows deleted
         return $statement->rowCount();
@@ -1134,7 +1144,6 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function updateAll($object, $field, $value, $pre_trigger = null, $post_trigger = null)
     {
-        $identifier = $this->getIdentifier();
         $collection = $this->getModelAsCollection($object);
         //
         // Trigger the pre-trigger, if there is one.
@@ -1161,7 +1170,7 @@ abstract class Mapper implements IMapper, Serializable
             if (isset($property_map)) {
                 $this->setModelProperty($model, $property_map['property'], $value);
             }
-            $id_values[] = $this->getModelProperty($model, $identifier['property']);
+            $id_values[] = $this->getModelProperty($model, $this->getIdentifierProperty());
         }
         if (empty($id_values)) {
             return false;
@@ -1171,7 +1180,7 @@ abstract class Mapper implements IMapper, Serializable
         $query     = "
 			UPDATE `{$this->getTable()}`
 			SET `$field` = :value
-			WHERE `{$identifier['column']}` IN {$this->getArrayPlaceholders($id_values, 'id')}
+			WHERE `{$this->getIdentifierColumn()}` IN {$this->getArrayPlaceholders($id_values, 'id')}
 		";
         $statement = $this->database->prepare($query);
         $statement->bindValue('value', $value);
@@ -1234,6 +1243,49 @@ abstract class Mapper implements IMapper, Serializable
     }
 
     /**
+     * Retrieves identifier property name.
+     *
+     * @return string
+     */
+    public function getIdentifierProperty()
+    {
+        return $this->getIdentifier()['property'];
+    }
+
+    /**
+     * Retrieves identifier column name.
+     *
+     * @return string
+     */
+    public function getIdentifierColumn()
+    {
+        return $this->getIdentifier()['column'];
+    }
+
+    /**
+     * Sets identifier for this mapper.
+     *
+     * @param array
+     * @return $this
+     */
+    protected function setIdentifier($identifier)
+    {
+        $this->identifier = $identifier;
+        return $this;
+    }
+
+    /**
+     * Does this mapper have an identifier? If it doesn't, that makes updates
+     * and deletes problematic.
+     *
+     * @return bool
+     */
+    public function hasIdentifier()
+    {
+        return !empty($this->getIdentifier());
+    }
+
+    /**
      * TODO: PDO Array support for using WHERE IN
      *
      * @deprecated findByColumn/findByColumnList now have array support
@@ -1276,7 +1328,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function findById($identifierValue)
     {
-        return $this->findOneByColumn($this->identifier['column'], $identifierValue);
+        return $this->findOneByColumn($this->getIdentifierColumn(), $identifierValue);
     }
 
     /**
@@ -1607,7 +1659,7 @@ abstract class Mapper implements IMapper, Serializable
      */
     public function isUnique($columnList, $currentId)
     {
-        $query = $this->selectScalarByColumnList($this->getTable() . '.' . $this->getIdentifier()['column'], $columnList);
+        $query = $this->selectScalarByColumnList($this->getTable() . '.' . $this->getIdentifierColumn(), $columnList);
         $query->execute();
         while (($dupeId = $query->fetchColumn()) !== false) {
             if ($currentId == $dupeId) {
@@ -1683,7 +1735,7 @@ abstract class Mapper implements IMapper, Serializable
     public function findIdsByColumnList(array $columnList, array $options = [])
     {
         try {
-            $stmt = $this->selectScalarByColumnList('DISTINCT ' . $this->getTable() . '.' . $this->getIdentifier()['column'], $columnList, $options);
+            $stmt = $this->selectScalarByColumnList('DISTINCT ' . $this->getTable() . '.' . $this->getIdentifierColumn(), $columnList, $options);
         } catch (UnderflowException $e) {
             return [];
         }
@@ -1806,8 +1858,10 @@ abstract class Mapper implements IMapper, Serializable
     public function create($object)
     {
         $collection = $this->getModelAsCollection($object);
-        foreach ($collection as $model) {
-            $this->setModelProperty($model, $this->identifier['property'], null);
+        if ($this->hasIdentifier()) {
+            foreach ($collection as $model) {
+                $this->setModelProperty($model, $this->getIdentifierProperty(), null);
+            }
         }
         return $this->save($collection);
     }
@@ -1844,17 +1898,17 @@ abstract class Mapper implements IMapper, Serializable
                 return false;
             }
         }
-        $identifier      = $this->getIdentifier();
-        $id_property     = $identifier['property'];
+        $id_property     = $this->getIdentifierProperty();
+        $id_column       = $this->getIdentifierColumn();
         $existingObjects = array();
-        if (isset($identifier['column'])) {
+        if (isset($id_column)) {
             // retrieve the objects as they currently exist so we can perform a diff if we need to
             $collectionIds = array();
             // retrieve the IDs in a dehydrating fashion, in case they're models
             foreach ($collection as $object) {
                 $collectionIds[] = $this->getModelProperty($object, $id_property);
             }
-            foreach ($this->findByColumn($identifier['column'], $collectionIds, ['deleted' => true]) as $obj) {
+            foreach ($this->findByColumn($id_column, $collectionIds, ['deleted' => true]) as $obj) {
                 // index by ID
                 $existingObjects[$this->getModelProperty($obj, $id_property)] = $obj;
             }
@@ -1922,7 +1976,7 @@ abstract class Mapper implements IMapper, Serializable
                             if ($value instanceof $otherModelExample) {
                                 $otherKey = $otherMapper->getModelProperty(
                                     $value,
-                                    $otherMapper->getIdentifier()['property']
+                                    $this->getIdentifierProperty()
                                 );
                             } else {
                                 $otherKey = $value;
@@ -2327,7 +2381,7 @@ abstract class Mapper implements IMapper, Serializable
         }
 
         if ($idValue) {
-            $this->setModelProperty($model, $this->identifier['property'], $idValue);
+            $this->setModelProperty($model, $this->getIdentifierProperty(), $idValue);
         }
 
         return $model;
@@ -2607,7 +2661,7 @@ abstract class Mapper implements IMapper, Serializable
             }
         } else {
             // retrieve current DB version
-            $objectB = $this->findById($this->getModelProperty($objectA, $this->identifier['property']));
+            $objectB = $this->findById($this->getModelProperty($objectA, $this->getIdentifierProperty()));
         }
 
         $diff = array();
