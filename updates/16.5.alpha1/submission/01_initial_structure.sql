@@ -44,8 +44,9 @@ CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ;
 
 CREATE TABLE `project` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(250) NOT NULL,
+  `title` VARCHAR(250) NOT NULL,
   `description` TEXT NULL,
+  `weight` INT(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
@@ -54,10 +55,13 @@ COLLATE = utf8_general_ci;
 
 CREATE TABLE `assessment` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(250) NOT NULL,
   `project_id` INT UNSIGNED NOT NULL,
+  `title` VARCHAR(250) NOT NULL,
+  `description` TEXT NULL,
   `publish_date` DATETIME NULL,
+  `open_date` DATETIME NULL,
   `due_date` DATETIME NULL,
+  `weight` INT(11) NOT NULL DEFAULT 0,
   `sequence` TINYINT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_asessment_project_id_idx` (`project_id` ASC),
