@@ -58,14 +58,15 @@ INSERT INTO `sportsfixtures_sport` (`name`, `url`, `created_at`, `updated_at`) V
 INSERT INTO `sportsfixtures_sport` (`name`, `url`, `created_at`, `updated_at`) VALUES ('Tiddlywinks Everything Empty', 'https://www.youtube.com/watch?v=09TSwVSl3ZM', NOW(), NOW());
 
 /* Add some seasons */
-INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES ('Summer 2015', '2015-01-01', '2015-06-30', '2016-01-01 00:00:00', NOW(), NOW());
-INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES ('Winter 2015', '2015-07-01', '2015-12-31', '2016-01-01 00:00:00', NOW(), NOW());
-INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES ('Summer 2016', '2016-01-01', '2016-06-30', NULL, NOW(), NOW());
-INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES ('Winter 2016', '2016-07-01', '2016-12-31', NULL, NOW(), NOW());
-INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES ('Summer 2017', '2017-01-01', '2017-06-30', NULL, NOW(), NOW());
-INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES ('Winter 2017', '2017-07-01', '2017-12-31', NULL, NOW(), NOW());
-INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES ('Winter 2017 (1st half)', '2017-07-01', '2017-09-30', NULL, NOW(), NOW());
-INSERT INTO `sportsfixtures_season` (`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES ('Winter 2017 (2nd half)', '2017-10-01', '2017-12-31', NULL, NOW(), NOW());
+INSERT INTO `sportsfixtures_season` (`id`,`name`, `start`, `end`, `archived_at`, `created_at`, `updated_at`) VALUES
+  (1,'Summer 2015',            '2015-01-01', '2015-06-30', '2016-01-01 00:00:00', NOW(), NOW()),
+  (2,'Winter 2015',            '2015-07-01', '2015-12-31', '2016-01-01 00:00:00', NOW(), NOW()),
+  (3,'Summer 2016',            '2016-01-01', '2016-06-30', NULL,                  NOW(), NOW()),
+  (4,'Winter 2016',            '2016-07-01', '2016-12-31', NULL,                  NOW(), NOW()),
+  (5,'Summer 2017',            '2017-01-01', '2017-06-30', NULL,                  NOW(), NOW()),
+  (6,'Winter 2017',            '2017-07-01', '2017-12-31', NULL,                  NOW(), NOW()),
+  (7,'Winter 2017 (1st half)', '2017-07-01', '2017-09-30', NULL,                  NOW(), NOW()),
+  (8,'Winter 2017 (2nd half)', '2017-10-01', '2017-12-31', NULL,                  NOW(), NOW());
 
 
 /* Add some Venues
@@ -117,44 +118,49 @@ INSERT INTO `sportsfixtures_team` (`division_id`, `name`, `url`, `created_at`, `
 
 /* Two Teams for Soccer Year 8
  */
-INSERT INTO `sportsfixtures_team` (`division_id`, `name`, `url`, `created_at`, `updated_at`) VALUES ('3', '8A', 'http://8a-soccer.alaress.com.au', NOW(), NOW());
-INSERT INTO `sportsfixtures_team` (`division_id`, `name`, `url`, `created_at`, `updated_at`) VALUES ('3', '8B', 'http://8b-soccer.alaress.com.au', NOW(), NOW());
+INSERT INTO `sportsfixtures_team` (`division_id`, `name`, `url`, `created_at`, `updated_at`) VALUES
+  ('3', '8A', 'http://8a-soccer.alaress.com.au', NOW(), NOW()),
+  ('3', '8B', 'http://8b-soccer.alaress.com.au', NOW(), NOW());
 
 
 
 
 /* All Positions for AFL
  */
-INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `updated_at`) VALUES ('2', 'Centre Half-Forward', NOW(), NOW());
-INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `updated_at`) VALUES ('2', 'Half-Forward', NOW(), NOW());
-INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `updated_at`) VALUES ('2', 'Forward Pocket', NOW(), NOW());
-INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `updated_at`) VALUES ('2', 'Full Forward', NOW(), NOW());
-INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `updated_at`) VALUES ('2', 'Ruck', NOW(), NOW());
-INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `updated_at`) VALUES ('2', 'Centre', NOW(), NOW());
-INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `updated_at`) VALUES ('2', 'Ruck-Rover', NOW(), NOW());
-INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `updated_at`) VALUES ('2', 'Rover', NOW(), NOW());
-INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `updated_at`) VALUES ('2', 'Wing', NOW(), NOW());
-INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `updated_at`) VALUES ('2', 'Centre Half-Back', NOW(), NOW());
-INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `updated_at`) VALUES ('2', 'Half-Back', NOW(), NOW());
-INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `updated_at`) VALUES ('2', 'Back Pocket', NOW(), NOW());
-INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `updated_at`) VALUES ('2', 'Full Back', NOW(), NOW());
+INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `updated_at`) VALUES
+  ('2', 'Centre Half-Forward', NOW(), NOW()),
+  ('2', 'Half-Forward',        NOW(), NOW()),
+  ('2', 'Forward Pocket',      NOW(), NOW()),
+  ('2', 'Full Forward',        NOW(), NOW()),
+  ('2', 'Ruck',                NOW(), NOW()),
+  ('2', 'Centre',              NOW(), NOW()),
+  ('2', 'Ruck-Rover',          NOW(), NOW()),
+  ('2', 'Rover',               NOW(), NOW()),
+  ('2', 'Wing',                NOW(), NOW()),
+  ('2', 'Centre Half-Back',    NOW(), NOW()),
+  ('2', 'Half-Back',           NOW(), NOW()),
+  ('2', 'Back Pocket',         NOW(), NOW()),
+  ('2', 'Full Back',           NOW(), NOW());
 
 /* Two Divisions for AFL
  */
-INSERT INTO `sportsfixtures_division` (`sport_id`, `season_id`, `name`, `created_at`, `updated_at`) VALUES ('2', 2, 'Open', NOW(), NOW());
-INSERT INTO `sportsfixtures_division` (`sport_id`, `season_id`, `name`, `created_at`, `updated_at`) VALUES ('2', 2, 'Year 9', NOW(), NOW());
+INSERT INTO `sportsfixtures_division` (`sport_id`, `season_id`, `name`, `created_at`, `updated_at`) VALUES
+  ('2', 4, 'Open',   NOW(), NOW()),
+  ('2', 5, 'Year 9', NOW(), NOW());
 
 /* Two Teams for AFL Open
  */
-INSERT INTO `sportsfixtures_team` (`division_id`, `name`, `url`, `created_at`, `updated_at`) VALUES ('4', 'First XVIII', 'http://1st-afl.alaress.com.au', NOW(), NOW());
-INSERT INTO `sportsfixtures_team` (`division_id`, `name`, `url`, `created_at`, `updated_at`) VALUES ('4', 'Second XVIII', 'http://2nd-afl.alaress.com.au', NOW(), NOW());
+INSERT INTO `sportsfixtures_team` (`division_id`, `name`, `url`, `created_at`, `updated_at`) VALUES
+  ('4', 'First XVIII',  'http://1st-afl.alaress.com.au', NOW(), NOW()),
+  ('4', 'Second XVIII', 'http://2nd-afl.alaress.com.au', NOW(), NOW());
 
 /* Four Teams for AFL Year 9
  */
-INSERT INTO `sportsfixtures_team` (`division_id`, `name`, `url`, `created_at`, `updated_at`) VALUES ('5', '9A', 'http://9a-afl.alaress.com.au', NOW(), NOW());
-INSERT INTO `sportsfixtures_team` (`division_id`, `name`, `url`, `created_at`, `updated_at`) VALUES ('5', '9B', 'http://9b-afl.alaress.com.au', NOW(), NOW());
-INSERT INTO `sportsfixtures_team` (`division_id`, `name`, `url`, `created_at`, `updated_at`) VALUES ('5', '9C', 'http://9c-afl.alaress.com.au', NOW(), NOW());
-INSERT INTO `sportsfixtures_team` (`division_id`, `name`, `url`, `created_at`, `updated_at`) VALUES ('5', '9D', 'http://9d-afl.alaress.com.au', NOW(), NOW());
+INSERT INTO `sportsfixtures_team` (`division_id`, `name`, `url`, `created_at`, `updated_at`) VALUES
+  ('5', '9A', 'http://9a-afl.alaress.com.au', NOW(), NOW()),
+  ('5', '9B', 'http://9b-afl.alaress.com.au', NOW(), NOW()),
+  ('5', '9C', 'http://9c-afl.alaress.com.au', NOW(), NOW()),
+  ('5', '9D', 'http://9d-afl.alaress.com.au', NOW(), NOW());
 
 /* Demo assignations: Lobby
  */
@@ -167,7 +173,15 @@ INSERT INTO `sportsfixtures_team_position`(`id`,`team_id`,`user_id`,`position_id
 
 /* Matches
  */
-INSERT INTO `sportsfixtures_match`(`id`,`division_id`, `season_id`, `venue_id`,`home_team_id`,`away_team_id`,`home_school_id`,`away_school_id`,`name`,`start_at`,`created_at`,`updated_at`,`deleted_at`) VALUES (1,4,2,6,8,9,NULL,NULL,'First Match Ever','2016-07-08 11:00:00','2016-07-07 19:57:35','2016-07-07 19:57:35',NULL),(2,4,2,3,8,NULL,NULL,2,'Grand Final','2016-07-30 16:00:00','2016-07-07 20:06:41','2016-07-07 20:06:41',NULL);
+INSERT INTO `sportsfixtures_match`(`id`,`division_id`, `season_id`, `venue_id`,`home_team_id`,`away_team_id`,`home_school_id`,`away_school_id`,`name`,`start_at`,`created_at`,`updated_at`,`deleted_at`) VALUES
+  (1,4,2,6,8,   9,NULL,NULL,'First Match Ever', '2016-07-08 11:00:00','2016-07-07 19:57:35','2016-07-07 19:57:35',NULL),
+  (2,4,2,3,8,NULL,NULL,   2,'Second Match Ever','2016-07-30 16:00:00','2016-07-07 20:06:41','2016-07-07 20:06:41',NULL),
+  (3,4,3,3,8,NULL,NULL,   2,'Round 1',          '2016-07-30 16:00:00','2016-07-07 20:06:41','2016-07-07 20:06:41',NULL),
+  (4,4,3,3,8,NULL,NULL,   2,'Round 2',          '2016-07-30 16:00:00','2016-07-07 20:06:41','2016-07-07 20:06:41',NULL),
+  (5,4,4,3,8,NULL,NULL,   2,'Round 1',          '2016-07-30 16:00:00','2016-07-07 20:06:41','2016-07-07 20:06:41',NULL),
+  (6,4,4,3,8,NULL,NULL,   2,'Round 2',          '2016-07-30 16:00:00','2016-07-07 20:06:41','2016-07-07 20:06:41',NULL),
+  (7,4,4,3,8,NULL,NULL,   2,'Grand Final',      '2016-07-30 16:00:00','2016-07-07 20:06:41','2016-07-07 20:06:41',NULL),
+  (8,4,6,3,8,NULL,NULL,   2,'Practice',         '2016-07-30 16:00:00','2016-07-07 20:06:41','2016-07-07 20:06:41',NULL);
 
 /* Itineraries
  */
