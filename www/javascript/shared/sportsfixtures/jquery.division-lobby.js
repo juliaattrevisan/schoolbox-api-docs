@@ -28,10 +28,10 @@
         /* Glossary of data vars
 
          Dragon drop receiving elements
-             data-test-division-player-list
-             data-test-team-player-list
-             data-test-team-player-list-proxy
-                (behaves like data-test-team-player-list, but needs extra handling)
+             data-division-player-list
+             data-team-player-list
+             data-team-player-list-proxy
+                (behaves like data-team-player-list, but needs extra handling)
 
          Using dragon drop to add/remove players from teams and/or divisions
          These contain routes to backend
@@ -102,7 +102,7 @@
 
                     /* The three possible destinations into which $player can drop
                      */
-                    var to = player.closest('[data-test-team-player-list], [data-test-team-player-list-proxy], [data-test-division-player-list]');
+                    var to = player.closest('[data-team-player-list], [data-team-player-list-proxy], [data-division-player-list]');
 
                     /* Indicators
                      */
@@ -128,7 +128,7 @@
                      */
                     else if (isDivisionList(from) && isTeamPlayerList(to)) {
                         if (config.debugging) {
-                            toId = to.parents('[data-test-team]').attr('data-test-team');
+                            toId = to.parents('[data-team]').attr('data-team');
                             console.log('dragging player from division to team ' + toId);
                         }
 
@@ -159,7 +159,7 @@
                                     removeProxyHelperClone(to);
                                 }
 
-                                updateTeamMetadata($('[data-test-team='+toId+']'), response);
+                                updateTeamMetadata($('[data-team='+toId+']'), response);
                                 updateDivisionLobby(response.divisionLobby);
                             })
                             .done(function() {
@@ -178,8 +178,8 @@
                      */
                     else if (isTeamPlayerList(from) && isTeamPlayerList(to)) {
                         if (config.debugging) {
-                            fromId = from.parents('[data-test-team]').attr('data-test-team');
-                            toId = to.parents('[data-test-team]').attr('data-test-team');
+                            fromId = from.parents('[data-team]').attr('data-team');
+                            toId = to.parents('[data-team]').attr('data-team');
                             console.log('dragging between teams - from: ' + fromId + ', to: ' + toId);
                         }
 
@@ -222,8 +222,8 @@
                                     removeProxyHelperClone(to);
                                 }
 
-                                updateTeamMetadata($('[data-test-team='+fromId+']'), fromTeamConfiguration);
-                                updateTeamMetadata($('[data-test-team='+toId+']'), toTeamConfiguration);
+                                updateTeamMetadata($('[data-team='+fromId+']'), fromTeamConfiguration);
+                                updateTeamMetadata($('[data-team='+toId+']'), toTeamConfiguration);
                                 updateDivisionLobby(toTeamConfiguration.divisionLobby);
                             })
                             .done(function() {
@@ -242,13 +242,13 @@
                      */
                     else if (isTeamPlayerList(from) && isDivisionList(to)) {
                         if (config.debugging) {
-                            fromId = from.parents('[data-test-team]').attr('data-test-team');
+                            fromId = from.parents('[data-team]').attr('data-team');
                             console.log('remove a player from team ' + fromId);
                         }
 
                         /* Unique case: remove the clone from the division list
                          */
-                        $('[data-test-division-player-list]').find(player).remove();
+                        $('[data-division-player-list]').find(player).remove();
 
                         /* Activate indicators
                          */
@@ -270,7 +270,7 @@
                                     console.log('DB: removing ' + player.data('player') + ' from ' + from.data('removePlayersAction'));
                                 }
 
-                                updateTeamMetadata($('[data-test-team='+fromId+']'), response);
+                                updateTeamMetadata($('[data-team='+fromId+']'), response);
                                 updateDivisionLobby(response.divisionLobby);
                             })
                             .done(function() {
@@ -297,7 +297,7 @@
          * @param newDivisionLobby
          */
         function updateDivisionLobby(newDivisionLobby) {
-            $('[data-test-division-player-list]').html($(newDivisionLobby).find('[data-test-division-player-list]').html());
+            $('[data-division-player-list]').html($(newDivisionLobby).find('[data-division-player-list]').html());
         }
 
         /**
@@ -305,7 +305,7 @@
          * Updates the Team's player count
          */
         function updateTeamMetadata(teamContainer, response) {
-            teamContainer.find('[data-test-team-player-list]').html($(response.html));
+            teamContainer.find('[data-team-player-list]').html($(response.html));
             teamContainer.find('[data-player-count]').text(teamContainer.find('[data-player]').length);
         }
 
@@ -340,12 +340,12 @@
                 e.preventDefault();
                 var el       = $(this);
 
-                var feedback = findIndicator(el.parents('[data-test-division-player-list]'));
+                var feedback = findIndicator(el.parents('[data-division-player-list]'));
                 feedback.labelActivate({text: 'Adding to team...'});
 
                 $.post(el.attr('href'), [{name: 'userId[]', value: el.data('addTeamPlayer')}])
                     .done(function(response) {
-                        updateTeamMetadata($('[data-test-team='+el.attr('data-affected-team')+']'), response);
+                        updateTeamMetadata($('[data-team='+el.attr('data-affected-team')+']'), response);
                         updateDivisionLobby(response.divisionLobby);
                     })
                     .done(function() {
@@ -371,12 +371,12 @@
                 $(this).confirmDialog({
                     text: 'Are you sure you wish to remove this player from this team?',
                     confirmEvent: function(el) {
-                        var feedback = findIndicator(el.parents('[data-test-team-player-list]'));
+                        var feedback = findIndicator(el.parents('[data-team-player-list]'));
                         feedback.labelActivate({text: 'Removing from team...'});
 
                         $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removeTeamPlayer')}])
                             .done(function(response) {
-                                updateTeamMetadata($('[data-test-team='+el.attr('data-affected-team')+']'), response);
+                                updateTeamMetadata($('[data-team='+el.attr('data-affected-team')+']'), response);
                                 updateDivisionLobby(response.divisionLobby);
                             })
                             .done(function() {
@@ -405,7 +405,7 @@
                 $(this).confirmDialog({
                     text: 'Are you sure you wish to remove this player from this division, and all teams within this division?',
                     confirmEvent: function(el) {
-                        var feedback = findIndicator(el.parents('[data-test-division-player-list]'));
+                        var feedback = findIndicator(el.parents('[data-division-player-list]'));
                         feedback.labelActivate({text: 'Removing from division...'});
 
                         $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removePlayer')}])
@@ -416,7 +416,7 @@
                                  */
                                 var playerId = el.parents('[data-player]').attr('data-player');
 
-                                $('[data-test-division-player-list], [data-test-team-player-list]').find('[data-player='+playerId+']').remove();
+                                $('[data-division-player-list], [data-team-player-list]').find('[data-player='+playerId+']').remove();
                             })
                             .done(function() {
                                 feedback.labelTimeout({text: 'Removed!', css: 'success'});
@@ -442,10 +442,10 @@
         function saveOrdering(sortable) {
             if (config.debugging) {
                 if (isDivisionList(sortable)) {
-                    console.log('Saving new sequence for division ' + sortable.attr('data-test-division-player-list'));
+                    console.log('Saving new sequence for division ' + sortable.attr('data-division-player-list'));
                 }
                 else {
-                    console.log('Saving new sequence for team ' + sortable.parents('[data-test-team]').attr('data-test-team'));
+                    console.log('Saving new sequence for team ' + sortable.parents('[data-team]').attr('data-team'));
                 }
             }
 
@@ -500,7 +500,7 @@
          * in the division player list
          */
         function applyPlayerFilter() {
-            var divisionPlayerList = $('[data-test-division-player-list]');
+            var divisionPlayerList = $('[data-division-player-list]');
 
             switch (parseInt($('#player-filter').val())) {
 
@@ -534,7 +534,7 @@
          * @param to
          */
         function removeProxyHelperClone(to) {
-            to.parents('[data-test-team]').find('[data-test-team-player-list-proxy]').children('[data-player]').remove();
+            to.parents('[data-team]').find('[data-team-player-list-proxy]').children('[data-player]').remove();
         }
 
         /**
@@ -543,14 +543,14 @@
          * @param element
          */
         function isDivisionList(element) {
-            return hasAttr(element, 'data-test-division-player-list');
+            return hasAttr(element, 'data-division-player-list');
         }
 
         /**
          * $element is a team's player list sortable
          *
          * Dragging into the title of the team requires a check on this element:
-         * data-test-team-player-list-proxy
+         * data-team-player-list-proxy
          *
          * Functions equivalently to dragging into player list itself, but this
          * provides us with a way of determining where the player was dragged
@@ -558,7 +558,7 @@
          * @param element
          */
         function isTeamPlayerList(element) {
-            return (hasAttr(element, 'data-test-team-player-list') || hasAttr(element, 'data-test-team-player-list-proxy'));
+            return (hasAttr(element, 'data-team-player-list') || hasAttr(element, 'data-team-player-list-proxy'));
         }
 
         /**
@@ -568,7 +568,7 @@
          * @returns {boolean}
          */
         function isTeamPlayerListProxy(element) {
-            return hasAttr(element, 'data-test-team-player-list-proxy');
+            return hasAttr(element, 'data-team-player-list-proxy');
         }
 
         /**
@@ -596,10 +596,10 @@
          */
         function findIndicator(element) {
             if (isDivisionList(element)) {
-                return $('[data-test-division-indicator]');
+                return $('[data-division-indicator]');
             }
 
-            return element.parents('[data-test-team]').find('[data-test-team-indicator]');
+            return element.parents('[data-team]').find('[data-team-indicator]');
         }
     }
 }(jQuery));

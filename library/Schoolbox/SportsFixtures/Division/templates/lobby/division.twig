@@ -4,7 +4,7 @@
             data-add-players-action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {entityId: division.id}) }}"
             data-remove-players-action="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.id}) }}"
             data-reorder-players-action="{{ routeLookup('sportsfixturesDivision.postReorderPlayers', {entityId: division.id}) }}"
-            data-test-division-player-list="{{ division.id }}">
+            data-division-player-list="{{ division.id }}">
 
             {% for playerData in players %}
                 <li class="actions-small-1" data-player="{{ playerData.player.id }}" data-assigned="{% if playerData.player.id in assigned %}1{% else %}0{% endif %}">
@@ -56,5 +56,5 @@
                 </li>
             {% endfor %}
         </ul>
-        <span class="label full-width hide" data-test-division-indicator></span>
+        <span class="label full-width hide" data-division-indicator></span>
     </section>
