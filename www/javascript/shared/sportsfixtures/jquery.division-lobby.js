@@ -350,6 +350,10 @@
                     })
                     .done(function() {
                         feedback.labelTimeout({text: 'Added!', css: 'success'});
+
+                        /* Reapply filter settings to division player list
+                         */
+                        applyPlayerFilter();
                     })
                     .fail(function() {
                         feedback.labelTimeout({text: 'Add failed!', css: 'alert'});
@@ -377,6 +381,10 @@
                             })
                             .done(function() {
                                 feedback.labelTimeout({text: 'Removed!', css: 'success'});
+
+                                /* Reapply filter settings to division player list
+                                 */
+                                applyPlayerFilter();
                             })
                             .fail(function() {
                                 feedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
@@ -412,6 +420,10 @@
                             })
                             .done(function() {
                                 feedback.labelTimeout({text: 'Removed!', css: 'success'});
+
+                                /* Reapply filter settings to division player list
+                                 */
+                                applyPlayerFilter();
                             })
                             .fail(function() {
                                 feedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
