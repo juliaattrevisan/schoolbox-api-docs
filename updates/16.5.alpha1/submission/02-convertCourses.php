@@ -30,6 +30,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
     $log->info(sprintf('%d courses found', count($deprecatedCourses)));
     foreach ($deprecatedCourses as $deprecatedCourse) {
+        $log->debug(sprintf('Attempting to convert course "%s" (id: %d)', $deprecatedCourse->getName(), $deprecatedCourse->getId()));
         try {
             $newCourseMapper->save($newCourseMapper->convertDeprecatedModel($deprecatedCourse));
             $log->info(sprintf('Course "%s" converted', $deprecatedCourse->getName()));
