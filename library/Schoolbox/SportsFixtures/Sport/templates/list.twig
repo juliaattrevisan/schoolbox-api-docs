@@ -4,12 +4,13 @@
             event.preventDefault();
 
             var element = $(this);
+            var $sport = element.closest('[data-sport]');
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Sport?',
                 confirmEvent: function() {
-                    $.post(element.attr('href'), {sportId: element.attr('data-delete')}, function() {
-                        window.location.href = window.location.href;
+                    $.post(element.data('post-action'), {sportId: element.data('delete')}, function() {
+                        $sport.fadeOut({ done: $sport.remove });
                     });
                 }
             });
@@ -38,7 +39,7 @@
         <section>
             <ul class="information-list">
                 {% for currentSport in allSports %}
-                <li class="actions-small-1">
+                <li class="actions-small-1" data-sport>
                     <div class="list-item">
                         <div class="small-12 avatar card">
                             <p>{{ currentSport.name }}</p>
