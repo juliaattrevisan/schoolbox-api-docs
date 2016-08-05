@@ -176,6 +176,7 @@ CREATE TABLE `project_course_unit_specification` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+-- TODO once conversions are completed, add FK constraints to these tables
 
 ALTER TABLE `assess`
 ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `category_id`;
