@@ -26,9 +26,9 @@ use Schoolbox\Resource\Folder;
  *             unit data source.
  *
  * @package Schoolbox\Assessment\Course\Unit
- * @method Model findById($id)
+ * @method DeprecatedModel findById($id)
  */
-class Mapper extends Folder\Mapper
+class DeprecatedMapper extends Folder\Mapper
 {
 
     /**
@@ -39,7 +39,7 @@ class Mapper extends Folder\Mapper
     protected function mapping()
     {
         parent::mapping();
-        $this->hasModel(Model::class);
+        $this->hasModel(DeprecatedModel::class);
 
         // define the join for unit tasks (it's a reverse join, but it works)
         $this->joins('id', TaskMapper::getInstance(), 'category_id', null, self::COLUMN_JOIN_MULTI, 'tasks', 'task');
@@ -113,7 +113,7 @@ class Mapper extends Folder\Mapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        /** @var Model[] $cache */
+        /** @var DeprecatedModel[] $cache */
         $cache = [];
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {

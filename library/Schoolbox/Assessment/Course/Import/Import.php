@@ -5,8 +5,8 @@ namespace Schoolbox\Assessment\Course\Import;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\Mapper as CourseMapper;
-use Schoolbox\Assessment\Course\Unit\Model as Unit;
-use Schoolbox\Assessment\Course\Unit\Mapper as UnitMapper;
+use Schoolbox\Assessment\Course\Unit\DeprecatedModel as Unit;
+use Schoolbox\Assessment\Course\Unit\DeprecatedMapper as UnitMapper;
 
 /**
  * Import

@@ -21,11 +21,11 @@ use Schoolbox\Collection;
 class Model extends \Schoolbox\Resource\Folder\Model
 {
 
-    /** @var Collection|Unit\Model[] */
+    /** @var Collection|Unit\DeprecatedModel[] */
     protected $units;
 
     /**
-     * @return Unit\Model[]|Collection
+     * @return Unit\DeprecatedModel[]|Collection
      */
     public function getUnits()
     {
@@ -34,7 +34,7 @@ class Model extends \Schoolbox\Resource\Folder\Model
 
 
     /**
-     * @param Unit\Model[]|Collection $units
+     * @param Unit\DeprecatedModel[]|Collection $units
      * @return static
      */
     public function setUnits($units)

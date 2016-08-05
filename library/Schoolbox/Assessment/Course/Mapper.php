@@ -63,7 +63,7 @@ class Mapper extends FolderMapper
         $this->hasModel(Model::class);
 
         // reverse join onto self for unit definition
-        $this->joins('id', Unit\Mapper::class, 'parent', null, self::COLUMN_JOIN_MULTI, 'units', 'unit');
+        $this->joins('id', Unit\DeprecatedMapper::class, 'parent', null, self::COLUMN_JOIN_MULTI, 'units', 'unit');
 
         $this->ancestry = new Ancestry(FolderMapper::getInstance());
     }
@@ -196,7 +196,7 @@ class Mapper extends FolderMapper
     public function verifyCourse(Folder $course)
     {
         // a course is defined as a folder that contains units
-        return Unit\Mapper::getInstance()->findByCourseId($course->getId())->count() > 0;
+        return Unit\DeprecatedMapper::getInstance()->findByCourseId($course->getId())->count() > 0;
     }
 
 
@@ -242,7 +242,7 @@ class Mapper extends FolderMapper
 
         if ($this->inFacultyArea($folder)) {
             try {
-                Unit\Mapper::getInstance()->findById($folder->getId());
+                Unit\DeprecatedMapper::getInstance()->findById($folder->getId());
             } catch (MapperException $e) {
                 // this is the desired case here: not a unit
                 return !$this->containsCourses($folder);

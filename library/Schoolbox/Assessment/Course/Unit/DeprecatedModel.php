@@ -19,7 +19,7 @@ use Schoolbox\Collection;
  *
  * @package Schoolbox\Assessment\Course\Unit
  */
-class Model extends \Schoolbox\Resource\Folder\Model
+class DeprecatedModel extends \Schoolbox\Resource\Folder\Model
 {
 
     /** @var Collection|Task[] */
@@ -37,7 +37,7 @@ class Model extends \Schoolbox\Resource\Folder\Model
 
     /**
      * @param \Schoolbox\Assessment\Course\Task[]|Collection $tasks
-     * @return Model
+     * @return DeprecatedModel
      */
     public function setTasks($tasks)
     {

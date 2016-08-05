@@ -9,7 +9,7 @@
 
 namespace Schoolbox\Resource\Browser\Resources;
 
-use Schoolbox\Assessment\Course\Unit\Mapper as UnitMapper;
+use Schoolbox\Assessment\Course\Unit\DeprecatedMapper as UnitMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
