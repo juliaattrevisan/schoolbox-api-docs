@@ -15,11 +15,18 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
  * Class Mapper
  *
  * @package Schoolbox\Assessment\Course\Unit
+ * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
  */
 class Mapper extends BaseMapper
 {
+    /**
+     * Setup data source, model and data mappings.
+     */
     protected function mapping()
     {
+        $this->hasTable('course_unit');
+        $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('course_id', CourseMapper::getInstance(), 'id', null, null, 'course');
         $this->joins('folder_id', FolderMapper::getInstance(), 'id', null, null, 'folder');
