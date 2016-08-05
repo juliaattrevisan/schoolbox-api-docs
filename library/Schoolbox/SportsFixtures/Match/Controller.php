@@ -171,9 +171,13 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
         }
 
-        // Can't create a match in archived season
-        if(!$match->getId() && $match->getDivision()->getSeason()->isArchived()){
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
+        // Are we creating a new match ?
+        if(!$match->getId()){
+
+            // Is the proposed match season archived ?
+            if( $match->getSeason()->isArchived() ) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
+            }
         }
 
         $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $match->getId(), [

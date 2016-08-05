@@ -174,7 +174,9 @@
             <div class="empty-state">
                 <i class="icon-match"></i>
                 <p>There are no Matches in {{ division.name }}.</p>
-                <p><a href="{{ routeLookup('sportsfixturesMatch.getCreateForm', {contextId: division.id}) }}" title="Add a Match">Add a Match</a></p>
+                {% if not division.season.isArchived %}
+                    <p><a href="{{ routeLookup('sportsfixturesMatch.getCreateForm', {contextId: division.id}) }}" title="Add a Match">Add a Match</a></p>
+                {% endif %}
             </div>
         {% endif %}
     </div>
