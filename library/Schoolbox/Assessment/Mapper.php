@@ -13,6 +13,7 @@ use Schoolbox\Mapper as BaseMapper;
  * The base mapper for an assessment.
  *
  * @package Schoolbox\Assessment
+ * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
 {
