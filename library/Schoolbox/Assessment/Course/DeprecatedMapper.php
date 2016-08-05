@@ -30,9 +30,9 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  *             course data source.
  *
  * @package Schoolbox\Assessment\Course
- * @method Model findById($id)
+ * @method DeprecatedModel findById($id)
  */
-class Mapper extends FolderMapper
+class DeprecatedMapper extends FolderMapper
 {
     /**
      * A Folder instance that represents the root node
@@ -60,7 +60,7 @@ class Mapper extends FolderMapper
     {
         parent::mapping();
 
-        $this->hasModel(Model::class);
+        $this->hasModel(DeprecatedModel::class);
 
         // reverse join onto self for unit definition
         $this->joins('id', Unit\DeprecatedMapper::class, 'parent', null, self::COLUMN_JOIN_MULTI, 'units', 'unit');
@@ -236,7 +236,7 @@ class Mapper extends FolderMapper
     public function mayBeConvertedToCourse(Folder $folder)
     {
         // it's a Course... it's allowed to be a course
-        if ($folder instanceof Model) {
+        if ($folder instanceof DeprecatedModel) {
             return true;
         }
 

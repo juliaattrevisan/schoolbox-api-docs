@@ -18,7 +18,7 @@ use Schoolbox\Collection;
  *
  * @package Schoolbox\Assessment\Course
  */
-class Model extends \Schoolbox\Resource\Folder\Model
+class DeprecatedModel extends \Schoolbox\Resource\Folder\Model
 {
 
     /** @var Collection|Unit\DeprecatedModel[] */
