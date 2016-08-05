@@ -142,8 +142,8 @@ class Controller extends AbstractController
 
         // Sort seasons by start then end dates
         $allSeasons->sortByMultiFields([
-            ['start','desc'],
-            ['end','desc']
+            'start' => 'desc',
+            'end'   => 'desc',
         ]);
 
         // Sort matches within seasons by startAt datetime

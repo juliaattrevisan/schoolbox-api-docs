@@ -56,8 +56,8 @@ class Controller extends AbstractController
             $allSeasons = $mapper->findByName($query);
 
             $allSeasons->sortByMultiFields([
-                ['start', 'desc'],
-                ['end', 'desc'],
+                'start' => 'desc',
+                'end'   => 'desc',
             ]);
 
             $seasons = [];

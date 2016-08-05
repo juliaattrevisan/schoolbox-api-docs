@@ -369,26 +369,35 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     /**
      * Convenience method to sort a collection using multiple fields
      *
-     * @param array $options               eg [['lastName','asc'],['firstName','asc']]
-     * @var   string   $options[idx][0]    The field to sort on
-     * @var   string   $options[idx][1]    Direction to sort this field {'asc','desc'}
-     * @var   callable $options[idx][2]    Optional compare function used to sort field
+     * @param array         $fields       Keys = fieldName. Values = direction + optional callback. eg
+    *                                      [  'lastName'  => ['asc'],
+    *                                         'firstName' => ['asc', $callable],
+    *                                          'dob'       => 'desc',   ]
+     *
+     * @var   string|array  $fields[]     If value is string: Direction to sort. {'asc'|'desc'}
+     * @var   string        $fields[][1]  If value is array:  1st item is direction,
+     * @var   callable      $fields[][2]                      2nd item is a compare function (optional)
      * @return static
      */
-    public function sortByMultiFields(array $options){
+    public function sortByMultiFields(array $fields){
 
-        $fields           = [];
+        $fieldNames       = [];
         $directions       = [];
         $compareFunctions = [];
 
-        foreach($options as $option){
-            $fields[]           = $option[0];
-            $directions[]       = $option[1];
-            $compareFunctions[] = isset($option[2]) ? $option[2] : null;
+        foreach($fields as $fieldName => $fieldOptions){
+            $fieldNames[] = $fieldName;
+
+            if(is_array($fieldOptions)){
+                $directions[]       = $fieldOptions[0];
+                $compareFunctions[] = $fieldOptions[1] ?: null;
+            } else {
+                $directions[]       = $fieldOptions;
+                $compareFunctions[] = null;
+            }
         }
 
-        return $this->sortBy($fields, $directions, $compareFunctions);
-
+        return $this->sortBy($fieldNames, $directions, $compareFunctions);
     }
 
 
