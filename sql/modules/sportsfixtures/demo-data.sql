@@ -142,11 +142,12 @@ INSERT INTO `sportsfixtures_position` (`sport_id`, `name`, `created_at`, `update
   ('2', 'Back Pocket',         NOW(), NOW()),
   ('2', 'Full Back',           NOW(), NOW());
 
-/* Two Divisions for AFL
+/* Divisions for AFL
  */
 INSERT INTO `sportsfixtures_division` (`sport_id`, `season_id`, `name`, `created_at`, `updated_at`) VALUES
   ('2', 4, 'Open',   NOW(), NOW()),
-  ('2', 5, 'Year 9', NOW(), NOW());
+  ('2', 5, 'Year 9', NOW(), NOW()),
+  ('2', 2, 'Year 8', NOW(), NOW());
 
 /* Two Teams for AFL Open
  */
