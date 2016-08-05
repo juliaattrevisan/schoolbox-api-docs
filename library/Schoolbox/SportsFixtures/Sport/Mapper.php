@@ -12,16 +12,14 @@ namespace Schoolbox\SportsFixtures\Sport;
 
 
 use Schoolbox\Mapper As BaseMapper;
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage;
-use Schoolbox\User;
+use \Schoolbox\SportsFixtures\Sport\Model as Sport;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 
 /**
  * Class Mapper
- * @method Model createModel()
- * @method Model findById($id)
+ * @method Sport createModel()
+ * @method Sport findById($id)
  * @package Schoolbox\SportsFixtures\Sport
  */
 class Mapper extends BaseMapper
@@ -32,7 +30,7 @@ class Mapper extends BaseMapper
     protected function mapping()
     {
         $this->hasTable('sportsfixtures_sport');
-        $this->hasModel(Model::class);
+        $this->hasModel(Sport::class);
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
@@ -51,9 +49,9 @@ class Mapper extends BaseMapper
      * Delete all Positions associated with this Sport
      * when it's being deleted
      *
-     * @param Model $sport
+     * @param Sport $sport
      */
-    public function deleteDivisions(Model $sport)
+    public function deleteDivisions(Sport $sport)
     {
         $allDivisions = DivisionMapper::getInstance()->findByColumn('sport_id', $sport->getId());
 
