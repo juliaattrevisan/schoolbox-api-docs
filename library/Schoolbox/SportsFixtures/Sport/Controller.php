@@ -15,6 +15,7 @@ use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Sport\Model as Sport;
 use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use \Schoolbox\Mapper as BaseMapper;
 
 class Controller extends AbstractController
 {
@@ -48,7 +49,7 @@ class Controller extends AbstractController
         /* TODO: Not sure if we need this here
          * but I'll set it up anyway just in case
          */
-        $allSports = $this->getSportMapper()->findAll([
+        $allSports = $this->getMapper()->findAll([
             'order' => [
                 'name' => 'asc'
             ]
@@ -117,19 +118,11 @@ class Controller extends AbstractController
         $sport->setUrl($url);
         $sport->setUpdatedAt(\Alaress_Date_Format::now());
 
-        $this->getSportMapper()->save($sport);
+        $this->getMapper()->save($sport);
     }
 
     /* Getters/Setters
      */
-
-    /**
-     * @return SportMapper
-     */
-    protected function getSportMapper()
-    {
-        return $this->mapper;
-    }
 
     /**
      * @return DivisionMapper
