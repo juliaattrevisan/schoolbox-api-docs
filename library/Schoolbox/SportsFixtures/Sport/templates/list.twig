@@ -9,7 +9,7 @@
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Sport?',
                 confirmEvent: function() {
-                    $.post(element.data('post-action'), {sportId: element.data('delete')}, function() {
+                    $.post(element.data('post-action'), {}, function() {
                         $sport.fadeOut({ done: $sport.remove });
                     });
                 }

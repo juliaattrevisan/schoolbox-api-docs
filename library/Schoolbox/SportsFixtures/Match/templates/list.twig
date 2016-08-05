@@ -6,12 +6,13 @@
             event.preventDefault();
 
             var element = $(this);
+            var $match  = element.closest('[data-match]');
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Match?',
                 confirmEvent: function() {
-                    $.post(element.attr('href'), {positionId: element.attr('data-delete')}, function() {
-                        window.location.href = window.location.href;
+                    $.post(element.attr('href'), {}, function() {
+                        $match.fadeOut({ done: $match.remove });
                     });
                 }
             });

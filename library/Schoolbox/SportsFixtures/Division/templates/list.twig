@@ -4,12 +4,13 @@
             event.preventDefault();
 
             var element = $(this);
+            var $division = element.closest('[data-division]');
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Division?',
                 confirmEvent: function() {
                     $.post(element.attr('href'), {}, function() {
-                        window.location.href = window.location.href;
+                        $division.fadeOut({ done: $division.remove });
                     });
                 }
             });
@@ -46,7 +47,7 @@
         <section>
             <ul class="action-list">
                 {% for currentDivision in allDivisions %}
-                <li class="actions-small-1">
+                <li class="actions-small-1" data-division>
                     <div class="list-item">
                         <div class="small-12 avatar card">
                             <h3><a href="{{ routeLookup('sportsfixturesDivision.getEntity', {entityId: currentDivision.id}) }}">
