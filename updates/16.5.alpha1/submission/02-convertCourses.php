@@ -29,14 +29,14 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $successCount      = 0;
     $failureCount      = 0;
 
-    $log->info(sprintf('%d courses found', count($deprecatedCourses)));
+    $log->debug(sprintf('%d courses found', count($deprecatedCourses)));
     foreach ($deprecatedCourses as $deprecatedCourse) {
 
         // Convert just this course
-        $log->debug(sprintf('Attempting to convert course "%s" (id: %d)', $deprecatedCourse->getName(), $deprecatedCourse->getId()));
+        $log->info(sprintf('Converting course "%s" (id: %d)...', $deprecatedCourse->getName(), $deprecatedCourse->getId()));
         try {
             $newCourseMapper->save($newCourseMapper->convertDeprecatedModel($deprecatedCourse));
-            $log->info(sprintf('Course "%s" converted', $deprecatedCourse->getName()));
+            $log->debug(sprintf('Course "%s" converted', $deprecatedCourse->getName()));
             $successCount++;
         } catch (MapperException $e) {
             $log->error(sprintf('Course "%s" could not be converted!', $deprecatedCourse->getName()), ['message' => $e->getMessage()]);
@@ -49,12 +49,12 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         $unitSuccessCount = 0;
         $unitFailureCount = 0;
 
-        $log->info(sprintf('%d units found in course', count($deprecatedUnits)));
+        $log->debug(sprintf('%d units found in course', count($deprecatedUnits)));
         foreach ($deprecatedUnits as $deprecatedUnit) {
-            $log->debug(sprintf('Attempting to convert unit "%s" (id: %d)', $deprecatedUnit->getName(), $deprecatedUnit->getId()));
+            $log->info(sprintf('Converting unit "%s" (id: %d)...', $deprecatedUnit->getName(), $deprecatedUnit->getId()));
             try {
                 $newUnitMapper->save($newUnitMapper->convertDeprecatedModel($deprecatedUnit));
-                $log->info(sprintf('Unit "%s" converted', $deprecatedUnit->getName()));
+                $log->debug(sprintf('Unit "%s" converted', $deprecatedUnit->getName()));
                 $unitSuccessCount++;
             } catch (MapperException $e) {
                 $log->error(sprintf('Unit "%s" could not be converted!', $deprecatedUnit->getName()), ['message' => $e->getMessage()]);
