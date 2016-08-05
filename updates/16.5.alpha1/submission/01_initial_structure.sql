@@ -18,7 +18,7 @@ CREATE TABLE `course` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `folder_id` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `fk_course_folder_id_idx` (`folder_id` ASC),
+  UNIQUE INDEX `folder_id_UNIQUE` (`folder_id` ASC),
   CONSTRAINT `fk_course_folder_id`
     FOREIGN KEY (`folder_id`)
     REFERENCES `folder` (`id`)
