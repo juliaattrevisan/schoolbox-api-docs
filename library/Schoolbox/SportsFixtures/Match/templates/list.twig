@@ -2,21 +2,6 @@
 
 <script type="text/javascript">
     $(function() {
-        $('#allMatches').on('click', '[data-delete]', function(event) {
-            event.preventDefault();
-
-            var element = $(this);
-            var $match  = element.closest('[data-match]');
-
-            $(this).confirmDialog({
-                text: 'Are you sure you want to delete this Match?',
-                confirmEvent: function() {
-                    $.post(element.attr('href'), {}, function() {
-                        $match.fadeOut({ done: $match.remove });
-                    });
-                }
-            });
-        });
 
         // Season selector
         var $seasonSelector = $('[data-context-switcher]');
@@ -60,9 +45,47 @@
             enableNext ? $next.removeAttr('disabled') : $next.attr('disabled','disabled');
             $next.prop('disabled', enableNext);
         }
-
         // Refresh UI if user got here by clicking browser 'back'
         $seasonDropdown.trigger('change');
+
+
+        $('#allMatches').on('click', '[data-delete]', function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+            var $match  = element.closest('[data-match]');
+            var $season = $match.closest('[data-season]');
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this Match?',
+                confirmEvent: function() {
+                    $.post(element.attr('href'), {}, function() {
+
+                        // Is this the last match in an archived season ?
+                        if( $season.data('archived') && 1 == $season.find('[data-match]').length){
+                            $season.fadeOut({ done: $season.remove() });
+
+                            var currentSeasonId = $seasonDropdown.val();
+
+                            // Also remove option from select
+                            $seasonDropdown.find('option[value='+$season.data('season')+']').remove();
+
+                            // Did we remove the currently selected option?
+                            if($season.data('season') == currentSeasonId){
+                                $seasonDropdown.trigger('change');
+                            }
+                        }
+
+                        // Is this the last match in the division ?
+                        if( 1 == $('[data-match]').length){
+                            window.location.href = window.location.href;
+                        } else {
+                            $match.fadeOut({ done: $match.remove() });
+                        }
+                    });
+                }
+            });
+        });
     });
 </script>
 <ul class="breadcrumb">
@@ -86,11 +109,6 @@
                     <h2 class="subheader">Matches in {{ division.name }}</h2>
                 </div>
             </div>
-            {% if not division.season.isArchived%}
-            <nav>
-                <a href='{{ routeLookup('sportsfixturesMatch.getCreateForm', {contextId: division.id}) }}' class="icon-add" title="Add Match to {{ division.name }}"></a>
-            </nav>
-            {% endif %}
         </div>
     </div>
 
@@ -122,20 +140,30 @@
 
         {% if allMatches|length %}
             <div>
-            {% for currentSeason in allSeasons %}
-                <div data-season="{{ currentSeason.id }}" {% if currentSeason.getId != division.season.getId %} class="hide" {% endif %} >
-                    <h2 class="subheader"><a href="{{ routeLookup('sportsfixturesSeason.getEntity', {entityId: currentSeason.id}) }}">
-                        {% if currentSeason.isArchived %}
-                            <del class="icon icon-archive" title="Season has been archived.">{{ currentSeason.name }}</del>
-                        {% else %}
-                            <span title="View season details">{{ currentSeason.name }}</span>
-                        {% endif %}
-                    </a>
-                        {% if currentSeason.getId == division.season.getId %} (<span title="{{ division.name }} is currently attached to this season">current</span>) {% endif %}
-                    </h2>
+            {% for season in allSeasons %}
+                <div data-season="{{ season.id }}" {% if season.isArchived %} data-archived="1" {% endif %}  {% if season.getId != division.season.getId %} class="hide" {% endif %}  >
+                    <div class="actions-small-1">
+                        <h2 class="subheader"><a href="{{ routeLookup('sportsfixturesSeason.getEntity', {entityId: season.id}) }}">
+                                {% if season.isArchived %}
+                                    <del class="icon icon-archive" title="Season has been archived.">{{ season.name }}</del>
+                                {% else %}
+                                    <span title="View season details">{{ season.name }}</span>
+                                {% endif %}
+                            </a>
+                            {% if season.getId == division.season.getId %} (<span title="{{ division.name }} is currently attached to this season">current</span>) {% endif %}
+                        </h2>
+
+                        <nav>
+                            {% if not season.isArchived %}
+                                <a href='{{ routeLookup('sportsfixturesMatch.getInSeasonForm', {contextId: division.id, seasonId: season.id}) }}' class="icon-add" title="Add Match to {{ season.name }} {{ division.name }}"></a>
+                            {% endif %}
+                        </nav>
+
+                    </div>
+
                     <section>
                         <ul class="action-list">
-                            {% for currentMatch in allMatches[currentSeason.id] %}
+                            {% for currentMatch in allMatches[season.id] %}
                                 {% include '@sportsfixturesMatch/listItem.twig' %}
                             {% endfor %}
                         </ul>

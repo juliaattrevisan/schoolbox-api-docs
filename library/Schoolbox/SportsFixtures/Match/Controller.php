@@ -158,6 +158,41 @@ class Controller extends AbstractController
         ]));
     }
 
+
+    /**
+     * Create/Modify a match
+     *
+     * @param Match $match With division and season already hydrated
+     */
+    public function getInSeasonForm(Match $match){
+
+        // Can't modify an archived match
+        if($match->getId() && $match->getSeason()->isArchived()){
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
+        }
+
+        // Can't create a match in archived season
+        if(!$match->getId() && $match->getDivision()->getSeason()->isArchived()){
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
+        }
+
+        $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $match->getId(), [
+            'order' => [
+                'start_at' => 'asc'
+            ]
+        ]);
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/create.twig', [
+            'sport'             => $match->getDivision()->getSport(),
+            'division'          => $match->getDivision(),
+            'match'             => $match,
+            'schoolMapper'      => $this->getSchoolTagCloudMapper(),
+            'schoolToken'       => TagCloudMapper::SCHOOL_PREFIX,
+            'allItineraryItems' => $allItineraryItems,
+            'action'            => $match->getId() ? 'Modify' : 'Create'
+        ]));
+    }
+
     /**
      * @param Match $match
      * @param Division $division
@@ -185,35 +220,9 @@ class Controller extends AbstractController
         else {
             $match->setSeason($division->getSeason());
         }
-
         $match->setDivision($division);
 
-        // Can't modify an archived match
-        if($match->getId() && $match->getSeason()->isArchived()){
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
-        }
-
-        // Can't create a match in archived season
-        if(!$match->getId() && $division->getSeason()->isArchived()){
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
-        }
-
-        $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $match->getId(), [
-            'order' => [
-                'start_at' => 'asc'
-            ]
-        ]);
-
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/create.twig', [
-            'sport'             => $division->getSport(),
-            'division'          => $match->getDivision(),
-            'match'             => $match,
-            'schoolMapper'      => $this->getSchoolTagCloudMapper(),
-            'schoolToken'       => TagCloudMapper::SCHOOL_PREFIX,
-            'allItineraryItems' => $allItineraryItems,
-            'action'            => $match->getId() ? 'Modify' : 'Create'
-        ]));
+        $this->getInSeasonForm($match);
     }
 
     /**

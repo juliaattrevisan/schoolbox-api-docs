@@ -10,10 +10,15 @@ namespace Schoolbox\SportsFixtures\Match;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
+use Alaress\Web\Router\PathMatcher;
+use Aura\Router\Router;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\SportsFixtures\Match\Model as Match;
+use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\SportsFixtures\Season\Mapper as SeasonMapper;
 
 class Module extends RestfulModule
 {
@@ -26,6 +31,47 @@ class Module extends RestfulModule
     public function __construct(ContainerInterface $injector, RestfulModule $context)
     {
         parent::__construct($injector, Mapper::getInstance(), 'matches', $context, 'sportsfixturesMatch');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutes(Router $router, $basePath)
+    {
+        parent::initRoutes($router, $basePath);
+
+        $collection = $this->getCollectionName();
+
+        $context = "{$this->context->getCollectionName()}/{contextId}/";
+
+        $routes = [
+            'GET' => [
+                "/{$context}season/{seasonId}/$collection/new" => 'getInSeasonForm',
+            ],
+        ];
+
+        foreach ($routes['GET'] as $path => $controllerMethod) {
+            $this->addGetRoute($router, $controllerMethod, $basePath, $path)->setTokens([ 'contextId' => '\d+|\*', 'seasonId' => '\d+', 'entityId' => '\d+' ]);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        parent::initRoutePreloads($matcher);
+
+        // these routes will just spawn new entities, but if context exists, it is required
+        $this->addRoutePreload($matcher, '(?:getInSeasonForm)', function ($params) {
+            /** @var Match $match */
+            $match = $this->mapper->createModel();
+            $match->setDivision(DivisionMapper::getInstance()->findById($params['contextId']));
+            $match->setSeason(SeasonMapper::getInstance()->findById($params['seasonId']));
+            return [
+                'match'    => $match,
+            ];
+        });
     }
 
     /**
