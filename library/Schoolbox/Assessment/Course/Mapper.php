@@ -27,7 +27,7 @@ class Mapper extends BaseMapper
         $this->hasTable('course');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('folder_id', FolderMapper::getInstance(), 'id', null, null, 'folder');
+        $this->joins('folder_id', FolderMapper::getInstance(), 'id', null, null, null, 'folder');
     }
 
     /**
