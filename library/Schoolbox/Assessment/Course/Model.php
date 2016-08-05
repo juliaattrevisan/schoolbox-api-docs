@@ -11,6 +11,13 @@ namespace Schoolbox\Assessment\Course;
 
 use Schoolbox\Collection;
 
+/**
+ * Class Model
+ *
+ * @deprecated This model will be replaced with one for an actual course object.
+ *
+ * @package Schoolbox\Assessment\Course
+ */
 class Model extends \Schoolbox\Resource\Folder\Model
 {
 

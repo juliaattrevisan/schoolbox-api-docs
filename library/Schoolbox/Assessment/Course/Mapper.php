@@ -26,6 +26,9 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 /**
  * Class Mapper
  *
+ * @deprecated This pseudo-mapper will be replaced with a mapper onto an actual
+ *             course data source.
+ *
  * @package Schoolbox\Assessment\Course
  * @method Model findById($id)
  */

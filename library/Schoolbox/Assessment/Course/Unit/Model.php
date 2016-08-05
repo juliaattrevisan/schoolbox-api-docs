@@ -12,6 +12,13 @@ namespace Schoolbox\Assessment\Course\Unit;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 
+/**
+ * Class Model
+ *
+ * @deprecated This model will be replaced with one for an actual unit object.
+ *
+ * @package Schoolbox\Assessment\Course\Unit
+ */
 class Model extends \Schoolbox\Resource\Folder\Model
 {
 

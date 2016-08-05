@@ -22,6 +22,9 @@ use Schoolbox\Resource\Folder;
  *
  * Class Mapper
  *
+ * @deprecated This pseudo-mapper will be replaced with a mapper onto an actual
+ *             unit data source.
+ *
  * @package Schoolbox\Assessment\Course\Unit
  * @method Model findById($id)
  */
