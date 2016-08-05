@@ -36,8 +36,8 @@
             var index  = $seasonDropdown[0].selectedIndex;
             var length = $seasonDropdown[0].length;
 
-            var enablePrevious = index > 1 && length > 2;
-            var enableNext     = index < (length-1) && length > 2;
+            var enablePrevious = index > 0 && length > 1;
+            var enableNext     = index < (length-1) && length > 1;
 
             enablePrevious ? $previous.removeAttr('disabled') : $previous.attr('disabled','disabled');
             $previous.prop('disabled', enablePrevious);
@@ -120,7 +120,6 @@
                 </nav>
                 <div class="semester">
                     <select id="context-selector-semester">
-                        <option disabled label="Select a season">Select a season</option>
                         <option value="0" selected="selected">All Seasons</option>
                         {% for season in allSeasons %}
                             {% set isCurrent = season.getId == division.season.getId %}
