@@ -25,6 +25,7 @@ use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use \Schoolbox\SportsFixtures\Team\Position\Model as TeamPosition;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
+use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Division\User\Model as DivisionUser;
 use \Schoolbox\SportsFixtures\Division\User\Mapper as DivisionUserMapper;
