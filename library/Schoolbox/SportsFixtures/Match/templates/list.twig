@@ -23,11 +23,11 @@
         var $seasonDropdown = $seasonSelector.find('#context-selector-semester');
         var $previous       = $seasonSelector.find('[data-interaction=previous]');
         var $next           = $seasonSelector.find('[data-interaction=next]');
-        var ALL             = 0;
+        var ALL_SEASONS     = 0;
         $seasonDropdown.on('change',function(event){
             var seasonId = $(this).val();
             $seasons.each(function(idx,elem){
-                if(ALL == seasonId || $(elem).data('season') == seasonId){
+                if(ALL_SEASONS == seasonId || $(elem).data('season') == seasonId){
                     $(elem).removeClass('hide');
                 } else {
                     $(elem).addClass('hide');
@@ -39,8 +39,7 @@
         // User clicks a navigation element
         $previous.add($next).on('click',function(event){
             event.preventDefault();
-            var increment = $(this).data('interaction') == 'previous' ? -1 : 1;
-            $seasonDropdown[0].selectedIndex += increment;
+            $seasonDropdown[0].selectedIndex += $(this).data('interaction') == 'previous' ? -1 : 1;
             $seasonDropdown.trigger('change');
         });
 
@@ -104,9 +103,10 @@
                     <select id="context-selector-semester">
                         <option disabled label="Select a season">Select a season</option>
                         <option value="0" selected="selected">All Seasons</option>
-                        {% for currentSeason in allSeasons %}
-                            <option value="{{ currentSeason.getId }}" {% if currentSeason.getId == division.season.getId %} selected="selected" {% endif %}
-                            >{{ currentSeason.name }} ({{ currentSeason.start.getDateOnly }}—{{ currentSeason.end.getDateOnly }})</option>
+                        {% for season in allSeasons %}
+                            {% set isCurrent = season.getId == division.season.getId %}
+                            <option value="{{ season.getId }}" {% if isCurrent %} selected="selected" {% endif %}
+                            >{{ season.name }} ({{ season.start.getDateOnly }}—{{ season.end.getDateOnly }}){% if isCurrent %} *{% endif %}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -124,15 +124,14 @@
             {% for currentSeason in allSeasons %}
                 <div data-season="{{ currentSeason.id }}" {% if currentSeason.getId != division.season.getId %} class="hide" {% endif %} >
                     <h2 class="subheader"><a href="{{ routeLookup('sportsfixturesSeason.getEntity', {entityId: currentSeason.id}) }}">
-                        {% set seasonName %}
-                            {{ currentSeason.name }} {% if currentSeason.getId == division.season.getId %} (current) {% endif %}
-                        {% endset %}
                         {% if currentSeason.isArchived %}
-                            <del class="icon icon-archive" title="Season has been archived.">{{ seasonName }}</del>
+                            <del class="icon icon-archive" title="Season has been archived.">{{ currentSeason.name }}</del>
                         {% else %}
-                            {{ seasonName }}
+                            <span title="View season details">{{ currentSeason.name }}</span>
                         {% endif %}
-                    </a></h2>
+                    </a>
+                        {% if currentSeason.getId == division.season.getId %} (<span title="{{ division.name }} is currently attached to this season">current</span>) {% endif %}
+                    </h2>
                     <section>
                         <ul class="action-list">
                             {% for currentMatch in allMatches[currentSeason.id] %}
