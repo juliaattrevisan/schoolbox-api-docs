@@ -29,4 +29,16 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('folder_id', FolderMapper::getInstance(), 'id', null, null, 'folder');
     }
+
+    /**
+     * Converts a DeprecatedModel for a course into a new model.
+     *
+     * @param DeprecatedModel $deprecatedModel
+     * @return Model
+     */
+    public function convertDeprecatedModel(DeprecatedModel $deprecatedModel)
+    {
+        return $this->createModel()
+            ->setFolder($this->getJoinMapper('folder')->findById($deprecatedModel->getId()));
+    }
 }
