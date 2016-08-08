@@ -163,24 +163,24 @@ class Session
      */
     public function authenticate($username, $password)
     {
-
-        // user must be a valid object (username exists) and also enabled
-        $uMap = new \Schoolbox\UserMapper();
-        $user = null;
-        try {
-            $user = $uMap->findOneByColumn('username', $username);
-        } catch (Schoolbox\Mapper\Exception $e) {
-            throw new SchoolboxNotFoundException();
-        }
-        if (!($user instanceof \Schoolbox\User && $user->getEnabled())) {
-            throw new SchoolboxAccountDisabledException();
-        }
-
-        $result = false;
-
         if (empty($username) || empty($password)) {
             throw new SchoolboxAccessDeniedException();
         }
+
+        $userMapper = \Schoolbox\UserMapper::getInstance();
+
+        // Cannot use findOneByColumn() as that returns deleted users which may mask extant user.
+        $user = $userMapper->findByColumnList(['username' => $username], ['deleted' => false])->first();
+        if(!$user instanceof \Schoolbox\User){
+            throw new SchoolboxNotFoundException();
+        }
+
+        if (!($user->getEnabled())) {
+            throw new SchoolboxAccountDisabledException();
+        }
+
+
+        $result = false;
 
         // Function to check username exists and password is correct
         if (Cfg::get('ldap_enable')) {
@@ -327,6 +327,12 @@ class Session
         // failed authentication
         return false;
     }
+
+    /**
+     * @param string $username
+     * @param string $password
+     * @return bool
+     */
     private function authenticateSQL($username, $password)
     {
         $passwordValidator = new \Schoolbox\User\Password\Validator(

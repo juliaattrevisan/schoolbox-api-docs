@@ -61,9 +61,8 @@ class Validator
      */
     public function checkPassword($username, $password)
     {
-        try {
-            $user = $this->userMapper->findOneByColumn('username', $username);
-        } catch (MapperException $e) {
+        $user = $this->userMapper->findByColumnList(['username' => $username], ['deleted' => false])->first();
+        if(!$user instanceof User){
             return false;
         }
 
