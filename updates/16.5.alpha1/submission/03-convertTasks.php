@@ -61,40 +61,57 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     // Go
     $selectTaskQuery->execute();
     $log->debug(sprintf('%d tasks found', $selectTaskQuery->rowCount()));
+    $successCount = 0;
+    $failureCount = 0;
     foreach ($selectTaskQuery->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
         // Convert this task
         $log->info(sprintf('Converting task "%s" (id: %d)...', $row['title'], $row['id']));
 
-        // Create project
-        $insertProjectQuery->execute(['title' => $row['title']]);
-        $projectId = $db->lastInsertId();
-        $log->debug('Created project');
+        try {
+            $db->beginTransaction();
 
-        // Associate this project with the task's folder
-        $insertProjectRelationQuery->execute(['projectId' => $projectId, 'folderId' => $row['category_id']]);
-        $log->debug('Created project/folder relation');
+            // Create project
+            $insertProjectQuery->execute(['title' => $row['title']]);
+            $projectId = $db->lastInsertId();
+            $log->debug('Created project');
 
-        // Create assessment
-        $insertAssessmentQuery->execute(['projectId' => $projectId, 'title' => $row['title']]);
-        $assessmentId = $db->lastInsertId();
-        $log->debug('Created assessment/project relation');
+            // Associate this project with the task's folder
+            $insertProjectRelationQuery->execute(['projectId' => $projectId, 'folderId' => $row['category_id']]);
+            $log->debug('Created project/folder relation');
 
-        // Associate this task with the assessment
-        $updateTaskQuery->execute(['assessmentId' => $assessmentId, 'taskId' => $row['id']]);
-        $log->debug('Created task/assessment relation');
+            // Create assessment
+            $insertAssessmentQuery->execute(['projectId' => $projectId, 'title' => $row['title']]);
+            $assessmentId = $db->lastInsertId();
+            $log->debug('Created assessment/project relation');
 
-        if ($row['assess_id']) {
-            // Tasks with a quiz: delete task, and associate quiz with assessment
-            $updateQuizQuery->execute(['assessmentId' => $assessmentId, 'assessId' => $row['assess_id']]);
-            $deleteTaskQuery->execute(['taskId' => $row['id']]);
-            $log->debug('Task has quiz - created quiz/assessment relation, deleted task');
-        }
-        if ($row['box_id']) {
-            // Tasks with a due work: delete task, and associate due work with assessment
-            $updateDueWorkQuery->execute(['assessmentId' => $assessmentId, 'boxId' => $row['box_id']]);
-            $deleteTaskQuery->execute(['taskId' => $row['id']]);
-            $log->debug('Task has due work - created due work/assessment relation, deleted task');
+            // Associate this task with the assessment
+            $updateTaskQuery->execute(['assessmentId' => $assessmentId, 'taskId' => $row['id']]);
+            $log->debug('Created task/assessment relation');
+
+            if ($row['assess_id']) {
+                // Tasks with a quiz: delete task, and associate quiz with assessment
+                $updateQuizQuery->execute(['assessmentId' => $assessmentId, 'assessId' => $row['assess_id']]);
+                $deleteTaskQuery->execute(['taskId' => $row['id']]);
+                $log->debug('Task has quiz - created quiz/assessment relation, deleted task');
+            }
+            if ($row['box_id']) {
+                // Tasks with a due work: delete task, and associate due work with assessment
+                $updateDueWorkQuery->execute(['assessmentId' => $assessmentId, 'boxId' => $row['box_id']]);
+                $deleteTaskQuery->execute(['taskId' => $row['id']]);
+                $log->debug('Task has due work - created due work/assessment relation, deleted task');
+            }
+
+            $successCount++;
+            $db->commit();
+
+        } catch (PDOException $e) {
+            $log->error(sprintf('Task "%s" could not be converted!', $row['title']), ['message' => $e->getMessage()]);
+            $failureCount++;
+            $db->rollBack();
+
         }
     }
+
+    $log->info(sprintf('%d tasks converted, %d failed to convert', $successCount, $failureCount));
 });
