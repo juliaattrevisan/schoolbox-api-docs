@@ -51,14 +51,8 @@
                 <li class="actions-small-1">
                     <div class="list-item">
                         <div class="small-12 avatar card">
-                            <h3><a href="{{ routeLookup('sportsfixturesTeam.getEntity', {entityId: currentTeam.id}) }}">
-                            {% if division.season.isArchived %}
-                                <del class="icon icon-archive" title="This team is archived.">{{ currentTeam.name }}</del>
-                            {% else %}
-                                <span title="View Team Details">{{ currentTeam.name }}</span>
-                            {% endif %}
-                            </a></h3>
-                            <p><a href="{{ currentTeam.url }}">{{ currentTeam.url }}</a>
+                            <h3>{{ currentTeam.name }}</h3>
+                            <p class="meta"><a href="{{ currentTeam.url }}">{{ currentTeam.url }}</a>
                         </div>
                     </div>
                     <nav>
