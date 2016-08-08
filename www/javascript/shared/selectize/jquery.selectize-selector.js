@@ -138,15 +138,6 @@
 //            'destroy'
         ];
 
-        // Unlock modal if one of the following are clicked
-        var closeSelectors = [
-            '.close-reveal-modal',
-            'a',
-            'button',
-            'input[type=button]',
-            'input[type=submit]'
-        ];
-
         // Set up selectize on all elements
         element.each(function() {
             var singleElement = $(this);
@@ -154,13 +145,19 @@
 
             // Is this selectize inside a foundation modal ?
             if( singleElement.closest('[data-reveal]').length ){
-                // Lock modal when dropdown appears
+
+                // Lock modal when dropdown opens
                 singleElement.data('selectize').on('dropdown_open', function(){
                     Foundation.libs.reveal.locked = true;
                 });
 
-                $('[data-reveal]').on('click', closeSelectors.join(), function(){
-                    Foundation.libs.reveal.locked = false;
+                // Unlock modal when dropdown closes
+                singleElement.data('selectize').on('dropdown_close', function(){
+
+                    // It appears the modal doesn't process the 'close' event until some period after the user action.
+                    setTimeout(function(){
+                        Foundation.libs.reveal.locked = false;
+                    }, 125);   // empirical testing indicated '111' was minimum delay required.
                 });
             }
 
