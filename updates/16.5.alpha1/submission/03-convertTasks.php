@@ -60,27 +60,37 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
     // Go
     $selectTaskQuery->execute();
+    $log->debug(sprintf('%d tasks found', $selectTaskQuery->rowCount()));
     foreach ($selectTaskQuery->fetchAll(PDO::FETCH_ASSOC) as $row) {
+
+        // Convert this task
+        $log->info(sprintf('Converting task "%s" (id: %d)...', $row['title'], $row['id']));
 
         // Create project
         $insertProjectQuery->execute(['title' => $row['title']]);
         $projectId = $db->lastInsertId();
+        $log->debug('Created project');
 
         // Associate this project with the task's folder
         $insertProjectRelationQuery->execute(['projectId' => $projectId, 'folderId' => $row['folder_id']]);
+        $log->debug('Created project/folder relation');
 
         // Create assessment
         $insertAssessmentQuery->execute(['projectId' => $projectId, 'title' => $row['title']]);
         $assessmentId = $db->lastInsertId();
+        $log->debug('Created assessment/project relation');
 
         // Associate this task with the assessment
         if ($row['assess_id']) {
+            // Tasks with a quiz: delete task, and associate quiz with assessment
             $updateQuizQuery->execute(['assessmentId' => $assessmentId, 'assessId' => $row['assess_id']]);
             $deleteTaskQuery->execute(['taskId' => $row['id']]);
         } elseif ($row['box_id']) {
+            // Tasks with a due work: delete task, and associate due work with assessment
             $updateDueWorkQuery->execute(['assessmentId' => $assessmentId, 'boxId' => $row['box_id']]);
             $deleteTaskQuery->execute(['taskId' => $row['id']]);
         } else {
+            // Other tasks - associate task with assessment
             $updateTaskQuery->execute(['assessmentId' => $assessmentId, 'taskId' => $row['id']]);
         }
     }
