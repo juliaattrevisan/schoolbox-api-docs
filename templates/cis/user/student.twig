@@ -1,0 +1,16 @@
+{% extends '@core/user/student.twig' %}
+
+{% for contact in contacts %}
+    <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ loop.index }}">
+        <li><a class="icon-modify" href="/homepage/4694">Update Contact Details</a></li>
+        {% if contact.StudentContactDefaultEmail and contact.StudentContactUseEmail != 'N' %}
+        <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></li>
+        {% endif %}
+        {% if contact.StudentContactMobilePhone %}
+        <li><a class="icon-mobile" href="tel:{{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a></li>
+        {% endif %}
+        {% if contact.StudentContactOccupPhone %}
+        <li><a class="icon-mobile" href="tel:{{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a></li>
+        {% endif %}
+    </ul>
+{% endfor %}
