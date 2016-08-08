@@ -8,10 +8,6 @@
  */
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\Assessment\Mapper as AssessmentMapper;
-use Schoolbox\Assessment\Model as AssessmentModel;
-use Schoolbox\Assessment\Course;
-use Schoolbox\Assessment\Project;
 use Schoolbox\Mapper\Exception as MapperException;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
@@ -56,7 +52,6 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         FROM task
         WHERE COALESCE(assessment_id, 0) = 0
     ");
-
 
     // Go
     $selectTaskQuery->execute();
