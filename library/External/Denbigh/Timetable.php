@@ -254,69 +254,45 @@ class External_Denbigh_Timetable implements External_TimetableInterface
      */
     public function getRoomTimetable($roomCodes)
     {
-        return array();
-//        // First: $this->getFullTimetable() and pinch its query
-//        // Second: join to whatever is in External_*_User->getStaff
-//        // Third: join to the timetable implementation if at all possible
-//        $query = "
-//            SELECT
-//                co.subjectName AS Description,
-//                l.day AS DayNumber,
-//                l.period AS PeriodNumber,
-//                '' AS TimetableGroup,
-//                '' AS ClassCampus,
-//                l.classCode AS ClassCode,
-//                l.staffCode AS StaffID,
-//                p.title AS StaffTitle,
-//                p.preferred_name AS StaffPreferredName,
-//                p.surname AS StaffSurname
-//            FROM Lessons l
-//            LEFT JOIN Staff AS s ON
-//                l.staffCode = s.staffCode
-//            LEFT JOIN People AS p ON
-//                s.peopleDenbighId = p.denbighId
-//            INNER JOIN Classes AS cl ON
-//                l.classCode = cl.classCode
-//            INNER JOIN Courses co ON
-//                cl.courseCode = co.courseCode
-//            WHERE l.room = :room
-//            ORDER BY
-//                l.day ASC,
-//                l.period ASC
-//        ";
-//        $statement = $this->getExternalDatabase()->prepare($query);
-//        $statement->execute(array('room' => $roomCode));
-//
-//        // Denbigh doesn't seem to have any campus data for its timetables:
-//        // just link to the first campus.
-//        $campusId = $this->getInternalDatabase()->query("
-//            SELECT id
-//            FROM luCampus
-//            ORDER BY id ASC
-//            LIMIT 1
-//        ")->fetchColumn();
-//
-//        $campusTimetable = $this->getTimetableDefinition($campusId);
-//        new Alaress_Probe($campusTimetable);
-//        $result          = array();
-//        foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $row) {
-//
-//            // Match day and period against a start and end.
-//            for ($i = 0; $i < $campusTimetable['periodCount']; $i++) {
-//                $periodNumber   = $campusTimetable['number'][$i];
-//                $periodSequence = $campusTimetable['sequence'][$i];
-//
-//                // (Ignore period sequence 2, everyone else does)
-//                if ($periodNumber == $row['PeriodNumber'] && $periodSequence != 2) {
-//                    $row['PeriodStart'] = $campusTimetable['start'][$i];
-//                    $row['PeriodEnd']   = $campusTimetable['end'][$i];
-//                    $row['PeriodName']  = $campusTimetable['desc'][$i];
-//                    $result[] = $row;
-//                    break;
-//                }
-//            }
-//        }
-//        return $result;
+        if (empty($roomCodes)) {
+            return [];
+        }
+
+        // Get the first timetable group, that's the best I can do
+        // (because Denbigh lessons don't have a campus)
+        $campusQuery = $this->getInternalDatabase()->query('SELECT ext_timetable_code FROM luCampus LIMIT 1');
+        if ($campusQuery->rowCount() == 0) {
+            return [];
+        }
+        $timetableGroup = $campusQuery->fetchColumn();
+
+        $query = "SELECT l.day AS DayNumber, 
+                        l.period AS PeriodNumber, 
+                        startTime AS PeriodStart, 
+                        endTime AS PeriodEnd, 
+                        l.classCode AS ClassCode, 
+                        l.staffCode AS StaffID, 
+                        l.room AS RoomCode, 
+                        co.subjectName AS Description,
+                        :timetableGroup AS TimetableGroup
+                        FROM Lessons l 
+                        RIGHT JOIN Classes cl ON cl.classCode = l.classCode
+                        RIGHT JOIN Courses co ON co.courseCode = cl.courseCode
+                        WHERE l.room IN (:rooms)";
+
+        $query = strtr(
+            $query,
+            array(
+                ':timetableGroup' => $this->externalDatabase->quote($timetableGroup),
+                ':rooms'          => implode(',', array_map([$this->externalDatabase, 'quote'], $roomCodes)),
+            )
+        );
+
+        $statement = $this->getExternalDatabase()->prepare($query);
+        $statement->execute();
+
+
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
