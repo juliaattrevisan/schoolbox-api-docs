@@ -81,17 +81,20 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         $log->debug('Created assessment/project relation');
 
         // Associate this task with the assessment
+        $updateTaskQuery->execute(['assessmentId' => $assessmentId, 'taskId' => $row['id']]);
+        $log->debug('Created task/assessment relation');
+
         if ($row['assess_id']) {
             // Tasks with a quiz: delete task, and associate quiz with assessment
             $updateQuizQuery->execute(['assessmentId' => $assessmentId, 'assessId' => $row['assess_id']]);
             $deleteTaskQuery->execute(['taskId' => $row['id']]);
-        } elseif ($row['box_id']) {
+            $log->debug('Task has quiz - created quiz/assessment relation, deleted task');
+        }
+        if ($row['box_id']) {
             // Tasks with a due work: delete task, and associate due work with assessment
             $updateDueWorkQuery->execute(['assessmentId' => $assessmentId, 'boxId' => $row['box_id']]);
             $deleteTaskQuery->execute(['taskId' => $row['id']]);
-        } else {
-            // Other tasks - associate task with assessment
-            $updateTaskQuery->execute(['assessmentId' => $assessmentId, 'taskId' => $row['id']]);
+            $log->debug('Task has due work - created due work/assessment relation, deleted task');
         }
     }
 });
