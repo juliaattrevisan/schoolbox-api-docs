@@ -202,7 +202,11 @@ function Calendar(id, bubbleId, opts) {
                                         .attr('href', this.href)
                                         .text(this.label)
                                         .prepend('<span />')
-                                )
+                                );
+
+                                // Sigh. Hack to insert whitespace to mimic standard button HTML.
+                                // (A pure CSS margin solution would require the parent element to have font-size=0)
+                                data.bookingActions.push(' ');
                             }
                         })
                     }
