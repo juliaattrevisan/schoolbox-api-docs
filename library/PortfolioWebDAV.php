@@ -397,12 +397,10 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             if ($groupHandler->isStaff()) {
                 $paths = array(
                     $settings['baseUri'].'staff/',
-                    $settings['baseUri'].'student/',
                     $settings['baseUri'].'public/',
                 );
             } elseif ($groupHandler->isStudent()) {
                 $paths = array(
-                    $settings['baseUri'].'student/',
                     $settings['baseUri'].'public/',
                 );
             }
