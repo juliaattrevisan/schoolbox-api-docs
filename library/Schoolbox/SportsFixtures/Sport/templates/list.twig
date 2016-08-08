@@ -10,7 +10,14 @@
                 text: 'Are you sure you want to delete this Sport?',
                 confirmEvent: function() {
                     $.post(element.data('post-action'), {}, function() {
-                        $sport.fadeOut({ done: $sport.remove });
+
+                        // Is this the last sport ?
+                        if( 1 == $('[data-sport]').length){
+                            window.location.href = window.location.href;
+                        } else {
+                            $sport.fadeOut({ done: $sport.remove() });
+                        }
+
                     });
                 }
             });
@@ -38,24 +45,8 @@
         {% if allSports|length %}
         <section>
             <ul class="information-list">
-                {% for currentSport in allSports %}
-                <li class="actions-small-1" data-sport>
-                    <div class="list-item">
-                        <div class="small-12 avatar card">
-                            <p>{{ currentSport.name }}</p>
-                            <p><a href="{{ currentSport.url }}">{{ currentSport.url }}</a>
-                        </div>
-                    </div>
-                    <nav>
-                        <a href="{{ routeLookup('sportsfixturesSport.getModifyForm', {entityId: currentSport.id}) }}" class="icon-modify" title="Modify"></a>
-                        <a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: currentSport.id}) }}" class="icon-division" title="Manage Divisions in {{ currentSport.name }}"></a>
-                        <a href="{{ routeLookup('sportsfixturesPosition.getList', {contextId: currentSport.id}) }}" class="icon-position" title="Manage Positions in {{ currentSport.name }}"></a>
-                        <a href="#" class="icon-more" data-dropdown="sportsfixtures-sport-{{ currentSport.getId() }}-actions"></a>
-                    </nav>
-                    <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-sport-{{ currentSport.getId() }}-actions">
-                        <li><a href="#" data-action="delete" data-post-action="{{ routeLookup('sportsfixturesSport.deleteEntity', {entityId: currentSport.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentSport.id }}">Delete</a></li>
-                    </ul>
-                </li>
+                {% for sport in allSports %}
+                    {% include '@sportsfixturesSport/listItem.twig' %}
                 {% endfor %}
             </ul>
         </section>
