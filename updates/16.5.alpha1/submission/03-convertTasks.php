@@ -54,7 +54,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $selectTaskQuery = $db->prepare("
         SELECT id, category_id, title, assess_id, box_id 
         FROM task
-        WHERE COALESCE(assessment_id, 0) != 0 
+        WHERE COALESCE(assessment_id, 0) = 0
     ");
 
 
