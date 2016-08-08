@@ -116,10 +116,17 @@ class Controller extends AbstractController
          */
         $seasonMatches = new Collection();
 
+        // Flag to indicate whether any extant matches are scheduled in the division's current season
+        $isMatchesInCurrentSeason = false;
+
         /* Accumulate faceless schools and group by season
          */
         /** @var Match $currentMatch */
         foreach ($allMatches as $currentMatch) {
+
+            if($currentMatch->getSeason()->getId() == $division->getSeason()->getId()){
+                $isMatchesInCurrentSeason = true;
+            }
 
             if ($currentMatch->getHomeSchoolId()) {
                 $facelessTeam = $this->getTeamMapper()->createModel()->setName($this->getSchoolTagCloudMapper()->getTagName($currentMatch->getHomeSchoolId()));
@@ -138,6 +145,11 @@ class Controller extends AbstractController
             }
 
             $seasonMatches->getOffset($currentMatch->getSeason()->getId())->add($currentMatch);
+        }
+
+        // Ensure we always render the division's current season, so we can add matches even if empty
+        if(!$isMatchesInCurrentSeason){
+            $allSeasons->add($division->getSeason());
         }
 
         // Sort seasons by start then end dates

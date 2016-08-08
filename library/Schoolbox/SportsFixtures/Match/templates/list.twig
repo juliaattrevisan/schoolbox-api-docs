@@ -136,9 +136,7 @@
     </div>
 
     <div class="small-12 island" id="allMatches">
-
-        {% if allMatches|length %}
-            <div>
+        <div>
             {% for season in allSeasons %}
                 <div data-season="{{ season.id }}" {% if season.isArchived %} data-archived="1" {% endif %}  {% if season.getId != division.season.getId %} class="hide" {% endif %}  >
                     <div class="actions-small-1">
@@ -157,9 +155,9 @@
                                 <a href='{{ routeLookup('sportsfixturesMatch.getInSeasonForm', {contextId: division.id, seasonId: season.id}) }}' class="icon-add" title="Add Match to {{ season.name }} {{ division.name }}"></a>
                             {% endif %}
                         </nav>
-
                     </div>
 
+                    {% if allMatches[season.id]|length %}
                     <section>
                         <ul class="action-list">
                             {% for currentMatch in allMatches[season.id] %}
@@ -167,17 +165,15 @@
                             {% endfor %}
                         </ul>
                     </section>
+                    {% elseif not division.season.isArchived %}
+                        <div class="empty-state">
+                            <i class="icon-match"></i>
+                            <p>There are no Matches in {{ season.name }} {{ division.name }}.</p>
+                            <p><a href="{{ routeLookup('sportsfixturesMatch.getInSeasonForm', {contextId: division.id, seasonId: season.id}) }}" title="Add Match to {{ season.name }} {{ division.name }}">Add a Match</a></p>
+                        </div>
+                    {% endif %}
                 </div>
             {% endfor %}
-            </div>
-        {% else %}
-            <div class="empty-state">
-                <i class="icon-match"></i>
-                <p>There are no Matches in {{ division.name }}.</p>
-                {% if not division.season.isArchived %}
-                    <p><a href="{{ routeLookup('sportsfixturesMatch.getCreateForm', {contextId: division.id}) }}" title="Add a Match">Add a Match</a></p>
-                {% endif %}
-            </div>
-        {% endif %}
+        </div>
     </div>
 </div>
