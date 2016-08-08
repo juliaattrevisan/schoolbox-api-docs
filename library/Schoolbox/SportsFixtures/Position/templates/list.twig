@@ -4,12 +4,19 @@
             event.preventDefault();
 
             var element = $(this);
+            var $position = element.closest('[data-position]');
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Position?',
                 confirmEvent: function() {
-                    $.post(element.attr('href'), {positionId: element.attr('data-delete')}, function() {
-                        window.location.href = window.location.href;
+                    $.post(element.attr('href'), {}, function() {
+
+                        // Is this the last match in the division ?
+                        if( 1 == $('[data-position]').length){
+                            window.location.href = window.location.href;
+                        } else {
+                            $position.fadeOut({ done: $position.remove() });
+                        }
                     });
                 }
             });
