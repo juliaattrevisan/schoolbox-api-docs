@@ -4,12 +4,18 @@
             event.preventDefault();
 
             var element = $(this);
+            var $venue  = element.closest('[data-venue]');
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Venue?',
                 confirmEvent: function() {
-                    $.post(element.attr('href'), {venueId: element.attr('data-delete')}, function() {
-                        window.location.href = window.location.href;
+                    $.post(element.attr('href'), {}, function() {
+                        // Is this the last venue ?
+                        if( 1 == $('[data-venue]').length){
+                            window.location.href = window.location.href;
+                        } else {
+                            $venue.fadeOut({ done: $venue.remove() });
+                        }
                     });
                 }
             });
@@ -37,19 +43,8 @@
         {% if allVenues|length %}
             <section>
                 <ul class="information-list">
-                    {% for currentVenue in allVenues %}
-                        <li class="actions-small-1">
-                            <div class="list-item">
-                                <div class="small-12 avatar card">
-                                    <p>{{ currentVenue.name }}</p>
-                                    <p class="meta">{{ currentVenue.address }}</p>
-                                </div>
-                            </div>
-                            <nav>
-                                <a href="{{ routeLookup('sportsfixturesVenue.deleteEntity', {entityId: currentVenue.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentVenue.id }}"></a>
-                                <a href="{{ routeLookup('sportsfixturesVenue.getModifyForm', {entityId: currentVenue.id}) }}" class="icon-modify" title="Modify"></a>
-                            </nav>
-                        </li>
+                    {% for venue in allVenues %}
+                        {% include '@sportsfixturesVenue/listItem.twig' %}
                     {% endfor %}
                 </ul>
             </section>
