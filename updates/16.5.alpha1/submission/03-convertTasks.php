@@ -72,7 +72,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         $log->debug('Created project');
 
         // Associate this project with the task's folder
-        $insertProjectRelationQuery->execute(['projectId' => $projectId, 'folderId' => $row['folder_id']]);
+        $insertProjectRelationQuery->execute(['projectId' => $projectId, 'folderId' => $row['category_id']]);
         $log->debug('Created project/folder relation');
 
         // Create assessment
