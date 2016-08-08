@@ -4,12 +4,19 @@
             event.preventDefault();
 
             var element = $(this);
+            var $team   = element.closest('[data-team]');
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Team?',
                 confirmEvent: function() {
                     $.post(element.attr('href'), {teamId: element.attr('data-delete')}, function() {
-                        window.location.href = window.location.href;
+
+                        // Is this the last team in the division ?
+                        if( 1 == $('[data-team]').length){
+                            window.location.href = window.location.href;
+                        } else {
+                            $team.fadeOut({ done: $team.remove() });
+                        }
                     });
                 }
             });
@@ -48,7 +55,7 @@
         <section>
             <ul class="action-list">
                 {% for currentTeam in allTeams %}
-                <li class="actions-small-1">
+                <li class="actions-small-1" data-team>
                     <div class="list-item">
                         <div class="small-12 avatar card">
                             <h3>{{ currentTeam.name }}</h3>
