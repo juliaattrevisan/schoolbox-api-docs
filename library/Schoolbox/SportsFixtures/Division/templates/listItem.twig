@@ -1,0 +1,35 @@
+<li class="actions-small-1" data-division>
+    <div class="list-item">
+        <div class="small-12 avatar card">
+            <h3><a href="{{ routeLookup('sportsfixturesDivision.getEntity', {entityId: division.id}) }}">
+                    {% if division.season.isArchived %}
+                        <del class="icon icon-archive" title="This division's season is archived.">{{ division.name }}</del>
+                    {% else %}
+                        <span title="View Details">{{ division.name }}</span>
+                    {% endif %}
+                </a></h3>
+            <p><a href="{{ division.url }}">{{ division.url }}</a>
+        </div>
+    </div>
+    {% if not division.season.isArchived %}
+        <nav>
+            <a href="{{ routeLookup('sportsfixturesDivision.getModifyForm', {entityId: division.id}) }}" class="icon-modify" title="Modify"></a>
+            <a href="{{ routeLookup('sportsfixturesDivision.getLobby', {entityId: division.id}) }}" class="icon-player" title="Manage Players in {{ division.name }}"></a>
+            <a href="{{ routeLookup('sportsfixturesTeam.getList', {contextId: division.id}) }}" class="icon-team" title="Manage Teams in {{ division.name }}"></a>
+            <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}" class="icon-match" title="Manage Matches in {{ division.name }}"></a>
+            <a href="#" class="icon-more" data-dropdown="sportsfixtures-division-{{ division.getId() }}-actions"></a>
+        </nav>
+        <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-division-{{ division.getId() }}-actions">
+            <li><a href="{{ routeLookup('sportsfixturesDivision.deleteEntity', {entityId: division.id}) }}" class="icon-delete" title="Delete" data-delete="{{ division.id }}">Delete</a></li>
+        </ul>
+    {% else %}
+        <nav>
+            <a href="{{ routeLookup('sportsfixturesTeam.getList', {contextId: division.id}) }}" class="icon-team" title="View Teams in {{ division.name }}"></a>
+            <a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}" class="icon-match" title="View Matches in {{ division.name }}"></a>
+            <a href="#" class="icon-more" data-dropdown="sportsfixtures-division-{{ division.getId() }}-actions"></a>
+        </nav>
+        <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-division-{{ division.getId() }}-actions">
+            <li><a href="{{ routeLookup('sportsfixturesDivision.deleteEntity', {entityId: division.id}) }}" class="icon-delete" title="Delete" data-delete="{{ division.id }}">Delete</a></li>
+        </ul>
+    {% endif %}
+</li>
