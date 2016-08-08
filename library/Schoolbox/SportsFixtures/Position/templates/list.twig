@@ -46,17 +46,7 @@
             <section>
                 <ul class="action-list">
                     {% for currentPosition in allPositions %}
-                        <li class="actions-small-1">
-                            <div class="list-item">
-                                <div class="small-12 avatar card">
-                                    <p>{{ currentPosition.name }}</p>
-                                </div>
-                            </div>
-                            <nav>
-                                <a href="{{ routeLookup('sportsfixturesPosition.deleteEntity', {entityId: currentPosition.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentPosition.id }}"></a>
-                                <a href="{{ routeLookup('sportsfixturesPosition.getModifyForm', {entityId: currentPosition.id}) }}" class="icon-modify" title="Modify"></a>
-                            </nav>
-                        </li>
+                        {% include '@sportsfixturesPosition/listItem.twig' %}
                     {% endfor %}
                 </ul>
             </section>
