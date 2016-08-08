@@ -823,7 +823,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
                 if (is_array($subject_list) && !empty($subject_list)) {
                     $category_codes = array_map(
                         function ($row) {
-                            return $row['code'];
+                            return trim($row['code']);
                         }, $subject_list
                     );
                     if (!empty($category_codes)) {
