@@ -158,17 +158,109 @@ class RubricMapper
      */
     public function findBySubmissionBox($box, $forceTaskMode = false, $editMode = false)
     {
-        $levelCollection = LevelMapper::getInstance()->findByColumn('box_id', $box->getId(), [ 'order' => [ 'sequence' => 'ASC' ] ]);
+        list ($groups, $criteria) = $this->findCriteria($box, $forceTaskMode);
+        $descriptors = $this->findDescriptors($box);
+        $levelList   = $this->generateLevelList($box, $descriptors, $criteria);
 
-        $levelList = [];
+        // setup the data structure to match what the factory expects
+        $postdata = [$box->getId() => [
+            'level'      => $levelList,
+            'group'      => $groups,
+            'criterion'  => $criteria,
+            'descriptor' => $descriptors,
+        ]];
 
-        foreach ($levelCollection as $level) {
-            $levelList[$level->getSequence()] = [
-                'id'   => $level->getId(),
-                'name' => $level->getName()
+        // use the factory to produce the rubric object
+        return $this->factory->buildFromPostData($postdata, $forceTaskMode || $editMode)->setSubmissionBox($box);
+    }
+
+
+    /**
+     * @param SubmissionBox $box
+     * @param bool          $forceTaskMode
+     * @return array
+     */
+    protected function findCriteria(SubmissionBox $box, $forceTaskMode)
+    {
+        // why 20? because it's not 0.
+        $groupId    = 20;
+        $groupIdMap = $groups = $criteria = [];
+
+        $criteriaStatement = $this->generateCriteriaStatement($box, $forceTaskMode);
+
+        while ($r = $criteriaStatement->fetch(PDO::FETCH_ASSOC)) {
+
+            $groupName = $r['grouping'];
+
+            if (empty($groupIdMap[$groupName])) {
+                ++$groupId;
+
+                $groupIdMap[$groupName] = $groupId;
+                $groups[$groupId] = [ 'name' => $groupName ];
+            }
+
+            // check for usage
+            $usedElsewhere = ($r['usages'] - $r['selected']) > 0;
+
+            $criteria[$r['crit_id']] = [
+                'groupId'  => $groupIdMap[$groupName],
+                'on'       => $r['selected'] > 0,
+                'name'     => $r['name'],
+                'readonly' => $usedElsewhere
+            ];
+
+        }
+
+        // umm... I have *never* had to do this before... how does the while() loop break if not EOF??
+        $criteriaStatement->closeCursor();
+
+        // ensure any descriptors already in play get priority
+        $stmt = $this->database->query("
+            SELECT DISTINCT c.id, c.grouping, c.name
+            FROM rubric_descriptor d
+            RIGHT JOIN rubric_criterion c ON d.criterion_id = c.id
+            WHERE d.submission_box_id = :box_id
+            AND d.valid IS TRUE
+            AND c.deleted_at IS NULL
+        ", [
+            'box_id' => $box->getId()
+        ]);
+
+        while ($r = $stmt->fetch(PDO::FETCH_NUM)) {
+            list ($id, $grouping, $name) = $r;
+
+            if (!empty($criteria[$id])) {
+                // ensure it gets flagged as active... in theory this *should* happen every time
+                $criteria[$id]['on'] = true;
+                continue;
+            }
+
+            if (empty($groupIdMap[$grouping])) {
+                ++$groupId;
+
+                $groupIdMap[$grouping] = $groupId;
+                $groups[$groupId] = [ 'name' => $grouping ];
+            }
+
+            $criteria[$id] = [
+                'groupId'  => $groupId,
+                'on'       => true,
+                'name'     => $name,
+                'readonly' => true // we can only assume at this point...
             ];
         }
 
+        return [ $groups, $criteria ];
+    }
+
+    /**
+     * @param SubmissionBox $box
+     * @param bool          $forceTaskMode
+     * @throws \Schoolbox\Mapper\Exception
+     * @return \PDOStatement
+     */
+    protected function generateCriteriaStatement(SubmissionBox $box, $forceTaskMode)
+    {
         $args = [
             'boxId' => $box->getId(),
             'folderId' => $box->getCategory()->getId()
@@ -221,44 +313,23 @@ class RubricMapper
         ", $args);
 
 
-        // why 20? because it's not 0.
-        $groupId = 20;
+        return $criteriaStatement;
+    }
 
-        $groups = $criteria = $descriptors = [];
 
-        $groupIdMap = [];
-
-        while ($r = $criteriaStatement->fetch(PDO::FETCH_ASSOC)) {
-
-            $groupName = $r['grouping'];
-
-            if (empty($groupIdMap[$groupName])) {
-                ++$groupId;
-
-                $groupIdMap[$groupName] = $groupId;
-                $groups[$groupId] = [ 'name' => $groupName ];
-            }
-
-            // check for usage
-            $usedElsewhere = ($r['usages'] - $r['selected']) > 0;
-
-            $criteria[$r['crit_id']] = [
-                'groupId'  => $groupIdMap[$groupName],
-                'on'       => $r['selected'] > 0,
-                'name'     => $r['name'],
-                'readonly' => $usedElsewhere
-            ];
-
-        }
-
-        // umm... I have *never* had to do this before... how does the while() loop break if not EOF??
-        $criteriaStatement->closeCursor();
-
+    /**
+     * @param SubmissionBox $box
+     * @return array
+     */
+    protected function findDescriptors(SubmissionBox $box)
+    {
         /** @var Collection|SubmissionBox\Rubric\Descriptor[] $descriptorCollection */
         $descriptorCollection = SubmissionBox\Rubric\DescriptorMapper::getInstance()->findByColumnList([
             'submission_box_id' => $box->getId(),
             'valid'             => true
         ]);
+
+        $descriptors = [];
 
         foreach ($descriptorCollection as $d) {
             // only populate if a description is given
@@ -266,6 +337,29 @@ class RubricMapper
                 'id'     => $d->getId(),
                 'text'   => $d->getDescription(),
                 'points' => $d->getValue() || $d->getDescription() ? $d->getValue() : ''
+            ];
+        }
+
+        return $descriptors;
+    }
+
+
+    /**
+     * @param SubmissionBox $box
+     * @param array         $descriptors
+     * @param array         $criteria
+     * @return array
+     */
+    protected function generateLevelList(SubmissionBox $box, array $descriptors, array $criteria)
+    {
+        $levelList = [];
+
+        $levelCollection = LevelMapper::getInstance()->findByColumn('box_id', $box->getId(), [ 'order' => [ 'sequence' => 'ASC' ] ]);
+
+        foreach ($levelCollection as $level) {
+            $levelList[$level->getSequence()] = [
+                'id'   => $level->getId(),
+                'name' => $level->getName()
             ];
         }
 
@@ -299,16 +393,7 @@ class RubricMapper
             $levelList[] = [ 'name' => '' ];
         }
 
-        // setup the data structure to match what the factory expects
-        $postdata = [$box->getId() => [
-            'level'      => $levelList,
-            'group'      => $groups,
-            'criterion'  => $criteria,
-            'descriptor' => $descriptors,
-        ]];
-
-        // use the factory to produce the rubric object
-        return $this->factory->buildFromPostData($postdata, $forceTaskMode || $editMode)->setSubmissionBox($box);
+        return $levelList;
     }
 
 

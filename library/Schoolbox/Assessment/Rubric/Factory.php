@@ -237,6 +237,10 @@ class Factory
 
             foreach ($levelCache as $levelSequence => $l) {
 
+                if (empty($descriptors[$criterionId][$levelSequence])) {
+                    continue;
+                }
+
                 $descriptor      = $descriptors[$criterionId][$levelSequence];
                 $descriptorId    = isset($descriptor['id']) ? $descriptor['id'] : null;
                 $descriptorText  = $descriptor['text'];
