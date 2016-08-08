@@ -77,7 +77,7 @@
                 score: function(search) {
                     return function(item) {
                         // Simply filter list, don't reorder
-                        return -1 === item.name.indexOf(search) ? 0 : 1;
+                        return -1 === item.name.toLowerCase().indexOf(search.toLowerCase()) ? 0 : 1;
                     };
                 },
             }
