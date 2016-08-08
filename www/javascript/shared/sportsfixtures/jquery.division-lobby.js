@@ -161,6 +161,7 @@
 
                                 updateTeamMetadata($('[data-team='+toId+']'), response);
                                 updateDivisionLobby(response.divisionLobby);
+                                initApplyPositionSelector();
                             })
                             .done(function() {
 
@@ -225,6 +226,7 @@
                                 updateTeamMetadata($('[data-team='+fromId+']'), fromTeamConfiguration);
                                 updateTeamMetadata($('[data-team='+toId+']'), toTeamConfiguration);
                                 updateDivisionLobby(toTeamConfiguration.divisionLobby);
+                                initApplyPositionSelector();
                             })
                             .done(function() {
 
@@ -272,6 +274,7 @@
 
                                 updateTeamMetadata($('[data-team='+fromId+']'), response);
                                 updateDivisionLobby(response.divisionLobby);
+                                initApplyPositionSelector();
                             })
                             .done(function() {
 
