@@ -41,7 +41,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $log->debug(sprintf('Course "%s" converted', $deprecatedCourse->getName()));
             $successCount++;
         } catch (MapperException $e) {
-            $log->error(sprintf('Course "%s" could not be converted!', $deprecatedCourse->getName()), ['message' => $e->getMessage()]);
+            $log->error(sprintf('Course "%s" could not be converted!', $deprecatedCourse->getName()), [$e]);
             $failureCount++;
         }
 
@@ -59,7 +59,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 $log->debug(sprintf('Unit "%s" converted', $deprecatedUnit->getName()));
                 $unitSuccessCount++;
             } catch (MapperException $e) {
-                $log->error(sprintf('Unit "%s" could not be converted!', $deprecatedUnit->getName()), ['message' => $e->getMessage()]);
+                $log->error(sprintf('Unit "%s" could not be converted!', $deprecatedUnit->getName()), [$e]);
                 $unitFailureCount++;
             }
         }
