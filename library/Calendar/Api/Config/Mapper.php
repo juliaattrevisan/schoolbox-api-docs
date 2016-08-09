@@ -229,7 +229,16 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
             foreach (array_filter(glob("$subpath/*"), 'is_dir') as $subdirname) {
                 $connectorClassFilename = basename($subdirname);
 
-                /* Augment that array
+                // Check module is not disabled
+                try{
+                    $className = 'Calendar_Api_Config_Connector_' . $connectorClassFilename;
+                    new $className;
+                } catch (DomainException $e){
+                    // Expected if module is disabled.
+                    continue;
+                }
+
+                /* Module is not disabled. Augment that array
                  */
                 $allApi[$eventTypeFilename][] = $connectorClassFilename;
             }
