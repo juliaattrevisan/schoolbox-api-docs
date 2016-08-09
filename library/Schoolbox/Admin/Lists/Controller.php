@@ -48,18 +48,19 @@ class Controller extends Base
      */
     public function postSave()
     {
-        $tableData = $this->getTableData();
-        $mapper_name = $tableData[$this->getRequest()->post['table']]['mapper'];
+        $table           = $this->getRequest()->post['table'];
+        $tableData       = $this->getTableData();
+        $mapper_name     = $tableData[$table]['mapper'];
         $sortable_column = $this->getRequest()->post["sortable_column"];
 
         /** @var \Schoolbox\Mapper $mapper */
         $mapper = new $mapper_name;
         $model_name = $mapper->getModel();
 
-        $ids = [];
+        $ids    = [];
         $values = [];
-        $fixed = [];
-        $nulls = [];
+        $fixed  = [];
+        $nulls  = [];
         $radios = [];
 
         // Get the data into some sort of usable format
