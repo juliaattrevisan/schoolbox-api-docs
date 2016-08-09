@@ -199,7 +199,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'luResidentialHouse'    => [
+            'residential-house'    => [
                 'title'             => 'Residential Houses',
                 'mapper'            => \HouseResidentialMapper::class,
                 'fields'            => [
@@ -209,7 +209,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'luCampus'    => [
+            'campus'    => [
                 'title'             => 'Campus',
                 'mapper'            => CampusMapper::class,
                 'fields'            => [
@@ -227,7 +227,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'luEventType'           => [
+            'event-type'           => [
                 'title'             => 'Event Types',
                 'mapper'            => EventTypeMapper::class,
                 'fields'            => [
@@ -242,7 +242,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'newsTopic'             => [
+            'news-topic'             => [
                 'title'             => 'News Topics',
                 'mapper'            => TopicMapper::class,
                 'sortable'          => 'sequence',
@@ -253,7 +253,7 @@ class Controller extends Base
                     ],
                 ]
             ],
-            'lu_submission_type'    => [
+            'submission-type'    => [
                 'title'             => 'Submission Types',
                 'mapper'            => WorkTypeMapper::class,
                 'fields'            => [
@@ -263,7 +263,7 @@ class Controller extends Base
                     ],
                 ]
             ],
-            'submission_errors'     => [
+            'submission-errors'     => [
                 'title'             => 'Submission States',
                 'mapper'            => \DueWork_ErrorMapper::class,
                 'fields'            => [
@@ -288,7 +288,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'component_definition'  => [
+            'component-definition'  => [
                 'title'             => 'Components',
                 'mapper'            => \Component_DefinitionMapper::class,
                 'findAllMethod'     => 'findAllIncludeHidden',
@@ -318,7 +318,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'lu_timetable_colour'   => [
+            'timetable-colour'   => [
                 'title'             => 'Timetable Colours',
                 'mapper'            => \Timetable_ColourMapper::class,
                 'fields'            => [
@@ -333,7 +333,7 @@ class Controller extends Base
                     ],
                 ]
             ],
-            'lu_pastoral_type'      => [
+            'pastoral-type'      => [
                 'title'             => 'Pastoral Types',
                 'mapper'            => TypeMapper::class,
                 'sort'              => 'name',
@@ -354,7 +354,7 @@ class Controller extends Base
                     ],
                 ]
             ],
-            'lu_pastoral_category'    => [
+            'pastoral-category'    => [
                 'title'             => 'Pastoral Sub-Types',
                 'mapper'            => CategoryMapper::class,
                 'sort'              => 'pastoralTypeId',
@@ -376,7 +376,7 @@ class Controller extends Base
                     ],
                 ]
             ],
-            'lu_pastoral_severity'    => [
+            'pastoral-severity'    => [
                 'title'             => 'Pastoral Record Severity',
                 'mapper'            => SeverityMapper::class,
                 'sortable'          => 'order',
