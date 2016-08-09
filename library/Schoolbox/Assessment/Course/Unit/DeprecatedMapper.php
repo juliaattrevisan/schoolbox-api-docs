@@ -158,4 +158,18 @@ class DeprecatedMapper extends Folder\Mapper
         return $this->countByColumn('parent', $courseId, $options);
     }
 
+
+    /**
+     * Converts a DeprecatedModel for a course into a new model.
+     *
+     * @param DeprecatedModel $deprecatedModel
+     * @return Model
+     */
+    public function convertDeprecatedModel(DeprecatedModel $deprecatedModel)
+    {
+        $model = new Model();
+        return $model
+            ->setFolder(Folder\Mapper::getInstance()->findById($deprecatedModel->getId()))
+            ->setCourse(Mapper::getInstance()->findOneByColumn('folder_id', $deprecatedModel->getParent()->getId()));
+    }
 }

@@ -318,4 +318,18 @@ class DeprecatedMapper extends FolderMapper
     {
         return $this->ancestry;
     }
+
+
+    /**
+     * Converts a DeprecatedModel for a course into a new model.
+     *
+     * @param DeprecatedModel $deprecatedModel
+     * @return Model
+     */
+    public function convertDeprecatedModel(DeprecatedModel $deprecatedModel)
+    {
+        $model = new Model();
+        return $model
+            ->setFolder(FolderMapper::getInstance()->findById($deprecatedModel->getId()));
+    }
 }
