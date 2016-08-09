@@ -30,7 +30,6 @@ class Controller extends Base
      */
     private function underscoreToCamelCase($string, $capitalizeFirstCharacter = true)
     {
-
         $str = str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
 
         if (!$capitalizeFirstCharacter) {
@@ -67,26 +66,27 @@ class Controller extends Base
 
         foreach ($this->getRequest()->post as $field => $value) {
 
-            if (substr($field, 0, 6) == "value-")
+            if (substr($field, 0, 6) == "value-") {
                 $values[substr($field, 6)] = $value;
-            else if (substr($field, 0, 6) == "fixed-")
+            } else if (substr($field, 0, 6) == "fixed-") {
                 $fixed[substr($field, 6)] = $value;
-            else if (substr($field, 0, 5) == "null-")
+            } else if (substr($field, 0, 5) == "null-") {
                 $nulls[substr($field, 5)] = $value;
-            else if (substr($field, 0, 6) == "radio-")
+            } else if (substr($field, 0, 6) == "radio-") {
                 $radios[substr($field, 6)] = $value;
-            else if ($field == "id")
+            } else if ($field == "id") {
                 $ids = $value;
+            }
         }
 
         foreach ($ids as $currentIndex => $id)
         {
             // Negative ID numbers indicate new records
 
-            if ($id > 0)
+            if ($id > 0) {
                 // Lookup existing record
                 $model = $mapper->findById($id);
-            else {
+            } else {
                 // Create new record
                 $model = new $model_name;
                 foreach ($fixed as $field => $value) {
@@ -403,16 +403,14 @@ class Controller extends Base
             $table = "roles";
         }
 
-
         $tables = $this->getTableData();
 
-
         /** @var \Schoolbox\Mapper $mapper */
-        $mapper = new $tables[$table]['mapper'];
+        $mapper     = new $tables[$table]['mapper'];
         $model_name = $mapper->getModel();
-        $prototype = new $model_name;
+        $prototype  = new $model_name;
 
-        $reflect = new \ReflectionClass($prototype);
+        $reflect    = new \ReflectionClass($prototype);
         $properties = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PRIVATE);
 
         $records = [];
@@ -493,16 +491,14 @@ class Controller extends Base
 
         // Render this thing out
 
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@adminLists/index.twig',
-                'data'     => array(
-                    'pageCurrent' => 'lists',
-                    'tables' => $tables,
-                    'table' => $table,
-                    'records' => $records
-                ),
-            )
-        );
+        $this->getResponse()->content->set([
+            'template' => '@adminLists/index.twig',
+            'data'     => [
+                'pageCurrent' => 'lists',
+                'tables'      => $tables,
+                'table'       => $table,
+                'records'     => $records
+            ],
+        ]);
     }
 }
