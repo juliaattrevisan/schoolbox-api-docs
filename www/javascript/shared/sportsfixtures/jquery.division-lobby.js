@@ -61,7 +61,7 @@
 
                 /* Show console.log output
                  */
-                debugging: true
+                debugging: false
             };
 
             var derived = {
