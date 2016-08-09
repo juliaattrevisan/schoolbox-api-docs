@@ -612,7 +612,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
          */
         foreach ($statement as $row) {
             $category = $this->hydrate($row, 'c');
-            $category->setCodes(new Collection([ $code_mapper->hydrate($row, 'cc')->setCategory($category) ]));
+            $category->setCodes(new Collection([ $code_mapper->hydrate($row, 'cc')->setFolder($category) ]));
 
             $hashtable[$category->getId()] = $category;
         }
