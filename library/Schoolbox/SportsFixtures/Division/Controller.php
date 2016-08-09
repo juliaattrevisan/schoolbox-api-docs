@@ -244,6 +244,7 @@ class Controller extends AbstractController
                 ->setUser($user)
                 ->setSequence(0);
         }
+        $this->getDivisionUserMapper()->save($divisionUsers);
         $this->renderPostAddPlayersResponse($division);
     }
 
