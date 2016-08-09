@@ -111,7 +111,7 @@ foreach ($typeList as $type) {
          */
         foreach ($allApi as $currentEventType => $allConnectors) {
             /* Render titles etc
-             * Put a space between CamelCase names so they become Camel Case
+             * Put a space between 'CamelCase' names so they become 'Camel Case'
              */
             $this->setVar(
                 array(
@@ -142,6 +142,8 @@ foreach ($typeList as $type) {
                     $currentEventType,
                     $currentConnector
                 );
+
+
 
                 if (count($allConfigs)) {
                     foreach ($allConfigs as $currentConfig) {
