@@ -326,7 +326,9 @@
                 function(stream) {
                     self._startRecordingMediaRecorder(stream);
                 },
-                self._attemptFlashRecording
+                function() {
+                    self._attemptFlashRecording();
+                }
             );
         } else if (self.isWebRtcSupported()) {
             getUserMedia(
@@ -334,7 +336,9 @@
                 function(stream) {
                     self._startRecordingWebRtc(stream);
                 },
-                self._attemptFlashRecording
+                function() {
+                    self._attemptFlashRecording();
+                }
             );
         } else {
             self._attemptFlashRecording();
