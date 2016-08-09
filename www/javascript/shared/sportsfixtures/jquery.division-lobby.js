@@ -176,6 +176,7 @@
                             })
                             .fail(function() {
                                 toFeedback.labelTimeout({text: 'Add failed!', css: 'alert'});
+                                player.remove();
                             });
                     }
                     /* Dragging players between teams
@@ -244,6 +245,7 @@
                             })
                             .fail(function() {
                                 toFeedback.labelTimeout({text: 'Add failed!', css: 'alert'});
+                                player.remove();
                             });
                     }
                     /* Remove a player from a team
