@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Course\Unit;
 use Component_Homepage_CourseBuilderController;
 use PDO;
 use PDOStatement;
+use Schoolbox\Assessment\Course\Mapper as CourseMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\PredicateBuilder;
@@ -170,6 +171,6 @@ class DeprecatedMapper extends Folder\Mapper
         $model = new Model();
         return $model
             ->setFolder(Folder\Mapper::getInstance()->findById($deprecatedModel->getId()))
-            ->setCourse(Mapper::getInstance()->findOneByColumn('folder_id', $deprecatedModel->getParent()->getId()));
+            ->setCourse(CourseMapper::getInstance()->findOneByColumn('folder_id', $deprecatedModel->getParent()->getId()));
     }
 }
