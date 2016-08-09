@@ -176,8 +176,8 @@ $kernel->run
     $searchStmt = $db->query("
         SELECT COUNT(t.box_id) unit_boxes, COUNT(ti.box_id) class_boxes, ui.* 
         FROM course_unit_instance ui
-        LEFT JOIN category c1 ON ui.category_id = c1.id
-        LEFT JOIN category c2 ON ui.unit_category_id = c2.id
+        LEFT JOIN folder c1 ON ui.category_id = c1.id
+        LEFT JOIN folder c2 ON ui.unit_category_id = c2.id
         LEFT JOIN task_instance ti ON ti.course_unit_instance_id = ui.id
         LEFT JOIN task t ON t.category_id = c2.id 
         LEFT JOIN submission_box b1 ON ti.box_id = b1.id
