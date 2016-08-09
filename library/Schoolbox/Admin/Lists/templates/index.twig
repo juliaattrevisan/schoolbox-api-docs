@@ -82,7 +82,6 @@
 
         <form method="post" action="/adminv2/lists/save">
             <input name="table" type="hidden" value="{{ table }}" />
-            <input name="mapper" type="hidden" value="{{ mapper }}" />
             <input name="sortable_column" type="hidden" value="{{ tables[table].sortable }}">
 
             {# This is used when hidden fields cannot be NULL. Existing records should already be set in DB #}

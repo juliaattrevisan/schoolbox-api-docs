@@ -49,9 +49,14 @@ class Controller extends Base
         return $str;
     }
 
+    /**
+     * @api /adminv2/lists/save
+     * @level 160
+     */
     public function postSave()
     {
-        $mapper_name = $this->getRequest()->post["mapper"];
+        $tableData = $this->getTableData();
+        $mapper_name = $tableData[$this->getRequest()->post['table']]['mapper'];
         $sortable_column = $this->getRequest()->post["sortable_column"];
 
         /** @var \Schoolbox\Mapper $mapper */
@@ -142,20 +147,17 @@ class Controller extends Base
         $this->getResponse()->redirect->afterPost('/adminv2/lists/' . $this->getRequest()->post["table"]);
     }
 
-    /**
-     * Show options
-     *
-     * @param string $table
-     */
-    public function getIndex($table)
-    {
-        if (!isset($table)) {
-            $table = "roles";
-        }
 
+    /**
+     * Gets all table settings
+     *
+     * @return array
+     */
+    private function getTableData()
+    {
         // This array defines the tables that can be updated
 
-        $tables = [
+        return [
             'roles' => [
                 'title'             => 'Roles',                                 // Title of the tab
                 'mapper'            => RoleMapper::class,                       // Mapper for the list item
@@ -391,6 +393,25 @@ class Controller extends Base
                 ]
             ],
         ];
+    }
+
+    /**
+     * Show options
+     *
+     * @api /adminv2/lists/save
+     * @level 160
+     *
+     * @param string $table
+     */
+    public function getIndex($table)
+    {
+        if (!isset($table)) {
+            $table = "roles";
+        }
+
+
+        $tables = $this->getTableData();
+
 
         /** @var \Schoolbox\Mapper $mapper */
         $mapper = new $tables[$table]['mapper'];
@@ -485,8 +506,7 @@ class Controller extends Base
                     'pageCurrent' => 'lists',
                     'tables' => $tables,
                     'table' => $table,
-                    'records' => $records,
-                    'mapper' => get_class($mapper)
+                    'records' => $records
                 ),
             )
         );
