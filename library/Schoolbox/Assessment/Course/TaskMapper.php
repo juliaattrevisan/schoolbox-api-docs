@@ -11,6 +11,7 @@ namespace Schoolbox\Assessment\Course;
 
 use Schoolbox;
 use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 
 class TaskMapper extends Schoolbox\Mapper {
@@ -163,7 +164,7 @@ class TaskMapper extends Schoolbox\Mapper {
             return $task;
         }
         else {
-            throw new Mapper\Exception('Instance of object not found');
+            throw new MapperException('Instance of object not found');
         }
     }
 
