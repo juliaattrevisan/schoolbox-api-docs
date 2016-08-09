@@ -216,7 +216,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                     ++$colourIndex;
                                 }
 
-                                $this->setVar('PERIOD_COLOUR', '#' . Scrub::text($subjectColourMap[$class['code']]));
+                                $this->setVar('PERIOD_COLOUR', Scrub::text($subjectColourMap[$class['code']]));
 
                                 try {
                                     $folder = $this->getFolderMapper()->findByCode($class['code']);
