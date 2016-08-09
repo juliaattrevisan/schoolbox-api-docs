@@ -37,14 +37,14 @@ class Result extends Base
 			    {$mapper->getJoinColumnString('hash', 's')},
 			    {$mapper->getJoinMapper('hash')->getJoinColumnString('allowedFileExtension', 'e')},
                 {$mapper->getJoinColumnString('owner', 'o')},
-				{$mapper->getJoinColumnString('folder', 'c')},
+				{$mapper->getJoinColumnString('category', 'c')},
 				MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()}) AS `score`
 			FROM
 				`{$mapper->getTable()}` `f`
 				LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
 				LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
 				LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
-				INNER JOIN {$mapper->getJoinSql('folder', 'f', 'c')}
+				INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
 				LEFT JOIN `perms` p ON `f`.category = `p`.cid
 					AND p.gid = :role_id
 					AND p.type >= :min_access
@@ -75,7 +75,7 @@ class Result extends Base
             $storage = $mapper->hydrateJoin($row, 'hash', 's');
             $mime = $mapper->getJoinMapper('hash')->hydrateJoin($row, 'allowedFileExtension', 'e');
             $owner = $mapper->hydrateJoin($row, 'owner', 'o');
-            $folder = $mapper->hydrateJoin($row, 'folder', 'c');
+            $folder = $mapper->hydrateJoin($row, 'category', 'c');
 
             $storage->setMimetype($mime);
             $file->setStorage($storage);
@@ -105,7 +105,7 @@ class Result extends Base
 				LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
 				LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
 				LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
-				INNER JOIN {$mapper->getJoinSql('folder', 'f', 'c')}
+				INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
 				LEFT JOIN `perms` p ON `f`.category = `p`.cid
 					AND p.gid = :role_id
 					AND p.type >= :min_access
