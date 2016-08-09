@@ -172,24 +172,52 @@ class Controller extends AbstractController
 
 
     /**
-     * Create/Modify a match
-     *
-     * @param Match $match With division and season already hydrated
+     * @param Match $match
+     * @param Division $division
+     * @return void
      */
-    public function getInSeasonForm(Match $match){
+    protected function getForm($match, $division = null)
+    {
+        // Is this an update of an extant match ?
+        if($match->getId()){
+            $division = $match->getDivision();
 
-        // Can't modify an archived match
-        if($match->getId() && $match->getSeason()->isArchived()){
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
+            // Hydrate the division's season
+            try{
+                $division->setSeason(SeasonMapper::getInstance()->findById($division->getSeason()->getId()));
+            } catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
+            }
+
+            // Hydrate the division's sport
+            try {
+                $division->setSport(SportMapper::getInstance()->findById($division->getSport()->getId()));
+            } catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
+            }
+        }
+        // Else creating new match in specified division
+        else {
+            $match->setDivision($division);
+
+            // Was a season specified ?
+            $seasonId = $this->getRequest()->query['season'];
+            if($seasonId){
+                try {
+                    $season = $this->getSeasonMapper()->findById($seasonId);
+                } catch (MapperException $e) {
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
+                }
+            } else {
+                // No season specified. Default to division's current season.
+                $season = $division->getSeason();
+            }
+            $match->setSeason($season);
         }
 
-        // Are we creating a new match ?
-        if(!$match->getId()){
-
-            // Is the proposed match season archived ?
-            if( $match->getSeason()->isArchived() ) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
-            }
+        // Do not permit creation or modification of matches in archived seasons.
+        if( $match->getSeason()->isArchived() ) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
         }
 
         $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $match->getId(), [
@@ -207,38 +235,6 @@ class Controller extends AbstractController
             'allItineraryItems' => $allItineraryItems,
             'action'            => $match->getId() ? 'Modify' : 'Create'
         ]));
-    }
-
-    /**
-     * @param Match $match
-     * @param Division $division
-     * @return void
-     */
-    protected function getForm($match, $division = null)
-    {
-        // Is this an update of an extant match ?
-        if($match->getId()){
-            $division = $match->getDivision();
-
-            try{
-                $division->setSeason(SeasonMapper::getInstance()->findById($division->getSeason()->getId()));
-            } catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
-            }
-
-            try {
-                $division->setSport(SportMapper::getInstance()->findById($division->getSport()->getId()));
-            } catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
-            }
-        }
-        // Else creating new match
-        else {
-            $match->setSeason($division->getSeason());
-        }
-        $match->setDivision($division);
-
-        $this->getInSeasonForm($match);
     }
 
     /**

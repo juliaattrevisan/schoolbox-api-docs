@@ -36,47 +36,6 @@ class Module extends RestfulModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath)
-    {
-        parent::initRoutes($router, $basePath);
-
-        $collection = $this->getCollectionName();
-
-        $context = "{$this->context->getCollectionName()}/{contextId}/";
-
-        $routes = [
-            'GET' => [
-                "/{$context}season/{seasonId}/$collection/new" => 'getInSeasonForm',
-            ],
-        ];
-
-        foreach ($routes['GET'] as $path => $controllerMethod) {
-            $this->addGetRoute($router, $controllerMethod, $basePath, $path)->setTokens([ 'contextId' => '\d+|\*', 'seasonId' => '\d+', 'entityId' => '\d+' ]);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initRoutePreloads(PathMatcher $matcher)
-    {
-        parent::initRoutePreloads($matcher);
-
-        // these routes will just spawn new entities, but if context exists, it is required
-        $this->addRoutePreload($matcher, '(?:getInSeasonForm)', function ($params) {
-            /** @var Match $match */
-            $match = $this->mapper->createModel();
-            $match->setDivision(DivisionMapper::getInstance()->findById($params['contextId']));
-            $match->setSeason(SeasonMapper::getInstance()->findById($params['seasonId']));
-            return [
-                'match'    => $match,
-            ];
-        });
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function initRoutePermissions(Authorizer $authorizer) {
 
         /* Permissions requirements for being a Sports Administrator

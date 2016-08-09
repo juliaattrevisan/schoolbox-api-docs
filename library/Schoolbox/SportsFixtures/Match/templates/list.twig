@@ -152,7 +152,7 @@
 
                         <nav>
                             {% if not season.isArchived %}
-                                <a href='{{ routeLookup('sportsfixturesMatch.getInSeasonForm', {contextId: division.id, seasonId: season.id}) }}' class="icon-add" title="Add Match to {{ season.name }} {{ division.name }}"></a>
+                                <a href='{{ routeLookup('sportsfixturesMatch.getCreateForm', {contextId: division.id}) }}?season={{ season.id }}' class="icon-add" title="Add Match to {{ season.name }} {{ division.name }}"></a>
                             {% endif %}
                         </nav>
                     </div>
@@ -169,7 +169,7 @@
                         <div class="empty-state">
                             <i class="icon-match"></i>
                             <p>There are no Matches in {{ season.name }} {{ division.name }}.</p>
-                            <p><a href="{{ routeLookup('sportsfixturesMatch.getInSeasonForm', {contextId: division.id, seasonId: season.id}) }}" title="Add Match to {{ season.name }} {{ division.name }}">Add a Match</a></p>
+                            <p><a href="{{ routeLookup('sportsfixturesMatch.getCreateForm', {contextId: division.id}) }}?season={{ season.id }}" title="Add Match to {{ season.name }} {{ division.name }}">Add a Match</a></p>
                         </div>
                     {% endif %}
                 </div>
