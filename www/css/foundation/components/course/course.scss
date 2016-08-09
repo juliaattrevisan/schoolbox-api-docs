@@ -52,41 +52,6 @@ input[type="submit"][readonly] {
     background-position: 0.75rem 50%;
 }
 
-.selectize-control {
-    &.multi .selectize-input.has-items {
-        padding: 0 0 1px 0;
-    }
-
-    .selectize-input > div a.remove {
-        padding: 1px 5px 2px 4px !important;
-        width: 1rem !important;
-        margin: 0 4px 0 5px !important;
-    }
-
-    .selectize-input > div {
-        margin: 0 1px 0 0 !important;
-    }
-
-    .selectize-input > div a.remove:hover {
-        text-decoration: none;
-        background: $content-ui-submit-foreground;
-        border-radius: 1rem;
-        color: calc-text-color($content-ui-submit-foreground);
-    }
-}
-
-.selectize-input {
-    margin-bottom: 0;
-
-    &.dropdown-active:before {
-        display: none;
-    }
-}
-
-.selectize-input > input[type=text] {
-    margin-left: 0.5rem !important;
-}
-
 /* Label elements with no text content
  */
 .course-import {

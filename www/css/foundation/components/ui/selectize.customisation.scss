@@ -54,8 +54,10 @@ $selectize-padding-item-y: 0;
 .selectize-control.single .selectize-input > div,
 .selectize-control.multi .selectize-input > div {
 	background: $content-ui-background;
-	padding: 0 0 0 0.5rem;
-	margin: 1px 0px 1px 1px;
+	padding: 0 0.5rem 0 0.5rem;
+	margin: 1px;
+	font-size: $base-font-size;
+	font-weight: $font-weight-normal;
 	a {
 		padding: 0.5rem !important;
 		width: 1.5rem !important;
@@ -63,20 +65,37 @@ $selectize-padding-item-y: 0;
 	}
 }
 
-/* Because there should be an x next to the element, but isn't?
- */
-.selectize-control.single .selectize-input > div {
-    padding: 0 0.5rem 0 0.5rem;
-}
-
 .selectize-control {
 	margin: 0 0 $form-spacing 0;
+
+	&.multi .selectize-input.has-items {
+		padding: 1px;
+	}
+
+	.selectize-input > div a.remove {
+		padding: 1px 5px 2px 4px !important;
+		width: 1rem !important;
+		margin: 0 4px 0 5px !important;
+	}
+
+	.selectize-input > div a.remove:hover {
+		text-decoration: none;
+		background: $content-ui-submit-foreground;
+		border-radius: 1rem;
+		color: calc-text-color($content-ui-submit-foreground);
+	}
+
+	.selectize-input > input[type=text] {
+		margin-left: 0.5rem !important;
+	}
 }
 
 .selectize-input {
     line-height: 2.25rem;
+	margin-bottom: 0;
     input {
         height: auto;
+		font-size: 1rem;
 
         .remove {
             color: $content-ui-foreground;
@@ -86,9 +105,12 @@ $selectize-padding-item-y: 0;
          */
         &[placeholder] {
             margin-left: 0.5rem !important;
+			font-size: 13px;
         }
     }
-
+	&.dropdown-active:before {
+		display: none;
+	}
 }
 
 .selectize-dropdown {
