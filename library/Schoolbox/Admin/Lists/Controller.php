@@ -47,9 +47,9 @@ class Controller extends Base
      */
     public function postSave()
     {
-        $table           = $this->getRequest()->post['table'];
+        $tableKey        = $this->getRequest()->post['table'];
         $tableData       = $this->getTableData();
-        $mapper_name     = $tableData[$table]['mapper'];
+        $mapper_name     = $tableData[$tableKey]['mapper'];
         $sortable_column = $this->getRequest()->post["sortable_column"];
 
         /** @var \Schoolbox\Mapper $mapper */
@@ -150,6 +150,7 @@ class Controller extends Base
     private function getTableData()
     {
         // This array defines the tables that can be updated
+        // Note that they are NOT indexed by actual table name, but by an arbitrary key.
 
         return [
             'roles' => [
@@ -395,7 +396,7 @@ class Controller extends Base
      * @api /adminv2/lists/save
      * @level 160
      *
-     * @param string $table
+     * @param string $table Arbitrary value to identify a table. Does not need to be the actual table name.
      */
     public function getIndex($table)
     {
