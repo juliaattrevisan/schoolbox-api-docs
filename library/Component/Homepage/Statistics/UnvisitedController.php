@@ -80,7 +80,7 @@ class Component_Homepage_Statistics_UnvisitedController extends Component_Homepa
             $stmt = Database::getInstance()->prepare(
                 "SELECT
                  u.id, u.title, u.firstname, u.lastname, u.synergy_id, g.name gname
-             FROM category c
+             FROM folder c
              RIGHT JOIN userGroups ug ON ug.cid = c.id
              LEFT JOIN userAccess ua ON ua.sid = c.id AND service = '1'
              LEFT JOIN `user` u ON u.id = ua.uid

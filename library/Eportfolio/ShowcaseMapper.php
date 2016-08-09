@@ -100,7 +100,7 @@ class ShowcaseMapper extends Schoolbox\Mapper {
             FROM `{$this->table}` si
             LEFT JOIN {$this->getJoinSql('submissionBox', 'si', 'sb')}
             LEFT JOIN {$submissionBoxMapper->getJoinSql('work_type', 'sb', 't')}
-            LEFT JOIN `category` AS `f` ON `sb`.`category` = `f`.`id`
+            LEFT JOIN `folder` AS `f` ON `sb`.`category` = `f`.`id`
             WHERE si.uid = :userId
             ORDER BY f.name
         ";
@@ -152,7 +152,7 @@ class ShowcaseMapper extends Schoolbox\Mapper {
             FROM `{$this->table}` si
             LEFT JOIN {$this->getJoinSql('submissionBox', 'si', 'sb')}
             LEFT JOIN {$submissionBoxMapper->getJoinSql('work_type', 'sb', 't')}
-            LEFT JOIN `category` AS `f` ON `sb`.`category` = `f`.`id`
+            LEFT JOIN `folder` AS `f` ON `sb`.`category` = `f`.`id`
             WHERE si.uid = :userId
             ORDER BY si.created_at DESC
             LIMIT :limit

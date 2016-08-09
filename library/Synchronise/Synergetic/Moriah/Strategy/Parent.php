@@ -25,7 +25,7 @@ class Synchronise_Synergetic_Moriah_Strategy_Parent extends Synchronise_Synerget
         $db = Database::getInstance();
         $result = $db->query("
             SELECT `id`, `name`
-            FROM `category`
+            FROM `folder`
             WHERE `name` LIKE '%Information'
             AND `parent` = '1197'
         ");
@@ -42,7 +42,7 @@ class Synchronise_Synergetic_Moriah_Strategy_Parent extends Synchronise_Synerget
           AND uid = :parentId
           AND sid IN (
             SELECT id
-            FROM `category`
+            FROM `folder`
             WHERE `name` LIKE '%Information'
             AND parent = '1197'
           )
