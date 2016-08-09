@@ -22,13 +22,6 @@ use Schoolbox\Pastoral\Category\Mapper as CategoryMapper;
 class Controller extends Base
 {
     /**
-     * Controller constructor.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * Converts "strings_like_this" to "StringsLikeThis"
      *
      * @param $string
