@@ -35,15 +35,14 @@ $findAllFoldersQuery = $db->prepare("SELECT id, name, parent FROM `category` WHE
 
 // Do a recursive lookup on every item and make sure the ancestry is valid
 
-$folderMapper = FolderMapper::getInstance();
-
 do {
 
     $errors = 0;
 
-    $folders = $folderMapper->findAll();
+    $findAllFoldersQuery->execute();
+    $folders = $findAllFoldersQuery->fetchAll();
 
-    /** @var FolderModel $folder */
+    /** @var array $folder */
     foreach ($folders as $folder)
     {
         // Keep track of nodes we have traversed so we don't end up in a loop
@@ -53,30 +52,34 @@ do {
 
         try
         {
-            while ($folderCurrent->getParent()->getId() != 0)
+            while ($folderCurrent['parent'] != 0)
             {
-                $found[$folderCurrent->getId()] = 1;
+                $found[$folderCurrent['id']] = 1;
 
-                /** @var FolderModel $folderCurrent */
-                $folderCurrent = $folderMapper->findCheaplyById($folderCurrent->getParent()->getId());
+                /** @var array $folderCurrent */
+                $findFolderQuery->execute(['id' => $folderCurrent['parent']]);
+                if ($findFolderQuery->rowCount() == 0) {
+                    throw new \Exception('No folder found');
+                }
+                $folderCurrent = $findFolderQuery->fetch();
 
-                if ($folderCurrent->getParent()->getId() == null)
+                if ($folderCurrent['parent'] == null)
                 {
                     // Node has no parent set
 
-                    $logger->info(sprintf("Orphaned Folder '%s' (%d) moved to {$folderName} (%d)", $folder->getName(),
-                        $folder->getId(), $parent_id));
+                    $logger->info(sprintf("Orphaned Folder '%s' (%d) moved to {$folderName} (%d)", $folder['name'],
+                        $folder['id'], $parent_id));
 
                     $moveQuery->execute([
                         'parent_id' => $parent_id,
-                        'id' => $folder->getId()
+                        'id' => $folder['id']
                     ]);
 
                     $errors++;
 
                     break;
                 }
-                else if (isset($found[$folderCurrent->getId()]))
+                else if (isset($found[$folderCurrent['id']]))
                 {
                     // Found a looping family tree
 
@@ -85,13 +88,13 @@ do {
                     foreach ($found as $id => $item)
                         $loopString .= "{$id},";
 
-                    $loopString = $loopString . $folderCurrent->getId();
+                    $loopString = $loopString . $folderCurrent['id'];
 
-                    $logger->info(sprintf("Looping Folder '%s' (%s) moved to {$folderName} (%d)", $folder->getName(),
+                    $logger->info(sprintf("Looping Folder '%s' (%s) moved to {$folderName} (%d)", $folder['name'],
                         $loopString, $parent_id));
                     $moveQuery->execute([
                         'parent_id' => $parent_id,
-                        'id' => $folder->getId()
+                        'id' => $folder['id']
                     ]);
 
                     $errors++;
@@ -102,12 +105,12 @@ do {
         }
         catch (\Exception $e)
         {
-            $logger->info(sprintf("Folder '%s' (%d) missing Parent (%d) moved to {$folderName} (%d)", $folder->getName(),
-                $folder->getId(), $folder->getParent()->getId(), $parent_id));
+            $logger->info(sprintf("Folder '%s' (%d) missing Parent (%d) moved to {$folderName} (%d)", $folder['name'],
+                $folder['id'], $folder['parent'], $parent_id));
 
             $moveQuery->execute([
                 'parent_id' => $parent_id,
-                'id' => $folder->getId()
+                'id' => $folder['id']
             ]);
 
             $errors++;
