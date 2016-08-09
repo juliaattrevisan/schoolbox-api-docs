@@ -173,6 +173,9 @@
                                 /* Reapply filter settings to division player list
                                  */
                                 applyPlayerFilter();
+                            })
+                            .fail(function() {
+                                toFeedback.labelTimeout({text: 'Add failed!', css: 'alert'});
                             });
                     }
                     /* Dragging players between teams
@@ -238,6 +241,9 @@
                                 /* Reapply filter settings to division player list
                                  */
                                 applyPlayerFilter();
+                            })
+                            .fail(function() {
+                                toFeedback.labelTimeout({text: 'Add failed!', css: 'alert'});
                             });
                     }
                     /* Remove a player from a team
@@ -285,6 +291,9 @@
                                 /* Reapply filter settings to division player list
                                  */
                                 applyPlayerFilter();
+                            })
+                            .fail(function() {
+                                fromFeedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
                             });
                     }
                 }
