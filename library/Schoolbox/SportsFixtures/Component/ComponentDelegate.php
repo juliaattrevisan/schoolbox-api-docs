@@ -13,7 +13,10 @@
 
 namespace Schoolbox\SportsFixtures\Component;
 
+use Alaress\Session\Session;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
+use \SitePage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -81,10 +84,17 @@ class ComponentDelegate
     protected $schoolTagCloudMapper;
 
     /**
-     * Delegate constructor.
+     * @var SitePage
      */
-    public function __construct()
+    protected $sitepage;
+
+    /**
+     * Delegate constructor.
+     * @param SitePage $sitepage
+     */
+    public function __construct(SitePage $sitepage)
     {
+        $this->setSitePage($sitepage);
         $this->setUserMapper(UserMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
         $this->setSportMapper(SportMapper::getInstance());
@@ -97,6 +107,8 @@ class ComponentDelegate
         $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
     }
 
+
+
     /**
      * @return array
      */
@@ -104,9 +116,15 @@ class ComponentDelegate
     {
         $matches = [];
 
-        if(is_array($_SESSION["children"])){
-            foreach ($_SESSION["children"] as $child) {
+        /** @var Session $session */
+        $session = $this->getSitePage()->getDi()->get('session');
+        $children = $session->get('children');
 
+        if(is_array($children))
+        {
+            foreach ($children as $child)
+            {
+                /** @var Collection|TeamPlayer[] $childTeams */
                 $childTeams = $this->getTeamPlayerMapper()->findByColumn('user_id', $child["id"]);
                 $matchesForChild = $this->getMatches($childTeams);
 
@@ -114,16 +132,16 @@ class ComponentDelegate
 
                     if (!isset($matches[$matchCurrent->getId()])) {
                         $matches[$matchCurrent->getId()] = [];
-                        $matches[$matchCurrent->getId()]["home"]  = false;
-                        $matches[$matchCurrent->getId()]["away"]  = false;
+                        $matches[$matchCurrent->getId()]["home"] = false;
+                        $matches[$matchCurrent->getId()]["away"] = false;
                         $matches[$matchCurrent->getId()]["match"] = $matchCurrent;
                         $matches[$matchCurrent->getId()]["teams"] = [
                             $matchCurrent->getHomeTeam()->getId() => [
-                                'team'     => $matchCurrent->getHomeTeam(),
+                                'team' => $matchCurrent->getHomeTeam(),
                                 'children' => [],
                             ],
                             $matchCurrent->getAwayTeam()->getId() => [
-                                'team'     => $matchCurrent->getAwayTeam(),
+                                'team' => $matchCurrent->getAwayTeam(),
                                 'children' => [],
                             ],
                         ];
@@ -242,7 +260,7 @@ class ComponentDelegate
 
     /**
      * @param $teamPlayers
-     * @return array
+     * @return Match[]
      */
     public function getMatches($teamPlayers) {
         $matches = [];
@@ -275,10 +293,10 @@ class ComponentDelegate
     /**
      * Sort matches chronologically
      *
-     * @param array $matches
-     * @return mixed
+     * @param Match[] $matches
+     * @return Match[]
      */
-    public function sortMatches($matches) {
+    public function sortMatches(array $matches) {
         // Sort matches by date order
         usort($matches, function($a, $b) {
             /** @var Match $a */
@@ -484,5 +502,19 @@ class ComponentDelegate
     protected function setSchoolTagCloudMapper($schoolTagCloudMapper)
     {
         $this->schoolTagCloudMapper = $schoolTagCloudMapper;
+    }
+
+    /**
+     * @param SitePage $sitepage
+     */
+    protected function setSitePage(SitePage $sitepage){
+        $this->sitepage = $sitepage;
+    }
+
+    /**
+     * @return SitePage
+     */
+    protected function getSitePage(){
+        return $this->sitepage;
     }
 }

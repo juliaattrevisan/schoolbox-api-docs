@@ -7,6 +7,7 @@
 
 namespace Schoolbox\SportsFixtures\Component\Dashboard;
 
+use Alaress\Session\Session;
 use Component_Dashboard_ControllerAbstract;
 use Component_Instance;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -30,7 +31,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
         parent::__construct($instance, $user, $sitepage);
-        $this->delegate = new ComponentDelegate();
+        $this->delegate = new ComponentDelegate($sitepage);
     }
 
     /**
