@@ -13,24 +13,9 @@ class Calendar_Api_Config_Connector_Booking extends Calendar_Api_Config_Connecto
 {
 
     /**
-     * Used when previously saved config is unserialised from DB record.
-     */
-    public function __wakeup()
-    {
-        $this->checkModuleEnabled();
-    }
-
-    /**
-     * Used when config is created for the first time.
-     */
-    public function __construct()
-    {
-        $this->checkModuleEnabled();
-    }
-
-    /**
      * Checks if Resource Booking module is enabled. If not, throw Exception.
      * @throws DomainException
+     * @return true If no exception thrown
      */
     protected function checkModuleEnabled()
     {
@@ -39,6 +24,7 @@ class Calendar_Api_Config_Connector_Booking extends Calendar_Api_Config_Connecto
         if(0 == $configMapper->get('resource_booking_enabled')){
             throw new DomainException('Resource Booking Module is disabled');
         }
+        return true;
     }
 
     /**
