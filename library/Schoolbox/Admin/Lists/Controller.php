@@ -406,6 +406,12 @@ class Controller extends Base
 
         $tables = $this->getTableData();
 
+        // Check for incorrect URLs
+        if(!isset($tables[$table])){
+            $this->getResponse()->status->setCode(404);
+            return;
+        }
+
         /** @var \Schoolbox\Mapper $mapper */
         $mapper     = new $tables[$table]['mapper'];
         $model_name = $mapper->getModel();
