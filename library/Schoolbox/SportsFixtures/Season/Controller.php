@@ -14,6 +14,7 @@ use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\SportsFixtures\Season\Model as Season;
 use \Schoolbox\SportsFixtures\Season\Mapper as SeasonMapper;
+use Schoolbox\Collection;
 
 /**
  * Class Controller
