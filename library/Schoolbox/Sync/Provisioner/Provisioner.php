@@ -86,6 +86,16 @@ class Provisioner
      */
     private $logMapper;
 
+    /**
+     * Caches new user's usernames so we can detect multi new users
+     * with the the same username during dry-run.
+     *
+     * Maps 'username' => 'externalId'
+     *
+     * @var array
+     */
+    protected $newUsernameCache = [];
+
 
     /**
      * Constructor
@@ -266,7 +276,7 @@ class Provisioner
                         $this->logger->warning(sprintf("User record fails sanity check (%s): skipping", $e->getMessage()), array_merge($commonContext, [ 'error' => $e ]));
                         continue;
                     } catch (\Exception $e) {
-                        $this->logger->error("User record save failed!", array_merge($commonContext, [ 'error' => $e ]));
+                        $this->logger->error("User record save failed!", array_merge($commonContext, [ 'error' => $e->getMessage() ]));
                     }
                 }
 
@@ -338,6 +348,8 @@ class Provisioner
     protected function sanityCheck(User $internalUser)
     {
         $this->userMapper->verifyValidUsername($internalUser);
+        $this->userMapper->verifyUniqueUsername($internalUser);
+        $this->verifyUniqueNewUserUsername($internalUser);
         $this->userMapper->verifyValidRole($internalUser);
         $this->userMapper->verifyHasCampus($internalUser);
         $this->userMapper->verifyValidFirstName($internalUser);
@@ -345,5 +357,33 @@ class Provisioner
         $this->userMapper->verifyValidWebmail($internalUser);
         $this->userMapper->verifyValidInternalMail($internalUser);
         $this->userMapper->verifyValidEportfolioEnabled($internalUser);
+    }
+
+    /**
+     * Checks whether a new user's proposed username conflicts with another new user.
+     * This enables such scenarios to be detected during the dry-run, rather than waiting for
+     * mapper to throw error during live-run.
+     *
+     * @param \Schoolbox\Sync\Provisioner\User $internalUser
+     * @throws UnexpectedValueException if multiple new users were created with same username
+     * @return bool Always true, as long as it doesn't throw
+     */
+    protected function verifyUniqueNewUserUsername(User $internalUser){
+
+        // Is this a new user?
+        if(null === $internalUser->getId()){
+            // Have we already created a new user with this username?
+            if(isset($this->newUsernameCache[$internalUser->getUsername()])){
+                throw new UnexpectedValueException(
+                    sprintf('A new user with username "%s" was already created. Other user external id: "%s"',
+                        $internalUser->getUsername(),
+                        $this->newUsernameCache[$internalUser->getUsername()]
+                    )
+                );
+            }
+            // New username is unique. Add to cache
+            $this->newUsernameCache[$internalUser->getUsername()] = $internalUser->getExternalId();
+        }
+        return true;
     }
 }

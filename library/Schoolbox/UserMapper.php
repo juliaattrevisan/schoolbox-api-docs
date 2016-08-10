@@ -24,6 +24,15 @@ use UnexpectedValueException;
  */
 class UserMapper extends Mapper
 {
+    /**
+     * If in use (ie not null), this should mirror all non-softDeleted users in DB.
+     * If we save, delete, soft-delete, or restore a user, we must update the
+     * cache via callbacks to ensure integrity.
+     *
+     * @var array|null $usernameCache Maps 'username' => 'id'.
+     */
+    protected $usernameCache;
+
     protected function mapping()
     {
 
@@ -290,6 +299,13 @@ class UserMapper extends Mapper
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateSuperuserStatus']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateDefaultCampus']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'addUsernameToCache']);
+
+        $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'removeUsernameFromCache']);
+
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeUsernameFromCache']);
+
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'addUsernameToCache']);
     }
 
     /**
@@ -628,21 +644,69 @@ class UserMapper extends Mapper
     /**
      * Pre-save callback for verifying whether a user's name is unique.
      *
+     * For data-integrity, this method relies on a post-save/restore
+     * callback to add any new users to the cache.
+     *
      * @param  User $user
      * @return bool Always true, as long as it doesn't throw
      * @throws UnexpectedValueException if it isn't unique
      */
     public function verifyUniqueUsername(User $user)
     {
-        if (!$this->isUnique(['username' => $user->getUsername(),], $user->getId())) {
-            throw new UnexpectedValueException(
-                sprintf(
-                    'A user with username "%s" already exists.',
-                    $user->getUsername()
-                )
-            );
+        // Load cache on first invocation
+        if(!is_array($this->usernameCache)){
+            $this->usernameCache = [];
+            $query = $this->selectScalarByColumnList("{$this->getTable()}.id, {$this->getTable()}.username", []);
+            $query->execute();
+            while($row = $query->fetch(\PDO::FETCH_ASSOC)){
+                $this->usernameCache[$row['username']] = $row['id'];
+            }
         }
+
+        // Check cache
+        if(array_key_exists($user->getUsername(), $this->usernameCache)) {
+            if($this->usernameCache[$user->getUsername()] != $user->getId()){
+                throw new UnexpectedValueException(
+                    sprintf('A user with username "%s" already exists. Existing user id: "%s"',
+                        $user->getUsername(),
+                        $this->usernameCache[$user->getUsername()]
+                    )
+                );
+            }
+        }
+
+        // No duplicates
         return true;
+    }
+
+    /**
+     * Post-save + Post-restore callback to ensure username cache is up-to-date
+     *
+     * @param User $user
+     */
+    public function addUsernameToCache(User $user){
+        // Is cache in use?
+        if(is_array($this->usernameCache)){
+            $this->usernameCache[$user->getUsername()] = $user->getId();
+        }
+    }
+
+    /**
+     * Post-delete + Post-softDelete callback to ensure username cache is up-to-date
+     *
+     * @param User $user
+     */
+    public function removeUsernameFromCache(User $user){
+        // Is cache in use?
+        if(is_array($this->usernameCache)){
+            // Is username in cache?
+            if(isset($this->usernameCache[$user->getUsername()])){
+                // Does cache record belong to this user?
+                if($this->usernameCache[$user->getUsername()] == $user->getId()){
+                    unset($this->usernameCache[$user->getUsername()]);
+                }
+            }
+        }
     }
 
     /**
