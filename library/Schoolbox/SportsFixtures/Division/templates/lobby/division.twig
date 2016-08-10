@@ -13,15 +13,15 @@
                         <div class="small-11 compact card wrap-down">
                             <a href="/search/user/{{ playerData.player.id }}">
                                 <img src="/portrait.php?userId={{ playerData.player.externalId }}&amp;size=square64" />
-                                <h3>{{ playerData.player.formatName() }}</h3>
+                                <p>{{ playerData.player.formatName() }}</p>
                             </a>
                             {% for currentTeam in playerData.teams %}
                                 {% if loop.first %}
-                                    <span class="meta">
+                                    <p class="meta">
                                 {% endif %}
                                 {{ currentTeam.name }}{% if not loop.last %}, {% endif %}
                                 {% if loop.last %}
-                                    </span>
+                                    </p>
                                 {% endif %}
                             {% endfor %}
                         </div>
