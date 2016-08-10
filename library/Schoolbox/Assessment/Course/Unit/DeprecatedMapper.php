@@ -43,7 +43,7 @@ class DeprecatedMapper extends Folder\Mapper
         $this->hasModel(DeprecatedModel::class);
 
         // define the join for unit tasks (it's a reverse join, but it works)
-        $this->joins('id', TaskMapper::getInstance(), 'category_id', null, self::COLUMN_JOIN_MULTI, 'tasks', 'task');
+        $this->joins('id', TaskMapper::class, 'category_id', null, self::COLUMN_JOIN_MULTI, 'tasks', 'task');
     }
 
 
