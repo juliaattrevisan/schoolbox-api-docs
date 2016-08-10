@@ -10,8 +10,6 @@
 namespace Schoolbox\Admin\Lists;
 
 use Alaress\Web\Controller\Base;
-use Schoolbox\User;
-use Schoolbox\Resource\Storage;
 use Schoolbox\RoleMapper;
 use Schoolbox\CampusMapper;
 use Schoolbox\Calendar\EventTypeMapper;
@@ -24,13 +22,6 @@ use Schoolbox\Pastoral\Category\Mapper as CategoryMapper;
 class Controller extends Base
 {
     /**
-     * Controller constructor.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * Converts "strings_like_this" to "StringsLikeThis"
      *
      * @param $string
@@ -39,7 +30,6 @@ class Controller extends Base
      */
     private function underscoreToCamelCase($string, $capitalizeFirstCharacter = true)
     {
-
         $str = str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
 
         if (!$capitalizeFirstCharacter) {
@@ -51,45 +41,59 @@ class Controller extends Base
         return $str;
     }
 
+    /**
+     * @api /adminv2/lists/save
+     * @level 160
+     */
     public function postSave()
     {
-        $mapper_name = $this->getRequest()->post["mapper"];
+        $tableKey        = $this->getRequest()->post['table'];
+        $tableData       = $this->getTableData();
+
+        // Check for incorrect URLs
+        if(!isset($tableData[$tableKey])){
+            $this->getResponse()->status->setCode(404);
+            return;
+        }
+
+        $mapper_name     = $tableData[$tableKey]['mapper'];
         $sortable_column = $this->getRequest()->post["sortable_column"];
 
         /** @var \Schoolbox\Mapper $mapper */
         $mapper = new $mapper_name;
         $model_name = $mapper->getModel();
 
-        $ids = [];
+        $ids    = [];
         $values = [];
-        $fixed = [];
-        $nulls = [];
+        $fixed  = [];
+        $nulls  = [];
         $radios = [];
 
         // Get the data into some sort of usable format
 
         foreach ($this->getRequest()->post as $field => $value) {
 
-            if (substr($field, 0, 6) == "value-")
+            if (substr($field, 0, 6) == "value-") {
                 $values[substr($field, 6)] = $value;
-            else if (substr($field, 0, 6) == "fixed-")
+            } else if (substr($field, 0, 6) == "fixed-") {
                 $fixed[substr($field, 6)] = $value;
-            else if (substr($field, 0, 5) == "null-")
+            } else if (substr($field, 0, 5) == "null-") {
                 $nulls[substr($field, 5)] = $value;
-            else if (substr($field, 0, 6) == "radio-")
+            } else if (substr($field, 0, 6) == "radio-") {
                 $radios[substr($field, 6)] = $value;
-            else if ($field == "id")
+            } else if ($field == "id") {
                 $ids = $value;
+            }
         }
 
         foreach ($ids as $currentIndex => $id)
         {
             // Negative ID numbers indicate new records
 
-            if ($id > 0)
+            if ($id > 0) {
                 // Lookup existing record
                 $model = $mapper->findById($id);
-            else {
+            } else {
                 // Create new record
                 $model = new $model_name;
                 foreach ($fixed as $field => $value) {
@@ -144,20 +148,18 @@ class Controller extends Base
         $this->getResponse()->redirect->afterPost('/adminv2/lists/' . $this->getRequest()->post["table"]);
     }
 
+
     /**
-     * Show options
+     * Gets all table settings
      *
-     * @param string $table
+     * @return array
      */
-    public function getIndex($table)
+    private function getTableData()
     {
-        if (!isset($table)) {
-            $table = "roles";
-        }
-
         // This array defines the tables that can be updated
+        // Note that they are NOT indexed by actual table name, but by an arbitrary key.
 
-        $tables = [
+        return [
             'roles' => [
                 'title'             => 'Roles',                                 // Title of the tab
                 'mapper'            => RoleMapper::class,                       // Mapper for the list item
@@ -204,7 +206,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'luResidentialHouse'    => [
+            'residential-house'    => [
                 'title'             => 'Residential Houses',
                 'mapper'            => \HouseResidentialMapper::class,
                 'fields'            => [
@@ -214,7 +216,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'luCampus'    => [
+            'campus'    => [
                 'title'             => 'Campus',
                 'mapper'            => CampusMapper::class,
                 'fields'            => [
@@ -232,7 +234,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'luEventType'           => [
+            'event-type'           => [
                 'title'             => 'Event Types',
                 'mapper'            => EventTypeMapper::class,
                 'fields'            => [
@@ -247,7 +249,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'newsTopic'             => [
+            'news-topic'             => [
                 'title'             => 'News Topics',
                 'mapper'            => TopicMapper::class,
                 'sortable'          => 'sequence',
@@ -258,7 +260,7 @@ class Controller extends Base
                     ],
                 ]
             ],
-            'lu_submission_type'    => [
+            'submission-type'    => [
                 'title'             => 'Submission Types',
                 'mapper'            => WorkTypeMapper::class,
                 'fields'            => [
@@ -268,7 +270,7 @@ class Controller extends Base
                     ],
                 ]
             ],
-            'submission_errors'     => [
+            'submission-errors'     => [
                 'title'             => 'Submission States',
                 'mapper'            => \DueWork_ErrorMapper::class,
                 'fields'            => [
@@ -293,7 +295,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'component_definition'  => [
+            'component-definition'  => [
                 'title'             => 'Components',
                 'mapper'            => \Component_DefinitionMapper::class,
                 'findAllMethod'     => 'findAllIncludeHidden',
@@ -323,7 +325,7 @@ class Controller extends Base
                     ]
                 ]
             ],
-            'lu_timetable_colour'   => [
+            'timetable-colour'   => [
                 'title'             => 'Timetable Colours',
                 'mapper'            => \Timetable_ColourMapper::class,
                 'fields'            => [
@@ -338,7 +340,7 @@ class Controller extends Base
                     ],
                 ]
             ],
-            'lu_pastoral_type'      => [
+            'pastoral-type'      => [
                 'title'             => 'Pastoral Types',
                 'mapper'            => TypeMapper::class,
                 'sort'              => 'name',
@@ -359,7 +361,7 @@ class Controller extends Base
                     ],
                 ]
             ],
-            'lu_pastoral_category'    => [
+            'pastoral-category'    => [
                 'title'             => 'Pastoral Sub-Types',
                 'mapper'            => CategoryMapper::class,
                 'sort'              => 'pastoralTypeId',
@@ -381,7 +383,7 @@ class Controller extends Base
                     ],
                 ]
             ],
-            'lu_pastoral_severity'    => [
+            'pastoral-severity'    => [
                 'title'             => 'Pastoral Record Severity',
                 'mapper'            => SeverityMapper::class,
                 'sortable'          => 'order',
@@ -393,13 +395,36 @@ class Controller extends Base
                 ]
             ],
         ];
+    }
+
+    /**
+     * Show options
+     *
+     * @api /adminv2/lists/save
+     * @level 160
+     *
+     * @param string $table Arbitrary value to identify a table. Does not need to be the actual table name.
+     */
+    public function getIndex($table)
+    {
+        if (!isset($table)) {
+            $table = "roles";
+        }
+
+        $tables = $this->getTableData();
+
+        // Check for incorrect URLs
+        if(!isset($tables[$table])){
+            $this->getResponse()->status->setCode(404);
+            return;
+        }
 
         /** @var \Schoolbox\Mapper $mapper */
-        $mapper = new $tables[$table]['mapper'];
+        $mapper     = new $tables[$table]['mapper'];
         $model_name = $mapper->getModel();
-        $prototype = new $model_name;
+        $prototype  = new $model_name;
 
-        $reflect = new \ReflectionClass($prototype);
+        $reflect    = new \ReflectionClass($prototype);
         $properties = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC | \ReflectionProperty::IS_PROTECTED | \ReflectionProperty::IS_PRIVATE);
 
         $records = [];
@@ -480,17 +505,14 @@ class Controller extends Base
 
         // Render this thing out
 
-        $this->getResponse()->content->set(
-            array(
-                'template' => '@adminLists/index.twig',
-                'data'     => array(
-                    'pageCurrent' => 'lists',
-                    'tables' => $tables,
-                    'table' => $table,
-                    'records' => $records,
-                    'mapper' => get_class($mapper)
-                ),
-            )
-        );
+        $this->getResponse()->content->set([
+            'template' => '@adminLists/index.twig',
+            'data'     => [
+                'pageCurrent' => 'lists',
+                'tables'      => $tables,
+                'table'       => $table,
+                'records'     => $records
+            ],
+        ]);
     }
 }
