@@ -1,0 +1,16 @@
+<li class="actions-small-1" data-sport>
+    <div class="list-item">
+        <div class="small-12 avatar card">
+            <h3><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}" title="Manage Divisions in {{ sport.name }}">{{ sport.name }}</a></h3>
+            <p><a href="{{ sport.url }}">{{ sport.url }}</a>
+        </div>
+    </div>
+    <nav>
+        <a href="{{ routeLookup('sportsfixturesSport.getModifyForm', {entityId: sport.id}) }}" class="icon-modify" title="Modify"></a>
+        <a href="#" class="icon-more" data-dropdown="sportsfixtures-sport-{{ sport.getId() }}-actions"></a>
+    </nav>
+    <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-sport-{{ sport.getId() }}-actions">
+        <li><a href="{{ routeLookup('sportsfixturesPosition.getList', {contextId: sport.id}) }}" class="icon-position" title="Manage Positions in {{ sport.name }}">Manage Positions</a></li>
+        <li><a href="#" data-action="delete" data-post-action="{{ routeLookup('sportsfixturesSport.deleteEntity', {entityId: sport.id}) }}" class="icon-delete" title="Delete" data-delete="{{ sport.id }}">Delete</a></li>
+    </ul>
+</li>

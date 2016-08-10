@@ -13,7 +13,7 @@ use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\SportsFixtures\Division\Model as Division;
-use Schoolbox\SportsFixtures\Division\User\Model as DivisionUserModel;
+use Schoolbox\SportsFixtures\Division\User\Model as DivisionUser;
 use Schoolbox\SportsFixtures\Division\User\Mapper as DivisionUserMapper;
 
 /**
@@ -71,7 +71,7 @@ class Collector
     {
         // Load players into division
         // TODO add players into division model as a M2M join
-        /** @var DivisionUserModel[] $players */
+        /** @var DivisionUser[] $players */
         $players = $this->getDivisionUserMapper()->findByColumn('division_id', $division->getId(), ['order' => ['sequence' => 'desc']]);
         foreach ($players as $player) {
             $division->getPlayers()->add($player->getUser());

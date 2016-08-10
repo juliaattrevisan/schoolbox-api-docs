@@ -302,37 +302,105 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      * IComparable objects, then the object's compare method is used, otherwise
      * standard comparison is used.
      *
+     * Supports multi-field comparision. Eg, 'sort by last name, then first name'
+     *
      * Special case of $this->sortByCallback().
      *
-     * @param string   $field           The name of the field to sort by.
-     * @param string   $direction       The order to sort by - 'asc' or 'desc'
-     * @param callable $compareFunction If set, use this callable as the comparison.
-     *                                  Only works if values aren't directly comparable.
+     * @param string|string[]      $field           The name of the field[s] to sort by.
+     * @param string|string[]      $direction       The order[s] to sort by - 'asc' or 'desc'
+     * @param callable|callable[]  $compareFunction If set, use this callable[s] as the comparison.
+     *                                               Only applied if values aren't directly comparable.
      *
      * @return $this
      */
     public function sortBy($field, $direction, $compareFunction = null)
     {
-        $get_method = $this->getGetMethodName($field);
-        $is_asc     = (strtolower($direction) === 'asc');
-        $isCallable = is_callable($compareFunction);
-        $callback   = function($a, $b) use ($get_method, $is_asc, $isCallable, $compareFunction) {
-            $result  = 0;
-            $a_value = $a->$get_method();
-            $b_value = $b->$get_method();
-            if ($a_value instanceof \IComparable && $b_value instanceof \IComparable) {
-                $result = $a_value->compare($b_value);
-            } elseif ($a_value !== $b_value) {
-                if ($isCallable) {
-                    $result = $compareFunction($a_value, $b_value);
-                } else {
-                    $result = $a_value < $b_value ? -1 : 1;
+        $fields           = (array)$field;
+        $directions       = (array)$direction;
+        $compareFunctions = is_array($compareFunction) ? $compareFunction : array_fill(0,count($fields),null);
+
+        $get_methods = [];
+        foreach($fields as $field){
+            $get_methods[] = $this->getGetMethodName($field);
+        }
+
+        $is_asc = [];
+        foreach($directions as $direction){
+            $is_asc[] = (strtolower($direction) === 'asc');
+        }
+
+        $isCallable = [];
+        foreach($compareFunctions as $compareFunction){
+            $isCallable[] = is_callable($compareFunction);
+        }
+
+        $callback   = function($a, $b) use ($get_methods, $is_asc, $isCallable, $compareFunctions) {
+            $result = 0;
+            $i = 0;
+            for(; $i < count($get_methods); $i++){
+                $a_value = $a->$get_methods[$i]();
+                $b_value = $b->$get_methods[$i]();
+
+                if ($a_value instanceof \IComparable && $b_value instanceof \IComparable) {
+                    $result = $a_value->compare($b_value);
+                } elseif ($a_value !== $b_value) {
+                    if ($isCallable[$i]) {
+                        $result = $compareFunctions[$i]($a_value, $b_value);
+                    } else {
+                        $result = $a_value < $b_value ? -1 : 1;
+                    }
+                }
+
+                // Have we determined a result ?
+                if(0 !== $result){
+                    break;
                 }
             }
-            return $is_asc ? $result : -$result;
+
+            // At this point, if $result is 0, we didn't break and $i has incremented past the end of array.
+            // Otherwise we broke at $i and return result at that position with requested polarity.
+            return 0 === $result ? 0 : ($is_asc[$i] ? $result : -$result);
         };
+
         return $this->sortByCallback($callback);
     }
+
+
+    /**
+     * Convenience method to sort a collection using multiple fields
+     *
+     * @param array         $fields       Keys = fieldName. Values = direction + optional callback. eg
+    *                                      [  'lastName'  => ['asc'],
+    *                                         'firstName' => ['asc', $callable],
+    *                                          'dob'       => 'desc',   ]
+     *
+     * @var   string|array  $fields[]     If value is string: Direction to sort. {'asc'|'desc'}
+     * @var   string        $fields[][1]  If value is array:  1st item is direction,
+     * @var   callable      $fields[][2]                      2nd item is a compare function (optional)
+     * @return static
+     */
+    public function sortByMultiFields(array $fields){
+
+        $fieldNames       = [];
+        $directions       = [];
+        $compareFunctions = [];
+
+        foreach($fields as $fieldName => $fieldOptions){
+            $fieldNames[] = $fieldName;
+
+            if(is_array($fieldOptions)){
+                $directions[]       = $fieldOptions[0];
+                $compareFunctions[] = $fieldOptions[1] ?: null;
+            } else {
+                $directions[]       = $fieldOptions;
+                $compareFunctions[] = null;
+            }
+        }
+
+        return $this->sortBy($fieldNames, $directions, $compareFunctions);
+    }
+
+
 
     /**
     * Sorts the collection by a callback. @see usort()

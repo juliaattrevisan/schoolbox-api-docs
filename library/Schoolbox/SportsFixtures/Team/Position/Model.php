@@ -7,9 +7,9 @@
 
 namespace Schoolbox\SportsFixtures\Team\Position;
 
-use \Schoolbox\User as UserModel;
-use \Schoolbox\SportsFixtures\Team\Model as TeamModel;
-use \Schoolbox\SportsFixtures\Position\Model as PositionModel;
+use \Schoolbox\User as User;
+use \Schoolbox\SportsFixtures\Team\Model as Team;
+use \Schoolbox\SportsFixtures\Position\Model as Position;
 
 /**
  * Model for relation between teams and users.
@@ -28,21 +28,21 @@ class Model
     /**
      * Team part of the user/team relation.
      *
-     * @var TeamModel
+     * @var Team
      */
     protected $team;
 
     /**
      * User part of the user/team relation.
      *
-     * @var UserModel
+     * @var User
      */
     protected $user;
 
     /**
      * Position of player
      *
-     * @var PositionModel
+     * @var Position
      */
     protected $position;
 
@@ -51,9 +51,9 @@ class Model
      */
     public function __construct()
     {
-        $this->user = new UserModel();
-        $this->team = new TeamModel();
-        $this->position = new PositionModel();
+        $this->user = new User();
+        $this->team = new Team();
+        $this->position = new Position();
     }
 
     /**
@@ -75,7 +75,7 @@ class Model
     }
 
     /**
-     * @return TeamModel
+     * @return Team
      */
     public function getTeam()
     {
@@ -83,17 +83,17 @@ class Model
     }
 
     /**
-     * @param  TeamModel $team
+     * @param  Team $team
      * @return static
      */
-    public function setTeam(TeamModel $team)
+    public function setTeam(Team $team)
     {
         $this->team = $team;
         return $this;
     }
 
     /**
-     * @return PositionModel
+     * @return Position
      */
     public function getPosition()
     {
@@ -101,17 +101,17 @@ class Model
     }
 
     /**
-     * @param  PositionModel $position
+     * @param  Position $position
      * @return static
      */
-    public function setPosition(PositionModel $position)
+    public function setPosition(Position $position)
     {
         $this->position = $position;
         return $this;
     }
 
     /**
-     * @return UserModel
+     * @return User
      */
     public function getUser()
     {
@@ -119,10 +119,10 @@ class Model
     }
 
     /**
-     * @param  UserModel $user
+     * @param  User $user
      * @return static
      */
-    public function setUser(UserModel $user)
+    public function setUser(User $user)
     {
         $this->user = $user;
         return $this;

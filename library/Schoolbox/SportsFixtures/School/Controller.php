@@ -11,7 +11,7 @@ namespace Schoolbox\SportsFixtures\School;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
-use \Schoolbox\TagCloud\Model as TagCloudModel;
+use \Schoolbox\TagCloud\Model as TagCloud;
 
 class Controller extends Base
 {
@@ -53,7 +53,7 @@ class Controller extends Base
      */
     public function postEditSchool() {
 
-        /** @var TagCloudModel $tag */
+        /** @var TagCloud $tag */
         $tag = $this->getSchoolTagCloudMapper()->findById($this->getRequest()->post["id"]);
         $tag->setUpdatedAt(\Alaress_Date_Format::now());
         $tag->setName($this->getRequest()->post["name"]);
@@ -66,7 +66,7 @@ class Controller extends Base
      * Delete external school from tag cloud
      */
     public function postDeleteSchool() {
-        /** @var TagCloudModel $tag */
+        /** @var TagCloud $tag */
         $tag = $this->getSchoolTagCloudMapper()->findById($this->getRequest()->post["id"]);
         $this->getSchoolTagCloudMapper()->delete($tag);
     }

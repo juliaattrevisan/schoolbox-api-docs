@@ -29,12 +29,17 @@
                         {{ teamResult.description|raw }}
                     </div>
                 </div>
+
+
                 <nav>
-                    {% if hasMatchModify %}
-                    <a href="{{ routeLookup('sportsfixturesResult.deleteEntity', {entityId: teamResult.id}) }}" class="icon-delete" title="Delete" data-delete="{{ match.result[team.id].id }}"></a>
+                    {% if hasMatchModify and not match.season.isArchived %}
                     <a href="{{ routeLookup('sportsfixturesResult.getModifyForm', {entityId: teamResult.id}) }}" class="icon-modify" title="Modify"></a>
                     {% endif %}
+                    <a href="#" class="icon-more" data-dropdown="sportsfixtures-position-{{ currentPosition.getId() }}-actions"></a>
                 </nav>
+                <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-position-{{ currentPosition.getId() }}-actions">
+                    <li><a href="{{ routeLookup('sportsfixturesResult.deleteEntity', {entityId: teamResult.id}) }}" class="icon-delete" title="Delete" data-delete="{{ match.result[team.id].id }}">Delete</a></li>
+                </ul>
             </div>
         </div>
     </div>

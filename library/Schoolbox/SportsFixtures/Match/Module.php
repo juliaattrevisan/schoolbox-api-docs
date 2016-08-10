@@ -10,10 +10,15 @@ namespace Schoolbox\SportsFixtures\Match;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
+use Alaress\Web\Router\PathMatcher;
+use Aura\Router\Router;
 use Aura\Di\ContainerInterface;
 use Schoolbox\Module\RestfulModule;
 use Schoolbox\Module\StandardModuleTrait;
 use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\SportsFixtures\Match\Model as Match;
+use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\SportsFixtures\Season\Mapper as SeasonMapper;
 
 class Module extends RestfulModule
 {

@@ -4,12 +4,19 @@
             event.preventDefault();
 
             var element = $(this);
+            var $position = element.closest('[data-position]');
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Position?',
                 confirmEvent: function() {
-                    $.post(element.attr('href'), {positionId: element.attr('data-delete')}, function() {
-                        window.location.href = window.location.href;
+                    $.post(element.attr('href'), {}, function() {
+
+                        // Is this the last position in the sport ?
+                        if( 1 == $('[data-position]').length){
+                            window.location.href = window.location.href;
+                        } else {
+                            $position.fadeOut({ done: $position.remove() });
+                        }
                     });
                 }
             });
@@ -46,17 +53,7 @@
             <section>
                 <ul class="action-list">
                     {% for currentPosition in allPositions %}
-                        <li class="actions-small-1">
-                            <div class="list-item">
-                                <div class="small-12 avatar card">
-                                    <p>{{ currentPosition.name }}</p>
-                                </div>
-                            </div>
-                            <nav>
-                                <a href="{{ routeLookup('sportsfixturesPosition.deleteEntity', {entityId: currentPosition.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentPosition.id }}"></a>
-                                <a href="{{ routeLookup('sportsfixturesPosition.getModifyForm', {entityId: currentPosition.id}) }}" class="icon-modify" title="Modify"></a>
-                            </nav>
-                        </li>
+                        {% include '@sportsfixturesPosition/listItem.twig' %}
                     {% endfor %}
                 </ul>
             </section>

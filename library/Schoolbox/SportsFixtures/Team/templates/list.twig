@@ -4,12 +4,19 @@
             event.preventDefault();
 
             var element = $(this);
+            var $team   = element.closest('[data-team]');
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this Team?',
                 confirmEvent: function() {
                     $.post(element.attr('href'), {teamId: element.attr('data-delete')}, function() {
-                        window.location.href = window.location.href;
+
+                        // Is this the last team in the division ?
+                        if( 1 == $('[data-team]').length){
+                            window.location.href = window.location.href;
+                        } else {
+                            $team.fadeOut({ done: $team.remove() });
+                        }
                     });
                 }
             });
@@ -37,26 +44,34 @@
                     <h2 class="subheader">{{ division.name }}</h2>
                 </div>
             </div>
+            {% if not division.season.isArchived %}
             <nav>
                 <a href='{{ routeLookup('sportsfixturesTeam.getCreateForm', {contextId: division.id}) }}' class="icon-add" title="Add Team to {{ division.name }}"></a>
             </nav>
+            {% endif %}
         </div>
 
         {% if allTeams|length %}
         <section>
             <ul class="action-list">
                 {% for currentTeam in allTeams %}
-                <li class="actions-small-1">
+                <li class="actions-small-1" data-team>
                     <div class="list-item">
                         <div class="small-12 avatar card">
-                            <p>{{ currentTeam.name }}</p>
-                            <p><a href="{{ currentTeam.url }}">{{ currentTeam.url }}</a>
+                            <h3>{{ currentTeam.name }}</h3>
+                            <p class="meta"><a href="{{ currentTeam.url }}">{{ currentTeam.url }}</a>
                         </div>
                     </div>
                     <nav>
-                        <a href="{{ routeLookup('sportsfixturesTeam.deleteEntity', {entityId: currentTeam.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentTeam.id }}"></a>
-                        <a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: currentTeam.id}) }}" class="icon-modify" title="Modify"></a>
+                        {% if not division.season.isArchived %}
+                            <a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: currentTeam.id}) }}" class="icon-modify" title="Modify"></a>
+                        {% endif %}
+
+                        <a href="#" class="icon-more" data-dropdown="sportsfixtures-team-{{ currentTeam.getId() }}-actions"></a>
                     </nav>
+                    <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-team-{{ currentTeam.getId() }}-actions">
+                        <li><a href="{{ routeLookup('sportsfixturesTeam.deleteEntity', {entityId: currentTeam.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentTeam.id }}">Delete</a></li>
+                    </ul>
                 </li>
                 {% endfor %}
             </ul>

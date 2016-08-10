@@ -10,9 +10,8 @@ namespace Schoolbox\SportsFixtures\Division\Helper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 use Schoolbox\SportsFixtures\Team\Helper\Translator as TeamTranslator;
-use Schoolbox\SportsFixtures\Team\Model as TeamModel;
 use Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
-use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
+use Schoolbox\SportsFixtures\Division\Model as Division;
 
 /**
  * Translates a Division object into a data format that is suitable for use in
@@ -50,10 +49,10 @@ class Translator
     /**
      * Builds a template friendly data model from a division.
      *
-     * @param DivisionModel $division
+     * @param Division $division
      * @return array
      */
-    public function translateDivision(DivisionModel $division)
+    public function translateDivision(Division $division)
     {
         $dataModel = [
             'division'  => $division,

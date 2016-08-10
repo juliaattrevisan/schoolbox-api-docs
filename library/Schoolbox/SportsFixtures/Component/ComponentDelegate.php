@@ -13,7 +13,10 @@
 
 namespace Schoolbox\SportsFixtures\Component;
 
+use Alaress\Session\Session;
+use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
+use \SitePage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -81,10 +84,17 @@ class ComponentDelegate
     protected $schoolTagCloudMapper;
 
     /**
-     * Delegate constructor.
+     * @var SitePage
      */
-    public function __construct()
+    protected $sitepage;
+
+    /**
+     * Delegate constructor.
+     * @param SitePage $sitepage
+     */
+    public function __construct(SitePage $sitepage)
     {
+        $this->setSitePage($sitepage);
         $this->setUserMapper(UserMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
         $this->setSportMapper(SportMapper::getInstance());
@@ -97,6 +107,8 @@ class ComponentDelegate
         $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
     }
 
+
+
     /**
      * @return array
      */
@@ -104,42 +116,50 @@ class ComponentDelegate
     {
         $matches = [];
 
-        foreach ($_SESSION["children"] as $child) {
+        /** @var Session $session */
+        $session = $this->getSitePage()->getDi()->get('session');
+        $children = $session->get('children');
 
-            $childTeams = $this->getTeamPlayerMapper()->findByColumn('user_id', $child["id"]);
-            $matchesForChild = $this->getMatches($childTeams);
+        if(is_array($children))
+        {
+            foreach ($children as $child)
+            {
+                /** @var Collection|TeamPlayer[] $childTeams */
+                $childTeams = $this->getTeamPlayerMapper()->findByColumn('user_id', $child["id"]);
+                $matchesForChild = $this->getMatches($childTeams);
 
-            foreach ($matchesForChild as $matchCurrent) {
+                foreach ($matchesForChild as $matchCurrent) {
 
-                if (!isset($matches[$matchCurrent->getId()])) {
-                    $matches[$matchCurrent->getId()] = [];
-                    $matches[$matchCurrent->getId()]["home"]  = false;
-                    $matches[$matchCurrent->getId()]["away"]  = false;
-                    $matches[$matchCurrent->getId()]["match"] = $matchCurrent;
-                    $matches[$matchCurrent->getId()]["teams"] = [
-                        $matchCurrent->getHomeTeam()->getId() => [
-                            'team'     => $matchCurrent->getHomeTeam(),
-                            'children' => [],
-                        ],
-                        $matchCurrent->getAwayTeam()->getId() => [
-                            'team'     => $matchCurrent->getAwayTeam(),
-                            'children' => [],
-                        ],
-                    ];
-                }
-
-                foreach ($childTeams as $team) {
-                    $teamId = $team->getTeam()->getId();
-                    $isHome = ($teamId == $matchCurrent->getHomeTeam()->getId());
-                    $isAway = ($teamId == $matchCurrent->getAwayTeam()->getId());
-                    if ($isHome) {
-                        $matches[$matchCurrent->getId()]["home"] = true;
+                    if (!isset($matches[$matchCurrent->getId()])) {
+                        $matches[$matchCurrent->getId()] = [];
+                        $matches[$matchCurrent->getId()]["home"] = false;
+                        $matches[$matchCurrent->getId()]["away"] = false;
+                        $matches[$matchCurrent->getId()]["match"] = $matchCurrent;
+                        $matches[$matchCurrent->getId()]["teams"] = [
+                            $matchCurrent->getHomeTeam()->getId() => [
+                                'team' => $matchCurrent->getHomeTeam(),
+                                'children' => [],
+                            ],
+                            $matchCurrent->getAwayTeam()->getId() => [
+                                'team' => $matchCurrent->getAwayTeam(),
+                                'children' => [],
+                            ],
+                        ];
                     }
-                    if ($isAway) {
-                        $matches[$matchCurrent->getId()]["away"] = true;
-                    }
-                    if ($isHome || $isAway) {
-                        $matches[$matchCurrent->getId()]["teams"][$teamId]["children"][$team->getUser()->getId()] = $team->getUser();
+
+                    foreach ($childTeams as $team) {
+                        $teamId = $team->getTeam()->getId();
+                        $isHome = ($teamId == $matchCurrent->getHomeTeam()->getId());
+                        $isAway = ($teamId == $matchCurrent->getAwayTeam()->getId());
+                        if ($isHome) {
+                            $matches[$matchCurrent->getId()]["home"] = true;
+                        }
+                        if ($isAway) {
+                            $matches[$matchCurrent->getId()]["away"] = true;
+                        }
+                        if ($isHome || $isAway) {
+                            $matches[$matchCurrent->getId()]["teams"][$teamId]["children"][$team->getUser()->getId()] = $team->getUser();
+                        }
                     }
                 }
             }
@@ -240,7 +260,7 @@ class ComponentDelegate
 
     /**
      * @param $teamPlayers
-     * @return array
+     * @return Match[]
      */
     public function getMatches($teamPlayers) {
         $matches = [];
@@ -273,10 +293,10 @@ class ComponentDelegate
     /**
      * Sort matches chronologically
      *
-     * @param array $matches
-     * @return mixed
+     * @param Match[] $matches
+     * @return Match[]
      */
-    public function sortMatches($matches) {
+    public function sortMatches(array $matches) {
         // Sort matches by date order
         usort($matches, function($a, $b) {
             /** @var Match $a */
@@ -482,5 +502,19 @@ class ComponentDelegate
     protected function setSchoolTagCloudMapper($schoolTagCloudMapper)
     {
         $this->schoolTagCloudMapper = $schoolTagCloudMapper;
+    }
+
+    /**
+     * @param SitePage $sitepage
+     */
+    protected function setSitePage(SitePage $sitepage){
+        $this->sitepage = $sitepage;
+    }
+
+    /**
+     * @return SitePage
+     */
+    protected function getSitePage(){
+        return $this->sitepage;
     }
 }

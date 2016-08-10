@@ -12,7 +12,6 @@ use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
-use \Schoolbox\Config\ConfigMapper;
 use \Schoolbox\User;
 use \Schoolbox\Permission\Access\UserAccess;
 use \Schoolbox\Permission\Access\UserAccessMapper;
@@ -24,7 +23,7 @@ use \Schoolbox\SportsFixtures\Match\Weather as MatchWeather;
 use \Schoolbox\SportsFixtures\Result\Model as Result;
 use \Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
 use Schoolbox\SportsFixtures\Status\Mapper as StatusMapper;
-use Schoolbox\SportsFixtures\Status\Model as StatusModel;
+use Schoolbox\SportsFixtures\Status\Model as Status;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\SportsFixtures\Team\Metadata\Factory as TeamMetadataFactory;
@@ -363,13 +362,33 @@ class Controller extends AbstractController
      */
     protected function getForm($entity, $context = null)
     {
+        // For clarity
+        $result = $entity;
+        $match  = $context;
+
+        // If updating existing results
+        if($result->getId()){
+            $match = MatchMapper::getInstance()->findById($result->getMatch()->getId());
+            $result->setMatch($match);
+
+            // Don't permit update of archived results
+            if($match->getSeason()->isArchived()){
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
+            }
+        }
+
+        // Don't permit creation of results for archived matches
+        if(!$result->getId() && $match->getSeason()->isArchived()){
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
+        }
+
         try {
             $team = $this->getTeamMapper()->findById($entity->getTeam()->getId());
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
         }
 
-        $this->getCreateFormForTeam($entity, $team, $context);
+        $this->getCreateFormForTeam($result, $team, $match);
     }
 
     /**
@@ -396,7 +415,7 @@ class Controller extends AbstractController
         }
 
         // Save status (optional)
-        /** @var StatusModel $status */
+        /** @var Status $status */
         $statusId = $this->getRequest()->post->get('statusId');
         if ($statusId) {
             try {
@@ -424,13 +443,13 @@ class Controller extends AbstractController
     /**
      * Save Result data to db
      *
-     * @param Match $match
-     * @param Team $team
-     * @param StatusModel $status
+     * @param Match  $match
+     * @param Team   $team
+     * @param Status $status
      * @param string $description
      * @param Result $result
      */
-    private function saveResult(Match $match, Team $team, StatusModel $status, $description, Result $result)
+    private function saveResult(Match $match, Team $team, Status $status, $description, Result $result)
     {
         $result->setMatch($match);
         $result->setTeam($team);

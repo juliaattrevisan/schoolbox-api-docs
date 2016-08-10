@@ -12,10 +12,10 @@ use Alaress\Async\Notification\Instance\BuilderInterface;
 use Alaress\Async\Notification\Parameter\Param;
 use Alaress\Async\Notification\Parameter\ParameterInterface;
 use Monolog\Logger;
-use Schoolbox\User as UserModel;
-use Schoolbox\SportsFixtures\Match\Model as MatchModel;
-use Schoolbox\SportsFixtures\Sport\Model as SportModel;
-use Schoolbox\SportsFixtures\Team\Model as TeamModel;
+use Schoolbox\User as User;
+use Schoolbox\SportsFixtures\Match\Model as Match;
+use Schoolbox\SportsFixtures\Sport\Model as Sport;
+use Schoolbox\SportsFixtures\Team\Model as Team;
 
 /**
  * Sports fixtures customized wrapper for the notification instance builder.
@@ -31,7 +31,7 @@ class Builder implements BuilderInterface
      */
     protected $internalBuilder;
 
-    public function __construct(UserModel $effector, $validate = true)
+    public function __construct(User $effector, $validate = true)
     {
         $this->internalBuilder = new InternalBuilder($validate);
         // Set some defaults into the builder
@@ -41,34 +41,34 @@ class Builder implements BuilderInterface
     }
 
     /**
-     * @param SportModel $sport
+     * @param Sport $sport
      * @param int $stacking
      * @return self
      */
-    public function setSportParam(SportModel $sport, $stacking = Param::STACKING_REPLACE)
+    public function setSportParam(Sport $sport, $stacking = Param::STACKING_REPLACE)
     {
         $this->internalBuilder->setParam('sport', new Param($sport->getName(), $sport->getUrl(), $stacking));
         return $this;
     }
 
     /**
-     * @param MatchModel $match
-     * @param TeamModel $team
+     * @param Match $match
+     * @param Team $team
      * @return self
      */
-    public function setMatchHref(MatchModel $match, TeamModel $team)
+    public function setMatchHref(Match $match, Team $team)
     {
         $this->setHref($this->buildHrefForMatch($match, $team));
         return $this;
     }
 
     /**
-     * @param MatchModel $match
-     * @param TeamModel $team
+     * @param Match $match
+     * @param Team $team
      * @param int $stacking
      * @return self
      */
-    public function setMatchParam(MatchModel $match, TeamModel $team, $stacking = Param::STACKING_REPLACE)
+    public function setMatchParam(Match $match, Team $team, $stacking = Param::STACKING_REPLACE)
     {
         $this->internalBuilder->setParam('match', $this->buildMatchParam($match, $team, $stacking));
         return $this;
@@ -77,11 +77,11 @@ class Builder implements BuilderInterface
     /**
      * Builds the href for the results page for this match and team.
      *
-     * @param MatchModel $match
-     * @param TeamModel $team
+     * @param Match $match
+     * @param Team $team
      * @return string
      */
-    public function buildHrefForMatch(MatchModel $match, TeamModel $team)
+    public function buildHrefForMatch(Match $match, Team $team)
     {
         return "/sportsfixtures/matches/{$match->getId()}/results/{$team->getId()}";
     }
@@ -89,12 +89,12 @@ class Builder implements BuilderInterface
     /**
      * Builds a parameter for this notifier's builder's "match" parameter.
      *
-     * @param MatchModel $match
-     * @param TeamModel $team
+     * @param Match $match
+     * @param Team $team
      * @param int $stacking
      * @return Param
      */
-    public function buildMatchParam(MatchModel $match, TeamModel $team, $stacking = Param::STACKING_REPLACE)
+    public function buildMatchParam(Match $match, Team $team, $stacking = Param::STACKING_REPLACE)
     {
         $ts   = microtime(true);
         $href = $this->buildHrefForMatch($match, $team);

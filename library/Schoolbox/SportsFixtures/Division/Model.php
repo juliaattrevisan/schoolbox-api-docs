@@ -16,6 +16,7 @@ use \Schoolbox\ISoftDeletable;
 use \Schoolbox\User;
 use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use \Schoolbox\SportsFixtures\Sport\Model as Sport;
+use \Schoolbox\SportsFixtures\Season\Model as Season;
 use \Schoolbox\SportsFixtures\Team;
 
 class Model implements ISoftDeletable {
@@ -27,16 +28,19 @@ class Model implements ISoftDeletable {
     /** @var Sport */
     protected $sport;
 
+    /** @var Season */
+    protected $season;
+
     /** @var string */
     protected $name;
 
     /** @var string */
     protected $url;
 
-    /** @var \Alaress_Date_Format */
+    /** @var Alaress_Date_Format */
     protected $createdAt;
 
-    /** @var \Alaress_Date_Format */
+    /** @var Alaress_Date_Format */
     protected $updatedAt;
 
     /**
@@ -166,7 +170,7 @@ class Model implements ISoftDeletable {
      * @param Sport $sport
      * @return self
      */
-    public function setSport($sport) {
+    public function setSport(Sport $sport) {
         $this->sport = $sport;
         return $this;
     }
@@ -179,32 +183,48 @@ class Model implements ISoftDeletable {
     }
 
     /**
-     * @param \Alaress_Date_Format $createdAt
+     * @param Season $season
      * @return self
      */
-    public function setCreatedAt($createdAt) {
+    public function setSeason(Season $season) {
+        $this->season = $season;
+        return $this;
+    }
+
+    /**
+     * @return Season
+     */
+    public function getSeason() {
+        return $this->season;
+    }
+
+    /**
+     * @param Alaress_Date_Format $createdAt
+     * @return self
+     */
+    public function setCreatedAt(Alaress_Date_Format $createdAt) {
         $this->createdAt = $createdAt;
         return $this;
     }
 
     /**
-     * @return \Alaress_Date_Format $createdAt
+     * @return Alaress_Date_Format $createdAt
      */
     public function getCreatedAt() {
         return $this->createdAt;
     }
 
     /**
-     * @param \Alaress_Date_Format $updatedAt
+     * @param Alaress_Date_Format $updatedAt
      * @return self
      */
-    public function setUpdatedAt($updatedAt) {
+    public function setUpdatedAt(Alaress_Date_Format $updatedAt) {
         $this->updatedAt = $updatedAt;
         return $this;
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
     public function getUpdatedAt() {
         return $this->updatedAt;

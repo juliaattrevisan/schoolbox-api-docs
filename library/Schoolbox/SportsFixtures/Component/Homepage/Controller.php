@@ -30,7 +30,7 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
         parent::__construct($instance, $user, $sitepage);
-        $this->delegate = new ComponentDelegate();
+        $this->delegate = new ComponentDelegate($sitepage);
     }
 
     /**

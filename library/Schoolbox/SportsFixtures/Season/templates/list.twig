@@ -1,0 +1,92 @@
+<div id="errorModal" class="reveal-modal" data-reveal aria-labelledby="errorModalTitle" aria-hidden="true" role="dialog">
+    <h2 id="errorModalTitle">Error</h2>
+    <p class="alert alert-box icon-alert">Something went wrong - maybe try reloading your page and trying again?</p>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+
+<script type="text/javascript">
+    $(function() {
+
+        // Archive / Restore / Delete AJAX actions
+        $('#allSeasons').on('click', 'a[data-action]', function(event) {
+            event.preventDefault();
+            var     button        = $(this),
+                    action        = button.data('action'),
+                    season        = button.closest('[data-season]'),
+                    divisionCount = season.data('divisionCount'),
+                    divisionClass = 0 == divisionCount ? 'gradient-10' : 'gradient-1',
+                    matchCount    = season.data('matchCount'),
+                    matchClass    = 0 == matchCount ? 'gradient-10' : 'gradient-1',
+                    tenseClause   = action == 'restore' ? 'that were' : 'currently';
+
+            var text = 'Are you sure you want to <strong>'+action+'</strong> this season?<br>' +
+                'This will <strong>'+action+'</strong> <span class="'+divisionClass+'">'+divisionCount+'</span> divisions and <span class="'+matchClass+'">'+matchCount+'</span> matches '+tenseClause+' linked to this season, ' +
+                'along with all their subsidiary entities';
+
+            button.confirmDialog({
+                text: text,
+                format: 'html',
+                confirmEvent: function(el) {
+                    // AJAX, then update DOM
+                    // Archive/restore: refresh
+                    // Delete: remove completely
+                    $.post(el.data('postAction'))
+                            .done(function(data) {
+                                switch (action) {
+                                    case 'delete':
+                                        season.fadeOut({ done: season.remove });
+                                        break;
+                                    case 'archive':
+                                    case 'restore':
+                                    default:
+                                        var $newDom  = $(data);
+                                        // Replace whole list item
+                                        season.replaceWith($newDom);
+                                        break;
+                                }
+                            })
+                            .fail(function() {
+                                $('#errorModal').foundation('reveal', 'open');
+                            });
+                }
+            })
+        });
+    });
+</script>
+<ul class="breadcrumb">
+    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
+    <li class="active"><a href="{{ routeLookup('sportsfixturesSeason.getList', {}) }}">All Seasons</a></li>
+</ul>
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>Sports Fixtures</h1>
+        </div>
+    </div>
+    <nav>
+        <a href='{{ routeLookup('sportsfixturesSeason.getCreateForm', {}) }}' class="icon-add" title="Add Season"></a>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="small-12 island" id="allSeasons">
+        {% if allSeasons|length %}
+            <section>
+                <ul class="information-list">
+                    {% for currentSeason in allSeasons %}
+                        {% include '@sportsfixturesSeason/listItem.twig' %}
+                    {% endfor %}
+                </ul>
+            </section>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-season"></i>
+                <p>There are no Seasons.</p>
+                <p><a href="{{ routeLookup('sportsfixturesSeason.getCreateForm', {context: match.id}) }}" title="Add a Season">Add a Season</a></p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+

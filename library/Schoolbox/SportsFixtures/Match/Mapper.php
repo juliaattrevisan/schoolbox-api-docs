@@ -14,11 +14,11 @@ namespace Schoolbox\SportsFixtures\Match;
 use PDOStatement;
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage;
-use Schoolbox\User;
 use Schoolbox\SportsFixtures\Match\Model as Match;
 use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\SportsFixtures\Season\Model as Season;
+use Schoolbox\SportsFixtures\Season\Mapper as SeasonMapper;
 use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use Schoolbox\SportsFixtures\Venue\Model as Venue;
@@ -32,6 +32,7 @@ use Schoolbox\Collection;
 /**
  * Class Mapper
  * @method Model createModel()
+ * @method Model findById($identifierValue)
  * @package Schoolbox\SportsFixtures\Match
  */
 class Mapper extends BaseMapper
@@ -46,6 +47,7 @@ class Mapper extends BaseMapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('division_id', DivisionMapper::class, 'id', null, null, 'division', 'division');
+        $this->joins('season_id', SeasonMapper::class, 'id', null, null, 'season', 'season');
         $this->joins('venue_id', VenueMapper::class, 'id', null, null, 'venue', 'venue');
         $this->uses('name', self::TYPE_STRING);
         $this->uses('start_at', self::TYPE_DATETIME);
@@ -120,6 +122,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('home_team', 'h')},
                 {$this->getJoinColumnString('away_team', 'a')},
 				{$this->getJoinColumnString('division', 'd')},
+				{$this->getJoinColumnString('season', 's')},
 				{$this->getJoinColumnString('venue', 'v')},
 				{$this->getJoinColumnString('itinerary', 'i')},
 				{$this->getJoinColumnString('result', 'r')},
@@ -139,6 +142,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('home_team', null, 'h')}
             LEFT JOIN {$this->getJoinSql('away_team', null, 'a')}
             LEFT JOIN {$this->getJoinSql('division', null, 'd')}
+            LEFT JOIN {$this->getJoinSql('season', null, 's')}
             LEFT JOIN {$this->getJoinSql('venue', null, 'v')}
             LEFT JOIN {$this->getJoinSql('itinerary', null, 'i')}
             LEFT JOIN {$this->getJoinSql('result', null, 'r')}
@@ -155,7 +159,20 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $collection = new Collection();
+        /** @var Collection|Match[] $matches */
+        $matches   = new Collection();
+
+        /** @var Collection|Division[] $divisions */
+        $divisions = new Collection();
+
+        /** @var Collection|Season[] $seasons */
+        $seasons = new Collection();
+
+        /** @var Collection|Venue[] $venues */
+        $venues    = new Collection();
+
+        /** @var Collection|Match[] $teams */
+        $teams     = new Collection();
 
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $matchId = $row['id'];
@@ -163,59 +180,70 @@ class Mapper extends BaseMapper
             /* Set up us the match in the collection
              * Only hydrate all this stuff if it never existed previously
              */
-            if (!($collection->getOffset($matchId) instanceof Match)) {
+            if (!($matches->getOffset($matchId) instanceof Match)) {
                 /** @var Match $match */
                 $match = $this->hydrate($row);
 
-                /** @var Division $division */
-                $division = $this->hydrateJoin($row, 'division', 'd');
+                if(!$divisions->getOffset($row['division_id']) instanceof Division){
+                    $divisions->setOffset($row['division_id'], $this->hydrateJoin($row, 'division', 'd'));
+                }
+                $match->setDivision($divisions->getOffset($row['division_id']));
 
-                /** @var Venue $venue */
-                $venue = $this->hydrateJoin($row, 'venue', 'v');
+                if(!$seasons->getOffset($row['season_id']) instanceof Season){
+                    $seasons->setOffset($row['season_id'], $this->hydrateJoin($row, 'season', 's'));
+                }
+                $match->setSeason($seasons->getOffset($row['season_id']));
 
-                /** @var Team $homeTeam */
-                /** @var Team $awayTeam */
-                $homeTeam = $this->hydrateJoin($row, 'home_team', 'h');
-                $awayTeam = $this->hydrateJoin($row, 'away_team', 'a');
+                if(!$venues->getOffset($row['venue_id']) instanceof Venue){
+                    $venues->setOffset($row['venue_id'], $this->hydrateJoin($row, 'venue', 'v'));
+                }
+                $match->setVenue($venues->getOffset($row['venue_id']));
 
-                $match->setVenue($venue);
-                $match->setDivision($division);
-                $match->setHomeTeam($homeTeam);
-                $match->setAwayTeam($awayTeam);
+                // Optional relationship
+                if(!$teams->getOffset($row['home_team_id']) instanceof Team){
+                    $teams->setOffset($row['home_team_id'], $this->hydrateJoin($row, 'home_team', 'h'));
+                }
+                $match->setHomeTeam($teams->getOffset($row['home_team_id']));
 
-                $collection->setOffset($match->getId(), $match);
+                // Optional relationship
+                if(!$teams->getOffset($row['away_team_id']) instanceof Team){
+                    $teams->setOffset($row['away_team_id'], $this->hydrateJoin($row, 'away_team', 'a'));
+                }
+                $match->setAwayTeam($teams->getOffset($row['away_team_id']));
+
+                $matches->setOffset($match->getId(), $match);
             }
 
             /* Append all Result instances as you go
              */
             if ($row['r.team_id']) {
-                if (!($collection->getOffset($matchId)->getResult()->getOffset($row['r.team_id']) instanceof Result)) {
+                if (!($matches->getOffset($matchId)->getResult()->getOffset($row['r.team_id']) instanceof Result)) {
                     /** @var Result $result */
                     $result = $this->hydrateJoin($row, 'result', 'r');
                     $result->setStatus($this->hydrateJoin($row, 'result.status', 'rs'));
 
-                    $collection->getOffset($matchId)->getResult()->setOffset($result->getTeam()->getId(), $result);
+                    $matches->getOffset($matchId)->getResult()->setOffset($result->getTeam()->getId(), $result);
                 }
             }
 
             /* Append all ItineraryItems as you go
              */
             if ($row['i.id']) {
-                if (!($collection->getOffset($matchId)->getItinerary()->getOffset($row['i.id']) instanceof ItineraryItem)) {
+                if (!($matches->getOffset($matchId)->getItinerary()->getOffset($row['i.id']) instanceof ItineraryItem)) {
                     $itineraryItem = $this->hydrateJoin($row, 'itinerary', 'i');
 
-                    $collection->getOffset($matchId)->getItinerary()->setOffset($itineraryItem->getId(), $itineraryItem);
+                    $matches->getOffset($matchId)->getItinerary()->setOffset($itineraryItem->getId(), $itineraryItem);
                 }
             }
         }
 
         /* Order itinerary items in asc order
          */
-        foreach ($collection as $current) {
+        foreach ($matches as $current) {
             $current->getItinerary()->sortBy('startAt', 'asc');
         }
 
-        return $collection;
+        return $matches;
     }
 
     /**

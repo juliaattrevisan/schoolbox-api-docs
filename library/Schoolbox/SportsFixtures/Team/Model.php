@@ -11,7 +11,7 @@
 namespace Schoolbox\SportsFixtures\Team;
 
 use \Alaress_Date_Format;
-use Schoolbox\Collection;
+use \Schoolbox\Collection;
 use \Schoolbox\ISoftDeletable;
 use \Schoolbox\User;
 use \Schoolbox\ValueLabelInterface;
@@ -34,10 +34,10 @@ class Model implements ISoftDeletable, ValueLabelInterface {
     /** @var string */
     protected $url;
 
-    /** @var \Alaress_Date_Format */
+    /** @var Alaress_Date_Format */
     protected $createdAt;
 
-    /** @var \Alaress_Date_Format */
+    /** @var Alaress_Date_Format */
     protected $updatedAt;
 
     /**
@@ -160,7 +160,7 @@ class Model implements ISoftDeletable, ValueLabelInterface {
     }
 
     /**
-     * @param \Alaress_Date_Format $createdAt
+     * @param Alaress_Date_Format $createdAt
      * @return self
      */
     public function setCreatedAt($createdAt) {
@@ -169,14 +169,14 @@ class Model implements ISoftDeletable, ValueLabelInterface {
     }
 
     /**
-     * @return \Alaress_Date_Format $createdAt
+     * @return Alaress_Date_Format $createdAt
      */
     public function getCreatedAt() {
         return $this->createdAt;
     }
 
     /**
-     * @param \Alaress_Date_Format $updatedAt
+     * @param Alaress_Date_Format $updatedAt
      * @return self
      */
     public function setUpdatedAt($updatedAt) {
@@ -185,7 +185,7 @@ class Model implements ISoftDeletable, ValueLabelInterface {
     }
 
     /**
-     * @return \Alaress_Date_Format
+     * @return Alaress_Date_Format
      */
     public function getUpdatedAt() {
         return $this->updatedAt;

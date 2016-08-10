@@ -18,7 +18,7 @@ use \Schoolbox\SportsFixtures\Division\Model as Division;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Team\Model as Team;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use \Schoolbox\SportsFixtures\Team\Player\Model as TeamUserModel;
+use \Schoolbox\SportsFixtures\Team\Player\Model as TeamUser;
 use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
 use Schoolbox\UserMapper;
@@ -199,9 +199,6 @@ class Controller extends AbstractController
      */
     public function getForm($entity, $context = null)
     {
-        // Load coaches into entity
-        $entity->setCoaches($this->getCoachCloud()->findForTeam($entity));
-
         if (empty($context)) {
             try {
                 $context = $this->getDivisionMapper()->findById($entity->getDivision()->getId());
@@ -210,6 +207,17 @@ class Controller extends AbstractController
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
             }
         }
+
+        // Don't permit creation of modification of teams in archived divisions
+        if($context->getSeason()->isArchived()){
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
+        }
+
+
+        // Load coaches into entity
+        $entity->setCoaches($this->getCoachCloud()->findForTeam($entity));
+
+
 
         try {
             $sport = $this->getSportMapper()->findById($context->getSport()->getId());
@@ -303,7 +311,7 @@ class Controller extends AbstractController
         $sequenceNo = count($userIds);
         foreach ($userIds as $userId) {
             try {
-                /** @var TeamUserModel $teamUser */
+                /** @var TeamUser $teamUser */
                 $teamUser = $this->getTeamPlayerMapper()->findOneByColumnList([
                     'user_id' => $userId,
                     'team_id' => $team->getId(),

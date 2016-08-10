@@ -8,28 +8,29 @@
         $('[data-school-delete]').click(function() {
             event.preventDefault();
 
-            var row = $(this).closest('li');
-            var schoolId = $(this).attr('data-school-delete');
+            var $school = $(this).closest('[data-school]');
+            var schoolId = $(this).data('school-delete');
 
             $(this).confirmDialog({
                 text: 'Are you sure you want to delete this school?',
                 confirmEvent: function () {
                     $.post('{{ routeLookup('sportsfixturesSchool.postDeleteSchool') }}', {id: schoolId}, function() {
-                        $(row).remove();
-                        if ($('#schoolList li').length == 0) {
-                            $('#schoolEmpty').removeClass('hide');
-                            $('#schoolList').addClass('hide');
-                        } else {
-                            $('#schoolEmpty').addClass('hide');
-                            $('#schoolList').removeClass('hide');
-                        }
+
+                        $school.fadeOut({ done: function(){
+
+                            // Is this the last external school ?
+                            if( 1 == $('[data-school]').length){
+                                $('#schoolEmpty').removeClass('hide');
+                            }
+
+                            $school.remove();
+                        } });
                     });
                 }
             });
         });
     });
 </script>
-
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
     <li class="active"><a href="{{ routeLookup('sportsfixturesSchool.getList', {}) }}">External Schools</a></li>
@@ -59,16 +60,19 @@
             <section id="schoolList">
                 <ul class="action-list">
                     {% for school in schools %}
-                    <li class="actions-small-2">
+                    <li class="actions-small-2" data-school="{{ school.id }}">
                         <div class="list-item">
                             <div class="small-12 avatar card">
                                 <p>{{ school.name }}</p>
                             </div>
                         </div>
                         <nav>
-                            <a href='#' data-school-delete="{{ school.id }}" class="icon-delete" title="Delete School"></a>
                             <a href='#' data-reveal-id="editSchoolModal" data-school-name="{{ school.name }}" data-school-modify="{{ school.id }}" class="icon-modify" title="Edit School"></a>
+                            <a href="#" class="icon-more" data-dropdown="sportsfixtures-school-{{ school.getId() }}-actions"></a>
                         </nav>
+                        <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-school-{{ school.getId() }}-actions">
+                            <li><a href='#' data-school-delete="{{ school.id }}" class="icon-delete" title="Delete School">Delete</a></li>
+                        </ul>
                     </li>
                     {% endfor %}
                 </ul>

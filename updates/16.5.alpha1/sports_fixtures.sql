@@ -13,11 +13,25 @@ CREATE TABLE `sportsfixtures_sport` (
 	`deleted_at` DATETIME NULL COMMENT '',
 PRIMARY KEY (`id`)  COMMENT '') ENGINE=InnoDB CHARACTER SET=utf8;
 
+/* Season Table */
+CREATE TABLE `sportsfixtures_season` (
+	`id` INT NOT NULL AUTO_INCREMENT,
+	`name` VARCHAR(255) NOT NULL,
+	`start` DATE NOT NULL,
+	`end` DATE NOT NULL,
+	`archived_at` DATETIME NULL DEFAULT NULL,
+	`created_at` DATETIME NOT NULL,
+	`updated_at` DATETIME NOT NULL,
+	`deleted_at` DATETIME NULL DEFAULT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB CHARACTER SET=utf8;
+
 /* Division Table
  */
 CREATE TABLE `sportsfixtures_division` (
 	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
 	`sport_id` INT NULL COMMENT '',
+	`season_id` INT NOT NULL,
 	`name` VARCHAR(255) NULL COMMENT '',
 	`url` VARCHAR(2048) NULL COMMENT '',
 	`created_at` DATETIME NULL COMMENT '',
@@ -26,8 +40,12 @@ CREATE TABLE `sportsfixtures_division` (
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`sport_id`)
 	REFERENCES `sportsfixtures_sport`(`id`)
-		ON UPDATE NO ACTION
-		ON DELETE NO ACTION
+		ON UPDATE RESTRICT
+		ON DELETE RESTRICT,
+	FOREIGN KEY (`season_id`)
+	REFERENCES `sportsfixtures_season`(`id`)
+		ON UPDATE RESTRICT
+		ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Team Table
@@ -43,8 +61,8 @@ CREATE TABLE `sportsfixtures_team` (
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`division_id`)
 	REFERENCES `sportsfixtures_division`(`id`)
-		ON UPDATE NO ACTION
-		ON DELETE NO ACTION
+		ON UPDATE RESTRICT
+		ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Position Table
@@ -59,8 +77,8 @@ CREATE TABLE `sportsfixtures_position` (
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`sport_id`)
 	REFERENCES `sportsfixtures_sport`(`id`)
-		ON UPDATE NO ACTION
-		ON DELETE NO ACTION
+		ON UPDATE RESTRICT
+		ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 
@@ -77,8 +95,8 @@ CREATE TABLE `sportsfixtures_division_user` (
 	CONSTRAINT `fk_sportsfixtures_division_user__division`
 	FOREIGN KEY (`division_id`)
 	REFERENCES `sportsfixtures_division` (`id`)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
+		ON DELETE RESTRICT
+		ON UPDATE RESTRICT
 	) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Venue Table */
@@ -102,6 +120,7 @@ CREATE TABLE `sportsfixtures_venue` (
 CREATE TABLE `sportsfixtures_match` (
 	`id` INT NOT NULL AUTO_INCREMENT COMMENT '',
 	`division_id` INT NOT NULL,
+	`season_id` INT NOT NULL,
 	`venue_id` INT NOT NULL,
 	`home_team_id` INT,
 	`away_team_id` INT NULL,
@@ -116,20 +135,24 @@ CREATE TABLE `sportsfixtures_match` (
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`division_id`)
 		REFERENCES `sportsfixtures_division`(`id`)
-			ON UPDATE NO ACTION
-			ON DELETE NO ACTION,
+			ON UPDATE RESTRICT
+			ON DELETE RESTRICT,
+	FOREIGN KEY (`season_id`)
+	  REFERENCES `sportsfixtures_season`(`id`)
+		  ON UPDATE RESTRICT
+		  ON DELETE RESTRICT,
 	FOREIGN KEY (`venue_id`)
 		REFERENCES `sportsfixtures_venue`(`id`)
-			ON UPDATE NO ACTION
-			ON DELETE NO ACTION,
+			ON UPDATE RESTRICT
+			ON DELETE RESTRICT,
 	FOREIGN KEY (`home_team_id`)
 		REFERENCES `sportsfixtures_team`(`id`)
-			ON UPDATE NO ACTION
-			ON DELETE NO ACTION,
+			ON UPDATE RESTRICT
+			ON DELETE RESTRICT,
 	FOREIGN KEY (`away_team_id`)
 		REFERENCES `sportsfixtures_team`(`id`)
-			ON UPDATE NO ACTION
-			ON DELETE NO ACTION
+			ON UPDATE RESTRICT
+			ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Match ItineraryItem Table
@@ -145,8 +168,8 @@ CREATE TABLE `sportsfixtures_match_itineraryitem` (
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`match_id`)
 		REFERENCES `sportsfixtures_match`(`id`)
-			ON UPDATE NO ACTION
-			ON DELETE NO ACTION
+			ON UPDATE RESTRICT
+			ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Match Status Table (add before sportsfixtures_result)
@@ -180,12 +203,12 @@ CREATE TABLE `sportsfixtures_result` (
 	PRIMARY KEY (`id`),
 	FOREIGN KEY (`match_id`)
 		REFERENCES `sportsfixtures_match`(`id`)
-			ON UPDATE NO ACTION
-			ON DELETE NO ACTION,
+			ON UPDATE RESTRICT
+			ON DELETE RESTRICT,
 	FOREIGN KEY (`status_id`)
 	REFERENCES `sportsfixtures_status`(`id`)
-		ON UPDATE CASCADE
-		ON DELETE SET NULL
+		ON UPDATE RESTRICT
+		ON DELETE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /* Error table entries */
@@ -197,7 +220,9 @@ INSERT INTO `error` VALUES
 		(177, 'The requested match could not be found.'),
 		(178, 'The requested position could not be found.'),
 		(179, 'The requested status could not be found.'),
-		(180, 'That which you are looking for could not be found.');
+		(180, 'That which you are looking for could not be found.'),
+		(181, 'The requested season could not be found.'),
+		(182, 'The requested item has been archived.');
 
 /** Team players table **/
 CREATE TABLE `sportsfixtures_team_user` (
@@ -212,8 +237,8 @@ CREATE TABLE `sportsfixtures_team_user` (
 	CONSTRAINT `fk_sportsfixtures_team_user__team`
 	FOREIGN KEY (`team_id`)
 	REFERENCES `sportsfixtures_team` (`id`)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
+		ON DELETE RESTRICT
+		ON UPDATE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /** Team Participant table **/
@@ -243,12 +268,12 @@ CREATE TABLE `sportsfixtures_team_position` (
 	CONSTRAINT `fk_sportsfixtures_team_position__team`
 	FOREIGN KEY (`team_id`)
 	REFERENCES `sportsfixtures_team` (`id`)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE,
+		ON DELETE RESTRICT
+		ON UPDATE RESTRICT,
 	FOREIGN KEY (`position_id`)
 	REFERENCES `sportsfixtures_position` (`id`)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE
+	ON DELETE RESTRICT
+	ON UPDATE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 /** Team Participant Positions */
@@ -307,13 +332,13 @@ CREATE TABLE `sportsfixtures_team_coach` (
 	CONSTRAINT `fk_sportsfixtures_team_coach__team`
 	FOREIGN KEY (`sportsfixtures_team_id`)
 	REFERENCES `sportsfixtures_team` (`id`)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE,
+		ON DELETE RESTRICT
+		ON UPDATE RESTRICT,
 	CONSTRAINT `fk_sportsfixtures_team_coach__coach`
 	FOREIGN KEY (`sportsfixtures_coach_id`)
 	REFERENCES `sportsfixtures_coach` (`id`)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
+		ON DELETE RESTRICT
+		ON UPDATE RESTRICT
 ) ENGINE=InnoDB CHARACTER SET=utf8;
 
 

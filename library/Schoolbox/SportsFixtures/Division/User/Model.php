@@ -7,8 +7,8 @@
 
 namespace Schoolbox\SportsFixtures\Division\User;
 
-use \Schoolbox\User as UserModel;
-use \Schoolbox\SportsFixtures\Division\Model as DivisionModel;
+use \Schoolbox\User as User;
+use \Schoolbox\SportsFixtures\Division\Model as Division;
 
 /**
  * Model for relation between divisions and users.
@@ -27,14 +27,14 @@ class Model
     /**
      * Division part of the user/division relation.
      *
-     * @var DivisionModel
+     * @var Division
      */
     protected $division;
 
     /**
      * User part of the user/division relation.
      *
-     * @var UserModel
+     * @var User
      */
     protected $user;
 
@@ -50,8 +50,8 @@ class Model
      */
     public function __construct()
     {
-        $this->user     = new UserModel();
-        $this->division = new DivisionModel();
+        $this->user     = new User();
+        $this->division = new Division();
     }
 
     /**
@@ -73,7 +73,7 @@ class Model
     }
 
     /**
-     * @return DivisionModel
+     * @return Division
      */
     public function getDivision()
     {
@@ -81,17 +81,17 @@ class Model
     }
 
     /**
-     * @param  DivisionModel $division
+     * @param  Division $division
      * @return static
      */
-    public function setDivision(DivisionModel $division)
+    public function setDivision(Division $division)
     {
         $this->division = $division;
         return $this;
     }
 
     /**
-     * @return UserModel
+     * @return User
      */
     public function getUser()
     {
@@ -99,10 +99,10 @@ class Model
     }
 
     /**
-     * @param  UserModel $user
+     * @param  User $user
      * @return static
      */
-    public function setUser(UserModel $user)
+    public function setUser(User $user)
     {
         $this->user = $user;
         return $this;

@@ -11,12 +11,12 @@ use Alaress\Async\Notification\Parameter\Param;
 use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use Schoolbox\SportsFixtures\Team\Model as TeamModel;
+use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
-use Schoolbox\SportsFixtures\Match\Model as MatchModel;
+use Schoolbox\SportsFixtures\Match\Model as Match;
 use Schoolbox\SportsFixtures\Notification\Instance\Builder;
 use Schoolbox\User;
 use Monolog\Logger;
@@ -55,7 +55,7 @@ class Helper
      * Retrieves a team given a team ID.
      *
      * @param int $teamId
-     * @return TeamModel
+     * @return Team
      */
     public function findTeam($teamId)
     {
@@ -63,12 +63,12 @@ class Helper
     }
 
     /**
-     * @param MatchModel $match
-     * @return MatchModel
+     * @param Match $match
+     * @return Match
      */
-    public function hydrateMatch(MatchModel $match)
+    public function hydrateMatch(Match $match)
     {
-        /** @var MatchModel $hydratedMatch */
+        /** @var Match $hydratedMatch */
         $hydratedMatch = $this->matchMapper->findById($match->getId());
         $division      = $this->divisionMapper->findById($hydratedMatch->getDivision()->getId());
         $sport         = $this->sportMapper->findById($division->getSport()->getId());
@@ -110,13 +110,13 @@ class Helper
     /**
      * Builds a generic notification builder for this match.
      *
-     * @param MatchModel $match
+     * @param Match      $match
      * @param User       $effector
      * @param string     $namespace
      * @param string     $trigger
      * @return Builder
      */
-    public function buildBuilder(MatchModel $match, User $effector, $namespace, $trigger)
+    public function buildBuilder(Match $match, User $effector, $namespace, $trigger)
     {
         $bob = new Builder($effector);
         $bob->setSportParam($match->getDivision()->getSport())
@@ -132,10 +132,10 @@ class Helper
      *
      * @param Envelope  $envelope
      * @param Builder   $bob
-     * @param TeamModel $team
+     * @param Team $team
      * @return Envelope
      */
-    public function postToTeam(Envelope $envelope, Builder $bob, TeamModel $team)
+    public function postToTeam(Envelope $envelope, Builder $bob, Team $team)
     {
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $team->getId());
         foreach ($teamPlayers as $teamPlayer) {
@@ -152,10 +152,10 @@ class Helper
      *
      * @param Envelope  $envelope
      * @param Builder   $bob
-     * @param TeamModel $team
+     * @param Team $team
      * @return Envelope
      */
-    public function postToParentsOfTeam(Envelope $envelope, Builder $bob, TeamModel $team)
+    public function postToParentsOfTeam(Envelope $envelope, Builder $bob, Team $team)
     {
         $teamPlayers = $this->teamPlayerMapper->findByColumn("team_id", $team->getId());
         foreach ($teamPlayers as $teamPlayer) {
@@ -173,11 +173,11 @@ class Helper
      *
      * @param Envelope   $envelope
      * @param Builder    $bob
-     * @param MatchModel $match
+     * @param Match      $match
      * @param int        $stacking The stacking setting to use for the match parameter
      * @return Envelope
      */
-    public function postToTeams(Envelope $envelope, Builder $bob, MatchModel $match, $stacking = Param::STACKING_REPLACE)
+    public function postToTeams(Envelope $envelope, Builder $bob, Match $match, $stacking = Param::STACKING_REPLACE)
     {
         // Home
         $bob->setMatchHref($match, $match->getHomeTeam())
@@ -197,11 +197,11 @@ class Helper
      *
      * @param Envelope   $envelope
      * @param Builder    $bob
-     * @param MatchModel $match
+     * @param Match      $match
      * @param int        $stacking The stacking setting to use for the match parameter
      * @return Envelope
      */
-    public function postToParentsOfTeams(Envelope $envelope, Builder $bob, MatchModel $match, $stacking = Param::STACKING_REPLACE)
+    public function postToParentsOfTeams(Envelope $envelope, Builder $bob, Match $match, $stacking = Param::STACKING_REPLACE)
     {
         // Home
         $bob->setMatchHref($match, $match->getHomeTeam())

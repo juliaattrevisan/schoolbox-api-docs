@@ -60,7 +60,7 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Find all the Teams whose names are like $keyword
+     * Find all the Venues whose names are like $keyword
      *
      * @param string $keyword
      * @return \Schoolbox\Collection

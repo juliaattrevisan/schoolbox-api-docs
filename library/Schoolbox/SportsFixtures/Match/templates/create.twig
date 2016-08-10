@@ -16,6 +16,10 @@
                     required: true,
                     min: 1
                 },
+                seasonId: {
+                    required: true,
+                    minlength: 1
+                },
                 startAtDate: {
                     required: true,
                     minlength: 1
@@ -37,6 +41,7 @@
                 'divisionId': 'Please choose a Division.',
                 'venueId': 'Please choose a Venue.',
                 'name': 'Please enter a Match name.',
+                'seasonId': 'Please choose a Season',
                 'startAtDate': 'Please choose a date.',
                 'startAtTime': 'Please choose a time.'
             },
@@ -60,7 +65,26 @@
             });
         });
 
-        $('#matchForm').find('[data-datepicker]').datepicker();
+        $('#season').selectizeSelector({
+            ajax: {
+                url: '/sportsfixtures/seasons',
+                type: 'GET',
+                dataType: 'json'
+            },
+            value: {"id":{{ match.season.id }}, "name": "{{ match.season.name }} - {{ match.season.start.getLocalShort }} to {{ match.season.end.getLocalShort }}"},
+            multiple: false,
+            selectize: {
+                score: function(search) {
+                    return function(item) {
+                        // Simply filter list, don't reorder
+                        return -1 === item.name.toLowerCase().indexOf(search.toLowerCase()) ? 0 : 1;
+                    };
+                },
+            }
+        });
+
+        // Ensure match is scheduled within the season
+        $('[data-datepicker]').datepicker( );
 
         $('#matchForm').find('[data-timepicker]').timepicker({
             appendTo: function ($input) {
@@ -146,24 +170,31 @@
 
             <section>
                 <fieldset class="content">
-                    <div class="small-12 columns">
-                        <input type="hidden" name="divisionId" value="{{ division.id }}"/>
-                        <input type="hidden" name="matchId" value="{{ match.id }}"/>
+                    <input type="hidden" name="divisionId" value="{{ division.id }}"/>
+                    <input type="hidden" name="matchId" value="{{ match.id }}"/>
 
+                    <div class="small-12 columns">
                         <label>
                             Name
                             <input type="text" name="name" value="{{ match.name }}"/>
                         </label>
                     </div>
 
-                    <div class="column small-12 medium-6">
+                    <div class="column small-12 medium-4">
+                        <label>
+                            Season
+                            <input id='season' name="seasonId" type='text' value='' placeholder="Search Seasons" />
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-4">
                         <label>
                             Date
                             <input type="text" name="startAtDate" placeholder="Date" data-datepicker value="{{ match.startAt.getLocalShort }}">
                         </label>
                     </div>
 
-                    <div class="column small-12 medium-6">
+                    <div class="column small-12 medium-4">
                         <div class="timepick">
                             <label>
                                 Time
@@ -175,8 +206,8 @@
                     <div class="small-12 columns">
                         <label>
                             Venue
+                            <input id='venue' name="venueId" type='text' value='' placeholder="Search Venues" />
                         </label>
-                        <input id='venue' name="venueId" type='text' value='' placeholder="Search Venues" />
                     </div>
                 </fieldset>
 
@@ -185,14 +216,14 @@
                     <div class="small-12 medium-6 columns">
                         <label>
                             Home
+                            <input id='homeTeam' name="homeTeamId" type='text' value='' placeholder="Search Teams" />
                         </label>
-                        <input id='homeTeam' name="homeTeamId" type='text' value='' placeholder="Search Teams" />
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
                             Away
+                            <input id='awayTeam' name="awayTeamId" type='text' value='' placeholder="Search Teams" />
                         </label>
-                        <input id='awayTeam' name="awayTeamId" type='text' value='' placeholder="Search Teams" />
                     </div>
                 </fieldset>
 

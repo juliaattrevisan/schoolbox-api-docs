@@ -8,11 +8,10 @@
 namespace Schoolbox\SportsFixtures\Team\Helper;
 
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
-use Schoolbox\SportsFixtures\Team\Model as TeamModel;
+use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
-use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
 use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
+use Schoolbox\User;
 
 /**
  * Translates a Division object into a data format that is suitable for use in
@@ -44,10 +43,10 @@ class Translator
     /**
      * Builds a template friendly data model from a team.
      *
-     * @param TeamModel $team
+     * @param Team $team
      * @return array
      */
-    public function translateTeam(TeamModel $team)
+    public function translateTeam(Team $team)
     {
         $positions = $this->getTeamPositionMapper()->findByColumn('team_id', $team->getId());
 
@@ -69,10 +68,10 @@ class Translator
     /**
      * Adds teams and their players into this division.
      *
-     * @param TeamModel $team
-     * @return TeamModel
+     * @param Team $team
+     * @return User[]
      */
-    public function collectPlayers(TeamModel $team)
+    public function collectPlayers(Team $team)
     {
         $teamPlayers = $this->getTeamPlayerMapper()->findByColumn(
             'team_id',

@@ -17,18 +17,19 @@ use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\SportsFixtures\Sport\Model as Sport;
 use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
-use \Schoolbox\SportsFixtures\Position\Model as PositionModel;
+use Schoolbox\SportsFixtures\Season\Model as Season;
+use Schoolbox\SportsFixtures\Season\Mapper as SeasonMapper;
+use \Schoolbox\SportsFixtures\Position\Model as Position;
 use \Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use \Schoolbox\SportsFixtures\Team\Model as TeamModel;
 use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
-use \Schoolbox\SportsFixtures\Team\Position\Model as TeamPositionModel;
+use \Schoolbox\SportsFixtures\Team\Position\Model as TeamPosition;
 use \Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
-use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
+use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
-use \Schoolbox\SportsFixtures\Division\User\Model as DivisionUserModel;
+use \Schoolbox\SportsFixtures\Division\User\Model as DivisionUser;
 use \Schoolbox\SportsFixtures\Division\User\Mapper as DivisionUserMapper;
-use Schoolbox\User as UserModel;
+use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 
 class Controller extends AbstractController
@@ -38,6 +39,11 @@ class Controller extends AbstractController
      * @var SportMapper
      */
     protected $sportMapper;
+
+    /**
+     * @var SeasonMapper
+     */
+    protected $seasonMapper;
 
     /**
      * @var ErrorMapper
@@ -91,6 +97,7 @@ class Controller extends AbstractController
     {
         parent::__construct(DivisionMapper::getInstance());
         $this->setSportMapper(SportMapper::getInstance());
+        $this->setSeasonMapper(SeasonMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setTeamMapper(TeamMapper::getInstance());
         $this->setPositionMapper(PositionMapper::getInstance());
@@ -107,7 +114,7 @@ class Controller extends AbstractController
      *  - in the format provided in the request Accepts header
      * If entity is deleted, respond with '210 Gone'
      *
-     * @param DivisionModel $entity
+     * @param Division $entity
      * @throws Exception
      * @return void
      */
@@ -129,7 +136,7 @@ class Controller extends AbstractController
     public function getList($context = null)
     {
         try {
-            $allDivisions = $this->getDivisionMapper()->findByColumn('sport_id', $context->getId(), [
+            $allDivisions = $this->getMapper()->findByColumn('sport_id', $context->getId(), [
                 'order' => [
                     'name' => 'asc'
                 ]
@@ -146,7 +153,7 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param DivisionModel $entity
+     * @param Division $entity
      * @param Sport         $context
      * @return void
      */
@@ -155,6 +162,7 @@ class Controller extends AbstractController
         if (empty($context)) {
             $context = $this->getSportMapper()->findById($entity->getSport()->getId());
         }
+        $entity->setSport($context);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesDivision/create.twig', [
             'division' => $entity,
@@ -172,18 +180,12 @@ class Controller extends AbstractController
     {
         try {
             // Load division
-            $division = $this->getDivisionMapper()->findById($entityId);
+            $division = $this->getMapper()->findById($entityId);
         }
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
         }
 
-        try {
-            $division->setSport($this->getSportMapper()->findById($division->getSport()->getId()));
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SPORT_NOT_FOUND);
-        }
 
         // Add players and teams into the division
         $division = $this->getDivisionCollector()->collectPlayers($division);
@@ -211,15 +213,16 @@ class Controller extends AbstractController
     }
 
     /**
-     * @param DivisionModel $entity
+     * @param Division $entity
      * @return void
      */
     protected function persistEntity($entity)
     {
         try {
-            $sport = $this->getSportMapper()->findById($this->getRequest()->post['sportId']);
+            $sport  = $this->getSportMapper()->findById($this->getRequest()->post['sportId']);
+            $season = $this->getSeasonMapper()->findById($this->getRequest()->post['seasonId']);
 
-            $this->saveDivision($sport, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $entity);
+            $this->saveDivision($sport, $season, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $entity);
 
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesDivision.getList', [
                 'contextId' => $sport->getId()
@@ -233,9 +236,9 @@ class Controller extends AbstractController
     /**
      * Add players to a Division
      *
-     * @param DivisionModel $division
+     * @param Division $division
      */
-    public function postAddPlayers(DivisionModel $division)
+    public function postAddPlayers(Division $division)
     {
         $divisionUsers = [];
         foreach ($this->getUserMapper()->findByColumn('id', $this->getRequest()->post->get('userId')) as $user) {
@@ -252,9 +255,9 @@ class Controller extends AbstractController
     /**
      * Uploads players from a CSV into a Division
      *
-     * @param DivisionModel $division
+     * @param Division $division
      */
-    public function postUploadPlayers(DivisionModel $division)
+    public function postUploadPlayers(Division $division)
     {
         $divisionUsers = [];
 
@@ -285,7 +288,7 @@ class Controller extends AbstractController
             } catch (MapperException $e) {
                 // noop
             }
-            if ($user instanceof UserModel) {
+            if ($user instanceof User) {
                 $divisionUsers[] = $this->getDivisionUserMapper()->createModel()
                     ->setDivision($division)
                     ->setUser($user)
@@ -301,9 +304,9 @@ class Controller extends AbstractController
     /**
      * Remove players from a Division
      *
-     * @param DivisionModel $division
+     * @param Division $division
      */
-    public function postRemovePlayers(DivisionModel $division)
+    public function postRemovePlayers(Division $division)
     {
         $this->getDivisionUserMapper()->delete(
             $this->getDivisionUserMapper()->findByColumnList([
@@ -321,16 +324,16 @@ class Controller extends AbstractController
     /**
      * Reorder players within a Division
      *
-     * @param DivisionModel $division
+     * @param Division $division
      */
-    public function postReorderPlayers(DivisionModel $division)
+    public function postReorderPlayers(Division $division)
     {
         $userIds       = $this->getRequest()->post->get('userId');
         $divisionUsers = [];
         $sequenceNo    = count($userIds);
         foreach ($userIds as $userId) {
             try {
-                /** @var DivisionUserModel $divisionUser */
+                /** @var DivisionUser $divisionUser */
                 $divisionUser = $this->getDivisionUserMapper()->findOneByColumnList([
                     'user_id'     => $userId,
                     'division_id' => $division->getId(),
@@ -396,7 +399,7 @@ class Controller extends AbstractController
 
                 if (!isset($positionCache[$position])) {
                     // Haven't got this position, load it and shove into cache
-                    /** @var PositionModel $positionModel */
+                    /** @var Position $positionModel */
                     try {
                         $positionModel = $this->getPositionMapper()->findById($position);
                         $positionCache[$position] = $positionModel;
@@ -408,7 +411,7 @@ class Controller extends AbstractController
                     $positionModel = $positionCache[$position];
                 }
 
-                $teamPosition = new TeamPositionModel();
+                $teamPosition = new TeamPosition();
                 $teamPosition->setTeam($team);
                 $teamPosition->setUser($player);
                 $teamPosition->setPosition($positionModel);
@@ -429,27 +432,30 @@ class Controller extends AbstractController
     /**
      * Save Division data to db
      *
-     * @param $sport
-     * @param $name
-     * @param $url
-     * @param DivisionModel $division
+     * @param Sport $sport
+     * @param Season $season
+     * @param string $name
+     * @param string $url
+     * @param Division $division
      */
-    private function saveDivision($sport, $name, $url, DivisionModel $division)
+    private function saveDivision(Sport $sport, Season $season, $name, $url, Division $division)
     {
-        $division->setName($name);
-        $division->setUrl($url);
-        $division->setSport($sport);
-        $division->setUpdatedAt(\Alaress_Date_Format::now());
+        $division
+            ->setSport($sport)
+            ->setSeason($season)
+            ->setName($name)
+            ->setUrl($url)
+            ->setUpdatedAt(\Alaress_Date_Format::now());
 
-        $this->getDivisionMapper()->save($division);
+        $this->getMapper()->save($division);
     }
 
     /**
      * Outputs the response from an add player method.
      *
-     * @param DivisionModel $division
+     * @param Division $division
      */
-    protected function renderPostAddPlayersResponse(DivisionModel $division)
+    protected function renderPostAddPlayersResponse(Division $division)
     {
         if ($this->getRequest()->isXhr()) {
             // Output a XHR data model + HTML output
@@ -494,12 +500,23 @@ class Controller extends AbstractController
         return $this;
     }
 
+
     /**
-     * @return DivisionMapper
+     * @return SeasonMapper
      */
-    protected function getDivisionMapper()
+    protected function getSeasonMapper()
     {
-        return $this->mapper;
+        return $this->seasonMapper;
+    }
+
+    /**
+     * @param SeasonMapper $seasonMapper
+     * @return static
+     */
+    protected function setSeasonMapper(SeasonMapper $seasonMapper)
+    {
+        $this->seasonMapper = $seasonMapper;
+        return $this;
     }
 
     /**
