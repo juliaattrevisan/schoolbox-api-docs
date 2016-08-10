@@ -203,10 +203,10 @@ class TagCloud implements BaseMapper\UsableAsTagSource
                 {$this->mapper->getJoinColumnString('user', 'u')},
                 {$this->mapper->getJoinColumnString('user.role', 'ur')}
             FROM {$this->mapper->getTable()}
-            INNER JOIN sportsfixtures_team_coach stc ON {$this->mapper->getTable()}.id = stc.sportsfixtures_coach_id
+            INNER JOIN sportsfixtures_team_coach stc ON {$this->mapper->getTable()}.id = stc.coach_id
             LEFT JOIN {$this->mapper->getJoinSql('user', '', 'u')}
             LEFT JOIN {$this->mapper->getJoinSql('user.role', 'u', 'ur')}
-            WHERE stc.sportsfixtures_team_id = :teamId
+            WHERE stc.team_id = :teamId
             ORDER BY name ASC
         ";
         $statement = $this->mapper->getDatabase()->prepare($query);
