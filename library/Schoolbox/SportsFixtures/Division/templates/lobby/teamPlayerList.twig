@@ -1,0 +1,35 @@
+{% for teamPlayer in players %}
+    <li class="actions-small-2" data-player="{{ teamPlayer.id }}">
+        <div class="list-item">
+            <div class="grip compact"></div>
+            <div class="small-10 compact card wrap-down">
+                <a href="/search/user/{{ teamPlayer.id }}">
+                    <img src="/portrait.php?userId={{ teamPlayer.externalId }}&amp;size=square64" />
+                    <h3>{{ teamPlayer.formatName() }}</h3>
+                </a>
+                <p class="meta">
+                    {% for currentPosition in positions[teamPlayer.id] %}
+                        {{ currentPosition.position.name }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+            </div>
+        </div>
+        <nav>
+            <a href="#"
+               data-reveal-id="editPlayerPositions"
+               class="icon-position"
+               title="Change Player Positions"
+               data-player-positions-name="{{ teamPlayer.formatName() }}"
+               data-player-positions-team-name="{{ team.name }}"
+               data-player-positions-user="{{ teamPlayer.id }}"
+               data-player-positions-team="{{ team.id }}"
+               data-player-positions="{% for teamPosition in positions[teamPlayer.id] %}{{ teamPosition.position.id }}{% if not loop.last %},{% endif %}{% endfor %}"
+            ></a>
+            <a href="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: team.id}) }}"
+               class="icon-close"
+               title="Remove Player from {{ team.name }}"
+               data-remove-team-player="{{ teamPlayer.id }}"
+               data-affected-team="{{ team.id }}"></a>
+        </nav>
+    </li>
+{% endfor %}

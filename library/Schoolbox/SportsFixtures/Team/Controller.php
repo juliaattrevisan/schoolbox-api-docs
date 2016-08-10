@@ -347,9 +347,24 @@ class Controller extends AbstractController
     protected function renderPostAddPlayersResponse(Team $team)
     {
         if ($this->getRequest()->isXhr()) {
+            $this->getTeamTranslator()->collectPlayers($team);
+
             // Output a XHR data model + HTML output
             $dataModel = $this->getTeamTranslator()->translateTeam($team);
-            $dataModel['html'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/team.twig', $dataModel)->getAsString();
+            $dataModel['html'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/teamPlayerList.twig', $dataModel)->getAsString();
+
+
+            /* this is stupid
+             */
+            $divisionCollector = new \Schoolbox\SportsFixtures\Division\Helper\Collector();
+            $divisionTranslator = new \Schoolbox\SportsFixtures\Division\Helper\Translator();
+
+            $divisionCollector->collectPlayers($team->getDivision());
+            $divisionCollector->collectTeams($team->getDivision());
+            $divisionLobby = $divisionTranslator->translateDivision($team->getDivision());
+            $dataModel['divisionLobby'] = $this->buildUnthemedHtmlOutput('@sportsfixturesDivision/lobby/division.twig', $divisionLobby)->getAsString();
+
+
             $this->getResponse()->content->set(
                 $this->buildJsonOutput($dataModel)
             );

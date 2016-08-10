@@ -12,6 +12,7 @@ use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 use Schoolbox\SportsFixtures\Team\Model as TeamModel;
 use Schoolbox\SportsFixtures\Team\Position\Mapper as TeamPositionMapper;
 use Schoolbox\SportsFixtures\Division\Model as DivisionModel;
+use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 
 /**
  * Translates a Division object into a data format that is suitable for use in
@@ -27,11 +28,17 @@ class Translator
     protected $teamPositionMapper;
 
     /**
+     * @var TeamPlayerMapper
+     */
+    protected $teamPlayerMapper;
+
+    /**
      * Constructor - populates required mappers.
      */
     public function __construct()
     {
         $this->setTeamPositionMapper(TeamPositionMapper::getInstance());
+        $this->setTeamPlayerMapper(TeamPlayerMapper::getInstance());
     }
 
     /**
@@ -59,6 +66,27 @@ class Translator
         ];
     }
 
+    /**
+     * Adds teams and their players into this division.
+     *
+     * @param TeamModel $team
+     * @return TeamModel
+     */
+    public function collectPlayers(TeamModel $team)
+    {
+        $teamPlayers = $this->getTeamPlayerMapper()->findByColumn(
+            'team_id',
+            $team->getId(),
+            ['order' => ['team_id' => 'asc', 'sequence' => 'desc']]
+        );
+
+        foreach ($teamPlayers as $teamPlayer) {
+            $team->getPlayers()->add($teamPlayer->getUser());
+        }
+
+        return $team->getPlayers();
+    }
+
     /* Getters/setters */
 
     /**
@@ -76,6 +104,25 @@ class Translator
     public function setTeamPositionMapper($teamPositionMapper)
     {
         $this->teamPositionMapper = $teamPositionMapper;
+        return $this;
+    }
+
+
+    /**
+     * @return TeamPlayerMapper
+     */
+    public function getTeamPlayerMapper()
+    {
+        return $this->teamPlayerMapper;
+    }
+
+    /**
+     * @param TeamPlayerMapper $teamPlayerMapper
+     * @return static
+     */
+    public function setTeamPlayerMapper($teamPlayerMapper)
+    {
+        $this->teamPlayerMapper = $teamPlayerMapper;
         return $this;
     }
 }

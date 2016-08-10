@@ -1,12 +1,13 @@
-{% if players is not empty %}
-    <section data-division="{{ division.id }}">
+
+    <section data-division>
         <ul class="information-list sortable"
-            data-division-player-list="{{ division.id }}"
             data-add-players-action="{{ routeLookup('sportsfixturesDivision.postAddPlayers', {entityId: division.id}) }}"
             data-remove-players-action="{{ routeLookup('sportsfixturesDivision.postRemovePlayers', {entityId: division.id}) }}"
-            data-reorder-players-action="{{ routeLookup('sportsfixturesDivision.postReorderPlayers', {entityId: division.id}) }}">
+            data-reorder-players-action="{{ routeLookup('sportsfixturesDivision.postReorderPlayers', {entityId: division.id}) }}"
+            data-division-player-list="{{ division.id }}">
+
             {% for playerData in players %}
-                <li class="actions-small-1" data-player="{{ playerData.player.id }}">
+                <li class="actions-small-1" data-player="{{ playerData.player.id }}" data-assigned="{% if playerData.player.id in assigned %}1{% else %}0{% endif %}">
                     <div class="list-item">
                         <div class="grip compact"></div>
                         <div class="small-11 compact card wrap-down">
@@ -37,11 +38,13 @@
                                 {% if currentTeam.team in playerData.teams %}
                                     <a href="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: currentTeam.team.id}) }}"
                                        class="icon-close"
-                                       data-remove-team-player="{{ playerData.player.id }}">Remove Player from {{ currentTeam.team.name }}</a>
+                                       data-remove-team-player="{{ playerData.player.id }}"
+                                       data-affected-team="{{ currentTeam.team.id }}">Remove Player from {{ currentTeam.team.name }}</a>
                                 {% else %}
                                     <a href="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: currentTeam.team.id}) }}"
                                        class="icon-add"
-                                       data-add-team-player="{{ playerData.player.id }}">Add Player to {{ currentTeam.team.name }}</a>
+                                       data-add-team-player="{{ playerData.player.id }}"
+                                       data-affected-team="{{ currentTeam.team.id }}">Add Player to {{ currentTeam.team.name }}</a>
                                 {% endif %}
                             </li>
                         {% endfor %}
@@ -53,15 +56,5 @@
                 </li>
             {% endfor %}
         </ul>
-        <span class="label full-width hide" data-relation="save-label"></span>
+        <span class="label full-width hide" data-division-indicator></span>
     </section>
-{% else %}
-    <div class="empty-state">
-        <i class="icon-group"></i>
-        <p>There are no Players in {{ division.name }}.</p>
-        <p>
-            You may <a href="#" title="Add Players" data-reveal-id="addPlayersModal">add players by name</a>,
-            or <a href="#" title="Upload Player List" data-reveal-id="uploadPlayersModal">upload a list</a>.
-        </p>
-    </div>
-{% endif %}
