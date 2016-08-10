@@ -470,7 +470,7 @@
                 return {name: 'userId[]', value: $(this).data('player')};
             });
 
-            return $.post(sortable.data('reorderPlayersAction'), data)
+            return $.post(sortable.data('reorderPlayersAction'), data);
         }
 
         /**

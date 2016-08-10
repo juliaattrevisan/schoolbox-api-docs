@@ -2,6 +2,7 @@
     <ul class="information-list sortable"
         data-add-players-action="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: team.id}) }}"
         data-remove-players-action="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: team.id}) }}"
+        data-reorder-players-action="{{ routeLookup('sportsfixturesTeam.postReorderPlayers', {entityId: team.id}) }}"
         data-team-player-list-proxy>
 
         <li class="actions-small-2">
