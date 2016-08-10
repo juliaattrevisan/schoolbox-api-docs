@@ -21,3 +21,8 @@ ALTER TABLE `socialstream_post`         MODIFY `url`       VARCHAR(2048);
 ALTER TABLE `task`                      MODIFY `link`      VARCHAR(2048);
 ALTER TABLE `task_instance`             MODIFY `link`      VARCHAR(2048);
 ALTER TABLE `tile`                      MODIFY `link`      VARCHAR(2048);
+
+-- Develop only.
+ALTER TABLE `sportsfixtures_division`   MODIFY `url`       VARCHAR(2048);
+ALTER TABLE `sportsfixtures_sport`      MODIFY `url`       VARCHAR(2048);
+ALTER TABLE `sportsfixtures_team`       MODIFY `url`       VARCHAR(2048);
