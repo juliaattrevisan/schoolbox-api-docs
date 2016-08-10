@@ -49,6 +49,13 @@ class Controller extends Base
     {
         $tableKey        = $this->getRequest()->post['table'];
         $tableData       = $this->getTableData();
+
+        // Check for incorrect URLs
+        if(!isset($tableData[$tableKey])){
+            $this->getResponse()->status->setCode(404);
+            return;
+        }
+
         $mapper_name     = $tableData[$tableKey]['mapper'];
         $sortable_column = $this->getRequest()->post["sortable_column"];
 
