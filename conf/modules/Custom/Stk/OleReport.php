@@ -31,6 +31,9 @@ class OleReport implements ModuleConfigInterface
         $di = $kernel->getDependencyInjector();
         if ($di->get('config')->get('site_location') === 'stk') {
             $module = new OleReportModule($di);
+            $module
+                ->setExternalDb($di->newInstance('\\External_User'))
+                ->setUserMapper($di->newInstance('\\Schoolbox\\UserMapper'));
             $module->init('/modules/custom/stk/oleReport');
         }
     }

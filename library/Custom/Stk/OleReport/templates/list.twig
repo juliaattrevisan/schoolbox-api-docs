@@ -1,0 +1,41 @@
+<ul class="breadcrumb">
+    <li><a href="/search/user/{{ student.getId()|e('url') }}">{{ student.formatName() }}</a></li>
+    <li class="active"><a>OLE Reports</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>{{ student.formatName() }} Reports</h1>
+    </div>
+
+    {% if reports|length %}
+        {% for year, semesters in reports %}
+        <div class="small-12 island">
+            <h3>{{ year }}</h3>
+            <section>
+                <ul class="action-list">
+                    {% for semester, reports in semesters %}
+                        {% for reportId, report in reports %}
+                            <li class="actions-small-1">
+                                <div class="list-item">
+                                    <div class="small-12 avatar card">
+                                        <h3><a href="{{ routeLookup('customStkOleReport.sendReport', {studentId: student.id, reportId: reportId}) }}"><span class="icon-download"></span> Semester {{ report.description }}</a> </h3>
+                                        <p class="meta"> </p>
+                                    </div>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </section>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="small-12 island">
+            <div class="empty-state">
+                <i class="icon-document"></i>
+                <p>No OLE Reports found.</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
