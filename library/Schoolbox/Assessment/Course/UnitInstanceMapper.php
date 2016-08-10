@@ -198,14 +198,14 @@ class UnitInstanceMapper extends BaseMapper {
             $existingCat = $collection->filterBy('id', $row['c.id']);
             if ($existingCat->count()) {
                 $code = $code_mapper->hydrate($row, 'cc');
-                if ($code->getCategory()->getId()) {
+                if ($code->getFolder()->getId()) {
                     $existingCat->first()->addCode($code);
                 }
             }
             else {
                 $course = $folderMapper->hydrate($row, 'c');
                 $code = $code_mapper->hydrate($row, 'cc');
-                if ($code->getCategory()->getId()) {
+                if ($code->getFolder()->getId()) {
                     $course->addCode($code);
                 }
                 $collection->add($course);

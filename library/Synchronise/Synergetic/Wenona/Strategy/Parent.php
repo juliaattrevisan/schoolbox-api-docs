@@ -108,7 +108,7 @@ class Synchronise_Synergetic_Wenona_Strategy_Parent extends Synchronise_Synerget
         $groupHandler = new Group(HOMEPAGE_SERVICE);
         $userHandler = new User();
 
-        $result = $db->getAll("SELECT `id`, `name` FROM `category` WHERE `name` LIKE '%Wenona Parents%'");
+        $result = $db->getAll("SELECT `id`, `name` FROM `folder` WHERE `name` LIKE '%Wenona Parents%'");
         $wpaCats = array();
         // index by name, not id
         foreach ($result as $r) {

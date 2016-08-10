@@ -402,7 +402,7 @@ class Controller extends BaseController
         if ($postData['inherit'] == 1) {
 
             // If inheriting permissions we need to remove any existing class codes...
-            $codeMapper->deleteByColumn('categoryID', $postData['categoryID']);
+            $codeMapper->deleteByColumn('folder_id', $postData['categoryID']);
 
             // ...and user access permissions...
             $userAccessMapper->deleteByColumn("sid", $postData["categoryID"]);
@@ -481,7 +481,7 @@ class Controller extends BaseController
         // (I'm not confident that deleting cat codes in the postSave method
         //  regardless of whether there are any won't break somewhere else)
         if ($user->isSuperuser() && $model->getId() && count($codeCollection) === 0) {
-            $codeMapper->deleteByColumn('categoryID', $model->getId());
+            $codeMapper->deleteByColumn('folder_id', $model->getId());
         }
 
         // Only privileged users (teachers?) get to change curriculum codes?

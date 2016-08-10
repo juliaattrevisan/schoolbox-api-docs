@@ -14,7 +14,7 @@ $logger  = new Alaress\Lumberjack\Logger(STDOUT, null, Monolog\Logger::INFO, [],
 
 $folderName = $db->quote($folderName);
 
-$lostQuery = $db->prepare("SELECT `id` FROM `category` WHERE `name` = {$folderName}");
+$lostQuery = $db->prepare("SELECT `id` FROM `folder` WHERE `name` = {$folderName}");
 $lostQuery->execute();
 
 if ($lostQuery->rowCount() > 0) {
@@ -23,11 +23,11 @@ if ($lostQuery->rowCount() > 0) {
 }
 else
 {
-    $db->exec("INSERT INTO `category` (name, parent, inherit) VALUES ({$folderName}, 0, 0)");
+    $db->exec("INSERT INTO `folder` (name, parent, inherit) VALUES ({$folderName}, 0, 0)");
     $parent_id = $db->lastInsertId();
 }
 
-$moveQuery = $db->prepare("UPDATE `category` SET `parent` = :parent_id WHERE `id` = :id;");
+$moveQuery = $db->prepare("UPDATE `folder` SET `parent` = :parent_id WHERE `id` = :id;");
 
 // Do a recursive lookup on every item and make sure the ancestry is valid
 

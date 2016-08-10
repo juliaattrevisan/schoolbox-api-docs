@@ -81,7 +81,7 @@ class SubmissionReturn extends DeprecatedModel
                     s.name,
                     s.description,
                     -1 AS fid
-                  FROM ( `" . $this->_table . "` r, submission_box s, category c )
+                  FROM ( `" . $this->_table . "` r, submission_box s, folder c )
                   WHERE r.deleted_at IS NULL
                   AND r.box_id = s.id
                   AND s.category = c.id
@@ -115,7 +115,7 @@ class SubmissionReturn extends DeprecatedModel
                     -1 AS fid,
                     s.max_mark,
                     m.slug
-                  FROM ( `" . $this->_table . "` r, submission_box s, category c )
+                  FROM ( `" . $this->_table . "` r, submission_box s, folder c )
                   LEFT JOIN submission_mark_type m ON s.mark_type = m.mark_type_id
                   WHERE r.deleted_at IS NULL
                   AND r.box_id = s.id

@@ -50,7 +50,7 @@ class SoftLinks implements Check
      * @var array
      */
     protected $blacklist = [
-        'assess_luQuestionType', 'category', 'class', 'component_config_definition', 'component_config_instance', 'error', 'file', 'myFile', 'myFolder', 'msg_source',
+        'assess_luQuestionType', 'folder', 'class', 'component_config_definition', 'component_config_instance', 'error', 'file', 'myFile', 'myFolder', 'msg_source',
         'user_profile', 'dropbox', 'etherpad_pad', 'leave_request', 'user_assume_log', 'submission_mark_type', 'storage', 'homepageTemplate', 'luCampus', 'luResidentialHouse',
         'lu_leave_request_host_type', 'lu_resource_moderation_type', 'user', 'eportfolio_coverphoto', 'reportcard_comment', 'eotc_metadata', 'eotc_status', 'eotc_config',
         'plagscan_document', 'video_queue', 'scheduleq', 'rubric_descriptor', 'assess_question_category', 'calendar_connector', 'submission_return', 'wiki',

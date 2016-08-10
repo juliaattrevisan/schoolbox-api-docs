@@ -32,7 +32,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
      */
     protected function getFolderFieldname()
     {
-        return 'folder';
+        return 'category';
     }
 
 
@@ -52,7 +52,7 @@ class Mapper extends Resource\AbstractFileMapper implements ILocator, IFileMappe
         $this->uses('hidden', self::TYPE_BOOLEAN);
         $this->uses('modified', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP, 'modifiedAt');
 
-        $this->joins('category', Resource\Folder\Mapper::class, 'id', null, null, 'folder','folder');
+        $this->joins('category', Resource\Folder\Mapper::class, 'id', null, null, 'folder', 'category');
 
 //        // defined longwise because $this->joins doesn't support extra
 //        $this->hasJoin(
