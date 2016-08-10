@@ -112,7 +112,7 @@ class Controller extends AbstractController
         /**
          * Each item is a Collection of matches, indexed by seasonId
          *
-         * @var Collection[]|Match[][] $seasonMatches
+         * @var Collection|Match[][] $seasonMatches
          */
         $seasonMatches = new Collection();
 
@@ -160,7 +160,7 @@ class Controller extends AbstractController
 
         // Sort matches within seasons by startAt datetime
         foreach($seasonMatches as $matches){
-            $matches->sortBy('startAt','desc');
+            $matches->sortBy('startAt','asc');
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/list.twig', [
