@@ -69,7 +69,7 @@ try {
         $submission = $subMap->createModel()
             ->setCreatedAt($now)
             ->setStorage($storage)
-            ->setFilename($storage->getFilename())
+            ->setFilename('Online Submission')
             ->setSubmissionBox($box)
             ->setOwner($user)
             ->setLate($box->getDueDate()->lt($now))
