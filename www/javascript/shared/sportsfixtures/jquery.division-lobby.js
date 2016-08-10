@@ -127,8 +127,9 @@
                     /* Dragging from division to a team
                      */
                     else if (isDivisionList(from) && isTeamPlayerList(to)) {
+                        toId = to.parents('[data-team]').attr('data-team');
+
                         if (config.debugging) {
-                            toId = to.parents('[data-team]').attr('data-team');
                             console.log('dragging player from division to team ' + toId);
                         }
 
@@ -182,9 +183,10 @@
                     /* Dragging players between teams
                      */
                     else if (isTeamPlayerList(from) && isTeamPlayerList(to)) {
+                        fromId = from.parents('[data-team]').attr('data-team');
+                        toId = to.parents('[data-team]').attr('data-team');
+
                         if (config.debugging) {
-                            fromId = from.parents('[data-team]').attr('data-team');
-                            toId = to.parents('[data-team]').attr('data-team');
                             console.log('dragging between teams - from: ' + fromId + ', to: ' + toId);
                         }
 
@@ -251,8 +253,9 @@
                     /* Remove a player from a team
                      */
                     else if (isTeamPlayerList(from) && isDivisionList(to)) {
+                        fromId = from.parents('[data-team]').attr('data-team');
+
                         if (config.debugging) {
-                            fromId = from.parents('[data-team]').attr('data-team');
                             console.log('remove a player from team ' + fromId);
                         }
 
