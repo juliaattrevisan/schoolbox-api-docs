@@ -25,6 +25,10 @@
         initAddPlayerToDivisionSelectize();
         initApplyPositionSelector();
 
+        /* Apply default filter state
+         */
+        applyPlayerFilter();
+
         /* Glossary of data vars
 
          Dragon drop receiving elements
