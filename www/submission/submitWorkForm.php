@@ -52,30 +52,39 @@ if (isset($_POST['user_id']) && $_POST['user_id'] != $sessionUser->getId()) {
     $user = $_SESSION['user'];
 }
 
-// if there's a post body, we need to undraft the draftl; otherwise we ignore that
-if (trim($_POST['body'])) {
-    $drafts = $subMap->getDrafts($user->getId(), $_POST['box_id'], 1);
-    if ($drafts->count()) {
-        // Create a new item that isn't a draft, instead of resaving the old one.
-        $drafts->first()->setId(null)->setDraft(false);
-        $submissions->add($drafts->first());
+try {
+
+    $box = $boxMap->findById($_POST['box_id']);
+
+    // check uploading to this box is permitted
+    $boxMap->checkUploadability($box, $user);
+
+    $now = Alaress_Date_Format::now();
+
+    // If there's a post body, create a new non-draft out of it, and then a submission
+    if (trim($_POST['body'])) {
+
+        $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->acceptStream('online-submission.html', $_POST['body'], false);
+
+        $submission = $subMap->createModel()
+            ->setCreatedAt($now)
+            ->setStorage($storage)
+            ->setFilename('Online Submission')
+            ->setSubmissionBox($box)
+            ->setOwner($user)
+            ->setLate($box->getDueDate()->lt($now))
+        ;
+
+        $submissions->add($submission);
     }
-}
 
-if (is_array($_POST['attachment'])) {
-    try {
-
-        $box = $boxMap->findById($_POST['box_id']);
-
-        // check uploading to this box is permitted
-        $boxMap->checkUploadability($box, $user);
+    // If there's attachments, create a submission for each one
+    if (is_array($_POST['attachment'])) {
 
         $factory = new CollectorFactory();
 
         /** @var IStorage[] $subs */
         $attachments = $factory->build($_POST['attachment'])->getAll();
-
-        $now = Alaress_Date_Format::now();
 
         foreach ($attachments as $storage) {
             $submission = $subMap->createModel()
@@ -89,26 +98,25 @@ if (is_array($_POST['attachment'])) {
 
             $submissions->add($submission);
         }
-
-    } catch (Schoolbox\Mapper\Exception $e) {
-        // something didn't exist
-
-        // make sure we save whatever we got so far
-        $subMap->save($submissions);
-        error(9, $e->getMessage());
-
-    } catch (Schoolbox\Resource\Exception $e) {
-        // something wasn't allowed to exist
-
-        // make sure we save whatever we got so far
-        $subMap->save($submissions);
-        error(9, $e->getMessage());
-
-    } catch (\InvalidArgumentException $e) {
-        error(9, $e->getMessage());
-        exit;
     }
 
+} catch (Schoolbox\Mapper\Exception $e) {
+    // something didn't exist
+
+    // make sure we save whatever we got so far
+    $subMap->save($submissions);
+    error(9, $e->getMessage());
+
+} catch (Schoolbox\Resource\Exception $e) {
+    // something wasn't allowed to exist
+
+    // make sure we save whatever we got so far
+    $subMap->save($submissions);
+    error(9, $e->getMessage());
+
+} catch (\InvalidArgumentException $e) {
+    error(9, $e->getMessage());
+    exit;
 }
 
 $subMap->save($submissions);
