@@ -9,28 +9,28 @@
 class AdminV2_Nav
 {
     private $nav = array(
-        'home' => 'Home',
-        'user' => 'Users',
-        'side-menu' => 'Side Menu',
-        'dashboard' => 'Dashboard',
-        'homepage' => 'Homepages',
-        'eportfolio' => 'ePortfolios',
-        'allowed-file' => 'Allowed Files',
-        'setting' => 'Settings',
-        'calendar' => 'Calendar',
+        'home'             => 'Home',
+        'user'             => 'Users',
+        'side-menu'        => 'Side Menu',
+        'dashboard'        => 'Dashboard',
+        'homepage'         => 'Homepages',
+        'eportfolio'       => 'ePortfolios',
+        'allowed-file'     => 'Allowed Files',
+        'setting'          => 'Settings',
+        'calendar'         => 'Calendar',
         'bulk-add-folders' => 'Folder',
-        'rollover' => 'Rollover',
-        'grades' => 'Grades',
-        'rubric-results' => 'Rubrics',
-        'terms' => 'Terms',
-        'course-builder' => 'Course Builder',
-        'messages' => 'Messages',
-        'lists' => 'Lists',
-        'cleanup' => 'Cleanup',
-        'usage' => 'Usage',
-        'engagement' => 'Engagement',
-        'ups' => 'User Provisioning System',
-        'import' => 'Import',
+        'rollover'         => 'Rollover',
+        'grades'           => 'Grades',
+        'rubric-results'   => 'Rubrics',
+        'terms'            => 'Terms',
+        'course-builder'   => 'Course Builder',
+        'messages'         => 'Messages',
+        'lists'            => 'Lists',
+        'cleanup'          => 'Cleanup',
+        'usage'            => 'Usage',
+        'engagement'       => 'Engagement',
+        'ups'              => 'User Provisioning System',
+        'import'           => 'Import',
     );
 
     public function parse(SitePage $page, $currentPage = 'home')
@@ -40,9 +40,9 @@ class AdminV2_Nav
 
         foreach ($this->nav as $href => $label) {
             $page->setVar(array(
-                'ADMNAV_HREF' => $href,
+                'ADMNAV_HREF'    => $href,
                 'ADMNAV_CURRENT' => $currentPage == $href ? 'active' : '',
-                'ADMNAV_LABEL' => $label
+                'ADMNAV_LABEL'   => $label
             ));
             $page->parse('admin_nav_item_block', 'admin_nav_item', true);
         }

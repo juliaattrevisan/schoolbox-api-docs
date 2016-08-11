@@ -13,6 +13,21 @@ class Calendar_Api_Config_Connector_Booking extends Calendar_Api_Config_Connecto
 {
 
     /**
+     * Checks if Resource Booking module is enabled. If not, throw Exception.
+     * @throws DomainException
+     * @return true If no exception thrown
+     */
+    protected function checkModuleEnabled()
+    {
+        //Ensure ResourceBooking module is enabled
+        $configMapper = \Schoolbox\Config\ConfigMapper::getInstance();
+        if(0 == $configMapper->get('resource_booking_enabled')){
+            throw new DomainException('Resource Booking Module is disabled');
+        }
+        return true;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getDefaultLabel()
