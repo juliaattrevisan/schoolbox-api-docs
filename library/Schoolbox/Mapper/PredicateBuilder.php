@@ -280,7 +280,7 @@ class PredicateBuilder
      *
      * @return string Something like "(:id_0, :id_1, :id_2)".
      */
-    public static function getArrayPlaceholders(array $input, $prefix = null)
+    public static function getArrayPlaceholders($input, $prefix = null)
     {
         return '(' . implode(',', self::getPlaceholders($input, $prefix)) . ')';
     }
@@ -293,7 +293,7 @@ class PredicateBuilder
      * @param string $prefix
      * @return array
      */
-    protected static function getPlaceholders(array $input, $prefix = null)
+    protected static function getPlaceholders($input, $prefix = null)
     {
         $placeholders = [];
         foreach ($input as $i => $param) {
