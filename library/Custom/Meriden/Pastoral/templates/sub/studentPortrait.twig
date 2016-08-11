@@ -1,6 +1,6 @@
 {# Student's portrait - exactly the same as /submission/allWork/{{ student.id }} #}
 <section>
-    <div class="small-12 avatar card">
+    <div class="card small-12">
         <a href="/search/user/{{ student.getId() }}" title="View Profile">
             <img src="/portrait.php?userId={{ student.getExternalId() }}&amp;size=square64" alt="{{ student.formatName() }}" />
             <p>{{ student.formatName() }}</p>
