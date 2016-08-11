@@ -36,6 +36,8 @@ class Synchronise_Synergetic_Scs_Hydrator_Group_Student implements Synchronise_B
             case 40:
                 // Assume 40 = Prep, like other Synergetic schools
                 return 7;
+            case 0:
+                return 7;
             case 1:
                 return 8;
             case 2:
