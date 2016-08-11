@@ -43,7 +43,7 @@ if(is_numeric($this->arg[0])) {
     $output = array(
         'ACTION'      => 'Modify',
         'NEWS_ID'     => $newsItem['id'],
-        'HEADING'     => $newsItem['heading'],
+        'HEADING'     => Scrub::text($newsItem['heading']),
         'BODY'        => $newsItem['body'],
         'CATEGORY_ID' => $newsItem['code'],
 		'CATEGORY_NAME' => Scrub::text($folder->getName()),
