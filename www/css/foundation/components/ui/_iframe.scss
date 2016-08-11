@@ -1,3 +1,9 @@
+// iframe default dimensions
+iframe {
+  width: 100%;
+  height: rem-calc(($base-font-size) * 25);
+}
+
 .scroll-wrapper {
   /* Hack to allow iframes to scroll on IOS, wrap around iframes you need to be able to scroll on mobile */
   -webkit-overflow-scrolling: touch;
