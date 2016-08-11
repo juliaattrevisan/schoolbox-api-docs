@@ -195,7 +195,7 @@ INSERT INTO `sportsfixtures_result`(`id`,`status_id`,`match_id`,`team_id`,`descr
 /* Coaches
  */
 INSERT INTO `sportsfixtures_coach`(`id`,`name`,`user_id`,`created_at`,`updated_at`,`deleted_at`) VALUES (1,'Boaty McBoatface',NULL,'2016-07-19 12:57:12','2016-07-19 12:57:12',NULL),(2,'Ms Celia Glenn',3,'2016-07-19 12:57:12','2016-07-19 12:57:12',NULL),(3,'Miss Jackie Benson',247,'2016-07-19 12:57:12','2016-07-19 12:57:12',NULL);
-INSERT INTO `sportsfixtures_team_coach`(`sportsfixtures_team_id`,`sportsfixtures_coach_id`) VALUES (8,1),(8,2),(8,3);
+INSERT INTO `sportsfixtures_team_coach`(`team_id`,`coach_id`) VALUES (8,1),(8,2),(8,3);
 
 
 /* All Positions for Rowing
