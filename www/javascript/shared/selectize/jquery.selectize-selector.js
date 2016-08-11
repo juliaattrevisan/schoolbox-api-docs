@@ -80,7 +80,7 @@
                 },
                 onInitialize: function() {
                     // Initialize: clear existing options, and add items from
-                    // setttings.value
+                    // settings.value
                     var self = this
                     self.clear();
                     self.clearOptions();
@@ -136,12 +136,31 @@
             'type',
 //            'load',
 //            'destroy'
-        ]
+        ];
 
         // Set up selectize on all elements
         element.each(function() {
-            var singleElement = $(this)
-            singleElement.val('').selectize(settings.selectize)
+            var singleElement = $(this);
+            singleElement.val('').selectize(settings.selectize);
+
+            // Is this selectize inside a foundation modal ?
+            if( singleElement.closest('[data-reveal]').length ){
+
+                // Lock modal when dropdown opens
+                singleElement.data('selectize').on('dropdown_open', function(){
+                    Foundation.libs.reveal.locked = true;
+                });
+
+                // Unlock modal when dropdown closes
+                singleElement.data('selectize').on('dropdown_close', function(){
+
+                    // It appears the modal doesn't process the 'close' event until some period after the user action.
+                    setTimeout(function(){
+                        Foundation.libs.reveal.locked = false;
+                    }, 200);   // empirical testing indicated '111' was minimum delay required.
+                });
+            }
+
             $.each(selectizeEvents, function(i,event) {
                 singleElement.data('selectize').on(
                     event,
@@ -150,7 +169,7 @@
                     }
                 )
             })
-        })
+        });
 
         // Chain me
         return this;
