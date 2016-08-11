@@ -133,10 +133,8 @@ class Controller extends Base
         $headers->set('Content-Length', strlen($content));
         $headers->set('Content-Disposition', 'attachment; filename="'.$fileName.'"');
 
-        $this->getResponse()->content->set([
-            'format' => 'file',
-            'data'   => $content
-        ]);
+        $this->getResponse()->content->set( $this->buildFileOutputFromString($content) );
+
     }
 
     // Getters / Setters
