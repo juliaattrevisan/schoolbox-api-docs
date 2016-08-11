@@ -40,7 +40,7 @@
     <div class="small-12 columns">
         <select id="player-filter">
             <option value="0">Show All Players</option>
-            <option value="1">Show Unassigned Players</option>
+            <option value="1" selected>Show Unassigned Players</option>
             <option value="2">Show Assigned Players</option>
         </select>
     </div>
@@ -78,37 +78,33 @@
             </div>
         {% endif %}
     </div>
-    <div class="small-12 medium-6 columns">
-        <div class="row">
-            <div class="small-12 island">
-                <div class="actions-small-1 row">
-                    <div class="list-item">
-                        <div class="small-12 column">
-                            <h2 class="subheader">Teams</h2>
-                        </div>
-                    </div>
-                    <nav>
-                        <a href="{{ routeLookup('sportsfixturesTeam.getCreateForm', {contextId: division.id}) }}" class="icon-add" title="Add Team"></a>
-                    </nav>
+    <div class="small-12 medium-6 island">
+        <div class="actions-small-1 row">
+            <div class="list-item">
+                <div class="small-12 column">
+                    <h2 class="subheader">Teams</h2>
                 </div>
-
-                {% if teams is not empty %}
-                    {% for teamData in teams %}
-                        {% include '@sportsfixturesDivision/lobby/team.twig' with {
-                            team: teamData.team,
-                            players: teamData.players,
-                            positions: teamData.positions
-                        } only %}
-                    {% endfor %}
-                {% else %}
-                    <div class="empty-state">
-                        <i class="icon-sport"></i>
-                        <p>There are no Teams in {{ division.name }}.</p>
-                        <p><a href="{{ routeLookup('sportsfixturesTeam.getCreateForm', {contextId: division.id}) }}" title="Add a Team">Add a Team</a></p>
-                    </div>
-                {% endif %}
             </div>
+            <nav>
+                <a href="{{ routeLookup('sportsfixturesTeam.getCreateForm', {contextId: division.id}) }}" class="icon-add" title="Add Team"></a>
+            </nav>
         </div>
+
+        {% if teams is not empty %}
+            {% for teamData in teams %}
+                {% include '@sportsfixturesDivision/lobby/team.twig' with {
+                    team: teamData.team,
+                    players: teamData.players,
+                    positions: teamData.positions
+                } only %}
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-sport"></i>
+                <p>There are no Teams in {{ division.name }}.</p>
+                <p><a href="{{ routeLookup('sportsfixturesTeam.getCreateForm', {contextId: division.id}) }}" title="Add a Team">Add a Team</a></p>
+            </div>
+        {% endif %}
     </div>
 </div>
 

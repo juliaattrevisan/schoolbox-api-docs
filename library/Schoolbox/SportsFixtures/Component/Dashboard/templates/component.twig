@@ -21,7 +21,7 @@
                             {% if role == 'parent' %}
                                 {% for team in match.teams %}
                                     {% if team.children is not empty %}
-                                        <p class="meta icon-group">
+                                        <p class="meta">
                                             {% for child in team.children %}
                                                 {% if not loop.first and not loop.last %},{% endif %}
                                                 {% if loop.last and not loop.first %}and{% endif %}

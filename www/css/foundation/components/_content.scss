@@ -723,16 +723,21 @@ nav {
             @include grid-column(1);
             @extend .icon-grip;
             @extend [class^="icon-"]; // (this is valid)
-
+			display: table;
 			padding: 0;
 			text-align: center;
 			cursor: move;
 
 			&:before {
-				line-height: 3rem;
+				display: table-cell;
+				vertical-align: middle;
 				padding: 0;
 				color: $content-ui-foreground;
+				line-height: 4;
 			}
+		}
+		.grip.compact:before{
+			line-height: 2.5;
 		}
 	}
 	> li{
@@ -1301,6 +1306,7 @@ ul.flex-list {
 	 */
 	&.compact {
 		min-height: 2.5rem;
+		padding: 0.25rem 1rem 0 1rem;
 
 		[class*="icon-"] {
 			width: 2rem;
@@ -1311,11 +1317,15 @@ ul.flex-list {
 
 		p {
 			margin-left: 2rem;
+			line-height: 1.25;
+			&:last-child{
+				padding: 0;
+			}
 		}
 
 		img {
 			width: 2.5rem;
-
+			margin: -0.35em 1rem 0 -1rem;
 			&.mime {
 				padding: 0 0 0 0.5rem !important;
 				margin: 0 0.75rem 0 -0.75rem;
@@ -1430,12 +1440,6 @@ ul.flex-list {
         width: #{'calc(100% - 4rem)'};
         max-width: #{'calc(100% - 4rem)'};
     }
-}
-
-/* Grip sizing for Compact Cards
- */
-.information-list.sortable .grip.compact:before {
-	line-height: 2rem;
 }
 
 p{

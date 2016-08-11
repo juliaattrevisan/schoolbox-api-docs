@@ -5,7 +5,7 @@
             <div class="small-10 compact card wrap-down">
                 <a href="/search/user/{{ teamPlayer.id }}">
                     <img src="/portrait.php?userId={{ teamPlayer.externalId }}&amp;size=square64" />
-                    <h3>{{ teamPlayer.formatName() }}</h3>
+                    <p>{{ teamPlayer.formatName() }}</p>
                 </a>
                 <p class="meta">
                     {% for currentPosition in positions[teamPlayer.id] %}
