@@ -11,16 +11,18 @@
     {% if reports|length %}
         {% for year, semesters in reports %}
         <div class="small-12 island">
-            <h3>{{ year }}</h3>
+            <h2 class="subheader">{{ year }}</h2>
             <section>
                 <ul class="action-list">
                     {% for semester, reports in semesters %}
                         {% for reportId, report in reports %}
                             <li class="actions-small-1">
                                 <div class="list-item">
-                                    <div class="small-12 avatar card">
-                                        <h3><a href="{{ routeLookup('customStkOleReport.sendReport', {studentId: student.id, reportId: reportId}) }}"><span class="icon-download"></span> Semester {{ report.description }}</a> </h3>
-                                        <p class="meta"> </p>
+                                    <div class="compact avatar card small-12">
+                                        <a href="{{ routeLookup('customStkOleReport.sendReport', {studentId: student.id, reportId: reportId}) }}">
+                                            <img src="/images/mime/60x60/pdf_alt.png" class="mime">
+                                            <h3>{{ report.description }}</h3>
+                                        </a>
                                     </div>
                                 </div>
                             </li>
