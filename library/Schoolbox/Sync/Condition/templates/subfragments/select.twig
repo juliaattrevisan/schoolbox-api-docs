@@ -1,0 +1,21 @@
+{##
+ # Select subfragment specifically for UPS conditions.
+ #
+ # Because condition values are stored without [] characters, the selected
+ # check needs to compare the preselected value against the select value with
+ # those characters stripped.
+ #}
+
+<select {{ disabled }} name="{{ name }}"
+    {% for dataVar, dataValue in selectData %}
+        {{ dataVar }}="{{ dataValue }}"
+    {% endfor %}
+>
+    <option disabled selected="selected" value="">Please Select</option>
+
+    {% for value, label in options %}
+    <option value="{{ value }}" {% if value|replace({'[]': ''}) == preselected %}selected="selected"{% endif %}>
+        {{ label }}
+    </option>
+    {% endfor %}
+</select>
