@@ -157,7 +157,7 @@
                     // It appears the modal doesn't process the 'close' event until some period after the user action.
                     setTimeout(function(){
                         Foundation.libs.reveal.locked = false;
-                    }, 125);   // empirical testing indicated '111' was minimum delay required.
+                    }, 200);   // empirical testing indicated '111' was minimum delay required.
                 });
             }
 
