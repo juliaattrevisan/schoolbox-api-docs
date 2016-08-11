@@ -17,6 +17,7 @@ use Schoolbox\Resource\File\IFile;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
 use Schoolbox\Resource\File\StorableTrait;
+use Schoolbox\UserMapper;
 
 
 class ReturnedWork implements ISoftDeletable, IFile
@@ -386,10 +387,12 @@ class ReturnedWork implements ISoftDeletable, IFile
         if ($user->getRole()->isStaff()) {
             return true;
         }
-        // le sigh
-        $this->getOwner()->loadParents();
-        if ($this->getOwner()->isChildOf($user)) {
-            return true;
+        if ($user->getRole()->isParent()) {
+            $this->setOwner(UserMapper::getInstance()->findById($this->getOwner()->getId()));
+            $this->getOwner()->loadParents();
+            if ($this->getOwner()->isChildOf($user)) {
+                return true;
+            }
         }
         return false;
     }
