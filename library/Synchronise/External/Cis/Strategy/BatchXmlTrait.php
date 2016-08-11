@@ -22,7 +22,7 @@ trait Synchronise_External_Cis_Strategy_BatchXmlTrait
             throw new Exception('stream_dir has not been configured');
         }
 
-        $filename = $dir.strftime('/isams_batch-%Y%m%d.xml', $_SERVER['REQUEST_TIME']);
+        $filename = $dir.strftime('/isams_batch-%Y%m%d%H.xml', $_SERVER['REQUEST_TIME']);
         printf("Using file \"%s\"\n", $filename);
         if (!file_exists($filename)) {
             printf("File \"%s\" doesn't exist - downloading...\n", $filename);
