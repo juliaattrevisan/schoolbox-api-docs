@@ -209,8 +209,10 @@ class MSSQL {
 	{
 		if (!$this->isConnected()) {
 			$this->connect();
-
 		}
+
+		// Change database per query, instead of per connection
+		$this->changeDB($this->db);
 
 		// SB-6907: Cathedral's SQL server won't accept long query strings, so
 		// strip any leading space from each line of the query.
