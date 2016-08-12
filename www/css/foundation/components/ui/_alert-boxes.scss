@@ -56,6 +56,7 @@ $alert-default-background: darken($body-bg, 10%);
 .alert-box {
     background-color: $alert-default-background;
     color: calc-text-color($alert-default-background, tint($alert-default-background, $alert-tint-amount), darken($alert-default-background, $alert-tint-amount));
+    text-align: center;
 
     .close {
         &:hover {
@@ -66,6 +67,10 @@ $alert-default-background: darken($body-bg, 10%);
         line-height: .8;
     }
 
+    &.highlight {
+        background-color: $accent-background;
+        color: $accent-foreground;
+    }
     &.success {
         background-color: $success-color;
         color: calc-text-color($success-color, tint($success-color, $alert-tint-amount), darken($success-color, $alert-tint-amount));
