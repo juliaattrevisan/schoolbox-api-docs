@@ -85,6 +85,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             ci.category_id
         FROM task_instance ti
         INNER JOIN course_unit_instance ci ON ti.course_unit_instance_id = ci.id
+        ORDER BY ti.id ASC
     ");
     $selectQuizQuery               = $db->prepare("SELECT weight, start, finish FROM assess WHERE assess_id = :assessId");
     $selectDueWorkQuery            = $db->prepare("SELECT weight, publish_date, open_date, date FROM submission_box WHERE id = :boxId");
