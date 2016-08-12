@@ -62,51 +62,56 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $successCount = 0;
     $failureCount = 0;
     foreach ($selectTaskQuery->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $taskId   = $row['id'];
+        $folderId = $row['category_id'];
+        $title    = $row['title'];
+        $quizId   = $row['assess_id'];
+        $boxId    = $row['box_id'];
 
         // Convert this task
-        $log->info(sprintf('Converting task "%s" (id: %d)...', $row['title'], $row['id']));
+        $log->info(sprintf('Converting task "%s" (id: %d)...', $title, $taskId));
 
         try {
             $db->beginTransaction();
 
             // Figure out project's weight
             $weight = 0;
-            if ($row['assess_id']) {
-                $selectQuizWeightQuery->execute(['assessId' => $row['assess_id']]);
+            if ($quizId) {
+                $selectQuizWeightQuery->execute(['assessId' => $quizId]);
                 $weight = $selectQuizWeightQuery->fetchColumn();
-            } elseif ($row['box_id']) {
-                $selectDueWorkWeightQuery->execute(['boxId' => $row['box_id']]);
+            } elseif ($boxId) {
+                $selectDueWorkWeightQuery->execute(['boxId' => $boxId]);
                 $weight = $selectDueWorkWeightQuery->fetchColumn();
             }
 
             // Create project
-            $insertProjectQuery->execute(['title' => $row['title'], 'weight' => intval($weight)]);
+            $insertProjectQuery->execute(['title' => $title, 'weight' => intval($weight)]);
             $projectId = $db->lastInsertId();
             $log->debug('Created project');
 
             // Associate this project with the task's folder
-            $insertProjectRelationQuery->execute(['projectId' => $projectId, 'folderId' => $row['category_id']]);
+            $insertProjectRelationQuery->execute(['projectId' => $projectId, 'folderId' => $folderId]);
             $log->debug('Created project/folder relation');
 
             // Create assessment
-            $insertAssessmentQuery->execute(['projectId' => $projectId, 'title' => $row['title']]);
+            $insertAssessmentQuery->execute(['projectId' => $projectId, 'title' => $title]);
             $assessmentId = $db->lastInsertId();
             $log->debug('Created assessment/project relation');
 
             // Associate this task with the assessment
-            $updateTaskQuery->execute(['assessmentId' => $assessmentId, 'taskId' => $row['id']]);
+            $updateTaskQuery->execute(['assessmentId' => $assessmentId, 'taskId' => $taskId]);
             $log->debug('Created task/assessment relation');
 
-            if ($row['assess_id']) {
+            if ($quizId) {
                 // Tasks with a quiz: delete task, and associate quiz with assessment
-                $updateQuizQuery->execute(['assessmentId' => $assessmentId, 'assessId' => $row['assess_id']]);
-                $deleteTaskQuery->execute(['taskId' => $row['id']]);
+                $updateQuizQuery->execute(['assessmentId' => $assessmentId, 'assessId' => $quizId]);
+                $deleteTaskQuery->execute(['taskId' => $taskId]);
                 $log->debug('Task has quiz - created quiz/assessment relation, deleted task');
             }
-            if ($row['box_id']) {
+            if ($boxId) {
                 // Tasks with a due work: delete task, and associate due work with assessment
-                $updateDueWorkQuery->execute(['assessmentId' => $assessmentId, 'boxId' => $row['box_id']]);
-                $deleteTaskQuery->execute(['taskId' => $row['id']]);
+                $updateDueWorkQuery->execute(['assessmentId' => $assessmentId, 'boxId' => $boxId]);
+                $deleteTaskQuery->execute(['taskId' => $taskId]);
                 $log->debug('Task has due work - created due work/assessment relation, deleted task');
             }
 
@@ -114,7 +119,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $db->commit();
 
         } catch (PDOException $e) {
-            $log->error(sprintf('Task "%s" could not be converted!', $row['title']), ['message' => $e->getMessage()]);
+            $log->error(sprintf('Task "%s" could not be converted!', $title), ['message' => $e->getMessage()]);
             $failureCount++;
             $db->rollBack();
 

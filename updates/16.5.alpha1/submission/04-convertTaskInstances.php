@@ -96,54 +96,60 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $successCount = 0;
     $failureCount = 0;
     foreach ($selectTaskInstanceQuery->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $taskId   = $row['id'];
+        $unitId   = $row['course_unit_instance_id'];
+        $folderId = $row['category_id'];
+        $title    = $row['title'];
+        $quizId   = $row['assess_id'];
+        $boxId    = $row['box_id'];
 
         // Convert this task
-        $log->info(sprintf('Converting task instance "%s" (id: %d)...', $row['title'], $row['id']));
+        $log->info(sprintf('Converting task instance "%s" (id: %d)...', $title, $taskId));
 
         try {
             $db->beginTransaction();
 
             // Figure out project's weight
             $weight = 0;
-            if ($row['assess_id']) {
-                $selectQuizWeightQuery->execute(['assessId' => $row['assess_id']]);
+            if ($quizId) {
+                $selectQuizWeightQuery->execute(['assessId' => $quizId]);
                 $weight = $selectQuizWeightQuery->fetchColumn();
-            } elseif ($row['box_id']) {
-                $selectDueWorkWeightQuery->execute(['boxId' => $row['box_id']]);
+            } elseif ($boxId) {
+                $selectDueWorkWeightQuery->execute(['boxId' => $boxId]);
                 $weight = $selectDueWorkWeightQuery->fetchColumn();
             }
 
             // Create project
-            $insertProjectQuery->execute(['title' => $row['title'], 'weight' => intval($weight)]);
+            $insertProjectQuery->execute(['title' => $title, 'weight' => intval($weight)]);
             $projectId = $db->lastInsertId();
             $log->debug('Created project');
 
             // Associate this project with the task's folder
-            $insertProjectRelationQuery->execute(['projectId' => $projectId, 'courseUnitInstanceId' => $row['course_unit_instance_id']]);
+            $insertProjectRelationQuery->execute(['projectId' => $projectId, 'courseUnitInstanceId' => $unitId]);
             $log->debug('Created project/course instance relation');
 
             // Create assessment
-            $insertAssessmentQuery->execute(['projectId' => $projectId, 'title' => $row['title']]);
+            $insertAssessmentQuery->execute(['projectId' => $projectId, 'title' => $title]);
             $assessmentId = $db->lastInsertId();
             $log->debug('Created assessment/project relation');
 
             // Create the task out of this assessment
-            if ($row['assess_id']) {
+            if ($quizId) {
                 // Tasks with a quiz: associate quiz with assessment
-                $updateQuizQuery->execute(['assessmentId' => $assessmentId, 'assessId' => $row['assess_id']]);
+                $updateQuizQuery->execute(['assessmentId' => $assessmentId, 'assessId' => $quizId]);
                 $log->debug('Task instance has quiz - created quiz/assessment relation');
             }
-            if ($row['box_id']) {
+            if ($boxId) {
                 // Tasks with a due work: associate due work with assessment
-                $updateDueWorkQuery->execute(['assessmentId' => $assessmentId, 'boxId' => $row['box_id']]);
+                $updateDueWorkQuery->execute(['assessmentId' => $assessmentId, 'boxId' => $boxId]);
                 $log->debug('Task instance has due work - created due work/assessment relation');
             }
-            if (!$row['assess_id'] && !$row['box_id']) {
+            if (!$quizId && !$boxId) {
                 // Copy the task directly
                 $insertTaskQuery->execute([
                     'assessmentId'   => $assessmentId,
-                    'categoryId'     => $row['category_id'],
-                    'taskInstanceId' => $row['id'],
+                    'categoryId'     => $folderId,
+                    'taskInstanceId' => $taskId,
                 ]);
                 $log->debug('Task instance has no quiz or due work - copied task instance to task');
             }
@@ -152,7 +158,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $db->commit();
 
         } catch (PDOException $e) {
-            $log->error(sprintf('Task instance "%s" could not be converted!', $row['title']), ['message' => $e->getMessage()]);
+            $log->error(sprintf('Task instance "%s" could not be converted!', $title), ['message' => $e->getMessage()]);
             $failureCount++;
             $db->rollBack();
 
