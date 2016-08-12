@@ -99,7 +99,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     foreach ($selectTaskQuery->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
         // Convert this task
-        $log->info(sprintf('Converting task "%s" (id: %d)...', $row['title'], $row['id']));
+        $log->info(sprintf('Converting task instance "%s" (id: %d)...', $row['title'], $row['id']));
 
         try {
             $db->beginTransaction();
@@ -153,7 +153,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $db->commit();
 
         } catch (PDOException $e) {
-            $log->error(sprintf('Task "%s" could not be converted!', $row['title']), ['message' => $e->getMessage()]);
+            $log->error(sprintf('Task instance "%s" could not be converted!', $row['title']), ['message' => $e->getMessage()]);
             $failureCount++;
             $db->rollBack();
 
