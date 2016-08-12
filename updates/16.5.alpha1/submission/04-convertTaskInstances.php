@@ -86,8 +86,9 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         FROM task_instance ti
         INNER JOIN course_unit_instance ci ON ti.course_unit_instance_id = ci.id
     ");
-    $selectQuizWeightQuery    = $db->prepare("SELECT weight, start, finish FROM assess WHERE assess_id = :assessId");
-    $selectDueWorkWeightQuery = $db->prepare("SELECT weight, publish_date, open_date, date FROM submission_box WHERE id = :boxId");
+    $selectQuizQuery       = $db->prepare("SELECT weight, start, finish FROM assess WHERE assess_id = :assessId");
+    $selectDueWorkQuery    = $db->prepare("SELECT weight, publish_date, open_date, date FROM submission_box WHERE id = :boxId");
+    $selectCourseUnitQuery = $db->prepare("SELECT open_date, due_date FROM course_unit_instance WHERE id = :courseUnitInstanceId");
 
 
     // Go
@@ -115,8 +116,9 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $openDate    = null;
             $dueDate     = null;
             if ($quizId) {
-                $selectQuizWeightQuery->execute(['assessId' => $quizId]);
-                $quizRow = $selectQuizWeightQuery->fetch(PDO::FETCH_ASSOC);
+                // Use weight and dates from quiz
+                $selectQuizQuery->execute(['assessId' => $quizId]);
+                $quizRow = $selectQuizQuery->fetch(PDO::FETCH_ASSOC);
                 if ($quizRow) {
                     $weight      = $quizRow['weight'];
                     $publishDate = $quizRow['start'];
@@ -124,13 +126,23 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                     $dueDate     = $quizRow['finish'];
                 }
             } elseif ($boxId) {
-                $selectDueWorkWeightQuery->execute(['boxId' => $boxId]);
-                $boxRow = $selectDueWorkWeightQuery->fetch(PDO::FETCH_ASSOC);
+                // Use weight and dates from due work
+                $selectDueWorkQuery->execute(['boxId' => $boxId]);
+                $boxRow = $selectDueWorkQuery->fetch(PDO::FETCH_ASSOC);
                 if ($boxRow) {
                     $weight      = $boxRow['weight'];
                     $publishDate = $boxRow['publish_date'];
                     $openDate    = $boxRow['open_date'];
                     $dueDate     = $boxRow['date'];
+                }
+            } else {
+                // Use dates from the course unit instance
+                $selectCourseUnitQuery->execute(['courseUnitInstanceId' => $unitId]);
+                $courseUnitRow = $selectCourseUnitQuery->fetch(PDO::FETCH_ASSOC);
+                if ($courseUnitRow) {
+                    $publishDate = $courseUnitRow['open_date'];
+                    $openDate    = $courseUnitRow['open_date'];
+                    $dueDate     = $courseUnitRow['due_date'];
                 }
             }
 
