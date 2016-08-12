@@ -36,7 +36,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     ");
     $insertProjectRelationQuery = $db->prepare("
         INSERT INTO project_course_unit_instance (project_id, course_unit_instance_id)
-        VALUES (:projectId, (SELECT id FROM course_unit WHERE folder_id = :folderId LIMIT 1))
+        VALUES (:projectId, :courseUnitInstanceId)
     ");
     $insertTaskQuery = $db->prepare("
         INSERT INTO task (
@@ -120,7 +120,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $log->debug('Created project');
 
             // Associate this project with the task's folder
-            $insertProjectRelationQuery->execute(['projectId' => $projectId, 'folderId' => $row['category_id']]);
+            $insertProjectRelationQuery->execute(['projectId' => $projectId, 'courseUnitInstanceId' => $row['course_unit_instance_id']]);
             $log->debug('Created project/folder relation');
 
             // Create assessment
