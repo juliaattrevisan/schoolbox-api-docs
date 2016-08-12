@@ -28,7 +28,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     // Insert project and related information queries
     $insertProjectQuery = $db->prepare("
         INSERT INTO project (title, description, weight)
-        VALUES (:title, '', 0)
+        VALUES (:title, '', :weight)
     ");
     $insertAssessmentQuery = $db->prepare("
         INSERT INTO assessment (project_id, title, description, publish_date, open_date, due_date, weight, sequence)
@@ -46,12 +46,15 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $updateQuizQuery    = $db->prepare("UPDATE assess SET assessment_id = :assessmentId WHERE assess_id = :assessId");
     $deleteTaskQuery    = $db->prepare("UPDATE task SET deleted_at = NOW() WHERE id = :taskId");
 
-    // Select tasks queries
+    // Select queries
     $selectTaskQuery = $db->prepare("
         SELECT id, category_id, title, assess_id, box_id 
         FROM task
         WHERE COALESCE(assessment_id, 0) = 0
     ");
+    $selectQuizWeightQuery    = $db->prepare("SELECT weight FROM assess WHERE assess_id = :assessId");
+    $selectDueWorkWeightQuery = $db->prepare("SELECT weight FROM submission_box WHERE id = :boxId");
+
 
     // Go
     $selectTaskQuery->execute();
@@ -66,8 +69,18 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         try {
             $db->beginTransaction();
 
+            // Figure out project's weight
+            $weight = 0;
+            if ($row['assess_id']) {
+                $selectQuizWeightQuery->execute(['assessId' => $row['assess_id']]);
+                $weight = $selectQuizWeightQuery->fetchColumn();
+            } elseif ($row['box_id']) {
+                $selectDueWorkWeightQuery->execute(['boxId' => $row['box_id']]);
+                $weight = $selectDueWorkWeightQuery->fetchColumn();
+            }
+
             // Create project
-            $insertProjectQuery->execute(['title' => $row['title']]);
+            $insertProjectQuery->execute(['title' => $row['title'], 'weight' => intval($weight)]);
             $projectId = $db->lastInsertId();
             $log->debug('Created project');
 
