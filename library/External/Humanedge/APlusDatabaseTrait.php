@@ -33,8 +33,7 @@ trait External_Humanedge_APlusDatabaseTrait
                     'passwd'   => Config::get('external_humanedge_aplus_db_passwd'),
                     'db'       => Config::get('external_humanedge_aplus_db_db'),
                     'encoding' => Config::get('external_db_encoding'),
-                ],
-                true
+                ]
             );
         }
         return $this->aPlusDatabase;

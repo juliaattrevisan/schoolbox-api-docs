@@ -79,8 +79,7 @@ class Healthcheck
                 'passwd'   => Config::get('external_humanedge_aplus_db_passwd'),
                 'db'       => Config::get('external_humanedge_aplus_db_db'),
                 'encoding' => Config::get('external_db_encoding'),
-            ],
-            true
+            ]
         );
         $db->debug = true;
         return $db;
