@@ -86,9 +86,9 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         FROM task_instance ti
         INNER JOIN course_unit_instance ci ON ti.course_unit_instance_id = ci.id
     ");
-    $selectQuizQuery       = $db->prepare("SELECT weight, start, finish FROM assess WHERE assess_id = :assessId");
-    $selectDueWorkQuery    = $db->prepare("SELECT weight, publish_date, open_date, date FROM submission_box WHERE id = :boxId");
-    $selectCourseUnitQuery = $db->prepare("SELECT open_date, due_date FROM course_unit_instance WHERE id = :courseUnitInstanceId");
+    $selectQuizQuery               = $db->prepare("SELECT weight, start, finish FROM assess WHERE assess_id = :assessId");
+    $selectDueWorkQuery            = $db->prepare("SELECT weight, publish_date, open_date, date FROM submission_box WHERE id = :boxId");
+    $selectCourseUnitInstanceQuery = $db->prepare("SELECT open_date, due_date FROM course_unit_instance WHERE id = :courseUnitInstanceId");
 
 
     // Go
@@ -97,12 +97,12 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $successCount = 0;
     $failureCount = 0;
     foreach ($selectTaskInstanceQuery->fetchAll(PDO::FETCH_ASSOC) as $row) {
-        $taskId   = $row['id'];
-        $unitId   = $row['course_unit_instance_id'];
-        $folderId = $row['category_id'];
-        $title    = $row['title'];
-        $quizId   = $row['assess_id'];
-        $boxId    = $row['box_id'];
+        $taskId               = $row['id'];
+        $courseUnitInstanceId = $row['course_unit_instance_id'];
+        $folderId             = $row['category_id'];
+        $title                = $row['title'];
+        $quizId               = $row['assess_id'];
+        $boxId                = $row['box_id'];
 
         // Convert this task
         $log->info(sprintf('Converting task instance "%s" (id: %d)...', $title, $taskId));
@@ -137,12 +137,12 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 }
             } else {
                 // Use dates from the course unit instance
-                $selectCourseUnitQuery->execute(['courseUnitInstanceId' => $unitId]);
-                $courseUnitRow = $selectCourseUnitQuery->fetch(PDO::FETCH_ASSOC);
-                if ($courseUnitRow) {
-                    $publishDate = $courseUnitRow['open_date'];
-                    $openDate    = $courseUnitRow['open_date'];
-                    $dueDate     = $courseUnitRow['due_date'];
+                $selectCourseUnitInstanceQuery->execute(['courseUnitInstanceId' => $courseUnitInstanceId]);
+                $courseUnitInstanceRow = $selectCourseUnitInstanceQuery->fetch(PDO::FETCH_ASSOC);
+                if ($courseUnitInstanceRow) {
+                    $publishDate = $courseUnitInstanceRow['open_date'];
+                    $openDate    = $courseUnitInstanceRow['open_date'];
+                    $dueDate     = $courseUnitInstanceRow['due_date'];
                 }
             }
 
@@ -155,7 +155,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $log->debug('Created project');
 
             // Associate this project with the task's folder
-            $insertProjectRelationQuery->execute(['projectId' => $projectId, 'courseUnitInstanceId' => $unitId]);
+            $insertProjectRelationQuery->execute(['projectId' => $projectId, 'courseUnitInstanceId' => $courseUnitInstanceId]);
             $log->debug('Created project/course instance relation');
 
             // Create assessment
