@@ -62,6 +62,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         if ($single_day) {
             $query .= ' AND tp.day = :day ';
         }
+        $query .= " ORDER BY tp.start";
         return $this->getDatabase()->prepare($query);
     }
 
