@@ -32,7 +32,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     ");
     $insertAssessmentQuery = $db->prepare("
         INSERT INTO assessment (project_id, title, description, publish_date, open_date, due_date, weight, sequence)
-        VALUES (:projectId, :title, '', NULL, NULL, NULL, 0, 1)
+        VALUES (:projectId, :title, '', NULL, NULL, :weight, 0, 1)
     ");
     $insertProjectRelationQuery = $db->prepare("
         INSERT INTO project_course_unit (project_id, course_unit_id)
@@ -85,16 +85,23 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             }
 
             // Create project
-            $insertProjectQuery->execute(['title' => $title, 'weight' => intval($weight)]);
+            $insertProjectQuery->execute([
+                'title'  => $title,
+                'weight' => intval($weight),
+            ]);
             $projectId = $db->lastInsertId();
             $log->debug('Created project');
 
             // Associate this project with the task's folder
-            $insertProjectRelationQuery->execute(['projectId' => $projectId, 'folderId' => $folderId]);
+            $insertProjectRelationQuery->execute(['projectId' => $projectId, 'folderId'  => $folderId]);
             $log->debug('Created project/folder relation');
 
             // Create assessment
-            $insertAssessmentQuery->execute(['projectId' => $projectId, 'title' => $title]);
+            $insertAssessmentQuery->execute([
+                'projectId' => $projectId,
+                'title'     => $title,
+                'weight'    => intval($weight),
+            ]);
             $assessmentId = $db->lastInsertId();
             $log->debug('Created assessment/project relation');
 
