@@ -88,6 +88,14 @@ class MSSQL {
 	 */
 	protected static $instance = null;
 
+    /**
+     * A key-value lookup for each connection - it contains the last database
+     * that that host/user/password combination queried.
+     *
+     * @var array
+     */
+    protected static $lastDatabase = [];
+
 	/**
 	 * @param bool $db
 	 * @param bool $optionalConfig
@@ -169,6 +177,29 @@ class MSSQL {
 
 	}
 
+    /**
+     * Determines a unique identifier for this host/user/password combination.
+     *
+     * @return string
+     */
+    protected function getConnectionHash()
+    {
+        return hash('sha256', serialize([$this->host, $this->user, $this->passwd]));
+    }
+
+    /**
+     * Changes to a different database, only if this host/user/password isn't
+     * already connected to it.
+     *
+     * @param $db
+     */
+    protected function changeDatabaseIfRequired($db)
+    {
+        if (self::$lastDatabase[$this->getConnectionHash()] != $db) {
+            $this->changeDB($db);
+        }
+    }
+
 	/**
 	 * Change to a different DB on server
 	 * @param string $db
@@ -178,6 +209,8 @@ class MSSQL {
 		if(@mssql_select_db($db, $this->dbf))
 		{
 			$this->db = $db;
+			// Store that this connection is connected to this database
+			self::$lastDatabase[$this->getConnectionHash()] = $db;
 			return true;
 
 		}
@@ -211,8 +244,7 @@ class MSSQL {
 			$this->connect();
 		}
 
-		// Change database per query, instead of per connection
-		$this->changeDB($this->db);
+		$this->changeDatabaseIfRequired($this->db);
 
 		// SB-6907: Cathedral's SQL server won't accept long query strings, so
 		// strip any leading space from each line of the query.
@@ -267,6 +299,7 @@ class MSSQL {
 		if (!$this->isConnected()) {
 			$this->connect();
 		}
+		$this->changeDatabaseIfRequired($this->db);
 
 		$bound_outputs = array();
 		$proc          = $this->buildProcedure($name, $params, $bound_outputs);
