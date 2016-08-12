@@ -77,6 +77,9 @@ class MSSQL {
 	/**
 	 * Does this instance require a new connection?
 	 *
+	 * @deprecated New connections should never be required anymore, now that
+	 *             the database a connection is connected to is tracked.
+	 *
 	 * @var bool
 	 */
 	protected $newConnection = false;
@@ -100,6 +103,7 @@ class MSSQL {
 	 * @param bool $db
 	 * @param bool $optionalConfig
 	 * @param bool $newConnection Enforces a new connection, even if already connected with these credentials.
+     *                            (This parameter is deprecated, @see $this->newConnection)
 	 */
 	function MSSQL($db = false, $optionalConfig = false, $newConnection = false) {
 
