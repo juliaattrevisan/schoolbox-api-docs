@@ -20,8 +20,8 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Convert Task Instances', [
 
 $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
-    // Perform the task conversion in hand-crafted SQL.
-    // This is because the task mapper needs to be fundamentally changed to work as part of assessments.
+    // Perform the task instance conversion in hand-crafted SQL.
+    // This is because the task instance mapper needs to be fundamentally changed to work as part of assessments.
 
     $db = Database::getInstance();
 
@@ -38,6 +38,8 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         INSERT INTO project_course_unit_instance (project_id, course_unit_instance_id)
         VALUES (:projectId, :courseUnitInstanceId)
     ");
+
+    // Insert task query - most fields are just copied from the task instance
     $insertTaskQuery = $db->prepare("
         INSERT INTO task (
             assessment_id,
@@ -69,14 +71,11 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     ");
 
     // Update assessment type queries
-    // (Tasks which are related to a due work or quiz get deleted - the quiz gets related directly to the assessment)
-//    $updateTaskQuery    = $db->prepare("UPDATE task SET assessment_id = :assessmentId WHERE id = :taskId");
-    $updateDueWorkQuery      = $db->prepare("UPDATE submission_box SET assessment_id = :assessmentId WHERE id = :boxId");
-    $updateQuizQuery         = $db->prepare("UPDATE assess SET assessment_id = :assessmentId WHERE assess_id = :assessId");
-//    $deleteTaskInstanceQuery = $db->prepare("UPDATE task_instance SET deleted_at = NOW() WHERE id = :taskId");
+    $updateDueWorkQuery = $db->prepare("UPDATE submission_box SET assessment_id = :assessmentId WHERE id = :boxId");
+    $updateQuizQuery    = $db->prepare("UPDATE assess SET assessment_id = :assessmentId WHERE assess_id = :assessId");
 
     // Select tasks queries
-    $selectTaskQuery          = $db->prepare("
+    $selectTaskInstanceQuery = $db->prepare("
         SELECT 
             ti.id,
             ti.course_unit_instance_id,
@@ -92,11 +91,11 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
 
     // Go
-    $selectTaskQuery->execute();
-    $log->debug(sprintf('%d task instances found', $selectTaskQuery->rowCount()));
+    $selectTaskInstanceQuery->execute();
+    $log->debug(sprintf('%d task instances found', $selectTaskInstanceQuery->rowCount()));
     $successCount = 0;
     $failureCount = 0;
-    foreach ($selectTaskQuery->fetchAll(PDO::FETCH_ASSOC) as $row) {
+    foreach ($selectTaskInstanceQuery->fetchAll(PDO::FETCH_ASSOC) as $row) {
 
         // Convert this task
         $log->info(sprintf('Converting task instance "%s" (id: %d)...', $row['title'], $row['id']));
@@ -121,7 +120,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
             // Associate this project with the task's folder
             $insertProjectRelationQuery->execute(['projectId' => $projectId, 'courseUnitInstanceId' => $row['course_unit_instance_id']]);
-            $log->debug('Created project/folder relation');
+            $log->debug('Created project/course instance relation');
 
             // Create assessment
             $insertAssessmentQuery->execute(['projectId' => $projectId, 'title' => $row['title']]);
