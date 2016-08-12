@@ -27,8 +27,8 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
     // Insert project and related information queries
     $insertProjectQuery = $db->prepare("
-        INSERT INTO project (title, description, weight)
-        VALUES (:title, '', :weight)
+        INSERT INTO project (title, description, weight, publish_date, open_date, due_date)
+        VALUES (:title, '', :weight, :publish, :open, :due)
     ");
     $insertAssessmentQuery = $db->prepare("
         INSERT INTO assessment (project_id, title, description, publish_date, open_date, due_date, weight, sequence)
@@ -86,8 +86,8 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         FROM task_instance ti
         INNER JOIN course_unit_instance ci ON ti.course_unit_instance_id = ci.id
     ");
-    $selectQuizWeightQuery    = $db->prepare("SELECT weight FROM assess WHERE assess_id = :assessId");
-    $selectDueWorkWeightQuery = $db->prepare("SELECT weight FROM submission_box WHERE id = :boxId");
+    $selectQuizWeightQuery    = $db->prepare("SELECT weight, start, finish FROM assess WHERE assess_id = :assessId");
+    $selectDueWorkWeightQuery = $db->prepare("SELECT weight, publish_date, open_date, date FROM submission_box WHERE id = :boxId");
 
 
     // Go
@@ -109,18 +109,39 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         try {
             $db->beginTransaction();
 
-            // Figure out project's weight
-            $weight = 0;
+            // Figure out project's weight, publish/open/due date
+            $weight      = 0;
+            $publishDate = null;
+            $openDate    = null;
+            $dueDate     = null;
             if ($quizId) {
                 $selectQuizWeightQuery->execute(['assessId' => $quizId]);
-                $weight = $selectQuizWeightQuery->fetchColumn();
+                $quizRow = $selectQuizWeightQuery->fetch(PDO::FETCH_ASSOC);
+                if ($quizRow) {
+                    $weight      = $quizRow['weight'];
+                    $publishDate = $quizRow['start'];
+                    $openDate    = $quizRow['start'];
+                    $dueDate     = $quizRow['finish'];
+                }
             } elseif ($boxId) {
                 $selectDueWorkWeightQuery->execute(['boxId' => $boxId]);
-                $weight = $selectDueWorkWeightQuery->fetchColumn();
+                $boxRow = $selectDueWorkWeightQuery->fetch(PDO::FETCH_ASSOC);
+                if ($boxRow) {
+                    $weight      = $boxRow['weight'];
+                    $publishDate = $boxRow['publish_date'];
+                    $openDate    = $boxRow['open_date'];
+                    $dueDate     = $boxRow['date'];
+                }
             }
 
             // Create project
-            $insertProjectQuery->execute(['title' => $title, 'weight' => intval($weight)]);
+            $insertProjectQuery->execute([
+                'title'   => $title,
+                'weight'  => intval($weight),
+                'publish' => $publishDate,
+                'open'    => $openDate,
+                'due'     => $dueDate,
+            ]);
             $projectId = $db->lastInsertId();
             $log->debug('Created project');
 
