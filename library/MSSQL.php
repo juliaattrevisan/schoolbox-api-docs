@@ -15,25 +15,6 @@ use Alaress\DebugBar\Instance as DebugBar;
 class MSSQL {
 
 	/**
-	 * This used to store this database's default encoding, now does nothing.
-	 *
-	 * @deprecated use ini setting mssql.encoding instead
-	 *
-	 * @var string
-	 */
-	protected $encoding = 'ISO-8859-1';
-
-	/**
-	 * This used to control whether encoding was converted or not for calls to
-	 * getAll/Row/One, now does nothing.
-	 *
-	 * @deprecated use ini setting mssql.encoding instead
-	 *
-	 * @var bool
-	 */
-	protected $convert_encoding = false;
-
-	/**
 	 * @var MssqlDatabaseCollector
 	 */
 	protected $collector = null;
@@ -103,7 +84,6 @@ class MSSQL {
 			$this->user = $optionalConfig['user'];
 			$this->passwd = $optionalConfig['passwd'];
 			$this->db = $optionalConfig['db'];
-			$encoding = $optionalConfig['encoding'];
 		}
 		else {
 			$this->host = Cfg::get('external_db_host');
@@ -111,10 +91,6 @@ class MSSQL {
 			$this->passwd = Cfg::get('external_db_passwd');
 			$this->debug = 0;
 			$this->db = $db?$db:Cfg::get('external_db_db');
-			$encoding = Cfg::get('external_db_encoding');
-		}
-		if (!empty($encoding)) {
-			$this->encoding = $encoding;
 		}
 	}
 
@@ -533,32 +509,6 @@ class MSSQL {
 	{
 		return $value;
 //		return mb_convert_encoding($value, 'UTF-8', $this->encoding);
-	}
-
-
-	/**
-	 * Gets whether character set conversion is enabled.
-	 *
-	 * @deprecated use ini setting mssql.encoding instead
-	 *
-	 * @return bool
-	 */
-	public function getConvertEncoding()
-	{
-		return $this->convert_encoding;
-	}
-
-
-	/**
-	 * Sets whether character set conversion is enabled.
-	 *
-	 * @deprecated use ini setting mssql.encoding instead
-	 *
-	 * @param $convert
-	 */
-	public function setConvertEncoding($convert)
-	{
-		$this->convert_encoding = $convert;
 	}
 
 	/**
