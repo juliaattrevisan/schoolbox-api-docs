@@ -75,16 +75,6 @@ class MSSQL {
 	protected $result = null;
 
 	/**
-	 * Does this instance require a new connection?
-	 *
-	 * @deprecated New connections should never be required anymore, now that
-	 *             the database a connection is connected to is tracked.
-	 *
-	 * @var bool
-	 */
-	protected $newConnection = false;
-
-	/**
 	 * Static instance of this class
 	 *
 	 * @var self
@@ -102,10 +92,8 @@ class MSSQL {
 	/**
 	 * @param bool $db
 	 * @param bool $optionalConfig
-	 * @param bool $newConnection Enforces a new connection, even if already connected with these credentials.
-     *                            (This parameter is deprecated, @see $this->newConnection)
 	 */
-	function MSSQL($db = false, $optionalConfig = false, $newConnection = false) {
+	function MSSQL($db = false, $optionalConfig = false) {
 
 		/* Blasphemy (heresy unavoidable)
 		 * Hijack these settings for alternative config
@@ -125,7 +113,6 @@ class MSSQL {
 			$this->db = $db?$db:Cfg::get('external_db_db');
 			$encoding = Cfg::get('external_db_encoding');
 		}
-		$this->newConnection = $newConnection;
 		if (!empty($encoding)) {
 			$this->encoding = $encoding;
 		}
@@ -155,7 +142,7 @@ class MSSQL {
 			if (strlen(ini_get('mssql.charset')) === 0) {
 				ini_set('mssql.charset', 'UTF-8');
 			}
-			$this->dbf = @mssql_connect($this->host, $this->user, $this->passwd, $this->newConnection);
+			$this->dbf = @mssql_connect($this->host, $this->user, $this->passwd);
 		}
 
 		if ($this->dbf == false) {
