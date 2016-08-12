@@ -27,12 +27,12 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
     // Insert project and related information queries
     $insertProjectQuery = $db->prepare("
-        INSERT INTO project (title, description, weight, publish_date, open_date, due_date)
-        VALUES (:title, '', :weight, :publish, :open, :due)
+        INSERT INTO project (title, description, weight)
+        VALUES (:title, '', :weight)
     ");
     $insertAssessmentQuery = $db->prepare("
         INSERT INTO assessment (project_id, title, description, publish_date, open_date, due_date, weight, sequence)
-        VALUES (:projectId, :title, '', NULL, NULL, NULL, 0, 1)
+        VALUES (:projectId, :title, '', :publish, :open, :due, :weight, 1)
     ");
     $insertProjectRelationQuery = $db->prepare("
         INSERT INTO project_course_unit_instance (project_id, course_unit_instance_id)
@@ -138,9 +138,6 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $insertProjectQuery->execute([
                 'title'   => $title,
                 'weight'  => intval($weight),
-                'publish' => $publishDate,
-                'open'    => $openDate,
-                'due'     => $dueDate,
             ]);
             $projectId = $db->lastInsertId();
             $log->debug('Created project');
@@ -150,7 +147,14 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $log->debug('Created project/course instance relation');
 
             // Create assessment
-            $insertAssessmentQuery->execute(['projectId' => $projectId, 'title' => $title]);
+            $insertAssessmentQuery->execute([
+                'projectId' => $projectId,
+                'title'     => $title,
+                'weight'    => intval($weight),
+                'publish'   => $publishDate,
+                'open'      => $openDate,
+                'due'       => $dueDate,
+            ]);
             $assessmentId = $db->lastInsertId();
             $log->debug('Created assessment/project relation');
 
