@@ -49,9 +49,8 @@
             $(config.element)
                 .stop()
                 .text(config.text)
-                .removeClass('alert success hide')
-                .addClass(config.css)
-                .css({opacity:1});
+                .removeClass('alert success')
+                .addClass('highlight pop');
         }
     }
 
@@ -79,7 +78,7 @@
 
                 /* Duration to display the message element
                  */
-                duration: 1000,
+                duration: 2000,
 
                 /* Duration of the fade effect for the message
                  * element to go away
@@ -123,13 +122,10 @@
 
             setTimeout(
                 function() {
-                    $(config.element).stop().animate({opacity: 0}, config.fadeDuration, function() {
-                        $(config.element)
-                            .addClass('hide')
-                            .removeClass(config.css)
-                            .addClass(config.initialCss)
-                            .trigger('hide.labelTimeout');
-                    });
+                    $(config.element)
+                        .addClass(config.initialCss)
+                        .removeClass('pop')
+                        .trigger('labelTimeout');
                 },
                 config.duration
             )

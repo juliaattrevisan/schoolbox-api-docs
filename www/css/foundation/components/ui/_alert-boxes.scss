@@ -53,10 +53,10 @@ $alert-tint-amount: 90%;
 
 $alert-default-background: darken($body-bg, 10%);
 
-.alert-box {
+.alert-box,
+.toast{
     background-color: $alert-default-background;
     color: calc-text-color($alert-default-background, tint($alert-default-background, $alert-tint-amount), darken($alert-default-background, $alert-tint-amount));
-    text-align: center;
 
     .close {
         &:hover {
@@ -85,7 +85,35 @@ $alert-default-background: darken($body-bg, 10%);
     }
 }
 
-.alert-box:empty {
+.alert-box:empty,
+.toast:empty{
     display: none;
+}
+
+/* Toast pop-up alert
+*/
+.toast{
+    @include alert();
+    text-align: center;
+    font-size: $base-font-size;
+    position: fixed;
+    bottom: -60px;
+    padding-left: 260px;
+    margin-bottom: 0;
+    width: 100%;
+    left: 0;
+    @include transition(bottom, .3s, ease-in-out, 0s);
+    &.pop{
+        bottom: 0;
+    }
+    .close {
+        @include alert-close();
+        &:hover {
+            text-decoration: none;
+        }
+        color: inherit;
+        margin: 0;
+        line-height: .8;
+    }
 }
 
