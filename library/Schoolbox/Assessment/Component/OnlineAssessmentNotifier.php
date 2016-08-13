@@ -423,7 +423,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
 		$href = "/assess/intro/$quizId";
 
-		$when = self::UPCOMING_WINDOW . " hour" . self::UPCOMING_WINDOW == 1 ? '' : 's';
+		$when = self::UPCOMING_WINDOW . " hour" . ( self::UPCOMING_WINDOW == 1 ? '' : 's' );
 		$msg = new Message(":quizname is due in $when in :catname", $icon, $href);
 
 		$unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
