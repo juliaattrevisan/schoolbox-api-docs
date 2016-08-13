@@ -118,7 +118,8 @@ function renderStudent(
     $splitSubjects = \Config::get('mysubjects_split');
     $teacherRoles  = $groupHandler->getStaffGroupTypeIds();
     foreach ($synUserHandler->getSubjectList($user['synergy_id'], $user['uid']) as $subject) {
-        $group = $splitSubjects ? $subject['classType'] : 'Subject';
+        $group = $splitSubjects && $subject['classType'] ? $subject['classType'] : 'Classes';
+
         // Load a bunch of category and teacher info too
         try {
             $subject['folder'] = $folderMapper->findByCode($subject['code']);
