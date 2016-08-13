@@ -40,16 +40,13 @@ try {
     }
     $viewer = $user;
 
-    $back = ConfigMapper::getInstance()->get('calendar_export_start');
-    $forward = ConfigMapper::getInstance()->get('calendar_export_end');
-    $timetable_forward = ConfigMapper::getInstance()->get('timetable_export_end');
+    $back = (int)ConfigMapper::getInstance()->get('calendar_export_start');
+    $forward = (int)ConfigMapper::getInstance()->get('calendar_export_end');
+    $timetable_forward = (int)ConfigMapper::getInstance()->get('timetable_export_end');
 
-    if (!is_int($back)) $back = 1;
-    if (!is_int($forward)) $forward = 12;
-    if (!is_int($timetable_forward)) $timetable_forward = 3;
-    $back = abs($back);
-    $forward = abs($forward);
-    $timetable_forward = abs($timetable_forward);
+    $back = $back ? abs($back) : 1;
+    $forward = $forward ? abs($forward) : 12;
+    $timetable_forward = $timetable_forward ? abs($timetable_forward) : 3;
 
     // Default start and end times
     $start = strtotime("-{$back} months", $_SERVER['REQUEST_TIME']);
