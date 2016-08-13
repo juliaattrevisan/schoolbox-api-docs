@@ -10,8 +10,10 @@
 
 require_once __DIR__ . '/../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Etherpad Sync');
-$logger  = new Alaress\Lumberjack\Logger(STDOUT, null, Monolog\Logger::INFO, [], isset($options['porcelain']));
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Etherpad Sync', array('level'=>200) );
+$logger = $kernel->logger();
+
+
 
 /* Load the pad from our db to get its groupId
  * Error out if you can't find it
@@ -29,8 +31,6 @@ $logger->info(sprintf("Commencing etherpad sync, processing %d pads", count($all
 
 foreach($allPads as $currentPad) {
 	$getTextResult = $client->getHTML($currentPad->getPadId());
-
-    var_dump($getTextResult);
 
 	if ($getTextResult->getMessage() == 'ok') {
 		$data = $getTextResult->getData();
