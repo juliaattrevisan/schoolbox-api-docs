@@ -453,12 +453,12 @@ class FileMapper extends Mapper
             return array();
         }
         $query = "
-            SELECT ss.box_id, COUNT(*) as submission_count
+            SELECT ss.box_id, COUNT(DISTINCT submitted) as submission_count
             FROM {$this->getTable()} ss
             WHERE ss.owner = :user_id
             AND ss.box_id IN {$this->getArrayPlaceholders($box_ids, 'sb')}
             AND ss.draft IS FALSE
-            GROUP BY ss.box_id
+            GROUP BY ss.box_id 
         ";
         $statement = $this->database->prepare($query);
         $params = $this->getArrayParameters($box_ids, 'sb');
