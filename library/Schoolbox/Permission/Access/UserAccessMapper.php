@@ -242,9 +242,6 @@ class UserAccessMapper extends Mapper
     }
 
 
-
-
-
     /**
     * @param FolderModel $folder
     * @param string $roleType
