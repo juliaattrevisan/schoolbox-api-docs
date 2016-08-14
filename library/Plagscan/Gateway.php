@@ -111,8 +111,12 @@ class Plagscan_Gateway
         $this->createRequest($parameterList, array($documentParameter));
 
         $response = $this->parseXmlResponse($this->response);
-
-        return (string)$response->PID;
+        if($response instanceof SimpleXMLElement) {
+            return (string)$response->PID;
+        }
+        else {
+            return null;
+        }
     }
 
     /**
