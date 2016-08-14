@@ -208,6 +208,16 @@ class UserAccessMapper extends Mapper
         return $this->findUsersInCategory($folder, Role::STAFF, UserAccess::ACCESS_READ, $includeSynergy);
     }
 
+    /**
+     * Returns a list of users who are most likely to be teachers in this folder
+     *
+     * @param FolderModel $folder
+     * @return Collection|User[]
+     */
+    public function findTeachersInCategory($folder)
+    {
+        return $this->findUsersInCategory($folder, Role::STAFF, $accessType = UserAccess::ACCESS_WRITE, true);
+    }
 
     /**
     * @param FolderModel $folder
@@ -230,6 +240,9 @@ class UserAccessMapper extends Mapper
         //TODO role type should be optional
         return $this->findUsersInCategory($folder, Role::STAFF, $accessType = UserAccess::ACCESS_FULL, false);
     }
+
+
+
 
 
     /**

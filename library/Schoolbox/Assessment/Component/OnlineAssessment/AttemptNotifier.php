@@ -162,7 +162,7 @@ class AttemptNotifier extends AbstractModuleNotifier {
 			->setHref($href)
 			->addTopic("assess.$assessId.attempted");
 
-		foreach ($this->userAccessMapper->findStaffInCategory($category) as $teacher) {
+		foreach ($this->userAccessMapper->findTeachersInCategory($category) as $teacher) {
 			$envelope->targetToUser($teacher, $bob->build());
 		}
 
