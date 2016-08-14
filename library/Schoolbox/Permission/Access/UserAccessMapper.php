@@ -216,7 +216,7 @@ class UserAccessMapper extends Mapper
      */
     public function findTeachersInCategory($folder)
     {
-        return $this->findUsersInCategory($folder, Role::STAFF, $accessType = UserAccess::ACCESS_WRITE, true);
+        return $this->findUsersInCategory($folder, Role::STAFF, UserAccess::ACCESS_WRITE, true);
     }
 
     /**
@@ -238,7 +238,7 @@ class UserAccessMapper extends Mapper
     public function findAdminsInCategory($folder)
     {
         //TODO role type should be optional
-        return $this->findUsersInCategory($folder, Role::STAFF, $accessType = UserAccess::ACCESS_FULL, false);
+        return $this->findUsersInCategory($folder, Role::STAFF, UserAccess::ACCESS_FULL, false);
     }
 
 
