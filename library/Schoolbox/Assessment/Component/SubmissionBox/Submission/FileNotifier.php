@@ -239,7 +239,7 @@ class FileNotifier extends AbstractModuleNotifier
             ->addTopic("duework.$boxId.$type");
 
         // send this message to teachers and to write-level group members.
-        foreach ($this->userAccessMapper->findStaffInCategory($cat) as $teacher) {
+        foreach ($this->userAccessMapper->findTeachersInCategory($cat) as $teacher) {
             $envelope->targetToUser($teacher, $bob->build());
         }
 
