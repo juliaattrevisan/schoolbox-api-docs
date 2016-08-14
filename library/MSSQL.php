@@ -346,11 +346,7 @@ class MSSQL {
 		if (!is_array($row)) {
 			return false;
 		}
-		$one = $row[0];
-		if ($this->getConvertEncoding()) {
-			$one = $this->convertEncoding($one);
-		}
-		return $one;
+		return $row[0];
 	}
 
 	/**
@@ -428,7 +424,7 @@ class MSSQL {
 			return false;
 		}
 
-		if ($this->getConvertEncoding() && is_array($return_array)) {
+		if (is_array($return_array)) {
 			$return_array = array_map(array($this, 'convertEncoding'), $return_array);
 		}
 
