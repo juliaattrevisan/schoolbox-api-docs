@@ -390,7 +390,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 			$childName = $student->getFirstname();
 			$childId = $student->getId();
 
-			$msgr->targetToUser($childId, $msg, "assess.$quizId.overdue", Logger::ERROR, array(
+			$msgr->targetToParent($childId, $msg, "assess.$quizId.overdue", Logger::ERROR, array(
 				'child'    => array($childName, "/search/user/$childId"),
 				'quizname' => array($quizName, $href),
 				'catname'  => array($catName, "/homepage/$catId"),
