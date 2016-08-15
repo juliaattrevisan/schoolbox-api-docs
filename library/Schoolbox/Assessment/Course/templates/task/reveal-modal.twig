@@ -129,7 +129,7 @@ $data = {
             </label>
         </div>
         <input type="submit" value="{{ reveal.method | capitalize }}" {% if not reveal.title %}disabled="disabled"{% endif %} />
-        <span class="label full-width hide" data-create-task-indicator></span>
+        <div class="toast" data-alert data-create-task-indicator></div>
     </form>
     {% if not _standalone %}
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
