@@ -100,10 +100,9 @@ $alert-default-background: darken($body-bg, 10%);
     font-size: $base-font-size;
     position: fixed;
     bottom: -60px;
-    padding-left: 260px;
-    margin-bottom: 0;
-    width: 100%;
-    left: 0;
+    margin: 0 10%;
+    left: $off-canvas-width;
+    right: 0;
     @include transition(bottom, .3s, ease-in-out, 0s);
     &.pop{
         bottom: 0;
@@ -116,6 +115,21 @@ $alert-default-background: darken($body-bg, 10%);
         color: inherit;
         margin: 0;
         line-height: .8;
+    }
+}
+
+@media #{$xlarge-up} {
+    .inner-wrap.docking{
+        .toast{
+            right: $off-canvas-width;
+        }
+    }
+}
+
+@media #{$medium-down} {
+    .toast{
+        left: 0;
+        margin: 0;
     }
 }
 
