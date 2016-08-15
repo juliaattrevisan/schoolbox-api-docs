@@ -297,6 +297,53 @@ class AttemptMapper extends Mapper
     }
 
     /**
+     * Gets the number of quizzes that a student attempted for the given subject between the given dates
+     *
+     * @param int $studentId
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
+     * @param int $folderId
+     *
+     * @return int
+     */
+    public function getAttemptCountForStudentInTerm($studentId, $folderId, Alaress_Date_Format $from, Alaress_Date_Format $to)
+    {
+        $parts = [
+            'aa.user_id = :studentId',
+            'a.category_id = :folderId',
+            'a.deleted_at IS NULL',
+            'aa.deleted_at IS NULL'
+        ];
+        $params = [
+            'studentId' => $studentId,
+            'folderId'  => $folderId,
+        ];
+        if(!$from->isNull()){
+            $params['from'] = $from->getDatabaseDate();
+            $parts[] = 'DATE(a.finish) >= :from';
+        }
+        if(!$to->isNull()){
+            $params['to'] = $to->getDatabaseDate();
+            $parts[] = 'DATE(a.finish) <= :to';
+        }
+        $whereClause = implode(' AND ', $parts);
+
+        $query = "
+            SELECT COUNT(*) AS attempts
+            FROM {$this->getTable()} AS aa
+            JOIN assess AS a ON a.assess_id = aa.assess_id
+            WHERE $whereClause
+        ";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($params);
+        if ($row = $statement->fetch()) {
+            return intval($row['attempts']);
+        }
+        return 0;
+    }
+
+    /**
      * Gets all attempts which are are not yet finished, but have expired.
      *
      * @return Attempt[]
