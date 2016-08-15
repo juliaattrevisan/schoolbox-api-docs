@@ -532,7 +532,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 $paths = array(
                     'http://WebDavShareDrive.redeemer.net.au',
                     'http://WebDavMediaDrive.redeemer.net.au',
-                    'http://WebDavHomeStudent.redeemer.net.au'. $_SESSION['username'] . '/'
+                    'http://WebDavHomeStudent.redeemer.net.au/'. $_SESSION['username'] . '/'
                 );
             }
 	} elseif ($site_location == 'accac') {
