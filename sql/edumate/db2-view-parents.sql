@@ -36,16 +36,21 @@ INNER JOIN edumate.contact ON
         OR edumate.contact.contact_id = edumate.view_student_mail_carers.carer2_contact_id
         OR edumate.contact.contact_id = edumate.view_student_mail_carers.carer3_contact_id
         OR edumate.contact.contact_id = edumate.view_student_mail_carers.carer4_contact_id
-INNER JOIN edumate.carer ON edumate.carer.contact_id = edumate.contact.contact_id;
+INNER JOIN edumate.carer ON edumate.carer.contact_id = edumate.contact.contact_id
+;
 
 CREATE OR REPLACE VIEW DB2INST1.SCHOOLBOX_PARENTS AS
 SELECT DISTINCT
 car1.carer_number,
 replace(c1.firstname, '&#039;','''')||CHR(32)||replace(c1.surname, '&#039;','''') AS FULL_NAME,
-replace(c1.email_address, '&#039;','''') AS EMAIL, c1.mobile_phone AS MOBILE,
+replace(c1.email_address, '&#039;','''') AS EMAIL,
+su1.username as USERNAME,
+c1.mobile_phone AS MOBILE,
 car2.carer_number AS SPOUSE_CARER_NUMBER,
 replace(c2.firstname, '&#039;','''')||CHR(32)||replace(c2.surname, '&#039;','''') AS SPOUSE_FULL_NAME,
-replace(c2.email_address, '&#039;','''') AS SPOUSE_EMAIL, c2.mobile_phone AS SPOUSE_MOBILE,
+replace(c2.email_address, '&#039;','''') AS SPOUSE_EMAIL,
+su2.username as SPOUSE_USERNAME,
+c2.mobile_phone AS SPOUSE_MOBILE,
 case
 when c1.email_address like c2.email_address then replace(c1.email_address, '&#039;','''')
 when c1.email_address is null and c2.email_address is null then ''
@@ -60,14 +65,20 @@ INNER JOIN edumate.contact c1 ON c1.contact_id = edumate.view_student_mail_carer
 INNER JOIN edumate.carer car1 ON car1.contact_id = c1.contact_id
 LEFT JOIN edumate.contact c2 ON c2.contact_id = edumate.view_student_mail_carers.carer2_contact_id
 LEFT JOIN edumate.carer car2 ON car2.contact_id = c2.contact_id
+LEFT JOIN sys_user su1 ON su1.contact_id = c1.contact_id
+LEFT JOIN sys_user su2 ON su2.contact_id = c2.contact_id
 UNION
 SELECT DISTINCT
 car1.carer_number,
 replace(c1.firstname, '&#039;','''')||CHR(32)||replace(c1.surname, '&#039;','''') AS FULL_NAME,
-replace(c1.email_address, '&#039;','''') AS EMAIL, c1.mobile_phone AS MOBILE,
+replace(c1.email_address, '&#039;','''') AS EMAIL,
+su1.username as USERNAME,
+c1.mobile_phone AS MOBILE,
 car2.carer_number AS SPOUSE_CARER_NUMBER,
 replace(c2.firstname, '&#039;','''')||CHR(32)||replace(c2.surname, '&#039;','''') AS SPOUSE_FULL_NAME,
-replace(c2.email_address, '&#039;','''') AS SPOUSE_EMAIL, c2.mobile_phone AS SPOUSE_MOBILE,
+replace(c2.email_address, '&#039;','''') AS SPOUSE_EMAIL,
+su2.username as SPOUSE_USERNAME,
+c2.mobile_phone AS SPOUSE_MOBILE,
 case when c1.email_address like c2.email_address then replace(c1.email_address, '&#039;','''')
 when c1.email_address is null and c2.email_address is null then ''
 when c1.email_address is not null and c2.email_address is null then replace(c1.email_address, '&#039;','''')
@@ -91,3 +102,6 @@ INNER JOIN edumate.contact c1 ON c1.contact_id = edumate.view_student_mail_carer
 INNER JOIN edumate.carer car1 ON car1.contact_id = c1.contact_id
 LEFT JOIN edumate.contact c2 ON c2.contact_id = edumate.view_student_mail_carers.carer2_contact_id
 LEFT JOIN edumate.carer car2 ON car2.contact_id = c2.contact_id;
+LEFT JOIN sys_user su1 ON su1.contact_id = c1.contact_id
+LEFT JOIN sys_user su2 ON su2.contact_id = c2.contact_id
+;
