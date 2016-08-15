@@ -516,23 +516,23 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
 
         } elseif ($site_location == 'rlc') {
             $settings = array(
-                'baseUri' => 'http://WebDavShareDrive.rlc.qld.edu.au',
+                'baseUri' => 'http://WebDavShareDrive.redeemer.net.au',
                 'userName' => 'redeemer/'.$_SESSION['username'],
                 'password' => $_SESSION['password'],
             );
 
             if ($groupHandler->isStaff()) {
                 $paths = array(
-                    'http://WebDavShareDrive.rlc.qld.edu.au/',
-                    'http://WebDavMediaDrive.rlc.qld.edu.au/',
-                    'http://WebDavHomeStaff.rlc.qld.edu.au/'.$_SESSION['username'].'/',
-                    'http://WebDavHomeStudent.rlc.qld.edu.au'
+                    'http://WebDavShareDrive.redeemer.net.au/',
+                    'http://WebDavMediaDrive.redeemer.net.au/',
+                    'http://WebDavHomeStaff.redeemer.net.au/'.$_SESSION['username'].'/',
+                    'http://WebDavHomeStudent.redeemer.net.au'
                 );
             } elseif ($groupHandler->isStudent()) {
                 $paths = array(
-                    'http://WebDavShareDrive.rlc.qld.edu.au',
-                    'http://WebDavMediaDrive.rlc.qld.edu.au',
-                    'http://WebDavHomeStudent.rlc.qld.edu.au'. $_SESSION['username'] . '/'
+                    'http://WebDavShareDrive.redeemer.net.au',
+                    'http://WebDavMediaDrive.redeemer.net.au',
+                    'http://WebDavHomeStudent.redeemer.net.au/'. $_SESSION['username'] . '/'
                 );
             }
 	} elseif ($site_location == 'accac') {
