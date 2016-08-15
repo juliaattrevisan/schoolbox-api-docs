@@ -38,8 +38,10 @@
                 <div data-effect-fragment="{{ currentEffect.id }}">
                     {% include allEffectStructures.fragments[currentEffect.id].fragment.getFilename() %}
                 </div>
-                <div id='effect-{{ currentEffect.id }}-fragment-status' data-alert class="toast">Loading</div>
-                <div id='effect-{{ currentEffect.id }}-status' data-alert data-label-status class="toast { meta.effect[currentEffect.id].status ? '' : 'hide' }}">{{ meta.effect[currentEffect.id].status }}</div>
+                <div class="small-12 columns">
+                    <span id='effect-{{ currentEffect.id }}-fragment-status' class="label highlight full-width hide">Loading</span>
+                    <span id='effect-{{ currentEffect.id }}-status' data-label-status class="label highlight full-width {{ meta.effect[currentEffect.id].status ? '' : 'hide' }}">{{ meta.effect[currentEffect.id].status }}</span>
+                </div>
             </div>
         </div>
     </div>
