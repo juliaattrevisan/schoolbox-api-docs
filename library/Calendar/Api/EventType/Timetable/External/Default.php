@@ -105,10 +105,20 @@ class Calendar_Api_EventType_Timetable_External_Default extends Calendar_Api_Eve
 
                             $event = new Event();
                             $event->setEventId(md5($key));
-                            $event->setAllday(false);
+
+                            if ($startTime && $endTime) {
+                                // Set the start and end time
+                                $event->setStartTime(new Alaress_Date_Format($startTime, 'U'));
+                                $event->setEndTime(new Alaress_Date_Format($endTime, 'U'));
+                                $event->setAllday(false);
+                            } else {
+                                // No start and end time - show this as an all day event
+                                $event->setStartTime(new Alaress_Date_Format($currentDate, 'Y-m-d'));
+                                $event->setEndTime(new Alaress_Date_Format($currentDate, 'Y-m-d'));
+                                $event->setAllday(true);
+                            }
+
                             $event->setLocation($period['room']);
-                            $event->setStartTime(new Alaress_Date_Format($startTime, 'U'));
-                            $event->setEndTime(new Alaress_Date_Format($endTime, 'U'));
                             $event->setPublishDate(null);
                             $event->setTitle(sprintf('%s (%s)', $period['description'], $code));
                             $event->setCampusList($campusId);

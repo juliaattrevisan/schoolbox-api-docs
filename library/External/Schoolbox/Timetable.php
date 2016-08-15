@@ -62,7 +62,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         if ($single_day) {
             $query .= ' AND tp.day = :day ';
         }
-        $query .= " ORDER BY tp.start";
+        $query .= " ORDER BY tp.sequence";
         return $this->getDatabase()->prepare($query);
     }
 
@@ -155,8 +155,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
         foreach ($periodList as $period) {
             $periodSequence = $period['sequence'];
 
-            $startTime = new Alaress_Date_Format($period['start'], Alaress_Date_Format::DATABASE_TIME_FORMAT);
-            $endTime = new Alaress_Date_Format($period['finish'], Alaress_Date_Format::DATABASE_TIME_FORMAT);
+            $startTime = $period['state'] ? new Alaress_Date_Format($period['start'], Alaress_Date_Format::DATABASE_TIME_FORMAT) : new Alaress_Date_NullDate();
+            $endTime = $period['finish'] ? new Alaress_Date_Format($period['finish'], Alaress_Date_Format::DATABASE_TIME_FORMAT) : new Alaress_Date_NullDate();
 
             if (!isset($periodListAdaption[$periodSequence])) {
                 $periodListAdaption[$periodSequence] = array(
@@ -220,8 +220,8 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
         foreach ($periodList as $period) {
 
-            $startTime = new Alaress_Date_Format($period['start'], Alaress_Date_Format::DATABASE_TIME_FORMAT);
-            $endTime = new Alaress_Date_Format($period['finish'], Alaress_Date_Format::DATABASE_TIME_FORMAT);
+            $startTime = $period['state'] ? new Alaress_Date_Format($period['start'], Alaress_Date_Format::DATABASE_TIME_FORMAT) : new Alaress_Date_NullDate();
+            $endTime = $period['finish'] ? new Alaress_Date_Format($period['finish'], Alaress_Date_Format::DATABASE_TIME_FORMAT) : new Alaress_Date_NullDate();
 
             $periodAdaption = array(
                 'periodNumber'   => $period['sequence'],
