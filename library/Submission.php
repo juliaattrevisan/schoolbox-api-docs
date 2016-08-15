@@ -483,7 +483,7 @@ class Submission extends DeprecatedModel implements \Schoolbox\IHomepageCleanabl
                 GROUP BY folder.id
                 ORDER BY folder.name";
 
-        return $this->db->getAll($sql);
+        return $this->db->getAll($sql) ?: [];
 
     }
 
