@@ -9,10 +9,10 @@
  * @link      http://www.alaress.com.au/
  */
 
+use Alaress\Lumberjack\CompositeLoggerInterface;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
-use Schoolbox\Notif\StoredisLogger;
 use Schoolbox\Sync\Provisioner\Provisioner;
 
 $options = getopt("vr:", array('perform-update'));
@@ -53,7 +53,7 @@ $kernel->run(
         // define the redis key we'll use for this run
         $di->values['ups.redisKey'] = INSTANCE_ID . '.provision.user.' . getmypid();
 
-        /** @var StoredisLogger $logger */
+        /** @var CompositeLoggerInterface $logger */
         $logger = $di->get('ups.logger');
 
         // append the CLI logger to the main logger

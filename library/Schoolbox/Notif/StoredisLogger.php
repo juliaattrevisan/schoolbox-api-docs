@@ -10,6 +10,7 @@
 namespace Schoolbox\Notif;
 
 
+use Alaress\Lumberjack\CompositeLoggerInterface;
 use Alaress_Date_Format as Date;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\JsonFormatter;
@@ -27,7 +28,7 @@ use Schoolbox\File;
  *
  * @package Schoolbox\Notif
  */
-class StoredisLogger implements CacheableLoggerInterface
+class StoredisLogger implements CacheableLoggerInterface, CompositeLoggerInterface
 {
 
     /** @var Predis\Client */
