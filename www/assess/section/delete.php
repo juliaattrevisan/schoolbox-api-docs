@@ -69,5 +69,5 @@ $sectionHandler->resequenceSectionsAfterDelete($section['assess_id']);
 
 $return_url = $_GET["return_url"] != '' ? "?return_url={$_GET["return_url"]}" : "";
 
-SitePage::localRedir('/assess/modify/' . $section['assess_id'] . $return_url);
+SitePage::localRedir('/assess/summary/' . $section['assess_id'] . $return_url);
 

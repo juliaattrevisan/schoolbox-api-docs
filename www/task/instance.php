@@ -28,7 +28,7 @@ if ($action === 'modify') {
         $task_type = 'task';
     }
     elseif ($task_type_id === Task::TYPE_ONLINE_ASSESS) {
-        $this->localRedir('/assess/modify/'.$task_instance->getAssessment()->getId().$return_url);
+        $this->localRedir('/assess/summary/'.$task_instance->getAssessment()->getId().$return_url);
     }
     elseif ($task_type_id === Task::TYPE_DUE_WORK) {
         $this->localRedir('/submission/createSubmission/modify/'.$task_instance->getSubmissionBox()->getId().$return_url);

@@ -62,4 +62,4 @@ if ($is_task) {
     Task\InstanceMapper::getInstance()->save($task_instance);
 }
 
-SitePage::localRedir('/assess/modify/' . $import->getAssessId());
+SitePage::localRedir('/assess/summary/' . $import->getAssessId());

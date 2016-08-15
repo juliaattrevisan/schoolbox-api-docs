@@ -24,4 +24,4 @@ if ($_FILES['importXML']['tmp_name']) {
 $import = new Assess_Import_Xml($this->arg[0], new Survey_Main(), new Survey_Section(), new Survey_Factory(), $data, $this);
 $import->import();
 
-SitePage::localRedir('/survey/modify/' . $import->getAssessId());
+SitePage::localRedir('/survey/summary/' . $import->getAssessId());
