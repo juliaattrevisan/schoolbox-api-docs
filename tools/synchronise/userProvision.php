@@ -9,12 +9,10 @@
  * @link      http://www.alaress.com.au/
  */
 
-use Alaress\Redis;
 use Aura\Di;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
 use Schoolbox\Notif\StoredisLogger;
-use Schoolbox\Sync\Log;
 use Schoolbox\Sync\Provisioner\Provisioner;
 
 $options = getopt("vr:", array('perform-update'));

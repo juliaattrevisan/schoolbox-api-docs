@@ -10,13 +10,10 @@ namespace Schoolbox\Import;
 use Alaress\Csv\Reader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\External\Importer;
-use Schoolbox\Mapper;
 use Schoolbox\Notif\CacheableLoggerInterface;
-use Schoolbox\Notif\StoredisLogger;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage;
-use Schoolbox\Sync\Log;
 use Psr\Log\LoggerInterface;
 
 /**
