@@ -52,12 +52,18 @@ class Controller extends Base
         }
 
         $query = "
-            SELECT StudentReportsArchiveLinkSeq, FileYear, FileSemester, Description
+            SELECT StudentReportsArchiveLinkSeq, sral.FileYear, sral.FileSemester, Description
             FROM SynergyOneMedia.dbo.StudentReportsArchive sra
             JOIN SynergyOneMedia.dbo.StudentReportsArchiveLink sral ON sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
-            WHERE ID = {$student->getExternalId()}
-            AND FileYear > 2013
-            ORDER BY FileYear DESC, FileSemester DESC, CreatedDate DESC";
+            INNER JOIN SynergyOne.dbo.studentyears sy ON sy.id = sral.ID AND sy.fileyear = sral.FileYear
+            LEFT OUTER JOIN SynergyOne.dbo.uluStudentReports ulusr
+            ON sral.fileyear = ulusr.fileyear AMD sral.FileSemester = ulusr.FileSemester AND sy.YearLevel = ulusr.YearLevel
+            AMD sy.StudentCampus =ulusr.Campus
+            WHERE
+            sral.ID = {$student->getExternalId()} AND
+            ulusr.ShowOnOLE =1
+            ORDER BY sral.FileYear DESC, sral.FileSemester DESC, sra.CreatedDate DESC
+            ";
 
         $resultIterator = $this->getDatabase()->getIterator($query);
 
