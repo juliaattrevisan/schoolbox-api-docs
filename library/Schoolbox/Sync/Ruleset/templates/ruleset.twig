@@ -14,7 +14,7 @@ set upsConfig = {
 %}
 
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
-<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.toast-timeout.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.retry-promise.js"></script>
 <script type="text/javascript" src="/javascript/shared/ups/jquery.ups.js"></script>
 
@@ -133,7 +133,7 @@ set upsConfig = {
                                 <a class="icon-more" title="Actions" data-dropdown="rule-{{ currentRule.id }}-options"></a>
                             </nav>
                         </div>
-    
+
                         <span id='rule-{{ currentRule.id }}-status' class="label highlight full-width hide"></span>
                     </div>
 
@@ -245,7 +245,7 @@ set upsConfig = {
             {% endif %}
 
             <input type="submit" value="Save All Rules" data-ruleset-save />
-            <span class="label full-width hide" data-relation="response-message"></span>
+            <div class="toast" data-alert data-relation="response-message"></div>
         </div>
 
         <div id="token-list" class="reveal-modal" data-reveal>

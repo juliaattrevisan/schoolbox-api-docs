@@ -114,7 +114,7 @@
                      */
                     var indicator = container.find('[data-save-item]');
 
-                    indicator.labelActivate({
+                    indicator.toastActivate({
                         text: 'Saving'
                     });
 
@@ -132,7 +132,7 @@
                             container.find('[data-action]').attr('data-action', newItem.update);
                             element.attr('data-item-original-value', newData);
 
-                            indicator.labelTimeout({
+                            indicator.toastTimeout({
                                 text: 'Saved',
                                 css: 'success'
                             });
@@ -145,7 +145,7 @@
                             }
                         },
                         error: function() {
-                            indicator.labelTimeout({
+                            indicator.toastTimeout({
                                 text: 'Error!',
                                 css: 'alert'
                             });

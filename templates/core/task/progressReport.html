@@ -1,5 +1,5 @@
 <!-- BEGIN custom_head -->
-<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.toast-timeout.js"></script>
 <script type="text/javascript">
     (function($) {
         $(function(){
@@ -8,7 +8,7 @@
                 event.preventDefault()
 
                 var label = $('[data-save-progress-state]');
-                label.labelActivate();
+                label.toastActivate();
 
                 var element = $(this);
                 var form    = element.closest('form');
@@ -33,7 +33,7 @@
                                 break;
                         }
 
-                        label.labelTimeout({
+                        label.toastTimeout({
                             text: 'Saved',
                             css: 'success'
                         });
@@ -151,6 +151,6 @@
             </table>
             <!--[if gte IE 9]> </div><![endif]-->
         </div>
-        <span class="label full-width hide" data-save-progress-state></span>
+        <div class="toast" data-alert data-save-progress-state></div>
     </div>
 </div>

@@ -1,4 +1,4 @@
-<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.toast-timeout.js"></script>
 <script type="text/javascript" src="/javascript/shared/sportsfixtures/jquery.mightyList.js"></script>
 <script type="text/javascript">
     $(function() {
@@ -44,7 +44,7 @@
                                                 <input type="text" name="name" value="{{ currentStatus.name }}" data-item-original-value="{{ currentStatus.name }}" data-item-element />
                                             </label>
 
-                                            <span class="label full-width hide" data-save-item></span>
+                                            <div class="toast" data-alert data-save-item></div>
                                         </div>
                                     </fieldset>
                                 </section>
@@ -76,7 +76,7 @@
                                 <input type="text" name="name" value="" data-item-original-value="" data-item-element />
                             </label>
 
-                            <span class="label full-width hide" data-save-item></span>
+                            <div class="toast" data-alert data-save-item></div>
                         </div>
                     </fieldset>
                 </section>

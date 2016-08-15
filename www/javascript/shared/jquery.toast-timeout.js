@@ -7,7 +7,7 @@
      *
      * @param options
      */
-    $.fn.labelActivate = function(options) {
+    $.fn.toastActivate = function(options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -27,11 +27,7 @@
 
                 /* Initial text to display
                  */
-                text: 'Updating...please wait',
-
-                /* The style at the end of labelActivate
-                 */
-                css: 'highlight'
+                text: 'Updating...please wait'
             }
 
             var derived = {
@@ -49,9 +45,8 @@
             $(config.element)
                 .stop()
                 .text(config.text)
-                .removeClass('alert success hide')
-                .addClass(config.css)
-                .css({opacity:1});
+                .removeClass('alert success')
+                .addClass('pop');
         }
     }
 
@@ -59,7 +54,7 @@
      * Fades out a label.
      * This occurs within an ajax success/error callback
      */
-    $.fn.labelTimeout = function(options) {
+    $.fn.toastTimeout = function(options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -79,7 +74,7 @@
 
                 /* Duration to display the message element
                  */
-                duration: 1000,
+                duration: 2000,
 
                 /* Duration of the fade effect for the message
                  * element to go away
@@ -90,11 +85,7 @@
                  */
                 text: 'Updated',
 
-                /* The style at the end of labelActivate
-                 */
-                initialCss: 'highlight',
-
-                /* The style to use after labelActivate
+                /* The style to use after toastActivate
                  */
                 css: 'success'
 
@@ -117,19 +108,15 @@
              */
             $(config.element)
                 .text(config.text)
-                .removeClass(config.initialCss)
                 .addClass(config.css)
                 .stop();
 
             setTimeout(
                 function() {
-                    $(config.element).stop().animate({opacity: 0}, config.fadeDuration, function() {
-                        $(config.element)
-                            .addClass('hide')
-                            .removeClass(config.css)
-                            .addClass(config.initialCss)
-                            .trigger('hide.labelTimeout');
-                    });
+                    $(config.element)
+                        .stop()
+                        .removeClass('pop')
+                        .trigger('toastTimeout');
                 },
                 config.duration
             )

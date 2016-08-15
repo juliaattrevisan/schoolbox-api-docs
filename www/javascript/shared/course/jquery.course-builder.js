@@ -22,13 +22,13 @@
             var formData = form.serializeArray();
             var isNew    = !(form.find('input[name="id"]').val());
             var label    = form.find('[data-create-task-indicator]');
-            label.labelActivate();
+            label.toastActivate();
 
             // Booleans in data get passed as string 'true' or 'false', wtf?
             formData.push({name: 'copy', value: (copy ? 1 : 0)});
             form.find("input[type=submit]").attr('disabled', true);
             $.post(form.attr('action'), formData, function(data) {
-                label.labelTimeout({
+                label.toastTimeout({
                     text: 'Saved',
                     css: 'success'
                 });

@@ -53,7 +53,8 @@ $alert-tint-amount: 90%;
 
 $alert-default-background: darken($body-bg, 10%);
 
-.alert-box {
+.alert-box,
+.toast{
     background-color: $alert-default-background;
     color: calc-text-color($alert-default-background, tint($alert-default-background, $alert-tint-amount), darken($alert-default-background, $alert-tint-amount));
 
@@ -66,6 +67,10 @@ $alert-default-background: darken($body-bg, 10%);
         line-height: .8;
     }
 
+    &.highlight {
+        background-color: $accent-background;
+        color: $accent-foreground;
+    }
     &.success {
         background-color: $success-color;
         color: calc-text-color($success-color, tint($success-color, $alert-tint-amount), darken($success-color, $alert-tint-amount));
@@ -80,7 +85,57 @@ $alert-default-background: darken($body-bg, 10%);
     }
 }
 
-.alert-box:empty {
+.alert-box:empty,
+.toast:empty{
     display: none;
+}
+
+/* Toast pop-up alert
+*/
+.toast{
+    @include alert();
+    background-color: $accent-background;
+    color: $accent-foreground;
+    text-align: center;
+    font-size: $base-font-size;
+    position: fixed;
+    bottom: -60px;
+    margin: 0 10%;
+    left: $off-canvas-width;
+    right: 0;
+    z-index: 100;
+    @include transition(bottom, .3s, ease-in-out, 0s);
+    &.pop{
+        bottom: 0;
+    }
+    .close {
+        @include alert-close();
+        &:hover {
+            text-decoration: none;
+        }
+        color: inherit;
+        margin: 0;
+        line-height: .8;
+    }
+}
+
+/* Adjust toast width depending if
+*  notifications shown
+*/
+@media #{$xlarge-up} {
+    .inner-wrap.docking{
+        .toast{
+            right: $off-canvas-width;
+        }
+    }
+}
+
+/* Full width toast on smaller devices
+*/
+@media #{$medium-down} {
+    .toast{
+        left: 0;
+        margin: 0;
+    }
 }
 

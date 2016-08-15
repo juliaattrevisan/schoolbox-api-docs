@@ -164,14 +164,14 @@
 
                         var label = $form.find('[data-relation="response-message"]');
 
-                        label.labelActivate({
+                        label.toastActivate({
                             text: 'Preparing to save'
                         });
 
                         $form
                             .ajaxForm({url: config.submitUrl})
                             .on('done.ajaxForm', function() {
-                                label.labelTimeout({
+                                label.toastTimeout({
                                     text: 'Saved',
                                     css: 'success'
                                 });
@@ -185,7 +185,7 @@
                                 }
                             })
                             .on('fail.ajaxForm', function() {
-                                label.labelTimeout({
+                                label.toastTimeout({
                                     text: 'Error',
                                     css: 'alert'
                                 });
@@ -323,7 +323,7 @@
 
                     var label = $('[data-identifier="'+indicator+'"]');
                     label.text('Saved').css({opacity:1}).removeClass('hide');
-                    label.labelTimeout({duration: 3000});
+                    label.toastTimeout({duration: 3000});
                 });
             });
         }
@@ -384,7 +384,7 @@
                 var identifier = self.attr('name') + '-weight';
                 var label = $('[data-identifier="'+identifier+'"]');
 
-                label.labelActivate({
+                label.toastActivate({
                     text: 'Preparing to save'
                 });
 
@@ -414,13 +414,13 @@
 
                         /* Animate label feedback
                          */
-                        label.labelTimeout({
+                        label.toastTimeout({
                             text: 'Saved',
                             css: 'success'
                         });
                     })
                     .on('fail.ajaxForm', function() {
-                        label.labelTimeout({
+                        label.toastTimeout({
                             text: 'Value failed to save',
                             css: 'alert'
                         });

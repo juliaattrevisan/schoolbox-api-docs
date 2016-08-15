@@ -1,5 +1,5 @@
 {# I need some way of adding custom_head #}
-<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.toast-timeout.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.confirm-dialog.js"></script>
 <script type="text/javascript" src="/javascript/shared/tiles/jquery.tile-resize.js"></script>
 <script type="text/javascript" src="/javascript/shared/attacher.hide-watch.js"></script>
@@ -138,13 +138,13 @@
             items:  '> li:not(.add)',
             stop: function(event, ui) {
                 // save this form
-                reorderFeedback.labelActivate({text: 'Saving order...'});
+                reorderFeedback.toastActivate({text: 'Saving order...'});
                 $.post(form.attr('action'), form.serializeArray())
                     .done(function() {
-                        reorderFeedback.labelTimeout({text: 'Saved!', 'css': 'success'});
+                        reorderFeedback.toastTimeout({text: 'Saved!', 'css': 'success'});
                     })
                     .fail(function() {
-                        reorderFeedback.labelTimeout({text: 'Save Failed!', 'css': 'alert'});
+                        reorderFeedback.toastTimeout({text: 'Save Failed!', 'css': 'alert'});
                     })
             }
         });
@@ -161,17 +161,17 @@
                 confirmEvent: function() {
                     // Add some sort of deleting animation
                     deletedTile.addClass('marked-for-delete');
-                    reorderFeedback.labelActivate({text: 'Deleting...', 'css': 'alert'});
+                    reorderFeedback.toastActivate({text: 'Deleting...', 'css': 'alert'});
                     // Send delete request
                     $.post(element.attr('href'))
                         .done(function() {
-                            reorderFeedback.labelTimeout({text: 'Deleted!'});
+                            reorderFeedback.toastTimeout({text: 'Deleted!'});
                             deletedTile.fadeOut('slow', function() {
                                 deletedTile.remove();
                             })
                         })
                         .fail(function() {
-                            reorderFeedback.labelTimeout({text: 'Delete Failed!', 'css': 'alert'});
+                            reorderFeedback.toastTimeout({text: 'Delete Failed!', 'css': 'alert'});
                             deletedTile.removeClass('marked-for-delete');
                         })
                 }
@@ -318,7 +318,7 @@
                     </legend>
                     <div class="row">
                         <div class="small-12 columns">
-                            <span class="label full-width hide" data-relation="save-label"></span>
+                            <div class="toast" data-alert data-relation="save-label"></div>
                             {% include '@tile/sub/tileList.twig' with {
                                 layout:   item,
                                 tileList: item.tileList,

@@ -166,7 +166,7 @@
 
                 var label = form.find('[data-create-task-indicator]');
 
-                label.labelActivate();
+                label.toastActivate();
 
                 // Is this a new form?
                 var is_new = !(form.find('input[name="id"]').val());
@@ -174,7 +174,7 @@
                 $(this).find("input[type=submit]").attr('disabled', true);
 
                 $.post(form.attr('action'), form.serialize(), function(data) {
-                    label.labelTimeout({
+                    label.toastTimeout({
                         text: 'Saved',
                         css: 'success'
                     });

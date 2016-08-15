@@ -55,7 +55,7 @@
             $(config.activator).click(function(event) {
                 event.preventDefault();
 
-                $(config.label).labelActivate({
+                $(config.label).toastActivate({
                     text: 'Preparing Showcase'
                 });
 
@@ -66,7 +66,7 @@
                     url: config.element.attr('action'),
                     data: config.element.serialize(), // serializes the form's elements.
                     success: function(data) {
-                        $(config.label).labelTimeout({
+                        $(config.label).toastTimeout({
                             text: 'Showcase Updated'
                         });
                     }
