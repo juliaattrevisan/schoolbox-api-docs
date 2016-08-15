@@ -592,7 +592,7 @@ class Marksheet
                         'WORK_ID'           => $item['id'],
                         'WORK_STAT_VALUE'   => is_numeric($value) ? (float)round($value, 3) : $value,
                         // truncate to 3 decimals, then strip extraneous 0s
-                        'ASSESS_MODIFY_URL' => $item['object'] instanceof OnlineAssessment ? '/assess/summary/' . $item['id'] : '/submission/submissionForm.php?id=' . $item['id'],
+                        'ASSESS_MODIFY_URL' => $item['object'] instanceof OnlineAssessment ? '/assess/modify/' . $item['id'] : '/submission/submissionForm.php?id=' . $item['id'],
                     )
                 );
 
