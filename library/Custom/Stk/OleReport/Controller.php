@@ -57,8 +57,8 @@ class Controller extends Base
             JOIN SynergyOneMedia.dbo.StudentReportsArchiveLink sral ON sra.StudentReportsArchiveSeq = sral.StudentReportsArchiveSeq
             INNER JOIN SynergyOne.dbo.studentyears sy ON sy.id = sral.ID AND sy.fileyear = sral.FileYear
             LEFT OUTER JOIN SynergyOne.dbo.uluStudentReports ulusr
-            ON sral.fileyear = ulusr.fileyear AMD sral.FileSemester = ulusr.FileSemester AND sy.YearLevel = ulusr.YearLevel
-            AMD sy.StudentCampus =ulusr.Campus
+            ON sral.fileyear = ulusr.fileyear AND sral.FileSemester = ulusr.FileSemester AND sy.YearLevel = ulusr.YearLevel
+            AND sy.StudentCampus =ulusr.Campus
             WHERE
             sral.ID = {$student->getExternalId()} AND
             ulusr.ShowOnOLE =1
