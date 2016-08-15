@@ -90,8 +90,9 @@ a[disabled], a.disabled {
 .splash {
 	display: block;
 	position: absolute;
-	background-color: calc-button-color($content-ui-hover);
+	background-color: $content-ui-foreground;
 	border-radius: 100%;
+	opacity: 0.5;
 	@include transform (scale(0));
 }
 
@@ -156,6 +157,10 @@ input[type="submit"]{
  */
 a.submit {
 	@extend input[type="submit"];
+
+	.splash {
+		background-color: $submit-button-color;
+	}
 }
 
 /* Flex List Action Buttons

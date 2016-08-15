@@ -90,6 +90,9 @@
     }
 }
 
+.component-palette [data-component-palette] {
+    transition: all 0.2s;
+}
 
 [data-component-palette]{
     background-color: $white;
