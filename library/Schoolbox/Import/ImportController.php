@@ -11,6 +11,7 @@ use Alaress\Csv\Reader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\External\Importer;
 use Schoolbox\Mapper;
+use Schoolbox\Notif\CacheableLoggerInterface;
 use Schoolbox\Notif\StoredisLogger;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -151,7 +152,7 @@ class ImportController extends Base
     /**
      * Builds a logger for use in the importer.
      *
-     * @return StoredisLogger eventually will return a more generic logger
+     * @return CacheableLoggerInterface
      * @throws \Aura\Di\Exception\ServiceNotFound if the logger wasn't found?
      */
     protected function buildLogger()
@@ -204,7 +205,7 @@ class ImportController extends Base
     /**
      * Parses lines out of the logger.
      *
-     * @param  StoredisLogger $logger
+     * @param  CacheableLoggerInterface $logger
      * @return array
      */
     protected function parseLogLines($logger)
