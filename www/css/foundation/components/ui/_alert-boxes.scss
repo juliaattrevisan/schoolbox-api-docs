@@ -118,6 +118,9 @@ $alert-default-background: darken($body-bg, 10%);
     }
 }
 
+/* Adjust toast width depending if
+*  notifications shown
+*/
 @media #{$xlarge-up} {
     .inner-wrap.docking{
         .toast{
@@ -126,6 +129,8 @@ $alert-default-background: darken($body-bg, 10%);
     }
 }
 
+/* Full width toast on smaller devices
+*/
 @media #{$medium-down} {
     .toast{
         left: 0;
