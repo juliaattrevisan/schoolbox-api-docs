@@ -85,7 +85,7 @@ class Javascript extends Base
                 ),
                 'custom' => array(
                     'modifyLink' => $this->getEvent()->getIsAssessment()
-                        ? ('/assess/modify/' . $this->getEvent()->getEventId())
+                        ? ('/assess/summary/' . $this->getEvent()->getEventId())
                         : ('/submission/createSubmission/modify/' . $this->getEvent()->getEventId()),
                     'moreDetailsLink' => $this->getEvent()->getIsAssessment()
                         ? ($this->getUser()->getId() === $this->getViewer()->getId() ? '/assess/intro/'.$this->getEvent()->getEventId() : '')

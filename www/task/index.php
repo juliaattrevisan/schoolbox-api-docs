@@ -47,7 +47,7 @@ elseif ($action === 'modify') {
     // Set the template type.
     // If an assess or due work task, redirect to those edit pages.
     if ($task_type_id === Task::TYPE_ONLINE_ASSESS) {
-        $this->localRedir('/assess/modify/'.$task->getAssessment()->getId() . $return_url);
+        $this->localRedir('/assess/summary/'.$task->getAssessment()->getId() . $return_url);
     }
     elseif ($task_type_id === Task::TYPE_DUE_WORK) {
         $this->localRedir('/submission/createSubmission/modify/'.$task->getSubmissionBox()->getId() . $return_url);
