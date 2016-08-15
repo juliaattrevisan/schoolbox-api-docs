@@ -266,12 +266,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     {
         // If we are inheriting permissions delete any previously created group perms
         if ($model->getInherit()) {
-            $this->getGroupMapper()->deleteByColumn("cid", $model->getId());
-        }
-
-        // if no codes populated, no need to do anything
-        if (!$model->getCodes()->count()) {
-            return true;
+            $this->getGroupMapper()->deleteByColumn('cid', $model->getId());
         }
 
         // first drop the previous code(s) connected to this category
@@ -282,19 +277,22 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         } catch (\Exception $e) {
         }
 
-        // bind the given codes to this category
-        foreach ($model->getCodes() as $code) {
-            $code->setFolder($model);
+        // if no codes populated or inheriting, no need to do anything
+        if ($model->getCodes()->count() && !$model->getInherit()) {
+            // bind the given codes to this category
+            foreach ($model->getCodes() as $code) {
+                $code->setFolder($model);
+            }
+
+            // persist the Code objects
+            Code\Mapper::getInstance()->save($model->getCodes());
+
+            // remove any mutes that might exist on this subject (classes are not allowed to be muted)
+            RerouteOverrideMapper::getInstance()->deleteByColumnList([
+                'delivery'      => RoutePermission::MUTE,
+                'msg_route_key' => "service.1.{$model->getId()}"
+            ]);
         }
-
-        // persist the Code objects
-        Code\Mapper::getInstance()->save($model->getCodes());
-
-        // remove any mutes that might exist on this subject (classes are not allowed to be muted)
-        RerouteOverrideMapper::getInstance()->deleteByColumnList([
-            'delivery'      => RoutePermission::MUTE,
-            'msg_route_key' => "service.1.{$model->getId()}"
-        ]);
 
         return true;
     }
