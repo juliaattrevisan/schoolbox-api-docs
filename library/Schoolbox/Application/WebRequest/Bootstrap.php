@@ -457,11 +457,9 @@ class Bootstrap implements BootstrapInterface {
 		// TODO unify this definition and the one in Daemon\Bootstrap
 		$di->set('ups.logger',
 			$di->lazyNew(
-				\Schoolbox\Notif\StoredisLogger::class,
+				\Schoolbox\Notif\StorefileLogger::class,
 				[
-					'redisClient' => $di->lazy(function () { return Redis::getClientInstance(); }),
-					'redisKey'    => $di->lazyValue('ups.redisKey'),
-					'receiver'    => $di->lazyNew(\Schoolbox\Resource\Storage\Mapper::class),
+					'receiver' => $di->lazyNew(\Schoolbox\Resource\Storage\Mapper::class),
 				]
 			)
 		);
