@@ -27,11 +27,7 @@
 
                 /* Initial text to display
                  */
-                text: 'Updating...please wait',
-
-                /* The style at the end of toastActivate
-                 */
-                css: 'highlight'
+                text: 'Updating...please wait'
             }
 
             var derived = {
@@ -50,7 +46,7 @@
                 .stop()
                 .text(config.text)
                 .removeClass('alert success')
-                .addClass('highlight pop');
+                .addClass('pop');
         }
     }
 
@@ -89,10 +85,6 @@
                  */
                 text: 'Updated',
 
-                /* The style at the end of toastActivate
-                 */
-                initialCss: 'highlight',
-
                 /* The style to use after toastActivate
                  */
                 css: 'success'
@@ -116,14 +108,12 @@
              */
             $(config.element)
                 .text(config.text)
-                .removeClass(config.initialCss)
                 .addClass(config.css)
                 .stop();
 
             setTimeout(
                 function() {
                     $(config.element)
-                        .addClass(config.initialCss)
                         .removeClass('pop')
                         .trigger('toastTimeout');
                 },
