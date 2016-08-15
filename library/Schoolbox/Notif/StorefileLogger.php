@@ -55,14 +55,14 @@ class StorefileLogger implements CacheableLoggerInterface
         Storage\Receiver $receiver,
         FormatterInterface $formatter = null
     ) {
-        $file = tempnam(sys_get_temp_dir(), '');
-        if (!$file) {
+        $this->file = tempnam(sys_get_temp_dir(), 'sb-storefile-');
+        if (!$this->file) {
             throw new \RuntimeException('Temp file could not be created!');
         }
 
         $this->receiver = $receiver;
 
-        $handler = new StreamHandler($file);
+        $handler = new StreamHandler($this->file);
 
         // default to JSON formatting
         if (!$formatter) {
@@ -111,7 +111,7 @@ class StorefileLogger implements CacheableLoggerInterface
         }
 
         // save the tempfile to storage (will throw a File\Exception if it fails)
-        $storage = $this->receiver->acceptStream($basename, $this->file, false);
+        $storage = $this->receiver->accept($basename, $this->file, false);
 
         // Remove the stream
         unlink($this->file);
