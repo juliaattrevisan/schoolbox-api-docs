@@ -4,6 +4,8 @@
 @mixin button-dimensions() {
     min-height: $global-button-height;
     padding: $global-button-padding;
+	position: relative;
+	overflow: hidden;
 }
 
 a[disabled], a.disabled {
@@ -84,6 +86,28 @@ a[disabled], a.disabled {
 	}
 }
 
+/* Splash effect when clicking buttons
+*/
+.splash {
+	display: block;
+	position: absolute;
+	background-color: $content-ui-foreground;
+	border-radius: 100%;
+	opacity: 0.5;
+	@include transform (scale(0));
+}
+
+/* On.click animation effect on buttons
+*/
+.splash.animate {
+	@include animation (ripple 0.3s linear);
+}
+	@keyframes ripple {
+		/* Scale 200% to safely cover the entire button and fade it out
+		 */
+		100% { opacity: 0; @include transform (scale(2)); }
+}
+
 /* Arbitrary <button> element
  */
 button {
@@ -134,6 +158,10 @@ input[type="submit"]{
  */
 a.submit {
 	@extend input[type="submit"];
+
+	.splash {
+		background-color: $submit-button-color;
+	}
 }
 
 /* Flex List Action Buttons

@@ -80,6 +80,26 @@
         $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
             $(this).css({'top': $(window).scrollTop() + modalTop + 'px'});
         });
+
+        var splash, d, x, y;
+        $(".button, button, .sub-nav a, .tabs a, .pagination a, .flex-list a, [data-component-palette]").click(function(e){
+            if($(this).find(".splash").length === 0){
+                $(this).prepend("<span class='splash'></span>");
+            }
+
+            splash = $(this).find(".splash");
+            splash.removeClass("animate");
+
+            if(!splash.height() && !splash.width()){
+                d = Math.max($(this).outerWidth(), $(this).outerHeight());
+                splash.css({height: d, width: d});
+            }
+
+            x = e.pageX - $(this).offset().left - splash.width()/2;
+            y = e.pageY - $(this).offset().top - splash.height()/2;
+
+            splash.css({top: y+'px', left: x+'px'}).addClass("animate");
+        });
     });
 
     // Date formats (global variable)
