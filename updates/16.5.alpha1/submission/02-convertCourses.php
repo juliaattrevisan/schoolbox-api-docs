@@ -42,8 +42,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $selectOldUnitsQuery = $database->prepare("
         SELECT DISTINCT
             `folder`.`id`,
-            `folder`.`name`,
-            `folder`.`parent`
+            `folder`.`name`
         FROM `folder`
         LEFT JOIN folder AS course ON `folder`.parent = course.id
         RIGHT JOIN component_instance ci ON ci.identifier = `folder`.id AND ci.module = 'homepage'
