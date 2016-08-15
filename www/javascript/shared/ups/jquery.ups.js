@@ -157,7 +157,7 @@
                 var $rule = $submit.closest('[data-rule]');
                 var $label = $rule.find('[data-relation="response-message"]');
 
-                $label.labelActivate({
+                $label.toastActivate({
                     text: 'Saving...'
                 });
 
@@ -167,13 +167,13 @@
                         $rule.find(config.validInputTypes).attr('disabled', false);
                         $rule.find('option').removeAttr('disabled');
                         $rule.find('option').not('[value]').prop('disabled',true);
-                        $label.labelTimeout({
+                        $label.toastTimeout({
                             text: 'Saved',
                             css: 'success'
                         });
                     })
                     .fail(function( jqXHR, textStatus, errorThrown){
-                        $label.labelTimeout({
+                        $label.toastTimeout({
                             text: 'Error',
                             css: 'alert'
                         });
@@ -199,7 +199,7 @@
                 var $rules = $(config.element).find('[data-rule]');
                 var $label = $(config.element).find('[data-relation="response-message"]').last();
 
-                $label.labelActivate({
+                $label.toastActivate({
                     text: 'Saving...'
                 });
 
@@ -208,13 +208,13 @@
                         $(config.element).find(config.validInputTypes).attr('disabled', false);
                         $(config.element).find('option').removeAttr('disabled');
                         $(config.element).find('option').not('[value]').prop('disabled',true);
-                        $label.labelTimeout({
+                        $label.toastTimeout({
                             text: 'Saved',
                             css: 'success'
                         });
                     })
                     .fail(function( jqXHR, textStatus, errorThrown){
-                        $label.labelTimeout({
+                        $label.toastTimeout({
                             text: 'Error',
                             css: 'alert'
                         });
@@ -326,7 +326,7 @@
 
                         /* Activate indicator label
                          */
-                        label.labelActivate();
+                        label.toastActivate();
 
                         /* Delete asynchronously if successful; ignore if unsuccessful
                          */
@@ -342,7 +342,7 @@
 
                                 /* Show that something failed
                                  */
-                                label.labelTimeout({
+                                label.toastTimeout({
                                     text: config.rule.delete.fail,
                                     css: 'alert'
                                 });
@@ -456,7 +456,7 @@
 
                         /* Activate indicator label
                          */
-                        label.labelActivate();
+                        label.toastActivate();
 
                         /* Unsaved Conditions can be removed without needing the indicator
                          * as these don't require backend confirmation
@@ -485,7 +485,7 @@
 
                                     /* Show that something failed
                                      */
-                                    label.labelTimeout({
+                                    label.toastTimeout({
                                         text: config.condition.delete.fail,
                                         css: 'alert'
                                     });
@@ -644,14 +644,14 @@
 
                 var label = $('#effect-' + effectId + '-fragment-status');
 
-                label.labelActivate();
+                label.toastActivate();
 
                 /* Inject fragment into Effect container
                  */
                 $.get(config.effect.change.url, data, function(responseText) {
                     $('[data-effect-fragment='+effectId+']').html(responseText);
 
-                    label.labelTimeout({
+                    label.toastTimeout({
                         text: 'Ready',
                     });
                 });
@@ -675,7 +675,7 @@
 
                         /* Activate indicator label
                          */
-                        label.labelActivate();
+                        label.toastActivate();
 
                         /* Unsaved Effects can be removed without needing the indicator
                          * as these don't require backend confirmation
@@ -702,7 +702,7 @@
 
                                     /* Show that something failed
                                      */
-                                    label.labelTimeout({
+                                    label.toastTimeout({
                                         text: config.effect.delete.fail,
                                         css: 'alert'
                                     });
@@ -925,12 +925,12 @@
                     fetchInProgress = true;
 
                     var label = $('#effect-' + effectId + '-status');
-                    label.labelActivate();
+                    label.toastActivate();
 
                     $.get(config.effect.map.newRowUrl, data, function(responseText) {
                         rowContainer.append(responseText);
 
-                        label.labelTimeout({
+                        label.toastTimeout({
                             text: 'Ready'
                         });
                     }).always(function () {

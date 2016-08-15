@@ -51,7 +51,7 @@
 		saveForms(questions)
 			.fail(function() {
 				saving.removeClass('loader');
-				label.labelActivate({text: 'Progress Save Failed!', css: 'alert'});
+				label.toastActivate({text: 'Progress Save Failed!', css: 'alert'});
 			})
 			.done(function() {
 				var errors = false;
@@ -105,7 +105,7 @@
 				/* Remove loading gif; show success label
 				 */
 				saving.removeClass('loader');
-				label.removeClass('hide').labelTimeout({text: 'Progress Saved'});
+				label.removeClass('hide').toastTimeout({text: 'Progress Saved'});
 					//.find('[data-evaluation-progress-saved]').removeClass('hide');
 
 				/* Detect errors, prevent redirection if any were made

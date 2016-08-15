@@ -139,7 +139,7 @@
 
                         /* Activate indicators
                          */
-                        toFeedback.labelActivate({text: 'Adding to team...'});
+                        toFeedback.toastActivate({text: 'Adding to team...'});
 
                         /* Execute db transaction - ajax call here
                          */
@@ -172,15 +172,15 @@
 
                                 /* Activate indicators
                                  */
-                                fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
-                                toFeedback.labelTimeout({text: 'Added!', css: 'success'});
+                                fromFeedback.toastTimeout({text: 'Removed!', css: 'success'});
+                                toFeedback.toastTimeout({text: 'Added!', css: 'success'});
 
                                 /* Reapply filter settings to division player list
                                  */
                                 applyPlayerFilter();
                             })
                             .fail(function() {
-                                toFeedback.labelTimeout({text: 'Add failed!', css: 'alert'});
+                                toFeedback.toastTimeout({text: 'Add failed!', css: 'alert'});
                                 player.remove();
                             });
                     }
@@ -196,8 +196,8 @@
 
                         /* Activate indicators
                          */
-                        fromFeedback.labelActivate({text: 'Removing from team...'});
-                        toFeedback.labelActivate({text: 'Adding to team...'});
+                        fromFeedback.toastActivate({text: 'Removing from team...'});
+                        toFeedback.toastActivate({text: 'Adding to team...'});
 
                         /* Execute db transaction - ajax call here
                          */
@@ -242,15 +242,15 @@
 
                                 /* Activate indicators
                                  */
-                                fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
-                                toFeedback.labelTimeout({text: 'Added!', css: 'success'});
+                                fromFeedback.toastTimeout({text: 'Removed!', css: 'success'});
+                                toFeedback.toastTimeout({text: 'Added!', css: 'success'});
 
                                 /* Reapply filter settings to division player list
                                  */
                                 applyPlayerFilter();
                             })
                             .fail(function() {
-                                toFeedback.labelTimeout({text: 'Add failed!', css: 'alert'});
+                                toFeedback.toastTimeout({text: 'Add failed!', css: 'alert'});
                                 player.remove();
                             });
                     }
@@ -269,7 +269,7 @@
 
                         /* Activate indicators
                          */
-                        fromFeedback.labelActivate({text: 'Removing from team...'});
+                        fromFeedback.toastActivate({text: 'Removing from team...'});
 
                         /* Execute db transaction - ajax call here
                          */
@@ -295,14 +295,14 @@
 
                                 /* Activate indicators
                                  */
-                                fromFeedback.labelTimeout({text: 'Removed!', css: 'success'});
+                                fromFeedback.toastTimeout({text: 'Removed!', css: 'success'});
 
                                 /* Reapply filter settings to division player list
                                  */
                                 applyPlayerFilter();
                             })
                             .fail(function() {
-                                fromFeedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
+                                fromFeedback.toastTimeout({text: 'Remove failed!', css: 'alert'});
                             });
                     }
                 }
@@ -362,7 +362,7 @@
                 var el       = $(this);
 
                 var feedback = findIndicator(el.parents('[data-division-player-list]'));
-                feedback.labelActivate({text: 'Adding to team...'});
+                feedback.toastActivate({text: 'Adding to team...'});
 
                 $.post(el.attr('href'), [{name: 'userId[]', value: el.data('addTeamPlayer')}])
                     .done(function(response) {
@@ -370,14 +370,14 @@
                         updateDivisionLobby(response.divisionLobby);
                     })
                     .done(function() {
-                        feedback.labelTimeout({text: 'Added!', css: 'success'});
+                        feedback.toastTimeout({text: 'Added!', css: 'success'});
 
                         /* Reapply filter settings to division player list
                          */
                         applyPlayerFilter();
                     })
                     .fail(function() {
-                        feedback.labelTimeout({text: 'Add failed!', css: 'alert'});
+                        feedback.toastTimeout({text: 'Add failed!', css: 'alert'});
                     });
             });
         }
@@ -393,7 +393,7 @@
                     text: 'Are you sure you wish to remove this player from this team?',
                     confirmEvent: function(el) {
                         var feedback = findIndicator(el.parents('[data-team-player-list]'));
-                        feedback.labelActivate({text: 'Removing from team...'});
+                        feedback.toastActivate({text: 'Removing from team...'});
 
                         $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removeTeamPlayer')}])
                             .done(function(response) {
@@ -401,14 +401,14 @@
                                 updateDivisionLobby(response.divisionLobby);
                             })
                             .done(function() {
-                                feedback.labelTimeout({text: 'Removed!', css: 'success'});
+                                feedback.toastTimeout({text: 'Removed!', css: 'success'});
 
                                 /* Reapply filter settings to division player list
                                  */
                                 applyPlayerFilter();
                             })
                             .fail(function() {
-                                feedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
+                                feedback.toastTimeout({text: 'Remove failed!', css: 'alert'});
                             });
                     }
                 });
@@ -427,7 +427,7 @@
                     text: 'Are you sure you wish to remove this player from this division, and all teams within this division?',
                     confirmEvent: function(el) {
                         var feedback = findIndicator(el.parents('[data-division-player-list]'));
-                        feedback.labelActivate({text: 'Removing from division...'});
+                        feedback.toastActivate({text: 'Removing from division...'});
 
                         $.post(el.attr('href'), [{name: 'userId[]', value: el.data('removePlayer')}])
                             .done(function(response) {
@@ -440,14 +440,14 @@
                                 $('[data-division-player-list], [data-team-player-list]').find('[data-player='+playerId+']').remove();
                             })
                             .done(function() {
-                                feedback.labelTimeout({text: 'Removed!', css: 'success'});
+                                feedback.toastTimeout({text: 'Removed!', css: 'success'});
 
                                 /* Reapply filter settings to division player list
                                  */
                                 applyPlayerFilter();
                             })
                             .fail(function() {
-                                feedback.labelTimeout({text: 'Remove failed!', css: 'alert'});
+                                feedback.toastTimeout({text: 'Remove failed!', css: 'alert'});
                             });
                     }
                 });

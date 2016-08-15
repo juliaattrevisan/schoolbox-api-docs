@@ -7,7 +7,7 @@
      *
      * @param options
      */
-    $.fn.labelActivate = function(options) {
+    $.fn.toastActivate = function(options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -29,7 +29,7 @@
                  */
                 text: 'Updating...please wait',
 
-                /* The style at the end of labelActivate
+                /* The style at the end of toastActivate
                  */
                 css: 'highlight'
             }
@@ -58,7 +58,7 @@
      * Fades out a label.
      * This occurs within an ajax success/error callback
      */
-    $.fn.labelTimeout = function(options) {
+    $.fn.toastTimeout = function(options) {
         options = options || {};
 
         var config = init(options, $(this));
@@ -89,11 +89,11 @@
                  */
                 text: 'Updated',
 
-                /* The style at the end of labelActivate
+                /* The style at the end of toastActivate
                  */
                 initialCss: 'highlight',
 
-                /* The style to use after labelActivate
+                /* The style to use after toastActivate
                  */
                 css: 'success'
 
@@ -125,7 +125,7 @@
                     $(config.element)
                         .addClass(config.initialCss)
                         .removeClass('pop')
-                        .trigger('labelTimeout');
+                        .trigger('toastTimeout');
                 },
                 config.duration
             )

@@ -2,7 +2,7 @@
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
 <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
-<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.toast-timeout.js"></script>
 <script type="text/javascript">
     $(function() {
 
@@ -50,7 +50,7 @@
             formContents.push({name: 'save_draft', value: '1'})
             formContents.push({name: 'body',       value: CKEDITOR.instances['editor-body'].getData()})
 
-            formSaveLabel.labelActivate({
+            formSaveLabel.toastActivate({
                 text: 'Autosaving'
             });
 
@@ -64,13 +64,13 @@
 
                 },
                 success: function() {
-                    formSaveLabel.labelTimeout({
+                    formSaveLabel.toastTimeout({
                         text: 'Draft Saved',
                         css: 'success'
                     });
                 },
                 error: function() {
-                    formSaveLabel.labelTimeout({
+                    formSaveLabel.toastTimeout({
                         text: 'Error!',
                         css: 'alert'
                     });

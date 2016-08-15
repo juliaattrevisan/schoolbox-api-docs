@@ -64,7 +64,7 @@
 
         // attach listeners if
         var saveLabel = $(this.options.saveLabelSelector);
-        var useLabel  = saveLabel.length && saveLabel.labelActivate && saveLabel.labelTimeout;
+        var useLabel  = saveLabel.length && saveLabel.toastActivate && saveLabel.toastTimeout;
         $(this.element)
             .on('click', this.options.columnSelectorSelector, function (event) {
                 // Don't allow deselect of the only column selected
@@ -99,8 +99,8 @@
                 });
                 mspec.loadColorpickerColors();
                 if (useLabel) {
-                    saveLabel.labelActivate(labelParams);
-                    saveLabel.labelTimeout(labelParams);
+                    saveLabel.toastActivate(labelParams);
+                    saveLabel.toastTimeout(labelParams);
                 }
             })
             .on('click', this.options.saveBtnSelector, function (event) {
@@ -121,18 +121,18 @@
 
                 var ajaxRequest = $.post(opt.url, data, opt.complete);
                 if (useLabel) {
-                    saveLabel.labelActivate({
+                    saveLabel.toastActivate({
                         text: 'Saving...'
                     });
                     ajaxRequest
                         .done(function() {
-                            saveLabel.labelTimeout({
+                            saveLabel.toastTimeout({
                                 text: 'Columns Saved',
                                 css: 'success'
                             });
                         })
                         .fail(function() {
-                            saveLabel.labelTimeout({
+                            saveLabel.toastTimeout({
                                 text: 'Error!',
                                 css: 'alert'
                             });
