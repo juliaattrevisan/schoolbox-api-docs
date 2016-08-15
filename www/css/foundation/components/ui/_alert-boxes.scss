@@ -94,6 +94,8 @@ $alert-default-background: darken($body-bg, 10%);
 */
 .toast{
     @include alert();
+    background-color: $accent-background;
+    color: $accent-foreground;
     text-align: center;
     font-size: $base-font-size;
     position: fixed;

@@ -10,6 +10,6 @@
                 preselected: currentCondition.arguments[0]
             } %}
         </div>
-        <div id='condition-{{ currentCondition.id }}-status' class="toast highlight {{ meta.condition[currentCondition.id].status ? '' : 'hide' }}" data-alert>{{ meta.condition[currentCondition.id].status }}</div>
+        <div id='condition-{{ currentCondition.id }}-status' class="toast {{ meta.condition[currentCondition.id].status ? '' : 'hide' }}" data-alert>{{ meta.condition[currentCondition.id].status }}</div>
     </div>
 </div>
