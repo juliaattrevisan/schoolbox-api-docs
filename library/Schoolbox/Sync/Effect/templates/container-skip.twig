@@ -13,11 +13,7 @@
                 <input type="hidden" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][userProperty]" value="" />
             </div>
 
-            <div>
-                <div class="small-12 columns">
-                    <span id='effect-{{ currentEffect.id }}-status' class="label highlight full-width {{ meta.effect[currentEffect.id].status ? '' : 'hide' }}">{{ meta.effect[currentEffect.id].status }}</span>
-                </div>
-            </div>
+            <div id='effect-{{ currentEffect.id }}-status' class="toast highlight {{ meta.effect[currentEffect.id].status ? '' : 'hide' }}" data-alert>{{ meta.effect[currentEffect.id].status }}</div>
         </div>
     </div>
     <nav>
