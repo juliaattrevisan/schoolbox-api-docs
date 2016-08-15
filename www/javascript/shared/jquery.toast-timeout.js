@@ -114,6 +114,7 @@
             setTimeout(
                 function() {
                     $(config.element)
+                        .stop()
                         .removeClass('pop')
                         .trigger('toastTimeout');
                 },

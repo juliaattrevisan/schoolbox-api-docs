@@ -94,8 +94,6 @@ $alert-default-background: darken($body-bg, 10%);
 */
 .toast{
     @include alert();
-    background-color: $accent-background;
-    color: $accent-foreground;
     text-align: center;
     font-size: $base-font-size;
     position: fixed;
@@ -103,6 +101,7 @@ $alert-default-background: darken($body-bg, 10%);
     margin: 0 10%;
     left: $off-canvas-width;
     right: 0;
+    z-index: 100;
     @include transition(bottom, .3s, ease-in-out, 0s);
     &.pop{
         bottom: 0;
