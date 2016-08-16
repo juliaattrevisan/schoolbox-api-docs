@@ -37,8 +37,8 @@ class Average implements ISummator
             /* Exclude null values from average
              */
             foreach ($allAssessables as $currentAssessable) {
-                if ($currentAssessable->getMark() !== null) {
-                    $sum += $currentAssessable->getMark();
+                if ($currentAssessable->calculateMark() !== null) {
+                    $sum += $currentAssessable->calculateMark();
                     $numItems++;
                 }
             }

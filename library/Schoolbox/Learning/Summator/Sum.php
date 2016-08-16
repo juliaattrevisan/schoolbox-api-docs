@@ -28,8 +28,8 @@ class Sum implements ISummator
         $sum = null;
 
         foreach ($allAssessables as $currentAssessable) {
-            if ($currentAssessable->getMark() !== null) {
-                $sum += $currentAssessable->getMark();
+            if ($currentAssessable->calculateMark() !== null) {
+                $sum += $currentAssessable->calculateMark();
             }
         }
 

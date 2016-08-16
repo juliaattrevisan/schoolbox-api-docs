@@ -33,11 +33,11 @@ class Minimum implements ISummator
         /* Accommodate a set of negative values
          */
         if ($allAssessables->count()) {
-            $min = $allAssessables->first()->getMark();
+            $min = $allAssessables->first()->calculateMark();
 
             foreach ($allAssessables as $currentAssessable) {
-                if (($currentAssessable->getMark() < $min) && ($currentAssessable->getMark() !== null)) {
-                    $min = $currentAssessable->getMark();
+                if (($currentAssessable->calculateMark() < $min) && ($currentAssessable->calculateMark() !== null)) {
+                    $min = $currentAssessable->calculateMark();
                 }
             }
         }

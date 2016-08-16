@@ -40,7 +40,7 @@ class Project extends AbstractModel implements IAssessable
     }
 
     /**
-     * Calculate the final mark for this assessable
+     * Calculate the final mark for this IAssessable
      *
      * Projects use Summator strategies to determine final marks
      * for a Collection of Assessable instances

@@ -33,11 +33,11 @@ class Maximum implements ISummator
         /* Accommodate a set of negative values
          */
         if ($allAssessables->count()) {
-            $max = $allAssessables->first()->getMark();
+            $max = $allAssessables->first()->calculateMark();
 
             foreach ($allAssessables as $currentAssessable) {
-                if (($currentAssessable->getMark() > $max) && ($currentAssessable->getMark() !== null)) {
-                    $max = $currentAssessable->getMark();
+                if (($currentAssessable->calculateMark() > $max) && ($currentAssessable->calculateMark() !== null)) {
+                    $max = $currentAssessable->calculateMark();
                 }
             }
         }

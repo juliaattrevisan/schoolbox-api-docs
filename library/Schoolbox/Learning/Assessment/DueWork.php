@@ -28,7 +28,7 @@ class DueWork extends AbstractModel implements IAssessable
     }
 
     /**
-     * Calculate the final mark for this assessable
+     * Calculate the final mark for this IAssessable
      */
     public function calculateMark()
     {
