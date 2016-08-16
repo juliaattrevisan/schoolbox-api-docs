@@ -8,7 +8,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Schoolbox\Learning\Assessment\Quiz\Review;
+namespace Schoolbox\Learning\Assessment\Quiz\Feedback;
 
 use \Schoolbox\Learning\Assessment\IFeedback;
 
