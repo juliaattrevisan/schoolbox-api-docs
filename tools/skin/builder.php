@@ -5,11 +5,12 @@
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
 
-require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
+require_once __DIR__ . '/../../conf/core/require.php';
+spl_autoload_call('Schoolbox\\Application\\Daemon');
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Skin Builder', array('level'=>200));
+$logger = $kernel->logger();
+pcntl_signal(SIGCHLD, SIG_DFL);
 
-use Alaress\Lumberjack\Logger;
-
-$logger = new Logger();
 
 define('SKIN_FILE', dirname(__FILE__) .'/../../www/css/foundation/utils/_skin.scss');
 define('CUSTOM_CSS_FILE', dirname(__FILE__) .'/../../www/css/foundation/utils/_custom.scss');

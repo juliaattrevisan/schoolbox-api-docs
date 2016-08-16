@@ -6,14 +6,14 @@
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
-require_once __DIR__ . '/../../library/Bootstrap.php';
-
-
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
 use Crocodoc\Document;
-use Alaress\Lumberjack\Logger;
 
-$logger = new Logger;
+require_once __DIR__ . '/../../conf/core/require.php';
+spl_autoload_call('Schoolbox\\Application\\Daemon');
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Crocodoc Uploader', array('level'=>200));
+$logger = $kernel->logger();
+
 if(Config::get('crocodoc_api_token')) {
 
     $pendingUpload = FileMapper::getInstance()->getCrocodoc();

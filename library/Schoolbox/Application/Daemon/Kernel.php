@@ -68,7 +68,10 @@ class Kernel extends \Alaress\Application\Kernel {
      */
     protected function setOpts($opts) {
         $this->opts = $opts;
-        $this->opts['level'] = $this->getLoggingLevel();
+        // If level not set, logging level determined by verbose
+        if(!isset($this->opts['level'])) {
+            $this->opts['level'] = $this->getLoggingLevel();
+        }
     }
 
 	/**
@@ -293,6 +296,9 @@ EOL;
 
 
     /**
+     * Determine logging level via verbose setting
+     * verbose is set by -vvv.  Each v represents a value in an array.
+     * So -v is level 1, -vv is level 2, -vvv is level 3
      * @return int
      */
     public function getLoggingLevel() {
@@ -312,7 +318,6 @@ EOL;
             2 => 200, // mod verbosity: most things
             3 => 100  // max verbosity: EV-ER-Y-THING...
         );
-
         return $limits[$threshold];
     }
 

@@ -9,12 +9,13 @@
  *
  */
 
-require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
-
-use Alaress\Lumberjack\Logger;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper;
 
-$log = new Logger;
+require_once __DIR__ . '/../../conf/core/require.php';
+spl_autoload_call('Schoolbox\\Application\\Daemon');
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', array('level'=>200));
+$log = $kernel->logger();
+
 $mapper = Plagscan_DocumentMapper::getInstance();
 $docs   = $mapper->findByColumn('status', Plagscan_Document::STATUS_UNSCANNABLE);
 

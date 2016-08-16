@@ -11,14 +11,13 @@
  * @idea_stolen_from Matt Day <matt.day@alaress.com.au>
  */
 
-require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
-
-use Alaress\Lumberjack\Logger;
+require_once __DIR__ . '/../../conf/core/require.php';
+spl_autoload_call('Schoolbox\\Application\\Daemon');
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Plagscan Scanner', array('level'=>200));
+$log = $kernel->logger();
 
 $opts = getopt('', ['re-retrieve']);
 $reRetrieveMode = isset($opts['re-retrieve']);
-
-$log = new Logger();
 
 //
 // Hit the Plagscan API for each document.
