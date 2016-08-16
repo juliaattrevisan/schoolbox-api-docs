@@ -1,0 +1,195 @@
+<?php
+
+/* Ram this into your www/test.php to have a crack
+ */
+require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
+
+use \Schoolbox\Learning\Assessment\Project;
+use \Schoolbox\Learning\Summator;
+
+use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+
+use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
+
+use \Schoolbox\Learning\Assessment\Task\Model as Task;
+use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
+
+/* First (marked)
+ */
+$feedback1 = new DueWorkFeedback();
+$feedback1
+    ->setMark(-3)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new DueWorkSubmission();
+$response
+    ->getAllFeedback()
+    ->add($feedback1);
+
+$dueWork1 = new DueWork();
+$dueWork1
+    ->setTitle('My First Due Work')
+    ->getAllResponses()
+    ->add($response);
+
+
+/* Second (marked)
+ */
+$feedback1 = new DueWorkFeedback();
+$feedback1
+    ->setMark(999999)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-05 17:01:11', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-05 17:01:11', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$feedback2 = new DueWorkFeedback();
+$feedback2
+    ->setMark(25)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-05 18:01:11', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-05 18:01:11', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new DueWorkSubmission();
+$response
+    ->getAllFeedback()
+    ->add($feedback1)
+    ->add($feedback2);
+
+$dueWork2 = new DueWork();
+$dueWork2
+    ->setTitle('My Second Due Work')
+    ->getAllResponses()
+    ->add($response);
+
+
+/* Third (unmarked)
+ */
+$feedback = new DueWorkFeedback();
+$feedback
+    ->setMark(null)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-23 08:29:45', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-24 22:58:59', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new DueWorkSubmission();
+$response
+    ->getAllFeedback()
+    ->add($feedback);
+
+$dueWork3 = new DueWork();
+$dueWork3
+    ->setTitle('My Third Due Work')
+    ->getAllResponses()
+    ->add($response);
+
+
+/* Fourth (marked)
+ * Note that the array structure is is the Mark given
+ * per Quiz Response that the student made - don't get
+ * it confused with the new Assessable Response!!!
+ */
+$feedback1 = new QuizReview();
+$feedback1
+    ->setAllResponses([
+        [
+            'mark' => 3 // Question 1
+        ],
+        [
+            'mark' => 2 // Question 2
+        ],
+        [
+            'mark' => 2 // Question 3
+        ],
+        [
+            'mark' => 1 // Question 4
+        ]
+    ])
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-03 09:13:31', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-23 21:47:56', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$feedback2 = new QuizReview();
+$feedback2
+    ->setAllResponses([
+        [
+            'mark' => 5 // Question 1
+        ],
+        [
+            'mark' => 4 // Question 2
+        ],
+        [
+            'mark' => 5 // Question 3
+        ],
+        [
+            'mark' => 5 // Question 4
+        ]
+    ])
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-04 12:11:21', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-24 20:41:16', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new QuizAttempt();
+$response
+    ->getAllFeedback()
+    ->add($feedback1)
+    ->add($feedback2);
+
+$quiz1 = new Quiz();
+$quiz1->setTitle('Quiz of the Century')
+    ->getAllResponses()
+    ->add($response);
+
+
+/* Fifth (marked)
+ */
+$feedback = new TaskFeedback();
+$feedback
+    ->setCompletedByStudent(true)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new TaskCompletion();
+$response
+    ->getAllFeedback()
+    ->add($feedback);
+
+$task1 = new Task();
+$task1
+    ->setTitle('Task Manager')
+    ->getAllResponses()
+    ->add($response);
+
+
+// Assessment Summary by hand
+//
+// -3 + 25 + 19 [5,4,5,5] + Completed
+//
+// => 41/3 = 13.67 (Average)
+// => 25 (Maximum)
+// => -3 (Minimum)
+// => 41 (Sum)
+//
+// 4/5 things marked, or completed
+
+
+/* Summators
+ */
+$allSummators = [
+    new Summator\Average(),
+    new Summator\Maximum(),
+    new Summator\Minimum(),
+    new Summator\Sum()
+];
+
+foreach ($allSummators as $currentSummator) {
+    $project = new Project($currentSummator);
+    $project->getAssessables()
+        ->add($dueWork1)
+        ->add($dueWork2)
+        ->add($dueWork3)
+        ->add($quiz1)
+        ->add($task1);
+
+    new \Alaress_Probe(get_class($currentSummator), $project->calculateMark(), $project->calculatePercentageMarked());
+}
