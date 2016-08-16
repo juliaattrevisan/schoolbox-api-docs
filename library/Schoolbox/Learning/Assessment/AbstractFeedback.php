@@ -19,6 +19,39 @@ class AbstractFeedback implements IFeedback
      */
     protected $mark;
 
+    /**
+     * @var \Alaress_Date_Format
+     */
+    protected $createdAt;
+
+    /**
+     * @var \Alaress_Date_Format
+     */
+    protected $updatedAt;
+
+    /**
+     * @var \Alaress_Date_Format
+     */
+    protected $deletedAt;
+
+    /**
+     * Calculate the final mark for this IAssessable
+     */
+    public function calculateMark()
+    {
+        return $this->getMark();
+    }
+
+    /**
+     * This IAssessable has a mark value of null
+     *
+     * @return bool
+     */
+    public function isNullMark()
+    {
+        return $this->calculateMark() === null;
+    }
+
     /* Getters/Setters
      */
 
@@ -39,20 +72,50 @@ class AbstractFeedback implements IFeedback
     }
 
     /**
-     * Calculate the final mark for this IAssessable
+     * @return \Alaress_Date_Format
      */
-    public function calculateMark()
+    public function getCreatedAt()
     {
-        return $this->getMark();
+        return $this->createdAt;
     }
 
     /**
-     * This IAssessable has a mark value of null
-     *
-     * @return bool
+     * @param \Alaress_Date_Format $createdAt
      */
-    public function isNullMark()
+    public function setCreatedAt($createdAt)
     {
-        return $this->calculateMark() === null;
+        $this->createdAt = $createdAt;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param \Alaress_Date_Format $updatedAt
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @param \Alaress_Date_Format $deletedAt
+     */
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
     }
 }

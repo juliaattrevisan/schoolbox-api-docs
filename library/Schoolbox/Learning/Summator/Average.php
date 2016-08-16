@@ -46,6 +46,7 @@ class Average implements ISummator
                     /** @var AbstractFeedback $currentFeedback */
                     foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
                         if (!$currentFeedback->isNullMark()) {
+                            new \Alaress_Probe($currentFeedback->calculateMark());
                         }
                     }
                 }
