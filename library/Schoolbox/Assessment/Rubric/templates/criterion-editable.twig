@@ -35,8 +35,17 @@
     {%- set descriptor = rubric.descriptors[crit.id][levelIndex] -%}
 
     <td class="{{ cellClass }}">
-        <textarea{% if not checkChecked %} disabled="disabled"{% endif %} placeholder="Descriptor" rows="2" name="{{ descInput }}[{{ levelIndex }}][text]">{{ descriptor.text }}</textarea>
-        <input{% if not checkChecked %} disabled="disabled"{% endif %} class="rb-value" type="text" placeholder="Points" value="{{ descriptor.value }}" name="{{ descInput }}[{{ levelIndex }}][points]" />
+        <textarea {% if not checkChecked %} disabled="disabled"{% endif %}
+                data-descriptor="text"
+                placeholder="Descriptor"
+                rows="2"
+                name="{{ descInput }}[{{ levelIndex }}][text]">{{ descriptor.text }}</textarea>
+        <input {% if not checkChecked %} disabled="disabled"{% endif %}
+                data-descriptor="value"
+                class="rb-value"
+                type="text"
+                placeholder="Points"
+                value="{{ descriptor.value }}" name="{{ descInput }}[{{ levelIndex }}][points]" />
     </td>
 
 {%- endfor %}
