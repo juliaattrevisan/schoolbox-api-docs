@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * Model
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+namespace Schoolbox\Learning\Assessment\Task\Review;
+
+use \Schoolbox\Learning\Assessment\IFeedback;
+
+class Model implements IFeedback
+{
+    /**
+     * This Task has been completed either:
+     *  - by student, as self-assessed
+     *  - by teacher, as assessed
+     *
+     * @var bool
+     */
+    protected $isCompleted = false;
+
+    /**
+     * Calculate the final mark for this IAssessable
+     *
+     * Tasks aren't marked and always return null
+     *
+     * @return null
+     */
+    public function calculateMark()
+    {
+        return null;
+    }
+}

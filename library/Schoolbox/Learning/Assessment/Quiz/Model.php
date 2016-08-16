@@ -18,51 +18,10 @@ use \Schoolbox\Learning\Assessment\AbstractModel;
 
 class Model extends AbstractModel
 {
-
-    /**
-     * All the Responses to this Quiz
-     *
-     * @var array
-     */
-    protected $allResponses = [];
-
     /**
      * Quiz constructor.
      */
     public function __construct()
     {
-    }
-
-    /**
-     * Calculate the final mark for this IAssessable
-     */
-    public function calculateMark()
-    {
-        $sum = 0;
-
-        foreach ($this->getAllResponses() as $currentResponse) {
-            $sum += $currentResponse['mark'];
-        }
-
-        return $sum;
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return array
-     */
-    public function getAllResponses()
-    {
-        return $this->allResponses;
-    }
-
-    /**
-     * @param array $allResponses
-     */
-    public function setAllResponses($allResponses)
-    {
-        $this->allResponses = $allResponses;
     }
 }

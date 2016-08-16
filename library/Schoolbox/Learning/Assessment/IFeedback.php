@@ -11,7 +11,13 @@
 namespace Schoolbox\Learning\Assessment;
 
 
-interface IReview
+interface IFeedback
 {
 
+    /**
+     * Calculate the final mark for the Review instance
+     *
+     * @return mixed
+     */
+    public function calculateMark();
 }

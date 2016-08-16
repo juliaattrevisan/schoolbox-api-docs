@@ -14,44 +14,11 @@ use \Schoolbox\Learning\Assessment\AbstractModel;
 
 class Model extends AbstractModel
 {
-    /**
-     * Mark given to this Assessable
-     *
-     * @var float
-     */
-    protected $mark;
 
     /**
      * DueWork constructor.
      */
     public function __construct()
     {
-    }
-
-    /**
-     * Calculate the final mark for this IAssessable
-     */
-    public function calculateMark()
-    {
-        return $this->getMark();
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return float
-     */
-    public function getMark()
-    {
-        return $this->mark;
-    }
-
-    /**
-     * @param float $mark
-     */
-    public function setMark($mark)
-    {
-        $this->mark = $mark;
     }
 }

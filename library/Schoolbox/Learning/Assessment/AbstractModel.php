@@ -11,6 +11,8 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use \Schoolbox\Collection;
+
 abstract class AbstractModel implements IAssessable
 {
 
@@ -45,20 +47,18 @@ abstract class AbstractModel implements IAssessable
     protected $weight;
 
     /**
+     * A Collection of things that Students submit
+     *
+     * @var Collection
+     */
+    protected $allResponses;
+
+    /**
      * Assessable constructor.
      */
     public function __construct()
     {
-    }
-
-    /**
-     * This IAssessable has a mark value of null
-     *
-     * @return bool
-     */
-    public function isNullMark()
-    {
-        return $this->calculateMark() === null;
+        $this->setAllResponses(new Collection());
     }
 
     /* Getters/Setters
@@ -158,6 +158,22 @@ abstract class AbstractModel implements IAssessable
     public function setWeight($weight)
     {
         $this->weight = $weight;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAllResponses()
+    {
+        return $this->allResponses;
+    }
+
+    /**
+     * @param Collection $allResponses
+     */
+    public function setAllResponses($allResponses)
+    {
+        $this->allResponses = $allResponses;
     }
 }
 

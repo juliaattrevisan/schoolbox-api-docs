@@ -8,11 +8,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Schoolbox\Learning\Assessment\Task\Review;
+namespace Schoolbox\Learning\Assessment\Task\Completion;
 
-use \Schoolbox\Learning\Assessment\IReview;
-
-class Model implements IReview
+class Model
 {
 
 }

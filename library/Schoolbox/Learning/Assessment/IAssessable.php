@@ -14,10 +14,5 @@ namespace Schoolbox\Learning\Assessment;
 interface IAssessable
 {
 
-    /**
-     * Calculate the final mark for the Assessable
-     *
-     * @return mixed
-     */
-    public function calculateMark();
+
 }
