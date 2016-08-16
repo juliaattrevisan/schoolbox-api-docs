@@ -46,7 +46,7 @@ class Minimum implements ISummator
             /* Find out if there are any other lesser values
              */
             foreach ($allAssessables as $currentAssessable) {
-                if (($currentAssessable->calculateMark() < $min) && ($currentAssessable->calculateMark() !== null)) {
+                if (($currentAssessable->calculateMark() < $min) && !$currentAssessable->isNullMark()) {
                     $min = $currentAssessable->calculateMark();
                 }
             }

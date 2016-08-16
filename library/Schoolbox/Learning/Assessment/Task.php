@@ -11,7 +11,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 
-class Task extends AbstractModel implements IAssessable
+class Task extends AbstractModel
 {
     /**
      * Calculate the final mark for this IAssessable

@@ -11,7 +11,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 
-class DueWork extends AbstractModel implements IAssessable
+class DueWork extends AbstractModel
 {
     /**
      * Mark given to this Assessable

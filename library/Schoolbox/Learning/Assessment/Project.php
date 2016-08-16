@@ -13,7 +13,7 @@ namespace Schoolbox\Learning\Assessment;
 use \Schoolbox\Collection;
 use \Schoolbox\Learning\Summator\ISummator;
 
-class Project extends AbstractModel implements IAssessable
+class Project extends AbstractModel
 {
 
     /**
@@ -58,7 +58,7 @@ class Project extends AbstractModel implements IAssessable
         $numMarked = 0;
 
         foreach ($this->getAssessables() as $currentAssessable) {
-            if ($currentAssessable->calculateMark() !== null) {
+            if (!$currentAssessable->calculateMark()) {
                 $numMarked++;
             }
         }

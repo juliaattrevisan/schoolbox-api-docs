@@ -36,7 +36,7 @@ class Maximum implements ISummator
             $max = $allAssessables->first()->calculateMark();
 
             foreach ($allAssessables as $currentAssessable) {
-                if (($currentAssessable->calculateMark() > $max) && ($currentAssessable->calculateMark() !== null)) {
+                if (($currentAssessable->calculateMark() > $max) && !$currentAssessable->isNullMark()) {
                     $max = $currentAssessable->calculateMark();
                 }
             }

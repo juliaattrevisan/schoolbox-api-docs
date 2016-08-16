@@ -11,7 +11,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
-abstract class AbstractModel
+abstract class AbstractModel implements IAssessable
 {
 
     /**
@@ -49,6 +49,16 @@ abstract class AbstractModel
      */
     public function __construct()
     {
+    }
+
+    /**
+     * This IAssessable has a mark value of null
+     *
+     * @return bool
+     */
+    public function isNullMark()
+    {
+        return $this->calculateMark() === null;
     }
 
     /* Getters/Setters

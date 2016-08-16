@@ -11,7 +11,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 
-class Quiz extends AbstractModel implements IAssessable
+class Quiz extends AbstractModel
 {
 
     /**
