@@ -1,0 +1,56 @@
+<?php
+/**
+ * DueWork
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Learning\Assessable;
+
+
+class DueWork extends Base implements IAssessable
+{
+    /**
+     * Mark given to this Assessable
+     *
+     * @var float
+     */
+    protected $mark;
+
+    /**
+     * DueWork constructor.
+     */
+    public function __construct()
+    {
+    }
+
+    /**
+     * Calculate the final mark for this assessable
+     */
+    public function calculateMark()
+    {
+        return $this->getMark();
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return float
+     */
+    public function getMark()
+    {
+        return $this->mark;
+    }
+
+    /**
+     * @param float $mark
+     */
+    public function setMark($mark)
+    {
+        $this->mark = $mark;
+    }
+}
