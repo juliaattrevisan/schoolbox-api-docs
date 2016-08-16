@@ -13,6 +13,7 @@
 namespace Schoolbox\Learning\Summator;
 
 use \Schoolbox\Collection;
+use \Schoolbox\Learning\Assessment\AbstractResponse;
 
 class Maximum implements ISummator
 {
@@ -33,11 +34,19 @@ class Maximum implements ISummator
         /* Accommodate a set of negative values
          */
         if ($allAssessables->count()) {
-            $max = $allAssessables->first()->calculateMark();
-
             foreach ($allAssessables as $currentAssessable) {
-                if (($currentAssessable->calculateMark() > $max) && !$currentAssessable->isNullMark()) {
-                    $max = $currentAssessable->calculateMark();
+
+                /** @var AbstractResponse $currentResponse */
+                foreach ($currentAssessable->getAllResponses() as $currentResponse) {
+                    $feedback = $currentResponse->findMostRecentFeedback();
+
+                    if ($feedback) {
+                        $currentFeedbackMark = $feedback->calculateMark();
+
+                        if ($currentFeedbackMark > $max) {
+                            $max = $currentFeedbackMark;
+                        }
+                    }
                 }
             }
         }

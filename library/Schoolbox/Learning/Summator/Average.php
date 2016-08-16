@@ -31,12 +31,12 @@ class Average implements ISummator
      */
     public function summate(Collection $allAssessables)
     {
+        $sum = null;
+
         if ($allAssessables->count()) {
             $numItems = 0;
             $sum = 0;
 
-            /* Exclude null values from average
-             */
             foreach ($allAssessables as $currentAssessable) {
 
                 /** @var AbstractResponse $currentResponse */
@@ -55,6 +55,6 @@ class Average implements ISummator
             }
         }
 
-        return null;
+        return $sum;
     }
 }
