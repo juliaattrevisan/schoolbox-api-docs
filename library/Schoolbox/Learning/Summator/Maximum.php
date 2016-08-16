@@ -24,11 +24,11 @@ class Maximum implements ISummator
      * change the ordering of this object, by reference
      *
      * @param Collection $allAssessables
-     * @return int
+     * @return null|int|float
      */
     public function summate(Collection $allAssessables)
     {
-        $max = 0;
+        $max = null;
 
         /* Accommodate a set of negative values
          */
@@ -36,7 +36,7 @@ class Maximum implements ISummator
             $max = $allAssessables->first()->getMark();
 
             foreach ($allAssessables as $currentAssessable) {
-                if ($currentAssessable->getMark() > $max) {
+                if (($currentAssessable->getMark() > $max) && ($currentAssessable->getMark() !== null)) {
                     $max = $currentAssessable->getMark();
                 }
             }
