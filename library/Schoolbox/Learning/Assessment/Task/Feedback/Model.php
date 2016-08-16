@@ -15,13 +15,18 @@ use \Schoolbox\Learning\Assessment\AbstractFeedback;
 class Model extends AbstractFeedback
 {
     /**
-     * This Task has been completed either:
-     *  - by student, as self-assessed
-     *  - by teacher, as assessed
+     * This Task has been completed by Student
      *
      * @var bool
      */
-    protected $isCompleted = false;
+    protected $completedByStudent = false;
+
+    /**
+     * This Task has been completed by Teacher
+     *
+     * @var bool
+     */
+    protected $completedByTeacher = false;
 
     /**
      * Calculate the final mark for this IAssessable
@@ -33,5 +38,44 @@ class Model extends AbstractFeedback
     public function calculateMark()
     {
         return null;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return boolean
+     */
+    public function isCompletedByStudent()
+    {
+        return $this->completedByStudent;
+    }
+
+    /**
+     * @param boolean $completedByStudent
+     * @return self
+     */
+    public function setCompletedByStudent($completedByStudent)
+    {
+        $this->completedByStudent = $completedByStudent;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isCompletedByTeacher()
+    {
+        return $this->completedByTeacher;
+    }
+
+    /**
+     * @param boolean $completedByTeacher
+     * @return self
+     */
+    public function setCompletedByTeacher($completedByTeacher)
+    {
+        $this->completedByTeacher = $completedByTeacher;
+        return $this;
     }
 }
