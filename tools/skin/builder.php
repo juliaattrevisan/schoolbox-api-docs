@@ -7,7 +7,7 @@
 
 require_once __DIR__ . '/../../conf/core/require.php';
 spl_autoload_call('Schoolbox\\Application\\Daemon');
-$kernel = new \Schoolbox\Application\Daemon\Kernel('Crocodoc Uploader', array('level'=>200));
+$kernel = new \Schoolbox\Application\Daemon\Kernel('Skin Builder', array('level'=>200));
 $logger = $kernel->logger();
 pcntl_signal(SIGCHLD, SIG_DFL);
 
