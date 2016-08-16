@@ -63,6 +63,8 @@ $endTime = new Alaress_Date_Format;
 if($start && $end) {
     $startTime->setFromFormat($start, Alaress_Date_Format::DATABASE_DATE_FORMAT);
     $endTime->setFromFormat($end, Alaress_Date_Format::DATABASE_DATE_FORMAT);
+    $startTime->setTime(0,0,0);
+    $endTime->setTime(23,59,59);
 }
 else if($now->getUsingFormat('m') > 6) {
     $startTime->setDate(date('Y'),7,1)->setTime(0,0,0);
