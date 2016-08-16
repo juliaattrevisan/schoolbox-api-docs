@@ -30,16 +30,22 @@ class Average implements ISummator
      */
     public function summate(Collection $allAssessables)
     {
-        $numItems = $allAssessables->count();
-
-        if ($numItems) {
+        if ($allAssessables->count()) {
+            $numItems = 0;
             $sum = 0;
 
+            /* Exclude null values from average
+             */
             foreach ($allAssessables as $currentAssessable) {
-                $sum += $currentAssessable->getMark();
+                if ($currentAssessable->getMark() !== null) {
+                    $sum += $currentAssessable->getMark();
+                    $numItems++;
+                }
             }
 
-            return (float)$sum/(float)$numItems;
+            if ($numItems) {
+                return (float)$sum / (float)$numItems;
+            }
         }
 
         /* TODO: When nothing to mark, what should this return?
