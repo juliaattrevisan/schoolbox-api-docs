@@ -13,6 +13,7 @@
 namespace Schoolbox\Learning\Summator;
 
 use \Schoolbox\Collection;
+use \Schoolbox\Learning\Assessment\AbstractResponse;
 
 class Minimum implements ISummator
 {
@@ -23,6 +24,8 @@ class Minimum implements ISummator
      * Don't do $allAssessables->sort() as this will actually
      * change the ordering of this object, by reference
      *
+     * Accommodate a set of negative values
+     *
      * @param Collection $allAssessables
      * @return null|int|float
      */
@@ -30,24 +33,24 @@ class Minimum implements ISummator
     {
         $min = null;
 
-        /* Accommodate a set of negative values
-         */
         if ($allAssessables->count()) {
-
-            /* Find the first non-null value
-             */
             foreach ($allAssessables as $currentAssessable) {
-                if ($currentAssessable->calculateMark() !== null) {
-                    $min = $currentAssessable->calculateMark();
-                    break;
-                }
-            }
 
-            /* Find out if there are any other lesser values
-             */
-            foreach ($allAssessables as $currentAssessable) {
-                if (($currentAssessable->calculateMark() < $min) && !$currentAssessable->isNullMark()) {
-                    $min = $currentAssessable->calculateMark();
+                /** @var AbstractResponse $currentResponse */
+                foreach ($currentAssessable->getAllResponses() as $currentResponse) {
+                    $feedback = $currentResponse->findMostRecentFeedback();
+
+                    if ($feedback) {
+                        $currentFeedbackMark = $feedback->calculateMark();
+
+                        /* $min is being set for the first time to a non-null value
+                         * If you don't do this check for $min == null, summate() will
+                         * always return null (any actual value is never less than null)
+                         */
+                        if ($currentFeedbackMark < $min || $min == null) {
+                            $min = $currentFeedbackMark;
+                        }
+                    }
                 }
             }
         }

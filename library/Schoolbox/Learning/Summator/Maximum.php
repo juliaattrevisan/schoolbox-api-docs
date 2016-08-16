@@ -24,6 +24,8 @@ class Maximum implements ISummator
      * Don't do $allAssessables->sort() as this will actually
      * change the ordering of this object, by reference
      *
+     * Accommodate a set of negative values
+     *
      * @param Collection $allAssessables
      * @return null|int|float
      */
@@ -31,8 +33,6 @@ class Maximum implements ISummator
     {
         $max = null;
 
-        /* Accommodate a set of negative values
-         */
         if ($allAssessables->count()) {
             foreach ($allAssessables as $currentAssessable) {
 
