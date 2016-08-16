@@ -1,39 +1,74 @@
 <?php
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2016, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2016, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
  */
 
 namespace Schoolbox\Assessment\Course;
 
+use Schoolbox\Resource\Folder\Model as FolderModel;
 
-use Schoolbox\Collection;
-
-class Model extends \Schoolbox\Resource\Folder\Model
+/**
+ * Class Model
+ *
+ * @package Schoolbox\Assessment\Course
+ */
+class Model
 {
-
-    /** @var Collection|Unit\Model[] */
-    protected $units;
+    /**
+     * @var int
+     */
+    protected $id;
 
     /**
-     * @return Unit\Model[]|Collection
+     * @var FolderModel
      */
-    public function getUnits()
+    protected $folder;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
     {
-        return $this->units;
+        $this->folder = new FolderModel();
     }
 
+    /* Getters/Setters */
 
     /**
-     * @param Unit\Model[]|Collection $units
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
      * @return static
      */
-    public function setUnits($units)
+    public function setId($id)
     {
-        $this->units = $units;
+        $this->id = $id;
         return $this;
     }
 
+    /**
+     * @return FolderModel
+     */
+    public function getFolder()
+    {
+        return $this->folder;
+    }
+
+    /**
+     * @param FolderModel $folder
+     * @return static
+     */
+    public function setFolder($folder)
+    {
+        $this->folder = $folder;
+        return $this;
+    }
 }

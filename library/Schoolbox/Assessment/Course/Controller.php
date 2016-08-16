@@ -25,12 +25,12 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
 use Schoolbox\Assessment\Course\Import\Import as CourseImport;
-use Schoolbox\Assessment\Course\Mapper as CourseMapper;
-use Schoolbox\Assessment\Course\Model as CourseModel;
+use Schoolbox\Assessment\Course\DeprecatedMapper as CourseMapper;
+use Schoolbox\Assessment\Course\DeprecatedModel as CourseModel;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
 use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
-use Schoolbox\Assessment\Course\Unit\Mapper;
+use Schoolbox\Assessment\Course\Unit\DeprecatedMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum;
 use Schoolbox\Error;
@@ -79,7 +79,7 @@ class Controller extends Base\Base
     /** @var CourseMapper */
     protected $courseMapper;
 
-    /** @var Unit\Mapper */
+    /** @var Unit\DeprecatedMapper */
     protected $unitMapper;
 
     /** @var Component_DefinitionMapper */
@@ -118,7 +118,7 @@ class Controller extends Base\Base
     public function __construct()
     {
         $this->setCourseMapper(CourseMapper::getInstance());
-        $this->setUnitMapper(Unit\Mapper::getInstance());
+        $this->setUnitMapper(Unit\DeprecatedMapper::getInstance());
         $this->setSubmissionBoxMapper(SubmissionBoxMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
         $this->setOnlineAssessmentMapper(OnlineAssessmentMapper::getInstance());
@@ -2230,7 +2230,7 @@ class Controller extends Base\Base
 
 
     /**
-     * @return Unit\Mapper
+     * @return Unit\DeprecatedMapper
      */
     public function getUnitMapper()
     {
@@ -2239,7 +2239,7 @@ class Controller extends Base\Base
 
 
     /**
-     * @param Unit\Mapper $unitMapper
+     * @param Unit\DeprecatedMapper $unitMapper
      * @return static
      */
     public function setUnitMapper($unitMapper)

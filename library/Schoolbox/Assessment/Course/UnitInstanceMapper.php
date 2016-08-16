@@ -119,7 +119,7 @@ class UnitInstanceMapper extends BaseMapper {
      * $unitInstance was spawned
      *
      * @param UnitInstance $unitInstance
-     * @return Course\Model
+     * @return Course\DeprecatedModel
      * @throws BaseMapper\Exception
      */
     public function findCourseForUnit(UnitInstance $unitInstance)
@@ -129,14 +129,14 @@ class UnitInstanceMapper extends BaseMapper {
         if (!$unit->getParent() instanceof Folder) {
             // dynamic hydration.....
             try {
-                $unit = Course\Unit\Mapper::getInstance()->findById($unit->getId());
+                $unit = Course\Unit\DeprecatedMapper::getInstance()->findById($unit->getId());
             } catch (BaseMapper\Exception\Deleted $e) {
                 // I reject your deletion of this object
                 $unit = $e->getDeletedObject();
             }
         }
 
-        return Course\Mapper::getInstance()->findById($unit->getParent()->getId());
+        return Course\DeprecatedMapper::getInstance()->findById($unit->getParent()->getId());
     }
 
     /**

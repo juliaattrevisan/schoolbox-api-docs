@@ -1,41 +1,99 @@
 <?php
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2016, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2016, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
  */
 
 namespace Schoolbox\Assessment\Course\Unit;
 
+use Schoolbox\Assessment\Course\Model as CourseModel;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 
-use Schoolbox\Assessment\Course\Task;
-use Schoolbox\Collection;
-
-class Model extends \Schoolbox\Resource\Folder\Model
+/**
+ * Class Model
+ *
+ * @package Schoolbox\Assessment\Course
+ */
+class Model
 {
-
-    /** @var Collection|Task[] */
-    protected $tasks;
-
+    /**
+     * @var int
+     */
+    protected $id;
 
     /**
-     * @return \Schoolbox\Assessment\Course\Task[]|Collection
+     * @var FolderModel
      */
-    public function getTasks()
+    protected $folder;
+
+    /**
+     * @var CourseModel
+     */
+    protected $course;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
     {
-        return $this->tasks;
+        $this->folder = new FolderModel();
+        $this->course = new CourseModel();
     }
 
+    /* Getters/Setters */
 
     /**
-     * @param \Schoolbox\Assessment\Course\Task[]|Collection $tasks
-     * @return Model
+     * @return int
      */
-    public function setTasks($tasks)
+    public function getId()
     {
-        $this->tasks = $tasks;
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     * @return static
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
         return $this;
     }
 
+    /**
+     * @return FolderModel
+     */
+    public function getFolder()
+    {
+        return $this->folder;
+    }
+
+    /**
+     * @param FolderModel $folder
+     * @return static
+     */
+    public function setFolder($folder)
+    {
+        $this->folder = $folder;
+        return $this;
+    }
+
+    /**
+     * @return CourseModel
+     */
+    public function getCourse()
+    {
+        return $this->course;
+    }
+
+    /**
+     * @param CourseModel $course
+     * @return static
+     */
+    public function setCourse($course)
+    {
+        $this->course = $course;
+        return $this;
+    }
 }
