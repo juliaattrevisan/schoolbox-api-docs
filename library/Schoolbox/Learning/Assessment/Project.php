@@ -50,6 +50,46 @@ class Project extends AbstractModel implements IAssessable
         return $this->getSummator()->summate($this->getAssessables());
     }
 
+    /**
+     * Calculate how many IAssessable instances have a non-null mark value
+     */
+    protected function numMarked()
+    {
+        $numMarked = 0;
+
+        foreach ($this->getAssessables() as $currentAssessable) {
+            if ($currentAssessable->calculateMark() !== null) {
+                $numMarked++;
+            }
+        }
+
+        return $numMarked;
+    }
+
+    /**
+     * Calculate how many IAssessable instances are in this Project
+     *
+     * @return int
+     */
+    protected function numAssessables()
+    {
+        return $this->getAssessables()->count();
+    }
+
+    /**
+     * Calculate percentage of a Project that has been marked
+     *
+     * @return int
+     */
+    public function calculatePercentageMarked()
+    {
+        if ($this->numAssessables()) {
+            return 100 * ($this->numMarked() / $this->numAssessables());
+        }
+
+        return 0;
+    }
+
     /* Getters/Setters
      */
 
