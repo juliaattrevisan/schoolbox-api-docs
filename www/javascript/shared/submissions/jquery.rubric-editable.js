@@ -406,7 +406,7 @@
 
         var $levels = $rb.children('thead').find('input[data-level]');
 
-        // permit up to 11 levels
+        // permit up to opt.levelLimit levels
         if (opt.levelLimit == 0 || $levels.length < opt.levelLimit) {
             $levels.find('[data-spawn]').removeClass('hide');
         }
@@ -414,7 +414,44 @@
         // refresh the sequencer
         $rb.sequencer('refresh');
 
+        // Inputs for levels and descriptors need to be renumbered after deleting a row.
+        this.renumberColumnInputs();
+
         return true;
+    };
+
+    /**
+     * Fixes numbering of inputs of all columns.
+     *
+     * Levels and descriptors (text and points) are renumbered.
+     */
+    RubricEditable.prototype.renumberColumnInputs = function()
+    {
+        var $rb = $(this.element),
+            rows = $rb.find('tr'),
+            i = 0;
+
+        // Re-number all the levels, descriptors and values in the rubric grid
+        rows.each(function() {
+            var $row = $(this);
+
+            // Renumber levels
+            $row.find('[data-level]').map(function() {
+                this.name = this.name.replace(/\[\d+]\[name]$/, '[' + String(i) + '][name]');
+            });
+
+            // Renumber descriptor texts
+            $row.find('[data-descriptor="text"]').map(function() {
+                this.name = this.name.replace(/\[\d+]\[text]$/, '[' + String(i) + '][text]');
+            });
+
+            // Renumber descriptor values
+            $row.find('[data-descriptor="value"]').map(function() {
+                this.name = this.name.replace(/\[\d+]\[points]$/, '[' + String(i) + '][points]');
+            });
+
+            i++;
+        });
     };
 
     /**
