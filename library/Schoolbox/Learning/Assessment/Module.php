@@ -76,7 +76,7 @@ class Module extends BaseModule
             function ($params) {
 
                 // TODO. Hydrate specified IAssessable
-                $args['assessment'] = [$params['assessmentId']];
+                $args['assessment'] = $params['assessmentId'];
 
                 if (array_key_exists('studentId', $params)) {
                     try {
