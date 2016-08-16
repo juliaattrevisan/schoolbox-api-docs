@@ -15,10 +15,4 @@ use \Schoolbox\Learning\Assessment\AbstractModel;
 class Model extends AbstractModel
 {
 
-    /**
-     * DueWork constructor.
-     */
-    public function __construct()
-    {
-    }
 }

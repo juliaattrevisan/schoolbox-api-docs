@@ -62,6 +62,7 @@ class Project extends AbstractModel
     {
         $numMarked = 0;
 
+        /** @var IResponse $currentAssessable */
         foreach ($this->getAssessables() as $currentAssessable) {
             if (!$currentAssessable->calculateMark()) {
                 $numMarked++;

@@ -18,10 +18,4 @@ use \Schoolbox\Learning\Assessment\AbstractModel;
 
 class Model extends AbstractModel
 {
-    /**
-     * Quiz constructor.
-     */
-    public function __construct()
-    {
-    }
 }

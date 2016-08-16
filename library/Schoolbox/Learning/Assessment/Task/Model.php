@@ -21,6 +21,4 @@ use \Schoolbox\Learning\Assessment\AbstractModel;
 
 class Model extends AbstractModel
 {
-
-
 }
