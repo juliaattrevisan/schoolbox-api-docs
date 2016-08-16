@@ -47,7 +47,7 @@ abstract class AbstractModel implements IAssessable
     protected $weight;
 
     /**
-     * A Collection of things that Students submit
+     * A Collection of IResponse instances that Students submit
      *
      * @var Collection
      */

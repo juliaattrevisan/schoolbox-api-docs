@@ -10,7 +10,9 @@
  */
 namespace Schoolbox\Learning\Assessment\Task\Completion;
 
-class Model
+use \Schoolbox\Learning\Assessment\AbstractResponse;
+
+class Model extends AbstractResponse
 {
 
 }
