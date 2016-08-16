@@ -17,6 +17,8 @@ namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
 use \Schoolbox\Learning\Summator\ISummator;
+use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
 class Project extends AbstractModel
 {
@@ -62,32 +64,34 @@ class Project extends AbstractModel
     {
         $numMarked = 0;
 
-        /** @var IResponse $currentAssessable */
-        foreach ($this->getAssessables() as $currentAssessable) {
-            if (!$currentAssessable->calculateMark()) {
-                $numMarked++;
-            }
-        }
-
         if ($this->getAssessables()->count()) {
             foreach ($this->getAssessables() as $currentAssessable) {
 
                 /** @var AbstractResponse $currentResponse */
                 foreach ($currentAssessable->getAllResponses() as $currentResponse) {
-                    $feedback = $currentResponse->findMostRecentNonNullFeedback();
 
-                    if ($feedback) {
-                        $currentFeedbackMark = $feedback->calculateMark();
+                    /* Tasks have a special treatment in this context
+                     * Tasks aren't marked
+                     */
+                    if ($currentResponse instanceof TaskCompletion) {
 
-                        if ($currentFeedbackMark > $max) {
-                            $max = $currentFeedbackMark;
+                        /** @var TaskFeedback $feedback */
+                        $feedback = $currentResponse->findMostRecentFeedback();
+
+                        if ($feedback->isCompletedByStudent() || $feedback->isCompletedByTeacher()) {
+                            $numMarked++;
+                        }
+                    }
+                    else {
+                        $feedback = $currentResponse->findMostRecentNonNullFeedback();
+
+                        if ($feedback) {
+                            $numMarked++;
                         }
                     }
                 }
             }
         }
-
-
 
         return $numMarked;
     }

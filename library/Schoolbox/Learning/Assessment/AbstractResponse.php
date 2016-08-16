@@ -56,6 +56,26 @@ class AbstractResponse implements IResponse
         return null;
     }
 
+    /**
+     * Find the most recent Feedback, based on its Updated field
+     */
+    public function findMostRecentFeedback()
+    {
+        if ($this->getAllFeedback()->count()) {
+            $latest = $this->getAllFeedback()->first();
+
+            foreach ($this->getAllFeedback() as $currentFeedback) {
+                if ($currentFeedback->getUpdatedAt()->gt($latest->getUpdatedAt())) {
+                    $latest = $currentFeedback;
+                }
+            }
+
+            return $latest;
+        }
+
+        return null;
+    }
+
     /* Getters/Setters
      */
 
