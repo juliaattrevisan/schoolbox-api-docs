@@ -58,18 +58,24 @@
                         slotLabelFormat: ['ddd D']
                     },
                     timelineWeek: {
-                        slotLabelFormat: ['ddd D/M', 'ha']
+                        slotLabelFormat: ['ddd D/M', 'h'],
+                        scrollTime: '32:00',
+                        slotWidth: '20'
+
                     },
                     timelineDay: {
-                        slotLabelFormat: ['ha']
+                        slotLabelFormat: ['ha'],
+                        scrollTime: '08:00',
+                        slotWidth: '20'
                     }
+
                 },
                 height: 'auto',
                 timeFormat: 'h(:mm)a',
                 eventLimit: {{ config.calendar_collapse_events ? 'true' : 'false' }},
                 firstDay: Number({{ config.calendar_start_day }}),
                 schedulerLicenseKey: {{ config.fullcalendar_scheduler_license_key|json_encode|raw }},
-                defaultView: calendarView,
+                defaultView: 'timelineDay',
                 header: {
                     left: 'prev,today,next',
                     center: 'title',
