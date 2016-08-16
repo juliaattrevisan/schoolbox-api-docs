@@ -15,10 +15,11 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment;
+namespace Schoolbox\Learning\Assessment\Task;
 
+use \Schoolbox\Learning\Assessment\AbstractModel;
 
-class Task extends AbstractModel
+class Model extends AbstractModel
 {
 
     /**

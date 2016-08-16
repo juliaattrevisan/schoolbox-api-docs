@@ -8,10 +8,11 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment;
+namespace Schoolbox\Learning\Assessment\DueWork;
 
+use \Schoolbox\Learning\Assessment\AbstractModel;
 
-class DueWork extends AbstractModel
+class Model extends AbstractModel
 {
     /**
      * Mark given to this Assessable

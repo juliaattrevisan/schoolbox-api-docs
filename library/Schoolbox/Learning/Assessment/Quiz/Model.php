@@ -12,10 +12,11 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment;
+namespace Schoolbox\Learning\Assessment\Quiz;
 
+use \Schoolbox\Learning\Assessment\AbstractModel;
 
-class Quiz extends AbstractModel
+class Model extends AbstractModel
 {
 
     /**
