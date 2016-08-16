@@ -1,10 +1,73 @@
 /** Settings for Magnific
     Modal for image gallery and previewing things
-    **/
-
-
+**/
 .mfp-iframe-scaler {
-  iframe {
-    background: #FFFFFF;
-  }
+	iframe {
+		background: #FFFFFF;
+	}
+}
+
+img.mfp-img{
+	padding: 3rem 0 6rem;
+}
+
+.mfp-figure:after{
+	top: 3rem;
+	bottom: 6rem;
+}
+
+.mfp-image-holder .mfp-close,
+.mfp-iframe-holder .mfp-close{
+	background: rgba(0,0,0,0.5);
+	border-radius: 5rem;
+	top: 1.65rem;
+	right: -1.35rem;
+	padding: 0;
+	font-size: 3rem;
+	width: 2.75rem;
+	text-align: center;
+
+	&:hover{
+		background: rgba(0,0,0,1);
+		cursor: pointer;
+	}
+}
+.mfp-arrow{
+	color: $white;
+	opacity: 1;
+	&:before{
+		border: 0;
+		opacity: 1;
+		margin-top: 30px;
+		@extend .icon-48;
+	}
+}
+
+.mfp-container .mfp-arrow-left:before{
+	@extend .icon-previous;
+}
+
+.mfp-container .mfp-arrow-right:before{
+	@extend .icon-next;
+	margin-left: 20px;
+}
+
+.mfp-bottom-bar{
+	background: $black;
+	margin: 0;
+	position: fixed;
+	top: auto;
+	bottom: 0;
+	padding: 1rem;
+	.mfp-title {
+		text-align: center;
+		padding: 0;
+	}
+	.mfp-counter{
+		text-align: center;
+		margin: 10px 0 0 0;
+		position: relative;
+		top: auto;
+		right: auto;
+	}
 }
