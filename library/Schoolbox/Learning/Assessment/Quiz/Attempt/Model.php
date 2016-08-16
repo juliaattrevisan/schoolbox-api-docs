@@ -8,7 +8,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Schoolbox\Learning\Assessment\Quiz\Submission;
+namespace Schoolbox\Learning\Assessment\Quiz\Attempt;
 
 use \Schoolbox\Learning\Assessment\AbstractResponse;
 

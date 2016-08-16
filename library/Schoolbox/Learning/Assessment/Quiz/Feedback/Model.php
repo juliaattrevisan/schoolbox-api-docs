@@ -17,6 +17,9 @@ class Model extends AbstractFeedback
     /**
      * All the Responses to this Quiz
      *
+     * These are Students' Responses to individual Questions
+     * that were asked in the Quiz's Sections
+     *
      * @var array
      */
     protected $allResponses = [];
