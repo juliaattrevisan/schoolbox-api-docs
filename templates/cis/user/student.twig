@@ -1,0 +1,110 @@
+{% extends '@core/user/student.twig' %}
+
+
+{% block contacts %}
+    <h2 class="subheader">Contact Information</h2>
+
+    {% for message in externalUser.AlertMessages %}
+        {% block contacts_alert %}
+            {# Only staff may view contact alerts #}
+            {% if showContactsAlert %}
+                <div class="alert-box alert icon-alert no-margin">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endblock contacts_alert %}
+    {% endfor %}
+
+    <section>
+        <div class="content no-pad">
+            <ul class="information-list">
+                {% for contact in contacts %}
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="avatar card small-12">
+                                {% if contact.main %}
+                                    <a href="/search/user/{{ contact.main.getId() }}">
+                                        <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
+                                        <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
+                                    </a>
+                                {% else %}
+                                    <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64" />
+                                    <h3>{{ contact.StudentContactTitle }} {{ contact.StudentContactPreferred }} {{ contact.StudentContactSurname }}</h3>
+                                {% endif %}
+                                <p class="meta">{{ contact.StudentContactRelation }}</p>
+                            </div>
+                        </div>
+                        <nav>
+                            <a href="#" class="icon-more" data-dropdown="row-options-contact-{{ loop.index }}" title="Actions"></a>
+                        </nav>
+                        <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ loop.index }}">
+                            <li><a class="icon-modify" href="/homepage/4694">Update Contact Details</a></li>
+                            {% if contact.StudentContactDefaultEmail and contact.StudentContactUseEmail != 'N' %}
+                                <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentContactDefaultEmail }}">{{ contact.StudentContactDefaultEmail }}</a></li>
+                            {% endif %}
+                            {% if contact.StudentContactMobilePhone %}
+                                <li><a class="icon-mobile" href="tel:{{ contact.StudentContactMobilePhone }}">{{ contact.StudentContactMobilePhone }}</a></li>
+                            {% endif %}
+                            {% if contact.StudentContactOccupPhone %}
+                                <li><a class="icon-mobile" href="tel:{{ contact.StudentContactOccupPhone }}">{{ contact.StudentContactOccupPhone }}</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+
+                    {# is there a spouse? #}
+                    {% if contact.StudentContactSpouseTitle or contact.StudentContactSpousePreferred %}
+                        <li class="actions-small-1">
+                            <div class="list-item">
+                                <div class="avatar card small-12">
+                                    {# need to know user's schoolbox info here #}
+                                    {% if contact.spouse %}
+                                        <a href="/search/user/{{ contact.spouse.getId() }}">
+                                            <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
+                                            <h3>{{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}</h3>
+                                        </a>
+                                    {% else %}
+                                        <img src="/portrait.php?userId={{ contact.StudentContactSpouseID }}&amp;size=square64" />
+                                        <h3>{{ contact.StudentContactSpouseTitle }} {{ contact.StudentContactSpousePreferred }} {{ contact.StudentContactSpouseSurname }}</h3>
+                                    {% endif %}
+                                    <p class="meta">{{ contact.StudentContactSpouseRelation }}</p>
+                                </div>
+                            </div>
+                            <nav>
+                                <a href="#" class="icon-more" data-dropdown="row-options-contact-{{ contact.StudentContactSpouseID }}" title="Actions"></a>
+                            </nav>
+                            <ul class="f-dropdown" data-dropdown-content id="row-options-contact-{{ contact.StudentContactSpouseID }}">
+                                {% if contact.StudentContactSpouseDefaultEmail and contact.StudentContactSpouseUseEmail != 'N'%}
+                                    <li><a class="icon-email" href="{{ session.mailhandle }}{{ contact.StudentContactSpouseDefaultEmail }}">{{ contact.StudentContactSpouseDefaultEmail }}</a></li>
+                                {% endif %}
+                                {% if contact.StudentContactSpouseMobilePhone %}
+                                    <li><a class="icon-mobile" href="tel:{{ contact.StudentContactSpouseMobilePhone }}">{{ contact.StudentContactSpouseMobilePhone }}</a></li>
+                                {% endif %}
+                                {% if contact.StudentContactSpouseOccupPhone %}
+                                    <li><a class="icon-mobile" href="tel:{{ contact.StudentContactSpouseOccupPhone }}">{{ contact.StudentContactSpouseOccupPhone }}</a></li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    <li class="actions-small-1">
+                        <div class="list-item">
+                            <div class="avatar card small-12">
+                                <span class="icon-home icon-32"></span>
+                                {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
+                                    <p>{{ contact.StudentContactAddress1 }}</p>
+                                    <p>{{ contact.StudentContactAddress2 }}</p>
+                                    <p>{{ contact.StudentContactAddress3 }}</p>
+                                    <p>{{ contact.StudentContactSuburb }},</p>
+                                    <p>{{ contact.StudentContactState }} {{ contact.StudentContactPostCode }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <nav>
+                            <a class="icon-mobile" href="tel:{{ contact.StudentContactPhoneActual }}" title="Call {{ contact.StudentContactPhoneActual }}"></a>
+                        </nav>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+{% endblock contacts %}

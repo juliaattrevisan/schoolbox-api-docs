@@ -324,7 +324,7 @@
 
 <div class="row">
     <div class="small-12 {% if showClasses %}xlarge-6 xlarge-push-6{% else %}xlarge-12{% endif %} columns">
-        {% if showContacts %}
+        {% if showContacts and contacts|length > 0 %}
         <div class="row">
             {% block contacts_island %}
             <div class="small-12 medium-6 xlarge-12 island">
@@ -508,11 +508,11 @@
                                         <div class="card small-12">
                                             {% if subject.folder.getId() and subject.perms >= constant('\\Schoolbox\\Permission\\Access\\UserAccess::ACCESS_READ') %}
                                             <a href="/homepage/code/{{ subject.code|e('url')|e('url')|e('url') }}">
-                                                <span class="icon-folder icon-32"></span>
+                                                <span class="icon-home icon-32 "></span>
                                                 <h3>{{ subject.name }}</h3>
                                             </a>
                                             {% else %}
-                                            <span class="icon-folder icon-32"></span>
+                                            <span class="icon-home icon-32"></span>
                                             <h3>{{ subject.name }}</h3>
                                             {% endif %}
                                             <p class="meta">{{ subject.code }}</p>
