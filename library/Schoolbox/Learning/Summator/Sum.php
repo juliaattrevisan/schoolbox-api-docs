@@ -13,6 +13,7 @@
 namespace Schoolbox\Learning\Summator;
 
 use \Schoolbox\Collection;
+use \Schoolbox\Learning\Assessment\AbstractResponse;
 
 class Sum implements ISummator
 {
@@ -27,9 +28,19 @@ class Sum implements ISummator
     {
         $sum = null;
 
-        foreach ($allAssessables as $currentAssessable) {
-            if (!$currentAssessable->isNullMark()) {
-                $sum += $currentAssessable->calculateMark();
+        if ($allAssessables->count()) {
+            $sum = 0;
+
+            foreach ($allAssessables as $currentAssessable) {
+
+                /** @var AbstractResponse $currentResponse */
+                foreach ($currentAssessable->getAllResponses() as $currentResponse) {
+                    $feedback = $currentResponse->findMostRecentFeedback();
+
+                    if ($feedback) {
+                        $sum += $feedback->calculateMark();
+                    }
+                }
             }
         }
 
