@@ -113,11 +113,7 @@ class DueWork_Detail
                 }
                 else {
                     $insertion['submissions'] = $submissions;
-                    if ($submissions->count() > 1) {
-                        $insertion['user']['status'] = self::RESUBMITTED;
-                    } else {
-                        $insertion['user']['status'] = self::SUBMITTED;
-                    }
+                    $insertion['user']['status'] = self::SUBMITTED;
 
                     // determine whether to give the ontime or late class
                     $submitTime                = $submissions->first()->getCreatedAt();
