@@ -27,11 +27,39 @@ class AbstractResponse implements IResponse
         $this->setAllFeedback(new Collection());
     }
 
+    /**
+     * Find the most recent Feedback based on its Updated field
+     */
+    public function findMostRecentFeedback()
+    {
+        if ($this->getAllFeedback()->count()) {
+            $latest = $this->getAllFeedback()->first();
+
+            foreach ($this->getAllFeedback() as $currentFeedback) {
+                if ($currentFeedback->getUpdatedAt()->gt($latest->getUpdatedAt()) && !$currentFeedback->isNullMark()) {
+                    $latest = $currentFeedback;
+                }
+            }
+
+            /* If the ->first() instance is actually null
+             * and all the other Feedbacks are also null
+             * return null
+             *
+             * Otherwise return the Feedback itself
+             */
+            if (!$latest->isNullMark()) {
+                return $latest;
+            }
+        }
+
+        return null;
+    }
+
     /* Getters/Setters
      */
 
     /**
-     * @return mixed
+     * @return Collection
      */
     public function getAllFeedback()
     {
@@ -39,7 +67,7 @@ class AbstractResponse implements IResponse
     }
 
     /**
-     * @param mixed $allFeedback
+     * @param Collection $allFeedback
      */
     public function setAllFeedback($allFeedback)
     {
