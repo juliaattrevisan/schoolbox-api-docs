@@ -9,9 +9,9 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessable;
+namespace Schoolbox\Learning\Assessment;
 
-abstract class Base
+abstract class AbstractModel
 {
 
     /**

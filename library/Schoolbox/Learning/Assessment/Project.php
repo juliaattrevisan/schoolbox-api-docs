@@ -8,12 +8,12 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessable;
+namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
 use \Schoolbox\Learning\Summator\ISummator;
 
-class Project extends Base implements IAssessable
+class Project extends AbstractModel implements IAssessable
 {
 
     /**

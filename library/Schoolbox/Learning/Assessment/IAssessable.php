@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessable;
+namespace Schoolbox\Learning\Assessment;
 
 
 interface IAssessable
