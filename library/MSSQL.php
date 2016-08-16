@@ -15,25 +15,6 @@ use Alaress\DebugBar\Instance as DebugBar;
 class MSSQL {
 
 	/**
-	 * This used to store this database's default encoding, now does nothing.
-	 *
-	 * @deprecated use ini setting mssql.encoding instead
-	 *
-	 * @var string
-	 */
-	protected $encoding = 'ISO-8859-1';
-
-	/**
-	 * This used to control whether encoding was converted or not for calls to
-	 * getAll/Row/One, now does nothing.
-	 *
-	 * @deprecated use ini setting mssql.encoding instead
-	 *
-	 * @var bool
-	 */
-	protected $convert_encoding = false;
-
-	/**
 	 * @var MssqlDatabaseCollector
 	 */
 	protected $collector = null;
@@ -75,25 +56,25 @@ class MSSQL {
 	protected $result = null;
 
 	/**
-	 * Does this instance require a new connection?
-	 *
-	 * @var bool
-	 */
-	protected $newConnection = false;
-
-	/**
 	 * Static instance of this class
 	 *
 	 * @var self
 	 */
 	protected static $instance = null;
 
+    /**
+     * A key-value lookup for each connection - it contains the last database
+     * that that host/user/password combination queried.
+     *
+     * @var array
+     */
+    protected static $lastDatabase = [];
+
 	/**
 	 * @param bool $db
 	 * @param bool $optionalConfig
-	 * @param bool $newConnection Enforces a new connection, even if already connected with these credentials.
 	 */
-	function MSSQL($db = false, $optionalConfig = false, $newConnection = false) {
+	function MSSQL($db = false, $optionalConfig = false) {
 
 		/* Blasphemy (heresy unavoidable)
 		 * Hijack these settings for alternative config
@@ -103,7 +84,6 @@ class MSSQL {
 			$this->user = $optionalConfig['user'];
 			$this->passwd = $optionalConfig['passwd'];
 			$this->db = $optionalConfig['db'];
-			$encoding = $optionalConfig['encoding'];
 		}
 		else {
 			$this->host = Cfg::get('external_db_host');
@@ -111,11 +91,6 @@ class MSSQL {
 			$this->passwd = Cfg::get('external_db_passwd');
 			$this->debug = 0;
 			$this->db = $db?$db:Cfg::get('external_db_db');
-			$encoding = Cfg::get('external_db_encoding');
-		}
-		$this->newConnection = $newConnection;
-		if (!empty($encoding)) {
-			$this->encoding = $encoding;
 		}
 	}
 
@@ -143,7 +118,7 @@ class MSSQL {
 			if (strlen(ini_get('mssql.charset')) === 0) {
 				ini_set('mssql.charset', 'UTF-8');
 			}
-			$this->dbf = @mssql_connect($this->host, $this->user, $this->passwd, $this->newConnection);
+			$this->dbf = @mssql_connect($this->host, $this->user, $this->passwd);
 		}
 
 		if ($this->dbf == false) {
@@ -169,6 +144,29 @@ class MSSQL {
 
 	}
 
+    /**
+     * Determines a unique identifier for this host/user/password combination.
+     *
+     * @return string
+     */
+    protected function getConnectionHash()
+    {
+        return hash('sha256', serialize([$this->host, $this->user, $this->passwd]));
+    }
+
+    /**
+     * Changes to a different database, only if this host/user/password isn't
+     * already connected to it.
+     *
+     * @param $db
+     */
+    protected function changeDatabaseIfRequired($db)
+    {
+        if (self::$lastDatabase[$this->getConnectionHash()] != $db) {
+            $this->changeDB($db);
+        }
+    }
+
 	/**
 	 * Change to a different DB on server
 	 * @param string $db
@@ -178,6 +176,8 @@ class MSSQL {
 		if(@mssql_select_db($db, $this->dbf))
 		{
 			$this->db = $db;
+			// Store that this connection is connected to this database
+			self::$lastDatabase[$this->getConnectionHash()] = $db;
 			return true;
 
 		}
@@ -209,8 +209,9 @@ class MSSQL {
 	{
 		if (!$this->isConnected()) {
 			$this->connect();
-
 		}
+
+		$this->changeDatabaseIfRequired($this->db);
 
 		// SB-6907: Cathedral's SQL server won't accept long query strings, so
 		// strip any leading space from each line of the query.
@@ -265,6 +266,7 @@ class MSSQL {
 		if (!$this->isConnected()) {
 			$this->connect();
 		}
+		$this->changeDatabaseIfRequired($this->db);
 
 		$bound_outputs = array();
 		$proc          = $this->buildProcedure($name, $params, $bound_outputs);
@@ -344,11 +346,7 @@ class MSSQL {
 		if (!is_array($row)) {
 			return false;
 		}
-		$one = $row[0];
-		if ($this->getConvertEncoding()) {
-			$one = $this->convertEncoding($one);
-		}
-		return $one;
+		return $row[0];
 	}
 
 	/**
@@ -426,7 +424,7 @@ class MSSQL {
 			return false;
 		}
 
-		if ($this->getConvertEncoding() && is_array($return_array)) {
+		if (is_array($return_array)) {
 			$return_array = array_map(array($this, 'convertEncoding'), $return_array);
 		}
 
@@ -507,32 +505,6 @@ class MSSQL {
 	{
 		return $value;
 //		return mb_convert_encoding($value, 'UTF-8', $this->encoding);
-	}
-
-
-	/**
-	 * Gets whether character set conversion is enabled.
-	 *
-	 * @deprecated use ini setting mssql.encoding instead
-	 *
-	 * @return bool
-	 */
-	public function getConvertEncoding()
-	{
-		return $this->convert_encoding;
-	}
-
-
-	/**
-	 * Sets whether character set conversion is enabled.
-	 *
-	 * @deprecated use ini setting mssql.encoding instead
-	 *
-	 * @param $convert
-	 */
-	public function setConvertEncoding($convert)
-	{
-		$this->convert_encoding = $convert;
 	}
 
 	/**
