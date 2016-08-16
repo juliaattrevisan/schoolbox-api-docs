@@ -69,6 +69,26 @@ class Project extends AbstractModel
             }
         }
 
+        if ($this->getAssessables()->count()) {
+            foreach ($this->getAssessables() as $currentAssessable) {
+
+                /** @var AbstractResponse $currentResponse */
+                foreach ($currentAssessable->getAllResponses() as $currentResponse) {
+                    $feedback = $currentResponse->findMostRecentNonNullFeedback();
+
+                    if ($feedback) {
+                        $currentFeedbackMark = $feedback->calculateMark();
+
+                        if ($currentFeedbackMark > $max) {
+                            $max = $currentFeedbackMark;
+                        }
+                    }
+                }
+            }
+        }
+
+
+
         return $numMarked;
     }
 

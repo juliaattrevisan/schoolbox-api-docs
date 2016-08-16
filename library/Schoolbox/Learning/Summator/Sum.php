@@ -35,7 +35,7 @@ class Sum implements ISummator
 
                 /** @var AbstractResponse $currentResponse */
                 foreach ($currentAssessable->getAllResponses() as $currentResponse) {
-                    $feedback = $currentResponse->findMostRecentFeedback();
+                    $feedback = $currentResponse->findMostRecentNonNullFeedback();
 
                     if ($feedback) {
                         $sum += $feedback->calculateMark();

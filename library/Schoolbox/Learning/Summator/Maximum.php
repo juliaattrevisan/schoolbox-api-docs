@@ -38,7 +38,7 @@ class Maximum implements ISummator
 
                 /** @var AbstractResponse $currentResponse */
                 foreach ($currentAssessable->getAllResponses() as $currentResponse) {
-                    $feedback = $currentResponse->findMostRecentFeedback();
+                    $feedback = $currentResponse->findMostRecentNonNullFeedback();
 
                     if ($feedback) {
                         $currentFeedbackMark = $feedback->calculateMark();

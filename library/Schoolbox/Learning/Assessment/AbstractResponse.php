@@ -28,9 +28,10 @@ class AbstractResponse implements IResponse
     }
 
     /**
-     * Find the most recent Feedback based on its Updated field
+     * Find the most recent Feedback with a non-null Mark value,
+     * based on its Updated field
      */
-    public function findMostRecentFeedback()
+    public function findMostRecentNonNullFeedback()
     {
         if ($this->getAllFeedback()->count()) {
             $latest = $this->getAllFeedback()->first();
