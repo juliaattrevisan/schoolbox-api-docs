@@ -10,9 +10,9 @@
  */
 namespace Schoolbox\Learning\Assessment\Task\Feedback;
 
-use \Schoolbox\Learning\Assessment\IFeedback;
+use \Schoolbox\Learning\Assessment\AbstractFeedback;
 
-class Model implements IFeedback
+class Model extends AbstractFeedback
 {
     /**
      * This Task has been completed either:

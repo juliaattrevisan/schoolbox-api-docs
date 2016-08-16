@@ -10,9 +10,9 @@
  */
 namespace Schoolbox\Learning\Assessment\Quiz\Feedback;
 
-use \Schoolbox\Learning\Assessment\IFeedback;
+use \Schoolbox\Learning\Assessment\AbstractFeedback;
 
-class Model implements IFeedback
+class Model extends AbstractFeedback
 {
     /**
      * All the Responses to this Quiz

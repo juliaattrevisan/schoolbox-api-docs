@@ -10,51 +10,9 @@
  */
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
-use \Schoolbox\Learning\Assessment\IFeedback;
+use \Schoolbox\Learning\Assessment\AbstractFeedback;
 
-class Model implements IFeedback
+class Model extends AbstractFeedback
 {
-    /**
-     * Mark given to this Assessable
-     *
-     * @var float
-     */
-    protected $mark;
 
-    /* Getters/Setters
-     */
-
-    /**
-     * @return float
-     */
-    public function getMark()
-    {
-        return $this->mark;
-    }
-
-    /**
-     * @param float $mark
-     */
-    public function setMark($mark)
-    {
-        $this->mark = $mark;
-    }
-
-    /**
-     * Calculate the final mark for this IAssessable
-     */
-    public function calculateMark()
-    {
-        return $this->getMark();
-    }
-
-    /**
-     * This IAssessable has a mark value of null
-     *
-     * @return bool
-     */
-    public function isNullMark()
-    {
-        return $this->calculateMark() === null;
-    }
 }

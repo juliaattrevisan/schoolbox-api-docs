@@ -11,6 +11,8 @@
 namespace Schoolbox\Learning\Summator;
 
 use \Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\AbstractFeedback;
+use \Schoolbox\Learning\Assessment\AbstractResponse;
 
 class Average implements ISummator
 {
@@ -37,15 +39,25 @@ class Average implements ISummator
             /* Exclude null values from average
              */
             foreach ($allAssessables as $currentAssessable) {
-                if (!$currentAssessable->isNullMark()) {
-                    $sum += $currentAssessable->calculateMark();
-                    $numItems++;
+
+                /** @var AbstractResponse $currentResponse */
+                foreach ($currentAssessable->getAllResponses() as $currentResponse) {
+
+                    /** @var AbstractFeedback $currentFeedback */
+                    foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
+                        if (!$currentFeedback->isNullMark()) {
+                        }
+                    }
                 }
             }
-
-            if ($numItems) {
-                return (float)$sum / (float)$numItems;
-            }
+//                if (!$currentAssessable->isNullMark()) {
+//                    $sum += $currentAssessable->calculateMark();
+//                    $numItems++;
+//                }
+//
+//            if ($numItems) {
+//                return (float)$sum / (float)$numItems;
+//            }
         }
 
         /* TODO: When nothing to mark, what should this return?
