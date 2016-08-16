@@ -11,7 +11,10 @@
 namespace Schoolbox\Assessment\Component\OnlineAssessment;
 
 use Alaress_Date_Format;
+use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * Class AttemptMapper
@@ -341,6 +344,53 @@ class AttemptMapper extends Mapper
             return intval($row['attempts']);
         }
         return 0;
+    }
+
+    /**
+     * Return a collection of subjects where the specified student attempted quizzes during the specified period.
+     *
+     * @param int $studentId
+     * @param Alaress_Date_Format $from
+     * @param Alaress_Date_Format $to
+     * @return Collection|Folder[]
+     */
+    public function getAttemptedSubjects($studentId, Alaress_Date_Format $from, Alaress_Date_Format $to)
+    {
+        $parts = [
+            'aa.user_id = :studentId',
+        ];
+        $params = [
+            'studentId' => $studentId,
+        ];
+        if(!$from->isNull()){
+            $params['from'] = $from->getDatabaseDate();
+            $parts[] = 'DATE(a.finish) >= :from';
+        }
+        if(!$to->isNull()){
+            $params['to'] = $to->getDatabaseDate();
+            $parts[] = 'DATE(a.finish) <= :to';
+        }
+        $whereClause = implode(' AND ', $parts);
+
+        $query = "
+                SELECT c.id FROM category c
+                JOIN assess a ON a.category_id = c.id
+                JOIN assess_attempt aa ON aa.assess_id = a.assess_id
+                WHERE $whereClause";
+        $query .= " GROUP BY c.id";
+
+        $statement = $this->database->prepare($query);
+        $statement->execute($params);
+
+        $folderIds = [];
+        while($row = $statement->fetch(\PDO::FETCH_ASSOC)){
+            $folderIds[] = $row['id'];
+        }
+
+        if(count($folderIds)){
+            return FolderMapper::getInstance()->findByColumn('id', $folderIds);
+        }
+        return new Collection();
     }
 
     /**
