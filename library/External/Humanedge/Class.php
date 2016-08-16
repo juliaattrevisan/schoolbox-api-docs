@@ -86,6 +86,7 @@ class External_Humanedge_Class implements External_ClassInterface
             LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
             INNER JOIN tblAllocation a on s.ID = a.SubjectID
             INNER JOIN tblTeacher t on a.TeacherID = t.ID
+            INNER JOIN tblRoom r on r.ID = b.RoomID
             WHERE t.deleted = 0
             AND   s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($classCode)}
 
@@ -96,6 +97,7 @@ class External_Humanedge_Class implements External_ClassInterface
             FROM tblSubject s
             INNER JOIN tblBlockItem b on s.ID = b.SubjectID
             INNER JOIN tblTeacher t on b.TeacherID = t.ID
+            INNER JOIN tblRoom r on r.ID = b.RoomID
             WHERE t.deleted = 0
             AND   s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($classCode)}
         ";
