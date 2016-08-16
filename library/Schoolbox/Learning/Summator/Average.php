@@ -55,8 +55,6 @@ class Average implements ISummator
             }
         }
 
-        /* TODO: When nothing to mark, what should this return?
-         */
         return null;
     }
 }

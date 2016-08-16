@@ -48,9 +48,11 @@ class Model extends AbstractFeedback
 
     /**
      * @param array $allResponses
+     * @return self
      */
     public function setAllResponses($allResponses)
     {
         $this->allResponses = $allResponses;
+        return $this;
     }
 }

@@ -68,10 +68,12 @@ class AbstractResponse implements IResponse
 
     /**
      * @param Collection $allFeedback
+     * @return self
      */
     public function setAllFeedback($allFeedback)
     {
         $this->allFeedback = $allFeedback;
+        return $this;
     }
 
 }

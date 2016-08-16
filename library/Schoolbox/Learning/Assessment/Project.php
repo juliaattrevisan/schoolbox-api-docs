@@ -109,10 +109,12 @@ class Project extends AbstractModel
 
     /**
      * @param Collection $assessables
+     * @return self
      */
     public function setAssessables($assessables)
     {
         $this->assessables = $assessables;
+        return $this;
     }
 
     /**
@@ -129,9 +131,11 @@ class Project extends AbstractModel
      * Set a summation strategy
      *
      * @param ISummator $summator
+     * @return self
      */
     public function setSummator($summator)
     {
         $this->summator = $summator;
+        return $this;
     }
 }

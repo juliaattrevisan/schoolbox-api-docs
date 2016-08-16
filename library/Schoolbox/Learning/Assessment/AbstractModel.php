@@ -74,10 +74,12 @@ abstract class AbstractModel implements IAssessable
 
     /**
      * @param string $title
+     * @return self
      */
     public function setTitle($title)
     {
         $this->title = $title;
+        return $this;
     }
 
     /**
@@ -90,10 +92,12 @@ abstract class AbstractModel implements IAssessable
 
     /**
      * @param string $description
+     * @return self
      */
     public function setDescription($description)
     {
         $this->description = $description;
+        return $this;
     }
 
     /**
@@ -106,10 +110,12 @@ abstract class AbstractModel implements IAssessable
 
     /**
      * @param \Alaress_Date_Format $publishAt
+     * @return self
      */
     public function setPublishAt($publishAt)
     {
         $this->publishAt = $publishAt;
+        return $this;
     }
 
     /**
@@ -122,10 +128,12 @@ abstract class AbstractModel implements IAssessable
 
     /**
      * @param \Alaress_Date_Format $openAt
+     * @return self
      */
     public function setOpenAt($openAt)
     {
         $this->openAt = $openAt;
+        return $this;
     }
 
     /**
@@ -138,10 +146,12 @@ abstract class AbstractModel implements IAssessable
 
     /**
      * @param \Alaress_Date_Format $closeAt
+     * @return self
      */
     public function setCloseAt($closeAt)
     {
         $this->closeAt = $closeAt;
+        return $this;
     }
 
     /**
@@ -154,10 +164,12 @@ abstract class AbstractModel implements IAssessable
 
     /**
      * @param float $weight
+     * @return self
      */
     public function setWeight($weight)
     {
         $this->weight = $weight;
+        return $this;
     }
 
     /**
@@ -170,10 +182,12 @@ abstract class AbstractModel implements IAssessable
 
     /**
      * @param Collection $allResponses
+     * @return self
      */
     public function setAllResponses($allResponses)
     {
         $this->allResponses = $allResponses;
+        return $this;
     }
 }
 
