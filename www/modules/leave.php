@@ -50,21 +50,35 @@ try {
         }
 		else {
             if ($method == 'report' && $this->arg[1] == 'house') {
-                if (is_numeric($this->arg[2])) {
-                    $houseId = $this->arg[2];
-                }
-				else {
-                    $houseId = $_SESSION['houseId'];
-                }
 
-                if (is_string($this->arg[3])) {
-                    $date = str_replace('-', '/', $this->arg[3]);
-                }
-				else {
-                    $date = date('d/m/Y', time());
-                }
+                $houseId = is_numeric($this->arg[2])
+                    ? $this->arg[2]
+                    : $_SESSION['houseId'];
 
-                $data = $leaveController->executeHouseReport($houseId, $date);
+                $timespanOptions = Leave_Controller::getTimespanOptions();
+
+                // Determine requested report timespan type
+                $timespan = is_string($this->arg[3]) && in_array($this->arg[3], $timespanOptions)
+                    ? $this->arg[3]
+                    : Leave_Controller::REPORT_TIMESPAN_WEEKEND;
+
+                // Determine requested report start
+                $dateStart = is_string($this->arg[4])
+                    ? str_replace('-', '/', $this->arg[4])
+                    : date('d/m/Y', time());
+
+                // Determine requested report end
+                $dateEnd = (Leave_Controller::REPORT_TIMESPAN_RANGE === $timespan && isset($this->arg[5]))
+                    ? str_replace('-', '/', $this->arg[5])
+                    : null;
+
+                // Catch malformed URLs
+                try {
+                    /** @var array $data */
+                    $data = $leaveController->executeHouseReport($houseId, $timespan, $dateStart, $dateEnd);
+                } catch (InvalidArgumentException $iae){
+                    error(156);
+                }
 
                 $argumentCount = count($this->arg);
 
@@ -75,15 +89,13 @@ try {
                 }
                 /* Print view
          		 */
+                else if ($this->arg[$argumentCount - 1] == 'print') {
+                    $leaveController->printHouseReport($data);
+                }
+                /* Web view
+                 */
                 else {
-                    if ($this->arg[$argumentCount - 1] == 'print') {
-                        $leaveController->printHouseReport($data);
-                    }
-                    /* Web view
-         			 */
-                    else {
-                        $leaveController->renderHouseReport($data);
-                    }
+                    $leaveController->renderHouseReport($data);
                 }
             }
 			else {

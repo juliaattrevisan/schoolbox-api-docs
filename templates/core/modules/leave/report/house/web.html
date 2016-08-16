@@ -28,31 +28,58 @@
             }
         });
 
+        // User clicks on 'search', 'print' or 'export'
         $(document).on('click', '[data-action]', function (event) {
             event.preventDefault();
 
-            var searchForm = $('form[data-form_type="search"]');
-            var houseId  = searchForm.find(':input[name="reportHouse"]').val();
-            var date     = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
-            var action   = $(this).data('action');
-            var location = '/modules/leave/report/house/' + houseId + '/' + date;
+            var $table     = $('#requestList');
+            var searchForm = $('[data-form_type=search]');
+            var houseId    = searchForm.find(':input[name="reportHouse"]').val();
+            var action     = $(this).data('action');
+            var timespan   = searchForm.find('[name=reportTimespan]').val();
 
-            if (action == 'export') {
-                location += '/export';
+            // 'Export' and 'Print' ignore search form and display values currently displayed in table
+            var dateStart = 'search' === action
+                    ? searchForm.find(':input[name="reportDateStart"]').val().replace(/\//g, '-')
+                    : $table.attr('data-date-display-start');
+
+            var location   = '/modules/leave/report/house/' + houseId + '/' + timespan + '/' + dateStart;
+
+            if('range' === timespan){
+                // 'Export' and 'Print' ignore search form and display values currently displayed in table
+                var dateEnd = 'search' === action
+                        ? searchForm.find(':input[name="reportDateEnd"]').val().replace(/\//g, '-')
+                        : $table.attr('data-date-display-end');
+                location += '/' + dateEnd;
+            }
+
+            if ('search' !== action) {
+                location += '/' + action;
             }
 
             window.location.href = location;
         });
 
-        $('a[data-print]').click(function(e) {
-            e.preventDefault();
 
-            var searchForm = $('[data-form_type=search]');
-            var houseId  = searchForm.find(':input[name="reportHouse"]').val();
-            var date     = searchForm.find(':input[name="reportDate"]').val().replace(/\//g, '-');
-            var location = '/modules/leave/report/house/' + houseId + '/' + date + '/print';
-            window.location.href = location;
-        })
+
+        // User selects a different report period from dropdown
+        var dateFormat = 'DD/MM/YYYY';
+        $('[name=reportTimespan]').on('change',function(event){
+            switch($(this).val()){
+                case 'day':
+                case 'weekend':
+                    $('[data-date-end]').addClass('hide');
+                    break;
+                case 'range':
+                    $('[data-date-end]').removeClass('hide');
+                    if('' === $('[name=reportDateEnd]').val()){
+                        var startDate = moment($('[name=reportDateStart]').val(), dateFormat);
+                        startDate.add('week',1);
+                        $('[name=reportDateEnd]').val(startDate.format(dateFormat));
+                    }
+                    break;
+            }
+        });
     });
 </script>
 <!-- END custom_head -->
@@ -71,8 +98,8 @@
         </div>
     </div>
     <nav>
-        <a class="icon-print" title="Print" data-print></a>
-        <a class="icon-export" data-action="export" title="Export"></a>
+        <a class="icon-print" title="Print" data-action="print"></a>
+        <a class="icon-export" title="Export" data-action="export"></a>
     </nav>
 </div>
 
@@ -95,17 +122,28 @@
             <section class="content">
                 <fieldset>
                     <legend>Search</legend>
-                    <div class="small-12 large-5 columns">
+                    <div class="small-12 medium-6 large-4 columns">
                         <select name="reportHouse">
                             <!-- BEGIN house -->
                             <option value="{HOUSE_ID}" {HOUSE_SELECTED}>{HOUSE_NAME}</option>
                             <!-- END house -->
                         </select>
                     </div>
-                    <div class="small-12 large-5 columns">
-                        <input data-datepicker name="reportDate" type="text" value="{REPORT_DATE}">
+                    <div class="small-12 medium-6 large-2 columns">
+                        <select name="reportTimespan">
+                            <!-- BEGIN report_timespan -->
+                            <option value="{REPORT_TIMESPAN_VALUE}" {REPORT_TIMESPAN_SELECTED}>{REPORT_TIMESPAN_LABEL}</option>
+                            <!-- END report_timespan -->
+                        </select>
                     </div>
-                    <div class="small-12 large-2 columns">
+                    <div class="small-12 medium-4 large-2 columns" data-date-start>
+                        <input data-datepicker name="reportDateStart" type="text" value="{REPORT_DATE_START}">
+                    </div>
+                    <div class="small-12 medium-4 large-2 columns {CLASS_REPORT_DATE_END}" data-date-end>
+                        <input data-datepicker name="reportDateEnd" type="text" value="{REPORT_DATE_END}">
+                    </div>
+
+                    <div class="small-12 medium-4 large-2 columns">
                         <input type="submit" title="Search" value='Search' data-action="search">
                     </div>
                 </fieldset>
@@ -118,117 +156,100 @@
 <div class="row">
     <div class="small-12 columns">
         <div class="scrollable">
-        <table data-topic="requestList" id="requestList" class="full-width">
-            <colgroup>
-                <col width="15%">
-                <col width="3%">
-                <col width="7%">
-                <col span="10" class="multi-cell" width="6%">
-                <col width="15%">
-            </colgroup>
-            <thead>
-                <tr>
-                    <th colspan="3"></th>
-                    <!-- BEGIN report_header -->
-                    <th colspan="{REPORT_HEADER_COLSPAN}" class="leaveReportHeaderDate leaveReportLeftBorder leaveReportRightBorder">
-                        {REPORT_HEADER_WEEKDAY}<br/>
-                        {REPORT_HEADER_DATE}
-                    </th>
-                    <!-- END report_header -->
-                    <th colspan="3"></th>
-                </tr>
-                <tr>
-                    <th>Name</th>
-                    <th class='leaveReportYear'>Year</th>
-                    <th></th>
-                    <!-- BEGIN report_header_subtitle -->
-                    <!-- BEGIN report_header_subtitle_show_am -->
-                    <th class='leaveReportMeridiem leaveReportLeftBorder'>AM</th>
-                    <!-- END report_header_subtitle_show_am -->
+            <table data-topic="requestList" id="requestList" class="full-width" data-date-display-start="{DATE_DISPLAY_START}" data-date-display-end="{DATE_DISPLAY_END}">
+                <colgroup>
+                    <col width="15%">
+                    <col width="3%">
+                    <col width="3%">
+                    <col span="{COUNT_DATA_COLUMNS}" class="multi-cell" width="6%">
+                    <col width="8%">
+                    <col width="8%">
+                    <col width="10%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th colspan="3"></th>
+                        <!-- BEGIN report_header -->
+                        <th colspan="{REPORT_HEADER_COLSPAN}" class="leaveReportHeaderDate leaveReportLeftBorder leaveReportRightBorder">
+                            {REPORT_HEADER_WEEKDAY}<br/>
+                            {REPORT_HEADER_DATE}
+                        </th>
+                        <!-- END report_header -->
+                        <th colspan="3"></th>
+                    </tr>
+                    <tr>
+                        <th>Name</th>
+                        <th class='leaveReportYear'>Year</th>
+                        <th class='leaveReportBoardingStatus'></th>
+                        <!-- BEGIN report_header_subtitle -->
 
-                    <!-- BEGIN report_header_subtitle_hide_am -->
-                    <!--<th class='leaveReportMeridiem leaveReportLeftBorder no-arrow leaveReportHide'></th>-->
-                    <!-- END report_header_subtitle_hide_am -->
+                        <!-- BEGIN report_header_subtitle_show_am -->
+                        <th class='leaveReportMeridiem leaveReportLeftBorder'>AM</th>
+                        <!-- END report_header_subtitle_show_am -->
 
-                    <!-- BEGIN report_header_subtitle_show_day -->
-                    <th class='leaveReportMeridiem'>PM</th>
-                    <!-- END report_header_subtitle_show_day -->
+                        <!-- BEGIN report_header_subtitle_show_day -->
+                        <th class='leaveReportMeridiem'>PM</th>
+                        <!-- END report_header_subtitle_show_day -->
 
-                    <!-- BEGIN report_header_subtitle_hide_day -->
-                    <!--<th class='leaveReportMeridiem no-arrow leaveReportHide'></th>-->
-                    <!-- END report_header_subtitle_hide_day -->
+                        <!-- BEGIN report_header_subtitle_show_pm -->
+                        <th class='leaveReportMeridiem leaveReportRightBorder'>Bed</th>
+                        <!-- END report_header_subtitle_show_pm -->
 
-                    <!-- BEGIN report_header_subtitle_show_pm -->
-                    <th class='leaveReportMeridiem leaveReportRightBorder'>Bed</th>
-                    <!-- END report_header_subtitle_show_pm -->
+                        <!-- END report_header_subtitle -->
+                        <th class="leaveReportNoPrint right-border">Host</th>
+                        <th class="leaveReportNoPrint">Activity</th>
+                        <th>Approved By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- BEGIN row -->
+                    <tr class="{CLASS}">
+                        <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
+                        <td class='leaveReportYear'>{USER_YEAR}</td>
+                        <td class='leaveReportBoardingStatus'>{USER_BOARDING_STATUS}</td>
 
-                    <!-- END report_header_subtitle -->
-                    <th class="leaveReportNoPrint right-border">Host</th>
-                    <th class="leaveReportNoPrint">Activity</th>
-                    <th>Approved By</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- BEGIN row -->
-                <!-- BEGIN request -->
-                <tr class="{CLASS}">
-                    <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
-                    <td class='leaveReportYear'>{USER_YEAR}</td>
-                    <td>{USER_BOARDING_STATUS}</td>
-                    <!-- BEGIN request_period -->
-                    <!-- BEGIN request_period_show_am -->
-                    <td class='leaveReportMeridiem leaveReportLeftBorder'>{REQUEST_PERIOD_MORNING}</td>
-                    <!-- END request_period_show_am -->
-                    <!-- BEGIN request_period_hide_am -->
-                    <!--<td class="leaveReportMeridiem leaveReportLeftBorder leaveReportNoRightBorder leaveReportHide"></td>-->
-                    <!-- END request_period_hide_am -->
-                    <!-- BEGIN request_period_show_day -->
-                    <td class='leaveReportMeridiem'>{REQUEST_PERIOD_DAY}</td>
-                    <!-- END request_period_show_day -->
-                    <!-- BEGIN request_period_hide_day -->
-                    <!--<td class="leaveReportMeridiem leaveReportNoBorder leaveReportHide"></td>-->
-                    <!-- END request_period_hide_day -->
-                    <!-- BEGIN request_period_show_pm -->
-                    <td class='leaveReportMeridiem leaveReportRightBorder'>{REQUEST_PERIOD_NIGHT}</td>
-                    <!-- END request_period_show_pm -->
-                    <!-- END request_period -->
-                    <td class="leaveReportNoPrint right-border">{REQUEST_HOST}</td>
+                        <!-- BEGIN request_period -->
 
-                    <td class="leaveReportNoPrint">{REQUEST_ACTIVITY}</td>
+                            <!-- BEGIN request_period_show_am -->
+                            <td class='leaveReportMeridiem leaveReportLeftBorder'>{REQUEST_PERIOD_MORNING}</td>
+                            <!-- END request_period_show_am -->
 
-                    <td class="">
-                        <!-- BEGIN request_authorisation -->
-                        <a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a><br/>
-                        <!-- END request_authorisation -->
-                    </td>
-                </tr>
-                <!-- END request -->
-                <!-- BEGIN empty_request -->
-                <tr class="{CLASS}">
-                    <td><a href="/modules/leave/student/{USER_ID}">{USER_NAME}</a></td>
-                    <td>{USER_YEAR}</td>
-                    <td></td>
-                    <td colspan="1" class="leaveReportHide"></td>
-                    <td colspan="{PERIOD_COUNT}"></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                <!-- END empty_request -->
-                <!-- END row -->
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="3">Totals</td>
-                    <!-- BEGIN request_period_total -->
-                    <td>{PERIOD_TOTAL}</td>
-                    <!-- END request_period_total -->
-                    <td colspan="3"></td>
-                </tr>
-                <!-- Signatures and initials -->
-                <!-- BEGIN request_period_initial -->
-                <!-- END request_period_initial -->
-            </tfoot>
-        </table>
+                            <!-- BEGIN request_period_show_day -->
+                            <td class='leaveReportMeridiem'>{REQUEST_PERIOD_DAY}</td>
+                            <!-- END request_period_show_day -->
+
+                            <!-- BEGIN request_period_show_pm -->
+                            <td class='leaveReportMeridiem leaveReportRightBorder'>{REQUEST_PERIOD_NIGHT}</td>
+                            <!-- END request_period_show_pm -->
+
+                        <!-- END request_period -->
+
+                        <td class="leaveReportNoPrint right-border">{REQUEST_HOST}</td>
+
+                        <td class="leaveReportNoPrint">{REQUEST_ACTIVITY}</td>
+
+                        <td class="">
+                            <!-- BEGIN request_authorisation -->
+                            <a href="/search/user/{REQUEST_AUTHORISATION_USER_ID}">{REQUEST_AUTHORISATION_USER_NAME}</a><br/>
+                            <!-- END request_authorisation -->
+                        </td>
+                    </tr>
+                    <!-- END row -->
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3">Totals</td>
+                        <!-- BEGIN request_period_total -->
+                        <td>{PERIOD_TOTAL}</td>
+                        <!-- END request_period_total -->
+                        <td colspan="3"></td>
+                    </tr>
+                    <!-- Signatures and initials -->
+                    <!-- BEGIN request_period_initial -->
+                    <!-- END request_period_initial -->
+                </tfoot>
+            </table>
+        </div>
     </div>
 </div>
 <!-- END request_list -->

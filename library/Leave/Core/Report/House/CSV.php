@@ -9,7 +9,15 @@
  * @link		http://www.alaress.com.au/
  * @version	 SVN: $Id$
  */
-class Leave_Core_Report_House_CSV extends Leave_Core_Report_House_Web {
+
+
+class Leave_Core_Report_House_CSV extends Leave_Report_House_RendererBase {
+
+    /**
+     * @var resource $stream
+     */
+    private $stream;
+
 	protected $decoration = array(
 		'pendingStart' => '',
 		'pendingEnd' => ' ',
@@ -18,13 +26,13 @@ class Leave_Core_Report_House_CSV extends Leave_Core_Report_House_Web {
 		'approvedEnd' => ' ',
 	);
 
-	/**
-	 * Set up blocks and stuff
-	 */
-	protected function setup() {
+    /**
+     * Setup Hook for descendant classes
+     * @param array $data extra data for descendant classes
+     * @return void
+     */
+    protected function setup(array $data){
 		$this->getPage()->setAjax(true);
-
-		$this->recombination();
 	}
 
 	/**
@@ -34,7 +42,7 @@ class Leave_Core_Report_House_CSV extends Leave_Core_Report_House_Web {
 		header("Content-type: text/csv");
 		header("Cache-Control: no-store, no-cache");
 		header('Content-Disposition: attachment; filename="House Report.csv"');
-		$this->stream = fopen("php://output",'w');
+		$this->setStream(fopen("php://output",'w'));
 
 		$this->renderHeadings();
 		$this->renderSubheadings();
@@ -59,12 +67,12 @@ class Leave_Core_Report_House_CSV extends Leave_Core_Report_House_Web {
 			$headerDate = new Alaress_Date_Format($this->getReportStart()->getUnixTimestamp(), 'U');
 			$headerDate->addDays($j);
 
-			/* Skip AM for Friday
+			/* Skip AM for Friday if using Weekend view
 			 */
 			$fieldList[] = $headerDate->getLongDateOnly();
 			$fieldList[] = '';
 
-			if ($j) {
+			if ($j || 1 === $this->getRange()) {
 				$fieldList[] = '';
 			}
 		}
@@ -82,10 +90,10 @@ class Leave_Core_Report_House_CSV extends Leave_Core_Report_House_Web {
 	protected function renderSubheadings() {
 		$fieldList = array('', '', '');
 
-		/* Skip AM for Friday
+		/* Skip AM for Friday if not single-day view
 		 */
 		for ($j = 0; $j < $this->getRange(); $j++) {
-			if ($j) {
+			if ($j || 1 === $this->getRange()) {
 				$fieldList[] = 'AM';
 			}
 
@@ -106,7 +114,7 @@ class Leave_Core_Report_House_CSV extends Leave_Core_Report_House_Web {
 			$allPeople = $this->getCombined();
 
 			if (is_array($allPeople) && count($allPeople)) {
-				foreach($allPeople as $currentPerson) {
+				foreach($allPeople as $userId => $currentPerson) {
 					$fieldList = array();
 
 					/* Personal details
@@ -118,14 +126,14 @@ class Leave_Core_Report_House_CSV extends Leave_Core_Report_House_Web {
 					/* Periods
 					 */
 					for ($j = 0; $j < count($currentPerson['periods']); $j++) {
-						$currentPeriod = $currentPerson['periods'][$j];
+						$currentPeriod = $currentPerson['periods'][$j]['request_period'];
 
-						if ($j) {
-							$fieldList[] = $currentPeriod['request_period_morning'];
+						if ($j || 1 === $this->getRange()) {
+							$fieldList[] = $currentPeriod['morning'][0]['display'];
 						}
 
-						$fieldList[] = $currentPeriod['request_period_day'];
-						$fieldList[] = $currentPeriod['request_period_night'];
+						$fieldList[] = $currentPeriod['day'][0]['display'];
+						$fieldList[] = $currentPeriod['night'][0]['display'];
 					}
 
 					/* Authorisation
@@ -148,12 +156,19 @@ class Leave_Core_Report_House_CSV extends Leave_Core_Report_House_Web {
 	/* Getters/Setters
 	 */
 
+    /**
+     * @param resource $stream
+     */
+    protected function setStream($stream) {
+        $this->stream = $stream;
+    }
+
 	/**
 	 * Get stream
 	 *
 	 * @return mixed
 	 */
-	private function getStream() {
+    protected function getStream() {
 		return $this->stream;
 	}
 }

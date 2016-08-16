@@ -1,12 +1,15 @@
 <?php
 /**
- * Leave_Core_Report_House_Print
- *
- * @author	  Steve Chan <steve.chan@alaress.com.au>
+ * @author	    Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link		http://www.alaress.com.au/
- * @version	 SVN: $Id$
+ * @version	    SVN: $Id$
  */
-class Leave_Core_Report_House_Print extends Leave_Core_Report_House_Web {
-	protected $templateFile = 'modules/leave/report/house/web.html';
+
+
+/**
+ * Retain in inheritance tree to maintain consistent & logical inheritance levels
+ */
+class Leave_Core_Report_House_Print extends Leave_Core_Report_House_HTML {
+
 }

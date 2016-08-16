@@ -473,8 +473,8 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 				{$this->getJoinColumnString('host_type', 'ht')}
 			FROM {$this->getTable()} `lr`
 			RIGHT JOIN {$this->getJoinSql('user', 'lr', 'u')}
-				AND lr.start < :finish
-				AND lr.finish > :start
+				AND CAST(lr.start AS DATE) <= :finish
+				AND lr.finish >= :start
 				AND (lr.status = :statusApproved OR lr.status = :statusPending OR lr.status IS NULL)
 			LEFT JOIN {$this->getJoinSql('authorisationUser', 'lr', 'au')}
 			LEFT JOIN {$this->getJoinSql('travelType', 'lr', 'tt')}
@@ -504,11 +504,11 @@ class Leave_RequestMapper extends Schoolbox\Mapper {
 	 * Get the numbers of people who are absent and present for a given day, taking
 	 * into account the days they have been scheduled to be away.
 	 *
-	 * To prevent shortages of fud, the following preconditions have been used.
+	 * To prevent shortages of food, the following preconditions have been used.
 	 *
 	 * When Leaving:
 	 * If you are present for any portion of a particular segment, you are classified
-	 * as being present for that segment. e.g. If you leave between 00;00:00 and 11:59:59
+	 * as being present for that segment. e.g. If you leave between 00:00:00 and 11:59:59
 	 * you are still considered as being present for the morning.
 	 *
 	 * When Returning:

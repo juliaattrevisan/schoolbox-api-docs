@@ -9,6 +9,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+
 class Leave_Kings_Report_House_Web extends Leave_Core_Report_House_Web
 {
     /**
