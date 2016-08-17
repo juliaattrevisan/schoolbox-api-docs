@@ -1,0 +1,3 @@
+UPDATE config SET description = "This certificate must be sourced from Google" WHERE name like 'push_gcm_api_key';
+UPDATE config SET description = "This certificate should be in PEM format and sourced from Apple" WHERE name like 'push_apns_cert_path';
+UPDATE config SET name="Apple Push Notification Service Certificate Password", description = "This is the password that protects your PEM key if set, note this can be left blank if the PEM has no password" WHERE name like 'push_apns_cert_key';
