@@ -35,12 +35,6 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
     /** @var resource */
     protected $stream;
 
-    /** @var Predis\Client */
-    protected $client;
-
-    /** @var string */
-    protected $key;
-
     /** @var Storage\Receiver */
     protected $receiver;
 
