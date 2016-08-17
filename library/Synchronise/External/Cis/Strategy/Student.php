@@ -69,12 +69,19 @@ class Synchronise_External_Cis_Strategy_Student extends Synchronise_Base_Strateg
         } catch (Exception $e) {
             $profile = UserProfileMapper::getInstance()->createModel();
         }
+
+        try {
+            $dob = new Alaress_Date_Format($externalUser['StudentBirthDate'], 'Y-m-d');
+        } catch (Exception $e) {
+            $dob = new Alaress_Date_NullDate();
+        }
+
         $profile
             ->setUserId($newUser['id'])
             ->setHouse($externalUser['StudentHouse'])
             ->setHomegroup($externalUser['StudentForm'])
             ->setLevel($newUser['year'])
-            ->setDob(new Alaress_Date_Format($externalUser['StudentBirthDate'], 'Y-m-d'))
+            ->setDob($dob)
             ->setHomegroup($externalUser['StudentClassGroup'])
             ->setGivenName($externalUser['StudentPreferred'])
             ->setLastName($externalUser['StudentSurname'])
