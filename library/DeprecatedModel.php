@@ -19,6 +19,9 @@ class DeprecatedModel
 
     var $_index;
 
+    /** @var DeprecatedDatabase */
+    var $db;
+
 	/**
 	 * @deprecated
 	 */

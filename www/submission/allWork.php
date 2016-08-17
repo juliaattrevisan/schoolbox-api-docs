@@ -14,6 +14,7 @@ define('PERMISSION_DENIED', false);
 
 use Schoolbox\Assessment\StudentReportCard;
 use Schoolbox\Assessment\Term;
+use \Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 
 // require sitepage context
 if(!isset($this)) {
@@ -70,6 +71,7 @@ if($subject) {
 	}
 	// if the student is not enrolled, check if they have submitted to the subject
 	else {
+	    // Did this user submit any due work?
 		$catArray = $boxHandler->submittedToCategoryList(
 			$userId,
 			$term->getStart(),
@@ -80,9 +82,19 @@ if($subject) {
 			$catIdArray[] = $c['id'];
 		}
 
-		if(in_array($subject, $catIdArray)) {
-			$permission = PERMISSION_GRANTED;
-		}
+        if(in_array($subject, $catIdArray)) {
+            $permission = PERMISSION_GRANTED;
+        }
+
+        // Still not granted ?
+        if(PERMISSION_GRANTED !== $permission){
+            // Did this user complete any quizzes which had a finish in specified term ?
+            $quizzesAttempted = AttemptMapper::getInstance()->getAttemptCountForStudentInTerm($userId, $subject, $term->getStart(), $term->getActualFinish());
+
+            if($quizzesAttempted > 0){
+                $permission = PERMISSION_GRANTED;
+            }
+        }
 	}
 
 	if($permission == PERMISSION_DENIED) {

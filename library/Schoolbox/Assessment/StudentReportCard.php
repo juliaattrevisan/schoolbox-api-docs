@@ -12,6 +12,7 @@ namespace Schoolbox\Assessment;
 use Eportfolio\ShowcaseMapper;
 use Schoolbox\Assessment\Component\OnlineAssessment;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Assessment\Component\OnlineAssessment\AttemptMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\StudentReportCard\Comment;
@@ -98,6 +99,9 @@ class StudentReportCard
     protected $showcaseMapper;
     protected $assessMapper;
 
+    /** @var AttemptMapper */
+    protected $attemptMapper;
+
     /**
      * @var Term\Mapper
      */
@@ -125,6 +129,7 @@ class StudentReportCard
         $this->submissionMapper = new SubmissionBoxMapper();
         $this->showcaseMapper   = new ShowcaseMapper();
         $this->assessMapper     = new OnlineAssessmentMapper();
+        $this->attemptMapper    = AttemptMapper::getInstance();
         $this->groupHandler     = new \Group();
         $this->folderMapper     = new Folder\Mapper();
         $this->termMapper       = Term\Mapper::getInstance();
@@ -1231,6 +1236,17 @@ class StudentReportCard
             ),
             ['order' => ['name' => 'asc']]
         );
+
+        /* Get subjects for which this user attempted quizzes */
+        $attemptedSubjects = $this->attemptMapper->getAttemptedSubjects(
+            $this->targetUserId,
+            $this->targetTerm->getStart(),
+            $this->targetTerm->getActualFinish()
+        );
+
+        // Merge in subjects with attempted quizzes
+        $this->categoriesInTerm->mergeUnique($attemptedSubjects, 'id');
+
         // Ensure folder codes are populated
         Folder\Code\Mapper::getInstance()->applyCodesToCategories($this->categoriesInTerm);
     }
