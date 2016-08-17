@@ -453,16 +453,20 @@ class Bootstrap implements BootstrapInterface {
 		// Paginator internal object
 		$di->setters['Alaress\\Paginator\\UrlPaginator']['setPaginator'] = $di->lazyNew('Alaress\\Paginator\\Paginator');
 
-		// Build a user provisioner
-		// TODO unify this definition and the one in Daemon\Bootstrap
-		$di->set('ups.logger',
-			$di->lazyNew(
-				\Schoolbox\Notif\StorefileLogger::class,
-				[
-					'receiver' => $di->lazyNew(\Schoolbox\Resource\Storage\Mapper::class),
-				]
-			)
-		);
+        // Build a user provisioner
+        // TODO unify this definition and the one in Daemon\Bootstrap
+        $di->set('ups.logger',
+            $di->lazyNew(
+                \Schoolbox\Notif\StorefileLogger::class,
+                [
+                    'receiver' => $di->lazyNew(\Schoolbox\Resource\Storage\Mapper::class),
+                    'filename' => $di->lazy(function () use ($di) {
+                        $logDir = $di->get('config')->get('cache_dir').'/logs/';
+                        return tempnam($logDir, 'sb-storefile-');
+                    }),
+                ]
+            )
+        );
 
 		// Build a user provisioner
 		$di->set(

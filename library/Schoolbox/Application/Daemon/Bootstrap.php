@@ -151,14 +151,18 @@ class Bootstrap implements BootstrapInterface {
         // All modules relate to web requests, not daemons.
         // Therefore, no modules need to be set up.
 
-		$di->set('ups.logger',
-			$di->lazyNew(
-				\Schoolbox\Notif\StorefileLogger::class,
-				[
-					'receiver' => $di->lazyNew(\Schoolbox\Resource\Storage\Mapper::class),
-				]
-			)
-		);
+        $di->set('ups.logger',
+            $di->lazyNew(
+                \Schoolbox\Notif\StorefileLogger::class,
+                [
+                    'receiver' => $di->lazyNew(\Schoolbox\Resource\Storage\Mapper::class),
+                    'filename' => $di->lazy(function () use ($di) {
+                        $logDir = $di->get('config')->get('cache_dir').'/logs/';
+                        return tempnam($logDir, 'sb-storefile-');
+                    }),
+                ]
+            )
+        );
 
         // Build a user provisioner
         $di->set(
