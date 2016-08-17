@@ -43,17 +43,17 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
 
 
     /**
+     * @param string                 $filename A temporary filename to log to.
+     *                                         Will be deleted on __destruct or flushToStorage
      * @param Storage\Receiver       $receiver
      * @param FormatterInterface     $formatter
      */
     public function __construct(
+        $filename,
         Storage\Receiver $receiver,
         FormatterInterface $formatter = null
     ) {
-        $this->file = tempnam(sys_get_temp_dir(), 'sb-storefile-');
-        if (!$this->file) {
-            throw new \RuntimeException('Temp file could not be created!');
-        }
+        $this->file = $filename;
 
         $this->receiver = $receiver;
 
