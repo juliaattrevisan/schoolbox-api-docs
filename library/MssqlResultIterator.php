@@ -9,19 +9,17 @@
 class MssqlResultIterator implements SeekableIterator, Countable
 {
     /**
-     * @var resource
+     * @var resource|bool
      */
     protected $result;
 
     /**
-     * @var array
-     */
-    protected $currentRow = [];
-
-    /**
+     * Position is semantically stored here, regardless of pointer in underlying result.
+     * This implies we must call mssql_data_seek($position) prior to retrieving any data.
+     *
      * @var int
      */
-    protected $rowNum = 0;
+    protected $position;
 
     /**
      * A list of map functions to apply to each result.
@@ -33,21 +31,41 @@ class MssqlResultIterator implements SeekableIterator, Countable
     /**
      * Constructor
      *
-     * @param resource $result A result from mssql_query
+     * Unfortunately, this can receive the result from mssql_execute() which executes a
+     * stored proc. In this case, we can't guarantee that 'false' means error, as it does
+     * in almost all other cases, eg mssql_query(). We therefore have to treat both 'true'
+     * and 'false' as successful queries that returned empty result sets.
+     *
+     * @param resource|bool $result
      */
     public function __construct($result)
     {
-        $this->result = $result;
+        if(is_resource($result) && mssql_num_rows($result)){
+            $this->result = $result;
+        } else {
+            $this->result = false;
+        }
+        $this->position = 0;
     }
 
     /**
-     * Return the current element
+     * Return the current element after applying transformations added via `$this->addMap()`.
      *
-     * @return array
+     * @return array|null
      */
     public function current()
     {
-        return $this->currentRow;
+        if(is_resource($this->result)){
+            mssql_data_seek($this->result, $this->position);
+            $row = mssql_fetch_assoc($this->result);
+            if ($row !== false) {
+                foreach ($this->maps as $map) {
+                    $row = $map($row);
+                }
+                return $row;
+            }
+        }
+        return null;
     }
 
     /**
@@ -55,8 +73,7 @@ class MssqlResultIterator implements SeekableIterator, Countable
      */
     public function next()
     {
-        $this->rowNum++;
-        $this->loadNextRow();
+        ++$this->position;
     }
 
     /**
@@ -66,7 +83,7 @@ class MssqlResultIterator implements SeekableIterator, Countable
      */
     public function key()
     {
-        return $this->rowNum;
+        return $this->position;
     }
 
     /**
@@ -76,15 +93,14 @@ class MssqlResultIterator implements SeekableIterator, Countable
      */
     public function valid()
     {
-        // Is there a current result?
-        $row = $this->currentRow;
-        if ($row === false) {
+        if(!is_resource($this->result) || $this->position < 0 || $this->position >= $this->count() ){
             return false;
         }
-        foreach ($this->maps as $map) {
-            $row = $map($row);
-        }
-        $this->currentRow = $row;
+
+        // Intentionally no check for " ! mssql_fetch_assoc($this->result) "
+        // If that method fails, the position is still valid, but null should be returned.
+        // This ensures a foreach() doesn't bug out prematurely.
+
         return true;
     }
 
@@ -93,39 +109,28 @@ class MssqlResultIterator implements SeekableIterator, Countable
      */
     public function rewind()
     {
-        if (gettype($this->result) == 'resource') {
-            $this->rowNum = 0;
-            try {
-                $this->seek(0);
-            } catch (OutOfBoundsException $e) {
-                // No results at all - noop
-                // (loadNextRow will set $this->result to false)
-            }
-        }
+        $this->position = 0;
     }
 
     /**
-     * Seeks to a position
+     * Seeks to a position.
      *
      * @var int $position
+     * @throw OutOfBoundsException
      */
     public function seek($position)
     {
-        if (is_resource($this->result)) {
-            if ($position < count($this) && mssql_data_seek($this->result, $position)) {
-                $this->loadNextRow();
-                return;
-            }
-
-            /* Tried to access an area beyond the bounds of a
-             * result set that contains data
-             */
+        // Non-resource results are treated as empty, so seek should always throw
+        if(!is_resource($this->result) || $position < 0 || $position >= count($this)){
             throw new OutOfBoundsException(sprintf('Position "%s" is out of bounds', $position));
         }
 
-        /* Not even a resource object, die loudly
-         */
-        throw new InvalidArgumentException('Invalid result set');
+        // Intentionally distinct from above, as semantics are distinct
+        if(!mssql_data_seek($this->result, $position)){
+            throw new OutOfBoundsException(sprintf('Unable to seek to position "%s"', $position));
+        }
+
+        $this->position = $position;
     }
 
     /**
@@ -133,7 +138,10 @@ class MssqlResultIterator implements SeekableIterator, Countable
      */
     public function count()
     {
-        return mssql_num_rows($this->result);
+        if(is_resource($this->result)){
+            return mssql_num_rows($this->result);
+        }
+        return 0;
     }
 
     /**
@@ -146,19 +154,5 @@ class MssqlResultIterator implements SeekableIterator, Countable
     {
         $this->maps[] = $map;
         return $this;
-    }
-
-    /**
-     * Loads next row, and applies transformations added via `$this->addMap()`.
-     */
-    protected function loadNextRow()
-    {
-        $row = mssql_fetch_assoc($this->result);
-        if ($row !== false) {
-            foreach ($this->maps as $map) {
-                $row = $map($row);
-            }
-        }
-        $this->currentRow = $row;
     }
 }
