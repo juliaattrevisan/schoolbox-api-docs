@@ -428,29 +428,26 @@
     RubricEditable.prototype.renumberColumnInputs = function()
     {
         var $rb = $(this.element),
-            rows = $rb.find('tr'),
-            i = 0;
+            rows = $rb.find('tr');
 
         // Re-number all the levels, descriptors and values in the rubric grid
         rows.each(function() {
             var $row = $(this);
 
             // Renumber levels
-            $row.find('[data-level]').map(function() {
+            $row.find('[data-level]').each(function(i) {
                 this.name = this.name.replace(/\[\d+]\[name]$/, '[' + String(i) + '][name]');
             });
 
             // Renumber descriptor texts
-            $row.find('[data-descriptor="text"]').map(function() {
+            $row.find('[data-descriptor="text"]').each(function(i) {
                 this.name = this.name.replace(/\[\d+]\[text]$/, '[' + String(i) + '][text]');
             });
 
             // Renumber descriptor values
-            $row.find('[data-descriptor="value"]').map(function() {
+            $row.find('[data-descriptor="value"]').each(function(i) {
                 this.name = this.name.replace(/\[\d+]\[points]$/, '[' + String(i) + '][points]');
             });
-
-            i++;
         });
     };
 
