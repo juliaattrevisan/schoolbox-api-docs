@@ -54,6 +54,9 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
         FormatterInterface $formatter = null
     ) {
         $this->file = $filename;
+        if (!$this->file) {
+            throw new \RuntimeException('Temp file does not exist!');
+        }
 
         $this->receiver = $receiver;
 
