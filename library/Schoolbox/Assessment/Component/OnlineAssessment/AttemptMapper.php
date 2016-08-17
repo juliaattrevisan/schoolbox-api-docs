@@ -373,11 +373,11 @@ class AttemptMapper extends Mapper
         $whereClause = implode(' AND ', $parts);
 
         $query = "
-                SELECT c.id FROM category c
-                JOIN assess a ON a.category_id = c.id
+                SELECT f.id FROM folder f
+                JOIN assess a ON a.category_id = f.id
                 JOIN assess_attempt aa ON aa.assess_id = a.assess_id
                 WHERE $whereClause";
-        $query .= " GROUP BY c.id";
+        $query .= " GROUP BY f.id";
 
         $statement = $this->database->prepare($query);
         $statement->execute($params);
