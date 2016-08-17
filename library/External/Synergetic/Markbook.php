@@ -356,7 +356,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
                                     '{$assessmentRemote['MarkBookSeq']}',
                                     '{$mark}',
                                     '".$this->getDatabase()->quote($comment)."',
-                                    CONVERT( datetime, '".$dueDate->getDatabase()."', 20)),  
+                                    CONVERT( datetime, '".$this->getDatabase()->quote($dueDate->getDatabase())."', 20)),  
                                     '".$marker->getExternalId()."',
                                     CURRENT_TIMESTAMP
                                   )
