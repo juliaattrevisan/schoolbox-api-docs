@@ -118,88 +118,86 @@
 
 <div class="row">
     <div class="small-12 island">
-        <section>
-            <table data-sortable>
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th class="text-right show-for-xlarge-up">Grade</th>
-                        <th>Status</th>
-                        <th>Date Submitted</th>
-                        <th class="text-right no-pad" data-orderable="false">
-                            <!-- BEGIN checkbox -->
-                            <div>
-                                <span title="Select all attempts" class="show-for-medium-up">
-                                    <input data-selectall="review[]" id="review-all" type="checkbox">
-                                    <label for="review-all" class="checkbox-toggle">
-                                        <span class="icon-tick" title="Toggle All Reviewed"></span>
-                                    </label>
-                                </span>
+        <table data-sortable>
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th class="text-right show-for-xlarge-up">Grade</th>
+                    <th>Status</th>
+                    <th>Date Submitted</th>
+                    <th class="text-right no-pad" data-orderable="false">
+                        <!-- BEGIN checkbox -->
+                        <div>
+                            <span title="Select all attempts" class="show-for-medium-up">
+                                <input data-selectall="review[]" id="review-all" type="checkbox">
+                                <label for="review-all" class="checkbox-toggle">
+                                    <span class="icon-tick" title="Toggle All Reviewed"></span>
+                                </label>
+                            </span>
+                        </div>
+                        <!-- END checkbox -->
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- BEGIN user_attempts -->
+                <!-- BEGIN attempt -->
+                <tr data-student="{ATTEMPT_ATTEMPT_ID}">
+                    <td data-order="{ATTEMPT_SURNAME}, {ATTEMPT_FIRSTNAME}">
+                        <div class="card small-12">
+                            <a href="/search/user/{USER_ID}" title="View Profile">
+                                <img src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square64" alt="View Profile">
+                                <b>{ATTEMPT_SURNAME}, {ATTEMPT_FIRSTNAME}</b>
+                            </a>
+                            <!-- BEGIN has_marks -->
+                            <div class="show-for-large-down"><span class="gradient-{ATTEMPT_GRADIENT}"><b>{ATTEMPT_PERCENTAGE}</b></span></div>
+                            <div class="show-for-xlarge-up">
+                                            <span class="gradient-{ATTEMPT_GRADIENT}">
+                                                {ATTEMPT_TOTAL_MARKS}/{ATTEMPT_TOTAL_AVAILABLE_MARKS}
+                                            </span>
                             </div>
-                            <!-- END checkbox -->
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- BEGIN user_attempts -->
-                    <!-- BEGIN attempt -->
-                    <tr data-student="{ATTEMPT_ATTEMPT_ID}">
-                        <td data-order="{ATTEMPT_SURNAME}, {ATTEMPT_FIRSTNAME}">
-                            <div class="card small-12">
-                                <a href="/search/user/{USER_ID}" title="View Profile">
-                                    <img src="/portrait.php?userId={ATTEMPT_EXTERNAL_ID}&size=square64" alt="View Profile">
-                                    <b>{ATTEMPT_SURNAME}, {ATTEMPT_FIRSTNAME}</b>
-                                </a>
-                                <!-- BEGIN has_marks -->
-                                <div class="show-for-large-down"><span class="gradient-{ATTEMPT_GRADIENT}"><b>{ATTEMPT_PERCENTAGE}</b></span></div>
-                                <div class="show-for-xlarge-up">
-                                                <span class="gradient-{ATTEMPT_GRADIENT}">
-                                                    {ATTEMPT_TOTAL_MARKS}/{ATTEMPT_TOTAL_AVAILABLE_MARKS}
-                                                </span>
-                                </div>
-                                <!-- END has_marks -->
-                            </div>
-                        </td>
-                        <td class="text-right show-for-xlarge-up" data-order="{ATTEMPT_PERCENTAGE}">
-                            <div class="card small-12">
-                                <h2><b><span class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}</span></b></h2>
-                            </div>
-                        </td>
-                        <td>
-                            <!-- BEGIN submitted -->
-                            <div class="gradient-10">Quiz Completed</div>
-                            <!-- END submitted -->
+                            <!-- END has_marks -->
+                        </div>
+                    </td>
+                    <td class="text-right show-for-xlarge-up" data-order="{ATTEMPT_PERCENTAGE}">
+                        <div class="card small-12">
+                            <h2><b><span class="gradient-{ATTEMPT_GRADIENT}">{ATTEMPT_PERCENTAGE}</span></b></h2>
+                        </div>
+                    </td>
+                    <td>
+                        <!-- BEGIN submitted -->
+                        <div class="gradient-10">Quiz Completed</div>
+                        <!-- END submitted -->
 
-                            <!-- BEGIN unsubmitted -->
-                            <div>{ATTEMPT_FINISH}</div>
-                            <!-- END unsubmitted -->
+                        <!-- BEGIN unsubmitted -->
+                        <div>{ATTEMPT_FINISH}</div>
+                        <!-- END unsubmitted -->
 
-                            {ATTEMPT_NOT_FINISH}
+                        {ATTEMPT_NOT_FINISH}
 
-                            <!-- BEGIN reviewed -->
-                            <span class="label success"><b>Reviewed</b></span>
-                            <!-- END reviewed -->
+                        <!-- BEGIN reviewed -->
+                        <span class="label success"><b>Reviewed</b></span>
+                        <!-- END reviewed -->
 
-                            <!-- BEGIN not_reviewed -->
-                            <span class="label neutral"><b>Not Reviewed</b></span>
-                            <!-- END not_reviewed -->
-                        </td>
-                        <td data-order="{ATTEMPT_TIMESTAMP}">
-                                {ATTEMPT_FINISH}<br />
-                                {ATTEMPT_TIME_TAKEN}
-                        </td>
-                        <td class="actions-xlarge-4 actions-small-1">
-                            <nav>
-                                {ATTEMPT_REVIEW}
-                                {ATTEMPT_CHECKBOX}
-                            </nav>
-                        </td>
-                    </tr>
-                    <!-- END attempt -->
-                    <!-- END user_attempts -->
-                </tbody>
-            </table>
-        </section>
+                        <!-- BEGIN not_reviewed -->
+                        <span class="label neutral"><b>Not Reviewed</b></span>
+                        <!-- END not_reviewed -->
+                    </td>
+                    <td data-order="{ATTEMPT_TIMESTAMP}">
+                            {ATTEMPT_FINISH}<br />
+                            {ATTEMPT_TIME_TAKEN}
+                    </td>
+                    <td class="actions-xlarge-4 actions-small-1">
+                        <nav>
+                            {ATTEMPT_REVIEW}
+                            {ATTEMPT_CHECKBOX}
+                        </nav>
+                    </td>
+                </tr>
+                <!-- END attempt -->
+                <!-- END user_attempts -->
+            </tbody>
+        </table>
     </div>
 </div>
 

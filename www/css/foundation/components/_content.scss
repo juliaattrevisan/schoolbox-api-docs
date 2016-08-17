@@ -401,6 +401,14 @@ table{
 	width: 100%;
 	.card{
 		padding: 0;
+		img{
+			margin: -0.6rem 1rem 0 -0.6rem;
+		}
+	}
+	.no-pad{
+		.card img{
+			margin: 0 1rem 0 0;
+		}
 	}
 }
 thead tr th, .row-header, .island table.dataTable thead th {
@@ -1165,11 +1173,7 @@ ul.flex-list {
     // card "extends" column
 	float: left;
 	position: relative;
-    min-height: (3 * rem-calc($base-font-size));
     padding: 0.5rem 1rem 0 1rem;
-    @media #{$medium-up} {
-        min-height: (4 * rem-calc($base-font-size));
-    }
 
     /*
      * Displays an image to the left,
