@@ -125,6 +125,12 @@ class Healthcheck
         $this->MssqlConnection();
     }
 
+    private function PcschoolsCheckConnection()
+    {
+        $this->log .= "\nMaze Connection Check\n";
+        $this->MssqlConnection();
+    }
+
     private function HumanedgeCheckConnection()
     {
         $this->log .= "\nHumanedge Connection Check\n";
@@ -228,6 +234,36 @@ class Healthcheck
         $list[] = 'TT';
         $list[] = 'TTTG';
         $list[] = 'UM';
+        sort($list);
+
+        foreach ($list as $table) {
+            $this->log .= "  $table : ";
+            $db = new MSSQL();
+            $db->debug = true;
+            $result = $db->query("SELECT TOP 1 * FROM $table");
+            if ($result) {
+                $this->log .= "OK\n";
+            } else {
+                $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
+            }
+            unset($db,$result);
+        }
+    }
+
+    private function PcschoolsCheckTables()
+    {
+        $this->log .= "\nPCSchools Permission Check - Tables\n";
+        $list[] = 'TIMEFILE';
+        $list[] = 'SUB';
+        $list[] = 'SUBJECT';
+        $list[] = 'STUDENT';
+        $list[] = 'TIMEPDHD';
+        $list[] = 'CALENDAR';
+        $list[] = 'CODEMAST';
+        $list[] = 'TEACHER';
+        $list[] = 'FAMILY';
+        $list[] = 'SYSFILE';
+        $list[] = 'IDENTITY';
         sort($list);
 
         foreach ($list as $table) {
