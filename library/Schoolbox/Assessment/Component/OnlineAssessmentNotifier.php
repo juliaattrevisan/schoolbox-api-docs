@@ -267,7 +267,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$msg = new Message(":quizname has closed and :number did not submit work", $icon, $href);
 
 		$msgr->targetToUser($owner->getId(), $msg, "assess.$quizId.closed", Logger::ERROR, array(
-			'boxname' => array($quizName, "/assess/results/$quizId"),
+			'quizname' => array($quizName, "/assess/results/$quizId"),
 			'number'  => sprintf("%s student%s", $totalUnattempted, $totalUnattempted == 1 ? '' : 's')
 		));
 
@@ -341,7 +341,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$icon = "/images/icon.php?size={$this->iconSize}&icon=work";
 		$href = "/assess/intro/$quizId";
 
-		$msg = new Message(":boxname has closed in :catname", $icon, $href);
+		$msg = new Message(":quizname has closed in :catname", $icon, $href);
 
 		$unattemptedStudents = $this->getStudentsUnattemptedList($quiz);
 
@@ -567,11 +567,11 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                 $date = $relative->getTimeOnly() .' on '.$date;
             }
 
-			$msg = new Message(":author $verb :boxname to :date in :catname", $icon, $href);
+			$msg = new Message(":author $verb :quizname to :date in :catname", $icon, $href);
 
 			$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.datechanged", Logger::NOTICE, array(
 					'author' => array($ownerName, "/search/user/$ownerId"),
-					'boxname' => array($quizName, "/assess/intro/$quizId"),
+					'quizname' => array($quizName, "/assess/intro/$quizId"),
 					'date' => $date,
 					'catname' => array($cat->getName(), "/homepage/$catId")
 				),
@@ -697,7 +697,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                 $date = $relative->getTimeOnly() .' on '.$date;
             }
 
-            $msg = new Message(":child's $quizType :boxname closing date was $verb to :date in :catname", $icon, $href);
+            $msg = new Message(":child's $quizType :quizname closing date was $verb to :date in :catname", $icon, $href);
             foreach ($students as $student) {
                 $msgr->targetToParent(
                     $student->getId(),
@@ -706,7 +706,7 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
                     Logger::NOTICE,
                     array(
                         'child'   => array($student->formatName('{firstname}'), "/search/user/".$student->getId()),
-                        'boxname' => array($quizName, "/assess/intro/$quizId"),
+                        'quizname' => array($quizName, "/assess/intro/$quizId"),
                         'date'    => $date,
                         'catname' => array($cat->getName(), "/homepage/$catId"),
                     )
@@ -766,10 +766,10 @@ class OnlineAssessmentNotifier extends AbstractModuleNotifier implements SourceI
 		$icon = "/images/icon.php?size={$this->iconSize}&icon=cross";
 		$href = "/intro/assess/$quizId";
 
-		$msg = new Message("Submissions have closed for :boxname in :catname", $icon, $href);
+		$msg = new Message(":quizname has closed in :catname", $icon, $href);
 
 		$msgr->broadcastToCategory($catId, $msg, "assess.$quizId.closed", Logger::NOTICE, array(
-			'boxname' => array($quizName, $href),
+			'quizname' => array($quizName, $href),
 			'catname' => array($catName, "/homepage/$catId"),
 		));
 
