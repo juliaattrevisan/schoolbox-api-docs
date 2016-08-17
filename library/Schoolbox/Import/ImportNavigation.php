@@ -7,15 +7,7 @@
 
 namespace Schoolbox\Import;
 
-use Alaress\Csv\Reader;
-use Alaress\Web\Controller\Base;
 use Aura\Router\Router;
-use Schoolbox\Mapper;
-use Schoolbox\Notif\StoredisLogger;
-use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\Attachment\Zone;
-use Schoolbox\Resource\Storage;
-use Schoolbox\Sync\Log;
 use Schoolbox\Sync\Navigator\Navigator;
 use Schoolbox\Sync\Navigator\Node;
 
