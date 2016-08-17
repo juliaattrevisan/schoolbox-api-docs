@@ -263,6 +263,28 @@
     };
 
     /**
+     * Try to record using the Flash recorder.
+     *
+     * Triggers a recordingStartFailed event if Flash isn't supported,
+     * or something goes wrong in the fallback.
+     *
+     * @param error The error in WebRTC or MediaRecorder which caused us to fall back.
+     *
+     * @private
+     */
+    RecorderPlugin.prototype._attemptFlashRecording = function(error) {
+        if (this.isFlashSupported()) {
+            try {
+                this._startRecordingFlash();
+            } catch (e) {
+                this.triggerEvent('recordingStartFailed', [e]);
+            }
+        } else {
+            this.triggerEvent('recordingStartFailed', [error]);
+        }
+    };
+
+    /**
      * Start recording in Flash mode
      *
      * @private
@@ -304,13 +326,8 @@
                 function(stream) {
                     self._startRecordingMediaRecorder(stream);
                 },
-                function(error) {
-                    // Try to fall back to Flash.
-                    if (self.isFlashSupported()) {
-                        self._startRecordingFlash();
-                    } else {
-                        self.triggerEvent('recordingStartFailed', [error]);
-                    }
+                function() {
+                    self._attemptFlashRecording();
                 }
             );
         } else if (self.isWebRtcSupported()) {
@@ -319,17 +336,12 @@
                 function(stream) {
                     self._startRecordingWebRtc(stream);
                 },
-                function(error) {
-                    // Try to fall back to Flash.
-                    if (self.isFlashSupported()) {
-                        self._startRecordingFlash();
-                    } else {
-                        self.triggerEvent('recordingStartFailed', [error]);
-                    }
+                function() {
+                    self._attemptFlashRecording();
                 }
             );
         } else {
-            self._startRecordingFlash();
+            self._attemptFlashRecording();
         }
         return this;
     };
