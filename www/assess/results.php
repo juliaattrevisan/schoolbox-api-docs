@@ -80,7 +80,6 @@ function processAttempt(
         'ATTEMPT_SURNAME' => $currentAttempt['lastname'],
         'ATTEMPT_TOTAL_MARKS' => number_format($currentAttempt['totalMarks'], 2),
         'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($totalAvailableMarks, 2),
-        'ATTEMPT_PERCENTAGE' => "{$percentage}%",
         'ATTEMPT_CHECKBOX' => '<input id="review-'.$currentAttempt['attempt_id'].'" name="review[]" type="checkbox" name=\'reviewAttemptIds[]\' value=\''.$currentAttempt['attempt_id'].'\'><label for="review-'.$currentAttempt['attempt_id'].'" class="checkbox-toggle"><span class="icon-tick" title="Mark As Reviewed"></span></label>',
         'ATTEMPT_GRADIENT'  => (int)($percentage / 10),
         'ATTEMPT_REVIEW_STATUS' => $reviewedAt,
@@ -104,6 +103,7 @@ function processAttempt(
             'ATTEMPT_TIMESTAMP' => $attemptFinishDate->getUnixTimestamp(),
             'ATTEMPT_TIME_TAKEN' => $timeTaken,
             'ATTEMPT_FINISH' => $finish,
+            'ATTEMPT_PERCENTAGE' => "{$percentage}%",
             'ATTEMPT_NOT_FINISH' => '',
             'ATTEMPT_REVIEW' => '<a href="/assess/review/'.$page->arg[0].'/'.$firstSection['section_id'].'/'.$currentAttempt['attempt_id'].'" class="icon-view" title="View Submission"></a>',
             'unsubmitted_block' => ''
@@ -121,6 +121,7 @@ function processAttempt(
             'ATTEMPT_TIME_TAKEN' => $timeTaken,
             'ATTEMPT_FINISH' => 'Incomplete',
             'ATTEMPT_NOT_FINISH' => '',
+            'ATTEMPT_PERCENTAGE' => '',
             'ATTEMPT_REVIEW' => '<a href="/assess/review/'.$page->arg[0].'/'.$firstSection['section_id'].'/'.$currentAttempt['attempt_id'].'" class="icon-view" title="View Submission"></a>',
             'submitted_block' => '',
             'has_marks_block' => '',
@@ -205,7 +206,6 @@ catch (\Exception $e) {
 $this->setFile(TEMPLATE_content, 'assess/results.html');
 $this->setBlock(TEMPLATE_content, 'user_attempts', 'user_attempts_block');
 $this->setBlock('user_attempts', 'attempt', 'attempt_block');
-$this->setBlock('attempt', 'attempted', 'attempted_block');
 $this->setBlock('attempt', 'reviewed', 'reviewed_block');
 $this->setBlock('attempt', 'not_reviewed', 'not_reviewed_block');
 $this->setBlock('attempt', 'submitted', 'submitted_block');
@@ -301,7 +301,6 @@ $allAttempts = $attemptHandler->getList($this->arg[0]);
  */
 if (is_array($allAttempts) && count($allAttempts)) {
     $this->parse('has_attempt_block', 'has_attempt');
-    $this->parse('attempted_block', 'attempted');
     $this->parse('has_marks_block', 'has_marks');
 } else {
     $this->setVar(array(
@@ -379,7 +378,6 @@ if (is_array($allStudents) && count($allStudents)) {
                 'reviewed_block' => '',
                 'has_marks_block' => '',
                 'not_reviewed_block' => '',
-                'attempted_block'  => '',
             ));
 
             $this->parse('unsubmitted_block', 'unsubmitted');
