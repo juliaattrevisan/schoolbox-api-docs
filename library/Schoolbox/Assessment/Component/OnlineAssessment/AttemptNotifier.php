@@ -235,9 +235,6 @@ class AttemptNotifier extends AbstractModuleNotifier {
             $this->log->debug(sprintf(self::LOG_MARK_PATTERN, $assessId, $assess->getMarkVisibility(), 'sending', 'parent'));
         }
 
-		$assessId = $attempt->getAssessment()->getId();
-		/** @var OnlineAssessment $assess */
-		$assess   = $this->assessMapper->findById($assessId);
         $category = $this->categoryMapper->findById($assess->getCategory()->getId());
 
 		$studentId = $attempt->getUser()->getId();
