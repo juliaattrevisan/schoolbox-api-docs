@@ -203,72 +203,8 @@ class External_Liss_Server {
 		$authenticator = new External_Liss_Authenticator($message->params[0]);
 
 		if ($authenticator->isAuthenticated()) {
-			$userMapper = new \Schoolbox\UserMapper();
-
-			$allData = $message->params[2]->me['array'];
-
-			foreach($allData as $currentData) {
-				$struct = $currentData->me['struct'];
-
-				/* Update vs create
-				 * Try to find via external id - if one exists, update it
-				 * Otherwise create a new one
-				 */
-				try {
-					$externalId = (string)$struct['TeacherCode']->me['string'];
-
-					$user = $userMapper->findByExternalId($externalId);
-				}
-				catch (\Exception $e) {
-					$user = new \Schoolbox\User();
-				}
-
-				/* TODO: SDK doesn't match spec
-				 */
-				$name = (string)$struct['Name']->me['string'];
-				$bits = explode(' ', $name);
-
-				$user->setFirstname($bits[0]);
-				$user->setLastname($bits[1]);
-				$user->setExternalId((string)$struct['TeacherCode']->me['string']);
-
-				/* TODO: Add campus
-				 */
-				$campusMapper = new \Schoolbox\CampusMapper();
-				$campus = $campusMapper->findById(1);
-
-				$campusCollection = new \Schoolbox\Collection();
-				$campusCollection->add($campus);
-
-				$user->setCampusCollection($campusCollection);
-				$user->setDefaultCampus($campus);
-
-				/* TODO: Add role
-				 */
-				$roleMapper = new \Schoolbox\RoleMapper();
-				$role = $roleMapper->findById(2);
-
-				$user->setRole($role);
-
-				/* TODO: Emails
-				 */
-				$user->setLocalEmail(0);
-				$user->setWebmail(1);
-				$user->setUseInternalMail(0);
-
-				/* TODO: Eportfolio
-				 */
-				$user->setEportfolioEnable(1);
-
-				/* TODO: Mandatory other fields
-				 */
-				$user->setUsername('teacher' . md5($user->getFirstname() . $user->getLastname()));
-				$user->setSuperuser(0);
-				$user->setEnabled(1);
-
-				$userMapper->save($user);
-			}
-
+			/* Respond without doing anything to avoid errors
+			 */
 			return new xmlrpcresp(new xmlrpcval('Teachers Imported', 'string'));
 		}
 		return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
@@ -284,68 +220,8 @@ class External_Liss_Server {
 		$authenticator = new External_Liss_Authenticator($message->params[0]);
 
 		if ($authenticator->isAuthenticated()) {
-			$userMapper = new \Schoolbox\UserMapper();
-
-			$allData = $message->params[2]->me['array'];
-
-			foreach($allData as $currentData) {
-				$struct = $currentData->me['struct'];
-
-				/* Update vs create
-				 * Try to find via external id - if one exists, update it
-				 * Otherwise create a new one
-				 */
-				try {
-					$externalId = (string)$struct['StudentId']->me['string'];
-
-					$user = $userMapper->findByExternalId($externalId);
-				}
-				catch (\Exception $e) {
-					$user = new \Schoolbox\User();
-				}
-
-				$user->setFirstname((string)$struct['FirstName']->me['string']);
-				$user->setLastname((string)$struct['Surname']->me['string']);
-				$user->setExternalId((string)$struct['StudentId']->me['string']);
-				$user->setYear((string)$struct['Form']->me['string']);
-
-				/* TODO: Add campus
-				 */
-				$campusMapper = new \Schoolbox\CampusMapper();
-				$campus = $campusMapper->findById(1);
-
-				$campusCollection = new \Schoolbox\Collection();
-				$campusCollection->add($campus);
-
-				$user->setCampusCollection($campusCollection);
-				$user->setDefaultCampus($campus);
-
-				/* TODO: Add role
-				 */
-				$roleMapper = new \Schoolbox\RoleMapper();
-				$role = $roleMapper->findById(3);
-
-				$user->setRole($role);
-
-				/* TODO: Emails
-				 */
-				$user->setLocalEmail(0);
-				$user->setWebmail(1);
-				$user->setUseInternalMail(0);
-
-				/* TODO: Eportfolio
-				 */
-				$user->setEportfolioEnable(1);
-
-				/* TODO: Mandatory other fields
-				 */
-				$user->setUsername('student' . md5($user->getFirstname() . $user->getLastname()));
-				$user->setSuperuser(0);
-				$user->setEnabled(1);
-
-				$userMapper->save($user);
-			}
-
+			/* Respond without doing anything to avoid errors
+			 */
 			return new xmlrpcresp(new xmlrpcval('Students Imported', 'string'));
 		}
 		return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
