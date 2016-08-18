@@ -10,9 +10,52 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork;
 
+use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 
 class Model extends AbstractAssessment
 {
 
+    /**
+     * All the Files that are part of the Due Work specification
+     * e.g. "Here are some pictures to look at, so you can complete
+     * this Due Work"
+     *
+     * @var Collection
+     */
+    protected $allFiles;
+
+    /**
+     * Model constructor.
+     */
+    public function __construct()
+    {
+
+        /* I know Dr hates hook methods, so do this instead
+         */
+        parent::__construct();
+
+        $this->setAllFiles(new Collection());
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return Collection
+     */
+    public function getAllFiles()
+    {
+        return $this->allFiles;
+    }
+
+    /**
+     * @param Collection $allFiles
+     * @return self
+     */
+    public function setAllFiles($allFiles)
+    {
+        $this->allFiles = $allFiles;
+        return $this;
+    }
 }

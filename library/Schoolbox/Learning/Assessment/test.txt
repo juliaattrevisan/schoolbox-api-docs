@@ -1,8 +1,8 @@
 <?php
 
-/* Ram this into your www/test.php to have a crack
- */
 require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
+
+use \Schoolbox\Collection;
 
 use \Schoolbox\Learning\Assessment\Project;
 use \Schoolbox\Learning\Summator;
@@ -10,6 +10,7 @@ use \Schoolbox\Learning\Summator;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 
 use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
@@ -32,12 +33,35 @@ $response
     ->getAllFeedback()
     ->add($feedback1);
 
+$file1 = new DueWorkFile();
+$file1
+    ->setId(1)
+    ->setHash('abcdefg12341234')
+    ->setFilename('myfile1.jpg');
+
+$file2 = new DueWorkFile();
+$file2
+    ->setId(2)
+    ->setHash('zxvzxcvzxcv945786947')
+    ->setFilename('myfile2.jpg');
+
+$allFiles = new Collection();
+$allFiles
+    ->add($file1)
+    ->add($file2);
+
 $dueWork1 = new DueWork();
 $dueWork1
     ->setTitle('My First Due Work')
     ->getAllResponses()
     ->add($response);
 
+$dueWork1
+    ->getAllFiles()
+    ->add($file1)
+    ->add($file2);
+
+new \Alaress_Probe($dueWork1);
 
 /* Second (marked)
  */
@@ -193,3 +217,36 @@ foreach ($allSummators as $currentSummator) {
 
     new \Alaress_Probe(get_class($currentSummator), $project->calculateMark(), $project->calculatePercentageMarked());
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+die();
