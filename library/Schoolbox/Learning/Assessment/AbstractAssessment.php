@@ -13,7 +13,7 @@ namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
 
-abstract class AbstractModel implements IAssessable
+abstract class AbstractAssessment implements IAssessable
 {
 
     /**

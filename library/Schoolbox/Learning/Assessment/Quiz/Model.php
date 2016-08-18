@@ -14,8 +14,8 @@
 
 namespace Schoolbox\Learning\Assessment\Quiz;
 
-use \Schoolbox\Learning\Assessment\AbstractModel;
+use \Schoolbox\Learning\Assessment\AbstractAssessment;
 
-class Model extends AbstractModel
+class Model extends AbstractAssessment
 {
 }

@@ -10,9 +10,9 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork;
 
-use \Schoolbox\Learning\Assessment\AbstractModel;
+use \Schoolbox\Learning\Assessment\AbstractAssessment;
 
-class Model extends AbstractModel
+class Model extends AbstractAssessment
 {
 
 }

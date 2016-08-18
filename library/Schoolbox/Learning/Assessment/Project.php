@@ -20,7 +20,7 @@ use \Schoolbox\Learning\Summator\ISummator;
 use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
 use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
-class Project extends AbstractModel
+class Project extends AbstractAssessment
 {
 
     /**

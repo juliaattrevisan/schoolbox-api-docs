@@ -17,8 +17,8 @@
 
 namespace Schoolbox\Learning\Assessment\Task;
 
-use \Schoolbox\Learning\Assessment\AbstractModel;
+use \Schoolbox\Learning\Assessment\AbstractAssessment;
 
-class Model extends AbstractModel
+class Model extends AbstractAssessment
 {
 }
