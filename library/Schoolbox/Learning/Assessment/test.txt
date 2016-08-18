@@ -9,6 +9,7 @@ use \Schoolbox\Learning\Summator;
 
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File as DueWorkSubmissionFile;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 
@@ -28,10 +29,20 @@ $feedback1
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
 
+$submissionFile1 = new DueWorkSubmissionFile();
+$submissionFile1
+    ->setId(11)
+    ->setHash('s89789d9hw3thsug8923u5')
+    ->setCrocodocId('vjfh-6677=eirj-01928333')
+    ->setFilename('please mark this submission file Sir.xlsx');
+
 $response = new DueWorkSubmission();
 $response
     ->getAllFeedback()
     ->add($feedback1);
+$response
+    ->getAllFiles()
+    ->add($submissionFile1);
 
 $file1 = new DueWorkFile();
 $file1
