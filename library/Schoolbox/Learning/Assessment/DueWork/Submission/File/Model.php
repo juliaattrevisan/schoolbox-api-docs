@@ -2,6 +2,9 @@
 /**
  * File
  *
+ * A File that was uploaded as part of a Student's Submission
+ * for a particular Due Work
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -42,10 +45,27 @@ class Model
     protected $filename;
 
     /**
+     * A plagscan result instance
+     *
+     * @var Plagscan
+     */
+    protected $plagscan;
+
+    /**
      * File constructor.
      */
     public function __construct()
     {
+    }
+
+    /**
+     * This Submission File has an attached Plagscan result document
+     *
+     * @return bool
+     */
+    public function hasPlagscan()
+    {
+        return $this->getPlagscan() !== null;
     }
 
     /* Getters/Setters
@@ -124,5 +144,21 @@ class Model
     {
         $this->filename = $filename;
         return $this;
+    }
+
+    /**
+     * @return Plagscan
+     */
+    public function getPlagscan()
+    {
+        return $this->plagscan;
+    }
+
+    /**
+     * @param Plagscan $plagscan
+     */
+    public function setPlagscan($plagscan)
+    {
+        $this->plagscan = $plagscan;
     }
 }
