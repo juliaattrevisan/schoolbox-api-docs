@@ -157,7 +157,7 @@ class Bootstrap implements BootstrapInterface {
                 [
                     'receiver' => $di->lazyNew(\Schoolbox\Resource\Storage\Mapper::class),
                     'filename' => $di->lazy(function () use ($di) {
-                        $logDir = $di->get('config')->get('cache_dir').'/logs/';
+                        $logDir = $di->get('config')->get('logs_dir');
                         return tempnam($logDir, 'sb-storefile-');
                     }),
                 ]
