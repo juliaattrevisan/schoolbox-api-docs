@@ -460,9 +460,8 @@ class Bootstrap implements BootstrapInterface {
                 \Schoolbox\Notif\StorefileLogger::class,
                 [
                     'receiver' => $di->lazyNew(\Schoolbox\Resource\Storage\Mapper::class),
-                    'filename' => $di->lazy(function () use ($di) {
-                        $logDir = $di->get('config')->get('cache_dir').'/logs/';
-                        return tempnam($logDir, 'sb-storefile-');
+                    'filename' => $di->lazy(function () {
+                        return tempnam(sys_get_temp_dir(), 'sb-storefile-');
                     }),
                 ]
             )
