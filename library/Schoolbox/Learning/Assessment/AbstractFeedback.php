@@ -148,10 +148,12 @@ class AbstractFeedback implements IFeedback
 
     /**
      * @param string $comment
+     * @return $this
      */
     public function setComment($comment)
     {
         $this->comment = $comment;
+        return $this;
     }
 
     /**
@@ -164,10 +166,12 @@ class AbstractFeedback implements IFeedback
 
     /**
      * @param User $reviewer
+     * @return $this
      */
     public function setReviewer($reviewer)
     {
         $this->reviewer = $reviewer;
+        return $this;
     }
 
     /**
@@ -180,10 +184,12 @@ class AbstractFeedback implements IFeedback
 
     /**
      * @param \Alaress_Date_Format $publishedAt
+     * @return $this
      */
     public function setPublishedAt($publishedAt)
     {
         $this->publishedAt = $publishedAt;
+        return $this;
     }
 
     /**
