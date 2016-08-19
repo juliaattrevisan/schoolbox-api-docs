@@ -62,6 +62,13 @@ class Model extends AbstractAssessment
     protected $showSubmittedOnly = false;
 
     /**
+     * This DueWork has an associated Rubric
+     *
+     * @var bool
+     */
+    protected $hasRubric = false;
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -141,6 +148,14 @@ class Model extends AbstractAssessment
         return $this;
     }
 
+    /**
+     * This DueWork has an associated Rubric
+     */
+    public function hasRubric()
+    {
+        return $this->getHasRubric();
+    }
+
     /* Getters/Setters
      */
 
@@ -208,9 +223,29 @@ class Model extends AbstractAssessment
 
     /**
      * @param boolean $showSubmittedOnly
+     * @return $this
      */
     public function setShowSubmittedOnly($showSubmittedOnly)
     {
         $this->showSubmittedOnly = $showSubmittedOnly;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getHasRubric()
+    {
+        return $this->hasRubric;
+    }
+
+    /**
+     * @param boolean $hasRubric
+     * @return $this
+     */
+    public function setHasRubric($hasRubric)
+    {
+        $this->hasRubric = $hasRubric;
+        return $this;
     }
 }
