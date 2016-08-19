@@ -88,16 +88,18 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
      */
     public function getSourceListForCalendar()
     {
-        $configs    = $this->getAllConfigRecords();
-        $sourceList = $configs->map(
-            function ($record) {
-                /** @var Calendar_Api_Config_Record $record */
-                return array(
+        $configs = $this->getAllConfigRecords();
+        foreach ($configs as $record) {
+            /** @var Calendar_Api_Config_Record $record */
+            try {
+                $sourceList[] = array(
                     'id'   => $record->getId(),
                     'name' => $record->decodeConfig()->getLabel()
                 );
+            } catch (DomainException $e) {
+                //config does not exist or is disabled
             }
-        )->getAll();
+        }
 
         // Multiple sources can have identical names - join their IDs together.
         $sourceList = array_reduce(
@@ -147,12 +149,16 @@ class Calendar_Api_Config_Mapper extends Schoolbox\Mapper
         $allConfigs = array();
 
         foreach ($configs as $currentConfig) {
-            /* @var $currentConfig Calendar_Api_Config_Record */
-            $config = $currentConfig->decodeConfig();
-            /** @var Calendar_Api_Config_Connector_Abstract $config */
-            $config->setId($currentConfig->getId());
+            try {
+                /* @var $currentConfig Calendar_Api_Config_Record */
+                $config = $currentConfig->decodeConfig();
+                /** @var Calendar_Api_Config_Connector_Abstract $config */
+                $config->setId($currentConfig->getId());
 
-            $allConfigs[] = $config;
+                $allConfigs[] = $config;
+            } catch (DomainException $e) {
+                //config does not exist or is disabled
+            }
         }
 
         return $allConfigs;

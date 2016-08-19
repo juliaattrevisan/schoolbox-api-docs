@@ -43,14 +43,19 @@ class Calendar_Api_Factory {
 		foreach($allConfigRecords as $currentConfig) {
 
 			/** @var Calendar_Api_Config_Record $currentConfig */
-			$config = $currentConfig->decodeConfig();
+			try {
+                $config = $currentConfig->decodeConfig();
 
-			/* Update $config so it knows the calendar_connector id from whence it came
-			 * This is used in produce() and passed to each unique/default implementation
-			 */
-			$config->setId($currentConfig->getId());
+                /* Update $config so it knows the calendar_connector id from whence it came
+                 * This is used in produce() and passed to each unique/default implementation
+                 */
+                $config->setId($currentConfig->getId());
 
-			$this->addConfig($config);
+                $this->addConfig($config);
+            }
+            catch (DomainException $e) {
+                //Calendar not enabled, dont add
+            }
 		}
 	}
 
