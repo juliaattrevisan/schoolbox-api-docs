@@ -14,5 +14,14 @@ use \Schoolbox\Learning\Assessment\AbstractResponse;
 
 class Model extends AbstractResponse
 {
-
+    /**
+     * Attempts are submitted at the updatedAt value
+     * in case the Attempt is modified by the Student
+     *
+     * @return \Alaress_Date_Format
+     */
+    public function getSubmittedAt()
+    {
+        return $this->getUpdatedAt();
+    }
 }
