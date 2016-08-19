@@ -30,7 +30,7 @@ $hodes = \Schoolbox\UserMapper::getInstance()->findById(230);
 $celia = \Schoolbox\UserMapper::getInstance()->findBYId(3);
 $somodio = \Schoolbox\UserMapper::getInstance()->findBYId(150);
 
-/* First (marked)
+/* First (multiple submission files, plagscan; marked, one feedback, multiple feedback files, comment, published)
  */
 $feedbackFile1 = new DueWorkFeedbackFile();
 $feedbackFile1
@@ -98,7 +98,7 @@ $type
 
 $dueWork1 = new DueWork();
 $dueWork1
-    ->setTitle('My First Due Work')
+    ->setTitle('1. My First Due Work')
     ->setType($type)
     ->acceptsMultiple()
     ->showOnlySubmittedStudents()
@@ -108,8 +108,7 @@ $dueWork1
     ->getAllFiles()->add($file1)->add($file2);
 
 
-
-/* Second (marked)
+/* Second (no submission files, no plagscan; marked, multiple feedbacks, no feedback files, comment, published)
  */
 $feedback1 = new DueWorkFeedback();
 $feedback1
@@ -141,7 +140,7 @@ $type
 
 $dueWork2 = new DueWork();
 $dueWork2
-    ->setTitle('My Second Due Work')
+    ->setTitle('2. My Second Due Work')
     ->setType($type)
     ->setHasRubric(true)
     ->acceptsSingle()
@@ -149,7 +148,7 @@ $dueWork2
     ->getAllResponses()->add($response);
 
 
-/* Third (unmarked)
+/* Third (no submission files, no plagscan; unmarked, no feedback, no feedback files, no comment, unpublished)
  */
 $feedback = new DueWorkFeedback();
 $feedback
@@ -171,14 +170,15 @@ $type
 
 $dueWork3 = new DueWork();
 $dueWork3
-    ->setTitle('My Third Due Work')
+    ->setTitle('3. My Third Due Work')
     ->setType($type)
     ->showAllSubmissibleStudents()
     ->getAllResponses()->add($response);
 
 
 
-/* Fourth (marked)
+/* Fourth (one submission; marked multiple feedbacks, no feedback files, unpublished)
+ *
  * Note that the array structure is is the Mark given
  * per Quiz Response that the student made - don't get
  * it confused with the new Assessable Response!!!
@@ -230,26 +230,65 @@ $response
 
 $quiz1 = new Quiz();
 $quiz1
-    ->setTitle('Quiz of the Century')
+    ->setTitle('4. Quiz of the Century')
     ->getAllResponses()->add($response);
 
 
-/* Fifth (marked)
+
+/*  Fifth (no submissions; no feedbacks, no feedback files, unpublished)
+ */
+$quiz2 = new Quiz();
+$quiz2
+    ->setTitle('5. A quiz nobody has tried');
+
+
+
+/* Sixth (one submission, self assessed by student; published)
  */
 $feedback = new TaskFeedback();
 $feedback
-    ->setCompletedByStudent(true)
+    ->setReviewer($hodes)
+    ->setPublishedAt(new \Alaress_Date_Format('2016-09-14 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
 
 $response = new TaskCompletion();
 $response
+    ->setSubmittedBy($hodes)
     ->getAllFeedback()->add($feedback);
 
 $task1 = new Task();
 $task1
-    ->setTitle('Task Manager')
+    ->setTitle('6. Task Manager')
     ->getAllResponses()->add($response);
+
+
+
+/* Seventh (one submission, assessed by teacher; published)
+ */
+$feedback = new TaskFeedback();
+$feedback
+    ->setReviewer($celia)
+    ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new TaskCompletion();
+$response
+    ->setSubmittedBy($hodes)
+    ->getAllFeedback()->add($feedback);
+
+$task2 = new Task();
+$task2
+    ->setTitle('7. Task of Kings')
+    ->getAllResponses()->add($response);
+
+
+/* Eighth (incomplete Task)
+ */
+$task3 = new Task();
+$task3
+    ->setTitle('8. Read this book');
 
 
 /******************************************** reporting *******************************************/
@@ -284,7 +323,11 @@ foreach ($allSummators as $currentSummator) {
         ->add($dueWork2)
         ->add($dueWork3)
         ->add($quiz1)
-        ->add($task1);
+        ->add($quiz2)
+        ->add($task1)
+        ->add($task2)
+        ->add($task3)
+    ;
 
     new \Alaress_Probe(get_class($currentSummator), $project->calculateMark(), $project->calculatePercentageMarked());
 }
@@ -357,7 +400,7 @@ foreach ($project->getAssessables() as $currentAssessable) {
             implode('<br />', $allPlagscan),
             $submittedBy ? $submittedBy->getFullname() : '',
             $submittedOnBehalfOf ? $submittedOnBehalfOf->getFullname() : '',
-            $latestSubmission ? $latestSubmission->getSubmittedAt()->getLocal() : ''
+            $latestSubmission && $latestSubmission ? $latestSubmission->getSubmittedAt()->getLocal() : ''
         );
     }
     elseif ($currentAssessable instanceof Quiz) {
@@ -368,16 +411,36 @@ foreach ($project->getAssessables() as $currentAssessable) {
         if ($currentAssessable->getAllResponses()->count()) {
             $latestSubmission = $currentAssessable->getAllResponses()->first();
             $submittedBy = $latestSubmission->getSubmittedBy();
-
-            new \Alaress_Probe(
-                $currentAssessable->getTitle(),
-                '',
-                '',
-                $submittedBy ? $submittedBy->getFullname() : '',
-                '',
-                $latestSubmission ? $latestSubmission->getSubmittedAt()->getLocal() : ''
-            );
         }
+
+        new \Alaress_Probe(
+            $currentAssessable->getTitle(),
+            '',
+            '',
+            $submittedBy ? $submittedBy->getFullname() : '',
+            '',
+            $latestSubmission && $latestSubmission ? $latestSubmission->getSubmittedAt()->getLocal() : ''
+        );
+    }
+    elseif ($currentAssessable instanceof Task) {
+
+        /** @var TaskCompletion $latestSubmission */
+        $latestSubmission = null;
+        $submittedBy = null;
+
+        if ($currentAssessable->getAllResponses()->count()) {
+            $latestSubmission = $currentAssessable->getAllResponses()->first();
+            $submittedBy = $latestSubmission->getSubmittedBy();
+        }
+
+        new \Alaress_Probe(
+            $currentAssessable->getTitle(),
+            '',
+            '',
+            $submittedBy ? $submittedBy->getFullname() : '',
+            '',
+            $latestSubmission && $latestSubmission->getSubmittedAt() ? $latestSubmission->getSubmittedAt()->getLocal() : ''
+        );
     }
 }
 
@@ -390,10 +453,12 @@ foreach ($project->getAssessables() as $currentAssessable) {
     if ($currentAssessable instanceof DueWork) {
         $allFiles = [];
         $allPlagscan = [];
-        $latestFeedback = null;
 
         /** @var DueWorkSubmission $latestSubmission */
         $latestSubmission = null;
+
+        /** @var DueWorkFeedback $latestFeedback */
+        $latestFeedback = null;
 
         /** @var \Schoolbox\User $submittedBy */
         $submittedBy = null;
@@ -422,13 +487,16 @@ foreach ($project->getAssessables() as $currentAssessable) {
             implode('<br />', $allFiles),
             $latestFeedback ? $latestFeedback->calculateMark() : '',
             $latestFeedback ? $latestFeedback->getComment() : '',
-            $latestFeedback ? $latestFeedback->getPublishedAt()->getLocal() : 'Unpublished'
+            $latestFeedback && $latestFeedback ? $latestFeedback->getPublishedAt()->getLocal() : 'Unpublished'
         );
     }
     elseif ($currentAssessable instanceof Quiz) {
 
         /** @var QuizAttempt $latestSubmission */
         $latestSubmission = null;
+
+        /** @var QuizReview $latestFeedback */
+        $latestFeedback = null;
 
         /** @var \Schoolbox\User $submittedBy */
         $submittedBy = null;
@@ -437,7 +505,6 @@ foreach ($project->getAssessables() as $currentAssessable) {
             $latestSubmission = $currentAssessable->getAllResponses()->first();
             $submittedBy      = $latestSubmission->getSubmittedBy();
 
-            /** @var QuizReview $latestFeedback */
             $latestFeedback = $latestSubmission->findMostRecentNonNullFeedback();
         }
 
@@ -446,11 +513,43 @@ foreach ($project->getAssessables() as $currentAssessable) {
             implode('<br />', $allFiles),
             $latestFeedback ? $latestFeedback->calculateMark() : '',
             '',
-            $latestFeedback->getPublishedAt() ? $latestFeedback->getPublishedAt()->getLocal() : 'Unpublished'
+            $latestFeedback && $latestFeedback->getPublishedAt() ? $latestFeedback->getPublishedAt()->getLocal() : 'Unpublished'
+        );
+    }
+    elseif ($currentAssessable instanceof Task) {
+
+        /** @var TaskCompletion $latestSubmission */
+        $latestSubmission = null;
+
+        /** @var TaskFeedback $latestFeedback */
+        $latestFeedback = null;
+
+        /** @var \Schoolbox\User $submittedBy */
+        $submittedBy = null;
+
+        $completionString = '';
+
+        if ($currentAssessable->getAllResponses()->count()) {
+            $latestSubmission = $currentAssessable->getAllResponses()->first();
+            $submittedBy      = $latestSubmission->getSubmittedBy();
+
+            /** @var TaskFeedback $latestFeedback */
+            $latestFeedback = $latestSubmission->findMostRecentFeedback();
+
+            if ($latestFeedback) {
+                $completionString = 'Completion by ' . $latestSubmission->getSubmittedBy()->getFullname() . '<br />Feedback by ' . $latestFeedback->getReviewer()->getFullname();
+            }
+        }
+
+        new \Alaress_Probe(
+            $currentAssessable->getTitle(),
+            '',
+            $latestFeedback ?  $completionString : 'Not completed',
+            '',
+            $latestFeedback && $latestFeedback->getPublishedAt() ? $latestFeedback->getPublishedAt()->getLocal() : 'Unpublished'
         );
     }
 }
 
 
 die();
-
