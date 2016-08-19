@@ -7,24 +7,45 @@
 
 namespace Schoolbox\Learning\Course;
 
+use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * Class Model
+ * A Course is an extension of a Folder.
+ *
+ * A Course may contain several Units, and may be imported onto another Folder.
+ * This action will create a corresponding Course Instance for this Course.
+ *
+ * (Historically, a Course was defined as a Folder which had at least one child
+ *  Folder which contained a Course Builder component. This class puts this
+ *  concept into a concrete class.)
  *
  * @package Schoolbox\Learning\Course
  */
 class Model
 {
     /**
+     * Unique identifier.
+     *
      * @var int
      */
     protected $id;
 
     /**
+     * The Folder within which this Course lives.
+     *
+     * TODO review whether this relation needs to exist
+     *
      * @var FolderModel
      */
     protected $folder;
+
+    /**
+     * The Units that are a part of this Course.
+     *
+     * @var Collection|Unit\Model[]
+     */
+    protected $units;
 
     /**
      * Constructor
@@ -69,6 +90,24 @@ class Model
     public function setFolder($folder)
     {
         $this->folder = $folder;
+        return $this;
+    }
+
+    /**
+     * @return Collection|Unit\Model[]
+     */
+    public function getUnits()
+    {
+        return $this->units;
+    }
+
+    /**
+     * @param Collection|Unit\Model[] $units
+     * @return static
+     */
+    public function setUnits($units)
+    {
+        $this->units = $units;
         return $this;
     }
 }

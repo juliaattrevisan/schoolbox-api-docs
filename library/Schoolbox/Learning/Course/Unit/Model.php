@@ -7,30 +7,58 @@
 
 namespace Schoolbox\Learning\Course\Unit;
 
+use Schoolbox\Collection;
 use Schoolbox\Learning\Course\Model as CourseModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * Class Model
+ * A Unit is an extension of a Folder.
+ *
+ * A Unit may contain several Assessables, and may be imported onto another
+ * Folder as part of the action of importing a Course onto a folder. This
+ * action creates a Unit Instance for each Unit that was chosen to be imported
+ * as part of that process.
+ *
+ * (Historically, a Unit was defined as a Folder which contained a Course
+ *  Builder component. This class puts this concept into a concrete class.)
  *
  * @package Schoolbox\Learning\Course
  */
 class Model
 {
     /**
+     * Unique identifier.
+     *
      * @var int
      */
     protected $id;
 
     /**
+     * The Folder which this Unit belongs to.
+     *
+     * TODO review if this relation is required - Units can't exist without Folders
+     *
      * @var FolderModel
      */
     protected $folder;
 
     /**
+     * The Course which this Unit belongs to.
+     *
+     * TODO review if this relation is required - Courses can't exist without Folders
+     *
      * @var CourseModel
      */
     protected $course;
+
+    /**
+     * The Assessable objects which are a part of this Course.
+     *
+     * TODO add the Assessable interface to this definition, once it exists
+     *
+     * @var Collection
+     */
+    protected $assessables;
 
     /**
      * Constructor
@@ -94,6 +122,24 @@ class Model
     public function setCourse($course)
     {
         $this->course = $course;
+        return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAssessables()
+    {
+        return $this->assessables;
+    }
+
+    /**
+     * @param Collection $assessables
+     * @return static
+     */
+    public function setAssessables($assessables)
+    {
+        $this->assessables = $assessables;
         return $this;
     }
 }
