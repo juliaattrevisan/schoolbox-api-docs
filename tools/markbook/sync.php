@@ -31,10 +31,10 @@ if (isset($options['h'])) {
     echo <<<HELP
 Syncs existing markbook data from Schoolbox into remote system
 
-Usage: sync.php -p[folderID] [--dry-run] [--update-only]
+Usage: sync.php -p[folderID] [--start=yyyy-mm-dd] [--end=yyyy-mm-dd] [--dry-run] [--update-only]
     -p:                  the ID of parent folder to start the traversal, defaults to 0 
-    --start              work due after this date, format 2016-04-20, defaults to current semester
-    --end                work due before this date, format 2016-08-15, defualts to current semester
+    --start              work due after this date, format --start=2016-04-20, defaults to current semester
+    --end                work due before this date, format --end=2016-08-15, defualts to current semester
     --dry-run:           if set, don't actually update anything, but show what
                          would be updated.
     --update-only:       if set, will not create any new items in the remote system, only
