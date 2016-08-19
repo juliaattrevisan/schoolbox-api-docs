@@ -50,7 +50,7 @@ class AbstractFeedback implements IFeedback
      *
      * @var \Alaress_Date_Format
      */
-    protected $publishedAt;
+    protected $publishedAt = null;
 
     /**
      * @var \Alaress_Date_Format
@@ -90,6 +90,17 @@ class AbstractFeedback implements IFeedback
     public function isNullMark()
     {
         return $this->calculateMark() === null;
+    }
+
+    /**
+     * Determine whether this Feedback has been published.
+     * If the publish date is null, it's a draft
+     *
+     * @return bool
+     */
+    public function isPublished()
+    {
+        return $this->getPublishedAt() !== null;
     }
 
     /* Getters/Setters
