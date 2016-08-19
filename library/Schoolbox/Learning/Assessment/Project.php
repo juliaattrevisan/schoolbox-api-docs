@@ -78,7 +78,7 @@ class Project extends AbstractAssessment
                         /** @var TaskFeedback $feedback */
                         $feedback = $currentResponse->findMostRecentFeedback();
 
-                        if ($feedback->isCompletedByStudent() || $feedback->isCompletedByTeacher()) {
+                        if ($feedback) {
                             $numMarked++;
                         }
                     }
