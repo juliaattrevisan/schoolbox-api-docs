@@ -11,6 +11,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
+use \Schoolbox\User;
 
 class AbstractResponse implements IResponse
 {
@@ -18,6 +19,16 @@ class AbstractResponse implements IResponse
      * @var Collection
      */
     protected $allFeedback;
+
+    /**
+     * The person who created this Submission
+     *
+     * Teachers can submit on behalf of a Student - the Teacher
+     * is the User instance here
+     *
+     * @var User
+     */
+    protected $submittedBy;
 
     /**
      * @var \Alaress_Date_Format
@@ -33,6 +44,7 @@ class AbstractResponse implements IResponse
      * @var \Alaress_Date_Format
      */
     protected $deletedAt;
+
 
     /**
      * Model constructor.
@@ -113,6 +125,24 @@ class AbstractResponse implements IResponse
     public function setAllFeedback($allFeedback)
     {
         $this->allFeedback = $allFeedback;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getSubmittedBy()
+    {
+        return $this->submittedBy;
+    }
+
+    /**
+     * @param User $submittedBy
+     * @return $this
+     */
+    public function setSubmittedBy($submittedBy)
+    {
+        $this->submittedBy = $submittedBy;
         return $this;
     }
 

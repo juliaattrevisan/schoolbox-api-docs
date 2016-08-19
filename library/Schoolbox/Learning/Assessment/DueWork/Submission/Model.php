@@ -25,16 +25,6 @@ class Model extends AbstractResponse
     protected $allFiles;
 
     /**
-     * The person who created this Submission
-     *
-     * Teachers can submit on behalf of a Student - the Teacher
-     * is the User instance here
-     *
-     * @var User
-     */
-    protected $submittedBy;
-
-    /**
      * The person who owns this Submission
      *
      * Teachers can submit on behalf of a Student - the Student
@@ -85,24 +75,6 @@ class Model extends AbstractResponse
     public function setAllFiles($allFiles)
     {
         $this->allFiles = $allFiles;
-        return $this;
-    }
-
-    /**
-     * @return User
-     */
-    public function getSubmittedBy()
-    {
-        return $this->submittedBy;
-    }
-
-    /**
-     * @param User $submittedBy
-     * @return $this
-     */
-    public function setSubmittedBy($submittedBy)
-    {
-        $this->submittedBy = $submittedBy;
         return $this;
     }
 
