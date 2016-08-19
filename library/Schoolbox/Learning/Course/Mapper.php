@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Course;
+namespace Schoolbox\Learning\Course;
 
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -13,7 +13,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 /**
  * Class Mapper
  *
- * @package Schoolbox\Assessment\Course
+ * @package Schoolbox\Learning\Course
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  */

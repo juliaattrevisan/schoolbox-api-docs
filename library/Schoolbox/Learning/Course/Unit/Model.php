@@ -5,15 +5,15 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Course\Unit;
+namespace Schoolbox\Learning\Course\Unit;
 
-use Schoolbox\Assessment\Course\Model as CourseModel;
+use Schoolbox\Learning\Course\Model as CourseModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
  * Class Model
  *
- * @package Schoolbox\Assessment\Course
+ * @package Schoolbox\Learning\Course
  */
 class Model
 {

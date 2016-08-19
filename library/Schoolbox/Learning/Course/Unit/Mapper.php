@@ -5,16 +5,16 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Course\Unit;
+namespace Schoolbox\Learning\Course\Unit;
 
-use Schoolbox\Assessment\Course\Mapper as CourseMapper;
+use Schoolbox\Learning\Course\Mapper as CourseMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
  * Class Mapper
  *
- * @package Schoolbox\Assessment\Course\Unit
+ * @package Schoolbox\Learning\Course\Unit
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  */

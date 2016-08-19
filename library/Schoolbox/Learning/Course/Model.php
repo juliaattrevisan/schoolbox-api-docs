@@ -5,14 +5,14 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Course;
+namespace Schoolbox\Learning\Course;
 
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
  * Class Model
  *
- * @package Schoolbox\Assessment\Course
+ * @package Schoolbox\Learning\Course
  */
 class Model
 {
