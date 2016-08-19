@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment;
+namespace Schoolbox\Learning\Assessment\DueWork;
 
 
 class Type

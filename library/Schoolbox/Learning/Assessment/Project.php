@@ -120,6 +120,16 @@ class Project extends AbstractAssessment
         return 0;
     }
 
+    /**
+     * @inheritdoc
+     *
+     * @return string
+     */
+    public function getTypeName()
+    {
+        return 'Project';
+    }
+
     /* Getters/Setters
      */
 

@@ -14,5 +14,15 @@ namespace Schoolbox\Learning\Assessment;
 interface IAssessable
 {
 
+    /**
+     * Return the name of the "type" of Assessable this is
+     *
+     * For Due Works, it'll be "Essay, Homework, etc"
+     * For Quiz, it'll just be "Quiz"
+     * For Task, it'll just be "Task"
+     *
+     * @return mixed
+     */
+    public function getTypeName();
 
 }

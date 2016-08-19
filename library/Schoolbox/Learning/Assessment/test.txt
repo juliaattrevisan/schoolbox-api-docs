@@ -7,6 +7,7 @@ use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\Project;
 use \Schoolbox\Learning\Summator;
 
+
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
@@ -258,11 +259,12 @@ foreach ($allSummators as $currentSummator) {
 }
 
 echo "<h1>Types</h1>";
+
+new \Alaress_Probe($project->getTypeName());
+
 foreach ($project->getAssessables() as $currentAssessable) {
-    new \Alaress_Probe($currentAssessable->getType()->getName());
+    new \Alaress_Probe($currentAssessable->getTypeName());
 }
-
-
 
 
 

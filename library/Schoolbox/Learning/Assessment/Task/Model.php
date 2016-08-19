@@ -18,52 +18,17 @@
 namespace Schoolbox\Learning\Assessment\Task;
 
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
-use \Schoolbox\Learning\Assessment\Type;
 
 class Model extends AbstractAssessment
 {
+
     /**
-     * The "type" of the Due Work
-     * (Essay, Homework, etc)
+     * @inheritdoc
      *
-     * For Quiz, it'll just say "Quiz"
-     * Similarly for Task
-     *
-     * @var Type
+     * @return string
      */
-    protected $type;
-
-    /**
-     * Model constructor.
-     */
-    public function __construct()
+    public function getTypeName()
     {
-        parent::__construct();
-
-        /* Ram in a default Type for Task
-         */
-        $type = new Type();
-        $type->setName('Task');
-
-        $this->setType($type);
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return Type
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param Type $type
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
+        return 'Task';
     }
 }

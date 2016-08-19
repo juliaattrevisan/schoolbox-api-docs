@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Assessment\DueWork;
 
 use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
-use \Schoolbox\Learning\Assessment\Type;
 
 class Model extends AbstractAssessment
 {
@@ -30,9 +29,6 @@ class Model extends AbstractAssessment
      * The "type" of the Due Work
      * (Essay, Homework, etc)
      *
-     * For Quiz, it'll just say "Quiz"
-     * Similarly for Task
-     *
      * @var Type
      */
     protected $type;
@@ -49,6 +45,16 @@ class Model extends AbstractAssessment
 
         $this->setAllFiles(new Collection());
         $this->setType(new Type());
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return string
+     */
+    public function getTypeName()
+    {
+        return $this->getType()->getName();
     }
 
     /* Getters/Setters
