@@ -65,7 +65,7 @@ class AbstractFeedback implements IFeedback
 
     /**
      * @param $mark
-     * @return self
+     * @return $this
      */
     public function setMark($mark)
     {
@@ -83,7 +83,7 @@ class AbstractFeedback implements IFeedback
 
     /**
      * @param \Alaress_Date_Format $createdAt
-     * @return self
+     * @return $this
      */
     public function setCreatedAt($createdAt)
     {
@@ -101,7 +101,7 @@ class AbstractFeedback implements IFeedback
 
     /**
      * @param \Alaress_Date_Format $updatedAt
-     * @return self
+     * @return $this
      */
     public function setUpdatedAt($updatedAt)
     {
@@ -119,7 +119,7 @@ class AbstractFeedback implements IFeedback
 
     /**
      * @param \Alaress_Date_Format $deletedAt
-     * @return self
+     * @return $this
      */
     public function setDeletedAt($deletedAt)
     {

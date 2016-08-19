@@ -74,7 +74,7 @@ abstract class AbstractAssessment implements IAssessable
 
     /**
      * @param string $title
-     * @return self
+     * @return $this
      */
     public function setTitle($title)
     {
@@ -92,7 +92,7 @@ abstract class AbstractAssessment implements IAssessable
 
     /**
      * @param string $description
-     * @return self
+     * @return $this
      */
     public function setDescription($description)
     {
@@ -110,7 +110,7 @@ abstract class AbstractAssessment implements IAssessable
 
     /**
      * @param \Alaress_Date_Format $publishAt
-     * @return self
+     * @return $this
      */
     public function setPublishAt($publishAt)
     {
@@ -128,7 +128,7 @@ abstract class AbstractAssessment implements IAssessable
 
     /**
      * @param \Alaress_Date_Format $openAt
-     * @return self
+     * @return $this
      */
     public function setOpenAt($openAt)
     {
@@ -146,7 +146,7 @@ abstract class AbstractAssessment implements IAssessable
 
     /**
      * @param \Alaress_Date_Format $closeAt
-     * @return self
+     * @return $this
      */
     public function setCloseAt($closeAt)
     {
@@ -164,7 +164,7 @@ abstract class AbstractAssessment implements IAssessable
 
     /**
      * @param float $weight
-     * @return self
+     * @return $this
      */
     public function setWeight($weight)
     {
@@ -182,7 +182,7 @@ abstract class AbstractAssessment implements IAssessable
 
     /**
      * @param Collection $allResponses
-     * @return self
+     * @return $this
      */
     public function setAllResponses($allResponses)
     {
