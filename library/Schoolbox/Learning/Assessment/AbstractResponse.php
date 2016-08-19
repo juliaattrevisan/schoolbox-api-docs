@@ -20,6 +20,21 @@ class AbstractResponse implements IResponse
     protected $allFeedback;
 
     /**
+     * @var \Alaress_Date_Format
+     */
+    protected $createdAt;
+
+    /**
+     * @var \Alaress_Date_Format
+     */
+    protected $updatedAt;
+
+    /**
+     * @var \Alaress_Date_Format
+     */
+    protected $deletedAt;
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -97,4 +112,57 @@ class AbstractResponse implements IResponse
         return $this;
     }
 
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * @param \Alaress_Date_Format $createdAt
+     * @return $this
+     */
+    public function setCreatedAt($createdAt)
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @param \Alaress_Date_Format $updatedAt
+     * @return $this
+     */
+    public function setUpdatedAt($updatedAt)
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getDeletedAt()
+    {
+        return $this->deletedAt;
+    }
+
+    /**
+     * @param \Alaress_Date_Format $deletedAt
+     * @return $this
+     */
+    public function setDeletedAt($deletedAt)
+    {
+        $this->deletedAt = $deletedAt;
+        return $this;
+    }
 }
