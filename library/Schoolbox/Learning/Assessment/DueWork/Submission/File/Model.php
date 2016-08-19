@@ -68,6 +68,23 @@ class Model
         return $this->getPlagscan() !== null;
     }
 
+    /**
+     * Wrap up hasPlagscan() logic here, to save you from doing it everywhere
+     *
+     * @return string
+     */
+    public function findPlagscanScore()
+    {
+        if ($this->hasPlagscan()) {
+            return $this->getPlagscan()->getScore();
+        }
+
+        /* TODO: Probably check for returning a status of some sort first
+         */
+
+        return '';
+    }
+
     /* Getters/Setters
      */
 
