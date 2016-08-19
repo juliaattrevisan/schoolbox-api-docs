@@ -10,14 +10,47 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use \Schoolbox\User;
+
 class AbstractFeedback implements IFeedback
 {
+    /**
+     * @var int
+     */
+    protected $id;
+
     /**
      * Mark given to this Assessable
      *
      * @var float
      */
     protected $mark;
+
+    /**
+     * The mark out of 100 given to this Assessable
+     *
+     * @var
+     */
+    protected $normalisedMark;
+
+    /**
+     * @var string
+     */
+    protected $comment;
+
+    /**
+     * The person who reviewed this Feedback
+     *
+     * @var User
+     */
+    protected $reviewer;
+
+    /**
+     * The datetime at which this Feedback was made visible to Students
+     *
+     * @var \Alaress_Date_Format
+     */
+    protected $publishedAt;
 
     /**
      * @var \Alaress_Date_Format
@@ -56,6 +89,22 @@ class AbstractFeedback implements IFeedback
      */
 
     /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
      * @return float
      */
     public function getMark()
@@ -71,6 +120,70 @@ class AbstractFeedback implements IFeedback
     {
         $this->mark = $mark;
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNormalisedMark()
+    {
+        return $this->normalisedMark;
+    }
+
+    /**
+     * @param mixed $normalisedMark
+     */
+    public function setNormalisedMark($normalisedMark)
+    {
+        $this->normalisedMark = $normalisedMark;
+    }
+
+    /**
+     * @return string
+     */
+    public function getComment()
+    {
+        return $this->comment;
+    }
+
+    /**
+     * @param string $comment
+     */
+    public function setComment($comment)
+    {
+        $this->comment = $comment;
+    }
+
+    /**
+     * @return User
+     */
+    public function getReviewer()
+    {
+        return $this->reviewer;
+    }
+
+    /**
+     * @param User $reviewer
+     */
+    public function setReviewer($reviewer)
+    {
+        $this->reviewer = $reviewer;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getPublishedAt()
+    {
+        return $this->publishedAt;
+    }
+
+    /**
+     * @param \Alaress_Date_Format $publishedAt
+     */
+    public function setPublishedAt($publishedAt)
+    {
+        $this->publishedAt = $publishedAt;
     }
 
     /**
