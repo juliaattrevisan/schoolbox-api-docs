@@ -24,6 +24,8 @@ use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
 use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
+
+
 /* First (marked)
  */
 $feedback1 = new DueWorkFeedback();
@@ -49,11 +51,9 @@ $submissionFile1
 
 $response = new DueWorkSubmission();
 $response
-    ->getAllFeedback()
-    ->add($feedback1);
+    ->getAllFeedback()->add($feedback1);
 $response
-    ->getAllFiles()
-    ->add($submissionFile1);
+    ->getAllFiles()->add($submissionFile1);
 
 $file1 = new DueWorkFile();
 $file1
@@ -68,9 +68,7 @@ $file2
     ->setFilename('myfile2.jpg');
 
 $allFiles = new Collection();
-$allFiles
-    ->add($file1)
-    ->add($file2);
+$allFiles->add($file1)->add($file2);
 
 $type = new DueWorkType();
 $type
@@ -81,13 +79,13 @@ $dueWork1 = new DueWork();
 $dueWork1
     ->setTitle('My First Due Work')
     ->setType($type)
-    ->getAllResponses()
-    ->add($response);
+    ->acceptsMultiple()
+    ->showOnlySubmittedStudents()
+    ->getAllResponses()->add($response);
 
 $dueWork1
-    ->getAllFiles()
-    ->add($file1)
-    ->add($file2);
+    ->getAllFiles()->add($file1)->add($file2);
+
 
 
 /* Second (marked)
@@ -106,9 +104,7 @@ $feedback2
 
 $response = new DueWorkSubmission();
 $response
-    ->getAllFeedback()
-    ->add($feedback1)
-    ->add($feedback2);
+    ->getAllFeedback()->add($feedback1)->add($feedback2);
 
 $type = new DueWorkType();
 $type
@@ -119,8 +115,10 @@ $dueWork2 = new DueWork();
 $dueWork2
     ->setTitle('My Second Due Work')
     ->setType($type)
-    ->getAllResponses()
-    ->add($response);
+    ->setHasRubric(true)
+    ->acceptsSingle()
+    ->showOnlySubmittedStudents()
+    ->getAllResponses()->add($response);
 
 
 /* Third (unmarked)
@@ -133,8 +131,7 @@ $feedback
 
 $response = new DueWorkSubmission();
 $response
-    ->getAllFeedback()
-    ->add($feedback);
+    ->getAllFeedback()->add($feedback);
 
 $type = new DueWorkType();
 $type
@@ -145,8 +142,9 @@ $dueWork3 = new DueWork();
 $dueWork3
     ->setTitle('My Third Due Work')
     ->setType($type)
-    ->getAllResponses()
-    ->add($response);
+    ->showAllSubmissibleStudents()
+    ->getAllResponses()->add($response);
+
 
 
 /* Fourth (marked)
@@ -194,14 +192,12 @@ $feedback2
 
 $response = new QuizAttempt();
 $response
-    ->getAllFeedback()
-    ->add($feedback1)
-    ->add($feedback2);
+    ->getAllFeedback()->add($feedback1)->add($feedback2);
 
 $quiz1 = new Quiz();
-$quiz1->setTitle('Quiz of the Century')
-    ->getAllResponses()
-    ->add($response);
+$quiz1
+    ->setTitle('Quiz of the Century')
+    ->getAllResponses()->add($response);
 
 
 /* Fifth (marked)
@@ -214,14 +210,12 @@ $feedback
 
 $response = new TaskCompletion();
 $response
-    ->getAllFeedback()
-    ->add($feedback);
+    ->getAllFeedback()->add($feedback);
 
 $task1 = new Task();
 $task1
     ->setTitle('Task Manager')
-    ->getAllResponses()
-    ->add($response);
+    ->getAllResponses()->add($response);
 
 
 // Assessment Summary by hand
@@ -258,14 +252,33 @@ foreach ($allSummators as $currentSummator) {
     new \Alaress_Probe(get_class($currentSummator), $project->calculateMark(), $project->calculatePercentageMarked());
 }
 
-echo "<h1>Types</h1>";
+echo "<h1>Types and Visibility</h1>";
+
+
+new \Alaress_Probe('Type', 'Accept Online?', 'Show Unsubmitted?', 'Has Rubric?');
+
+foreach ($project->getAssessables() as $currentAssessable) {
+
+    if ($currentAssessable instanceof DueWork) {
+        new \Alaress_Probe($currentAssessable->getTypeName(), $currentAssessable->getAcceptOnline(), !$currentAssessable->getShowSubmittedOnly(), $currentAssessable->hasRubric());
+    }
+    else {
+        new \Alaress_Probe($currentAssessable->getTypeName());
+    }
+}
 
 new \Alaress_Probe($project->getTypeName());
 
-foreach ($project->getAssessables() as $currentAssessable) {
-    new \Alaress_Probe($currentAssessable->getTypeName());
-}
-
-
-
 die();
+
+
+
+
+
+
+
+
+
+
+
+
