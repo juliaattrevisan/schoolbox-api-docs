@@ -26,6 +26,14 @@ class Model extends AbstractAssessment
     protected $allFiles;
 
     /**
+     * An instance of DueWork Type
+     * (Essay, Homework, etc)
+     *
+     * @var Type
+     */
+    protected $type;
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -36,6 +44,7 @@ class Model extends AbstractAssessment
         parent::__construct();
 
         $this->setAllFiles(new Collection());
+        $this->setType(new Type());
     }
 
     /* Getters/Setters
@@ -56,6 +65,24 @@ class Model extends AbstractAssessment
     public function setAllFiles($allFiles)
     {
         $this->allFiles = $allFiles;
+        return $this;
+    }
+
+    /**
+     * @return Type
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param Type $type
+     * @return self
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
         return $this;
     }
 }

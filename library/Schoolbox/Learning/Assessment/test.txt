@@ -13,6 +13,7 @@ use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmi
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as DueWorkSubmissionFilePlagscan;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
+use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 
 use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
@@ -70,9 +71,15 @@ $allFiles
     ->add($file1)
     ->add($file2);
 
+$type = new DueWorkType();
+$type
+    ->setId(23)
+    ->setName('Homework of the Century');
+
 $dueWork1 = new DueWork();
 $dueWork1
     ->setTitle('My First Due Work')
+    ->setType($type)
     ->getAllResponses()
     ->add($response);
 
@@ -81,7 +88,6 @@ $dueWork1
     ->add($file1)
     ->add($file2);
 
-new \Alaress_Probe($dueWork1);
 
 /* Second (marked)
  */
@@ -103,9 +109,15 @@ $response
     ->add($feedback1)
     ->add($feedback2);
 
+$type = new DueWorkType();
+$type
+    ->setId(42)
+    ->setName('Essay');
+
 $dueWork2 = new DueWork();
 $dueWork2
     ->setTitle('My Second Due Work')
+    ->setType($type)
     ->getAllResponses()
     ->add($response);
 
@@ -123,9 +135,15 @@ $response
     ->getAllFeedback()
     ->add($feedback);
 
+$type = new DueWorkType();
+$type
+    ->setId(42)
+    ->setName('Essay');
+
 $dueWork3 = new DueWork();
 $dueWork3
     ->setTitle('My Third Due Work')
+    ->setType($type)
     ->getAllResponses()
     ->add($response);
 
@@ -226,6 +244,7 @@ $allSummators = [
     new Summator\Sum()
 ];
 
+echo "<h1>Summators</h1>";
 foreach ($allSummators as $currentSummator) {
     $project = new Project($currentSummator);
     $project->getAssessables()
@@ -237,3 +256,14 @@ foreach ($allSummators as $currentSummator) {
 
     new \Alaress_Probe(get_class($currentSummator), $project->calculateMark(), $project->calculatePercentageMarked());
 }
+
+echo "<h1>Types</h1>";
+foreach ($project->getAssessables() as $currentAssessable) {
+    new \Alaress_Probe($currentAssessable->getType()->getName());
+}
+
+
+
+
+
+die();

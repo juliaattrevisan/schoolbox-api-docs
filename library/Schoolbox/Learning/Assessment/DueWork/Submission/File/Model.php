@@ -156,9 +156,11 @@ class Model
 
     /**
      * @param Plagscan $plagscan
+     * @return self
      */
     public function setPlagscan($plagscan)
     {
         $this->plagscan = $plagscan;
+        return $this;
     }
 }
