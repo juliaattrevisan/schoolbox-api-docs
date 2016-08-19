@@ -255,12 +255,12 @@ foreach ($allSummators as $currentSummator) {
 echo "<h1>Types and Visibility</h1>";
 
 
-new \Alaress_Probe('Type', 'Accept Online?', 'Show Unsubmitted?', 'Has Rubric?');
+new \Alaress_Probe('Type', 'Accept Online?', 'Accepts Multi?', 'Show Unsubmitted?', 'Has Rubric?');
 
 foreach ($project->getAssessables() as $currentAssessable) {
 
     if ($currentAssessable instanceof DueWork) {
-        new \Alaress_Probe($currentAssessable->getTypeName(), $currentAssessable->getAcceptOnline(), !$currentAssessable->getShowSubmittedOnly(), $currentAssessable->hasRubric());
+        new \Alaress_Probe($currentAssessable->getTypeName(), $currentAssessable->getAcceptOnline(), $currentAssessable->isAcceptMulti(), !$currentAssessable->getShowSubmittedOnly(), $currentAssessable->hasRubric());
     }
     else {
         new \Alaress_Probe($currentAssessable->getTypeName());
@@ -270,15 +270,3 @@ foreach ($project->getAssessables() as $currentAssessable) {
 new \Alaress_Probe($project->getTypeName());
 
 die();
-
-
-
-
-
-
-
-
-
-
-
-

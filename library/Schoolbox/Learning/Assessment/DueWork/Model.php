@@ -105,6 +105,15 @@ class Model extends AbstractAssessment
     }
 
     /**
+     * Does this DueWork accept no submission online?
+     * @return bool
+     */
+    public function isAcceptNone()
+    {
+        return $this->getAcceptOnline() == self::ACCEPT_ONLINE_NONE;
+    }
+
+    /**
      * This DueWork accepts one submissions online
      *
      * @return $this
@@ -116,6 +125,16 @@ class Model extends AbstractAssessment
     }
 
     /**
+     * Does this DueWork accept one submission online?
+     *
+     * @return bool
+     */
+    public function isAcceptSingle()
+    {
+        return $this->getAcceptOnline() == self::ACCEPT_ONLINE_SINGLE;
+    }
+
+    /**
      * This DueWork accepts multiple submissions online
      *
      * @return $this
@@ -124,6 +143,15 @@ class Model extends AbstractAssessment
     {
         $this->setAcceptOnline(self::ACCEPT_ONLINE_MULTI);
         return $this;
+    }
+
+    /**
+     * Does this DueWork accept multiple submissions online?
+     * @return bool
+     */
+    public function isAcceptMulti()
+    {
+        return $this->getAcceptOnline() == self::ACCEPT_ONLINE_MULTI;
     }
 
     /**
