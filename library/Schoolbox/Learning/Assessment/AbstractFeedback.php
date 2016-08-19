@@ -68,6 +68,13 @@ class AbstractFeedback implements IFeedback
     protected $deletedAt;
 
     /**
+     * AbstractFeedback constructor.
+     */
+    public function __construct()
+    {
+    }
+
+    /**
      * Calculate the final mark for this IAssessable
      */
     public function calculateMark()
