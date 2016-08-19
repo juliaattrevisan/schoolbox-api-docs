@@ -55,6 +55,13 @@ class Model extends AbstractAssessment
     protected $acceptOnline;
 
     /**
+     * Show students who haven't submitted to this Due Work
+     *
+     * @var bool
+     */
+    protected $showSubmittedOnly = false;
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -109,6 +116,28 @@ class Model extends AbstractAssessment
     public function acceptsMultiple()
     {
         $this->setAcceptOnline(self::ACCEPT_ONLINE_MULTI);
+        return $this;
+    }
+
+    /**
+     * Only show Students who have submitted to this DueWork
+     *
+     * @return $this
+     */
+    public function showOnlySubmittedStudents()
+    {
+        $this->setShowSubmittedOnly(true);
+        return $this;
+    }
+
+    /**
+     * Show all Students who can submit to this DueWork
+     *
+     * @return $this
+     */
+    public function showAllSubmissibleStudents()
+    {
+        $this->setShowSubmittedOnly(false);
         return $this;
     }
 
@@ -167,5 +196,21 @@ class Model extends AbstractAssessment
     {
         $this->acceptOnline = $acceptOnline;
         return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getShowSubmittedOnly()
+    {
+        return $this->showSubmittedOnly;
+    }
+
+    /**
+     * @param boolean $showSubmittedOnly
+     */
+    public function setShowSubmittedOnly($showSubmittedOnly)
+    {
+        $this->showSubmittedOnly = $showSubmittedOnly;
     }
 }
