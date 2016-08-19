@@ -15,6 +15,20 @@ use \Schoolbox\Learning\Assessment\AbstractAssessment;
 
 class Model extends AbstractAssessment
 {
+    /**
+     * Accept zero submissions online
+     */
+    const ACCEPT_ONLINE_NONE = 0;
+
+    /**
+     * Accept one submission online
+     */
+    const ACCEPT_ONLINE_SINGLE = 1;
+
+    /**
+     * Accept multiple submissions online
+     */
+    const ACCEPT_ONLINE_MULTI = 2;
 
     /**
      * All the Files that are part of the Due Work specification
@@ -34,6 +48,13 @@ class Model extends AbstractAssessment
     protected $type;
 
     /**
+     * An enum for accepting submissions online
+     *
+     * @var int
+     */
+    protected $acceptOnline;
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -45,6 +66,7 @@ class Model extends AbstractAssessment
 
         $this->setAllFiles(new Collection());
         $this->setType(new Type());
+        $this->setAcceptOnline(self::ACCEPT_ONLINE_NONE);
     }
 
     /**
@@ -55,6 +77,39 @@ class Model extends AbstractAssessment
     public function getTypeName()
     {
         return $this->getType()->getName();
+    }
+
+    /**
+     * This DueWork accepts no submissions online
+     *
+     * @return $this
+     */
+    public function acceptsNone()
+    {
+        $this->setAcceptOnline(self::ACCEPT_ONLINE_NONE);
+        return $this;
+    }
+
+    /**
+     * This DueWork accepts one submissions online
+     *
+     * @return $this
+     */
+    public function acceptsSingle()
+    {
+        $this->setAcceptOnline(self::ACCEPT_ONLINE_SINGLE);
+        return $this;
+    }
+
+    /**
+     * This DueWork accepts multiple submissions online
+     *
+     * @return $this
+     */
+    public function acceptsMultiple()
+    {
+        $this->setAcceptOnline(self::ACCEPT_ONLINE_MULTI);
+        return $this;
     }
 
     /* Getters/Setters
@@ -93,6 +148,24 @@ class Model extends AbstractAssessment
     public function setType($type)
     {
         $this->type = $type;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAcceptOnline()
+    {
+        return $this->acceptOnline;
+    }
+
+    /**
+     * @param int $acceptOnline
+     * @return $this
+     */
+    public function setAcceptOnline($acceptOnline)
+    {
+        $this->acceptOnline = $acceptOnline;
         return $this;
     }
 }
