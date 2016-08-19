@@ -12,6 +12,7 @@ use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as DueWorkSubmissionFilePlagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
@@ -25,14 +26,27 @@ use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
 use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
 
+$hodes = \Schoolbox\UserMapper::getInstance()->findById(230);
+$celia = \Schoolbox\UserMapper::getInstance()->findBYId(3);
+$somodio = \Schoolbox\UserMapper::getInstance()->findBYId(150);
 
 /* First (marked)
  */
+$feedbackFile1 = new DueWorkFeedbackFile();
+$feedbackFile1
+    ->setId(12)
+    ->setHash('lj23lj2llj5l2jsdkjf90')
+    ->setCrocodocId('j239jf-23mndi9f-1234nns9fh-5nl6i0f')
+    ->setFilename('This is the correct response.txt');
+
 $feedback1 = new DueWorkFeedback();
 $feedback1
     ->setMark(-3)
+    ->setComment('This is a flawed piece of work.')
+    ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
-    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->getAllFiles()->add($feedbackFile1);
 
 $plagscan1 = new DueWorkSubmissionFilePlagscan();
 $plagscan1
@@ -46,14 +60,24 @@ $submissionFile1
     ->setId(11)
     ->setHash('s89789d9hw3thsug8923u5')
     ->setCrocodocId('vjfh-6677=eirj-01928333')
-    ->setFilename('please mark this submission file Sir.xlsx')
+    ->setFilename('mark this file Sir.xlsx')
     ->setPlagscan($plagscan1);
+
+$submissionFile2 = new DueWorkSubmissionFile();
+$submissionFile2
+    ->setId(12)
+    ->setHash('s89789d9hw3thsug8923u5')
+    ->setCrocodocId('vjfh-6677=eirj-01928333')
+    ->setFilename('and this one too.docx');
 
 $response = new DueWorkSubmission();
 $response
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setSubmittedBy($hodes)
+    ->setSubmittedOnBehalfOf($hodes)
     ->getAllFeedback()->add($feedback1);
 $response
-    ->getAllFiles()->add($submissionFile1);
+    ->getAllFiles()->add($submissionFile1)->add($submissionFile2);
 
 $file1 = new DueWorkFile();
 $file1
@@ -66,9 +90,6 @@ $file2
     ->setId(2)
     ->setHash('zxvzxcvzxcv945786947')
     ->setFilename('myfile2.jpg');
-
-$allFiles = new Collection();
-$allFiles->add($file1)->add($file2);
 
 $type = new DueWorkType();
 $type
@@ -93,17 +114,24 @@ $dueWork1
 $feedback1 = new DueWorkFeedback();
 $feedback1
     ->setMark(999999)
+    ->setComment('You should not see this.')
+    ->setPublishedAt(new \Alaress_Date_Format('2016-08-08 17:01:11', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-05 17:01:11', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-05 17:01:11', \Alaress_Date_Format::DATABASE_FORMAT));
 
 $feedback2 = new DueWorkFeedback();
 $feedback2
     ->setMark(25)
+    ->setComment('A work of art.')
+    ->setPublishedAt(new \Alaress_Date_Format('2016-08-12 18:12:11', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-05 18:01:11', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-05 18:01:11', \Alaress_Date_Format::DATABASE_FORMAT));
 
 $response = new DueWorkSubmission();
 $response
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-04 18:22:02', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setSubmittedBy($somodio)
+    ->setSubmittedOnBehalfOf($hodes)
     ->getAllFeedback()->add($feedback1)->add($feedback2);
 
 $type = new DueWorkType();
@@ -131,6 +159,9 @@ $feedback
 
 $response = new DueWorkSubmission();
 $response
+    ->setSubmittedBy($hodes)
+    ->setSubmittedOnBehalfOf($hodes)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 07:23:02', \Alaress_Date_Format::DATABASE_FORMAT))
     ->getAllFeedback()->add($feedback);
 
 $type = new DueWorkType();
@@ -218,6 +249,9 @@ $task1
     ->getAllResponses()->add($response);
 
 
+/******************************************** reporting *******************************************/
+
+
 // Assessment Summary by hand
 //
 // -3 + 25 + 19 [5,4,5,5] + Completed
@@ -254,19 +288,114 @@ foreach ($allSummators as $currentSummator) {
 
 echo "<h1>Types and Visibility</h1>";
 
-
-new \Alaress_Probe('Type', 'Accept Online?', 'Accepts Multi?', 'Show Unsubmitted?', 'Has Rubric?');
+new \Alaress_Probe('Title', 'Type', 'Accept Online?', 'Accepts Multi?', 'Show Unsubmitted?', 'Has Rubric?');
 
 foreach ($project->getAssessables() as $currentAssessable) {
-
     if ($currentAssessable instanceof DueWork) {
-        new \Alaress_Probe($currentAssessable->getTypeName(), $currentAssessable->getAcceptOnline(), $currentAssessable->isAcceptMulti(), !$currentAssessable->getShowSubmittedOnly(), $currentAssessable->hasRubric());
+        new \Alaress_Probe(
+            $currentAssessable->getTitle(),
+            $currentAssessable->getTypeName(),
+            $currentAssessable->getAcceptOnline(),
+            $currentAssessable->isAcceptMulti(),
+            !$currentAssessable->getShowSubmittedOnly(),
+            $currentAssessable->hasRubric()
+        );
     }
     else {
-        new \Alaress_Probe($currentAssessable->getTypeName());
+        new \Alaress_Probe($currentAssessable->getTitle(), $currentAssessable->getTypeName(), '', '', '', '');
     }
 }
 
 new \Alaress_Probe($project->getTypeName());
+
+
+echo "<h1>Submission</h1>";
+
+new \Alaress_Probe('Title', 'Files', 'Plagscan', 'Submitted By', 'Submitted On Behalf Of', 'Submitted At');
+
+foreach ($project->getAssessables() as $currentAssessable) {
+    if ($currentAssessable instanceof DueWork) {
+
+        /** @var DueWorkSubmissionFile $currentFile */
+        /** @var \Schoolbox\User $submittedBy */
+        /** @var \Schoolbox\User $submittedOnBehalfOf */
+
+        $latestSubmission = null;
+        $submittedBy = null;
+        $submittedOnBehalfOf = null;
+        $allFiles = [];
+        $allPlagscan = [];
+
+        if ($currentAssessable->getAllResponses()->count()) {
+            $latestSubmission = $currentAssessable->getAllResponses()->first();
+            $submittedBy = $latestSubmission->getSubmittedBy();
+            $submittedOnBehalfOf = $latestSubmission->getSubmittedOnBehalfOf();
+
+
+            if ($latestSubmission && $latestSubmission->getAllFiles()->count()) {
+                foreach ($latestSubmission->getAllFiles() as $currentFile) {
+                    $allFiles[] = $currentFile->getFilename();
+                    $allPlagscan[] = $currentFile->findPlagscanScore();
+                }
+            }
+        }
+
+        new \Alaress_Probe(
+            $currentAssessable->getTitle(),
+            implode('<br />', $allFiles),
+            implode('<br />', $allPlagscan),
+            $submittedBy ? $submittedBy->getFullname() : '',
+            $submittedOnBehalfOf ? $submittedOnBehalfOf->getFullname() : '',
+            $latestSubmission ? $latestSubmission->getSubmittedAt()->getLocal() : ''
+        );
+    }
+}
+
+
+echo "<h1>Feedbacks</h1>";
+
+new \Alaress_Probe('Title', 'Files', 'Mark', 'Comment', 'Published At', 'Published?');
+
+foreach ($project->getAssessables() as $currentAssessable) {
+    if ($currentAssessable instanceof DueWork) {
+
+        /** @var DueWorkSubmissionFile $currentFile */
+        /** @var \Schoolbox\User $submittedBy */
+        /** @var \Schoolbox\User $submittedOnBehalfOf */
+        /** @var DueWorkFeedback $latestFeedback */
+
+        $latestSubmission = null;
+        $submittedBy = null;
+        $submittedOnBehalfOf = null;
+        $allFiles = [];
+        $allPlagscan = [];
+
+        $latestFeedback = null;
+
+        if ($currentAssessable->getAllResponses()->count()) {
+            $latestSubmission = $currentAssessable->getAllResponses()->first();
+            $submittedBy = $latestSubmission->getSubmittedBy();
+            $submittedOnBehalfOf = $latestSubmission->getSubmittedOnBehalfOf();
+
+            $latestFeedback = $latestSubmission->findMostRecentNonNullFeedback();
+
+            if ($latestFeedback) {
+                foreach ($latestFeedback->getAllFiles() as $currentFile) {
+                    $allFiles[] = $currentFile->getFilename();
+                }
+            }
+        }
+
+        new \Alaress_Probe(
+            $currentAssessable->getTitle(),
+            implode('<br />', $allFiles),
+            $latestFeedback ? $latestFeedback->getMark() : '',
+            $latestFeedback ? $latestFeedback->getComment() : '',
+            $latestFeedback ? $latestFeedback->getPublishedAt()->getLocal() : '',
+            $latestFeedback ? 'Published' : 'Unpublished'
+        );
+    }
+}
+
 
 die();
