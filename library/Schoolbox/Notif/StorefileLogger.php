@@ -111,8 +111,8 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
         // save the tempfile to storage (will throw a File\Exception if it fails)
         $storage = $this->receiver->accept($basename, $this->file, false);
 
-        // Remove the stream
-        unlink($this->file);
+        // Clear stream contents I guess
+        file_put_contents($this->file, '');
 
         // all done - pass back the new object
         return $storage;
