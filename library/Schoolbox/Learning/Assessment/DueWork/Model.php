@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment\DueWork;
 
 use \Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
+use \Schoolbox\Learning\Assessment\Type;
 
 class Model extends AbstractAssessment
 {
@@ -26,8 +27,11 @@ class Model extends AbstractAssessment
     protected $allFiles;
 
     /**
-     * An instance of DueWork Type
+     * The "type" of the Due Work
      * (Essay, Homework, etc)
+     *
+     * For Quiz, it'll just say "Quiz"
+     * Similarly for Task
      *
      * @var Type
      */

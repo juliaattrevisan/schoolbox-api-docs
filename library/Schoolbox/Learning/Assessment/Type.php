@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Learning\Assessment\DueWork;
+namespace Schoolbox\Learning\Assessment;
 
 
 class Type
@@ -22,6 +22,9 @@ class Type
     /**
      * The "type" of the Due Work
      * (Essay, Homework, etc)
+     *
+     * For Quiz, it'll just say "Quiz"
+     * Similarly for Task
      *
      * @var string
      */
