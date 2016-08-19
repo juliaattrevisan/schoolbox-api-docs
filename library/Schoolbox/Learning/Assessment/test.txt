@@ -223,6 +223,9 @@ $feedback2
 
 $response = new QuizAttempt();
 $response
+    ->setSubmittedBy($hodes)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-02 19:04:41', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 19:12:41', \Alaress_Date_Format::DATABASE_FORMAT))
     ->getAllFeedback()->add($feedback1)->add($feedback2);
 
 $quiz1 = new Quiz();
@@ -314,24 +317,32 @@ echo "<h1>Submission</h1>";
 new \Alaress_Probe('Title', 'Files', 'Plagscan', 'Submitted By', 'Submitted On Behalf Of', 'Submitted At');
 
 foreach ($project->getAssessables() as $currentAssessable) {
+
+    /** @var \Schoolbox\User $submittedBy */
+    $submittedBy = null;
+
     if ($currentAssessable instanceof DueWork) {
 
-        /** @var DueWorkSubmissionFile $currentFile */
-        /** @var \Schoolbox\User $submittedBy */
-        /** @var \Schoolbox\User $submittedOnBehalfOf */
-
+        /** @var DueWorkSubmission $latestSubmission */
         $latestSubmission = null;
-        $submittedBy = null;
+
+        /** @var \Schoolbox\User $submittedOnBehalfOf */
         $submittedOnBehalfOf = null;
-        $allFiles = [];
+
+        /* Plagscan docs
+         */
         $allPlagscan = [];
+
+        /* Attached files
+         */
+        $allFiles = [];
 
         if ($currentAssessable->getAllResponses()->count()) {
             $latestSubmission = $currentAssessable->getAllResponses()->first();
             $submittedBy = $latestSubmission->getSubmittedBy();
             $submittedOnBehalfOf = $latestSubmission->getSubmittedOnBehalfOf();
 
-
+            /** @var DueWorkSubmissionFile $currentFile */
             if ($latestSubmission && $latestSubmission->getAllFiles()->count()) {
                 foreach ($latestSubmission->getAllFiles() as $currentFile) {
                     $allFiles[] = $currentFile->getFilename();
@@ -349,37 +360,57 @@ foreach ($project->getAssessables() as $currentAssessable) {
             $latestSubmission ? $latestSubmission->getSubmittedAt()->getLocal() : ''
         );
     }
+    elseif ($currentAssessable instanceof Quiz) {
+
+        /** @var QuizAttempt $latestSubmission */
+        $latestSubmission = null;
+
+        if ($currentAssessable->getAllResponses()->count()) {
+            $latestSubmission = $currentAssessable->getAllResponses()->first();
+            $submittedBy = $latestSubmission->getSubmittedBy();
+
+            new \Alaress_Probe(
+                $currentAssessable->getTitle(),
+                '',
+                '',
+                $submittedBy ? $submittedBy->getFullname() : '',
+                '',
+                $latestSubmission ? $latestSubmission->getSubmittedAt()->getLocal() : ''
+            );
+        }
+    }
 }
 
 
 echo "<h1>Feedbacks</h1>";
 
-new \Alaress_Probe('Title', 'Files', 'Mark', 'Comment', 'Published At', 'Published?');
+new \Alaress_Probe('Title', 'Files', 'Mark', 'Comment', 'Published At');
 
 foreach ($project->getAssessables() as $currentAssessable) {
     if ($currentAssessable instanceof DueWork) {
-
-        /** @var DueWorkSubmissionFile $currentFile */
-        /** @var \Schoolbox\User $submittedBy */
-        /** @var \Schoolbox\User $submittedOnBehalfOf */
-        /** @var DueWorkFeedback $latestFeedback */
-
-        $latestSubmission = null;
-        $submittedBy = null;
-        $submittedOnBehalfOf = null;
         $allFiles = [];
         $allPlagscan = [];
-
         $latestFeedback = null;
+
+        /** @var DueWorkSubmission $latestSubmission */
+        $latestSubmission = null;
+
+        /** @var \Schoolbox\User $submittedBy */
+        $submittedBy = null;
+
+        /** @var \Schoolbox\User $submittedOnBehalfOf */
+        $submittedOnBehalfOf = null;
 
         if ($currentAssessable->getAllResponses()->count()) {
             $latestSubmission = $currentAssessable->getAllResponses()->first();
             $submittedBy = $latestSubmission->getSubmittedBy();
             $submittedOnBehalfOf = $latestSubmission->getSubmittedOnBehalfOf();
 
+            /** @var DueWorkFeedback $latestFeedback */
             $latestFeedback = $latestSubmission->findMostRecentNonNullFeedback();
 
             if ($latestFeedback) {
+                /** @var DueWorkSubmissionFile $currentFile */
                 foreach ($latestFeedback->getAllFiles() as $currentFile) {
                     $allFiles[] = $currentFile->getFilename();
                 }
@@ -389,13 +420,37 @@ foreach ($project->getAssessables() as $currentAssessable) {
         new \Alaress_Probe(
             $currentAssessable->getTitle(),
             implode('<br />', $allFiles),
-            $latestFeedback ? $latestFeedback->getMark() : '',
+            $latestFeedback ? $latestFeedback->calculateMark() : '',
             $latestFeedback ? $latestFeedback->getComment() : '',
-            $latestFeedback ? $latestFeedback->getPublishedAt()->getLocal() : '',
-            $latestFeedback ? 'Published' : 'Unpublished'
+            $latestFeedback ? $latestFeedback->getPublishedAt()->getLocal() : 'Unpublished'
+        );
+    }
+    elseif ($currentAssessable instanceof Quiz) {
+
+        /** @var QuizAttempt $latestSubmission */
+        $latestSubmission = null;
+
+        /** @var \Schoolbox\User $submittedBy */
+        $submittedBy = null;
+
+        if ($currentAssessable->getAllResponses()->count()) {
+            $latestSubmission = $currentAssessable->getAllResponses()->first();
+            $submittedBy      = $latestSubmission->getSubmittedBy();
+
+            /** @var QuizReview $latestFeedback */
+            $latestFeedback = $latestSubmission->findMostRecentNonNullFeedback();
+        }
+
+        new \Alaress_Probe(
+            $currentAssessable->getTitle(),
+            implode('<br />', $allFiles),
+            $latestFeedback ? $latestFeedback->calculateMark() : '',
+            '',
+            $latestFeedback->getPublishedAt() ? $latestFeedback->getPublishedAt()->getLocal() : 'Unpublished'
         );
     }
 }
 
 
 die();
+
