@@ -111,6 +111,16 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
+     * Does this folder have a course?
+     *
+     * @return bool
+     */
+    public function hasCourse()
+    {
+        return ($this->course instanceof CourseModel && $this->course->getId());
+    }
+
+    /**
      * Get name of category with list of class codes (eg. 'Chemistry (CH123)')
      *
      * @return string
