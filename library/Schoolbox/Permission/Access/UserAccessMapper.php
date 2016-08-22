@@ -24,6 +24,9 @@ use Schoolbox\UserMapper;
  *
  * @package Schoolbox\Permission\Access
  * @method UserAccess createModel()
+ * @method delete($object)
+ * @method deleteByColumn($columnName, $columnValue, $options = array())
+ * @method deleteByColumnList($columnList, $options = array())
  */
 class UserAccessMapper extends Mapper
 {
