@@ -5,10 +5,10 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Course\Unit;
+namespace Schoolbox\Learning\Course\Template\Unit;
 
 use Schoolbox\Collection;
-use Schoolbox\Learning\Course\Model as CourseModel;
+use Schoolbox\Learning\Course\Template\Model as CourseModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
@@ -22,7 +22,7 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  * (Historically, a Unit was defined as a Folder which contained a Course
  *  Builder component. This class puts this concept into a concrete class.)
  *
- * @package Schoolbox\Learning\Course
+ * @package Schoolbox\Learning\Course\Template
  */
 class Model
 {

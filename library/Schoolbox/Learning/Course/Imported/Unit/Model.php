@@ -5,12 +5,12 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Course\Unit\Instance;
+namespace Schoolbox\Learning\Course\Imported\Unit;
 
 use Schoolbox\Collection;
-use Schoolbox\Learning\Course\Instance\Model as CourseInstanceModel;
+use Schoolbox\Learning\Course\Imported\Model as CourseInstanceModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Learning\Course\Unit\Model as UnitModel;
+use Schoolbox\Learning\Course\Template\Unit\Model as UnitModel;
 
 /**
  * A Unit Instance is a single import of a Unit onto a Folder. It belongs to a
@@ -22,7 +22,7 @@ use Schoolbox\Learning\Course\Unit\Model as UnitModel;
  *
  * TODO merge existing Unit Instance class (\Schoolbox\Assessment\Course\UnitInstance) into this
  *
- * @package Schoolbox\Learning\Course
+ * @package Schoolbox\Learning\Course\Template
  */
 class Model
 {

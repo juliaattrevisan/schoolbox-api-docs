@@ -5,22 +5,22 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Course\Instance;
+namespace Schoolbox\Learning\Course\Template;
 
 use Schoolbox\Collection;
-use Schoolbox\Learning\Course\Unit\Instance\Model as UnitInstanceModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * A Course Instance is an import of a Course onto a Folder.
+ * A Course is an extension of a Folder.
  *
- * A Course Instance may contain several Unit Instances.
+ * A Course may contain several Units, and may be imported onto another Folder.
+ * This action will create a corresponding Course Instance for this Course.
  *
- * (Historically, a Course Instance was defined as a Unit Instance which had at least one child
+ * (Historically, a Course was defined as a Folder which had at least one child
  *  Folder which contained a Course Builder component. This class puts this
  *  concept into a concrete class.)
  *
- * @package Schoolbox\Learning\Course
+ * @package Schoolbox\Learning\Course\Template
  */
 class Model
 {
@@ -32,7 +32,7 @@ class Model
     protected $id;
 
     /**
-     * The Folder within which this Course Instance lives.
+     * The Folder within which this Course lives.
      *
      * TODO review whether this relation needs to exist
      *
@@ -41,9 +41,9 @@ class Model
     protected $folder;
 
     /**
-     * The Unit Instances that are a part of this Course.
+     * The Units that are a part of this Course.
      *
-     * @var Collection|UnitInstanceModel[]
+     * @var Collection|Unit\Model[]
      */
     protected $units;
 
@@ -94,7 +94,7 @@ class Model
     }
 
     /**
-     * @return Collection|UnitInstanceModel[]
+     * @return Collection|Unit\Model[]
      */
     public function getUnits()
     {
@@ -102,7 +102,7 @@ class Model
     }
 
     /**
-     * @param Collection|UnitInstanceModel[] $units
+     * @param Collection|Unit\Model[] $units
      * @return static
      */
     public function setUnits($units)
