@@ -77,17 +77,16 @@ class Project extends AbstractAssessment
 
                         /** @var TaskFeedback $feedback */
                         $feedback = $currentResponse->findMostRecentFeedback();
-
-                        if ($feedback) {
-                            $numMarked++;
-                        }
                     }
                     else {
-                        $feedback = $currentResponse->findMostRecentNonNullFeedback();
 
-                        if ($feedback) {
-                            $numMarked++;
-                        }
+                        /* Find the latest Feedback instance that contained a Mark
+                         */
+                        $feedback = $currentResponse->findMostRecentNonNullFeedback();
+                    }
+
+                    if ($feedback) {
+                        $numMarked++;
                     }
                 }
             }
