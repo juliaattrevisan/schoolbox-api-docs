@@ -16,7 +16,6 @@
 namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
-use \Schoolbox\Learning\Summator\ISummator;
 use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
 use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
@@ -29,32 +28,15 @@ class Project extends AbstractAssessment
     protected $assessables;
 
     /**
-     * Summation strategy
-     *
-     * @var ISummator
-     */
-    protected $summator;
-
-    /**
      * Project constructor.
-     *
-     * @param ISummator $summator
      */
-    public function __construct(ISummator $summator)
+    public function __construct()
     {
-        $this->setAssessables(new Collection());
-        $this->setSummator($summator);
-    }
+        /* I know Dr hates hook methods, so do this instead
+         */
+        parent::__construct();
 
-    /**
-     * Calculate the final mark for this IAssessable
-     *
-     * Projects use Summator strategies to determine final marks
-     * for a Collection of Assessable instances
-     */
-    public function calculateMark()
-    {
-        return $this->getSummator()->summate($this->getAssessables());
+        $this->setAssessables(new Collection());
     }
 
     /**
@@ -120,6 +102,61 @@ class Project extends AbstractAssessment
     }
 
     /**
+     * Calculate the number of Feedbacks that have been Published
+     * to Students
+     *
+     * @return int
+     */
+    protected function numPublished()
+    {
+        $numPublished = 0;
+
+        if ($this->getAssessables()->count()) {
+            foreach ($this->getAssessables() as $currentAssessable) {
+
+                /** @var AbstractResponse $currentResponse */
+                foreach ($currentAssessable->getAllResponses() as $currentResponse) {
+
+                    /* Tasks have a special treatment in this context
+                     * Tasks aren't marked
+                     */
+                    if ($currentResponse instanceof TaskCompletion) {
+
+                        /** @var TaskFeedback $feedback */
+                        $feedback = $currentResponse->findMostRecentFeedback();
+                    }
+                    else {
+
+                        /* Find the latest Feedback instance that contained a Mark
+                         */
+                        $feedback = $currentResponse->findMostRecentNonNullFeedback();
+                    }
+
+                    if ($feedback && $feedback->isPublished()) {
+                        $numPublished++;
+                    }
+                }
+            }
+        }
+
+        return $numPublished;
+    }
+
+    /**
+     * Calculate percentage of a Project that has been Published
+     *
+     * @return int
+     */
+    public function calculatePercentagePublished()
+    {
+        if ($this->numAssessables()) {
+            return 100 * ($this->numPublished() / $this->numAssessables());
+        }
+
+        return 0;
+    }
+
+    /**
      * @inheritdoc
      *
      * @return string
@@ -147,28 +184,6 @@ class Project extends AbstractAssessment
     public function setAssessables($assessables)
     {
         $this->assessables = $assessables;
-        return $this;
-    }
-
-    /**
-     * Get summation strategy
-     *
-     * @return ISummator
-     */
-    public function getSummator()
-    {
-        return $this->summator;
-    }
-
-    /**
-     * Set a summation strategy
-     *
-     * @param ISummator $summator
-     * @return self
-     */
-    public function setSummator($summator)
-    {
-        $this->summator = $summator;
         return $this;
     }
 }
