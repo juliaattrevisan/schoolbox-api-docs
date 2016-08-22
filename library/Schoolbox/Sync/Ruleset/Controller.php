@@ -643,8 +643,15 @@ class Controller extends Base {
         if (is_array($effects)) {
             foreach ($effects as $effectId => $effectData) {
 
-                // Don't save undefined effects
-                if("" === $effectData['userProperty'] || "" === $effectData['type']){
+                // Don't save undefined / invalid effects
+
+                // All effects must have a 'type'
+                if('' == $effectData['type']){
+                    continue;
+                }
+
+                // All non-'skip' effects must have a 'userProperty'
+                if(EffectTypeMapper::EFFECT_TYPE_SKIP != $effectData['type'] && '' == $effectData['userProperty']){
                     continue;
                 }
 
