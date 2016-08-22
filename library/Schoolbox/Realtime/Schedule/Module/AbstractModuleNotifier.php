@@ -281,7 +281,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
 
 
     /**
-     * @return Mapper
+     * @return IMapper
      */
     public function getMapper()
     {
@@ -312,7 +312,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface
     protected function raiseNotification(User $effector, $action, $model, Mapper $mapper, array $diff = null)
     {
         $this->notif
-             ->setTopic(Notif::TOPIC_APPLICATION)
+             ->setTopic(NotifInterface::TOPIC_APPLICATION)
              ->notice(serialize(new Event($effector, $action, $model, $mapper, $diff)));
     }
 }
