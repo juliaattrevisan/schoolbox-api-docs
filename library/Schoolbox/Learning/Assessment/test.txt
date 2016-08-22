@@ -41,7 +41,7 @@ $feedbackFile1
 
 $feedback1 = new DueWorkFeedback();
 $feedback1
-    ->setMark(-3)
+    ->setNormalisedMark(-3)
     ->setComment('This is a flawed piece of work.')
     ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -112,7 +112,7 @@ $dueWork1
  */
 $feedback1 = new DueWorkFeedback();
 $feedback1
-    ->setMark(999999)
+    ->setNormalisedMark(999999)
     ->setComment('You should not see this.')
     ->setPublishedAt(new \Alaress_Date_Format('2016-08-08 17:01:11', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-05 17:01:11', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -120,7 +120,7 @@ $feedback1
 
 $feedback2 = new DueWorkFeedback();
 $feedback2
-    ->setMark(25)
+    ->setNormalisedMark(25)
     ->setComment('A work of art.')
     ->setPublishedAt(new \Alaress_Date_Format('2016-08-12 18:12:11', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-05 18:01:11', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -152,7 +152,7 @@ $dueWork2
  */
 $feedback = new DueWorkFeedback();
 $feedback
-    ->setMark(null)
+    ->setNormalisedMark(null)
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-23 08:29:45', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-24 22:58:59', \Alaress_Date_Format::DATABASE_FORMAT));
 
@@ -553,3 +553,574 @@ foreach ($project->getAssessables() as $currentAssessable) {
 
 
 die();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * divisionPlayerList
+ * - contains a sequenced list of players in the division with [id,name,html]
+ * - an html fragment for their avatarcard
+ * - a data var in the avatarcard fragment to indicate whether they have been assigned to a team or not
+ *   (this should be stored as a data var on the avatar card's list item in the dom, to enable a filter selection as per SA-463).
+ *
+ * player
+ * - this is the person that was just drug from once sortable to another
+ * - an html fragment for their avatarcard
+ *
+ * team.from
+ * - the team from which a person was drug (if any)
+ * - the list of players in that team, after transaction occurred
+ *
+ * team.to
+ * - the team into which a person was drug (if any)
+ * - the list of players in that team, after transaction occurred
+ * - this is the team that was affected by the most recent drag/drop action, or equivalent via the tot
+ */
+$data = [
+    'division' => [
+        'players' => [
+            [
+                'id'   => 2,
+                'name' => 'albert',
+                'html' => '<div class="small-12 card" data-assigned="8"> ... </div>',
+            ],
+            [
+                'id'   => 1,
+                'name' => 'joseph',
+                'html' => '<div class="small-12 card" data-assigned="8"> ... </div>',
+            ],
+            [
+                'id'   => 4,
+                'name' => 'bruce',
+                'html' => '<div class="small-12 card"> ... </div>',
+            ],
+            [
+                'id'   => 3,
+                'name' => 'harry',
+                'html' => '<div class="small-12 card" data-assigned="9"> ... </div>',
+            ],
+        ],
+    ],
+
+    /* The player that was drug between sortables
+     */
+    'player' => [
+        [
+            'id'   => 1,
+            'name' => 'joseph',
+            'html' => '<div class="small-12 card"> ... </div>',
+        ],
+    ],
+
+    /* New state of all affected teams, where applicable
+     */
+    'team' => [
+        'from' => [
+            'id' => 8,
+            'players' => [
+                'id'   => 2,
+                'name' => 'albert',
+                'html' => '<div class="small-12 card" data-assigned="8"> ... </div>',
+            ],
+            [
+                'id'   => 1,
+                'name' => 'joseph',
+                'html' => '<div class="small-12 card" data-assigned="8"> ... </div>',
+            ],
+
+        ],
+        'to' => [
+            'id' => 9,
+            'players' => [
+                'id'   => 3,
+                'name' => 'harry',
+                'html' => '<div class="small-12 card" data-assigned="9"> ... </div>',
+            ],
+
+        ]
+    ]
+];
+
+return json_encode($data);
+
+/*
+ - upon drag from division list to player list
+ - transact with db, get the json back
+ - insert the last modified player team.player.html into the team list and reattach any event listeners $(team.to.id).append(json.team.player.html)
+   -- can probably still just replace the entire list of players
+ - all other Position and Sequencing actions can remain the same
+
+
+ - upon drag from player list to player list
+ - transact with db, get the json back
+ - insert the last modified player team.to.player.html into the team list and reattach any event listeners $(team).append(json.player.html)
+   -- can probably still just replace the entire list of players
+
+
+ - upon drag from player list to division list
+ - transact with db, get the json back
+ - refresh player list for division and team
+   -- can probably still just replace the entire list of players
+
+ - when resorting within a team or division, probably don't need any data returned from backend
+   and can leave everything to do what it naturally does
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//$teamMapper = \Schoolbox\SportsFixtures\Team\Mapper::getInstance();
+//$teamMapper->deleteByColumnList([
+//    'division_id' => 1
+//]);
+
+
+//$connector = new \EOTC\EventConnector();
+//$connector->setUser($_SESSION['user']);
+//
+//$event = $connector->getEvent(1);
+//
+//new \Alaress_Probe($event);
+//die();
+
+//$teamMapper = \Schoolbox\SportsFixtures\Team\Mapper::getInstance();
+//$teamMapper->deleteByColumnList([
+//    'division_id' => 1
+//]);
+
+
+//$now = \Alaress_Date_Format::now();
+//
+//$previously = clone $now;
+//
+//new \Alaress_Probe(
+//    $previously->addHours(-24)->getDatabase(),
+//    $now->getDatabase()
+//);
+//
+//die();
+
+
+
+
+///** @var \Schoolbox\SportsFixtures\Match\Model $match */
+//$match = \Schoolbox\SportsFixtures\Match\Mapper::getInstance()->findById(3);
+//
+//$snapshot = new \Schoolbox\SportsFixtures\Snapshot\Snapshot($match);
+//$snapshot->snapshot();
+//
+//new \Alaress_Probe('Snapshot executed.');
+//die();
+
+
+
+
+
+
+//
+//$user = \Schoolbox\UserMapper::getInstance()->findById(230);
+//
+//$auth = new \Schoolbox\SportsFixtures\Authenticator($user, \Schoolbox\Permission\Access\UserAccessMapper::getInstance());
+//
+//new \Alaress_Probe($auth->isSportsAdministrator());
+//die();
+//
+//
+//
+//
+//
+//
+//
+///* Equivalent characters for automarking purposes
+// * Replace em and en dashes with hyphen
+// */
+//function compareStrings($str1, $str2)
+//{
+//    return strcmp(normalise($str1), normalise($str2))  == 0;
+//}
+//
+//function normalise($response)
+//{
+//    $equivalences = strtr(
+//        $response,
+//        [
+//            '—' => '-',
+//            '–' => '-'
+//        ]
+//    );
+//
+//    return mb_strtolower(trim(preg_replace('/\\s+/', ' ', $equivalences)), 'UTF-8');
+//}
+//
+//
+//$response = 'parentheses, or colons in each case';
+//$answer = 'parentheses, or colons in each case';
+//
+//new \Alaress_Probe(compareStrings($response, $answer));
+//die();
+//
+//
+//
+//
+//
+
+
+
+
+//use \Schoolbox\Application\Exception\Exception as SchoolboxException;
+//
+//$errorMapper = \Schoolbox\Error\Mapper::getInstance();
+//
+//throw $errorMapper->generateException($errorMapper::ERROR_EMAIL_NOT_FOUND);
+
+//throw new SchoolboxException('mort');
+//
+//
+//try {
+//
+//}
+//catch (SchoolboxException $e) {
+//}
+
+
+
+
+//
+////throw new SchoolboxException('my message', 3);
+//throw new SchoolboxException('Username or password is incorrectddddddddd');
+//throw \Schoolbox\Error\Mapper::getInstance()->generateException('Fail Source', null);
+//
+////            throw \Schoolbox\Error\Mapper::getInstance()->generateException(1);
+//
+//
+//try {
+//
+//}
+//catch (SchoolboxException $e) {
+////    error($e->getCode(), $e->getMessage());
+//}
+//
+//
+//
+//exit();
+
+
+
+
+
+//use \Schoolbox\Exception\Runtime as SchoolboxExceptionRuntime;
+//use \Schoolbox\Exception\BadFunctionCall as SchoolboxExceptionBadFunctionCall;
+//use \Schoolbox\Error\Mapper as ErrorMapper;
+
+
+
+
+
+//class whateverController
+//{
+//
+//    public function something()
+//    {
+//        try {
+//            if (1 > 0) {
+//                throw new InvalidArgumentException("One must not be greater than zero.");
+//            }
+//        } catch (InvalidArgumentException $e) {
+////            throw new Schoolbox\Exception\Runtime(ErrorMapper::ERROR_CATEGORY_DELETED, $e);
+//            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_ATTENDANCE_FUTURE, $e);
+//        }
+//    }
+//}
+//
+//exit();
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//$data1 = [
+//    230 => [
+//        'val' => 90.3
+//    ],
+//    300 => [
+//        'val' => 40.2
+//    ],
+//    150 => [
+//        'val' => 0.01
+//    ],
+//    151 => [
+//        'val' => 40.3
+//    ],
+//    166 => [
+//        'val' => 40.3
+//    ],
+//    177 => [
+//        'val' => 40.2525252525252552
+//    ],
+//    40 => [
+//        'val' => 11.2
+//    ],
+//    22 => [
+//        'val' => 98.9
+//    ]
+//];
+//
+//$data2 = [
+//    230 => 90.3,
+//    300 => 40.2,
+//    150 => 0.01,
+//    151 => 40.3,
+//    166 => 40.3,
+//    177 => 40.2525252525252552,
+//    40 => 11.2,
+//    22 => 98.9
+//];
+//
+//$sorter1 = new \Schoolbox\LearningAnalytics\Sorter($data1);
+//$sorted1 = $sorter1->findAscending('val');
+//$sorted2 = $sorter1->findDescending('val');
+//
+//$sorter2 = new \Schoolbox\LearningAnalytics\Sorter($data2);
+//$sorted3 = $sorter2->findAscending();
+//$sorted4 = $sorter2->findDescending();
+//
+//new \Alaress_Probe($sorted1, $sorted2, $sorted3, $sorted4);
+//
+//
+//
+//exit();
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//Alaress_Date_Format::newLocalShort('get frakked');
+//exit();
+//
+//new \Alaress_Probe([], [], false, true, null);
+//exit();
+//
+//use Schoolbox\CampusMapper;
+//use Schoolbox\External\Normalise\Timetable\Lesson;
+//use Schoolbox\External\Normalise\Timetable\Period\Teaching as TeachingPeriod;
+//use Schoolbox\External\Normalise\Timetable\Period\NonTeaching as NonTeachingPeriod;
+//use Schoolbox\External\Normalise\Timetable\Day;
+//use Schoolbox\External\Normalise\Timetable\Timetable;
+//use Schoolbox\External\Normalise\Timetable\Definition;
+//
+//$campus = CampusMapper::getInstance()->findById(1);
+//
+///* Timetable Definition
+// */
+//$definition1 = new TeachingPeriod();
+//$definition1->setName('Period One')
+//    ->setNumber(1)
+//    ->setStart('9am')
+//    ->setEnd('10am');
+//
+//$definition2 = new NonTeachingPeriod();
+//$definition2->setName('Period Two')
+//    ->setNumber(2)
+//    ->setStart('10:30am')
+//    ->setEnd('11am');
+//
+//$definition3 = new TeachingPeriod();
+//$definition3->setName('Period Three')
+//    ->setNumber(3)
+//    ->setStart('11am')
+//    ->setEnd('12:30pm');
+//
+//$definition4 = new NonTeachingPeriod();
+//$definition4->setName('Period Four')
+//    ->setNumber(4)
+//    ->setStart('12:30pm')
+//    ->setEnd('1pm');
+//
+//$definition5 = new TeachingPeriod();
+//$definition5->setName('Period Five')
+//    ->setNumber(5)
+//    ->setStart('1pm')
+//    ->setEnd('3pm');
+//
+//$definition6 = new TeachingPeriod();
+//$definition6->setName('Period Six')
+//    ->setNumber(6)
+//    ->setStart('3pm')
+//    ->setEnd('3:30pm');
+//
+//$definition = new Definition($campus);
+//$definition->addPeriod($definition1)
+//    ->addPeriod($definition2)
+//    ->addPeriod($definition3)
+//    ->addPeriod($definition4)
+//    ->addPeriod($definition5)
+//    ->addPeriod($definition6);
+//
+///* Actual Timetables
+// */
+//$lesson1 = new Lesson();
+//$lesson1->setName('Die slowly')
+//    ->setCode('DS NOW')
+//    ->setType('A')
+//    ->setRoom('My Room')
+//    ->setCampus($campus);
+//
+//$lesson2 = new Lesson();
+//$lesson2->setName('Get Better Quickly')
+//    ->setCode('GBQ 001')
+//    ->setType('A')
+//    ->setRoom('THE SKY')
+//    ->setCampus($campus);
+//
+//$lesson3 = new Lesson();
+//$lesson3->setName('Lames Leckie')
+//    ->setCode('LL')
+//    ->setType('P')
+//    ->setRoom('Boardroom')
+//    ->setCampus($campus);
+//
+//$staff = new \Schoolbox\External\Normalise\User\Staff();
+//$staff->setPreferredName('James')
+//    ->setLastname('On The Phone')
+//    ->setTitle('Mr');
+//
+//$lesson3->getAllStaff()->add($staff);
+//
+//$period1 = new TeachingPeriod();
+//$period1->setName('The First Period')
+//    ->setNumber(1)
+//    ->setStart('9am')
+//    ->setEnd('10am')
+//    ->addClass($lesson1)
+//    ->addClass($lesson2);
+//
+//$period2 = new NonTeachingPeriod();
+//$period2->setName('RECESS')
+//    ->setNumber(2)
+//    ->setStart('10am')
+//    ->setEnd('10:30am');
+//
+//$period3 = new TeachingPeriod();
+//$period3->setName('The Third Period')
+//    ->setNumber(3)
+//    ->setStart('10:30am')
+//    ->setEnd('11am')
+//    ->addClass($lesson2);
+//
+//$period4 = new TeachingPeriod();
+//$period4->setName('Some other place')
+//    ->setNumber(4)
+//    ->setStart('10:43am')
+//    ->setEnd('noon')
+//    ->addClass($lesson3);
+//
+//$day1 = new Day();
+//$day1->setName('Matthew Day')
+//    ->setNumber(1)
+//    ->addPeriod($period1)
+//    ->addPeriod($period2)
+//    ->addPeriod($period3);
+//
+//$day2 = new Day();
+//$day2->setName('Season 2')
+//    ->setNumber(2)
+//    ->addPeriod($period4);
+//
+//$timetable = new Timetable();
+//$timetable->setUser($_SESSION['user'])
+//    ->addDay($day1)
+//    ->addDay($day2);
+//
+//
+//$allTimetables = new \Schoolbox\Collection();
+//$allTimetables->add($timetable);
+//
+///* Decompile all timetables back into arrays
+// */
+//$decompiled = [];
+//
+//foreach ($allTimetables as $currentTimetable) {
+//    $decompiled[] = $currentTimetable->decompile();
+//}
+//
+///* Show output
+// */
+//new \Alaress_Probe($allTimetables, $decompiled);
+//new \Alaress_Probe('<hr>');
+//new \Alaress_Probe($definition, $definition->decompile());
+//
+exit();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -24,7 +24,7 @@ class AbstractFeedback implements IFeedback
      *
      * @var float
      */
-    protected $mark;
+    protected $humanReadableMark;
 
     /**
      * The mark out of 100 given to this Assessable
@@ -79,7 +79,7 @@ class AbstractFeedback implements IFeedback
      */
     public function calculateMark()
     {
-        return $this->getMark();
+        return $this->getNormalisedMark();
     }
 
     /**
@@ -116,27 +116,29 @@ class AbstractFeedback implements IFeedback
 
     /**
      * @param int $id
+     * @return $this
      */
     public function setId($id)
     {
         $this->id = $id;
+        return $this;
     }
 
     /**
      * @return float
      */
-    public function getMark()
+    public function getHumanReadableMark()
     {
-        return $this->mark;
+        return $this->humanReadableMark;
     }
 
     /**
-     * @param $mark
+     * @param float $humanReadableMark
      * @return $this
      */
-    public function setMark($mark)
+    public function setHumanReadableMark($humanReadableMark)
     {
-        $this->mark = $mark;
+        $this->humanReadableMark = $humanReadableMark;
         return $this;
     }
 
@@ -150,10 +152,12 @@ class AbstractFeedback implements IFeedback
 
     /**
      * @param mixed $normalisedMark
+     * @return $this
      */
     public function setNormalisedMark($normalisedMark)
     {
         $this->normalisedMark = $normalisedMark;
+        return $this;
     }
 
     /**
