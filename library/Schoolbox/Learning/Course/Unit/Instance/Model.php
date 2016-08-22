@@ -20,6 +20,8 @@ use Schoolbox\Learning\Course\Unit\Model as UnitModel;
  * created from - a teacher may then add, modify or remove individual
  * Assessable objects inside this object.
  *
+ * TODO merge existing Unit Instance class (\Schoolbox\Assessment\Course\UnitInstance) into this
+ *
  * @package Schoolbox\Learning\Course
  */
 class Model
