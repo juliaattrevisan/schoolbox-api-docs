@@ -13,6 +13,8 @@ namespace Schoolbox\Resource\Folder;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Course\Model as CourseModel;
+use Schoolbox\Learning\Course\Instance\Model as CourseInstanceModel;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\HomepageConfig;
@@ -74,6 +76,19 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
     protected $teacher_collection;
 
+    /**
+     * The course (if any!) that is attached to this folder.
+     *
+     * @var CourseModel
+     */
+    protected $course;
+
+    /**
+     * The course instances that have been imported onto this folder.
+     *
+     * @var Collection|CourseInstanceModel[]
+     */
+    protected $courseInstances;
 
     /**
      * Constructor
@@ -406,6 +421,42 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     public function setTaskCount($taskCount)
     {
         $this->taskCount = $taskCount;
+        return $this;
+    }
+
+    /**
+     * @return CourseModel
+     */
+    public function getCourse()
+    {
+        return $this->course;
+    }
+
+    /**
+     * @param CourseModel $course
+     * @return static
+     */
+    public function setCourse($course)
+    {
+        $this->course = $course;
+        return $this;
+    }
+
+    /**
+     * @return Collection|CourseInstanceModel[]
+     */
+    public function getCourseInstances()
+    {
+        return $this->courseInstances;
+    }
+
+    /**
+     * @param Collection|CourseInstanceModel[] $courseInstances
+     * @return static
+     */
+    public function setCourseInstances($courseInstances)
+    {
+        $this->courseInstances = $courseInstances;
         return $this;
     }
 }
