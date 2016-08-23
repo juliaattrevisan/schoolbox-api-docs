@@ -56,6 +56,7 @@ class UserMapper extends SchoolboxMapper
          * Otherwise leave it unchanged from whatever it was
          */
         if ($config->get('ups_groups_enabled')) {
+            /** @var UserAccessMapper $userAccessMapper */
             $userAccessMapper = $this->getJoinMapper('userAccess');
 
             // make sure any mutes go through correctly
@@ -86,8 +87,12 @@ class UserMapper extends SchoolboxMapper
 
                 /* Do not blow away Owners, only Read/Write accessors
                  */
-                if ($found && ($found->getAccessLevel() < UserAccess::ACCESS_FULL)) {
-                    $userAccessMapper->delete($found);
+                if ($found instanceof UserAccess && ($found->getAccessLevel() < UserAccess::ACCESS_FULL)) {
+                    $userAccessMapper->deleteByColumnList([
+                        'uid'     => $user->getId(),
+                        'sid'     => $found->getServiceIdentifier(),
+                        'service' => UserAccess::SERVICE_HOMEPAGE,
+                    ]);
                 }
             }
 
