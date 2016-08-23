@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Course\Imported;
 
 use Schoolbox\Collection;
+use Schoolbox\Learning\Course\Template\Model as TemplateCourseModel;
 use Schoolbox\Learning\Course\Imported\Unit\Model as ImportedUnitModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
@@ -40,6 +41,13 @@ class Model
      * @var FolderModel
      */
     protected $folder;
+
+    /**
+     * The Template Course which this object was created from.
+     *
+     * @var TemplateCourseModel
+     */
+    protected $template;
 
     /**
      * The Imported Units that are a part of this object.
@@ -91,6 +99,24 @@ class Model
     public function setFolder($folder)
     {
         $this->folder = $folder;
+        return $this;
+    }
+
+    /**
+     * @return TemplateCourseModel
+     */
+    public function getTemplate()
+    {
+        return $this->template;
+    }
+
+    /**
+     * @param TemplateCourseModel $template
+     * @return static
+     */
+    public function setTemplate($template)
+    {
+        $this->template = $template;
         return $this;
     }
 
