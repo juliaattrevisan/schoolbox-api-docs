@@ -98,7 +98,7 @@ class Model extends AbstractAssessment
      *
      * @return $this
      */
-    public function acceptsNone()
+    public function setAcceptsNone()
     {
         $this->setAcceptOnline(self::ACCEPT_ONLINE_NONE);
         return $this;
@@ -118,7 +118,7 @@ class Model extends AbstractAssessment
      *
      * @return $this
      */
-    public function acceptsSingle()
+    public function setAcceptsSingle()
     {
         $this->setAcceptOnline(self::ACCEPT_ONLINE_SINGLE);
         return $this;
@@ -139,7 +139,7 @@ class Model extends AbstractAssessment
      *
      * @return $this
      */
-    public function acceptsMultiple()
+    public function setAcceptsMultiple()
     {
         $this->setAcceptOnline(self::ACCEPT_ONLINE_MULTI);
         return $this;
