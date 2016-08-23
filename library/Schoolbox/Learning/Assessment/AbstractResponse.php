@@ -57,8 +57,41 @@ class AbstractResponse implements IResponse
     /**
      * Find the most recent Feedback with a non-null Mark value,
      * based on its Updated field
+     *
+     * Assumes getAllFeedback() is sorted in reverse chronological order
      */
-    public function findMostRecentNonNullFeedback()
+    public function findMostRecentFeedback()
+    {
+        if ($this->getAllFeedback()->count()) {
+            $latest = $this->getAllFeedback()->first();
+
+            foreach ($this->getAllFeedback() as $currentFeedback) {
+                if (!$currentFeedback->isNullMark()) {
+                    return $currentFeedback;
+                }
+            }
+
+            /* If the ->first() instance is actually null
+             * and all the other Feedbacks are also null
+             * return null
+             *
+             * Otherwise return the Feedback itself
+             */
+            if (!$latest->isNullMark()) {
+                return $latest;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Find the most recent Published Feedback with a non-null Mark value,
+     * based on its Updated field
+     *
+     * Assumes getAllFeedback() is sorted in reverse chronological order
+     */
+    public function findMostRecentPublishedFeedback()
     {
         if ($this->getAllFeedback()->count()) {
             $latest = $this->getAllFeedback()->first();
@@ -80,28 +113,6 @@ class AbstractResponse implements IResponse
             if (!$latest->isNullMark()) {
                 return $latest;
             }
-        }
-
-        return null;
-    }
-
-    /**
-     * Find the most recent Feedback, based on its Updated field
-     */
-    public function findMostRecentFeedback()
-    {
-        if ($this->getAllFeedback()->count()) {
-            $latest = $this->getAllFeedback()->first();
-
-            foreach ($this->getAllFeedback() as $currentFeedback) {
-                if ($currentFeedback->getPublishedAt()) {
-                    if ($currentFeedback->getPublishedAt()->gt($latest->getPublishedAt())) {
-                        $latest = $currentFeedback;
-                    }
-                }
-            }
-
-            return $latest;
         }
 
         return null;

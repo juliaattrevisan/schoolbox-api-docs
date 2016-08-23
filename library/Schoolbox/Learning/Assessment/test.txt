@@ -51,18 +51,24 @@ $plagscan1
     ->setScore('93% plagiariased')
     ->setHtml('<div><strong>YOU CHEATED</strong></div>');
 
+$storage1 = new \Schoolbox\Resource\Storage\Model();
+$storage1->setHash('s89789d9hw3thsug8923u5');
+
 $submissionFile1 = new DueWorkSubmissionFile();
 $submissionFile1
     ->setId(11)
-    ->setHash('s89789d9hw3thsug8923u5')
+    ->setStorage($storage1)
     ->setCrocodocId('vjfh-6677=eirj-01928333')
     ->setFilename('mark this file Sir.xlsx')
     ->setPlagscan($plagscan1);
 
+$storage2 = new \Schoolbox\Resource\Storage\Model();
+$storage2->setHash('lk5j34kl5jousdio');
+
 $submissionFile2 = new DueWorkSubmissionFile();
 $submissionFile2
     ->setId(12)
-    ->setHash('s89789d9hw3thsug8923u5')
+    ->setStorage($storage1)
     ->setCrocodocId('vjfh-6677=eirj-01928333')
     ->setFilename('and this one too.docx');
 
@@ -96,7 +102,7 @@ $dueWork1 = new DueWork();
 $dueWork1
     ->setTitle('1. My First Due Work')
     ->setType($type)
-    ->acceptsMultiple()
+    ->setAcceptsMultiple()
     ->showOnlySubmittedStudents()
     ->getAllResponses()->add($response);
 
@@ -127,7 +133,7 @@ $response
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-04 18:22:02', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setSubmittedBy($somodio)
     ->setSubmittedOnBehalfOf($hodes)
-    ->getAllFeedback()->add($feedback1)->add($feedback2);
+    ->getAllFeedback()->add($feedback2)->add($feedback1);
 
 $type = new DueWorkType();
 $type
@@ -139,7 +145,7 @@ $dueWork2
     ->setTitle('2. My Second Due Work')
     ->setType($type)
     ->setHasRubric(true)
-    ->acceptsSingle()
+    ->setAcceptsSingle()
     ->showOnlySubmittedStudents()
     ->getAllResponses()->add($response);
 
@@ -241,17 +247,9 @@ $quiz2
 
 /* Sixth (one submission, self assessed by student; published)
  */
-$feedback = new TaskFeedback();
-$feedback
-    ->setReviewer($hodes)
-    ->setPublishedAt(new \Alaress_Date_Format('2016-09-14 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
-    ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
-    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
-
 $response = new TaskCompletion();
 $response
-    ->setSubmittedBy($hodes)
-    ->getAllFeedback()->add($feedback);
+    ->setSubmittedBy($hodes);
 
 $task1 = new Task();
 $task1
@@ -303,6 +301,8 @@ $project
     ->add($task2)
     ->add($task3)
 ;
+
+echo "<h1>Title</h1>";
 
 new \Alaress_Probe('Title', '% Marked', '% Published');
 new \Alaress_Probe($project->getTitle(), $project->calculatePercentageMarked(), $project->calculatePercentagePublished());
@@ -447,7 +447,7 @@ foreach ($project->getAssessables() as $currentAssessable) {
             $submittedOnBehalfOf = $latestSubmission->getSubmittedOnBehalfOf();
 
             /** @var DueWorkFeedback $latestFeedback */
-            $latestFeedback = $latestSubmission->findMostRecentNonNullFeedback();
+            $latestFeedback = $latestSubmission->findMostRecentFeedback();
 
             if ($latestFeedback) {
                 /** @var DueWorkSubmissionFile $currentFile */
@@ -480,7 +480,7 @@ foreach ($project->getAssessables() as $currentAssessable) {
             $latestSubmission = $currentAssessable->getAllResponses()->first();
             $submittedBy      = $latestSubmission->getSubmittedBy();
 
-            $latestFeedback = $latestSubmission->findMostRecentNonNullFeedback();
+            $latestFeedback = $latestSubmission->findMostRecentFeedback();
         }
 
         new \Alaress_Probe(

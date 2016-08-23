@@ -25,4 +25,26 @@ class Model extends AbstractResponse
     {
         return $this->getUpdatedAt();
     }
+
+    /**
+     * Find the most recent Published Feedback, based on its Updated field
+     */
+    public function findMostRecentFeedback()
+    {
+        if ($this->getAllFeedback()->count()) {
+            $latest = $this->getAllFeedback()->first();
+
+            foreach ($this->getAllFeedback() as $currentFeedback) {
+                if ($currentFeedback->getPublishedAt()) {
+                    if ($currentFeedback->getPublishedAt()->gt($latest->getPublishedAt())) {
+                        $latest = $currentFeedback;
+                    }
+                }
+            }
+
+            return $latest;
+        }
+
+        return null;
+    }
 }

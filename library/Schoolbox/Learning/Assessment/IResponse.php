@@ -17,13 +17,18 @@ interface IResponse
     /**
      * Find the most recent Feedback with a non-null Mark value,
      * based on its Updated field
-     */
-    public function findMostRecentNonNullFeedback();
-
-    /**
-     * Find the most recent Feedback, based on its Updated field
+     *
+     * Assumes getAllFeedback() is sorted in reverse chronological order
      */
     public function findMostRecentFeedback();
+
+    /**
+     * Find the most recent Published Feedback with a non-null Mark value,
+     * based on its Updated field
+     *
+     * Assumes getAllFeedback() is sorted in reverse chronological order
+     */
+    public function findMostRecentPublishedFeedback();
 
     /* Getters/Setters
      */

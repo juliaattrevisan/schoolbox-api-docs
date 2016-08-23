@@ -16,8 +16,6 @@
 namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
-use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
-use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
 class Project extends AbstractAssessment
 {
@@ -50,23 +48,7 @@ class Project extends AbstractAssessment
 
             /** @var AbstractResponse $currentResponse */
             foreach ($currentAssessable->getAllResponses() as $currentResponse) {
-
-                /* Tasks have a special treatment in this context
-                 * Tasks aren't marked
-                 */
-                if ($currentResponse instanceof TaskCompletion) {
-
-                    /** @var TaskFeedback $feedback */
-                    $feedback = $currentResponse->findMostRecentFeedback();
-                }
-                else {
-
-                    /* Find the latest Feedback instance that contained a Mark
-                     */
-                    $feedback = $currentResponse->findMostRecentNonNullFeedback();
-                }
-
-                if ($feedback) {
+                if ($currentResponse->findMostRecentFeedback()) {
                     $numMarked++;
                 }
             }
@@ -113,23 +95,7 @@ class Project extends AbstractAssessment
 
             /** @var AbstractResponse $currentResponse */
             foreach ($currentAssessable->getAllResponses() as $currentResponse) {
-
-                /* Tasks have a special treatment in this context
-                 * Tasks aren't marked
-                 */
-                if ($currentResponse instanceof TaskCompletion) {
-
-                    /** @var TaskFeedback $feedback */
-                    $feedback = $currentResponse->findMostRecentFeedback();
-                }
-                else {
-
-                    /* Find the latest Feedback instance that contained a Mark
-                     */
-                    $feedback = $currentResponse->findMostRecentNonNullFeedback();
-                }
-
-                if ($feedback && $feedback->isPublished()) {
+                if ($currentResponse->findMostRecentPublishedFeedback()) {
                     $numPublished++;
                 }
             }
