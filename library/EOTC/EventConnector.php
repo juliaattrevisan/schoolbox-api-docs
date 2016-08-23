@@ -326,9 +326,15 @@ class EventConnector extends EventMapper
             /* For filters
              */
             $campusIds = array();
+            $inCampus = false;
 
             foreach ($eventItem->getCampusCollection() as $currentCampus) {
                 $campusIds[] = $currentCampus->getId();
+
+                if($this->getUser()->isInCampus($currentCampus)) {
+                    $inCampus = true;
+                }
+
             }
 
             /* Only present this event for a particular user if they are
@@ -344,6 +350,7 @@ class EventConnector extends EventMapper
              *  - Staff members should see it in translucent form
              *  - Students should only see this event if it's Approved and
              *    if they are assigned to it as an attendee
+             *  IF event is approved and in the campus of the user they can see it
              */
             $isAttendee = false;
 
@@ -357,7 +364,8 @@ class EventConnector extends EventMapper
                 $isAttendee = true;
             }
 
-            if ($isEOTCManager || $isAttendee || $eventItem->getMetadata()->getStatus()->isApproved()) {
+            if ($isEOTCManager || $isAttendee || ($eventItem->getMetadata()->getStatus()->isApproved() && $inCampus)) {
+
 
                 /* Translate an \EOTC\Event type into a
                  * Calendar_Event_Type_Abstract type
