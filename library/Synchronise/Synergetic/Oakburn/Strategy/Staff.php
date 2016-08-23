@@ -16,8 +16,8 @@ class Synchronise_Synergetic_Oakburn_Strategy_Staff extends Synchronise_Base_Str
         $this
             ->addHydrator(new Synchronise_Base_Hydrator_Default())
             ->addHydrator(new Synchronise_Base_Hydrator_Staff())
+            ->addHydrator(new Synchronise_Synergetic_Oakburn_Hydrator_Staff_Group())
             ->addHydrator(new Synchronise_Synergetic_Oakburn_Hydrator_Staff_Campus())
-			->addHydrator(new Synchronise_Synergetic_Oakburn_Hydrator_Staff_Group())
 			->addHydrator(new Synchronise_Base_Hydrator_Webmail())
             ->addHydrator(new Synchronise_Base_Hydrator_UnsetCommonFieldsOnUpdate())
             ->addHydrator(new Synchronise_Base_Hydrator_Clear())
