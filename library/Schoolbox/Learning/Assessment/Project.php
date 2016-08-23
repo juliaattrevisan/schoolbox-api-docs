@@ -46,30 +46,28 @@ class Project extends AbstractAssessment
     {
         $numMarked = 0;
 
-        if ($this->getAssessables()->count()) {
-            foreach ($this->getAssessables() as $currentAssessable) {
+        foreach ($this->getAssessables() as $currentAssessable) {
 
-                /** @var AbstractResponse $currentResponse */
-                foreach ($currentAssessable->getAllResponses() as $currentResponse) {
+            /** @var AbstractResponse $currentResponse */
+            foreach ($currentAssessable->getAllResponses() as $currentResponse) {
 
-                    /* Tasks have a special treatment in this context
-                     * Tasks aren't marked
+                /* Tasks have a special treatment in this context
+                 * Tasks aren't marked
+                 */
+                if ($currentResponse instanceof TaskCompletion) {
+
+                    /** @var TaskFeedback $feedback */
+                    $feedback = $currentResponse->findMostRecentFeedback();
+                }
+                else {
+
+                    /* Find the latest Feedback instance that contained a Mark
                      */
-                    if ($currentResponse instanceof TaskCompletion) {
+                    $feedback = $currentResponse->findMostRecentNonNullFeedback();
+                }
 
-                        /** @var TaskFeedback $feedback */
-                        $feedback = $currentResponse->findMostRecentFeedback();
-                    }
-                    else {
-
-                        /* Find the latest Feedback instance that contained a Mark
-                         */
-                        $feedback = $currentResponse->findMostRecentNonNullFeedback();
-                    }
-
-                    if ($feedback) {
-                        $numMarked++;
-                    }
+                if ($feedback) {
+                    $numMarked++;
                 }
             }
         }
@@ -111,30 +109,28 @@ class Project extends AbstractAssessment
     {
         $numPublished = 0;
 
-        if ($this->getAssessables()->count()) {
-            foreach ($this->getAssessables() as $currentAssessable) {
+        foreach ($this->getAssessables() as $currentAssessable) {
 
-                /** @var AbstractResponse $currentResponse */
-                foreach ($currentAssessable->getAllResponses() as $currentResponse) {
+            /** @var AbstractResponse $currentResponse */
+            foreach ($currentAssessable->getAllResponses() as $currentResponse) {
 
-                    /* Tasks have a special treatment in this context
-                     * Tasks aren't marked
+                /* Tasks have a special treatment in this context
+                 * Tasks aren't marked
+                 */
+                if ($currentResponse instanceof TaskCompletion) {
+
+                    /** @var TaskFeedback $feedback */
+                    $feedback = $currentResponse->findMostRecentFeedback();
+                }
+                else {
+
+                    /* Find the latest Feedback instance that contained a Mark
                      */
-                    if ($currentResponse instanceof TaskCompletion) {
+                    $feedback = $currentResponse->findMostRecentNonNullFeedback();
+                }
 
-                        /** @var TaskFeedback $feedback */
-                        $feedback = $currentResponse->findMostRecentFeedback();
-                    }
-                    else {
-
-                        /* Find the latest Feedback instance that contained a Mark
-                         */
-                        $feedback = $currentResponse->findMostRecentNonNullFeedback();
-                    }
-
-                    if ($feedback && $feedback->isPublished()) {
-                        $numPublished++;
-                    }
+                if ($feedback && $feedback->isPublished()) {
+                    $numPublished++;
                 }
             }
         }
