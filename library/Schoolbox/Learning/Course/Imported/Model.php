@@ -8,7 +8,7 @@
 namespace Schoolbox\Learning\Course\Imported;
 
 use Schoolbox\Collection;
-use Schoolbox\Learning\Course\Imported\Unit\Model as UnitInstanceModel;
+use Schoolbox\Learning\Course\Imported\Unit\Model as ImportedUnitModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
@@ -44,7 +44,7 @@ class Model
     /**
      * The Imported Units that are a part of this object.
      *
-     * @var Collection|UnitInstanceModel[]
+     * @var Collection|ImportedUnitModel[]
      */
     protected $units;
 
@@ -95,7 +95,7 @@ class Model
     }
 
     /**
-     * @return Collection|UnitInstanceModel[]
+     * @return Collection|ImportedUnitModel[]
      */
     public function getUnits()
     {
@@ -103,7 +103,7 @@ class Model
     }
 
     /**
-     * @param Collection|UnitInstanceModel[] $units
+     * @param Collection|ImportedUnitModel[] $units
      * @return static
      */
     public function setUnits($units)

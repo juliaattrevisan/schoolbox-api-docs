@@ -8,9 +8,9 @@
 namespace Schoolbox\Learning\Course\Imported\Unit;
 
 use Schoolbox\Collection;
-use Schoolbox\Learning\Course\Imported\Model as CourseInstanceModel;
+use Schoolbox\Learning\Course\Imported\Model as ImportedCourseModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Learning\Course\Template\Unit\Model as UnitModel;
+use Schoolbox\Learning\Course\Template\Unit\Model as TemplateUnitModel;
 
 /**
  * An Imported Unit is a single import of a Unit onto a Folder. It belongs to an
@@ -52,16 +52,16 @@ class Model
      *
      * TODO review if this relation is required - this object can't exist without its Imported Course
      *
-     * @var CourseInstanceModel
+     * @var ImportedCourseModel
      */
-    protected $courseInstance;
+    protected $course;
 
     /**
      * The Template Unit which this object was created from.
      *
-     * @var UnitModel
+     * @var TemplateUnitModel
      */
-    protected $unit;
+    protected $templateUnit;
 
     /**
      * The Assessable objects which are a part of this object.
@@ -77,9 +77,9 @@ class Model
      */
     public function __construct()
     {
-        $this->unit           = new UnitModel();
-        $this->folder         = new FolderModel();
-        $this->courseInstance = new CourseInstanceModel();
+        $this->templateUnit = new TemplateUnitModel();
+        $this->folder       = new FolderModel();
+        $this->course       = new ImportedCourseModel();
     }
 
     /* Getters/Setters */
@@ -121,38 +121,38 @@ class Model
     }
 
     /**
-     * @return UnitModel
+     * @return TemplateUnitModel
      */
-    public function getUnit()
+    public function getTemplateUnit()
     {
-        return $this->unit;
+        return $this->templateUnit;
     }
 
     /**
-     * @param UnitModel $unit
+     * @param TemplateUnitModel $templateUnit
      * @return static
      */
-    public function setUnit($unit)
+    public function setTemplateUnit($templateUnit)
     {
-        $this->unit = $unit;
+        $this->templateUnit = $templateUnit;
         return $this;
     }
 
     /**
-     * @return CourseInstanceModel
+     * @return ImportedCourseModel
      */
-    public function getCourseInstance()
+    public function getCourse()
     {
-        return $this->courseInstance;
+        return $this->course;
     }
 
     /**
-     * @param CourseInstanceModel $courseInstance
+     * @param ImportedCourseModel $course
      * @return static
      */
-    public function setCourseInstance($courseInstance)
+    public function setCourse($course)
     {
-        $this->courseInstance = $courseInstance;
+        $this->course = $course;
         return $this;
     }
 
