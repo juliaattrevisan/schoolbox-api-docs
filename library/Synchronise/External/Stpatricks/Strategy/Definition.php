@@ -31,7 +31,7 @@ class Synchronise_External_Stpatricks_Strategy_Definition extends Synchronise_Ex
         );
 
         $this->setDefinition('staff',
-            array('staffID', 'title', 'firstName', 'lastName', 'networkLogin', 'localEmail', 'role')
+            array('staffID', 'title', 'firstName', 'lastName', 'networkLogin', 'localEmail')
         );
 
         $this->setDefinition('student',
