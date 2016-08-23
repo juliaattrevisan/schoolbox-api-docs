@@ -46,6 +46,9 @@ class Project extends AbstractAssessment
 
         foreach ($this->getAssessables() as $currentAssessable) {
 
+            /* TODO: foreach $allUsers as $currentUser
+             */
+
             /** @var AbstractResponse $currentResponse */
             foreach ($currentAssessable->getAllResponses() as $currentResponse) {
                 if ($currentResponse->findMostRecentFeedback()) {
@@ -92,6 +95,9 @@ class Project extends AbstractAssessment
         $numPublished = 0;
 
         foreach ($this->getAssessables() as $currentAssessable) {
+
+            /* TODO: foreach $allUsers as $currentUser
+             */
 
             /** @var AbstractResponse $currentResponse */
             foreach ($currentAssessable->getAllResponses() as $currentResponse) {
