@@ -103,8 +103,14 @@ $dueWork1
     ->setTitle('1. My First Due Work')
     ->setType($type)
     ->setAcceptsMultiple()
-    ->showOnlySubmittedStudents()
-    ->getAllResponses()->add($response);
+    ->showOnlySubmittedStudents();
+
+// Append it on a per-user basis
+if (!$dueWork1->getAllResponses()->getOffset($hodes->getId()) instanceof \Schoolbox\Collection) {
+    $dueWork1->getAllResponses()->setOffset($hodes->getId(), new \Schoolbox\Collection());
+}
+
+$dueWork1->getAllResponses()->getOffset($hodes->getId())->add($response);
 
 $dueWork1
     ->getAllFiles()->add($file1)->add($file2);
@@ -146,8 +152,14 @@ $dueWork2
     ->setType($type)
     ->setHasRubric(true)
     ->setAcceptsSingle()
-    ->showOnlySubmittedStudents()
-    ->getAllResponses()->add($response);
+    ->showOnlySubmittedStudents();
+
+// Append it on a per-user basis
+if (!$dueWork2->getAllResponses()->getOffset($hodes->getId()) instanceof \Schoolbox\Collection) {
+    $dueWork2->getAllResponses()->setOffset($hodes->getId(), new \Schoolbox\Collection());
+}
+
+$dueWork2->getAllResponses()->getOffset($hodes->getId())->add($response);
 
 
 /* Third (no submission files, no plagscan; unmarked, no feedback, no feedback files, no comment, unpublished)
@@ -174,8 +186,14 @@ $dueWork3 = new DueWork();
 $dueWork3
     ->setTitle('3. My Third Due Work')
     ->setType($type)
-    ->showAllSubmissibleStudents()
-    ->getAllResponses()->add($response);
+    ->showAllSubmissibleStudents();
+
+// Append it on a per-user basis
+if (!$dueWork3->getAllResponses()->getOffset($hodes->getId()) instanceof \Schoolbox\Collection) {
+    $dueWork3->getAllResponses()->setOffset($hodes->getId(), new \Schoolbox\Collection());
+}
+
+$dueWork3->getAllResponses()->getOffset($hodes->getId())->add($response);
 
 
 
@@ -231,10 +249,14 @@ $response
     ->getAllFeedback()->add($feedback1)->add($feedback2);
 
 $quiz1 = new Quiz();
-$quiz1
-    ->setTitle('4. Quiz of the Century')
-    ->getAllResponses()->add($response);
+$quiz1->setTitle('4. Quiz of the Century');
 
+// Append it on a per-user basis
+if (!$quiz1->getAllResponses()->getOffset($hodes->getId()) instanceof \Schoolbox\Collection) {
+    $quiz1->getAllResponses()->setOffset($hodes->getId(), new \Schoolbox\Collection());
+}
+
+$quiz1->getAllResponses()->getOffset($hodes->getId())->add($response);
 
 
 /*  Fifth (no submissions; no feedbacks, no feedback files, unpublished)
@@ -243,7 +265,10 @@ $quiz2 = new Quiz();
 $quiz2
     ->setTitle('5. A quiz nobody has tried');
 
-
+// Append it on a per-user basis
+if (!$quiz2->getAllResponses()->getOffset($hodes->getId()) instanceof \Schoolbox\Collection) {
+    $quiz2->getAllResponses()->setOffset($hodes->getId(), new \Schoolbox\Collection());
+}
 
 /* Sixth (one submission, self assessed by student; published)
  */
@@ -252,10 +277,14 @@ $response
     ->setSubmittedBy($hodes);
 
 $task1 = new Task();
-$task1
-    ->setTitle('6. Task Manager')
-    ->getAllResponses()->add($response);
+$task1->setTitle('6. Task Manager');
 
+// Append it on a per-user basis
+if (!$task1->getAllResponses()->getOffset($hodes->getId()) instanceof \Schoolbox\Collection) {
+    $task1->getAllResponses()->setOffset($hodes->getId(), new \Schoolbox\Collection());
+}
+
+$task1->getAllResponses()->getOffset($hodes->getId())->add($response);
 
 
 /* Seventh (one submission, assessed by teacher; published)
@@ -273,9 +302,14 @@ $response
     ->getAllFeedback()->add($feedback);
 
 $task2 = new Task();
-$task2
-    ->setTitle('7. Task of Kings')
-    ->getAllResponses()->add($response);
+$task2->setTitle('7. Task of Kings');
+
+// Append it on a per-user basis
+if (!$task2->getAllResponses()->getOffset($hodes->getId()) instanceof \Schoolbox\Collection) {
+    $task2->getAllResponses()->setOffset($hodes->getId(), new \Schoolbox\Collection());
+}
+
+$task2->getAllResponses()->getOffset($hodes->getId())->add($response);
 
 
 /* Eighth (incomplete Task)
@@ -283,6 +317,11 @@ $task2
 $task3 = new Task();
 $task3
     ->setTitle('8. Read this book');
+
+// Append it on a per-user basis
+if (!$task3->getAllResponses()->getOffset($hodes->getId()) instanceof \Schoolbox\Collection) {
+    $task3->getAllResponses()->setOffset($hodes->getId(), new \Schoolbox\Collection());
+}
 
 
 /******************************************** reporting *******************************************/
@@ -301,6 +340,7 @@ $project
     ->add($task2)
     ->add($task3)
 ;
+
 
 echo "<h1>Title</h1>";
 
@@ -355,8 +395,8 @@ foreach ($project->getAssessables() as $currentAssessable) {
          */
         $allFiles = [];
 
-        if ($currentAssessable->getAllResponses()->count()) {
-            $latestSubmission = $currentAssessable->getAllResponses()->first();
+        if ($currentAssessable->getAllResponses()->getOffset($hodes->getId())->count()) {
+            $latestSubmission = $currentAssessable->getAllResponses()->getOffset($hodes->getId())->first();
             $submittedBy = $latestSubmission->getSubmittedBy();
             $submittedOnBehalfOf = $latestSubmission->getSubmittedOnBehalfOf();
 
@@ -383,8 +423,8 @@ foreach ($project->getAssessables() as $currentAssessable) {
         /** @var QuizAttempt $latestSubmission */
         $latestSubmission = null;
 
-        if ($currentAssessable->getAllResponses()->count()) {
-            $latestSubmission = $currentAssessable->getAllResponses()->first();
+        if ($currentAssessable->getAllResponses()->getOffset($hodes->getId())->count()) {
+            $latestSubmission = $currentAssessable->getAllResponses()->getOffset($hodes->getId())->first();
             $submittedBy = $latestSubmission->getSubmittedBy();
         }
 
@@ -403,8 +443,8 @@ foreach ($project->getAssessables() as $currentAssessable) {
         $latestSubmission = null;
         $submittedBy = null;
 
-        if ($currentAssessable->getAllResponses()->count()) {
-            $latestSubmission = $currentAssessable->getAllResponses()->first();
+        if ($currentAssessable->getAllResponses()->getOffset($hodes->getId())->count()) {
+            $latestSubmission = $currentAssessable->getAllResponses()->getOffset($hodes->getId())->first();
             $submittedBy = $latestSubmission->getSubmittedBy();
         }
 
@@ -422,7 +462,7 @@ foreach ($project->getAssessables() as $currentAssessable) {
 
 echo "<h1>Feedbacks</h1>";
 
-new \Alaress_Probe('Title', 'Files', 'Mark', 'Comment', 'Published At');
+new \Alaress_Probe('Title', 'User', 'Files', 'Mark', 'Comment', 'Published At');
 
 foreach ($project->getAssessables() as $currentAssessable) {
     if ($currentAssessable instanceof DueWork) {
@@ -442,7 +482,7 @@ foreach ($project->getAssessables() as $currentAssessable) {
         $submittedOnBehalfOf = null;
 
         if ($currentAssessable->getAllResponses()->count()) {
-            $latestSubmission = $currentAssessable->getAllResponses()->first();
+            $latestSubmission = $currentAssessable->getAllResponses()->getOffset($hodes->getId())->first();
             $submittedBy = $latestSubmission->getSubmittedBy();
             $submittedOnBehalfOf = $latestSubmission->getSubmittedOnBehalfOf();
 
@@ -459,6 +499,7 @@ foreach ($project->getAssessables() as $currentAssessable) {
 
         new \Alaress_Probe(
             $currentAssessable->getTitle(),
+            $hodes->getId(),
             implode('<br />', $allFiles),
             $latestFeedback ? $latestFeedback->calculateMark() : '',
             $latestFeedback ? $latestFeedback->getComment() : '',
@@ -477,14 +518,17 @@ foreach ($project->getAssessables() as $currentAssessable) {
         $submittedBy = null;
 
         if ($currentAssessable->getAllResponses()->count()) {
-            $latestSubmission = $currentAssessable->getAllResponses()->first();
-            $submittedBy      = $latestSubmission->getSubmittedBy();
+            $latestSubmission = $currentAssessable->getAllResponses()->getOffset($hodes->getId())->first();
 
-            $latestFeedback = $latestSubmission->findMostRecentFeedback();
+            if ($latestSubmission) {
+                $submittedBy = $latestSubmission->getSubmittedBy();
+                $latestFeedback = $latestSubmission->findMostRecentFeedback();
+            }
         }
 
         new \Alaress_Probe(
             $currentAssessable->getTitle(),
+            $hodes->getId(),
             implode('<br />', $allFiles),
             $latestFeedback ? $latestFeedback->calculateMark() : '',
             '',
@@ -505,19 +549,23 @@ foreach ($project->getAssessables() as $currentAssessable) {
         $completionString = '';
 
         if ($currentAssessable->getAllResponses()->count()) {
-            $latestSubmission = $currentAssessable->getAllResponses()->first();
-            $submittedBy      = $latestSubmission->getSubmittedBy();
+            $latestSubmission = $currentAssessable->getAllResponses()->getOffset($hodes->getId())->first();
 
-            /** @var TaskFeedback $latestFeedback */
-            $latestFeedback = $latestSubmission->findMostRecentFeedback();
+            if ($latestSubmission) {
+                $submittedBy = $latestSubmission->getSubmittedBy();
 
-            if ($latestFeedback) {
-                $completionString = 'Completion by ' . $latestSubmission->getSubmittedBy()->getFullname() . '<br />Feedback by ' . $latestFeedback->getReviewer()->getFullname();
+                /** @var TaskFeedback $latestFeedback */
+                $latestFeedback = $latestSubmission->findMostRecentFeedback();
+
+                if ($latestFeedback) {
+                    $completionString = 'Completion by ' . $latestSubmission->getSubmittedBy()->getFullname() . '<br />Feedback by ' . $latestFeedback->getReviewer()->getFullname();
+                }
             }
         }
 
         new \Alaress_Probe(
             $currentAssessable->getTitle(),
+            $hodes->getId(),
             '',
             $latestFeedback ?  $completionString : 'Not completed',
             '',

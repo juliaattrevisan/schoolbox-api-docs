@@ -44,15 +44,13 @@ class Project extends AbstractAssessment
     {
         $numMarked = 0;
 
+        /** @var AbstractResponse $currentResponse */
         foreach ($this->getAssessables() as $currentAssessable) {
-
-            /* TODO: foreach $allUsers as $currentUser
-             */
-
-            /** @var AbstractResponse $currentResponse */
-            foreach ($currentAssessable->getAllResponses() as $currentResponse) {
-                if ($currentResponse->findMostRecentFeedback()) {
-                    $numMarked++;
+            foreach ($currentAssessable->getAllResponses() as $userId => $allResponses) {
+                foreach ($allResponses as $currentResponse) {
+                    if ($currentResponse->findMostRecentFeedback()) {
+                        $numMarked++;
+                    }
                 }
             }
         }
@@ -94,15 +92,13 @@ class Project extends AbstractAssessment
     {
         $numPublished = 0;
 
+        /** @var AbstractResponse $currentResponse */
         foreach ($this->getAssessables() as $currentAssessable) {
-
-            /* TODO: foreach $allUsers as $currentUser
-             */
-
-            /** @var AbstractResponse $currentResponse */
-            foreach ($currentAssessable->getAllResponses() as $currentResponse) {
-                if ($currentResponse->findMostRecentPublishedFeedback()) {
-                    $numPublished++;
+            foreach ($currentAssessable->getAllResponses() as $userId => $allResponses) {
+                foreach ($allResponses as $currentResponse) {
+                    if ($currentResponse->findMostRecentPublishedFeedback()) {
+                        $numPublished++;
+                    }
                 }
             }
         }
