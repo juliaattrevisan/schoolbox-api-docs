@@ -12,6 +12,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
+use \Schoolbox\User;
 
 abstract class AbstractAssessment implements IAssessable
 {
@@ -52,6 +53,13 @@ abstract class AbstractAssessment implements IAssessable
      * @var Collection
      */
     protected $allResponses;
+
+    /**
+     * The person who created this Assessable
+     *
+     * @var User
+     */
+    protected $creator;
 
     /**
      * Assessable constructor.
@@ -187,6 +195,24 @@ abstract class AbstractAssessment implements IAssessable
     public function setAllResponses($allResponses)
     {
         $this->allResponses = $allResponses;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getCreator()
+    {
+        return $this->creator;
+    }
+
+    /**
+     * @param User $creator
+     * @return $this
+     */
+    public function setCreator($creator)
+    {
+        $this->creator = $creator;
         return $this;
     }
 }
