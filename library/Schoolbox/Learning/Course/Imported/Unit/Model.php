@@ -61,7 +61,7 @@ class Model
      *
      * @var TemplateUnitModel
      */
-    protected $templateUnit;
+    protected $template;
 
     /**
      * The Assessable objects which are a part of this object.
@@ -77,9 +77,9 @@ class Model
      */
     public function __construct()
     {
-        $this->templateUnit = new TemplateUnitModel();
-        $this->folder       = new FolderModel();
-        $this->course       = new ImportedCourseModel();
+        $this->template = new TemplateUnitModel();
+        $this->folder   = new FolderModel();
+        $this->course   = new ImportedCourseModel();
     }
 
     /* Getters/Setters */
@@ -123,18 +123,18 @@ class Model
     /**
      * @return TemplateUnitModel
      */
-    public function getTemplateUnit()
+    public function getTemplate()
     {
-        return $this->templateUnit;
+        return $this->template;
     }
 
     /**
-     * @param TemplateUnitModel $templateUnit
+     * @param TemplateUnitModel $template
      * @return static
      */
-    public function setTemplateUnit($templateUnit)
+    public function setTemplate($template)
     {
-        $this->templateUnit = $templateUnit;
+        $this->template = $template;
         return $this;
     }
 
