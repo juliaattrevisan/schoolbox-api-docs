@@ -17,6 +17,8 @@ use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\Resource\Folder\IFolder;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
+use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 /**
  * Class AbstractFile
@@ -31,6 +33,8 @@ use Schoolbox\User;
 abstract class AbstractFile implements IFile, ISoftDeletable
 {
     use StorableTrait;
+    use CreatedAtDate;
+    use DeletedAtDate;
 
     /** @var string */
     protected $title;
@@ -38,56 +42,8 @@ abstract class AbstractFile implements IFile, ISoftDeletable
     /** @var \Schoolbox\User */
     protected $owner;
 
-    /** @var Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var Alaress_Date_Format */
-    protected $deletedAt;
-
     /** @var IFolder */
     protected $folder;
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-
-    /**
-     * @param Alaress_Date_Format $createdAt
-     * @return self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-
-    /**
-     * Returns the full mime string for the file
-     *
-     * @return string
-     */
-    public function getMime()
-    {
-        return $this->getMimetype()->getMime();
-    }
-
-
-    /**
-     * Returns the full mime string for the file
-     *
-     * @return Mimetype
-     */
-    public function getMimetype()
-    {
-        return $this->getStorage()->getMimetype();
-    }
-
 
     /**
      * @return IFolder
@@ -146,69 +102,6 @@ abstract class AbstractFile implements IFile, ISoftDeletable
     {
         $this->title = $title;
         return $this;
-    }
-
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        return $this->deletedAt instanceof Alaress_Date_Format
-            && !$this->getDeletedAt()->isNull()
-            && $this->deletedAt->getUnixTimeStamp() < Alaress_Date_Format::now()->getUnixTimeStamp();
-    }
-
-
-    /**
-     * @param Alaress_Date_Format $deletedAt
-     * @return self
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-        return $this;
-    }
-
-
-    /**
-     * Returns the size on disk of the file
-     *
-     * @return int
-     */
-    public function getSize()
-    {
-        return $this->getStorage()
-                    ->getSize();
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getHash()
-    {
-        return $this->getStorage()
-                    ->getHash();
-    }
-
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getLastAccessed()
-    {
-        return $this->getStorage()
-                    ->getLastAccessed();
     }
 
 

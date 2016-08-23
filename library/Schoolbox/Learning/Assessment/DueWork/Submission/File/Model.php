@@ -13,14 +13,14 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Submission\File;
 
+use Schoolbox\Resource\Storage\IStorage;
+use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use \Schoolbox\Resource\File\StorableTrait;
 
-class Model
+class Model implements IStorage
 {
-
-    /**
-     * @var int
-     */
-    protected $id;
+    use StorableTrait;
+    use CreatedAtDate;
 
     /**
      * A crococococodoc UUID value which identifies the file
@@ -29,20 +29,6 @@ class Model
      * @var string
      */
     protected $crocodocId;
-
-    /**
-     * The hash of the file's contents
-     *
-     * @var string
-     */
-    protected $hash;
-
-    /**
-     * The filename which was submitted
-     *
-     * @var string
-     */
-    protected $filename;
 
     /**
      * A plagscan result instance
@@ -89,24 +75,6 @@ class Model
      */
 
     /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param int $id
-     * @return self
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getCrocodocId()
@@ -124,42 +92,6 @@ class Model
     public function setCrocodocId($crocodocId)
     {
         $this->crocodocId = $crocodocId;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHash()
-    {
-        return $this->hash;
-    }
-
-    /**
-     * @param string $hash
-     * @return self
-     */
-    public function setHash($hash)
-    {
-        $this->hash = $hash;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFilename()
-    {
-        return $this->filename;
-    }
-
-    /**
-     * @param string $filename
-     * @return self
-     */
-    public function setFilename($filename)
-    {
-        $this->filename = $filename;
         return $this;
     }
 
