@@ -9,7 +9,6 @@ namespace Schoolbox\Learning\Course\Imported\Unit;
 
 use Schoolbox\Collection;
 use Schoolbox\Learning\Course\Imported\Model as ImportedCourseModel;
-use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Learning\Course\Template\Unit\Model as TemplateUnitModel;
 
 /**
@@ -36,16 +35,6 @@ class Model
      * @var int
      */
     protected $id;
-
-    /**
-     * The Folder which this object belongs to.
-     *
-     * TODO review if this relation is required - this object can't exist without Folders
-     * Besides - this object is dependent on its Imported Course, which itself belongs to a Folder
-     *
-     * @var FolderModel
-     */
-    protected $folder;
 
     /**
      * The Imported Course which this object belongs to.
@@ -78,7 +67,6 @@ class Model
     public function __construct()
     {
         $this->template = new TemplateUnitModel();
-        $this->folder   = new FolderModel();
         $this->course   = new ImportedCourseModel();
     }
 
@@ -99,24 +87,6 @@ class Model
     public function setId($id)
     {
         $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return FolderModel
-     */
-    public function getFolder()
-    {
-        return $this->folder;
-    }
-
-    /**
-     * @param FolderModel $folder
-     * @return static
-     */
-    public function setFolder($folder)
-    {
-        $this->folder = $folder;
         return $this;
     }
 
