@@ -405,7 +405,10 @@ class Controller extends BaseController
             $codeMapper->deleteByColumn('folder_id', $postData['categoryID']);
 
             // ...and user access permissions...
-            $userAccessMapper->deleteByColumn("sid", $postData["categoryID"]);
+            $userAccessMapper->deleteByColumnList([
+                "sid"     => $postData["categoryID"],
+                "service" => UserAccess::SERVICE_HOMEPAGE,
+            ]);
 
             // ...and role permissions
             $roleAccessMapper->deleteByColumn("cid", $postData["categoryID"]);
