@@ -12,15 +12,16 @@ use Schoolbox\Learning\Course\Imported\Unit\Model as UnitInstanceModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * A Course Instance is an import of a Course onto a Folder.
+ * An Imported Course is an import of a Template Course onto a Folder.
  *
- * A Course Instance may contain several Unit Instances.
+ * This object will contain one or more Imported Units (whichever of the
+ * Template Course's Template Units were selected as part of the import process).
  *
- * (Historically, a Course Instance was defined as a Unit Instance which had at least one child
- *  Folder which contained a Course Builder component. This class puts this
- *  concept into a concrete class.)
+ * (Historically, this did not exist as a separate concept. Imported Units were
+ *  related directly to the Folder the Template Course was imported onto, and
+ *  linked to a component.)
  *
- * @package Schoolbox\Learning\Course\Template
+ * @package Schoolbox\Learning\Course\Imported
  */
 class Model
 {
@@ -32,7 +33,7 @@ class Model
     protected $id;
 
     /**
-     * The Folder within which this Course Instance lives.
+     * The Folder within which this object lives.
      *
      * TODO review whether this relation needs to exist
      *
@@ -41,7 +42,7 @@ class Model
     protected $folder;
 
     /**
-     * The Unit Instances that are a part of this Course.
+     * The Imported Units that are a part of this object.
      *
      * @var Collection|UnitInstanceModel[]
      */

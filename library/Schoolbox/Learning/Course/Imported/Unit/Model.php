@@ -13,16 +13,20 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Learning\Course\Template\Unit\Model as UnitModel;
 
 /**
- * A Unit Instance is a single import of a Unit onto a Folder. It belongs to a
- * Course Instance.
+ * An Imported Unit is a single import of a Unit onto a Folder. It belongs to an
+ * Imported Course.
  *
- * On creation, a Unit Instance takes its Assessables from the Unit it was
- * created from - a teacher may then add, modify or remove individual
+ * On creation, this object makes a copy of the Assessables in the Template Unit it was
+ * created from, and adds them to itself - a teacher may then add, modify or remove individual
  * Assessable objects inside this object.
+ *
+ * (Historically, this was known as a Unit Instance. It did not belong to an
+ *  Imported Course - instead, it belonged directly to the Folder it was imported
+ *  onto, and was also linked to a component on that Folder.)
  *
  * TODO merge existing Unit Instance class (\Schoolbox\Assessment\Course\UnitInstance) into this
  *
- * @package Schoolbox\Learning\Course\Template
+ * @package Schoolbox\Learning\Course\Imported\Unit
  */
 class Model
 {
@@ -34,33 +38,33 @@ class Model
     protected $id;
 
     /**
-     * The Folder which this Unit Instance belongs to.
+     * The Folder which this object belongs to.
      *
-     * TODO review if this relation is required - Units can't exist without Folders
-     * Besides - this object is dependent on its Course Instance, which requires its Folder
+     * TODO review if this relation is required - this object can't exist without Folders
+     * Besides - this object is dependent on its Imported Course, which itself belongs to a Folder
      *
      * @var FolderModel
      */
     protected $folder;
 
     /**
-     * The Course which this Unit Instance belongs to.
+     * The Imported Course which this object belongs to.
      *
-     * TODO review if this relation is required - Unit Instances can't exist without their Course Instance
+     * TODO review if this relation is required - this object can't exist without its Imported Course
      *
      * @var CourseInstanceModel
      */
     protected $courseInstance;
 
     /**
-     * The Unit which this Unit Instance was created from.
+     * The Template Unit which this object was created from.
      *
      * @var UnitModel
      */
     protected $unit;
 
     /**
-     * The Assessable objects which are a part of this Unit Instance.
+     * The Assessable objects which are a part of this object.
      *
      * TODO add the Assessable interface to this definition, once it exists
      *

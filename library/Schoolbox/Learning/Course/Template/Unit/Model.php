@@ -12,17 +12,17 @@ use Schoolbox\Learning\Course\Template\Model as CourseModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * A Unit is an extension of a Folder.
+ * A Template Unit is an extension of a Folder.
  *
- * A Unit may contain several Assessables, and may be imported onto another
- * Folder as part of the action of importing a Course onto a folder. This
- * action creates a Unit Instance for each Unit that was chosen to be imported
+ * This object may contain several Assessables, and may be imported onto another Folder
+ * as part of the action of importing a Course onto a folder.
+ * This action creates an Imported Unit for each Template Unit that was chosen to be imported
  * as part of that process.
  *
- * (Historically, a Unit was defined as a Folder which contained a Course
- *  Builder component. This class puts this concept into a concrete class.)
+ * (Historically, this was simply known as a Unit, and defined as a Folder which contained a
+ *  Course Builder component. This class puts this concept into a concrete class.)
  *
- * @package Schoolbox\Learning\Course\Template
+ * @package Schoolbox\Learning\Course\Template\Unit
  */
 class Model
 {
@@ -34,25 +34,25 @@ class Model
     protected $id;
 
     /**
-     * The Folder which this Unit belongs to.
+     * The Folder which this object belongs to.
      *
-     * TODO review if this relation is required - Units can't exist without Folders
+     * TODO review if this relation is required - Template Units can't exist without Folders
      *
      * @var FolderModel
      */
     protected $folder;
 
     /**
-     * The Course which this Unit belongs to.
+     * The Template Course which this object belongs to.
      *
-     * TODO review if this relation is required - Courses can't exist without Folders
+     * TODO review if this relation is required - Template Units can't exist without a Course Unit
      *
      * @var CourseModel
      */
     protected $course;
 
     /**
-     * The Assessable objects which are a part of this Course.
+     * The Assessable objects which are a part of this object.
      *
      * TODO add the Assessable interface to this definition, once it exists
      *

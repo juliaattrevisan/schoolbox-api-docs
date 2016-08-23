@@ -11,14 +11,15 @@ use Schoolbox\Collection;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * A Course is an extension of a Folder.
+ * A Template Course is an extension of a Folder.
  *
- * A Course may contain several Units, and may be imported onto another Folder.
- * This action will create a corresponding Course Instance for this Course.
+ * This object may contain several Template Units, and may be imported onto another Folder.
+ * This action will create a corresponding Imported Course for this Template Course,
+ * with whatever Template Units were selected to be imported.
  *
- * (Historically, a Course was defined as a Folder which had at least one child
- *  Folder which contained a Course Builder component. This class puts this
- *  concept into a concrete class.)
+ * (Historically, this was simply known as a Course, and was defined as a Folder
+ *  which had at least one child Folder which contained a Course Builder component.
+ *  This class puts this concept into a concrete class.)
  *
  * @package Schoolbox\Learning\Course\Template
  */
@@ -32,7 +33,7 @@ class Model
     protected $id;
 
     /**
-     * The Folder within which this Course lives.
+     * The Folder within which this object lives.
      *
      * TODO review whether this relation needs to exist
      *
@@ -41,7 +42,7 @@ class Model
     protected $folder;
 
     /**
-     * The Units that are a part of this Course.
+     * The Template Units that are a part of this object.
      *
      * @var Collection|Unit\Model[]
      */
