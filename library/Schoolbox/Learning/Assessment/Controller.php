@@ -166,6 +166,7 @@ class Controller extends Base
 
     // ================ DUMMY DATA GENERATION ===============================================
 
+
     /**
      * Temp method to generate dummy breadcrumbs
      *
@@ -585,6 +586,7 @@ class Controller extends Base
                     'hash'         => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
                     'fileName'     => 'portfolio',
                     'plagScan'     => [ ],
+                    'storage'      => self::getDummyStorage(1),
                 ]);
             case 2:
                 return array_merge($dueWorkSubmissionFile, [
@@ -594,6 +596,7 @@ class Controller extends Base
                     'plagScan'     => [
                         self::getDummyPlagScan(1),
                     ],
+                    'storage'      => self::getDummyStorage(2),
                 ]);
             case 3:
             default:
@@ -604,6 +607,181 @@ class Controller extends Base
                     'plagScan'     => [
                         self::getDummyPlagScan(2),
                     ],
+                    'storage'      => self::getDummyStorage(3),
+                ]);
+        }
+    }
+
+    /**
+     * @param int $storageId        enum {1,2,3,4,5,6,7}
+     * @return array
+     */
+    public static function getDummyStorage($storageId){
+        $storage = [
+            'id'           => $storageId,
+            'mimetype'     => self::getDummyMimeType($storageId),
+            'created_at'   => new Alaress_Date_Format('2016/08/08','Y/m/d'),
+            'updated_at'   => new Alaress_Date_Format('2016/08/17','Y/m/d'),
+            'deleted_at'   => new Alaress_Date_NullDate(),
+        ];
+        switch($storageId){
+            case 1:
+                return array_merge($storage, [
+                    'extension'  => 'docx',
+                    'filename'   => 'someFile',
+                    'basename'   => 'someFile.docx',
+                    'mime'       => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'size'       => 25000,
+                    'hash'       => '4b50da92d887f9e05804f7425125b5064f5cb385',
+                ]);
+            case 2:
+                return array_merge($storage, [
+                    'extension'  => 'gif',
+                    'filename'   => 'abc',
+                    'basename'   => 'abc.gif',
+                    'mime'       => 'image/gif',
+                    'size'       => 25000,
+                    'hash'       => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
+                ]);
+            case 3:
+                return array_merge($storage, [
+                    'extension'  => 'mpeg',
+                    'filename'   => 'myVideo',
+                    'basename'   => 'myVideo.mpeg',
+                    'mime'       => 'video/mpeg',
+                    'size'       => 25000,
+                    'hash'       => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
+                ]);
+            case 4:
+                return array_merge($storage, [
+                    'extension'  => 'mpeg',
+                    'filename'   => 'mAudio',
+                    'basename'   => 'mAudio.mpeg',
+                    'mime'       => 'audio/mpeg',
+                    'size'       => 25000,
+                    'hash'       => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
+                ]);
+            case 5:
+                return array_merge($storage, [
+                    'extension'  => 'html',
+                    'filename'   => 'index',
+                    'basename'   => 'index.html',
+                    'mime'       => 'text/html',
+                    'size'       => 4000,
+                    'hash'       => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
+                ]);
+            case 6:
+            default:
+                return array_merge($storage, [
+                    'extension'  => 'zip',
+                    'filename'   => 'mArchive',
+                    'basename'   => 'mArchive.zip',
+                    'mime'       => 'application/x-7z-compressed',
+                    'size'       => 25000,
+                    'hash'       => '90dd4fb4f06041fdf26b15fdf7a45b5699bf5833',
+                ]);
+        }
+    }
+
+    /**
+     * @param int $mimeTypeId        enum {1,2,3,4,5,6,7}
+     * @return array
+     */
+    public static function getDummyMimeType($mimeTypeId){
+        $mimeType = [
+            'id'                => $mimeTypeId,
+            'actualMaxFileSize' => 1000000,
+            'maxFileSize'       => 1000000,
+            'enable'            => true,
+            'isEnabled'         => true,
+            'deleted'           => false,
+            'isDeleted'         => false,
+        ];
+        switch($mimeTypeId){
+            case 1:
+                return array_merge($mimeType, [
+                    'fileTypeId'        => 46,
+                    'class'             => 'docx',
+                    'description'       => 'Microsoft Word 2007 Document',
+                    'iconFile'          => 'msword_doc.png',
+                    'iconClass'         => 'msworddoc',
+                    'inline'            => false,
+                    'mime'              => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'isAudio'           => false,
+                    'isVideo'           => false,
+                    'isImage'           => false,
+                    'type'              => 'application',
+                ]);
+            case 2:
+                return array_merge($mimeType, [
+                    'fileTypeId'        => 1,
+                    'class'             => 'gif',
+                    'description'       => 'GIF Image',
+                    'iconFile'          => 'image_gif.png',
+                    'iconClass'         => 'imagegif',
+                    'inline'            => true,
+                    'mime'              => 'image/gif',
+                    'isAudio'           => false,
+                    'isVideo'           => false,
+                    'isImage'           => true,
+                    'type'              => 'image',
+                ]);
+            case 3:
+                return array_merge($mimeType, [
+                    'fileTypeId'        => 27,
+                    'class'             => 'video',
+                    'description'       => 'MPEG Video',
+                    'iconFile'          => 'video_alt.png',
+                    'iconClass'         => 'videoalt',
+                    'inline'            => false,
+                    'mime'              => 'video/mpeg',
+                    'isAudio'           => false,
+                    'isVideo'           => true,
+                    'isImage'           => false,
+                    'type'              => 'video',
+                ]);
+            case 4:
+                return array_merge($mimeType, [
+                    'fileTypeId'        => 23,
+                    'class'             => 'mpeg',
+                    'description'       => 'MPEG Audio',
+                    'iconFile'          => 'sound_mp3.png',
+                    'iconClass'         => 'soundmp3',
+                    'inline'            => false,
+                    'mime'              => 'audio/mpeg',
+                    'isAudio'           => true,
+                    'isVideo'           => false,
+                    'isImage'           => false,
+                    'type'              => 'audio',
+                ]);
+            case 5:
+                return array_merge($mimeType, [
+                    'fileTypeId'        => 2,
+                    'class'             => 'html',
+                    'description'       => 'HTML Document',
+                    'iconFile'          => 'html.png',
+                    'iconClass'         => 'html',
+                    'inline'            => true,
+                    'mime'              => 'text/html',
+                    'isAudio'           => false,
+                    'isVideo'           => false,
+                    'isImage'           => false,
+                    'type'              => 'text',
+                ]);
+            case 6:
+            default:
+                return array_merge($mimeType, [
+                    'fileTypeId'        => 80,
+                    'class'             => 'zip',
+                    'description'       => '7-Zip',
+                    'iconFile'          => 'archive.png',
+                    'iconClass'         => 'archive',
+                    'inline'            => false,
+                    'mime'              => 'application/x-7z-compressed',
+                    'isAudio'           => false,
+                    'isVideo'           => false,
+                    'isImage'           => false,
+                    'type'              => 'application',
                 ]);
         }
     }

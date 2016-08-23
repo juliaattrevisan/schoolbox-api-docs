@@ -65,23 +65,8 @@ class Controller extends Base
             'breadcrumbs' => self::getDummyBreadcrumbs(),
             'assessment'  => \Schoolbox\Learning\Assessment\Controller::getDummyAssessment($assessmentId),
             'student'     => $student,
+            'term'        => TermMapper::getInstance()->findById(4),
         ];
-
-        // Due Work
-        if(in_array($assessmentId, [2])){
-            // Inline-grader / Crocodoc is intimately bound to SitePage-style rendering.
-            // Needs to be objectified and passed to twig, and have twig interrogate it.
-            $submissionFile = SubmissionBox\Submission\FileMapper::getInstance()->findById(18);
-            $crocodoc = new Crocodoc(
-                $this->di->get('sitePage'),
-                $submissionFile,
-                null,
-                [],
-                TermMapper::getInstance()->findById(8)
-            );
-            $crocodoc->render();
-            $twigData['crocodoc'] = $crocodoc;
-        }
 
         // Project || Due Work
         if(in_array($assessmentId, [1,2])){
@@ -104,19 +89,21 @@ class Controller extends Base
     public function getFeedback($feedback)
     {
         // TODO - generate data
-        // Inline-grader / Crocodoc is intimately bound to SitePage-style rendering.
-        // Needs to be objectified and passed to twig, and have twig interrogate it.
-        $submissionFile = SubmissionBox\Submission\FileMapper::getInstance()->findById(18);
-        $crocodoc = new Crocodoc(
-            $this->di->get('sitePage'),
-            $submissionFile,
-            null,
-            [],
-            TermMapper::getInstance()->findById(8)
-        );
+        switch($feedback){
+            case 1:
+                $feedback = \Schoolbox\Learning\Assessment\Controller::getDummyDueWorkFeedback(1);
+                break;
+            case 2:
+                $feedback = \Schoolbox\Learning\Assessment\Controller::getDummyQuizAnswer(1,true);
+                break;
+            case 3:
+            default:
+                $feedback = \Schoolbox\Learning\Assessment\Controller::getDummyTaskFeedback(1);
+                break;
+        }
         $twigData = [
             'breadcrumbs' => self::getDummyBreadcrumbs(),
-            'crocodoc'    => $crocodoc,
+            'feedback'    => $feedback,
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', $twigData));

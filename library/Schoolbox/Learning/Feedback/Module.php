@@ -115,7 +115,7 @@ class Module extends BaseModule
             '(?:getFeedback)',
             function ($params) {
                 // TODO. Hydrate specified Feedback object
-                $feedback = [$params['feedbackId']];
+                $feedback = $params['feedbackId'];
                 return [
                     'feedback' => $feedback,
                 ];
