@@ -33,7 +33,7 @@
                 }
             });
         }
-        $datepicker.data('previousValue', string);
+        $datepicker.data('previousValue', string).valid();
     };
 
     $(function(){
