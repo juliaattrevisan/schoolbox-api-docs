@@ -40,6 +40,8 @@ interface IFeedback
      */
     public function getId();
     public function setId($id);
+    public function getAssessable();
+    public function setAssessable($assessable);
     public function getHumanReadableMark();
     public function setHumanReadableMark($humanReadableMark);
     public function getNormalisedMark();

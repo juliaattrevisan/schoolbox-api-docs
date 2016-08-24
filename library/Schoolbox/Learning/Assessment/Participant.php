@@ -62,7 +62,8 @@ class Participant
     {
         $collection = new Collection();
 
-        foreach ($this->getAllResponses() as $currentFeedback) {
+        /** @var IResponse $currentResponse */
+        foreach ($this->getAllResponses() as $currentResponse) {
         }
     }
 
@@ -75,6 +76,7 @@ class Participant
     {
         $collection = new Collection();
 
+        /** @var IFeedback $currentFeedback */
         foreach ($this->getAllFeedbacks() as $currentFeedback) {
         }
     }

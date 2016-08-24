@@ -20,6 +20,13 @@ class AbstractFeedback implements IFeedback
     protected $id;
 
     /**
+     * The IAssessable to which this relates
+     *
+     * @var IAssessable
+     */
+    protected $assessable;
+
+    /**
      * Mark given to this Assessable
      *
      * @var float
@@ -265,6 +272,24 @@ class AbstractFeedback implements IFeedback
     public function setDeletedAt($deletedAt)
     {
         $this->deletedAt = $deletedAt;
+        return $this;
+    }
+
+    /**
+     * @return IAssessable
+     */
+    public function getAssessable()
+    {
+        return $this->assessable;
+    }
+
+    /**
+     * @param IAssessable $assessable
+     * @return $this
+     */
+    public function setAssessable($assessable)
+    {
+        $this->assessable = $assessable;
         return $this;
     }
 }
