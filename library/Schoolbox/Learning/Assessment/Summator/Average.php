@@ -2,6 +2,10 @@
 /**
  * Average
  *
+ * Takes an Average of all the most recent normalisedMark Feedbacks for every
+ * IResponse that was spawned. Tasks always return null for its calculateMark()
+ * value, and are excluded from the Average calculations.
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/

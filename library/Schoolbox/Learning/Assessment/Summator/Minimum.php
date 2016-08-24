@@ -1,8 +1,13 @@
 <?php
 /**
- * Maximum
+ * Minimum
  *
- * Calculate the highest marked Assessable
+ * Calculate the lowest normalisedMark Feedback for the selected User
+ *
+ * Tasks do not participate in the Minimum calculation and
+ * must be handled specially, as null is always less than any
+ * numeric value. The minimum value of a set of values that
+ * contain a mix of nulls and non-nulls should never be null.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd

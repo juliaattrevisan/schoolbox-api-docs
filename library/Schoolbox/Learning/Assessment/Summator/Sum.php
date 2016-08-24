@@ -1,8 +1,9 @@
 <?php
 /**
- * Maximum
+ * Sum
  *
- * Calculate the highest marked Assessable
+ * Calculate the Sum of the normalisedMarks for every Feedback
+ * for a particular User.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
