@@ -29,7 +29,7 @@
 		 */
 		$('[data-evaluation-finish]').click(function(event) {
 			event.preventDefault();
-			var href = $(this).attr('href');
+			var href = $(this).data('href');
 			$(this).confirmDialog({
 				confirmEvent: function() {
 					$.fn.evaluation.saveAll(href);
