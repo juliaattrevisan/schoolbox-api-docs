@@ -1,4 +1,4 @@
-<script type="text/javascript" src="/javascript/shared/jquery.toast-timeout.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
 <script type="text/javascript" src="/javascript/shared/sportsfixtures/jquery.mightyList.js"></script>
 <script type="text/javascript">
     $(function() {
@@ -34,25 +34,8 @@
         <section>
             <ul class="information-list hide" data-item-list>
                 {% for currentStatus in allStatus %}
-                    <li class="actions-small-1" data-item="{{ currentStatus.id }}">
-                        <div class="list-item">
-                            <div data-action="{{ routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) }}">
-                                <section>
-                                    <fieldset class="content">
-                                        <div class="small-12 columns">
-                                            <label>
-                                                <input type="text" name="name" value="{{ currentStatus.name }}" data-item-original-value="{{ currentStatus.name }}" data-item-element />
-                                            </label>
-
-                                            <div class="toast" data-alert data-save-item></div>
-                                        </div>
-                                    </fieldset>
-                                </section>
-                            </div>
-                        </div>
-                        <nav>
-                            <a href="{{ routeLookup('sportsfixturesStatus.deleteEntity', {entityId: currentStatus.id}) }}" class="icon-delete" title="Delete" data-delete></a>
-                        </nav>
+                    <li class="actions-small-2" data-item="{{ currentStatus.id }}">
+                        {% include '@sportsfixturesStatus/listItem.twig' %}
                     </li>
                 {% endfor %}
             </ul>
@@ -66,24 +49,7 @@
 </div>
 
 <ul class="information-list hide">
-    <li id='item-clone' class="actions-small-1" data-item="">
-        <div class="list-item">
-            <div data-action="{{ routeLookup('sportsfixturesStatus.createEntity') }}">
-                <section>
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <label>
-                                <input type="text" name="name" value="" data-item-original-value="" data-item-element />
-                            </label>
-
-                            <div class="toast" data-alert data-save-item></div>
-                        </div>
-                    </fieldset>
-                </section>
-            </div>
-        </div>
-        <nav>
-            <a href="" class="icon-delete" title="Delete" data-delete></a>
-        </nav>
+    <li id="item-clone" class="actions-small-2" data-item="">
+        {% include '@sportsfixturesStatus/listItem.twig' %}
     </li>
 </ul>
