@@ -31,6 +31,9 @@ $hodes = \Schoolbox\UserMapper::getInstance()->findById(230);
 $sberryhill = \Schoolbox\UserMapper::getInstance()->findById(15);
 $slucier = \Schoolbox\UserMapper::getInstance()->findById(16);
 
+$bsalem = \Schoolbox\UserMapper::getInstance()->findById(31);
+$asaxon = \Schoolbox\UserMapper::getInstance()->findById(17);
+
 $celia = \Schoolbox\UserMapper::getInstance()->findBYId(3);
 $somodio = \Schoolbox\UserMapper::getInstance()->findBYId(150);
 
@@ -233,7 +236,7 @@ $dueWork3->findParticipant($hodes)->getAllResponses()->add($response);
  */
 $allParticipants = new \Schoolbox\Collection();
 
-foreach ([$hodes, $sberryhill, $slucier] as $currentStudent) {
+foreach ([$bsalem, $asaxon] as $currentStudent) {
     $allParticipants->add(new Participant($currentStudent));
 }
 
@@ -286,14 +289,14 @@ $feedback2
 $response = new QuizAttempt();
 $response
     ->setAssessable($quiz1)
-    ->setSubmittedBy($hodes)
+    ->setSubmittedBy($bsalem)
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-02 19:04:41', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 19:12:41', \Alaress_Date_Format::DATABASE_FORMAT))
     ->getAllFeedback()->add($feedback1)->add($feedback2);
 
 // Append it on a per-user basis
-$quiz1->findParticipant($hodes)->getAllResponses()->add($response);
-$quiz1->findParticipant($hodes)->getAllFeedbacks()->add($feedback1)->add($feedback2);
+$quiz1->findParticipant($bsalem)->getAllResponses()->add($response);
+$quiz1->findParticipant($bsalem)->getAllFeedbacks()->add($feedback1)->add($feedback2);
 
 
 
@@ -339,11 +342,11 @@ $task1->findParticipant($hodes)->getAllResponses()->add($response);
 
 
 
-/* Seventh (one submission, assessed by teacher; published)
+/* Seventh (multiple students, one submission each, assessed by teacher; published)
  */
 $allParticipants = new \Schoolbox\Collection();
 
-foreach ([$hodes, $sberryhill, $slucier] as $currentStudent) {
+foreach ([$hodes, $bsalem, $asaxon, $sberryhill, $slucier] as $currentStudent) {
     $allParticipants->add(new Participant($currentStudent));
 }
 
@@ -373,6 +376,48 @@ $response
 // Append it on a per-user basis
 $task2->findParticipant($hodes)->getAllResponses()->add($response);
 $task2->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
+
+$feedback = new TaskFeedback();
+$feedback
+    ->setAssessable($task2)
+    ->setReviewer($celia)
+    ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new TaskCompletion();
+$response
+    ->setAssessable($task2)
+    ->setSubmittedBy($asaxon)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 11:22:36', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 11:22:36', \Alaress_Date_Format::DATABASE_FORMAT));
+$response
+    ->getAllFeedback()->add($feedback);
+
+// Append it on a per-user basis
+$task2->findParticipant($asaxon)->getAllResponses()->add($response);
+$task2->findParticipant($asaxon)->getAllFeedbacks()->add($feedback);
+
+$feedback = new TaskFeedback();
+$feedback
+    ->setAssessable($task2)
+    ->setReviewer($celia)
+    ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new TaskCompletion();
+$response
+    ->setAssessable($task2)
+    ->setSubmittedBy($sberryhill)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 11:23:36', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 11:23:36', \Alaress_Date_Format::DATABASE_FORMAT));
+$response
+    ->getAllFeedback()->add($feedback);
+
+// Append it on a per-user basis
+$task2->findParticipant($sberryhill)->getAllResponses()->add($response);
+$task2->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
 
 
 
@@ -439,7 +484,7 @@ foreach ($project->getAssessables() as $currentAssessable) {
     }
 }
 
-new \Alaress_Probe($project->getTitle(), $project->getTypeName(), '', '', '', '');
+new \Alaress_Probe("{$project->getId()} {$project->getTitle()}", $project->getTypeName(), '', '', '', '');
 
 
 echo "<h1>Submission</h1>";
@@ -701,3 +746,5 @@ foreach ($project->getAssessables() as $currentAssessable) {
 
 
 die();
+
+
