@@ -40,6 +40,6 @@ interface IAssessable
     public function setCloseAt($closeAt);
     public function getWeight();
     public function setWeight($weight);
-    public function getAllResponses();
-    public function setAllResponses($allResponses);
+    public function getAllParticipants();
+    public function setAllParticipants($allParticipants);
 }

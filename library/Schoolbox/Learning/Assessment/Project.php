@@ -44,10 +44,14 @@ class Project extends AbstractAssessment
     {
         $numMarked = 0;
 
-        /** @var AbstractResponse $currentResponse */
+        /** @var IAssessable $currentAssessable */
         foreach ($this->getAssessables() as $currentAssessable) {
-            foreach ($currentAssessable->getAllResponses() as $userId => $allResponses) {
-                foreach ($allResponses as $currentResponse) {
+
+            /** @var Participant $currentParticipant */
+            foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
+
+                /** @var AbstractResponse $currentResponse */
+                foreach ($currentParticipant->findAllResponses($currentAssessable) as $currentResponse) {
                     if ($currentResponse->findMostRecentFeedback()) {
                         $numMarked++;
                     }
@@ -75,8 +79,8 @@ class Project extends AbstractAssessment
      */
     public function calculatePercentageMarked()
     {
-        if ($this->numAssessables()) {
-            return 100 * ($this->numMarked() / $this->numAssessables());
+        if ($this->numAssessables() && $this->getAllParticipants()->count()) {
+            return 100 * ($this->numMarked() / ($this->numAssessables() * $this->getAllParticipants()->count()));
         }
 
         return 0;
@@ -92,10 +96,14 @@ class Project extends AbstractAssessment
     {
         $numPublished = 0;
 
-        /** @var AbstractResponse $currentResponse */
+        /** @var IAssessable $currentAssessable */
         foreach ($this->getAssessables() as $currentAssessable) {
-            foreach ($currentAssessable->getAllResponses() as $userId => $allResponses) {
-                foreach ($allResponses as $currentResponse) {
+
+            /** @var Participant $currentParticipant */
+            foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
+
+                /** @var AbstractResponse $currentResponse */
+                foreach ($currentParticipant->findAllResponses($currentAssessable) as $currentResponse) {
                     if ($currentResponse->findMostRecentPublishedFeedback()) {
                         $numPublished++;
                     }
@@ -113,8 +121,8 @@ class Project extends AbstractAssessment
      */
     public function calculatePercentagePublished()
     {
-        if ($this->numAssessables()) {
-            return 100 * ($this->numPublished() / $this->numAssessables());
+        if ($this->numAssessables() && $this->getAllParticipants()->count()) {
+            return 100 * ($this->numPublished() / ($this->numAssessables() * $this->getAllParticipants()->count()));
         }
 
         return 0;

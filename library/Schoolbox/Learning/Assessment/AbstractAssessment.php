@@ -48,11 +48,11 @@ abstract class AbstractAssessment implements IAssessable
     protected $weight;
 
     /**
-     * A Collection of IResponse instances that Students submit
+     * A Collection of Participant instances
      *
-     * @var Collection
+     * @var
      */
-    protected $allResponses;
+    protected $allParticipants;
 
     /**
      * The person who created this Assessable
@@ -66,7 +66,31 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function __construct()
     {
-        $this->setAllResponses(new Collection());
+        $this->setAllParticipants(new Collection());
+    }
+
+    /* Delegation Methods
+     */
+
+    /**
+     * Find a reference to a particular Participant in this Assessable
+     * which saves you this traversal in Controllers etc
+     *
+     * @param User $user
+     * @return Participant
+     */
+    public function findParticipant(User $user)
+    {
+        /** @var Participant $currentParticipant */
+        foreach ($this->getAllParticipants() as $currentParticipant) {
+            if ($currentParticipant->getUser()->getId() == $user->getId()) {
+                return $currentParticipant;
+            }
+        }
+
+        /* TODO: Throw exception when you can't find a user?
+         */
+        throw new \OutOfBoundsException();
     }
 
     /* Getters/Setters
@@ -181,24 +205,6 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
-     * @return Collection
-     */
-    public function getAllResponses()
-    {
-        return $this->allResponses;
-    }
-
-    /**
-     * @param Collection $allResponses
-     * @return $this
-     */
-    public function setAllResponses($allResponses)
-    {
-        $this->allResponses = $allResponses;
-        return $this;
-    }
-
-    /**
      * @return User
      */
     public function getCreator()
@@ -213,6 +219,24 @@ abstract class AbstractAssessment implements IAssessable
     public function setCreator($creator)
     {
         $this->creator = $creator;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAllParticipants()
+    {
+        return $this->allParticipants;
+    }
+
+    /**
+     * @param mixed $allParticipants
+     * @return $this
+     */
+    public function setAllParticipants($allParticipants)
+    {
+        $this->allParticipants = $allParticipants;
         return $this;
     }
 }
