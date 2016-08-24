@@ -12,6 +12,14 @@ class External_Humanedge_Class implements External_ClassInterface
 {
     use External_Humanedge_APlusDatabaseTrait;
 
+    /**
+     * By default, class-teacher relations require that the timetable entry
+     * has a room attached to it.
+     *
+     * @var bool
+     */
+    protected $requireClassTeachersHaveRooms = true;
+
 //    /**
 //     * @var External_UserInterface
 //     */
@@ -78,15 +86,16 @@ class External_Humanedge_Class implements External_ClassInterface
      */
     public function getTeacherName($classCode)
     {
-        $db    = $this->loadAPlusDatabase();
-        $query = "
+        $roomJoin = ($this->requireClassTeachersHaveRooms ? 'INNER JOIN tblRoom r on r.ID = b.RoomID' : '');
+        $db       = $this->loadAPlusDatabase();
+        $query    = "
             SELECT DISTINCT
                 t.Code AS Code
             FROM tblSubject s
             LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
             INNER JOIN tblAllocation a on s.ID = a.SubjectID
             INNER JOIN tblTeacher t on a.TeacherID = t.ID
-            INNER JOIN tblRoom r on r.ID = b.RoomID
+            $roomJoin
             WHERE t.deleted = 0
             AND   s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($classCode)}
 
@@ -97,7 +106,7 @@ class External_Humanedge_Class implements External_ClassInterface
             FROM tblSubject s
             INNER JOIN tblBlockItem b on s.ID = b.SubjectID
             INNER JOIN tblTeacher t on b.TeacherID = t.ID
-            INNER JOIN tblRoom r on r.ID = b.RoomID
+            $roomJoin
             WHERE t.deleted = 0
             AND   s.Code + ISNULL(b.Suffix, '') = {$db->smartQuote($classCode)}
         ";

@@ -13,6 +13,14 @@ class External_Humanedge_User implements External_UserInterface
     use External_Humanedge_APlusDatabaseTrait;
 
     /**
+     * By default, teacher-subject relations require that the timetable entry
+     * has a room attached to it.
+     *
+     * @var bool
+     */
+    protected $requireTeacherSubjectsHaveRooms = true;
+
+    /**
      * @var MSSQL $database
      */
     private $database;
@@ -362,7 +370,8 @@ class External_Humanedge_User implements External_UserInterface
         } elseif ($user->getRole()->isStaff()) {
             // Statement 1: core subjects
             // Statement 2: electives
-            $query = "
+            $roomJoin = ($this->requireTeacherSubjectsHaveRooms ? 'INNER JOIN tblRoom r on r.ID = b.RoomID' : '');
+            $query    = "
                 SELECT DISTINCT
                     s.Code + ISNULL(b.Suffix, '') as code,
                     s.Name as name,
@@ -372,7 +381,7 @@ class External_Humanedge_User implements External_UserInterface
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
                 INNER JOIN tblTeacher t on a.TeacherID = t.ID
                 LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
-                INNER JOIN tblRoom r on r.ID = b.RoomID
+                $roomJoin
                 WHERE t.deleted = 0
                 AND t.code = $quotedId
 
@@ -386,7 +395,7 @@ class External_Humanedge_User implements External_UserInterface
                 FROM tblSubject s
                 INNER JOIN tblBlockItem b on s.ID = b.SubjectID
                 INNER JOIN tblTeacher t on b.TeacherID = t.ID
-                INNER JOIN tblRoom r on r.ID = b.RoomID
+                $roomJoin
                 WHERE t.deleted = 0
                 AND t.code = $quotedId
 
