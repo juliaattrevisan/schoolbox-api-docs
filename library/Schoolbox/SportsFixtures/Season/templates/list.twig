@@ -10,7 +10,7 @@
 <div id="deleteModal" class="reveal-modal" data-reveal aria-labelledby="deleteModalTitle" aria-hidden="true" role="dialog">
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     <h2>Delete Season</h2>
-    <input type="hidden" data-season value="">
+    <input type="hidden" data-delete-season value="">
 
     <p>There are <span data="division-count"></span> divisions and <span data="match-count"></span> matches currently linked to
         <strong><span data="season-name"></span></strong>.<br>What would you like to do with them?</p>
@@ -39,25 +39,27 @@
 <script type="text/javascript">
     $(function() {
 
-        var $allSeasons = $('#allSeasons');
 
-        // Delete season with linked divisions and/or matches
-        var $deleteModal  = $('#deleteModal');
-        var $alertDelete  = $deleteModal.find('[data=alert-delete]');
-        var $radioMove    = $deleteModal.find('#linkedEntitiesMove');
-        var $radioDelete  = $deleteModal.find('#linkedEntitiesDelete');
-        var $selectMove   = $deleteModal.find('[data=seasons]');
-        var $buttonDelete = $deleteModal.find('[data-action=confirm-delete]');
+
+        // Setup vars
+        var $allSeasons   = $('#allSeasons'),
+            $deleteModal  = $('#deleteModal'),
+            $alertDelete  = $deleteModal.find('[data=alert-delete]'),
+            $radioMove    = $deleteModal.find('#linkedEntitiesMove'),
+            $radioDelete  = $deleteModal.find('#linkedEntitiesDelete'),
+            $selectMove   = $deleteModal.find('[data=seasons]'),
+            $buttonDelete = $deleteModal.find('[data-action=confirm-delete]');
+
+        // Did user change delete cascade strategy ?
         $radioMove.add($radioDelete).on('change', function(){
             if($radioMove.prop('checked')){
                 $alertDelete.addClass('hide');
-                $selectMove.prop('disabled',false);
                 $buttonDelete.attr('disabled', $selectMove[0].selectedIndex < 1 );
             } else {
                 $alertDelete.removeClass('hide');
-                $selectMove.prop('disabled',true);
                 $buttonDelete.attr('disabled', false);
             }
+            $selectMove.prop('disabled',!$radioMove.prop('checked'));
         });
 
         // Did user select a season from the dropdown to move divisions/matches to ?
@@ -68,12 +70,12 @@
         // Did user click an action button on the delete modal ?
         $deleteModal.on('click', 'a[data-action]', function(event) {
             event.preventDefault();
+            $deleteModal.foundation('reveal', 'close');
+
             var $button = $(this),
                 action  = $button.data('action'),
-                $season = $('[data-season='+$deleteModal.find('[data-season]').val()+']'),
+                $season = $('[data-season='+$deleteModal.find('[data-delete-season]').val()+']'),
                 data    = {};
-
-            $deleteModal.foundation('reveal', 'close');
 
             switch(action){
                 case 'cancel':
@@ -108,59 +110,48 @@
                     .fail(function() {
                         $('#errorModal').foundation('reveal', 'open');
                     });
-
         });
-
-
-
-
-
 
         // Archive / Restore / Delete AJAX actions
         $allSeasons.on('click', 'a[data-action]', function(event) {
             event.preventDefault();
-            var     $button       = $(this),
-                    action        = $button.data('action'),
-                    $season       = $button.closest('[data-season]'),
-                    divisionCount = $season.attr('data-division-count'),
-                    divisionClass = 0 == divisionCount ? 'gradient-10' : 'gradient-1',
-                    matchCount    = $season.attr('data-match-count'),
-                    matchClass    = 0 == matchCount ? 'gradient-10' : 'gradient-1',
-                    tenseClause   = action == 'restore' ? 'that were' : 'currently';
-
-            var textQuestion = 'Are you sure you want to <strong>'+action+'</strong> this season?<br>';
-
-            // Generate modal text
-            if('delete' == action && 0 == divisionCount && 0 == matchCount){
-                var textResults = 'There are no divisions or matches currently linked to this season.';
-            } else {
-                var textResults = 'This will <strong>'+action+'</strong> <span class="'+divisionClass+'">'+divisionCount+'</span> divisions and <span class="'+matchClass+'">'
-                        +matchCount+'</span> matches '+tenseClause+' linked to this season, along with all their subsidiary entities';
-            }
-            var modalText = textQuestion + textResults;
+            var $button       = $(this),
+                action        = $button.data('action'),
+                $season       = $button.closest('[data-season]'),
+                divisionCount = $season.attr('data-division-count'),
+                divisionClass = divisionCount ? 'gradient-10' : 'gradient-1',
+                matchCount    = $season.attr('data-match-count'),
+                matchClass    = matchCount ? 'gradient-10' : 'gradient-1',
+                tenseClause   = action == 'restore' ? 'that were' : 'currently';
 
             // Special case for deleting a season with divisions and/or matches currently linked to it
             if('delete' == action && (divisionCount > 0 || matchCount > 0)){
                 resetDeleteModal($season);
+                $deleteModal.foundation('reveal', 'open');
                 return;
             }
 
+            // Generate modal text
+            var text = 'Are you sure you want to <strong>'+action+'</strong> this season?<br>';
+            if('delete' == action && 0 == divisionCount && 0 == matchCount){
+                text += 'There are no divisions or matches currently linked to this season.';
+            } else {
+                text += 'This will <strong>'+action+'</strong> <span class="'+divisionClass+'">'+divisionCount+'</span> divisions and <span class="'+matchClass+'">'
+                        +matchCount+'</span> matches '+tenseClause+' linked to this season, along with all their subsidiary entities';
+            }
 
             $button.confirmDialog({
-                text: modalText,
+                text: text,
                 format: 'html',
                 confirmEvent: function(el) {
                     // AJAX, then update DOM
                     // Archive/restore: refresh list item
                     // Delete: remove completely
-
                     $.post(el.data('postAction'))
                             .done(function(data) {
                                 switch (action) {
                                     case 'delete':
                                         $season.fadeOut({ done: $season.remove() });
-
-                                        // Was this the last season ?
                                         checkEmptyState();
                                         break;
                                     case 'archive':
@@ -170,8 +161,8 @@
                                         // Replace whole list item
                                         $season.replaceWith($newDom);
 
-                                        // Force dropdown reset
-                                        $deleteModal.find('[data-season]').val('')
+                                        // Force reset of destination season dropdown next time it is shown
+                                        $deleteModal.find('[data-delete-season]').val('')
                                         break;
                                 }
                             })
@@ -188,16 +179,14 @@
          * @param $season jQuery object for season selected for deletion
          */
         function resetDeleteModal($season){
-            $deleteModal.foundation('reveal', 'open');
 
-            // Does modal need to be reset?  TODO
-            if($deleteModal.find('[data-season]').val() != $season.data('season') ){
+            // Does modal need to be reset?
+            if($deleteModal.find('[data-delete-season]').val() != $season.data('season') ){
 
                 // Populate fields and labels
-                $deleteModal.find('[data-season]').val($season.data('season'));
+                $deleteModal.find('[data-delete-season]').val($season.data('season'));
                 $deleteModal.find('[data=season-name]').html($season.data('name'));
                 $buttonDelete.attr('data-post-action', $season.find('[data-action=delete]').data('post-action'));
-
 
                 var divisionCount = $season.data('division-count');
                 var divisionText = '<span class="gradient-'+(divisionCount > 0 ? '1' : '10') +'">'+divisionCount+'</span>';
