@@ -34,6 +34,92 @@
                  */
                 deleteKey: 'id',
 
+                onRevert: function (element) { /* noop*/ },
+
+                onModify: function (element, newData) {
+                    /* Parent container for this row
+                     */
+                    var container = element.parents('[data-item]');
+
+                    /* Data package
+                     */
+                    var data = {
+                        entityId: container.attr('data-item'),
+                        name: newData
+                    };
+
+                    /* Indicator
+                     */
+                    var indicator = container.find('[data-save-item]');
+
+                    indicator.toastActivate({
+                        text: 'Saving'
+                    });
+
+                    $.ajax({
+                        type: "POST",
+                        url:  container.find('[data-action]').attr('data-action'),
+                        data: data,
+                        success: function (newItem) {
+
+                            /* Update all the links, controls and identifiers when you spawn new rows
+                             * This is so their controls will work correctly after persisting
+                             */
+                            container.attr('data-item', newItem.id);
+                            container.find('[data-delete]').attr('href', newItem.delete);
+                            container.find('[data-action]').attr('data-action', newItem.update);
+                            element.attr('data-item-original-value', newData);
+
+                            indicator.toastTimeout({
+                                text: 'Saved',
+                                css: 'success'
+                            });
+
+                            /* Spawn a new row automatically if there are no
+                             * empty ones ready to utilise
+                             */
+                            if (canSpawnRow()) {
+                                spawnNewRow();
+                            }
+                        },
+                        error: function() {
+                            indicator.toastTimeout({
+                                text: 'Error!',
+                                css: 'alert'
+                            });
+                        }
+                    });
+                },
+
+                onDelete: function (element, container) {
+                    $(this).confirmDialog({
+                        text: 'Are you sure you want to delete ' + container.find('[data-item-element]').val() + '?',
+                        confirmEvent: function () {
+                            var data = [];
+
+                            data[config.deleteKey] = element.attr('data-delete');
+
+                            $.ajax({
+                                type: "POST",
+                                url: element.attr('href'),
+                                data: data,
+                                success: function() {
+                                    container.remove();
+                                }
+                            }).fail(function(responseText) {
+
+                                /* Tried to delete an already-deleted item?
+                                 * Be compliant and just remove it
+                                 */
+                                if (responseText.status == 410) {
+                                    container.remove();
+                                }
+                            });
+                        }
+                    });
+
+                },
+
                 /* Empty State element
                  * Shown when there are no items
                  */
@@ -98,59 +184,23 @@
                 var originalData = element.attr('data-item-original-value');
 
                 if (newData && (newData != originalData)) {
-
-                    /* Parent container for this row
-                     */
-                    var container = element.parents('[data-item]');
-
-                    /* Data package
-                     */
-                    var data = {
-                        entityId: container.attr('data-item'),
-                        name: newData
-                    };
-
-                    /* Indicator
-                     */
-                    var indicator = container.find('[data-save-item]');
-
-                    indicator.toastActivate({
-                        text: 'Saving'
-                    });
-
-                    $.ajax({
-                        type: "POST",
-                        url:  container.find('[data-action]').attr('data-action'),
-                        data: data,
-                        success: function (newItem) {
-
-                            /* Update all the links, controls and identifiers when you spawn new rows
-                             * This is so their controls will work correctly after persisting
-                             */
-                            container.attr('data-item', newItem.id);
-                            container.find('[data-delete]').attr('href', newItem.delete);
-                            container.find('[data-action]').attr('data-action', newItem.update);
-                            element.attr('data-item-original-value', newData);
-
-                            indicator.toastTimeout({
-                                text: 'Saved',
-                                css: 'success'
-                            });
-
-                            /* Spawn a new row automatically if there are no
-                             * empty ones ready to utilise
-                             */
-                            if (canSpawnRow()) {
-                                spawnNewRow();
-                            }
-                        },
-                        error: function() {
-                            indicator.toastTimeout({
-                                text: 'Error!',
-                                css: 'alert'
-                            });
+                    $.when(config.onModify(element, newData)).then(function () {
+                        /* Spawn a new row automatically if there are no
+                         * empty ones ready to utilise
+                         */
+                        if (canSpawnRow()) {
+                            spawnNewRow();
                         }
-                    });
+                    })
+                } else {
+                    $.when(config.onRevert(element)).then(function () {
+                        /* Spawn a new row automatically if there are no
+                         * empty ones ready to utilise
+                         */
+                        if (canSpawnRow()) {
+                            spawnNewRow();
+                        }
+                    })
                 }
             });
         }
@@ -175,35 +225,7 @@
                 /* Otherwise confirm deletion
                  */
                 else {
-                    $(this).confirmDialog({
-                        text: 'Are you sure you want to delete ' + container.find('[data-item-element]').val() + '?',
-                        confirmEvent: function () {
-                            var data = [];
-
-                            data[config.deleteKey] = element.attr('data-delete');
-
-                            $.ajax({
-                                type: "POST",
-                                url: element.attr('href'),
-                                data: data,
-                                success: function() {
-                                    container.remove();
-
-                                    refreshEmptyStates();
-                                }
-                            }).fail(function(responseText) {
-
-                                /* Tried to delete an already-deleted item?
-                                 * Be compliant and just remove it
-                                 */
-                                if (responseText.status == 410) {
-                                    container.remove();
-
-                                    refreshEmptyStates();
-                                }
-                            });
-                        }
-                    });
+                    $.when(config.onDelete(element, container)).then(refreshEmptyStates);
                 }
             });
         }
