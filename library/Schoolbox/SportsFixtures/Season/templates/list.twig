@@ -39,6 +39,8 @@
 <script type="text/javascript">
     $(function() {
 
+        var $allSeasons = $('#allSeasons');
+
         // Delete season with linked divisions and/or matches
         var $deleteModal  = $('#deleteModal');
         var $alertDelete  = $deleteModal.find('[data=alert-delete]');
@@ -90,10 +92,6 @@
                     .done(function() {
                         switch (action) {
                             case 'confirm-delete':
-
-                                // TODO, if no seasons left, show empty state
-
-
                                 // If move, transfer division/match counts to other season
                                 if('move' == data['cascade']){
                                     var $otherSeason = $('[data-season='+data['move']+']');
@@ -101,6 +99,9 @@
                                     $otherSeason.attr('data-match-count', parseInt($otherSeason.attr('data-match-count')) + parseInt($season.attr('data-match-count')));
                                 }
                                 $season.fadeOut({ done: $season.remove() });
+
+                                // Was this the last season ?
+                                checkEmptyState();
                                 break;
                         }
                     })
@@ -108,17 +109,15 @@
                         $('#errorModal').foundation('reveal', 'open');
                     });
 
-        })
+        });
 
 
-        function checkEmptyState(){
-            // TODO
-        }
+
 
 
 
         // Archive / Restore / Delete AJAX actions
-        $('#allSeasons').on('click', 'a[data-action]', function(event) {
+        $allSeasons.on('click', 'a[data-action]', function(event) {
             event.preventDefault();
             var     $button       = $(this),
                     action        = $button.data('action'),
@@ -160,8 +159,9 @@
                                 switch (action) {
                                     case 'delete':
                                         $season.fadeOut({ done: $season.remove() });
-                                            // TODO, if no seasons left, show empty state
 
+                                        // Was this the last season ?
+                                        checkEmptyState();
                                         break;
                                     case 'archive':
                                     case 'restore':
@@ -209,7 +209,7 @@
 
                 // Populate dropdown
                 $selectMove.find('option:not(:first-child)').remove();
-                $.each($('#allSeasons').find('[data-season]'), function(idx, elem){
+                $.each($allSeasons.find('[data-season]'), function(idx, elem){
                     var $elem = $(elem);
                     // Filter out this season, and archived seasons
                     if($season.data('season') == $elem.data('season') || $elem.data('archived')){
@@ -223,6 +223,18 @@
                 });
                 $selectMove[0].selectedIndex = 0;
                 $radioMove.trigger('click').trigger('change');
+            }
+        }
+
+        /**
+         * Checks how many seasons are in list, if 0, display the empty-state message
+         */
+        function checkEmptyState(){
+            var $emptyState = $('[data-empty-state]');
+            if($allSeasons.find('[data-season]').length){
+                $emptyState.addClass('hide');
+            } else {
+                $emptyState.removeClass('hide');
             }
         }
     });
@@ -254,13 +266,13 @@
                     {% endfor %}
                 </ul>
             </section>
-        {% else %}
-            <div class="empty-state">
-                <i class="icon-season"></i>
-                <p>There are no Seasons.</p>
-                <p><a href="{{ routeLookup('sportsfixturesSeason.getCreateForm', {context: match.id}) }}" title="Add a Season">Add a Season</a></p>
-            </div>
         {% endif %}
+
+        <div class="empty-state {% if allSeasons|length %}hide{% endif %}" data-empty-state>
+            <i class="icon-season"></i>
+            <p>There are no Seasons.</p>
+            <p><a href="{{ routeLookup('sportsfixturesSeason.getCreateForm', {context: match.id}) }}" title="Add a Season">Add a Season</a></p>
+        </div>
     </div>
 </div>
 
