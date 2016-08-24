@@ -57,9 +57,12 @@ class Participant
      * Find all the Responses that were spawned for a particular IAssessable
      *
      * @param IAssessable $assessable
+     * @return Collection
      */
     public function findAllResponses(IAssessable $assessable)
     {
+        $assessableClass = get_class($assessable);
+
         $collection = new Collection();
 
         /** @var IResponse $currentResponse */
@@ -68,22 +71,48 @@ class Participant
             /** @var IAssessable $currentAssessable */
             $currentAssessable = $currentResponse->getAssessable();
 
-            new \Alaress_Probe($currentAssessable instanceof $assessable);
+            /* So that $dueWork 1 doesn't get matched with $quiz 1
+             * or $task 1 - have to check types as well as id
+             */
+            if ($currentAssessable instanceof $assessableClass) {
+                if ($currentAssessable->getId() == $assessable->getId()) {
+                    $collection->add($currentResponse);
+                }
+            }
         }
+
+        return $collection;
     }
 
     /**
      * Find all the Feedbacks that were spawned for a particular IAssessable
      *
      * @param IAssessable $assessable
+     * @return Collection
      */
     public function findAllFeedback(IAssessable $assessable)
     {
+        $assessableClass = get_class($assessable);
+
         $collection = new Collection();
 
         /** @var IFeedback $currentFeedback */
         foreach ($this->getAllFeedbacks() as $currentFeedback) {
+
+            /** @var IAssessable $currentAssessable */
+            $currentAssessable = $currentFeedback->getAssessable();
+
+            /* So that $dueWork 1 doesn't get matched with $quiz 1
+             * or $task 1 - have to check types as well as id
+             */
+            if ($currentAssessable instanceof $assessableClass) {
+                if ($currentAssessable->getId() == $assessable->getId()) {
+                    $collection->add($currentFeedback);
+                }
+            }
         }
+
+        return $collection;
     }
 
     /* Getters/Setters
