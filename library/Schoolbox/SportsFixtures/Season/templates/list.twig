@@ -26,7 +26,7 @@
         <input type="radio" name="linkedEntities" value="delete" id="linkedEntitiesDelete"><label for="linkedEntitiesDelete">Delete divisions and matches</label>
     </fieldset>
 
-    <p class="alert-box warning icon-warning hide" data="alert-delete">Are you sure you really want to delete all divisions and matches linked to <strong><span data="season-name"></span></strong>? This cannot be undone</p>
+    <p class="alert-box warning icon-warning hide" data="alert-delete">Are you sure you really want to delete all divisions and matches linked to <strong><span data="season-name"></span></strong>, as well as all subsidiary entities? This cannot be undone</p>
 
     <ul class="flex-list buttons">
         <li><a href="#" class="button submit" data-action="confirm-delete" data-post-action="">Delete Season</a></li>
@@ -38,8 +38,6 @@
 <script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
 <script type="text/javascript">
     $(function() {
-
-
 
         // Setup vars
         var $allSeasons   = $('#allSeasons'),
@@ -119,9 +117,9 @@
                 action        = $button.data('action'),
                 $season       = $button.closest('[data-season]'),
                 divisionCount = $season.attr('data-division-count'),
-                divisionClass = divisionCount ? 'gradient-10' : 'gradient-1',
+                divisionClass = divisionCount ? 'gradient-1' : 'gradient-10',
                 matchCount    = $season.attr('data-match-count'),
-                matchClass    = matchCount ? 'gradient-10' : 'gradient-1',
+                matchClass    = matchCount ? 'gradient-1' : 'gradient-10',
                 tenseClause   = action == 'restore' ? 'that were' : 'currently';
 
             // Special case for deleting a season with divisions and/or matches currently linked to it
@@ -133,11 +131,11 @@
 
             // Generate modal text
             var text = 'Are you sure you want to <strong>'+action+'</strong> this season?<br>';
-            if('delete' == action && 0 == divisionCount && 0 == matchCount){
-                text += 'There are no divisions or matches currently linked to this season.';
-            } else {
+            if(divisionCount > 0 || matchCount > 0){
                 text += 'This will <strong>'+action+'</strong> <span class="'+divisionClass+'">'+divisionCount+'</span> divisions and <span class="'+matchClass+'">'
                         +matchCount+'</span> matches '+tenseClause+' linked to this season, along with all their subsidiary entities';
+            } else {
+                text += 'There are no divisions or matches currently linked to this season.';
             }
 
             $button.confirmDialog({
