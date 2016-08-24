@@ -501,10 +501,10 @@ class Controller extends Base
                     'role'              => $this->getUser()->getRole()->getType(),
                     'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
                     'teachers'          => $student->getTeacherCollection(),
-                    'WRITE_ACCESS'      => WRITE_ACCESS,
-                    'READ_ACCESS'       => READ_ACCESS,
-                    'FULL_ACCESS'       => FULL_ACCESS,
-                    'pastoralModerator' => $pastoralModerator
+                    'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
+                    'READ_ACCESS'       => UserAccess::ACCESS_READ,
+                    'FULL_ACCESS'       => UserACcess::ACCESS_FULL,
+                    'pastoralModerator' => $this->getPastoralModeratorLevel()
                 ),
             )
         );
@@ -574,10 +574,10 @@ class Controller extends Base
                 'data'     => array(
                     'session'           => $_SESSION,
                     'record'            => $pastoral,
-                    'WRITE_ACCESS'      => WRITE_ACCESS,
-                    'READ_ACCESS'       => READ_ACCESS,
-                    'FULL_ACCESS'       => FULL_ACCESS,
-                    'pastoralModerator' => $pastoralModerator,
+                    'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
+                    'READ_ACCESS'       => UserAccess::ACCESS_READ,
+                    'FULL_ACCESS'       => UserACcess::ACCESS_FULL,
+                    'pastoralModerator' => $this->getPastoralModeratorLevel(),
                     'role'              => $this->getUser()->getRole()->getType(),
                 ),
             )
@@ -668,7 +668,7 @@ class Controller extends Base
                     'WRITE_ACCESS'      => WRITE_ACCESS,
                     'READ_ACCESS'       => READ_ACCESS,
                     'FULL_ACCESS'       => FULL_ACCESS,
-                    'pastoralModerator' => $pastoralModerator,
+                    'pastoralModerator' => $this->getPastoralModeratorLevel(),
                     'attachzone'        => $this->getAttachZone($this->getPastoralAttachmentMapper()->findByPastoralId($id)),
                 ),
             )
@@ -919,7 +919,7 @@ class Controller extends Base
 
             // Only the owner or a moderator should be updating a record
 
-            if ($this->getPastoralModeratorLevel() < UserAccess::WRITE_ACCESS) {
+            if ($this->getPastoralModeratorLevel() < UserAccess::ACCESS_WRITE) {
                 if ($this->getUser()->getId() != $record->getOwner()->getId()) {
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
                 }
