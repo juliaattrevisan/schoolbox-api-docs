@@ -12,8 +12,11 @@ use Alaress_Date_Format;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
 use \Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted as DeletedMapperException;
 use \Schoolbox\SportsFixtures\Season\Model as Season;
 use \Schoolbox\SportsFixtures\Season\Mapper as SeasonMapper;
+use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 use Schoolbox\Collection;
 
 /**
@@ -29,12 +32,24 @@ class Controller extends AbstractController
     protected $errorMapper;
 
     /**
+     * @var DivisionMapper
+     */
+    protected $divisionMapper;
+
+    /**
+     * @var MatchMapper
+     */
+    protected $matchMapper;
+
+    /**
      * Controller constructor.
      */
     public function __construct()
     {
         parent::__construct(SeasonMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
+        $this->setDivisionMapper(DivisionMapper::getInstance());
+        $this->setMatchMapper(MatchMapper::getInstance());
     }
 
     /**
@@ -205,14 +220,63 @@ class Controller extends AbstractController
      * Delete the given entity. Deletion is considered to be an idempotent method,
      * so do not return an error on repeat attempts to delete an entity.
      *
+     * @api POST sportsfixtures/seasons/{entityId}/delete
+     * @level 165
      * @param Season $entity
      * @return void
      */
     public function deleteEntity($entity)
     {
+        $post = $this->getRequest()->post;
+
+        // When soft-deleting a season, we must ensure any linked divisions and matches are not left in
+        // an invalid state (ie pointing to a soft-deleted season). Hence, if linked entities exist, the caller
+        // must specify via POST params how to cascade the delete, along with relevant args.
+        // We can either:
+        //   * cascade=move&move={seasonId}, or       (move linked divisions/matches to another season)
+        //   * cascade=delete                         (delete linked division/matches)
+
+        $seasonId = $entity->getId();
+
+        // Did caller not specify a cascade strategy?
+        if(!$post->get('cascade')){
+            // Are there attached divisions or matches ?
+            if(
+                $this->getMapper()->getDivisionCounts([$seasonId])[$seasonId] ||
+                $this->getMapper()->getMatchCounts([$seasonId])[$seasonId]
+            ){
+                $message = 'Season has linked divisions and/or matches. Unlink divisions/matches or specify how to cascade the delete';
+                $this->outputPostError($entity, new \DomainException($message));
+                return;
+            }
+        }
+
+        // Did caller specify they wished to move the divisions/matches to another season ?
+        if('move' == $post->get('cascade')){
+            // Get that other season
+            $otherSeason = $this->getMapper()->findById($post->get('move'));
+
+            // Move any divisions to other season
+            $divisions = $this->getDivisionMapper()->findByColumn('season_id', $seasonId);
+            foreach($divisions as $division){
+                $division->setSeason($otherSeason);
+            }
+            $this->getDivisionMapper()->save($divisions);
+
+            // Move any matches to other season
+            $matches = $this->getMatchMapper()->findByColumn('season_id', $seasonId);
+            foreach($matches as $match){
+                $match->setSeason($otherSeason);
+            }
+            $this->getMatchMapper()->save($matches);
+        }
+
+        // Either season now has no linked divisions/matches, or caller specified to cascade the delete
         try {
             $this->getMapper()->delete($entity);
-            $this->outputPostSuccess($entity);
+            $this->getResponse()->content->set($this->buildJsonOutput([
+                'status'  => 200,
+            ]));
         } catch (Exception $e) {
             $this->outputPostError($entity, $e);
         }
@@ -252,26 +316,6 @@ class Controller extends AbstractController
         }
     }
 
-    /* Getters/Setters
-     */
-
-    /**
-     * @return ErrorMapper
-     */
-    protected function getErrorMapper()
-    {
-        return $this->errorMapper;
-    }
-
-    /**
-     * @param ErrorMapper $errorMapper
-     * @return static
-     */
-    protected function setErrorMapper($errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
-        return $this;
-    }
 
     /**
      * POST action success method.
@@ -282,12 +326,12 @@ class Controller extends AbstractController
     {
         if ($this->getRequest()->isXhr()) {
 
-            $divisionCounts = $this->getMapper()->getDivisionCounts();
+            $divisionCounts = $this->getMapper()->getDivisionCounts([$season->getId()]);
             if(!isset($divisionCounts[$season->getId()])){
                 $divisionCounts[$season->getId()] = 0;
             }
 
-            $matchCounts = $this->getMapper()->getMatchCounts();
+            $matchCounts = $this->getMapper()->getMatchCounts([$season->getId()]);
             if(!isset($matchCounts[$season->getId()])){
                 $matchCounts[$season->getId()] = 0;
             }
@@ -319,12 +363,67 @@ class Controller extends AbstractController
         if ($this->getRequest()->isXhr()) {
             // Dump out an AJAX error
             $this->getResponse()->status->setCode(500);
-            $this->getResponse()->content->set([
-                'format' => 'json',
-                'data'   => $e->getMessage(),
-            ]);
+            $this->getResponse()->content->set($this->buildJsonOutput($e->getMessage()));
         } else {
             throw $e;
         }
     }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+    /**
+     * @param ErrorMapper $errorMapper
+     * @return static
+     */
+    protected function setErrorMapper($errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
+        return $this;
+    }
+
+    /**
+     * @return DivisionMapper
+     */
+    protected function getDivisionMapper()
+    {
+        return $this->divisionMapper;
+    }
+
+    /**
+     * @param DivisionMapper $divisionMapper
+     * @return static
+     */
+    protected function setDivisionMapper($divisionMapper)
+    {
+        $this->divisionMapper = $divisionMapper;
+        return $this;
+    }
+
+    /**
+     * @return MatchMapper
+     */
+    protected function getMatchMapper()
+    {
+        return $this->matchMapper;
+    }
+
+    /**
+     * @param MatchMapper matchMapper
+     * @return static
+     */
+    protected function setMatchMapper($matchMapper)
+    {
+        $this->matchMapper = $matchMapper;
+        return $this;
+    }
+
 }
