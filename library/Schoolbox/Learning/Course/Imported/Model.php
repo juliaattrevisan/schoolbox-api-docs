@@ -63,6 +63,7 @@ class Model implements AssessmentContext
     public function __construct()
     {
         $this->folder = new FolderModel();
+        $this->units  = new Collection();
     }
 
     /* Getters/Setters */
