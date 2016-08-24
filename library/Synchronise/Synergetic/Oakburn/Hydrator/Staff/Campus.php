@@ -24,4 +24,11 @@ class Synchronise_Synergetic_Oakburn_Hydrator_Staff_Campus extends Synchronise_B
 
         return $newUser;
     }
+
+    public function hydrateOnUpdate($externalUser, $newUser)
+    {
+        unset($newUser['campus']);
+        unset($newUser['defaultCampus']);
+        return $newUser;
+    }
 }
