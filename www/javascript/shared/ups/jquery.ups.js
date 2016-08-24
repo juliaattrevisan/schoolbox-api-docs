@@ -378,12 +378,10 @@
             $(config.element).on('click', '[data-condition-create]', function(event) {
                 event.preventDefault();
 
-                // Exists if triggered via empty state link
-                var $emptyState = $(this).closest('[data-empty-state-conditions]');
-
                 /* The Rule into which the new Effect is injected
                  */
                 var ruleId = $(this).attr('data-condition-create');
+                var $emptyState = $('#rule-'+ruleId).find('[data-empty-state-conditions]');
                 var ruleContainer = '#rule-' + ruleId + '-conditions';
 
                 /* The url from which new Conditions are spawned
@@ -531,14 +529,12 @@
                 /* The Rule into which the new Effect is injected
                  */
                 var ruleId = $(this).attr('data-effect-create');
+                var $emptyState = $('#rule-'+ruleId).find('[data-empty-state-effects]');
                 var ruleContainer = '#rule-' + ruleId + '-effects';
 
                 /* The url from which new Effect are spawned
                  */
                 var url = $(this).attr('href');
-
-                // Exists if triggered via empty state link
-                var $emptyState = $(this).closest('[data-empty-state-effects]');
 
                 $.post(url, function(responseText) {
                     var effectId = config.stubPrefix + '-' + latestEffectInstance;

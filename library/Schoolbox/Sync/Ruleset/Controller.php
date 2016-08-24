@@ -90,7 +90,7 @@ class Controller extends Base {
 
     /**
      * Ruleset view
-     *
+     * @api GET /adminv2/ups/{rulesetId}
      * @param string $rulesetId
      */
     public function read($rulesetId) {
@@ -499,6 +499,7 @@ class Controller extends Base {
 
     /**
      * Update the settings for a Ruleset (student, parent, staff)
+     * @api POST /adminv2/ups/ruleset/update
      */
     public function updateRuleset()
     {
@@ -516,6 +517,8 @@ class Controller extends Base {
      * Each call to this function must provide the contents for a single Rule in
      * the Ruleset. Saving 'All Rules' would trigger multiple parallel asynchronous
      * calls to this function. This is to avoid max_input_vars being breached.
+     *
+     * @api POST /adminv2/ups/ruleset/rule/update
      */
     public function updateRule(){
 
@@ -640,8 +643,15 @@ class Controller extends Base {
         if (is_array($effects)) {
             foreach ($effects as $effectId => $effectData) {
 
-                // Don't save undefined effects
-                if("" === $effectData['userProperty'] || "" === $effectData['type']){
+                // Don't save undefined / invalid effects
+
+                // All effects must have a 'type'
+                if('' == $effectData['type']){
+                    continue;
+                }
+
+                // All non-'skip' effects must have a 'userProperty'
+                if(EffectTypeMapper::EFFECT_TYPE_SKIP != $effectData['type'] && '' == $effectData['userProperty']){
                     continue;
                 }
 

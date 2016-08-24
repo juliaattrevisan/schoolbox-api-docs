@@ -1,4 +1,4 @@
-<li id="effect-{{ currentEffect.id }}" class="actions-small-1 content" data-locked="{{ meta.effect[currentEffect.id].lock.status }}">
+<li id="effect-{{ currentEffect.id }}" class="actions-small-1 content" data-effect data-locked="{{ meta.effect[currentEffect.id].lock.status }}">
     <input type="hidden" name="rule[{{ currentEffect.rule.id }}][effect][{{ currentEffect.id }}][type]" value="3">
 
     <div class="list-item">
@@ -15,7 +15,7 @@
 
             <div>
                 <div class="small-12 columns">
-                    <span id='effect-{{ currentEffect.id }}-status' class="label highlight full-width {{ meta.effect[currentEffect.id].status ? '' : 'hide' }}">{{ meta.effect[currentEffect.id].status }}</span>
+                    <span id='effect-{{ currentEffect.id }}-status' data-label-status class="label highlight full-width {{ meta.effect[currentEffect.id].status ? '' : 'hide' }}">{{ meta.effect[currentEffect.id].status }}</span>
                 </div>
             </div>
         </div>
