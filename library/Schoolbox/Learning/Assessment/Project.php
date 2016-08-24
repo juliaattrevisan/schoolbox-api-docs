@@ -38,9 +38,35 @@ class Project extends AbstractAssessment
     }
 
     /**
+     * Calculate how many IAssessable instances are in this Project
+     *
+     * @return int
+     */
+    public function numAssessables()
+    {
+        return $this->getAssessables()->count();
+    }
+
+    /**
+     * Calculate how many Participant instances are in this Project
+     *
+     * @return int
+     */
+    public function numParticipants()
+    {
+        $denominator = 0;
+
+        foreach ($this->getAssessables() as $currentAssessable) {
+            $denominator += $currentAssessable->getAllParticipants()->count();
+        }
+
+        return $denominator;
+    }
+
+    /**
      * Calculate how many IAssessable instances have a non-null mark value
      */
-    protected function numMarked()
+    public function numMarked()
     {
         $numMarked = 0;
 
@@ -63,24 +89,14 @@ class Project extends AbstractAssessment
     }
 
     /**
-     * Calculate how many IAssessable instances are in this Project
-     *
-     * @return int
-     */
-    protected function numAssessables()
-    {
-        return $this->getAssessables()->count();
-    }
-
-    /**
      * Calculate percentage of a Project that has been marked
      *
      * @return int
      */
     public function calculatePercentageMarked()
     {
-        if ($this->numAssessables() && $this->getAllParticipants()->count()) {
-            return 100 * ($this->numMarked() / ($this->numAssessables() * $this->getAllParticipants()->count()));
+        if ($this->numAssessables()) {
+            return 100 * ($this->numMarked() / $this->numParticipants());
         }
 
         return 0;
@@ -92,7 +108,7 @@ class Project extends AbstractAssessment
      *
      * @return int
      */
-    protected function numPublished()
+    public function numPublished()
     {
         $numPublished = 0;
 
@@ -121,11 +137,9 @@ class Project extends AbstractAssessment
      */
     public function calculatePercentagePublished()
     {
-        if ($this->numAssessables() && $this->getAllParticipants()->count()) {
-            return 100 * ($this->numPublished() / ($this->numAssessables() * $this->getAllParticipants()->count()));
+        if ($this->numAssessables()) {
+            return 100 * ($this->numPublished() / $this->numParticipants());
         }
-
-        return 0;
     }
 
     /**
