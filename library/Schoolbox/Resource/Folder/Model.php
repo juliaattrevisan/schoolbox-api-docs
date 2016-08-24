@@ -13,6 +13,7 @@ namespace Schoolbox\Resource\Folder;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Template\Model as CourseModel;
 use Schoolbox\Learning\Course\Imported\Model as CourseInstanceModel;
 use Schoolbox\Resource\AbstractFolder;
@@ -29,7 +30,7 @@ use Schoolbox\ValueLabelInterface;
  *
  * @package Schoolbox\Resource\Folder
  */
-class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface
+class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext
 {
     use Node\Traits\HasCurriculumNodes;
 
@@ -289,6 +290,16 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
             'value' => $this->getId(),
             'label' => $this->getName()
         ];
+    }
+
+    /**
+     * If an Assessable is in a folder, then its context is this folder.
+     *
+     * @return $this
+     */
+    public function getFolder()
+    {
+        return $this;
     }
 
     /**

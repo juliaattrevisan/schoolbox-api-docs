@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Course\Imported;
 
 use Schoolbox\Collection;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Template\Model as TemplateCourseModel;
 use Schoolbox\Learning\Course\Imported\Unit\Model as ImportedUnitModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -24,7 +25,7 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  *
  * @package Schoolbox\Learning\Course\Imported
  */
-class Model
+class Model implements AssessmentContext
 {
     /**
      * Unique identifier.

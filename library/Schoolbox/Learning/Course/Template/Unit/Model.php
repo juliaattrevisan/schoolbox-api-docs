@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Course\Template\Unit;
 
 use Schoolbox\Collection;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Template\Model as CourseModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
@@ -24,7 +25,7 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  *
  * @package Schoolbox\Learning\Course\Template\Unit
  */
-class Model
+class Model implements AssessmentContext
 {
     /**
      * Unique identifier.

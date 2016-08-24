@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Course\Imported\Unit;
 
 use Schoolbox\Collection;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Imported\Model as ImportedCourseModel;
 use Schoolbox\Learning\Course\Template\Unit\Model as TemplateUnitModel;
 
@@ -27,7 +28,7 @@ use Schoolbox\Learning\Course\Template\Unit\Model as TemplateUnitModel;
  *
  * @package Schoolbox\Learning\Course\Imported\Unit
  */
-class Model
+class Model implements AssessmentContext
 {
     /**
      * Unique identifier.
@@ -142,5 +143,13 @@ class Model
     {
         $this->assessables = $assessables;
         return $this;
+    }
+
+    /**
+     * This object's assessment context is its Imported Course's assessment context.
+     */
+    public function getFolder()
+    {
+        return $this->getCourse()->getFolder();
     }
 }
