@@ -12,6 +12,7 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
@@ -484,7 +485,7 @@ class Mapper extends BaseMapper
 
             // Pastoral moderators can access everything
 
-            if ($user->getAccessList()->filterBy('service',PASTORAL_SERVICE)->count() > 0) {
+            if ($user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0) {
                 return true;
             }
 
@@ -574,7 +575,7 @@ class Mapper extends BaseMapper
 
             // Pastoral moderators can access everything
 
-            if ($user->getAccessList()->filterBy('service',PASTORAL_SERVICE)->count() > 0) {
+            if ($user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0) {
                 return true;
             }
 

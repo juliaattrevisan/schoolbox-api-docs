@@ -410,7 +410,7 @@ class Controller extends Base
      * @throws MapperException
      */
     public function getPastoralModeratorLevel() {
-        $pastoralModeratorList = $this->getUser()->getAccessList()->filterBy('service', PASTORAL_SERVICE);
+        $pastoralModeratorList = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL);
 
         //Get first from collection
         if($pastoralModeratorList->count() > 0) {

@@ -66,6 +66,13 @@ class UserAccess
 
     /**
      * Value for $this->service:
+     * $this->user has $this->accessLevel permission for the pastoral care
+     * system.
+     */
+    const SERVICE_PASTORAL = 9;
+
+    /**
+     * Value for $this->service:
      * $this->user has $this->accessLevel permission for the Sports Fixtures
      * system.
      */
