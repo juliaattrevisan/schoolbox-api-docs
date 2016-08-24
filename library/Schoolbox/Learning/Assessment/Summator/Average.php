@@ -23,6 +23,7 @@ class Average implements ISummator
     public function __construct()
     {
     }
+
     /**
      * Execute summation strategy for a particular Participant
      *
@@ -47,9 +48,16 @@ class Average implements ISummator
                     foreach ($participant->findAllResponsesForAssessable($currentAssessable) as $currentResponse) {
                         $feedback = $currentResponse->findMostRecentFeedback();
 
+                        /* Only use numeric marks in Average computation
+                         * to prevent Tasks from influencing your result
+                         */
                         if ($feedback) {
-                            $sum += $feedback->calculateMark();
-                            $numItems++;
+                            $markValue = $feedback->calculateMark();
+
+                            if ($markValue) {
+                                $sum += $markValue;
+                                $numItems++;
+                            }
                         }
                     }
                 }
