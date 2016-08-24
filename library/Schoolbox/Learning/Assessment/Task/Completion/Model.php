@@ -26,17 +26,39 @@ class Model extends AbstractResponse
         return $this->getUpdatedAt();
     }
 
+    /* Tasks always return Null marks for Feedbacks
+     * Exclude the isNullMark() check for Tasks
+     */
+
     /**
-     * Find the most recent Published Feedback, based on its Updated field
+     * Find the most recent Feedback with a non-null Mark value,
+     * based on its Updated field
+     *
+     * Assumes getAllFeedback() is sorted in reverse chronological order
      */
     public function findMostRecentFeedback()
+    {
+        if ($this->getAllFeedback()->count()) {
+            return $this->getAllFeedback()->first();
+        }
+
+        return null;
+    }
+
+    /**
+     * Find the most recent Published Feedback with a non-null Mark value,
+     * based on its Updated field
+     *
+     * Assumes getAllFeedback() is sorted in reverse chronological order
+     */
+    public function findMostRecentPublishedFeedback()
     {
         if ($this->getAllFeedback()->count()) {
             $latest = $this->getAllFeedback()->first();
 
             foreach ($this->getAllFeedback() as $currentFeedback) {
                 if ($currentFeedback->getPublishedAt()) {
-                    if ($currentFeedback->getPublishedAt()->gt($latest->getPublishedAt())) {
+                    if ($currentFeedback->getPublishedAt()->gt($latest->getPublishedAt()) && !$currentFeedback->isNullMark()) {
                         $latest = $currentFeedback;
                     }
                 }
