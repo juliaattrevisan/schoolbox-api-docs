@@ -484,7 +484,7 @@ class Mapper extends BaseMapper
 
             // Pastoral moderators can access everything
 
-            if ($this->getUserAccessMapper()->findServiceForUser($user,PASTORAL_SERVICE)->count() > 0) {
+            if ($user->getAccessList()->filterBy('service',PASTORAL_SERVICE)->count() > 0) {
                 return true;
             }
 
@@ -574,7 +574,7 @@ class Mapper extends BaseMapper
 
             // Pastoral moderators can access everything
 
-            if ($this->getUserAccessMapper()->findServiceForUser($user,PASTORAL_SERVICE)->count() > 0) {
+            if ($user->getAccessList()->filterBy('service',PASTORAL_SERVICE)->count() > 0) {
                 return true;
             }
 

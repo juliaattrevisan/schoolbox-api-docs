@@ -39,6 +39,7 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Permission\Access\UserAccess;
 
 class Controller extends Base
 {
@@ -223,10 +224,8 @@ class Controller extends Base
 
         // And spit this thing out
 
-        if ($this->getUser()->isSuperuser())
-            $pastoralModerator = true;
-        else
-            $pastoralModerator = $this->getUserAccessMapper()->findServiceForUser($this->getUser(), PASTORAL_SERVICE)->count() > 0;
+
+        $pastoralModerator = $this->getPastoralModeratorLevel() > UserAccess::ACCESS_READ;
 
         $this->getResponse()->content->set(
             array(
@@ -265,10 +264,7 @@ class Controller extends Base
         if (!$this->getUser()->getRole()->isStaff())
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
 
-        if ($this->getUser()->isSuperuser())
-            $pastoralModerator = true;
-        else
-            $pastoralModerator = $this->getUserAccessMapper()->findServiceForUser($this->getUser(), PASTORAL_SERVICE)->count() > 0;
+        $pastoralModerator = $this->getPastoralModeratorLevel() > UserAccess::ACCESS_READ;
 
         $this->getResponse()->content->set(
             array(
@@ -414,13 +410,11 @@ class Controller extends Base
      * @throws MapperException
      */
     public function getPastoralModeratorLevel() {
-        $pastoralModerator = $this->getUserAccessMapper()->findServiceForUser($this->getUser(), PASTORAL_SERVICE)->count() > 0;
+        $pastoralModeratorList = $this->getUser()->getAccessList()->filterBy('service', PASTORAL_SERVICE);
 
-        if ($pastoralModerator) {
-            $pastoralModerator  = $this->getUserAccessMapper()->findOneByColumnList([
-                "uid" => $this->getUser()->getId(),
-                "service" => PASTORAL_SERVICE
-            ])->getAccessLevel();
+        //Get first from collection
+        if($pastoralModeratorList->count() > 0) {
+            $pastoralModerator = $pastoralModeratorList->first()->getAccessLevel();
         } else {
             $pastoralModerator = 0;
         }
@@ -450,13 +444,9 @@ class Controller extends Base
         $student->loadParents();
         $student->loadTeachers();
 
-        // Get pastoral moderator status
-
-        $pastoralModerator = $this->getPastoralModeratorLevel();
-
         // The list screen is restricted to parents and staff
 
-        if (!$pastoralModerator)
+        if ($this->getPastoralModeratorLevel() < UserAccess::ACCESS_READ)
             if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->isParentOf($student))
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
 
@@ -539,10 +529,7 @@ class Controller extends Base
         $student->loadParents();
 
         // Get pastoral moderator status
-
-        $pastoralModerator = $this->getPastoralModeratorLevel();
-
-        if (!$pastoralModerator) {
+        if ($this->getPastoralModeratorLevel() < UserAccess::ACCESS_READ) {
             if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->isParentOf($student)) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
             }
@@ -661,9 +648,7 @@ class Controller extends Base
 
         // Only the staff member that owns the record should be updating it
 
-        $pastoralModerator = $this->getPastoralModeratorLevel();
-
-        if ($pastoralModerator < WRITE_ACCESS)
+        if ($this->getPastoralModeratorLevel() < UserAccess::ACCESS_WRITE)
             if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $record->getOwner()->getId())
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
 
@@ -934,9 +919,7 @@ class Controller extends Base
 
             // Only the owner or a moderator should be updating a record
 
-            $pastoralModerator = $this->getPastoralModeratorLevel();
-
-            if ($pastoralModerator < WRITE_ACCESS) {
+            if ($this->getPastoralModeratorLevel() < UserAccess::WRITE_ACCESS) {
                 if ($this->getUser()->getId() != $record->getOwner()->getId()) {
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
                 }
@@ -1144,12 +1127,6 @@ class Controller extends Base
 
                 /** @var \Schoolbox\Resource\Storage\Model $storageObject */
                 foreach ($attachmentObjects as $storageObject) {
-
-                    if ($hash_array[0] == 'browse') {
-                        $file = $this->getFileMapper()->findById($hash_array[1]);
-                        $hash_array[1] = $file->getHash();
-                    }
-
                     // Only add attachments which don't already exist
 
                     if (!in_array($storageObject->getHash(), $retainedAttachments)) {
@@ -1187,10 +1164,7 @@ class Controller extends Base
         }
 
         // Work out if this person should be allowed to delete the record
-
-        $pastoralModerator = $this->getUserAccessMapper()->findServiceForUser($this->getUser(), PASTORAL_SERVICE)->count() > 0;
-
-        if (!$pastoralModerator) {
+        if ($this->getPastoralModeratorLevel() < UserAccess::ACCESS_WRITE) {
             if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $record->getOwner()->getId()) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
             }
