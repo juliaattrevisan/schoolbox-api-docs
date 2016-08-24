@@ -503,12 +503,15 @@ class Controller extends Base {
      */
     public function updateRuleset()
     {
+        $response = [];
         $postData = $this->getRequest()->post;
         $roleType = $postData['rulesetId'];
 
-        $this->updateConfig($roleType, $postData['config'][$roleType]);
-        $this->updateRuleSequence(($postData['sequence']));
-        $this->updateCustomRules($roleType, $postData['customRule']);
+        $response['config']     = $this->updateConfig($roleType, $postData['config'][$roleType]);
+        $response['sequence']   = $this->updateRuleSequence(($postData['sequence']));
+        $response['customRule'] = $this->updateCustomRules($roleType, $postData['customRule']);
+
+        $this->getResponse()->content->set($this->buildJsonOutput($response));
     }
 
     /**
@@ -540,17 +543,19 @@ class Controller extends Base {
      * a Rule instance that we never had in the first place
      *
      * @param $sequencing
+     * @return bool Whether Rule Sequence was successfully saved
      */
     protected function updateRuleSequence($sequencing) {
 
         // TODO DI some more
         $mapper = RuleMapper::getInstance();
-        $mapper->updateRuleSequence($sequencing);
+        return false !== $mapper->updateRuleSequence($sequencing);
     }
 
     /**
      * @param $roleType
      * @param $config
+     * @return bool Whether config was successfully saved
      */
     protected function updateConfig($roleType, $config)
     {
@@ -558,7 +563,7 @@ class Controller extends Base {
         $mapper = Config\Mapper::getInstance();
         $model  = $mapper->findById($roleType);
         $model->setEnabled($config['enabled']);
-        $mapper->save($model);
+        return false !== $mapper->save($model);
     }
 
     /**
@@ -755,11 +760,12 @@ class Controller extends Base {
      *
      * @param string $roleType
      * @param array  $customRules Custom rule options
+     * @return bool Whether Custom Rules were successfully saved
      */
     protected function updateCustomRules($roleType, $customRules)
     {
         if (!is_array($customRules)) {
-            return;
+            return false;
         }
 
         // TODO DI some more
@@ -773,6 +779,6 @@ class Controller extends Base {
             $ruleParams = $customRules[$rule->getId()];
             $rule->setEnabled($ruleParams['enabled']);
         }
-        $mapper->save($rules);
+        return false !== $mapper->save($rules);
     }
 }
