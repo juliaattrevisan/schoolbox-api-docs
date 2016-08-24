@@ -12,7 +12,10 @@
 namespace Schoolbox\Learning\Assessment\Summator;
 
 use \Schoolbox\Collection;
+use \Schoolbox\User;
+use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use \Schoolbox\Learning\Assessment\AbstractResponse;
+use \Schoolbox\Learning\Assessment\Participant;
 
 class Minimum implements ISummator
 {
@@ -25,28 +28,38 @@ class Minimum implements ISummator
      * Accommodate a set of negative values
      *
      * @param Collection $allAssessables
+     * @param User $user
      * @return null|int|float
      */
-    public function summate(Collection $allAssessables)
+    public function summate(Collection $allAssessables, User $user)
     {
         $min = null;
 
         if ($allAssessables->count()) {
+
+            /** @var AbstractAssessment $currentAssessable */
             foreach ($allAssessables as $currentAssessable) {
 
+                /** @var Participant $participant */
+                $participant = $currentAssessable->findParticipant($user);
+
                 /** @var AbstractResponse $currentResponse */
-                foreach ($currentAssessable->getAllResponses() as $currentResponse) {
-                    $feedback = $currentResponse->findMostRecentNonNullFeedback();
+                if ($participant) {
+                    foreach ($participant->findAllResponsesForAssessable($currentAssessable) as $currentResponse) {
+                        $feedback = $currentResponse->findMostRecentFeedback();
 
-                    if ($feedback) {
-                        $currentFeedbackMark = $feedback->calculateMark();
-
-                        /* $min is being set for the first time to a non-null value
-                         * If you don't do this check for $min == null, summate() will
-                         * always return null (any actual value is never less than null)
+                        /* Null should not be the minimum
                          */
-                        if ($currentFeedbackMark < $min || $min == null) {
-                            $min = $currentFeedbackMark;
+                        if ($feedback && !$feedback->isNullMark()) {
+                            $currentFeedbackMark = $feedback->calculateMark();
+
+                            /* $min is being set for the first time to a non-null value
+                             * If you don't do this check for $min == null, summate() will
+                             * always return null (any actual value is never less than null)
+                             */
+                            if ($currentFeedbackMark < $min || $min == null) {
+                                $min = $currentFeedbackMark;
+                            }
                         }
                     }
                 }

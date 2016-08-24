@@ -12,7 +12,10 @@
 namespace Schoolbox\Learning\Assessment\Summator;
 
 use \Schoolbox\Collection;
+use \Schoolbox\User;
+use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use \Schoolbox\Learning\Assessment\AbstractResponse;
+use \Schoolbox\Learning\Assessment\Participant;
 
 class Maximum implements ISummator
 {
@@ -25,24 +28,32 @@ class Maximum implements ISummator
      * Accommodate a set of negative values
      *
      * @param Collection $allAssessables
+     * @param User $user
      * @return null|int|float
      */
-    public function summate(Collection $allAssessables)
+    public function summate(Collection $allAssessables, User $user)
     {
         $max = null;
 
         if ($allAssessables->count()) {
+
+            /** @var AbstractAssessment $currentAssessable */
             foreach ($allAssessables as $currentAssessable) {
 
+                /** @var Participant $participant */
+                $participant = $currentAssessable->findParticipant($user);
+
                 /** @var AbstractResponse $currentResponse */
-                foreach ($currentAssessable->getAllResponses() as $currentResponse) {
-                    $feedback = $currentResponse->findMostRecentNonNullFeedback();
+                if ($participant) {
+                    foreach ($participant->findAllResponsesForAssessable($currentAssessable) as $currentResponse) {
+                        $feedback = $currentResponse->findMostRecentFeedback();
 
-                    if ($feedback) {
-                        $currentFeedbackMark = $feedback->calculateMark();
+                        if ($feedback) {
+                            $currentFeedbackMark = $feedback->calculateMark();
 
-                        if ($currentFeedbackMark > $max) {
-                            $max = $currentFeedbackMark;
+                            if ($currentFeedbackMark > $max) {
+                                $max = $currentFeedbackMark;
+                            }
                         }
                     }
                 }

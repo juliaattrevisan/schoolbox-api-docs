@@ -16,6 +16,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
+use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Summator\ISummator;
 
 class Project extends AbstractAssessment
@@ -49,14 +50,17 @@ class Project extends AbstractAssessment
     }
 
     /**
-     * Calculate the final mark for this IAssessable
+     * Calculate the final mark for this IAssessable, for a particular User
      *
      * Projects use Summator strategies to determine final marks
      * for a Collection of Assessable instances
+     *
+     * @param User $user
+     * @return mixed
      */
-    public function calculateMark()
+    public function calculateMark(User $user)
     {
-         return $this->getSummator()->summate($this->getAssessables());
+         return $this->getSummator()->summate($this->getAssessables(), $user);
     }
 
     /**

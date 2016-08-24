@@ -10,7 +10,10 @@
 namespace Schoolbox\Learning\Assessment\Summator;
 
 use \Schoolbox\Collection;
+use \Schoolbox\User;
+use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use \Schoolbox\Learning\Assessment\AbstractResponse;
+use \Schoolbox\Learning\Assessment\Participant;
 
 class Average implements ISummator
 {
@@ -21,28 +24,33 @@ class Average implements ISummator
     {
     }
     /**
-     * Execute summation strategy
+     * Execute summation strategy for a particular Participant
      *
      * @param Collection $allAssessables
+     * @param User $user
      * @return float|null
      */
-    public function summate(Collection $allAssessables)
+    public function summate(Collection $allAssessables, User $user)
     {
-        $sum = null;
-
         if ($allAssessables->count()) {
-            $numItems = 0;
-            $sum = 0;
+            $numItems    = 0;
+            $sum         = 0;
 
+            /** @var AbstractAssessment $currentAssessable */
             foreach ($allAssessables as $currentAssessable) {
 
-                /** @var AbstractResponse $currentResponse */
-                foreach ($currentAssessable->getAllResponses() as $currentResponse) {
-                    $feedback = $currentResponse->findMostRecentNonNullFeedback();
+                /** @var Participant $participant */
+                $participant = $currentAssessable->findParticipant($user);
 
-                    if ($feedback) {
-                        $sum += $feedback->calculateMark();
-                        $numItems++;
+                /** @var AbstractResponse $currentResponse */
+                if ($participant) {
+                    foreach ($participant->findAllResponsesForAssessable($currentAssessable) as $currentResponse) {
+                        $feedback = $currentResponse->findMostRecentFeedback();
+
+                        if ($feedback) {
+                            $sum += $feedback->calculateMark();
+                            $numItems++;
+                        }
                     }
                 }
             }
@@ -52,6 +60,6 @@ class Average implements ISummator
             }
         }
 
-        return $sum;
+        return null;
     }
 }

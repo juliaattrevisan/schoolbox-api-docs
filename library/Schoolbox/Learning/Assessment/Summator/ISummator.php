@@ -10,6 +10,7 @@
 namespace Schoolbox\Learning\Assessment\Summator;
 
 use \Schoolbox\Collection;
+use \Schoolbox\User;
 
 interface ISummator
 {
@@ -18,7 +19,8 @@ interface ISummator
      * IAssessable instances
      *
      * @param Collection $allAssessables
+     * @param User $user
      * @return mixed
      */
-    public function summate(Collection $allAssessables);
+    public function summate(Collection $allAssessables, User $user);
 }
