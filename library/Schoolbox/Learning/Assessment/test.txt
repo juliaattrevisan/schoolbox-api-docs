@@ -137,7 +137,15 @@ $response
 $dueWork1->findParticipant($hodes)->getAllResponses()->add($response);
 $dueWork1->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
 
+/* Arbitrary quick clones
+ */
+$response->setSubmittedBy($sberryhill);
+$dueWork1->findParticipant($sberryhill)->getAllResponses()->add($response);
+$dueWork1->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
 
+$response->setSubmittedBy($slucier);
+$dueWork1->findParticipant($slucier)->getAllResponses()->add($response);
+$dueWork1->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
 
 /* Second (no submission files, no plagscan; marked, multiple feedbacks, no feedback files, comment, published)
  */
@@ -193,6 +201,15 @@ $response
 $dueWork2->findParticipant($hodes)->getAllResponses()->add($response);
 $dueWork2->findParticipant($hodes)->getAllFeedbacks()->add($feedback2)->add($feedback1);
 
+/* Arbitrary quick clones
+ */
+$response->setSubmittedBy($sberryhill);
+$dueWork2->findParticipant($sberryhill)->getAllResponses()->add($response);
+$dueWork2->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback1);
+
+$response->setSubmittedBy($slucier);
+$dueWork2->findParticipant($slucier)->getAllResponses()->add($response);
+$dueWork2->findParticipant($slucier)->getAllFeedbacks()->add($feedback1);
 
 
 /* Third (no submission files, no plagscan; unmarked, no feedback, no feedback files, no comment, unpublished)
@@ -216,16 +233,36 @@ $dueWork3
     ->showAllSubmissibleStudents()
     ->setAllParticipants($allParticipants);
 
+$feedback = new DueWorkFeedback();
+$feedback
+    ->setAssessable($dueWork3)
+    ->setNormalisedMark(25)
+    ->setComment('A work of art.')
+    ->setPublishedAt(new \Alaress_Date_Format('2016-08-12 18:12:11', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-05 18:01:11', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-05 18:01:11', \Alaress_Date_Format::DATABASE_FORMAT));
+
 $response = new DueWorkSubmission();
 $response
     ->setAssessable($dueWork3)
     ->setSubmittedBy($hodes)
     ->setSubmittedOnBehalfOf($hodes)
-    ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 07:23:02', \Alaress_Date_Format::DATABASE_FORMAT));
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 07:23:02', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->getAllFeedback()->add($feedback);
 
 // Append it on a per-user basis
 $dueWork3->findParticipant($hodes)->getAllResponses()->add($response);
+$dueWork3->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
 
+/* Arbitrary quick clones
+ */
+$response->setSubmittedBy($sberryhill);
+$dueWork3->findParticipant($sberryhill)->getAllResponses()->add($response);
+$dueWork3->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
+
+$response->setSubmittedBy($slucier);
+$dueWork3->findParticipant($slucier)->getAllResponses()->add($response);
+$dueWork3->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
 
 
 /* Fourth (one submission; marked multiple feedbacks, no feedback files, unpublished)
@@ -263,6 +300,7 @@ $feedback1
             'mark' => 1 // Question 4
         ]
     ])
+    ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 09:13:31', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-03 09:13:31', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-23 21:47:56', \Alaress_Date_Format::DATABASE_FORMAT));
 
@@ -283,6 +321,7 @@ $feedback2
             'mark' => 5 // Question 4
         ]
     ])
+    ->setPublishedAt(\Alaress_Date_Format::now())
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-04 12:11:21', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-24 20:41:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
@@ -297,6 +336,12 @@ $response
 // Append it on a per-user basis
 $quiz1->findParticipant($bsalem)->getAllResponses()->add($response);
 $quiz1->findParticipant($bsalem)->getAllFeedbacks()->add($feedback1)->add($feedback2);
+
+/* Arbitrary quick clones
+ */
+$response->setSubmittedBy($asaxon);
+$quiz1->findParticipant($asaxon)->getAllResponses()->add($response);
+$quiz1->findParticipant($asaxon)->getAllFeedbacks()->add($feedback);
 
 
 
@@ -314,6 +359,48 @@ $quiz2
     ->setTitle('A quiz nobody has tried')
     ->setAllParticipants($allParticipants);
 
+$feedback = new QuizReview();
+$feedback
+    ->setAssessable($quiz2)
+    ->setAllResponses([
+        [
+            'mark' => 5 // Question 1
+        ],
+        [
+            'mark' => 4 // Question 2
+        ],
+        [
+            'mark' => 5 // Question 3
+        ],
+        [
+            'mark' => 5 // Question 4
+        ]
+    ])
+    ->setPublishedAt(\Alaress_Date_Format::now())
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-04 12:11:21', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-24 20:41:16', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new QuizAttempt();
+$response
+    ->setAssessable($quiz2)
+    ->setSubmittedBy($hodes)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-02 19:04:41', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 19:12:41', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->getAllFeedback()->add($feedback);
+
+$quiz2->findParticipant($hodes)->getAllResponses()->add($response);
+$quiz2->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
+
+/* Arbitrary quick clones
+ */
+$response->setSubmittedBy($sberryhill);
+$quiz2->findParticipant($sberryhill)->getAllResponses()->add($response);
+$quiz2->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
+
+$response->setSubmittedBy($slucier);
+$quiz2->findParticipant($slucier)->getAllResponses()->add($response);
+$quiz2->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
+
 
 
 /* Sixth (one submission, self assessed by student; published)
@@ -330,15 +417,35 @@ $task1
     ->setTitle('Task Manager')
     ->setAllParticipants($allParticipants);
 
+$feedback = new TaskFeedback();
+$feedback
+    ->setAssessable($task1)
+    ->setReviewer($celia)
+    ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+
 $response = new TaskCompletion();
 $response
     ->setAssessable($task1)
     ->setSubmittedBy($hodes)
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT));
+$response->getAllFeedback()->add($feedback);
 
 // Append it on a per-user basis
 $task1->findParticipant($hodes)->getAllResponses()->add($response);
+$task1->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
+
+/* Arbitrary quick clones
+ */
+$response->setSubmittedBy($sberryhill);
+$task1->findParticipant($sberryhill)->getAllResponses()->add($response);
+$task1->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
+
+$response->setSubmittedBy($slucier);
+$task1->findParticipant($slucier)->getAllResponses()->add($response);
+$task1->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
 
 
 
@@ -377,57 +484,78 @@ $response
 $task2->findParticipant($hodes)->getAllResponses()->add($response);
 $task2->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
 
-$feedback = new TaskFeedback();
-$feedback
-    ->setAssessable($task2)
-    ->setReviewer($celia)
-    ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
-    ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
-    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+/* Arbitrary quick clones
+ */
+$response->setSubmittedBy($bsalem);
+$task2->findParticipant($bsalem)->getAllResponses()->add($response);
+$task2->findParticipant($bsalem)->getAllFeedbacks()->add($feedback);
 
-$response = new TaskCompletion();
-$response
-    ->setAssessable($task2)
-    ->setSubmittedBy($asaxon)
-    ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 11:22:36', \Alaress_Date_Format::DATABASE_FORMAT))
-    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 11:22:36', \Alaress_Date_Format::DATABASE_FORMAT));
-$response
-    ->getAllFeedback()->add($feedback);
-
-// Append it on a per-user basis
+$response->setSubmittedBy($asaxon);
 $task2->findParticipant($asaxon)->getAllResponses()->add($response);
 $task2->findParticipant($asaxon)->getAllFeedbacks()->add($feedback);
 
-$feedback = new TaskFeedback();
-$feedback
-    ->setAssessable($task2)
-    ->setReviewer($celia)
-    ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
-    ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
-    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
-
-$response = new TaskCompletion();
-$response
-    ->setAssessable($task2)
-    ->setSubmittedBy($sberryhill)
-    ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 11:23:36', \Alaress_Date_Format::DATABASE_FORMAT))
-    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 11:23:36', \Alaress_Date_Format::DATABASE_FORMAT));
-$response
-    ->getAllFeedback()->add($feedback);
-
-// Append it on a per-user basis
+$response->setSubmittedBy($sberryhill);
 $task2->findParticipant($sberryhill)->getAllResponses()->add($response);
 $task2->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
+
+$response->setSubmittedBy($slucier);
+$task2->findParticipant($slucier)->getAllResponses()->add($response);
+$task2->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
 
 
 
 /* Eighth (incomplete Task)
  */
+$allParticipants = new \Schoolbox\Collection();
+
+foreach ([$hodes, $bsalem, $asaxon, $sberryhill, $slucier] as $currentStudent) {
+    $allParticipants->add(new Participant($currentStudent));
+}
+
 $task3 = new Task();
 $task3
     ->setId(3)
     ->setTitle('Read this book')
     ->setAllParticipants($allParticipants);
+
+$feedback = new TaskFeedback();
+$feedback
+    ->setAssessable($task3)
+    ->setReviewer($celia)
+    ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new TaskCompletion();
+$response
+    ->setAssessable($task3)
+    ->setSubmittedBy($hodes)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 11:21:36', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 11:21:36', \Alaress_Date_Format::DATABASE_FORMAT));
+$response
+    ->getAllFeedback()->add($feedback);
+
+// Append it on a per-user basis
+$task3->findParticipant($hodes)->getAllResponses()->add($response);
+$task3->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
+
+/* Arbitrary quick clones
+ */
+$response->setSubmittedBy($bsalem);
+$task3->findParticipant($bsalem)->getAllResponses()->add($response);
+$task3->findParticipant($bsalem)->getAllFeedbacks()->add($feedback);
+
+$response->setSubmittedBy($asaxon);
+$task3->findParticipant($asaxon)->getAllResponses()->add($response);
+$task3->findParticipant($asaxon)->getAllFeedbacks()->add($feedback);
+
+$response->setSubmittedBy($sberryhill);
+$task3->findParticipant($sberryhill)->getAllResponses()->add($response);
+$task3->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
+
+$response->setSubmittedBy($slucier);
+$task3->findParticipant($slucier)->getAllResponses()->add($response);
+$task3->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
 
 
 
@@ -455,7 +583,11 @@ $project
 echo "<h1>Project Traversal</h1>";
 
 new \Alaress_Probe('ID, Title', '% of Project Marked', '% of Project Marked And Published');
-new \Alaress_Probe("{$project->getId()} {$project->getTitle()}", $project->calculatePercentageMarked(), $project->calculatePercentagePublished());
+new \Alaress_Probe(
+    "{$project->getId()} {$project->getTitle()}",
+    "{$project->numMarked()}/{$project->numParticipants()} = {$project->calculatePercentageMarked()}",
+    "{$project->numPublished()}/{$project->numParticipants()} = {$project->calculatePercentagePublished()}"
+);
 
 echo "<h1>Types and Visibility</h1>";
 
