@@ -105,7 +105,7 @@ class User extends SchoolboxUser
              * - don't change Full Access settings
              * - downgrade Write to Read
              */
-            foreach ($this->getAccessList() as $current) {
+            foreach ($this->getAccessList()->filterBy('service', UserACcess::SERVICE_HOMEPAGE) as $current) {
                 if (in_array($current->getServiceIdentifier(), $identifiers)) {
                     if ($current->getAccesslevel() < FULL_ACCESS) {
                         $current->setAccessLevel($level);
@@ -123,7 +123,7 @@ class User extends SchoolboxUser
                 foreach ($diff as $current) {
                     $userAccess = new UserAccess();
                     $userAccess->setUser($this);
-                    $userAccess->setService(HOMEPAGE_SERVICE);
+                    $userAccess->setService(UserAccess::SERVICE_HOMEPAGE);
                     $userAccess->setServiceIdentifier($current);
                     $userAccess->setAccessLevel($level);
 

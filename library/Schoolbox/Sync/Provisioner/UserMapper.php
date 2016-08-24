@@ -88,11 +88,7 @@ class UserMapper extends SchoolboxMapper
                 /* Do not blow away Owners, only Read/Write accessors
                  */
                 if ($found instanceof UserAccess && ($found->getAccessLevel() < UserAccess::ACCESS_FULL)) {
-                    $userAccessMapper->deleteByColumnList([
-                        'uid'     => $user->getId(),
-                        'sid'     => $found->getServiceIdentifier(),
-                        'service' => UserAccess::SERVICE_HOMEPAGE,
-                    ]);
+                    $userAccessMapper->delete($found);
                 }
             }
 

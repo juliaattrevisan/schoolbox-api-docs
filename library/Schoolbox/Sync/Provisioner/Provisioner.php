@@ -199,7 +199,7 @@ class Provisioner
 
                     /* Don't blow away any FULL_ACCESS settings
                      */
-                    foreach ($internalUser->getAccessList() as $current) {
+                    foreach ($internalUser->getAccessList()->filterBy('service', UserAccess::SERVICE_HOMEPAGE) as $current) {
                         if ($current->getAccessLevel() == FULL_ACCESS) {
                             $preserved->add($current);
 

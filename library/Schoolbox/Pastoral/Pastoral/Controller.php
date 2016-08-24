@@ -226,7 +226,7 @@ class Controller extends Base
         if ($this->getUser()->isSuperuser())
             $pastoralModerator = true;
         else
-            $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+            $pastoralModerator = $this->getUserAccessMapper()->findServiceForUser($this->getUser(), PASTORAL_SERVICE)->count() > 0;
 
         $this->getResponse()->content->set(
             array(
@@ -268,7 +268,7 @@ class Controller extends Base
         if ($this->getUser()->isSuperuser())
             $pastoralModerator = true;
         else
-            $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+            $pastoralModerator = $this->getUserAccessMapper()->findServiceForUser($this->getUser(), PASTORAL_SERVICE)->count() > 0;
 
         $this->getResponse()->content->set(
             array(
@@ -414,7 +414,7 @@ class Controller extends Base
      * @throws MapperException
      */
     public function getPastoralModeratorLevel() {
-        $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+        $pastoralModerator = $this->getUserAccessMapper()->findServiceForUser($this->getUser(), PASTORAL_SERVICE)->count() > 0;
 
         if ($pastoralModerator) {
             $pastoralModerator  = $this->getUserAccessMapper()->findOneByColumnList([
@@ -1188,7 +1188,7 @@ class Controller extends Base
 
         // Work out if this person should be allowed to delete the record
 
-        $pastoralModerator = $this->getUserAccessMapper()->findAllForUser($this->getUser())->filterBy("service", PASTORAL_SERVICE)->count() > 0;
+        $pastoralModerator = $this->getUserAccessMapper()->findServiceForUser($this->getUser(), PASTORAL_SERVICE)->count() > 0;
 
         if (!$pastoralModerator) {
             if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $record->getOwner()->getId()) {

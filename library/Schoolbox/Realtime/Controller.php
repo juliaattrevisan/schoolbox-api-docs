@@ -216,7 +216,7 @@ class Controller extends BaseController
     protected function calculateFollowment()
     {
         // as much as we'd like get this as cached in session, we can't include subjects here
-        $accesses  = $this->getUserAccessMapper()->findAllForUser($this->getUser(), false);
+        $accesses  = $this->getUserAccessMapper()->findAllGroupsForUser($this->getUser());
 
         $folderIds = $accesses->getColumnValues('serviceIdentifier');
 
