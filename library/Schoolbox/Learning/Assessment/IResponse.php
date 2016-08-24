@@ -32,6 +32,8 @@ interface IResponse
 
     /* Getters/Setters
      */
+    public function getId();
+    public function setId($id);
     public function getAssessable();
     public function setAssessable($assessable);
     public function getAllFeedback();

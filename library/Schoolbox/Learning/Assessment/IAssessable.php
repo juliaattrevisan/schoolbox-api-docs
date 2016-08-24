@@ -28,6 +28,8 @@ interface IAssessable
 
     /* Getters/Setters
      */
+    public function getId();
+    public function setId($id);
     public function getTitle();
     public function setTitle($title);
     public function getDescription();
@@ -42,4 +44,10 @@ interface IAssessable
     public function setWeight($weight);
     public function getAllParticipants();
     public function setAllParticipants($allParticipants);
+    public function getCreatedAt();
+    public function setCreatedAt($createdAt);
+    public function getUpdatedAt();
+    public function setUpdatedAt($updatedAt);
+    public function getDeletedAt();
+    public function setDeletedAt($deletedAt);
 }

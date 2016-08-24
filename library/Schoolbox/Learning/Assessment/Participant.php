@@ -64,6 +64,11 @@ class Participant
 
         /** @var IResponse $currentResponse */
         foreach ($this->getAllResponses() as $currentResponse) {
+
+            /** @var IAssessable $currentAssessable */
+            $currentAssessable = $currentResponse->getAssessable();
+
+            new \Alaress_Probe($currentAssessable instanceof $assessable);
         }
     }
 

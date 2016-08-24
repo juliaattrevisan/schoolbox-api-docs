@@ -11,13 +11,17 @@
 namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\User;
+use \Schoolbox\Mapper\Traits\Model\Id;
+use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 class AbstractFeedback implements IFeedback
 {
-    /**
-     * @var int
-     */
-    protected $id;
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
     /**
      * The IAssessable to which this relates
@@ -60,21 +64,6 @@ class AbstractFeedback implements IFeedback
     protected $publishedAt = null;
 
     /**
-     * @var \Alaress_Date_Format
-     */
-    protected $createdAt;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $updatedAt;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $deletedAt;
-
-    /**
      * AbstractFeedback constructor.
      */
     public function __construct()
@@ -112,24 +101,6 @@ class AbstractFeedback implements IFeedback
 
     /* Getters/Setters
      */
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param int $id
-     * @return $this
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
 
     /**
      * @return float
@@ -218,60 +189,6 @@ class AbstractFeedback implements IFeedback
     public function setPublishedAt($publishedAt)
     {
         $this->publishedAt = $publishedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $createdAt
-     * @return $this
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $updatedAt
-     * @return $this
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $deletedAt
-     * @return $this
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
         return $this;
     }
 

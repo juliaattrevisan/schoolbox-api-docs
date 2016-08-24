@@ -12,9 +12,18 @@ namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
 use \Schoolbox\User;
+use \Schoolbox\Mapper\Traits\Model\Id;
+use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 class AbstractResponse implements IResponse
 {
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
+
     /**
      * The IAssessable to which this relates
      *
@@ -36,21 +45,6 @@ class AbstractResponse implements IResponse
      * @var User
      */
     protected $submittedBy;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $createdAt;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $updatedAt;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $deletedAt;
 
     /**
      * Model constructor.
@@ -160,60 +154,6 @@ class AbstractResponse implements IResponse
     public function setSubmittedBy($submittedBy)
     {
         $this->submittedBy = $submittedBy;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $createdAt
-     * @return $this
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $updatedAt
-     * @return $this
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $deletedAt
-     * @return $this
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
         return $this;
     }
 

@@ -13,9 +13,17 @@ namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
 use \Schoolbox\User;
+use \Schoolbox\Mapper\Traits\Model\Id;
+use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use \Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 abstract class AbstractAssessment implements IAssessable
 {
+    use Id;
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
     /**
      * @var string
