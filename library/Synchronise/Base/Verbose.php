@@ -219,7 +219,9 @@ class Synchronise_Base_Verbose {
              */
 			$data['SynergyID'] = $newUser['synergy_id'];
 			$data['AltEmail'] = $newUser['alt_email'];
-			$data['Campus'] = '[' . implode(',', $newUser['campus']) . ']';
+            if(is_array($newUser['campus'])){
+			    $data['Campus'] = '[' . implode(',', $newUser['campus']) . ']';
+            }
 			$data['GroupID'] = $newUser['group_id'];
             $data['Year'] = '';
 
