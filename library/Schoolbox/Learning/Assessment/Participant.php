@@ -59,7 +59,7 @@ class Participant
      * @param IAssessable $assessable
      * @return Collection
      */
-    public function findAllResponses(IAssessable $assessable)
+    public function findAllResponsesForAssessable(IAssessable $assessable)
     {
         $assessableClass = get_class($assessable);
 
@@ -90,7 +90,7 @@ class Participant
      * @param IAssessable $assessable
      * @return Collection
      */
-    public function findAllFeedback(IAssessable $assessable)
+    public function findAllFeedbackForAssessable(IAssessable $assessable)
     {
         $assessableClass = get_class($assessable);
 

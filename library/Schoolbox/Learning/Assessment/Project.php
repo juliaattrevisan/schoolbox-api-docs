@@ -51,7 +51,7 @@ class Project extends AbstractAssessment
             foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
 
                 /** @var AbstractResponse $currentResponse */
-                foreach ($currentParticipant->findAllResponses($currentAssessable) as $currentResponse) {
+                foreach ($currentParticipant->findAllResponsesForAssessable($currentAssessable) as $currentResponse) {
                     if ($currentResponse->findMostRecentFeedback()) {
                         $numMarked++;
                     }
@@ -103,7 +103,7 @@ class Project extends AbstractAssessment
             foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
 
                 /** @var AbstractResponse $currentResponse */
-                foreach ($currentParticipant->findAllResponses($currentAssessable) as $currentResponse) {
+                foreach ($currentParticipant->findAllResponsesForAssessable($currentAssessable) as $currentResponse) {
                     if ($currentResponse->findMostRecentPublishedFeedback()) {
                         $numPublished++;
                     }
