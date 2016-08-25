@@ -21,9 +21,10 @@ use \Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
 
 /**
  * Class Mapper
+ * @package Schoolbox\SportsFixtures\Sport
+ *
  * @method Sport createModel()
  * @method Sport findById($id)
- * @package Schoolbox\SportsFixtures\Sport
  */
 class Mapper extends BaseMapper
 {
@@ -49,7 +50,8 @@ class Mapper extends BaseMapper
             'other_key' => 'sport_id',
         ]);
 
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteDivisions'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE,       [ $this, 'savePositions' ]);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'deleteDivisions' ]);
     }
 
 
@@ -104,6 +106,18 @@ class Mapper extends BaseMapper
         return $this->createCollection($cache);
     }
 
+    /**
+     * Perform an intersection of the itinerary given against what exists in the database:
+     *  - any records that exist in memory are to be persisted to the DB;
+     *  - any records that exist in DB but not memory are to be deleted.
+     *
+     * @param Model $model
+     * @return bool
+     */
+    public function savePositions(Sport $model)
+    {
+        return $this->cascadeJoin('positions', [ 'sport_id' => $model->getId() ], $model->getPositions());
+    }
 
     /**
      * Delete all Divisions associated with this Sport

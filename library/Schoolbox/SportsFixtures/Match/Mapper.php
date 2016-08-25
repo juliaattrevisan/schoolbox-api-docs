@@ -84,38 +84,16 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * Perform a bisection of the itinerary given against what exists in the database:
+     * Perform an intersection of the itinerary given against what exists in the database:
      *  - any records that exist in memory are to be persisted to the DB;
-     *  - any records that exist in DB but not memory are to be soft-deleted;
+     *  - any records that exist in DB but not memory are to be deleted.
      *
      * @param Model $match
      * @return bool
      */
     public function saveItinerary(Match $match)
     {
-        $iMap = $this->getJoinMapper('itinerary');
-
-        // retrieve records that already exist for this match and index by ID
-        $existing = $iMap->findByColumn('match_id', $match->getId())->indexBy('id');
-        $updated  = $this->createCollection($match->getItinerary()->getAll())->indexBy('id');
-
-        // extract IDs
-        $existingIds = $existing->getColumnValues('id');
-        $updatedIds  = $updated->getColumnValues('id');
-
-        // determine what to do
-        $delete  = array_diff($existingIds, $updatedIds);
-        $persist = array_diff($updatedIds, $delete);
-
-        foreach ($delete as $id) {
-            $iMap->delete($existing[$id]);
-        }
-
-        foreach ($persist as $id) {
-            $iMap->save($updated[$id]);
-        }
-
-        return true;
+        return $this->cascadeJoin('itinerary', [ 'match_id' => $match->getId() ], $match->getItinerary());
     }
 
     /**

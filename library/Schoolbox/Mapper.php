@@ -2750,7 +2750,7 @@ abstract class Mapper implements IMapper, Serializable
 
         $db = $this->getDatabase();
 
-        if (!$db instanceof Database) {
+        if (!$db instanceof \Database) {
             throw new Exception("No db in ".get_class($this));
         }
 
@@ -2790,5 +2790,44 @@ abstract class Mapper implements IMapper, Serializable
             return [];
         }
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Perform an intersection of the dependent join given against what exists in the database:
+     *  - any records that exist in memory are to be persisted to the DB;
+     *  - any records that exist in DB but not memory are to be deleted.
+     *
+     * @param string     $joinName   the join to cascade changes onto
+     * @param array      $search     which DB records to pull for comparison
+     * @param Collection $collection the new collection to align DB to
+     * @return bool
+     */
+    protected function cascadeJoin($joinName, array $search, Collection $collection)
+    {
+        $foreignMapper = $this->getJoinMapper($joinName);
+
+        $foreignIdProperty = $foreignMapper->getIdentifierProperty();
+
+        // retrieve records that already exist for this match and index by ID
+        $existing = $foreignMapper->findByColumnList($search)->indexBy($foreignIdProperty);
+        $updated  = $this->createCollection($collection->getAll())->indexBy($foreignIdProperty);
+
+        // extract IDs
+        $existingIds = $existing->getColumnValues($foreignIdProperty);
+        $updatedIds  = $updated->getColumnValues($foreignIdProperty);
+
+        // determine what to do
+        $delete  = array_diff($existingIds, $updatedIds);
+        $persist = array_diff($updatedIds, $delete);
+
+        foreach ($delete as $id) {
+            $foreignMapper->delete($existing[$id]);
+        }
+
+        foreach ($persist as $id) {
+            $foreignMapper->save($updated[$id]);
+        }
+
+        return true;
     }
 }
