@@ -8,7 +8,6 @@
  */
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\Mapper\Exception as MapperException;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
@@ -72,7 +71,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $log->debug(sprintf('Course "%s" converted', $deprecatedCourse['name']));
             $courseId = $database->lastInsertId();
             $successCount++;
-        } catch (MapperException $e) {
+        } catch (PDOException $e) {
             $log->error(sprintf('Course "%s" could not be converted!', $deprecatedCourse['name']), [$e]);
             $failureCount++;
             continue;
@@ -91,7 +90,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 $insertNewUnitQuery->execute(['folderId' => $deprecatedUnit['id'], 'courseId' => $courseId]);
                 $log->debug(sprintf('Unit "%s" converted', $deprecatedUnit['name']));
                 $unitSuccessCount++;
-            } catch (MapperException $e) {
+            } catch (PDOException $e) {
                 $log->error(sprintf('Unit "%s" could not be converted!', $deprecatedUnit['name']), [$e]);
                 $unitFailureCount++;
             }
