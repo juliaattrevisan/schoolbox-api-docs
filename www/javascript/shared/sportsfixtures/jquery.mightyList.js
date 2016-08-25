@@ -34,8 +34,26 @@
                  */
                 deleteKey: 'id',
 
+                listSelector: '[data-item-list]',
+
+                /* What am I cloning to create a new row?
+                 */
+                templateSelector: '#item-clone',
+
+                /* Which element to focus when a new record is spawned
+                 */
+                focusSelector: '[name="name"]',
+
+                /* Callback when a line-item is reverted to its original state. By default, no effect.
+                 */
                 onRevert: function (element) { /* noop*/ },
 
+                /* Callback when a new line-item is spawned. By default, no effect.
+                 */
+                onCreate: function (element) { /* noop */ },
+
+                /* Callback when a line-item is modified. By default, persist to server.
+                 */
                 onModify: function (element, newData) {
                     /* Parent container for this row
                      */
@@ -91,6 +109,8 @@
                     });
                 },
 
+                /* Callback when a line-item is removed. By default, persist to server.
+                 */
                 onDelete: function (element, container) {
                     $(this).confirmDialog({
                         text: 'Are you sure you want to delete ' + container.find('[data-item-element]').val() + '?',
@@ -123,7 +143,7 @@
                 /* Empty State element
                  * Shown when there are no items
                  */
-                emptyState: $('.empty-state')
+                emptyState: '.empty-state'
             };
 
             return $.extend(defaults, options);
@@ -137,9 +157,9 @@
             $(config.element).on('click', '[data-item-add]', function(event) {
                 if (canSpawnRow()) {
                     spawnNewRow();
-                }
-                else {
-                    $(config.element).find('input[name=name]').last().focus();
+
+                } else {
+                    $(config.element).find(config.focusSelector).last().focus();
                 }
             });
         }
@@ -148,7 +168,7 @@
          * Determine whether the last list item is empty
          */
         function canSpawnRow() {
-            return ($(config.element).find('input[name=name]').last().val() != '');
+            return $(config.element).find(config.listSelector).find(config.focusSelector).last().val() != '';
         }
 
         /**
@@ -191,7 +211,7 @@
                         if (canSpawnRow()) {
                             spawnNewRow();
                         }
-                    })
+                    });
                 } else {
                     $.when(config.onRevert(element)).then(function () {
                         /* Spawn a new row automatically if there are no
@@ -200,7 +220,7 @@
                         if (canSpawnRow()) {
                             spawnNewRow();
                         }
-                    })
+                    });
                 }
             });
         }
@@ -235,15 +255,18 @@
          * Otherwise hide empty state/show list when items exist
          */
         function refreshEmptyStates() {
-            var numItems = $(config.element).find('[data-item-list]').find('[data-item]').length;
+            var $element = $(config.element),
+                $empty   = $element.find(config.emptyState),
+                $list    = $element.find(config.listSelector),
+                numItems = $list.find('[data-item]').length;
 
             if (numItems) {
-                $(config.emptyState).addClass('hide');
-                $(config.element).find('[data-item-list]').removeClass('hide');
+                $empty.addClass('hide');
+                $list.removeClass('hide');
             }
             else {
-                $(config.emptyState).removeClass('hide');
-                $(config.element).find('[data-item-list]').addClass('hide');
+                $empty.removeClass('hide');
+                $list.addClass('hide');
             }
         }
 
@@ -251,18 +274,38 @@
          * Spawn a new list row
          */
         function spawnNewRow() {
-            var clone = $('#item-clone').clone();
-            clone.attr('id', '');
+            var $element = $(config.element),
+                $list    = $element.find(config.listSelector),
+                clone    = $element.find(config.templateSelector).clone(),
+                last     = config.templateSelector.split(' ').pop(),
+                selector = last.match(/([a-z]+)?([^a-z][a-z-_0-9]+)/).pop(),
+                sstring  = selector.substr(1),
+                type     = selector[0];
+
+            if (type == '#') {
+                // remove id
+                clone.removeAttr('id');
+
+            } else if (type == '.') {
+                // remove class
+                clone.removeClass(sstring);
+
+            } else if (type == '[') {
+                // remove attr
+                clone.removeAttr(sstring);
+            }
 
             /* Append it to the list
              */
-            $(config.element).find('[data-item-list]').append(clone);
+            $list.append(clone);
 
             /* Focus it, to save you needing to do it manually
              */
-            $(config.element).find('input[name=name]').last().focus();
+            $element.find(config.focusSelector).last().focus();
 
             refreshEmptyStates();
+
+            config.onCreate(clone);
         }
     }
 }(jQuery));
