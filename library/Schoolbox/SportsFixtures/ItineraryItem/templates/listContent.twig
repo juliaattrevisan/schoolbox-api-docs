@@ -1,0 +1,48 @@
+<script type="text/javascript" src="/javascript/shared/sportsfixtures/jquery.mightyList.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#itinerary').mightyList({
+            deleteKey: 'itineraryItemId',
+            templateSelector: '[data-template]',
+            focusSelector: '[name="description"]',
+            onModify: function (element) {
+                element.closest('[data-item]').find('[data-unsaved-indicator]').removeClass('hide');
+            },
+            onDelete: function (element, container) {
+                container.detach();
+            },
+            onRevert: function (element) {
+                element.closest('[data-item]').find('[data-unsaved-indicator]').addClass('hide');
+            },
+            onCreate: function (element) {
+                element.find('[data-datepicker]').val($('[name=startAtDate]').val());
+                element.find('[data-datepicker]').datepicker();
+                element.find('[data-timepicker]').timepicker({
+                    appendTo: function ($input) {
+                        return $input.closest('.timepick');
+                    }
+                });
+            }
+        });
+    });
+</script>
+
+<section>
+    <ul class="action-list hide" data-item-list>
+        {% for itineraryItem in itineraryItems %}
+        <li class="actions-small-2">
+            {% include '@sportsfixturesItineraryItem/listItem.twig' %}
+        </li>
+        {% endfor %}
+    </ul>
+</section>
+<div class="empty-state hide">
+    <i class="icon-itineraryitem"></i>
+    <p>There is no itinerary for {{ match.name | default('this match') }}.</p>
+    <p><a data-item-add>Create an itinerary</a></p>
+</div>
+<ul class="information-list hide">
+    <li data-template class="actions-small-2" data-item="">
+        {% include '@sportsfixturesItineraryItem/listItem.twig' %}
+    </li>
+</ul>

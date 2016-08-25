@@ -1,21 +1,3 @@
-<script type="text/javascript">
-    $(function() {
-        $('#allItineraryItems').on('click', '[data-delete]', function(event) {
-            event.preventDefault();
-
-            var element = $(this);
-
-            $(this).confirmDialog({
-                text: 'Are you sure you want to delete this Itinerary Item?',
-                confirmEvent: function() {
-                    $.post(element.attr('href'), {positionId: element.attr('data-delete')}, function() {
-                        window.location.href = window.location.href;
-                    });
-                }
-            });
-        });
-    });
-</script>
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
     <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
@@ -31,7 +13,7 @@
 </div>
 
 <div class="row">
-    <div class="small-12 island" id="allItineraryItems">
+    <div class="small-12 island" id="itinerary">
 
         <div class="actions-small-1 row">
             <div class="list-item">
@@ -40,35 +22,9 @@
                 </div>
             </div>
             <nav>
-                <a href='{{ routeLookup('sportsfixturesItineraryItem.getCreateForm', {contextId: match.id}) }}' class="icon-add" title="Add Itinerary Item to {{ match.name }}"></a>
+                <a class="icon-add" title="Add Itinerary Item" data-item-add></a>
             </nav>
         </div>
-
-        {% if allItineraryItems|length %}
-            <section>
-                <ul class="action-list">
-                    {% for currentItineraryItem in allItineraryItems %}
-                        <li class="actions-small-2">
-                            <div class="list-item">
-                                <div class="card small-12">
-                                    <p>{{ currentItineraryItem.startAt.local }}</p>
-                                    <p class="meta">{{ currentItineraryItem.description }}</p>
-                                </div>
-                            </div>
-                            <nav>
-                                <a href="{{ routeLookup('sportsfixturesItineraryItem.deleteEntity', {entityId: currentItineraryItem.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentItineraryItem.id }}"></a>
-                                <a href="{{ routeLookup('sportsfixturesItineraryItem.getModifyForm', {entityId: currentItineraryItem.id}) }}" class="icon-modify" title="Modify"></a>
-                            </nav>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        {% else %}
-            <div class="empty-state">
-                <i class="icon-itineraryitem"></i>
-                <p>There are no Itinerary Items in {{ match.name }}.</p>
-                <p><a href="{{ routeLookup('sportsfixturesItineraryItem.getCreateForm', {contextId: match.id}) }}" title="Add an Itinerary Item">Add an Itinerary Item</a></p>
-            </div>
-        {% endif %}
+        {% include '@sportfixturesItineraryItem/listContent.twig' with { itineraryItems: allItineraryItems } %}
     </div>
 </div>

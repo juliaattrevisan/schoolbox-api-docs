@@ -1,0 +1,29 @@
+<div class="list-item">
+    <input type="hidden" name="matchId" value="{{ match.id }}"/>
+    <input type="hidden" name="itineraryItemId" value="{{ itineraryItem.id }}"/>
+    <div class="column small-12 medium-6 large-3 xlarge-2">
+        <label>
+            Date
+            <input type="text" name="startAtDate" placeholder="Date" data-datepicker value="{{ itineraryItem.startAt.localShort }}">
+        </label>
+    </div>
+    <div class="column small-12 medium-6 large-3 xlarge-2">
+        <div class="timepick">
+            <label>
+                Time
+                <input type="text" name="startAtTime" autocomplete="off" placeholder="Time" class="ui-timepicker-input" data-timepicker value="{{ itineraryItem.startAt.timeOnly }}">
+            </label>
+        </div>
+    </div>
+    <div class="small-12 large-6 xlarge-8 columns">
+        <label>
+            Description
+            <input type="text" name="description" value="{{ itineraryItem.description }}"  data-item-original-value="{{ itineraryItem.description }}" data-item-element />
+        </label>
+    </div>
+</div>
+{% if not hideNav %}
+<nav>
+    <a href="{{ routeLookup('sportsfixturesItineraryItem.deleteEntity', {entityId: currentItineraryItem.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentItineraryItem.id }}"></a>
+</nav>
+{% endif %}
