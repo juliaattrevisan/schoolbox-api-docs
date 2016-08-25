@@ -30,9 +30,14 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         SELECT DISTINCT
             cui.category_id,
             cui.component_id,
-            cu.course_id
+            cu.course_id,
+            f.name AS folder_name,
+            cf.name AS course_name
         FROM course_unit_instance cui
+        INNER JOIN folder f ON cui.category_id = f.id
         INNER JOIN course_unit cu ON cui.unit_category_id = cu.folder_id
+        INNER JOIN course c ON cu.course_id = c.id
+        INNER JOIN folder cf ON c.folder_id = cf.id
         WHERE cui.deleted_at IS NULL
         ORDER BY cui.component_id
     ");
@@ -71,7 +76,16 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     foreach ($selectUnitInstancesQuery as $unitInstance) {
 
         // Create a new course instance
-        $log->info(sprintf('Creating course instance for component %d...', $unitInstance['component_id']));
+        $log->info(
+            sprintf(
+                'Creating course instance for course "%s" (#%d) on folder "%s" (#%d) (Component: #%d)',
+                $unitInstance['course_name'],
+                $unitInstance['course_id'],
+                $unitInstance['folder_name'],
+                $unitInstance['category_id'],
+                $unitInstance['component_id']
+            )
+        );
         $database->beginTransaction();
         try {
             $insertCourseInstanceQuery->execute([
