@@ -1,11 +1,12 @@
 <section data-team="{{ team.id }}">
-    <ul class="information-list sortable"
+    <ul class="information-list sortable expandable"
         data-add-players-action="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: team.id}) }}"
         data-remove-players-action="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: team.id}) }}"
         data-reorder-players-action="{{ routeLookup('sportsfixturesTeam.postReorderPlayers', {entityId: team.id}) }}"
         data-team-player-list-proxy>
 
-        <li class="actions-small-2">
+        <li class="actions-small-1">
+            <div class="icon-up-arrow expander" title="Expand/Collapse Team" data-collapser="team-{{ team.id }}"></div>
             <div class="list-item">
                 <div class="small-12 card wrap-down">
                     <h3>{{ team.name }}</h3>
@@ -15,7 +16,6 @@
                 </div>
             </div>
             <nav>
-                <a href="#" class="icon-up-arrow" title="Expand/Collapse Content" data-collapser="team-{{ team.id }}"></a>
                 <a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: team.id}) }}" class="icon-modify" title="Modify Team"></a>
             </nav>
             <div class="toast" data-alert data-team-indicator></div>
@@ -26,7 +26,8 @@
                 data-remove-players-action="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: team.id}) }}"
                 data-reorder-players-action="{{ routeLookup('sportsfixturesTeam.postReorderPlayers', {entityId: team.id}) }}"
                 data-team-player-list
-                data-collapsable="team-{{ team.id }}">
+                data-collapsable="team-{{ team.id }}"
+                data-collapse-state="uncollapsed">
 
                 {% include '@sportsfixturesDivision/lobby/teamPlayerList.twig' %}
             </ul>
