@@ -42,8 +42,8 @@ class Module extends BaseModule
             ],
             'POST' => [
                 '/add'          => 'postAddSchool',
-                '/edit'         => 'postEditSchool',
-                '/delete'       => 'postDeleteSchool',
+                '/{entityId}/edit'   => 'postEditSchool',
+                '/{entityId}/delete' => 'postDeleteSchool',
             ]
         ];
 

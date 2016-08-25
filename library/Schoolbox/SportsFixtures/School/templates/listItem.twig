@@ -1,0 +1,14 @@
+<div class="list-item">
+    {% set url = school.id ? routeLookup('sportsfixturesSchool.postEditSchool', {entityId: school.id}) : routeLookup('sportsfixturesSchool.postAddSchool') %}
+    <div class="small-12 compact card" data-action="{{ url }}">
+        <label>
+            <input type="text" name="name" value="{{ school.name }}" data-item-original-value="{{ school.name }}" data-item-element />
+        </label>
+
+        <span class="toast" data-save-item></span>
+    </div>
+</div>
+<nav>
+    <span data-unsaved-indicator class="icon-info hide" title="Not yet saved"></span>
+    <a href="{{ routeLookup('sportsfixturesSchool.postDeleteSchool', {entityId: school.id}) }}" class="icon-delete" title="Delete" data-delete></a>
+</nav>

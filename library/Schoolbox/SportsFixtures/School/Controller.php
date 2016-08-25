@@ -44,20 +44,51 @@ class Controller extends Base
      * Add external school to tag cloud
      */
     public function postAddSchool() {
-        $this->getSchoolTagCloudMapper()->getTagId($this->getRequest()->post["name"]);
+        $entityId = $this->getSchoolTagCloudMapper()->getTagId($this->getRequest()->post["name"]);
+
+        if ($this->getRequest()->isXhr()) {
+            $status = [
+                'id' => $entityId,
+                'update' => $this->getRouter()->generate('sportsfixturesSchool.postEditSchool', [
+                    'entityId' => $entityId
+                ]),
+                'delete' => $this->getRouter()->generate('sportsfixturesSchool.postDeleteSchool', [
+                    'entityId' => $entityId
+                ])
+            ];
+
+            $this->getResponse()->content->set($this->buildJsonOutput($status));
+            return;
+        }
+
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesSchool.getList', []));
     }
 
     /**
      * Update name of school
      */
-    public function postEditSchool() {
+    public function postEditSchool($entityId) {
 
         /** @var TagCloud $tag */
-        $tag = $this->getSchoolTagCloudMapper()->findById($this->getRequest()->post["id"]);
+        $tag = $this->getSchoolTagCloudMapper()->findById($entityId);
         $tag->setUpdatedAt(\Alaress_Date_Format::now());
         $tag->setName($this->getRequest()->post["name"]);
         $this->getSchoolTagCloudMapper()->save($tag);
+
+        if ($this->getRequest()->isXhr()) {
+            $status = [
+                'id' => $entityId,
+                'update' => $this->getRouter()->generate('sportsfixturesSchool.postEditSchool', [
+                    'entityId' => $entityId
+                ]),
+                'delete' => $this->getRouter()->generate('sportsfixturesSchool.postDeleteSchool', [
+                    'entityId' => $entityId
+                ])
+            ];
+
+            $this->getResponse()->content->set($this->buildJsonOutput($status));
+            return;
+        }
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesSchool.getList', []));
     }
@@ -65,9 +96,9 @@ class Controller extends Base
     /**
      * Delete external school from tag cloud
      */
-    public function postDeleteSchool() {
+    public function postDeleteSchool($entityId) {
         /** @var TagCloud $tag */
-        $tag = $this->getSchoolTagCloudMapper()->findById($this->getRequest()->post["id"]);
+        $tag = $this->getSchoolTagCloudMapper()->findById($entityId);
         $this->getSchoolTagCloudMapper()->delete($tag);
     }
 
