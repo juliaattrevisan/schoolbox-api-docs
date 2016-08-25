@@ -59,7 +59,7 @@ class Model implements ISoftDeletable
 
     /** @var \Alaress_Date_Format */
     protected $startAt;
-    
+
     /** @var Collection|Result[] */
     protected $result;
 
@@ -252,7 +252,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Collection
+     * @return Collection|Result[]
      */
     public function getResult()
     {
@@ -260,7 +260,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection $result
+     * @param Collection|Result[] $result
      * @return static
      */
     public function setResult($result)
