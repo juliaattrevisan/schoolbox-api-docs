@@ -8,3 +8,5 @@ JavaScript
 iFrame
 Textarea
 Textareas
+Schoolbox
+Alaress
