@@ -16,10 +16,21 @@ namespace Schoolbox\Sync\Iterator;
 
 use IteratorIterator;
 use Schoolbox\External\Normalise\User;
+use Traversable;
 
 class Guardian extends IteratorIterator
 {
     use StackableTrait;
+
+    /**
+     * Ensure that $iterator is an actually an iterator, and not just a Traversable.
+     *
+     * @param Traversable $iterator
+     */
+    public function __construct(Traversable $iterator)
+    {
+        parent::__construct(new IteratorIterator($iterator));
+    }
 
     /**
      * @return string
