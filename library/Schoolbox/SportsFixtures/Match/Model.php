@@ -10,7 +10,7 @@
 
 namespace Schoolbox\SportsFixtures\Match;
 
-use Alaress_Date_Format;
+use \Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
@@ -20,6 +20,7 @@ use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Venue\Model as Venue;
 use Schoolbox\SportsFixtures\Result\Model as Result;
 use Schoolbox\SportsFixtures\ItineraryItem\Model as ItineraryItem;
+use Schoolbox\SportsFixtures\School\Model as School;
 
 class Model implements ISoftDeletable
 {
@@ -48,16 +49,16 @@ class Model implements ISoftDeletable
     /** @var Team $awayTeam */
     protected $awayTeam;
 
-    /** @var int $awaySchoolId */
-    protected $awaySchoolId;
+    /** @var School $awaySchool */
+    protected $awaySchool;
 
-    /** @var int $homeSchoolId */
-    protected $homeSchoolId;
+    /** @var School $homeSchool */
+    protected $homeSchool;
 
     /** @var string $notes */
     protected $notes;
 
-    /** @var \Alaress_Date_Format */
+    /** @var Alaress_Date_Format */
     protected $startAt;
 
     /** @var Collection|Result[] */
@@ -144,38 +145,38 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return int
+     * @return School
      */
-    public function getAwaySchoolId()
+    public function getAwaySchool()
     {
-        return $this->awaySchoolId;
+        return $this->awaySchool;
     }
 
     /**
-     * @param int $awaySchoolId
+     * @param School $awaySchool
      * @return static
      */
-    public function setAwaySchoolId($awaySchoolId)
+    public function setAwaySchool(School $awaySchool)
     {
-        $this->awaySchoolId = $awaySchoolId;
+        $this->awaySchool = $awaySchool;
         return $this;
     }
 
     /**
-     * @return int
+     * @return School
      */
-    public function getHomeSchoolId()
+    public function getHomeSchool()
     {
-        return $this->homeSchoolId;
+        return $this->homeSchool;
     }
 
     /**
-     * @param int $homeSchoolId
+     * @param School $homeSchool
      * @return static
      */
-    public function setHomeSchoolId($homeSchoolId)
+    public function setHomeSchool($homeSchool)
     {
-        $this->homeSchoolId = $homeSchoolId;
+        $this->homeSchool = $homeSchool;
         return $this;
     }
 
@@ -263,7 +264,7 @@ class Model implements ISoftDeletable
      * @param Collection|Result[] $result
      * @return static
      */
-    public function setResult($result)
+    public function setResult(Collection $result)
     {
         $this->result = $result;
         return $this;
@@ -281,7 +282,7 @@ class Model implements ISoftDeletable
      * @param Collection|ItineraryItem[] $itinerary
      * @return static
      */
-    public function setItinerary($itinerary)
+    public function setItinerary(Collection $itinerary)
     {
         $this->itinerary = $itinerary;
         return $this;
