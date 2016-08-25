@@ -124,11 +124,12 @@ class Component_Renderer
 
         $folderCodes = implode(', ', $temp);
 
+        $component->getPageTemplate()->setVar('ID', $folder->getId());
         $component->getPageTemplate()->setVar('CODE', urlencode(urlencode($folderCodes)));
         $component->getPageTemplate()->setVar('HEADING', Scrub::text($folder->getName()));
         $component->getPageTemplate()->setVar('SITE_LOCATION', Cfg::get('site_location'));
         $component->getPageTemplate()->setVar('RETURN_URL', urlencode(base64_encode('/homepage/' . $_POST["cid"])));
-        $component->getPageTemplate()->pparse($templateTarget, $templateHandle);
+        $component->getPageTemplate()->pParse($templateTarget, $templateHandle);
     }
 
     /**
