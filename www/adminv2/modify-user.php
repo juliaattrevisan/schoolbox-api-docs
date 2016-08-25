@@ -1,5 +1,7 @@
 <?php
 
+use Schoolbox\Permission\Access\UserAccess;
+
 $userHandler = new User();
 $groupHandler = new Group();
 
@@ -297,7 +299,7 @@ if(is_numeric($this->arg[0])) {
                     /* Pastoral
                      * Use the constants for now, but they should be removed
                      */
-                    case PASTORAL_SERVICE:
+                    case UserAccess::SERVICE_PASTORAL:
                         $this->parse('user_pastoral_block', 'user_pastoral', true);
                         break;
 

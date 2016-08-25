@@ -135,7 +135,19 @@ class UserAccessMapper extends Mapper
      */
     public function findAllForUser(User $user, $includeSynergy = true)
     {
-        $access = $this->findAllGroupsForUser($user);
+        $access = new Collection();
+
+        // start with the userAccess table (filtering away access level 0)
+        $internal = $this->findByColumnList([
+            'uid' => $user->getId(),
+            'type' => [UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL],
+        ])->map(function ($ua) use ($user) {
+            /** @var UserAccess $ua */
+            // don't needlessly hold stub replicas of the user in memory
+            return $ua->setUser($user);
+        });
+
+        $access->mergeUnique($internal);
 
         // we can bug out early if no external sources need to be considered
         if (!$includeSynergy) {
@@ -184,12 +196,25 @@ class UserAccessMapper extends Mapper
      */
     public function findAllGroupsForUser(User $user)
     {
+        return $this->findServiceForUser($user, UserAccess::SERVICE_HOMEPAGE);
+    }
+
+
+    /**
+     * Find all UserAccess instances for a User of a given service
+     *
+     * @param User $user
+     * @return Collection
+     */
+    public function findServiceForUser(User $user, $service)
+    {
         $access = new Collection();
 
         // start with the userAccess table (filtering away access level 0)
         $internal = $this->findByColumnList([
             'uid' => $user->getId(),
-            'type' => [UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL]
+            'type' => [UserAccess::ACCESS_READ, UserAccess::ACCESS_WRITE, UserAccess::ACCESS_FULL],
+            'service' => $service,
         ])->map(function ($ua) use ($user) {
             /** @var UserAccess $ua */
             // don't needlessly hold stub replicas of the user in memory
