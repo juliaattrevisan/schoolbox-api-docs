@@ -30,7 +30,7 @@
 <section>
     <ul class="action-list hide" data-item-list>
         {% for itineraryItem in itineraryItems %}
-        <li class="actions-small-2">
+        <li class="actions-small-1" data-item>
             {% include '@sportsfixturesItineraryItem/listItem.twig' %}
         </li>
         {% endfor %}
@@ -42,7 +42,7 @@
     <p><a data-item-add>Create an itinerary</a></p>
 </div>
 <ul class="information-list hide">
-    <li data-template class="actions-small-2" data-item="">
+    <li data-template class="actions-small-1" data-item>
         {% include '@sportsfixturesItineraryItem/listItem.twig' %}
     </li>
 </ul>

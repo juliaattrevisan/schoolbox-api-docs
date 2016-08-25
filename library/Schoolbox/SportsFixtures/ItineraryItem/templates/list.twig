@@ -25,6 +25,6 @@
                 <a class="icon-add" title="Add Itinerary Item" data-item-add></a>
             </nav>
         </div>
-        {% include '@sportfixturesItineraryItem/listContent.twig' with { itineraryItems: allItineraryItems } %}
+        {% include '@sportfixturesItineraryItem/listContent.twig' with { itineraryItems: match.itinerary } %}
     </div>
 </div>
