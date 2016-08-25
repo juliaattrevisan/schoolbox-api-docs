@@ -2,19 +2,19 @@
     <div class="list-item">
         <div class="small-12 card">
 
-            {% if not currentMatch.season.isArchived %}
+            {% if not currentMatch.season.archived %}
                 {% if currentMatch.name %}
-                    <p>{{ currentMatch.name }}</p>
+                    <h3>{{ currentMatch.name }}</h3>
                     <p class="meta">{{ matchHeading.generateWithResultLink(currentMatch) }}</p>
                 {% else %}
-                    <p>{{ matchHeading.generateWithResultLink(currentMatch) }}</p>
+                    <h3>{{ matchHeading.generateWithResultLink(currentMatch) }}</h3>
                 {% endif %}
             {% else %}
                 {% if currentMatch.name %}
-                    <p><del class="icon icon-archive" title="This match's season is archived.">{{ currentMatch.name }}</del></p>
+                    <h3><del class="icon icon-archive" title="This match's season is archived.">{{ currentMatch.name }}</del></h3>
                     <p class="meta">{{ matchHeading.generateWithResultLink(currentMatch) }}</p>
                 {% else %}
-                    <p>{{ matchHeading.generateWithResultLink(currentMatch) }}</p>
+                    <h3>{{ matchHeading.generateWithResultLink(currentMatch) }}</h3>
                 {% endif %}
             {% endif %}
 
@@ -22,9 +22,9 @@
         </div>
     </div>
     <nav>
-        {% if not currentMatch.season.isArchived %}
+        {%- if not currentMatch.season.isArchived -%}
             <a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: currentMatch.id}) }}" class="icon-modify" title="Modify"></a>
-        {% endif %}
+        {%- endif -%}
         <a href="#" class="icon-more" data-dropdown="sportsfixtures-match-{{ currentMatch.getId() }}-actions"></a>
     </nav>
     <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-match-{{ currentMatch.getId() }}-actions">

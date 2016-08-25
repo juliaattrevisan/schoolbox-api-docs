@@ -8,10 +8,6 @@
     $(function() {
         $('#matchForm').alaressValidate({
             rules: {
-                divisionId: {
-                    required: true,
-                    min: 1
-                },
                 venueId: {
                     required: true,
                     min: 1
@@ -38,7 +34,6 @@
                 }
             },
             messages: {
-                'divisionId': 'Please choose a Division.',
                 'venueId': 'Please choose a Venue.',
                 'name': 'Please enter a Match name.',
                 'seasonId': 'Please choose a Season',
@@ -50,28 +45,17 @@
             }
         });
 
-        $('#matchForm').find('[data-itinerary-delete]').click(function(event) {
-            event.preventDefault();
-
-            var element = $(this);
-
-            $(this).confirmDialog({
-                text: 'Are you sure you want to delete this item?',
-                confirmEvent: function() {
-                    $.post(element.attr('href'), {}, function() {
-                        window.location.href = window.location.href;
-                    });
-                }
-            });
-        });
 
         $('#season').selectizeSelector({
             ajax: {
-                url: '/sportsfixtures/seasons',
+                url: '{{ routeLookup('sportsfixturesSeason.getList') }}',
                 type: 'GET',
                 dataType: 'json'
             },
-            value: {"id":{{ match.season.id }}, "name": "{{ match.season.name }} - {{ match.season.start.getLocalShort }} to {{ match.season.end.getLocalShort }}"},
+            value: {
+                id: {{ match.season.id }},
+                name: "{{ match.season.name }} - {{ match.season.start.localShort }} to {{ match.season.end.localShort }}"
+            },
             multiple: false,
             selectize: {
                 score: function(search) {
@@ -79,7 +63,7 @@
                         // Simply filter list, don't reorder
                         return -1 === item.name.toLowerCase().indexOf(search.toLowerCase()) ? 0 : 1;
                     };
-                },
+                }
             }
         });
 
@@ -94,43 +78,56 @@
 
         $('#homeTeam').selectizeSelector({
             ajax: {
-                url:      '/sportsfixtures/divisions/{{ division.id }}/teams?schools=1',
+                url:      '{{ routeLookup('sportsfixturesTeam.getList', { contextId: match.division.id }) }}?schools=1',
                 type:     'GET',
                 dataType: 'json'
             },
-            {% if match.homeTeam.id %}
-            value: {"id":{{ match.homeTeam.id }},"name":"{{ match.homeTeam.name }}"},
-            {% endif %}
-            {% if match.homeSchoolId %}
-            value: {"id":'{{ schoolToken }}{{ match.homeSchoolId }}',"name":"{{ schoolMapper.getTagName(match.homeSchoolId) }}"},
-            {% endif %}
+            {% if match.homeTeam.id -%}
+            value: {
+                id: {{ match.homeTeam.id }},
+                name: "{{ match.homeTeam.name }}"
+            },
+            {% elseif match.homeSchoolId -%}
+            value: {
+                id: "{{ tagPrefix }}{{ match.homeSchoolId }}",
+                name: "{{ tags.home }}"
+            },
+            {% endif -%}
             multiple: false
         });
 
         $('#awayTeam').selectizeSelector({
             ajax: {
-                url:      '/sportsfixtures/divisions/{{ division.id }}/teams?schools=1',
+                url:      '{{ routeLookup('sportsfixturesTeam.getList', { contextId: match.division.id }) }}?schools=1',
                 type:     'GET',
                 dataType: 'json'
             },
-            {% if match.awayTeam.id %}
-            value: {"id":{{ match.awayTeam.id }},"name":"{{ match.awayTeam.name }}"},
-            {% endif %}
-            {% if match.awaySchoolId %}
-            value: {"id":'{{ schoolToken }}{{ match.awaySchoolId }}',"name":"{{ schoolMapper.getTagName(match.awaySchoolId) }}"},
-            {% endif %}
+            {% if match.awayTeam.id -%}
+            value: {
+                id: {{ match.awayTeam.id }},
+                name: "{{ match.awayTeam.name }}"
+            },
+            {% elseif match.awaySchoolId -%}
+            value: {
+                id: "{{ tagPrefix }}{{ match.awaySchoolId }}",
+                name: "{{ tags.away }}"
+            },
+            {% endif -%}
             multiple: false
         });
 
         $('#venue').selectizeSelector({
             ajax: {
-                url: '/sportsfixtures/venues',
+                url: '{{ routeLookup('sportsfixturesVenue.getList') }}',
                 type: 'GET',
                 dataType: 'json'
             },
-            {% if match.venue.id %}
-            value: {"id":{{ match.venue.id }}, "name": "{{ match.venue.name }}"},
-            {% endif %}
+            {% if match.venue.id -%}
+            value: {
+                id: {{ match.venue.id }},
+                name: "{{ match.venue.name }}"
+            },
+            {% endif -%}
             multiple: false
         });
 
@@ -138,22 +135,19 @@
     });
 </script>
 
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}">Matches in {{ division.name }}</a></li>
-
-    {% if match.id %}
-        <li class="active"><a href="{{ routeLookup('sportsfixturesMatch.getModifyForm', {entityId: match.id}) }}">{{ match.name }}</a></li>
-    {% else %}
-        <li class="active"><a href="#">{{ action }}</a></li>
-    {% endif %}
-</ul>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Fixtures', routeLookup('sportsfixtures.getLanding') ],
+    [ 'Sports', routeLookup('sportsfixturesSport.getList') ],
+    [ match.division.sport.name, routeLookup('sportsfixturesSport.getEntity', { entityId: match.division.sport.id }) ],
+    [ match.division.name, routeLookup('sportsfixturesDivision.getLobby', { entityId: match.division.id }) ],
+    [ 'Fixtures', routeLookup('sportsfixturesMatch.getList', { contextId: match.division.id }) ],
+    [ match.name | default(action ~ ' Match') ]
+) }}
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Sports Fixtures</h1>
+        <h1>{{ match.division.name }} {{ match.division.sport.name }}</h1>
     </div>
 </div>
 
@@ -165,12 +159,12 @@
             {% set formUrl = routeLookup('sportsfixturesMatch.createEntity') %}
         {% endif %}
 
-        <form id='matchForm' action="{{ formUrl }}" method="post">
-            <h2 class="subheader">{{ action }} Match in {{ division.name }}</h2>
+        <form id="matchForm" action="{{ formUrl }}" method="post">
+            <h2 class="subheader">{{ action }} Match</h2>
 
             <section>
                 <fieldset class="content">
-                    <input type="hidden" name="divisionId" value="{{ division.id }}"/>
+                    <input type="hidden" name="divisionId" value="{{ match.division.id }}"/>
                     <input type="hidden" name="matchId" value="{{ match.id }}"/>
 
                     <div class="small-12 columns">
@@ -183,14 +177,14 @@
                     <div class="column small-12 medium-4">
                         <label>
                             Season
-                            <input id='season' name="seasonId" type='text' value='' placeholder="Search Seasons" />
+                            <input id="season" name="seasonId" type="text" value='' placeholder="Search Seasons" />
                         </label>
                     </div>
 
                     <div class="column small-12 medium-4">
                         <label>
                             Date
-                            <input type="text" name="startAtDate" placeholder="Date" data-datepicker value="{{ match.startAt.getLocalShort }}">
+                            <input type="text" name="startAtDate" placeholder="Date" data-datepicker value="{{ match.startAt.localShort }}">
                         </label>
                     </div>
 
@@ -198,7 +192,7 @@
                         <div class="timepick">
                             <label>
                                 Time
-                                <input type="text" name="startAtTime" autocomplete="off" placeholder="Start Time" class="ui-timepicker-input" data-timepicker value="{{ match.startAt.getTimeOnly }}">
+                                <input type="text" name="startAtTime" autocomplete="off" placeholder="Start Time" class="ui-timepicker-input" data-timepicker value="{{ match.startAt.timeOnly }}">
                             </label>
                         </div>
                     </div>
@@ -206,7 +200,7 @@
                     <div class="small-12 columns">
                         <label>
                             Venue
-                            <input id='venue' name="venueId" type='text' value='' placeholder="Search Venues" />
+                            <input id="venue" name="venueId" type="text" value='' placeholder="Search Venues" />
                         </label>
                     </div>
                 </fieldset>
@@ -216,51 +210,23 @@
                     <div class="small-12 medium-6 columns">
                         <label>
                             Home
-                            <input id='homeTeam' name="homeTeamId" type='text' value='' placeholder="Search Teams" />
+                            <input id="homeTeam" name="homeTeamId" type="text" value='' placeholder="Search Teams" />
                         </label>
                     </div>
                     <div class="small-12 medium-6 columns">
                         <label>
                             Away
-                            <input id='awayTeam' name="awayTeamId" type='text' value='' placeholder="Search Teams" />
+                            <input id="awayTeam" name="awayTeamId" type="text" value='' placeholder="Search Teams" />
                         </label>
                     </div>
                 </fieldset>
 
-                {% if match.id %}
                 <fieldset class="content">
                     <legend>Itinerary</legend>
-
-                    <div class="small-12 columns">
-                        {% if allItineraryItems|length %}
-                            <ul class="action-list">
-                                {% for currentItineraryItem in allItineraryItems %}
-                                    <li class="actions-small-2">
-                                        <div class="list-item">
-                                            <div class="small-12 card">
-                                                <p>{{ currentItineraryItem.startAt.local }}</p>
-                                                <p class="meta">{{ currentItineraryItem.description }}</p>
-                                            </div>
-                                        </div>
-                                        <nav>
-                                            <a href="{{ routeLookup('sportsfixturesItineraryItem.deleteEntity', {entityId: currentItineraryItem.id}) }}" class="icon-delete" title="Delete" data-itinerary-delete="{{ currentItineraryItem.id }}"></a>
-                                            <a href="{{ routeLookup('sportsfixturesItineraryItem.getModifyForm', {entityId: currentItineraryItem.id}) }}" class="icon-modify" title="Modify"></a>
-                                        </nav>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-
-                            <a href="{{ routeLookup('sportsfixturesItineraryItem.getCreateForm', {contextId: match.id}) }}" class="full-width button icon-add">Add Itinerary Item</a>
-                        {% else %}
-                            <div class="empty-state">
-                                <i class="icon-itineraryitem"></i>
-                                <p>There are no items in this Match's Itinerary.</p>
-                                <p><a href="{{ routeLookup('sportsfixturesItineraryItem.getCreateForm', {contextId: match.id}) }}" title="Add an Itinerary Item">Add an Itinerary Item.</a></p>
-                            </div>
-                        {% endif %}
+                    <div class="small-12 column" id="itinerary">
+                        {% include '@sportsfixturesItineraryItem/listContent.twig' with { itineraryItems: match.itinerary } %}
                     </div>
                 </fieldset>
-                {% endif %}
 
                 <fieldset class="content">
                     <legend>Notes</legend>

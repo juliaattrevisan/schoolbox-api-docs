@@ -11,6 +11,8 @@
 namespace Schoolbox\SportsFixtures\Match;
 
 
+use OutOfBoundsException;
+use PDO;
 use PDOStatement;
 use Schoolbox\Mapper As BaseMapper;
 use Schoolbox\Mapper\Exception;
@@ -62,22 +64,58 @@ class Mapper extends BaseMapper
 
         /* Reverse join thingo
          */
-        $this->hasJoin('result', array(
+        $this->hasJoin('result', [
             'mapper'    => ResultMapper::class,
             'this_key'  => 'id',
             'other_key' => 'match_id',
-        ));
+        ]);
 
         /* Reverse join thingo
          */
-        $this->hasJoin('itinerary', array(
+        $this->hasJoin('itinerary', [
             'mapper'    => ItineraryItemMapper::class,
             'this_key'  => 'id',
             'other_key' => 'match_id',
-        ));
+        ]);
 
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteItineraryItems'));
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteResults'));
+        $this->registerCallback(self::CALLBACK_POSTSAVE,       [ $this, 'saveItinerary' ]);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'deleteItineraryItems' ]);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'deleteResults' ]);
+    }
+
+    /**
+     * Perform a bisection of the itinerary given against what exists in the database:
+     *  - any records that exist in memory are to be persisted to the DB;
+     *  - any records that exist in DB but not memory are to be soft-deleted;
+     *
+     * @param Model $match
+     * @return bool
+     */
+    public function saveItinerary(Match $match)
+    {
+        $iMap = $this->getJoinMapper('itinerary');
+
+        // retrieve records that already exist for this match and index by ID
+        $existing = $iMap->findByColumn('match_id', $match->getId())->indexBy('id');
+        $updated  = $this->createCollection($match->getItinerary()->getAll())->indexBy('id');
+
+        // extract IDs
+        $existingIds = $existing->getColumnValues('id');
+        $updatedIds  = $updated->getColumnValues('id');
+
+        // determine what to do
+        $delete  = array_diff($existingIds, $updatedIds);
+        $persist = array_diff($updatedIds, $delete);
+
+        foreach ($delete as $id) {
+            $iMap->delete($existing[$id]);
+        }
+
+        foreach ($persist as $id) {
+            $iMap->save($updated[$id]);
+        }
+
+        return true;
     }
 
     /**
@@ -110,8 +148,6 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     protected function getSelectString()
@@ -121,18 +157,16 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('home_team', 'h')},
                 {$this->getJoinColumnString('away_team', 'a')},
-				{$this->getJoinColumnString('division', 'd')},
-				{$this->getJoinColumnString('season', 's')},
-				{$this->getJoinColumnString('venue', 'v')},
-				{$this->getJoinColumnString('itinerary', 'i')},
-				{$this->getJoinColumnString('result', 'r')},
-				{$this->getJoinColumnString('result.status', 'rs')}
+                {$this->getJoinColumnString('division', 'd')},
+                {$this->getJoinColumnString('season', 's')},
+                {$this->getJoinColumnString('venue', 'v')},
+                {$this->getJoinColumnString('itinerary', 'i')},
+                {$this->getJoinColumnString('result', 'r')},
+                {$this->getJoinColumnString('result.status', 'rs')}
         ";
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @return string
      */
     protected function getFromString()
@@ -151,8 +185,6 @@ class Mapper extends BaseMapper
     }
 
     /**
-     * {@inheritdoc}
-     *
      * @param PDOStatement $statement
      * @return Collection
      * @throws Exception
@@ -160,7 +192,7 @@ class Mapper extends BaseMapper
     protected function hydrateSelect(PDOStatement $statement)
     {
         /** @var Collection|Match[] $matches */
-        $matches   = new Collection();
+        $matches = new Collection();
 
         /** @var Collection|Division[] $divisions */
         $divisions = new Collection();
@@ -169,12 +201,12 @@ class Mapper extends BaseMapper
         $seasons = new Collection();
 
         /** @var Collection|Venue[] $venues */
-        $venues    = new Collection();
+        $venues = new Collection();
 
-        /** @var Collection|Match[] $teams */
-        $teams     = new Collection();
+        /** @var Collection|Team[] $teams */
+        $teams = new Collection();
 
-        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $matchId = $row['id'];
 
             /* Set up us the match in the collection
@@ -184,29 +216,29 @@ class Mapper extends BaseMapper
                 /** @var Match $match */
                 $match = $this->hydrate($row);
 
-                if(!$divisions->getOffset($row['division_id']) instanceof Division){
+                if (!$divisions->getOffset($row['division_id']) instanceof Division) {
                     $divisions->setOffset($row['division_id'], $this->hydrateJoin($row, 'division', 'd'));
                 }
                 $match->setDivision($divisions->getOffset($row['division_id']));
 
-                if(!$seasons->getOffset($row['season_id']) instanceof Season){
+                if (!$seasons->getOffset($row['season_id']) instanceof Season) {
                     $seasons->setOffset($row['season_id'], $this->hydrateJoin($row, 'season', 's'));
                 }
                 $match->setSeason($seasons->getOffset($row['season_id']));
 
-                if(!$venues->getOffset($row['venue_id']) instanceof Venue){
+                if (!$venues->getOffset($row['venue_id']) instanceof Venue) {
                     $venues->setOffset($row['venue_id'], $this->hydrateJoin($row, 'venue', 'v'));
                 }
                 $match->setVenue($venues->getOffset($row['venue_id']));
 
                 // Optional relationship
-                if(!$teams->getOffset($row['home_team_id']) instanceof Team){
+                if (!$teams->getOffset($row['home_team_id']) instanceof Team) {
                     $teams->setOffset($row['home_team_id'], $this->hydrateJoin($row, 'home_team', 'h'));
                 }
                 $match->setHomeTeam($teams->getOffset($row['home_team_id']));
 
                 // Optional relationship
-                if(!$teams->getOffset($row['away_team_id']) instanceof Team){
+                if (!$teams->getOffset($row['away_team_id']) instanceof Team) {
                     $teams->setOffset($row['away_team_id'], $this->hydrateJoin($row, 'away_team', 'a'));
                 }
                 $match->setAwayTeam($teams->getOffset($row['away_team_id']));
@@ -251,31 +283,33 @@ class Mapper extends BaseMapper
      * The team can be either the home or away team
      *
      * @param Team $team
-     * @return mixed
+     * @throws OutOfBoundsException
+     * @return Match
      */
     public function findNextMatch(Team $team)
     {
+        $now = \Alaress_Date_Format::now();
         $query = "
             SELECT {$this->getColumnString()}
             FROM {$this->getTable()}
-            WHERE start_at > NOW()
-            AND (home_team_id = :homeTeamId OR away_team_id = :awayTeamId)
+            WHERE start_at > :now
+            AND (home_team_id = :teamId OR away_team_id = :teamId)
             ORDER BY start_at ASC
             LIMIT 1
         ";
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute([
-            'homeTeamId' => $team->getId(),
-            'awayTeamId' => $team->getId()
+            'teamId' => $team->getId(),
+            'now'    => $now->getDatabase()
         ]);
 
-        $row = $statement->fetch(\PDO::FETCH_ASSOC);
+        $row = $statement->fetch(PDO::FETCH_ASSOC);
 
         if ($row) {
             return $this->hydrate($row);
         }
 
-        throw new \OutOfBoundsException();
+        throw new OutOfBoundsException("Given team has no future matches");
     }
 }
