@@ -167,7 +167,8 @@ class Controller extends AbstractController
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesDivision/create.twig', [
             'division' => $entity,
             'sport'    => $context,
-            'action'   => $entity->getId() ? 'Modify' : 'Create'
+            'action'   => $entity->getId() ? 'Modify' : 'Create',
+            'referer'  => base64_encode($this->getRequest()->headers->get('Referer'))
         ]));
     }
 
@@ -180,6 +181,7 @@ class Controller extends AbstractController
     {
         try {
             // Load division
+            /** @var Division $division */
             $division = $this->getMapper()->findById($entityId);
         }
         catch (MapperException $e) {
@@ -224,9 +226,15 @@ class Controller extends AbstractController
 
             $this->saveDivision($sport, $season, $this->getRequest()->post['name'], $this->getRequest()->post['url'], $entity);
 
-            $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesDivision.getList', [
-                'contextId' => $sport->getId()
-            ]));
+            $return = base64_decode($this->getRequest()->post['returnUrl']);
+
+            if (empty($return)) {
+                $return = $this->getRouter()->generate('sportsfixturesDivision.getList', [
+                    'contextId' => $sport->getId()
+                ]);
+            }
+
+            $this->getResponse()->redirect->afterPost($return);
 
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_DIVISION_NOT_FOUND);
