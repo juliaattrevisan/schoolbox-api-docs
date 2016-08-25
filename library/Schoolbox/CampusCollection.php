@@ -19,7 +19,12 @@ class CampusCollection extends Collection {
      * @return boolean
      */
     public function find( Campus $campus) {
-
+        foreach($this as $localCampus) {
+            if($localCampus->getId() == $campus->getId()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
