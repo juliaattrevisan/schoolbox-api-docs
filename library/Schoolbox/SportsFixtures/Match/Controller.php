@@ -249,16 +249,12 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
         }
 
-        // acquire tag names we require
-        $tags = [];
-
-        if ($match->getHomeSchoolId()) {
-            $tags['home'] = $this->getSchoolTagCloudMapper()->getTagName($match->getHomeSchoolId());
-        }
-
-        if ($match->getAwaySchoolId()) {
-            $tags['away'] = $this->getSchoolTagCloudMapper()->getTagName($match->getAwaySchoolId());
-        }
+        $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $match->getId(), [
+            'order' => [
+                'start_at' => 'asc'
+            ]
+        ]);
+        $match->setItinerary($allItineraryItems);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/create.twig', [
             'match'     => $match,
