@@ -6,6 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Resource\Folder\Model as Folder;
+
 abstract class Component_Config_Factory
 {
 
@@ -14,9 +16,9 @@ abstract class Component_Config_Factory
     /**
      * @static
      * @param $key
-     * @param $folder
+     * @param Folder $folder
      * @param $fields
-     * @return bool
+     * @return Component_Config_Abstract|bool
      */
     public static function build($key, $folder, $fields)
     {
