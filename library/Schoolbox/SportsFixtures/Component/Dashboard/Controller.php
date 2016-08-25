@@ -53,9 +53,9 @@ class Controller extends Component_Dashboard_ControllerAbstract
         // Grab the relevant data depending on role type
 
         if ($this->user->getRole()->isParent()) {
-            $data = $this->delegate->getParentDashboardData();
+            $matches = $this->delegate->getParentDashboardData();
         } else if ($this->user->getRole()->isStudent()) {
-            $data = $this->delegate->getStudentDashboardData($this->user);
+            $matches = $this->delegate->getStudentDashboardData($this->user);
         } else {
             // Unsupported role type, don't render the component
             return false;
@@ -63,17 +63,19 @@ class Controller extends Component_Dashboard_ControllerAbstract
 
         // If the child wasn't involved in any matches don't render the component
 
-        if (count($data["matches"]) == 0) {
+        if (0 == count($matches)) {
             return false;
         }
 
         return $this->renderTwigTemplate(
             $templateHandle,
             '@sportsfixturesDashboard/component.twig',
-            array_merge($data, [
+            [
                 'componentInstanceId'   => $this->getInstance()->getId(),
-                'componentClass'        => $this->getComponentName()
-            ])
+                'componentClass'        => $this->getComponentName(),
+                'user'                  => $this->user,
+                'matches'               => $matches,
+            ]
         );
     }
 }

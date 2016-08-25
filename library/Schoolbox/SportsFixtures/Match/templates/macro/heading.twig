@@ -11,7 +11,7 @@
             <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}">{{ match.homeTeam.name }}</a>
         {% endset %}
     {% else %}
-        {% set homeTeamData = match.homeTeam.name %}
+        {% set homeTeamData = match.homeSchool.name %}
     {% endif %}
 
     {# Away Team #}
@@ -20,7 +20,7 @@
             <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}">{{ match.awayTeam.name }}</a>
         {% endset %}
     {% else %}
-        {% set awayTeamData = match.awayTeam.name %}
+        {% set awayTeamData = match.awaySchool.name %}
     {% endif %}
 
     {{ homeTeamData|raw }} vs {{ awayTeamData|raw }}

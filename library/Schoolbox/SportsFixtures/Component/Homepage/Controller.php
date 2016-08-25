@@ -51,15 +51,16 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         // Grab data for the team we are viewing
         
-        $data = $this->delegate->getTeamData($this->config["team"]["value"], $this->getConfig('showHistorical'));
+        $matches = $this->delegate->getTeamMatches($this->getConfig('team'), $this->getConfig('showHistorical'));
 
         return $this->renderTwigTemplate(
             $templateHandle,
             '@sportsfixturesHomepage/component.twig',
-            array_merge($data, [
+            [
                 'componentInstanceId'   => $this->getInstance()->getId(),
-                'componentClass'        => $this->getComponentName()
-            ])
+                'componentClass'        => $this->getComponentName(),
+                'matches'               => $matches,
+            ]
         );
     }
 }
