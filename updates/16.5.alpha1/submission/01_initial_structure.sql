@@ -150,3 +150,18 @@ ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `id`;
 
 ALTER TABLE `submission_box`
 ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `id`;
+
+-- New component configuration type for a course outline component's Course Instances
+INSERT INTO `component_config_definition` (
+  component_definition_id,
+  `key`,
+  default_value,
+  label,
+  description
+) VALUES (
+  (SELECT id FROM component_definition WHERE class = 'Component_Homepage_CourseOutlineController' LIMIT 1),
+  'courseInstance',
+  '',
+  'Course Instance',
+  'The Course Instance that is displayed in this component'
+);
