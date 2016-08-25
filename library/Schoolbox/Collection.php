@@ -10,6 +10,7 @@
 namespace Schoolbox;
 
 use ArrayAccess;
+use InvalidArgumentException;
 use Schoolbox;
 use ArrayIterator;
 use ICollection;
@@ -276,6 +277,25 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         return null;
     }
 
+
+    /**
+     * This is a Collection-aware wrapper around array_column, for use in the Twig filter {{ | column($column) }}
+     *
+     * @param array  $input
+     * @param string $column
+     * @throws InvalidArgumentException if the input given is not traversable
+     * @return array
+     */
+    public static function array_column($input, $column)
+    {
+        if ($input instanceof self) {
+            return $input->getColumnValues($column);
+        }
+        if (is_array($input)) {
+            return array_column($input, $column);
+        }
+        throw new InvalidArgumentException("Invalid input given, must be array or Collection");
+    }
 
     /**
     * Gets values for the given column in the collection.

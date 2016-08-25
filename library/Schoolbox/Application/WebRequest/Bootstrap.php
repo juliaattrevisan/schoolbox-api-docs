@@ -30,13 +30,13 @@ use Database;
 use DeprecatedDatabase;
 use PDO;
 use Schoolbox\Application\WebRequest;
+use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Notif\SilentNotif;
 use Scrub;
 use Twig_Extension_Debug;
 use Twig_Extensions_Extension_Text;
-use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 use Twig_SimpleFilter;
 use Twig_SimpleFunction;
@@ -416,6 +416,13 @@ class Bootstrap implements BootstrapInterface {
 						new Twig_SimpleFilter(
 							'bytes',
 							array('Alaress_Byte_Format', 'bytesToString')
+						)
+					);
+
+					$twig->addFilter(
+						new Twig_SimpleFilter(
+							'column',
+							[ Collection::class, 'array_column' ]
 						)
 					);
 
