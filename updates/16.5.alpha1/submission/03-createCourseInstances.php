@@ -8,7 +8,6 @@
  */
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\Mapper\Exception as MapperException;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
@@ -38,12 +37,12 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         ORDER BY cui.component_id
     ");
 
-//    // Insert new courses and units
+    // Insert and update objects
     $insertCourseInstanceQuery = $database->prepare("
         INSERT INTO course_instance (folder_id, course_id) 
         VALUES (:folderId, :courseId)
     ");
-    $updateUnitInstanceQuery   = $database->prepare("
+    $updateUnitInstanceQuery = $database->prepare("
         UPDATE course_unit_instance 
         SET    course_instance_id = :courseInstanceId 
         WHERE  component_id = :componentId
@@ -81,7 +80,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             ]);
             $log->debug('Course instance created');
             $courseInstanceId = $database->lastInsertId();
-        } catch (MapperException $e) {
+        } catch (PDOException $e) {
             $log->error('Course instance could not be created!');
             $failureCount++;
             $database->rollBack();
@@ -89,20 +88,21 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         }
 
 
-//        // Assign this course instance to each unit instance
-//        $log->info('Attaching course instance to unit instances...');
-//        try {
-//            $updateUnitInstanceQuery->execute([
-//                'folderId'         => $unitInstance['category_id'],
-//                'courseInstanceId' => $courseInstanceId,
-//            ]);
-//            $log->debug('Course instance attached to unit instances');
-//        } catch (MapperException $e) {
-//            $log->error('Course instance could not be attached!');
-//            $failureCount++;
-//            $database->rollBack();
-//            continue;
-//        }
+        // Assign this course instance to each unit instance
+        $log->info('Attaching course instance to unit instances...');
+        try {
+            $updateUnitInstanceQuery->execute([
+                'folderId'         => $unitInstance['category_id'],
+                'componentId'      => $unitInstance['component_id'],
+                'courseInstanceId' => $courseInstanceId,
+            ]);
+            $log->debug('Course instance attached to unit instances');
+        } catch (PDOException $e) {
+            $log->error('Course instance could not be attached!');
+            $failureCount++;
+            $database->rollBack();
+            continue;
+        }
 
 
         // Set course instance on component configuration
@@ -114,7 +114,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 'courseInstanceId' => $courseInstanceId,
             ]);
             $log->debug('Course instance attached to component');
-        } catch (MapperException $e) {
+        } catch (PDOException $e) {
             $log->error('Course instance could not be attached!');
             $failureCount++;
             $database->rollBack();
