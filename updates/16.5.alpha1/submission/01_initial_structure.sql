@@ -39,6 +39,19 @@ CREATE TABLE `course_unit` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
+CREATE TABLE `course_instance` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `folder_id` INT UNSIGNED NOT NULL,
+  `course_id` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `folder_id_UNIQUE` (`folder_id` ASC),
+  INDEX `fk_course_instance_course_id_idx` (`course_id` ASC),
+  CONSTRAINT `fk_course_instance_course_id`
+  FOREIGN KEY (`course_id`)
+  REFERENCES `course` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
 ALTER TABLE `course_unit_instance`
 CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ;
 
