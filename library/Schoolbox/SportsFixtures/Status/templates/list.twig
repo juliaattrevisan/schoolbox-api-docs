@@ -1,4 +1,4 @@
-<script type="text/javascript" src="/javascript/shared/jquery.label-timeout.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.toast-timeout.js"></script>
 <script type="text/javascript" src="/javascript/shared/sportsfixtures/jquery.mightyList.js"></script>
 <script type="text/javascript">
     $(function() {
@@ -7,10 +7,12 @@
         });
     });
 </script>
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
-    <li class="active"><a href="{{ routeLookup('sportsfixturesStatus.getList', {}) }}">Status</a></li>
-</ul>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Fixtures', routeLookup('sportsfixtures.getLanding') ],
+    [ 'Statuses' ],
+) }}
 
 <div class="row">
     <div class="small-12 columns">
@@ -42,7 +44,7 @@
         </section>
         <div class="empty-state hide">
             <i class="icon-position"></i>
-            <p>There are no Statuses.</p>
+            <p>There are currently no statuses.</p>
             <p><a title="Add a Status" data-item-add>Add a Status</a></p>
         </div>
     </div>

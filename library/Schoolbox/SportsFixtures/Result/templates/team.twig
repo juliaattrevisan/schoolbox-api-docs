@@ -1,23 +1,24 @@
 {% extends '@sportsfixturesMatch/match.twig' %}
 {% import '@sportsfixturesMatch/macro/heading.twig' as matchHeading %}
 {% block breadcrumbs %}
-    <ul class="breadcrumb">
-        <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
-        <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
-        <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
-        <li><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}">Matches in {{ division.name }}</a></li>
+    {% import 'sub/breadcrumbs.twig' as bread %}
 
-        {% if match.id %}
-            <li class="active"><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: team.id}) }}">{{ matchHeading.generate(match) }}</a></li>
-        {% else %}
-            <li><a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: team.id}) }}">{{ matchHeading.generate(match) }}</a></li>
-            <li class="active"><a href="#">{{ action }}</a></li>
-        {% endif %}
-    </ul>
+    {% set headingCrumb = match.id ? routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: team.id}) : '' %}
+    {% set actionCrumb  = match.id ? action : '' %}
+
+    {{ bread.crumbs(
+        [ 'Fixtures',                   routeLookup('sportsfixtures.getLanding') ],
+        [ 'Sports',                     routeLookup('sportsfixturesSport.getList') ],
+        [ sport.name,                   routeLookup('sportsfixturesSport.getEntity', { entityId: sport.id }) ],
+        [ division.name,                routeLookup('sportsfixturesDivision.getLobby', { entityId: division.id }) ],
+        [ matchHeading.generate(match), headingCrumb ],
+        [ actionCrumb ]
+    ) }}
+
 {% endblock %}
 
 {% block results %}
-    {% if match.result.offset(team.id) %}
+    {% if match.result[team.id] %}
     <script type="text/javascript">
         $(function() {
             $('[data-delete]').click(function(event) {
@@ -29,7 +30,7 @@
                     text: 'Are you sure you want to delete this Result?',
                     confirmEvent: function() {
                         $.post(element.attr('href'), {}, function() {
-                            window.location.href = window.location.href;
+                            window.location.reload();
                         });
                     }
                 });
@@ -45,7 +46,7 @@
                     <div class="list-item">
                         <div class="small-12 columns">
                             <h4>{{ team.name }}</h4>
-                            {{ match.result.offset(team.id).description|raw }}
+                            {{ match.result[team.id].description|raw }}
                         </div>
                     </div>
                     <nav>
