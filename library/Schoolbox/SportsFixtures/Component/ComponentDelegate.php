@@ -215,9 +215,10 @@ class ComponentDelegate
 
     /**
      * @param int $teamId
+     * @param bool $getHistorical Whether to also return matches that have been played
      * @return array
      */
-    public function getTeamData($teamId)
+    public function getTeamData($teamId, $getHistorical)
     {
         if ($teamId == 0) {
             return [];
@@ -240,13 +241,13 @@ class ComponentDelegate
 
         /** @var Match $match */
         foreach ($home_matches as $match) {
-            if ($match->getStartAt()->isFuture()) {
+            if ($getHistorical || $match->getStartAt()->isFuture()) {
                 $matches[] = $this->loadExternals($match);
             }
         }
 
         foreach ($away_matches as $match) {
-            if ($match->getStartAt()->isFuture()) {
+            if ($getHistorical || $match->getStartAt()->isFuture()) {
                 $matches[] = $this->loadExternals($match);
             }
         }

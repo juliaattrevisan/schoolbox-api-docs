@@ -6,6 +6,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\Resource\Folder\Model as Folder;
+
 abstract class Component_Config_Abstract
 {
 
@@ -28,7 +31,7 @@ abstract class Component_Config_Abstract
      * Folder should be an instance of \Schoolbox\Resource\Folder\Model
      * but must be either handler array or instance, for now
      *
-     * @param $folder
+     * @param Folder $folder
      * @param null $fields
      */
     public function __construct($folder, $fields = null)

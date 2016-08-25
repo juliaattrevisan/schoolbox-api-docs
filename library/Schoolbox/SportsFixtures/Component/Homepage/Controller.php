@@ -51,7 +51,7 @@ class Controller extends Component_Homepage_ControllerAbstract
     {
         // Grab data for the team we are viewing
         
-        $data = $this->delegate->getTeamData($this->config["team"]["value"]);
+        $data = $this->delegate->getTeamData($this->config["team"]["value"], $this->getConfig('showHistorical'));
 
         return $this->renderTwigTemplate(
             $templateHandle,
