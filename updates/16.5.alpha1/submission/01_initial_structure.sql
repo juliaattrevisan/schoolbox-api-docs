@@ -55,6 +55,10 @@ CREATE TABLE `course_instance` (
 ALTER TABLE `course_unit_instance`
 CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ;
 
+-- Add FK relation to course_instance once that table is populated
+ALTER TABLE `course_unit_instance`
+  ADD COLUMN `course_instance_id` INT(11) NOT NULL AFTER `id`;
+
 CREATE TABLE `project` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(250) NOT NULL,
