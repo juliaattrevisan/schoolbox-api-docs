@@ -194,6 +194,14 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
+     * @return array
+     */
+    public function keys()
+    {
+        return array_keys($this->getStack());
+    }
+
+    /**
     * Gets first item in collection (regardless of its key)
     *
     * @return mixed
