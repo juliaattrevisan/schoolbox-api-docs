@@ -1,43 +1,15 @@
-<script type="text/javascript">
-    $(function() {
-        $('#allSports').on('click', '[data-delete]', function(event) {
-            event.preventDefault();
-
-            var element = $(this);
-            var $position = element.closest('[data-position]');
-
-            $(this).confirmDialog({
-                text: 'Are you sure you want to delete this Position?',
-                confirmEvent: function() {
-                    $.post(element.attr('href'), {}, function() {
-
-                        // Is this the last position in the sport ?
-                        if( 1 == $('[data-position]').length){
-                            window.location.href = window.location.href;
-                        } else {
-                            $position.fadeOut({ done: $position.remove() });
-                        }
-                    });
-                }
-            });
-        });
-    });
-</script>
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
     <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
     <li class="active"><a href="{{ routeLookup('sportsfixturesPosition.getList', {contextId: sport.id}) }}">Positions in {{ sport.name }}</a></li>
 </ul>
-
 <div class="row">
     <div class="small-12 columns">
         <h1>Sports Fixtures</h1>
     </div>
 </div>
-
 <div class="row">
-    <div class="small-12 island" id="allSports">
-
+    <div class="small-12 island" id="positions">
         <div class="actions-small-1 row">
             <div class="list-item">
                 <div class="small-12 columns">
@@ -45,24 +17,9 @@
                 </div>
             </div>
             <nav>
-                <a href='{{ routeLookup('sportsfixturesPosition.getCreateForm', {contextId: sport.id}) }}' class="icon-add" title="Add Position to {{ sport.name }}"></a>
+                <a href='{{ routeLookup('sportsfixturesPosition.getCreateForm', {contextId: sport.id}) }}' class="icon-add" title="Add position to {{ sport.name }}"></a>
             </nav>
         </div>
-
-        {% if allPositions|length %}
-            <section>
-                <ul class="action-list">
-                    {% for currentPosition in allPositions %}
-                        {% include '@sportsfixturesPosition/listItem.twig' %}
-                    {% endfor %}
-                </ul>
-            </section>
-        {% else %}
-            <div class="empty-state">
-                <i class="icon-position"></i>
-                <p>There are no Positions in {{ sport.name }}.</p>
-                <p><a href="{{ routeLookup('sportsfixturesPosition.getCreateForm', {contextId: sport.id}) }}" title="Add a Position">Add a Position</a></p>
-            </div>
-        {% endif %}
+        {% include '@sportsfixturesPosition/listContent.twig' with { positions: allPositions } %}
     </div>
 </div>

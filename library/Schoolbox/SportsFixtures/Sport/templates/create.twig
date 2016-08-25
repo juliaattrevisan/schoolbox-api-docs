@@ -20,12 +20,12 @@
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
     <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
-    <li class="active"><a href="#">{{ action }}</a></li>
+    <li class="active"><a>{{ sport.name | default('New Sport') }}</a></li>
 </ul>
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Sports Fixtures</h1>
+        <h1>{{ sport.name }}</h1>
     </div>
 </div>
 
@@ -37,7 +37,7 @@
             {% set formUrl = routeLookup('sportsfixturesSport.createEntity') %}
         {% endif %}
 
-        <form id='sportForm' action="{{ formUrl }}" method="post">
+        <form id="sportForm" action="{{ formUrl }}" method="post">
             <h2 class="subheader">{{ action }} Sport</h2>
 
             <section>
@@ -54,6 +54,12 @@
                             Homepage URL
                             <input type="text" name="url" value="{{ sport.url }}" placeholder="http://" />
                         </label>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Positions</legend>
+                    <div class="small-12 column" id="positions">
+                        {% include '@sportsfixturesPosition/listContent.twig' with { positions: sport.positions } %}
                     </div>
                 </fieldset>
             </section>
