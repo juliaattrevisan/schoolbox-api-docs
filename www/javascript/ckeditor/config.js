@@ -37,4 +37,9 @@ CKEDITOR.editorConfig = function( config ) {
 	config.removeDialogTabs = 'image:advanced;link:advanced';
 };
 
-nanospell.ckeditor('all',{server : "php"});
+nanospell.ckeditor('all',{
+	dictionary: "en_au,en,de,fr,it,id,es",
+	ignore_block_caps : true,
+	ignore_non_alpha : true,
+	server : "php"
+});
