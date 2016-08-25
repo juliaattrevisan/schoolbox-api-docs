@@ -96,6 +96,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $courseInstanceId = $database->lastInsertId();
         } catch (PDOException $e) {
             $log->error('Course instance could not be created!', [$e]);
+            $log->warning($e->getMessage());
             $failureCount++;
             $database->rollBack();
             continue;
@@ -113,6 +114,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $log->debug('Course instance attached to unit instances');
         } catch (PDOException $e) {
             $log->error('Course instance could not be attached!', [$e]);
+            $log->warning($e->getMessage());
             $failureCount++;
             $database->rollBack();
             continue;
@@ -120,7 +122,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
 
         // Set course instance on component configuration
-        // (If this doesn't work, it's okay, I guess?)
+        // (If this doesn't work, it's okay, I guess? The course instance was still created.)
         $log->info('Attaching course instance to component...');
         try {
             $updateComponentConfigurationQuery->execute([
@@ -130,6 +132,9 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $log->debug('Course instance attached to component');
         } catch (PDOException $e) {
             $log->error('Course instance could not be attached!', [$e]);
+            $log->error('What probably happened is that a single component somehow has unit instances that relate to more than one course.');
+            $log->error('The course instance has still been created, so its coursework still exists on this homepage.');
+            $log->warning($e->getMessage());
             $failureCount++;
             $database->rollBack();
             continue;
