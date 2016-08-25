@@ -223,10 +223,6 @@ class Controller extends Base
                 $paginatedRecords[] = $records[$i];
 
         // And spit this thing out
-
-
-        $pastoralModerator = $this->getPastoralModeratorLevel() > UserAccess::ACCESS_READ;
-
         $this->getResponse()->content->set(
             array(
                 'template' => '@pastoral/report.twig',
@@ -237,7 +233,6 @@ class Controller extends Base
                     'pagesToDisplay'  => $pagesToDisplay % 2 == 0 ? $pagesToDisplay : $pagesToDisplay + 1,
                     'totalPages'            => $totalPages,
                     'totalResults'          => $records->count(),
-                    'pastoralModerator'     => $pastoralModerator,
                     'pageCurrent'           => $pageCurrent,
                     'students'              => $this->getRequest()->query["students"],
                     'authors'               => $this->getRequest()->query["authors"],
@@ -264,15 +259,12 @@ class Controller extends Base
         if (!$this->getUser()->getRole()->isStaff())
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
 
-        $pastoralModerator = $this->getPastoralModeratorLevel() > UserAccess::ACCESS_READ;
-
         $this->getResponse()->content->set(
             array(
                 'template' => '@pastoral/reportPrint.twig',
                 'data'     => array(
                     'session'           => $_SESSION,
                     'results'           => $this->getReportData(),
-                    'pastoralModerator' => $pastoralModerator,
                     'students'          => $this->getRequest()->query["students"],
                     'authors'           => $this->getRequest()->query["authors"],
                     'severity'          => $this->getRequest()->query["severity"],
@@ -416,11 +408,11 @@ class Controller extends Base
         if($pastoralModeratorList->count() > 0) {
             $pastoralModerator = $pastoralModeratorList->first()->getAccessLevel();
         } else {
-            $pastoralModerator = 0;
+            $pastoralModerator = UserAccess::ACCESS_DENY;
         }
 
         if ($this->getUser()->isSuperuser())
-            $pastoralModerator = FULL_ACCESS;
+            $pastoralModerator = UserAccess::ACCESS_FULL;
 
         return $pastoralModerator;
     }
