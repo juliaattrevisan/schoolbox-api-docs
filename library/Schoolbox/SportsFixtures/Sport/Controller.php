@@ -10,6 +10,7 @@ namespace Schoolbox\SportsFixtures\Sport;
 
 use Alaress\Web\Controller\Exception;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
+use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\SportsFixtures\Sport\Model as Sport;
@@ -17,9 +18,8 @@ use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
 use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
-use Schoolbox\SportsFixtures\Team\Model as Team;
-use Schoolbox\SportsFixtures\Coach\Mapper as CoachMapper;
-use Schoolbox\SportsFixtures\Coach\Model as Coach;
+use Schoolbox\SportsFixtures\Position\Mapper as PositionMapper;
+use Schoolbox\SportsFixtures\Position\Model as Position;
 
 use \Schoolbox\Mapper as BaseMapper;
 
@@ -33,9 +33,10 @@ class Controller extends AbstractController
     /** @var TeamMapper */
     protected $teamMapper;
 
-    /**
-     * @var ErrorMapper
-     */
+    /** @var PositionMapper */
+    protected $positionMapper;
+
+    /** @var ErrorMapper */
     protected $errorMapper;
 
     /**
@@ -115,7 +116,11 @@ class Controller extends AbstractController
     public function persistEntity($entity)
     {
         try {
-            $this->saveSport($entity, $this->getRequest()->post['name'], $this->getRequest()->post['url']);
+            $post = $this->getRequest()->post;
+
+            $positions = $this->transposePositionPost($post['positions']);
+
+            $this->saveSport($entity, $post['name'], $post['url'], $positions);
 
             $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesSport.getList'));
         } catch (MapperException $e) {
@@ -124,17 +129,47 @@ class Controller extends AbstractController
     }
 
     /**
+     * Transposes the post-data of positions into a collection of actual objects
+     *
+     * @param array $posPost
+     * @return Collection|Position[]
+     * @throws MapperException
+     */
+    protected function transposePositionPost(array $posPost)
+    {
+        $c = $this->getPositionMapper()->createCollection();
+
+        $pCount = count($posPost['id']);
+
+        for ($i = 0; $i < $pCount; ++$i) {
+            if (empty($pCount['name'])) {
+                continue;
+            }
+
+            $c->add($this->getPositionMapper()->hydrate([
+                'id'       => $posPost['id'][$i],
+                'sport_id' => $posPost['sportId'][$i],
+                'name'     => $posPost['name'][$i]
+            ]));
+        }
+
+        return $c;
+    }
+
+    /**
      * Save Sport data to db
      *
      * @param Sport $sport
      * @param string $name
      * @param string $url
+     * @param Collection $positions
      */
-    private function saveSport(Sport $sport, $name, $url)
+    private function saveSport(Sport $sport, $name, $url, Collection $positions)
     {
         $sport->setName($name);
         $sport->setUrl($url);
         $sport->setUpdatedAt(\Alaress_Date_Format::now());
+        $sport->setPositions($positions);
 
         $this->getMapper()->save($sport);
     }
@@ -178,6 +213,23 @@ class Controller extends AbstractController
         return $this;
     }
 
+    /**
+     * @return PositionMapper
+     */
+    public function getPositionMapper()
+    {
+        return $this->positionMapper;
+    }
+
+    /**
+     * @param PositionMapper $positionMapper
+     * @return static
+     */
+    public function setPositionMapper($positionMapper)
+    {
+        $this->positionMapper = $positionMapper;
+        return $this;
+    }
 
     /**
      * @return ErrorMapper
