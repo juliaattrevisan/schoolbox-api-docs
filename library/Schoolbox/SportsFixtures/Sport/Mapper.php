@@ -11,6 +11,9 @@
 namespace Schoolbox\SportsFixtures\Sport;
 
 
+use PDO;
+use PDOStatement;
+use Schoolbox\Collection;
 use Schoolbox\Mapper As BaseMapper;
 use \Schoolbox\SportsFixtures\Sport\Model as Sport;
 use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
@@ -39,8 +42,68 @@ class Mapper extends BaseMapper
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
+        $this->hasJoin('positions', [
+            'multiple'  => true,
+            'mapper'    => PositionMapper::class,
+            'this_key'  => 'id',
+            'other_key' => 'sport_id',
+        ]);
+
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteDivisions'));
     }
+
+
+    /**
+     * Return the first part of the string required to select from this mapper
+     *
+     * @return string
+     */
+    protected function getSelectString()
+    {
+        return "
+            SELECT {$this->getColumnString()}, 
+                   {$this->getJoinColumnString('positions', 'p')}
+        ";
+    }
+
+
+    /**
+     * Return the second part of the string required to select from this mapper
+     *
+     * @return string
+     */
+    protected function getFromString()
+    {
+        return "
+            FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('positions', '', 'p')}
+        ";
+    }
+
+
+    /**
+     * @param PDOStatement $statement
+     * @return Collection
+     */
+    protected function hydrateSelect(PDOStatement $statement)
+    {
+        /** @var Sport[] $cache */
+        $cache = [];
+
+        while ($r = $statement->fetch(PDO::FETCH_ASSOC)) {
+
+            $sportId = $r['id'];
+
+            if (empty($cache[$sportId])) {
+                $cache[$sportId] = $this->hydrate($r);
+            }
+            
+            $cache[$sportId]->getPositions()->add($this->hydrateJoin($r, 'positions', 'p'));
+        }
+
+        return $this->createCollection($cache);
+    }
+
 
     /**
      * Delete all Divisions associated with this Sport
