@@ -95,7 +95,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $log->debug('Course instance created');
             $courseInstanceId = $database->lastInsertId();
         } catch (PDOException $e) {
-            $log->error('Course instance could not be created!');
+            $log->error('Course instance could not be created!', [$e]);
             $failureCount++;
             $database->rollBack();
             continue;
@@ -112,7 +112,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             ]);
             $log->debug('Course instance attached to unit instances');
         } catch (PDOException $e) {
-            $log->error('Course instance could not be attached!');
+            $log->error('Course instance could not be attached!', [$e]);
             $failureCount++;
             $database->rollBack();
             continue;
@@ -129,7 +129,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             ]);
             $log->debug('Course instance attached to component');
         } catch (PDOException $e) {
-            $log->error('Course instance could not be attached!');
+            $log->error('Course instance could not be attached!', [$e]);
             $failureCount++;
             $database->rollBack();
             continue;
