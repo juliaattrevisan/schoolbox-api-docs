@@ -96,20 +96,19 @@
                     <div class="small-12 columns">
                         <input type="hidden" name="divisionId" value="{{ division.id }}"/>
                         <input type="hidden" name="teamId" value="{{ team.id }}"/>
-
+                    </div>
+                    <div class="small-12 columns">
                         <label>
                             Name
                             <input type="text" name="name" value="{{ team.name }}"/>
                         </label>
-
+                    </div>
+                    <div class="small-12 columns">
                         <label>
-                            Url
-                            <input type="text" name="url" value="{{ team.url }}" />
+                            Homepage URL
+                            <input type="text" name="url" value="{{ team.url }}" placeholder="http://" />
                         </label>
                     </div>
-                </fieldset>
-
-                <fieldset class="content">
                     <div class="small-12 columns">
                         <label>
                             Coaches
