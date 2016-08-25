@@ -1,0 +1,13 @@
+{# usage:
+    {% import '@sub/breadcrumbs.twig' as bread  %}
+    {{ bread.crumbs([ label, href ], ...) }} # note the variadic nature of this function
+#}
+{% macro crumbs() %}
+    <ul class="breadcrumb">
+        {% for crumb in varargs %}
+            <li {% if loop.last %}class="active"{% endif %}>
+                <a{% if crumb[1] %} href="{{ crumb[1] }}"{% endif %}>{{ crumb[0] }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
