@@ -10,11 +10,17 @@ namespace Schoolbox\SportsFixtures\Sport;
 
 use Alaress\Web\Controller\Exception;
 use Schoolbox\Application\WebRequest\Restful\AbstractController;
-use \Schoolbox\Error\Mapper as ErrorMapper;
-use \Schoolbox\Mapper\Exception as MapperException;
-use \Schoolbox\SportsFixtures\Sport\Model as Sport;
-use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
-use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\SportsFixtures\Sport\Model as Sport;
+use Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
+use Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
+use Schoolbox\SportsFixtures\Division\Model as Division;
+use Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
+use Schoolbox\SportsFixtures\Team\Model as Team;
+use Schoolbox\SportsFixtures\Coach\Mapper as CoachMapper;
+use Schoolbox\SportsFixtures\Coach\Model as Coach;
+
 use \Schoolbox\Mapper as BaseMapper;
 
 class Controller extends AbstractController
@@ -23,6 +29,9 @@ class Controller extends AbstractController
      * @var DivisionMapper
      */
     protected $divisionMapper;
+
+    /** @var TeamMapper */
+    protected $teamMapper;
 
     /**
      * @var ErrorMapper
@@ -36,6 +45,7 @@ class Controller extends AbstractController
     {
         parent::__construct(SportMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
+        $this->setTeamMapper(TeamMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
@@ -78,14 +88,22 @@ class Controller extends AbstractController
      *  - in the format provided in the request Accepts header
      * If entity is deleted, respond with '210 Gone'
      *
-     * @param object $entity
+     * @param Sport $entity
      * @throws Exception
      * @return void
      */
     public function getEntity($entity)
     {
+        $divisions = $this->getDivisionMapper()->findByColumn('sport_id', $entity->getId());
+
+        foreach ($divisions as $division) {
+            /** @var Division $division */
+            $division->setTeams($this->getTeamMapper()->findByColumn('division_id', $division->getId()));
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesSport/entity.twig', [
-            'sport' => $entity
+            'sport'     => $entity,
+            'divisions' => $divisions
         ]));
     }
 
@@ -139,6 +157,27 @@ class Controller extends AbstractController
     {
         $this->divisionMapper = $divisionMapper;
     }
+
+
+    /**
+     * @return TeamMapper
+     */
+    public function getTeamMapper()
+    {
+        return $this->teamMapper;
+    }
+
+
+    /**
+     * @param TeamMapper $teamMapper
+     * @return static
+     */
+    public function setTeamMapper($teamMapper)
+    {
+        $this->teamMapper = $teamMapper;
+        return $this;
+    }
+
 
     /**
      * @return ErrorMapper
