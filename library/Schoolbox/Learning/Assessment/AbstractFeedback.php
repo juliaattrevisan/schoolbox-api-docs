@@ -50,7 +50,8 @@ class AbstractFeedback implements IFeedback
     protected $comment;
 
     /**
-     * The person who reviewed this Feedback
+     * The person who reviewed (created) this Feedback
+     * Typically a Teacher
      *
      * @var User
      */
