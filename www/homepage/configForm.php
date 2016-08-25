@@ -131,7 +131,7 @@ if (is_numeric($_REQUEST['cid'])) {
             // Create a controller object for the config class to use when
             // dehydrating config values into database
             $cclass = $instance->getDefinition()->getClass();
-            /** @var Component_ControllerAbstract $controller */
+            /** @var Component_Homepage_ControllerAbstract $controller */
             $controller = new $cclass($instance, new \Schoolbox\User(), $page);
             // No need to execute at all just to set configuration,
             // and doing so can break components that rely on context
