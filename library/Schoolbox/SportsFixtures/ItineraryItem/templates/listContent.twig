@@ -4,7 +4,7 @@
         $('#itinerary').mightyList({
             deleteKey: 'itineraryItemId',
             templateSelector: '[data-template]',
-            focusSelector: '[name="description"]',
+            focusSelector: '[name="itinerary[description][]"]',
             onModify: function (element) {
                 element.closest('[data-item]').find('[data-unsaved-indicator]').removeClass('hide');
             },

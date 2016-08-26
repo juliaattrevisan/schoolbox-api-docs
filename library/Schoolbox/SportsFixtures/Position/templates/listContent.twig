@@ -3,6 +3,7 @@
     $(function() {
         $('#positions').mightyList({
             deleteKey: 'positionId',
+            focusSelector: '[name="positions[id][]"]',
             templateSelector: '[data-template]',
             onModify: function (element) {
                 element.closest('[data-item]').find('[data-unsaved-indicator]').removeClass('hide');
