@@ -141,7 +141,7 @@
     [ 'Sports', routeLookup('sportsfixturesSport.getList') ],
     [ match.division.sport.name, routeLookup('sportsfixturesSport.getEntity', { entityId: match.division.sport.id }) ],
     [ match.division.name, routeLookup('sportsfixturesDivision.getLobby', { entityId: match.division.id }) ],
-    [ 'Fixtures', routeLookup('sportsfixturesMatch.getList', { contextId: match.division.id }) ],
+    [ 'Seasons', routeLookup('sportsfixturesMatch.getList', { contextId: match.division.id }) ],
     [ match.name | default(action ~ ' Match') ]
 ) }}
 

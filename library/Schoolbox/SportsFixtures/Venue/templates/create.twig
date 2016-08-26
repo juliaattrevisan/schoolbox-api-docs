@@ -25,15 +25,16 @@
     });
 </script>
 
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesVenue.getList', {}) }}">All Venues</a></li>
-    <li class="active"><a href="#">{{ action }}</a></li>
-</ul>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Fixtures', routeLookup('sportsfixtures.getLanding') ],
+    [ 'Venues',   routeLookup('sportsfixturesVenue.getList') ],
+    [ venue.name | default ('New Venue') ]
+) }}
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Sports Fixtures</h1>
+        <h1>Fixtures</h1>
     </div>
 </div>
 

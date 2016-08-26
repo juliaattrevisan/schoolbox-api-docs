@@ -22,6 +22,14 @@
         });
     });
 </script>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Fixtures', routeLookup('sportsfixtures.getLanding') ],
+    [ 'Venues',   routeLookup('sportsfixturesVenue.getList') ],
+    [ venue.name | default ('New Venue') ]
+) }}
+
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
     <li class="active"><a href="{{ routeLookup('sportsfixturesVenue.getList', {}) }}">All Venues</a></li>

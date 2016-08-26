@@ -88,17 +88,19 @@
         });
     });
 </script>
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Fixtures</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">Sports</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesSport.getEntity', { entityId: division.sport.id }) }}">{{ division.sport.name }}</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesDivision.getLobby', { entityId: division.id }) }}">{{ division.name }}</a></li>
-    <li class="active"><a>Fixtures</a></li>
-</ul>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Fixtures',          routeLookup('sportsfixtures.getLanding') ],
+    [ 'Sports',            routeLookup('sportsfixturesSport.getList') ],
+    [ division.sport.name, routeLookup('sportsfixturesSport.getEntity', { entityId: division.sport.id }) ],
+    [ division.name,       routeLookup('sportsfixturesDivision.getLobby', { entityId: division.id }) ],
+    [ 'Seasons ']
+) }}
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>{{ division.name }} {{ division.sport.name }} Fixtures</h1>
+        <h1>{{ division.name }} {{ division.sport.name }} Seasons</h1>
     </div>
 </div>
 
