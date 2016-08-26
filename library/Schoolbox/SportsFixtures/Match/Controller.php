@@ -364,7 +364,7 @@ class Controller extends AbstractController
 
         for ($i = 0; $i < $itCount; ++$i) {
 
-            if (empty($itPost['description'])) {
+            if (empty($itPost['description'][$i])) {
                 continue;
             }
 

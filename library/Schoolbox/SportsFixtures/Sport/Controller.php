@@ -143,7 +143,7 @@ class Controller extends AbstractController
         $pCount = count($posPost['id']);
 
         for ($i = 0; $i < $pCount; ++$i) {
-            if (empty($pCount['name'])) {
+            if (empty($posPost['name'][$i])) {
                 continue;
             }
 

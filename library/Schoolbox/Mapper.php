@@ -2810,23 +2810,28 @@ abstract class Mapper implements IMapper, Serializable
 
         // retrieve records that already exist for this match and index by ID
         $existing = $foreignMapper->findByColumnList($search)->indexBy($foreignIdProperty);
+        $create   = $this->createCollection($collection->getAll())->filterBy($foreignIdProperty, null);
         $updated  = $this->createCollection($collection->getAll())->indexBy($foreignIdProperty);
+
+        unset($updated[null]);
 
         // extract IDs
         $existingIds = $existing->getColumnValues($foreignIdProperty);
         $updatedIds  = $updated->getColumnValues($foreignIdProperty);
 
         // determine what to do
-        $delete  = array_diff($existingIds, $updatedIds);
-        $persist = array_diff($updatedIds, $delete);
+        $delete = array_diff($existingIds, $updatedIds);
+        $update = array_diff($updatedIds, $delete);
 
         foreach ($delete as $id) {
             $foreignMapper->delete($existing[$id]);
         }
 
-        foreach ($persist as $id) {
+        foreach ($update as $id) {
             $foreignMapper->save($updated[$id]);
         }
+
+        $foreignMapper->save($create);
 
         return true;
     }
