@@ -2,6 +2,7 @@
 
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Mapper\Exception as MapperException;
 
 //require_once 'include/permission.php';
 
@@ -150,7 +151,11 @@ function renderStudent(
 
         $owner = $groupHandler->getOwner($group['id']);
         if (is_array($owner)) {
-            $group['owner'] = $userMapper->findById($owner['uid']);
+            try {
+                $group['owner'] = $userMapper->findById($owner['uid']);
+            } catch (MapperException $e) {
+                $group['owner'] == $userMapper->getUnknownUser();
+            }
         }
     }
     unset($group);
