@@ -17,6 +17,8 @@ ADD CONSTRAINT `fk_folder_id`
 CREATE TABLE `course` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `folder_id` INT UNSIGNED NOT NULL,
+  `created_at` DATETIME NOT NULL,
+  `deleted_at` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `folder_id_UNIQUE` (`folder_id` ASC),
   CONSTRAINT `fk_course_folder_id`
@@ -30,6 +32,8 @@ CREATE TABLE `course_unit` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `folder_id` INT UNSIGNED NOT NULL,
   `course_id` INT UNSIGNED NOT NULL,
+  `created_at` DATETIME NOT NULL,
+  `deleted_at` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `folder_id_UNIQUE` (`folder_id` ASC),
   INDEX `fk_course_unit_course_id_idx` (`course_id` ASC),
@@ -37,12 +41,15 @@ CREATE TABLE `course_unit` (
     FOREIGN KEY (`course_id`)
     REFERENCES `course` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
 
 CREATE TABLE `course_instance` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `folder_id` INT UNSIGNED NOT NULL,
   `course_id` INT UNSIGNED NOT NULL,
+  `created_at` DATETIME NOT NULL,
+  `deleted_at` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `folder_id_UNIQUE` (`folder_id` ASC),
   INDEX `fk_course_instance_course_id_idx` (`course_id` ASC),
@@ -50,7 +57,8 @@ CREATE TABLE `course_instance` (
   FOREIGN KEY (`course_id`)
   REFERENCES `course` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
 
 ALTER TABLE `course_unit_instance`
 CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ;
