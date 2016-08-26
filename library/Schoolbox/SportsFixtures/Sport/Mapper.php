@@ -116,6 +116,11 @@ class Mapper extends BaseMapper
      */
     public function savePositions(Sport $model)
     {
+        // ensure the positions all point onto this sport
+        foreach ($model->getPositions() as $position) {
+            $position->setSport($model);
+        }
+
         return $this->cascadeJoin('positions', [ 'sport_id' => $model->getId() ], $model->getPositions());
     }
 

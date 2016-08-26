@@ -93,6 +93,11 @@ class Mapper extends BaseMapper
      */
     public function saveItinerary(Match $match)
     {
+        // ensure the itinerary items all point to the correct match (ie. this one)
+        foreach ($match->getItinerary() as $item) {
+            $item->setMatch($match);
+        }
+        
         return $this->cascadeJoin('itinerary', [ 'match_id' => $match->getId() ], $match->getItinerary());
     }
 
