@@ -716,37 +716,51 @@ nav {
   @extend .hide-for-print;
 }
 
+@mixin list-interaction($selector, $cursor, $icon: '', $color: $content-ui-foreground) {
+	.#{$selector} {
+		@if str-length($icon) > 0 {
+			@extend .icon-#{$icon};
+		}
+		@extend [class^="icon-"]; // (this is valid)
+		display: table;
+		padding: 0;
+		text-align: center;
+		cursor: $cursor;
+		&:before {
+			display: table-cell;
+			vertical-align: middle;
+			padding: 0;
+			color: $color;
+			@media #{$small-only} {
+				line-height: 3;
+			}
+			@media #{$medium-up} {
+				line-height: 4;
+			}
+		}
+		&.compact:before{
+			line-height: 2.5;
+		}
+	}
+}
+
 @mixin information-list() {
 	@include responsive-sides(1, padding);
 	list-style: none;
 	margin: 0;
 	padding: 0;
 
+	&.expandable {
+		@include list-interaction('expander', 'pointer');
+	}
+
     &.sortable {
         .ui-sortable-helper {
             border-bottom: none;
             background-color: $row-action-hover-background;
         }
-        .grip {
-            @include grid-column(1);
-            @extend .icon-grip;
-            @extend [class^="icon-"]; // (this is valid)
-			display: table;
-			padding: 0;
-			text-align: center;
-			cursor: move;
 
-			&:before {
-				display: table-cell;
-				vertical-align: middle;
-				padding: 0;
-				color: $content-ui-foreground;
-				line-height: 4;
-			}
-		}
-		.grip.compact:before{
-			line-height: 2.5;
-		}
+		@include list-interaction('grip', 'move', 'grip');
 	}
 	> li{
 		@include grid-row($behavior:nest); // there is no scenario in which .information-list > li will operate as anything other than a row
@@ -1444,6 +1458,11 @@ ul.flex-list {
         width: #{'calc(100% - 4rem)'};
         max-width: #{'calc(100% - 4rem)'};
     }
+
+	[type="text"] {
+		margin-top: rem-calc(($base-font-size - 10));
+		margin-bottom: rem-calc(($base-font-size - 10));
+	}
 }
 
 p{

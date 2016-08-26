@@ -23,27 +23,25 @@
     });
 </script>
 
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: division.sport.id}) }}">Divisions in {{ division.sport.name }}</a></li>
-    <li class="active"><a href="{{ routeLookup('sportsfixturesDivision.getLobby', {entityId: division.id}) }}">{{ division.name }} Lobby</a></li>
-</ul>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Fixtures',          routeLookup('sportsfixtures.getLanding') ],
+    [ 'Sports',            routeLookup('sportsfixturesSport.getList') ],
+    [ division.sport.name, routeLookup('sportsfixturesSport.getEntity', { entityId: division.sport.id }) ],
+    [ division.name ]
+) }}
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Sports Fixtures</h1>
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1>{{ division.name }} {{ division.sport.name }} Lobby</h1>
+        </div>
     </div>
-</div>
-
-<div class="row">
-    <div class="small-12 columns">
-        <select id="player-filter">
-            <option value="0">Show All Players</option>
-            <option value="1" selected>Show Unassigned Players</option>
-            <option value="2">Show Assigned Players</option>
-        </select>
-    </div>
+    {% if division.teams | length %}
+    <nav>
+        <a href="{{ routeLookup('sportsfixturesMatch.getList', { contextId: division.id }) }}" class="icon-match" title="View Fixture"></a>
+    </nav>
+    {% endif %}
 </div>
 
 <div class="row">
@@ -58,6 +56,17 @@
                 <a href="#" class="icon-add" title="Add Players" data-reveal-id="addPlayersModal"></a>
                 <a href="#" class="icon-upload" title="Upload Player List" data-reveal-id="uploadPlayersModal"></a>
             </nav>
+        </div>
+        <div class="row">
+            <div class="small-12 column">
+                <div class="content">
+                    <select id="player-filter">
+                        <option value="0">Show All Players</option>
+                        <option value="1" selected>Show Unassigned Players</option>
+                        <option value="2">Show Assigned Players</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         {% if players is not empty %}

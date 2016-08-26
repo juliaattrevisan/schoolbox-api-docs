@@ -13,15 +13,19 @@ namespace Schoolbox\SportsFixtures\Match;
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Collection;
-use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
 use Schoolbox\SportsFixtures\Division\Model as Division;
 use Schoolbox\SportsFixtures\Season\Model as Season;
 use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Venue\Model as Venue;
+use Schoolbox\SportsFixtures\Result\Model as Result;
+use Schoolbox\SportsFixtures\ItineraryItem\Model as ItineraryItem;
 
 class Model implements ISoftDeletable
 {
-    use DeletedAtDate;
+    use ModelTrait\DeletedAtDate;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
 
     /** @var int */
     protected $id;
@@ -55,17 +59,11 @@ class Model implements ISoftDeletable
 
     /** @var \Alaress_Date_Format */
     protected $startAt;
-
-    /** @var \Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var \Alaress_Date_Format */
-    protected $updatedAt;
-
-    /** @var Collection */
+    
+    /** @var Collection|Result[] */
     protected $result;
 
-    /** @var Collection */
+    /** @var Collection|ItineraryItem[] */
     protected $itinerary;
 
     /**
@@ -272,7 +270,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Collection
+     * @return Collection|ItineraryItem[]
      */
     public function getItinerary()
     {
@@ -280,7 +278,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection $itinerary
+     * @param Collection|ItineraryItem[] $itinerary
      * @return static
      */
     public function setItinerary($itinerary)
@@ -323,41 +321,5 @@ class Model implements ISoftDeletable
     {
         $this->notes = $notes;
         return $this;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $createdAt
-     * @return static
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param \Alaress_Date_Format $updatedAt
-     * @return static
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
     }
 }

@@ -22,10 +22,12 @@
         });
     });
 </script>
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
-    <li class="active"><a href="{{ routeLookup('sportsfixturesVenue.getList', {}) }}">All Venues</a></li>
-</ul>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Fixtures', routeLookup('sportsfixtures.getLanding') ],
+    [ 'Venues' ]
+) }}
 
 <div class="actions-small-1 row">
     <div class="list-item">

@@ -2,13 +2,9 @@
     $(function() {
         $('#positionForm').alaressValidate({
             rules: {
-                sportId: {
-                    required: true,
-                    min: 1
-                },
                 name: {
                     required: true,
-                    minlength: 2
+                    minlength: 1
                 }
             },
             messages: {
@@ -23,8 +19,8 @@
 </script>
 
 <ul class="breadcrumb">
-    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
+    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Fixtures</a></li>
+    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">Sports</a></li>
     <li><a href="{{ routeLookup('sportsfixturesPosition.getList', {contextId: sport.id}) }}">Positions in {{ sport.name }}</a></li>
 
     {% if position.id %}
@@ -48,7 +44,7 @@
             {% set formUrl = routeLookup('sportsfixturesPosition.createEntity') %}
         {% endif %}
 
-        <form id='positionForm' action="{{ formUrl }}" method="post">
+        <form id="positionForm" action="{{ formUrl }}" method="post">
             <h2 class="subheader">{{ action }} Position in {{ sport.name }}</h2>
 
             <section>

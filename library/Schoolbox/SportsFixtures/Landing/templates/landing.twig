@@ -1,6 +1,7 @@
-<ul class="breadcrumb">
-    <li class="active"><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
-</ul>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Fixtures' ]
+) }}
 
 <div class="row">
     <div class="small-12 columns">

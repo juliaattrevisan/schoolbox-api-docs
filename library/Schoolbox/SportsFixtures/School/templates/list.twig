@@ -1,40 +1,20 @@
-<script>
+<script type="text/javascript" src="/javascript/shared/jquery.toast-timeout.js"></script>
+<script type="text/javascript" src="/javascript/shared/sportsfixtures/jquery.mightyList.js"></script>
+<script type="text/javascript">
     $(function() {
-        $('[data-school-modify]').click(function() {
-            $('#schoolId').val($(this).attr('data-school-modify'));
-            $('#schoolName').val($(this).attr('data-school-name'));
-        });
-
-        $('[data-school-delete]').click(function() {
-            event.preventDefault();
-
-            var $school = $(this).closest('[data-school]');
-            var schoolId = $(this).data('school-delete');
-
-            $(this).confirmDialog({
-                text: 'Are you sure you want to delete this school?',
-                confirmEvent: function () {
-                    $.post('{{ routeLookup('sportsfixturesSchool.postDeleteSchool') }}', {id: schoolId}, function() {
-
-                        $school.fadeOut({ done: function(){
-
-                            // Is this the last external school ?
-                            if( 1 == $('[data-school]').length){
-                                $('#schoolEmpty').removeClass('hide');
-                            }
-
-                            $school.remove();
-                        } });
-                    });
-                }
-            });
+        $('#allSchools').mightyList({
+            deleteKey: 'id',
+            templateSelector: '[data-clone]'
         });
     });
 </script>
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
-    <li class="active"><a href="{{ routeLookup('sportsfixturesSchool.getList', {}) }}">External Schools</a></li>
-</ul>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Fixtures', routeLookup('sportsfixtures.getLanding') ],
+    [ 'External Schools' ]
+) }}
+
 
 <div class="row">
     <div class="small-12 columns">
@@ -42,9 +22,8 @@
     </div>
 </div>
 
-
 <div class="row">
-    <div class="small-12 island" id="allSports">
+    <div class="small-12 island" id="allSchools">
         <div class="actions-small-1 row">
             <div class="list-item">
                 <div class="small-12 columns">
@@ -52,57 +31,27 @@
                 </div>
             </div>
             <nav>
-                <a href="#" data-reveal-id="addSchoolModal" class="icon-add" title="Add School"></a>
+                <a href="#" data-item-add class="icon-add" title="Add School"></a>
             </nav>
         </div>
-
-        {% if schools | length %}
-            <section id="schoolList">
-                <ul class="action-list">
-                    {% for school in schools %}
-                    <li class="actions-small-2" data-school="{{ school.id }}">
-                        <div class="list-item">
-                            <div class="card compact small-12">
-                                <h3>{{ school.name }}</h3>
-                            </div>
-                        </div>
-                        <nav>
-                            <a href='#' data-reveal-id="editSchoolModal" data-school-name="{{ school.name }}" data-school-modify="{{ school.id }}" class="icon-modify" title="Edit School"></a>
-                            <a href="#" class="icon-more" data-dropdown="sportsfixtures-school-{{ school.getId() }}-actions"></a>
-                        </nav>
-                        <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-school-{{ school.getId() }}-actions">
-                            <li><a href='#' data-school-delete="{{ school.id }}" class="icon-delete" title="Delete School">Delete</a></li>
-                        </ul>
+        <section>
+            <ul class="information-list hide" data-item-list>
+                {% for school in schools %}
+                    <li class="actions-small-1" data-item="{{ school.id }}">
+                        {% include '@sportsfixturesSchool/listItem.twig' %}
                     </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        {% endif %}
-
-        <div id="schoolEmpty" class="empty-state {% if schools | length %}hide{% endif %}">
+                {% endfor %}
+            </ul>
+        </section>
+        <div id="schoolEmpty" class="empty-state hide">
             <i class="icon-match"></i>
-            <p>There are no External Schools.</p>
-            <p><a href="#" data-reveal-id="addSchoolModal" title="Add a School">Add a School</a></p>
+            <p>There are currently no external schools.</p>
+            <p><a href="#" data-item-add>Add a school</a></p>
         </div>
+        <ul class="information-list hide">
+            <li data-clone class="actions-small-1" data-item>
+                {% include '@sportsfixturesSchool/listItem.twig' %}
+            </li>
+        </ul>
     </div>
-</div>
-
-
-<div id="addSchoolModal" class="reveal-modal" data-reveal aria-labelledby="addSchoolModalTitle" aria-hidden="true" role="dialog">
-    <h2 id="addSchoolModalTitle">Add External School</h2>
-    <form action="{{ routeLookup('sportsfixturesSchool.postAddSchool') }}" method="post">
-        <input type="text" name="name" placeholder="School Name">
-        <input type="submit" class="full-width" value="Add" />
-    </form>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-
-<div id="editSchoolModal" class="reveal-modal" data-reveal aria-labelledby="editSchoolModalTitle" aria-hidden="true" role="dialog">
-    <h2 id="editSchoolModalTitle">Edit External School</h2>
-    <form action="{{ routeLookup('sportsfixturesSchool.postEditSchool') }}" method="post">
-        <input type="hidden" id="schoolId" name="id">
-        <input type="text" id="schoolName" name="name" placeholder="School Name">
-        <input type="submit" class="full-width" value="Edit" />
-    </form>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>

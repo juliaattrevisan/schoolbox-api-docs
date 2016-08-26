@@ -1,0 +1,39 @@
+<script type="text/javascript" src="/javascript/shared/sportsfixtures/jquery.mightyList.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#positions').mightyList({
+            deleteKey: 'positionId',
+            focusSelector: '[name="positions[name][]"]',
+            templateSelector: '[data-template]',
+            onModify: function (element) {
+                element.closest('[data-item]').find('[data-unsaved-indicator]').removeClass('hide');
+            },
+            onDelete: function (element, container) {
+                container.detach();
+            },
+            onRevert: function (element) {
+                element.closest('[data-item]').find('[data-unsaved-indicator]').addClass('hide');
+            }
+        });
+    });
+</script>
+
+<section>
+    <ul class="action-list hide" data-item-list>
+        {% for position in positions %}
+            <li class="actions-small-1" data-item>
+                {% include '@sportsfixturesPosition/listItem.twig' %}
+            </li>
+        {% endfor %}
+    </ul>
+</section>
+<div class="empty-state hide">
+    <i class="icon-position"></i>
+    <p>There are currently no positions for {{ sport.name | default('this sport') }}.</p>
+    <p><a data-item-add>Add a position</a></p>
+</div>
+<ul class="information-list hide">
+    <li data-template class="actions-small-1" data-item>
+        {% include '@sportsfixturesPosition/listItem.twig' %}
+    </li>
+</ul>

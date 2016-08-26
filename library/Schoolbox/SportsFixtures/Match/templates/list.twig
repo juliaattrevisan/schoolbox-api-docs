@@ -88,48 +88,41 @@
         });
     });
 </script>
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: division.getSport.id}) }}">Divisions in {{ division.getSport.name }}</a></li>
-    <li class="active"><a href="{{ routeLookup('sportsfixturesMatch.getList', {contextId: division.id}) }}">Matches in {{ division.name }}</a></li>
-</ul>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Fixtures',          routeLookup('sportsfixtures.getLanding') ],
+    [ 'Sports',            routeLookup('sportsfixturesSport.getList') ],
+    [ division.sport.name, routeLookup('sportsfixturesSport.getEntity', { entityId: division.sport.id }) ],
+    [ division.name,       routeLookup('sportsfixturesDivision.getLobby', { entityId: division.id }) ],
+    [ 'Seasons ']
+) }}
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Sports Fixtures</h1>
+        <h1>{{ division.name }} {{ division.sport.name }} Seasons</h1>
     </div>
 </div>
 
 <div class="row">
-    <div class="small-12 island">
-        <div class="actions-small-1 row">
-            <div class="list-item">
-                <div class="small-12 columns">
-                    <h2 class="subheader">Matches in {{ division.name }}</h2>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="small-12 medium-6 columns">
         <div class="content">
             <div data-context-switcher class="context-switch clearfix">
                 <nav>
-                    <a data-interaction="previous" {% if allSeasons.last.getId != division.season.getId %} disabled {% endif %} href="#" title="Previous Season"></a>
+                    <a data-interaction="previous" {% if allSeasons.last.id != division.season.id %} disabled {% endif %} href="#" title="Previous Season"></a>
                 </nav>
                 <div class="semester">
                     <select id="context-selector-semester">
                         <option value="0" selected="selected">All Seasons</option>
                         {% for season in allSeasons %}
-                            {% set isCurrent = season.getId == division.season.getId %}
-                            <option value="{{ season.getId }}" {% if isCurrent %} selected="selected" {% endif %}
-                            >{{ season.name }} ({{ season.start.getDateOnly }}—{{ season.end.getDateOnly }}){% if isCurrent %} *{% endif %}</option>
+                            {% set isCurrent = season.id == division.season.id %}
+                            <option value="{{ season.id }}" {% if isCurrent %} selected="selected" {% endif %}
+                            >{{ season.name }} ({{ season.start.dateOnly }}—{{ season.end.dateOnly }}){% if isCurrent %} *{% endif %}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <nav>
-                    <a data-interaction="next" {% if allSeasons.first.getId != division.season.getId %} disabled {% endif %} href="#" title="Next Season"></a>
+                    <a data-interaction="next" {% if allSeasons.first.id != division.season.id %} disabled {% endif %} href="#" title="Next Season"></a>
                 </nav>
             </div>
         </div>
@@ -138,26 +131,41 @@
     <div class="small-12 island" id="allMatches">
         <div>
             {% for season in allSeasons %}
-                <div data-season="{{ season.id }}" {% if season.isArchived %} data-archived="1" {% endif %}  {% if season.getId != division.season.getId %} class="hide" {% endif %}  >
+                {% set matchCount = allMatches[season.id]|length %}
+
+                <div data-season="{{ season.id }}" {% if season.archived %} data-archived="1" {% endif %}  {% if season.id != division.season.id %} class="hide" {% endif %}  >
                     <div class="actions-small-1">
-                        <h2 class="subheader"><a href="{{ routeLookup('sportsfixturesSeason.getEntity', {entityId: season.id}) }}">
-                                {% if season.isArchived %}
+                        <div class="list-item">
+                            <h2 class="subheader">
+                                {% if season.archived %}
                                     <del class="icon icon-archive" title="Season has been archived.">{{ season.name }}</del>
                                 {% else %}
                                     <span title="View season details">{{ season.name }}</span>
                                 {% endif %}
-                            </a>
-                            {% if season.getId == division.season.getId %} (<span title="{{ division.name }} is currently attached to this season">current</span>) {% endif %}
-                        </h2>
+                                {% if season.id == division.season.id %} (<span title="{{ division.name }} is currently attached to this season">current</span>) {% endif %}
+                            </h2>
+                            <ul class="meta">
+                                <li class="icon-match">
+                                    {% if not matchCount %}
+                                    No matches
+                                    {% elseif matchCount == 1 %}
+                                    One match
+                                    {% else %}
+                                    {{ matchCount }} matches
+                                    {% endif %}
+                                    in fixture
+                                </li>
+                            </ul>
+                        </div>
 
                         <nav>
-                            {% if not season.isArchived %}
-                                <a href='{{ routeLookup('sportsfixturesMatch.getCreateForm', {contextId: division.id}) }}?season={{ season.id }}' class="icon-add" title="Add Match to {{ season.name }} {{ division.name }}"></a>
+                            {% if not season.archived %}
+                                <a href='{{ routeLookup('sportsfixturesMatch.getCreateForm', {contextId: division.id}) }}?season={{ season.id }}' class="icon-add" title="Add Match to {{ division.name }} {{ division.sport.name }} {{ season.name }} "></a>
                             {% endif %}
                         </nav>
                     </div>
 
-                    {% if allMatches[season.id]|length %}
+                    {% if matchCount %}
                     <section>
                         <ul class="action-list">
                             {% for currentMatch in allMatches[season.id] %}
@@ -165,11 +173,15 @@
                             {% endfor %}
                         </ul>
                     </section>
-                    {% elseif not division.season.isArchived %}
+                    {% else %}
                         <div class="empty-state">
                             <i class="icon-match"></i>
-                            <p>There are no Matches in {{ season.name }} {{ division.name }}.</p>
-                            <p><a href="{{ routeLookup('sportsfixturesMatch.getCreateForm', {contextId: division.id}) }}?season={{ season.id }}" title="Add Match to {{ season.name }} {{ division.name }}">Add a Match</a></p>
+                            <p>There are no matches in {{ division.name }} {{ division.sport.name }} {{ season.name }}.</p>
+                        {% if division.season.archived %}
+                            <p>This season is currently archived. To add a match, you first need to <a href="{{ routeLookup('sportsfixturesSeason.getList') }}">restore it</a> or <a href="{{ routeLookup('sportsfixturesDivision.getModifyForm', { entityId: division.id }) }}">assign the division to a different season</a>.</p>
+                        {% else %}
+                            <p><a href="{{ routeLookup('sportsfixturesMatch.getCreateForm', {contextId: division.id}) }}?season={{ season.id }}" title="Add match to {{ division.name }} {{ division.sport.name }} {{ season.name }}">Add a Match</a></p>
+                        {% endif %}
                         </div>
                     {% endif %}
                 </div>

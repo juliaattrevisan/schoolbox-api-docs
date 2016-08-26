@@ -40,80 +40,81 @@ class Controller extends AbstractController
     /**
      * List of Seasons
      *
-     * @api GET /sportsfixtures/seasons
+     * @api GET /sportsfixtures/seasons?query
      * @level 165
      *
      * @param object $context
      */
     public function getList($context = null)
     {
-        /* ajax a list of seasons
-         */
-        if ($this->getRequest()->isXhr()) {
-            $query = $this->getRequest()->query->get('query');
-
-            /** @var SeasonMapper $mapper */
-            $mapper     = $this->getMapper();
-            $allSeasons = $mapper->findByName($query);
-
-            $allSeasons->sortByMultiFields([
+        // in all forms, the retrieved list will be sorted like this
+        $options = [
+            'order' => [
                 'start' => 'desc',
                 'end'   => 'desc',
-            ]);
+            ]
+        ];
 
-            $seasons = [];
+        /* ajax a list of seasons
+         */
+        if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
 
-            /** @var Season $currentSeason */
-            foreach ($allSeasons as $currentSeason) {
-                // Filter out archive seasons
-                if(!$currentSeason->isArchived()){
-                    $seasons[] = array_combine(['id', 'name'], $currentSeason->findValueLabelPair());
+            // quote the query string to protect against injection and the like
+            $query = $this->getMapper()->getDatabase()->quoteForLike($this->getRequest()->query->get('query'));
+
+            $search = [
+                '~name'       => "%$query%",
+                'archived_at' => null
+            ];
+
+            // get the list with archived excluded, sort by start and end, then transform to be selectize-compatible
+            $seasons = $this->getMapper()->findByColumnList($search, $options)->map(
+                function ($season)
+                {
+                    /** @var Season $season */
+                    return array_combine([ 'id', 'name' ], $season->findValueLabelPair());
                 }
-            }
+            );
 
             $this->getResponse()->content->set($this->buildJsonOutput($seasons));
+
+            return;
         }
-        else {
-            try {
-                /** @var Collection|Season[] $allSeasons */
-                $allSeasons = $this->mapper->findAll(
-                    [
-                        'order' => [
-                            'start' => 'desc',
-                            'end' => 'desc',
-                        ]
-                    ]
-                );
 
-                // Get number of division attached to each season to inform
-                // user of impact of archive/delete/restore actions.
-                $divisionCounts = $this->getMapper()->getDivisionCounts();
-                $matchCounts    = $this->getMapper()->getMatchCounts();
+        try {
+            /** @var Collection|Season[] $allSeasons */
+            $allSeasons = $this->getMapper()->findAll($options);
 
-                // Ensure all seasons have keys for twig to access
-                foreach($allSeasons as $season){
-                    if(!isset($divisionCounts[$season->getId()])){
-                        $divisionCounts[$season->getId()] = 0;
-                    }
-                    if(!isset($matchCounts[$season->getId()])){
-                        $matchCounts[$season->getId()] = 0;
-                    }
+            // Get number of division attached to each season to inform
+            // user of impact of archive/delete/restore actions.
+            $divisionCounts = $this->getMapper()->getDivisionCounts();
+            $matchCounts    = $this->getMapper()->getMatchCounts();
+
+            // Ensure all seasons have keys for twig to access
+            foreach ($allSeasons as $season) {
+                if (!isset($divisionCounts[$season->getId()])) {
+                    $divisionCounts[$season->getId()] = 0;
                 }
-
-                $this->getResponse()->content->set(
-                    $this->buildHtmlOutput(
-                        '@sportsfixturesSeason/list.twig',
-                        [
-                            'allSeasons'     => $allSeasons,
-                            'divisionCounts' => $divisionCounts,
-                            'matchCounts'    => $matchCounts,
-                        ]
-                    )
-                );
-            } catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
+                if (!isset($matchCounts[$season->getId()])) {
+                    $matchCounts[$season->getId()] = 0;
+                }
             }
+
+            $this->getResponse()->content->set(
+                $this->buildHtmlOutput(
+                    '@sportsfixturesSeason/list.twig',
+                    [
+                        'allSeasons'     => $allSeasons,
+                        'divisionCounts' => $divisionCounts,
+                        'matchCounts'    => $matchCounts,
+                    ]
+                )
+            );
+
+        } catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_NOT_FOUND);
         }
+
     }
 
     /**

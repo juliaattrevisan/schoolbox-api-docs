@@ -7,14 +7,16 @@
         });
     });
 </script>
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
-    <li class="active"><a href="{{ routeLookup('sportsfixturesStatus.getList', {}) }}">Status</a></li>
-</ul>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Fixtures', routeLookup('sportsfixtures.getLanding') ],
+    [ 'Statuses' ]
+) }}
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Sports Fixtures</h1>
+        <h1>Fixtures</h1>
     </div>
 </div>
 
@@ -34,56 +36,22 @@
         <section>
             <ul class="information-list hide" data-item-list>
                 {% for currentStatus in allStatus %}
-                    <li class="actions-small-1" data-item="{{ currentStatus.id }}">
-                        <div class="list-item">
-                            <div data-action="{{ routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) }}">
-                                <section>
-                                    <fieldset class="content">
-                                        <div class="small-12 columns">
-                                            <label>
-                                                <input type="text" name="name" value="{{ currentStatus.name }}" data-item-original-value="{{ currentStatus.name }}" data-item-element />
-                                            </label>
-
-                                            <div class="toast" data-alert data-save-item></div>
-                                        </div>
-                                    </fieldset>
-                                </section>
-                            </div>
-                        </div>
-                        <nav>
-                            <a href="{{ routeLookup('sportsfixturesStatus.deleteEntity', {entityId: currentStatus.id}) }}" class="icon-delete" title="Delete" data-delete></a>
-                        </nav>
+                    <li class="actions-small-2" data-item="{{ currentStatus.id }}">
+                        {% include '@sportsfixturesStatus/listItem.twig' %}
                     </li>
                 {% endfor %}
             </ul>
         </section>
         <div class="empty-state hide">
             <i class="icon-position"></i>
-            <p>There are no Statuses.</p>
+            <p>There are currently no statuses.</p>
             <p><a title="Add a Status" data-item-add>Add a Status</a></p>
         </div>
+        <ul class="information-list hide">
+            <li id="item-clone" class="actions-small-2" data-item="">
+                {% include '@sportsfixturesStatus/listItem.twig' %}
+            </li>
+        </ul>
     </div>
 </div>
 
-<ul class="information-list hide">
-    <li id='item-clone' class="actions-small-1" data-item="">
-        <div class="list-item">
-            <div data-action="{{ routeLookup('sportsfixturesStatus.createEntity') }}">
-                <section>
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            <label>
-                                <input type="text" name="name" value="" data-item-original-value="" data-item-element />
-                            </label>
-
-                            <div class="toast" data-alert data-save-item></div>
-                        </div>
-                    </fieldset>
-                </section>
-            </div>
-        </div>
-        <nav>
-            <a href="" class="icon-delete" title="Delete" data-delete></a>
-        </nav>
-    </li>
-</ul>

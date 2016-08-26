@@ -121,7 +121,7 @@ class Controller extends AbstractController
     {
         /* ajax a list of Teams for a particular Division
          */
-        if ($this->getRequest()->isXhr()) {
+        if (strpos($this->getRequest()->headers->get('accept'), 'application/json') !== false) {
             $query = $this->getRequest()->query->get('query');
 
             /** @var TeamMapper $mapper */
@@ -154,7 +154,7 @@ class Controller extends AbstractController
 
                 // Sort return array by name
                 usort($teams, function ($a, $b) {
-                    return (strcmp($a['name'], $b['name']));
+                    return strcmp($a['name'], $b['name']);
                 });
             }
 
@@ -256,8 +256,8 @@ class Controller extends AbstractController
             $entity
         );
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesTeam.getList', [
-            'contextId' => $divisionId
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesDivision.getLobby', [
+            'entityId' => $divisionId
         ]));
     }
 

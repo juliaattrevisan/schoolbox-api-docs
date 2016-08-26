@@ -7,13 +7,9 @@
                 name: {
                     required: true,
                     minlength: 2
-                },
-                divisionId: {
-                    min: 1
                 }
             },
             messages: {
-                'divisionId': 'Please choose a Division.',
                 'name': 'Please enter a Team name.'
             },
             errorPlacement: function(error, element) {
@@ -61,22 +57,18 @@
     });
 </script>
 
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesTeam.getList', {contextId: division.id}) }}">Teams in {{ division.name }}</a></li>
-
-    {% if team.id %}
-    <li class="active"><a href="{{ routeLookup('sportsfixturesTeam.getModifyForm', {entityId: team.id}) }}">{{ team.name }}</a></li>
-    {% else %}
-    <li class="active"><a href="#">{{ action }}</a></li>
-    {% endif %}
-</ul>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Fixtures',    routeLookup('sportsfixtures.getLanding') ],
+    [ 'Sports',      routeLookup('sportsfixturesSport.getList') ],
+    [ sport.name,    routeLookup('sportsfixturesSport.getEntity', { entityId: sport.id }) ],
+    [ division.name, routeLookup('sportsfixturesDivision.getLobby', { entityId: division.id }) ],
+    [ team.name | default(action ~ ' Team') ]
+) }}
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Sports Fixtures</h1>
+        <h1>{{ division.name }} {{ sport.name }}</h1>
     </div>
 </div>
 
@@ -89,27 +81,26 @@
         {% endif %}
 
         <form id='teamForm' action="{{ formUrl }}" method="post">
-            <h2 class="subheader">{{ action }} Team in {{ division.name }}</h2>
+            <h2 class="subheader">{{ action }} Team</h2>
 
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <input type="hidden" name="divisionId" value="{{ division.id }}"/>
                         <input type="hidden" name="teamId" value="{{ team.id }}"/>
-
+                    </div>
+                    <div class="small-12 columns">
                         <label>
                             Name
                             <input type="text" name="name" value="{{ team.name }}"/>
                         </label>
-
+                    </div>
+                    <div class="small-12 columns">
                         <label>
-                            Url
-                            <input type="text" name="url" value="{{ team.url }}" />
+                            Homepage URL
+                            <input type="text" name="url" value="{{ team.url }}" placeholder="http://" />
                         </label>
                     </div>
-                </fieldset>
-
-                <fieldset class="content">
                     <div class="small-12 columns">
                         <label>
                             Coaches

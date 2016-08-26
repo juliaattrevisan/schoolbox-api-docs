@@ -8,10 +8,6 @@
                     required: true,
                     minlength: 2
                 },
-                sportId: {
-                    required: true,
-                    minlength: 1
-                },
                 seasonId: {
                     required: true,
                     minlength: 1
@@ -19,17 +15,16 @@
             },
             messages: {
                 'name': 'Please enter a Division name.',
-                'sportId': 'Please choose a Sport.',
                 'seasonId': 'Please select a Season.'
             },
             errorPlacement: function(error, element) {
                 $.alaressValidate.defaultErrorPlacement(error, element);
             }
-        })
+        });
 
         $('#season').selectizeSelector({
             ajax: {
-                url: '/sportsfixtures/seasons',
+                url: '{{ routeLookup('sportsfixturesSeason.getList') }}',
                 type: 'GET',
                 dataType: 'json'
             },
@@ -43,28 +38,23 @@
                         // Simply filter list, don't reorder
                         return -1 === item.name.toLowerCase().indexOf(search.toLowerCase()) ? 0 : 1;
                     };
-                },
+                }
             }
         });
-
     });
 </script>
 
-<ul class="breadcrumb">
-    <li><a href="{{ routeLookup('sportsfixtures.getLanding', {}) }}">Sports Fixtures</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesSport.getList', {}) }}">All Sports</a></li>
-    <li><a href="{{ routeLookup('sportsfixturesDivision.getList', {contextId: sport.id}) }}">Divisions in {{ sport.name }}</a></li>
-
-    {% if division.id %}
-    <li class="active"><a href="{{ routeLookup('sportsfixturesDivision.getModifyForm', {entityId: division.id}) }}">{{ division.name }}</a></li>
-    {% else %}
-    <li class="active"><a href="#">{{ action }}</a></li>
-    {% endif %}
-</ul>
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ 'Fixtures',    routeLookup('sportsfixtures.getLanding') ],
+    [ 'Sports',      routeLookup('sportsfixturesSport.getList') ],
+    [ sport.name,    routeLookup('sportsfixturesSport.getEntity', { entityId: sport.id }) ],
+    [ division.name | default(action ~ ' Division') ]
+) }}
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Sports Fixtures</h1>
+        <h1>{{ sport.name }}</h1>
     </div>
 </div>
 
@@ -76,7 +66,8 @@
             {% set formUrl = routeLookup('sportsfixturesDivision.createEntity') %}
         {% endif %}
 
-        <form id='divisionForm' action="{{ formUrl }}" method="post">
+        <form id="divisionForm" action="{{ formUrl }}" method="post">
+            <input type="hidden" name="returnUrl" value="{{ referer }}" />
             <h2 class="subheader">{{ action }} Division in {{ sport.name }}</h2>
 
             <section>
@@ -91,13 +82,13 @@
                         </label>
 
                         <label>
-                            Season
-                            <input id='season' name="seasonId" type='text' value='{{ division.season.name }}' placeholder="Search Seasons" />
+                            Current Season
+                            <input id="season" name="seasonId" type="text" value="{{ division.season.name }}" placeholder="Search Seasons" />
                         </label>
 
                         <label>
-                            Url
-                            <input type="text" name="url" value="{{ division.url }}" />
+                            Homepage URL
+                            <input type="text" name="url" value="{{ division.url }}" placeholder="http://" />
                         </label>
                     </div>
                 </fieldset>

@@ -1,14 +1,14 @@
-<li class="actions-small-1" data-position>
-    <div class="list-item">
-        <div class="small-12 card">
-            <p>{{ currentPosition.name }}</p>
-        </div>
+<div class="list-item">
+    <input type="hidden" name="positions[sportId][]" value="{{ sport.id }}"/>
+    <input type="hidden" name="positions[id][]" value="{{ position.id }}"/>
+    <div class="small-12 columns">
+        <label>
+            <input type="text" name="positions[name][]" value="{{ position.name }}"  data-item-original-value="{{ position.name }}" data-item-element />
+        </label>
     </div>
-    <nav>
-        <a href="{{ routeLookup('sportsfixturesPosition.getModifyForm', {entityId: currentPosition.id}) }}" class="icon-modify" title="Modify"></a>
-        <a href="#" class="icon-more" data-dropdown="sportsfixtures-position-{{ currentPosition.getId() }}-actions"></a>
-    </nav>
-    <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-position-{{ currentPosition.getId() }}-actions">
-        <li><a href="{{ routeLookup('sportsfixturesPosition.deleteEntity', {entityId: currentPosition.id}) }}" class="icon-delete" title="Delete" data-delete="{{ currentPosition.id }}">Delete</a></li>
-    </ul>
-</li>
+</div>
+{% if not hideNav %}
+<nav>
+    <a href="{{ routeLookup('sportsfixturesPosition.deleteEntity', {entityId: position.id}) }}" class="icon-delete" title="Delete" data-delete="{{ position.id }}"></a>
+</nav>
+{% endif %}

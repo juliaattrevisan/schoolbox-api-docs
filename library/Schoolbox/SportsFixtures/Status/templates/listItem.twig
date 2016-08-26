@@ -1,0 +1,13 @@
+<div class="list-item">
+    <div class="small-12 compact card" data-action="{{ routeLookup('sportsfixturesStatus.updateEntity', {entityId: currentStatus.id}) }}">
+        <label>
+            <input type="text" name="name" placeholder="Status name" value="{{ currentStatus.name }}" data-item-original-value="{{ currentStatus.name }}" data-item-element />
+        </label>
+
+        <span class="toast" data-save-item></span>
+    </div>
+</div>
+<nav>
+    <span data-unsaved-indicator class="icon-info hide" title="Not yet saved"></span>
+    <a href="{{ routeLookup('sportsfixturesStatus.deleteEntity', {entityId: currentStatus.id}) }}" class="icon-delete" title="Delete" data-delete></a>
+</nav>

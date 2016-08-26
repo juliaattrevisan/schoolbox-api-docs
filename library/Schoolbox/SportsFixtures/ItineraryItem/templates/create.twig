@@ -1,15 +1,8 @@
 <script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
-<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
-<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
-
 <script type="text/javascript">
     $(function() {
         $('#itineraryItemForm').alaressValidate({
             rules: {
-                matchId: {
-                    required: true,
-                    min: 1
-                },
                 startAtDate: {
                     required: true
                 },
@@ -22,7 +15,6 @@
                 }
             },
             messages: {
-                'matchId': 'Please choose a Match.',
                 'startAtDate': 'Please choose a Date',
                 'startAtTime': 'Please choose a Time',
                 'description': 'Please enter a name.'
@@ -70,36 +62,12 @@
             {% set formUrl = routeLookup('sportsfixturesItineraryItem.createEntity') %}
         {% endif %}
 
-        <form id='itineraryItemForm' action="{{ formUrl }}" method="post">
+        <form id="itineraryItemForm" action="{{ formUrl }}" method="post">
             <h2 class="subheader">{{ action }} Itinerary Item in {{ match.name }}</h2>
 
             <section>
                 <fieldset class="content">
-                    <div class="small-12 columns">
-                        <input type="hidden" name="matchId" value="{{ match.id }}"/>
-                        <input type="hidden" name="itineraryItemId" value="{{ itineraryItem.id }}"/>
-
-                        <label>
-                            Description
-                            <input type="text" name="description" value="{{ itineraryItem.description }}"/>
-                        </label>
-                    </div>
-
-                    <div class="column small-12 medium-6">
-                        <label>
-                            Date
-                            <input type="text" name="startAtDate" placeholder="Date" data-datepicker value="{{ itineraryItem.startAt.getLocalShort }}">
-                        </label>
-                    </div>
-
-                    <div class="column small-12 medium-6">
-                        <div class="timepick">
-                            <label>
-                                Time
-                                <input type="text" name="startAtTime" autocomplete="off" placeholder="Start Time" class="ui-timepicker-input" data-timepicker value="{{ itineraryItem.startAt.getTimeOnly }}">
-                            </label>
-                        </div>
-                    </div>
+                    {% include '@sportsfixturesItineraryItem/listItem.twig' with { hideNav: true } %}
                 </fieldset>
             </section>
 

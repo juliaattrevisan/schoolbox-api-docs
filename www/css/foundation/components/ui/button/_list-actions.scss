@@ -82,6 +82,40 @@
 			}
 		}
 	}
+
+	$interaction-map: (
+		selectable: 'selector',
+		sortable:   'grip',
+		expandable: 'expander'
+	);
+
+	@each $interaction, $selector in $interaction-map {
+		.#{$interaction} {
+			.card, .column, .columns {
+				margin-left: 3.5rem;
+			}
+			.#{$selector} {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 3rem;
+				height: 3rem;
+			}
+		}
+	}
+
+	.selector .checkbox-label {
+		@media #{$small-only} {
+			margin: rem-calc(($base-font-size - 3)) 1rem !important;
+		}
+		@media #{$medium-up} {
+			margin: 1.25rem 1rem !important;
+		}
+	}
+	.expandable .expander {
+		padding: 0.8125rem 1.25rem;
+		cursor: pointer;
+	}
 }
 
 @media #{$small-up}  { @include action-html-classes($size:small);  }
