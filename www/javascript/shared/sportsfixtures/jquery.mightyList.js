@@ -133,6 +133,8 @@
                                  */
                                 if (responseText.status == 410) {
                                     container.remove();
+
+                                    refreshEmptyStates();
                                 }
                             });
                         }
