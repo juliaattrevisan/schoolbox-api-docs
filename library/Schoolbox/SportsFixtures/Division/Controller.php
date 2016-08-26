@@ -229,8 +229,8 @@ class Controller extends AbstractController
             $return = base64_decode($this->getRequest()->post['returnUrl']);
 
             if (empty($return)) {
-                $return = $this->getRouter()->generate('sportsfixturesDivision.getList', [
-                    'contextId' => $sport->getId()
+                $return = $this->getRouter()->generate('sportsfixturesSport.getEntity', [
+                    'entityId' => $sport->getId()
                 ]);
             }
 
