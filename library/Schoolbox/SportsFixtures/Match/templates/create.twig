@@ -47,17 +47,30 @@
 
 
         $('#season').selectizeSelector({
-            ajax: {
-                url: '{{ routeLookup('sportsfixturesSeason.getList') }}',
-                type: 'GET',
-                dataType: 'json'
-            },
             value: {
                 id: {{ match.season.id }},
                 name: "{{ match.season.name }} - {{ match.season.start.localShort }} to {{ match.season.end.localShort }}"
             },
             multiple: false,
             selectize: {
+                preload: true,
+                hideSelected: false,
+                load: function(query, callback) {
+                    // Load: get values from AJAX, and callback with result
+                    var ajaxSettings = {
+                        url: '{{ routeLookup('sportsfixturesSeason.getList') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: { query: query }
+                    };
+                    $.ajax(ajaxSettings)
+                            .done(function(result) {
+                                callback(result)
+                            })
+                            .fail(function() {
+                                callback()
+                            })
+                },
                 score: function(search) {
                     return function(item) {
                         // Simply filter list, don't reorder
@@ -73,15 +86,11 @@
         $('#matchForm').find('[data-timepicker]').timepicker({
             appendTo: function ($input) {
                 return $input.closest('.timepick');
-            }
+            },
+            scrollDefault: '08:00'
         });
 
         $('#homeTeam').selectizeSelector({
-            ajax: {
-                url:      '{{ routeLookup('sportsfixturesTeam.getList', { contextId: match.division.id }) }}?schools=1',
-                type:     'GET',
-                dataType: 'json'
-            },
             {% if match.homeTeam.id -%}
             value: {
                 id: {{ match.homeTeam.id }},
@@ -93,15 +102,30 @@
                 name: "{{ tags.home }}"
             },
             {% endif -%}
-            multiple: false
+            multiple: false,
+            selectize: {
+                preload: true,
+                hideSelected: false,
+                load: function(query, callback) {
+                    // Load: get values from AJAX, and callback with result
+                    var ajaxSettings = {
+                        url: '{{ routeLookup('sportsfixturesTeam.getList', { contextId: match.division.id }) }}?schools=1',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: { query: query }
+                    };
+                    $.ajax(ajaxSettings)
+                            .done(function(result) {
+                                callback(result)
+                            })
+                            .fail(function() {
+                                callback()
+                            })
+                }
+            }
         });
 
         $('#awayTeam').selectizeSelector({
-            ajax: {
-                url:      '{{ routeLookup('sportsfixturesTeam.getList', { contextId: match.division.id }) }}?schools=1',
-                type:     'GET',
-                dataType: 'json'
-            },
             {% if match.awayTeam.id -%}
             value: {
                 id: {{ match.awayTeam.id }},
@@ -113,7 +137,27 @@
                 name: "{{ tags.away }}"
             },
             {% endif -%}
-            multiple: false
+            multiple: false,
+            selectize: {
+                preload: true,
+                hideSelected: false,
+                load: function(query, callback) {
+                    // Load: get values from AJAX, and callback with result
+                    var ajaxSettings = {
+                        url: '{{ routeLookup('sportsfixturesTeam.getList', { contextId: match.division.id }) }}?schools=1',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: { query: query }
+                    };
+                    $.ajax(ajaxSettings)
+                            .done(function(result) {
+                                callback(result)
+                            })
+                            .fail(function() {
+                                callback()
+                            })
+                }
+            }
         });
 
         $('#venue').selectizeSelector({
@@ -128,7 +172,27 @@
                 name: "{{ match.venue.name }}"
             },
             {% endif -%}
-            multiple: false
+            multiple: false,
+            selectize: {
+                preload: true,
+                hideSelected: false,
+                load: function(query, callback) {
+                    // Load: get values from AJAX, and callback with result
+                    var ajaxSettings = {
+                        url: '{{ routeLookup('sportsfixturesVenue.getList') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: { query: query }
+                    };
+                    $.ajax(ajaxSettings)
+                            .done(function(result) {
+                                callback(result)
+                            })
+                            .fail(function() {
+                                callback()
+                            })
+                }
+            }
         });
 
         $('textarea').alaressEditor();
