@@ -193,13 +193,11 @@ ul.tileList {
             // Font size: I assume some will want to change this and the font family
             font-size: 2em;
             padding: 1em;
-            box-sizing: border-box;
             &.text-top {
                 top: 0;
             }
             &.text-middle {
                 top: 50%;
-                left: 50%;
             }
             &.text-bottom {
                 bottom: 0;
