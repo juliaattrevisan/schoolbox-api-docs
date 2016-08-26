@@ -8,9 +8,12 @@
 namespace Schoolbox\Learning\Course\Imported\Unit;
 
 use Schoolbox\Collection;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Imported\Model as ImportedCourseModel;
 use Schoolbox\Learning\Course\Template\Unit\Model as TemplateUnitModel;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 /**
  * An Imported Unit is a single import of a Unit onto a Folder. It belongs to an
@@ -28,8 +31,11 @@ use Schoolbox\Learning\Course\Template\Unit\Model as TemplateUnitModel;
  *
  * @package Schoolbox\Learning\Course\Imported\Unit
  */
-class Model implements AssessmentContext
+class Model implements AssessmentContext, ISoftDeletable
 {
+    use CreatedAtDate;
+    use DeletedAtDate;
+
     /**
      * Unique identifier.
      *
@@ -67,8 +73,10 @@ class Model implements AssessmentContext
      */
     public function __construct()
     {
-        $this->template = new TemplateUnitModel();
-        $this->course   = new ImportedCourseModel();
+        $this->template  = new TemplateUnitModel();
+        $this->course    = new ImportedCourseModel();
+        $this->createdAt = new \Alaress_Date_NullDate();
+        $this->deletedAt = new \Alaress_Date_NullDate();
     }
 
     /* Getters/Setters */

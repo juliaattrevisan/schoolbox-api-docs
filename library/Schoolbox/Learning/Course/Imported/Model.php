@@ -8,9 +8,12 @@
 namespace Schoolbox\Learning\Course\Imported;
 
 use Schoolbox\Collection;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Template\Model as TemplateCourseModel;
 use Schoolbox\Learning\Course\Imported\Unit\Model as ImportedUnitModel;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
@@ -25,8 +28,11 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  *
  * @package Schoolbox\Learning\Course\Imported
  */
-class Model implements AssessmentContext
+class Model implements AssessmentContext, ISoftDeletable
 {
+    use CreatedAtDate;
+    use DeletedAtDate;
+
     /**
      * Unique identifier.
      *
@@ -62,8 +68,10 @@ class Model implements AssessmentContext
      */
     public function __construct()
     {
-        $this->folder = new FolderModel();
-        $this->units  = new Collection();
+        $this->folder    = new FolderModel();
+        $this->units     = new Collection();
+        $this->createdAt = new \Alaress_Date_NullDate();
+        $this->deletedAt = new \Alaress_Date_NullDate();
     }
 
     /* Getters/Setters */
