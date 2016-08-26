@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Course\Template;
+namespace Schoolbox\Learning\Course\Specification;
 
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
@@ -25,7 +25,7 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  *  which had at least one child Folder which contained a Course Builder component.
  *  This class puts this concept into a concrete class.)
  *
- * @package Schoolbox\Learning\Course\Template
+ * @package Schoolbox\Learning\Course\Specification
  */
 class Model implements AssessmentContext, ISoftDeletable
 {

@@ -5,15 +5,16 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Course\Template;
+namespace Schoolbox\Learning\Course\Specification\Unit;
 
+use Schoolbox\Learning\Course\Specification\Mapper as CourseMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
  * Class Mapper
  *
- * @package Schoolbox\Learning\Course\Template
+ * @package Schoolbox\Learning\Course\Specification\Unit
  * @method Model createModel($idValue = null)
  * @method Model findById($identifierValue)
  */
@@ -24,10 +25,11 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('course');
+        $this->hasTable('course_unit');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('folder_id', FolderMapper::class, 'id', null, null, null, 'folder');
+        $this->joins('course_id', CourseMapper::class, 'id', null, null, null,'course');
+        $this->joins('folder_id', FolderMapper::class, 'id', null, null, null,'folder');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }

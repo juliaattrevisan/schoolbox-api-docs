@@ -5,12 +5,12 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Course\Template\Unit;
+namespace Schoolbox\Learning\Course\Specification\Unit;
 
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Template\Model as CourseModel;
+use Schoolbox\Learning\Course\Specification\Model as CourseModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder\Model as FolderModel;
@@ -26,7 +26,7 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  * (Historically, this was simply known as a Unit, and defined as a Folder which contained a
  *  Course Builder component. This class puts this concept into a concrete class.)
  *
- * @package Schoolbox\Learning\Course\Template\Unit
+ * @package Schoolbox\Learning\Course\Specification\Unit
  */
 class Model implements AssessmentContext, ISoftDeletable
 {

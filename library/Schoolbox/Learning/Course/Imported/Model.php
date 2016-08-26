@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\Course\Imported;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Template\Model as TemplateCourseModel;
+use Schoolbox\Learning\Course\Specification\Model as TemplateCourseModel;
 use Schoolbox\Learning\Course\Imported\Unit\Model as ImportedUnitModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;

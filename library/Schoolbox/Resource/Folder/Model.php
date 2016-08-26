@@ -14,7 +14,7 @@ use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Template\Model as CourseModel;
+use Schoolbox\Learning\Course\Specification\Model as CourseModel;
 use Schoolbox\Learning\Course\Imported\Model as CourseInstanceModel;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
