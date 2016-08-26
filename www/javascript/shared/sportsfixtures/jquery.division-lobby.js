@@ -481,7 +481,7 @@
          * When the player clicks the edit positions button
          */
         function initApplyPositionSelector() {
-            $('[data-player-positions-user]').on('click', function() {
+            $(document).on('click', '[data-player-positions-user]', function() {
 
                 // Set the form data with the team/user IDs
                 $('#playerPositionName').html($(this).attr('data-player-positions-team-name') + ' - ' + $(this).attr('data-player-positions-name'));
