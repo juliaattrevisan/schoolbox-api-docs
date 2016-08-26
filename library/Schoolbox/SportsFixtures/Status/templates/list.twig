@@ -11,12 +11,12 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
     [ 'Fixtures', routeLookup('sportsfixtures.getLanding') ],
-    [ 'Statuses' ],
+    [ 'Statuses' ]
 ) }}
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Sports Fixtures</h1>
+        <h1>Fixtures</h1>
     </div>
 </div>
 
@@ -47,11 +47,11 @@
             <p>There are currently no statuses.</p>
             <p><a title="Add a Status" data-item-add>Add a Status</a></p>
         </div>
+        <ul class="information-list hide">
+            <li id="item-clone" class="actions-small-2" data-item="">
+                {% include '@sportsfixturesStatus/listItem.twig' %}
+            </li>
+        </ul>
     </div>
 </div>
 
-<ul class="information-list hide">
-    <li id="item-clone" class="actions-small-2" data-item="">
-        {% include '@sportsfixturesStatus/listItem.twig' %}
-    </li>
-</ul>
