@@ -25,9 +25,9 @@
 
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-    [ 'Fixtures',    routeLookup('sportsfixtures.getLanding') ],
-    [ 'Sports',      routeLookup('sportsfixturesSport.getList') ],
-    [ sport.name,    routeLookup('sportsfixturesSport.getEntity', { entityId: sport.id }) ],
+    [ 'Fixtures',          routeLookup('sportsfixtures.getLanding') ],
+    [ 'Sports',            routeLookup('sportsfixturesSport.getList') ],
+    [ division.sport.name, routeLookup('sportsfixturesSport.getEntity', { entityId: division.sport.id }) ],
     [ division.name ]
 ) }}
 
