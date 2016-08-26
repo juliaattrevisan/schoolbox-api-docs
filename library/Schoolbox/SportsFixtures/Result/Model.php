@@ -12,7 +12,7 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use \Alaress_Date_Format;
 use Schoolbox\SportsFixtures\Match\Model as Match;
 use Schoolbox\SportsFixtures\Team\Model as Team;
-use Schoolbox\SportsFixtures\Status;
+use Schoolbox\SportsFixtures\Status\Model as Status;
 
 
 /**
@@ -34,7 +34,7 @@ class Model implements ISoftDeletable
     /** @var Team $team */
     protected $team;
 
-    /** @var Status\Model $status */
+    /** @var Status $status */
     protected $status;
 
     /** @var string */
@@ -121,7 +121,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Status\Model
+     * @return Status
      */
     public function getStatus()
     {
@@ -129,7 +129,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Status\Model $status
+     * @param Status $status
      * @return static
      */
     public function setStatus($status)
@@ -140,7 +140,7 @@ class Model implements ISoftDeletable
 
     /**
      * @param Alaress_Date_Format $createdAt
-     * @return self
+     * @return static
      */
     public function setCreatedAt($createdAt) {
         $this->createdAt = $createdAt;
@@ -156,7 +156,7 @@ class Model implements ISoftDeletable
 
     /**
      * @param Alaress_Date_Format $updatedAt
-     * @return self
+     * @return static
      */
     public function setUpdatedAt($updatedAt) {
         $this->updatedAt = $updatedAt;

@@ -22,6 +22,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     private $delegate;
 
+
     /**
      * Injectable constructor
      *
@@ -29,20 +30,12 @@ class Controller extends Component_Dashboard_ControllerAbstract
      * @param User               $user
      * @param SitePage           $sitepage
      */
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
+    {
         parent::__construct($instance, $user, $sitepage);
-        $this->delegate = new ComponentDelegate($sitepage);
+        $this->setDelegate(new ComponentDelegate());
     }
 
-    /**
-     * Loads the grid component into its set configuration.
-     *
-     * @return true
-     */
-    public function execute()
-    {
-        return true;
-    }
 
     /**
      * @param String $templateHandle
@@ -50,18 +43,23 @@ class Controller extends Component_Dashboard_ControllerAbstract
      */
     public function renderTemplate($templateHandle)
     {
+        $playerIds = [];
+        $getHistorical = false;
+
         // Grab the relevant data depending on role type
 
-        if ($this->user->getRole()->isParent()) {
-            $matches = $this->delegate->getParentDashboardData();
-        } else if ($this->user->getRole()->isStudent()) {
-            $matches = $this->delegate->getStudentDashboardData($this->user);
-        } else {
-            // Unsupported role type, don't render the component
-            return false;
+        if ($this->getUser()->getRole()->isParent()) {
+            /** @var Session $session */
+            $session  = $this->getSitePage()->getDi()->get('session');
+            $children = $session->get('children');
+            foreach ($children as $child) {
+                $playerIds[] = $child['id'];
+            }
+        } else if ($this->getUser()->getRole()->isStudent()) {
+            $playerIds[] = $this->getUser()->getId();
         }
 
-        // If the child wasn't involved in any matches don't render the component
+        $matches = $this->getDelegate()->getMatchesForUsers($playerIds, $getHistorical);
 
         if (0 == count($matches)) {
             return false;
@@ -73,9 +71,32 @@ class Controller extends Component_Dashboard_ControllerAbstract
             [
                 'componentInstanceId'   => $this->getInstance()->getId(),
                 'componentClass'        => $this->getComponentName(),
-                'user'                  => $this->user,
+                'user'                  => $this->getUser(),
                 'matches'               => $matches,
             ]
         );
     }
+
+    /*
+     * Getters / Setters
+     */
+
+    /**
+     * @return ComponentDelegate
+     */
+    protected function getDelegate()
+    {
+        return $this->delegate;
+    }
+
+    /**
+     * @param ComponentDelegate $delegate
+     * @return static
+     */
+    protected function setDelegate(ComponentDelegate $delegate)
+    {
+        $this->delegate = $delegate;
+        return $this;
+    }
+
 }

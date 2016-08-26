@@ -262,9 +262,8 @@ class Controller extends AbstractController
          * This saves endless shenanigans in front-end land
          */
         if (!$match->getHomeTeam()->getId()) {
-            $name = $this->getSchoolTagCloudMapper()->getTagName($match->getHomeSchoolId());
 
-            $facelessTeam = $this->getTeamMapper()->createModel()->setName($name);
+            $facelessTeam = $this->getTeamMapper()->createModel()->setName($match->getHomeSchool()->getName());
 
             $match->setHomeTeam($facelessTeam);
         }
@@ -273,9 +272,8 @@ class Controller extends AbstractController
          * This saves endless shenanigans in front-end land
          */
         if (!$match->getAwayTeam()->getId()) {
-            $name = $this->getSchoolTagCloudMapper()->getTagName($match->getAwaySchoolId());
 
-            $facelessTeam = $this->getTeamMapper()->createModel()->setName($name);
+            $facelessTeam = $this->getTeamMapper()->createModel()->setName($match->getAwaySchool()->getName());
 
             $match->setAwayTeam($facelessTeam);
         }

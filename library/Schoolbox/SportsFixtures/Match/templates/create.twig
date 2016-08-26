@@ -98,8 +98,8 @@
             },
             {% elseif match.homeSchoolId -%}
             value: {
-                id: "{{ tagPrefix }}{{ match.homeSchoolId }}",
-                name: "{{ tags.home }}"
+                id: "{{ tagPrefix }}{{ match.homeSchool.id }}",
+                name: "{{ match.homeSchool.name }}"
             },
             {% endif -%}
             multiple: false,
@@ -133,8 +133,8 @@
             },
             {% elseif match.awaySchoolId -%}
             value: {
-                id: "{{ tagPrefix }}{{ match.awaySchoolId }}",
-                name: "{{ tags.away }}"
+                id: "{{ tagPrefix }}{{ match.awaySchool.id }}",
+                name: "{{ match.awaySchool.name }}"
             },
             {% endif -%}
             multiple: false,

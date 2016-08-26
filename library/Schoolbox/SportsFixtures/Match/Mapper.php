@@ -29,6 +29,8 @@ use Schoolbox\SportsFixtures\ItineraryItem\Model as ItineraryItem;
 use Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
 use Schoolbox\SportsFixtures\Result\Model as Result;
 use Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
+use Schoolbox\SportsFixtures\Status\Model as Status;
+use Schoolbox\SportsFixtures\Status\Mapper as StatusMapper;
 use Schoolbox\SportsFixtures\School\Model as School;
 use Schoolbox\SportsFixtures\School\Mapper as SchoolMapper;
 use Schoolbox\Collection;
@@ -198,6 +200,9 @@ class Mapper extends BaseMapper
         /** @var Collection|School[] $schools */
         $schools   = new Collection();
 
+        /** @var Collection|Result[] $results */
+        $results = new Collection();
+
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $matchId = $row['id'];
 
@@ -241,7 +246,6 @@ class Mapper extends BaseMapper
                 }
                 $match->setHomeSchool($schools->getOffset($row['home_school_id']));
 
-
                 // Optional relationship
                 if(!$schools->getOffset($row['away_school_id']) instanceof School){
                     $schools->setOffset($row['away_school_id'], $this->hydrateJoin($row, 'away_school', 'as'));
@@ -254,14 +258,23 @@ class Mapper extends BaseMapper
             /* Append all Result instances as you go
              */
             if ($row['r.team_id']) {
-                if (!($matches->getOffset($matchId)->getResult()->getOffset($row['r.team_id']) instanceof Result)) {
+                if (!$results[$row['r.team_id']] instanceof Result) {
                     /** @var Result $result */
                     $result = $this->hydrateJoin($row, 'result', 'r');
                     $result->setStatus($this->hydrateJoin($row, 'result.status', 'rs'));
+                    $results[$row['r.team_id']] = $result;
 
-                    $matches->getOffset($matchId)->getResult()->setOffset($result->getTeam()->getId(), $result);
+                    // Figure out if this result if for the home or away team
+                    if($matches[$matchId]->getHomeTeam()->getId() == $result->getTeam()->getId()){
+                        $matches[$matchId]->setHomeTeamResult($result);
+                    } else if($matches[$matchId]->getAwayTeam()->getId() == $result->getTeam()->getId()){
+                        $matches[$matchId]->setAwayTeamResult($result);
+                    } else {
+                        throw new \LogicException('Cannot match this result with a match team');
+                    }
                 }
             }
+
 
             /* Append all ItineraryItems as you go
              */

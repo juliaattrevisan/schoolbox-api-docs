@@ -9,10 +9,11 @@
  *
  */
 
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User;
 
 abstract class Component_ControllerAbstract
 {
@@ -43,16 +44,16 @@ abstract class Component_ControllerAbstract
     protected $sitepage;
 
     /**
-     * The category the component is on, if any.
+     * The folder the component is on, if any.
      *
-     * @var \Schoolbox\Resource\Folder\Model
+     * @var Folder|null
      */
     protected $context;
 
     /**
      * The folder the component pulls data from, if any.
      *
-     * @var \Schoolbox\Resource\Folder\Model
+     * @var Folder
      */
     protected $source;
 
@@ -130,19 +131,20 @@ abstract class Component_ControllerAbstract
     * Constructor
     *
     * @param Component_Instance $instance
-    * @param \Schoolbox\User $user
+    * @param User $user
     * @param SitePage $sitepage
     */
-    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage)
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
-        $this->instance = $instance;
-        $this->user     = $user;
-        $this->sitepage = $sitepage;
-        $this->config   = $instance->getConfigArray();
-        $this->context  = new FolderModel();
-        $this->source   = new FolderModel();
-        $this->setFolderMapper(FolderMapper::getInstance());
-        $this->setErrorMapper(ErrorMapper::getInstance());
+        $this
+            ->setInstance($instance)
+            ->setUser($user)
+            ->setSitePage($sitepage)
+            ->setConfig($instance->getConfigArray())
+            ->setFolderMapper(FolderMapper::getInstance())
+            ->setErrorMapper(ErrorMapper::getInstance())
+            ->setContext($this->getFolderMapper()->createModel())
+            ->setSource($this->getFolderMapper()->createModel());
     }
 
     /**
@@ -156,8 +158,8 @@ abstract class Component_ControllerAbstract
      */
     public function setup($context = null, array $config = array())
     {
-        $this->context = $context;
-        $this->config  = $config;
+        $this->setContext($context);
+        $this->setConfig($config);
 
         if($this->isUsingAltSource()){
             // remove any non-numeric values from the source config (legacy support)
@@ -169,7 +171,7 @@ abstract class Component_ControllerAbstract
             } catch(\Schoolbox\Mapper\Exception\Deleted $e){
                 $source = $e->getDeletedObject();
             }
-            if(!($source instanceof FolderModel)){
+            if(!($source instanceof Folder)){
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
             }
             $this->setSource($source);
@@ -796,33 +798,9 @@ abstract class Component_ControllerAbstract
     }
 
  
-    /**
-     * @return \Schoolbox\Resource\Folder\Model
-     */
-    public function getContext()
-    {
-        return $this->context;
-    }
 
-    /**
-     * @param string $key
-     * @param string $attr
-     * @return mixed
-     */
-    public function getConfig($key = '', $attr = 'value')
-    {
-        if ($key) {
-            return isset($this->config[$key][$attr]) ? $this->config[$key][$attr] : false;
-        }
 
-        $return = array();
 
-        foreach ($this->config as $key => $item) {
-            $return[$key] = $item['value'];
-        }
-
-        return $return;
-    }
 
     /**
      * @param $key
@@ -833,58 +811,17 @@ abstract class Component_ControllerAbstract
         return isset($this->config[$key]) ? true : false;
     }
 
-    public function getSortFields()
-    {
-        return $this->sortFields;
-    }
 
-    public function getFilterFields()
-    {
-        return $this->filterFields;
-    }
-
+    /**
+     * @return Template
+     */
     public function getPageTemplate()
     {
-        return $this->sitepage->template;
+        return $this->getSitePage()->template;
     }
 
 
-    /**
-     * Public accessor for $this->instance - use this instead of magic method
-     * obscuring a protected variable. (wat)
-     *
-     * @param \Component_Instance $instance
-     */
-    public function setInstance($instance)
-    {
-        $this->instance = $instance;
-    }
 
-    /**
-     * @return \Component_Instance
-     */
-    public function getInstance()
-    {
-        return $this->instance;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMaximumPermission()
-    {
-        return $this->maximumPermission;
-    }
-
-    /**
-     * @param  int $maximumPermission
-     * @return $this
-     */
-    public function setMaximumPermission($maximumPermission)
-    {
-        $this->maximumPermission = $maximumPermission;
-        return $this;
-    }
 
     /**
      * Checks if the user's permission on this component is at least read level.
@@ -956,6 +893,152 @@ abstract class Component_ControllerAbstract
         return intval($this->getConfig("src")) > 0;
     }
 
+
+
+    /**
+     * Return whether we are able to render this component's content for current user.
+     * False if lacks READ+ permission on content, or because content is deleted.
+     * @return bool
+     */
+    public function isSourceRenderable(){
+        if(!$this->hasReadAccess() || ($this->isUsingAltSource() && $this->getSource()->isDeleted())){
+            return false;
+        }
+        return true;
+    }
+
+
+
+
+
+    /*
+     * Getters / Setters
+     */
+
+    /**
+     * @return \Schoolbox\Resource\Folder\Model
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
+
+    /**
+     * @param Folder|null $context
+     * @return static
+     */
+    protected function setContext(Folder $context = null)
+    {
+        $this->context = $context;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    protected function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param User $user
+     * @return static
+     */
+    protected function setUser(User $user)
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+
+
+
+    /**
+     * @param string $key
+     * @param string $attr
+     * @return mixed
+     */
+    public function getConfig($key = '', $attr = 'value')
+    {
+        if ($key) {
+            return isset($this->config[$key][$attr]) ? $this->config[$key][$attr] : false;
+        }
+
+        $return = array();
+
+        foreach ($this->config as $key => $item) {
+            $return[$key] = $item['value'];
+        }
+
+        return $return;
+    }
+
+    /**
+     * @param array $config
+     * @return static
+     */
+    protected function setConfig(array $config)
+    {
+        $this->config = $config;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSortFields()
+    {
+        return $this->sortFields;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFilterFields()
+    {
+        return $this->filterFields;
+    }
+
+    /**
+     * @return \Component_Instance
+     */
+    public function getInstance()
+    {
+        return $this->instance;
+    }
+
+    /**
+     * Public accessor for $this->instance - use this instead of magic method
+     * obscuring a protected variable. (wat)
+     *
+     * @param \Component_Instance $instance
+     * @return static
+     */
+    public function setInstance($instance)
+    {
+        $this->instance = $instance;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaximumPermission()
+    {
+        return $this->maximumPermission;
+    }
+
+    /**
+     * @param  int $maximumPermission
+     * @return static
+     */
+    public function setMaximumPermission($maximumPermission)
+    {
+        $this->maximumPermission = $maximumPermission;
+        return $this;
+    }
+
     /**
      * Gets the Folder, if any, this component draws its data from
      *
@@ -975,16 +1058,42 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Return whether we are able to render this component's content for current user.
-     * False if lacks READ+ permission on content, or because content is deleted.
-     * @return bool
+     * Get component name default
+     *
+     * @return string
      */
-    public function isSourceRenderable(){
-        if(!$this->hasReadAccess() || ($this->isUsingAltSource() && $this->getSource()->isDeleted())){
-            return false;
+    protected function getComponentName()
+    {
+        /* Special case for Manage Folders and any other
+         * arbitrarily-constructed components
+         */
+        if (!$this->instance->getId()) {
+            return '';
         }
-        return true;
+
+        /* Return db version of the name if class var is empty
+        * or not set
+        */
+        if (!strlen($this->componentName)) {
+            return $this->instance->getDefinition()->getName();
+        }
+
+        /* Otherwise allow a per-controller hardcoded version
+         */
+        return $this->componentName;
     }
+
+    /**
+     * Assign component name default
+     *
+     * @param $componentName
+     * @return string
+     */
+    protected function setComponentName($componentName)
+    {
+        $this->componentName = $componentName;
+    }
+
 
     /**
      * @return Schoolbox\Resource\Folder\Mapper
@@ -1023,39 +1132,16 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Assign component name default
-     *
-     * @param $componentName
-     * @return string
-     */
-    protected function setComponentName($componentName)
-    {
-        $this->componentName = $componentName;
-    }
-    /**
-     * Get component name default
+     * Get component href
      *
      * @return string
      */
-    protected function getComponentName()
+    protected function getComponentHref()
     {
-        /* Special case for Manage Folders and any other
-         * arbitrarily-constructed components
-         */
-        if (!$this->instance->getId()) {
-            return '';
+        if (!strlen(trim($this->componentHref))) {
+            return '#';
         }
-
-        /* Return db version of the name if class var is empty
-        * or not set
-        */
-        if (!strlen($this->componentName)) {
-            return $this->instance->getDefinition()->getName();
-        }
-
-        /* Otherwise allow a per-controller hardcoded version
-         */
-        return $this->componentName;
+        return $this->componentHref;
     }
 
     /**
@@ -1069,15 +1155,20 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Get component href
-     *
-     * @return string
+     * @return SitePage
      */
-    protected function getComponentHref()
-    {
-        if (!strlen(trim($this->componentHref))) {
-            return '#';
-        }
-        return $this->componentHref;
+    protected function getSitePage(){
+        return $this->sitepage;
     }
+
+    /**
+     * @param SitePage $sitePage
+     * @return static
+     */
+    protected function setSitePage(SitePage $sitePage){
+        $this->sitepage = $sitePage;
+        return $this;
+    }
+
+
 }
