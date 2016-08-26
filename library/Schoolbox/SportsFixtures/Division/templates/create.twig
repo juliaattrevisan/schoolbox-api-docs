@@ -24,7 +24,7 @@
 
         $('#season').selectizeSelector({
             ajax: {
-                url: '/sportsfixtures/seasons',
+                url: '{{ routeLookup('sportsfixturesSeason.getList') }}',
                 type: 'GET',
                 dataType: 'json'
             },
