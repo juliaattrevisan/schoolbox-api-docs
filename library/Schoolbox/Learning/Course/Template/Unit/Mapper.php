@@ -30,5 +30,7 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('course_id', CourseMapper::class, 'id', null, null, null,'course');
         $this->joins('folder_id', FolderMapper::class, 'id', null, null, null,'folder');
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
+        $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
     }
 }
