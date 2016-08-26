@@ -5,31 +5,31 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Course\Imported\Unit;
+namespace Schoolbox\Learning\Course\Import\Unit;
 
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Imported\Model as ImportedCourseModel;
+use Schoolbox\Learning\Course\Import\Model as CourseImportModel;
 use Schoolbox\Learning\Course\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 /**
- * An Imported Unit is a single import of a Unit Specification onto a Folder. It belongs to an
- * Imported Course.
+ * An Unit Import is a single import of a Unit Specification onto a Folder. It belongs to an
+ * Course Import.
  *
  * On creation, this object makes a copy of the Assessables in the Unit Specification it was
  * created from, and adds them to itself - a teacher may then add, modify or remove individual
  * Assessable objects inside this object.
  *
  * (Historically, this was known as a Unit Instance. It did not belong to an
- *  Imported Course - instead, it belonged directly to the Folder it was imported
+ *  Course Import - instead, it belonged directly to the Folder it was imported
  *  onto, and was also linked to a component on that Folder.)
  *
  * TODO merge existing Unit Instance class (\Schoolbox\Assessment\Course\UnitInstance) into this
  *
- * @package Schoolbox\Learning\Course\Imported\Unit
+ * @package Schoolbox\Learning\Course\Import\Unit
  */
 class Model implements AssessmentContext, ISoftDeletable
 {
@@ -44,11 +44,11 @@ class Model implements AssessmentContext, ISoftDeletable
     protected $id;
 
     /**
-     * The Imported Course which this object belongs to.
+     * The Course Import which this object belongs to.
      *
-     * TODO review if this relation is required - this object can't exist without its Imported Course
+     * TODO review if this relation is required - this object can't exist without its Course Import
      *
-     * @var ImportedCourseModel
+     * @var CourseImportModel
      */
     protected $course;
 
@@ -74,7 +74,7 @@ class Model implements AssessmentContext, ISoftDeletable
     public function __construct()
     {
         $this->specification  = new UnitSpecificationModel();
-        $this->course         = new ImportedCourseModel();
+        $this->course         = new CourseImportModel();
         $this->createdAt      = new \Alaress_Date_NullDate();
         $this->deletedAt      = new \Alaress_Date_NullDate();
     }
@@ -118,7 +118,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @return ImportedCourseModel
+     * @return CourseImportModel
      */
     public function getCourse()
     {
@@ -126,7 +126,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @param ImportedCourseModel $course
+     * @param CourseImportModel $course
      * @return static
      */
     public function setCourse($course)
@@ -154,7 +154,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * This object's assessment context is its Imported Course's assessment context.
+     * This object's assessment context is its Course Import's assessment context.
      */
     public function getFolder()
     {

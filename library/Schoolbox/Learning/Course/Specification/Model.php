@@ -18,7 +18,7 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  * A Course Specification is an extension of a Folder.
  *
  * This object may contain several Unit Specifications, and may be imported onto another Folder.
- * This action will create a corresponding Imported Course for this Course Specification,
+ * This action will create a corresponding Course Import for this Course Specification,
  * with whatever Unit Specifications were selected to be imported.
  *
  * (Historically, this was simply known as a Course, and was defined as a Folder

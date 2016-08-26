@@ -20,7 +20,7 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  *
  * This object may contain several Assessables, and may be imported onto another Folder
  * as part of the action of importing a Course onto a folder.
- * This action creates an Imported Unit for each Unit Specification that was chosen to be imported
+ * This action creates an Unit Import for each Unit Specification that was chosen to be imported
  * as part of that process.
  *
  * (Historically, this was simply known as a Unit, and defined as a Folder which contained a

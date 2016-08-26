@@ -5,28 +5,28 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Course\Imported;
+namespace Schoolbox\Learning\Course\Import;
 
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Specification\Model as CourseSpecificationModel;
-use Schoolbox\Learning\Course\Imported\Unit\Model as ImportedUnitModel;
+use Schoolbox\Learning\Course\Import\Unit\Model as UnitImportModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * An Imported Course is an import of a Course Specification onto a Folder.
+ * An Course Import is an import of a Course Specification onto a Folder.
  *
- * This object will contain one or more Imported Units (whichever of the
+ * This object will contain one or more Unit Imports (whichever of the
  * Course Specification's Unit Specifications were selected as part of the import process).
  *
- * (Historically, this did not exist as a separate concept. Imported Units were
+ * (Historically, this did not exist as a separate concept. Unit Imports were
  *  related directly to the Folder the Course Specification was imported onto, and
  *  linked to a component.)
  *
- * @package Schoolbox\Learning\Course\Imported
+ * @package Schoolbox\Learning\Course\Import
  */
 class Model implements AssessmentContext, ISoftDeletable
 {
@@ -57,9 +57,9 @@ class Model implements AssessmentContext, ISoftDeletable
     protected $specification;
 
     /**
-     * The Imported Units that are a part of this object.
+     * The Unit Imports that are a part of this object.
      *
-     * @var Collection|ImportedUnitModel[]
+     * @var Collection|UnitImportModel[]
      */
     protected $units;
 
@@ -132,7 +132,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @return Collection|ImportedUnitModel[]
+     * @return Collection|UnitImportModel[]
      */
     public function getUnits()
     {
@@ -140,7 +140,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @param Collection|ImportedUnitModel[] $units
+     * @param Collection|UnitImportModel[] $units
      * @return static
      */
     public function setUnits($units)
