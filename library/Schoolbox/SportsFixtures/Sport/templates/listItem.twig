@@ -11,7 +11,6 @@
         <a href="#" class="icon-more" data-dropdown="sportsfixtures-sport-{{ sport.getId() }}-actions"></a>
     </nav>
     <ul class="f-dropdown" data-dropdown-content="" id="sportsfixtures-sport-{{ sport.getId() }}-actions">
-        <li><a href="{{ routeLookup('sportsfixturesPosition.getList', {contextId: sport.id}) }}" class="icon-position" title="Manage Positions in {{ sport.name }}">Manage Positions</a></li>
         <li><a href="#" data-action="delete" data-post-action="{{ routeLookup('sportsfixturesSport.deleteEntity', {entityId: sport.id}) }}" class="icon-delete" title="Delete" data-delete="{{ sport.id }}">Delete</a></li>
     </ul>
 </li>
