@@ -47,6 +47,7 @@ class Controller extends AbstractController
         parent::__construct(SportMapper::getInstance());
         $this->setDivisionMapper(DivisionMapper::getInstance());
         $this->setTeamMapper(TeamMapper::getInstance());
+        $this->setPositionMapper(PositionMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
     }
 
