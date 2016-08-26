@@ -270,7 +270,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Collection
+     * @return Collection|ItineraryItem[]
      */
     public function getItinerary()
     {
@@ -278,7 +278,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Collection $itinerary
+     * @param Collection|ItineraryItem[] $itinerary
      * @return static
      */
     public function setItinerary($itinerary)
