@@ -14,8 +14,8 @@ use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Specification\Model as CourseModel;
-use Schoolbox\Learning\Course\Import\Model as CourseInstanceModel;
+use Schoolbox\Learning\Course\Specification\Model as CourseSpecificationModel;
+use Schoolbox\Learning\Course\Import\Model as CourseImportModel;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\HomepageConfig;
@@ -78,18 +78,18 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     protected $teacher_collection;
 
     /**
-     * The course (if any!) that is attached to this folder.
+     * The Course Specification (if any!) that this folder has.
      *
-     * @var CourseModel
+     * @var CourseSpecificationModel
      */
-    protected $course;
+    protected $courseSpecification;
 
     /**
-     * The course instances that have been imported onto this folder.
+     * The Course Imports that have been imported onto this folder.
      *
-     * @var Collection|CourseInstanceModel[]
+     * @var Collection|CourseImportModel[]
      */
-    protected $courseInstances;
+    protected $courseImports;
 
     /**
      * Constructor
@@ -112,13 +112,13 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * Does this folder have a course?
+     * Does this folder have a course specification?
      *
      * @return bool
      */
-    public function hasCourse()
+    public function hasCourseSpecification()
     {
-        return ($this->course instanceof CourseModel && $this->course->getId());
+        return ($this->courseSpecification instanceof CourseSpecificationModel && $this->courseSpecification->getId());
     }
 
     /**
@@ -446,38 +446,38 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @return CourseModel
+     * @return CourseSpecificationModel
      */
-    public function getCourse()
+    public function getCourseSpecification()
     {
-        return $this->course;
+        return $this->courseSpecification;
     }
 
     /**
-     * @param CourseModel $course
+     * @param CourseSpecificationModel $courseSpecification
      * @return static
      */
-    public function setCourse($course)
+    public function setCourseSpecification($courseSpecification)
     {
-        $this->course = $course;
+        $this->courseSpecification = $courseSpecification;
         return $this;
     }
 
     /**
-     * @return Collection|CourseInstanceModel[]
+     * @return Collection|CourseImportModel[]
      */
-    public function getCourseInstances()
+    public function getCourseImports()
     {
-        return $this->courseInstances;
+        return $this->courseImports;
     }
 
     /**
-     * @param Collection|CourseInstanceModel[] $courseInstances
+     * @param Collection|CourseImportModel[] $courseImports
      * @return static
      */
-    public function setCourseInstances($courseInstances)
+    public function setCourseImports($courseImports)
     {
-        $this->courseInstances = $courseInstances;
+        $this->courseImports = $courseImports;
         return $this;
     }
 }
