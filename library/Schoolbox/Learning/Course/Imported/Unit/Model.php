@@ -11,15 +11,15 @@ use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Imported\Model as ImportedCourseModel;
-use Schoolbox\Learning\Course\Specification\Unit\Model as TemplateUnitModel;
+use Schoolbox\Learning\Course\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 
 /**
- * An Imported Unit is a single import of a Unit onto a Folder. It belongs to an
+ * An Imported Unit is a single import of a Unit Specification onto a Folder. It belongs to an
  * Imported Course.
  *
- * On creation, this object makes a copy of the Assessables in the Template Unit it was
+ * On creation, this object makes a copy of the Assessables in the Unit Specification it was
  * created from, and adds them to itself - a teacher may then add, modify or remove individual
  * Assessable objects inside this object.
  *
@@ -53,11 +53,11 @@ class Model implements AssessmentContext, ISoftDeletable
     protected $course;
 
     /**
-     * The Template Unit which this object was created from.
+     * The Unit Specification which this object was created from.
      *
-     * @var TemplateUnitModel
+     * @var UnitSpecificationModel
      */
-    protected $template;
+    protected $specification;
 
     /**
      * The Assessable objects which are a part of this object.
@@ -73,10 +73,10 @@ class Model implements AssessmentContext, ISoftDeletable
      */
     public function __construct()
     {
-        $this->template  = new TemplateUnitModel();
-        $this->course    = new ImportedCourseModel();
-        $this->createdAt = new \Alaress_Date_NullDate();
-        $this->deletedAt = new \Alaress_Date_NullDate();
+        $this->specification  = new UnitSpecificationModel();
+        $this->course         = new ImportedCourseModel();
+        $this->createdAt      = new \Alaress_Date_NullDate();
+        $this->deletedAt      = new \Alaress_Date_NullDate();
     }
 
     /* Getters/Setters */
@@ -100,20 +100,20 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @return TemplateUnitModel
+     * @return UnitSpecificationModel
      */
-    public function getTemplate()
+    public function getSpecification()
     {
-        return $this->template;
+        return $this->specification;
     }
 
     /**
-     * @param TemplateUnitModel $template
+     * @param UnitSpecificationModel $specification
      * @return static
      */
-    public function setTemplate($template)
+    public function setSpecification($specification)
     {
-        $this->template = $template;
+        $this->specification = $specification;
         return $this;
     }
 

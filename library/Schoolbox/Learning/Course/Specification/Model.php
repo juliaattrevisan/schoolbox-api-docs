@@ -15,11 +15,11 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * A Template Course is an extension of a Folder.
+ * A Course Specification is an extension of a Folder.
  *
- * This object may contain several Template Units, and may be imported onto another Folder.
- * This action will create a corresponding Imported Course for this Template Course,
- * with whatever Template Units were selected to be imported.
+ * This object may contain several Unit Specifications, and may be imported onto another Folder.
+ * This action will create a corresponding Imported Course for this Course Specification,
+ * with whatever Unit Specifications were selected to be imported.
  *
  * (Historically, this was simply known as a Course, and was defined as a Folder
  *  which had at least one child Folder which contained a Course Builder component.
@@ -49,7 +49,7 @@ class Model implements AssessmentContext, ISoftDeletable
     protected $folder;
 
     /**
-     * The Template Units that are a part of this object.
+     * The Unit Specifications that are a part of this object.
      *
      * @var Collection|Unit\Model[]
      */

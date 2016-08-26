@@ -10,20 +10,20 @@ namespace Schoolbox\Learning\Course\Imported;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Specification\Model as TemplateCourseModel;
+use Schoolbox\Learning\Course\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Learning\Course\Imported\Unit\Model as ImportedUnitModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * An Imported Course is an import of a Template Course onto a Folder.
+ * An Imported Course is an import of a Course Specification onto a Folder.
  *
  * This object will contain one or more Imported Units (whichever of the
- * Template Course's Template Units were selected as part of the import process).
+ * Course Specification's Unit Specifications were selected as part of the import process).
  *
  * (Historically, this did not exist as a separate concept. Imported Units were
- *  related directly to the Folder the Template Course was imported onto, and
+ *  related directly to the Folder the Course Specification was imported onto, and
  *  linked to a component.)
  *
  * @package Schoolbox\Learning\Course\Imported
@@ -50,11 +50,11 @@ class Model implements AssessmentContext, ISoftDeletable
     protected $folder;
 
     /**
-     * The Template Course which this object was created from.
+     * The Course Specification which this object was created from.
      *
-     * @var TemplateCourseModel
+     * @var CourseSpecificationModel
      */
-    protected $template;
+    protected $specification;
 
     /**
      * The Imported Units that are a part of this object.
@@ -68,10 +68,11 @@ class Model implements AssessmentContext, ISoftDeletable
      */
     public function __construct()
     {
-        $this->folder    = new FolderModel();
-        $this->units     = new Collection();
-        $this->createdAt = new \Alaress_Date_NullDate();
-        $this->deletedAt = new \Alaress_Date_NullDate();
+        $this->folder        = new FolderModel();
+        $this->units         = new Collection();
+        $this->createdAt     = new \Alaress_Date_NullDate();
+        $this->deletedAt     = new \Alaress_Date_NullDate();
+        $this->specification = new CourseSpecificationModel();
     }
 
     /* Getters/Setters */
@@ -113,20 +114,20 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @return TemplateCourseModel
+     * @return CourseSpecificationModel
      */
-    public function getTemplate()
+    public function getSpecification()
     {
-        return $this->template;
+        return $this->specification;
     }
 
     /**
-     * @param TemplateCourseModel $template
+     * @param CourseSpecificationModel $specification
      * @return static
      */
-    public function setTemplate($template)
+    public function setSpecification($specification)
     {
-        $this->template = $template;
+        $this->specification = $specification;
         return $this;
     }
 

@@ -16,11 +16,11 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * A Template Unit is an extension of a Folder.
+ * A Unit Specification is an extension of a Folder.
  *
  * This object may contain several Assessables, and may be imported onto another Folder
  * as part of the action of importing a Course onto a folder.
- * This action creates an Imported Unit for each Template Unit that was chosen to be imported
+ * This action creates an Imported Unit for each Unit Specification that was chosen to be imported
  * as part of that process.
  *
  * (Historically, this was simply known as a Unit, and defined as a Folder which contained a
@@ -43,16 +43,16 @@ class Model implements AssessmentContext, ISoftDeletable
     /**
      * The Folder which this object belongs to.
      *
-     * TODO review if this relation is required - Template Units can't exist without Folders
+     * TODO review if this relation is required - this object can't exist without Folders
      *
      * @var FolderModel
      */
     protected $folder;
 
     /**
-     * The Template Course which this object belongs to.
+     * The Course Specification which this object belongs to.
      *
-     * TODO review if this relation is required - Template Units can't exist without a Course Unit
+     * TODO review if this relation is required - this object can't exist without a Course Unit
      *
      * @var CourseModel
      */
