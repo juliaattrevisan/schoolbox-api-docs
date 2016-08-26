@@ -49,7 +49,7 @@
     [ 'Fixtures',    routeLookup('sportsfixtures.getLanding') ],
     [ 'Sports',      routeLookup('sportsfixturesSport.getList') ],
     [ sport.name,    routeLookup('sportsfixturesSport.getEntity', { entityId: sport.id }) ],
-    [ division.name | default(action ~ ' Division') ],
+    [ division.name | default(action ~ ' Division') ]
 ) }}
 
 <div class="row">
