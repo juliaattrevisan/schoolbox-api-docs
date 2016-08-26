@@ -30,6 +30,8 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         SELECT DISTINCT
             cui.category_id,
             cui.component_id,
+            cui.created_at,
+            cui.deleted_at,
             cu.course_id,
             f.name AS folder_name,
             cf.name AS course_name
@@ -38,14 +40,13 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         INNER JOIN course_unit cu ON cui.unit_category_id = cu.folder_id
         INNER JOIN course c ON cu.course_id = c.id
         INNER JOIN folder cf ON c.folder_id = cf.id
-        WHERE cui.deleted_at IS NULL
         ORDER BY cui.component_id
     ");
 
     // Insert and update objects
     $insertCourseInstanceQuery = $database->prepare("
-        INSERT INTO course_instance (folder_id, course_id) 
-        VALUES (:folderId, :courseId)
+        INSERT INTO course_instance (folder_id, course_id, created_at, deleted_at)
+        VALUES (:folderId, :courseId, :created, :deleted)
     ");
     $updateUnitInstanceQuery = $database->prepare("
         UPDATE course_unit_instance 
@@ -91,6 +92,8 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $insertCourseInstanceQuery->execute([
                 'folderId' => $unitInstance['category_id'],
                 'courseId' => $unitInstance['course_id'],
+                'created'  => $unitInstance['created_at'],
+                'deleted'  => $unitInstance['deleted_at'],
             ]);
             $log->debug('Course instance created');
             $courseInstanceId = $database->lastInsertId();
