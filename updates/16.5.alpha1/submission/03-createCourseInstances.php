@@ -69,7 +69,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             (SELECT ccd.id
              FROM component_config_definition ccd
              INNER JOIN component_definition cd ON ccd.component_definition_id = cd.id
-             WHERE ccd.`key` = 'courseInstance'
+             WHERE ccd.`key` = 'importedCourse'
              AND cd.class = 'Component_Homepage_CourseOutlineController'),
             :componentId,
             :courseInstanceId

@@ -6,15 +6,16 @@
  */
 
 /**
- * Config option for selecting a course instance
+ * Config option for selecting an Imported Course to display within a Course
+ * Outline component.
  */
-class Component_Config_CourseInstance extends Component_Config_Abstract
+class Component_Config_ImportedCourse extends Component_Config_Abstract
 {
     /**
      * @inheritdoc
      */
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
-        $page->setVar('COMPONENT_CONFIG_COURSEINSTANCE', $configValue);
+        $page->setVar('COMPONENT_CONFIG_IMPORTED_COURSE', $configValue);
     }
 }

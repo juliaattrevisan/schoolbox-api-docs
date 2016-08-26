@@ -163,7 +163,7 @@ ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `id`;
 ALTER TABLE `submission_box`
 ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `id`;
 
--- New component configuration type for a course outline component's Course Instances
+-- New component configuration type for a course outline component's Imported Courses
 INSERT INTO `component_config_definition` (
   component_definition_id,
   `key`,
@@ -172,8 +172,8 @@ INSERT INTO `component_config_definition` (
   description
 ) VALUES (
   (SELECT id FROM component_definition WHERE class = 'Component_Homepage_CourseOutlineController' LIMIT 1),
-  'courseInstance',
+  'importedCourse',
   '',
-  'Course Instance',
-  'The Course Instance that is displayed in this component'
+  'Imported Course',
+  'The Imported Course that is displayed in this component'
 );
