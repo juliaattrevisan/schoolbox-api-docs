@@ -256,8 +256,8 @@ class Controller extends AbstractController
             $entity
         );
 
-        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesTeam.getList', [
-            'contextId' => $divisionId
+        $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesDivision.getLobby', [
+            'entityId' => $divisionId
         ]));
     }
 
