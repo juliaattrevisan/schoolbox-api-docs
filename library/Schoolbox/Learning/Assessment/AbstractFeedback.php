@@ -33,14 +33,14 @@ class AbstractFeedback implements IFeedback
     /**
      * Mark given to this Assessable
      *
-     * @var float
+     * @var string
      */
     protected $humanReadableMark;
 
     /**
      * The mark out of 100 given to this Assessable
      *
-     * @var
+     * @var float
      */
     protected $normalisedMark;
 

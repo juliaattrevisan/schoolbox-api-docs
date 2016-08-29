@@ -50,23 +50,23 @@ interface IFeedback
     public function setId($id);
 
     /**
-     * @return float
+     * @return string
      */
     public function getHumanReadableMark();
 
     /**
-     * @param float $humanReadableMark
+     * @param string $humanReadableMark
      * @return $this
      */
     public function setHumanReadableMark($humanReadableMark);
 
     /**
-     * @return mixed
+     * @return float
      */
     public function getNormalisedMark();
 
     /**
-     * @param mixed $normalisedMark
+     * @param float $normalisedMark
      * @return $this
      */
     public function setNormalisedMark($normalisedMark);
