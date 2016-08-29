@@ -1,0 +1,141 @@
+<?php
+
+// Copy this file to /www/test.php, then access /test.php on your vagrant box.
+
+require_once __DIR__ . '/../library/Bootstrap.php';
+
+
+// Create a Course Specification for a Folder
+$courseSpecFolder = new Schoolbox\Resource\Folder\Model();
+$courseSpecFolder->setId(51)->setName('Houses');
+$courseSpec       = new Schoolbox\Learning\Course\Specification\Model();
+$courseSpec       = $courseSpec->setFolder($courseSpecFolder);
+// Add the Course Spec back to the Folder
+$courseSpecFolder = $courseSpecFolder->setCourseSpecification($courseSpec);
+
+
+// Create Unit Specifications for all the children of that Folder
+$unitSpecs = [
+    [52, 'Fox House',],
+    [54, 'Oak House',],
+    [55, 'Thistle House',],
+    [56, 'Dalton House',],
+];
+foreach ($unitSpecs as $unitSpec) {
+    list($folderId, $folderName) = $unitSpec;
+    $unitSpecFolder = new Schoolbox\Resource\Folder\Model();
+    $unitSpecFolder->setId($folderId)->setName($folderName);
+    $unitSpec       = new Schoolbox\Learning\Course\Specification\Unit\Model();
+    $unitSpec       = $unitSpec->setFolder($unitSpecFolder);
+    $courseSpec     = $courseSpec->setUnits($courseSpec->getUnits()->add($unitSpec));
+}
+
+
+// Create Course Imports for a few class Folders
+$frenchClass = new Schoolbox\Resource\Folder\Model();
+$frenchClass->setId(237)->setName('9AH French');
+$frenchClassCourseImport = new Schoolbox\Learning\Course\Import\Model();
+$frenchClassCourseImport = $frenchClassCourseImport
+    ->setFolder($frenchClass)
+    ->setSpecification($courseSpec);
+
+$englishClass = new Schoolbox\Resource\Folder\Model();
+$englishClass->setId(43)->setName('English 3 4');
+$englishClassCourseImport = new Schoolbox\Learning\Course\Import\Model();
+$englishClassCourseImport = $englishClassCourseImport
+    ->setFolder($englishClass)
+    ->setSpecification($courseSpec);
+
+$scienceClass = new Schoolbox\Resource\Folder\Model();
+$scienceClass->setId(357)->setName('Science Unit 2');
+$scienceClassCourseImport = new Schoolbox\Learning\Course\Import\Model();
+$scienceClassCourseImport = $scienceClassCourseImport
+    ->setFolder($scienceClass)
+    ->setSpecification($courseSpec);
+
+
+// Add the Course Imports back to the Spec Folder
+$courseSpecFolder = $courseSpecFolder->setCourseImports(
+    $courseSpecFolder->getCourseImports()
+        ->add($frenchClassCourseImport)
+        ->add($englishClassCourseImport)
+        ->add($scienceClassCourseImport)
+);
+
+
+// Create Unit Imports for the Unit Specs in the Course Spec, and add them to each class.
+// French: only add even numbered unit specs
+// English: only add odd numbered unit specs
+// Science: add all unit specs
+$i = 0;
+foreach ($courseSpec->getUnits() as $unitSpec) {
+    $unitImport = new Schoolbox\Learning\Course\Import\Unit\Model();
+    $unitImport->setSpecification($unitSpec);
+    if ($i % 2 == 0) {
+        $frenchClassCourseImport = $frenchClassCourseImport->setUnits($frenchClassCourseImport->getUnits()->add($unitImport));
+    } else {
+        $englishClassCourseImport = $englishClassCourseImport->setUnits($englishClassCourseImport->getUnits()->add($unitImport));
+    }
+    $scienceClassCourseImport = $scienceClassCourseImport->setUnits($scienceClassCourseImport->getUnits()->add($unitImport));
+    $i++;
+}
+
+
+// Echo it out
+?>
+
+<h1>Course Specification Folder: <?= $courseSpecFolder->getNameWithCodes() ?> (#<?= $courseSpecFolder->getId() ?>)</h1>
+
+<hr />
+
+<h2>Course Specification</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>Unit Name</th>
+        <th>Unit Folder ID</th>
+        <th>Assessments</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($courseSpecFolder->getCourseSpecification()->getUnits() as $unitSpec): ?>
+        <tr>
+            <td><?= $unitSpec->getFolder()->getNameWithCodes() ?></td>
+            <td><?= $unitSpec->getFolder()->getId() ?></td>
+            <td>TBD</td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>
+
+<hr />
+
+<h2>Course Imports</h2>
+
+<?php foreach ($courseSpecFolder->getCourseImports() as $courseImport): ?>
+    <h3><?= $courseImport->getSpecification()->getFolder()->getNameWithCodes() ?></h3>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Unit Spec Name</th>
+            <th>Unit Spec Folder ID</th>
+            <th>Open Date</th>
+            <th>Close Date</th>
+            <th>Assessments</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($courseImport->getUnits() as $unitImport): ?>
+            <tr>
+                <td><?= $unitImport->getSpecification()->getFolder()->getNameWithCodes() ?></td>
+                <td><?= $unitImport->getSpecification()->getFolder()->getId() ?></td>
+                <td>TBD</td>
+                <td>TBD</td>
+                <td>TBD</td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php endforeach; ?>
