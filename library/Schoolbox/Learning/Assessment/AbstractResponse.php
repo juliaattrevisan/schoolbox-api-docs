@@ -59,6 +59,8 @@ class AbstractResponse implements IResponse
      * based on its Updated field
      *
      * Assumes getAllFeedback() is sorted in reverse chronological order
+     *
+     * @return AbstractFeedback|null
      */
     public function findMostRecentFeedback()
     {
@@ -90,6 +92,8 @@ class AbstractResponse implements IResponse
      * based on its Updated field
      *
      * Assumes getAllFeedback() is sorted in reverse chronological order
+     *
+     * @return AbstractFeedback|null
      */
     public function findMostRecentPublishedFeedback()
     {
