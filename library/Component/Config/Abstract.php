@@ -29,9 +29,9 @@ abstract class Component_Config_Abstract
      * Constructor
      *
      * Folder should be an instance of \Schoolbox\Resource\Folder\Model
-     * but must be either handler array or instance, for now
+     * but may be either handler array or instance, for now
      *
-     * @param Folder $folder
+     * @param $folder
      * @param null $fields
      */
     public function __construct($folder, $fields = null)
