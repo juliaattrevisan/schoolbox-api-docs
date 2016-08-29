@@ -23,16 +23,29 @@
         });
 
         $('#season').selectizeSelector({
-            ajax: {
-                url: '{{ routeLookup('sportsfixturesSeason.getList') }}',
-                type: 'GET',
-                dataType: 'json'
-            },
             {% if division.season.id %}
             value: {"id":{{ division.season.id }}, "name": "{{ division.season.name }}"},
             {% endif %}
             multiple: false,
             selectize: {
+                preload: true,
+                hideSelected: false,
+                load: function(query, callback) {
+                    // Load: get values from AJAX, and callback with result
+                    var ajaxSettings = {
+                        url: '{{ routeLookup('sportsfixturesSeason.getList') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: { query: query }
+                    };
+                    $.ajax(ajaxSettings)
+                            .done(function(result) {
+                                callback(result)
+                            })
+                            .fail(function() {
+                                callback()
+                            })
+                },
                 score: function(search) {
                     return function(item) {
                         // Simply filter list, don't reorder
@@ -40,6 +53,21 @@
                     };
                 }
             }
+        });
+
+        /**
+         * Modal for URL homepage selection
+         */
+        $('[data-role="openResourceBrowser"]').click(function(e) {
+            e.preventDefault();
+            $('[data-role="resourceBrowser"]').socialstreamBrowser({
+                title: 'Choose a folder',
+                categoryId: 0,
+                mimeFilter: false,
+                submitCallback: function(url, filename) {
+                    $('input[name="url"]').val(url);
+                }
+            });
         });
     });
 </script>
@@ -88,7 +116,15 @@
 
                         <label>
                             Homepage URL
-                            <input type="text" name="url" value="{{ division.url }}" placeholder="http://" />
+                            <div class="column no-pad">
+                                <div class="medium-8 large-9 columns no-pad">
+                                    <input type="text" name="url" value="{{ division.url }}" placeholder="http://" />
+                                </div>
+                                <div class="medium-4 large-3 columns">
+                                    <a href="#" class="button" data-role="openResourceBrowser">Browse {{ locale.translate('resource',true,true) }}</a>
+                                    <div data-role="resourceBrowser" class="hide"></div>
+                                </div>
+                            </div>
                         </label>
                     </div>
                 </fieldset>
