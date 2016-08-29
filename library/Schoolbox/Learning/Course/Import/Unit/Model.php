@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Course\Import\Unit;
 
+use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
@@ -27,8 +28,6 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
  *  Course Import - instead, it belonged directly to the Folder it was imported
  *  onto, and was also linked to a component on that Folder.)
  *
- * TODO merge existing Unit Instance class (\Schoolbox\Assessment\Course\UnitInstance) into this
- *
  * @package Schoolbox\Learning\Course\Import\Unit
  */
 class Model implements AssessmentContext, ISoftDeletable
@@ -46,6 +45,8 @@ class Model implements AssessmentContext, ISoftDeletable
     /**
      * The Course Import which this object belongs to.
      *
+     * Replaces the previous Unit Instance class' component field.
+     *
      * TODO review if this relation is required - this object can't exist without its Course Import
      *
      * @var CourseImportModel
@@ -55,12 +56,16 @@ class Model implements AssessmentContext, ISoftDeletable
     /**
      * The Unit Specification which this object was created from.
      *
+     * Replaces the previous Unit Instance class' unit_category field.
+     *
      * @var UnitSpecificationModel
      */
     protected $specification;
 
     /**
      * The Assessable objects which are a part of this object.
+     *
+     * Replaces the previous Unit Instance class' tasks collection.
      *
      * TODO add the Assessable interface to this definition, once it exists
      *
@@ -69,12 +74,32 @@ class Model implements AssessmentContext, ISoftDeletable
     protected $assessables;
 
     /**
+     * The date on which this object opens.
+     *
+     * Assessables within this object may have their own open dates.
+     *
+     * @var Alaress_Date_Format
+     */
+    protected $openDate;
+
+    /**
+     * The date on which this object is due.
+     *
+     * Assessables within this object may have their own due dates.
+     *
+     * @var Alaress_Date_Format
+     */
+    protected $dueDate;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->specification  = new UnitSpecificationModel();
         $this->course         = new CourseImportModel();
+        $this->openDate       = new \Alaress_Date_NullDate();
+        $this->dueDate        = new \Alaress_Date_NullDate();
         $this->createdAt      = new \Alaress_Date_NullDate();
         $this->deletedAt      = new \Alaress_Date_NullDate();
     }
@@ -150,6 +175,42 @@ class Model implements AssessmentContext, ISoftDeletable
     public function setAssessables($assessables)
     {
         $this->assessables = $assessables;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getOpenDate()
+    {
+        return $this->openDate;
+    }
+
+    /**
+     * @param Alaress_Date_Format $openDate
+     * @return static
+     */
+    public function setOpenDate($openDate)
+    {
+        $this->openDate = $openDate;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getDueDate()
+    {
+        return $this->dueDate;
+    }
+
+    /**
+     * @param Alaress_Date_Format $dueDate
+     * @return static
+     */
+    public function setDueDate($dueDate)
+    {
+        $this->dueDate = $dueDate;
         return $this;
     }
 
