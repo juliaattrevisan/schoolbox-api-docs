@@ -26,7 +26,7 @@ class Controller extends Base
      */
     public function __construct(ErrorMapper $errorMapper)
     {
-        $this->errorMapper = $errorMapper;
+        $this->setErrorMapper($errorMapper);
     }
 
 
@@ -71,9 +71,10 @@ class Controller extends Base
             ]));
         }
 
+
         // Does this class exist ?
         if (!$class->getId()) {
-            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
 
         // TODO - generate data

@@ -24,7 +24,7 @@ class Controller extends Base
      */
     public function __construct(ErrorMapper $errorMapper)
     {
-        $this->errorMapper = $errorMapper;
+        $this->setErrorMapper($errorMapper);
     }
 
 
