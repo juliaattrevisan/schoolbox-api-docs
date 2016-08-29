@@ -19,6 +19,8 @@ use \Schoolbox\Collection;
 
 class Participant
 {
+    const TRAVERSAL_MARKED = 1;
+    const TRAVERSAL_PUBLISHED = 2;
 
     /**
      * The User to whom all these Responses and Feedbacks are relevant
@@ -115,6 +117,9 @@ class Participant
         return $collection;
     }
 
+    /* Traveller
+     */
+
     /**
      * This Participant received a Feedback for the $assessable
      *
@@ -123,66 +128,7 @@ class Participant
      */
     public function isAssessableMarked(IAssessable $assessable)
     {
-        $isAssessableMarked = false;
-
-        $numResponses = $this->findAllResponsesForAssessable($assessable)->count();
-        $numFeedbacks = $this->findAllFeedbackForAssessable($assessable)->count();
-
-        /* No Responses, No Feedback >>> not marked
-         */
-        if (!$numResponses && !$numFeedbacks) {
-            $isAssessableMarked = false;
-        }
-        /* At least one Response, No Feedback >>> not marked
-         */
-        elseif ($numResponses && !$numFeedbacks) {
-            $isAssessableMarked = false;
-        }
-        /* No Responses, at least one Feedback >>> marked
-         */
-        elseif (!$numResponses && $numFeedbacks) {
-            $isAssessableMarked = true;
-        }
-        /* Time to inspect the stacks
-         */
-        else {
-
-            /** @var IResponse $latestResponse */
-            $allResponses = $this->findAllResponsesForAssessable($assessable);
-            $latestResponse = $allResponses->first();
-
-            /** @var IFeedback $latestFeedback */
-            $allFeedbacks = $this->findAllFeedbackForAssessable($assessable);
-            $latestFeedback = $allFeedbacks->first();
-
-            /* Find the most recent Response
-             *
-             * @var IResponse $currentResponse
-             */
-            foreach ($allResponses as $currentResponse) {
-                if ($currentResponse->getUpdatedAt()->gt($latestResponse->getUpdatedAt())) {
-                    $latestResponse = $currentResponse;
-                }
-            }
-
-            /* Find the most recent Feedback
-             *
-             * @var IFeedback $currentFeedback
-             */
-            foreach ($allFeedbacks as $currentFeedback) {
-                if ($currentFeedback->getUpdatedAt()->gt($latestFeedback->getUpdatedAt())) {
-                    $latestFeedback = $currentFeedback;
-                }
-            }
-
-            /* Compare to see which one is the most recent action to occur
-             */
-            if ($latestFeedback->getUpdatedAt()->gt($latestResponse->getUpdatedAt())) {
-                $isAssessableMarked = true;
-            }
-        }
-
-        return $isAssessableMarked;
+        return $this->assessableFeedbackTraversal($assessable, self::TRAVERSAL_MARKED);
     }
 
     /**
@@ -193,7 +139,22 @@ class Participant
      */
     public function isAssessablePublished(IAssessable $assessable)
     {
-        $isAssessablePublished = false;
+        return $this->assessableFeedbackTraversal($assessable, self::TRAVERSAL_PUBLISHED);
+    }
+
+    /**
+     * A unified traversal of Feedbacks for the $assessable for this Participant
+     *
+     * This should probably be rammed away into its own class, as there will be
+     * a lot of traversals coming up IMHO
+     *
+     * @param IAssessable $assessable
+     * @param $type
+     * @return bool
+     */
+    private function assessableFeedbackTraversal(IAssessable $assessable, $type)
+    {
+        $outcome = false;
 
         $numResponses = $this->findAllResponsesForAssessable($assessable)->count();
         $numFeedbacks = $this->findAllFeedbackForAssessable($assessable)->count();
@@ -201,17 +162,17 @@ class Participant
         /* No Responses, No Feedback >>> not marked
          */
         if (!$numResponses && !$numFeedbacks) {
-            $isAssessablePublished = false;
+            $outcome = false;
         }
         /* At least one Response, No Feedback >>> not marked
          */
         elseif ($numResponses && !$numFeedbacks) {
-            $isAssessablePublished = false;
+            $outcome = false;
         }
         /* No Responses, at least one Feedback >>> marked
          */
         elseif (!$numResponses && $numFeedbacks) {
-            $isAssessablePublished = true;
+            $outcome = true;
         }
         /* Time to inspect the stacks
          */
@@ -247,12 +208,19 @@ class Participant
 
             /* Compare to see which one is the most recent action to occur
              */
-            if ($latestFeedback->getUpdatedAt()->gt($latestResponse->getUpdatedAt()) && $latestFeedback->isPublished()) {
-                $isAssessablePublished = true;
+            if ($type == self::TRAVERSAL_PUBLISHED) {
+                if ($latestFeedback->getUpdatedAt()->gt($latestResponse->getUpdatedAt()) && $latestFeedback->isPublished()) {
+                    $outcome = true;
+                }
+            }
+            else if ($type == self::TRAVERSAL_MARKED) {
+                if ($latestFeedback->getUpdatedAt()->gt($latestResponse->getUpdatedAt())) {
+                    $outcome = true;
+                }
             }
         }
 
-        return $isAssessablePublished;
+        return $outcome;
     }
 
     /* Getters/Setters
