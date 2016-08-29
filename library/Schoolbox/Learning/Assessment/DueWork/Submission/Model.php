@@ -25,16 +25,6 @@ class Model extends AbstractResponse
     protected $allFiles;
 
     /**
-     * The person who owns this Submission
-     *
-     * Teachers can submit on behalf of a Student - the Student
-     * is the User instance here
-     *
-     * @var User
-     */
-    protected $submittedOnBehalfOf;
-
-    /**
      * Model constructor.
      */
     public function __construct()
@@ -75,24 +65,6 @@ class Model extends AbstractResponse
     public function setAllFiles($allFiles)
     {
         $this->allFiles = $allFiles;
-        return $this;
-    }
-
-    /**
-     * @return User
-     */
-    public function getSubmittedOnBehalfOf()
-    {
-        return $this->submittedOnBehalfOf;
-    }
-
-    /**
-     * @param User $submittedOnBehalfOf
-     * @return $this
-     */
-    public function setSubmittedOnBehalfOf($submittedOnBehalfOf)
-    {
-        $this->submittedOnBehalfOf = $submittedOnBehalfOf;
         return $this;
     }
 }

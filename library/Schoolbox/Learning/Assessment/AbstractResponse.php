@@ -47,6 +47,16 @@ class AbstractResponse implements IResponse
     protected $submittedBy;
 
     /**
+     * The person who owns this Submission
+     *
+     * Teachers can submit on behalf of a Student - the Student
+     * is the User instance here
+     *
+     * @var User
+     */
+    protected $submittedOnBehalfOf;
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -176,6 +186,24 @@ class AbstractResponse implements IResponse
     public function setAssessable($assessable)
     {
         $this->assessable = $assessable;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getSubmittedOnBehalfOf()
+    {
+        return $this->submittedOnBehalfOf;
+    }
+
+    /**
+     * @param User $submittedOnBehalfOf
+     * @return $this
+     */
+    public function setSubmittedOnBehalfOf($submittedOnBehalfOf)
+    {
+        $this->submittedOnBehalfOf = $submittedOnBehalfOf;
         return $this;
     }
 }
