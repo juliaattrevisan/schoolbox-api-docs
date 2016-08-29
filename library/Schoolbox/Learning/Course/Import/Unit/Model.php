@@ -74,6 +74,19 @@ class Model implements AssessmentContext, ISoftDeletable
     protected $assessables;
 
     /**
+     * The title of this object.
+     *
+     * Usually this will come from this object's specification (usually the
+     * specification's folder's name), but it exists as a separate field in
+     * the database.
+     *
+     * TODO review whether this field is required
+     *
+     * @var string
+     */
+    protected $title;
+
+    /**
      * The date on which this object opens.
      *
      * Assessables within this object may have their own open dates.
@@ -175,6 +188,24 @@ class Model implements AssessmentContext, ISoftDeletable
     public function setAssessables($assessables)
     {
         $this->assessables = $assessables;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     * @return static
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
         return $this;
     }
 
