@@ -65,27 +65,107 @@ class Project extends AbstractAssessment
 
     /**
      * Calculate how many IAssessable instances have a non-null mark value
+     *
+     * The most recent action determines the marked/not-marked state of
+     * an Assessable. This accounts for a series of edge cases which really
+     * make you hate life
+     *
+     * For a particular Participant:
+     *
+     * If the Assessable contains zero Responses and zero Feedbacks:
+     *     >>> not marked
+     *
+     * If the Assessable contains at least one Response and zero Feedbacks:
+     *     >>> not marked
+     *
+     * If the Assessable contains zero Responses and at least one Feedback:
+     *     >>> marked
+     *
+     * If the Assessable contains at least one Response and at least one Feedback:
+     * Start traversing to find out what's going on.
+     *          If the most recent Response contains a Feedback -OR-
+     *          If a Feedback occurred more recently than the Response
+     *          (ie. Feedback is the most recent action) >>> marked
+     *
+     *          Otherwise >>> not marked
      */
     public function numMarked()
     {
-        $numMarked = 0;
+        $num = 0;
 
         /** @var IAssessable $currentAssessable */
         foreach ($this->getAssessables() as $currentAssessable) {
 
             /** @var Participant $currentParticipant */
             foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
+                $isAssessableMarked = false;
 
-                /** @var AbstractResponse $currentResponse */
-                foreach ($currentParticipant->findAllResponsesForAssessable($currentAssessable) as $currentResponse) {
-                    if ($currentResponse->findMostRecentFeedback()) {
-                        $numMarked++;
+                $numResponses = $currentParticipant->findAllResponsesForAssessable($currentAssessable)->count();
+                $numFeedbacks = $currentParticipant->findAllFeedbackForAssessable($currentAssessable)->count();
+
+                /* No Responses, No Feedback >>> not marked
+                 */
+                if (!$numResponses && !$numFeedbacks) {
+                    $isAssessableMarked = false;
+                }
+                /* At least one Response, No Feedback >>> not marked
+                 */
+                elseif ($numResponses && !$numFeedbacks) {
+                    $isAssessableMarked = false;
+                }
+                /* No Responses, at least one Feedback >>> marked
+                 */
+                elseif (!$numResponses && $numFeedbacks) {
+                    $isAssessableMarked = true;
+                }
+                /* Time to inspect the stacks
+                 */
+                else {
+
+                    /** @var IResponse $latestResponse */
+                    $allResponses = $currentParticipant->findAllResponsesForAssessable($currentAssessable);
+                    $latestResponse = $allResponses->first();
+
+                    /** @var IFeedback $latestFeedback */
+                    $allFeedbacks = $currentParticipant->findAllFeedbackForAssessable($currentAssessable);
+                    $latestFeedback = $allFeedbacks->first();
+
+                    /* Find the most recent Response
+                     *
+                     * @var IResponse $currentResponse
+                     */
+                    foreach ($allResponses as $currentResponse) {
+                        if ($currentResponse->getUpdatedAt()->gt($latestResponse->getUpdatedAt())) {
+                            $latestResponse = $currentResponse;
+                        }
                     }
+
+                    /* Find the most recent Feedback
+                     *
+                     * @var IFeedback $currentFeedback
+                     */
+                    foreach ($allFeedbacks as $currentFeedback) {
+                        if ($currentFeedback->getUpdatedAt()->gt($latestFeedback->getUpdatedAt())) {
+                            $latestFeedback = $currentFeedback;
+                        }
+                    }
+
+                    /* Compare to see which one is the most recent action to occur
+                     */
+                    if ($latestFeedback->getUpdatedAt()->gt($latestResponse->getUpdatedAt())) {
+                        $isAssessableMarked = true;
+                    }
+                }
+
+                /* Increment if marked
+                 */
+                if ($isAssessableMarked) {
+                    $num++;
                 }
             }
         }
 
-        return $numMarked;
+        return $num;
     }
 
     /**
