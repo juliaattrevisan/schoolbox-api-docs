@@ -27,8 +27,8 @@ class Controller extends Component_Dashboard_ControllerAbstract
      * Injectable constructor
      *
      * @param Component_Instance $instance
-     * @param User               $user
-     * @param SitePage           $sitepage
+     * @param User $user
+     * @param SitePage $sitepage
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
@@ -55,8 +55,10 @@ class Controller extends Component_Dashboard_ControllerAbstract
             foreach ($children as $child) {
                 $playerIds[] = $child['id'];
             }
-        } else if ($this->getUser()->getRole()->isStudent()) {
-            $playerIds[] = $this->getUser()->getId();
+        } else {
+            if ($this->getUser()->getRole()->isStudent()) {
+                $playerIds[] = $this->getUser()->getId();
+            }
         }
 
         $matches = $this->getDelegate()->getMatchesForUsers($playerIds, $getHistorical);
@@ -69,10 +71,10 @@ class Controller extends Component_Dashboard_ControllerAbstract
             $templateHandle,
             '@sportsfixturesDashboard/component.twig',
             [
-                'componentInstanceId'   => $this->getInstance()->getId(),
-                'componentClass'        => $this->getComponentName(),
-                'user'                  => $this->getUser(),
-                'matches'               => $matches,
+                'componentInstanceId' => $this->getInstance()->getId(),
+                'componentClass'      => $this->getComponentName(),
+                'user'                => $this->getUser(),
+                'matches'             => $matches,
             ]
         );
     }

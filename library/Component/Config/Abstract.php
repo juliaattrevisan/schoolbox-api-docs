@@ -59,7 +59,7 @@ abstract class Component_Config_Abstract
     /**
      * Converts value from a form into a value that can be stored in a database.
      *
-     * @param  mixed                        $value
+     * @param  mixed $value
      * @param  Component_ControllerAbstract $controller
      * @return mixed
      */
@@ -81,14 +81,14 @@ abstract class Component_Config_Abstract
     /**
      * Renders this configuration into a SitePage.
      *
-     * @param SitePage                     $page        The SitePage to render into
-     * @param string                       $key         I don't think this is used
-     * @param string                       $keyblock    The block the config gets rendered into.
+     * @param SitePage $page The SitePage to render into
+     * @param string $key I don't think this is used
+     * @param string $keyblock The block the config gets rendered into.
      *                                                  If a config template has sub-blocks, then
      *                                                  they are set into this block.
      *                                                  Is always set to the same value as $key.
-     * @param mixed                        $configValue The value of this config
-     * @param Component_ControllerAbstract $component   The component this config is part of
+     * @param mixed $configValue The value of this config
+     * @param Component_ControllerAbstract $component The component this config is part of
      */
     abstract public function parse(
         SitePage $page,

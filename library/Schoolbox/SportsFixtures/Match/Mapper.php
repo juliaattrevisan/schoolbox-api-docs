@@ -82,9 +82,9 @@ class Mapper extends BaseMapper
             'other_key' => 'match_id',
         ]);
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE,       [ $this, 'saveItinerary' ]);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'deleteItineraryItems' ]);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'deleteResults' ]);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'saveItinerary']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteItineraryItems']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteResults']);
     }
 
     /**
@@ -102,7 +102,7 @@ class Mapper extends BaseMapper
             $item->setMatch($match);
         }
 
-        return $this->cascadeJoin('itinerary', [ 'match_id' => $match->getId() ], $match->getItinerary());
+        return $this->cascadeJoin('itinerary', ['match_id' => $match->getId()], $match->getItinerary());
     }
 
     /**
@@ -198,7 +198,7 @@ class Mapper extends BaseMapper
         $teams = new Collection();
 
         /** @var Collection|School[] $schools */
-        $schools   = new Collection();
+        $schools = new Collection();
 
         /** @var Collection|Result[] $results */
         $results = new Collection();
@@ -241,13 +241,13 @@ class Mapper extends BaseMapper
                 $match->setAwayTeam($teams->getOffset($row['away_team_id']));
 
                 // Optional relationship
-                if(!$schools->getOffset($row['home_school_id']) instanceof School){
+                if (!$schools->getOffset($row['home_school_id']) instanceof School) {
                     $schools->setOffset($row['home_school_id'], $this->hydrateJoin($row, 'home_school', 'hs'));
                 }
                 $match->setHomeSchool($schools->getOffset($row['home_school_id']));
 
                 // Optional relationship
-                if(!$schools->getOffset($row['away_school_id']) instanceof School){
+                if (!$schools->getOffset($row['away_school_id']) instanceof School) {
                     $schools->setOffset($row['away_school_id'], $this->hydrateJoin($row, 'away_school', 'as'));
                 }
                 $match->setAwaySchool($schools->getOffset($row['away_school_id']));
@@ -265,12 +265,14 @@ class Mapper extends BaseMapper
                     $results[$row['r.team_id']] = $result;
 
                     // Figure out if this result if for the home or away team
-                    if($matches[$matchId]->getHomeTeam()->getId() == $result->getTeam()->getId()){
+                    if ($matches[$matchId]->getHomeTeam()->getId() == $result->getTeam()->getId()) {
                         $matches[$matchId]->setHomeTeamResult($result);
-                    } else if($matches[$matchId]->getAwayTeam()->getId() == $result->getTeam()->getId()){
-                        $matches[$matchId]->setAwayTeamResult($result);
                     } else {
-                        throw new \LogicException('Cannot match this result with a match team');
+                        if ($matches[$matchId]->getAwayTeam()->getId() == $result->getTeam()->getId()) {
+                            $matches[$matchId]->setAwayTeamResult($result);
+                        } else {
+                            throw new \LogicException('Cannot match this result with a match team');
+                        }
                     }
                 }
             }

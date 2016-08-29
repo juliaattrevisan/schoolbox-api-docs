@@ -60,7 +60,8 @@ class Model implements ISoftDeletable
      * @param int $id
      * @return self
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -68,7 +69,8 @@ class Model implements ISoftDeletable
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -142,7 +144,8 @@ class Model implements ISoftDeletable
      * @param Alaress_Date_Format $createdAt
      * @return static
      */
-    public function setCreatedAt($createdAt) {
+    public function setCreatedAt($createdAt)
+    {
         $this->createdAt = $createdAt;
         return $this;
     }
@@ -150,7 +153,8 @@ class Model implements ISoftDeletable
     /**
      * @return Alaress_Date_Format $createdAt
      */
-    public function getCreatedAt() {
+    public function getCreatedAt()
+    {
         return $this->createdAt;
     }
 
@@ -158,7 +162,8 @@ class Model implements ISoftDeletable
      * @param Alaress_Date_Format $updatedAt
      * @return static
      */
-    public function setUpdatedAt($updatedAt) {
+    public function setUpdatedAt($updatedAt)
+    {
         $this->updatedAt = $updatedAt;
         return $this;
     }
@@ -166,7 +171,8 @@ class Model implements ISoftDeletable
     /**
      * @return Alaress_Date_Format
      */
-    public function getUpdatedAt() {
+    public function getUpdatedAt()
+    {
         return $this->updatedAt;
     }
 }

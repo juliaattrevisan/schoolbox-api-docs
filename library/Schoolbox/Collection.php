@@ -22,12 +22,12 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     protected $position = 0;
 
     /**
-    * Constructor
-    *
-    * Only set a stack parameter if it's an array
-    *
-    * @param array $stack
-    */
+     * Constructor
+     *
+     * Only set a stack parameter if it's an array
+     *
+     * @param array $stack
+     */
     public function __construct($stack = array())
     {
         if (is_array($stack)) {
@@ -59,23 +59,23 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-    * Returns whole collection as an array.
-    *
-    * @return array
-    */
+     * Returns whole collection as an array.
+     *
+     * @return array
+     */
     public function getAll()
     {
         return $this->stack;
     }
 
     /**
-    * Sets key value in collection
-    *
-    * @param  mixed $offset
-    * @param  mixed $value
-    *
-    * @return void
-    */
+     * Sets key value in collection
+     *
+     * @param  mixed $offset
+     * @param  mixed $value
+     *
+     * @return void
+     */
     public function offsetSet($offset, $value)
     {
         if (empty($offset)) {
@@ -86,12 +86,12 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-    * Gets value in collection
-    *
-    * @param mixed $offset
-    *
-    * @return mixed
-    */
+     * Gets value in collection
+     *
+     * @param mixed $offset
+     *
+     * @return mixed
+     */
     public function offsetGet($offset)
     {
         if (isset($this->stack[$offset])) {
@@ -102,69 +102,69 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-    * Does this value exist?
-    *
-    * @param mixed $offset
-    *
-    * @return bool
-    */
+     * Does this value exist?
+     *
+     * @param mixed $offset
+     *
+     * @return bool
+     */
     public function offsetExists($offset)
     {
         return isset($this->stack[$offset]);
     }
 
     /**
-    * Unsets value in collection
-    *
-    * @param mixed $offset
-    *
-    * @return void
-    */
+     * Unsets value in collection
+     *
+     * @param mixed $offset
+     *
+     * @return void
+     */
     public function offsetUnset($offset)
     {
         unset($this->stack[$offset]);
     }
 
     /**
-    * Set stack
-    *
-    * @param $stack
-    */
+     * Set stack
+     *
+     * @param $stack
+     */
     protected function setStack($stack)
     {
         $this->stack = $stack;
     }
 
     /**
-    * Get stack
-    *
-    * @return array
-    */
+     * Get stack
+     *
+     * @return array
+     */
     protected function getStack()
     {
         return $this->stack;
     }
 
     /**
-    * Get number of elements in collection.
-    *
-    * @return int
-    */
+     * Get number of elements in collection.
+     *
+     * @return int
+     */
     public function count()
     {
         return count($this->getStack());
     }
 
     /**
-    * Retrieves an iterator over this collection's stack.
-    *
-    * @return \Traversable
-    */
+     * Retrieves an iterator over this collection's stack.
+     *
+     * @return \Traversable
+     */
     public function getIterator()
     {
         return new ArrayIterator($this->stack);
     }
-    
+
     /**
      * Rewind
      */
@@ -202,10 +202,10 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-    * Gets first item in collection (regardless of its key)
-    *
-    * @return mixed
-    */
+     * Gets first item in collection (regardless of its key)
+     *
+     * @return mixed
+     */
     public function first()
     {
         foreach ($this as $item) {
@@ -216,15 +216,15 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-    * Get the last item in the collection
-    *
-    * @throws \Exception
-    * @return mixed
-    */
+     * Get the last item in the collection
+     *
+     * @throws \Exception
+     * @return mixed
+     */
     public function last()
     {
         if ($this->count()) {
-            return $this->stack[count($this->stack)-1];
+            return $this->stack[count($this->stack) - 1];
         }
 
         return null;
@@ -254,25 +254,25 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
 
     /**
-    * Gets the name of the get method for this field.
-    *
-    * @param string $field The field name to retrieve.
-    *
-    * @return string
-    */
+     * Gets the name of the get method for this field.
+     *
+     * @param string $field The field name to retrieve.
+     *
+     * @return string
+     */
     protected function getGetMethodName($field)
     {
-        return 'get'.ucfirst($field);
+        return 'get' . ucfirst($field);
     }
 
     /**
-    * Returns first item in collection whose value of $field is $value.
-    *
-    * @param string $field The field name to compare against
-    * @param mixed  $value The value to compare against
-    *
-    * @return object
-    */
+     * Returns first item in collection whose value of $field is $value.
+     *
+     * @param string $field The field name to compare against
+     * @param mixed $value The value to compare against
+     *
+     * @return object
+     */
     public function getBy($field, $value)
     {
         $method_name = $this->getGetMethodName($field);
@@ -289,7 +289,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     /**
      * This is a Collection-aware wrapper around array_column, for use in the Twig filter {{ | column($column) }}
      *
-     * @param array  $input
+     * @param array $input
      * @param string $column
      * @throws InvalidArgumentException if the input given is not traversable
      * @return array
@@ -306,15 +306,15 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-    * Gets values for the given column in the collection.
-    *
-    * @param string $column
-    *
-    * @return array
-    */
+     * Gets values for the given column in the collection.
+     *
+     * @param string $column
+     *
+     * @return array
+     */
     public function getColumnValues($column)
     {
-        $parts       = array();
+        $parts = array();
         $method_name = $this->getGetMethodName($column);
         foreach ($this as $item) {
             $method = array($item, $method_name);
@@ -334,38 +334,38 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      *
      * Special case of $this->sortByCallback().
      *
-     * @param string|string[]      $field           The name of the field[s] to sort by.
-     * @param string|string[]      $direction       The order[s] to sort by - 'asc' or 'desc'
-     * @param callable|callable[]  $compareFunction If set, use this callable[s] as the comparison.
+     * @param string|string[] $field The name of the field[s] to sort by.
+     * @param string|string[] $direction The order[s] to sort by - 'asc' or 'desc'
+     * @param callable|callable[] $compareFunction If set, use this callable[s] as the comparison.
      *                                               Only applied if values aren't directly comparable.
      *
      * @return $this
      */
     public function sortBy($field, $direction, $compareFunction = null)
     {
-        $fields           = (array)$field;
-        $directions       = (array)$direction;
-        $compareFunctions = is_array($compareFunction) ? $compareFunction : array_fill(0,count($fields),null);
+        $fields = (array)$field;
+        $directions = (array)$direction;
+        $compareFunctions = is_array($compareFunction) ? $compareFunction : array_fill(0, count($fields), null);
 
         $get_methods = [];
-        foreach($fields as $field){
+        foreach ($fields as $field) {
             $get_methods[] = $this->getGetMethodName($field);
         }
 
         $is_asc = [];
-        foreach($directions as $direction){
+        foreach ($directions as $direction) {
             $is_asc[] = (strtolower($direction) === 'asc');
         }
 
         $isCallable = [];
-        foreach($compareFunctions as $compareFunction){
+        foreach ($compareFunctions as $compareFunction) {
             $isCallable[] = is_callable($compareFunction);
         }
 
-        $callback   = function($a, $b) use ($get_methods, $is_asc, $isCallable, $compareFunctions) {
+        $callback = function ($a, $b) use ($get_methods, $is_asc, $isCallable, $compareFunctions) {
             $result = 0;
             $i = 0;
-            for(; $i < count($get_methods); $i++){
+            for (; $i < count($get_methods); $i++) {
                 $a_value = $a->$get_methods[$i]();
                 $b_value = $b->$get_methods[$i]();
 
@@ -380,7 +380,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
                 }
 
                 // Have we determined a result ?
-                if(0 !== $result){
+                if (0 !== $result) {
                     break;
                 }
             }
@@ -397,30 +397,31 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     /**
      * Convenience method to sort a collection using multiple fields
      *
-     * @param array         $fields       Keys = fieldName. Values = direction + optional callback. eg
-    *                                      [  'lastName'  => ['asc'],
-    *                                         'firstName' => ['asc', $callable],
-    *                                          'dob'       => 'desc',   ]
+     * @param array $fields Keys = fieldName. Values = direction + optional callback. eg
+     *                                      [  'lastName'  => ['asc'],
+     *                                         'firstName' => ['asc', $callable],
+     *                                         'dob'       => 'desc',   ]
      *
-     * @var   string|array  $fields[]     If value is string: Direction to sort. {'asc'|'desc'}
-     * @var   string        $fields[][1]  If value is array:  1st item is direction,
-     * @var   callable      $fields[][2]                      2nd item is a compare function (optional)
+     * @var   string|array $fields []     If value is string: Direction to sort. {'asc'|'desc'}
+     * @var   string $fields [][1]        If value is array:  1st item is direction,
+     * @var   callable $fields [][2]                          2nd item is a compare function (optional)
      * @return static
      */
-    public function sortByMultiFields(array $fields){
+    public function sortByMultiFields(array $fields)
+    {
 
-        $fieldNames       = [];
-        $directions       = [];
+        $fieldNames = [];
+        $directions = [];
         $compareFunctions = [];
 
-        foreach($fields as $fieldName => $fieldOptions){
+        foreach ($fields as $fieldName => $fieldOptions) {
             $fieldNames[] = $fieldName;
 
-            if(is_array($fieldOptions)){
-                $directions[]       = $fieldOptions[0];
+            if (is_array($fieldOptions)) {
+                $directions[] = $fieldOptions[0];
                 $compareFunctions[] = $fieldOptions[1] ?: null;
             } else {
-                $directions[]       = $fieldOptions;
+                $directions[] = $fieldOptions;
                 $compareFunctions[] = null;
             }
         }
@@ -429,14 +430,13 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
 
-
     /**
-    * Sorts the collection by a callback. @see usort()
-    *
-    * @param callable $callback
-    *
-    * @return $this
-    */
+     * Sorts the collection by a callback. @see usort()
+     *
+     * @param callable $callback
+     *
+     * @return $this
+     */
     public function sortByCallback($callback)
     {
         $stack = $this->getStack();
@@ -446,13 +446,13 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-    * Limits the collection by count and offset. @see array_slice()
-    *
-    * @param int $offset
-    * @param int $count
-    *
-    * @return $this
-    */
+     * Limits the collection by count and offset. @see array_slice()
+     *
+     * @param int $offset
+     * @param int $count
+     *
+     * @return $this
+     */
     public function limit($offset = 0, $count = null)
     {
         $this->setStack(array_slice($this->getStack(), $offset, $count));
@@ -460,13 +460,13 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-    * Merges contents of another collection with this one - appends all
-    * elements in the other collection to this one.
-    *
-    * @param Collection $other
-    *
-    * @return $this
-    */
+     * Merges contents of another collection with this one - appends all
+     * elements in the other collection to this one.
+     *
+     * @param Collection $other
+     *
+     * @return $this
+     */
     public function merge(Collection $other)
     {
         $this->setStack(array_merge($this->getStack(), $other->getStack()));
@@ -475,14 +475,14 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
 
 
     /**
-    * Merges contents of another collection with this one where duplicate elements
-    * are ignored. Preference is given to the collection on which the method is called.
-    *
-    * @param Collection $other - the second collection
-    * @param string $column    - a column on which to test uniqueness (ie. an ID)
-    *                            If omitted, the entire object will be tested
-    * @return self
-    */
+     * Merges contents of another collection with this one where duplicate elements
+     * are ignored. Preference is given to the collection on which the method is called.
+     *
+     * @param Collection $other - the second collection
+     * @param string $column - a column on which to test uniqueness (ie. an ID)
+     *                            If omitted, the entire object will be tested
+     * @return self
+     */
     public function mergeUnique(Collection $other, $column = null)
     {
         if ($column) {
@@ -505,22 +505,22 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-    * Put an object in a particular place in the stack
-    *
-    * @param $index
-    * @param $value
-    */
+     * Put an object in a particular place in the stack
+     *
+     * @param $index
+     * @param $value
+     */
     public function setOffset($index, $value)
     {
         $this->stack[$index] = $value;
     }
 
     /**
-    * Get the contents of a particular index in the stack
-    *
-    * @param $index
-    * @return mixed
-    */
+     * Get the contents of a particular index in the stack
+     *
+     * @param $index
+     * @return mixed
+     */
     public function getOffset($index)
     {
         if (isset($this->stack[$index])) {
@@ -530,30 +530,30 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-    * Reindex the stack (useful when you setOffset() particular indexes and
-    * want to restore 0-based indexes)
-    */
+     * Reindex the stack (useful when you setOffset() particular indexes and
+     * want to restore 0-based indexes)
+     */
     public function reindex()
     {
         $this->setStack(array_values($this->getStack()));
     }
 
     /**
-    * Returns a new collection containing items that are in $this, but not in
-    * $otherCollection.
-    *
-    * @param  Collection $otherCollection
-    * @param  callable   $diffMethod The callback method to use for deciding
-    *                                whether two items are the same.
-    *                                Defaults to == comparison.
-    * @return Collection
-    */
+     * Returns a new collection containing items that are in $this, but not in
+     * $otherCollection.
+     *
+     * @param  Collection $otherCollection
+     * @param  callable $diffMethod The callback method to use for deciding
+     *                                whether two items are the same.
+     *                                Defaults to == comparison.
+     * @return Collection
+     */
     public function diff(Collection $otherCollection, $diffMethod = null)
     {
         $diff = new Collection();
 
         if (!is_callable($diffMethod)) {
-            $diffMethod = function($a, $b) {
+            $diffMethod = function ($a, $b) {
                 return $a == $b;
             };
         }
@@ -574,14 +574,14 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-    * Applies a callabale to all items in this collection, and returns a new
+     * Applies a callabale to all items in this collection, and returns a new
      * collection with the result. If $includeNull == false, iterations that
      * return explicitly null will be omitted from the final result
-    *
-    * @param  callback   $callback
-     * @param  bool       $includeNull
-    * @return Collection
-    */
+     *
+     * @param  callback $callback
+     * @param  bool $includeNull
+     * @return Collection
+     */
     public function map($callback, $includeNull = true)
     {
         $return = new Collection();
@@ -595,12 +595,12 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-    * Filters out items that don't match $callbale, and returns a new
-    * collection with the result.
-    *
-    * @param  callback   $callback
-    * @return Collection
-    */
+     * Filters out items that don't match $callbale, and returns a new
+     * collection with the result.
+     *
+     * @param  callback $callback
+     * @return Collection
+     */
     public function filter($callback)
     {
         $return = new Collection();
@@ -613,31 +613,31 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-    * Groups all results by a field value.
-    *
-    * @param  string $field The field to search by.
-    * @return Collection|Collection[] @see $this->groupByCallback()
-    */
+     * Groups all results by a field value.
+     *
+     * @param  string $field The field to search by.
+     * @return Collection|Collection[] @see $this->groupByCallback()
+     */
     public function groupBy($field)
     {
         $get_method = $this->getGetMethodName($field);
         return $this->groupByCallback(
-            function($item) use ($get_method) {
+            function ($item) use ($get_method) {
                 return $item->$get_method();
             }
         );
     }
 
     /**
-    * Groups results by the return value of $callback.
-    *
-    * @param  callable $callback A callback which takes each item within $this
-    *                            as its only parameter, and returns a key.
-    * @return Collection|Collection[]
-    *   A collection of collections.
-    *   * key:   result of $item->$callback()
-    *   * value: a collection of all items in $this where $item->$callback() = $key
-    */
+     * Groups results by the return value of $callback.
+     *
+     * @param  callable $callback A callback which takes each item within $this
+     *                            as its only parameter, and returns a key.
+     * @return Collection|Collection[]
+     *   A collection of collections.
+     *   * key:   result of $item->$callback()
+     *   * value: a collection of all items in $this where $item->$callback() = $key
+     */
     public function groupByCallback($callback)
     {
         /** @var Collection[] $result */
@@ -653,12 +653,12 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-    * Slice this collection to a specified size, optionally with an offset
-    *
-    * @param int $offset
-    * @param int $count
-    * @return self
-    */
+     * Slice this collection to a specified size, optionally with an offset
+     *
+     * @param int $offset
+     * @param int $count
+     * @return self
+     */
     public function slice($offset, $count = null)
     {
         $this->stack = array_slice($this->stack, $offset, $count, false);
@@ -669,7 +669,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     {
         $getField = $this->getGetMethodName($field);
         return $this->filterByCallback(
-            function($item) use ($getField, $value) {
+            function ($item) use ($getField, $value) {
                 return $item->$getField() == $value;
             }
         );
@@ -677,16 +677,16 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
 
 
     /**
-    * Filters out elements from this collection based on the given callback
-    *
-    * @deprecated use filter() instead
-    * @param callable $callback {
-    *                      param $item
-    *                      return bool
-    *                 }
-    *
-    * @return Collection
-    */
+     * Filters out elements from this collection based on the given callback
+     *
+     * @deprecated use filter() instead
+     * @param callable $callback {
+     *                      param $item
+     *                      return bool
+     *                 }
+     *
+     * @return Collection
+     */
     public function filterByCallback($callback)
     {
         $result = array();
@@ -699,11 +699,11 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-    * Specify data which should be serialized to JSON. Currently, attempts to
-    * serialize all items within the stack.
-    *
-    * @return array
-    */
+     * Specify data which should be serialized to JSON. Currently, attempts to
+     * serialize all items within the stack.
+     *
+     * @return array
+     */
     public function jsonSerialize()
     {
         return $this->getStack();
@@ -722,8 +722,8 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         $this->reindex();
 
         $keys = $this->getColumnValues($column);
-        $len  = count($keys);
-        $new  = array();
+        $len = count($keys);
+        $new = array();
 
         for ($i = 0; $i < $len; ++$i) {
             $new[$keys[$i]] = $this->stack[$i];

@@ -78,7 +78,7 @@ class ComponentDelegate
         /** @var Collection|Match[] $teams */
         $matches = new Collection();
 
-        if(!count($userIds)){
+        if (!count($userIds)) {
             return $matches;
         }
 
@@ -92,10 +92,10 @@ class ComponentDelegate
 
         /** @var Collection|Team[] $teams */
         $teams = new Collection();
-        foreach($teamPlayers as $teamPlayer){
+        foreach ($teamPlayers as $teamPlayer) {
             $team = $teamPlayer->getTeam();
             // Don't clobber teams
-            if(!$teams[$team->getId()]){
+            if (!$teams[$team->getId()]) {
                 $teams[$team->getId()] = $team;
             }
             // Add player to team, but prevent duplicates by inserting at collection index
@@ -103,12 +103,12 @@ class ComponentDelegate
         }
 
         // Are we interested in matches in the past ?
-        if($getHistorical){
+        if ($getHistorical) {
             // Get all teams that the users played in
             $teamParticipants = $this->getTeamParticipantMapper()->findByColumn('user_id', $userIds);
-            foreach($teamParticipants as $teamParticipant){
+            foreach ($teamParticipants as $teamParticipant) {
                 $team = $teamParticipant->getTeam();
-                if(!$teams[$team->getId()]){
+                if (!$teams[$team->getId()]) {
                     $teams[$team->getId()] = $team;
                 }
                 // Add player to team, but prevent duplicates by inserting at collection index
@@ -121,23 +121,23 @@ class ComponentDelegate
         $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $teams->keys());
 
         /** @var Collection|Match[] $all_matches */
-        $all_matches  = $home_matches->mergeUnique($away_matches, 'id');
+        $all_matches = $home_matches->mergeUnique($away_matches, 'id');
 
         // Filter matches, and link teams which now contain relevant players
-        foreach($all_matches as $match){
-            if($getHistorical || $match->getStartAt()->isFuture()){
+        foreach ($all_matches as $match) {
+            if ($getHistorical || $match->getStartAt()->isFuture()) {
                 $matches[$match->getId()] = $match;
             } else {
                 continue;
             }
 
             // Can we link a home team ?
-            if($teams[$match->getHomeTeam()->getId()]){
+            if ($teams[$match->getHomeTeam()->getId()]) {
                 $match->setHomeTeam($teams[$match->getHomeTeam()->getId()]);
             }
 
             // Can we link an away team ?
-            if($teams[$match->getAwayTeam()->getId()]){
+            if ($teams[$match->getAwayTeam()->getId()]) {
                 $match->setAwayTeam($teams[$match->getAwayTeam()->getId()]);
             }
         }
@@ -168,28 +168,28 @@ class ComponentDelegate
         $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getId());
         $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getId());
 
-        $all_matches  = $home_matches->mergeUnique($away_matches, 'id');
+        $all_matches = $home_matches->mergeUnique($away_matches, 'id');
 
         // Filter matches
-        foreach($all_matches as $match){
-            if($getHistorical || $match->getStartAt()->isFuture()){
+        foreach ($all_matches as $match) {
+            if ($getHistorical || $match->getStartAt()->isFuture()) {
                 $matches[$match->getId()] = $match;
             }
         }
 
         // Are we getting matches that have been played ?
-        if($getHistorical){
+        if ($getHistorical) {
             $playedMatchIds = [];
-            foreach($matches as $match){
+            foreach ($matches as $match) {
                 // Has the match been played ?
-                if($match->getStartAt()->isPast()){
+                if ($match->getStartAt()->isPast()) {
                     $playedMatchIds[] = $match->getId();
                 }
             }
             /** @var Collection|Result[] $results */
             $results = $this->getResultMapper()->findByColumnList(['match_id' => $playedMatchIds]);
 
-            foreach($results as $result){
+            foreach ($results as $result) {
                 $matches[$result->getMatch()->getId()]->getResults()[$result->getTeam()->getId()] = $result;
             }
         }
@@ -207,7 +207,7 @@ class ComponentDelegate
     public function sortMatches(Collection $matches)
     {
         // Sort matches by date order
-        $matches->sortByCallback(function($a, $b) {
+        $matches->sortByCallback(function ($a, $b) {
             /** @var Match $a */
             /** @var Match $b */
             return ($a->getStartAt()->compare($b->getStartAt()));

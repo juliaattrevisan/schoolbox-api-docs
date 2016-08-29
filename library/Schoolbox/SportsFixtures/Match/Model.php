@@ -189,7 +189,8 @@ class Model implements ISoftDeletable
      * Returns scalar null if home team is a school, or if no result yet
      * @return null|Result
      */
-    public function getHomeTeamResult(){
+    public function getHomeTeamResult()
+    {
         return $this->homeTeamResult;
     }
 
@@ -197,7 +198,8 @@ class Model implements ISoftDeletable
      * @param null|Result $result
      * @return static
      */
-    public function setHomeTeamResult(Result $result){
+    public function setHomeTeamResult(Result $result)
+    {
         $this->homeTeamResult = $result;
         return $this;
     }
@@ -206,7 +208,8 @@ class Model implements ISoftDeletable
      * Returns scalar null if away team is a school, or if no result yet
      * @return null|Result
      */
-    public function getAwayTeamResult(){
+    public function getAwayTeamResult()
+    {
         return $this->awayTeamResult;
     }
 
@@ -214,7 +217,8 @@ class Model implements ISoftDeletable
      * @param null|Result $result
      * @return static
      */
-    public function setAwayTeamResult(Result $result){
+    public function setAwayTeamResult(Result $result)
+    {
         $this->awayTeamResult = $result;
         return $this;
     }
@@ -226,10 +230,10 @@ class Model implements ISoftDeletable
     public function getResults()
     {
         $results = new Collection();
-        if($this->getHomeTeamResult()){
+        if ($this->getHomeTeamResult()) {
             $results[$this->getHomeTeamResult()->getTeam()->getId()] = $this->getHomeTeamResult();
         }
-        if($this->getAwayTeamResult()){
+        if ($this->getAwayTeamResult()) {
             $results[$this->getAwayTeamResult()->getTeam()->getId()] = $this->getAwayTeamResult();
         }
         return $results;

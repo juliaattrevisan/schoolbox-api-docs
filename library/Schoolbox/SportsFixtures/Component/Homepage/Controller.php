@@ -25,10 +25,11 @@ class Controller extends Component_Homepage_ControllerAbstract
      * Injectable constructor
      *
      * @param Component_Instance $instance
-     * @param User               $user
-     * @param SitePage           $sitepage
+     * @param User $user
+     * @param SitePage $sitepage
      */
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
+    {
         parent::__construct($instance, $user, $sitepage);
         $this->delegate = new ComponentDelegate($sitepage);
     }
@@ -50,16 +51,16 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function renderTemplate($templateHandle)
     {
         // Grab data for the team we are viewing
-        
+
         $matches = $this->delegate->getTeamMatches($this->getConfig('team'), $this->getConfig('showHistorical'));
 
         return $this->renderTwigTemplate(
             $templateHandle,
             '@sportsfixturesHomepage/component.twig',
             [
-                'componentInstanceId'   => $this->getInstance()->getId(),
-                'componentClass'        => $this->getComponentName(),
-                'matches'               => $matches,
+                'componentInstanceId' => $this->getInstance()->getId(),
+                'componentClass'      => $this->getComponentName(),
+                'matches'             => $matches,
             ]
         );
     }

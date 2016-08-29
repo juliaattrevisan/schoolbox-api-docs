@@ -101,13 +101,13 @@ class Mapper extends BaseMapper
     /**
      * Finds all team memberships for a user in a division.
      *
-     * @param User     $user
+     * @param User $user
      * @param Division $division
      * @return Collection|Model[]
      */
     public function findForUserInDivision(User $user, Division $division)
     {
-        $query = $this->getSelectString().' WHERE td.id = :divisionId AND u.id = :userId';
+        $query = $this->getSelectString() . ' WHERE td.id = :divisionId AND u.id = :userId';
         $stmt  = $this->getDatabase()->prepare($query);
         $stmt->execute(['userId' => $user->getId(), 'divisionId' => $division->getId(),]);
         return $this->hydrateList($stmt);

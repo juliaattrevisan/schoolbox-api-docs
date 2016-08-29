@@ -163,7 +163,7 @@ class Controller extends AbstractController
 
         // Sort matches within seasons by startAt datetime
         foreach ($seasonMatches as $matches) {
-            $matches->sortBy('startAt','asc');
+            $matches->sortBy('startAt', 'asc');
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/list.twig', [
@@ -395,9 +395,9 @@ class Controller extends AbstractController
     {
         if (preg_match("/$prefix(.*)/", $teamId, $matches)) {
             // Away team is a faceless school, save the team as null
-            return [ $this->getTeamMapper()->createModel(), $this->getSchoolMapper()->findById($matches[1]) ];
+            return [$this->getTeamMapper()->createModel(), $this->getSchoolMapper()->findById($matches[1])];
         } else {
-            return [ $this->getTeamMapper()->findById($teamId), $this->getSchoolMapper()->createModel() ];
+            return [$this->getTeamMapper()->findById($teamId), $this->getSchoolMapper()->createModel()];
         }
 
     }
@@ -408,7 +408,7 @@ class Controller extends AbstractController
      * @param Model $match
      * @param Division $division
      * @param string $name
-     * @param Season $season,
+     * @param Season $season ,
      * @param Alaress_Date_Format $startAt
      * @param Team $homeTeam
      * @param Team $awayTeam
