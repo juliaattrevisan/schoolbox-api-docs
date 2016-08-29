@@ -53,8 +53,6 @@ class Controller extends Component_Homepage_ControllerAbstract
         
         $matches = $this->delegate->getTeamMatches($this->getConfig('team'), $this->getConfig('showHistorical'));
 
-//echo '<pre>';print_r($matches);die();
-
         return $this->renderTwigTemplate(
             $templateHandle,
             '@sportsfixturesHomepage/component.twig',
