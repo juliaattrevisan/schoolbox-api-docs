@@ -9,63 +9,16 @@
                     <div class="list-item">
                         <div class="card small-12">
 
-                            <div class="row">
-                                <div class="small-8 columns no-pad"><h3>{{ match.name }}</h3></div>
-                                <div class="small-4 columns text-right"><span class="meta" data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span></div>
-                            </div>
+                            {% if match.name|length %}
+                                <h3>{{ match.name }}: {{ matchHeading.generateWithStatusLink(match) }}</h3>
+                            {% else %}
+                                <h3>{{ matchHeading.generateWithStatusLink(match) }}</h3>
+                            {% endif %}
 
-                            <div class="row">
+                            <p class="meta">
+                                <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span>
+                            </p>
 
-                                <div class="small-3 columns no-pad">
-                                    {% if match.homeTeam.id %}
-                                        {% if match.homeTeam.url | length %}
-                                            <a href="{{ match.homeTeam.url }}">{{ match.homeTeam.name }}</a>
-                                        {% else %}
-                                            {{ match.homeTeam.name }}
-                                        {% endif %}
-                                    {% else %}
-                                        {{ match.homeSchool.name }}
-                                    {% endif %}
-                                </div>
-
-                                <div class="small-2 columns no-pad">
-                                    {% if match.homeTeam.id %}
-                                        <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}">
-                                            {% if match.homeTeamResult %}
-                                                ({{ match.homeTeamResult.status.name }})
-                                            {% else %}
-                                                itinerary
-                                            {% endif %}
-                                        </a>
-                                    {% endif %}
-                                </div>
-
-                                <div class="small-2 columns text-center">vs</div>
-
-                                <div class="small-3 columns text-right">
-                                    {% if match.awayTeam.id %}
-                                        {% if match.awayTeam.url | length %}
-                                            <a href="{{ match.awayTeam.url }}">{{ match.awayTeam.name }}</a>
-                                        {% else %}
-                                            {{ match.awayTeam.name }}
-                                        {% endif %}
-                                    {% else %}
-                                        {{ match.awaySchool.name }}
-                                    {% endif %}
-                                </div>
-
-                                <div class="small-2 columns no-pad">
-                                    {% if match.awayTeam.id %}
-                                        <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}">
-                                            {% if match.awayTeamResult %}
-                                                ({{ match.awayTeamResult.status.name }})
-                                            {% else %}
-                                                itinerary
-                                            {% endif %}
-                                        </a>
-                                    {% endif %}
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </li>
