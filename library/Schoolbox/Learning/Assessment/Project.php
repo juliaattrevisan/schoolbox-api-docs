@@ -190,24 +190,81 @@ class Project extends AbstractAssessment
      */
     public function numPublished()
     {
-        $numPublished = 0;
+        $num = 0;
 
         /** @var IAssessable $currentAssessable */
         foreach ($this->getAssessables() as $currentAssessable) {
 
             /** @var Participant $currentParticipant */
             foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
+                $isAssessablePublished = false;
 
-                /** @var AbstractResponse $currentResponse */
-                foreach ($currentParticipant->findAllResponsesForAssessable($currentAssessable) as $currentResponse) {
-                    if ($currentResponse->findMostRecentPublishedFeedback()) {
-                        $numPublished++;
+                $numResponses = $currentParticipant->findAllResponsesForAssessable($currentAssessable)->count();
+                $numFeedbacks = $currentParticipant->findAllFeedbackForAssessable($currentAssessable)->count();
+
+                /* No Responses, No Feedback >>> not marked
+                 */
+                if (!$numResponses && !$numFeedbacks) {
+                    $isAssessablePublished = false;
+                }
+                /* At least one Response, No Feedback >>> not marked
+                 */
+                elseif ($numResponses && !$numFeedbacks) {
+                    $isAssessablePublished = false;
+                }
+                /* No Responses, at least one Feedback >>> marked
+                 */
+                elseif (!$numResponses && $numFeedbacks) {
+                    $isAssessablePublished = true;
+                }
+                /* Time to inspect the stacks
+                 */
+                else {
+
+                    /** @var IResponse $latestResponse */
+                    $allResponses = $currentParticipant->findAllResponsesForAssessable($currentAssessable);
+                    $latestResponse = $allResponses->first();
+
+                    /** @var IFeedback $latestFeedback */
+                    $allFeedbacks = $currentParticipant->findAllFeedbackForAssessable($currentAssessable);
+                    $latestFeedback = $allFeedbacks->first();
+
+                    /* Find the most recent Response
+                     *
+                     * @var IResponse $currentResponse
+                     */
+                    foreach ($allResponses as $currentResponse) {
+                        if ($currentResponse->getUpdatedAt()->gt($latestResponse->getUpdatedAt())) {
+                            $latestResponse = $currentResponse;
+                        }
                     }
+
+                    /* Find the most recent Feedback
+                     *
+                     * @var IFeedback $currentFeedback
+                     */
+                    foreach ($allFeedbacks as $currentFeedback) {
+                        if ($currentFeedback->getUpdatedAt()->gt($latestFeedback->getUpdatedAt())) {
+                            $latestFeedback = $currentFeedback;
+                        }
+                    }
+
+                    /* Compare to see which one is the most recent action to occur
+                     */
+                    if ($latestFeedback->getUpdatedAt()->gt($latestResponse->getUpdatedAt()) && $latestFeedback->isPublished()) {
+                        $isAssessablePublished = true;
+                    }
+                }
+
+                /* Increment if published
+                 */
+                if ($isAssessablePublished) {
+                    $num++;
                 }
             }
         }
 
-        return $numPublished;
+        return $num;
     }
 
     /**
