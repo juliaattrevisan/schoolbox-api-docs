@@ -99,6 +99,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     {
         $this->setCodes(new Collection(array()));
         $this->setCurriculumNodes(new Collection());
+        $this->setCourseImports(new Collection());
     }
 
     /**
