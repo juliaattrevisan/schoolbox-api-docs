@@ -69,14 +69,27 @@ $courseSpecFolder = $courseSpecFolder->setCourseImports(
 // Science: add all unit specs
 $i = 0;
 foreach ($courseSpec->getUnits() as $unitSpec) {
-    $unitImport = new Schoolbox\Learning\Course\Import\Unit\Model();
-    $unitImport->setSpecification($unitSpec);
     if ($i % 2 == 0) {
-        $frenchClassCourseImport = $frenchClassCourseImport->setUnits($frenchClassCourseImport->getUnits()->add($unitImport));
+        $frenchClassUnitImport = new Schoolbox\Learning\Course\Import\Unit\Model();
+        $frenchClassUnitImport
+            ->setSpecification($unitSpec)
+            ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth())
+            ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth());
+        $frenchClassCourseImport->getUnits()->add($frenchClassUnitImport);
     } else {
-        $englishClassCourseImport = $englishClassCourseImport->setUnits($englishClassCourseImport->getUnits()->add($unitImport));
+        $englishClassUnitImport = new Schoolbox\Learning\Course\Import\Unit\Model();
+        $englishClassUnitImport
+            ->setSpecification($unitSpec)
+            ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth()->addDays(3))
+            ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth()->addDays(3));
+        $englishClassCourseImport->getUnits()->add($englishClassUnitImport);
     }
-    $scienceClassCourseImport = $scienceClassCourseImport->setUnits($scienceClassCourseImport->getUnits()->add($unitImport));
+    $scienceClassUnitImport = new Schoolbox\Learning\Course\Import\Unit\Model();
+    $scienceClassUnitImport
+        ->setSpecification($unitSpec)
+        ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth()->addDays(13))
+        ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth()->addDays(13));
+    $scienceClassCourseImport->getUnits()->add($scienceClassUnitImport);
     $i++;
 }
 
@@ -131,8 +144,8 @@ foreach ($courseSpec->getUnits() as $unitSpec) {
             <tr>
                 <td><?= $unitImport->getSpecification()->getFolder()->getNameWithCodes() ?></td>
                 <td><?= $unitImport->getSpecification()->getFolder()->getId() ?></td>
-                <td>TBD</td>
-                <td>TBD</td>
+                <td><?= $unitImport->getOpenDate()->getUsingFormat('Y-m-d H:i:s') ?></td>
+                <td><?= $unitImport->getDueDate()->getUsingFormat('Y-m-d H:i:s') ?></td>
                 <td>TBD</td>
             </tr>
         <?php endforeach; ?>
