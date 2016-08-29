@@ -40,7 +40,7 @@
             <a href="{{ match.homeTeam.url }}">{{ match.homeTeam.name }}</a>
         {% endset %}
     {% else %}
-        {% set homeTeamData = match.homeSchool.name %}
+        {% set homeTeamData = match.homeTeam.name %}
     {% endif %}
 
     {# Away Team #}
@@ -49,7 +49,7 @@
             <a href="{{ match.awayTeam.url }}">{{ match.awayTeam.name }}</a>
         {% endset %}
     {% else %}
-        {% set awayTeamData = match.awaySchool.name %}
+        {% set awayTeamData = match.awayTeam.name %}
     {% endif %}
 
     {{ homeTeamData|raw }} vs {{ awayTeamData|raw }}
