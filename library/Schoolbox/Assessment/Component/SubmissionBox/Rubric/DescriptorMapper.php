@@ -134,7 +134,7 @@ class DescriptorMapper extends Schoolbox\Mapper {
                 {$this->getJoinColumnString('level_id', 'rl')}
             FROM `{$this->getTable()}` `rd`
             INNER JOIN {$this->getJoinSql('criterion', 'rd', 'rc')}
-            LEFT  JOIN {$this->getJoinSql('level_id', 'rd', 'rl')}
+            INNER JOIN {$this->getJoinSql('level_id', 'rd', 'rl')}
             WHERE `rd`.`submission_box_id` = ?
         ";
         $statement = $this->getDatabase()->prepare($query);
