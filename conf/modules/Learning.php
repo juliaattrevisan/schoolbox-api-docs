@@ -11,6 +11,8 @@ use Alaress\Application\Kernel;
 use Schoolbox\Learning\Learning\Module as LearningModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
 use Schoolbox\Learning\Feedback\Module as FeedbackModule;
+use Schoolbox\UserMapper;
+use \External_User;
 
 class Learning implements ModuleConfigInterface
 {
@@ -27,20 +29,20 @@ class Learning implements ModuleConfigInterface
 
         $learningModule = new LearningModule($kernel->getDependencyInjector());
         $learningModule
-            ->setExternalDb($di->newInstance('\\External_User'))
-            ->setUserMapper($di->newInstance('\\Schoolbox\\UserMapper'))
+            ->setExternalDb($di->newInstance(External_User::class))
+            ->setUserMapper($di->newInstance(UserMapper::class))
             ->init("/$namespace");
 
         $assessmentModule = new AssessmentModule($kernel->getDependencyInjector());
         $assessmentModule
-            ->setExternalDb($di->newInstance('\\External_User'))
-            ->setUserMapper($di->newInstance('\\Schoolbox\\UserMapper'))
+            ->setExternalDb($di->newInstance(External_User::class))
+            ->setUserMapper($di->newInstance(UserMapper::class))
             ->init("/$namespace");
 
         $feedbackModule = new FeedbackModule($kernel->getDependencyInjector());
         $feedbackModule
-            ->setExternalDb($di->newInstance('\\External_User'))
-            ->setUserMapper($di->newInstance('\\Schoolbox\\UserMapper'))
+            ->setExternalDb($di->newInstance(External_User::class))
+            ->setUserMapper($di->newInstance(UserMapper::class))
             ->init("/$namespace");
     }
 }
