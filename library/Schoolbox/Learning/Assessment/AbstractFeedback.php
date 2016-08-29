@@ -97,6 +97,12 @@ class AbstractFeedback implements IFeedback
      */
     public function isPublished()
     {
+        /* If it's a nulldate instance, it's not published
+         */
+        if ($this->getPublishedAt() instanceof \Alaress_Date_NullDate) {
+            return false;
+        }
+
         return $this->getPublishedAt() !== null;
     }
 
