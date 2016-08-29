@@ -84,10 +84,9 @@ class Controller extends AbstractController
 
             // get the list with archived excluded, sort by start and end, then transform to be selectize-compatible
             $seasons = $this->getMapper()->findByColumnList($search, $options)->map(
-                function ($season)
-                {
+                function ($season) {
                     /** @var Season $season */
-                    return array_combine([ 'id', 'name' ], $season->findValueLabelPair());
+                    return array_combine(['id', 'name'], $season->findValueLabelPair());
                 }
             );
 
@@ -160,7 +159,7 @@ class Controller extends AbstractController
     protected function getForm($entity, $context = null)
     {
         // Don't permit edit of archived season
-        if($entity->getId() && $entity->isArchived()){
+        if ($entity->getId() && $entity->isArchived()) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
         }
 
@@ -239,12 +238,12 @@ class Controller extends AbstractController
         $seasonId = $entity->getId();
 
         // Did caller not specify a cascade strategy?
-        if(!$post->get('cascade')){
+        if (!$post->get('cascade')) {
             // Are there attached divisions or matches ?
-            if(
+            if (
                 $this->getMapper()->getDivisionCounts([$seasonId])[$seasonId] ||
                 $this->getMapper()->getMatchCounts([$seasonId])[$seasonId]
-            ){
+            ) {
                 $message = 'Season has linked divisions and/or matches. Unlink divisions/matches or specify how to cascade the delete';
                 $this->outputPostError($entity, new \DomainException($message));
                 return;
@@ -252,20 +251,20 @@ class Controller extends AbstractController
         }
 
         // Did caller specify they wished to move the divisions/matches to another season ?
-        if('move' == $post->get('cascade')){
+        if ('move' == $post->get('cascade')) {
             // Get that other season
             $otherSeason = $this->getMapper()->findById($post->get('move'));
 
             // Move any divisions to other season
             $divisions = $this->getDivisionMapper()->findByColumn('season_id', $seasonId);
-            foreach($divisions as $division){
+            foreach ($divisions as $division) {
                 $division->setSeason($otherSeason);
             }
             $this->getDivisionMapper()->save($divisions);
 
             // Move any matches to other season
             $matches = $this->getMatchMapper()->findByColumn('season_id', $seasonId);
-            foreach($matches as $match){
+            foreach ($matches as $match) {
                 $match->setSeason($otherSeason);
             }
             $this->getMatchMapper()->save($matches);
@@ -275,7 +274,7 @@ class Controller extends AbstractController
         try {
             $this->getMapper()->delete($entity);
             $this->getResponse()->content->set($this->buildJsonOutput([
-                'status'  => 200,
+                'status' => 200,
             ]));
         } catch (Exception $e) {
             $this->outputPostError($entity, $e);
@@ -327,12 +326,12 @@ class Controller extends AbstractController
         if ($this->getRequest()->isXhr()) {
 
             $divisionCounts = $this->getMapper()->getDivisionCounts([$season->getId()]);
-            if(!isset($divisionCounts[$season->getId()])){
+            if (!isset($divisionCounts[$season->getId()])) {
                 $divisionCounts[$season->getId()] = 0;
             }
 
             $matchCounts = $this->getMapper()->getMatchCounts([$season->getId()]);
-            if(!isset($matchCounts[$season->getId()])){
+            if (!isset($matchCounts[$season->getId()])) {
                 $matchCounts[$season->getId()] = 0;
             }
 
@@ -354,7 +353,7 @@ class Controller extends AbstractController
      * Outputs a POST error, perhaps via AJAX
      *
      * @param Season $season
-     * @param Exception $e    The exception which caused the error.
+     * @param Exception $e The exception which caused the error.
      *
      * @throws Exception If not an AJAX request, pass $e down the chain.
      */
