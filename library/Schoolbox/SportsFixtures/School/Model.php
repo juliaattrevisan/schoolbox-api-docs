@@ -11,23 +11,17 @@ namespace Schoolbox\SportsFixtures\School;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use \Alaress_Date_Format;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
 
 class Model implements ISoftDeletable
 {
-    // Implements ISoftDeletable
-    use DeletedAtDate;
-
-    /** @var int */
-    protected $id;
+    use ModelTrait\Id;
+    use ModelTrait\DeletedAtDate;
+    use ModelTrait\CreatedAtDate;
+    use ModelTrait\UpdatedAtDate;
 
     /** @var string */
     protected $name;
-
-    /** @var Alaress_Date_Format */
-    protected $createdAt;
-
-    /** @var Alaress_Date_Format */
-    protected $updatedAt;
 
     /**
      * Model constructor.
@@ -38,25 +32,6 @@ class Model implements ISoftDeletable
 
     /* Getters/Setters
      */
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param int $id
-     * @return static
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
 
     /**
      * @return string
@@ -77,41 +52,4 @@ class Model implements ISoftDeletable
         return $this;
     }
 
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-
-    /**
-     * @param Alaress_Date_Format $createdAt
-     * @return static
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    /**
-     * @return Alaress_Date_Format
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @param Alaress_Date_Format $updatedAt
-     * @return static
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
 }
