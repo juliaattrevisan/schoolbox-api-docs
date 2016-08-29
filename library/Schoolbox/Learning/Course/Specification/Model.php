@@ -12,6 +12,7 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
@@ -29,15 +30,9 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  */
 class Model implements AssessmentContext, ISoftDeletable
 {
+    use Id;
     use CreatedAtDate;
     use DeletedAtDate;
-
-    /**
-     * Unique identifier.
-     *
-     * @var int
-     */
-    protected $id;
 
     /**
      * The Folder within which this object lives.
@@ -67,24 +62,6 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /* Getters/Setters */
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param int $id
-     * @return static
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
 
     /**
      * @return FolderModel

@@ -15,6 +15,7 @@ use Schoolbox\Learning\Course\Import\Model as CourseImportModel;
 use Schoolbox\Learning\Course\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
+use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
  * An Unit Import is a single import of a Unit Specification onto a Folder. It belongs to an
@@ -32,15 +33,9 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
  */
 class Model implements AssessmentContext, ISoftDeletable
 {
+    use Id;
     use CreatedAtDate;
     use DeletedAtDate;
-
-    /**
-     * Unique identifier.
-     *
-     * @var int
-     */
-    protected $id;
 
     /**
      * The Course Import which this object belongs to.
@@ -118,24 +113,6 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /* Getters/Setters */
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param int $id
-     * @return static
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
 
     /**
      * @return UnitSpecificationModel
