@@ -115,6 +115,146 @@ class Participant
         return $collection;
     }
 
+    /**
+     * This Participant received a Feedback for the $assessable
+     *
+     * @param IAssessable $assessable
+     * @return bool
+     */
+    public function isAssessableMarked(IAssessable $assessable)
+    {
+        $isAssessableMarked = false;
+
+        $numResponses = $this->findAllResponsesForAssessable($assessable)->count();
+        $numFeedbacks = $this->findAllFeedbackForAssessable($assessable)->count();
+
+        /* No Responses, No Feedback >>> not marked
+         */
+        if (!$numResponses && !$numFeedbacks) {
+            $isAssessableMarked = false;
+        }
+        /* At least one Response, No Feedback >>> not marked
+         */
+        elseif ($numResponses && !$numFeedbacks) {
+            $isAssessableMarked = false;
+        }
+        /* No Responses, at least one Feedback >>> marked
+         */
+        elseif (!$numResponses && $numFeedbacks) {
+            $isAssessableMarked = true;
+        }
+        /* Time to inspect the stacks
+         */
+        else {
+
+            /** @var IResponse $latestResponse */
+            $allResponses = $this->findAllResponsesForAssessable($assessable);
+            $latestResponse = $allResponses->first();
+
+            /** @var IFeedback $latestFeedback */
+            $allFeedbacks = $this->findAllFeedbackForAssessable($assessable);
+            $latestFeedback = $allFeedbacks->first();
+
+            /* Find the most recent Response
+             *
+             * @var IResponse $currentResponse
+             */
+            foreach ($allResponses as $currentResponse) {
+                if ($currentResponse->getUpdatedAt()->gt($latestResponse->getUpdatedAt())) {
+                    $latestResponse = $currentResponse;
+                }
+            }
+
+            /* Find the most recent Feedback
+             *
+             * @var IFeedback $currentFeedback
+             */
+            foreach ($allFeedbacks as $currentFeedback) {
+                if ($currentFeedback->getUpdatedAt()->gt($latestFeedback->getUpdatedAt())) {
+                    $latestFeedback = $currentFeedback;
+                }
+            }
+
+            /* Compare to see which one is the most recent action to occur
+             */
+            if ($latestFeedback->getUpdatedAt()->gt($latestResponse->getUpdatedAt())) {
+                $isAssessableMarked = true;
+            }
+        }
+
+        return $isAssessableMarked;
+    }
+
+    /**
+     * This Participant received a Published Feedback for the $assessable
+     *
+     * @param IAssessable $assessable
+     * @return bool
+     */
+    public function isAssessablePublished(IAssessable $assessable)
+    {
+        $isAssessablePublished = false;
+
+        $numResponses = $this->findAllResponsesForAssessable($assessable)->count();
+        $numFeedbacks = $this->findAllFeedbackForAssessable($assessable)->count();
+
+        /* No Responses, No Feedback >>> not marked
+         */
+        if (!$numResponses && !$numFeedbacks) {
+            $isAssessablePublished = false;
+        }
+        /* At least one Response, No Feedback >>> not marked
+         */
+        elseif ($numResponses && !$numFeedbacks) {
+            $isAssessablePublished = false;
+        }
+        /* No Responses, at least one Feedback >>> marked
+         */
+        elseif (!$numResponses && $numFeedbacks) {
+            $isAssessablePublished = true;
+        }
+        /* Time to inspect the stacks
+         */
+        else {
+
+            /** @var IResponse $latestResponse */
+            $allResponses = $this->findAllResponsesForAssessable($assessable);
+            $latestResponse = $allResponses->first();
+
+            /** @var IFeedback $latestFeedback */
+            $allFeedbacks = $this->findAllFeedbackForAssessable($assessable);
+            $latestFeedback = $allFeedbacks->first();
+
+            /* Find the most recent Response
+             *
+             * @var IResponse $currentResponse
+             */
+            foreach ($allResponses as $currentResponse) {
+                if ($currentResponse->getUpdatedAt()->gt($latestResponse->getUpdatedAt())) {
+                    $latestResponse = $currentResponse;
+                }
+            }
+
+            /* Find the most recent Feedback
+             *
+             * @var IFeedback $currentFeedback
+             */
+            foreach ($allFeedbacks as $currentFeedback) {
+                if ($currentFeedback->getUpdatedAt()->gt($latestFeedback->getUpdatedAt())) {
+                    $latestFeedback = $currentFeedback;
+                }
+            }
+
+            /* Compare to see which one is the most recent action to occur
+             */
+            if ($latestFeedback->getUpdatedAt()->gt($latestResponse->getUpdatedAt()) && $latestFeedback->isPublished()) {
+                $isAssessablePublished = true;
+            }
+        }
+
+        return $isAssessablePublished;
+    }
+
     /* Getters/Setters
      */
 
