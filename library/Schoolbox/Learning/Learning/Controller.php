@@ -38,6 +38,13 @@ class Controller extends Base
      */
     public function getPendingAssessments()
     {
+        // Is current user not SuperUser or Staff ?
+        if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
+            $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getDue', [
+                'studentId' => $this->getUser()->getId()
+            ]));
+        }
+
         // TODO - generate data
         $assessmentsToMark = [];
         $assessmentsNotSubmitted = [];
@@ -57,6 +64,13 @@ class Controller extends Base
      */
     public function getMarkbook(Folder $class)
     {
+        // Is current user not SuperUser or Staff ?
+        if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
+            $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getDue', [
+                'studentId' => $this->getUser()->getId()
+            ]));
+        }
+
         // Does this class exist ?
         if (!$class->getId()) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);

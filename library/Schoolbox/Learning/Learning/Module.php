@@ -85,15 +85,7 @@ class Module extends BaseModule
     {
         $ruleRegexp = '(?:getMarkbook|getPendingAssessments)';
         $this
-            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
-            ->addRoutePermission(
-                $authorizer,
-                $ruleRegexp,
-                new Rule\Any(
-                    new Rule\IsSuperuser(),
-                    new Rule\HasRole(Role::STAFF)
-                )
-            );
+            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn());
 
         $ruleRegexp = '(?:getDue|getGrades|getGradesForSubject)';
         $this
