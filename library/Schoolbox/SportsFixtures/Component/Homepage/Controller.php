@@ -31,7 +31,7 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
         parent::__construct($instance, $user, $sitepage);
-        $this->delegate = new ComponentDelegate($sitepage);
+        $this->setDelegate(new ComponentDelegate());
     }
 
     /**
@@ -63,5 +63,27 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'matches'             => $matches,
             ]
         );
+    }
+
+    /*
+     * Getters / Setters
+     */
+
+    /**
+     * @return ComponentDelegate
+     */
+    protected function getDelegate()
+    {
+        return $this->delegate;
+    }
+
+    /**
+     * @param ComponentDelegate $delegate
+     * @return static
+     */
+    protected function setDelegate(ComponentDelegate $delegate)
+    {
+        $this->delegate = $delegate;
+        return $this;
     }
 }
