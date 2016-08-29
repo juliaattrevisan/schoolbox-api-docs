@@ -51,7 +51,7 @@ class Controller extends Component_Dashboard_ControllerAbstract
         if ($this->getUser()->getRole()->isParent()) {
             /** @var Session $session */
             $session  = $this->getSitePage()->getDi()->get('session');
-            $children = $session->get('children');
+            $children = $session->get('children') ?: [];
             foreach ($children as $child) {
                 $playerIds[] = $child['id'];
             }
