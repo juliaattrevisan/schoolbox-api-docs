@@ -17,10 +17,10 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * A Unit Specification is an extension of a Folder.
+ * A Unit Specification is a collection of Assessable objects. It exists on a Folder.
  *
- * This object may contain several Assessables, and may be imported onto another Folder
- * as part of the action of importing a Course onto a folder.
+ * It is intended to cover a single area of learning within a subject, and may be imported
+ * onto another Folder as part of the action of importing a Course onto that folder.
  * This action creates an Unit Import for each Unit Specification that was chosen to be imported
  * as part of that process.
  *

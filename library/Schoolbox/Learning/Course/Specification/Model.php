@@ -16,9 +16,9 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * A Course Specification is an extension of a Folder.
+ * A Course Specification is a collection of Unit Specifications. It exists on a Folder.
  *
- * This object may contain several Unit Specifications, and may be imported onto another Folder.
+ * It is intended to represent an entire subject's syllabus, and may be imported onto another Folder.
  * This action will create a corresponding Course Import for this Course Specification,
  * with whatever Unit Specifications were selected to be imported.
  *
