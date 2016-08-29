@@ -10,8 +10,8 @@ namespace Schoolbox\Learning\Course\Import;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Learning\Course\Import\Unit\Model as UnitImportModel;
+use Schoolbox\Learning\Course\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -63,10 +63,10 @@ class Model implements AssessmentContext, ISoftDeletable
      */
     public function __construct()
     {
-        $this->folder        = new FolderModel();
-        $this->units         = new Collection();
-        $this->createdAt     = new \Alaress_Date_NullDate();
-        $this->deletedAt     = new \Alaress_Date_NullDate();
+        $this->folder = new FolderModel();
+        $this->units = new Collection();
+        $this->createdAt = new \Alaress_Date_NullDate();
+        $this->deletedAt = new \Alaress_Date_NullDate();
         $this->specification = new CourseSpecificationModel();
     }
 

@@ -104,12 +104,12 @@ class Model implements AssessmentContext, ISoftDeletable
      */
     public function __construct()
     {
-        $this->specification  = new UnitSpecificationModel();
-        $this->course         = new CourseImportModel();
-        $this->openDate       = new \Alaress_Date_NullDate();
-        $this->dueDate        = new \Alaress_Date_NullDate();
-        $this->createdAt      = new \Alaress_Date_NullDate();
-        $this->deletedAt      = new \Alaress_Date_NullDate();
+        $this->specification = new UnitSpecificationModel();
+        $this->course = new CourseImportModel();
+        $this->openDate = new \Alaress_Date_NullDate();
+        $this->dueDate = new \Alaress_Date_NullDate();
+        $this->createdAt = new \Alaress_Date_NullDate();
+        $this->deletedAt = new \Alaress_Date_NullDate();
     }
 
     /* Getters/Setters */
@@ -129,24 +129,6 @@ class Model implements AssessmentContext, ISoftDeletable
     public function setSpecification($specification)
     {
         $this->specification = $specification;
-        return $this;
-    }
-
-    /**
-     * @return CourseImportModel
-     */
-    public function getCourse()
-    {
-        return $this->course;
-    }
-
-    /**
-     * @param CourseImportModel $course
-     * @return static
-     */
-    public function setCourse($course)
-    {
-        $this->course = $course;
         return $this;
     }
 
@@ -228,5 +210,23 @@ class Model implements AssessmentContext, ISoftDeletable
     public function getFolder()
     {
         return $this->getCourse()->getFolder();
+    }
+
+    /**
+     * @return CourseImportModel
+     */
+    public function getCourse()
+    {
+        return $this->course;
+    }
+
+    /**
+     * @param CourseImportModel $course
+     * @return static
+     */
+    public function setCourse($course)
+    {
+        $this->course = $course;
+        return $this;
     }
 }
