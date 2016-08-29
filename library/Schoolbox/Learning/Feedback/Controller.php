@@ -46,17 +46,12 @@ class Controller extends Base
      *
      * @api   GET /learning/feedback/:id
      * @level 165
+     * @param IFeedback $feedback TODO implement IFeedback
      */
-    public function getFeedback()
+    public function getFeedback($feedback)
     {
         // TODO - generate data
-        $assessmentsToMark = [];
-        $assessmentsNotSubmitted = [];
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', [
-            'assessmentsToMark'       => $assessmentsToMark,
-            'assessmentsNotSubmitted' => $assessmentsNotSubmitted,
-        ]));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningFeedback/assessmentFeedback.twig', []));
     }
 
 
