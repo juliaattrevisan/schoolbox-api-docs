@@ -259,9 +259,9 @@ class Controller extends AbstractController
         $match->setItinerary($allItineraryItems);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/create.twig', [
-            'match'             => $match,
+            'match'     => $match,
             'tagPrefix' => TagCloudMapper::SCHOOL_PREFIX,
-            'action'            => $match->getId() ? 'Modify' : 'Create'
+            'action'    => $match->getId() ? 'Modify' : 'Create'
         ]));
     }
 
@@ -326,8 +326,8 @@ class Controller extends AbstractController
 
         // Teams
         try {
-            list ($homeTeam, $homeSchoolId) = $this->calculateTeam($this->getRequest()->post['homeTeamId']);
-            list ($awayTeam, $awaySchoolId) = $this->calculateTeam($this->getRequest()->post['awayTeamId']);
+            list ($homeTeam, $homeSchool) = $this->calculateTeam($this->getRequest()->post['homeTeamId']);
+            list ($awayTeam, $awaySchool) = $this->calculateTeam($this->getRequest()->post['awayTeamId']);
 
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
@@ -339,7 +339,7 @@ class Controller extends AbstractController
         // Itinerary
         $itinerary = $this->transposeItineraryPost($this->getRequest()->post['itinerary']);
 
-        $this->saveMatch($entity, $division, $name, $season, $startAt, $homeTeam, $awayTeam, $homeSchoolId, $awaySchoolId, $venue, $notes, $itinerary);
+        $this->saveMatch($entity, $division, $name, $season, $startAt, $homeTeam, $awayTeam, $homeSchool, $awaySchool, $venue, $notes, $itinerary);
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesMatch.getList', [
             'contextId' => $division->getId()
@@ -387,15 +387,17 @@ class Controller extends AbstractController
     /**
      * @param string $teamId
      * @param string $prefix
-     * @return array
+     * @return array $return
+     * @var Team $return[0]
+     * @var School $return[1]
      */
     protected function calculateTeam($teamId, $prefix = TagCloudMapper::SCHOOL_PREFIX)
     {
         if (preg_match("/$prefix(.*)/", $teamId, $matches)) {
             // Away team is a faceless school, save the team as null
-            return [ $this->getTeamMapper()->createModel(), $matches[1] ];
+            return [ $this->getTeamMapper()->createModel(), $this->getSchoolMapper()->findById($matches[1]) ];
         } else {
-            return [ $this->getTeamMapper()->findById($teamId), null ];
+            return [ $this->getTeamMapper()->findById($teamId), $this->getSchoolMapper()->createModel() ];
         }
 
     }

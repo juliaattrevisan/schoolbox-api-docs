@@ -1,7 +1,7 @@
 {% import '@sportsfixturesMatch/macro/heading.twig' as matchHeading %}
 {% import '@sportsfixturesMatch/macro/map.twig' as matchMap %}
 
-{% if match.result.offset(team.id) %}
+{% if match.results.offset(team.id) %}
     {% set hasResult = true %}
 {% else %}
     {% set hasResult = false %}
