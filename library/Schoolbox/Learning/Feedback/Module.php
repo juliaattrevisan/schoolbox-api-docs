@@ -38,6 +38,11 @@ class Module extends BaseModule
     protected $userMapper;
 
     /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
      * @inheritdoc
      */
     public function initRoutes(Router $router, $basePath)
@@ -73,7 +78,7 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
-                    new Rule\IsUserOrParentOfUser($this->externalDb, $this->userMapper, 'studentId')
+                    new Rule\IsUserOrParentOfUser($this->getExternalDb(), $this->getUserMapper(), 'studentId')
                 )
             );
 
@@ -94,13 +99,13 @@ class Module extends BaseModule
                 // TODO. Hydrate specified IAssessable
                 $assessment = [$params['assessmentId']];
                 try {
-                    $student = UserMapper::getInstance()->findById($params['studentId']);
+                    $student = $this->getUserMapper()->findById($params['studentId']);
                 } catch (MapperException $e) {
-                    $student = new User();
+                    $student = $this->getUserMapper()->createModel();
                 }
                 return [
                     'assessment' => $assessment,
-                    'student'    => $student,
+                    'student' => $student,
                 ];
             }
         );
@@ -135,9 +140,20 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'errorMapper' => ErrorMapper::getInstance(),
+                'errorMapper' => $this->getErrorMapper(),
             ])
         );
+    }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return External_UserInterface
+     */
+    protected function getExternalDb()
+    {
+        return $this->externalDb;
     }
 
     /**
@@ -151,12 +167,38 @@ class Module extends BaseModule
     }
 
     /**
+     * @return UserMapper
+     */
+    protected function getUserMapper()
+    {
+        return $this->userMapper;
+    }
+
+    /**
      * @param  UserMapper $userMapper
      * @return static
      */
     public function setUserMapper(UserMapper $userMapper)
     {
         $this->userMapper = $userMapper;
+        return $this;
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->errorMapper;
+    }
+
+    /**
+     * @param  ErrorMapper $errorMapper
+     * @return static
+     */
+    public function setErrorMapper(ErrorMapper $errorMapper)
+    {
+        $this->errorMapper = $errorMapper;
         return $this;
     }
 }
