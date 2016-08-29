@@ -138,7 +138,7 @@ class ComponentDelegate
 
             // Can we link an away team ?
             if($teams[$match->getAwayTeam()->getId()]){
-                $match->setHomeTeam($teams[$match->getAwayTeam()->getId()]);
+                $match->setAwayTeam($teams[$match->getAwayTeam()->getId()]);
             }
         }
 
