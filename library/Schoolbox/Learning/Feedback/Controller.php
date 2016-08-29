@@ -37,7 +37,7 @@ class Controller extends Base
     {
         // TODO - generate data
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningFeedback/assessmentFeedback.twig', [ ]));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningFeedback/assessmentFeedback.twig', []));
     }
 
 

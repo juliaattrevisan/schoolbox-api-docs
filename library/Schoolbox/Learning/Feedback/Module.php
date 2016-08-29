@@ -47,7 +47,7 @@ class Module extends BaseModule
                 '/assessment/{assessmentId}/feedback/{studentId}' => 'getAssessmentFeedback',
                 '/feedback/{feedbackId}'                          => 'getFeedback',
             ],
-            'POST' => [ ]
+            'POST' => []
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
@@ -75,8 +75,7 @@ class Module extends BaseModule
                     new Rule\HasRole(Role::STAFF),
                     new Rule\IsUserOrParentOfUser($this->externalDb, $this->userMapper, 'studentId')
                 )
-            )
-        ;
+            );
 
         $ruleRegexp = '(?:getFeedback)';
         $this->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn());
@@ -96,7 +95,7 @@ class Module extends BaseModule
                 $assessment = [$params['assessmentId']];
                 try {
                     $student = UserMapper::getInstance()->findById($params['studentId']);
-                } catch (MapperException $e){
+                } catch (MapperException $e) {
                     $student = new User();
                 }
                 return [
@@ -134,7 +133,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
                 'errorMapper' => ErrorMapper::getInstance(),
             ])

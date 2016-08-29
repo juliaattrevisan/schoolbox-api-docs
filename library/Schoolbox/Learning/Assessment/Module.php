@@ -48,7 +48,7 @@ class Module extends BaseModule
                 '/assessment/{assessmentId}/summary/{studentId}' => 'getSummary',
                 '/assessment/{assessmentId}/submit/{studentId}'  => 'getSubmitForm',
             ],
-            'POST' => [ ]
+            'POST' => []
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
@@ -73,10 +73,10 @@ class Module extends BaseModule
                 // TODO. Hydrate specified IAssessable
                 $args['assessment'] = [$params['assessmentId']];
 
-                if(array_key_exists('studentId',$params)){
+                if (array_key_exists('studentId', $params)) {
                     try {
                         $args['student'] = UserMapper::getInstance()->findById($params['studentId']);
-                    } catch (MapperException $e){
+                    } catch (MapperException $e) {
                         $args['student'] = new User();
                     }
                 }
@@ -100,7 +100,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
                 'errorMapper' => ErrorMapper::getInstance(),
             ])
@@ -133,8 +133,7 @@ class Module extends BaseModule
                     new Rule\HasRole(Role::STAFF),
                     new Rule\IsUserOrParentOfUser($this->externalDb, $this->userMapper, 'studentId')
                 )
-            )
-        ;
+            );
     }
 
     /**

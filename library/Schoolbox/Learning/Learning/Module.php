@@ -54,7 +54,7 @@ class Module extends BaseModule
                 '/grades/{studentId}/{termCode}'             => 'getGrades',
                 '/grades/{studentId}/{termCode}/{subjectId}' => 'getGradesForSubject',
             ],
-            'POST' => [ ]
+            'POST' => []
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
@@ -81,8 +81,7 @@ class Module extends BaseModule
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF)
                 )
-            )
-        ;
+            );
 
         $ruleRegexp = '(?:getDue|getGrades|getGradesForSubject)';
         $this
@@ -95,8 +94,7 @@ class Module extends BaseModule
                     new Rule\HasRole(Role::STAFF),
                     new Rule\IsUserOrParentOfUser($this->externalDb, $this->userMapper, 'studentId')
                 )
-            )
-        ;
+            );
     }
 
 
@@ -111,7 +109,7 @@ class Module extends BaseModule
             function ($params) {
                 try {
                     $class = FolderMapper::getInstance()->findById($params['classId']);
-                } catch (MapperException $e){
+                } catch (MapperException $e) {
                     $class = new Folder();
                 }
                 return [
@@ -126,7 +124,7 @@ class Module extends BaseModule
             function ($params) {
                 try {
                     $student = UserMapper::getInstance()->findById($params['userId']);
-                } catch (MapperException $e){
+                } catch (MapperException $e) {
                     $student = new User();
                 }
                 return [
@@ -142,18 +140,18 @@ class Module extends BaseModule
             function ($params) {
                 try {
                     $args['student'] = UserMapper::getInstance()->findById($params['studentId']);
-                } catch (MapperException $e){
+                } catch (MapperException $e) {
                     $args['student'] = new User();
                 }
                 try {
-                    $args['term'] = TermMapper::getInstance()->findOneByColumn('code',$params['termCode']);
-                } catch (MapperException $e){
+                    $args['term'] = TermMapper::getInstance()->findOneByColumn('code', $params['termCode']);
+                } catch (MapperException $e) {
                     $args['term'] = new Term();
                 }
-                if(array_key_exists('subjectId', $params)){
+                if (array_key_exists('subjectId', $params)) {
                     try {
                         $args['subject'] = FolderMapper::getInstance()->findById($params['subjectId']);
-                    } catch (MapperException $e){
+                    } catch (MapperException $e) {
                         $args['subject'] = new Folder();
                     }
                 }
@@ -177,7 +175,7 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
                 'errorMapper' => ErrorMapper::getInstance(),
             ])

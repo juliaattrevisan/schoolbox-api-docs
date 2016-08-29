@@ -58,7 +58,7 @@ class Controller extends Base
     public function getMarkbook(Folder $class)
     {
         // Does this class exist ?
-        if(!$class->getId()){
+        if (!$class->getId()) {
             throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
 
@@ -66,8 +66,8 @@ class Controller extends Base
         $marksheet = [];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/marksheet.twig', [
-            'class'       => $class,
-            'marksheet'   => $marksheet,
+            'class'     => $class,
+            'marksheet' => $marksheet,
         ]));
     }
 
