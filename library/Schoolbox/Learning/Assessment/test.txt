@@ -139,12 +139,16 @@ $dueWork1->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
 
 /* Arbitrary quick clones
  */
-$response->setSubmittedBy($sberryhill);
-$dueWork1->findParticipant($sberryhill)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($sberryhill);
+$responseTemp->setSubmittedOnBehalfOf($sberryhill);
+$dueWork1->findParticipant($sberryhill)->getAllResponses()->add($responseTemp);
 $dueWork1->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
 
-$response->setSubmittedBy($slucier);
-$dueWork1->findParticipant($slucier)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($slucier);
+$responseTemp->setSubmittedOnBehalfOf($slucier);
+$dueWork1->findParticipant($slucier)->getAllResponses()->add($responseTemp);
 $dueWork1->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
 
 /* Second (no submission files, no plagscan; marked, multiple feedbacks, no feedback files, comment, published)
@@ -203,12 +207,16 @@ $dueWork2->findParticipant($hodes)->getAllFeedbacks()->add($feedback2)->add($fee
 
 /* Arbitrary quick clones
  */
-$response->setSubmittedBy($sberryhill);
-$dueWork2->findParticipant($sberryhill)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($sberryhill);
+$responseTemp->setSubmittedOnBehalfOf($sberryhill);
+$dueWork2->findParticipant($sberryhill)->getAllResponses()->add($responseTemp);
 $dueWork2->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback1);
 
-$response->setSubmittedBy($slucier);
-$dueWork2->findParticipant($slucier)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($slucier);
+$responseTemp->setSubmittedOnBehalfOf($slucier);
+$dueWork2->findParticipant($slucier)->getAllResponses()->add($responseTemp);
 $dueWork2->findParticipant($slucier)->getAllFeedbacks()->add($feedback1);
 
 
@@ -256,12 +264,16 @@ $dueWork3->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
 
 /* Arbitrary quick clones
  */
-$response->setSubmittedBy($sberryhill);
-$dueWork3->findParticipant($sberryhill)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($sberryhill);
+$responseTemp->setSubmittedOnBehalfOf($sberryhill);
+$dueWork3->findParticipant($sberryhill)->getAllResponses()->add($responseTemp);
 $dueWork3->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
 
-$response->setSubmittedBy($slucier);
-$dueWork3->findParticipant($slucier)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($slucier);
+$responseTemp->setSubmittedOnBehalfOf($slucier);
+$dueWork3->findParticipant($slucier)->getAllResponses()->add($responseTemp);
 $dueWork3->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
 
 
@@ -329,18 +341,25 @@ $response = new QuizAttempt();
 $response
     ->setAssessable($quiz1)
     ->setSubmittedBy($bsalem)
+    ->setSubmittedOnBehalfOf($bsalem)
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-02 19:04:41', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 19:12:41', \Alaress_Date_Format::DATABASE_FORMAT))
     ->getAllFeedback()->add($feedback1)->add($feedback2);
 
 // Append it on a per-user basis
-$quiz1->findParticipant($bsalem)->getAllResponses()->add($response);
+
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$quiz1->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
 $quiz1->findParticipant($bsalem)->getAllFeedbacks()->add($feedback1)->add($feedback2);
 
 /* Arbitrary quick clones
  */
-$response->setSubmittedBy($asaxon);
-$quiz1->findParticipant($asaxon)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($asaxon);
+$responseTemp->setSubmittedOnBehalfOf($asaxon);
+$quiz1->findParticipant($asaxon)->getAllResponses()->add($responseTemp);
 $quiz1->findParticipant($asaxon)->getAllFeedbacks()->add($feedback);
 
 
@@ -384,6 +403,7 @@ $response = new QuizAttempt();
 $response
     ->setAssessable($quiz2)
     ->setSubmittedBy($hodes)
+    ->setSubmittedOnBehalfOf($hodes)
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-02 19:04:41', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 19:12:41', \Alaress_Date_Format::DATABASE_FORMAT))
     ->getAllFeedback()->add($feedback);
@@ -393,12 +413,16 @@ $quiz2->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
 
 /* Arbitrary quick clones
  */
-$response->setSubmittedBy($sberryhill);
-$quiz2->findParticipant($sberryhill)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($sberryhill);
+$responseTemp->setSubmittedOnBehalfOf($sberryhill);
+$quiz2->findParticipant($sberryhill)->getAllResponses()->add($responseTemp);
 $quiz2->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
 
-$response->setSubmittedBy($slucier);
-$quiz2->findParticipant($slucier)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($slucier);
+$responseTemp->setSubmittedOnBehalfOf($slucier);
+$quiz2->findParticipant($slucier)->getAllResponses()->add($responseTemp);
 $quiz2->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
 
 
@@ -429,6 +453,7 @@ $response = new TaskCompletion();
 $response
     ->setAssessable($task1)
     ->setSubmittedBy($hodes)
+    ->setSubmittedOnBehalfOf($hodes)
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT));
 $response->getAllFeedback()->add($feedback);
@@ -439,12 +464,16 @@ $task1->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
 
 /* Arbitrary quick clones
  */
-$response->setSubmittedBy($sberryhill);
-$task1->findParticipant($sberryhill)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($sberryhill);
+$responseTemp->setSubmittedOnBehalfOf($sberryhill);
+$task1->findParticipant($sberryhill)->getAllResponses()->add($responseTemp);
 $task1->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
 
-$response->setSubmittedBy($slucier);
-$task1->findParticipant($slucier)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($slucier);
+$responseTemp->setSubmittedOnBehalfOf($slucier);
+$task1->findParticipant($slucier)->getAllResponses()->add($responseTemp);
 $task1->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
 
 
@@ -475,6 +504,7 @@ $response = new TaskCompletion();
 $response
     ->setAssessable($task2)
     ->setSubmittedBy($hodes)
+    ->setSubmittedOnBehalfOf($hodes)
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 11:21:36', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 11:21:36', \Alaress_Date_Format::DATABASE_FORMAT));
 $response
@@ -486,20 +516,28 @@ $task2->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
 
 /* Arbitrary quick clones
  */
-$response->setSubmittedBy($bsalem);
-$task2->findParticipant($bsalem)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$task2->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
 $task2->findParticipant($bsalem)->getAllFeedbacks()->add($feedback);
 
-$response->setSubmittedBy($asaxon);
-$task2->findParticipant($asaxon)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($asaxon);
+$responseTemp->setSubmittedOnBehalfOf($asaxon);
+$task2->findParticipant($asaxon)->getAllResponses()->add($responseTemp);
 $task2->findParticipant($asaxon)->getAllFeedbacks()->add($feedback);
 
-$response->setSubmittedBy($sberryhill);
-$task2->findParticipant($sberryhill)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($sberryhill);
+$responseTemp->setSubmittedOnBehalfOf($sberryhill);
+$task2->findParticipant($sberryhill)->getAllResponses()->add($responseTemp);
 $task2->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
 
-$response->setSubmittedBy($slucier);
-$task2->findParticipant($slucier)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($slucier);
+$responseTemp->setSubmittedOnBehalfOf($slucier);
+$task2->findParticipant($slucier)->getAllResponses()->add($responseTemp);
 $task2->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
 
 
@@ -530,6 +568,7 @@ $response = new TaskCompletion();
 $response
     ->setAssessable($task3)
     ->setSubmittedBy($hodes)
+    ->setSubmittedOnBehalfOf($hodes)
     ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 11:21:36', \Alaress_Date_Format::DATABASE_FORMAT))
     ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 11:21:36', \Alaress_Date_Format::DATABASE_FORMAT));
 $response
@@ -541,20 +580,28 @@ $task3->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
 
 /* Arbitrary quick clones
  */
-$response->setSubmittedBy($bsalem);
-$task3->findParticipant($bsalem)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$task3->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
 $task3->findParticipant($bsalem)->getAllFeedbacks()->add($feedback);
 
-$response->setSubmittedBy($asaxon);
-$task3->findParticipant($asaxon)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($asaxon);
+$responseTemp->setSubmittedOnBehalfOf($asaxon);
+$task3->findParticipant($asaxon)->getAllResponses()->add($responseTemp);
 $task3->findParticipant($asaxon)->getAllFeedbacks()->add($feedback);
 
-$response->setSubmittedBy($sberryhill);
-$task3->findParticipant($sberryhill)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($sberryhill);
+$responseTemp->setSubmittedOnBehalfOf($sberryhill);
+$task3->findParticipant($sberryhill)->getAllResponses()->add($responseTemp);
 $task3->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
 
-$response->setSubmittedBy($slucier);
-$task3->findParticipant($slucier)->getAllResponses()->add($response);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($slucier);
+$responseTemp->setSubmittedOnBehalfOf($slucier);
+$task3->findParticipant($slucier)->getAllResponses()->add($responseTemp);
 $task3->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
 
 
@@ -687,7 +734,8 @@ foreach ($project->getAssessables() as $currentAssessable) {
                 $latestSubmission = $currentParticipant->findAllResponsesForAssessable($currentAssessable)->first();
 
                 if ($latestSubmission) {
-                    $submittedBy = $latestSubmission->getSubmittedBy();
+                    $submittedBy         = $latestSubmission->getSubmittedBy();
+                    $submittedOnBehalfOf = $latestSubmission->getSubmittedOnBehalfOf();
                 }
             }
 
@@ -698,7 +746,7 @@ foreach ($project->getAssessables() as $currentAssessable) {
                 '',
                 '',
                 $submittedBy ? $submittedBy->getFullname() : '',
-                '',
+                $submittedOnBehalfOf ? $submittedOnBehalfOf->getFullname() : '',
                 $latestSubmission ? $latestSubmission->getSubmittedAt()->getLocal() : ''
             );
         }
@@ -717,7 +765,8 @@ foreach ($project->getAssessables() as $currentAssessable) {
                 $latestSubmission = $currentParticipant->findAllResponsesForAssessable($currentAssessable)->first();
 
                 if ($latestSubmission) {
-                    $submittedBy = $latestSubmission->getSubmittedBy();
+                    $submittedBy         = $latestSubmission->getSubmittedBy();
+                    $submittedOnBehalfOf = $latestSubmission->getSubmittedOnBehalfOf();
                 }
             }
 
@@ -728,7 +777,7 @@ foreach ($project->getAssessables() as $currentAssessable) {
                 '',
                 '',
                 $submittedBy ? $submittedBy->getFullname() : '',
-                '',
+                $submittedOnBehalfOf ? $submittedOnBehalfOf->getFullname() : '',
                 $latestSubmission ? $latestSubmission->getSubmittedAt()->getLocal() : ''
             );
         }
@@ -878,5 +927,3 @@ foreach ($project->getAssessables() as $currentAssessable) {
 
 
 die();
-
-
