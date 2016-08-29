@@ -1063,10 +1063,12 @@ abstract class Component_ControllerAbstract
      * Sets the Folder, if any, this component draws its data from
      *
      * @param Schoolbox\Resource\Folder\Model $source
+     * @return static
      */
     public function setSource($source)
     {
         $this->source = $source;
+        return $this;
     }
 
     /**
@@ -1100,10 +1102,12 @@ abstract class Component_ControllerAbstract
      *
      * @param $componentName
      * @return string
+     * @return static
      */
     protected function setComponentName($componentName)
     {
         $this->componentName = $componentName;
+        return $this;
     }
 
 
@@ -1160,10 +1164,12 @@ abstract class Component_ControllerAbstract
      * Assign component href default
      *
      * @param $componentHref
+     * @return static
      */
     protected function setComponentHref($componentHref)
     {
         $this->componentHref = $componentHref;
+        return $this;
     }
 
     /**
