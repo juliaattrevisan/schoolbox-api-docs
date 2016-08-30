@@ -19,9 +19,9 @@ class Access
      * Permission/access level constants
      */
 
-    const EVERYONE = 0;                 // Accessible by everyone
-    const STAFF = 1;                    // Accessible by staff only
-    const STAFF_PARENT = 2;             // Accessible by staff & parents only
+    const VISIBILITY_EVERYONE = 0;                 // Accessible by everyone
+    const VISIBILITY_STAFF = 1;                    // Accessible by staff only
+    const VISIBILITY_STAFF_PARENT = 2;             // Accessible by staff & parents only
 
     /**
      * Cache folder access calls

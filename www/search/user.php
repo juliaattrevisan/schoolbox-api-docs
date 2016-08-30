@@ -264,13 +264,13 @@ function renderStudent(
     $hideContacts = $userObject->getHideContacts() ? 1 : 0;
 
     switch ($protectStudentContacts) {
-        case Access::EVERYONE : // Everyone
+        case Access::VISIBILITY_EVERYONE : // Everyone
             break;
-        case Access::STAFF: // Staff Only
+        case Access::VISIBILITY_STAFF: // Staff Only
             if (!$user->getRole()->isStaff())
                 $hideContacts = true;
             break;
-        case Access::STAFF_PARENT: // Staff & Parents Only
+        case Access::VISIBILITY_STAFF_PARENT: // Staff & Parents Only
             if (!$user->getRole()->isStaff() && !$user->getRole()->isParent())
                 $hideContacts = true;
             break;
