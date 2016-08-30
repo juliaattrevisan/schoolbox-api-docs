@@ -110,6 +110,9 @@ abstract class Synchronise_Synergetic_StPauls_Strategy_Abstract extends Synchron
             case '0':
                 // Kinder and prep
                 return 20;
+            case '-1':
+                // Years P-2
+                return 3;
             case '1':
                 return 19;
             case '2':
