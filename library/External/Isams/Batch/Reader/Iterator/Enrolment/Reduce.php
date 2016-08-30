@@ -54,7 +54,7 @@ class External_Isams_Batch_Reader_Iterator_Enrolment_Reduce
             // For that reason the Set records need to be parsed before Schedule.
             // TODO write this into a separate map/reduce process
             foreach ($carry['classes'] as $setId => $carryItem) {
-                if ($item['ClassCode'] === $carry['classes'][$setId]['ClassCode']) {
+                if (strtolower($item['ClassCode']) === strtolower($carry['classes'][$setId]['ClassCode'])) {
                     $carry['classes'][$setId]['ClassPeriods'][] = [
                         'ClassPeriodID' => $item['ClassPeriodID'],
                         'ClassRoomID'   => $item['ClassRoomID'],
