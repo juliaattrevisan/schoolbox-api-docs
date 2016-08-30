@@ -106,6 +106,73 @@ abstract class AbstractAssessment implements IAssessable
         throw new \OutOfBoundsException();
     }
 
+    /* Traversals
+     */
+
+    /**
+     * @inheritdoc
+     *
+     * @return mixed
+     */
+    public function numParticipants()
+    {
+        return $this->getAllParticipants()->count();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return int
+     */
+    public function numMarked()
+    {
+        $num = 0;
+
+        /** @var Participant $currentParticipant */
+        foreach ($this->getAllParticipants() as $currentParticipant) {
+            if ($currentParticipant->isAssessableMarked($this)) {
+                $num++;
+            }
+        }
+
+        return $num;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return int
+     */
+    public function calculatePercentageMarked()
+    {
+        return 100 * ($this->numMarked() / $this->numParticipants());
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function numPublished()
+    {
+        $num = 0;
+
+        /** @var Participant $currentParticipant */
+        foreach ($this->getAllParticipants() as $currentParticipant) {
+            if ($currentParticipant->isAssessablePublished($this)) {
+                $num++;
+            }
+        }
+
+        return $num;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function calculatePercentagePublished()
+    {
+        return 100 * ($this->numPublished() / $this->numParticipants());
+    }
+
     /* Getters/Setters
      */
 
