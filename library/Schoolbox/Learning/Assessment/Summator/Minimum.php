@@ -50,21 +50,23 @@ class Minimum implements ISummator
 
                 /** @var AbstractResponse $currentResponse */
                 if ($participant) {
-                    foreach ($participant->findAllResponsesForAssessable($currentAssessable) as $currentResponse) {
-                        $feedback = $currentResponse->findMostRecentFeedback();
 
-                        /* Null should not be the minimum
+                    /* Only use numeric marks in Average computation
+                     * to prevent Tasks from influencing your result
+                     */
+                    $feedback = $participant->findMostRecentFeedback($currentAssessable, Participant::TRAVERSAL_MARKED);
+
+                    /* Null should not be the minimum
+                     */
+                    if ($feedback && !$feedback->isNullMark()) {
+                        $markValue = $feedback->calculateMark();
+
+                        /* $min is being set for the first time to a non-null value
+                         * If you don't do this check for $min == null, summate() will
+                         * always return null (any actual value is never less than null)
                          */
-                        if ($feedback && !$feedback->isNullMark()) {
-                            $currentFeedbackMark = $feedback->calculateMark();
-
-                            /* $min is being set for the first time to a non-null value
-                             * If you don't do this check for $min == null, summate() will
-                             * always return null (any actual value is never less than null)
-                             */
-                            if ($currentFeedbackMark < $min || $min == null) {
-                                $min = $currentFeedbackMark;
-                            }
+                        if ($markValue < $min || $min == null) {
+                            $min = $markValue;
                         }
                     }
                 }

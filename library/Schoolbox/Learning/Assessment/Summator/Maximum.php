@@ -45,15 +45,17 @@ class Maximum implements ISummator
 
                 /** @var AbstractResponse $currentResponse */
                 if ($participant) {
-                    foreach ($participant->findAllResponsesForAssessable($currentAssessable) as $currentResponse) {
-                        $feedback = $currentResponse->findMostRecentFeedback();
 
-                        if ($feedback) {
-                            $currentFeedbackMark = $feedback->calculateMark();
+                    /* Only use numeric marks in Average computation
+                     * to prevent Tasks from influencing your result
+                     */
+                    $feedback = $participant->findMostRecentFeedback($currentAssessable, Participant::TRAVERSAL_MARKED);
 
-                            if ($currentFeedbackMark > $max) {
-                                $max = $currentFeedbackMark;
-                            }
+                    if ($feedback && !$feedback->isNullMark()) {
+                        $markValue = $feedback->calculateMark();
+
+                        if ($markValue > $max) {
+                            $max = $markValue;
                         }
                     }
                 }
