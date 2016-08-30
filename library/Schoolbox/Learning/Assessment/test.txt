@@ -4,6 +4,7 @@ require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
 
 use \Schoolbox\Learning\Assessment\Project;
 use \Schoolbox\Learning\Assessment\Participant;
+use \Schoolbox\Learning\Assessment\Summator;
 
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
@@ -674,6 +675,33 @@ $task3->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
 
 
 /******************************************** REPORTING *******************************************/
+
+$allSummators = [
+    new Summator\Average(),
+    new Summator\Maximum(),
+    new Summator\Minimum(),
+    new Summator\Sum()
+];
+
+echo "<h1>Summators</h1>";
+
+foreach ($allSummators as $currentSummator) {
+    $project = new Project($currentSummator);
+    $project
+        ->setTitle('9. Project X')
+        ->getAssessables()
+        ->add($dueWork1)
+        ->add($dueWork2)
+        ->add($dueWork3)
+        ->add($quiz1)
+        ->add($quiz2)
+        ->add($task1)
+        ->add($task2)
+        ->add($task3)
+    ;
+
+     new \Alaress_Probe(get_class($currentSummator), $project->calculateMark());
+}
 
 $project = new Project();
 $project

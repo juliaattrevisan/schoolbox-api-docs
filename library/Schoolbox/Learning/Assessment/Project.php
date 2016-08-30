@@ -16,6 +16,7 @@
 namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
+use \Schoolbox\Learning\Assessment\Summator\ISummator;
 
 class Project extends AbstractAssessment
 {
@@ -26,15 +27,36 @@ class Project extends AbstractAssessment
     protected $assessables;
 
     /**
-     * Project constructor.
+     * Summation strategy
+     *
+     * @var ISummator
      */
-    public function __construct()
+    protected $summator;
+
+    /**
+     * Project constructor.
+     *
+     * @param ISummator $summator
+     */
+    public function __construct(ISummator $summator)
     {
         /* I know Dr hates hook methods, so do this instead
          */
         parent::__construct();
 
         $this->setAssessables(new Collection());
+        $this->setSummator($summator);
+    }
+
+    /**
+     * Calculate the final mark for this IAssessable
+     *
+     * Projects use Summator strategies to determine final marks
+     * for a Collection of Assessable instances
+     */
+    public function calculateMark()
+    {
+         return $this->getSummator()->summate($this->getAssessables());
     }
 
     /**
@@ -153,6 +175,24 @@ class Project extends AbstractAssessment
     public function setAssessables($assessables)
     {
         $this->assessables = $assessables;
+        return $this;
+    }
+
+    /**
+     * @return ISummator
+     */
+    public function getSummator()
+    {
+        return $this->summator;
+    }
+
+    /**
+     * @param ISummator $summator
+     * @return $this
+     */
+    public function setSummator($summator)
+    {
+        $this->summator = $summator;
         return $this;
     }
 }
