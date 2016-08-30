@@ -47,10 +47,10 @@ class Controller extends Base
 
         // TODO - generate data
         $assessmentsToMark = [
-            \Schoolbox\Learning\Assessment\Controller::getDummyAssessment(2),
+            Assessment\Controller::getDummyAssessment(2),
         ];
         $assessmentsNotSubmitted = [
-            \Schoolbox\Learning\Assessment\Controller::getDummyAssessment(3),
+            Assessment\Controller::getDummyAssessment(3),
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', [
@@ -106,9 +106,9 @@ class Controller extends Base
     {
         // TODO - generate data
         $assessmentsDue = [
-            \Schoolbox\Learning\Assessment\Controller::getDummyAssessment(2),
-            \Schoolbox\Learning\Assessment\Controller::getDummyAssessment(3),
-            \Schoolbox\Learning\Assessment\Controller::getDummyAssessment(4),
+            Assessment\Controller::getDummyAssessment(2),
+            Assessment\Controller::getDummyAssessment(3),
+            Assessment\Controller::getDummyAssessment(4),
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/dueWork.twig', [
@@ -136,13 +136,13 @@ class Controller extends Base
             [
                 'subject'     => 'English 3/4',
                 'assessables' => [
-                    \Schoolbox\Learning\Assessment\Controller::getDummyAssessment(2),
+                    Assessment\Controller::getDummyAssessment(2),
                 ]
             ],
             [
                 'subject'     => 'Maths Advanced',
                 'assessables' => [
-                    \Schoolbox\Learning\Assessment\Controller::getDummyAssessment(3),
+                    Assessment\Controller::getDummyAssessment(3),
                 ]
             ],
         ];
@@ -173,7 +173,7 @@ class Controller extends Base
             [
                 'subject'     => $subject->getName(),
                 'assessables' => [
-                    \Schoolbox\Learning\Assessment\Controller::getDummyAssessment(2),
+                    Assessment\Controller::getDummyAssessment(2),
                 ]
             ],
         ];
