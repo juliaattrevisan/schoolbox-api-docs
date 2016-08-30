@@ -50,66 +50,102 @@ interface IFeedback
     public function setId($id);
 
     /**
+     * Get the human-readable representation of the Normalised Mark
+     *
+     * This returns a string which could be something like "Not Submitted"
+     * or "B+" or "32/36"
+     *
      * @return string
      */
     public function getHumanReadableMark();
 
     /**
+     * Set the human-readable representation of the Normalised Mark
+     *
      * @param string $humanReadableMark
      * @return $this
      */
     public function setHumanReadableMark($humanReadableMark);
 
     /**
+     * Get the Normalised Mark for an IFeedback
+     *
+     * This is essentially a value out of 100 which numerically represents
+     * the human-readable mark (and vice versa)
+     *
      * @return float
      */
     public function getNormalisedMark();
 
     /**
+     * Set the Normalised Mark for an IFeedback
+     *
      * @param float $normalisedMark
      * @return $this
      */
     public function setNormalisedMark($normalisedMark);
 
     /**
+     * Get the comment associated with this IFeedback
+     *
      * @return string
      */
     public function getComment();
 
     /**
+     * Set the comment associated with this IFeedback
+     *
      * @param string $comment
      * @return $this
      */
     public function setComment($comment);
 
     /**
+     * Get the person who created this IFeedback
+     *
+     * Typically a teacher
+     *
      * @return User
      */
     public function getReviewer();
 
     /**
+     * Set the person who created this IFeedback
+     *
      * @param User $reviewer
      * @return $this
      */
     public function setReviewer($reviewer);
 
     /**
+     * Get the IAssessable to which this IResponse belongs
+     *
      * @return IAssessable
      */
     public function getAssessable();
 
     /**
+     * Set the IAssessable to which this IResponse belongs
+     *
      * @param IAssessable $assessable
      * @return $this
      */
     public function setAssessable($assessable);
 
     /**
+     * Get the date when this IFeedback was made accessible to respondents
+     * (typically students)
+     *
+     * A value of null or instance of Alaress_Date_NullDate indicates that
+     * this IFeedback was never published
+     *
      * @return \Alaress_Date_Format
      */
     public function getPublishedAt();
 
     /**
+     * Set the date when this IFeedback was made accessible to respondents
+     *
      * @param \Alaress_Date_Format $publishedAt
      * @return $this
      */
