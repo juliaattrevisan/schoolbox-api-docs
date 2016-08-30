@@ -1,0 +1,996 @@
+<?php
+
+require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
+
+use \Schoolbox\Learning\Assessment\Project;
+use \Schoolbox\Learning\Assessment\Participant;
+
+use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as DueWorkSubmissionFilePlagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
+use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
+use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
+
+use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
+
+use \Schoolbox\Learning\Assessment\Task\Model as Task;
+use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
+
+
+/******************************************** BESTIARY *******************************************/
+
+
+
+$hodes = \Schoolbox\UserMapper::getInstance()->findById(230);
+$sberryhill = \Schoolbox\UserMapper::getInstance()->findById(15);
+$slucier = \Schoolbox\UserMapper::getInstance()->findById(16);
+
+$bsalem = \Schoolbox\UserMapper::getInstance()->findById(31);
+$asaxon = \Schoolbox\UserMapper::getInstance()->findById(17);
+
+$celia = \Schoolbox\UserMapper::getInstance()->findBYId(3);
+$somodio = \Schoolbox\UserMapper::getInstance()->findBYId(150);
+
+
+
+/******************************************** CONSTRUCTION *******************************************/
+
+
+
+/* First (multiple submission files, plagscan; marked, one feedback, multiple feedback files, comment, published)
+ */
+$allParticipants = new \Schoolbox\Collection();
+
+foreach ([$hodes, $sberryhill, $slucier] as $currentStudent) {
+    $allParticipants->add(new Participant($currentStudent));
+}
+
+$type = new DueWorkType();
+$type
+    ->setId(23)
+    ->setName('Homework of the Century');
+
+$file1 = new DueWorkFile();
+$file1
+    ->setId(1)
+    ->setHash('abcdefg12341234')
+    ->setFilename('myfile1.jpg');
+
+$file2 = new DueWorkFile();
+$file2
+    ->setId(2)
+    ->setHash('zxvzxcvzxcv945786947')
+    ->setFilename('myfile2.jpg');
+
+$dueWork1 = new DueWork();
+$dueWork1
+    ->setId(1)
+    ->setTitle('My First Due Work')
+    ->setType($type)
+    ->setAcceptsMultiple()
+    ->showOnlySubmittedStudents()
+    ->setAllParticipants($allParticipants)
+    ->getAllFiles()->add($file1)->add($file2);
+
+$feedbackFile1 = new DueWorkFeedbackFile();
+$feedbackFile1
+    ->setId(12)
+    ->setHash('lj23lj2llj5l2jsdkjf90')
+    ->setCrocodocId('j239jf-23mndi9f-1234nns9fh-5nl6i0f')
+    ->setFilename('This is the correct response.txt');
+
+$feedback = new DueWorkFeedback();
+$feedback
+    ->setAssessable($dueWork1)
+    ->setNormalisedMark(-3)
+    ->setComment('This is a flawed piece of work.')
+    ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->getAllFiles()->add($feedbackFile1);
+
+$plagscan1 = new DueWorkSubmissionFilePlagscan();
+$plagscan1
+    ->setId(1234)
+    ->setStatus(1)
+    ->setScore('93% plagiariased')
+    ->setHtml('<div><strong>YOU CHEATED</strong></div>');
+
+$storage1 = new \Schoolbox\Resource\Storage\Model();
+$storage1->setHash('s89789d9hw3thsug8923u5');
+
+$submissionFile1 = new DueWorkSubmissionFile();
+$submissionFile1
+    ->setId(11)
+    ->setStorage($storage1)
+    ->setCrocodocId('vjfh-6677=eirj-01928333')
+    ->setFilename('mark this Sir.xlsx')
+    ->setPlagscan($plagscan1);
+
+$storage2 = new \Schoolbox\Resource\Storage\Model();
+$storage2->setHash('lk5j34kl5jousdio');
+
+$submissionFile2 = new DueWorkSubmissionFile();
+$submissionFile2
+    ->setId(12)
+    ->setStorage($storage1)
+    ->setCrocodocId('vjfh-6677=eirj-01928333')
+    ->setFilename('and this too.docx');
+
+$response = new DueWorkSubmission();
+$response
+    ->setAssessable($dueWork1)
+    ->setSubmittedBy($hodes)
+    ->setSubmittedOnBehalfOf($hodes)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->getAllFiles()->add($submissionFile1)->add($submissionFile2);
+$response
+    ->getAllFeedback()->add($feedback);
+
+// Append it on a per-user basis
+$dueWork1->findParticipant($hodes)->getAllResponses()->add($response);
+$dueWork1->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
+
+/* Arbitrary quick clones
+ */
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($sberryhill);
+$responseTemp->setSubmittedOnBehalfOf($sberryhill);
+$dueWork1->findParticipant($sberryhill)->getAllResponses()->add($responseTemp);
+$dueWork1->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
+
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($slucier);
+$responseTemp->setSubmittedOnBehalfOf($slucier);
+$dueWork1->findParticipant($slucier)->getAllResponses()->add($responseTemp);
+$dueWork1->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
+
+/* Second (no submission files, no plagscan; marked, multiple feedbacks, no feedback files, comment, published)
+ */
+$allParticipants = new \Schoolbox\Collection();
+
+foreach ([$hodes, $sberryhill, $slucier] as $currentStudent) {
+    $allParticipants->add(new Participant($currentStudent));
+}
+
+$type = new DueWorkType();
+$type
+    ->setId(42)
+    ->setName('Essay');
+
+$dueWork2 = new DueWork();
+$dueWork2
+    ->setId(2)
+    ->setTitle('My Second Due Work')
+    ->setType($type)
+    ->setHasRubric(true)
+    ->setAcceptsSingle()
+    ->showOnlySubmittedStudents()
+    ->setAllParticipants($allParticipants);
+
+$feedback1 = new DueWorkFeedback();
+$feedback1
+    ->setAssessable($dueWork2)
+    ->setNormalisedMark(999999)
+    ->setComment('You should not see this.')
+    ->setPublishedAt(new \Alaress_Date_Format('2016-08-08 17:01:11', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-05 17:01:11', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-05 17:01:11', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$feedback2 = new DueWorkFeedback();
+$feedback2
+    ->setAssessable($dueWork2)
+    ->setNormalisedMark(25)
+    ->setComment('A work of art.')
+    ->setPublishedAt(new \Alaress_Date_Format('2016-08-12 18:12:11', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-05 18:01:11', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-05 18:01:11', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new DueWorkSubmission();
+$response
+    ->setAssessable($dueWork2)
+    ->setSubmittedBy($somodio)
+    ->setSubmittedOnBehalfOf($hodes)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-04 18:22:02', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-04 18:22:02', \Alaress_Date_Format::DATABASE_FORMAT));
+$response
+    ->getAllFeedback()->add($feedback2)->add($feedback1);
+
+// Append it on a per-user basis
+$dueWork2->findParticipant($hodes)->getAllResponses()->add($response);
+$dueWork2->findParticipant($hodes)->getAllFeedbacks()->add($feedback2)->add($feedback1);
+
+/* Arbitrary quick clones
+ */
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($sberryhill);
+$responseTemp->setSubmittedOnBehalfOf($sberryhill);
+$dueWork2->findParticipant($sberryhill)->getAllResponses()->add($responseTemp);
+$dueWork2->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback1);
+
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($slucier);
+$responseTemp->setSubmittedOnBehalfOf($slucier);
+$dueWork2->findParticipant($slucier)->getAllResponses()->add($responseTemp);
+$dueWork2->findParticipant($slucier)->getAllFeedbacks()->add($feedback1);
+
+
+/* Third (no submission files, no plagscan; unmarked, no feedback, no feedback files, no comment, unpublished)
+ */
+$allParticipants = new \Schoolbox\Collection();
+
+foreach ([$hodes, $sberryhill, $slucier] as $currentStudent) {
+    $allParticipants->add(new Participant($currentStudent));
+}
+
+$type = new DueWorkType();
+$type
+    ->setId(42)
+    ->setName('Essay');
+
+$dueWork3 = new DueWork();
+$dueWork3
+    ->setId(3)
+    ->setTitle('My Third Due Work')
+    ->setType($type)
+    ->showAllSubmissibleStudents()
+    ->setAllParticipants($allParticipants);
+
+$feedback = new DueWorkFeedback();
+$feedback
+    ->setAssessable($dueWork3)
+    ->setNormalisedMark(25)
+    ->setComment('A work of art.')
+    ->setPublishedAt(new \Alaress_Date_Format('2016-08-12 18:12:11', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-25 18:01:11', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-25 18:01:11', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new DueWorkSubmission();
+$response
+    ->setAssessable($dueWork3)
+    ->setSubmittedBy($hodes)
+    ->setSubmittedOnBehalfOf($hodes)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 07:23:02', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-22 07:23:02', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->getAllFeedback()->add($feedback);
+
+// Append it on a per-user basis
+$dueWork3->findParticipant($hodes)->getAllResponses()->add($response);
+$dueWork3->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
+
+/* Arbitrary quick clones
+ */
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($sberryhill);
+$responseTemp->setSubmittedOnBehalfOf($sberryhill);
+$dueWork3->findParticipant($sberryhill)->getAllResponses()->add($responseTemp);
+$dueWork3->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
+
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($slucier);
+$responseTemp->setSubmittedOnBehalfOf($slucier);
+$dueWork3->findParticipant($slucier)->getAllResponses()->add($responseTemp);
+$dueWork3->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
+
+
+/* Fourth (one submission; marked multiple feedbacks, no feedback files, unpublished)
+ *
+ * Note that the array structure is is the Mark given
+ * per Quiz Response that the student made - don't get
+ * it confused with the new Assessable Response!!!
+ */
+$allParticipants = new \Schoolbox\Collection();
+
+foreach ([$bsalem, $asaxon] as $currentStudent) {
+    $allParticipants->add(new Participant($currentStudent));
+}
+
+$quiz1 = new Quiz();
+$quiz1
+    ->setId(1)
+    ->setTitle('Quiz of the Century')
+    ->setAllParticipants($allParticipants);
+
+$feedback1 = new QuizReview();
+$feedback1
+    ->setAssessable($quiz1)
+    ->setAllResponses([
+        [
+            'mark' => 3 // Question 1
+        ],
+        [
+            'mark' => 2 // Question 2
+        ],
+        [
+            'mark' => 2 // Question 3
+        ],
+        [
+            'mark' => 1 // Question 4
+        ]
+    ])
+    ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 09:13:31', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-03 09:13:31', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-23 21:47:56', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$feedback2 = new QuizReview();
+$feedback2
+    ->setAssessable($quiz1)
+    ->setAllResponses([
+        [
+            'mark' => 5 // Question 1
+        ],
+        [
+            'mark' => 4 // Question 2
+        ],
+        [
+            'mark' => 5 // Question 3
+        ],
+        [
+            'mark' => 5 // Question 4
+        ]
+    ])
+    ->setPublishedAt(\Alaress_Date_Format::now())
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-04 12:11:21', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-24 20:41:16', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new QuizAttempt();
+$response
+    ->setAssessable($quiz1)
+    ->setSubmittedBy($bsalem)
+    ->setSubmittedOnBehalfOf($bsalem)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-02 19:04:41', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 19:12:41', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->getAllFeedback()->add($feedback1)->add($feedback2);
+
+// Append it on a per-user basis
+
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$quiz1->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
+$quiz1->findParticipant($bsalem)->getAllFeedbacks()->add($feedback1)->add($feedback2);
+
+/* Arbitrary quick clones
+ */
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($asaxon);
+$responseTemp->setSubmittedOnBehalfOf($asaxon);
+$quiz1->findParticipant($asaxon)->getAllResponses()->add($responseTemp);
+$quiz1->findParticipant($asaxon)->getAllFeedbacks()->add($feedback1);
+
+
+
+/*  Fifth (no submissions; no feedbacks, no feedback files, unpublished)
+ */
+$allParticipants = new \Schoolbox\Collection();
+
+foreach ([$hodes, $sberryhill, $slucier] as $currentStudent) {
+    $allParticipants->add(new Participant($currentStudent));
+}
+
+$quiz2 = new Quiz();
+$quiz2
+    ->setId(2)
+    ->setTitle('A quiz nobody has tried')
+    ->setAllParticipants($allParticipants);
+
+$feedback = new QuizReview();
+$feedback
+    ->setAssessable($quiz2)
+    ->setAllResponses([
+        [
+            'mark' => 5 // Question 1
+        ],
+        [
+            'mark' => 4 // Question 2
+        ],
+        [
+            'mark' => 5 // Question 3
+        ],
+        [
+            'mark' => 5 // Question 4
+        ]
+    ])
+    ->setPublishedAt(\Alaress_Date_Format::now())
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-04 12:11:21', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-24 20:41:16', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new QuizAttempt();
+$response
+    ->setAssessable($quiz2)
+    ->setSubmittedBy($hodes)
+    ->setSubmittedOnBehalfOf($hodes)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-02 19:04:41', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 19:12:41', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->getAllFeedback()->add($feedback);
+
+$quiz2->findParticipant($hodes)->getAllResponses()->add($response);
+$quiz2->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
+
+/* Arbitrary quick clones
+ */
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($sberryhill);
+$responseTemp->setSubmittedOnBehalfOf($sberryhill);
+$quiz2->findParticipant($sberryhill)->getAllResponses()->add($responseTemp);
+$quiz2->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
+
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($slucier);
+$responseTemp->setSubmittedOnBehalfOf($slucier);
+$quiz2->findParticipant($slucier)->getAllResponses()->add($responseTemp);
+$quiz2->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
+
+
+
+/* Sixth (one submission, self assessed by student; published)
+ */
+$allParticipants = new \Schoolbox\Collection();
+
+foreach ([$hodes, $sberryhill, $slucier] as $currentStudent) {
+    $allParticipants->add(new Participant($currentStudent));
+}
+
+$task1 = new Task();
+$task1
+    ->setId(1)
+    ->setTitle('Task Manager')
+    ->setAllParticipants($allParticipants);
+
+$feedback = new TaskFeedback();
+$feedback
+    ->setAssessable($task1)
+    ->setReviewer($celia)
+    ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new TaskCompletion();
+$response
+    ->setAssessable($task1)
+    ->setSubmittedBy($hodes)
+    ->setSubmittedOnBehalfOf($hodes)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT));
+$response->getAllFeedback()->add($feedback);
+
+// Append it on a per-user basis
+$task1->findParticipant($hodes)->getAllResponses()->add($response);
+$task1->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
+
+/* Arbitrary quick clones
+ */
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($sberryhill);
+$responseTemp->setSubmittedOnBehalfOf($sberryhill);
+$task1->findParticipant($sberryhill)->getAllResponses()->add($responseTemp);
+$task1->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
+
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($slucier);
+$responseTemp->setSubmittedOnBehalfOf($slucier);
+$task1->findParticipant($slucier)->getAllResponses()->add($responseTemp);
+$task1->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
+
+
+
+/* Seventh (multiple students, one submission each, assessed by teacher; published)
+ */
+$allParticipants = new \Schoolbox\Collection();
+
+foreach ([$hodes, $bsalem, $asaxon, $sberryhill, $slucier] as $currentStudent) {
+    $allParticipants->add(new Participant($currentStudent));
+}
+
+$task2 = new Task();
+$task2
+    ->setId(2)
+    ->setTitle('Task of Kings')
+    ->setAllParticipants($allParticipants);
+
+$feedback = new TaskFeedback();
+$feedback
+    ->setAssessable($task2)
+    ->setReviewer($celia)
+    ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new TaskCompletion();
+$response
+    ->setAssessable($task2)
+    ->setSubmittedBy($hodes)
+    ->setSubmittedOnBehalfOf($hodes)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 11:21:36', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 11:21:36', \Alaress_Date_Format::DATABASE_FORMAT));
+$response
+    ->getAllFeedback()->add($feedback);
+
+// Append it on a per-user basis
+$task2->findParticipant($hodes)->getAllResponses()->add($response);
+$task2->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
+
+/* Arbitrary quick clones
+ */
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$task2->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
+$task2->findParticipant($bsalem)->getAllFeedbacks()->add($feedback);
+
+/* Weird edge case
+ */
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$task2->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
+$task2->findParticipant($bsalem)->getAllFeedbacks()->add($feedback);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$task2->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
+$task2->findParticipant($bsalem)->getAllFeedbacks()->add($feedback);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$task2->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
+$task2->findParticipant($bsalem)->getAllFeedbacks()->add($feedback);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$task2->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
+$task2->findParticipant($bsalem)->getAllFeedbacks()->add($feedback);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$task2->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
+$task2->findParticipant($bsalem)->getAllFeedbacks()->add($feedback);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$task2->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
+$task2->findParticipant($bsalem)->getAllFeedbacks()->add($feedback);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$task2->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
+$task2->findParticipant($bsalem)->getAllFeedbacks()->add($feedback);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$task2->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
+$task2->findParticipant($bsalem)->getAllFeedbacks()->add($feedback);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$task2->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
+$task2->findParticipant($bsalem)->getAllFeedbacks()->add($feedback);
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$task2->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
+$task2->findParticipant($bsalem)->getAllFeedbacks()->add($feedback);
+
+/* No feedback for this Response
+ */
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$responseTemp->setAllFeedback(new \Schoolbox\Collection());
+$task2->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
+
+
+
+
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($asaxon);
+$responseTemp->setSubmittedOnBehalfOf($asaxon);
+$task2->findParticipant($asaxon)->getAllResponses()->add($responseTemp);
+$task2->findParticipant($asaxon)->getAllFeedbacks()->add($feedback);
+
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($sberryhill);
+$responseTemp->setSubmittedOnBehalfOf($sberryhill);
+$task2->findParticipant($sberryhill)->getAllResponses()->add($responseTemp);
+$task2->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
+
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($slucier);
+$responseTemp->setSubmittedOnBehalfOf($slucier);
+$task2->findParticipant($slucier)->getAllResponses()->add($responseTemp);
+$task2->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
+
+
+
+/* Eighth (incomplete Task)
+ */
+$allParticipants = new \Schoolbox\Collection();
+
+foreach ([$hodes, $bsalem, $asaxon, $sberryhill, $slucier] as $currentStudent) {
+    $allParticipants->add(new Participant($currentStudent));
+}
+
+$task3 = new Task();
+$task3
+    ->setId(3)
+    ->setTitle('Read this book')
+    ->setAllParticipants($allParticipants);
+
+$feedback = new TaskFeedback();
+$feedback
+    ->setAssessable($task3)
+    ->setReviewer($celia)
+    ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+
+$response = new TaskCompletion();
+$response
+    ->setAssessable($task3)
+    ->setSubmittedBy($hodes)
+    ->setSubmittedOnBehalfOf($hodes)
+    ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 11:21:36', \Alaress_Date_Format::DATABASE_FORMAT))
+    ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 11:21:36', \Alaress_Date_Format::DATABASE_FORMAT));
+$response
+    ->getAllFeedback()->add($feedback);
+
+// Append it on a per-user basis
+$task3->findParticipant($hodes)->getAllResponses()->add($response);
+$task3->findParticipant($hodes)->getAllFeedbacks()->add($feedback);
+
+/* Arbitrary quick clones
+ */
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($bsalem);
+$responseTemp->setSubmittedOnBehalfOf($bsalem);
+$task3->findParticipant($bsalem)->getAllResponses()->add($responseTemp);
+$task3->findParticipant($bsalem)->getAllFeedbacks()->add($feedback);
+
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($asaxon);
+$responseTemp->setSubmittedOnBehalfOf($asaxon);
+$task3->findParticipant($asaxon)->getAllResponses()->add($responseTemp);
+$task3->findParticipant($asaxon)->getAllFeedbacks()->add($feedback);
+
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($sberryhill);
+$responseTemp->setSubmittedOnBehalfOf($sberryhill);
+$task3->findParticipant($sberryhill)->getAllResponses()->add($responseTemp);
+$task3->findParticipant($sberryhill)->getAllFeedbacks()->add($feedback);
+
+$responseTemp = clone $response;
+$responseTemp->setSubmittedBy($slucier);
+$responseTemp->setSubmittedOnBehalfOf($slucier);
+$task3->findParticipant($slucier)->getAllResponses()->add($responseTemp);
+$task3->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
+
+
+
+/******************************************** REPORTING *******************************************/
+
+$project = new Project();
+$project
+    ->setId(1)
+    ->setTitle('Project X')
+    ->setAllParticipants($allParticipants)
+    ->getAssessables()
+    ->add($dueWork1)
+    ->add($dueWork2)
+    ->add($dueWork3)
+    ->add($quiz1)
+    ->add($quiz2)
+    ->add($task1)
+    ->add($task2)
+    ->add($task3)
+;
+
+
+echo "<h1>Project Traversal</h1>";
+
+new \Alaress_Probe('ID, Title', '% of Project Marked', '% of Project Marked And Published');
+new \Alaress_Probe(
+    "{$project->getId()} {$project->getTitle()}",
+    "{$project->numMarked()}/{$project->numParticipants()} = {$project->calculatePercentageMarked()}",
+    "{$project->numPublished()}/{$project->numParticipants()} = {$project->calculatePercentagePublished()}"
+);
+
+echo "<h1>Types and Visibility</h1>";
+
+new \Alaress_Probe('ID, Title', 'Type', 'Accept Online?', 'Accepts Multi?', 'Show Unsubmitted?', 'Has Rubric?');
+
+foreach ($project->getAssessables() as $currentAssessable) {
+    if ($currentAssessable instanceof DueWork) {
+        new \Alaress_Probe(
+            "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
+            $currentAssessable->getTypeName(),
+            $currentAssessable->getAcceptOnline(),
+            $currentAssessable->isAcceptMulti(),
+            !$currentAssessable->getShowSubmittedOnly(),
+            $currentAssessable->hasRubric()
+        );
+    }
+    else {
+        new \Alaress_Probe(
+            "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
+            $currentAssessable->getTypeName(),
+            '',
+            '',
+            '',
+            ''
+        );
+    }
+}
+
+new \Alaress_Probe("{$project->getId()} {$project->getTitle()}", $project->getTypeName(), '', '', '', '');
+
+
+echo "<h1>Submission</h1>";
+
+new \Alaress_Probe('ID, Title', 'User', 'Files', 'Plagscan', 'Submitted By', 'Submitted On Behalf Of', 'Submitted At');
+
+foreach ($project->getAssessables() as $currentAssessable) {
+    if ($currentAssessable instanceof DueWork) {
+
+        /** @var Participant $currentParticipant */
+        foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
+            /** @var DueWorkSubmission $latestSubmission */
+            $latestSubmission = null;
+
+            /** @var \Schoolbox\User $submittedOnBehalfOf */
+            $submittedOnBehalfOf = null;
+
+            /** @var \Schoolbox\User $submittedBy */
+            $submittedBy = null;
+
+            /* Plagscan docs
+             */
+            $allPlagscan = [];
+
+            /* Attached files
+             */
+            $allFiles = [];
+
+            if ($currentParticipant->findAllResponsesForAssessable($currentAssessable)->count()) {
+                $latestSubmission = $currentParticipant->findAllResponsesForAssessable($currentAssessable)->first();
+
+                if ($latestSubmission) {
+                    $submittedBy         = $latestSubmission->getSubmittedBy();
+                    $submittedOnBehalfOf = $latestSubmission->getSubmittedOnBehalfOf();
+
+                    if ($latestSubmission && $latestSubmission->getAllFiles()->count()) {
+                        foreach ($latestSubmission->getAllFiles() as $currentFile) {
+                            $allFiles[]    = $currentFile->getFilename();
+                            $allPlagscan[] = $currentFile->findPlagscanScore();
+                        }
+                    }
+                }
+            }
+
+            new \Alaress_Probe('<hr>');
+            new \Alaress_Probe(
+                "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
+                $currentParticipant->getUser()->getId(),
+                implode('<br />', $allFiles),
+                implode('<br />', $allPlagscan),
+                $submittedBy ? $submittedBy->getFullname() : '',
+                $submittedOnBehalfOf ? $submittedOnBehalfOf->getFullname() : '',
+                $latestSubmission ? $latestSubmission->getSubmittedAt()->getLocal() : ''
+            );
+        }
+    }
+    elseif ($currentAssessable instanceof Quiz) {
+
+        /** @var Participant $currentParticipant */
+        foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
+            /** @var QuizAttempt $latestSubmission */
+            $latestSubmission = null;
+
+            /** @var \Schoolbox\User $submittedBy */
+            $submittedBy = null;
+
+            if ($currentParticipant->findAllResponsesForAssessable($currentAssessable)->count()) {
+                $latestSubmission = $currentParticipant->findAllResponsesForAssessable($currentAssessable)->first();
+
+                if ($latestSubmission) {
+                    $submittedBy         = $latestSubmission->getSubmittedBy();
+                    $submittedOnBehalfOf = $latestSubmission->getSubmittedOnBehalfOf();
+                }
+            }
+
+            new \Alaress_Probe('<hr>');
+            new \Alaress_Probe(
+                "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
+                $currentParticipant->getUser()->getId(),
+                '',
+                '',
+                $submittedBy ? $submittedBy->getFullname() : '',
+                $submittedOnBehalfOf ? $submittedOnBehalfOf->getFullname() : '',
+                $latestSubmission ? $latestSubmission->getSubmittedAt()->getLocal() : ''
+            );
+        }
+    }
+    elseif ($currentAssessable instanceof Task) {
+
+        /** @var Participant $currentParticipant */
+        foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
+            /** @var TaskCompletion $latestSubmission */
+            $latestSubmission = null;
+
+            /** @var \Schoolbox\User $submittedBy */
+            $submittedBy = null;
+
+            if ($currentParticipant->findAllResponsesForAssessable($currentAssessable)->count()) {
+                $latestSubmission = $currentParticipant->findAllResponsesForAssessable($currentAssessable)->first();
+
+                if ($latestSubmission) {
+                    $submittedBy         = $latestSubmission->getSubmittedBy();
+                    $submittedOnBehalfOf = $latestSubmission->getSubmittedOnBehalfOf();
+                }
+            }
+
+            new \Alaress_Probe('<hr>');
+            new \Alaress_Probe(
+                "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
+                $currentParticipant->getUser()->getId(),
+                '',
+                '',
+                $submittedBy ? $submittedBy->getFullname() : '',
+                $submittedOnBehalfOf ? $submittedOnBehalfOf->getFullname() : '',
+                $latestSubmission ? $latestSubmission->getSubmittedAt()->getLocal() : ''
+            );
+        }
+    }
+}
+
+
+echo "<h1>Feedbacks</h1>";
+
+new \Alaress_Probe('ID, Title', 'User', 'Files', 'Mark', 'Comment', 'Published At');
+
+foreach ($project->getAssessables() as $currentAssessable) {
+    if ($currentAssessable instanceof DueWork) {
+
+        /** @var Participant $currentParticipant */
+        foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
+            $allFiles = [];
+            $allPlagscan = [];
+
+            /** @var DueWorkSubmission $latestSubmission */
+            $latestSubmission = null;
+
+            /** @var DueWorkFeedback $latestFeedback */
+            $latestFeedback = null;
+
+            /** @var \Schoolbox\User $submittedBy */
+            $submittedBy = null;
+
+            /** @var \Schoolbox\User $submittedOnBehalfOf */
+            $submittedOnBehalfOf = null;
+
+            if ($currentParticipant->findAllResponsesForAssessable($currentAssessable)->count()) {
+                $latestSubmission = $currentParticipant->findAllResponsesForAssessable($currentAssessable)->first();
+
+                if ($latestSubmission) {
+                    $submittedBy = $latestSubmission->getSubmittedBy();
+                    $submittedOnBehalfOf = $latestSubmission->getSubmittedOnBehalfOf();
+
+                    /** @var DueWorkFeedback $latestFeedback */
+                    $latestFeedback = $latestSubmission->findMostRecentFeedback();
+
+                    if ($latestFeedback) {
+                        /** @var DueWorkSubmissionFile $currentFile */
+                        foreach ($latestFeedback->getAllFiles() as $currentFile) {
+                            $allFiles[] = $currentFile->getFilename();
+                        }
+                    }
+                }
+            }
+
+            new \Alaress_Probe('<hr>');
+            new \Alaress_Probe(
+                "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
+                $currentParticipant->getUser()->getId(),
+                implode('<br />', $allFiles),
+                $latestFeedback ? $latestFeedback->calculateMark() : '',
+                $latestFeedback ? $latestFeedback->getComment() : '',
+                $latestFeedback && $latestFeedback->isPublished() ? $latestFeedback->getPublishedAt()->getLocal() : 'Unpublished'
+            );
+        }
+    }
+    elseif ($currentAssessable instanceof Quiz) {
+
+        /** @var Participant $currentParticipant */
+        foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
+            $allFiles = [];
+            $allPlagscan = [];
+
+            /** @var QuizAttempt $latestSubmission */
+            $latestSubmission = null;
+
+            /** @var QuizReview $latestFeedback */
+            $latestFeedback = null;
+
+            /** @var \Schoolbox\User $submittedBy */
+            $submittedBy = null;
+
+            if ($currentParticipant->findAllResponsesForAssessable($currentAssessable)->count()) {
+                $latestSubmission = $currentParticipant->findAllResponsesForAssessable($currentAssessable)->first();
+
+                if ($latestSubmission) {
+                    $submittedBy = $latestSubmission->getSubmittedBy();
+
+                    /** @var DueWorkFeedback $latestFeedback */
+                    $latestFeedback = $latestSubmission->findMostRecentFeedback();
+                }
+            }
+
+            new \Alaress_Probe('<hr>');
+            new \Alaress_Probe(
+                "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
+                $currentParticipant->getUser()->getId(),
+                implode('<br />', $allFiles),
+                $latestFeedback ? $latestFeedback->calculateMark() : '',
+                '',
+                $latestFeedback && $latestFeedback->isPublished() ? $latestFeedback->getPublishedAt()->getLocal() : 'Unpublished'
+            );
+        }
+    }
+    elseif ($currentAssessable instanceof Task) {
+
+        /** @var Participant $currentParticipant */
+        foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
+            $allFiles = [];
+            $allPlagscan = [];
+
+            /** @var TaskCompletion $latestSubmission */
+            $latestSubmission = null;
+
+            /** @var TaskFeedback $latestFeedback */
+            $latestFeedback = null;
+
+            /** @var \Schoolbox\User $submittedBy */
+            $submittedBy = null;
+
+            $completionString = '';
+
+            if ($currentParticipant->findAllResponsesForAssessable($currentAssessable)->count()) {
+                $latestSubmission = $currentParticipant->findAllResponsesForAssessable($currentAssessable)->first();
+
+                if ($latestSubmission) {
+                    $submittedBy = $latestSubmission->getSubmittedBy();
+
+                    $completionString = 'Completion by ' . $latestSubmission->getSubmittedBy()->getFullname();
+
+                    /** @var TaskFeedback $latestFeedback */
+                    $latestFeedback = $latestSubmission->findMostRecentFeedback();
+
+                    if ($latestFeedback) {
+                        $completionString .=  '<br />Feedback by ' . $latestFeedback->getReviewer()->getFullname();
+                    }
+                }
+            }
+
+            new \Alaress_Probe('<hr>');
+            new \Alaress_Probe(
+                "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
+                $currentParticipant->getUser()->getId(),
+                '',
+                $completionString,
+                '',
+                $latestFeedback && $latestFeedback->isPublished() ? $latestFeedback->getPublishedAt()->getLocal() : 'Unpublished'
+            );
+        }
+    }
+}
+
+
+die();
+
+

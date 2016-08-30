@@ -10,6 +10,7 @@
 namespace Schoolbox\Resource\File;
 
 use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\File\Mimetype;
 
 trait StorableTrait
 {
@@ -65,6 +66,52 @@ trait StorableTrait
     }
 
     /**
+     * Returns the full mime string for the file
+     *
+     * @return string
+     */
+    public function getMime()
+    {
+        return $this->getMimetype()->getMime();
+    }
+
+    /**
+     * Returns the full mime string for the file
+     *
+     * @return Mimetype
+     */
+    public function getMimetype()
+    {
+        return $this->getStorage()->getMimetype();
+    }
+
+    /**
+     * Returns the size on disk of the file
+     *
+     * @return int
+     */
+    public function getSize()
+    {
+        return $this->getStorage()->getSize();
+    }
+
+    /**
+     * @return string
+     */
+    public function getHash()
+    {
+        return $this->getStorage()->getHash();
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getLastAccessed()
+    {
+        return $this->getStorage()->getLastAccessed();
+    }
+
+    /**
      * @return string
      */
     public function getExtension()
@@ -90,7 +137,6 @@ trait StorableTrait
         return $this->filename;
     }
 
-
     /**
      * @param string $filename
      * @return static
@@ -100,7 +146,6 @@ trait StorableTrait
         $this->filename = $filename;
         return $this;
     }
-
 
     /**
      * @return IStorage

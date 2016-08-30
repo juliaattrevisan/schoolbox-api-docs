@@ -111,6 +111,40 @@ class ReturnedWork implements ISoftDeletable, IFile
     }
 
     /**
+     * Does this user have permission to view this return?
+     *
+     * * Users may view their own returns
+     * * Staff may view returns
+     * * Parents may view their child's returns
+     *
+     * @param  User $user
+     * @return bool
+     */
+    public function hasPermission(User $user)
+    {
+        if ($user->isSuperuser()) {
+            return true;
+        }
+        if ($user->getId() == $this->getOwner()->getId()) {
+            return true;
+        }
+        if ($user->getRole()->isStaff()) {
+            return true;
+        }
+        if ($user->getRole()->isParent()) {
+            $this->setOwner(UserMapper::getInstance()->findById($this->getOwner()->getId()));
+            $this->getOwner()->loadParents();
+            if ($this->getOwner()->isChildOf($user)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
      * @param  \Schoolbox\Assessment\Component\SubmissionBox $submission_box
      *
      * @return $this
@@ -267,9 +301,6 @@ class ReturnedWork implements ISoftDeletable, IFile
         return $this->returned;
     }
 
-    /* Getters/Setters
-     */
-
     /**
      * Set uuid
      *
@@ -309,55 +340,6 @@ class ReturnedWork implements ISoftDeletable, IFile
         return $this;
     }
 
-
-    // IFile interface methods - passthru to storage
-
-    /**
-     * Returns the full mime string for the file
-     *
-     * @return string
-     */
-    public function getMime()
-    {
-        return $this->getStorage()->getMime();
-    }
-
-    /**
-     * Returns the full mime string for the file
-     *
-     * @return Mimetype
-     */
-    public function getMimetype()
-    {
-        return $this->getStorage()->getMimetype();
-    }
-
-    /**
-     * Returns the size on disk of the file
-     *
-     * @return int
-     */
-    public function getSize()
-    {
-        return $this->getStorage()->getSize();
-    }
-
-    /**
-     * @return string
-     */
-    public function getHash()
-    {
-        return $this->getStorage()->getHash();
-    }
-
-    /**
-     * @return \Alaress_Date_Format
-     */
-    public function getLastAccessed()
-    {
-        return $this->getStorage()->getLastAccessed();
-    }
-
     /**
      * @return \Alaress_Date_Format
      */
@@ -366,34 +348,5 @@ class ReturnedWork implements ISoftDeletable, IFile
         return $this->getReturned();
     }
 
-    /**
-     * Does this user have permission to view this return?
-     *
-     * * Users may view their own returns
-     * * Staff may view returns
-     * * Parents may view their child's returns
-     *
-     * @param  User $user
-     * @return bool
-     */
-    public function hasPermission(User $user)
-    {
-        if ($user->isSuperuser()) {
-            return true;
-        }
-        if ($user->getId() == $this->getOwner()->getId()) {
-            return true;
-        }
-        if ($user->getRole()->isStaff()) {
-            return true;
-        }
-        if ($user->getRole()->isParent()) {
-            $this->setOwner(UserMapper::getInstance()->findById($this->getOwner()->getId()));
-            $this->getOwner()->loadParents();
-            if ($this->getOwner()->isChildOf($user)) {
-                return true;
-            }
-        }
-        return false;
-    }
+
 }

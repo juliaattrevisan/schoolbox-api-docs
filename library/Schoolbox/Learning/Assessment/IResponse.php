@@ -1,0 +1,151 @@
+<?php
+/**
+ * IResponse
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Learning\Assessment;
+
+use \Schoolbox\Collection;
+use \Schoolbox\User;
+
+interface IResponse
+{
+
+    /**
+     * Find the most recent Feedback with a non-null Mark value,
+     * based on its Updated field
+     *
+     * Assumes getAllFeedback() is sorted in reverse chronological order
+     */
+    public function findMostRecentFeedback();
+
+    /**
+     * Find the most recent Published Feedback with a non-null Mark value,
+     * based on its Updated field
+     *
+     * Assumes getAllFeedback() is sorted in reverse chronological order
+     */
+    public function findMostRecentPublishedFeedback();
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @var string
+     */
+    public function getId();
+
+    /**
+     * @param  int $id
+     *
+     * @return $this
+     */
+    public function setId($id);
+
+    /**
+     * Get a Collection of all the Feedback instances associated with this IResponse
+     *
+     * @return Collection
+     */
+    public function getAllFeedback();
+
+    /**
+     * Set a Collection of all the Feedback instances associated with this IResponse
+     *
+     * @param Collection $allFeedback
+     * @return $this
+     */
+    public function setAllFeedback($allFeedback);
+
+    /**
+     * Get the person who created this IResponse (typically a student)
+     * This -can- be the teacher if they submit on behalf of a student
+     *
+     * @return User
+     */
+    public function getSubmittedBy();
+
+    /**
+     * Set the person who created this IResponse (typically a student)
+     * This -can- be the teacher if they submit on behalf of a student
+     *
+     * @param User $submittedBy
+     * @return $this
+     */
+    public function setSubmittedBy($submittedBy);
+
+    /**
+     * Get the person for whom the IResponse was created. This is used when
+     * Teachers submit on behalf of Students.
+     *
+     * submittedOnBehalfOf() is typically the student
+     *
+     * @return User
+     */
+    public function getSubmittedOnBehalfOf();
+
+    /**
+     * Set the person for whom the IResponse was created
+     *
+     * @param User $submittedOnBehalfOf
+     * @return $this
+     */
+    public function setSubmittedOnBehalfOf($submittedOnBehalfOf);
+
+    /**
+     * Get the IAssessable to which this IResponse belongs
+     *
+     * @return IAssessable
+     */
+    public function getAssessable();
+
+    /**
+     * Set the IAssessable to which this IResponse belongs
+     *
+     * @param IAssessable $assessable
+     * @return $this
+     */
+    public function setAssessable($assessable);
+
+    /**
+     * Created date
+     *
+     * @var \Alaress_Date_Format
+     */
+    public function getCreatedAt();
+
+    /**
+     * @param  \Alaress_Date_Format $createdAt
+     *
+     * @return $this
+     */
+    public function setCreatedAt($createdAt);
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getUpdatedAt();
+
+    /**
+     * @param  \Alaress_Date_Format $updatedAt
+     *
+     * @return $this
+     */
+    public function setUpdatedAt($updatedAt);
+
+    /**
+     * @return \Alaress_Date_Format
+     */
+    public function getDeletedAt();
+
+    /**
+     * @param  \Alaress_Date_Format $deletedAt
+     * @return $this
+     */
+    public function setDeletedAt($deletedAt);
+}

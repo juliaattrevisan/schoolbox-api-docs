@@ -14,7 +14,6 @@ use Alaress_Date_Format as ADF;
 use Eportfolio\ShowcaseMapper;
 use Plagscan_Document;
 use Schoolbox\Assessment\Component\SubmissionBox;
-use Schoolbox\File\Mimetype;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -54,64 +53,12 @@ class File implements IFile
 
 
     /**
-     * Returns the full mime string for the file
-     *
-     * @return string
-     */
-    public function getMime()
-    {
-        return $this->getMimetype()->getMime();
-    }
-
-
-    /**
-     * Returns the full mime string for the file
-     *
-     * @return Mimetype
-     */
-    public function getMimetype()
-    {
-        return $this->getStorage()->getMimetype();
-    }
-
-
-    /**
-     * Returns the size on disk of the file
-     *
-     * @return int
-     */
-    public function getSize()
-    {
-        return $this->getStorage()->getSize();
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getHash()
-    {
-        return $this->getStorage()->getHash();
-    }
-
-
-    /**
-     * @return ADF
-     */
-    public function getLastAccessed()
-    {
-        return $this->getStorage()->getLastAccessed();
-    }
-
-
-    /**
      * @return string
      */
     public function getUuid()
     {
         return $this->uuid;
     }
-
 
     /**
      * @param string $uuid
