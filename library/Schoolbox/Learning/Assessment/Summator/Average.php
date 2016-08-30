@@ -22,13 +22,6 @@ use \Schoolbox\Learning\Assessment\Participant;
 class Average implements ISummator
 {
     /**
-     * Average constructor.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * Execute summation strategy for a particular Participant
      *
      * @param Collection $allAssessables
