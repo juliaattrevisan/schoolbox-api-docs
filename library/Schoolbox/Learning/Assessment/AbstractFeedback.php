@@ -65,13 +65,6 @@ class AbstractFeedback implements IFeedback
     protected $publishedAt = null;
 
     /**
-     * AbstractFeedback constructor.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * Calculate the final mark for this IAssessable
      */
     public function calculateMark()

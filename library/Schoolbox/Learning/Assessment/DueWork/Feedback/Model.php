@@ -28,10 +28,6 @@ class Model extends AbstractFeedback
      */
     public function __construct()
     {
-        /* I know Dr hates hook methods, so do this instead
-         */
-        parent::__construct();
-
         $this->setAllFiles(new Collection());
     }
 
