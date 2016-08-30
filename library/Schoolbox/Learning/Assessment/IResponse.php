@@ -70,6 +70,17 @@ interface IResponse
     public function setSubmittedBy($submittedBy);
 
     /**
+     * @return User
+     */
+    public function getSubmittedOnBehalfOf();
+
+    /**
+     * @param User $submittedOnBehalfOf
+     * @return $this
+     */
+    public function setSubmittedOnBehalfOf($submittedOnBehalfOf);
+
+    /**
      * @return IAssessable
      */
     public function getAssessable();
