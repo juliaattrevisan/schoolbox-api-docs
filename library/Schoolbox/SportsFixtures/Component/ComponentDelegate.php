@@ -147,11 +147,11 @@ class ComponentDelegate
 
 
     /**
-     * @param int $teamId
-     * @param bool $getHistorical Whether to also return matches that have been played
+     * @param int  $teamId
+     * @param bool $includeHistorical Whether to also return matches that have been played
      * @return Collection|Match[]
      */
-    public function getTeamMatches($teamId, $getHistorical)
+    public function getTeamMatches($teamId, $includeHistorical)
     {
         /** @var Collection|Match[] $matches */
         $matches = new Collection();
@@ -172,13 +172,13 @@ class ComponentDelegate
 
         // Filter matches
         foreach ($all_matches as $match) {
-            if ($getHistorical || $match->getStartAt()->isFuture()) {
+            if ($includeHistorical || $match->getStartAt()->isFuture()) {
                 $matches[$match->getId()] = $match;
             }
         }
 
         // Are we getting matches that have been played ?
-        if ($getHistorical) {
+        if ($includeHistorical) {
             $playedMatchIds = [];
             foreach ($matches as $match) {
                 // Has the match been played ?
