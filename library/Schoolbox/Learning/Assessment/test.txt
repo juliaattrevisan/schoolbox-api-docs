@@ -676,14 +676,17 @@ $task3->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
 
 /******************************************** REPORTING *******************************************/
 
+// Show Project data about this $user
+$selectedUser = $hodes;
+
+echo "<h1>Summators for {$selectedUser->getFullName()}</h1>";
+
 $allSummators = [
     new Summator\Average(),
     new Summator\Maximum(),
     new Summator\Minimum(),
     new Summator\Sum()
 ];
-
-echo "<h1>Summators</h1>";
 
 foreach ($allSummators as $currentSummator) {
     $project = new Project($currentSummator);
@@ -700,10 +703,13 @@ foreach ($allSummators as $currentSummator) {
         ->add($task3)
     ;
 
-     new \Alaress_Probe(get_class($currentSummator), $project->calculateMark());
+    new \Alaress_Probe(get_class($currentSummator), $project->calculateMark($selectedUser));
 }
 
-$project = new Project();
+
+echo "<h1>Project Traversal</h1>";
+
+$project = new Project(new Summator\Average());
 $project
     ->setId(1)
     ->setTitle('Project X')
@@ -718,9 +724,6 @@ $project
     ->add($task2)
     ->add($task3)
 ;
-
-
-echo "<h1>Project Traversal</h1>";
 
 new \Alaress_Probe('ID, Title', '% of Project Marked', '% of Project Marked And Published');
 new \Alaress_Probe(
@@ -1020,5 +1023,3 @@ foreach ($project->getAssessables() as $currentAssessable) {
 
 
 die();
-
-
