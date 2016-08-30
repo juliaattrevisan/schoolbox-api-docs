@@ -13,10 +13,10 @@ INSERT INTO config
 )
 VALUES
 (
-  'protect_teacher_photo',
+  'protect_student_contacts',
   '0',
-  'Teacher Photo Visibility',
-  'Select who can see the staff profile photos',
+  'Student Contact Visibility',
+  'Select who can see student contacts on profile page',
   7,
   '0;Everyone:1;Staff Only:2;Staff and Parents',
   5,
