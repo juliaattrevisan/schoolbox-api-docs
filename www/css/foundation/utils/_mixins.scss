@@ -72,10 +72,10 @@
 	-webkit-border-radius: $radius;
 }
 
-@mixin box-shadow($x-offset, $y-offset, $blur, $color) {
-	-moz-box-shadow: $x-offset $y-offset $blur $color;
-	-webkit-box-shadow: $x-offset $y-offset $blur $color;
-	box-shadow: $x-offset $y-offset $blur $color;
+@mixin box-shadow($x-offset, $y-offset, $blur, $color, $inset:"") {
+	-moz-box-shadow: $x-offset $y-offset $blur $color #{$inset};
+	-webkit-box-shadow: $x-offset $y-offset $blur $color #{$inset};
+	box-shadow: $x-offset $y-offset $blur $color #{$inset};
 }
 
 @mixin box-sizing ($box-sizing) {
