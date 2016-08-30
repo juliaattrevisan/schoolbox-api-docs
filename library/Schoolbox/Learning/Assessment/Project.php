@@ -48,9 +48,7 @@ class Project extends AbstractAssessment
     }
 
     /**
-     * Calculate how many Participant instances are in this Project
-     *
-     * @return int
+     * @inheritdoc
      */
     public function numParticipants()
     {
@@ -64,30 +62,7 @@ class Project extends AbstractAssessment
     }
 
     /**
-     * Calculate how many IAssessable instances have a non-null mark value
-     *
-     * The most recent action determines the marked/not-marked state of
-     * an Assessable. This accounts for a series of edge cases which really
-     * make you hate life
-     *
-     * For a particular Participant:
-     *
-     * If the Assessable contains zero Responses and zero Feedbacks:
-     *     >>> not marked
-     *
-     * If the Assessable contains at least one Response and zero Feedbacks:
-     *     >>> not marked
-     *
-     * If the Assessable contains zero Responses and at least one Feedback:
-     *     >>> marked
-     *
-     * If the Assessable contains at least one Response and at least one Feedback:
-     * Start traversing to find out what's going on.
-     *          If the most recent Response contains a Feedback -OR-
-     *          If a Feedback occurred more recently than the Response
-     *          (ie. Feedback is the most recent action) >>> marked
-     *
-     *          Otherwise >>> not marked
+     * @inheritdoc
      */
     public function numMarked()
     {
@@ -108,9 +83,7 @@ class Project extends AbstractAssessment
     }
 
     /**
-     * Calculate percentage of a Project that has been marked
-     *
-     * @return int
+     * @inheritdoc
      */
     public function calculatePercentageMarked()
     {
@@ -122,10 +95,7 @@ class Project extends AbstractAssessment
     }
 
     /**
-     * Calculate the number of Feedbacks that have been Published
-     * to Students
-     *
-     * @return int
+     * @inheritdoc
      */
     public function numPublished()
     {
@@ -146,9 +116,7 @@ class Project extends AbstractAssessment
     }
 
     /**
-     * Calculate percentage of a Project that has been Published
-     *
-     * @return int
+     * @inheritdoc
      */
     public function calculatePercentagePublished()
     {
