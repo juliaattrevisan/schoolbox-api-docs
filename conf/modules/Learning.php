@@ -8,7 +8,7 @@
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
-use Schoolbox\Learning\Learning\Module as LearningModule;
+use Schoolbox\Learning\Module as LearningModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
 use Schoolbox\Learning\Feedback\Module as FeedbackModule;
 use Schoolbox\UserMapper;
