@@ -24,6 +24,7 @@ use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
 use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
 
+
 /******************************************** BESTIARY *******************************************/
 
 
@@ -152,6 +153,14 @@ $responseTemp->setSubmittedBy($slucier);
 $responseTemp->setSubmittedOnBehalfOf($slucier);
 $dueWork1->findParticipant($slucier)->getAllResponses()->add($responseTemp);
 $dueWork1->findParticipant($slucier)->getAllFeedbacks()->add($feedback);
+
+/* Accessing a nonexistent user in the Participant set throws exception
+ */
+try {
+    $dueWork1->findParticipant($somodio)->getAllFeedbacks()->add($feedback);
+}
+catch (\UnexpectedValueException $e) {
+}
 
 /* Second (no submission files, no plagscan; marked, multiple feedbacks, no feedback files, comment, published)
  */
