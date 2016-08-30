@@ -40,24 +40,30 @@ class Maximum implements ISummator
             /** @var AbstractAssessment $currentAssessable */
             foreach ($allAssessables as $currentAssessable) {
 
-                /** @var Participant $participant */
-                $participant = $currentAssessable->findParticipant($user);
+                try {
+                    /** @var Participant $participant */
+                    $participant = $currentAssessable->findParticipant($user);
 
-                /** @var AbstractResponse $currentResponse */
-                if ($participant) {
+                    /** @var AbstractResponse $currentResponse */
+                    if ($participant) {
 
-                    /* Only use numeric marks in Average computation
-                     * to prevent Tasks from influencing your result
-                     */
-                    $feedback = $participant->findMostRecentFeedback($currentAssessable, Participant::TRAVERSAL_MARKED);
+                        /* Only use numeric marks in Average computation
+                         * to prevent Tasks from influencing your result
+                         */
+                        $feedback = $participant->findMostRecentFeedback($currentAssessable, Participant::TRAVERSAL_MARKED);
 
-                    if ($feedback && !$feedback->isNullMark()) {
-                        $markValue = $feedback->calculateMark();
+                        if ($feedback && !$feedback->isNullMark()) {
+                            $markValue = $feedback->calculateMark();
 
-                        if ($markValue > $max) {
-                            $max = $markValue;
+                            if ($markValue > $max) {
+                                $max = $markValue;
+                            }
                         }
                     }
+                }
+                /* noop $user not found in Assessable's Participant collection
+                 */
+                catch (\UnexpectedValueException $e) {
                 }
             }
         }

@@ -34,6 +34,7 @@ interface IAssessable
      *
      * @param User $user
      * @return Participant
+     * @throws \UnexpectedValueException
      */
     public function findParticipant(User $user);
 

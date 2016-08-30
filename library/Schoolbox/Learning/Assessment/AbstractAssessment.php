@@ -109,7 +109,8 @@ abstract class AbstractAssessment implements IAssessable
      * which saves you this traversal in Controllers etc
      *
      * @param User $user
-     * @return Participant|null
+     * @return Participant
+     * @throws \UnexpectedValueException
      */
     public function findParticipant(User $user)
     {
@@ -120,12 +121,7 @@ abstract class AbstractAssessment implements IAssessable
             }
         }
 
-        /* Don't throw exception when you can't find a user
-         *
-         * This breaks the Project Composite when it Summates via traversals across
-         * mixed lists of Students - ie. when IAssessables have different participants
-         */
-        return null;
+        throw new \UnexpectedValueException();
     }
 
     /* Traversals

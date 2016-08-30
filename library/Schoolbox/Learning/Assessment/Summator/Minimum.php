@@ -45,31 +45,41 @@ class Minimum implements ISummator
             /** @var AbstractAssessment $currentAssessable */
             foreach ($allAssessables as $currentAssessable) {
 
-                /** @var Participant $participant */
-                $participant = $currentAssessable->findParticipant($user);
+                try {
+                    /** @var Participant $participant */
+                    $participant = $currentAssessable->findParticipant($user);
 
-                /** @var AbstractResponse $currentResponse */
-                if ($participant) {
+                    /** @var AbstractResponse $currentResponse */
+                    if ($participant) {
 
-                    /* Only use numeric marks in Average computation
-                     * to prevent Tasks from influencing your result
-                     */
-                    $feedback = $participant->findMostRecentFeedback($currentAssessable, Participant::TRAVERSAL_MARKED);
-
-                    /* Null should not be the minimum
-                     */
-                    if ($feedback && !$feedback->isNullMark()) {
-                        $markValue = $feedback->calculateMark();
-
-                        /* $min is being set for the first time to a non-null value
-                         * If you don't do this check for $min == null, summate() will
-                         * always return null (any actual value is never less than null)
+                        /* Only use numeric marks in Average computation
+                         * to prevent Tasks from influencing your result
                          */
-                        if ($markValue < $min || $min == null) {
-                            $min = $markValue;
+                        $feedback = $participant->findMostRecentFeedback(
+                            $currentAssessable,
+                            Participant::TRAVERSAL_MARKED
+                        );
+
+                        /* Null should not be the minimum
+                         */
+                        if ($feedback && !$feedback->isNullMark()) {
+                            $markValue = $feedback->calculateMark();
+
+                            /* $min is being set for the first time to a non-null value
+                             * If you don't do this check for $min == null, summate() will
+                             * always return null (any actual value is never less than null)
+                             */
+                            if ($markValue < $min || $min == null) {
+                                $min = $markValue;
+                            }
                         }
                     }
                 }
+                /* noop $user not found in Assessable's Participant collection
+                 */
+                catch (\UnexpectedValueException $e) {
+                }
+
             }
         }
 
