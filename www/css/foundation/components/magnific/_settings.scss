@@ -87,3 +87,9 @@ img.mfp-img{
 		margin-left: -20px;
 	}
 }
+
+@media #{$small-only} {
+	.mfp-arrow{
+		color: $black;
+	}
+}
