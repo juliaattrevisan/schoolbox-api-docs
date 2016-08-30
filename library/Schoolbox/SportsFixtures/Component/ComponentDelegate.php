@@ -70,10 +70,10 @@ class ComponentDelegate
      * Gets a collection of matches with only relevant teams and players attached, sorted by 'startAt'
      *
      * @param int[] $userIds
-     * @param bool $getHistorical Whether to return matches in the past
+     * @param bool  $includeHistorical Whether to return matches in the past
      * @return Collection|Match[]
      */
-    public function getMatchesForUsers(array $userIds, $getHistorical)
+    public function getMatchesForUsers(array $userIds, $includeHistorical)
     {
         /** @var Collection|Match[] $teams */
         $matches = new Collection();
@@ -103,7 +103,7 @@ class ComponentDelegate
         }
 
         // Are we interested in matches in the past ?
-        if ($getHistorical) {
+        if ($includeHistorical) {
             // Get all teams that the users played in
             $teamParticipants = $this->getTeamParticipantMapper()->findByColumn('user_id', $userIds);
             foreach ($teamParticipants as $teamParticipant) {
@@ -125,7 +125,7 @@ class ComponentDelegate
 
         // Filter matches, and link teams which now contain relevant players
         foreach ($all_matches as $match) {
-            if ($getHistorical || $match->getStartAt()->isFuture()) {
+            if ($includeHistorical || $match->getStartAt()->isFuture()) {
                 $matches[$match->getId()] = $match;
             } else {
                 continue;
