@@ -78,7 +78,7 @@ class AbstractResponse implements IResponse
             $latest = $this->getAllFeedback()->first();
 
             foreach ($this->getAllFeedback() as $currentFeedback) {
-                if (!$currentFeedback->isNullMark()) {
+                if ($currentFeedback->isMarked()) {
                     return $currentFeedback;
                 }
             }
@@ -89,7 +89,7 @@ class AbstractResponse implements IResponse
              *
              * Otherwise return the Feedback itself
              */
-            if (!$latest->isNullMark()) {
+            if ($latest->isMarked()) {
                 return $latest;
             }
         }
@@ -112,7 +112,7 @@ class AbstractResponse implements IResponse
 
             foreach ($this->getAllFeedback() as $currentFeedback) {
                 if ($currentFeedback->isPublished()) {
-                    if ($currentFeedback->getPublishedAt()->gt($latest->getPublishedAt()) && !$currentFeedback->isNullMark()) {
+                    if ($currentFeedback->getPublishedAt()->gt($latest->getPublishedAt()) && $currentFeedback->isMarked()) {
                         $latest = $currentFeedback;
                     }
                 }
@@ -124,7 +124,7 @@ class AbstractResponse implements IResponse
              *
              * Otherwise return the Feedback itself
              */
-            if ($latest->isPublished() && !$latest->isNullMark()) {
+            if ($latest->isPublished() && $latest->isMarked()) {
                 return $latest;
             }
         }

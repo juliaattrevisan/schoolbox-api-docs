@@ -73,13 +73,13 @@ class AbstractFeedback implements IFeedback
     }
 
     /**
-     * This IAssessable has a mark value of null
+     * This IAssessable has a non-null Mark value
      *
      * @return bool
      */
-    public function isNullMark()
+    public function isMarked()
     {
-        return $this->calculateMark() === null;
+        return $this->calculateMark() !== null;
     }
 
     /**

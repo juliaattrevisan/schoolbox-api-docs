@@ -20,11 +20,11 @@ interface IFeedback
     public function calculateMark();
 
     /**
-     * This IAssessable has a mark value of null
+     * This IAssessable has a non-null Mark value
      *
      * @return bool
      */
-    public function isNullMark();
+    public function isMarked();
 
     /**
      * Determine whether this Feedback has been published.

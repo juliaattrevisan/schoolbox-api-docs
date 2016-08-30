@@ -62,7 +62,7 @@ class Minimum implements ISummator
 
                         /* Null should not be the minimum
                          */
-                        if ($feedback && !$feedback->isNullMark()) {
+                        if ($feedback && $feedback->isMarked()) {
                             $markValue = $feedback->calculateMark();
 
                             /* $min is being set for the first time to a non-null value

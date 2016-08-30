@@ -52,7 +52,7 @@ class Maximum implements ISummator
                          */
                         $feedback = $participant->findMostRecentFeedback($currentAssessable, Participant::TRAVERSAL_MARKED);
 
-                        if ($feedback && !$feedback->isNullMark()) {
+                        if ($feedback && $feedback->isMarked()) {
                             $markValue = $feedback->calculateMark();
 
                             if ($markValue > $max) {
