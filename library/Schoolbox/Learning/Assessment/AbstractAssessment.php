@@ -48,6 +48,11 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @var \Alaress_Date_Format
      */
+    protected $dueAt;
+
+    /**
+     * @var \Alaress_Date_Format
+     */
     protected $closeAt;
 
     /**
@@ -179,6 +184,22 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @return \Alaress_Date_Format
      */
+    public function getDueAt()
+    {
+        return $this->dueAt;
+    }
+
+    /**
+     * @param \Alaress_Date_Format $dueAt
+     */
+    public function setDueAt($dueAt)
+    {
+        $this->dueAt = $dueAt;
+    }
+
+    /**
+     * @return \Alaress_Date_Format
+     */
     public function getCloseAt()
     {
         return $this->closeAt;
@@ -247,5 +268,7 @@ abstract class AbstractAssessment implements IAssessable
         $this->allParticipants = $allParticipants;
         return $this;
     }
+
+
 }
 
