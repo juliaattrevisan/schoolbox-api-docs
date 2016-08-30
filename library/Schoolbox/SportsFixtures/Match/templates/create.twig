@@ -96,7 +96,7 @@
                 id: {{ match.homeTeam.id }},
                 name: "{{ match.homeTeam.name }}"
             },
-            {% elseif match.homeSchoolId -%}
+            {% elseif match.homeSchool.Id -%}
             value: {
                 id: "{{ tagPrefix }}{{ match.homeSchool.id }}",
                 name: "{{ match.homeSchool.name }}"
