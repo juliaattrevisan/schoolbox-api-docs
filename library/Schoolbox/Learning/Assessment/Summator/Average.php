@@ -33,7 +33,7 @@ class Average implements ISummator
      *
      * @param Collection $allAssessables
      * @param User $user
-     * @return float|null
+     * @return null|int|float
      */
     public function summate(Collection $allAssessables, User $user)
     {
