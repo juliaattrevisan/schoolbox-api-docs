@@ -48,44 +48,65 @@ interface IResponse
     public function setId($id);
 
     /**
+     * Get a Collection of all the Feedback instances associated with this IResponse
+     *
      * @return Collection
      */
     public function getAllFeedback();
 
     /**
+     * Set a Collection of all the Feedback instances associated with this IResponse
+     *
      * @param Collection $allFeedback
      * @return $this
      */
     public function setAllFeedback($allFeedback);
 
     /**
+     * Get the person who created this IResponse (typically a student)
+     * This -can- be the teacher if they submit on behalf of a student
+     *
      * @return User
      */
     public function getSubmittedBy();
 
     /**
+     * Set the person who created this IResponse (typically a student)
+     * This -can- be the teacher if they submit on behalf of a student
+     *
      * @param User $submittedBy
      * @return $this
      */
     public function setSubmittedBy($submittedBy);
 
     /**
+     * Get the person for whom the IResponse was created. This is used when
+     * Teachers submit on behalf of Students.
+     *
+     * submittedOnBehalfOf() is typically the student
+     *
      * @return User
      */
     public function getSubmittedOnBehalfOf();
 
     /**
+     * Set the person for whom the IResponse was created
+     *
      * @param User $submittedOnBehalfOf
      * @return $this
      */
     public function setSubmittedOnBehalfOf($submittedOnBehalfOf);
 
     /**
+     * Get the IAssessable to which this IResponse belongs
+     *
      * @return IAssessable
      */
     public function getAssessable();
 
     /**
+     * Set the IAssessable to which this IResponse belongs
+     *
      * @param IAssessable $assessable
      * @return $this
      */
