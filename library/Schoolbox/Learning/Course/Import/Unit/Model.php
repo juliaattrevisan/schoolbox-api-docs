@@ -133,7 +133,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @return Collection
+     * @return Collection|IAssessable[]
      */
     public function getAssessables()
     {
@@ -141,7 +141,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @param Collection $assessables
+     * @param Collection|IAssessable[] $assessables
      * @return static
      */
     public function setAssessables($assessables)
