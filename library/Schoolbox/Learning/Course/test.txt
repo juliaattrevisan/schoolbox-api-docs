@@ -28,6 +28,7 @@ $foxSpec->setFolder($foxSpecFolder);
 $foxDueWork1 = new Schoolbox\Learning\Assessment\DueWork\Model();
 $foxDueWork1
     ->setId(1)
+    ->setType((new \Schoolbox\Learning\Assessment\DueWork\Type())->setId(1)->setName('Essay'))
     ->setTitle('Fox House Due Work')
     ->setAcceptsMultiple()
     ->showOnlySubmittedStudents();
@@ -35,6 +36,7 @@ $foxDueWork1
 $foxDueWork2 = new Schoolbox\Learning\Assessment\DueWork\Model();
 $foxDueWork2
     ->setId(2)
+    ->setType((new \Schoolbox\Learning\Assessment\DueWork\Type())->setId(2)->setName('Homework'))
     ->setTitle('Fox House Due Work 2')
     ->setAcceptsMultiple()
     ->showOnlySubmittedStudents();
@@ -112,6 +114,7 @@ $daltonQuiz
 $daltonDueWork = new Schoolbox\Learning\Assessment\DueWork\Model();
 $daltonDueWork
     ->setId(3)
+    ->setType((new \Schoolbox\Learning\Assessment\DueWork\Type())->setId(3)->setName('Assessment Task'))
     ->setTitle('Dalton Due Work')
     ->setAcceptsMultiple()
     ->showOnlySubmittedStudents();
@@ -219,7 +222,13 @@ foreach ($courseSpec->getUnits() as $unitSpec) {
         <tr>
             <td><?= $unitSpec->getFolder()->getNameWithCodes() ?></td>
             <td><?= $unitSpec->getFolder()->getId() ?></td>
-            <td>To be implemented</td>
+            <td>
+                <ul>
+                    <?php foreach ($unitSpec->getAssessables() as $assessable): ?>
+                        <li><?= $assessable->getTitle() ?> (<?= $assessable->getTypeName() ?> #<?= $assessable->getId() ?>)</li>
+                    <?php endforeach; ?>
+                </ul>
+            </td>
         </tr>
     <?php endforeach; ?>
     </tbody>
