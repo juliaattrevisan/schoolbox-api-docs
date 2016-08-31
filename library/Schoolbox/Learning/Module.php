@@ -212,17 +212,10 @@ class Module extends BaseModule
      */
     protected function getUserMapper()
     {
+        if (!$this->userMapper) {
+            $this->userMapper = $this->getInjector()->get('mapperFactory')->get(UserMapper::class);
+        }
         return $this->userMapper;
-    }
-
-    /**
-     * @param  UserMapper $userMapper
-     * @return static
-     */
-    public function setUserMapper(UserMapper $userMapper)
-    {
-        $this->userMapper = $userMapper;
-        return $this;
     }
 
     /**
@@ -230,17 +223,10 @@ class Module extends BaseModule
      */
     protected function getFolderMapper()
     {
+        if (!$this->folderMapper) {
+            $this->folderMapper = $this->getInjector()->get('mapperFactory')->get(FolderMapper::class);
+        }
         return $this->folderMapper;
-    }
-
-    /**
-     * @param  FolderMapper $folderMapper
-     * @return static
-     */
-    public function setFolderMapper(FolderMapper $folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-        return $this;
     }
 
     /**
@@ -248,17 +234,10 @@ class Module extends BaseModule
      */
     protected function getTermMapper()
     {
+        if (!$this->termMapper) {
+            $this->termMapper = $this->getInjector()->get('mapperFactory')->get(TermMapper::class);
+        }
         return $this->termMapper;
-    }
-
-    /**
-     * @param  TermMapper $termMapper
-     * @return static
-     */
-    public function setTermMapper(TermMapper $termMapper)
-    {
-        $this->termMapper = $termMapper;
-        return $this;
     }
 
     /**
@@ -266,16 +245,9 @@ class Module extends BaseModule
      */
     protected function getErrorMapper()
     {
+        if (!$this->errorMapper) {
+            $this->errorMapper = $this->getInjector()->get('mapperFactory')->get(ErrorMapper::class);
+        }
         return $this->errorMapper;
-    }
-
-    /**
-     * @param  ErrorMapper $errorMapper
-     * @return static
-     */
-    public function setErrorMapper(ErrorMapper $errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
-        return $this;
     }
 }

@@ -168,17 +168,10 @@ class Module extends BaseModule
      */
     protected function getUserMapper()
     {
+        if (!$this->userMapper) {
+            $this->userMapper = $this->getInjector()->get('mapperFactory')->get(UserMapper::class);
+        }
         return $this->userMapper;
-    }
-
-    /**
-     * @param  UserMapper $userMapper
-     * @return static
-     */
-    public function setUserMapper(UserMapper $userMapper)
-    {
-        $this->userMapper = $userMapper;
-        return $this;
     }
 
     /**
@@ -186,16 +179,9 @@ class Module extends BaseModule
      */
     protected function getErrorMapper()
     {
+        if (!$this->errorMapper) {
+            $this->errorMapper = $this->getInjector()->get('mapperFactory')->get(ErrorMapper::class);
+        }
         return $this->errorMapper;
-    }
-
-    /**
-     * @param  ErrorMapper $errorMapper
-     * @return static
-     */
-    public function setErrorMapper(ErrorMapper $errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
-        return $this;
     }
 }
