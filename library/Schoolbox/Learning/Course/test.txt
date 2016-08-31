@@ -179,7 +179,7 @@ foreach ($courseSpec->getUnits() as $unitSpec) {
             ->setSpecification($unitSpec)
             ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth())
             ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth())
-            ->populateFromSpecification($unitSpec);
+            ->populateAssessablesFromSpecification($unitSpec);
         $frenchClassCourseImport->getUnits()->add($frenchClassUnitImport);
     } else {
         $englishClassUnitImport = new Schoolbox\Learning\Course\Import\Unit\Model();
@@ -188,7 +188,7 @@ foreach ($courseSpec->getUnits() as $unitSpec) {
             ->setSpecification($unitSpec)
             ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth()->addDays(3))
             ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth()->addDays(3))
-            ->populateFromSpecification($unitSpec);
+            ->populateAssessablesFromSpecification($unitSpec);
         $englishClassCourseImport->getUnits()->add($englishClassUnitImport);
     }
     $scienceClassUnitImport = new Schoolbox\Learning\Course\Import\Unit\Model();
@@ -197,7 +197,7 @@ foreach ($courseSpec->getUnits() as $unitSpec) {
         ->setSpecification($unitSpec)
         ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth()->addDays(13))
         ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth()->addDays(13))
-        ->populateFromSpecification($unitSpec);
+        ->populateAssessablesFromSpecification($unitSpec);
     $scienceClassCourseImport->getUnits()->add($scienceClassUnitImport);
     $i++;
 }

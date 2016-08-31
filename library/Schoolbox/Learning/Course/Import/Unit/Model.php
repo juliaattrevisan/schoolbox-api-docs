@@ -113,12 +113,15 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * Populates this object from a Unit Specification.
+     * Populates this object's list of assessables from those from a Unit Specification.
+     *
+     * This method doesn't clear this object's assessables, or set this object's
+     * name or spec - it simply clones the spec's assessables into this object.
      *
      * @param UnitSpecificationModel $unitSpec
      * @return static
      */
-    public function populateFromSpecification(UnitSpecificationModel $unitSpec)
+    public function populateAssessablesFromSpecification(UnitSpecificationModel $unitSpec)
     {
         foreach ($unitSpec->getAssessables() as $assessable) {
             // Maybe each assessable has a clone method?
