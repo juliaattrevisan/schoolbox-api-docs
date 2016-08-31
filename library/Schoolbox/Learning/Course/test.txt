@@ -178,7 +178,8 @@ foreach ($courseSpec->getUnits() as $unitSpec) {
             ->setTitle($title)
             ->setSpecification($unitSpec)
             ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth())
-            ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth());
+            ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth())
+            ->populateFromSpecification($unitSpec);
         $frenchClassCourseImport->getUnits()->add($frenchClassUnitImport);
     } else {
         $englishClassUnitImport = new Schoolbox\Learning\Course\Import\Unit\Model();
@@ -186,7 +187,8 @@ foreach ($courseSpec->getUnits() as $unitSpec) {
             ->setTitle($title)
             ->setSpecification($unitSpec)
             ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth()->addDays(3))
-            ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth()->addDays(3));
+            ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth()->addDays(3))
+            ->populateFromSpecification($unitSpec);
         $englishClassCourseImport->getUnits()->add($englishClassUnitImport);
     }
     $scienceClassUnitImport = new Schoolbox\Learning\Course\Import\Unit\Model();
@@ -194,7 +196,8 @@ foreach ($courseSpec->getUnits() as $unitSpec) {
         ->setTitle($title)
         ->setSpecification($unitSpec)
         ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth()->addDays(13))
-        ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth()->addDays(13));
+        ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth()->addDays(13))
+        ->populateFromSpecification($unitSpec);
     $scienceClassCourseImport->getUnits()->add($scienceClassUnitImport);
     $i++;
 }
@@ -260,7 +263,13 @@ foreach ($courseSpec->getUnits() as $unitSpec) {
                 <td><?= $unitImport->getSpecification()->getFolder()->getId() ?></td>
                 <td><?= $unitImport->getOpenDate()->getUsingFormat('Y-m-d H:i:s') ?></td>
                 <td><?= $unitImport->getDueDate()->getUsingFormat('Y-m-d H:i:s') ?></td>
-                <td>To be implemented</td>
+                <td>
+                    <ul>
+                        <?php foreach ($unitImport->getAssessables() as $assessable): ?>
+                            <li><?= $assessable->getTitle() ?> (<?= $assessable->getTypeName() ?> #<?= $assessable->getId() ?>)</li>
+                        <?php endforeach; ?>
+                    </ul>
+                </td>
             </tr>
         <?php endforeach; ?>
         </tbody>
