@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Course\Import\Unit;
 use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Import\Model as CourseImportModel;
 use Schoolbox\Learning\Course\Specification\Unit\Model as UnitSpecificationModel;
@@ -62,9 +63,7 @@ class Model implements AssessmentContext, ISoftDeletable
      *
      * Replaces the previous Unit Instance class' tasks collection.
      *
-     * TODO add the Assessable interface to this definition, once it exists
-     *
-     * @var Collection
+     * @var Collection|IAssessable[]
      */
     protected $assessables;
 
@@ -110,6 +109,7 @@ class Model implements AssessmentContext, ISoftDeletable
         $this->dueDate = new \Alaress_Date_NullDate();
         $this->createdAt = new \Alaress_Date_NullDate();
         $this->deletedAt = new \Alaress_Date_NullDate();
+        $this->assessables = new Collection();
     }
 
     /* Getters/Setters */

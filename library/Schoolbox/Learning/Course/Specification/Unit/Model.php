@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Course\Specification\Unit;
 
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Specification\Model as CourseModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -56,9 +57,7 @@ class Model implements AssessmentContext, ISoftDeletable
     /**
      * The Assessable objects which are a part of this object.
      *
-     * TODO add the Assessable interface to this definition, once it exists
-     *
-     * @var Collection
+     * @var Collection|IAssessable[]
      */
     protected $assessables;
 
@@ -71,6 +70,7 @@ class Model implements AssessmentContext, ISoftDeletable
         $this->course = new CourseModel();
         $this->createdAt = new \Alaress_Date_NullDate();
         $this->deletedAt = new \Alaress_Date_NullDate();
+        $this->assessables = new Collection();
     }
 
     /* Getters/Setters */
