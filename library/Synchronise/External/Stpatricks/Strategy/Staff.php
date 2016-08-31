@@ -55,14 +55,14 @@ class Synchronise_External_Stpatricks_Strategy_Staff extends Synchronise_Externa
         $newUser['defaultCampus'] = 1;
         $newUser['campus'] = array(1);
 
+
         // Staff Group ID
-        if($newUser['role']) {
+        if(isset($currentUser['role']) && $currentUser['role'] == 1 ) {
             $newUser['group_id'] = self::STAFF_GROUP_ID;
         }
         else {
             $newUser['group_id'] = self::ADMIN_GROUP_ID;
         }
-
 
         // This person is not a superuser
         //$newUser['su'] = false;
