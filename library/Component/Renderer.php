@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Really basic component renderer, copied out of /homepage/configForm.php
  *
@@ -6,13 +7,12 @@
  * @copyright Copyright 2015 Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
- 
 class Component_Renderer
 {
     /**
      * Renders all components for an admin page.
      *
-     * @param SitePage                       $page
+     * @param SitePage $page
      * @param Component_ControllerAbstract[] $componentCollection
      */
     public function renderAllAdminComponents(SitePage $page, $componentCollection)
@@ -38,7 +38,7 @@ class Component_Renderer
             $component->setup(null, $component->getInstance()->getConfigArray());
 
             $page->setVar(array(
-                'ID'                        => $instance_no,
+                'ID' => $instance_no,
                 'COMPONENT_INSTANCE_ID'     => $instance_no,
                 'COMPONENT_DEFINITION_ID'   => $definitionId,
                 'COMPONENT_HANDLE'          => $instance_no,
@@ -67,7 +67,7 @@ class Component_Renderer
     /**
      * Renders a single component for an admin page.
      *
-     * @param SitePage                     $page
+     * @param SitePage $page
      * @param Component_ControllerAbstract $component
      */
     public function renderAdminComponent(SitePage $page, Component_ControllerAbstract $component)
@@ -76,10 +76,10 @@ class Component_Renderer
 
         $component->setup(null, $component->getInstance()->getConfigArray());
 
-        $instance_no  = $component->getInstance()->getId();
+        $instance_no = $component->getInstance()->getId();
         $definitionId = $component->getInstance()->getDefinition()->getId();
         $page->setVar(array(
-            'ID'                        => $instance_no,
+            'ID' => $instance_no,
             'COMPONENT_INSTANCE_ID'     => $instance_no,
             'COMPONENT_DEFINITION_ID'   => $definitionId,
             'COMPONENT_HANDLE'          => $instance_no,
@@ -95,7 +95,7 @@ class Component_Renderer
     /**
      * Renders a template into the Sitepage within $component.
      *
-     * @param \Schoolbox\Resource\Folder\Model      $folder
+     * @param \Schoolbox\Resource\Folder\Model $folder
      * @param Component_Homepage_ControllerAbstract $component
      */
     public function renderHomepageComponent(
@@ -124,17 +124,18 @@ class Component_Renderer
 
         $folderCodes = implode(', ', $temp);
 
+        $component->getPageTemplate()->setVar('ID', $folder->getId());
         $component->getPageTemplate()->setVar('CODE', urlencode(urlencode($folderCodes)));
         $component->getPageTemplate()->setVar('HEADING', Scrub::text($folder->getName()));
         $component->getPageTemplate()->setVar('SITE_LOCATION', Cfg::get('site_location'));
         $component->getPageTemplate()->setVar('RETURN_URL', urlencode(base64_encode('/homepage/' . $_POST["cid"])));
-        $component->getPageTemplate()->pparse($templateTarget, $templateHandle);
+        $component->getPageTemplate()->pParse($templateTarget, $templateHandle);
     }
 
     /**
      * Renders an ePortfolio template into the Sitepage within $component.
      *
-     * @param Eportfolio_Page_Instance                $eportfolioPage
+     * @param Eportfolio_Page_Instance $eportfolioPage
      * @param Component_Eportfolio_ControllerAbstract $component
      */
     public function renderEportfolioComponent(

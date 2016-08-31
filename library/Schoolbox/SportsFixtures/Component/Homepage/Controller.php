@@ -25,12 +25,13 @@ class Controller extends Component_Homepage_ControllerAbstract
      * Injectable constructor
      *
      * @param Component_Instance $instance
-     * @param User               $user
-     * @param SitePage           $sitepage
+     * @param User $user
+     * @param SitePage $sitepage
      */
-    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage) {
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
+    {
         parent::__construct($instance, $user, $sitepage);
-        $this->delegate = new ComponentDelegate($sitepage);
+        $this->setDelegate(new ComponentDelegate());
     }
 
     /**
@@ -50,16 +51,39 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function renderTemplate($templateHandle)
     {
         // Grab data for the team we are viewing
-        
-        $data = $this->delegate->getTeamData($this->config["team"]["value"]);
+
+        $matches = $this->delegate->getTeamMatches($this->getConfig('team'), $this->getConfig('showHistorical'));
 
         return $this->renderTwigTemplate(
             $templateHandle,
             '@sportsfixturesHomepage/component.twig',
-            array_merge($data, [
-                'componentInstanceId'   => $this->getInstance()->getId(),
-                'componentClass'        => $this->getComponentName()
-            ])
+            [
+                'componentInstanceId' => $this->getInstance()->getId(),
+                'componentClass'      => $this->getComponentName(),
+                'matches'             => $matches,
+            ]
         );
+    }
+
+    /*
+     * Getters / Setters
+     */
+
+    /**
+     * @return ComponentDelegate
+     */
+    protected function getDelegate()
+    {
+        return $this->delegate;
+    }
+
+    /**
+     * @param ComponentDelegate $delegate
+     * @return static
+     */
+    protected function setDelegate(ComponentDelegate $delegate)
+    {
+        $this->delegate = $delegate;
+        return $this;
     }
 }

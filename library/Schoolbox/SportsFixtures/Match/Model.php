@@ -10,7 +10,8 @@
 
 namespace Schoolbox\SportsFixtures\Match;
 
-use Alaress_Date_Format;
+use \Alaress_Date_Format;
+use Sabre\DAV\Exception\NotImplemented;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
@@ -20,6 +21,7 @@ use Schoolbox\SportsFixtures\Team\Model as Team;
 use Schoolbox\SportsFixtures\Venue\Model as Venue;
 use Schoolbox\SportsFixtures\Result\Model as Result;
 use Schoolbox\SportsFixtures\ItineraryItem\Model as ItineraryItem;
+use Schoolbox\SportsFixtures\School\Model as School;
 
 class Model implements ISoftDeletable
 {
@@ -48,20 +50,24 @@ class Model implements ISoftDeletable
     /** @var Team $awayTeam */
     protected $awayTeam;
 
-    /** @var int $awaySchoolId */
-    protected $awaySchoolId;
+    /** @var School $awaySchool */
+    protected $awaySchool;
 
-    /** @var int $homeSchoolId */
-    protected $homeSchoolId;
+    /** @var School $homeSchool */
+    protected $homeSchool;
 
     /** @var string $notes */
     protected $notes;
 
-    /** @var \Alaress_Date_Format */
+    /** @var Alaress_Date_Format */
     protected $startAt;
-    
-    /** @var Collection|Result[] */
-    protected $result;
+
+    /** @var Result|null */
+    protected $homeTeamResult;
+
+    /** @var Result|null */
+    protected $awayTeamResult;
+
 
     /** @var Collection|ItineraryItem[] */
     protected $itinerary;
@@ -72,8 +78,8 @@ class Model implements ISoftDeletable
     public function __construct()
     {
         $this->setItinerary(new Collection());
-        $this->setResult(new Collection());
     }
+
 
     /**
      * This Match contains $team
@@ -144,39 +150,105 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return int
+     * @return School
      */
-    public function getAwaySchoolId()
+    public function getAwaySchool()
     {
-        return $this->awaySchoolId;
+        return $this->awaySchool;
     }
 
     /**
-     * @param int $awaySchoolId
+     * @param School $awaySchool
      * @return static
      */
-    public function setAwaySchoolId($awaySchoolId)
+    public function setAwaySchool(School $awaySchool)
     {
-        $this->awaySchoolId = $awaySchoolId;
+        $this->awaySchool = $awaySchool;
         return $this;
     }
 
     /**
-     * @return int
+     * @return School
      */
-    public function getHomeSchoolId()
+    public function getHomeSchool()
     {
-        return $this->homeSchoolId;
+        return $this->homeSchool;
     }
 
     /**
-     * @param int $homeSchoolId
+     * @param School $homeSchool
      * @return static
      */
-    public function setHomeSchoolId($homeSchoolId)
+    public function setHomeSchool($homeSchool)
     {
-        $this->homeSchoolId = $homeSchoolId;
+        $this->homeSchool = $homeSchool;
         return $this;
+    }
+
+    /**
+     * Returns scalar null if home team is a school, or if no result yet
+     * @return null|Result
+     */
+    public function getHomeTeamResult()
+    {
+        return $this->homeTeamResult;
+    }
+
+    /**
+     * @param null|Result $result
+     * @return static
+     */
+    public function setHomeTeamResult(Result $result)
+    {
+        $this->homeTeamResult = $result;
+        return $this;
+    }
+
+    /**
+     * Returns scalar null if away team is a school, or if no result yet
+     * @return null|Result
+     */
+    public function getAwayTeamResult()
+    {
+        return $this->awayTeamResult;
+    }
+
+    /**
+     * @param null|Result $result
+     * @return static
+     */
+    public function setAwayTeamResult(Result $result)
+    {
+        $this->awayTeamResult = $result;
+        return $this;
+    }
+
+
+    /**
+     * @return Collection|Result[] Indexed by team_id
+     */
+    public function getResults()
+    {
+        $results = new Collection();
+        if ($this->getHomeTeamResult()) {
+            $results[$this->getHomeTeamResult()->getTeam()->getId()] = $this->getHomeTeamResult();
+        }
+        if ($this->getAwayTeamResult()) {
+            $results[$this->getAwayTeamResult()->getTeam()->getId()] = $this->getAwayTeamResult();
+        }
+        return $results;
+    }
+
+    /**
+     * For robustness, we do not permit results to be set as a Collection.
+     * This is to prevent callers attempting to set results for Teams not attached to this match,
+     * which would lead to indeterminate state and behaviour.
+     *
+     * @param Collection|Result[] $results
+     */
+    public function setResults(Collection $results)
+    {
+        throw new \DomainException('Results must be set per team.');
     }
 
     /**
@@ -251,23 +323,6 @@ class Model implements ISoftDeletable
         return $this;
     }
 
-    /**
-     * @return Collection
-     */
-    public function getResult()
-    {
-        return $this->result;
-    }
-
-    /**
-     * @param Collection $result
-     * @return static
-     */
-    public function setResult($result)
-    {
-        $this->result = $result;
-        return $this;
-    }
 
     /**
      * @return Collection|ItineraryItem[]
@@ -281,7 +336,7 @@ class Model implements ISoftDeletable
      * @param Collection|ItineraryItem[] $itinerary
      * @return static
      */
-    public function setItinerary($itinerary)
+    public function setItinerary(Collection $itinerary)
     {
         $this->itinerary = $itinerary;
         return $this;

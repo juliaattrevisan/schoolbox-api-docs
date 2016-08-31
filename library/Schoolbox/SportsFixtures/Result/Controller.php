@@ -221,6 +221,7 @@ class Controller extends AbstractController
      * The same as getEntity() except that it only shows
      * the Results for the specified Team
      *
+     * @api /sportsfixtures/matches/:matchId/results/:teamId
      * @param Match $context
      * @param Team $team
      */
@@ -262,9 +263,8 @@ class Controller extends AbstractController
          * This saves endless shenanigans in front-end land
          */
         if (!$match->getHomeTeam()->getId()) {
-            $name = $this->getSchoolTagCloudMapper()->getTagName($match->getHomeSchoolId());
 
-            $facelessTeam = $this->getTeamMapper()->createModel()->setName($name);
+            $facelessTeam = $this->getTeamMapper()->createModel()->setName($match->getHomeSchool()->getName());
 
             $match->setHomeTeam($facelessTeam);
         }
@@ -273,9 +273,8 @@ class Controller extends AbstractController
          * This saves endless shenanigans in front-end land
          */
         if (!$match->getAwayTeam()->getId()) {
-            $name = $this->getSchoolTagCloudMapper()->getTagName($match->getAwaySchoolId());
 
-            $facelessTeam = $this->getTeamMapper()->createModel()->setName($name);
+            $facelessTeam = $this->getTeamMapper()->createModel()->setName($match->getAwaySchool()->getName());
 
             $match->setAwayTeam($facelessTeam);
         }
@@ -335,7 +334,7 @@ class Controller extends AbstractController
             UserAccess::ACCESS_WRITE
         );
 
-        foreach($allUserAccess as $currentUserAccess) {
+        foreach ($allUserAccess as $currentUserAccess) {
             if ($currentUserAccess->getId() == $sessionUser->getId()) {
                 return true;
             }
@@ -367,18 +366,18 @@ class Controller extends AbstractController
         $match  = $context;
 
         // If updating existing results
-        if($result->getId()){
+        if ($result->getId()) {
             $match = MatchMapper::getInstance()->findById($result->getMatch()->getId());
             $result->setMatch($match);
 
             // Don't permit update of archived results
-            if($match->getSeason()->isArchived()){
+            if ($match->getSeason()->isArchived()) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
             }
         }
 
         // Don't permit creation of results for archived matches
-        if(!$result->getId() && $match->getSeason()->isArchived()){
+        if (!$result->getId() && $match->getSeason()->isArchived()) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
         }
 
@@ -443,8 +442,8 @@ class Controller extends AbstractController
     /**
      * Save Result data to db
      *
-     * @param Match  $match
-     * @param Team   $team
+     * @param Match $match
+     * @param Team $team
      * @param Status $status
      * @param string $description
      * @param Result $result

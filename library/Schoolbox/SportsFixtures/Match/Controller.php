@@ -27,6 +27,8 @@ use \Schoolbox\SportsFixtures\ItineraryItem\Model as ItineraryItem;
 use \Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
 use \Schoolbox\SportsFixtures\Venue\Model as Venue;
 use \Schoolbox\SportsFixtures\Venue\Mapper as VenueMapper;
+use \Schoolbox\SportsFixtures\School\Model as School;
+use \Schoolbox\SportsFixtures\School\Mapper as SchoolMapper;
 use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
 
 class Controller extends AbstractController
@@ -72,9 +74,9 @@ class Controller extends AbstractController
     protected $errorMapper;
 
     /**
-     * @var TagCloudMapper
+     * @var SchoolMapper
      */
-    protected $schoolTagCloudMapper;
+    protected $schoolMapper;
 
     /**
      * Controller constructor.
@@ -89,7 +91,7 @@ class Controller extends AbstractController
         $this->setItineraryItemMapper(ItineraryItemMapper::getInstance());
         $this->setVenueMapper(VenueMapper::getInstance());
         $this->setErrorMapper(ErrorMapper::getInstance());
-        $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
+        $this->setSchoolMapper(SchoolMapper::getInstance());
     }
 
     /**
@@ -129,13 +131,13 @@ class Controller extends AbstractController
                 $isMatchesInCurrentSeason = true;
             }
 
-            if ($currentMatch->getHomeSchoolId()) {
-                $facelessTeam = $this->getTeamMapper()->createModel()->setName($this->getSchoolTagCloudMapper()->getTagName($currentMatch->getHomeSchoolId()));
+            if (!$currentMatch->getHomeTeam()->getId()) {
+                $facelessTeam = $this->getTeamMapper()->createModel()->setName($currentMatch->getHomeSchool()->getName());
                 $currentMatch->setHomeTeam($facelessTeam);
             }
 
-            if ($currentMatch->getAwaySchoolId()) {
-                $facelessTeam = $this->getTeamMapper()->createModel()->setName($this->getSchoolTagCloudMapper()->getTagName($currentMatch->getAwaySchoolId()));
+            if (!$currentMatch->getAwayTeam()->getId()) {
+                $facelessTeam = $this->getTeamMapper()->createModel()->setName($currentMatch->getAwaySchool()->getName());
                 $currentMatch->setAwayTeam($facelessTeam);
             }
 
@@ -161,7 +163,7 @@ class Controller extends AbstractController
 
         // Sort matches within seasons by startAt datetime
         foreach ($seasonMatches as $matches) {
-            $matches->sortBy('startAt','asc');
+            $matches->sortBy('startAt', 'asc');
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/list.twig', [
@@ -249,21 +251,16 @@ class Controller extends AbstractController
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_SEASON_ARCHIVED);
         }
 
-        // acquire tag names we require
-        $tags = [];
-
-        if ($match->getHomeSchoolId()) {
-            $tags['home'] = $this->getSchoolTagCloudMapper()->getTagName($match->getHomeSchoolId());
-        }
-
-        if ($match->getAwaySchoolId()) {
-            $tags['away'] = $this->getSchoolTagCloudMapper()->getTagName($match->getAwaySchoolId());
-        }
+        $allItineraryItems = $this->getItineraryItemMapper()->findByColumn('match_id', $match->getId(), [
+            'order' => [
+                'start_at' => 'asc'
+            ]
+        ]);
+        $match->setItinerary($allItineraryItems);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesMatch/create.twig', [
             'match'     => $match,
             'tagPrefix' => TagCloudMapper::SCHOOL_PREFIX,
-            'tags'      => $tags,
             'action'    => $match->getId() ? 'Modify' : 'Create'
         ]));
     }
@@ -329,8 +326,8 @@ class Controller extends AbstractController
 
         // Teams
         try {
-            list ($homeTeam, $homeSchoolId) = $this->calculateTeam($this->getRequest()->post['homeTeamId']);
-            list ($awayTeam, $awaySchoolId) = $this->calculateTeam($this->getRequest()->post['awayTeamId']);
+            list ($homeTeam, $homeSchool) = $this->calculateTeam($this->getRequest()->post['homeTeamId']);
+            list ($awayTeam, $awaySchool) = $this->calculateTeam($this->getRequest()->post['awayTeamId']);
 
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
@@ -342,7 +339,7 @@ class Controller extends AbstractController
         // Itinerary
         $itinerary = $this->transposeItineraryPost($this->getRequest()->post['itinerary']);
 
-        $this->saveMatch($entity, $division, $name, $season, $startAt, $homeTeam, $awayTeam, $homeSchoolId, $awaySchoolId, $venue, $notes, $itinerary);
+        $this->saveMatch($entity, $division, $name, $season, $startAt, $homeTeam, $awayTeam, $homeSchool, $awaySchool, $venue, $notes, $itinerary);
 
         $this->getResponse()->redirect->afterPost($this->getRouter()->generate('sportsfixturesMatch.getList', [
             'contextId' => $division->getId()
@@ -390,15 +387,17 @@ class Controller extends AbstractController
     /**
      * @param string $teamId
      * @param string $prefix
-     * @return array
+     * @return array $return
+     * @var Team $return[0]
+     * @var School $return[1]
      */
     protected function calculateTeam($teamId, $prefix = TagCloudMapper::SCHOOL_PREFIX)
     {
         if (preg_match("/$prefix(.*)/", $teamId, $matches)) {
             // Away team is a faceless school, save the team as null
-            return [ $this->getTeamMapper()->createModel(), $matches[1] ];
+            return [$this->getTeamMapper()->createModel(), $this->getSchoolMapper()->findById($matches[1])];
         } else {
-            return [ $this->getTeamMapper()->findById($teamId), null ];
+            return [$this->getTeamMapper()->findById($teamId), $this->getSchoolMapper()->createModel()];
         }
 
     }
@@ -409,17 +408,17 @@ class Controller extends AbstractController
      * @param Model $match
      * @param Division $division
      * @param string $name
-     * @param Season $season,
+     * @param Season $season ,
      * @param Alaress_Date_Format $startAt
      * @param Team $homeTeam
      * @param Team $awayTeam
-     * @param int $homeSchoolId
-     * @param int $awaySchoolId
+     * @param School $homeSchool
+     * @param School $awaySchool
      * @param Venue $venue
      * @param string $notes
      * @param Collection|ItineraryItem[] $itinerary
      */
-    private function saveMatch(Match $match, Division $division, $name, Season $season, Alaress_Date_Format $startAt, Team $homeTeam, Team $awayTeam, $homeSchoolId, $awaySchoolId, Venue $venue, $notes, Collection $itinerary)
+    private function saveMatch(Match $match, Division $division, $name, Season $season, Alaress_Date_Format $startAt, Team $homeTeam, Team $awayTeam, School $homeSchool, School $awaySchool, Venue $venue, $notes, Collection $itinerary)
     {
         $match
             ->setDivision($division)
@@ -428,8 +427,8 @@ class Controller extends AbstractController
             ->setStartAt($startAt)
             ->setHomeTeam($homeTeam)
             ->setAwayTeam($awayTeam)
-            ->setHomeSchoolId($homeSchoolId)
-            ->setAwaySchoolId($awaySchoolId)
+            ->setHomeSchool($homeSchool)
+            ->setAwaySchool($awaySchool)
             ->setVenue($venue)
             ->setNotes($notes)
             ->setUpdatedAt(\Alaress_Date_Format::now())
@@ -451,10 +450,12 @@ class Controller extends AbstractController
 
     /**
      * @param SportMapper $sportMapper
+     * @return static
      */
     protected function setSportMapper($sportMapper)
     {
         $this->sportMapper = $sportMapper;
+        return $this;
     }
 
     /**
@@ -467,10 +468,12 @@ class Controller extends AbstractController
 
     /**
      * @param SeasonMapper $seasonMapper
+     * @return static
      */
     protected function setSeasonMapper($seasonMapper)
     {
         $this->seasonMapper = $seasonMapper;
+        return $this;
     }
 
     /**
@@ -483,10 +486,12 @@ class Controller extends AbstractController
 
     /**
      * @param DivisionMapper $divisionMapper
+     * @return static
      */
     protected function setDivisionMapper($divisionMapper)
     {
         $this->divisionMapper = $divisionMapper;
+        return $this;
     }
 
     /**
@@ -499,7 +504,7 @@ class Controller extends AbstractController
 
     /**
      * @param  TeamMapper $teamMapper
-     * @return $this
+     * @return static
      */
     public function setTeamMapper(TeamMapper $teamMapper)
     {
@@ -517,10 +522,12 @@ class Controller extends AbstractController
 
     /**
      * @param MatchMapper $matchMapper
+     * @return static
      */
     public function setMatchMapper($matchMapper)
     {
         $this->matchMapper = $matchMapper;
+        return $this;
     }
 
     /**
@@ -533,10 +540,12 @@ class Controller extends AbstractController
 
     /**
      * @param ItineraryItemMapper $itineraryItemMapper
+     * @return static
      */
     public function setItineraryItemMapper($itineraryItemMapper)
     {
         $this->itineraryItemMapper = $itineraryItemMapper;
+        return $this;
     }
 
     /**
@@ -549,10 +558,12 @@ class Controller extends AbstractController
 
     /**
      * @param VenueMapper $venueMapper
+     * @return static
      */
     public function setVenueMapper($venueMapper)
     {
         $this->venueMapper = $venueMapper;
+        return $this;
     }
 
     /**
@@ -565,25 +576,29 @@ class Controller extends AbstractController
 
     /**
      * @param ErrorMapper $errorMapper
+     * @return static
      */
     protected function setErrorMapper($errorMapper)
     {
         $this->errorMapper = $errorMapper;
+        return $this;
     }
 
     /**
-     * @return TagCloudMapper
+     * @return SchoolMapper
      */
-    protected function getSchoolTagCloudMapper()
+    protected function getSchoolMapper()
     {
-        return $this->schoolTagCloudMapper;
+        return $this->schoolMapper;
     }
 
     /**
-     * @param TagCloudMapper $schoolTagCloudMapper
+     * @param SchoolMapper $schoolMapper
+     * @return static
      */
-    protected function setSchoolTagCloudMapper($schoolTagCloudMapper)
+    protected function setSchoolMapper($schoolMapper)
     {
-        $this->schoolTagCloudMapper = $schoolTagCloudMapper;
+        $this->schoolMapper = $schoolMapper;
+        return $this;
     }
 }

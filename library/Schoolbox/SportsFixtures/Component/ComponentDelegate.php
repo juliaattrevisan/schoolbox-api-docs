@@ -13,46 +13,20 @@
 
 namespace Schoolbox\SportsFixtures\Component;
 
-use Alaress\Session\Session;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
-use \SitePage;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use \Schoolbox\SportsFixtures\Sport\Mapper as SportMapper;
-use \Schoolbox\SportsFixtures\Division\Mapper as DivisionMapper;
 use \Schoolbox\SportsFixtures\Team\Mapper as TeamMapper;
 use \Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use \Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayer;
 use \Schoolbox\SportsFixtures\Match\Model as Match;
 use \Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
-use \Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
-use \Schoolbox\SportsFixtures\Venue\Mapper as VenueMapper;
-use \Schoolbox\TagCloud\Mapper as TagCloudMapper;
+use \Schoolbox\SportsFixtures\Result\Model as Result;
+use \Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
+use Schoolbox\Sportsfixtures\Team\Model as Team;
+use Schoolbox\SportsFixtures\Team\Player\Participant\Mapper as TeamParticipantMapper;
 
 class ComponentDelegate
 {
-    /**
-     * @var UserMapper;
-     */
-    protected $userMapper;
-
-    /**
-     * @var FolderMapper;
-     */
-    protected $folderMapper;
-
-    /**
-     * @var SportMapper
-     */
-    protected $sportMapper;
-
-    /**
-     * @var DivisionMapper
-     */
-    protected $divisionMapper;
-
     /**
      * @var TeamMapper
      */
@@ -64,168 +38,126 @@ class ComponentDelegate
     protected $teamPlayerMapper;
 
     /**
+     * @var TeamParticipantMapper
+     */
+    protected $teamParticipantMapper;
+
+    /**
      * @var MatchMapper
      */
     protected $matchMapper;
 
     /**
-     * @var VenueMapper
+     * @var ResultMapper
      */
-    protected $venueMapper;
-
-    /**
-     * @var ItineraryItemMapper
-     */
-    protected $itineraryItemMapper;
-
-    /**
-     * @var TagCloudMapper
-     */
-    protected $schoolTagCloudMapper;
-
-    /**
-     * @var SitePage
-     */
-    protected $sitepage;
+    protected $resultMapper;
 
     /**
      * Delegate constructor.
-     * @param SitePage $sitepage
      */
-    public function __construct(SitePage $sitepage)
+    public function __construct()
     {
-        $this->setSitePage($sitepage);
-        $this->setUserMapper(UserMapper::getInstance());
-        $this->setFolderMapper(FolderMapper::getInstance());
-        $this->setSportMapper(SportMapper::getInstance());
-        $this->setDivisionMapper(DivisionMapper::getInstance());
-        $this->setTeamMapper(TeamMapper::getInstance());
-        $this->setTeamPlayerMapper(TeamPlayerMapper::getInstance());
-        $this->setItineraryItemMapper(ItineraryItemMapper::getInstance());
-        $this->setVenueMapper(VenueMapper::getInstance());
-        $this->setMatchMapper(MatchMapper::getInstance());
-        $this->setSchoolTagCloudMapper(TagCloudMapper::getInstance('sportsfixtures_school', 'id', 'name'));
+        $this
+            ->setTeamMapper(TeamMapper::getInstance())
+            ->setTeamPlayerMapper(TeamPlayerMapper::getInstance())
+            ->setTeamParticipantMapper(TeamParticipantMapper::getInstance())
+            ->setMatchMapper(MatchMapper::getInstance())
+            ->setResultMapper(ResultMapper::getInstance());
     }
 
 
-
     /**
-     * @return array
+     * Gets a collection of matches with only relevant teams and players attached, sorted by 'startAt'
+     *
+     * @param int[] $userIds
+     * @param bool  $includeHistorical Whether to return matches in the past
+     * @return Collection|Match[]
      */
-    public function getParentDashboardData()
+    public function getMatchesForUsers(array $userIds, $includeHistorical)
     {
-        $matches = [];
+        /** @var Collection|Match[] $teams */
+        $matches = new Collection();
 
-        /** @var Session $session */
-        $session = $this->getSitePage()->getDi()->get('session');
-        $children = $session->get('children');
+        if (!count($userIds)) {
+            return $matches;
+        }
 
-        if(is_array($children))
-        {
-            foreach ($children as $child)
-            {
-                /** @var Collection|TeamPlayer[] $childTeams */
-                $childTeams = $this->getTeamPlayerMapper()->findByColumn('user_id', $child["id"]);
-                $matchesForChild = $this->getMatches($childTeams);
+        // Get all teams the users are currently in
 
-                foreach ($matchesForChild as $matchCurrent) {
+        /** @var Collection|TeamPlayer[] $teamPlayers */
+        $teamPlayers = $this->getTeamPlayerMapper()->findByColumn('user_id', $userIds);
 
-                    if (!isset($matches[$matchCurrent->getId()])) {
-                        $matches[$matchCurrent->getId()] = [];
-                        $matches[$matchCurrent->getId()]["home"] = false;
-                        $matches[$matchCurrent->getId()]["away"] = false;
-                        $matches[$matchCurrent->getId()]["match"] = $matchCurrent;
-                        $matches[$matchCurrent->getId()]["teams"] = [
-                            $matchCurrent->getHomeTeam()->getId() => [
-                                'team' => $matchCurrent->getHomeTeam(),
-                                'children' => [],
-                            ],
-                            $matchCurrent->getAwayTeam()->getId() => [
-                                'team' => $matchCurrent->getAwayTeam(),
-                                'children' => [],
-                            ],
-                        ];
-                    }
 
-                    foreach ($childTeams as $team) {
-                        $teamId = $team->getTeam()->getId();
-                        $isHome = ($teamId == $matchCurrent->getHomeTeam()->getId());
-                        $isAway = ($teamId == $matchCurrent->getAwayTeam()->getId());
-                        if ($isHome) {
-                            $matches[$matchCurrent->getId()]["home"] = true;
-                        }
-                        if ($isAway) {
-                            $matches[$matchCurrent->getId()]["away"] = true;
-                        }
-                        if ($isHome || $isAway) {
-                            $matches[$matchCurrent->getId()]["teams"][$teamId]["children"][$team->getUser()->getId()] = $team->getUser();
-                        }
-                    }
+        // Uniquify the teams, and ensure relevant players are in team player lists
+
+        /** @var Collection|Team[] $teams */
+        $teams = new Collection();
+        foreach ($teamPlayers as $teamPlayer) {
+            $team = $teamPlayer->getTeam();
+            // Don't clobber teams
+            if (!$teams[$team->getId()]) {
+                $teams[$team->getId()] = $team;
+            }
+            // Add player to team, but prevent duplicates by inserting at collection index
+            $teams[$team->getId()]->getPlayers()[$teamPlayer->getUser()->getId()] = $teamPlayer->getUser();
+        }
+
+        // Are we interested in matches in the past ?
+        if ($includeHistorical) {
+            // Get all teams that the users played in
+            $teamParticipants = $this->getTeamParticipantMapper()->findByColumn('user_id', $userIds);
+            foreach ($teamParticipants as $teamParticipant) {
+                $team = $teamParticipant->getTeam();
+                if (!$teams[$team->getId()]) {
+                    $teams[$team->getId()] = $team;
                 }
+                // Add player to team, but prevent duplicates by inserting at collection index
+                $teams[$team->getId()]->getPlayers()[$teamParticipant->getUser()->getId()] = $teamParticipant->getUser();
             }
         }
 
-        return [
-            'role' => 'parent',
-            'matches' => $matches
-        ];
-    }
+        // Get all matches which involved these teams
+        $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $teams->keys());
+        $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $teams->keys());
 
-    /**
-     * @param User $user
-     * @return array
-     */
-    public function getStudentDashboardData($user)
-    {
-        // Get all teams the current user is in
-        $matches        = [];
-        $studentTeams   = $this->getTeamPlayerMapper()->findByColumn('user_id', $user->getId());
-        $studentMatches = $this->getMatches($studentTeams);
-        foreach ($studentMatches as $matchCurrent) {
-            $matches[$matchCurrent->getId()] = [
-                'home'  => false,
-                'away'  => false,
-                'match' => $matchCurrent,
-                'teams' => [
-                    $matchCurrent->getHomeTeam()->getId() => [
-                        'team' => $matchCurrent->getHomeTeam(),
-                    ],
-                    $matchCurrent->getAwayTeam()->getId() => [
-                        'team' => $matchCurrent->getAwayTeam(),
-                    ],
-                ],
-            ];
-            foreach ($studentTeams as $team) {
-                $teamId = $team->getTeam()->getId();
-                if ($teamId == $matchCurrent->getHomeTeam()->getId()) {
-                    $matches[$matchCurrent->getId()]["home"] = true;
-                }
-                if ($teamId == $matchCurrent->getAwayTeam()->getId()) {
-                    $matches[$matchCurrent->getId()]["away"] = true;
-                }
+        /** @var Collection|Match[] $all_matches */
+        $all_matches = $home_matches->mergeUnique($away_matches, 'id');
+
+        // Filter matches, and link teams which now contain relevant players
+        foreach ($all_matches as $match) {
+            if ($includeHistorical || $match->getStartAt()->isFuture()) {
+                $matches[$match->getId()] = $match;
+            } else {
+                continue;
+            }
+
+            // Can we link a home team ?
+            if ($teams[$match->getHomeTeam()->getId()]) {
+                $match->setHomeTeam($teams[$match->getHomeTeam()->getId()]);
+            }
+
+            // Can we link an away team ?
+            if ($teams[$match->getAwayTeam()->getId()]) {
+                $match->setAwayTeam($teams[$match->getAwayTeam()->getId()]);
             }
         }
 
-        return [
-            'user'      => $user,
-            'role'      => 'student',
-            'matches'   => $matches
-        ];
+        return $this->sortMatches($matches);
     }
 
+
     /**
-     * @param int $teamId
-     * @return array
+     * @param int  $teamId
+     * @param bool $includeHistorical Whether to also return matches that have been played
+     * @return Collection|Match[]
      */
-    public function getTeamData($teamId)
+    public function getTeamMatches($teamId, $includeHistorical)
     {
-        if ($teamId == 0) {
-            return [];
+        /** @var Collection|Match[] $matches */
+        $matches = new Collection();
+        if (!$teamId) {
+            return $matches;
         }
-
-        // Get current users role
-
-        $matches = [];
 
         // Get the team we are looking at
 
@@ -236,69 +168,46 @@ class ComponentDelegate
         $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $team->getId());
         $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $team->getId());
 
-        // Whack all of the matches into an array
+        $all_matches = $home_matches->mergeUnique($away_matches, 'id');
 
-        /** @var Match $match */
-        foreach ($home_matches as $match) {
-            if ($match->getStartAt()->isFuture()) {
-                $matches[] = $this->loadExternals($match);
+        // Filter matches
+        foreach ($all_matches as $match) {
+            if ($includeHistorical || $match->getStartAt()->isFuture()) {
+                $matches[$match->getId()] = $match;
             }
         }
 
-        foreach ($away_matches as $match) {
-            if ($match->getStartAt()->isFuture()) {
-                $matches[] = $this->loadExternals($match);
-            }
-        }
-
-        return [
-            'teamId'  => $teamId,
-            'matches' => $this->sortMatches($matches),
-        ];
-    }
-
-
-    /**
-     * @param $teamPlayers
-     * @return Match[]
-     */
-    public function getMatches($teamPlayers) {
-        $matches = [];
-
-        /** @var TeamPlayer $teamPlayer */
-        foreach ($teamPlayers as $teamPlayer) {
-
-            // Get all home and away matches for the current team
-            $home_matches = $this->getMatchMapper()->findByColumn('home_team_id', $teamPlayer->getTeam()->getId());
-            $away_matches = $this->getMatchMapper()->findByColumn('away_team_id', $teamPlayer->getTeam()->getId());
-
-            // Whack all of the matches into an array
-            /** @var Match $match */
-            foreach ($home_matches as $match) {
-                if ($match->getStartAt()->isFuture()) {
-                    $matches[] = $this->loadExternals($match);
+        // Are we getting matches that have been played ?
+        if ($includeHistorical) {
+            $playedMatchIds = [];
+            foreach ($matches as $match) {
+                // Has the match been played ?
+                if ($match->getStartAt()->isPast()) {
+                    $playedMatchIds[] = $match->getId();
                 }
             }
+            /** @var Collection|Result[] $results */
+            $results = $this->getResultMapper()->findByColumnList(['match_id' => $playedMatchIds]);
 
-            foreach ($away_matches as $match) {
-                if ($match->getStartAt()->isFuture()) {
-                    $matches[] = $this->loadExternals($match);
-                }
+            foreach ($results as $result) {
+                $matches[$result->getMatch()->getId()]->getResults()[$result->getTeam()->getId()] = $result;
             }
         }
 
         return $this->sortMatches($matches);
     }
 
+
     /**
      * Sort matches chronologically
      *
-     * @param Match[] $matches
-     * @return Match[]
+     * @param Collection|Match[] $matches
+     * @return Collection|Match[]
      */
-    public function sortMatches(array $matches) {
+    public function sortMatches(Collection $matches)
+    {
         // Sort matches by date order
-        usort($matches, function($a, $b) {
+        $matches->sortByCallback(function ($a, $b) {
             /** @var Match $a */
             /** @var Match $b */
             return ($a->getStartAt()->compare($b->getStartAt()));
@@ -307,33 +216,7 @@ class ComponentDelegate
         return $matches;
     }
 
-    /**
-     * Load external school names
-     * @param Match $match
-     * @return mixed
-     */
-    public function loadExternals($match) {
-        if ($match->getAwayTeam()->getId() == null) {
-            $match->getAwayTeam()->setName(
-                $this->getSchoolTagCloudMapper()->getTagName($match->getAwaySchoolId())
-            );
-        }
-
-        if ($match->getHomeTeam()->getId() == null) {
-            $match->getHomeTeam()->setName(
-                $this->getSchoolTagCloudMapper()->getTagName($match->getHomeSchoolId())
-            );
-        }
-
-        $match->getDivision()->getSport()->setName(
-            $this->getSportMapper()->findById($match->getDivision()->getSport()->getId())->getName()
-        );
-
-        return $match;
-    }
-
-    /**
-     * Here be the getters/setters, nothing to see here ¯\_(ツ)_/¯
+    /* Here be the getters/setters, nothing to see here ¯\_(ツ)_/¯
      */
 
     /**
@@ -346,11 +229,29 @@ class ComponentDelegate
 
     /**
      * @param  TeamPlayerMapper $teamPlayerMapper
-     * @return $this
+     * @return static
      */
     public function setTeamPlayerMapper(TeamPlayerMapper $teamPlayerMapper)
     {
         $this->teamPlayerMapper = $teamPlayerMapper;
+        return $this;
+    }
+
+    /**
+     * @return TeamParticipantMapper
+     */
+    protected function getTeamParticipantMapper()
+    {
+        return $this->teamParticipantMapper;
+    }
+
+    /**
+     * @param TeamParticipantMapper $teamParticipantMapper
+     * @return static
+     */
+    protected function setTeamParticipantMapper(TeamParticipantMapper $teamParticipantMapper)
+    {
+        $this->teamParticipantMapper = $teamParticipantMapper;
         return $this;
     }
 
@@ -364,7 +265,7 @@ class ComponentDelegate
 
     /**
      * @param  TeamMapper $teamMapper
-     * @return $this
+     * @return static
      */
     public function setTeamMapper(TeamMapper $teamMapper)
     {
@@ -382,139 +283,29 @@ class ComponentDelegate
 
     /**
      * @param MatchMapper $matchMapper
+     * @return static
      */
     public function setMatchMapper($matchMapper)
     {
         $this->matchMapper = $matchMapper;
-    }
-
-    /**
-     * @return SportMapper
-     */
-    protected function getSportMapper()
-    {
-        return $this->sportMapper;
-    }
-
-    /**
-     * @param SportMapper $sportMapper
-     */
-    protected function setSportMapper($sportMapper)
-    {
-        $this->sportMapper = $sportMapper;
-    }
-
-    /**
-     * @return ItineraryItemMapper
-     */
-    public function getItineraryItemMapper()
-    {
-        return $this->itineraryItemMapper;
-    }
-
-    /**
-     * @param ItineraryItemMapper $itineraryItemMapper
-     */
-    public function setItineraryItemMapper($itineraryItemMapper)
-    {
-        $this->itineraryItemMapper = $itineraryItemMapper;
-    }
-
-    /**
-     * @return VenueMapper
-     */
-    public function getVenueMapper()
-    {
-        return $this->venueMapper;
-    }
-
-    /**
-     * @param VenueMapper $venueMapper
-     */
-    public function setVenueMapper($venueMapper)
-    {
-        $this->venueMapper = $venueMapper;
-    }
-
-    /**
-     * @return UserMapper
-     */
-    public function getUserMapper()
-    {
-        return $this->userMapper;
-    }
-
-    /**
-     * @param  UserMapper $userMapper
-     * @return $this
-     */
-    public function setUserMapper($userMapper)
-    {
-        $this->userMapper = $userMapper;
         return $this;
     }
 
     /**
-     * @return FolderMapper
+     * @return ResultMapper
      */
-    public function getFolderMapper()
+    public function getResultMapper()
     {
-        return $this->folderMapper;
+        return $this->resultMapper;
     }
 
     /**
-     * @param  FolderMapper $folderMapper
-     * @return $this
+     * @param ResultMapper $resultMapper
+     * @return static
      */
-    public function setFolderMapper($folderMapper)
+    public function setResultMapper($resultMapper)
     {
-        $this->folderMapper = $folderMapper;
+        $this->resultMapper = $resultMapper;
         return $this;
-    }
-
-    /**
-     * @return DivisionMapper
-     */
-    protected function getDivisionMapper()
-    {
-        return $this->divisionMapper;
-    }
-
-    /**
-     * @param DivisionMapper $divisionMapper
-     */
-    protected function setDivisionMapper($divisionMapper)
-    {
-        $this->divisionMapper = $divisionMapper;
-    }
-
-    /**
-     * @return TagCloudMapper
-     */
-    protected function getSchoolTagCloudMapper()
-    {
-        return $this->schoolTagCloudMapper;
-    }
-
-    /**
-     * @param TagCloudMapper $schoolTagCloudMapper
-     */
-    protected function setSchoolTagCloudMapper($schoolTagCloudMapper)
-    {
-        $this->schoolTagCloudMapper = $schoolTagCloudMapper;
-    }
-
-    /**
-     * @param SitePage $sitepage
-     */
-    protected function setSitePage(SitePage $sitepage){
-        $this->sitepage = $sitepage;
-    }
-
-    /**
-     * @return SitePage
-     */
-    protected function getSitePage(){
-        return $this->sitepage;
     }
 }

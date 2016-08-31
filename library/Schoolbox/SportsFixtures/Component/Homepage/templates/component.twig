@@ -8,15 +8,17 @@
                 <li>
                     <div class="list-item">
                         <div class="card small-12">
+
                             {% if match.name|length %}
-                                <h3>{{ match.name }}: {{ matchHeading.generateWithResultLink(match) }}</h3>
+                                <h3>{{ match.name }}: {{ matchHeading.generateWithStatusLink(match) }}</h3>
                             {% else %}
-                                <h3>{{ matchHeading.generateWithResultLink(match) }}</h3>
+                                <h3>{{ matchHeading.generateWithStatusLink(match) }}</h3>
                             {% endif %}
 
                             <p class="meta">
                                 <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span>
                             </p>
+
                         </div>
                     </div>
                 </li>

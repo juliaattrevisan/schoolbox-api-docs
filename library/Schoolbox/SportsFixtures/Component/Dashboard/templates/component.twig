@@ -8,31 +8,40 @@
                 <li>
                     <div class="list-item">
                         <div class="card small-12">
-                            {% if match.match.name|length %}
-                                <h3>{{ match.match.name }}: {{ matchHeading.generateWithResultLink(match.match) }}</h3>
+                            {% if match.name|length %}
+                                <h3>{{ match.name }}: {{ matchHeading.generateWithResultLink(match) }}</h3>
                             {% else %}
-                                <h3>{{ matchHeading.generateWithResultLink(match.match) }}</h3>
+                                <h3>{{ matchHeading.generateWithResultLink(match) }}</h3>
                             {% endif %}
 
                             <p class="meta">
-                                <span data-tooltip title="{{ match.match.startAt.getLong }}">{{ match.match.startAt.getRelativeTime }}</span>
+                                <span data-tooltip title="{{ match.startAt.getLong }}">{{ match.startAt.getRelativeTime }}</span>
                             </p>
 
-                            {% if role == 'parent' %}
-                                {% for team in match.teams %}
-                                    {% if team.children is not empty %}
-                                        <p class="meta">
-                                            {% for child in team.children %}
-                                                {% if not loop.first and not loop.last %},{% endif %}
-                                                {% if loop.last and not loop.first %}and{% endif %}
-                                                <a href="/search/user/{{ child.getId }}">{{ child.formatName }}</a>
+                            {% if user.role.type == 'parent' %}
+                                {% if match.homeTeam.players | length %}
+                                    <p class="meta">
+                                        {% for child in match.homeTeam.players %}
+                                            {% if not loop.first and not loop.last %},{% endif %}
+                                            {% if loop.last and not loop.first %}and{% endif %}
+                                            <a href="/search/user/{{ child.getId }}">{{ child.formatName }}</a>
+                                            {% if loop.last and not loop.first %}are{% endif %}
+                                            {% if loop.last and loop.first %}is{% endif %}
+                                        {% endfor %} playing for {{ match.homeTeam.name }}
+                                    </p>
+                                {% endif %}
 
-                                                {% if loop.last and not loop.first %}are{% endif %}
-                                                {% if loop.last and loop.first %}is{% endif %}
-                                            {% endfor %} playing for {{ team.team.name }}
-                                        </p>
-                                    {% endif %}
-                                {% endfor %}
+                                {% if match.awayTeam.players | length %}
+                                    <p class="meta">
+                                        {% for child in match.awayTeam.players %}
+                                            {% if not loop.first and not loop.last %},{% endif %}
+                                            {% if loop.last and not loop.first %}and{% endif %}
+                                            <a href="/search/user/{{ child.getId }}">{{ child.formatName }}</a>
+                                            {% if loop.last and not loop.first %}are{% endif %}
+                                            {% if loop.last and loop.first %}is{% endif %}
+                                        {% endfor %} playing for {{ match.awayTeam.name }}
+                                    </p>
+                                {% endif %}
                             {% endif %}
                         </div>
                     </div>
@@ -43,9 +52,9 @@
 {% else %}
     <div class="content">
         <p>
-            {% if role == 'parent' %}
+            {% if user.role.type == 'parent' %}
                 Your children do not have any upcoming matches scheduled.
-            {% elseif role == 'student' %}
+            {% elseif user.role.type == 'student' %}
                 You have no upcoming matches scheduled.
             {% endif %}
         </p>

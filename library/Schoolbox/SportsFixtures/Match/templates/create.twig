@@ -96,10 +96,10 @@
                 id: {{ match.homeTeam.id }},
                 name: "{{ match.homeTeam.name }}"
             },
-            {% elseif match.homeSchoolId -%}
+            {% elseif match.homeSchool.Id -%}
             value: {
-                id: "{{ tagPrefix }}{{ match.homeSchoolId }}",
-                name: "{{ tags.home }}"
+                id: "{{ tagPrefix }}{{ match.homeSchool.id }}",
+                name: "{{ match.homeSchool.name }}"
             },
             {% endif -%}
             multiple: false,
@@ -131,10 +131,10 @@
                 id: {{ match.awayTeam.id }},
                 name: "{{ match.awayTeam.name }}"
             },
-            {% elseif match.awaySchoolId -%}
+            {% elseif match.awaySchool.id -%}
             value: {
-                id: "{{ tagPrefix }}{{ match.awaySchoolId }}",
-                name: "{{ tags.away }}"
+                id: "{{ tagPrefix }}{{ match.awaySchool.id }}",
+                name: "{{ match.awaySchool.name }}"
             },
             {% endif -%}
             multiple: false,

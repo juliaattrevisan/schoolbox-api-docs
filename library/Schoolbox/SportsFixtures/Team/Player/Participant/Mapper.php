@@ -21,6 +21,9 @@ use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
 use Schoolbox\SportsFixtures\Team\Player\Participant\Model as ParticipantPlayer;
 use Schoolbox\SportsFixtures\Match\Mapper as MatchMapper;
 
+/**
+ * @method Collection|ParticipantPlayer[] findByColumn($columnName, $columnValue, $options = array())
+ */
 class Mapper extends BaseMapper
 {
     /**

@@ -1,4 +1,6 @@
 <?php
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
 // The kernel contains the dependency injection engine.
 // If you inject the dependency injection engine into Sitepage,
 // it can use Twig to generate component content.
@@ -121,6 +123,8 @@ if (is_numeric($_REQUEST['cid'])) {
 
         if (is_object($instance)) {
             $componentConfigDefinitionMapper = Component_ConfigDefinitionMapper::getInstance();
+            $folderMapper = FolderMapper::getInstance();
+            $folder = $folderMapper->findById($config['cid']);
 
             $configDefinitionCollection = $componentConfigDefinitionMapper->findByColumn(
                 'component_definition_id', $instance->getDefinitionId()
@@ -131,7 +135,7 @@ if (is_numeric($_REQUEST['cid'])) {
             // Create a controller object for the config class to use when
             // dehydrating config values into database
             $cclass = $instance->getDefinition()->getClass();
-            /** @var Component_ControllerAbstract $controller */
+            /** @var Component_Homepage_ControllerAbstract $controller */
             $controller = new $cclass($instance, new \Schoolbox\User(), $page);
             // No need to execute at all just to set configuration,
             // and doing so can break components that rely on context
@@ -141,7 +145,7 @@ if (is_numeric($_REQUEST['cid'])) {
             foreach ($configDefinitionCollection as $confD) {
                 $key = $confD->getKey();
                 if (isset($config[$key])) {
-                    $configItem = Component_Config_Factory::build($key, $category, $config);
+                    $configItem = Component_Config_Factory::build($key, $folder, $config);
                     $value      = $configItem->dehydrate($config[$key], $controller);
 
                     // this should be 1:1 relation, so return only the first instance of this definition
@@ -171,10 +175,7 @@ if (is_numeric($_REQUEST['cid'])) {
                 // Just refetch the instance
                 $instance   = reset($componentInstanceMapper->findByInstanceId($instance->getId()));
                 $controller = new $cclass($instance, new \Schoolbox\User(), $page);
-
-                $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
-                $folder = $folderMapper->findById($_GET['cid']);
-                $renderer = new Component_Renderer();
+                $renderer   = new Component_Renderer();
                 $renderer->renderHomepageComponent($folder, $controller);
                 exit;
             } else {

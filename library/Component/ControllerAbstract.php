@@ -9,10 +9,11 @@
  *
  */
 
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User;
 
 abstract class Component_ControllerAbstract
 {
@@ -21,7 +22,7 @@ abstract class Component_ControllerAbstract
     const EMPTY_STATE_REASON_UNKNOWN = 0;
 
     /** @const int EMPTY_STATE_REASON_DENIED. No READ+ access to data source folder */
-    const EMPTY_STATE_REASON_DENIED  = 1;
+    const EMPTY_STATE_REASON_DENIED = 1;
 
     /** @const int EMPTY_STATE_REASON_DELETED. Component's data source folder is deleted */
     const EMPTY_STATE_REASON_DELETED = 2;
@@ -43,16 +44,16 @@ abstract class Component_ControllerAbstract
     protected $sitepage;
 
     /**
-     * The category the component is on, if any.
+     * The folder the component is on, if any.
      *
-     * @var \Schoolbox\Resource\Folder\Model
+     * @var Folder|null
      */
     protected $context;
 
     /**
      * The folder the component pulls data from, if any.
      *
-     * @var \Schoolbox\Resource\Folder\Model
+     * @var Folder
      */
     protected $source;
 
@@ -127,22 +128,23 @@ abstract class Component_ControllerAbstract
     protected $errorMapper;
 
     /**
-    * Constructor
-    *
-    * @param Component_Instance $instance
-    * @param \Schoolbox\User $user
-    * @param SitePage $sitepage
-    */
-    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage)
+     * Constructor
+     *
+     * @param Component_Instance $instance
+     * @param User $user
+     * @param SitePage $sitepage
+     */
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
-        $this->instance = $instance;
-        $this->user     = $user;
-        $this->sitepage = $sitepage;
-        $this->config   = $instance->getConfigArray();
-        $this->context  = new FolderModel();
-        $this->source   = new FolderModel();
-        $this->setFolderMapper(FolderMapper::getInstance());
-        $this->setErrorMapper(ErrorMapper::getInstance());
+        $this
+            ->setInstance($instance)
+            ->setUser($user)
+            ->setSitePage($sitepage)
+            ->setConfig($instance->getConfigArray())
+            ->setFolderMapper(FolderMapper::getInstance())
+            ->setErrorMapper(ErrorMapper::getInstance())
+            ->setContext($this->getFolderMapper()->createModel())
+            ->setSource($this->getFolderMapper()->createModel());
     }
 
     /**
@@ -156,20 +158,20 @@ abstract class Component_ControllerAbstract
      */
     public function setup($context = null, array $config = array())
     {
-        $this->context = $context;
-        $this->config  = $config;
+        $this->setContext($context);
+        $this->setConfig($config);
 
-        if($this->isUsingAltSource()){
+        if ($this->isUsingAltSource()) {
             // remove any non-numeric values from the source config (legacy support)
             $folderId = preg_replace('#[/a-zA-Z]#', '', $this->getConfig('src'));
 
             // source may be deleted
             try {
                 $source = $this->getFolderMapper()->findById($folderId);
-            } catch(\Schoolbox\Mapper\Exception\Deleted $e){
+            } catch (\Schoolbox\Mapper\Exception\Deleted $e) {
                 $source = $e->getDeletedObject();
             }
-            if(!($source instanceof FolderModel)){
+            if (!($source instanceof Folder)) {
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
             }
             $this->setSource($source);
@@ -194,7 +196,8 @@ abstract class Component_ControllerAbstract
      *
      * @return bool Whether to continue on and attempt Component render
      */
-    public function execute(){
+    public function execute()
+    {
         // Default to no action
         return true;
     }
@@ -235,7 +238,8 @@ abstract class Component_ControllerAbstract
     {
         if (empty($templateName)) {
             /* Break apart class name by underscores, get only last segment, remove last 10 characters then send it to lowercase */
-            $templateName = ucfirst(substr(array_pop(explode('_', $this->getInstance()->getDefinition()->getClass())), 0, -10));
+            $templateName = ucfirst(substr(array_pop(explode('_', $this->getInstance()->getDefinition()->getClass())),
+                0, -10));
         }
 
         if (empty($templatePath)) {
@@ -346,7 +350,8 @@ abstract class Component_ControllerAbstract
      * @param $config
      * @return array
      */
-    protected function determineConfigPermissions($config) {
+    protected function determineConfigPermissions($config)
+    {
         if (is_array($config) && count($config)) {
             // have write access
             if ($this->contextPermission > READ_ACCESS) {
@@ -402,19 +407,22 @@ abstract class Component_ControllerAbstract
      *
      * @return string
      */
-    protected function determineTemplate() {
+    protected function determineTemplate()
+    {
         if ($configTemplate = $this->getConfigurationTemplate()) {
             return $configTemplate;
-        }
-        /* Admin area; used when configuring dashboard/homepage/eportfolio layouts
+        } /* Admin area; used when configuring dashboard/homepage/eportfolio layouts
          */
-        else if (in_array($this->instance->getModule(), array('homepage_template', 'eportfolio_template'))) {
-            return 'component/config/_templatewrapper.html';
-        }
-        /* Public-facing pages for dashboard, homepage, eportfolio
+        else {
+            if (in_array($this->instance->getModule(), array('homepage_template', 'eportfolio_template'))) {
+                return 'component/config/_templatewrapper.html';
+            } /* Public-facing pages for dashboard, homepage, eportfolio
          */
-        else if (in_array($this->instance->getModule(), array('dashboard', 'homepage', 'eportfolio'))) {
-            return 'component/config/' . $this->instance->getModule() . '_wrapper.html';
+            else {
+                if (in_array($this->instance->getModule(), array('dashboard', 'homepage', 'eportfolio'))) {
+                    return 'component/config/' . $this->instance->getModule() . '_wrapper.html';
+                }
+            }
         }
     }
 
@@ -425,7 +433,8 @@ abstract class Component_ControllerAbstract
      *
      * @param $targetHandle
      */
-    protected function setupConfigRendering($targetHandle) {
+    protected function setupConfigRendering($targetHandle)
+    {
 
         /* Explicitly clear configTpl - repeated assignations won't work
          * and will erroneously use _wrapper.html
@@ -475,7 +484,8 @@ abstract class Component_ControllerAbstract
      * @param $is_for_template
      * @return int
      */
-    protected function renderConfigElements($processConfig, $is_for_template) {
+    protected function renderConfigElements($processConfig, $is_for_template)
+    {
         // it's possible hiding configs will hide all; check for this and hide the config dropdown if need be
         $configCount = 0;
 
@@ -492,8 +502,7 @@ abstract class Component_ControllerAbstract
             if ($key == 'componentname') {
                 if (!strlen($params['value'])) {
                     $componentname = $this->getComponentName();
-                }
-                else {
+                } else {
                     $componentname = $params['value'];
                 }
 
@@ -565,8 +574,7 @@ abstract class Component_ControllerAbstract
             $this->renderConfigElements(false, $is_for_template);
             $this->sitepage->parse($targetHandle, 'configTpl', false);
             return false;
-        }
-        else {
+        } else {
             /* If you want to process the config, then do so and display it
              * Also provide a triangle so you can alter them through the ui
              *
@@ -615,10 +623,10 @@ abstract class Component_ControllerAbstract
      *                               Just pass $templateHandle from
      *                               $this->renderTemplate($templateHandle).
      * @param string $twigTemplate   The path to a Twig template.
-     * @param array  $twigData       Data to pass into the Twig template.
-     * @param bool   $renderHeader   Set to false if you don't want the PHPLib
+     * @param array $twigData        Data to pass into the Twig template.
+     * @param bool $renderHeader     Set to false if you don't want the PHPLib
      *                               controlled header to show.
-     * @param bool   $renderConfig   Set to false if you don't want the PHPLib
+     * @param bool $renderConfig     Set to false if you don't want the PHPLib
      *                               controlled configuration to show.
      *                               (Dashboard components show the collapse
      *                                controls if this is true.)
@@ -671,14 +679,17 @@ abstract class Component_ControllerAbstract
      *
      * @return bool
      */
-    protected function renderSourceUnavailable(){
-        if($this->hasContextWriteAccess()) {
-            if(!$this->hasReadAccess()) {
+    protected function renderSourceUnavailable()
+    {
+        if ($this->hasContextWriteAccess()) {
+            if (!$this->hasReadAccess()) {
                 $this->renderAltSourceDenied();
-            } else if($this->getSource()->isDeleted()) {
-                $this->renderAltSourceDeleted();
             } else {
-                $this->renderEmptyState();
+                if ($this->getSource()->isDeleted()) {
+                    $this->renderAltSourceDeleted();
+                } else {
+                    $this->renderEmptyState();
+                }
             }
             return true;
         } else {
@@ -695,14 +706,17 @@ abstract class Component_ControllerAbstract
      * @param string $templateHandle
      * @return bool
      */
-    protected function renderSourceUnavailableTwig($templateHandle){
-        if($this->hasContextWriteAccess()) {
-            if(!$this->hasReadAccess()) {
+    protected function renderSourceUnavailableTwig($templateHandle)
+    {
+        if ($this->hasContextWriteAccess()) {
+            if (!$this->hasReadAccess()) {
                 return $this->renderTwigAltSourceDenied($templateHandle);
-            } else if($this->getSource()->isDeleted()) {
-                return $this->renderTwigAltSourceDeleted($templateHandle);
             } else {
-                return $this->renderTwigEmptyState($templateHandle);
+                if ($this->getSource()->isDeleted()) {
+                    return $this->renderTwigAltSourceDeleted($templateHandle);
+                } else {
+                    return $this->renderTwigEmptyState($templateHandle);
+                }
             }
         } else {
             return false;
@@ -714,7 +728,8 @@ abstract class Component_ControllerAbstract
      * @param string $templateHandle
      * @return bool
      */
-    protected function renderTwigAltSourceDeleted($templateHandle){
+    protected function renderTwigAltSourceDeleted($templateHandle)
+    {
         return $this->renderTwigEmptyState($templateHandle, self::EMPTY_STATE_REASON_DELETED);
     }
 
@@ -723,7 +738,8 @@ abstract class Component_ControllerAbstract
      * @param string $templateHandle
      * @return bool
      */
-    protected function renderTwigAltSourceDenied($templateHandle){
+    protected function renderTwigAltSourceDenied($templateHandle)
+    {
         return $this->renderTwigEmptyState($templateHandle, self::EMPTY_STATE_REASON_DENIED);
     }
 
@@ -737,7 +753,8 @@ abstract class Component_ControllerAbstract
      * @param int $reason Why we are unable to display this component's content.
      * @return bool
      */
-    protected function renderTwigEmptyState($templateHandle, $reason = self::EMPTY_STATE_REASON_UNKNOWN){
+    protected function renderTwigEmptyState($templateHandle, $reason = self::EMPTY_STATE_REASON_UNKNOWN)
+    {
 
         $isAltSourceDenied  = self::EMPTY_STATE_REASON_DENIED  === $reason;
         $isAltSourceDeleted = self::EMPTY_STATE_REASON_DELETED === $reason;
@@ -757,7 +774,8 @@ abstract class Component_ControllerAbstract
      * Convenience method for PHPLib-based Components to render the 'AltSourceDenied' empty state
      * @return bool
      */
-    protected function renderAltSourceDenied(){
+    protected function renderAltSourceDenied()
+    {
         return $this->renderEmptyState(self::EMPTY_STATE_REASON_DENIED);
     }
 
@@ -765,7 +783,8 @@ abstract class Component_ControllerAbstract
      * Convenience method for PHPLib-based Components to render the 'AltSourceDeleted' empty state
      * @return bool
      */
-    protected function renderAltSourceDeleted(){
+    protected function renderAltSourceDeleted()
+    {
         return $this->renderEmptyState(self::EMPTY_STATE_REASON_DELETED);
     }
 
@@ -778,7 +797,8 @@ abstract class Component_ControllerAbstract
      * @param int $reason Why we are unable to display this component's content.
      * @return true
      */
-    protected function renderEmptyState($reason = self::EMPTY_STATE_REASON_UNKNOWN){
+    protected function renderEmptyState($reason = self::EMPTY_STATE_REASON_UNKNOWN)
+    {
 
         $isAltSourceDenied  = self::EMPTY_STATE_REASON_DENIED  === $reason;
         $isAltSourceDeleted = self::EMPTY_STATE_REASON_DELETED === $reason;
@@ -790,39 +810,11 @@ abstract class Component_ControllerAbstract
             'isAltSourceDeleted'  => $isAltSourceDeleted,
         );
         $this->setVar('SOURCE_FOLDER_UNAVAILABLE', $this->sitepage->getTwig()->render($twigTemplate, $twigData));
-        $this->parse('source_folder_deleted_block','source_folder_deleted');
+        $this->parse('source_folder_deleted_block', 'source_folder_deleted');
         $this->setVar('source_folder_exists_block', '');
         return true;
     }
 
- 
-    /**
-     * @return \Schoolbox\Resource\Folder\Model
-     */
-    public function getContext()
-    {
-        return $this->context;
-    }
-
-    /**
-     * @param string $key
-     * @param string $attr
-     * @return mixed
-     */
-    public function getConfig($key = '', $attr = 'value')
-    {
-        if ($key) {
-            return isset($this->config[$key][$attr]) ? $this->config[$key][$attr] : false;
-        }
-
-        $return = array();
-
-        foreach ($this->config as $key => $item) {
-            $return[$key] = $item['value'];
-        }
-
-        return $return;
-    }
 
     /**
      * @param $key
@@ -833,58 +825,15 @@ abstract class Component_ControllerAbstract
         return isset($this->config[$key]) ? true : false;
     }
 
-    public function getSortFields()
-    {
-        return $this->sortFields;
-    }
 
-    public function getFilterFields()
-    {
-        return $this->filterFields;
-    }
-
+    /**
+     * @return Template
+     */
     public function getPageTemplate()
     {
-        return $this->sitepage->template;
+        return $this->getSitePage()->template;
     }
 
-
-    /**
-     * Public accessor for $this->instance - use this instead of magic method
-     * obscuring a protected variable. (wat)
-     *
-     * @param \Component_Instance $instance
-     */
-    public function setInstance($instance)
-    {
-        $this->instance = $instance;
-    }
-
-    /**
-     * @return \Component_Instance
-     */
-    public function getInstance()
-    {
-        return $this->instance;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMaximumPermission()
-    {
-        return $this->maximumPermission;
-    }
-
-    /**
-     * @param  int $maximumPermission
-     * @return $this
-     */
-    public function setMaximumPermission($maximumPermission)
-    {
-        $this->maximumPermission = $maximumPermission;
-        return $this;
-    }
 
     /**
      * Checks if the user's permission on this component is at least read level.
@@ -956,12 +905,157 @@ abstract class Component_ControllerAbstract
         return intval($this->getConfig("src")) > 0;
     }
 
+
+    /**
+     * Return whether we are able to render this component's content for current user.
+     * False if lacks READ+ permission on content, or because content is deleted.
+     * @return bool
+     */
+    public function isSourceRenderable()
+    {
+        if (!$this->hasReadAccess() || ($this->isUsingAltSource() && $this->getSource()->isDeleted())) {
+            return false;
+        }
+        return true;
+    }
+
+
+
+
+
+    /*
+     * Getters / Setters
+     */
+
+    /**
+     * @return \Schoolbox\Resource\Folder\Model
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
+
+    /**
+     * @param Folder|null $context
+     * @return static
+     */
+    protected function setContext(Folder $context = null)
+    {
+        $this->context = $context;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    protected function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param User $user
+     * @return static
+     */
+    protected function setUser(User $user)
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+
+    /**
+     * @param string $key
+     * @param string $attr
+     * @return mixed
+     */
+    public function getConfig($key = '', $attr = 'value')
+    {
+        if ($key) {
+            return isset($this->config[$key][$attr]) ? $this->config[$key][$attr] : false;
+        }
+
+        $return = array();
+
+        foreach ($this->config as $key => $item) {
+            $return[$key] = $item['value'];
+        }
+
+        return $return;
+    }
+
+    /**
+     * @param array $config
+     * @return static
+     */
+    protected function setConfig(array $config)
+    {
+        $this->config = $config;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getSortFields()
+    {
+        return $this->sortFields;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFilterFields()
+    {
+        return $this->filterFields;
+    }
+
+    /**
+     * @return \Component_Instance
+     */
+    public function getInstance()
+    {
+        return $this->instance;
+    }
+
+    /**
+     * Public accessor for $this->instance - use this instead of magic method
+     * obscuring a protected variable. (wat)
+     *
+     * @param \Component_Instance $instance
+     * @return static
+     */
+    public function setInstance($instance)
+    {
+        $this->instance = $instance;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaximumPermission()
+    {
+        return $this->maximumPermission;
+    }
+
+    /**
+     * @param  int $maximumPermission
+     * @return static
+     */
+    public function setMaximumPermission($maximumPermission)
+    {
+        $this->maximumPermission = $maximumPermission;
+        return $this;
+    }
+
     /**
      * Gets the Folder, if any, this component draws its data from
      *
      * @return Schoolbox\Resource\Folder\Model
      */
-    public function getSource(){
+    public function getSource()
+    {
         return $this->source;
     }
 
@@ -969,22 +1063,53 @@ abstract class Component_ControllerAbstract
      * Sets the Folder, if any, this component draws its data from
      *
      * @param Schoolbox\Resource\Folder\Model $source
+     * @return static
      */
-    public function setSource($source){
+    public function setSource($source)
+    {
         $this->source = $source;
+        return $this;
     }
 
     /**
-     * Return whether we are able to render this component's content for current user.
-     * False if lacks READ+ permission on content, or because content is deleted.
-     * @return bool
+     * Get component name default
+     *
+     * @return string
      */
-    public function isSourceRenderable(){
-        if(!$this->hasReadAccess() || ($this->isUsingAltSource() && $this->getSource()->isDeleted())){
-            return false;
+    protected function getComponentName()
+    {
+        /* Special case for Manage Folders and any other
+         * arbitrarily-constructed components
+         */
+        if (!$this->instance->getId()) {
+            return '';
         }
-        return true;
+
+        /* Return db version of the name if class var is empty
+        * or not set
+        */
+        if (!strlen($this->componentName)) {
+            return $this->instance->getDefinition()->getName();
+        }
+
+        /* Otherwise allow a per-controller hardcoded version
+         */
+        return $this->componentName;
     }
+
+    /**
+     * Assign component name default
+     *
+     * @param $componentName
+     * @return string
+     * @return static
+     */
+    protected function setComponentName($componentName)
+    {
+        $this->componentName = $componentName;
+        return $this;
+    }
+
 
     /**
      * @return Schoolbox\Resource\Folder\Mapper
@@ -1023,52 +1148,6 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Assign component name default
-     *
-     * @param $componentName
-     * @return string
-     */
-    protected function setComponentName($componentName)
-    {
-        $this->componentName = $componentName;
-    }
-    /**
-     * Get component name default
-     *
-     * @return string
-     */
-    protected function getComponentName()
-    {
-        /* Special case for Manage Folders and any other
-         * arbitrarily-constructed components
-         */
-        if (!$this->instance->getId()) {
-            return '';
-        }
-
-        /* Return db version of the name if class var is empty
-        * or not set
-        */
-        if (!strlen($this->componentName)) {
-            return $this->instance->getDefinition()->getName();
-        }
-
-        /* Otherwise allow a per-controller hardcoded version
-         */
-        return $this->componentName;
-    }
-
-    /**
-     * Assign component href default
-     *
-     * @param $componentHref
-     */
-    protected function setComponentHref($componentHref)
-    {
-        $this->componentHref = $componentHref;
-    }
-
-    /**
      * Get component href
      *
      * @return string
@@ -1080,4 +1159,36 @@ abstract class Component_ControllerAbstract
         }
         return $this->componentHref;
     }
+
+    /**
+     * Assign component href default
+     *
+     * @param $componentHref
+     * @return static
+     */
+    protected function setComponentHref($componentHref)
+    {
+        $this->componentHref = $componentHref;
+        return $this;
+    }
+
+    /**
+     * @return SitePage
+     */
+    protected function getSitePage()
+    {
+        return $this->sitepage;
+    }
+
+    /**
+     * @param SitePage $sitePage
+     * @return static
+     */
+    protected function setSitePage(SitePage $sitePage)
+    {
+        $this->sitepage = $sitePage;
+        return $this;
+    }
+
+
 }

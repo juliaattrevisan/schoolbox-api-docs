@@ -4,14 +4,14 @@
  # hyperlink it
  #}
 {% macro generateWithResultLink(match) %}
-
+{% spaceless %}
     {# Home Team #}
     {% if match.homeTeam.id %}
         {% set homeTeamData %}
             <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}">{{ match.homeTeam.name }}</a>
         {% endset %}
     {% else %}
-        {% set homeTeamData = match.homeTeam.name %}
+        {% set homeTeamData = match.homeSchool.name %}
     {% endif %}
 
     {# Away Team #}
@@ -20,10 +20,11 @@
             <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}">{{ match.awayTeam.name }}</a>
         {% endset %}
     {% else %}
-        {% set awayTeamData = match.awayTeam.name %}
+        {% set awayTeamData = match.awaySchool.name %}
     {% endif %}
 
     {{ homeTeamData|raw }} vs {{ awayTeamData|raw }}
+{% endspaceless %}
 {% endmacro %}
 
 
@@ -33,7 +34,7 @@
  # hyperlink it
  #}
 {% macro generateWithTeamLink(match) %}
-
+{% spaceless %}
     {# Home Team #}
     {% if match.homeTeam.url %}
         {% set homeTeamData %}
@@ -53,6 +54,7 @@
     {% endif %}
 
     {{ homeTeamData|raw }} vs {{ awayTeamData|raw }}
+{% endspaceless %}
 {% endmacro %}
 
 
@@ -63,7 +65,44 @@
  # hyperlink it
  #}
 {% macro generate(match) %}
+{% spaceless %}
     {{ match.homeTeam.name }} vs {{ match.awayTeam.name }}
+{% endspaceless %}
+{% endmacro %}
+
+
+{# Use to generate the text for Fixture Component List Item
+ #
+ # Links the Team name to results for the given team and match
+ #}
+{% macro generateWithStatusLink(match) %}
+{% spaceless %}
+    {# Home Team #}
+    {% if match.homeTeam.id %}
+        {% set homeTeamData %}
+            <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.homeTeam.id}) }}">{{ match.homeTeam.name }}</a>
+            {% if match.homeTeamResult %}
+                ({{ match.homeTeamResult.status.name }})
+            {% endif %}
+        {% endset %}
+    {% else %}
+        {% set homeTeamData = match.homeSchool.name %}
+    {% endif %}
+
+    {# Away Team #}
+    {% if match.awayTeam.id %}
+        {% set awayTeamData %}
+            <a href="{{ routeLookup('sportsfixturesResult.getResultForTeam', {contextId: match.id, teamId: match.awayTeam.id}) }}">{{ match.awayTeam.name }}</a>
+            {% if match.awayTeamResult %}
+                ({{ match.awayTeamResult.status.name }})
+            {% endif %}
+        {% endset %}
+    {% else %}
+        {% set awayTeamData = match.awaySchool.name %}
+    {% endif %}
+
+    {{ homeTeamData|raw }} vs {{ awayTeamData|raw }}
+{% endspaceless %}
 {% endmacro %}
 
 

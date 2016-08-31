@@ -12,7 +12,7 @@ use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use \Alaress_Date_Format;
 use Schoolbox\SportsFixtures\Match\Model as Match;
 use Schoolbox\SportsFixtures\Team\Model as Team;
-use Schoolbox\SportsFixtures\Status;
+use Schoolbox\SportsFixtures\Status\Model as Status;
 
 
 /**
@@ -34,7 +34,7 @@ class Model implements ISoftDeletable
     /** @var Team $team */
     protected $team;
 
-    /** @var Status\Model $status */
+    /** @var Status $status */
     protected $status;
 
     /** @var string */
@@ -60,7 +60,8 @@ class Model implements ISoftDeletable
      * @param int $id
      * @return self
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -68,7 +69,8 @@ class Model implements ISoftDeletable
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -121,7 +123,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @return Status\Model
+     * @return Status
      */
     public function getStatus()
     {
@@ -129,7 +131,7 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Status\Model $status
+     * @param Status $status
      * @return static
      */
     public function setStatus($status)
@@ -140,9 +142,10 @@ class Model implements ISoftDeletable
 
     /**
      * @param Alaress_Date_Format $createdAt
-     * @return self
+     * @return static
      */
-    public function setCreatedAt($createdAt) {
+    public function setCreatedAt($createdAt)
+    {
         $this->createdAt = $createdAt;
         return $this;
     }
@@ -150,15 +153,17 @@ class Model implements ISoftDeletable
     /**
      * @return Alaress_Date_Format $createdAt
      */
-    public function getCreatedAt() {
+    public function getCreatedAt()
+    {
         return $this->createdAt;
     }
 
     /**
      * @param Alaress_Date_Format $updatedAt
-     * @return self
+     * @return static
      */
-    public function setUpdatedAt($updatedAt) {
+    public function setUpdatedAt($updatedAt)
+    {
         $this->updatedAt = $updatedAt;
         return $this;
     }
@@ -166,7 +171,8 @@ class Model implements ISoftDeletable
     /**
      * @return Alaress_Date_Format
      */
-    public function getUpdatedAt() {
+    public function getUpdatedAt()
+    {
         return $this->updatedAt;
     }
 }

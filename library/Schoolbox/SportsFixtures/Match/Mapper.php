@@ -29,6 +29,10 @@ use Schoolbox\SportsFixtures\ItineraryItem\Model as ItineraryItem;
 use Schoolbox\SportsFixtures\ItineraryItem\Mapper as ItineraryItemMapper;
 use Schoolbox\SportsFixtures\Result\Model as Result;
 use Schoolbox\SportsFixtures\Result\Mapper as ResultMapper;
+use Schoolbox\SportsFixtures\Status\Model as Status;
+use Schoolbox\SportsFixtures\Status\Mapper as StatusMapper;
+use Schoolbox\SportsFixtures\School\Model as School;
+use Schoolbox\SportsFixtures\School\Mapper as SchoolMapper;
 use Schoolbox\Collection;
 
 /**
@@ -55,8 +59,8 @@ class Mapper extends BaseMapper
         $this->uses('start_at', self::TYPE_DATETIME);
         $this->joins('home_team_id', TeamMapper::class, 'id', null, null, 'homeTeam', 'home_team');
         $this->joins('away_team_id', TeamMapper::class, 'id', null, null, 'awayTeam', 'away_team');
-        $this->uses('home_school_id', self::TYPE_INTEGER);
-        $this->uses('away_school_id', self::TYPE_INTEGER);
+        $this->joins('home_school_id', SchoolMapper::class, 'id', null, null, 'homeSchool', 'home_school');
+        $this->joins('away_school_id', SchoolMapper::class, 'id', null, null, 'awaySchool', 'away_school');
         $this->uses('notes', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
@@ -78,9 +82,9 @@ class Mapper extends BaseMapper
             'other_key' => 'match_id',
         ]);
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE,       [ $this, 'saveItinerary' ]);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'deleteItineraryItems' ]);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'deleteResults' ]);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'saveItinerary']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteItineraryItems']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'deleteResults']);
     }
 
     /**
@@ -97,8 +101,8 @@ class Mapper extends BaseMapper
         foreach ($match->getItinerary() as $item) {
             $item->setMatch($match);
         }
-        
-        return $this->cascadeJoin('itinerary', [ 'match_id' => $match->getId() ], $match->getItinerary());
+
+        return $this->cascadeJoin('itinerary', ['match_id' => $match->getId()], $match->getItinerary());
     }
 
     /**
@@ -140,12 +144,14 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('home_team', 'h')},
                 {$this->getJoinColumnString('away_team', 'a')},
-                {$this->getJoinColumnString('division', 'd')},
-                {$this->getJoinColumnString('season', 's')},
-                {$this->getJoinColumnString('venue', 'v')},
-                {$this->getJoinColumnString('itinerary', 'i')},
-                {$this->getJoinColumnString('result', 'r')},
-                {$this->getJoinColumnString('result.status', 'rs')}
+				{$this->getJoinColumnString('division', 'd')},
+				{$this->getJoinColumnString('season', 's')},
+				{$this->getJoinColumnString('home_school', 'hs')},
+				{$this->getJoinColumnString('away_school', 'as')},
+				{$this->getJoinColumnString('venue', 'v')},
+				{$this->getJoinColumnString('itinerary', 'i')},
+				{$this->getJoinColumnString('result', 'r')},
+				{$this->getJoinColumnString('result.status', 'rs')}
         ";
     }
 
@@ -160,6 +166,8 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('away_team', null, 'a')}
             LEFT JOIN {$this->getJoinSql('division', null, 'd')}
             LEFT JOIN {$this->getJoinSql('season', null, 's')}
+            LEFT JOIN {$this->getJoinSql('home_school', null, 'hs')}
+            LEFT JOIN {$this->getJoinSql('away_school', null, 'as')}
             LEFT JOIN {$this->getJoinSql('venue', null, 'v')}
             LEFT JOIN {$this->getJoinSql('itinerary', null, 'i')}
             LEFT JOIN {$this->getJoinSql('result', null, 'r')}
@@ -188,6 +196,12 @@ class Mapper extends BaseMapper
 
         /** @var Collection|Team[] $teams */
         $teams = new Collection();
+
+        /** @var Collection|School[] $schools */
+        $schools = new Collection();
+
+        /** @var Collection|Result[] $results */
+        $results = new Collection();
 
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $matchId = $row['id'];
@@ -226,20 +240,44 @@ class Mapper extends BaseMapper
                 }
                 $match->setAwayTeam($teams->getOffset($row['away_team_id']));
 
+                // Optional relationship
+                if (!$schools->getOffset($row['home_school_id']) instanceof School) {
+                    $schools->setOffset($row['home_school_id'], $this->hydrateJoin($row, 'home_school', 'hs'));
+                }
+                $match->setHomeSchool($schools->getOffset($row['home_school_id']));
+
+                // Optional relationship
+                if (!$schools->getOffset($row['away_school_id']) instanceof School) {
+                    $schools->setOffset($row['away_school_id'], $this->hydrateJoin($row, 'away_school', 'as'));
+                }
+                $match->setAwaySchool($schools->getOffset($row['away_school_id']));
+
                 $matches->setOffset($match->getId(), $match);
             }
 
             /* Append all Result instances as you go
              */
             if ($row['r.team_id']) {
-                if (!($matches->getOffset($matchId)->getResult()->getOffset($row['r.team_id']) instanceof Result)) {
+                $resultsKey = $matchId.'-'.$row['r.team_id'];
+                if (!$results[$resultsKey] instanceof Result) {
                     /** @var Result $result */
                     $result = $this->hydrateJoin($row, 'result', 'r');
                     $result->setStatus($this->hydrateJoin($row, 'result.status', 'rs'));
+                    $results[$resultsKey] = $result;
 
-                    $matches->getOffset($matchId)->getResult()->setOffset($result->getTeam()->getId(), $result);
+                    // Figure out if this result if for the home or away team
+                    if ($matches[$matchId]->getHomeTeam()->getId() == $result->getTeam()->getId()) {
+                        $matches[$matchId]->setHomeTeamResult($result);
+                    } else {
+                        if ($matches[$matchId]->getAwayTeam()->getId() == $result->getTeam()->getId()) {
+                            $matches[$matchId]->setAwayTeamResult($result);
+                        } else {
+                            throw new \LogicException('Cannot match this result with a match team');
+                        }
+                    }
                 }
             }
+
 
             /* Append all ItineraryItems as you go
              */
