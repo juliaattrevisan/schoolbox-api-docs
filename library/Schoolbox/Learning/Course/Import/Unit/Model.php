@@ -112,6 +112,23 @@ class Model implements AssessmentContext, ISoftDeletable
         $this->assessables = new Collection();
     }
 
+    /**
+     * Populates this object from a Unit Specification.
+     *
+     * @param UnitSpecificationModel $unitSpec
+     * @return static
+     */
+    public function populateFromSpecification(UnitSpecificationModel $unitSpec)
+    {
+        foreach ($unitSpec->getAssessables() as $assessable) {
+            // Maybe each assessable has a clone method?
+            $newAssessable = clone $assessable;
+            $newAssessable->setId(null);
+            $this->getAssessables()->add($newAssessable);
+        }
+        return $this;
+    }
+
     /* Getters/Setters */
 
     /**
