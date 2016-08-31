@@ -15,20 +15,119 @@ $courseSpecFolder = $courseSpecFolder->setCourseSpecification($courseSpec);
 
 
 // Create Unit Specifications for all the children of that Folder
-$unitSpecs = [
-    [52, 'Fox House',],
-    [54, 'Oak House',],
-    [55, 'Thistle House',],
-    [56, 'Dalton House',],
-];
-foreach ($unitSpecs as $unitSpec) {
-    list($folderId, $folderName) = $unitSpec;
-    $unitSpecFolder = new Schoolbox\Resource\Folder\Model();
-    $unitSpecFolder->setId($folderId)->setName($folderName);
-    $unitSpec       = new Schoolbox\Learning\Course\Specification\Unit\Model();
-    $unitSpec       = $unitSpec->setFolder($unitSpecFolder);
-    $courseSpec     = $courseSpec->setUnits($courseSpec->getUnits()->add($unitSpec));
-}
+
+// Unit Spec: Fox House
+$foxSpecFolder = new Schoolbox\Resource\Folder\Model();
+$foxSpecFolder
+    ->setId(52)
+    ->setName('Fox House');
+$foxSpec = new Schoolbox\Learning\Course\Specification\Unit\Model();
+$foxSpec->setFolder($foxSpecFolder);
+
+// Fox House Assessables
+$foxDueWork1 = new Schoolbox\Learning\Assessment\DueWork\Model();
+$foxDueWork1
+    ->setId(1)
+    ->setTitle('Fox House Due Work')
+    ->setAcceptsMultiple()
+    ->showOnlySubmittedStudents();
+
+$foxDueWork2 = new Schoolbox\Learning\Assessment\DueWork\Model();
+$foxDueWork2
+    ->setId(2)
+    ->setTitle('Fox House Due Work 2')
+    ->setAcceptsMultiple()
+    ->showOnlySubmittedStudents();
+
+$foxSpec->getAssessables()
+        ->add($foxDueWork1)
+        ->add($foxDueWork2);
+
+
+// Unit Spec: Oak House
+$oakSpecFolder = new Schoolbox\Resource\Folder\Model();
+$oakSpecFolder
+    ->setId(54)
+    ->setName('Oak House');
+$oakSpec = new Schoolbox\Learning\Course\Specification\Unit\Model();
+$oakSpec->setFolder($oakSpecFolder);
+
+// Oak House Assessables
+$oakTask1 = new Schoolbox\Learning\Assessment\Task\Model();
+$oakTask1
+    ->setId(1)
+    ->setTitle('Oak Task 1');
+$oakTask2 = new Schoolbox\Learning\Assessment\Task\Model();
+$oakTask2
+    ->setId(2)
+    ->setTitle('Oak Task 2');
+
+$oakSpec->getAssessables()
+        ->add($oakTask1)
+        ->add($oakTask2);
+
+
+// Unit Spec: Thistle House
+$thistleSpecFolder = new Schoolbox\Resource\Folder\Model();
+$thistleSpecFolder
+    ->setId(55)
+    ->setName('Thistle House');
+$thistleSpec = new Schoolbox\Learning\Course\Specification\Unit\Model();
+$thistleSpec->setFolder($thistleSpecFolder);
+
+// Thistle House Assessables
+$thistleQuiz1 = new Schoolbox\Learning\Assessment\Quiz\Model();
+$thistleQuiz1
+    ->setId(1)
+    ->setTitle('Thistle Quiz 1');
+$thistleQuiz2 = new Schoolbox\Learning\Assessment\Quiz\Model();
+$thistleQuiz2
+    ->setId(2)
+    ->setTitle('Thistle Quiz 2');
+
+$thistleSpec->getAssessables()
+        ->add($thistleQuiz1)
+        ->add($thistleQuiz2);
+
+
+// Unit Spec: Dalton House
+$daltonSpecFolder = new Schoolbox\Resource\Folder\Model();
+$daltonSpecFolder
+    ->setId(56)
+    ->setName('Dalton House');
+$daltonSpec = new Schoolbox\Learning\Course\Specification\Unit\Model();
+$daltonSpec->setFolder($daltonSpecFolder);
+
+// Dalton House Assessables
+$daltonTask = new Schoolbox\Learning\Assessment\Task\Model();
+$daltonTask
+    ->setId(3)
+    ->setTitle('Dalton Task');
+
+$daltonQuiz = new Schoolbox\Learning\Assessment\Quiz\Model();
+$daltonQuiz
+    ->setId(3)
+    ->setTitle('Dalton Quiz');
+
+$daltonDueWork = new Schoolbox\Learning\Assessment\DueWork\Model();
+$daltonDueWork
+    ->setId(3)
+    ->setTitle('Dalton Due Work')
+    ->setAcceptsMultiple()
+    ->showOnlySubmittedStudents();
+
+$daltonSpec->getAssessables()
+           ->add($daltonTask)
+           ->add($daltonDueWork)
+           ->add($daltonQuiz);
+
+
+// Add all unit specs to course spec
+$courseSpec->getUnits()
+           ->add($foxSpec)
+           ->add($oakSpec)
+           ->add($thistleSpec)
+           ->add($daltonSpec);
 
 
 // Create Course Imports for a few class Folders
@@ -57,9 +156,9 @@ $scienceClassCourseImport = $scienceClassCourseImport
 // Add the Course Imports back to the Spec Folder
 $courseSpecFolder = $courseSpecFolder->setCourseImports(
     $courseSpecFolder->getCourseImports()
-        ->add($frenchClassCourseImport)
-        ->add($englishClassCourseImport)
-        ->add($scienceClassCourseImport)
+                     ->add($frenchClassCourseImport)
+                     ->add($englishClassCourseImport)
+                     ->add($scienceClassCourseImport)
 );
 
 
