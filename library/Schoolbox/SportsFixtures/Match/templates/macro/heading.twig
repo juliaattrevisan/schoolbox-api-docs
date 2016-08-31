@@ -66,10 +66,21 @@
  #}
 {% macro generate(match) %}
 {% spaceless %}
-    {{ match.homeTeam.name }} vs {{ match.awayTeam.name }}
+
+    {% if match.homeTeam.id %}
+        {{ match.homeTeam.name }}
+    {% else %}
+        {{ match.homeSchool.name }}
+    {% endif %} vs
+
+    {% if match.awayTeam.id %}
+        {{ match.awayTeam.name }}
+    {% else %}
+        {{ match.awaySchool.name }}
+    {% endif %}
+
 {% endspaceless %}
 {% endmacro %}
-
 
 {# Use to generate the text for Fixture Component List Item
  #
