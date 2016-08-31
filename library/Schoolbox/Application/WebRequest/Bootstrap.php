@@ -33,6 +33,7 @@ use Schoolbox\Application\WebRequest;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\MapperFactory;
 use Schoolbox\Notif\SilentNotif;
 use Scrub;
 use Twig_Extension_Debug;
@@ -43,179 +44,179 @@ use Twig_SimpleFunction;
 
 class Bootstrap implements BootstrapInterface {
 
-	/** @var bool */
-	protected $debugEnabled = false;
+    /** @var bool */
+    protected $debugEnabled = false;
 
-	/** @var Kernel */
-	protected $kernel;
+    /** @var Kernel */
+    protected $kernel;
 
-	/**
-	 * @param Kernel $kernel
-	 */
-	public function __construct($kernel) {
-		$this->kernel = $kernel;
-	}
-
-
-	/**
-	 * Load the core configuration file(s)
-	 *
-	 * @return void
-	 */
-	public function loadConfiguration() {
-		require_once __DIR__ . '/../../../../www/conf/conf.php';
-		require_once SITE_root . '/www/include/stdfuncs.php';
-		require_once SITE_root . '/library/constants.php';
-	}
+    /**
+     * @param Kernel $kernel
+     */
+    public function __construct($kernel) {
+        $this->kernel = $kernel;
+    }
 
 
-	/**
-	 * Set the include path
-	 *
-	 * @return void
-	 */
-	public function setIncludePath() {
-		set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . get_include_path());
-	}
+    /**
+     * Load the core configuration file(s)
+     *
+     * @return void
+     */
+    public function loadConfiguration() {
+        require_once __DIR__ . '/../../../../www/conf/conf.php';
+        require_once SITE_root . '/www/include/stdfuncs.php';
+        require_once SITE_root . '/library/constants.php';
+    }
 
 
-	/**
-	 * Register any autoloading required
-	 *
-	 * @return void
-	 */
-	public function registerAutoLoading() {
-		require_once 'library/Autoloader.php';
-		Autoloader::initialise();
-	}
+    /**
+     * Set the include path
+     *
+     * @return void
+     */
+    public function setIncludePath() {
+        set_include_path('.' . PATH_SEPARATOR . SITE_root . PATH_SEPARATOR . get_include_path());
+    }
 
 
-	/**
-	 * Initialise debugging
-	 *
-	 * @return void
-	 */
-	public function initialiseDebugging() {
-		// Set up the debug bar, and add listeners for various parts of the debug bar
-		// (database calls, XHProf)
-		// Should go in a DI container instead of a static class.
-		if($this->debugEnabled = DebugBar::isEnabled()) {
-			DebugBar::init();
-		}
-
-		// Install into database
-		if($this->debugEnabled) {
-			$debug_bar = DebugBar::getInstance();
-
-			// Throw away existing connection and reconnect with persistence off
-			$database = Database::getInstance();
-			$database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true,]);
-			$debug_bar->addCollector($database->getCollector());
-		}
-
-		// XHProf on the debug bar.
-		if($this->debugEnabled && Config::get('debug_xhprof') && extension_loaded('xhprof')) {
-			DebugBar::getInstance()->addCollector(new XhprofCollector());
-		}
-	}
+    /**
+     * Register any autoloading required
+     *
+     * @return void
+     */
+    public function registerAutoLoading() {
+        require_once 'library/Autoloader.php';
+        Autoloader::initialise();
+    }
 
 
-	/**
-	 * Register any error handling required
-	 *
-	 * @return void
-	 */
-	public function registerErrorHandling() {
-		// noop. WebRequest does not use custom error handling
-	}
+    /**
+     * Initialise debugging
+     *
+     * @return void
+     */
+    public function initialiseDebugging() {
+        // Set up the debug bar, and add listeners for various parts of the debug bar
+        // (database calls, XHProf)
+        // Should go in a DI container instead of a static class.
+        if($this->debugEnabled = DebugBar::isEnabled()) {
+            DebugBar::init();
+        }
+
+        // Install into database
+        if($this->debugEnabled) {
+            $debug_bar = DebugBar::getInstance();
+
+            // Throw away existing connection and reconnect with persistence off
+            $database = Database::getInstance();
+            $database->connect(SQL_dsn, SQL_user, SQL_passwd, ['debug' => true,]);
+            $debug_bar->addCollector($database->getCollector());
+        }
+
+        // XHProf on the debug bar.
+        if($this->debugEnabled && Config::get('debug_xhprof') && extension_loaded('xhprof')) {
+            DebugBar::getInstance()->addCollector(new XhprofCollector());
+        }
+    }
 
 
-	/**
-	 * Register any out-the-top exception handling required
-	 *
-	 * @return void
-	 */
-	public function registerExceptionHandling() {
-		set_exception_handler([$this, 'shutdownSafely']);
-	}
+    /**
+     * Register any error handling required
+     *
+     * @return void
+     */
+    public function registerErrorHandling() {
+        // noop. WebRequest does not use custom error handling
+    }
 
 
-	/**
-	 * Register any shutdown handling required
-	 *
-	 * @return void
-	 */
-	public function registerShutdownHandling() {
-		ShutdownHandler::instance()->registerFunction([$this, 'shutdownSafely']);
-	}
+    /**
+     * Register any out-the-top exception handling required
+     *
+     * @return void
+     */
+    public function registerExceptionHandling() {
+        set_exception_handler([$this, 'shutdownSafely']);
+    }
 
 
-	/**
-	 * Initialise connections to databases, etc.
-	 *
-	 * @return void
-	 */
-	public function initialiseExternalConnections() {
-		$database = Database::getInstance();
-		// Catch-22:
-		// I don't know if debug is enabled until I connect to the database.
-		// The only solution is to allow the config query to run and then throw
-		// away my connection, and create a fresh one with debug enabled.
-		$database->connect(SQL_dsn, SQL_user, SQL_passwd);
-
-		// Redis connection configuration
-		Redis::getInstance()->connect(ConfigMapper::getInstance()->get('redis_url'), null, INSTANCE_ID);
-	}
+    /**
+     * Register any shutdown handling required
+     *
+     * @return void
+     */
+    public function registerShutdownHandling() {
+        ShutdownHandler::instance()->registerFunction([$this, 'shutdownSafely']);
+    }
 
 
-	/**
-	 * Install any internal dependencies into the kernel (routing, etc.)
-	 *
-	 * @return void
-	 */
-	public function installDependencies() {
-		// Set correct timezone
-		date_default_timezone_set($timezone = Config::get('date_timezone'));
+    /**
+     * Initialise connections to databases, etc.
+     *
+     * @return void
+     */
+    public function initialiseExternalConnections() {
+        $database = Database::getInstance();
+        // Catch-22:
+        // I don't know if debug is enabled until I connect to the database.
+        // The only solution is to allow the config query to run and then throw
+        // away my connection, and create a fresh one with debug enabled.
+        $database->connect(SQL_dsn, SQL_user, SQL_passwd);
 
-		// Set up DB timezones here too
-		Database::getInstance()->setTimezone($timezone);
-		DeprecatedDatabase::getInstance()->setTimezone($timezone);
+        // Redis connection configuration
+        Redis::getInstance()->connect(ConfigMapper::getInstance()->get('redis_url'), null, INSTANCE_ID);
+    }
 
-		// Set up the dependency injector
 
-		// Do dependency injection stuff
-		// How do I get this container elsewhere without using a global?
-		$di = new Di\Container(new Di\Factory());
+    /**
+     * Install any internal dependencies into the kernel (routing, etc.)
+     *
+     * @return void
+     */
+    public function installDependencies() {
+        // Set correct timezone
+        date_default_timezone_set($timezone = Config::get('date_timezone'));
 
-		// Configuration
-		$di->set('config', $di->lazyNew('Schoolbox\\Config\\Loader'));
+        // Set up DB timezones here too
+        Database::getInstance()->setTimezone($timezone);
+        DeprecatedDatabase::getInstance()->setTimezone($timezone);
 
-		// Web router
-		$di->set(
-			'router',
-			$di->lazy(
-				function () {
-					$factory = new RouterFactory();
-					return $factory->newInstance();
-				}
-			)
-		);
+        // Set up the dependency injector
 
-		// Session
-		$di->set(
-			'session',
-			$di->lazy(
-				function () use ($di) {
-					$factory = new Factory(
-						$_COOKIE,
-						$di->get('config'),
-						$_SERVER['REQUEST_TIME']
-					);
-					$session = $factory->build();
-					return $session;
-				}
-			)
-		);
+        // Do dependency injection stuff
+        // How do I get this container elsewhere without using a global?
+        $di = new Di\Container(new Di\Factory());
+
+        // Configuration
+        $di->set('config', $di->lazyNew('Schoolbox\\Config\\Loader'));
+
+        // Web router
+        $di->set(
+            'router',
+            $di->lazy(
+                function () {
+                    $factory = new RouterFactory();
+                    return $factory->newInstance();
+                }
+            )
+        );
+
+        // Session
+        $di->set(
+            'session',
+            $di->lazy(
+                function () use ($di) {
+                    $factory = new Factory(
+                        $_COOKIE,
+                        $di->get('config'),
+                        $_SERVER['REQUEST_TIME']
+                    );
+                    $session = $factory->build();
+                    return $session;
+                }
+            )
+        );
 
         // User from session
         $di->set(
@@ -228,237 +229,237 @@ class Bootstrap implements BootstrapInterface {
             )
         );
 
-		$di->set(
-			'l10n',
-			$di->lazy(
-				function () {
-					$db = Database::getInstance();
-					$st = $db->query("SELECT term, singular_form, plural_form, capitalise_first FROM localisation");
+        $di->set(
+            'l10n',
+            $di->lazy(
+                function () {
+                    $db = Database::getInstance();
+                    $st = $db->query("SELECT term, singular_form, plural_form, capitalise_first FROM localisation");
 
-					$l10n = [];
+                    $l10n = [];
 
-					while ($r = $st->fetch(PDO::FETCH_ASSOC)) {
-						$l10n[$r['term']] = [
-							'singular'   => $r['singular_form'],
-							'plural'     => $r['plural_form'],
-							'capitalise' => (bool)$r['capitalise_first']
-						];
-					}
+                    while ($r = $st->fetch(PDO::FETCH_ASSOC)) {
+                        $l10n[$r['term']] = [
+                            'singular'   => $r['singular_form'],
+                            'plural'     => $r['plural_form'],
+                            'capitalise' => (bool)$r['capitalise_first']
+                        ];
+                    }
 
-					return new RosettaStone($l10n);
-				}
-			)
-		);
+                    return new RosettaStone($l10n);
+                }
+            )
+        );
 
-		// Preload of route parameters, and its module loader
+        // Preload of route parameters, and its module loader
         $di->params['Alaress\\Web\\Router\\PathMatcher']['moduleLoader'] = $di->lazyNew(
             ModuleLoader::class,
             ['injector' => $di, 'moduleRegex' => '/^(?P<module>[^\\.]+)\\./']
         );
-		$di->set('preloader', $di->lazyNew('Alaress\\Web\\Router\\PathMatcher'));
+        $di->set('preloader', $di->lazyNew('Alaress\\Web\\Router\\PathMatcher'));
 
-		// Authorization
-		$di->set('authorizer', $di->lazyNew('Alaress\\Authorizer\\Authorizer'));
+        // Authorization
+        $di->set('authorizer', $di->lazyNew('Alaress\\Authorizer\\Authorizer'));
 
-		// Web request/response factory
-		$di->params['Aura\\Web\\WebFactory'] = array('globals' => $GLOBALS);
-		$di->set('webFactory', $di->lazyNew('Aura\\Web\\WebFactory'));
+        // Web request/response factory
+        $di->params['Aura\\Web\\WebFactory'] = array('globals' => $GLOBALS);
+        $di->set('webFactory', $di->lazyNew('Aura\\Web\\WebFactory'));
 
-		// inject request and response into controller
-		// (I may need to mangle requests in pre-processing though)
-		$di->setters['Alaress\\Web\\Controller\\Base'] = array(
-			'setRequest'    => $di->lazy(
-				function () use ($di) {
-					return $di->get('webFactory')->newRequest();
-				}
-			),
-			'setResponse'   => $di->lazy(
-				function () use ($di) {
-					return $di->get('webFactory')->newResponse();
-				}
-			),
-			'setSession'    => $di->lazyGet('session'),
-			'setRouter'     => $di->lazyGet('router'),
-			'setAuthorizer' => $di->lazyGet('authorizer'),
-			'setDi'         => $di,
-		);
+        // inject request and response into controller
+        // (I may need to mangle requests in pre-processing though)
+        $di->setters['Alaress\\Web\\Controller\\Base'] = array(
+            'setRequest'    => $di->lazy(
+                function () use ($di) {
+                    return $di->get('webFactory')->newRequest();
+                }
+            ),
+            'setResponse'   => $di->lazy(
+                function () use ($di) {
+                    return $di->get('webFactory')->newResponse();
+                }
+            ),
+            'setSession'    => $di->lazyGet('session'),
+            'setRouter'     => $di->lazyGet('router'),
+            'setAuthorizer' => $di->lazyGet('authorizer'),
+            'setDi'         => $di,
+        );
 
-		// inject web params (yep, even Sitepage!)
+        // inject web params (yep, even Sitepage!)
 //		$di->setters['SitePage']['setDi'] = $di;
-		$di->set('layoutEngine', $di->lazy(function() use ($di) {
-			$sitepage = new \SitePage(false);
-			$sitepage->setDi($di);
-			return $sitepage;
-		}));;
-		$di->set('sitePage',     $di->lazy(function() use ($di) {
-			$sitepage = new \SitePage();
-			$sitepage->setDi($di);
-			return $sitepage;
-		}));
+        $di->set('layoutEngine', $di->lazy(function() use ($di) {
+            $sitepage = new \SitePage(false);
+            $sitepage->setDi($di);
+            return $sitepage;
+        }));;
+        $di->set('sitePage',     $di->lazy(function() use ($di) {
+            $sitepage = new \SitePage();
+            $sitepage->setDi($di);
+            return $sitepage;
+        }));
 
-		// Web output class - currently uses Sitepage
-		$di->setters[Output\Html::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
+        // Web output class - currently uses Sitepage
+        $di->setters[Output\Html::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
         $di->setters[Output\Stream::class]['setTemplateEngine'] = $di->lazyGet('templateEngine');
-		$di->setters[Output\ThemedHtml::class]['setSitepage'] = $di->lazyGet('layoutEngine');
-		$di->set('webOutput:base', $di->lazyNew(Output\Base::class));
-		$di->set('webOutput:html', $di->lazyNew(Output\ThemedHtml::class));
-		$di->set('webOutput:nochrome', $di->lazyNew(Output\Html::class));
-		$di->set('webOutput:json', $di->lazyNew(Output\Json::class));
-		$di->set('webOutput:file', $di->lazyNew(Output\File::class));
+        $di->setters[Output\ThemedHtml::class]['setSitepage'] = $di->lazyGet('layoutEngine');
+        $di->set('webOutput:base', $di->lazyNew(Output\Base::class));
+        $di->set('webOutput:html', $di->lazyNew(Output\ThemedHtml::class));
+        $di->set('webOutput:nochrome', $di->lazyNew(Output\Html::class));
+        $di->set('webOutput:json', $di->lazyNew(Output\Json::class));
+        $di->set('webOutput:file', $di->lazyNew(Output\File::class));
         $di->set('webOutput:stream', $di->lazyNew(Output\Stream::class));
 
-		// Mapper notifications:
-		// They rely upon the session being injected into them, so do that.
-		$di->setters['Schoolbox\\Mapper']['setSessionData'] = $di->lazy(function() use($di) {
-			/** @var \Alaress\Session\Session $session */
-			$session = $di->get('session');
-			$session->start();
-			return isset($_SESSION) ? $_SESSION : array();
-		});
+        // Mapper notifications:
+        // They rely upon the session being injected into them, so do that.
+        $di->setters['Schoolbox\\Mapper']['setSessionData'] = $di->lazy(function() use($di) {
+            /** @var \Alaress\Session\Session $session */
+            $session = $di->get('session');
+            $session->start();
+            return isset($_SESSION) ? $_SESSION : array();
+        });
 
-		// Template engine and functions
-		// Template loader: sets up link to templates without a namespace.
-		$di->set(
-			'templateEngine:loader',
-			$di->lazy(
-				function () use ($di) {
-					$config      = $di->get('config');
-					$chainLoader = new ChainLoader(new ModuleLoader($di, '[^@(?P<module>[^/]+)/]'));
-					$baseLoader  = new Twig_Loader_Filesystem(array());
-					// Paths: prefer templates/{site_location} over templates/core
-					$basePath     = $config->get('siteRoot').'/templates/';
-					$overridePath = $basePath.$config->get('site_location');
-					$corePath     = $basePath.'core';
-					if (is_dir($overridePath)) {
-						$baseLoader->addPath($overridePath);
-					}
-					$baseLoader->addPath($corePath);
-					// Core path: always uses templates/core, even if templates/{site_location} exists
-					// Used as a base for default path templates to inherit from.
-					$baseLoader->addPath($corePath, 'core');
-					$chainLoader->addLoader($baseLoader);
-					return $chainLoader;
-				}
-			)
-		);
+        // Template engine and functions
+        // Template loader: sets up link to templates without a namespace.
+        $di->set(
+            'templateEngine:loader',
+            $di->lazy(
+                function () use ($di) {
+                    $config      = $di->get('config');
+                    $chainLoader = new ChainLoader(new ModuleLoader($di, '[^@(?P<module>[^/]+)/]'));
+                    $baseLoader  = new Twig_Loader_Filesystem(array());
+                    // Paths: prefer templates/{site_location} over templates/core
+                    $basePath     = $config->get('siteRoot').'/templates/';
+                    $overridePath = $basePath.$config->get('site_location');
+                    $corePath     = $basePath.'core';
+                    if (is_dir($overridePath)) {
+                        $baseLoader->addPath($overridePath);
+                    }
+                    $baseLoader->addPath($corePath);
+                    // Core path: always uses templates/core, even if templates/{site_location} exists
+                    // Used as a base for default path templates to inherit from.
+                    $baseLoader->addPath($corePath, 'core');
+                    $chainLoader->addLoader($baseLoader);
+                    return $chainLoader;
+                }
+            )
+        );
 
         $di->params[TwigMethod\RequireModule::class]['di'] = $di;
         $di->set('templateEngine:requireModule', $di->lazyNew(TwigMethod\RequireModule::class));
 
-		$di->setters['Alaress\\Twig\\Method\\RouteLookup']['setRouter'] = $di->lazyGet('router');
-		$di->set('templateEngine:routeLookup', $di->lazyNew('Alaress\\Twig\\Method\\RouteLookup'));
+        $di->setters['Alaress\\Twig\\Method\\RouteLookup']['setRouter'] = $di->lazyGet('router');
+        $di->set('templateEngine:routeLookup', $di->lazyNew('Alaress\\Twig\\Method\\RouteLookup'));
 
-		$di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setRouter']     = $di->lazyGet('router');
-		$di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setAuthorizer'] = $di->lazyGet('authorizer');
-		$di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setSession']    = $di->lazyGet('session');
-		$di->set('templateEngine:isRouteAuthorized', $di->lazyNew('Alaress\\Twig\\Method\\IsRouteAuthorized'));
+        $di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setRouter']     = $di->lazyGet('router');
+        $di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setAuthorizer'] = $di->lazyGet('authorizer');
+        $di->setters['Alaress\\Twig\\Method\\IsRouteAuthorized']['setSession']    = $di->lazyGet('session');
+        $di->set('templateEngine:isRouteAuthorized', $di->lazyNew('Alaress\\Twig\\Method\\IsRouteAuthorized'));
 
-		$di->set(
-			'templateEngine',
-			$di->lazy(
-				function () use ($di) {
-					$config = $di->get('config');
+        $di->set(
+            'templateEngine',
+            $di->lazy(
+                function () use ($di) {
+                    $config = $di->get('config');
 
-					$options = [
-						'debug' => $config->get('debug_templates'),
-					];
+                    $options = [
+                        'debug' => $config->get('debug_templates'),
+                    ];
 
-					// do not cache when in debug mode
-					if (!$config->get('debug_mode')) {
-						$options['cache'] = $config->get('stream_dir') . '/templates/';
-					}
+                    // do not cache when in debug mode
+                    if (!$config->get('debug_mode')) {
+                        $options['cache'] = $config->get('stream_dir') . '/templates/';
+                    }
 
-					$twig   = new \Twig_Environment($di->get('templateEngine:loader'), $options);
+                    $twig   = new \Twig_Environment($di->get('templateEngine:loader'), $options);
 
                     if($this->debugEnabled) {
                         $twig = new TraceableTwigEnvironment($twig);
                         DebugBar::getInstance()->addCollector(new TwigCollector($twig));
                     }
 
-					$twig->addExtension(new Twig_Extension_Debug());
-					$twig->addExtension(new Twig_Extensions_Extension_Text());
-					$twig->addExtension(new \Schoolbox\Admin\Navigation\Renderer());
+                    $twig->addExtension(new Twig_Extension_Debug());
+                    $twig->addExtension(new Twig_Extensions_Extension_Text());
+                    $twig->addExtension(new \Schoolbox\Admin\Navigation\Renderer());
 
-					// HTML Purifier escape strategy
-					// Please use the filter below instead.
-					$twig->getExtension('core')
-						 ->setEscaper('purify', function ($twig, $string) {
-							 return Scrub::html($string);
-						});
+                    // HTML Purifier escape strategy
+                    // Please use the filter below instead.
+                    $twig->getExtension('core')
+                        ->setEscaper('purify', function ($twig, $string) {
+                            return Scrub::html($string);
+                        });
 
-					// HTML Purifier filter - known to output safe HTML
-					$twig->addFilter(
-						new Twig_SimpleFilter(
-							'purify',
-							array('Scrub', 'html'),
-							array('is_safe' => array('html'))
-						)
-					);
+                    // HTML Purifier filter - known to output safe HTML
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'purify',
+                            array('Scrub', 'html'),
+                            array('is_safe' => array('html'))
+                        )
+                    );
 
-					// HTML2Text filter
-					$twig->addFilter(
-						new Twig_SimpleFilter(
-							'html2text',
-							array('Scrub', 'html2text')
-						)
-					);
+                    // HTML2Text filter
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'html2text',
+                            array('Scrub', 'html2text')
+                        )
+                    );
 
-					// Cut sentence filter
-					$twig->addFilter(
-						new Twig_SimpleFilter(
-							'cutSentence',
-							array('TextFormatter', 'cutSentence')
-						)
-					);
+                    // Cut sentence filter
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'cutSentence',
+                            array('TextFormatter', 'cutSentence')
+                        )
+                    );
 
-					// Bytes to string filter
-					$twig->addFilter(
-						new Twig_SimpleFilter(
-							'bytes',
-							array('Alaress_Byte_Format', 'bytesToString')
-						)
-					);
+                    // Bytes to string filter
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'bytes',
+                            array('Alaress_Byte_Format', 'bytesToString')
+                        )
+                    );
 
-					$twig->addFilter(
-						new Twig_SimpleFilter(
-							'column',
-							[ Collection::class, 'array_column' ]
-						)
-					);
+                    $twig->addFilter(
+                        new Twig_SimpleFilter(
+                            'column',
+                            [ Collection::class, 'array_column' ]
+                        )
+                    );
 
-					// Global access to config object and localisation
-					$twig->addGlobal('config', $config);
-					$twig->addGlobal('locale',  $di->get('l10n'));
-					$dateFormats = new Alaress_Date_Locale_Config();
-					$dateFormats->setConfig($config);
-					$twig->addGlobal('dateFormats', $dateFormats);
+                    // Global access to config object and localisation
+                    $twig->addGlobal('config', $config);
+                    $twig->addGlobal('locale',  $di->get('l10n'));
+                    $dateFormats = new Alaress_Date_Locale_Config();
+                    $dateFormats->setConfig($config);
+                    $twig->addGlobal('dateFormats', $dateFormats);
 
                     // Define modules that are required by a template
                     $twig->addFunction(
                         new Twig_SimpleFunction('requireModule', $di->get('templateEngine:requireModule'))
                     );
 
-					// Add the route lookup and authorization methods
-					$twig->addFunction(
-						new Twig_SimpleFunction(
-							'routeLookup',
-							array($di->get('templateEngine:routeLookup'), 'execute')
-						)
-					);
-					$twig->addFunction(
-						new Twig_SimpleFunction(
-							'isRouteAuthorized',
-							array($di->get('templateEngine:isRouteAuthorized'), 'execute')
-						)
-					);
+                    // Add the route lookup and authorization methods
+                    $twig->addFunction(
+                        new Twig_SimpleFunction(
+                            'routeLookup',
+                            array($di->get('templateEngine:routeLookup'), 'execute')
+                        )
+                    );
+                    $twig->addFunction(
+                        new Twig_SimpleFunction(
+                            'isRouteAuthorized',
+                            array($di->get('templateEngine:isRouteAuthorized'), 'execute')
+                        )
+                    );
 
-					return $twig;
-				}
-			)
-		);
+                    return $twig;
+                }
+            )
+        );
 
-		// Paginator internal object
-		$di->setters['Alaress\\Paginator\\UrlPaginator']['setPaginator'] = $di->lazyNew('Alaress\\Paginator\\Paginator');
+        // Paginator internal object
+        $di->setters['Alaress\\Paginator\\UrlPaginator']['setPaginator'] = $di->lazyNew('Alaress\\Paginator\\Paginator');
 
         // Build a user provisioner
         // TODO unify this definition and the one in Daemon\Bootstrap
@@ -474,48 +475,51 @@ class Bootstrap implements BootstrapInterface {
             )
         );
 
-		// Build a user provisioner
-		$di->set(
-			'ups.provisioner',
-			$di->lazyNew(
-				\Schoolbox\Sync\Provisioner\Provisioner::class,
-				[
-					'rulesetFactory' => $di->lazyNew(\Schoolbox\Sync\Ruleset\Factory::class),
-					'grammarFactory' => $di->lazyNew(
-						\Schoolbox\Sync\Grammar\Factory::class,
-						[
-							'log'        => $di->lazyGet('ups.logger'),
-							'userMapper' => $di->lazy(function () {
-								$map = new \Schoolbox\Sync\Provisioner\UserMapper;
-								$map->setNotifier(new SilentNotif());
-								return $map;
-							}),
-							'ruleMapper' => $di->lazyNew(\Schoolbox\Sync\Rule\Mapper::class),
-						]
-					),
-					'externalUserSource' => $di->lazy(function() use ($di) {
-						$source = new \Schoolbox\External\Connector\SyncFactory();
-						return $source->build();
-					}),
-					'userMapper'     => $di->lazyNew(\Schoolbox\Sync\Provisioner\UserMapper::class),
-					'logger'         => $di->lazyGet('ups.logger'),
-					'logMapper'      => $di->lazyNew(\Schoolbox\Sync\Log\Mapper::class),
-				]
-			)
-		);
+        // Build a user provisioner
+        $di->set(
+            'ups.provisioner',
+            $di->lazyNew(
+                \Schoolbox\Sync\Provisioner\Provisioner::class,
+                [
+                    'rulesetFactory' => $di->lazyNew(\Schoolbox\Sync\Ruleset\Factory::class),
+                    'grammarFactory' => $di->lazyNew(
+                        \Schoolbox\Sync\Grammar\Factory::class,
+                        [
+                            'log'        => $di->lazyGet('ups.logger'),
+                            'userMapper' => $di->lazy(function () {
+                                $map = new \Schoolbox\Sync\Provisioner\UserMapper;
+                                $map->setNotifier(new SilentNotif());
+                                return $map;
+                            }),
+                            'ruleMapper' => $di->lazyNew(\Schoolbox\Sync\Rule\Mapper::class),
+                        ]
+                    ),
+                    'externalUserSource' => $di->lazy(function() use ($di) {
+                        $source = new \Schoolbox\External\Connector\SyncFactory();
+                        return $source->build();
+                    }),
+                    'userMapper'     => $di->lazyNew(\Schoolbox\Sync\Provisioner\UserMapper::class),
+                    'logger'         => $di->lazyGet('ups.logger'),
+                    'logMapper'      => $di->lazyNew(\Schoolbox\Sync\Log\Mapper::class),
+                ]
+            )
+        );
+
+        // Enable mappers to be injectable, but instantiated only when required
+        $di->set('mapperFactory', $di->lazyNew(MapperFactory::class));
 
 
-		// load dependencies into the kernel itself
-		$this->kernel->setDependencyInjector($di);
-		$this->kernel->setDebugMode($this->debugEnabled);
+        // load dependencies into the kernel itself
+        $this->kernel->setDependencyInjector($di);
+        $this->kernel->setDebugMode($this->debugEnabled);
 
 
-		// initialise session
-		$di->get('session')->start();
+        // initialise session
+        $di->get('session')->start();
 
 
-		// Initialise module configuration
-		require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
+        // Initialise module configuration
+        require_once SITE_root . '/conf/modules/ModuleConfigInterface.php';
         $customModuleLocation = sprintf(
             '/conf/modules/Custom/%s/',
             ucfirst($this->kernel->getDependencyInjector()->get('config')->get('site_location'))
@@ -525,25 +529,25 @@ class Bootstrap implements BootstrapInterface {
             glob(SITE_root . $customModuleLocation . '*.php')
         );
 
-		foreach ($modulePaths as $routePath) {
-			require_once $routePath;
+        foreach ($modulePaths as $routePath) {
+            require_once $routePath;
 
             // Get a route name out of this path
             $path = preg_replace('/^'.preg_quote(SITE_root.'/conf/modules/', '/').'/', '', $routePath);
             $path = preg_replace('/\\.php$/', '', $path);
             $path = preg_replace('/\\//', '\\', $path);
 
-			$class = 'Config\\Modules\\' . $path;
+            $class = 'Config\\Modules\\' . $path;
 
-			if(class_exists($class, false)) {
-				/** @var Config\Modules\ModuleConfigInterface $obj */
-				$obj = new $class();
-				$obj->configure($this->kernel);
-			}
+            if(class_exists($class, false)) {
+                /** @var Config\Modules\ModuleConfigInterface $obj */
+                $obj = new $class();
+                $obj->configure($this->kernel);
+            }
 
-		}
+        }
 
-	}
+    }
 
     /**
      * Shutdown handler for either exceptions or fatal errors
@@ -552,7 +556,7 @@ class Bootstrap implements BootstrapInterface {
      */
     public function shutdownSafely(\Exception $e = null)
     {
-		$outputStackTrace = Config::get('debug_show_stack_trace');
+        $outputStackTrace = Config::get('debug_show_stack_trace');
 
         if ($e instanceof \Exception) {
             $error = array(
@@ -581,7 +585,7 @@ class Bootstrap implements BootstrapInterface {
                 // RedisException extends RuntimeException: occurs when Redis
                 // session management isn't working for whatever reason.
                 $code    = 400;
-				$info    = "If the problem persists, please contact your System Administrator including the following information:";
+                $info    = "If the problem persists, please contact your System Administrator including the following information:";
 
                 if ($e instanceof \RuntimeException) {
                     $code    = 500;
@@ -590,7 +594,7 @@ class Bootstrap implements BootstrapInterface {
                     $code    = 500;
                     $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
                 } else {
-					$message = 'Schoolbox has encountered a fatal error.';
+                    $message = 'Schoolbox has encountered a fatal error.';
 
                     // decide what to tell the user based on where this error came from
                     switch ($cause) {
@@ -625,45 +629,45 @@ class Bootstrap implements BootstrapInterface {
                 // If there's no SitePage in DI yet: just output a styleless error.
                 $di = $this->kernel->getDependencyInjector();
 
-				/* Use structured information for rendering
+                /* Use structured information for rendering
                  */
-				$args = [
-					'message' => $message,
-					'info' => $info,
-					'url' => $url,
-					'error' => $error,
-					'date' => date('Y-m-d H:i:s'),
-					'outputStackTrace' => $outputStackTrace,
-					'stackTrace' => "$e"
-				];
+                $args = [
+                    'message' => $message,
+                    'info' => $info,
+                    'url' => $url,
+                    'error' => $error,
+                    'date' => date('Y-m-d H:i:s'),
+                    'outputStackTrace' => $outputStackTrace,
+                    'stackTrace' => "$e"
+                ];
 
-				/* Pass $data straight in for twig rendering
-				 */
+                /* Pass $data straight in for twig rendering
+                 */
                 if ($di instanceof Di\Container) {
-					/** @var \SitePage $page */
+                    /** @var \SitePage $page */
                     $page = $di->get('layoutEngine');
                     $page->error(null, $args, $code);
                 }
-				/* Just dump it out in raw form
-				 * TODO: Make synonymous with twig output
-				 */
-				else {
-					$output =
-						"<p><b>{$args['message']} {$args['info']}</b></p>" .
-						'<ul>' .
-						"<li>Datetime: {$args['date']}</li>" .
-						"<li>URL: {$args['url']}" .
-						'</li>';
+                /* Just dump it out in raw form
+                 * TODO: Make synonymous with twig output
+                 */
+                else {
+                    $output =
+                        "<p><b>{$args['message']} {$args['info']}</b></p>" .
+                        '<ul>' .
+                        "<li>Datetime: {$args['date']}</li>" .
+                        "<li>URL: {$args['url']}" .
+                        '</li>';
 
-					if ($outputStackTrace) {
-						$output .= "<li>Error: {$args['error']['message']} in {$args['error']['file']} on line {$args['error']['line']}.</li>";
-					} else {
-						$output .= "<li>Error: {$args['error']['message']}. (Further details have been logged.)</li>";
-					}
+                    if ($outputStackTrace) {
+                        $output .= "<li>Error: {$args['error']['message']} in {$args['error']['file']} on line {$args['error']['line']}.</li>";
+                    } else {
+                        $output .= "<li>Error: {$args['error']['message']}. (Further details have been logged.)</li>";
+                    }
 
-					$output .= '</ul>';
+                    $output .= '</ul>';
 
-					echo $output;
+                    echo $output;
                 }
             }
         }
