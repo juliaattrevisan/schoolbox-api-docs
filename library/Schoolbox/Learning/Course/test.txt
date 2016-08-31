@@ -88,8 +88,8 @@ $thistleQuiz2
     ->setTitle('Thistle Quiz 2');
 
 $thistleSpec->getAssessables()
-        ->add($thistleQuiz1)
-        ->add($thistleQuiz2);
+            ->add($thistleQuiz1)
+            ->add($thistleQuiz2);
 
 
 // Unit Spec: Dalton House
@@ -200,6 +200,30 @@ foreach ($courseSpec->getUnits() as $unitSpec) {
         ->populateAssessablesFromSpecification($unitSpec);
     $scienceClassCourseImport->getUnits()->add($scienceClassUnitImport);
     $i++;
+}
+
+
+// Augmented/Diminished/Reordered Course Imports for Science Class
+foreach ($scienceClassCourseImport->getUnits() as $unit) {
+    switch ($unit->getSpecification()->getFolder()->getId()) {
+        case 52:
+            // Fox House for Science Class:
+            // * Remove first assessable
+            // * Add another
+            $augmentTask = new Schoolbox\Learning\Assessment\Task\Model();
+            $augmentTask->setTitle('Science-only Task');
+            $unit->getAssessables()->slice(1)->add($augmentTask);
+            break;
+
+        case 55:
+            // Thistle House for Science Class:
+            // * Reorder assessables
+            $unit->getAssessables()->sortBy('title', 'desc');
+            break;
+
+        default:
+            break;
+    }
 }
 
 
