@@ -258,11 +258,12 @@ class Mapper extends BaseMapper
             /* Append all Result instances as you go
              */
             if ($row['r.team_id']) {
-                if (!$results[$row['r.team_id']] instanceof Result) {
+                $resultsKey = $matchId.'-'.$row['r.team_id'];
+                if (!$results[$resultsKey] instanceof Result) {
                     /** @var Result $result */
                     $result = $this->hydrateJoin($row, 'result', 'r');
                     $result->setStatus($this->hydrateJoin($row, 'result.status', 'rs'));
-                    $results[$row['r.team_id']] = $result;
+                    $results[$resultsKey] = $result;
 
                     // Figure out if this result if for the home or away team
                     if ($matches[$matchId]->getHomeTeam()->getId() == $result->getTeam()->getId()) {
