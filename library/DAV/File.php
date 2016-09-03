@@ -6,6 +6,10 @@
  * Time: 9:27 PM
  */
 
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class DAV_File extends Sabre\DAV\File
 {
@@ -19,20 +23,35 @@ class DAV_File extends Sabre\DAV\File
     private $fileMapper;
 
     /**
-     * A category mapper
+     * A folder mapper
      *
      * @var Schoolbox\Resource\Folder\Mapper
      */
     private $folderMapper;
 
+    /**
+     * Folder where file is located
+     *
+     * @var Schoolbox\Resource\Folder\Model
+     */
+    private $folder;
+
+    /**
+     * Permissions mapper for determining access rights
+     *
+     * @var \Schoolbox\Permission\Access\Access
+     */
+    private $accessor;
 
     /**
      * @param string $path
      */
     public function __construct($path)
     {
-        $this->setFileMapper(Schoolbox\Resource\File\Mapper::getInstance());
-        $this->setFolderMapper(Schoolbox\Resource\Folder\Mapper::getInstance());
+        $this->setFileMapper(FileMapper::getInstance());
+        $this->setFolderMapper(FolderMapper::getInstance());
+        $this->setAccessor(Access::getInstance());
+
         $this->setFileFromPath($path);
     }
 
@@ -47,13 +66,20 @@ class DAV_File extends Sabre\DAV\File
 
 
     /**
+     * Rename file
+     *
      * @param string $newName
+     * @throws Sabre\DAV\Exception\Forbidden
      */
     public function setName($newName)
     {
-        $this->getFile()->setFilename(pathinfo($newName, PATHINFO_FILENAME));
-
-        $this->getFileMapper()->save($this->getFile());
+        if ($this->getAccessor()->getFolderAccess($_SESSION['user'], array($this->getFolder()->getId())) >= UserAccess::ACCESS_WRITE) {
+            $this->getFile()->setFilename(pathinfo($newName, PATHINFO_FILENAME));
+            $this->getFileMapper()->save($this->getFile());
+        }
+        else {
+            throw new Sabre\DAV\Exception\Forbidden('Permission denied to modify file');
+        }
     }
 
 
@@ -67,23 +93,31 @@ class DAV_File extends Sabre\DAV\File
 
 
     /**
+     * Modify file
      * @param resource $data
+     * @throws Sabre\DAV\Exception\Forbidden
      */
     public function put($data)
     {
-        try {
-            // accept the data as a new storage
-            $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->acceptStream(
-                $this->getFile()->getBasename(), $data, false
-            );
+        if ($this->getAccessor()->getFolderAccess($_SESSION['user'], array($this->getFolder()->getId())) >= UserAccess::ACCESS_WRITE) {
 
-            // point this file to the new content
+            try {
+                // accept the data as a new storage
+                $storage = Schoolbox\Resource\Storage\Mapper::getInstance()->acceptStream(
+                    $this->getFile()->getBasename(), $data, false
+                );
 
-            $this->getFile()->setStorage($storage);
-            $this->getFileMapper()->save($this->getFile());
+                // point this file to the new content
 
-        } catch (Schoolbox\File\Exception $e) {
-            // ...? noop? throw?
+                $this->getFile()->setStorage($storage);
+                $this->getFileMapper()->save($this->getFile());
+
+            } catch (Schoolbox\File\Exception $e) {
+                // ...? noop? throw?
+            }
+        }
+        else {
+            throw new Sabre\DAV\Exception\Forbidden('Permission denied to modify file');
         }
     }
 
@@ -108,10 +142,16 @@ class DAV_File extends Sabre\DAV\File
 
     /**
      * @return void
+     * @throws Sabre\DAV\Exception\Forbidden
      */
     public function delete()
     {
-        $this->getFileMapper()->delete($this->getFile());
+        if ($this->getAccessor()->getFolderAccess($_SESSION['user'], array($this->getFolder()->getId())) >= UserAccess::ACCESS_WRITE) {
+            $this->getFileMapper()->delete($this->getFile());
+        }
+        else {
+            throw new Sabre\DAV\Exception\Forbidden('Permission denied to delete file');
+        }
     }
 
 
@@ -152,6 +192,7 @@ class DAV_File extends Sabre\DAV\File
 
             if ($allFolders->count()) {
                 $folderId = $allFolders->first()->getId();
+                $this->setFolder($allFolders->first());
             }
         }
 
@@ -219,4 +260,38 @@ class DAV_File extends Sabre\DAV\File
     {
         return $this->folderMapper;
     }
+
+    /**
+     * @return \Schoolbox\Resource\Folder\Model
+     */
+    private function getFolder()
+    {
+        return $this->folder;
+    }
+
+    /**
+     * @param \Schoolbox\Resource\Folder\Model $folder
+     */
+    private function setFolder($folder)
+    {
+        $this->folder = $folder;
+    }
+
+    /**
+     * @return \Schoolbox\Permission\Access\Access
+     */
+    private function getAccessor()
+    {
+        return $this->accessor;
+    }
+
+    /**
+     * @param \Schoolbox\Permission\Access\Access $accessor
+     */
+    private function setAccessor($accessor)
+    {
+        $this->accessor = $accessor;
+    }
+
+
 }
