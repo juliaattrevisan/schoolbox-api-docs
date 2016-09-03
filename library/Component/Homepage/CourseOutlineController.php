@@ -88,7 +88,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
             // Try to get original course folder from each unit in course.
             foreach ($this->unit_list as $unit) {
                 try {
-                    $this->originalCourse = Folder\Mapper::getInstance()->findById(
+                    $this->originalCourse = Folder\Mapper::getInstance()->findCheaplyById(
                         Folder\Mapper::getInstance()->findCheaplyById($unit->getUnitCategory()->getId())
                             ->getParent()->getId()
                     );

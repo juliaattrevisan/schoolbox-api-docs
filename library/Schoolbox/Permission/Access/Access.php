@@ -111,7 +111,7 @@ class Access
 
             try {
                 $accessLevels[] = RoleAccessMapper::getInstance()
-                    ->getAccess($user, $folderIds[0])
+                    ->getAccess($user, $folderIds[0], $cache)
                     ->getType();
             } catch (Mapper\Exception $e) {
                 // Noop
