@@ -193,9 +193,6 @@ class Controller extends Base
      */
     public function getReport()
     {
-        if ($this->getUser()->getRole()->isStudent())
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-
         $records = $this->getReportData();
 
         // Restrict results based on pagination
@@ -258,14 +255,6 @@ class Controller extends Base
      */
     public function getReportPrint()
     {
-        if ($this->getUser()->getRole()->isStudent())
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-
-        // Kick them back to the kerb if they aren't allowed to view this page
-
-        if (!$this->getUser()->getRole()->isStaff())
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-
         $this->getResponse()->content->set(
             array(
                 'template' => '@pastoral/reportPrint.twig',
@@ -339,15 +328,6 @@ class Controller extends Base
      */
     public function getReportBuilder()
     {
-        if ($this->getUser()->getRole()->isStudent())
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-
-        // Get current users role. The screen is restricted to pastoral moderators only
-        // Kick them back to the kerb if they shouldn't be looking at this page
-
-        if (!$this->getUser()->getRole()->isStaff())
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-
         // Create some arrays used to repopulate the selectizes
 
         // Students
@@ -433,24 +413,12 @@ class Controller extends Base
      */
     public function getIndex($id)
     {
-        if ($this->getUser()->getRole()->isStudent())
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-
         // Get the students parents
 
         $externalUserMapper = new \External_User();
         $student = $this->getUserMapper()->findWithSubjects($id);
         $student->loadParents();
         $student->loadTeachers();
-
-        // The list screen is restricted to parents and staff
-
-        if ($this->getPastoralModeratorLevel() < UserAccess::ACCESS_READ)
-            if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->isParentOf($student))
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-
-        if ($this->getUser()->getRole()->isParent() && !$this->getDi()->get('config')->get('pastoral_parent_access'))
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
 
         // Get the students contact details for display
 
@@ -519,44 +487,17 @@ class Controller extends Base
      */
     public function getRecord($studentId, $id)
     {
-        if ($this->getUser()->getRole()->isStudent())
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-
         // Get the students parents
 
         $student = $this->getUserMapper()->findWithSubjects($studentId);
         $student->loadParents();
-
-        // Get pastoral moderator status
-        if ($this->getPastoralModeratorLevel() < UserAccess::ACCESS_READ) {
-            if (!$this->getUser()->getRole()->isStaff() && !$this->getUser()->isParentOf($student)) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
-            }
-        }
-
-        if ($this->getUser()->getRole()->isParent() && !$this->getDi()->get('config')->get('pastoral_parent_access'))
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
 
         // Get the pastoral care record
 
         try {
             $pastoral = $this->getPastoralMapper()->findById($id);
         } catch (MapperException $e) {
-            if ($e->getCode() == 401) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
-            } else {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
-            }
-        }
-
-        if ($pastoral->getPrivate()) {
-            if (!$this->getPastoralMapper()->hasPrivatePermission($pastoral)) {
-
-                // Didn't have access to private record, but did have access by role
-
-                $this->getResponse()->redirect->afterPost("/pastoral/{$student->getId()}");
-                return;
-            }
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
         }
 
         // Load in related records
@@ -599,14 +540,6 @@ class Controller extends Base
      */
     public function getInsert($id)
     {
-        if ($this->getUser()->getRole()->isStudent())
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-
-        // Only staff should be inserting comments
-
-        if (!$this->getUser()->getRole()->isStaff())
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-
         try {
             $student = $this->getUserMapper()->findById($id);
         } catch (MapperException $e) {
@@ -642,9 +575,6 @@ class Controller extends Base
      */
     public function getUpdate($id)
     {
-        if ($this->getUser()->getRole()->isStudent())
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-
         // Get the record we are updating
 
         try {
@@ -652,12 +582,6 @@ class Controller extends Base
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
         }
-
-        // Only the staff member that owns the record should be updating it
-
-        if ($this->getPastoralModeratorLevel() < UserAccess::ACCESS_WRITE)
-            if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $record->getOwner()->getId())
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
 
         // Lets get the party started...
 
@@ -689,9 +613,6 @@ class Controller extends Base
      */
     public function postCommentDelete()
     {
-        if ($this->getUser()->getRole()->isStudent())
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-
         // Get the comment we are deleting
 
         try {
@@ -700,11 +621,6 @@ class Controller extends Base
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
         }
-
-        // Only the staff member that owns the record should be updating it
-
-        if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $comment->getOwner()->getId())
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
 
         $pastoralExternal = new \External_Pastoral();
         $pastoralExternal->deleteComment($comment);
@@ -719,15 +635,6 @@ class Controller extends Base
      */
     public function postComment()
     {
-        if ($this->getUser()->getRole()->isStudent())
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-
-        // Post a comment on a pastoral record
-        // Only staff should be doing this
-
-        if (!$this->getUser()->getRole()->isStaff())
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-
         // No blank comments thanks
 
         if (trim($this->getRequest()->post["body"]) != '')
@@ -757,15 +664,6 @@ class Controller extends Base
     public function postSave()
     {
         $post = $this->getRequest()->post;
-
-        if ($this->getUser()->getRole()->isStudent())
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-
-        // Only staff should be doing this
-
-        if (!$this->getUser()->getRole()->isStaff()) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-        }
 
         // External interface
 
@@ -924,13 +822,6 @@ class Controller extends Base
 
             $records->add($record);
 
-            // Only the owner or a moderator should be updating a record
-
-            if ($this->getPastoralModeratorLevel() < UserAccess::ACCESS_WRITE) {
-                if ($this->getUser()->getId() != $record->getOwner()->getId()) {
-                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
-                }
-            }
 
             try {
                 if ($this->getRequest()->post["typeId"] != null) {
@@ -1200,22 +1091,12 @@ class Controller extends Base
      */
     public function postDelete()
     {
-        if ($this->getUser()->getRole()->isStudent())
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_MODULE);
-
         // Get the record we are deleting
 
         try {
             $record = $this->getPastoralMapper()->findById($this->getRequest()->post["id"]);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
-        }
-
-        // Work out if this person should be allowed to delete the record
-        if ($this->getPastoralModeratorLevel() < UserAccess::ACCESS_WRITE) {
-            if (!$this->getUser()->getRole()->isStaff() || $this->getUser()->getId() != $record->getOwner()->getId()) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_PERM_RECORD);
-            }
         }
 
         $this->getPastoralCommentMapper()->deleteByColumn("pastoral_id", $this->getRequest()->post["id"]);

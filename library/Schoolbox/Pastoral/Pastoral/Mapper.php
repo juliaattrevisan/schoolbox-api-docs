@@ -3,17 +3,14 @@
  * @author      Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
  */
 
 namespace Schoolbox\Pastoral\Pastoral;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 use Schoolbox\RoleMapper;
@@ -175,12 +172,9 @@ class Mapper extends BaseMapper
     /**
      * Find all pastoral records by student ID number
      *
-     * @var int $id
-     *
-     * @return Collection|Pastoral\Model[]
-     * @throws MapperException
+     * @param $id
+     * @return Collection
      */
-
     public function findByStudentId($id)
     {
         $query = "
@@ -242,7 +236,6 @@ class Mapper extends BaseMapper
      * @return Pastoral\Model
      * @throws MapperException
      */
-
     public function findById($id)
     {
         $query = "
@@ -273,19 +266,16 @@ class Mapper extends BaseMapper
 
             // Check permissions
 
-            if ($this->hasPermission($record)) {
+            $record = $this->hydrateRecord($record, $row);
 
-                $record = $this->hydrateRecord($record, $row);
-
-                if ($record->getPrivate() && !$this->hasPrivatePermission($record)) {
-                    $record->setBody("The contents of this record have been marked as private.");
-                    $record->setShowPrivate(false);
-                } else {
-                    $record->setShowPrivate(true);
-                }
-
-                return $record;
+            if ($record->getPrivate() && !$this->hasPrivatePermission($record)) {
+                $record->setBody("The contents of this record have been marked as private.");
+                $record->setShowPrivate(false);
+            } else {
+                $record->setShowPrivate(true);
             }
+
+            return $record;
         }
 
         throw new MapperException('Instance of object not found');
@@ -294,12 +284,9 @@ class Mapper extends BaseMapper
     /**
      * Find pastoral record by parent ID number
      *
-     * @var int $parentId
-     *
-     * @return Collection|Model
-     * @throws MapperException
+     * @param $parentId
+     * @return Collection
      */
-
     public function findByParentId($parentId)
     {
         $query = "
@@ -348,7 +335,6 @@ class Mapper extends BaseMapper
      * @param $students
      * @param $tags
      * @return Collection
-     * @throws SchoolboxException
      */
     public function findAllReport($before_date, $after_date, $severity, $types, $authors, $students, $tags)
     {
@@ -506,7 +492,7 @@ class Mapper extends BaseMapper
                 try {
                     $record->setStudent($this->getUserMapper()->findById($record->getStudent()->getId()));
                 } catch (MapperException $e) {
-                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
+                    return false;
                 }
 
                 $record->getStudent()->loadParents();
@@ -681,7 +667,7 @@ class Mapper extends BaseMapper
             try {
                 $comment->setOwner($this->getUserMapper()->findById($comment->getOwner()->getId()));
             } catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
+                $comment->setOwner($this->getUserMapper()->getUnknownUser());
             }
         }
 

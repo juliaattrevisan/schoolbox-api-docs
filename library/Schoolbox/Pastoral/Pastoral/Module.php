@@ -14,6 +14,12 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Pastoral\Authorizer\Rule\IsInAudience;
+use Schoolbox\Pastoral\Authorizer\Rule\IsOwner;
+use Schoolbox\Pastoral\Authorizer\Rule\IsParentAccessAllowed;
+use Schoolbox\Pastoral\Authorizer\Rule\IsParentOfStudent;
+use Schoolbox\Pastoral\Authorizer\Rule\IsPastoralModerator;
+use Schoolbox\Role;
 use \Schoolbox\User;
 use Twig_Loader_Chain;
 
@@ -34,7 +40,6 @@ class Module extends BaseModule
                 '/report-builder'       => 'getReportBuilder',
                 '/report'               => 'getReport',
                 '/report-print'         => 'getReportPrint',
-                '/categories/{typeId}'  => 'getCategories',
                 '/insert/{id}'          => 'getInsert',
                 '/update/{id}'          => 'getUpdate',
                 '/{studentId}/{id}'     => 'getRecord',
@@ -60,7 +65,80 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $this->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn());
+        $permissionViewRecord = new Rule\All(
+            // Must be logged in
+            new Rule\IsLoggedIn(),
+
+            // And either...
+            new Rule\Any(
+
+                // Superusers and moderators get a free pass
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new IsPastoralModerator()
+                ),
+
+                // Otherwise...
+                new Rule\Any(
+
+                    // Staff members that are in the audience
+                    new Rule\All(
+                        new IsInAudience(),
+                        new Rule\HasRole(Role::STAFF)
+                    ),
+
+                    // Or parents of the child in the audience (and parent access is allowed in Schoolbox config)
+                    new Rule\All(
+                        new Rule\HasRole(Role::PARENT),
+                        new IsParentAccessAllowed(),
+                        new IsParentOfStudent(),
+                        new IsInAudience()
+                    )
+                )
+            )
+        );
+
+        $this->addRoutePermission($authorizer, 'getRecord', $permissionViewRecord);
+
+        // Only staff can create reports, insert records, or post comments
+
+        $permissionStaff = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\HasRole(Role::STAFF)
+            )
+        );
+
+        $this->addRoutePermission($authorizer, 'getReportBuilder|getReport|getReportPrint|getInsert|postComment|postCommentDelete', $permissionStaff);
+
+        // Only staff, or parents of the student can view a students pastoral care record list page
+
+        $permissionIndex = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\HasRole(Role::STAFF),
+                new Rule\All(
+                    new Rule\HasRole(Role::PARENT),
+                    new IsParentOfStudent(),
+                    new IsParentAccessAllowed()
+                )
+            )
+        );
+
+        $this->addRoutePermission($authorizer, 'getIndex', $permissionIndex);
+
+        // Only superusers, pastoral moderators or the owner of a record can update it
+
+        $permissionUpdate = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new IsPastoralModerator(),
+                new IsOwner()
+            )
+        );
+
+        $this->addRoutePermission($authorizer, 'getUpdate|postSave|postDelete', $permissionUpdate);
     }
 
     /**
