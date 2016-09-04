@@ -14,6 +14,15 @@ use Schoolbox\User;
 
 class Access
 {
+
+    /**
+     * Permission/access level constants
+     */
+
+    const VISIBILITY_EVERYONE = 0;                 // Accessible by everyone
+    const VISIBILITY_STAFF = 1;                    // Accessible by staff only
+    const VISIBILITY_STAFF_PARENT = 2;             // Accessible by staff & parents only
+
     /**
      * Cache folder access calls
      *
@@ -47,7 +56,7 @@ class Access
     /**
      * @param User $user
      * @param array $folderIds
-     * @param bool $cache           Whether to use cached results or get them from DB again
+     * @param bool $cache Whether to use cached results or get them from DB again
      * @return int
      */
     public function getFolderAccess(User $user, array $folderIds, $cache = true)
@@ -62,8 +71,7 @@ class Access
 
         // Check CMS access level
 
-        try
-        {
+        try {
             $accessLevels[] = UserAccessMapper::getInstance()
                 ->getAccess($user, null, UserAccess::SERVICE_CMS)
                 ->getAccessLevel();
@@ -73,25 +81,19 @@ class Access
             if (in_array(UserAccess::ACCESS_FULL, $accessLevels)) {
                 return UserAccess::ACCESS_FULL;
             }
-        }
-        catch (Mapper\Exception $e)
-        {
+        } catch (Mapper\Exception $e) {
             // noop
         }
 
-        if (count($folderIds) != 1)
-        {
+        if (count($folderIds) != 1) {
             $accessLevels[] = UserAccessMapper::getInstance()
                 ->userHasMinimumAccessToAll($user->getId(), $folderIds, UserAccess::ACCESS_WRITE)
                 ? UserAccess::ACCESS_WRITE
                 : UserAccess::ACCESS_DENY;
-        }
-        else
-        {
+        } else {
             // Check user access level
 
-            try
-            {
+            try {
                 $accessLevels[] = UserAccessMapper::getInstance()
                     ->getAccess($user, $folderIds[0], UserAccess::SERVICE_HOMEPAGE, $cache)
                     ->getAccessLevel();
@@ -101,22 +103,17 @@ class Access
                 if (in_array(UserAccess::ACCESS_FULL, $accessLevels)) {
                     return UserAccess::ACCESS_FULL;
                 }
-            }
-            catch (Mapper\Exception $e)
-            {
+            } catch (Mapper\Exception $e) {
                 // Noop
             }
 
             // Check role access level
 
-            try
-            {
+            try {
                 $accessLevels[] = RoleAccessMapper::getInstance()
                     ->getAccess($user, $folderIds[0])
                     ->getType();
-            }
-            catch (Mapper\Exception $e)
-            {
+            } catch (Mapper\Exception $e) {
                 // Noop
             }
         }

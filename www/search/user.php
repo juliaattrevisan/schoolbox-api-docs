@@ -3,6 +3,7 @@
 use Schoolbox\UserMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access as Access;
 
 //require_once 'include/permission.php';
 
@@ -258,6 +259,23 @@ function renderStudent(
     if ($user->getRole()->isParent() && !Config::get('pastoral_parent_access'))
         $showPastoral = false;
 
+    $protectStudentContacts = \Config::get('protect_student_contacts');
+
+    $hideContacts = $userObject->getHideContacts() ? 1 : 0;
+
+    switch ($protectStudentContacts) {
+        case Access::VISIBILITY_EVERYONE : // Everyone
+            break;
+        case Access::VISIBILITY_STAFF: // Staff Only
+            if (!$user->getRole()->isStaff())
+                $hideContacts = true;
+            break;
+        case Access::VISIBILITY_STAFF_PARENT: // Staff & Parents Only
+            if (!$user->getRole()->isStaff() && !$user->getRole()->isParent())
+                $hideContacts = true;
+            break;
+    }
+
     $page->setVar(
         'OUTPUT',
         $page->getTwig()->render(
@@ -268,7 +286,7 @@ function renderStudent(
                 'externalUser'   => $externalUser,
                 'showPastoral'   => $showPastoral,
                 'eportfolioAuth' => $authenticator->canView(),
-                'hideContacts'   => $userObject->getHideContacts() ? 1 : 0,
+                'hideContacts'   => $hideContacts,
                 'showClasses'    => $userObject->getHideTimetable() ? 0 : 1,
                 'now'            => Alaress_Date_Format::now(),
                 'boarderType'    => $synUserHandler->determineBoarderType($externalUser['StudentBoarder']),
@@ -278,7 +296,7 @@ function renderStudent(
                 'formTeacher'    => $formTeacher,
                 'tutorTeacher'   => $tutorTeacher,
                 'hohTeacher'     => $hohTeacher,
-                'coordTeacher'   => $coordTeacher,
+                'coordTeacher'   => $coordTeacher
             ]
         )
     );
