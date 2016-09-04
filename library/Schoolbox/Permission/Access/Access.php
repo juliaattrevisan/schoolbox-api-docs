@@ -61,6 +61,8 @@ class Access
      */
     public function getFolderAccess(User $user, array $folderIds, $cache = true)
     {
+
+
         // Superusers always have full access
 
         if ($user->isSuperuser()) {
@@ -92,6 +94,9 @@ class Access
                 : UserAccess::ACCESS_DENY;
         } else {
             // Check user access level
+            if($cache && isset($this->cachedFolderAccess[$user->getId()][$folderIds[0]])){
+                return $this->cachedFolderAccess[$user->getId()][$folderIds[0]];
+            }
 
             try {
                 $accessLevels[] = UserAccessMapper::getInstance()
@@ -101,7 +106,8 @@ class Access
                 // Short-circuit if access is full
 
                 if (in_array(UserAccess::ACCESS_FULL, $accessLevels)) {
-                    return UserAccess::ACCESS_FULL;
+                        $this->cachedFolderAccess[$user->getId()][$folderIds[0]] = UserAccess::ACCESS_FULL;
+                        return UserAccess::ACCESS_FULL;
                 }
             } catch (Mapper\Exception $e) {
                 // Noop
@@ -119,9 +125,12 @@ class Access
         }
 
         if (empty($accessLevels)) {
+            $this->cachedFolderAccess[$user->getId()][$folderIds[0]] = UserAccess::ACCESS_DENY;
             return UserAccess::ACCESS_DENY;
         }
 
-        return max($accessLevels);
+        $maxLevel = max($accessLevels);
+        return $this->cachedFolderAccess[$user->getId()][$folderIds[0]] = $maxLevel;
+
     }
 }

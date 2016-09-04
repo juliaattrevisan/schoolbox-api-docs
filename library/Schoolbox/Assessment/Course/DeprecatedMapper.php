@@ -184,7 +184,12 @@ class DeprecatedMapper extends FolderMapper
      */
     public function findCourseListByName($searchParam, $options = [])
     {
-        return $this->findByColumn('name', "%{$this->database->quoteForLike($searchParam)}%", $options);
+        if($this->database->quoteForLike($searchParam)) {
+            return $this->findByColumn('name', "%{$this->database->quoteForLike($searchParam)}%", $options);
+        }
+        else {
+            return $this->findAll($options);
+        }
     }
 
     /**
