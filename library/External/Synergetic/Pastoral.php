@@ -674,25 +674,29 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      */
     public function deletePastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
     {
-        if (trim($pastoral->getExternalId()) != '') {
-            $result = $this->getDatabase()->query("DELETE FROM PastoralCareContacts WHERE PastoralCareSeq = " . $pastoral->getExternalId());
+        if (Config::get('pastoral_external_delete')) {
+            if (trim($pastoral->getExternalId()) != '') {
+                $result = $this->getDatabase()->query("DELETE FROM PastoralCareContacts WHERE PastoralCareSeq = " . $pastoral->getExternalId());
 
-            if ($result)
-                $result = $this->getDatabase()->query("DELETE FROM PastoralCareComments WHERE PastoralCareSeq = " . $pastoral->getExternalId());
-            else
-                return false;
+                if ($result) {
+                    $result = $this->getDatabase()->query("DELETE FROM PastoralCareComments WHERE PastoralCareSeq = " . $pastoral->getExternalId());
+                } else {
+                    return false;
+                }
 
-            if ($result)
-                $result = $this->getDatabase()->query("DELETE FROM tPastoralCare WHERE PastoralCareSeq = " . $pastoral->getExternalId());
-            else
-                return false;
+                if ($result) {
+                    $result = $this->getDatabase()->query("DELETE FROM tPastoralCare WHERE PastoralCareSeq = " . $pastoral->getExternalId());
+                } else {
+                    return false;
+                }
 
-            return $result;
-        } else {
+                return $result;
+            } else {
 
-            // Nothing to delete
+                // Nothing to delete
 
-            return true;
+                return true;
+            }
         }
     }
 
