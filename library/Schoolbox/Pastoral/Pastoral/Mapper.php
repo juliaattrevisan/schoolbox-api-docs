@@ -30,15 +30,9 @@ use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Permission\Access\Access as AccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
 
 class Mapper extends BaseMapper
 {
-    /**
-     * @var ErrorMapper
-     */
-    protected $errorMapper;
-
     /**
      * @var RoleMapper
      */
@@ -89,7 +83,6 @@ class Mapper extends BaseMapper
      */
     public function __construct()
     {
-        $this->setErrorMapper(ErrorMapper::getInstance());
         $this->setUserAccessMapper(UserAccessMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
         $this->setAccessMapper(AccessMapper::getInstance());
@@ -753,24 +746,6 @@ class Mapper extends BaseMapper
     /**
      * Here be the getters/setters
      */
-
-    /**
-     * @param $errorMapper
-     * @return $this
-     */
-    public function setErrorMapper($errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
-        return $this;
-    }
-
-    /**
-     * @return ErrorMapper
-     */
-    public function getErrorMapper()
-    {
-        return $this->errorMapper;
-    }
 
     /**
      * @param $userAccessMapper
