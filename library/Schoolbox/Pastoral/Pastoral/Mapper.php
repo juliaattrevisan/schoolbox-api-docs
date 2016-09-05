@@ -517,24 +517,23 @@ class Mapper extends BaseMapper
             return true;
         }
 
-        /** @var \Schoolbox\User $user */
-        $user = $_SESSION["user"];
+        $user = $this->getSessionUser();
 
         if ($user instanceof User) {
 
-            // Pastoral moderators can access everything
-
-            if ($user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0) {
-                return true;
-            }
-
-            // To access a private record you at least be a staff member
+            // To access a private record you must be a staff member
 
             /** @var \Schoolbox\Role $role */
             $role = $user->getRole();
 
-            if ($role->isStudent() || $role->isParent() || $role->isGuest()) {
+            if (!$role->isStaff()) {
                 return false;
+            }
+
+            // Pastoral moderators can always access private records
+
+            if ($user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0) {
+                return true;
             }
 
             // Give owners permission to their own records regardless of other permissions
@@ -547,23 +546,17 @@ class Mapper extends BaseMapper
 
             $accessRecords = $this->getPastoralAccessMapper()->findByColumn("pastoral_id", $record->getId());
 
-            $record->setAccessList($accessRecords);
-
             foreach ($accessRecords as $accessCurrent) {
-                // Access records are either role based of user based.
+                // Only specifically audienced individuals can access private records, so we are only interested
+                // in records with a numeric `user_id`
 
                 if (is_numeric($accessCurrent->getUser()->getId())) {
-                    // This access record is a user based one, check if this is the user
-
-
                     if ($accessCurrent->getUser()->getId() == $user->getId()) {
                         return true;
                     }
                 }
             }
         }
-
-        // BZZZZZT! You're outta here.
 
         return false;
     }
