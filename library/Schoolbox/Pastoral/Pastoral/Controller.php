@@ -366,6 +366,7 @@ class Controller extends Base
                     'student' => $student,
                     'id' => '',
                     'record' => null,
+                    'allowIndividual' => $this->getDi()->get('config')->get('pastoral_individual_access'),
                     'allowParents' => $this->getDi()->get('config')->get('pastoral_parent_access'),
                     'types' => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
                     'categories' => $this->getPastoralCategoryMapper()->findAll()->sortBy('name', 'asc'),
@@ -400,6 +401,7 @@ class Controller extends Base
                 'data' => array(
                     'session' => $_SESSION,
                     'record' => $record,
+                    'allowIndividual' => $this->getDi()->get('config')->get('pastoral_individual_access'),
                     'allowParents' => $this->getDi()->get('config')->get('pastoral_parent_access'),
                     'types' => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
                     'categories' => $this->getPastoralCategoryMapper()->findAll()->sortBy('name', 'asc'),

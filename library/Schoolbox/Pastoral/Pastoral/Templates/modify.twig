@@ -274,15 +274,17 @@
                     </div>
                 </fieldset>
 
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>
-                            Individual User Access
-                            <span class="hint has-tip tip-top" data-tooltip title="Add individual users who you would like to access this record and its contents. These users will be able to see content marked as hidden.">?</span>
-                            <select id="addUser" name="user_id[]" multiple placeholder="Individual Users"></select>
-                        </label>
-                    </div>
-                </fieldset>
+                {% if allowIndividual %}
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label>
+                                Individual User Access
+                                <span class="hint has-tip tip-top" data-tooltip title="Add individual users who you would like to access this record and its contents. These users will be able to see content marked as hidden.">?</span>
+                                <select id="addUser" name="user_id[]" multiple placeholder="Individual Users"></select>
+                            </label>
+                        </div>
+                    </fieldset>
+                {% endif %}
 
                 {% if record.getAccessList.count > 0 %}
                     <ul class="grid information-list">
