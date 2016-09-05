@@ -1,6 +1,6 @@
 <?php
 /**
- * IsParentAccessAllowed
+ * IsParentAccessAllowed - Determine if parent access is allowed in Schoolbox instances config
  *
  * @author      Damian Sloane <steve.chan@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
@@ -23,7 +23,6 @@ class IsParentAccessAllowed implements IAuthorizationRule
     }
 
     /**
-     * Determine if the logged in user should have access to the requested pastoral care record
      * {@inheritdoc}
      */
     public function authorize(array $params = array(), User $user = null)

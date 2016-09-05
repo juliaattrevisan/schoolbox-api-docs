@@ -29,7 +29,6 @@ class IsOwner implements IAuthorizationRule
     }
 
     /**
-     * Determine if the logged in user should have access to the requested pastoral care record
      * {@inheritdoc}
      */
     public function authorize(array $params = array(), User $user = null)

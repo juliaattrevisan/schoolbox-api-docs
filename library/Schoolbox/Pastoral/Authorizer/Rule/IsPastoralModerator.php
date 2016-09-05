@@ -1,6 +1,6 @@
 <?php
 /**
- * IsPastoralModerator
+ * IsPastoralModerator - Determine if the logged in user is a pastoral moderator
  *
  * @author      Damian Sloane <steve.chan@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
@@ -17,7 +17,6 @@ use Alaress\Authorizer\Failure\Unauthorized;
 class IsPastoralModerator implements IAuthorizationRule
 {
     /**
-     * Determine if the logged in user should have access to the requested pastoral care record
      * {@inheritdoc}
      */
     public function authorize(array $params = array(), User $user = null)

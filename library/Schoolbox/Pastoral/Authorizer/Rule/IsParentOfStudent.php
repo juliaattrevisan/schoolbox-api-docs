@@ -1,6 +1,6 @@
 <?php
 /**
- * IsParentOfStudent
+ * IsParentOfStudent - Determine if user is parent of the student in the record we are viewing
  *
  * @author      Damian Sloane <steve.chan@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
@@ -28,7 +28,6 @@ class IsParentOfStudent implements IAuthorizationRule
     }
 
     /**
-     * Determine if the logged in user should have access to the requested pastoral care record
      * {@inheritdoc}
      */
     public function authorize(array $params = array(), User $user = null)
