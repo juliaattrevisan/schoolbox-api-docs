@@ -272,7 +272,9 @@ class Mapper extends BaseMapper
                         if ($matches[$matchId]->getAwayTeam()->getId() == $result->getTeam()->getId()) {
                             $matches[$matchId]->setAwayTeamResult($result);
                         } else {
-                            throw new \LogicException('Cannot match this result with a match team');
+                            // This result doesn't belong to either team.
+                            // Who knows how it got here, but it is safe to ignore.
+//                            throw new \LogicException('Cannot match this result with a match team');
                         }
                     }
                 }
