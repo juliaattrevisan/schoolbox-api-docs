@@ -396,24 +396,12 @@ class Mapper extends BaseMapper
                 $order_sql .= ", ";
             }
 
-            if ($order_current == 'student') {
-                $order_sql .= "`s`.lastname, `s`.firstname";
-            } else {
-                if ($order_current == 'severity') {
-                    $order_sql .= "`sv`.order";
-                } else {
-                    if ($order_current == 'date') {
-                        $order_sql .= "`r`.created_at";
-                    } else {
-                        if ($order_current == 'category') {
-                            $order_sql .= "`c`.name";
-                        } else {
-                            if ($order_current == 'author') {
-                                $order_sql .= "`o`.lastname, `o`.firstname";
-                            }
-                        }
-                    }
-                }
+            switch ($order_current) {
+                case 'student': $order_sql .= "`s`.lastname, `s`.firstname"; break;
+                case 'severity': $order_sql .= "`sv`.order"; break;
+                case 'date': $order_sql .= "`r`.created_at"; break;
+                case 'category': $order_sql .= "`c`.name"; break;
+                case 'author': $order_sql .= "`o`.lastname, `o`.firstname"; break;
             }
         }
 
