@@ -136,7 +136,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
      * @param int $now
      * @return array
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
     {
         $vars = array(
             'sbGetPeriodNumber',

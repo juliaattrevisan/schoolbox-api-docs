@@ -93,7 +93,7 @@ foreach ($userList as $user) {
 
             $staffFlag = $user->getRole()->isStaff();
 
-            $periodCurrent = $timetableHandler->getPeriodNumber($campus);
+            $periodCurrent = $timetableHandler->getPeriodNumber($campus, 0, $user);
             $dayCurrent = $timetableHandler->getDayNumber($campus);
 
             try {

@@ -143,7 +143,7 @@ class External_Pcschools_Timetable implements External_TimetableInterface
      * @internal param $campusId
      * @return array
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
     {
         // Assume that definition doesn't vary per student
         // Should this use getFullTimetable then?

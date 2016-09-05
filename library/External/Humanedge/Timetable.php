@@ -127,7 +127,7 @@ class External_Humanedge_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
     {
         $db   = $this->loadAPlusDatabase();
         $time = $now

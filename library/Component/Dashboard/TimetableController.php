@@ -75,7 +75,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                     if ($day_number) {
                         $this->dayNumber[$campus_id] = $day_number;
                         $this->dayName[$campus_id] = $timetableHandler->getDayName($day_number);
-                        $this->currentPeriod[$campus_id] = $timetableHandler->getPeriodNumber($campus);
+                        $this->currentPeriod[$campus_id] = $timetableHandler->getPeriodNumber($campus, 0, $user);
                         $this->timetable[$campus_id] = $timetableHandler->getTimetableForDate(
                             $_SESSION['sid'], $_SESSION['id'], $campus, Alaress_Date_Format::now()
                         );

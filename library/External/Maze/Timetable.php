@@ -211,7 +211,7 @@ class External_Maze_Timetable implements External_TimetableInterface
      * @param int $now
      * @return int
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
     {
         if ($now) {
             $now = new \Alaress_Date_Format($now, 'U');

@@ -25,7 +25,7 @@ class External_Offline_Timetable implements External_TimetableInterface
     }
 
 
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0)
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
     {
         // Noop
     }
