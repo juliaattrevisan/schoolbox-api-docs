@@ -691,13 +691,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                 }
 
                 return $result;
-            } else {
-
-                // Nothing to delete
-
-                return true;
             }
         }
+
+        return true;
     }
 
 
