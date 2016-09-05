@@ -334,9 +334,10 @@ class Mapper extends BaseMapper
      * @param $authors
      * @param $students
      * @param $tags
+     * @param $order
      * @return Collection
      */
-    public function findAllReport($before_date, $after_date, $severity, $types, $authors, $students, $tags)
+    public function findAllReport($before_date, $after_date, $severity, $types, $authors, $students, $tags, $order)
     {
         // Create filter SQL
 
@@ -366,6 +367,27 @@ class Mapper extends BaseMapper
             $criteria_sql .= $criterion;
         }
 
+        $order_sql = "";
+        $order_array = explode(",", $order);
+
+        foreach ($order_array as $order_current) {
+            if ($order_sql != "") {
+                $order_sql .= ", ";
+            }
+
+            if ($order_current == 'student') {
+                $order_sql .= "`s`.lastname, `s`.firstname";
+            } else if ($order_current == 'severity') {
+                $order_sql .= "`sv`.order";
+            } else if ($order_current == 'date') {
+                $order_sql .= "`r`.created_at";
+            } else if ($order_current == 'category') {
+                $order_sql .= "`c`.name";
+            } else if ($order_current == 'author') {
+                $order_sql .= "`o`.lastname, `o`.firstname";
+            }
+        }
+
         // Execute SQL
 
         $query = "
@@ -383,11 +405,9 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
             LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
             {$criteria_sql}
-            ORDER BY
-              `s`.lastname,
-
-            `r`.created_at
+            ORDER BY {$order_sql}
         ";
+
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute();
@@ -540,12 +560,9 @@ class Mapper extends BaseMapper
 
     /**
      * Checks if the logged in user has permission to view private records
-     *
      * @var Pastoral\Model $record
-     *
      * @return bool
      */
-
     public function hasPrivatePermission(Pastoral\Model $record)
     {
         // Hack for notifier
@@ -608,9 +625,10 @@ class Mapper extends BaseMapper
     // Since this hydration is common to all of the methods, shoved it down here
 
     /**
-     * @param Pastoral\Model $record
+     * @param Model $record
      * @param $row
-     * @return Pastoral\Model
+     * @return Model
+     * @throws MapperException
      */
     protected function hydrateRecord(Pastoral\Model $record, $row)
     {
@@ -650,13 +668,13 @@ class Mapper extends BaseMapper
                     $role = $this->getRoleMapper()->findById($access->getRole()->getId());
                     $access->setRole($role);
                 } catch (MapperException $e) {
-                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
+                    throw new MapperException('Instance of object not found');
                 }
             } else if ($access->getUser()->getId() != '') {
                 try {
                     $access->setUser($this->getUserMapper()->findById($access->getUser()->getId()));
                 } catch (MapperException $e) {
-                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND, $e);
+                    throw new MapperException('Instance of object not found');
                 }
             }
         }
@@ -685,7 +703,7 @@ class Mapper extends BaseMapper
                 $attachment->setFilename($file->getFilename());
             }
             catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_FILE_NOT_FOUND);
+                throw new MapperException('Instance of attached file not found');
             }
         }
 

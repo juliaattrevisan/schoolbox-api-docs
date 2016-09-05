@@ -318,9 +318,14 @@ class Controller extends Base
         else
             $tags = $this->getRequest()->query["tags"];
 
+        if (!isset($this->getRequest()->query["order"]))
+            $order = '';
+        else
+            $order = $this->getRequest()->query["order"];
+
         // Get matching records
 
-        return $this->getPastoralMapper()->findAllReport($before_date, $after_date, $severity, $types, $authors, $students, $tags);
+        return $this->getPastoralMapper()->findAllReport($before_date, $after_date, $severity, $types, $authors, $students, $tags, $order);
     }
 
     /**

@@ -9,15 +9,17 @@
 
     $(function () {
 
+        $('#sort-order').sortable({handle: '.grip', axis: 'y'});
+
         {# Toggle all checkboxes when the 'Select All' box is changed #}
 
-        $('[data-check-all]').change(function(e) {
+        $('[data-check-all]').change(function (e) {
             $('[data-check-type]').prop('checked', $(e.target)[0].checked);
         });
 
         {# Whenever a type checkbox is changed disable the 'Select All' box #}
 
-        $('[data-check-type]').change(function(e) {
+        $('[data-check-type]').change(function (e) {
             $('[data-check-all]').prop('checked', false);
         });
 
@@ -31,8 +33,8 @@
 
         $('#tags_filter').selectizeSelector({
             ajax: {
-                url:      '/ajax/tags/pastoral',
-                type:     'GET',
+                url: '/ajax/tags.php',
+                type: 'GET',
                 dataType: 'json'
             },
             multiple: true,
@@ -46,35 +48,35 @@
             },
             value: [
                 {% for tag in tagsSelected %}
-                    {'id':'{{ tag | escape('js') }}', 'name': '{{ tag | escape('js') }}'},
+                {'id': '{{ tag | escape('js') }}', 'name': '{{ tag | escape('js') }}'},
                 {% endfor %}]
         });
 
         $('#filterStudents').selectizeSelector({
             multiple: true,
             ajax: {
-                url:      '/ajax/user.php',
-                type:     'GET',
-                data:     {roleTypeID: 'student'},
+                url: '/ajax/user.php',
+                type: 'GET',
+                data: {roleTypeID: 'student'},
                 dataType: 'json'
             },
             value: [
                 {% for student in studentsSelected %}
-                {'id':'{{ student.id }}', 'name': '{{ student.name | escape('js') }}'},
+                {'id': '{{ student.id }}', 'name': '{{ student.name | escape('js') }}'},
                 {% endfor %}]
         });
 
         $('#filterAuthors').selectizeSelector({
             multiple: true,
             ajax: {
-                url:      '/ajax/user.php',
-                type:     'GET',
-                data:     {roleTypeID: 'staff'},
+                url: '/ajax/user.php',
+                type: 'GET',
+                data: {roleTypeID: 'staff'},
                 dataType: 'json'
             },
             value: [
                 {% for author in authorsSelected %}
-                {'id':'{{ author.id }}', 'name': '{{ author.name | escape('js') }}'},
+                {'id': '{{ author.id }}', 'name': '{{ author.name | escape('js') }}'},
                 {% endfor %}]
         });
 
@@ -84,7 +86,7 @@
 
         {# Generate the report after a little sanity checking#}
 
-        $('[data-report]').click(function(event) {
+        $('[data-report]').click(function (event) {
 
             event.preventDefault();
 
@@ -114,14 +116,24 @@
                 error = true;
             }
 
-            if (!error)
-            {
+            if (!error) {
                 // Create report page GET variables
 
                 $('#tags').val($('#tags_filter').val());
                 $('#after').val($('#datetime_after').val());
                 $('#before').val($('#datetime_before').val());
                 $('#severity').val($('#filterSeverity').val());
+
+                var order = '';
+
+                $('#sort-order').children('li').each(function (d) {
+                    if (order != '') {
+                        order += ',';
+                    }
+                    order = order + $(this).data('order');
+                });
+
+                $('#order').val(order);
 
                 var types = '';
                 var types_array = $('[name="types[]"]');
@@ -134,7 +146,7 @@
                 if (authors.val() != null)
                     $('#authors').val(authors.val().join());
 
-                for (var i=0; i<types_array.length; i++) {
+                for (var i = 0; i < types_array.length; i++) {
                     if (types_array[i].checked) {
                         if (types != '') {
                             types += ",";
@@ -176,6 +188,7 @@
             <input type="hidden" id="tags" name="tags">
             <input type="hidden" id="before" name="before">
             <input type="hidden" id="after" name="after">
+            <input type="hidden" id="order" name="order">
         </form>
 
         <section>
@@ -194,57 +207,105 @@
                         <select id="filterSeverity" name="severity_id">
                             <option value="">Show All Severity Levels</option>
                             {% for severity in severities %}
-                                <option {% if severity.id == severitySelected %}selected{% endif %} value="{{ severity.order }}">{{ severity.name }}</option>
+                                <option {% if severity.id == severitySelected %}selected{% endif %}
+                                        value="{{ severity.order }}">{{ severity.name }}</option>
                             {% endfor %}
                         </select>
                     </label>
                 </div>
                 <div class="small-12 columns">
-                    <label id="datetime_after_error" for="datetime_after" class="error" style="display:none;">Invalid date range specified</label>
+                    <label id="datetime_after_error" for="datetime_after" class="error" style="display:none;">Invalid
+                        date range specified</label>
                 </div>
                 <div class="small-12 large-6 columns">
                     <label for="datetime_after">
                         Published On Or After
-                        <input type="text" class="required" name="after" id="datetime_after" maxlength="50" value="{{ afterSelected }}"/>
+                        <input type="text" class="required" name="after" id="datetime_after" maxlength="50"
+                               value="{{ afterSelected }}"/>
                     </label>
                 </div>
                 <div class="small-12 large-6 columns">
                     <label for="item_datetime_published">
                         Published On Or Before
-                        <input type="text" class="required" name="before" id="datetime_before" maxlength="50" value="{{ beforeSelected }}"/>
+                        <input type="text" class="required" name="before" id="datetime_before" maxlength="50"
+                               value="{{ beforeSelected }}"/>
                     </label>
                 </div>
                 <div class="small-12 columns">
                     <label for="item_datetime_published">
                         Filtered By Tags
-                        <input type="text" class="required" name="tags_filter" id="tags_filter" maxlength="50" value="{{ tagsSelected }}"/>
+                        <input type="text" class="required" name="tags_filter" id="tags_filter" maxlength="50"
+                               value="{{ tagsSelected }}"/>
                     </label>
                 </div>
-                <div class="small-12 columns">
-                    <fieldset class="checklist" data-equalizer-watch="">
-                        <label>
-                            Select Record Types To View
-                        </label>
-                        <input id="type-all" data-check-all type="checkbox">
-                        <label for="type-all">Select All</label>
-                        {% for type in types %}
-                            <input data-check-type id="type-{{ type.id }}" name="types[]" value="{{ type.id }}" type="checkbox"
+            </fieldset>
+        </section>
+
+        <h2 class="subheader">Record Types</h2>
+        <ul class="meta">
+            Select the record types you want to appear in the report
+        </ul>
+        <section>
+            <div class="small-12 columns content">
+                <div class="checklist" data-equalizer-watch="">
+                    <input id="type-all" data-check-all type="checkbox">
+                    <label for="type-all">Select All</label>
+                    {% for type in types %}
+                        <input data-check-type id="type-{{ type.id }}" name="types[]" value="{{ type.id }}" type="checkbox"
                                 {% for typeSelected in typesSelected %}
                                     {% if typeSelected == type.id %}
                                         checked
                                     {% endif %}
                                 {% endfor %}
-                            >
-                            <label for="type-{{ type.id }}">
-                                {{ type.name }}
-                            </label>
-                        {% endfor %}
-                    </fieldset>
+                        >
+                        <label for="type-{{ type.id }}">
+                            {{ type.name }}
+                        </label>
+                    {% endfor %}
                 </div>
-                <div class="small-12 columns">
-                    <label id="type_error" for="datetime_after" class="error" style="display:none;">You must select at least one record type to show in the report</label></div>
+                <label id="type_error" for="datetime_after" class="error" style="display:none;">
+                    You must select at least one record type to show in the report
+                </label>
+            </div>
+        </section>
 
-            </fieldset>
+        <h2 class="subheader">Sort Order</h2>
+        <ul class="meta">
+            Select the order in which you would like your report sorted
+        </ul>
+        <section>
+            <ul id="sort-order" class="information-list sortable ui-sortable" data-sortable="">
+                <li class="row" data-order="student">
+                    <div class="grip"></div>
+                    <div class="avatar card small-11">
+                        Student Name
+                    </div>
+                </li>
+                <li class="row" data-order="date">
+                    <div class="grip"></div>
+                    <div class="avatar card small-11">
+                        Published Date
+                    </div>
+                </li>
+                <li class="row" data-order="category">
+                    <div class="grip"></div>
+                    <div class="avatar card small-11">
+                        Record Type
+                    </div>
+                </li>
+                <li class="row" data-order="severity">
+                    <div class="grip"></div>
+                    <div class="avatar card small-11">
+                        Severity
+                    </div>
+                </li>
+                <li class="row" data-order="author">
+                    <div class="grip"></div>
+                    <div class="avatar card small-11">
+                        Author Name
+                    </div>
+                </li>
+            </ul>
         </section>
 
         <a href="#" data-report class="submit expand">Create Report</a>
