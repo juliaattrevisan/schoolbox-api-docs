@@ -15,6 +15,7 @@ use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
 use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class IsInAudience implements IAuthorizationRule
 {
@@ -39,7 +40,13 @@ class IsInAudience implements IAuthorizationRule
     public function authorize(array $params = array(), User $user = null)
     {
         $pastoralId = $params['id'];
-        $record = $this->getPastoralMapper()->findById($pastoralId);
+        try {
+            $record = $this->getPastoralMapper()->findById($pastoralId);
+        } catch (MapperException $e) {
+            // Record didn't exist
+            throw new Unauthorized();
+        }
+
         $role = $user->getRole();
 
         // Give owners permission to their own records regardless of other permissions
