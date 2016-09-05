@@ -202,7 +202,7 @@ class DAV_Folder extends Sabre\DAV\Collection
     public function delete()
     {
         if ($this->getAccessor()->getFolderAccess($_SESSION['user'], array($this->getFolderID())) >= UserAccess::ACCESS_WRITE) {
-            $this->getFolderMapper()->delete($this->getFolder());
+            $this->getFolderMapper()->deleteFolder($this->getFolder()->getId(), $_SESSION['user']);
         }
         else {
             throw new Sabre\DAV\Exception\Forbidden('Permission denied to delete folder');
