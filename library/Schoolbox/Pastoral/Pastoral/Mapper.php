@@ -34,51 +34,6 @@ use Schoolbox\Permission\Access\UserAccessMapper;
 class Mapper extends BaseMapper
 {
     /**
-     * @var RoleMapper
-     */
-    protected $roleMapper;
-
-    /**
-     * @var UserMapper
-     */
-    protected $userMapper;
-
-    /**
-     * @var UserAccessMapper
-     */
-    protected $userAccessMapper;
-
-    /**
-     * @var AccessMapper
-     */
-    protected $accessMapper;
-
-    /**
-     * @var StorageMapper
-     */
-    protected $storageMapper;
-
-    /**
-     * @var PastoralTagsMapper
-     */
-    protected $pastoralTagsMapper;
-
-    /**
-     * @var PastoralCommentMapper
-     */
-    protected $pastoralCommentMapper;
-
-    /**
-     * @var PastoralAccessMapper
-     */
-    protected $pastoralAccessMapper;
-
-    /**
-     * @var PastoralAttachmentMapper
-     */
-    protected $pastoralAttachmentMapper;
-
-    /**
      * Mapper constructor.
      */
     public function __construct()
@@ -165,7 +120,6 @@ class Mapper extends BaseMapper
 
     /**
      * Find all pastoral records by student ID number
-     *
      * @param $id
      * @return Collection
      */
@@ -220,9 +174,7 @@ class Mapper extends BaseMapper
 
     /**
      * Find pastoral record by ID number
-     *
      * @var int $id
-     *
      * @return Pastoral\Model
      * @throws MapperException
      */
@@ -272,7 +224,6 @@ class Mapper extends BaseMapper
 
     /**
      * Find pastoral record by parent ID number
-     *
      * @param $parentId
      * @return Collection
      */
@@ -310,7 +261,6 @@ class Mapper extends BaseMapper
 
     /**
      * Gets DB records matching report criteria
-     *
      * @param \Schoolbox\User $user
      * @param $before_date
      * @param $after_date
@@ -561,9 +511,8 @@ class Mapper extends BaseMapper
         return false;
     }
 
-    // Since this hydration is common to all of the methods, shoved it down here
-
     /**
+     * Since this hydration is common to all of the methods, shoved it down here
      * @param Model $record
      * @param $row
      * @return Model
@@ -654,6 +603,51 @@ class Mapper extends BaseMapper
     /**
      * Here be the getters/setters
      */
+
+    /**
+     * @var RoleMapper
+     */
+    protected $roleMapper;
+
+    /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
+     * @var UserAccessMapper
+     */
+    protected $userAccessMapper;
+
+    /**
+     * @var AccessMapper
+     */
+    protected $accessMapper;
+
+    /**
+     * @var StorageMapper
+     */
+    protected $storageMapper;
+
+    /**
+     * @var PastoralTagsMapper
+     */
+    protected $pastoralTagsMapper;
+
+    /**
+     * @var PastoralCommentMapper
+     */
+    protected $pastoralCommentMapper;
+
+    /**
+     * @var PastoralAccessMapper
+     */
+    protected $pastoralAccessMapper;
+
+    /**
+     * @var PastoralAttachmentMapper
+     */
+    protected $pastoralAttachmentMapper;
 
     /**
      * @param $userAccessMapper
