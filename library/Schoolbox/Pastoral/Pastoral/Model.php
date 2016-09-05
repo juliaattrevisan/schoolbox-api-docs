@@ -117,7 +117,8 @@ class Model implements ISoftDeletable
      * @param boolean $private
      * @return self
      */
-    public function setPrivate($private) {
+    public function setPrivate($private)
+    {
         $this->private = $private;
         return $this;
     }
@@ -125,7 +126,8 @@ class Model implements ISoftDeletable
     /**
      * @return boolean
      */
-    public function getPrivate() {
+    public function getPrivate()
+    {
         return $this->private;
     }
 
@@ -133,7 +135,8 @@ class Model implements ISoftDeletable
      * @param string $body
      * @return self
      */
-    public function setBody($body) {
+    public function setBody($body)
+    {
         $this->body = $body;
         return $this;
     }
@@ -141,14 +144,16 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getBody() {
+    public function getBody()
+    {
         return $this->body;
     }
 
     /**
      * @return string
      */
-    public function getBodyText() {
+    public function getBodyText()
+    {
         return Scrub::html2text($this->body);
     }
 
@@ -156,7 +161,8 @@ class Model implements ISoftDeletable
      * @param string $heading
      * @return self
      */
-    public function setHeading($heading) {
+    public function setHeading($heading)
+    {
         $this->heading = $heading;
         return $this;
     }
@@ -164,7 +170,8 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getHeading() {
+    public function getHeading()
+    {
         return $this->heading;
     }
 
@@ -172,7 +179,8 @@ class Model implements ISoftDeletable
      * @param int $id
      * @return self
      */
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
         return $this;
     }
@@ -180,7 +188,8 @@ class Model implements ISoftDeletable
     /**
      * @return int
      */
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
@@ -188,7 +197,8 @@ class Model implements ISoftDeletable
      * @param Collection|Pastoral\Comment\Model[] $commentList
      * @return self
      */
-    public function setCommentList($commentList) {
+    public function setCommentList($commentList)
+    {
         $this->commentList = $commentList;
         return $this;
     }
@@ -196,14 +206,16 @@ class Model implements ISoftDeletable
     /**
      * @return Collection|Pastoral\Comment\Model[]
      */
-    public function getCommentList() {
+    public function getCommentList()
+    {
         return $this->commentList;
     }
 
     /**
      * @return Collection|Pastoral\Attachment\Model[]
      */
-    public function getAttachmentList() {
+    public function getAttachmentList()
+    {
         return $this->attachmentList;
     }
 
@@ -211,7 +223,8 @@ class Model implements ISoftDeletable
      * @param Collection|Pastoral\Attachment\Model[] $attachmentList
      * @return self
      */
-    public function setAttachmentList($attachmentList) {
+    public function setAttachmentList($attachmentList)
+    {
         $this->attachmentList = $attachmentList;
         return $this;
     }
@@ -220,7 +233,8 @@ class Model implements ISoftDeletable
      * @param int $externalId
      * @return self
      */
-    public function setExternalId($externalId) {
+    public function setExternalId($externalId)
+    {
         $this->externalId = $externalId;
         return $this;
     }
@@ -228,7 +242,8 @@ class Model implements ISoftDeletable
     /**
      * @return int
      */
-    public function getExternalId() {
+    public function getExternalId()
+    {
         return $this->externalId;
     }
 
@@ -236,7 +251,8 @@ class Model implements ISoftDeletable
      * @param Pastoral\Type\Model $type
      * @return self
      */
-    public function setType($type) {
+    public function setType($type)
+    {
         $this->type = $type;
         return $this;
     }
@@ -244,7 +260,8 @@ class Model implements ISoftDeletable
     /**
      * @return Pastoral\Type\Model
      */
-    public function getType() {
+    public function getType()
+    {
         return $this->type;
     }
 
@@ -252,7 +269,8 @@ class Model implements ISoftDeletable
      * @param Pastoral\Category\Model $category
      * @return self
      */
-    public function setCategory($category) {
+    public function setCategory($category)
+    {
         $this->category = $category;
         return $this;
     }
@@ -260,7 +278,8 @@ class Model implements ISoftDeletable
     /**
      * @return Pastoral\Category\Model
      */
-    public function getCategory() {
+    public function getCategory()
+    {
         return $this->category;
     }
 
@@ -268,7 +287,8 @@ class Model implements ISoftDeletable
      * @param Model $parent
      * @return self
      */
-    public function setParent($parent) {
+    public function setParent($parent)
+    {
         $this->parent = $parent;
         return $this;
     }
@@ -276,7 +296,8 @@ class Model implements ISoftDeletable
     /**
      * @return Model
      */
-    public function getParent() {
+    public function getParent()
+    {
         return $this->parent;
     }
 
@@ -284,7 +305,8 @@ class Model implements ISoftDeletable
      * @param Pastoral\Severity\Model $severity
      * @return self
      */
-    public function setSeverity($severity) {
+    public function setSeverity($severity)
+    {
         $this->severity = $severity;
         return $this;
     }
@@ -292,7 +314,8 @@ class Model implements ISoftDeletable
     /**
      * @return Pastoral\Severity\Model
      */
-    public function getSeverity() {
+    public function getSeverity()
+    {
         return $this->severity;
     }
 
@@ -300,7 +323,8 @@ class Model implements ISoftDeletable
      * @param User $student
      * @return self
      */
-    public function setStudent($student) {
+    public function setStudent($student)
+    {
         $this->student = $student;
         return $this;
     }
@@ -308,7 +332,8 @@ class Model implements ISoftDeletable
     /**
      * @return User
      */
-    public function getStudent() {
+    public function getStudent()
+    {
         return $this->student;
     }
 
@@ -316,7 +341,8 @@ class Model implements ISoftDeletable
      * @param User $owner
      * @return self
      */
-    public function setOwner($owner) {
+    public function setOwner($owner)
+    {
         $this->owner = $owner;
         return $this;
     }
@@ -324,7 +350,8 @@ class Model implements ISoftDeletable
     /**
      * @return User
      */
-    public function getOwner() {
+    public function getOwner()
+    {
         return $this->owner;
     }
 
@@ -332,7 +359,8 @@ class Model implements ISoftDeletable
      * @param \Alaress_Date_Format $updatedAt
      * @return self
      */
-    public function setUpdatedAt($updatedAt) {
+    public function setUpdatedAt($updatedAt)
+    {
         $this->updatedAt = $updatedAt;
         return $this;
     }
@@ -340,7 +368,8 @@ class Model implements ISoftDeletable
     /**
      * @return \Alaress_Date_Format
      */
-    public function getUpdatedAt() {
+    public function getUpdatedAt()
+    {
         return $this->updatedAt;
     }
 
@@ -348,7 +377,8 @@ class Model implements ISoftDeletable
      * @param \Alaress_Date_Format $createdAt
      * @return self
      */
-    public function setCreatedAt($createdAt) {
+    public function setCreatedAt($createdAt)
+    {
         $this->createdAt = $createdAt;
         return $this;
     }
@@ -356,7 +386,8 @@ class Model implements ISoftDeletable
     /**
      * @return \Alaress_Date_Format
      */
-    public function getCreatedAt() {
+    public function getCreatedAt()
+    {
         return $this->createdAt;
     }
 
@@ -364,7 +395,8 @@ class Model implements ISoftDeletable
      * @param \Alaress_Date_Format $deletedAt
      * @return self
      */
-    public function setDeletedAt($deletedAt) {
+    public function setDeletedAt($deletedAt)
+    {
         $this->deletedAt = $deletedAt;
         return $this;
     }
@@ -372,44 +404,50 @@ class Model implements ISoftDeletable
     /**
      * @return \Alaress_Date_Format
      */
-    public function getDeletedAt() {
+    public function getDeletedAt()
+    {
         return $this->deletedAt;
-    }    
-    
+    }
+
     /**
      * Is this object deleted?
      *
      * @return bool
      */
-    public function isDeleted() {
+    public function isDeleted()
+    {
         return !$this->getDeletedAt() instanceof \Alaress_Date_NullDate;
     }
 
     /**
      * @param Collection|Model
      */
-    public function setRelatedRecords($relatedRecords) {
+    public function setRelatedRecords($relatedRecords)
+    {
         $this->relatedRecords = $relatedRecords;
     }
 
     /**
      * @return Collection|Model
      */
-    public function getRelatedRecords() {
+    public function getRelatedRecords()
+    {
         return $this->relatedRecords;
     }
 
     /**
      * @param Boolean
      */
-    public function setShowPrivate($showPrivate) {
+    public function setShowPrivate($showPrivate)
+    {
         $this->showPrivate = $showPrivate;
     }
 
     /**
      * @return Boolean
      */
-    public function getShowPrivate() {
+    public function getShowPrivate()
+    {
         return $this->showPrivate;
     }
 }

@@ -63,12 +63,10 @@ class Notifier extends AbstractModuleNotifier
         $accessModels = $this->getPastoralAccessMapper()->findByColumn("pastoral_id", $model->getId());
 
         /** @var PastoralAccessModel $accessModel */
-        foreach ($accessModels as $accessModel)
-        {
+        foreach ($accessModels as $accessModel) {
             $roleId = $accessModel->getRole()->getId();
 
-            if (!empty($roleId))
-            {
+            if (!empty($roleId)) {
                 // Sending to a role
 
                 /** @var Role $role */
@@ -76,20 +74,19 @@ class Notifier extends AbstractModuleNotifier
 
                 // The system should only notify staff if they are a teacher of the student
 
-                if ($role->isStaff())
-                {
+                if ($role->isStaff()) {
                     /** @var User $teacher */
-                    foreach ($teachers as $teacher)
-                        if ($teacher->getRole()->getId() == $roleId)
+                    foreach ($teachers as $teacher) {
+                        if ($teacher->getRole()->getId() == $roleId) {
                             $envelope->targetToUser($teacher->getId(), $message);
+                        }
+                    }
+                } else {
+                    if ($role->isParent()) {
+                        $sendToParents = true;
+                    }
                 }
-                else if ($role->isParent())
-                {
-                    $sendToParents = true;
-                }
-            }
-            else
-            {
+            } else {
                 // Sending to individual users
 
                 $skip = false;
@@ -104,20 +101,23 @@ class Notifier extends AbstractModuleNotifier
                 /** @var Role $role */
                 $role = $this->getRoleMapper()->findOneByColumn("id", $user->getRole()->getId());
 
-                if ($role->isParent() && $pastoral->getPrivate())
+                if ($role->isParent() && $pastoral->getPrivate()) {
                     $skip = true;
+                }
 
                 // Otherwise, send it to the user
 
-                if (!$skip)
+                if (!$skip) {
                     $envelope->targetToUser($accessModel->getUser()->getId(), $message);
+                }
             }
         }
 
         // Just make sure parents don't ever get private notifications
 
-        if ($sendToParents && !$pastoral->getPrivate())
+        if ($sendToParents && !$pastoral->getPrivate()) {
             $envelope->targetToParent($model->getStudent()->getId(), $message);
+        }
 
         return $envelope;
     }
@@ -127,14 +127,18 @@ class Notifier extends AbstractModuleNotifier
      */
     public function loadDependencies($dependencies = null)
     {
-        if (empty($dependencies["userMapper"]))
+        if (empty($dependencies["userMapper"])) {
             $dependencies["userMapper"] = UserMapper::getInstance();
-        if (empty($dependencies["pastoralMapper"]))
+        }
+        if (empty($dependencies["pastoralMapper"])) {
             $dependencies["pastoralMapper"] = PastoralMapper::getInstance();
-        if (empty($dependencies["pastoralAccessMapper"]))
+        }
+        if (empty($dependencies["pastoralAccessMapper"])) {
             $dependencies["pastoralAccessMapper"] = PastoralAccessMapper::getInstance();
-        if (empty($dependencies["roleMapper"]))
+        }
+        if (empty($dependencies["roleMapper"])) {
             $dependencies["roleMapper"] = RoleMapper::getInstance();
+        }
 
         parent::loadDependencies($dependencies);
     }
@@ -168,7 +172,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array $diff
      * @return Envelope
      */
-    public function notifyCreated($model, $userEffected, $diff=[])
+    public function notifyCreated($model, $userEffected, $diff = [])
     {
         return $this->buildMessage($model, self::TRIGGER_CREATED);
     }
@@ -180,7 +184,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array $diff
      * @return Envelope
      */
-    public function notifyUpdated($model, $userEffected, $diff=[])
+    public function notifyUpdated($model, $userEffected, $diff = [])
     {
         return $this->buildMessage($model, self::TRIGGER_UPDATED);
     }
@@ -192,19 +196,19 @@ class Notifier extends AbstractModuleNotifier
     public function retrieveCallbacks($label)
     {
         return [
-            [ $this, "notify" . ucfirst($label) ]
+            [$this, "notify" . ucfirst($label)]
         ];
     }
 
     // Here be the getters/setter
 
     /**
-     * @var RoleMapper $roleMapper;
+     * @var RoleMapper $roleMapper ;
      */
     protected $roleMapper;
 
     /**
-     * @var UserMapper $userMapper;
+     * @var UserMapper $userMapper ;
      */
     protected $userMapper;
 
@@ -217,7 +221,8 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @return PastoralAccessMapper
      */
-    public function getPastoralAccessMapper() {
+    public function getPastoralAccessMapper()
+    {
         return $this->pastoralAccessMapper;
     }
 
@@ -234,7 +239,8 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @return RoleMapper
      */
-    public function getRoleMapper() {
+    public function getRoleMapper()
+    {
         return $this->roleMapper;
     }
 
@@ -251,7 +257,8 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @return UserMapper
      */
-    public function getUserMapper() {
+    public function getUserMapper()
+    {
         return $this->userMapper;
     }
 
@@ -268,7 +275,8 @@ class Notifier extends AbstractModuleNotifier
     /**
      * @return PastoralMapper
      */
-    public function getPastoralMapper() {
+    public function getPastoralMapper()
+    {
         return $this->pastoralMapper;
     }
 

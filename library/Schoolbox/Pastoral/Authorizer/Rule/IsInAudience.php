@@ -90,7 +90,8 @@ class IsInAudience implements IAuthorizationRule
     /**
      * @return PastoralAccessMapper
      */
-    public function getPastoralAccessMapper() {
+    public function getPastoralAccessMapper()
+    {
         return $this->pastoralAccessMapper;
     }
 
@@ -98,7 +99,8 @@ class IsInAudience implements IAuthorizationRule
      * @param PastoralAccessMapper $mapper
      * @return $this
      */
-    public function setPastoralAccessMapper(PastoralAccessMapper $mapper) {
+    public function setPastoralAccessMapper(PastoralAccessMapper $mapper)
+    {
         $this->pastoralAccessMapper = $mapper;
         return $this;
     }
@@ -106,7 +108,8 @@ class IsInAudience implements IAuthorizationRule
     /**
      * @return PastoralMapper
      */
-    public function getPastoralMapper() {
+    public function getPastoralMapper()
+    {
         return $this->pastoralMapper;
     }
 
@@ -114,7 +117,8 @@ class IsInAudience implements IAuthorizationRule
      * @param PastoralMapper $mapper
      * @return $this
      */
-    public function setPastoralMapper(PastoralMapper $mapper) {
+    public function setPastoralMapper(PastoralMapper $mapper)
+    {
         $this->pastoralMapper = $mapper;
         return $this;
     }

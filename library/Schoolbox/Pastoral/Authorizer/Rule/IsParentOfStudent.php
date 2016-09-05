@@ -60,7 +60,8 @@ class IsParentOfStudent implements IAuthorizationRule
     /**
      * @return UserMapper
      */
-    public function getUserMapper() {
+    public function getUserMapper()
+    {
         return $this->userMapper;
     }
 
@@ -68,7 +69,8 @@ class IsParentOfStudent implements IAuthorizationRule
      * @param UserMapper $mapper
      * @return $this
      */
-    public function setUserMapper(UserMapper $mapper) {
+    public function setUserMapper(UserMapper $mapper)
+    {
         $this->userMapper = $mapper;
         return $this;
     }

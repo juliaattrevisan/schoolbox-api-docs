@@ -21,7 +21,6 @@ use Schoolbox\Pastoral\Authorizer\Rule\IsParentOfStudent;
 use Schoolbox\Pastoral\Authorizer\Rule\IsPastoralModerator;
 use Schoolbox\Pastoral\Authorizer\Rule\IsPastoralModeratorWrite;
 use Schoolbox\Role;
-use \Schoolbox\User;
 use Twig_Loader_Chain;
 
 class Module extends BaseModule
@@ -75,7 +74,7 @@ class Module extends BaseModule
             // And either...
             new Rule\Any
             (
-                // Superusers and moderators get a free pass
+            // Superusers and moderators get a free pass
                 new Rule\Any
                 (
                     new Rule\IsSuperuser(),

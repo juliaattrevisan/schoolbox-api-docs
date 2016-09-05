@@ -26,6 +26,7 @@ use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverityModel;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
+use Schoolbox\Pastoral\Attachment\Model as PastoralAttachmentModel;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Permission\Access\Access as AccessMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -131,40 +132,40 @@ class Mapper extends BaseMapper
         $this->hasJoin(
             'access',
             array(
-                'mapper'    => '\\Schoolbox\\Pastoral\\Access\\Mapper',
+                'mapper' => '\\Schoolbox\\Pastoral\\Access\\Mapper',
                 'other_key' => 'pastoral_id',
-                'this_key'  => 'id',
-                'multiple'  => true,
+                'this_key' => 'id',
+                'multiple' => true,
             )
         );
 
         $this->hasJoin(
             'tags',
             array(
-                'mapper'    => '\\Schoolbox\\Pastoral\\Tags\\Mapper',
+                'mapper' => '\\Schoolbox\\Pastoral\\Tags\\Mapper',
                 'other_key' => 'pastoral_id',
-                'this_key'  => 'id',
-                'multiple'  => true,
+                'this_key' => 'id',
+                'multiple' => true,
             )
         );
 
         $this->hasJoin(
             'comments',
             array(
-                'mapper'    => '\\Schoolbox\\Pastoral\\Comment\\Mapper',
+                'mapper' => '\\Schoolbox\\Pastoral\\Comment\\Mapper',
                 'other_key' => 'pastoral_id',
-                'this_key'  => 'id',
-                'multiple'  => true,
+                'this_key' => 'id',
+                'multiple' => true,
             )
         );
 
         $this->hasJoin(
             'attachments',
             array(
-                'mapper'    => '\\Schoolbox\\Pastoral\\Attachment\\Mapper',
+                'mapper' => '\\Schoolbox\\Pastoral\\Attachment\\Mapper',
                 'other_key' => 'pastoral_id',
-                'this_key'  => 'id',
-                'multiple'  => true,
+                'this_key' => 'id',
+                'multiple' => true,
             )
         );
     }
@@ -201,8 +202,7 @@ class Mapper extends BaseMapper
 
         $records = new Collection();
 
-        foreach ($statement as $row)
-        {
+        foreach ($statement as $row) {
             /** @var Pastoral\Model $record */
             $record = $this->hydrate($row, 'r');
 
@@ -259,8 +259,7 @@ class Mapper extends BaseMapper
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute(array($id));
 
-        foreach ($statement as $row)
-        {
+        foreach ($statement as $row) {
             /** @var Pastoral\Model $record */
             $record = $this->hydrate($row, 'r');
 
@@ -310,15 +309,15 @@ class Mapper extends BaseMapper
 
         $collection = new Collection;
 
-        foreach ($statement as $row)
-        {
+        foreach ($statement as $row) {
             /** @var Pastoral\Model $record */
             $record = $this->hydrate($row, 'r');
 
             // Check permissions
 
-            if ($this->hasPermission($record))
+            if ($this->hasPermission($record)) {
                 $collection->add($this->hydrateRecord($record, $row));
+            }
         }
 
         return $collection;
@@ -339,8 +338,18 @@ class Mapper extends BaseMapper
      * @param $involved
      * @return Collection
      */
-    public function findAllReport($user, $before_date, $after_date, $severity, $types, $authors, $students, $tags, $order, $involved)
-    {
+    public function findAllReport(
+        $user,
+        $before_date,
+        $after_date,
+        $severity,
+        $types,
+        $authors,
+        $students,
+        $tags,
+        $order,
+        $involved
+    ) {
         // Create filter SQL
 
         $criteria = [];
@@ -355,15 +364,25 @@ class Mapper extends BaseMapper
             $criteria[] = "created_at >= '" . $after_date->toIso8601String() . "'";
         }
 
-        if ($severity != '') $criteria[] = "sv.order >= {$severity}";
-        if ($students != '') $criteria[] = "student_id IN ({$students})";
-        if ($authors != '') $criteria[] = "owner_id IN ({$authors})";
-        if ($types != '') $criteria[] = "type_id IN ({$types})";
+        if ($severity != '') {
+            $criteria[] = "sv.order >= {$severity}";
+        }
+        if ($students != '') {
+            $criteria[] = "student_id IN ({$students})";
+        }
+        if ($authors != '') {
+            $criteria[] = "owner_id IN ({$authors})";
+        }
+        if ($types != '') {
+            $criteria[] = "type_id IN ({$types})";
+        }
 
         $criteria_sql = "";
 
         foreach ($criteria as $criterion) {
-            if ($criteria_sql != "") { $criteria_sql .= " AND "; } else {
+            if ($criteria_sql != "") {
+                $criteria_sql .= " AND ";
+            } else {
                 $criteria_sql = "WHERE ";
             }
             $criteria_sql .= $criterion;
@@ -379,14 +398,22 @@ class Mapper extends BaseMapper
 
             if ($order_current == 'student') {
                 $order_sql .= "`s`.lastname, `s`.firstname";
-            } else if ($order_current == 'severity') {
-                $order_sql .= "`sv`.order";
-            } else if ($order_current == 'date') {
-                $order_sql .= "`r`.created_at";
-            } else if ($order_current == 'category') {
-                $order_sql .= "`c`.name";
-            } else if ($order_current == 'author') {
-                $order_sql .= "`o`.lastname, `o`.firstname";
+            } else {
+                if ($order_current == 'severity') {
+                    $order_sql .= "`sv`.order";
+                } else {
+                    if ($order_current == 'date') {
+                        $order_sql .= "`r`.created_at";
+                    } else {
+                        if ($order_current == 'category') {
+                            $order_sql .= "`c`.name";
+                        } else {
+                            if ($order_current == 'author') {
+                                $order_sql .= "`o`.lastname, `o`.firstname";
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -437,15 +464,15 @@ class Mapper extends BaseMapper
 
         $records = new Collection();
 
-        foreach ($statement as $row)
-        {
+        foreach ($statement as $row) {
             /** @var Pastoral\Model $record */
             $record = $this->hydrate($row, 'r');
 
             // Skip if the record has been deleted
 
-            if ($record->isDeleted())
+            if ($record->isDeleted()) {
                 continue;
+            }
 
             // Check tags
 
@@ -513,7 +540,8 @@ class Mapper extends BaseMapper
             // Pastoral moderators can access everything
 
             if ($user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0 ||
-                $user->isSuperuser()) {
+                $user->isSuperuser()
+            ) {
                 return true;
             }
 
@@ -692,11 +720,13 @@ class Mapper extends BaseMapper
                 } catch (MapperException $e) {
                     throw new MapperException('Instance of object not found');
                 }
-            } else if ($access->getUser()->getId() != '') {
-                try {
-                    $access->setUser($this->getUserMapper()->findById($access->getUser()->getId()));
-                } catch (MapperException $e) {
-                    throw new MapperException('Instance of object not found');
+            } else {
+                if ($access->getUser()->getId() != '') {
+                    try {
+                        $access->setUser($this->getUserMapper()->findById($access->getUser()->getId()));
+                    } catch (MapperException $e) {
+                        throw new MapperException('Instance of object not found');
+                    }
                 }
             }
         }
@@ -715,6 +745,7 @@ class Mapper extends BaseMapper
 
         $attachments = $record->getAttachmentList();
 
+        /** @var PastoralAttachmentModel $attachment */
         foreach ($attachments as $attachment) {
 
             // Get file icon using mime type
@@ -723,8 +754,7 @@ class Mapper extends BaseMapper
                 $file = $this->getStorageMapper()->findByHash($attachment->getHash());
                 $attachment->setIcon($file->getMimetype()->getIconFile());
                 $attachment->setFilename($file->getFilename());
-            }
-            catch (MapperException $e) {
+            } catch (MapperException $e) {
                 throw new MapperException('Instance of attached file not found');
             }
         }
@@ -740,7 +770,8 @@ class Mapper extends BaseMapper
      * @param $errorMapper
      * @return $this
      */
-    public function setErrorMapper($errorMapper) {
+    public function setErrorMapper($errorMapper)
+    {
         $this->errorMapper = $errorMapper;
         return $this;
     }
@@ -748,132 +779,152 @@ class Mapper extends BaseMapper
     /**
      * @return ErrorMapper
      */
-    public function getErrorMapper() {
+    public function getErrorMapper()
+    {
         return $this->errorMapper;
     }
 
     /**
      * @param $userAccessMapper
      */
-    public function setUserAccessMapper($userAccessMapper) {
+    public function setUserAccessMapper($userAccessMapper)
+    {
         $this->userAccessMapper = $userAccessMapper;
     }
 
     /**
      * @return UserAccessMapper
      */
-    public function getUserAccessMapper() {
+    public function getUserAccessMapper()
+    {
         return $this->userAccessMapper;
     }
 
     /**
      * @param $accessMapper
      */
-    public function setAccessMapper($accessMapper) {
+    public function setAccessMapper($accessMapper)
+    {
         $this->accessMapper = $accessMapper;
     }
 
     /**
      * @return AccessMapper
      */
-    public function getAccessMapper() {
+    public function getAccessMapper()
+    {
         return $this->accessMapper;
     }
+
     /**
      * @param $roleMapper
      */
-    public function setRoleMapper($roleMapper) {
+    public function setRoleMapper($roleMapper)
+    {
         $this->roleMapper = $roleMapper;
     }
 
     /**
      * @return RoleMapper
      */
-    public function getRoleMapper() {
+    public function getRoleMapper()
+    {
         return $this->roleMapper;
     }
 
     /**
      * @param $userMapper
      */
-    public function setUserMapper($userMapper) {
+    public function setUserMapper($userMapper)
+    {
         $this->userMapper = $userMapper;
     }
 
     /**
      * @return UserMapper
      */
-    public function getUserMapper() {
+    public function getUserMapper()
+    {
         return $this->userMapper;
     }
 
     /**
      * @param $storageMapper
      */
-    public function setStorageMapper($storageMapper) {
+    public function setStorageMapper($storageMapper)
+    {
         $this->storageMapper = $storageMapper;
     }
 
     /**
      * @return StorageMapper
      */
-    public function getStorageMapper() {
+    public function getStorageMapper()
+    {
         return $this->storageMapper;
     }
 
     /**
      * @param $pastoralCommentMapper
      */
-    public function setPastoralCommentMapper($pastoralCommentMapper) {
+    public function setPastoralCommentMapper($pastoralCommentMapper)
+    {
         $this->pastoralCommentMapper = $pastoralCommentMapper;
     }
 
     /**
      * @return PastoralCommentMapper
      */
-    public function getPastoralCommentMapper() {
+    public function getPastoralCommentMapper()
+    {
         return $this->pastoralCommentMapper;
     }
 
     /**
      * @param $pastoralTagsMapper
      */
-    public function setPastoralTagsMapper($pastoralTagsMapper) {
+    public function setPastoralTagsMapper($pastoralTagsMapper)
+    {
         $this->pastoralTagsMapper = $pastoralTagsMapper;
     }
 
     /**
      * @return PastoralTagsMapper
      */
-    public function getPastoralTagsMapper() {
+    public function getPastoralTagsMapper()
+    {
         return $this->pastoralTagsMapper;
     }
 
     /**
      * @param $pastoralAttachmentMapper
      */
-    public function setPastoralAttachmentMapper($pastoralAttachmentMapper) {
+    public function setPastoralAttachmentMapper($pastoralAttachmentMapper)
+    {
         $this->pastoralAttachmentMapper = $pastoralAttachmentMapper;
     }
 
     /**
      * @return PastoralAttachmentMapper
      */
-    public function getPastoralAttachmentMapper() {
+    public function getPastoralAttachmentMapper()
+    {
         return $this->pastoralAttachmentMapper;
     }
 
     /**
      * @param $pastoralAccessMapper
      */
-    public function setPastoralAccessMapper($pastoralAccessMapper) {
+    public function setPastoralAccessMapper($pastoralAccessMapper)
+    {
         $this->pastoralAccessMapper = $pastoralAccessMapper;
     }
 
     /**
      * @return PastoralAccessMapper
      */
-    public function getPastoralAccessMapper() {
+    public function getPastoralAccessMapper()
+    {
         return $this->pastoralAccessMapper;
     }
 }

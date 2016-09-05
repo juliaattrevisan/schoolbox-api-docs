@@ -57,7 +57,8 @@ class IsOwner implements IAuthorizationRule
     /**
      * @return PastoralMapper
      */
-    public function getPastoralMapper() {
+    public function getPastoralMapper()
+    {
         return $this->pastoralMapper;
     }
 
@@ -65,7 +66,8 @@ class IsOwner implements IAuthorizationRule
      * @param PastoralMapper $mapper
      * @return $this
      */
-    public function setPastoralMapper(PastoralMapper $mapper) {
+    public function setPastoralMapper(PastoralMapper $mapper)
+    {
         $this->pastoralMapper = $mapper;
         return $this;
     }

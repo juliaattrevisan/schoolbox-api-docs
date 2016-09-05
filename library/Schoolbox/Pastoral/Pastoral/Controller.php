@@ -155,9 +155,11 @@ class Controller extends Base
             ->setReadOnly(false)
             ->setMulti(true);
 
-        if ($attachments != null)
-            foreach ($attachments as $attachment)
+        if ($attachments != null) {
+            foreach ($attachments as $attachment) {
                 $zone->attachFiles(array($attachment->getHash()));
+            }
+        }
 
         return $zone->getTwigContext();
     }
@@ -169,19 +171,22 @@ class Controller extends Base
      * @param int $now
      * @return int
      */
-    private function calculateAge($timestamp = 0, $now = 0) {
+    private function calculateAge($timestamp = 0, $now = 0)
+    {
 
-        if ($now == 0)
+        if ($now == 0) {
             $now = time();
+        }
 
-        $yearDiff   = date("Y", $now) - date("Y", $timestamp);
-        $monthDiff  = date("m", $now) - date("m", $timestamp);
-        $dayDiff    = date("d", $now) - date("d", $timestamp);
+        $yearDiff = date("Y", $now) - date("Y", $timestamp);
+        $monthDiff = date("m", $now) - date("m", $timestamp);
+        $dayDiff = date("d", $now) - date("d", $timestamp);
 
-        if ($monthDiff < 0)
+        if ($monthDiff < 0) {
             $yearDiff--;
-        elseif (($monthDiff == 0) && ($dayDiff < 0))
+        } elseif (($monthDiff == 0) && ($dayDiff < 0)) {
             $yearDiff--;
+        }
 
         $result = intval($yearDiff);
 
@@ -197,10 +202,11 @@ class Controller extends Base
 
         // Restrict results based on pagination
 
-        if (!isset($this->getRequest()->query["pageCurrent"]))
+        if (!isset($this->getRequest()->query["pageCurrent"])) {
             $pageCurrent = 1;
-        else
+        } else {
             $pageCurrent = $this->getRequest()->query["pageCurrent"];
+        }
 
         // This is the number of pages the user is allowed to select from at any one time (Must be even)
 
@@ -213,40 +219,45 @@ class Controller extends Base
 
         // Put some limit checks on page numbers
 
-        if ($pageCurrent < 1)
+        if ($pageCurrent < 1) {
             $pageCurrent = 1;
-        else if ($pageCurrent > $totalPages)
-            $pageCurrent = $totalPages;
+        } else {
+            if ($pageCurrent > $totalPages) {
+                $pageCurrent = $totalPages;
+            }
+        }
 
         // Grab the records we're going to render
 
         $paginatedRecords = new Collection;
 
-        for ($i = ($pageCurrent - 1) * $resultsPerPage; $i < ($pageCurrent - 1) * $resultsPerPage + $resultsPerPage; $i++)
-            if ($records[$i] != null)
+        for ($i = ($pageCurrent - 1) * $resultsPerPage; $i < ($pageCurrent - 1) * $resultsPerPage + $resultsPerPage; $i++) {
+            if ($records[$i] != null) {
                 $paginatedRecords[] = $records[$i];
+            }
+        }
 
         // And spit this thing out
         $this->getResponse()->content->set(
             array(
                 'template' => '@pastoral/report.twig',
-                'data'     => array(
-                    'session'               => $_SESSION,
-                    'results'               => $paginatedRecords,
-                    'resultsPerPage'        => $resultsPerPage,
-                    'pagesToDisplay'        => $pagesToDisplay % 2 == 0 ? $pagesToDisplay : $pagesToDisplay + 1,
-                    'totalPages'            => $totalPages,
-                    'totalResults'          => $records->count(),
-                    'pageCurrent'           => $pageCurrent,
-                    'students'              => $this->getRequest()->query["students"],
-                    'authors'               => $this->getRequest()->query["authors"],
-                    'severity'              => $this->getRequest()->query["severity"],
-                    'types'                 => $this->getRequest()->query["types"],
-                    'tags'                  => $this->getRequest()->query["tags"],
-                    'before'                => $this->getRequest()->query["before"],
-                    'after'                 => $this->getRequest()->query["after"],
-                    'order'                 => $this->getRequest()->query["order"],
-                    'involved'              => $this->getRequest()->query["involved"]
+                'data' => array(
+                    'session' => $_SESSION,
+                    'results' => $paginatedRecords,
+                    'resultsPerPage' => $resultsPerPage,
+                    'pagesToDisplay' => $pagesToDisplay % 2 == 0 ? $pagesToDisplay : $pagesToDisplay + 1,
+                    'totalPages' => $totalPages,
+                    'totalResults' => $records->count(),
+                    'pageCurrent' => $pageCurrent,
+                    'students' => $this->getRequest()->query["students"],
+                    'authors' => $this->getRequest()->query["authors"],
+                    'severity' => $this->getRequest()->query["severity"],
+                    'types' => $this->getRequest()->query["types"],
+                    'tags' => $this->getRequest()->query["tags"],
+                    'before' => $this->getRequest()->query["before"],
+                    'after' => $this->getRequest()->query["after"],
+                    'order' => $this->getRequest()->query["order"],
+                    'involved' => $this->getRequest()->query["involved"]
                 ),
             )
         );
@@ -260,18 +271,18 @@ class Controller extends Base
         $this->getResponse()->content->set(
             array(
                 'template' => '@pastoral/reportPrint.twig',
-                'data'     => array(
-                    'session'           => $_SESSION,
-                    'results'           => $this->getReportData(),
-                    'students'          => $this->getRequest()->query["students"],
-                    'authors'           => $this->getRequest()->query["authors"],
-                    'severity'          => $this->getRequest()->query["severity"],
-                    'types'             => $this->getRequest()->query["types"],
-                    'tags'              => $this->getRequest()->query["tags"],
-                    'before'            => $this->getRequest()->query["before"],
-                    'after'             => $this->getRequest()->query["after"],
-                    'order'             => $this->getRequest()->query["order"],
-                    'involved'          => $this->getRequest()->query["involved"]
+                'data' => array(
+                    'session' => $_SESSION,
+                    'results' => $this->getReportData(),
+                    'students' => $this->getRequest()->query["students"],
+                    'authors' => $this->getRequest()->query["authors"],
+                    'severity' => $this->getRequest()->query["severity"],
+                    'types' => $this->getRequest()->query["types"],
+                    'tags' => $this->getRequest()->query["tags"],
+                    'before' => $this->getRequest()->query["before"],
+                    'after' => $this->getRequest()->query["after"],
+                    'order' => $this->getRequest()->query["order"],
+                    'involved' => $this->getRequest()->query["involved"]
                 ),
             )
         );
@@ -287,54 +298,64 @@ class Controller extends Base
         // Make sure all the criteria exist before we starting trying to use them, and if they don't get passed
         // across, just set blank defaults
 
-        if (!isset($this->getRequest()->query["students"]))
+        if (!isset($this->getRequest()->query["students"])) {
             $students = '';
-        else
+        } else {
             $students = $this->getRequest()->query["students"];
+        }
 
-        if (!isset($this->getRequest()->query["authors"]))
+        if (!isset($this->getRequest()->query["authors"])) {
             $authors = '';
-        else
+        } else {
             $authors = $this->getRequest()->query["authors"];
+        }
 
-        if (!isset($this->getRequest()->query["types"]))
+        if (!isset($this->getRequest()->query["types"])) {
             $types = '';
-        else
+        } else {
             $types = $this->getRequest()->query["types"];
+        }
 
-        if (!isset($this->getRequest()->query["severity"]))
+        if (!isset($this->getRequest()->query["severity"])) {
             $severity = '';
-        else
+        } else {
             $severity = $this->getRequest()->query["severity"];
+        }
 
-        if (!isset($this->getRequest()->query["before"]))
+        if (!isset($this->getRequest()->query["before"])) {
             $before_date = '';
-        else
+        } else {
             $before_date = $this->getRequest()->query["before"];
+        }
 
-        if (!isset($this->getRequest()->query["after"]))
+        if (!isset($this->getRequest()->query["after"])) {
             $after_date = '';
-        else
+        } else {
             $after_date = $this->getRequest()->query["after"];
+        }
 
-        if (!isset($this->getRequest()->query["tags"]))
+        if (!isset($this->getRequest()->query["tags"])) {
             $tags = '';
-        else
+        } else {
             $tags = $this->getRequest()->query["tags"];
+        }
 
-        if (!isset($this->getRequest()->query["order"]))
+        if (!isset($this->getRequest()->query["order"])) {
             $order = '';
-        else
+        } else {
             $order = $this->getRequest()->query["order"];
+        }
 
-        if (!isset($this->getRequest()->query["involved"]))
+        if (!isset($this->getRequest()->query["involved"])) {
             $involved = 'false';
-        else
+        } else {
             $involved = $this->getRequest()->query["involved"];
+        }
 
         // Get matching records
 
-        return $this->getPastoralMapper()->findAllReport($this->getUser(), $before_date, $after_date, $severity, $types, $authors, $students, $tags, $order, $involved);
+        return $this->getPastoralMapper()->findAllReport($this->getUser(), $before_date, $after_date, $severity, $types,
+            $authors, $students, $tags, $order, $involved);
     }
 
     /**
@@ -354,7 +375,7 @@ class Controller extends Base
             $studentsSelected[] = [
                 'id' => $student->getId(),
                 'name' => $student->getFirstname() . " " . $student->getLastname() .
-                    " - Year " . $student->getYear() . " " .$student->getRole()->getName() .
+                    " - Year " . $student->getYear() . " " . $student->getRole()->getName() .
                     " (" . $student->getExternalId() . ")"
             ];
         }
@@ -379,19 +400,19 @@ class Controller extends Base
         $this->getResponse()->content->set(
             array(
                 'template' => '@pastoral/reportBuilder.twig',
-                'data'     => array(
-                    'session'           => $_SESSION,
-                    'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
-                    'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
-                    'tags'              => $this->getPastoralTagsMapper()->findAll(),
-                    'studentsSelected'  => $studentsSelected,
-                    'authorsSelected'   => $authorsSelected,
-                    'severitySelected'  => $this->getRequest()->query["severity"],
-                    'typesSelected'     => array_filter(explode(",", $this->getRequest()->query["types"])),
-                    'tagsSelected'      => array_filter(explode(",", $this->getRequest()->query["tags"])),
-                    'beforeSelected'    => $this->getRequest()->query["before"],
-                    'afterSelected'     => $this->getRequest()->query["after"],
-                    'superUser'         => $this->getPastoralModeratorLevel() >= UserAccess::ACCESS_READ || $this->getUser()->getSuperuser()
+                'data' => array(
+                    'session' => $_SESSION,
+                    'types' => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
+                    'severities' => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
+                    'tags' => $this->getPastoralTagsMapper()->findAll(),
+                    'studentsSelected' => $studentsSelected,
+                    'authorsSelected' => $authorsSelected,
+                    'severitySelected' => $this->getRequest()->query["severity"],
+                    'typesSelected' => array_filter(explode(",", $this->getRequest()->query["types"])),
+                    'tagsSelected' => array_filter(explode(",", $this->getRequest()->query["tags"])),
+                    'beforeSelected' => $this->getRequest()->query["before"],
+                    'afterSelected' => $this->getRequest()->query["after"],
+                    'superUser' => $this->getPastoralModeratorLevel() >= UserAccess::ACCESS_READ || $this->getUser()->getSuperuser()
                 ),
             )
         );
@@ -403,18 +424,20 @@ class Controller extends Base
      * @return int
      * @throws MapperException
      */
-    public function getPastoralModeratorLevel() {
+    public function getPastoralModeratorLevel()
+    {
         $pastoralModeratorList = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL);
 
         //Get first from collection
-        if($pastoralModeratorList->count() > 0) {
+        if ($pastoralModeratorList->count() > 0) {
             $pastoralModerator = $pastoralModeratorList->first()->getAccessLevel();
         } else {
             $pastoralModerator = UserAccess::ACCESS_DENY;
         }
 
-        if ($this->getUser()->isSuperuser())
+        if ($this->getUser()->isSuperuser()) {
             $pastoralModerator = UserAccess::ACCESS_FULL;
+        }
 
         return $pastoralModerator;
     }
@@ -441,10 +464,8 @@ class Controller extends Base
         $contactList = $externalUserMapper->getStudentContactList($student->getExternalId());
         $studentExternal = $externalUserMapper->getStudent($student->getExternalId());
 
-        if ($contactList instanceof Collection)
-        {
-            foreach ($contactList as $contact)
-            {
+        if ($contactList instanceof Collection) {
+            foreach ($contactList as $contact) {
                 $main = null;
                 try {
                     $main = $this->getUserMapper()->findByExternalId($contact['StudentContactID']);
@@ -474,18 +495,18 @@ class Controller extends Base
         $this->getResponse()->content->set(
             array(
                 'template' => '@pastoral/index.twig',
-                'data'     => array(
-                    'session'           => $_SESSION,
-                    'records'           => $records,
-                    'student'           => $student,
-                    'studentAge'        => $this->calculateAge($studentExternal['StudentBirthDate']),
-                    'studentContacts'   => $studentContacts,
-                    'role'              => $this->getUser()->getRole()->getType(),
-                    'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
-                    'teachers'          => $student->getTeacherCollection(),
-                    'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
-                    'READ_ACCESS'       => UserAccess::ACCESS_READ,
-                    'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
+                'data' => array(
+                    'session' => $_SESSION,
+                    'records' => $records,
+                    'student' => $student,
+                    'studentAge' => $this->calculateAge($studentExternal['StudentBirthDate']),
+                    'studentContacts' => $studentContacts,
+                    'role' => $this->getUser()->getRole()->getType(),
+                    'types' => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
+                    'teachers' => $student->getTeacherCollection(),
+                    'WRITE_ACCESS' => UserAccess::ACCESS_WRITE,
+                    'READ_ACCESS' => UserAccess::ACCESS_READ,
+                    'FULL_ACCESS' => UserAccess::ACCESS_FULL,
                     'pastoralModerator' => $this->getPastoralModeratorLevel()
                 ),
             )
@@ -534,14 +555,14 @@ class Controller extends Base
         $this->getResponse()->content->set(
             array(
                 'template' => '@pastoral/record.twig',
-                'data'     => array(
-                    'session'           => $_SESSION,
-                    'record'            => $pastoral,
-                    'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
-                    'READ_ACCESS'       => UserAccess::ACCESS_READ,
-                    'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
+                'data' => array(
+                    'session' => $_SESSION,
+                    'record' => $pastoral,
+                    'WRITE_ACCESS' => UserAccess::ACCESS_WRITE,
+                    'READ_ACCESS' => UserAccess::ACCESS_READ,
+                    'FULL_ACCESS' => UserAccess::ACCESS_FULL,
                     'pastoralModerator' => $this->getPastoralModeratorLevel(),
-                    'role'              => $this->getUser()->getRole()->getType(),
+                    'role' => $this->getUser()->getRole()->getType(),
                 ),
             )
         );
@@ -566,17 +587,17 @@ class Controller extends Base
         $this->getResponse()->content->set(
             array(
                 'template' => '@pastoral/modify.twig',
-                'data'     => array(
-                    'session'           => $_SESSION,
-                    'student'           => $student,
-                    'id'                => '',
-                    'record'            => null,
-                    'allowParents'      => $this->getDi()->get('config')->get('pastoral_parent_access'),
-                    'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
-                    'categories'        => $this->getPastoralCategoryMapper()->findAll()->sortBy('name', 'asc'),
-                    'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
-                    'roles'             => $this->getRoleMapper()->findAll(),
-                    'attachzone'        => $this->getAttachZone(),
+                'data' => array(
+                    'session' => $_SESSION,
+                    'student' => $student,
+                    'id' => '',
+                    'record' => null,
+                    'allowParents' => $this->getDi()->get('config')->get('pastoral_parent_access'),
+                    'types' => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
+                    'categories' => $this->getPastoralCategoryMapper()->findAll()->sortBy('name', 'asc'),
+                    'severities' => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
+                    'roles' => $this->getRoleMapper()->findAll(),
+                    'attachzone' => $this->getAttachZone(),
                 ),
             )
         );
@@ -603,19 +624,19 @@ class Controller extends Base
         $this->getResponse()->content->set(
             array(
                 'template' => '@pastoral/modify.twig',
-                'data'     => array(
-                    'session'           => $_SESSION,
-                    'record'            => $record,
-                    'allowParents'      => $this->getDi()->get('config')->get('pastoral_parent_access'),
-                    'types'             => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
-                    'categories'        => $this->getPastoralCategoryMapper()->findAll()->sortBy('name', 'asc'),
-                    'severities'        => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
-                    'roles'             => $this->getRoleMapper()->findAll(),
-                    'WRITE_ACCESS'      => WRITE_ACCESS,
-                    'READ_ACCESS'       => READ_ACCESS,
-                    'FULL_ACCESS'       => FULL_ACCESS,
+                'data' => array(
+                    'session' => $_SESSION,
+                    'record' => $record,
+                    'allowParents' => $this->getDi()->get('config')->get('pastoral_parent_access'),
+                    'types' => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
+                    'categories' => $this->getPastoralCategoryMapper()->findAll()->sortBy('name', 'asc'),
+                    'severities' => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
+                    'roles' => $this->getRoleMapper()->findAll(),
+                    'WRITE_ACCESS' => WRITE_ACCESS,
+                    'READ_ACCESS' => READ_ACCESS,
+                    'FULL_ACCESS' => FULL_ACCESS,
                     'pastoralModerator' => $this->getPastoralModeratorLevel(),
-                    'attachzone'        => $this->getAttachZone($this->getPastoralAttachmentMapper()->findByPastoralId($id)),
+                    'attachzone' => $this->getAttachZone($this->getPastoralAttachmentMapper()->findByPastoralId($id)),
                 ),
             )
         );
@@ -652,8 +673,7 @@ class Controller extends Base
     {
         // No blank comments thanks
 
-        if (trim($this->getRequest()->post["body"]) != '')
-        {
+        if (trim($this->getRequest()->post["body"]) != '') {
             $comment = new PastoralCommentModel();
             $comment->setPastoralId($this->getRequest()->post["pastoral_id"]);
             $comment->setBody($this->getRequest()->post["body"]);
@@ -824,9 +844,7 @@ class Controller extends Base
 
                 $pastoralExternal->createPastoral($record);
             }
-        }
-        else
-        {
+        } else {
             // Modifying existing record
 
             try {
@@ -1004,15 +1022,15 @@ class Controller extends Base
 
             // Update external record
 
-            if ($record->getExternalId() != "")
+            if ($record->getExternalId() != "") {
                 $pastoralExternal->updatePastoral($record);
-            else
+            } else {
                 $pastoralExternal->createPastoral($record);
+            }
         }
 
         /** @var PastoralModel $record */
-        foreach ($records as $record)
-        {
+        foreach ($records as $record) {
             // Delete attachments if required
 
             // Keep track of attachments that aren't deleted so we don't add them again
@@ -1027,6 +1045,7 @@ class Controller extends Base
                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
             }
 
+            /** @var PastoralAttachmentModel $attachment */
             foreach ($attachments as $attachment) {
 
                 $foundAttachment = false;
@@ -1133,42 +1152,48 @@ class Controller extends Base
     /**
      * @param $pastoralMapper
      */
-    public function setPastoralMapper($pastoralMapper) {
+    public function setPastoralMapper($pastoralMapper)
+    {
         $this->pastoralMapper = $pastoralMapper;
     }
 
     /**
      * @return PastoralMapper
      */
-    public function getPastoralMapper() {
+    public function getPastoralMapper()
+    {
         return $this->pastoralMapper;
     }
 
     /**
      * @param $userAccessMapper
      */
-    public function setUserAccessMapper($userAccessMapper) {
+    public function setUserAccessMapper($userAccessMapper)
+    {
         $this->userAccessMapper = $userAccessMapper;
     }
 
     /**
      * @return UserAccessMapper
      */
-    public function getUserAccessMapper() {
+    public function getUserAccessMapper()
+    {
         return $this->userAccessMapper;
     }
 
     /**
      * @param $pastoralTypeMapper
      */
-    public function setPastoralTypeMapper($pastoralTypeMapper) {
+    public function setPastoralTypeMapper($pastoralTypeMapper)
+    {
         $this->pastoralTypeMapper = $pastoralTypeMapper;
     }
 
     /**
      * @return PastoralTypeMapper
      */
-    public function getPastoralTypeMapper() {
+    public function getPastoralTypeMapper()
+    {
         return $this->pastoralTypeMapper;
     }
 
@@ -1184,145 +1209,165 @@ class Controller extends Base
      */
     public function getPastoralUploadQueueMapper() {
         return $this->pastoralUploadQueueMapper;
-    }    
+    }
 
     /**
      * @param $pastoralCategoryMapper
      */
-    public function setPastoralCategoryMapper($pastoralCategoryMapper) {
+    public function setPastoralCategoryMapper($pastoralCategoryMapper)
+    {
         $this->pastoralCategoryMapper = $pastoralCategoryMapper;
     }
 
     /**
      * @return PastoralCategoryMapper
      */
-    public function getPastoralCategoryMapper() {
+    public function getPastoralCategoryMapper()
+    {
         return $this->pastoralCategoryMapper;
-    }    
+    }
 
     /**
      * @param $pastoralSeverityMapper
      */
-    public function setPastoralSeverityMapper($pastoralSeverityMapper) {
+    public function setPastoralSeverityMapper($pastoralSeverityMapper)
+    {
         $this->pastoralSeverityMapper = $pastoralSeverityMapper;
     }
 
     /**
      * @return PastoralSeverityMapper
      */
-    public function getPastoralSeverityMapper() {
+    public function getPastoralSeverityMapper()
+    {
         return $this->pastoralSeverityMapper;
     }
 
     /**
      * @param $pastoralTagsMapper
      */
-    public function setPastoralTagsMapper($pastoralTagsMapper) {
+    public function setPastoralTagsMapper($pastoralTagsMapper)
+    {
         $this->pastoralTagsMapper = $pastoralTagsMapper;
     }
 
     /**
      * @return PastoralTagsMapper
      */
-    public function getPastoralTagsMapper() {
+    public function getPastoralTagsMapper()
+    {
         return $this->pastoralTagsMapper;
     }
 
     /**
      * @param $roleMapper
      */
-    public function setRoleMapper($roleMapper) {
+    public function setRoleMapper($roleMapper)
+    {
         $this->roleMapper = $roleMapper;
     }
 
     /**
      * @return RoleMapper
      */
-    public function getRoleMapper() {
+    public function getRoleMapper()
+    {
         return $this->roleMapper;
     }
 
     /**
      * @param $userMapper
      */
-    public function setUserMapper($userMapper) {
+    public function setUserMapper($userMapper)
+    {
         $this->userMapper = $userMapper;
     }
 
     /**
      * @return UserMapper
      */
-    public function getUserMapper() {
+    public function getUserMapper()
+    {
         return $this->userMapper;
     }
 
     /**
      * @param $pastoralCommentMapper
      */
-    public function setPastoralCommentMapper($pastoralCommentMapper) {
+    public function setPastoralCommentMapper($pastoralCommentMapper)
+    {
         $this->pastoralCommentMapper = $pastoralCommentMapper;
     }
 
     /**
      * @return PastoralCommentMapper
      */
-    public function getPastoralCommentMapper() {
+    public function getPastoralCommentMapper()
+    {
         return $this->pastoralCommentMapper;
     }
 
     /**
      * @param $pastoralAccessMapper
      */
-    public function setPastoralAccessMapper($pastoralAccessMapper) {
+    public function setPastoralAccessMapper($pastoralAccessMapper)
+    {
         $this->pastoralAccessMapper = $pastoralAccessMapper;
     }
 
     /**
      * @return PastoralAccessMapper
      */
-    public function getPastoralAccessMapper() {
+    public function getPastoralAccessMapper()
+    {
         return $this->pastoralAccessMapper;
     }
 
     /**
      * @param $pastoralAttachmentMapper
      */
-    public function setPastoralAttachmentMapper($pastoralAttachmentMapper) {
+    public function setPastoralAttachmentMapper($pastoralAttachmentMapper)
+    {
         $this->pastoralAttachmentMapper = $pastoralAttachmentMapper;
     }
 
     /**
      * @return PastoralAttachmentMapper
      */
-    public function getPastoralAttachmentMapper() {
+    public function getPastoralAttachmentMapper()
+    {
         return $this->pastoralAttachmentMapper;
     }
 
     /**
      * @param $errorMapper
      */
-    public function setErrorMapper($errorMapper) {
+    public function setErrorMapper($errorMapper)
+    {
         $this->errorMapper = $errorMapper;
     }
 
     /**
      * @return ErrorMapper
      */
-    public function getErrorMapper() {
+    public function getErrorMapper()
+    {
         return $this->errorMapper;
     }
 
     /**
      * @param $fileMapper
      */
-    public function setFileMapper($fileMapper) {
+    public function setFileMapper($fileMapper)
+    {
         $this->fileMapper = $fileMapper;
     }
 
     /**
      * @return FileMapper
      */
-    public function getFileMapper() {
+    public function getFileMapper()
+    {
         return $this->fileMapper;
     }
 }
