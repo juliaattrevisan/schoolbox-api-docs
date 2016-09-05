@@ -77,7 +77,7 @@ interface IAssessable
     public function numMarked();
 
     /**
-     * Calculate percentage of a Project that has been marked
+     * Calculate percentage of an IAssessable that has been marked
      *
      * @return int
      */
@@ -92,7 +92,7 @@ interface IAssessable
     public function numPublished();
 
     /**
-     * Calculate percentage of a Project that has been Published
+     * Calculate percentage of an IAssessable that has been Published
      *
      * @return int
      */
