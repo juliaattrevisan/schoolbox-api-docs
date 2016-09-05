@@ -73,7 +73,7 @@ foreach ($allListGroups as $key => $currentListGroup) {
 
 		/** @var \EOTC\Event $currentEvent */
 		foreach ($currentListGroup as $currentEvent) {
-			if ($authenticator->isEOTCAdministratorForCampus($sessionUser, $currentEvent)) {
+			if ($authenticator->isEOTCAdministratorForCampus($sessionUser, $currentEvent) || $sessionUser->isSuperuser()) {
 				$this->setVar([
 					'EVENT_ID'                         => $currentEvent->getId(),
 					'EVENT_STATUS_NAME'                => $currentEvent->getMetadata()->getStatus()->getName(),
