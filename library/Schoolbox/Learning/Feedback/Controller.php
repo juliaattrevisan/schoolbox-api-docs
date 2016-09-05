@@ -7,8 +7,14 @@
 namespace Schoolbox\Learning\Feedback;
 
 use Alaress\Web\Controller\Base;
+use Crocodoc\Renderer\Strategy\Crocodoc;
+use Schoolbox\Assessment\Component\SubmissionBox;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\User;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 
 class Controller extends Base
 {
@@ -31,27 +37,76 @@ class Controller extends Base
      * Displays feedback for the specified assessment and student
      *
      * @api   GET /learning/assessment/:id/feedback/:studentId
+     * @param IAssessable|int TODO - replace int with IAssessable in Module
+     * @param User $student
      * @level 165
      */
-    public function getAssessmentFeedback()
+    public function getAssessmentFeedback($assessmentId, User $student)
     {
         // TODO - generate data
+        // Replaces /submission/inlineGrading/view/:submissionId/:studentId
+        //       eg /submission/inlineGrading/view/56/219
+        // Replaces /assess/review/:assessId/:sectionId/:attemptId
+        //       eg /assess/review/9/8/7
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningFeedback/assessmentFeedback.twig', []));
+
+        // submission box object
+        // student object
+        // submission returns[]
+        // plagscan (summon a plag scan doc) search for 'plagscan_document' attached to a student submission
+        // needs to handle the inline grader (is an iFrame) needs to determine the URL for the iFrame
+        // runs the submission through a chain, and determines how to render it,
+        // the current code gets passed a student submission, and returns an 'inline-grade' object
+        // also needs to handle rubrics (rubrics is a meta object)
+        // just pass submission_collection through to twig
+        // just launch rubrics builder, it will return rubric (would prefer that twig interrogates and handles output, rather than simple string being inserted)
+
+        $twigData = [
+            'breadcrumbs' => self::getDummyBreadcrumbs(),
+            'assessment'  => \Schoolbox\Learning\Assessment\Controller::getDummyAssessment($assessmentId),
+            'student'     => $student,
+            'term'        => TermMapper::getInstance()->findById(4),
+        ];
+
+        // Project || Due Work
+        if(in_array($assessmentId, [1,2])){
+            // Rubric
+            $submissionBox = SubmissionBoxMapper::getInstance()->findById(56);
+            $twigData['rubric'] = RubricMapper::getInstance()->findBySubmissionBoxAndStudent($submissionBox, $student)->toContext();
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningFeedback/assessmentFeedback.twig', $twigData));
     }
 
 
     /**
-     * Displays a single feedback item
+     * Displays crocodoc/inline grading iframe, may also download as PDF
      *
      * @api   GET /learning/feedback/:id
+     * @param IFeedback|int $feedback  TODO ensure param is IFeedback using Module
      * @level 165
-     * @param IFeedback $feedback TODO implement IFeedback
      */
     public function getFeedback($feedback)
     {
         // TODO - generate data
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningFeedback/assessmentFeedback.twig', []));
+        switch($feedback){
+            case 1:
+                $feedback = \Schoolbox\Learning\Assessment\Controller::getDummyDueWorkFeedback(1);
+                break;
+            case 2:
+                $feedback = \Schoolbox\Learning\Assessment\Controller::getDummyQuizAnswer(1,true);
+                break;
+            case 3:
+            default:
+                $feedback = \Schoolbox\Learning\Assessment\Controller::getDummyTaskFeedback(1);
+                break;
+        }
+        $twigData = [
+            'breadcrumbs' => self::getDummyBreadcrumbs(),
+            'feedback'    => $feedback,
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', $twigData));
     }
 
 
@@ -74,5 +129,30 @@ class Controller extends Base
     {
         $this->errorMapper = $errorMapper;
         return $this;
+    }
+
+    // ================ DUMMY DATA GENERATION ===============================================
+
+    /**
+     * Temp method to generate dummy breadcrumbs
+     *
+     * @todo remove this method when no longer required
+     * @return array
+     */
+    public static function getDummyBreadcrumbs(){
+        return [
+            [
+                'href'  => '/learning/assessment/1/feedback/230',
+                'label' => 'FirstCrumb',
+            ],
+            [
+                'href'  => '/learning/assessment/2/feedback/230',
+                'label' => 'SecondCrumb',
+            ],
+            [
+                'href'  => '/learning/assessment/3/feedback/230',
+                'label' => 'ActiveCrumb',
+            ],
+        ];
     }
 }

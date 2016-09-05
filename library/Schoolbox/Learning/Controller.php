@@ -46,8 +46,12 @@ class Controller extends Base
         }
 
         // TODO - generate data
-        $assessmentsToMark = [];
-        $assessmentsNotSubmitted = [];
+        $assessmentsToMark = [
+            Assessment\Controller::getDummyAssessment(2),
+        ];
+        $assessmentsNotSubmitted = [
+            Assessment\Controller::getDummyAssessment(3),
+        ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', [
             'assessmentsToMark'       => $assessmentsToMark,
@@ -64,6 +68,11 @@ class Controller extends Base
      */
     public function getMarkbook(Folder $class)
     {
+        // Replaces /submission/listSubmission/{termSlug}/{folderId}
+        //       eg /submission/listSubmission/{termSlug}/{folderId}
+        // Replaces /submission/viewSubmission/{dueWorkId}
+        //       eg /submission/viewSubmission/56
+
         // Is current user not SuperUser or Staff ?
         if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
             $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getDue', [
@@ -87,7 +96,7 @@ class Controller extends Base
     }
 
     /**
-     * Displays a list of marks for students in the specified class
+     * Displays a list assessables that a student needs to complete
      *
      * @api   GET /due/{studentId}
      * @level 165
@@ -96,7 +105,11 @@ class Controller extends Base
     public function getDue(User $student)
     {
         // TODO - generate data
-        $assessmentsDue = [];
+        $assessmentsDue = [
+            Assessment\Controller::getDummyAssessment(2),
+            Assessment\Controller::getDummyAssessment(3),
+            Assessment\Controller::getDummyAssessment(4),
+        ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/dueWork.twig', [
             'student'        => $student,
@@ -104,8 +117,9 @@ class Controller extends Base
         ]));
     }
 
+
     /**
-     * Displays a list of grades for the specified user and term for all subjects
+     * Displays a list of grades/results for the specified user and term for all subjects
      *
      * @api   GET /learning/grades/{userId}/{termCode}
      * @level 165
@@ -114,8 +128,24 @@ class Controller extends Base
      */
     public function getGrades(User $student, Term $term)
     {
+        // Replaces /submission/allWork/:studentId/:termSlug
+        //       eg /submission/allWork/230/2016-2
+
         // TODO - generate data
-        $grades = [];
+        $grades = [
+            [
+                'subject'     => 'English 3/4',
+                'assessables' => [
+                    Assessment\Controller::getDummyAssessment(2),
+                ]
+            ],
+            [
+                'subject'     => 'Maths Advanced',
+                'assessables' => [
+                    Assessment\Controller::getDummyAssessment(3),
+                ]
+            ],
+        ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/grades.twig', [
             'student' => $student,
@@ -135,8 +165,18 @@ class Controller extends Base
      */
     public function getGradesForSubject(User $student, Term $term, Folder $subject)
     {
+        // Replaces /submission/allWork/:studentId/:termSlug/:folderId
+        //       eg /submission/allWork/230/2016-2/176
+
         // TODO - generate data
-        $grades = [];
+        $grades = [
+            [
+                'subject'     => $subject->getName(),
+                'assessables' => [
+                    Assessment\Controller::getDummyAssessment(2),
+                ]
+            ],
+        ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/grades.twig', [
             'student' => $student,
