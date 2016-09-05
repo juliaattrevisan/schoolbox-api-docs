@@ -512,7 +512,8 @@ class Mapper extends BaseMapper
 
             // Pastoral moderators can access everything
 
-            if ($user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0) {
+            if ($user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0 ||
+                $user->isSuperuser()) {
                 return true;
             }
 

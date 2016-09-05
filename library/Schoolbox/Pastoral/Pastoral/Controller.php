@@ -234,7 +234,7 @@ class Controller extends Base
                     'session'               => $_SESSION,
                     'results'               => $paginatedRecords,
                     'resultsPerPage'        => $resultsPerPage,
-                    'pagesToDisplay'  => $pagesToDisplay % 2 == 0 ? $pagesToDisplay : $pagesToDisplay + 1,
+                    'pagesToDisplay'        => $pagesToDisplay % 2 == 0 ? $pagesToDisplay : $pagesToDisplay + 1,
                     'totalPages'            => $totalPages,
                     'totalResults'          => $records->count(),
                     'pageCurrent'           => $pageCurrent,
@@ -245,6 +245,8 @@ class Controller extends Base
                     'tags'                  => $this->getRequest()->query["tags"],
                     'before'                => $this->getRequest()->query["before"],
                     'after'                 => $this->getRequest()->query["after"],
+                    'order'                 => $this->getRequest()->query["order"],
+                    'involved'              => $this->getRequest()->query["involved"]
                 ),
             )
         );
@@ -268,6 +270,8 @@ class Controller extends Base
                     'tags'              => $this->getRequest()->query["tags"],
                     'before'            => $this->getRequest()->query["before"],
                     'after'             => $this->getRequest()->query["after"],
+                    'order'             => $this->getRequest()->query["order"],
+                    'involved'          => $this->getRequest()->query["involved"]
                 ),
             )
         );
@@ -387,6 +391,7 @@ class Controller extends Base
                     'tagsSelected'      => array_filter(explode(",", $this->getRequest()->query["tags"])),
                     'beforeSelected'    => $this->getRequest()->query["before"],
                     'afterSelected'     => $this->getRequest()->query["after"],
+                    'superUser'         => $this->getPastoralModeratorLevel() >= UserAccess::ACCESS_READ || $this->getUser()->getSuperuser()
                 ),
             )
         );

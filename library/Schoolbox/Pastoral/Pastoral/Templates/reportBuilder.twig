@@ -268,12 +268,23 @@
                         You must select at least one record type to show in the report
                     </label>
 
-                    <hr>
-                    <input id="involved-checkbox" name="involved-checkbox" value="1" type="checkbox">
-                    <label for="involved-checkbox">
-                        Only include record in which you are the owner or an audience member
-                    </label>
-
+                    {% if superUser %}
+                        <hr>
+                        <label>
+                            Super User / Pastoral Moderator Filter
+                        </label>
+                        <p class="meta">
+                            As you are logged in as either a superuser or pastoral moderator you have access to view all
+                            records in the system. To filter the report to show only those incidents in which you are
+                            involved click on the checkbox below.
+                        </p>
+                        <input id="involved-checkbox" name="involved-checkbox" value="1" type="checkbox">
+                        <label for="involved-checkbox">
+                            Only show records in which you are the author or an audience member
+                        </label>
+                    {% else %}
+                        <input type="hidden" id="involved-checkbox" value="1">
+                    {% endif %}
                 </div>
             </div>
         </section>
