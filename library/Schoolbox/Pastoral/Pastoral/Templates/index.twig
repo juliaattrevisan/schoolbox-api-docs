@@ -295,10 +295,10 @@
 
                     {# Show edit links to the owner and pastoral moderators. Moderator 'write' (2) can edit, Moderator 'moderate' (3) can delete #}
 
-                    {% if owner or pastoralModerator >= WRITE_ACCESS %}
+                    {% if owner or showModify %}
                         <nav>
                             <a class="icon-modify no-text" href="/pastoral/update/{{ record.getId() }}" title="Modify"></a>
-                            {% if owner or pastoralModerator >= FULL_ACCESS %}
+                            {% if owner or showDelete %}
                                 <a data-delete id="{{ record.id }}" class="icon-delete no-text" href="#" title="Delete"></a>
                             {% endif %}
                         </nav>

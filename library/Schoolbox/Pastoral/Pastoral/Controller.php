@@ -504,10 +504,8 @@ class Controller extends Base
                     'role' => $this->getUser()->getRole()->getType(),
                     'types' => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
                     'teachers' => $student->getTeacherCollection(),
-                    'WRITE_ACCESS' => UserAccess::ACCESS_WRITE,
-                    'READ_ACCESS' => UserAccess::ACCESS_READ,
-                    'FULL_ACCESS' => UserAccess::ACCESS_FULL,
-                    'pastoralModerator' => $this->getPastoralModeratorLevel()
+                    'showDelete' => $this->getPastoralModeratorLevel() >= FULL_ACCESS,
+                    'showModify' => $this->getPastoralModeratorLevel() >= WRITE_ACCESS
                 ),
             )
         );
@@ -558,10 +556,8 @@ class Controller extends Base
                 'data' => array(
                     'session' => $_SESSION,
                     'record' => $pastoral,
-                    'WRITE_ACCESS' => UserAccess::ACCESS_WRITE,
-                    'READ_ACCESS' => UserAccess::ACCESS_READ,
-                    'FULL_ACCESS' => UserAccess::ACCESS_FULL,
-                    'pastoralModerator' => $this->getPastoralModeratorLevel(),
+                    'showDelete' => $this->getPastoralModeratorLevel() >= FULL_ACCESS,
+                    'showModify' => $this->getPastoralModeratorLevel() >= WRITE_ACCESS,
                     'role' => $this->getUser()->getRole()->getType(),
                 ),
             )
@@ -632,9 +628,7 @@ class Controller extends Base
                     'categories' => $this->getPastoralCategoryMapper()->findAll()->sortBy('name', 'asc'),
                     'severities' => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
                     'roles' => $this->getRoleMapper()->findAll(),
-                    'WRITE_ACCESS' => WRITE_ACCESS,
-                    'READ_ACCESS' => READ_ACCESS,
-                    'FULL_ACCESS' => FULL_ACCESS,
+                    'showDelete' => $this->getPastoralModeratorLevel() >= FULL_ACCESS,
                     'pastoralModerator' => $this->getPastoralModeratorLevel(),
                     'attachzone' => $this->getAttachZone($this->getPastoralAttachmentMapper()->findByPastoralId($id)),
                 ),

@@ -121,10 +121,10 @@
                     </div>
 
                     {# Only display the edit/delete links to the owner of the record or pastoral moderators #}
-                    {% if owner or pastoralModerator >= WRITE_ACCESS %}
+                    {% if owner or showModify %}
                     <nav>
                         <a class="icon-modify" href="/pastoral/update/{{ record.getId() }}" title="Modify Comment"></a>
-                        {% if owner or pastoralModerator >= FULL_ACCESS %}
+                        {% if owner or showDelete %}
                             <a data-delete class="icon-delete" href="#" title="Delete Comment"></a>
                         {% endif %}
                     </nav>
@@ -219,7 +219,7 @@
                                 {%
                                     if  record.getOwner.getId == session.user.getId or
                                         comment.getOwner.getId == session.user.getId or
-                                        pastoralModerator >= FULL_ACCESS
+                                        showDelete
                                 %}
                                     <nav>
                                         <a data-delete-comment="{{ comment.getId }}" class="icon-delete" href="#" title="Delete Comment"></a>

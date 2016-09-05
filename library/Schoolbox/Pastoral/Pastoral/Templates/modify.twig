@@ -168,7 +168,7 @@
                     </div>
                 </div>
                 {% if record.getId != '' %}
-                    {% if owner or pastoralModerator >= FULL_ACCESS %}
+                    {% if owner or showDelete %}
                         <nav>
                             <a class="icon-more" title="" data-dropdown="header-options"></a>
                         </nav>
