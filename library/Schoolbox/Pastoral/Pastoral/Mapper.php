@@ -201,21 +201,18 @@ class Mapper extends BaseMapper
 
             // Check permissions
 
-            if ($this->hasPermission($record)) {
+            if ($record->getPrivate() && !$this->hasPrivatePermission($record)) {
 
-                if ($record->getPrivate() && !$this->hasPrivatePermission($record)) {
+                // The record is private and the user does not have access, remove attachments and
+                // override the body
 
-                    // The record is private and the user does not have access, remove attachments and
-                    // override the body
-
-                    $record->setAttachmentList(null);
-                    $record->setShowPrivate(false);
-                    $record->setBody("The contents of this record have been marked as private.");
-                } else {
-                    $record->setShowPrivate(true);
-                }
-                $records->add($this->hydrateRecord($record, $row));
+                $record->setAttachmentList(null);
+                $record->setShowPrivate(false);
+                $record->setBody("The contents of this record have been marked as private.");
+            } else {
+                $record->setShowPrivate(true);
             }
+            $records->add($this->hydrateRecord($record, $row));
         }
 
         return $records;
@@ -305,12 +302,7 @@ class Mapper extends BaseMapper
         foreach ($statement as $row) {
             /** @var Pastoral\Model $record */
             $record = $this->hydrate($row, 'r');
-
-            // Check permissions
-
-            if ($this->hasPermission($record)) {
-                $collection->add($this->hydrateRecord($record, $row));
-            }
+            $collection->add($this->hydrateRecord($record, $row));
         }
 
         return $collection;
@@ -390,15 +382,31 @@ class Mapper extends BaseMapper
             }
 
             switch ($order_current) {
-                case 'student': $order_sql .= "`s`.lastname, `s`.firstname"; break;
-                case 'severity': $order_sql .= "`sv`.order"; break;
-                case 'date': $order_sql .= "`r`.created_at"; break;
-                case 'category': $order_sql .= "`c`.name"; break;
-                case 'author': $order_sql .= "`o`.lastname, `o`.firstname"; break;
+                case 'student':
+                    $order_sql .= "`s`.lastname, `s`.firstname";
+                    break;
+                case 'severity':
+                    $order_sql .= "`sv`.order";
+                    break;
+                case 'date':
+                    $order_sql .= "`r`.created_at";
+                    break;
+                case 'category':
+                    $order_sql .= "`c`.name";
+                    break;
+                case 'author':
+                    $order_sql .= "`o`.lastname, `o`.firstname";
+                    break;
             }
         }
 
-        if ($involved == 'true') {
+        if ($involved == 'true' ||
+            (
+                !$this->getSessionUser()->getSuperuser() ||
+                !$this->getSessionUser()->getAccessList()->filterBy('service',
+                    UserAccess::SERVICE_PASTORAL)->count() > 0
+            )
+        ) {
 
             // Only show records the logged in user is involved with via audience/role/ownership
 
@@ -484,109 +492,16 @@ class Mapper extends BaseMapper
 
             // Check permission
 
-            if ($this->hasPermission($record)) {
-
-                if ($record->getPrivate() && !$this->hasPrivatePermission($record)) {
-                    $record->setBody("The contents of this record have been marked as private.");
-                    $record->setShowPrivate(false);
-                } else {
-                    $record->setShowPrivate(true);
-                }
-                $records->add($this->hydrateRecord($record, $row));
+            if ($record->getPrivate() && !$this->hasPrivatePermission($record)) {
+                $record->setBody("The contents of this record have been marked as private.");
+                $record->setShowPrivate(false);
+            } else {
+                $record->setShowPrivate(true);
             }
+            $records->add($this->hydrateRecord($record, $row));
         }
 
         return $records;
-    }
-
-    /**
-     * Checks if the logged in user has permission to view the specified record
-     *
-     * @param Pastoral\Model $record
-     * @return bool
-     */
-    public function hasPermission(Pastoral\Model $record)
-    {
-        // Hack for notifier
-
-        if (!isset($_SESSION)) {
-            return true;
-        }
-
-        /** @var User $user */
-        $user = $_SESSION["user"];
-
-        if ($user instanceof User) {
-
-            // Pastoral moderators can access everything
-
-            if ($user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL)->count() > 0 ||
-                $user->isSuperuser()
-            ) {
-                return true;
-            }
-
-            // To access a record you at least be a staff member, or the parent of the student
-
-            /** @var \Schoolbox\Role $role */
-            $role = $user->getRole();
-
-            // Students and guests, get outta here
-
-            if ($role->isStudent() || $role->isGuest()) {
-                return false;
-            }
-
-            // Parents must be a parent of the child the record relates to
-
-            if ($role->isParent()) {
-                try {
-                    $record->setStudent($this->getUserMapper()->findById($record->getStudent()->getId()));
-                } catch (MapperException $e) {
-                    return false;
-                }
-
-                $record->getStudent()->loadParents();
-
-                if (!$user->isParentOf($record->getStudent())) {
-                    return false;
-                }
-            }
-
-            // Give owners permission to their own records regardless of other permissions
-
-            if ($record->getOwner()->getId() == $user->getId()) {
-                return true;
-            }
-
-            // If we get through to here we need to check the audience of item
-
-            $record->setAccessList($this->getPastoralAccessMapper()->findByColumn("pastoral_id", $record->getId()));
-
-            $accessRecords = $record->getAccessList();
-
-            foreach ($accessRecords as $accessCurrent) {
-                // Access records are either role based of user based.
-
-                if (is_numeric($accessCurrent->getRole()->getId())) {
-                    // This access record is a role one, check if the user is in this role
-
-                    if ($role->getId() == $accessCurrent->getRole()->getId()) {
-                        return true;
-                    }
-                } else {
-                    // This access record is a user based one, check if this is the user
-
-                    if ($accessCurrent->getUser()->getId() == $user->getId()) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        // BZZZZZT! You're outta here.
-
-        return false;
     }
 
     /**
