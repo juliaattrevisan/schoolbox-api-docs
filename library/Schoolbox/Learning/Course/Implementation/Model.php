@@ -5,12 +5,12 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Course\Import;
+namespace Schoolbox\Learning\Course\Implementation;
 
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Import\Unit\Model as UnitImportModel;
+use Schoolbox\Learning\Course\Implementation\Unit\Model as UnitImplementationModel;
 use Schoolbox\Learning\Course\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -18,16 +18,16 @@ use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
- * An Course Import is an import of a Course Specification onto a Folder.
+ * An Course Implementation is an import of a Course Specification onto a Folder.
  *
- * This object will contain one or more Unit Imports (whichever of the
+ * This object will contain one or more Unit Implementations (whichever of the
  * Course Specification's Unit Specifications were selected as part of the import process).
  *
- * (Historically, this did not exist as a separate concept. Unit Imports were
+ * (Historically, this did not exist as a separate concept. Unit Implementations were
  *  related directly to the Folder the Course Specification was imported onto, and
  *  linked to a component.)
  *
- * @package Schoolbox\Learning\Course\Import
+ * @package Schoolbox\Learning\Course\Implementation
  */
 class Model implements AssessmentContext, ISoftDeletable
 {
@@ -52,9 +52,9 @@ class Model implements AssessmentContext, ISoftDeletable
     protected $specification;
 
     /**
-     * The Unit Imports that are a part of this object.
+     * The Unit Implementations that are a part of this object.
      *
-     * @var Collection|UnitImportModel[]
+     * @var Collection|UnitImplementationModel[]
      */
     protected $units;
 
@@ -109,7 +109,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @return Collection|UnitImportModel[]
+     * @return Collection|UnitImplementationModel[]
      */
     public function getUnits()
     {
@@ -117,7 +117,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @param Collection|UnitImportModel[] $units
+     * @param Collection|UnitImplementationModel[] $units
      * @return static
      */
     public function setUnits($units)

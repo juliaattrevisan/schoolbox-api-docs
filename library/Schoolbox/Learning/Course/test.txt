@@ -133,39 +133,39 @@ $courseSpec->getUnits()
            ->add($daltonSpec);
 
 
-// Create Course Imports for a few class Folders
+// Create Course Implementations for a few class Folders
 $frenchClass = new Schoolbox\Resource\Folder\Model();
 $frenchClass->setId(237)->setName('9AH French');
-$frenchClassCourseImport = new Schoolbox\Learning\Course\Import\Model();
-$frenchClassCourseImport = $frenchClassCourseImport
+$frenchClassCourseImplementation = new Schoolbox\Learning\Course\Implementation\Model();
+$frenchClassCourseImplementation = $frenchClassCourseImplementation
     ->setFolder($frenchClass)
     ->setSpecification($courseSpec);
 
 $englishClass = new Schoolbox\Resource\Folder\Model();
 $englishClass->setId(43)->setName('English 3 4');
-$englishClassCourseImport = new Schoolbox\Learning\Course\Import\Model();
-$englishClassCourseImport = $englishClassCourseImport
+$englishClassCourseImplementation = new Schoolbox\Learning\Course\Implementation\Model();
+$englishClassCourseImplementation = $englishClassCourseImplementation
     ->setFolder($englishClass)
     ->setSpecification($courseSpec);
 
 $scienceClass = new Schoolbox\Resource\Folder\Model();
 $scienceClass->setId(357)->setName('Science Unit 2');
-$scienceClassCourseImport = new Schoolbox\Learning\Course\Import\Model();
-$scienceClassCourseImport = $scienceClassCourseImport
+$scienceClassCourseImplementation = new Schoolbox\Learning\Course\Implementation\Model();
+$scienceClassCourseImplementation = $scienceClassCourseImplementation
     ->setFolder($scienceClass)
     ->setSpecification($courseSpec);
 
 
-// Add the Course Imports back to the Spec Folder
-$courseSpecFolder = $courseSpecFolder->setCourseImports(
-    $courseSpecFolder->getCourseImports()
-                     ->add($frenchClassCourseImport)
-                     ->add($englishClassCourseImport)
-                     ->add($scienceClassCourseImport)
+// Add the Course Implementations back to the Spec Folder
+$courseSpecFolder = $courseSpecFolder->setCourseImplementations(
+    $courseSpecFolder->getCourseImplementations()
+                     ->add($frenchClassCourseImplementation)
+                     ->add($englishClassCourseImplementation)
+                     ->add($scienceClassCourseImplementation)
 );
 
 
-// Create Unit Imports for the Unit Specs in the Course Spec, and add them to each class.
+// Create Unit Implementations for the Unit Specs in the Course Spec, and add them to each class.
 // French: only add even numbered unit specs
 // English: only add odd numbered unit specs
 // Science: add all unit specs
@@ -173,38 +173,38 @@ $i = 1;
 foreach ($courseSpec->getUnits() as $unitSpec) {
     $title = $i . ': ' . $unitSpec->getFolder()->getName();
     if ($i % 2 == 0) {
-        $frenchClassUnitImport = new Schoolbox\Learning\Course\Import\Unit\Model();
-        $frenchClassUnitImport
+        $frenchClassUnitImplementation = new Schoolbox\Learning\Course\Implementation\Unit\Model();
+        $frenchClassUnitImplementation
             ->setTitle($title)
             ->setSpecification($unitSpec)
             ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth())
             ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth())
             ->populateAssessablesFromSpecification($unitSpec);
-        $frenchClassCourseImport->getUnits()->add($frenchClassUnitImport);
+        $frenchClassCourseImplementation->getUnits()->add($frenchClassUnitImplementation);
     } else {
-        $englishClassUnitImport = new Schoolbox\Learning\Course\Import\Unit\Model();
-        $englishClassUnitImport
+        $englishClassUnitImplementation = new Schoolbox\Learning\Course\Implementation\Unit\Model();
+        $englishClassUnitImplementation
             ->setTitle($title)
             ->setSpecification($unitSpec)
             ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth()->addDays(3))
             ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth()->addDays(3))
             ->populateAssessablesFromSpecification($unitSpec);
-        $englishClassCourseImport->getUnits()->add($englishClassUnitImport);
+        $englishClassCourseImplementation->getUnits()->add($englishClassUnitImplementation);
     }
-    $scienceClassUnitImport = new Schoolbox\Learning\Course\Import\Unit\Model();
-    $scienceClassUnitImport
+    $scienceClassUnitImplementation = new Schoolbox\Learning\Course\Implementation\Unit\Model();
+    $scienceClassUnitImplementation
         ->setTitle($title)
         ->setSpecification($unitSpec)
         ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth()->addDays(13))
         ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth()->addDays(13))
         ->populateAssessablesFromSpecification($unitSpec);
-    $scienceClassCourseImport->getUnits()->add($scienceClassUnitImport);
+    $scienceClassCourseImplementation->getUnits()->add($scienceClassUnitImplementation);
     $i++;
 }
 
 
-// Augmented/Diminished/Reordered Course Imports for Science Class
-foreach ($scienceClassCourseImport->getUnits() as $unit) {
+// Augmented/Diminished/Reordered Course Implementations for Science Class
+foreach ($scienceClassCourseImplementation->getUnits() as $unit) {
     switch ($unit->getSpecification()->getFolder()->getId()) {
         case 52:
             // Fox House for Science Class:
@@ -263,10 +263,10 @@ foreach ($scienceClassCourseImport->getUnits() as $unit) {
 
 <hr />
 
-<h2>Course Imports</h2>
+<h2>Course Implementations</h2>
 
-<?php foreach ($courseSpecFolder->getCourseImports() as $courseImport): ?>
-    <h3><?= $courseImport->getFolder()->getNameWithCodes() ?></h3>
+<?php foreach ($courseSpecFolder->getCourseImplementations() as $courseImplementation): ?>
+    <h3><?= $courseImplementation->getFolder()->getNameWithCodes() ?></h3>
 
     <table>
         <thead>
@@ -280,16 +280,16 @@ foreach ($scienceClassCourseImport->getUnits() as $unit) {
         </tr>
         </thead>
         <tbody>
-        <?php foreach ($courseImport->getUnits() as $unitImport): ?>
+        <?php foreach ($courseImplementation->getUnits() as $unitImplementation): ?>
             <tr>
-                <td><?= $unitImport->getTitle() ?></td>
-                <td><?= $unitImport->getSpecification()->getFolder()->getNameWithCodes() ?></td>
-                <td><?= $unitImport->getSpecification()->getFolder()->getId() ?></td>
-                <td><?= $unitImport->getOpenDate()->getUsingFormat('Y-m-d H:i:s') ?></td>
-                <td><?= $unitImport->getDueDate()->getUsingFormat('Y-m-d H:i:s') ?></td>
+                <td><?= $unitImplementation->getTitle() ?></td>
+                <td><?= $unitImplementation->getSpecification()->getFolder()->getNameWithCodes() ?></td>
+                <td><?= $unitImplementation->getSpecification()->getFolder()->getId() ?></td>
+                <td><?= $unitImplementation->getOpenDate()->getUsingFormat('Y-m-d H:i:s') ?></td>
+                <td><?= $unitImplementation->getDueDate()->getUsingFormat('Y-m-d H:i:s') ?></td>
                 <td>
                     <ul>
-                        <?php foreach ($unitImport->getAssessables() as $assessable): ?>
+                        <?php foreach ($unitImplementation->getAssessables() as $assessable): ?>
                             <li><?= $assessable->getTitle() ?> (<?= $assessable->getTypeName() ?> #<?= $assessable->getId() ?>)</li>
                         <?php endforeach; ?>
                     </ul>

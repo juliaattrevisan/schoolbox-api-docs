@@ -22,7 +22,7 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  *
  * It is intended to cover a single area of learning within a subject, and may be imported
  * onto another Folder as part of the action of importing a Course onto that folder.
- * This action creates an Unit Import for each Unit Specification that was chosen to be imported
+ * This action creates an Unit Implementation for each Unit Specification that was chosen to be imported
  * as part of that process.
  *
  * (Historically, this was simply known as a Unit, and defined as a Folder which contained a

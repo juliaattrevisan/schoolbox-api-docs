@@ -15,7 +15,7 @@ use Schoolbox\Curriculum\Node;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Specification\Model as CourseSpecificationModel;
-use Schoolbox\Learning\Course\Import\Model as CourseImportModel;
+use Schoolbox\Learning\Course\Implementation\Model as CourseImplementationModel;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\HomepageConfig;
@@ -85,11 +85,11 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     protected $courseSpecification;
 
     /**
-     * The Course Imports that have been imported onto this folder.
+     * The Course Implementations that have been imported onto this folder.
      *
-     * @var Collection|CourseImportModel[]
+     * @var Collection|CourseImplementationModel[]
      */
-    protected $courseImports;
+    protected $courseImplementations;
 
     /**
      * Constructor
@@ -99,7 +99,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     {
         $this->setCodes(new Collection(array()));
         $this->setCurriculumNodes(new Collection());
-        $this->setCourseImports(new Collection());
+        $this->setCourseImplementations(new Collection());
     }
 
     /**
@@ -465,20 +465,20 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @return Collection|CourseImportModel[]
+     * @return Collection|CourseImplementationModel[]
      */
-    public function getCourseImports()
+    public function getCourseImplementations()
     {
-        return $this->courseImports;
+        return $this->courseImplementations;
     }
 
     /**
-     * @param Collection|CourseImportModel[] $courseImports
+     * @param Collection|CourseImplementationModel[] $courseImplementations
      * @return static
      */
-    public function setCourseImports($courseImports)
+    public function setCourseImplementations($courseImplementations)
     {
-        $this->courseImports = $courseImports;
+        $this->courseImplementations = $courseImplementations;
         return $this;
     }
 }

@@ -5,32 +5,32 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Course\Import\Unit;
+namespace Schoolbox\Learning\Course\Implementation\Unit;
 
 use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Import\Model as CourseImportModel;
+use Schoolbox\Learning\Course\Implementation\Model as CourseImplementationModel;
 use Schoolbox\Learning\Course\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
- * An Unit Import is a single import of a Unit Specification onto a Folder. It belongs to an
- * Course Import.
+ * An Unit Implementation is a single import of a Unit Specification onto a Folder. It belongs to an
+ * Course Implementation.
  *
  * On creation, this object makes a copy of the Assessables in the Unit Specification it was
  * created from, and adds them to itself - a teacher may then add, modify or remove individual
  * Assessable objects inside this object.
  *
- * (Historically, this was known as a Unit Instance. It did not belong to an
- *  Course Import - instead, it belonged directly to the Folder it was imported
+ * (Historically, this was known as a Unit Instance. It did not belong to a
+ *  Course Implementation - instead, it belonged directly to the Folder it was imported
  *  onto, and was also linked to a component on that Folder.)
  *
- * @package Schoolbox\Learning\Course\Import\Unit
+ * @package Schoolbox\Learning\Course\Implementation\Unit
  */
 class Model implements AssessmentContext, ISoftDeletable
 {
@@ -39,13 +39,13 @@ class Model implements AssessmentContext, ISoftDeletable
     use DeletedAtDate;
 
     /**
-     * The Course Import which this object belongs to.
+     * The Course Implementation which this object belongs to.
      *
      * Replaces the previous Unit Instance class' component field.
      *
-     * TODO review if this relation is required - this object can't exist without its Course Import
+     * TODO review if this relation is required - this object can't exist without its Course Implementation
      *
-     * @var CourseImportModel
+     * @var CourseImplementationModel
      */
     protected $course;
 
@@ -104,7 +104,7 @@ class Model implements AssessmentContext, ISoftDeletable
     public function __construct()
     {
         $this->specification = new UnitSpecificationModel();
-        $this->course = new CourseImportModel();
+        $this->course = new CourseImplementationModel();
         $this->openDate = new \Alaress_Date_NullDate();
         $this->dueDate = new \Alaress_Date_NullDate();
         $this->createdAt = new \Alaress_Date_NullDate();
@@ -225,7 +225,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * This object's assessment context is its Course Import's assessment context.
+     * This object's assessment context is its Course Implementation's assessment context.
      */
     public function getFolder()
     {
@@ -233,7 +233,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @return CourseImportModel
+     * @return CourseImplementationModel
      */
     public function getCourse()
     {
@@ -241,7 +241,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @param CourseImportModel $course
+     * @param CourseImplementationModel $course
      * @return static
      */
     public function setCourse($course)
