@@ -10,7 +10,7 @@
 namespace Schoolbox\Pastoral\Authorizer\Rule;
 
 use Alaress\Authorizer\Rule\IAuthorizationRule;
-use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
@@ -35,9 +35,15 @@ class IsOwner implements IAuthorizationRule
     public function authorize(array $params = array(), User $user = null)
     {
         $pastoralId = $params['id'];
-        $record = $this->getPastoralMapper()->findById($pastoralId);
 
-        if ($record->getOwner()->getId() == $user->getId()) {
+        try {
+            $record = $this->getPastoralMapper()->findById($pastoralId);
+
+            if ($record->getOwner()->getId() == $user->getId()) {
+                return true;
+            }
+        } catch (MapperException $e) {
+            // Record didn't exist, creating new record- so they are the owner by default
             return true;
         }
 

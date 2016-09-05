@@ -323,9 +323,14 @@ class Controller extends Base
         else
             $order = $this->getRequest()->query["order"];
 
+        if (!isset($this->getRequest()->query["involved"]))
+            $involved = 'false';
+        else
+            $involved = $this->getRequest()->query["involved"];
+
         // Get matching records
 
-        return $this->getPastoralMapper()->findAllReport($before_date, $after_date, $severity, $types, $authors, $students, $tags, $order);
+        return $this->getPastoralMapper()->findAllReport($this->getUser(), $before_date, $after_date, $severity, $types, $authors, $students, $tags, $order, $involved);
     }
 
     /**

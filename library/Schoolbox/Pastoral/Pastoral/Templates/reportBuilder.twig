@@ -123,6 +123,7 @@
                 $('#after').val($('#datetime_after').val());
                 $('#before').val($('#datetime_before').val());
                 $('#severity').val($('#filterSeverity').val());
+                $('#involved').val($('#involved-checkbox')[0].checked);
 
                 var order = '';
 
@@ -189,6 +190,7 @@
             <input type="hidden" id="before" name="before">
             <input type="hidden" id="after" name="after">
             <input type="hidden" id="order" name="order">
+            <input type="hidden" id="involved" name="involved">
         </form>
 
         <section>
@@ -262,10 +264,17 @@
                             {{ type.name }}
                         </label>
                     {% endfor %}
+                    <label id="type_error" for="datetime_after" class="error" style="display:none;">
+                        You must select at least one record type to show in the report
+                    </label>
+
+                    <hr>
+                    <input id="involved-checkbox" name="involved-checkbox" value="1" type="checkbox">
+                    <label for="involved-checkbox">
+                        Only include record in which you are the owner or an audience member
+                    </label>
+
                 </div>
-                <label id="type_error" for="datetime_after" class="error" style="display:none;">
-                    You must select at least one record type to show in the report
-                </label>
             </div>
         </section>
 

@@ -327,6 +327,7 @@ class Mapper extends BaseMapper
     /**
      * Gets DB records matching report criteria
      *
+     * @param \Schoolbox\User $user
      * @param $before_date
      * @param $after_date
      * @param $severity
@@ -335,9 +336,10 @@ class Mapper extends BaseMapper
      * @param $students
      * @param $tags
      * @param $order
+     * @param $involved
      * @return Collection
      */
-    public function findAllReport($before_date, $after_date, $severity, $types, $authors, $students, $tags, $order)
+    public function findAllReport($user, $before_date, $after_date, $severity, $types, $authors, $students, $tags, $order, $involved)
     {
         // Create filter SQL
 
@@ -388,6 +390,25 @@ class Mapper extends BaseMapper
             }
         }
 
+        if ($involved == 'true') {
+
+            // Only show records the logged in user is involved with via audience/role/ownership
+
+            $role_id = $user->getRole()->getId();
+            $user_id = $user->getId();
+
+            $involved_sql = "
+                AND (
+                    (SELECT COUNT(*) FROM pastoral_access WHERE role_id = {$role_id} AND pastoral_id = `r`.id) > 0 OR
+                    (SELECT COUNT(*) FROM pastoral_access WHERE user_id = {$user_id} AND pastoral_id = `r`.id) > 0 OR
+                    `r`.owner_id = {$user_id}
+                )
+            ";
+
+        } else {
+            $involved_sql = '';
+        }
+
         // Execute SQL
 
         $query = "
@@ -405,9 +426,9 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('type', 'r', 't')}
             LEFT JOIN {$this->getJoinSql('category', 'r', 'c')}
             {$criteria_sql}
+            {$involved_sql}
             ORDER BY {$order_sql}
         ";
-
 
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute();
