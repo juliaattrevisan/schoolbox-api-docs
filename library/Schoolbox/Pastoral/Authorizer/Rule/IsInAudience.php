@@ -12,38 +12,16 @@ namespace Schoolbox\Pastoral\Authorizer\Rule;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
-use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
-use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
-use Schoolbox\Mapper\Exception as MapperException;
 
 class IsInAudience implements IAuthorizationRule
 {
-    /** @var PastoralMapper */
-    protected $pastoralMapper;
-
-    /** @var PastoralAccessMapper */
-    protected $pastoralAccessMapper;
-
-    /**
-     * IsInAudience constructor.
-     */
-    public function __construct()
-    {
-        $this->setPastoralMapper(PastoralMapper::getInstance());
-        $this->setPastoralAccessMapper(PastoralAccessMapper::getInstance());
-    }
-
     /**
      * {@inheritdoc}
      */
     public function authorize(array $params = array(), User $user = null)
     {
-        $pastoralId = $params['id'];
-        try {
-            $record = $this->getPastoralMapper()->findById($pastoralId);
-        } catch (MapperException $e) {
-            // Record didn't exist
+        if (!isset($params['record'])) {
             throw new Unauthorized();
         }
 
@@ -51,24 +29,20 @@ class IsInAudience implements IAuthorizationRule
 
         // Give owners permission to their own records regardless of other permissions
 
-        if ($record->getOwner()->getId() == $user->getId()) {
+        if ($params['record']->getOwner()->getId() == $user->getId()) {
             return true;
         }
 
         // Check if the record is private make sure the user is allowed access
 
-        if ($record->getPrivate()) {
-            if (!$this->getPastoralMapper()->hasPrivatePermission($record)) {
-                throw new Unauthorized();
-            }
+        if ($params['record']->getPrivate() && !$params['privateAllowed']) {
+            throw new Unauthorized();
         }
 
         // If we get through to here we need to check the audience of item
 
-        $accessRecords = $this->getPastoralAccessMapper()->findByColumn("pastoral_id", $pastoralId);
-
         /** @var PastoralAccessModel $accessCurrent */
-        foreach ($accessRecords as $accessCurrent) {
+        foreach ($params['access'] as $accessCurrent) {
             // Access records are either role based of user based.
 
             if (is_numeric($accessCurrent->getRole()->getId())) {
@@ -89,43 +63,5 @@ class IsInAudience implements IAuthorizationRule
         // BZZZZZT! You're outta here.
 
         throw new Unauthorized();
-    }
-
-    /** Here be getters and setters */
-
-    /**
-     * @return PastoralAccessMapper
-     */
-    public function getPastoralAccessMapper()
-    {
-        return $this->pastoralAccessMapper;
-    }
-
-    /**
-     * @param PastoralAccessMapper $mapper
-     * @return $this
-     */
-    public function setPastoralAccessMapper(PastoralAccessMapper $mapper)
-    {
-        $this->pastoralAccessMapper = $mapper;
-        return $this;
-    }
-
-    /**
-     * @return PastoralMapper
-     */
-    public function getPastoralMapper()
-    {
-        return $this->pastoralMapper;
-    }
-
-    /**
-     * @param PastoralMapper $mapper
-     * @return $this
-     */
-    public function setPastoralMapper(PastoralMapper $mapper)
-    {
-        $this->pastoralMapper = $mapper;
-        return $this;
     }
 }

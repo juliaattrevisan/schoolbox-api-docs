@@ -21,8 +21,6 @@ class IsPastoralModeratorWrite implements IAuthorizationRule
      */
     public function authorize(array $params = array(), User $user = null)
     {
-        // Pastoral moderators with write access or greater can be considered the owner
-
         $pastoralModeratorList = $user->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL);
 
         if ($pastoralModeratorList->count() > 0) {
@@ -30,8 +28,6 @@ class IsPastoralModeratorWrite implements IAuthorizationRule
                 return true;
             }
         }
-
-        // BZZZZZT! You're outta here.
 
         throw new Unauthorized();
     }

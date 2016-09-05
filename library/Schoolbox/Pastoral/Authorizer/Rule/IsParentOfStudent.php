@@ -11,66 +11,21 @@ namespace Schoolbox\Pastoral\Authorizer\Rule;
 
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\User;
-use Schoolbox\UserMapper;
 use Alaress\Authorizer\Failure\Unauthorized;
 
 class IsParentOfStudent implements IAuthorizationRule
 {
-    /** @var UserMapper */
-    protected $userMapper;
-
-    /**
-     * IsParentOfStudent constructor.
-     */
-    public function __construct()
-    {
-        $this->setUserMapper(UserMapper::getInstance());
-    }
-
     /**
      * {@inheritdoc}
      */
     public function authorize(array $params = array(), User $user = null)
     {
-        if (isset($params['studentId'])) {
-            $student = $this->getUserMapper()->findById($params['studentId']);
-        } else {
-            $student = $this->getUserMapper()->findById($params['id']);
-        }
+        $params['student']->loadParents();
 
-        $student->loadParents();
-
-        // Don't know WTF is going on here, but logging in as Jo Rhodes $user has all the parents details, but the ID is
-        // that of the student?!?!?!
-
-        $user = $this->getUserMapper()->findByExternalId($user->getExternalId());
-
-        if ($user->isParentOf($student)) {
+        if ($user->isParentOf($params['student'])) {
             return true;
         }
 
-        // BZZZZZT! You're outta here.
-
         throw new Unauthorized();
-    }
-
-    /** Here be getters and setters */
-
-    /**
-     * @return UserMapper
-     */
-    public function getUserMapper()
-    {
-        return $this->userMapper;
-    }
-
-    /**
-     * @param UserMapper $mapper
-     * @return $this
-     */
-    public function setUserMapper(UserMapper $mapper)
-    {
-        $this->userMapper = $mapper;
-        return $this;
     }
 }

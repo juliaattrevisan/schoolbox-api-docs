@@ -227,15 +227,15 @@ class Controller extends Base
 
     /**
      * Display list of all pastoral records for selected student
-     * @param $id
+     * @param int $studentId The ID of the student the record relates to
      * @throws SchoolboxException
      */
-    public function getIndex($id)
+    public function getIndex($studentId)
     {
         // Get the students parents
 
         $externalUserMapper = new \External_User();
-        $student = $this->getUserMapper()->findWithSubjects($id);
+        $student = $this->getUserMapper()->findWithSubjects($studentId);
         $student->loadParents();
         $student->loadTeachers();
 
@@ -268,7 +268,7 @@ class Controller extends Base
         // And render this mess out
 
         try {
-            $records = $this->getPastoralMapper()->findByStudentId($id);
+            $records = $this->getPastoralMapper()->findByStudentId($studentId);
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
         }

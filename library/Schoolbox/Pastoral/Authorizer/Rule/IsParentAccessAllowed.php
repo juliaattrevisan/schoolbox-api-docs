@@ -16,13 +16,6 @@ use Alaress\Authorizer\Failure\Unauthorized;
 class IsParentAccessAllowed implements IAuthorizationRule
 {
     /**
-     * IsParentAccessAllowed constructor.
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function authorize(array $params = array(), User $user = null)

@@ -13,61 +13,26 @@ use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
 use Alaress\Authorizer\Failure\Unauthorized;
-use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
 
 class IsOwner implements IAuthorizationRule
 {
-    /** @var PastoralMapper */
-    protected $pastoralMapper;
-
-    /**
-     * IsOwner constructor.
-     */
-    public function __construct()
-    {
-        $this->setPastoralMapper(PastoralMapper::getInstance());
-    }
-
     /**
      * {@inheritdoc}
      */
     public function authorize(array $params = array(), User $user = null)
     {
-        $pastoralId = $params['id'];
+        // If there is no record then we have to assume they're creating a new one
 
-        try {
-            $record = $this->getPastoralMapper()->findById($pastoralId);
+        if (!isset($params['record'])) {
+            return true;
+        }
 
-            if ($record->getOwner()->getId() == $user->getId()) {
-                return true;
-            }
-        } catch (MapperException $e) {
-            // Record didn't exist, creating new record- so they are the owner by default
+        if ($params['record']->getOwner()->getId() == $user->getId()) {
             return true;
         }
 
         // BZZZZZT! You're outta here.
 
         throw new Unauthorized();
-    }
-
-    /** Here be getters and setters */
-
-    /**
-     * @return PastoralMapper
-     */
-    public function getPastoralMapper()
-    {
-        return $this->pastoralMapper;
-    }
-
-    /**
-     * @param PastoralMapper $mapper
-     * @return $this
-     */
-    public function setPastoralMapper(PastoralMapper $mapper)
-    {
-        $this->pastoralMapper = $mapper;
-        return $this;
     }
 }

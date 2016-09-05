@@ -25,8 +25,6 @@ class IsPastoralModerator implements IAuthorizationRule
             return true;
         }
 
-        // BZZZZZT! You're outta here.
-
         throw new Unauthorized();
     }
 }
