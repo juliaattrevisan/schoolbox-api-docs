@@ -298,31 +298,33 @@
                 <li class="row" data-order="student">
                     <div class="grip"></div>
                     <div class="avatar card small-11">
-                        Student Name
+                        Student Name<br>&nbsp;
                     </div>
                 </li>
                 <li class="row" data-order="date">
                     <div class="grip"></div>
                     <div class="avatar card small-11">
-                        Published Date
+                        Published Date<br>&nbsp;
                     </div>
                 </li>
                 <li class="row" data-order="category">
                     <div class="grip"></div>
                     <div class="avatar card small-11">
                         Record Type
+                        <div class="meta">({% for type in types %}{{ type.name }}{% if not loop.last %}, {% endif %}{% endfor %})</div>
                     </div>
                 </li>
                 <li class="row" data-order="severity">
                     <div class="grip"></div>
                     <div class="avatar card small-11">
                         Severity
+                        <div class="meta">({% for severity in severities %}{{ severity.name }}{% if not loop.last %}, {% endif %}{% endfor %})</div>
                     </div>
                 </li>
                 <li class="row" data-order="author">
                     <div class="grip"></div>
                     <div class="avatar card small-11">
-                        Author Name
+                        Author Name<br>&nbsp;
                     </div>
                 </li>
             </ul>
