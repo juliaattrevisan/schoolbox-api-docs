@@ -3,8 +3,10 @@
  * designed to work on a link.
  *
  * Options:
+ * * header:        Optional override for dialogue header text
  * * dialog:        A selector for the dialog to open, defaults to creating a new one
  * * text:          Text to show in dialog
+ * * format:        Whether text is to be rendered as 'text' or 'html'
  * * dialogOptions: passthru to $.fn.dialog
  * * confirmLabel:  Label for "Yes" button
  * * cancelLabel:   Label for "No" button
