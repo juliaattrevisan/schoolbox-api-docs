@@ -8,6 +8,10 @@
  */
 
 use Schoolbox\UserMapper;
+use Schoolbox\Resource\File\Mapper as FileMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 
 class DAV_Folder extends Sabre\DAV\Collection
 {
@@ -18,14 +22,20 @@ class DAV_Folder extends Sabre\DAV\Collection
     /** @var Schoolbox\Resource\File\Mapper */
     private $fileMapper;
 
-    /** @var Group */
-    private $groupHandler;
+    /** @var Access */
+    private $accessor;
 
     /** @var \Schoolbox\Resource\Folder\Mapper */
     private $folderMapper;
 
     /** @var DAV_SubjectServer_SubjectList */
     protected $subject_list;
+
+    /**
+     * Requested folder path string
+     * @var string
+     */
+    private $myPath;
 
 
     /**
@@ -35,12 +45,11 @@ class DAV_Folder extends Sabre\DAV\Collection
      */
     public function __construct($path)
     {
-        $this->setFolderMapper(Schoolbox\Resource\Folder\Mapper::getInstance());
-        $this->setFileMapper(Schoolbox\Resource\File\Mapper::getInstance());
+        $this->setFolderMapper(FolderMapper::getInstance());
+        $this->setFileMapper(FileMapper::getInstance());
+        $this->setAccessor(Access::getInstance());
 
         $this->myPath = $path;
-
-        $this->groupHandler = new Group();
 
         $this->folder = $this->getFolderMapper()->createModel()->setId(0);
         $this->setFolderFromPath($path);
@@ -59,9 +68,8 @@ class DAV_Folder extends Sabre\DAV\Collection
 
         // Loop through the directory, and create objects for each node that the user has permission to access
         $folders = array();
-
         foreach ($allFolders as $currentFolder) {
-            if ($this->getGroupHandler()->getPermission($currentFolder->getId()) >= READ_ACCESS) {
+            if ($this->getAccessor()->getFolderAccess($_SESSION['user'], array($currentFolder->getId())) >= UserAccess::ACCESS_READ) {
                 $folders[] = new DAV_Folder($this->myPath.'/'.$currentFolder->getName());
             }
         }
@@ -69,7 +77,7 @@ class DAV_Folder extends Sabre\DAV\Collection
         // Loop through all the files and output them if the user has access
         $files = array();
 
-        if ($this->getGroupHandler()->getPermission($this->getFolderID()) >= READ_ACCESS) {
+        if ($this->getAccessor()->getFolderAccess($_SESSION['user'],array($this->getFolderID())) >= UserAccess::ACCESS_READ) {
             /** @var Schoolbox\Collection|Schoolbox\Resource\File\Model[] $fileList */
             $fileList = $this->getFileMapper()->findByColumn('category', $this->getFolderID());
 
@@ -119,7 +127,7 @@ class DAV_Folder extends Sabre\DAV\Collection
     {
         //Prevent queries if permission is not allowed
         if ($this->getFolderID() > 0) {
-            if ($this->getGroupHandler()->getPermission($this->getFolderID()) < READ_ACCESS) {
+            if ($this->getAccessor()->getFolderAccess($_SESSION['user'], array($this->getFolderID())) < UserAccess::ACCESS_READ) {
                 throw new Sabre\DAV\Exception\Forbidden('Permission denied');
             }
         }
@@ -188,10 +196,17 @@ class DAV_Folder extends Sabre\DAV\Collection
 
     /**
      * Delete a folder
+     * @return void
+     * @throws Sabre\DAV\Exception\Forbidden
      */
     public function delete()
     {
-        $this->getFolderMapper()->delete($this->getFolder());
+        if ($this->getAccessor()->getFolderAccess($_SESSION['user'], array($this->getFolderID())) >= UserAccess::ACCESS_WRITE) {
+            $this->getFolderMapper()->deleteFolder($this->getFolder()->getId(), $_SESSION['user']);
+        }
+        else {
+            throw new Sabre\DAV\Exception\Forbidden('Permission denied to delete folder');
+        }
     }
 
 
@@ -203,7 +218,7 @@ class DAV_Folder extends Sabre\DAV\Collection
      */
     public function createFile($name, $data = null)
     {
-        if ($this->getGroupHandler()->getPermission($this->getFolderID()) >= WRITE_ACCESS) {
+        if ($this->getAccessor()->getFolderAccess($_SESSION['user'], array($this->getFolderID())) >= UserAccess::ACCESS_WRITE) {
             $storage = $this->getFileMapper()->getStorageMapper()->acceptStream($name, $data, false);
 
             $file = $this->fileMapper->createModel()
@@ -245,12 +260,18 @@ class DAV_Folder extends Sabre\DAV\Collection
      * Rename folder
      *
      * @param string $newName
+     * @throws Sabre\DAV\Exception\Forbidden
      */
     public function setName($newName)
     {
-        $this->getFolder()->setName($newName);
+        if ($this->getAccessor()->getFolderAccess($_SESSION['user'], array($this->getFolder()->getParent()->getId())) >= UserAccess::ACCESS_WRITE) {
 
-        $this->getFolderMapper()->save($this->getFolder());
+            $this->getFolder()->setName($newName);
+            $this->getFolderMapper()->save($this->getFolder());
+        }
+        else {
+            throw new Sabre\DAV\Exception\Forbidden('Permission denied to modify directory');
+        }
     }
 
 
@@ -314,15 +335,6 @@ class DAV_Folder extends Sabre\DAV\Collection
         }
     }
 
-
-    /**
-     * @return Group
-     */
-    private function getGroupHandler()
-    {
-        return $this->groupHandler;
-    }
-
     /* Getters/Setters
      */
 
@@ -383,6 +395,22 @@ class DAV_Folder extends Sabre\DAV\Collection
     {
         $this->fileMapper = $fileMapper;
         return $this;
+    }
+
+    /**
+     * @return Access
+     */
+    private function getAccessor()
+    {
+        return $this->accessor;
+    }
+
+    /**
+     * @param Access $accessor
+     */
+    private function setAccessor($accessor)
+    {
+        $this->accessor = $accessor;
     }
 
 }
