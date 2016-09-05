@@ -26,6 +26,8 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  *  which had at least one child Folder which contained a Course Builder component.
  *  This class puts this concept into a concrete class.)
  *
+ * TODO unit tests
+ *
  * @package Schoolbox\Learning\Course\Specification
  */
 class Model implements AssessmentContext, ISoftDeletable
