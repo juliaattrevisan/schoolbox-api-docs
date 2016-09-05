@@ -14,6 +14,7 @@
 
 namespace Schoolbox\Learning\Assessment\Quiz;
 
+use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 
 class Model extends AbstractAssessment
@@ -26,5 +27,18 @@ class Model extends AbstractAssessment
     public function getTypeName()
     {
         return 'Quiz';
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * Use the most recent Published Feedback as the official value
+     *
+     * @param User $user
+     * @return string
+     */
+    public function calculateMark(User $user)
+    {
+        return $this->findParticipant($user)->findMostRecentPublishedFeedback($this)->calculateMark();
     }
 }

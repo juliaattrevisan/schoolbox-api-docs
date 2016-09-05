@@ -11,8 +11,8 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 use \Schoolbox\Collection;
+use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
-use \Schoolbox\Learning\Assessment\Participant;
 
 class Model extends AbstractAssessment
 {
@@ -183,6 +183,19 @@ class Model extends AbstractAssessment
     public function hasRubric()
     {
         return $this->getHasRubric();
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * Use the most recent Published Feedback as the official value
+     *
+     * @param User $user
+     * @return string
+     */
+    public function calculateMark(User $user)
+    {
+        return $this->findParticipant($user)->findMostRecentPublishedFeedback($this)->calculateMark();
     }
 
     /* Getters/Setters

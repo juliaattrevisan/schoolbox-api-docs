@@ -146,11 +146,23 @@ class Participant
         return $outcome !== null;
     }
 
+    /**
+     * Find the most recent published IFeedback for an IAssessable for this Participant
+     *
+     * @param IAssessable $assessable
+     * @return null|IFeedback
+     */
     public function findMostRecentPublishedFeedback(IAssessable $assessable)
     {
         return $this->assessableFeedbackTraversal($assessable, self::TRAVERSAL_PUBLISHED);
     }
 
+    /**
+     * Find the most recent IFeedback for an IAssessable for this Participant
+     *
+     * @param IAssessable $assessable
+     * @return null|IFeedback
+     */
     public function findMostRecentFeedback(IAssessable $assessable)
     {
         return $this->assessableFeedbackTraversal($assessable, self::TRAVERSAL_MARKED);

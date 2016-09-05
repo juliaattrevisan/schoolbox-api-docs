@@ -38,6 +38,17 @@ interface IAssessable
      */
     public function findParticipant(User $user);
 
+    /**
+     * Calculate the final mark for this IAssessable, for a particular User
+     *
+     * Projects use Summator strategies to determine final marks
+     * for a Collection of Assessable instances
+     *
+     * @param User $user
+     * @return string
+     */
+    public function calculateMark(User $user);
+
     /* Traversals
      */
 

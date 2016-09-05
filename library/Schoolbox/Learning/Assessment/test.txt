@@ -1030,5 +1030,41 @@ foreach ($project->getAssessables() as $currentAssessable) {
     }
 }
 
+echo "<h1>Marks</h1>";
+
+new \Alaress_Probe('ID, Title', 'Assessable Mark');
+try {
+    new \Alaress_Probe(
+        "{$project->getId()} {$project->getTitle()}",
+        "{$project->calculateMark($hodes)}"
+    );
+}
+/* User not found
+ */
+catch (\UnexpectedValueException $e) {
+    new \Alaress_Probe(
+        "{$project->getId()} {$project->getTitle()}",
+        ''
+    );
+}
+
+foreach ($project->getAssessables() as $currentAssessable) {
+    try {
+        new \Alaress_Probe(
+            "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
+            "{$currentAssessable->calculateMark($hodes)}"
+        );
+    }
+    /* User not found
+     */
+    catch (\UnexpectedValueException $e) {
+        new \Alaress_Probe(
+            "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
+            ''
+        );
+    }
+}
+
 
 die();
+

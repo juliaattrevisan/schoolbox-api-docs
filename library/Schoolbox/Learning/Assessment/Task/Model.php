@@ -17,11 +17,11 @@
 
 namespace Schoolbox\Learning\Assessment\Task;
 
+use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 
 class Model extends AbstractAssessment
 {
-
     /**
      * @inheritdoc
      *
@@ -30,5 +30,18 @@ class Model extends AbstractAssessment
     public function getTypeName()
     {
         return 'Task';
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * Use the most recent Published Feedback as the official value
+     *
+     * @param User $user
+     * @return string
+     */
+    public function calculateMark(User $user)
+    {
+        return $this->findParticipant($user)->findMostRecentPublishedFeedback($this)->calculateMark();
     }
 }
