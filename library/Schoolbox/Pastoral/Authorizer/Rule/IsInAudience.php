@@ -1,6 +1,6 @@
 <?php
 /**
- * IsInAudience - Determine if a pastoral record should be viewable by the logged in user
+ * IsInAudience - Determine if a pastoral record should be viewable by the logged in user based on audienced roles/users
  *
  * @author      Damian Sloane <steve.chan@alaress.com.au>
  * @copyright   Copyright 2016, Alaress Pty Ltd
@@ -41,17 +41,7 @@ class IsInAudience implements IAuthorizationRule
     {
         $pastoralId = $params['id'];
         $record = $this->getPastoralMapper()->findById($pastoralId);
-
-        // Check if parents are allowed in
-
-        /** @var \Schoolbox\Role $role */
         $role = $user->getRole();
-
-        if ($role->isParent()) {
-            if (!\Config::get('pastoral_parent_access')) {
-                throw new Unauthorized();
-            }
-        }
 
         // Give owners permission to their own records regardless of other permissions
 
