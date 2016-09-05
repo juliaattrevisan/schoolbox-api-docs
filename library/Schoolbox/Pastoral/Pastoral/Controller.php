@@ -5,7 +5,6 @@
  * @author    Damian Sloane <damian.sloane@alaress.com.au>
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
- *
  */
 
 namespace Schoolbox\Pastoral\Pastoral;
@@ -45,76 +44,6 @@ use Schoolbox\Pastoral\UploadQueue\Model as PastoralUploadQueueModel;
 class Controller extends Base
 {
     /**
-     * @var PastoralMapper
-     */
-    protected $pastoralMapper;
-
-    /**
-     * @var UserAccessMapper
-     */
-    protected $userAccessMapper;
-
-    /**
-     * @var PastoralCategoryMapper
-     */
-    protected $pastoralCategoryMapper;
-
-    /**
-     * @var PastoralTypeMapper
-     */
-    protected $pastoralTypeMapper;
-
-    /**
-     * @var PastoralUploadQueueMapper
-     */
-    protected $pastoralUploadQueueMapper;
-
-    /**
-     * @var PastoralSeverityMapper
-     */
-    protected $pastoralSeverityMapper;
-
-    /**
-     * @var PastoralTagsMapper
-     */
-    protected $pastoralTagsMapper;
-
-    /**
-     * @var RoleMapper
-     */
-    protected $roleMapper;
-
-    /**
-     * @var UserMapper
-     */
-    protected $userMapper;
-
-    /**
-     * @var PastoralCommentMapper
-     */
-    protected $pastoralCommentMapper;
-
-    /**
-     * @var PastoralAccessMapper
-     */
-    protected $pastoralAccessMapper;
-
-    /**
-     * @var PastoralAttachmentMapper
-     */
-    protected $pastoralAttachmentMapper;
-
-    /**
-     * @var ErrorMapper
-     */
-    protected $errorMapper;
-
-    /**
-     * @var FileMapper
-     */
-    protected $fileMapper;
-
-    /**
      * Controller constructor.
      */
     public function __construct()
@@ -138,60 +67,8 @@ class Controller extends Base
     }
 
     /**
-     * Insert an attach zone into the template
-     *
-     * @param Collection|PastoralAttachmentModel $attachments
-     * @return array
+     * Here be the routes
      */
-    private function getAttachZone($attachments = null)
-    {
-        $zone = new Zone('attachment');
-        $zone
-            ->setThumbnailSize(64)
-            ->setModalTitle('Select Image')
-            ->setAttachmentsLabel('')
-            ->setAttachPrompt('Upload Image')
-            ->setMimeFilter('*/*')
-            ->setReadOnly(false)
-            ->setMulti(true);
-
-        if ($attachments != null) {
-            foreach ($attachments as $attachment) {
-                $zone->attachFiles(array($attachment->getHash()));
-            }
-        }
-
-        return $zone->getTwigContext();
-    }
-
-    /**
-     * Calculate age of student
-     *
-     * @param int $timestamp
-     * @param int $now
-     * @return int
-     */
-    private function calculateAge($timestamp = 0, $now = 0)
-    {
-
-        if ($now == 0) {
-            $now = time();
-        }
-
-        $yearDiff = date("Y", $now) - date("Y", $timestamp);
-        $monthDiff = date("m", $now) - date("m", $timestamp);
-        $dayDiff = date("d", $now) - date("d", $timestamp);
-
-        if ($monthDiff < 0) {
-            $yearDiff--;
-        } elseif (($monthDiff == 0) && ($dayDiff < 0)) {
-            $yearDiff--;
-        }
-
-        $result = intval($yearDiff);
-
-        return $result;
-    }
 
     /**
      * Generate a pastoral report with the relevant filtering applied, this version has the accordion and pagination
@@ -289,76 +166,6 @@ class Controller extends Base
     }
 
     /**
-     * Get pastoral report records
-     *
-     * @return Collection|Model
-     */
-    private function getReportData()
-    {
-        // Make sure all the criteria exist before we starting trying to use them, and if they don't get passed
-        // across, just set blank defaults
-
-        if (!isset($this->getRequest()->query["students"])) {
-            $students = '';
-        } else {
-            $students = $this->getRequest()->query["students"];
-        }
-
-        if (!isset($this->getRequest()->query["authors"])) {
-            $authors = '';
-        } else {
-            $authors = $this->getRequest()->query["authors"];
-        }
-
-        if (!isset($this->getRequest()->query["types"])) {
-            $types = '';
-        } else {
-            $types = $this->getRequest()->query["types"];
-        }
-
-        if (!isset($this->getRequest()->query["severity"])) {
-            $severity = '';
-        } else {
-            $severity = $this->getRequest()->query["severity"];
-        }
-
-        if (!isset($this->getRequest()->query["before"])) {
-            $before_date = '';
-        } else {
-            $before_date = $this->getRequest()->query["before"];
-        }
-
-        if (!isset($this->getRequest()->query["after"])) {
-            $after_date = '';
-        } else {
-            $after_date = $this->getRequest()->query["after"];
-        }
-
-        if (!isset($this->getRequest()->query["tags"])) {
-            $tags = '';
-        } else {
-            $tags = $this->getRequest()->query["tags"];
-        }
-
-        if (!isset($this->getRequest()->query["order"])) {
-            $order = '';
-        } else {
-            $order = $this->getRequest()->query["order"];
-        }
-
-        if (!isset($this->getRequest()->query["involved"])) {
-            $involved = 'false';
-        } else {
-            $involved = $this->getRequest()->query["involved"];
-        }
-
-        // Get matching records
-
-        return $this->getPastoralMapper()->findAllReport($this->getUser(), $before_date, $after_date, $severity, $types,
-            $authors, $students, $tags, $order, $involved);
-    }
-
-    /**
      * Display report builder page
      */
     public function getReportBuilder()
@@ -419,35 +226,9 @@ class Controller extends Base
     }
 
     /**
-     * Returns the logged in users pastoral care moderator level
-     *
-     * @return int
-     * @throws MapperException
-     */
-    public function getPastoralModeratorLevel()
-    {
-        $pastoralModeratorList = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL);
-
-        //Get first from collection
-        if ($pastoralModeratorList->count() > 0) {
-            $pastoralModerator = $pastoralModeratorList->first()->getAccessLevel();
-        } else {
-            $pastoralModerator = UserAccess::ACCESS_DENY;
-        }
-
-        if ($this->getUser()->isSuperuser()) {
-            $pastoralModerator = UserAccess::ACCESS_FULL;
-        }
-
-        return $pastoralModerator;
-    }
-
-    /**
      * Display list of all pastoral records for selected student
-     *
      * @param $id
      * @throws SchoolboxException
-     * @throws MapperException
      */
     public function getIndex($id)
     {
@@ -513,11 +294,9 @@ class Controller extends Base
 
     /**
      * Get an individual pastoral care record
-     *
-     * @param $studentId
-     * @param $id
+     * @param int $studentId The ID of the student the record relates to
+     * @param int $id The ID of the pastoral care record we want to view
      * @throws SchoolboxException
-     * @throws MapperException
      */
     public function getRecord($studentId, $id)
     {
@@ -566,8 +345,7 @@ class Controller extends Base
 
     /**
      * Insert pastoral care record page
-     *
-     * @param $id
+     * @param int $id The ID of the student we are inserting a record on
      * @throws SchoolboxException
      */
     public function getInsert($id)
@@ -601,8 +379,7 @@ class Controller extends Base
 
     /**
      * Update pastoral care record page
-     *
-     * @param $id
+     * @param int $id The ID of the pastoral care record we want to update
      * @throws SchoolboxException
      */
     public function getUpdate($id)
@@ -638,7 +415,6 @@ class Controller extends Base
 
     /**
      * Delete a comment
-     *
      * @throws SchoolboxException
      */
     public function postCommentDelete()
@@ -660,7 +436,6 @@ class Controller extends Base
 
     /**
      * Post a comment
-     *
      * @throws SchoolboxException
      */
     public function postComment()
@@ -687,7 +462,6 @@ class Controller extends Base
 
     /**
      * Insert/update a pastoral care record
-     *
      * @throws SchoolboxException
      */
     public function postSave()
@@ -1114,7 +888,6 @@ class Controller extends Base
 
     /**
      * Delete a pastoral care record
-     *
      * @throws SchoolboxException
      */
     public function postDelete()
@@ -1140,8 +913,231 @@ class Controller extends Base
     }
 
     /**
+     * Here be some helper functions
+     */
+
+    /**
+     * Insert an attach zone into the template
+     *
+     * @param Collection|PastoralAttachmentModel $attachments
+     * @return array
+     */
+    private function getAttachZone($attachments = null)
+    {
+        $zone = new Zone('attachment');
+        $zone
+            ->setThumbnailSize(64)
+            ->setModalTitle('Select Image')
+            ->setAttachmentsLabel('')
+            ->setAttachPrompt('Upload Image')
+            ->setMimeFilter('*/*')
+            ->setReadOnly(false)
+            ->setMulti(true);
+
+        if ($attachments != null) {
+            foreach ($attachments as $attachment) {
+                $zone->attachFiles(array($attachment->getHash()));
+            }
+        }
+
+        return $zone->getTwigContext();
+    }
+
+    /**
+     * Calculate age of student
+     *
+     * @param int $timestamp
+     * @param int $now
+     * @return int
+     */
+    private function calculateAge($timestamp = 0, $now = 0)
+    {
+
+        if ($now == 0) {
+            $now = time();
+        }
+
+        $yearDiff = date("Y", $now) - date("Y", $timestamp);
+        $monthDiff = date("m", $now) - date("m", $timestamp);
+        $dayDiff = date("d", $now) - date("d", $timestamp);
+
+        if ($monthDiff < 0) {
+            $yearDiff--;
+        } elseif (($monthDiff == 0) && ($dayDiff < 0)) {
+            $yearDiff--;
+        }
+
+        $result = intval($yearDiff);
+
+        return $result;
+    }
+
+    /**
+     * Returns the logged in users pastoral care moderator level
+     *
+     * @return int
+     * @throws MapperException
+     */
+    public function getPastoralModeratorLevel()
+    {
+        $pastoralModeratorList = $this->getUser()->getAccessList()->filterBy('service', UserAccess::SERVICE_PASTORAL);
+
+        //Get first from collection
+        if ($pastoralModeratorList->count() > 0) {
+            $pastoralModerator = $pastoralModeratorList->first()->getAccessLevel();
+        } else {
+            $pastoralModerator = UserAccess::ACCESS_DENY;
+        }
+
+        if ($this->getUser()->isSuperuser()) {
+            $pastoralModerator = UserAccess::ACCESS_FULL;
+        }
+
+        return $pastoralModerator;
+    }
+
+    /**
+     * Get pastoral report records
+     * @return Collection|Model
+     */
+    private function getReportData()
+    {
+        // Make sure all the criteria exist before we starting trying to use them, and if they don't get passed
+        // across, just set blank defaults
+
+        if (!isset($this->getRequest()->query["students"])) {
+            $students = '';
+        } else {
+            $students = $this->getRequest()->query["students"];
+        }
+
+        if (!isset($this->getRequest()->query["authors"])) {
+            $authors = '';
+        } else {
+            $authors = $this->getRequest()->query["authors"];
+        }
+
+        if (!isset($this->getRequest()->query["types"])) {
+            $types = '';
+        } else {
+            $types = $this->getRequest()->query["types"];
+        }
+
+        if (!isset($this->getRequest()->query["severity"])) {
+            $severity = '';
+        } else {
+            $severity = $this->getRequest()->query["severity"];
+        }
+
+        if (!isset($this->getRequest()->query["before"])) {
+            $before_date = '';
+        } else {
+            $before_date = $this->getRequest()->query["before"];
+        }
+
+        if (!isset($this->getRequest()->query["after"])) {
+            $after_date = '';
+        } else {
+            $after_date = $this->getRequest()->query["after"];
+        }
+
+        if (!isset($this->getRequest()->query["tags"])) {
+            $tags = '';
+        } else {
+            $tags = $this->getRequest()->query["tags"];
+        }
+
+        if (!isset($this->getRequest()->query["order"])) {
+            $order = '';
+        } else {
+            $order = $this->getRequest()->query["order"];
+        }
+
+        if (!isset($this->getRequest()->query["involved"])) {
+            $involved = 'false';
+        } else {
+            $involved = $this->getRequest()->query["involved"];
+        }
+
+        // Get matching records
+
+        return $this->getPastoralMapper()->findAllReport($this->getUser(), $before_date, $after_date, $severity, $types,
+            $authors, $students, $tags, $order, $involved);
+    }
+
+    /**
      * Here be the getters/setters, nothing else interesting to see
      */
+
+    /**
+     * @var PastoralMapper
+     */
+    protected $pastoralMapper;
+
+    /**
+     * @var UserAccessMapper
+     */
+    protected $userAccessMapper;
+
+    /**
+     * @var PastoralCategoryMapper
+     */
+    protected $pastoralCategoryMapper;
+
+    /**
+     * @var PastoralTypeMapper
+     */
+    protected $pastoralTypeMapper;
+
+    /**
+     * @var PastoralSeverityMapper
+     */
+    protected $pastoralSeverityMapper;
+
+    /**
+     * @var PastoralTagsMapper
+     */
+    protected $pastoralTagsMapper;
+
+    /**
+     * @var RoleMapper
+     */
+    protected $roleMapper;
+
+    /**
+     * @var UserMapper
+     */
+    protected $userMapper;
+
+    /**
+     * @var PastoralCommentMapper
+     */
+    protected $pastoralCommentMapper;
+
+    /**
+     * @var PastoralAccessMapper
+     */
+    protected $pastoralAccessMapper;
+
+    /**
+     * @var PastoralUploadQueueMapper
+     */
+    protected $pastoralUploadQueueMapper;
+
+    /**
+     * @var PastoralAttachmentMapper
+     */
+    protected $pastoralAttachmentMapper;
+
+    /**
+     * @var ErrorMapper
+     */
+    protected $errorMapper;
+
+    /**
+     * @var FileMapper
+     */
+    protected $fileMapper;
 
     /**
      * @param $pastoralMapper
