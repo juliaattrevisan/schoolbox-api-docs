@@ -12,6 +12,7 @@ use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -40,6 +41,17 @@ class Model implements AssessmentContext, ISoftDeletable
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
+
+    /**
+     * The Course Implementation which this object belongs to.
+     *
+     * Replaces the previous Unit Instance class' component field.
+     *
+     * TODO review if this relation is required - this object can't exist without its Course Implementation
+     *
+     * @var CourseImplementation
+     */
+    protected $course;
 
     /**
      * The Unit Specification which this object was created from.
@@ -96,6 +108,7 @@ class Model implements AssessmentContext, ISoftDeletable
     public function __construct()
     {
         $this->specification = new UnitSpecification();
+        $this->course = new CourseImplementation();
         $this->openDate = new \Alaress_Date_NullDate();
         $this->dueDate = new \Alaress_Date_NullDate();
         $this->createdAt = new \Alaress_Date_NullDate();
@@ -221,5 +234,23 @@ class Model implements AssessmentContext, ISoftDeletable
     public function getFolder()
     {
         return $this->getCourse()->getFolder();
+    }
+
+    /**
+     * @return CourseImplementation
+     */
+    public function getCourse()
+    {
+        return $this->course;
+    }
+
+    /**
+     * @param CourseImplementation $course
+     * @return static
+     */
+    public function setCourse($course)
+    {
+        $this->course = $course;
+        return $this;
     }
 }
