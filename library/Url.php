@@ -176,6 +176,26 @@ class Url
         return '/redir.php?url=' . urlencode(base64_encode($this->getUrl()));
     }
 
+    /**
+     * Returns whether the value is a HTTP, HTTPS, FTP or relative URL.
+     *
+     * This regex semantics should match the globally-available custom jquery validation
+     * method 'isURL' defined in jquery.validate.extensions.js
+     *
+     * @return bool
+     */
+    public function isValidUrl()
+    {
+        // If prefixed with a scheme, domain name must have 2 or more levels with chars from [\w-]
+        // If relative (prefixed with '/') remaining chars cannot have embedded spaces
+        // Absolute URLs can have any non-whitespace chars in their path (this is not strictly valid)
+        // TODO. This could be made more complex to filter more invalid paths, at the moment it's quite permissive.
+
+        $regExp = '#^((((http)|(ftp))s?://[\w-]+(\.[\w-]+)+(/\S*)?)|(/\S*))$#';
+
+        return preg_match($regExp, $this->url);
+    }
+
     /* Getters/Setters
       */
 
