@@ -93,6 +93,8 @@ class APNS extends AbstractService
 
             } catch (InvalidArgumentException $e) {
                 // your token is not a hex string
+                $this->getLog()->debug("Invalid token: '$token': removing from registry");
+                RegistryMapper::getInstance()->deleteByColumn('app_token', $token);
                 continue;
             }
 
