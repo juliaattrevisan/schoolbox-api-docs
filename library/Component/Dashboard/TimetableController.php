@@ -175,7 +175,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                         /* Always highlight the current cell, regardless of
                          * whether it has something on or not
                          */
-                        if ($current_period['PeriodNumber'] == $period['periodNumber']) {
+                        if ($current_period['PeriodNumber'] == $period['periodNumber']
+                            && $current_period['PeriodNumberSeq'] == $period['periodSequence']) {
                             $this->setVar(
                                 array(
                                     'PERIOD_CLASS'    => 'timetable-subject-active',
