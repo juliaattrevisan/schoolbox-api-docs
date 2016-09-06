@@ -347,6 +347,7 @@ class External_Humanedge_User implements External_UserInterface
                 FROM tblSubject s
                 INNER JOIN tblAllocation a on s.ID = a.SubjectID
                 INNER JOIN tblStudent st on a.FormID = st.FormID
+                INNER JOIN tblPeriod p ON a.PeriodID = p.ID
                 LEFT JOIN tblBlockItem b on s.ID = b.SubjectID
                 WHERE st.deleted = 0
                 AND st.code = $quotedId
