@@ -112,7 +112,7 @@ abstract class AbstractAssessment implements IAssessable
      * @return Participant
      * @throws \UnexpectedValueException
      */
-    public function findParticipant(User $user)
+    public function getParticipant(User $user)
     {
         /** @var Participant $currentParticipant */
         foreach ($this->getAllParticipants() as $currentParticipant) {
@@ -124,13 +124,58 @@ abstract class AbstractAssessment implements IAssessable
         throw new \UnexpectedValueException();
     }
 
+    /**
+     * @param User $user
+     * @param bool $publishedOnly
+     * @return string
+     */
+    public function getHumanReadableMark(User $user, $publishedOnly)
+    {
+        return $this->getMark($user, $publishedOnly, true);
+    }
+
+    /**
+     * @param User $user
+     * @param bool $publishedOnly
+     * @return float|null
+     */
+    public function getNormalisedMark(User $user, $publishedOnly)
+    {
+        return $this->getMark($user, $publishedOnly, false);
+    }
+
+    /**
+     * @param User $user
+     * @param $publishedOnly
+     * @param $normalised
+     * @return float|null|string
+     */
+    private function getMark(User $user, $publishedOnly, $normalised)
+    {
+        $participant = $this->getParticipant($user);
+
+        if ($publishedOnly) {
+            $feedback = $participant->findMostRecentPublishedFeedback($this);
+
+        } else {
+            $feedback = $participant->findMostRecentFeedback($this);
+        }
+
+        if ($normalised) {
+            return $feedback->getNormalisedMark();
+        }
+
+        return $feedback->getHumanReadableMark();
+    }
+
+
     /* Traversals
      */
 
     /**
      * @inheritdoc
      *
-     * @return mixed
+     * @return int
      */
     public function numParticipants()
     {
@@ -158,10 +203,8 @@ abstract class AbstractAssessment implements IAssessable
 
     /**
      * @inheritdoc
-     *
-     * @return int
      */
-    public function calculatePercentageMarked()
+    public function getPercentageMarked()
     {
         return 100 * ($this->numMarked() / $this->numParticipants());
     }
@@ -186,7 +229,7 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function calculatePercentagePublished()
+    public function getPercentagePublished()
     {
         return 100 * ($this->numPublished() / $this->numParticipants());
     }

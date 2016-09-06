@@ -36,18 +36,21 @@ interface IAssessable
      * @return Participant
      * @throws \UnexpectedValueException
      */
-    public function findParticipant(User $user);
+    public function getParticipant(User $user);
 
-    /**
-     * Calculate the final mark for this IAssessable, for a particular User
-     *
-     * Projects use Summator strategies to determine final marks
-     * for a Collection of Assessable instances
-     *
+/**
      * @param User $user
+     * @param bool $publishedOnly
      * @return string
      */
-    public function calculateMark(User $user);
+    public function getHumanReadableMark(User $user, $publishedOnly);
+
+    /**
+     * @param User $user
+     * @param bool $publishedOnly
+     * @return float|null
+     */
+    public function getNormalisedMark(User $user, $publishedOnly);
 
     /* Traversals
      */
@@ -90,9 +93,9 @@ interface IAssessable
     /**
      * Calculate percentage of an IAssessable that has been marked
      *
-     * @return int
+     * @return float
      */
-    public function calculatePercentageMarked();
+    public function getPercentageMarked();
 
     /**
      * Calculate the number of Feedbacks that have been Published
@@ -105,9 +108,9 @@ interface IAssessable
     /**
      * Calculate percentage of an IAssessable that has been Published
      *
-     * @return int
+     * @return float
      */
-    public function calculatePercentagePublished();
+    public function getPercentagePublished();
 
     /* Getters/Setters
      */

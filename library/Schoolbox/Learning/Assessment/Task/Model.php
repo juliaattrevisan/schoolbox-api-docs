@@ -42,6 +42,6 @@ class Model extends AbstractAssessment
      */
     public function calculateMark(User $user)
     {
-        return $this->findParticipant($user)->findMostRecentPublishedFeedback($this)->calculateMark();
+        return $this->getParticipant($user)->findMostRecentPublishedFeedback($this)->calculateMark();
     }
 }

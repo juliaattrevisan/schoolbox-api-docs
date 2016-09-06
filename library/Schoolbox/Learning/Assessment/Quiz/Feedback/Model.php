@@ -27,7 +27,7 @@ class Model extends AbstractFeedback
     /**
      * Calculate the final mark for this IAssessable
      */
-    public function calculateMark()
+    public function getNormalisedMark()
     {
         $sum = 0;
 
