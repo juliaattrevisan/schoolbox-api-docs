@@ -13,6 +13,7 @@ use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Notification;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
+use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\Realtime\Notification\Decorator;
 
 abstract class AbstractService implements ServiceInterface
@@ -28,12 +29,18 @@ abstract class AbstractService implements ServiceInterface
     /** @var Decorator */
     protected $decorator;
 
+    /** @var RegistryMapper */
+    private $registryMapper;
+
 
     /**
      * AbstractService constructor.
+     *
+     * @param RegistryMapper $registryMapper
      */
-    public function __construct()
+    public function __construct(RegistryMapper $registryMapper)
     {
+        $this->registryMapper = $registryMapper;
         $this->decorator = new Decorator();
     }
 
@@ -104,6 +111,15 @@ abstract class AbstractService implements ServiceInterface
 
     }
 
+
+    /**
+     * @param string $token
+     * @return void
+     */
+    protected function deleteToken($token)
+    {
+        $this->registryMapper->deleteByColumn('app_token', $token);
+    }
 
     /**
      * @param array $tokens

@@ -30,6 +30,10 @@ class ServiceManagerFactory
      * @var LoggerInterface
      */
     private $log;
+    /**
+     * @var RegistryMapper
+     */
+    private $registryMapper;
 
 
     /**
@@ -37,11 +41,13 @@ class ServiceManagerFactory
      *
      * @param IConfigLoader   $conf
      * @param LoggerInterface $log
+     * @param RegistryMapper  $registryMapper
      */
-    public function __construct(IConfigLoader $conf, LoggerInterface $log)
+    public function __construct(IConfigLoader $conf, LoggerInterface $log, RegistryMapper $registryMapper)
     {
         $this->conf = $conf;
         $this->log = $log;
+        $this->registryMapper = $registryMapper;
     }
 
 
@@ -92,7 +98,7 @@ class ServiceManagerFactory
         $conf = $this->conf;
 
         if ($conf->get('push_gcm_api_key')) {
-            return new Cloud\Google\GCM($conf->get('push_gcm_api_key'));
+            return new Cloud\Google\GCM($this->registryMapper, $conf->get('push_gcm_api_key'));
         }
         throw new OutOfBoundsException("GCM is not enabled");
     }
@@ -124,7 +130,7 @@ class ServiceManagerFactory
                 $log->debug("Apple cert is up to date");
             }
 
-            return new Cloud\Apple\APNS(Apns\Client\Message::PRODUCTION_URI, $tempCert, $conf->get('push_apns_cert_key') ?: null);
+            return new Cloud\Apple\APNS($this->registryMapper, Apns\Client\Message::PRODUCTION_URI, $tempCert, $conf->get('push_apns_cert_key') ?: null);
         }
 
         throw new OutOfBoundsException("APNS is not enabled");
