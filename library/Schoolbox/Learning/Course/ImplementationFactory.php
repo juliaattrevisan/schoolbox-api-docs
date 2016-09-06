@@ -5,18 +5,18 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Course\Implementation;
+namespace Schoolbox\Learning\Course;
 
 use Schoolbox\Learning\Course\Implementation as CourseImplementation;
-use Schoolbox\Learning\Course\Implementation\Unit\Factory as UnitImplementationFactory;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
+use Schoolbox\Learning\Course\Unit\ImplementationFactory as UnitImplementationFactory;
 
 /**
  * A factory for Course Implementation objects.
  *
  * @package Schoolbox\Learning\Course\Implementation
  */
-class Factory
+class ImplementationFactory
 {
     /**
      * Internal object - used to build Unit Implementation objects for the Course Implementation.

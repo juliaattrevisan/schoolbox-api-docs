@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Course\Implementation\Unit;
+namespace Schoolbox\Learning\Course\Unit;
 
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
@@ -15,7 +15,7 @@ use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
  *
  * @package Schoolbox\Learning\Course\Implementation\Unit
  */
-class Factory
+class ImplementationFactory
 {
     /**
      * Builds a Unit Implementation out of the given Unit Specification.
