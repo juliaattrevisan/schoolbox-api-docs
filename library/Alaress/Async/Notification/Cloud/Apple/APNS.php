@@ -73,9 +73,10 @@ class APNS extends AbstractService
      * @param array  $tokens
      * @param int    $id
      * @param string $title
+     * @param int    $unreadCount
      * @return bool
      */
-    public function propagate(array $tokens, $id, $title)
+    public function propagate(array $tokens, $id, $title, $unreadCount = 0)
     {
         $alert = new Message\Alert();
 
@@ -84,7 +85,7 @@ class APNS extends AbstractService
         $message = new Message();
 
         $message->setId($id);
-        $message->setBadge(1);
+        $message->setBadge($unreadCount);
         $message->setAlert($alert);
         $message->setSound('default');
 

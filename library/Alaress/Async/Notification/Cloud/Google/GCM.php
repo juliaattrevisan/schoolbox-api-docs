@@ -61,11 +61,12 @@ class GCM extends AbstractService
      * @param array  $registrationIds
      * @param int    $id
      * @param string $title
+     * @param int    $unreadCount
      * @throws RuntimeException if your API key is bad
      * @throws OverflowException if the max payload size (4KB) is exceeded
      * @return bool
      */
-    public function propagate(array $registrationIds, $id, $title)
+    public function propagate(array $registrationIds, $id, $title, $unreadCount = 0)
     {
         $data = [
             'id'           => $id,
