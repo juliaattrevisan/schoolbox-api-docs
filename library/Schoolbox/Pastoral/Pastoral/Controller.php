@@ -1071,6 +1071,7 @@ class Controller extends Base
                 $pastoralExternal->createPastoral($record);
         }
 
+        /** @var PastoralModel $record */
         foreach ($records as $record)
         {
             // Delete attachments if required
@@ -1134,6 +1135,8 @@ class Controller extends Base
                             // Queue file for upload to Synergetic DocMan
                             $queue = new PastoralUploadQueueModel();
                             $queue->setPastoralId($record->getId());
+                            $queue->setExternalId($this->getUser()->getExternalId());
+                            $queue->setStudentExternalId($record->getStudent()->getExternalId());
                             $queue->setHash($storageObject->getHash());
                             $queue->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
                             $queue->setType($storageObject->getType());

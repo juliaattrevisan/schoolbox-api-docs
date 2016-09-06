@@ -14,6 +14,8 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 class Model implements ISoftDeletable
 {
@@ -21,9 +23,15 @@ class Model implements ISoftDeletable
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
-    
+
     /** @var int */
     protected $pastoralId;
+
+    /** @var int */
+    protected $externalId;
+
+    /** @var int */
+    protected $studentExternalId;
 
     /** @var string */
     protected $hash;
@@ -34,10 +42,14 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $status;
 
+    /** @var string */
+    protected $message;
+
     /**
      * @return int
      */
-    public function getPastoralId() {
+    public function getPastoralId()
+    {
         return $this->pastoralId;
     }
 
@@ -45,8 +57,45 @@ class Model implements ISoftDeletable
      * @param int $pastoralId
      * @return self
      */
-    public function setPastoralId($pastoralId) {
+    public function setPastoralId($pastoralId)
+    {
         $this->pastoralId = $pastoralId;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExternalId()
+    {
+        return $this->externalId;
+    }
+
+    /**
+     * @param int $externalId
+     * @return self
+     */
+    public function setExternalId($externalId)
+    {
+        $this->externalId = $externalId;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getStudentExternalId()
+    {
+        return $this->studentExternalId;
+    }
+
+    /**
+     * @param int $studentExternalId
+     * @return self
+     */
+    public function setStudentExternalId($studentExternalId)
+    {
+        $this->studentExternalId = $studentExternalId;
         return $this;
     }
 
@@ -54,7 +103,8 @@ class Model implements ISoftDeletable
      * @param string $hash
      * @return self
      */
-    public function setHash($hash) {
+    public function setHash($hash)
+    {
         $this->hash = $hash;
         return $this;
     }
@@ -62,7 +112,8 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getHash() {
+    public function getHash()
+    {
         return $this->hash;
     }
 
@@ -70,7 +121,8 @@ class Model implements ISoftDeletable
      * @param string $type
      * @return self
      */
-    public function setType($type) {
+    public function setType($type)
+    {
         $this->type = $type;
         return $this;
     }
@@ -78,7 +130,8 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getType() {
+    public function getType()
+    {
         return $this->type;
     }
 
@@ -86,7 +139,8 @@ class Model implements ISoftDeletable
      * @param string $status
      * @return self
      */
-    public function setStatus($status) {
+    public function setStatus($status)
+    {
         $this->status = $status;
         return $this;
     }
@@ -94,8 +148,113 @@ class Model implements ISoftDeletable
     /**
      * @return string
      */
-    public function getStatus() {
+    public function getStatus()
+    {
         return $this->status;
     }
 
+    /**
+     * @param string $message
+     * @return self
+     */
+    public function setMessage($message)
+    {
+        $this->message = $message;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMessage()
+    {
+        return $this->message;
+    }
+
+
+    /**
+     * Determines if file is audio or video and does corresponding processing
+     * @returns boolean
+     */
+    public function process()
+    {
+        $storageMapper = StorageMapper::getInstance();
+
+        try {
+            $storageObject = $storageMapper->findByHash($this->getHash());
+        } catch (MapperException $e) {
+            return false;
+        }
+
+        // This whole thing is a bit of an ass, unfortunately Synergetic stores its DocMan files in
+        // the actual database- which means we need to shove the file into a SQL query as a hex string
+        // which is totally inefficent and very slow :(
+
+        // Temporarily increase the memory limit and timeout so we can get the file across to Synergetic
+
+        ini_set('memory_limit', '2048M');
+        set_time_limit(0);
+
+        try {
+            // Save the file into to the database
+
+            $hex = "0x" . bin2hex($storageObject->read());
+            $externalId = $this->getExternalId();
+            $studentExternalId = $this->getStudentExternalId();
+            $date = date("Y-m-d H:i:s");
+            $sourceDate = $storageObject->getCreatedAt()->getDatabase();
+            $extension = strtoupper($storageObject->getExtension());
+
+            $query = "
+             INSERT INTO SynergyOneMedia.dbo.tDocuments
+             (
+               Description,
+               DocumentCreatedByID,
+               DocumentModifiedByID,
+               Document,
+               DocumentCreatedDate,
+               DocumentModifiedDate,
+               SourceDate,           
+               DocumentType
+             )
+             VALUES
+             (
+               'Imported from Schoolbox',
+               {$externalId},
+               {$externalId},
+               {$hex},
+               '{$date}',
+               '{$date}',
+               '{$sourceDate}',
+               '{$extension}'
+             );            
+        ";
+
+            $database = \MSSQL::getInstance();
+            $database->query($query);
+            $documentReferencesSeq = $database->getOne("SELECT @@IDENTITY");
+
+            // Add a document reference to the student so it shows up on their record
+
+            $query =
+                "
+             INSERT INTO SynergyOneMedia.dbo.DocumentReferences
+             (
+               ID,
+               DocumentReferencesSeq
+             )
+             VALUES
+             (
+               {$studentExternalId},
+               {$documentReferencesSeq}
+             );            
+        ";
+
+            $database->query($query);
+            return true;
+
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 }
