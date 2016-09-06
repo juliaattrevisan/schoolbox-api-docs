@@ -163,20 +163,15 @@
      * isURL extension - checks that what you've entered is a HTTP, HTTPS, FTP
      * or relative URL.
      */
+    var regExURL = new RegExp("^((((http)|(ftp))s?://\\S+)|(/\\S*))$");
     $.validator.addMethod("isURL", function (value, element) {
         if (this.optional(element)) {
             return true;
         }
 
-        // Create a link out of the value, and get its protocol that way.
-        var anchor = $('<a />').attr('href', value);
-        switch (anchor.prop('protocol')) {
-            case 'http:':
-            case 'https:':
-            case 'ftp:':
-                return true;
-        }
-        return false;
+        // Does value start with http:// | https:// | ftp:// | ftps:// | /,
+        // then have no internal whitespace ?
+        return regExURL.test(value.trim().toLowerCase());
     }, "Please enter a URL beginning with http://, https://, ftp://, or a relative URL (beginning with /)");
 
     /**
