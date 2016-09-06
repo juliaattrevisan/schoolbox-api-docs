@@ -26,6 +26,11 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('DocMan', array(
 // CREATE DIGEST APP
 $kernel->run(function($di, $loop, $log, $opts) {
 
+    // Only process if its actually enabled in config
+    if (!Config::get('external_pastoral_docman')) {
+        exit;
+    }
+
     /**
      * @var Di\Container $di
      * @var LoopInterface $loop
