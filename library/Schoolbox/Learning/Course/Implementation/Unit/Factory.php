@@ -8,7 +8,7 @@
 namespace Schoolbox\Learning\Course\Implementation\Unit;
 
 use Schoolbox\Learning\Course\Implementation\Unit\Model as UnitImplementation;
-use Schoolbox\Learning\Course\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 
 /**
  * A factory for Unit Implementation objects.

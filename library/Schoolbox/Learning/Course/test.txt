@@ -8,7 +8,7 @@ require_once __DIR__ . '/../library/Bootstrap.php';
 // Create a Course Specification for a Folder
 $courseSpecFolder = new Schoolbox\Resource\Folder\Model();
 $courseSpecFolder->setId(51)->setName('Houses');
-$courseSpec       = new Schoolbox\Learning\Course\Specification\Model();
+$courseSpec       = new Schoolbox\Learning\Course\Specification();
 $courseSpec       = $courseSpec->setFolder($courseSpecFolder);
 // Add the Course Spec back to the Folder
 $courseSpecFolder = $courseSpecFolder->setCourseSpecification($courseSpec);
@@ -21,7 +21,7 @@ $foxSpecFolder = new Schoolbox\Resource\Folder\Model();
 $foxSpecFolder
     ->setId(52)
     ->setName('Fox House');
-$foxSpec = new Schoolbox\Learning\Course\Specification\Unit\Model();
+$foxSpec = new Schoolbox\Learning\Course\Unit\Specification();
 $foxSpec->setFolder($foxSpecFolder);
 
 // Fox House Assessables
@@ -51,7 +51,7 @@ $oakSpecFolder = new Schoolbox\Resource\Folder\Model();
 $oakSpecFolder
     ->setId(54)
     ->setName('Oak House');
-$oakSpec = new Schoolbox\Learning\Course\Specification\Unit\Model();
+$oakSpec = new Schoolbox\Learning\Course\Unit\Specification();
 $oakSpec->setFolder($oakSpecFolder);
 
 // Oak House Assessables
@@ -74,7 +74,7 @@ $thistleSpecFolder = new Schoolbox\Resource\Folder\Model();
 $thistleSpecFolder
     ->setId(55)
     ->setName('Thistle House');
-$thistleSpec = new Schoolbox\Learning\Course\Specification\Unit\Model();
+$thistleSpec = new Schoolbox\Learning\Course\Unit\Specification();
 $thistleSpec->setFolder($thistleSpecFolder);
 
 // Thistle House Assessables
@@ -97,7 +97,7 @@ $daltonSpecFolder = new Schoolbox\Resource\Folder\Model();
 $daltonSpecFolder
     ->setId(56)
     ->setName('Dalton House');
-$daltonSpec = new Schoolbox\Learning\Course\Specification\Unit\Model();
+$daltonSpec = new Schoolbox\Learning\Course\Unit\Specification();
 $daltonSpec->setFolder($daltonSpecFolder);
 
 // Dalton House Assessables

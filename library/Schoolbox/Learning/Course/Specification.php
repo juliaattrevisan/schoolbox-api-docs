@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Course\Specification;
+namespace Schoolbox\Learning\Course;
 
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
@@ -29,9 +29,9 @@ use Schoolbox\Resource\Folder\Model as Folder;
  *
  * TODO unit tests
  *
- * @package Schoolbox\Learning\Course\Specification
+ * @package Schoolbox\Learning\Course
  */
-class Model implements AssessmentContext, ISoftDeletable
+class Specification implements AssessmentContext, ISoftDeletable
 {
     use Id;
     use CreatedAtDate;
@@ -50,7 +50,7 @@ class Model implements AssessmentContext, ISoftDeletable
     /**
      * The Unit Specifications that are a part of this object.
      *
-     * @var Collection|Unit\Model[]
+     * @var Collection|Unit\Specification[]
      */
     protected $units;
 
@@ -85,7 +85,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @return Collection|Unit\Model[]
+     * @return Collection|Unit\Specification[]
      */
     public function getUnits()
     {
@@ -93,7 +93,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @param Collection|Unit\Model[] $units
+     * @param Collection|Unit\Specification[] $units
      * @return static
      */
     public function setUnits($units)

@@ -5,7 +5,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Course\Specification\Unit;
+namespace Schoolbox\Learning\Course\Unit;
 
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
@@ -30,9 +30,9 @@ use Schoolbox\Resource\Folder\Model as Folder;
  *
  * TODO unit tests
  *
- * @package Schoolbox\Learning\Course\Specification\Unit
+ * @package Schoolbox\Learning\Course\Unit
  */
-class Model implements AssessmentContext, ISoftDeletable
+class Specification implements AssessmentContext, ISoftDeletable
 {
     use Id;
     use CreatedAtDate;

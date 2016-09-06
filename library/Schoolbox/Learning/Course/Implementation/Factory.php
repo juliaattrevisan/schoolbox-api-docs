@@ -9,7 +9,7 @@ namespace Schoolbox\Learning\Course\Implementation;
 
 use Schoolbox\Learning\Course\Implementation\Unit\Factory as UnitImplementationFactory;
 use Schoolbox\Learning\Course\Implementation\Model as CourseImplementation;
-use Schoolbox\Learning\Course\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\Specification as CourseSpecification;
 
 /**
  * A factory for Course Implementation objects.

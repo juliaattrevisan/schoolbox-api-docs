@@ -11,7 +11,7 @@ use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Implementation\Unit\Model as UnitImplementation;
-use Schoolbox\Learning\Course\Specification\Model as CourseSpecification;
+use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
