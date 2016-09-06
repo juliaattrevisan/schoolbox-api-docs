@@ -107,8 +107,6 @@ class Model implements AssessmentContext, ISoftDeletable
      */
     public function __construct()
     {
-        $this->specification = new UnitSpecification();
-        $this->course = new CourseImplementation();
         $this->openDate = new \Alaress_Date_NullDate();
         $this->dueDate = new \Alaress_Date_NullDate();
         $this->createdAt = new \Alaress_Date_NullDate();

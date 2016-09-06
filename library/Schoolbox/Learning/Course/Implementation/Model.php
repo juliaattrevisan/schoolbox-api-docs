@@ -67,11 +67,9 @@ class Model implements AssessmentContext, ISoftDeletable
      */
     public function __construct()
     {
-        $this->folder = new Folder();
         $this->units = new Collection();
         $this->createdAt = new \Alaress_Date_NullDate();
         $this->deletedAt = new \Alaress_Date_NullDate();
-        $this->specification = new CourseSpecification();
     }
 
     /* Getters/Setters */
