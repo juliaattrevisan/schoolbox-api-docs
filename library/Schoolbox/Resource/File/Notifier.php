@@ -85,7 +85,7 @@ class Notifier extends ResourceNotifier
      */
     protected function getResourceName($resource)
     {
-        return $resource->getDescription();
+        return $resource->getTitle();
     }
 
 
