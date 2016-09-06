@@ -120,6 +120,8 @@ class Model implements AssessmentContext, ISoftDeletable
      * This method doesn't clear this object's assessables, or set this object's
      * name or spec - it simply clones the spec's assessables into this object.
      *
+     * @deprecated use \Schoolbox\Learning\Course\Implementation\Unit\Factory::buildFromSpecification instead
+     *
      * @param UnitSpecification $unitSpec
      * @return static
      */
