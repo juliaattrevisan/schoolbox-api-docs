@@ -136,21 +136,21 @@ $courseSpec->getUnits()
 // Create Course Implementations for a few class Folders
 $frenchClass = new Schoolbox\Resource\Folder\Model();
 $frenchClass->setId(237)->setName('9AH French');
-$frenchClassCourseImplementation = new Schoolbox\Learning\Course\Implementation\Model();
+$frenchClassCourseImplementation = new \Schoolbox\Learning\Course\Implementation();
 $frenchClassCourseImplementation = $frenchClassCourseImplementation
     ->setFolder($frenchClass)
     ->setSpecification($courseSpec);
 
 $englishClass = new Schoolbox\Resource\Folder\Model();
 $englishClass->setId(43)->setName('English 3 4');
-$englishClassCourseImplementation = new Schoolbox\Learning\Course\Implementation\Model();
+$englishClassCourseImplementation = new \Schoolbox\Learning\Course\Implementation();
 $englishClassCourseImplementation = $englishClassCourseImplementation
     ->setFolder($englishClass)
     ->setSpecification($courseSpec);
 
 $scienceClass = new Schoolbox\Resource\Folder\Model();
 $scienceClass->setId(357)->setName('Science Unit 2');
-$scienceClassCourseImplementation = new Schoolbox\Learning\Course\Implementation\Model();
+$scienceClassCourseImplementation = new \Schoolbox\Learning\Course\Implementation();
 $scienceClassCourseImplementation = $scienceClassCourseImplementation
     ->setFolder($scienceClass)
     ->setSpecification($courseSpec);
@@ -173,7 +173,7 @@ $i = 1;
 foreach ($courseSpec->getUnits() as $unitSpec) {
     $title = $i . ': ' . $unitSpec->getFolder()->getName();
     if ($i % 2 == 0) {
-        $frenchClassUnitImplementation = new Schoolbox\Learning\Course\Implementation\Unit\Model();
+        $frenchClassUnitImplementation = new \Schoolbox\Learning\Course\Unit\Implementation();
         $frenchClassUnitImplementation
             ->setTitle($title)
             ->setSpecification($unitSpec)
@@ -182,7 +182,7 @@ foreach ($courseSpec->getUnits() as $unitSpec) {
             ->populateAssessablesFromSpecification($unitSpec);
         $frenchClassCourseImplementation->getUnits()->add($frenchClassUnitImplementation);
     } else {
-        $englishClassUnitImplementation = new Schoolbox\Learning\Course\Implementation\Unit\Model();
+        $englishClassUnitImplementation = new \Schoolbox\Learning\Course\Unit\Implementation();
         $englishClassUnitImplementation
             ->setTitle($title)
             ->setSpecification($unitSpec)
@@ -191,7 +191,7 @@ foreach ($courseSpec->getUnits() as $unitSpec) {
             ->populateAssessablesFromSpecification($unitSpec);
         $englishClassCourseImplementation->getUnits()->add($englishClassUnitImplementation);
     }
-    $scienceClassUnitImplementation = new Schoolbox\Learning\Course\Implementation\Unit\Model();
+    $scienceClassUnitImplementation = new \Schoolbox\Learning\Course\Unit\Implementation();
     $scienceClassUnitImplementation
         ->setTitle($title)
         ->setSpecification($unitSpec)

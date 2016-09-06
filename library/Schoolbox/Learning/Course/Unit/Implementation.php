@@ -5,14 +5,14 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Course\Implementation\Unit;
+namespace Schoolbox\Learning\Course\Unit;
 
 use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -35,7 +35,7 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
  *
  * @package Schoolbox\Learning\Course\Implementation\Unit
  */
-class Model implements AssessmentContext, ISoftDeletable
+class Implementation implements AssessmentContext, ISoftDeletable
 {
     use Id;
     use CreatedAtDate;

@@ -5,13 +5,13 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Learning\Course\Implementation;
+namespace Schoolbox\Learning\Course;
 
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Implementation\Unit\Model as UnitImplementation;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
+use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -32,7 +32,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
  *
  * @package Schoolbox\Learning\Course\Implementation
  */
-class Model implements AssessmentContext, ISoftDeletable
+class Implementation implements AssessmentContext, ISoftDeletable
 {
     use Id;
     use CreatedAtDate;

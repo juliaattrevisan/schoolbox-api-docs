@@ -7,7 +7,7 @@
 
 namespace Schoolbox\Learning\Course\Implementation\Unit;
 
-use Schoolbox\Learning\Course\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 
 /**
@@ -21,7 +21,7 @@ class Factory
      * Builds a Unit Implementation out of the given Unit Specification.
      *
      * @param UnitSpecification $unitSpecification
-     * @return Model
+     * @return UnitImplementation
      */
     public function buildFromSpecification(UnitSpecification $unitSpecification)
     {

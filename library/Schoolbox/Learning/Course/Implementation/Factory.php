@@ -7,8 +7,8 @@
 
 namespace Schoolbox\Learning\Course\Implementation;
 
+use Schoolbox\Learning\Course\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\Implementation\Unit\Factory as UnitImplementationFactory;
-use Schoolbox\Learning\Course\Implementation\Model as CourseImplementation;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
 
 /**
