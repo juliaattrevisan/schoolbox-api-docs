@@ -14,8 +14,8 @@ use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Implementation as CourseImplementationModel;
-use Schoolbox\Learning\Course\Specification as CourseSpecificationModel;
+use Schoolbox\Learning\Course\Implementation as CourseImplementation;
+use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\HomepageConfig;
@@ -80,14 +80,14 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     /**
      * The Course Specification (if any!) that this folder has.
      *
-     * @var CourseSpecificationModel
+     * @var CourseSpecification
      */
     protected $courseSpecification;
 
     /**
      * The Course Implementations that have been imported onto this folder.
      *
-     * @var Collection|CourseImplementationModel[]
+     * @var Collection|CourseImplementation[]
      */
     protected $courseImplementations;
 
@@ -119,7 +119,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
     public function hasCourseSpecification()
     {
-        return ($this->courseSpecification instanceof CourseSpecificationModel && $this->courseSpecification->getId());
+        return ($this->courseSpecification instanceof CourseSpecification && $this->courseSpecification->getId());
     }
 
     /**
@@ -447,7 +447,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @return CourseSpecificationModel
+     * @return CourseSpecification
      */
     public function getCourseSpecification()
     {
@@ -455,7 +455,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @param CourseSpecificationModel $courseSpecification
+     * @param CourseSpecification $courseSpecification
      * @return static
      */
     public function setCourseSpecification($courseSpecification)
@@ -465,7 +465,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @return Collection|CourseImplementationModel[]
+     * @return Collection|CourseImplementation[]
      */
     public function getCourseImplementations()
     {
@@ -473,7 +473,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @param Collection|CourseImplementationModel[] $courseImplementations
+     * @param Collection|CourseImplementation[] $courseImplementations
      * @return static
      */
     public function setCourseImplementations($courseImplementations)
