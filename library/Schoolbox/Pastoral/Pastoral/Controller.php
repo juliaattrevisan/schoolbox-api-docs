@@ -927,8 +927,13 @@ class Controller extends Base
             try {
                 /** @var PastoralTypeModel $type */
                 $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
-                /** @var PastoralCategoryModel $category */
-                $category = $this->getPastoralCategoryMapper()->findById($this->getRequest()->post["categoryId"]);
+
+                if ($this->getRequest()->post["categoryId"] != null) {
+                    /** @var PastoralCategoryModel $category */
+                    $category = $this->getPastoralCategoryMapper()->findById($this->getRequest()->post["categoryId"]);
+                } else {
+                    $category = null;
+                }
                 /** @var PastoralSeverityModel $severity */
                 $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
             } catch (MapperException $e) {
