@@ -18,6 +18,7 @@ CREATE TABLE `course` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `folder_id` INT UNSIGNED NOT NULL,
   `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `folder_id_UNIQUE` (`folder_id` ASC),
@@ -33,6 +34,7 @@ CREATE TABLE `course_unit` (
   `folder_id` INT UNSIGNED NOT NULL,
   `course_id` INT UNSIGNED NOT NULL,
   `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `folder_id_UNIQUE` (`folder_id` ASC),
@@ -49,6 +51,7 @@ CREATE TABLE `course_instance` (
   `folder_id` INT UNSIGNED NOT NULL,
   `course_id` INT UNSIGNED NOT NULL,
   `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `folder_id_UNIQUE` (`folder_id` ASC),
@@ -61,7 +64,10 @@ CREATE TABLE `course_instance` (
 ENGINE = InnoDB;
 
 ALTER TABLE `course_unit_instance`
+ADD COLUMN `updated_at` DATETIME NULL AFTER `created_at`,
 CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ;
+
+UPDATE `course_unit_instance` SET `updated_at` = `created_at`;
 
 -- Add FK relation to course_instance once that table is populated
 ALTER TABLE `course_unit_instance`
