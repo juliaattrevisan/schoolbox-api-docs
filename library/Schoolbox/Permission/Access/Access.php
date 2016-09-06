@@ -71,20 +71,30 @@ class Access
 
         $accessLevels = [];
 
+        /* check cache before we proceed for shortcuts */
+        if($cache && count($folderIds) == 1 && isset($this->cachedFolderAccess[$user->getId()][$folderIds[0]])){
+            return $this->cachedFolderAccess[$user->getId()][$folderIds[0]];
+        }
+
         // Check CMS access level
 
-        try {
-            $accessLevels[] = UserAccessMapper::getInstance()
-                ->getAccess($user, null, UserAccess::SERVICE_CMS)
-                ->getAccessLevel();
+        try
+        {
+            if(!isset($this->cachedFolderAccess[$user->getId()][0]) ) {
+                $accessLevels[] = UserAccessMapper::getInstance()
+                    ->getAccess($user, null, UserAccess::SERVICE_CMS)
+                    ->getAccessLevel();
 
-            // Short-circuit if access is full
-
-            if (in_array(UserAccess::ACCESS_FULL, $accessLevels)) {
-                return UserAccess::ACCESS_FULL;
+                // Short-circuit if access is full
+                if (in_array(UserAccess::ACCESS_FULL, $accessLevels)) {
+                    $this->cachedFolderAccess[$user->getId()][0] = UserAccess::ACCESS_FULL;
+                    return UserAccess::ACCESS_FULL;
+                }
             }
-        } catch (Mapper\Exception $e) {
-            // noop
+        }
+        catch (Mapper\Exception $e)
+        {
+            $this->cachedFolderAccess[$user->getId()][0] = UserAccess::ACCESS_DENY;
         }
 
         if (count($folderIds) != 1) {
@@ -94,11 +104,8 @@ class Access
                 : UserAccess::ACCESS_DENY;
         } else {
             // Check user access level
-            if($cache && isset($this->cachedFolderAccess[$user->getId()][$folderIds[0]])){
-                return $this->cachedFolderAccess[$user->getId()][$folderIds[0]];
-            }
-
-            try {
+            try
+            {
                 $accessLevels[] = UserAccessMapper::getInstance()
                     ->getAccess($user, $folderIds[0], UserAccess::SERVICE_HOMEPAGE, $cache)
                     ->getAccessLevel();

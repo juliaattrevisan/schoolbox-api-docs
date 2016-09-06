@@ -69,8 +69,8 @@ if (!($category instanceof \Schoolbox\Resource\Folder\Model) || $category->isDel
 }
 
 // confirm that the user has permission to view this page
-$g = new Group();
-if (($actualPermission = $g->getPermission($category->getId())) < READ_ACCESS) {
+$access = \Schoolbox\Permission\Access\Access::getInstance();
+if (($actualPermission = $access->getFolderAccess($_SESSION['user'], [$category->getId()])) < READ_ACCESS) {
     error(14);
 }
 
@@ -375,10 +375,6 @@ foreach ($columns as $col) {
     }
 }
 $this->parse('colour_list_block', 'colour_list', true);
-
-
-// Widths
-$allWidths = $homepageHandler->getColumnWidths();
 
 $leftWidth = round($allWidths['left_column_width'] * 12 / 100);
 
