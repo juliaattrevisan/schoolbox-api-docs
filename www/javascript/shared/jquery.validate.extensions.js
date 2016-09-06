@@ -163,7 +163,7 @@
      * isURL extension - checks that what you've entered is a HTTP, HTTPS, FTP
      * or relative URL.
      */
-    var regExURL = new RegExp("^((((http)|(ftp))s?://\\S+)|(/\\S*))$");
+    var regExURL = new RegExp("^((((http)|(ftp))s?://[\\w-]+(\\.[\\w-]+)+(/\\S*)?)|(/\\S*))$");
     $.validator.addMethod("isURL", function (value, element) {
         if (this.optional(element)) {
             return true;
