@@ -51,8 +51,8 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     // Insert and update objects
     // TODO figure out a deleted date for course instances
     $insertCourseInstanceQuery = $database->prepare("
-        INSERT INTO course_instance (folder_id, course_id, created_at, deleted_at)
-        VALUES (:folderId, :courseId, :created, NULL)
+        INSERT INTO course_instance (folder_id, course_id, created_at, updated_at, deleted_at)
+        VALUES (:folderId, :courseId, :created, :created, NULL)
     ");
     $updateUnitInstanceQuery = $database->prepare("
         UPDATE course_unit_instance 
