@@ -86,6 +86,17 @@ class External_Offline_Pastoral implements External_PastoralInterface
     }
 
     /**
+     * Deletes an existing comment record
+     *
+     * @param \Schoolbox\Pastoral\Comment\Model $comment
+     * @return array
+     */
+    public function deleteComment(\Schoolbox\Pastoral\Comment\Model $comment)
+    {
+        // NOOP
+    }
+
+    /**
      * Import pastoral care records from external SIS
      */
     public function importPastoral($userId)

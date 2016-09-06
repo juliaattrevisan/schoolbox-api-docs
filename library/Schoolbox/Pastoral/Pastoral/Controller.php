@@ -227,19 +227,19 @@ class Controller extends Base
 
     /**
      * Display list of all pastoral records for selected student
-     * @param int $studentId The ID of the student the record relates to
+     * @param User $student
      * @throws SchoolboxException
      */
-    public function getIndex($studentId)
+    public function getIndex($student)
     {
-        // Get the students parents
+        // Get the students parents and teachers
 
-        $externalUserMapper = new \External_User();
-        $student = $this->getUserMapper()->findWithSubjects($studentId);
         $student->loadParents();
         $student->loadTeachers();
 
         // Get the students contact details for display
+
+        $externalUserMapper = new \External_User();
 
         $studentContacts = [];
         $contactList = $externalUserMapper->getStudentContactList($student->getExternalId());
@@ -268,7 +268,7 @@ class Controller extends Base
         // And render this mess out
 
         try {
-            $records = $this->getPastoralMapper()->findByStudentId($studentId);
+            $records = $this->getPastoralMapper()->findByStudentId($student->getId());
         } catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
         }
@@ -294,38 +294,27 @@ class Controller extends Base
 
     /**
      * Get an individual pastoral care record
-     * @param int $studentId The ID of the student the record relates to
-     * @param int $id The ID of the pastoral care record we want to view
+     * @param PastoralModel $record
+     * @param User $student
      * @throws SchoolboxException
      */
-    public function getRecord($studentId, $id)
+    public function getRecord($record, $student)
     {
-        // Get the students parents
-
-        $student = $this->getUserMapper()->findWithSubjects($studentId);
         $student->loadParents();
-
-        // Get the pastoral care record
-
-        try {
-            $pastoral = $this->getPastoralMapper()->findById($id);
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
-        }
 
         // Load in related records
 
         $collection = new Collection();
 
-        if (!empty($pastoral->getParent()->getId())) {
-            $collection->merge($this->getPastoralMapper()->findByParentId($pastoral->getParent()->getId()));
-            $collection->add($this->getPastoralMapper()->findById($pastoral->getParent()->getId()));
+        if (!empty($record->getParent()->getId())) {
+            $collection->merge($this->getPastoralMapper()->findByParentId($record->getParent()->getId()));
+            $collection->add($this->getPastoralMapper()->findById($record->getParent()->getId()));
         } else {
-            $collection->merge($this->getPastoralMapper()->findByParentId($pastoral->getId()));
-            $collection->add($pastoral);
+            $collection->merge($this->getPastoralMapper()->findByParentId($record->getId()));
+            $collection->add($record);
         }
 
-        $pastoral->setRelatedRecords($collection);
+        $record->setRelatedRecords($collection);
 
         // Lets render this thing
 
@@ -334,7 +323,7 @@ class Controller extends Base
                 'template' => '@pastoral/record.twig',
                 'data' => array(
                     'session' => $_SESSION,
-                    'record' => $pastoral,
+                    'record' => $record,
                     'showDelete' => $this->getPastoralModeratorLevel() >= FULL_ACCESS,
                     'showModify' => $this->getPastoralModeratorLevel() >= WRITE_ACCESS,
                     'role' => $this->getUser()->getRole()->getType(),
@@ -345,17 +334,11 @@ class Controller extends Base
 
     /**
      * Insert pastoral care record page
-     * @param int $id The ID of the student we are inserting a record on
+     * @param User $student
      * @throws SchoolboxException
      */
-    public function getInsert($id)
+    public function getInsert($student)
     {
-        try {
-            $student = $this->getUserMapper()->findById($id);
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
-        }
-
         // Render this thing...
 
         $this->getResponse()->content->set(
@@ -380,19 +363,11 @@ class Controller extends Base
 
     /**
      * Update pastoral care record page
-     * @param int $id The ID of the pastoral care record we want to update
+     * @param PastoralModel $record
      * @throws SchoolboxException
      */
-    public function getUpdate($id)
+    public function getUpdate($record)
     {
-        // Get the record we are updating
-
-        try {
-            $record = $this->getPastoralMapper()->findById($id);
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
-        }
-
         // Lets get the party started...
 
         $this->getResponse()->content->set(
@@ -409,7 +384,7 @@ class Controller extends Base
                     'roles' => $this->getRoleMapper()->findAll(),
                     'showDelete' => $this->getPastoralModeratorLevel() >= FULL_ACCESS,
                     'pastoralModerator' => $this->getPastoralModeratorLevel(),
-                    'attachzone' => $this->getAttachZone($this->getPastoralAttachmentMapper()->findByPastoralId($id)),
+                    'attachzone' => $this->getAttachZone($this->getPastoralAttachmentMapper()->findByPastoralId($record->getId())),
                 ),
             )
         );
@@ -417,19 +392,11 @@ class Controller extends Base
 
     /**
      * Delete a comment
+     * @param PastoralCommentModel $comment
      * @throws SchoolboxException
      */
-    public function postCommentDelete()
+    public function postCommentDelete($comment)
     {
-        // Get the comment we are deleting
-
-        try {
-            /** @var PastoralCommentModel $comment */
-            $comment = $this->getPastoralCommentMapper()->findOneByColumn("id", $this->getRequest()->post['id']);
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
-        }
-
         $pastoralExternal = new \External_Pastoral();
         $pastoralExternal->deleteComment($comment);
 
@@ -438,16 +405,19 @@ class Controller extends Base
 
     /**
      * Post a comment
+     * @param PastoralModel $record
      * @throws SchoolboxException
      */
-    public function postComment()
+    public function postCommentSave($record)
     {
+        $post = $this->getRequest()->post;
+
         // No blank comments thanks
 
-        if (trim($this->getRequest()->post["body"]) != '') {
+        if (trim($post["body"]) != '') {
             $comment = new PastoralCommentModel();
-            $comment->setPastoralId($this->getRequest()->post["pastoral_id"]);
-            $comment->setBody($this->getRequest()->post["body"]);
+            $comment->setPastoralId($record->getId());
+            $comment->setBody($post["body"]);
             $comment->setOwner($this->getUser());
             $comment->setCreatedAt(\Alaress_Date_Format::now());
             $this->getPastoralCommentMapper()->setSessionData($_SESSION);
@@ -459,14 +429,15 @@ class Controller extends Base
 
         // Go back to pastoral record
 
-        $this->getResponse()->redirect->afterPost("/pastoral/{$this->getRequest()->post["student_id"]}/{$this->getRequest()->post["pastoral_id"]}");
+        $this->getResponse()->redirect->afterPost("/pastoral/{$post["student_id"]}/{$record->getId()}");
     }
 
     /**
      * Insert/update a pastoral care record
+     * @param PastoralModel $record
      * @throws SchoolboxException
      */
-    public function postSave()
+    public function postSave($record)
     {
         $post = $this->getRequest()->post;
 
@@ -479,7 +450,7 @@ class Controller extends Base
         /** @var Collection|Model $records */
         $records = new Collection();
 
-        if (empty($this->getRequest()->post["id"])) {
+        if (empty($record)) {
 
             // Creating new pastoral record
 
@@ -489,12 +460,12 @@ class Controller extends Base
 
             // The student the user was currently viewing
 
-            $students[$this->getRequest()->post["student_id"]] = 1;
+            $students[$post["student_id"]] = 1;
 
             // And any other students specified on the pastoral record
 
-            if (is_array($this->getRequest()->post["duplicate_id"])) {
-                foreach ($this->getRequest()->post["duplicate_id"] as $studentId) {
+            if (is_array($post["duplicate_id"])) {
+                foreach ($post["duplicate_id"] as $studentId) {
                     if (trim($studentId) != '') {
                         $students[$studentId] = 1;
                     }
@@ -526,28 +497,28 @@ class Controller extends Base
 
                 try {
                     /** @var PastoralTypeModel $type */
-                    $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
+                    $type = $this->getPastoralTypeMapper()->findById($post["typeId"]);
 
                     try {
                         /** @var PastoralCategoryModel $category */
-                        $category = $this->getPastoralCategoryMapper()->findById($this->getRequest()->post["categoryId"]);
+                        $category = $this->getPastoralCategoryMapper()->findById($post["categoryId"]);
                         $record->setCategory($category);
                     } catch (MapperException $e) {
                         // Noop, this can be blank
                     }
 
                     /** @var PastoralSeverityModel $severity */
-                    $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
+                    $severity = $this->getPastoralSeverityMapper()->findById($post["severityId"]);
                 } catch (MapperException $e) {
                     throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
                 }
 
                 $record->setStudent($student);
-                $record->setHeading($this->getRequest()->post["heading"]);
+                $record->setHeading($post["heading"]);
                 $record->setType($type);
                 $record->setSeverity($severity);
-                $record->setBody($this->getRequest()->post["body"]);
-                $record->setPrivate($this->getRequest()->post["private"]);
+                $record->setBody($post["body"]);
+                $record->setPrivate($post["private"]);
                 $record->setOwner($this->getUser());
                 $record->setCreatedAt($createdAt);
                 $this->getPastoralMapper()->setSessionData($_SESSION);
@@ -563,9 +534,9 @@ class Controller extends Base
 
                 // Save the authorised users
 
-                if (isset($this->getRequest()->post["user_id"])) {
-                    if (is_array($this->getRequest()->post["user_id"])) {
-                        foreach ($this->getRequest()->post["user_id"] as $user_id) {
+                if (isset($post["user_id"])) {
+                    if (is_array($post["user_id"])) {
+                        foreach ($post["user_id"] as $user_id) {
 
                             try {
                                 $user = $this->getUserMapper()->findById($user_id);
@@ -583,7 +554,7 @@ class Controller extends Base
 
                 // Save the tags
 
-                $tags = explode(",", $this->getRequest()->post["tags"]);
+                $tags = explode(",", $post["tags"]);
 
                 foreach ($tags as $tagCurrent) {
                     if (trim($tagCurrent) != '') {
@@ -596,7 +567,7 @@ class Controller extends Base
 
                 // Save the audiences
 
-                foreach ($this->getRequest()->post["role"] as $role_id => $checked) {
+                foreach ($post["role"] as $role_id => $checked) {
                     if ($checked) {
                         try {
                             /** @var \Schoolbox\Role $role */
@@ -617,14 +588,7 @@ class Controller extends Base
         } else {
             // Modifying existing record
 
-            try {
-                $record = $this->getPastoralMapper()->findById($this->getRequest()->post["id"]);
-            } catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
-            }
-
             $records->add($record);
-
 
             try {
                 if ($this->getRequest()->post["typeId"] != null) {
@@ -662,12 +626,12 @@ class Controller extends Base
                 $severity = null;
             }
 
-            $record->setHeading($this->getRequest()->post["heading"]);
+            $record->setHeading($post["heading"]);
             $record->setType($type);
             $record->setCategory($category);
             $record->setSeverity($severity);
-            $record->setBody($this->getRequest()->post["body"]);
-            $record->setPrivate($this->getRequest()->post["private"]);
+            $record->setBody($post["body"]);
+            $record->setPrivate($post["private"]);
             $record->setUpdatedAt(\Alaress_Date_Format::now());
             $this->getPastoralMapper()->setSessionData($_SESSION);
             $this->getPastoralMapper()->save($record);
@@ -678,7 +642,7 @@ class Controller extends Base
 
             // Save the tags
 
-            $tags = explode(",", $this->getRequest()->post["tags"]);
+            $tags = explode(",", $post["tags"]);
 
             foreach ($tags as $tagCurrent) {
                 if (trim($tagCurrent) != '') {
@@ -695,8 +659,8 @@ class Controller extends Base
 
             $deleteIds = [];
 
-            if (trim($this->getRequest()->post["deleteIds"]) != "") {
-                $deleteIds = explode(",", $this->getRequest()->post["deleteIds"]);
+            if (trim($post["deleteIds"]) != "") {
+                $deleteIds = explode(",", $post["deleteIds"]);
 
                 foreach ($deleteIds as $user_id) {
                     foreach ($accessRoles as $role) {
@@ -710,9 +674,9 @@ class Controller extends Base
 
             // Update the authorised users
 
-            if (isset($this->getRequest()->post["user_id"])) {
-                if (is_array($this->getRequest()->post["user_id"])) {
-                    foreach ($this->getRequest()->post["user_id"] as $user_id) {
+            if (isset($post["user_id"])) {
+                if (is_array($post["user_id"])) {
+                    foreach ($post["user_id"] as $user_id) {
 
                         $found = false;
 
@@ -746,7 +710,7 @@ class Controller extends Base
 
             // Update the role based audience
 
-            foreach ($this->getRequest()->post["role"] as $role_id => $checked) {
+            foreach ($post["role"] as $role_id => $checked) {
 
                 if ($checked) {
 
@@ -885,24 +849,17 @@ class Controller extends Base
 
         // Go back to students pastoral record
 
-        $this->getResponse()->redirect->afterPost("/pastoral/{$this->getRequest()->post["student_id"]}");
+        $this->getResponse()->redirect->afterPost("/pastoral/{$post["student_id"]}");
     }
 
     /**
      * Delete a pastoral care record
+     * @param PastoralModel $record
      * @throws SchoolboxException
      */
-    public function postDelete()
+    public function postDelete($record)
     {
-        // Get the record we are deleting
-
-        try {
-            $record = $this->getPastoralMapper()->findById($this->getRequest()->post["id"]);
-        } catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
-        }
-
-        $this->getPastoralCommentMapper()->deleteByColumn("pastoral_id", $this->getRequest()->post["id"]);
+        $this->getPastoralCommentMapper()->deleteByColumn("pastoral_id", $record->getId());
 
         // Delete on external database
 

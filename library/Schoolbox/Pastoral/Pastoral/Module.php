@@ -25,6 +25,7 @@ use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
 use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
@@ -45,6 +46,7 @@ class Module extends BaseModule
         $this->setUserMapper(UserMapper::getInstance());
         $this->setPastoralMapper(PastoralMapper::getInstance());
         $this->setPastoralAccessMapper(PastoralAccessMapper::getInstance());
+        $this->setPastoralCommentMapper(PastoralCommentMapper::getInstance());
 
         parent::__construct($injector, $basename);
     }
@@ -59,16 +61,16 @@ class Module extends BaseModule
                 '/report-builder' => 'getReportBuilder',
                 '/report' => 'getReport',
                 '/report-print' => 'getReportPrint',
-                '/insert/{id}' => 'getInsert',
-                '/update/{id}' => 'getUpdate',
-                '/{studentId}/{id}' => 'getRecord',
+                '/insert/{studentId}' => 'getInsert',
+                '/update/{recordId}' => 'getUpdate',
+                '/{studentId}/{recordId}' => 'getRecord',
                 '/{studentId}' => 'getIndex',
             ],
             'POST' => [
-                '/save' => 'postSave',
-                '/comment' => 'postComment',
-                '/comment-delete' => 'postCommentDelete',
-                '/delete' => 'postDelete',
+                '/save/{recordId}' => 'postSave',
+                '/delete/{recordId}' => 'postDelete',
+                '/comment-save/{recordId}' => 'postCommentSave',
+                '/comment-delete/{commentId}' => 'postCommentDelete',
             ]
         ];
 
@@ -86,35 +88,41 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        // Add the item to params, if box_id is in the route.
+        // Preload required data for the various routes
 
         $userMapper = $this->getUserMapper();
         $pastoralMapper = $this->getPastoralMapper();
         $pastoralAccessMapper = $this->getPastoralAccessMapper();
-
+        $pastoralCommentMapper = $this->getPastoralCommentMapper();
+        
         $this->addRoutePreload(
             $matcher,
             '.*',
-            function ($params) use ($userMapper, $pastoralMapper, $pastoralAccessMapper) {
+            function ($params) use ($userMapper, $pastoralMapper, $pastoralAccessMapper, $pastoralCommentMapper) {
 
                 $returnArray = [];
 
-                // Load student details
+                // Load student record
 
                 if (array_key_exists('studentId', $params)) {
-                    // Load in the students details
-                    $returnArray['student'] = $userMapper->findById($params['studentId']);
+                    $returnArray['student'] = $userMapper->findWithSubjects($params['studentId']);
                 }
 
-                // Load record and access details
+                // Load comment
 
-                if (array_key_exists('id', $params)) {
+                if (array_key_exists('commentId', $params)) {
+                    $returnArray['comment'] = $pastoralCommentMapper->findById($params['commentId']);
+                }
+
+                // Load pastoral record and associated access details
+
+                if (array_key_exists('recordId', $params)) {
                     try {
                         // Load in the pastoral record
-                        $returnArray['record'] = $pastoralMapper->findById($params['id']);
+                        $returnArray['record'] = $pastoralMapper->findById($params['recordId']);
 
                         // Load in the access records
-                        $returnArray['access'] = $pastoralAccessMapper->findByColumn('pastoral_id', $params['id']);
+                        $returnArray['access'] = $pastoralAccessMapper->findByColumn('pastoral_id', $params['recordId']);
 
                         // Work out if they're allowed private access
                         $returnArray['privateAllowed'] = $this->getPastoralMapper()->hasPrivatePermission($returnArray['record']);
@@ -133,7 +141,8 @@ class Module extends BaseModule
     public function initRoutePermissions(Authorizer $authorizer)
     {
         $permissionViewRecord = new Rule\All(
-        // Must be logged in
+
+            // Must be logged in
             new Rule\IsLoggedIn(),
 
             // And either...
@@ -173,11 +182,12 @@ class Module extends BaseModule
         // Only staff can create reports, insert records, or post comments
 
         $permissionStaff = new Rule\All(
+
+            // Must be logged in
             new Rule\IsLoggedIn(),
-            new Rule\Any
-            (
-                new Rule\HasRole(Role::STAFF)
-            )
+
+            // Must be staff
+            new Rule\HasRole(Role::STAFF)
         );
 
         $this->addRoutePermission($authorizer,
@@ -186,14 +196,23 @@ class Module extends BaseModule
         // Only staff, or parents of the student can view a students pastoral care record list page
 
         $permissionIndex = new Rule\All(
+
+            // Must be logged in
             new Rule\IsLoggedIn(),
+
+            // And either....
             new Rule\Any
             (
+                // A staff member
                 new Rule\HasRole(Role::STAFF),
+
+                // Or a parent of a student
                 new Rule\All
                 (
                     new Rule\HasRole(Role::PARENT),
                     new IsParentOfStudent(),
+
+                    // And parent access is allowed via config
                     new IsParentAccessAllowed()
                 )
             )
@@ -204,10 +223,13 @@ class Module extends BaseModule
         // Only staff that are superusers, pastoral moderators (with write perms) or the owner of a record can update it
 
         $permissionUpdate = new Rule\All(
+
+            // Must be logged in
             new Rule\IsLoggedIn(),
+
             new Rule\All
             (
-            // Must be a staff member
+                // Must be a staff member
                 new Rule\HasRole(Role::STAFF),
 
                 // And either superuser, moderator or owner of record
@@ -260,6 +282,24 @@ class Module extends BaseModule
     }
 
     /**
+     * @return PastoralCommentMapper
+     */
+    public function getPastoralCommentMapper()
+    {
+        return $this->pastoralCommentMapper;
+    }
+
+    /**
+     * @param PastoralCommentMapper $mapper
+     * @return $this
+     */
+    public function setPastoralCommentMapper(PastoralCommentMapper $mapper)
+    {
+        $this->pastoralCommentMapper = $mapper;
+        return $this;
+    }    
+
+    /**
      * @return PastoralMapper
      */
     public function getPastoralMapper()
@@ -303,4 +343,7 @@ class Module extends BaseModule
 
     /** @var PastoralAccessMapper */
     protected $pastoralAccessMapper;
+
+    /** @var PastoralCommentMapper */
+    protected $pastoralCommentMapper;
 }

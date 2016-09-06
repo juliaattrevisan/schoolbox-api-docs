@@ -150,7 +150,7 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form class="top" id="pastoralForm" method="post" enctype="multipart/form-data" action="/pastoral/save">
+        <form class="top" id="pastoralForm" method="post" enctype="multipart/form-data" action="/pastoral/save/{{ record.getId | default('new') }}">
             <input type="hidden" name="id" value="{{ record.getId }}">
             <input type="hidden" id="deleteIds" name="deleteIds" value="">
             <input type="hidden" name="student_id" value="{{ student.getId }}{{ record.getStudent.getId }}">
