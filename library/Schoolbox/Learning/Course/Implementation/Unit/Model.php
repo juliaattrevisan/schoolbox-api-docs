@@ -17,6 +17,7 @@ use Schoolbox\Learning\Course\Specification\Unit\Model as UnitSpecificationModel
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 
 /**
  * An Unit Implementation is a single import of a Unit Specification onto a Folder. It belongs to an
@@ -38,6 +39,7 @@ class Model implements AssessmentContext, ISoftDeletable
 {
     use Id;
     use CreatedAtDate;
+    use UpdatedAtDate;
     use DeletedAtDate;
 
     /**

@@ -13,6 +13,7 @@ use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
@@ -34,6 +35,7 @@ class Model implements AssessmentContext, ISoftDeletable
 {
     use Id;
     use CreatedAtDate;
+    use UpdatedAtDate;
     use DeletedAtDate;
 
     /**
