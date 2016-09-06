@@ -14,11 +14,6 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
 {
 
     /**
-     * @var Group
-     */
-    private $groupHandler;
-
-    /**
      * Prepares data for the render function. Business logic.
      *
      * @return bool Whether to continue on and attempt Component render
@@ -29,7 +24,6 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
             return false;
         }
 
-        $this->groupHandler = new Group();
         return true;
     }
 
@@ -44,7 +38,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
             return false;
         }
 
-        if ($this->groupHandler->getPermission($this->getSource()->getId()) < READ_ACCESS) {
+        if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 

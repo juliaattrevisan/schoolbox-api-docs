@@ -20,7 +20,7 @@ class Thumbnail extends Base {
 	 * @throws \Exception
 	 */
 	protected function permissionCheck($file) {
-		if ($this->getGroupHandler()->getPermission($file->getFolder()->getId()) < READ_ACCESS) {
+		if ($this->getAccess()->getFolderAccess($_SESSION['user'], [$file->getFolder()->getId()]) < READ_ACCESS) {
 			\SitePage::redirectToBrokenImageOfSize(64, 64, 403);
 		}
 	}

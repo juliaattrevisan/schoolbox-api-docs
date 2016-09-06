@@ -10,11 +10,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 {
 
     /**
-     * @var Group
-     */
-    private $groupHandler;
-
-    /**
      * @var Schoolbox\Resource\File\Mapper
      */
     private $fileMapper;
@@ -57,7 +52,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             return $this->hasContextWriteAccess();
         }
 
-        $this->groupHandler       = new Group();
         $this->fileMapper         = Schoolbox\Resource\File\Mapper::getInstance();
         $this->userMapper         = Schoolbox\UserMapper::getInstance();
         $this->allowedFileHandler = new AllowedFile();
@@ -158,7 +152,6 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                         'FILE_POSTED_RELATIVE' => $file->getCreatedAt()->getRelativeTime(),
                         'FILE_MODIFIED_DATE' => $file->getModifiedAt()->getRelativeTime(),
                         'FILE_COMMENT' => nl2br(Scrub::text($file->getDescription())),
-                        'ON_OFF' => ++$j % 2 ? '' : 'dark',
                         'HIDDEN' => $file->isHidden() ? 'translucent' : '',
                     );
                     $this->setVar($output);

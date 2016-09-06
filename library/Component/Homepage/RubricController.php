@@ -14,11 +14,6 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
 {
 
     /**
-     * @var Group
-     */
-    protected $group_handler;
-
-    /**
      * @var DueWork_Rubric_Handler
      */
     protected $rubric_handler;
@@ -38,8 +33,6 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
         if(!$this->isSourceRenderable()){
             return $this->hasContextWriteAccess();
         }
-
-        $this->group_handler = new Group();
 
         // get rubric details
         $this->criteria = CriterionMapper::getInstance()->findByColumnList(

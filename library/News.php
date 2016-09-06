@@ -80,9 +80,9 @@ class News extends DeprecatedModel
 
     public function hasWrite($newsID)
     {
-        $groupHandler = new Group(NEWS_SERVICE);
+        $userAccessMapper = \Schoolbox\Permission\Access\UserAccessMapper::getInstance();
+        $permLevel = $userAccessMapper->getAccess($_SESSION['user'],0,\Schoolbox\Permission\Access\UserAccess::SERVICE_NEWS);
 
-        $permLevel = $groupHandler->getPermission(0);
         $news = $this->getById($newsID);
         if (($permLevel >= 2 && $news['item_owner'] == $_SESSION['id']) || $permLevel >= 3) {
             return true;

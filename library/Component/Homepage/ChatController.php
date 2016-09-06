@@ -21,9 +21,6 @@ class Component_Homepage_ChatController extends Component_Homepage_ControllerAbs
         }
         $this->parseConfig();
 
-        $group       = new Group();
-        $userHandler = new User();
-
         $this->setBlock($templateHandle, 'chat_state_active', 'chat_state_active_block');
         $this->setBlock($templateHandle, 'chat_state_inactive', 'chat_state_inactive_block');
         $this->setBlock($templateHandle, 'chat_staff_js', 'chat_staff_js_block');
@@ -43,15 +40,15 @@ class Component_Homepage_ChatController extends Component_Homepage_ControllerAbs
         $this->setVar(
             array(
                 'CHAT_COMPONENT_ID' => $this->instance->getId(),
-                'CHAT_USER_ID'      => $_SESSION['id'],
-                'CHAT_USER_EXT_ID'  => $_SESSION['sid'],
-                'CHAT_USER_NAME'    => Scrub::text($userHandler->formatName($_SESSION)),
+                'CHAT_USER_ID'      => $this->getUser()->getId(),
+                'CHAT_USER_EXT_ID'  => $this->getUser()->getExternalId(),
+                'CHAT_USER_NAME'    => Scrub::text($this->getUser()->getFullName()),
                 'CHAT_USER_PERM'    => $this->contentPermission,
                 'CHAT_STATE'        => $this->getConfig('state'),
             )
         );
 
-        if ($_SESSION['user']->getRole()->isStaff()) {
+        if ($this->getUser()->getRole()->isStaff()) {
             $this->parse('chat_staff_js_block', 'chat_staff_js');
         } else {
             $this->setVar('chat_staff_js_block', '');

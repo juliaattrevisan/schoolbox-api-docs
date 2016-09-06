@@ -9,14 +9,6 @@
  */
 class Component_Homepage_ImageGalleryController extends Component_Homepage_ControllerAbstract
 {
-
-    /**
-     * A group handler
-     *
-     * @var Group
-     */
-    private $groupHandler;
-
     /**
      * Template file to load
      *
@@ -36,8 +28,6 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
         if(!$this->isSourceRenderable()){
             return $this->hasContextWriteAccess();
         }
-
-        $this->groupHandler = new Group();
         return true;
     }
 

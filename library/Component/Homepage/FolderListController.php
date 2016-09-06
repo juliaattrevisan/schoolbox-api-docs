@@ -11,11 +11,6 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 {
 
     /**
-     * @var Group
-     */
-    private $groupHandler;
-
-    /**
      * Prepares data for the render function. Business logic.
      *
      * @return bool Whether to continue on and attempt Component render
@@ -28,7 +23,6 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             return $this->hasContextWriteAccess();
         }
 
-        $this->groupHandler = new Group();
         return true;
     }
 
@@ -63,7 +57,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             $treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
                 Folder\Mapper::getInstance(),
                 Schoolbox\Assessment\Course\Unit\DeprecatedMapper::getInstance(),
-                $_SESSION['user'],
+                $this->getUser(),
                 $this->sitepage->getLocalisedTerm('resource', true, true)
             );
             $allFolders = $treeBuilder->buildChildNodes($this->source->getId());
@@ -83,7 +77,6 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                         'FOLDER_ID' => $currentFolder['id'],
                         'FOLDER_NAME' => Scrub::text($currentFolder['text']),
                         'FOLDER_ICON' => $icons[$currentFolder['type']],
-                        'ON_OFF' => ++$j % 2 ? '' : 'dark',
                     );
                     if ($maxFolders > 0 && $j > $maxFolders) {
                         break;
@@ -103,7 +96,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                 $this->setVar('folders_block', '');
             }
 
-            $this->setvar(
+            $this->setVar(
                 array(
                     'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
                     'COMPONENT_CONFIG_SRC_ID' => $this->source->getId(),

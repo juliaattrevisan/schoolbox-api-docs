@@ -22,7 +22,7 @@ class Video extends Base {
 	 * @throws \Exception
 	 */
 	protected function permissionCheck($file) {
-		if ($this->getGroupHandler()->getPermission($file->getFolder()->getId()) < READ_ACCESS) {
+		if ($this->getAccess()->getFolderAccess($_SESSION['user'], [$file->getFolder()->getId()]) < READ_ACCESS) {
 			throw new \Exception('You do not have permission to view this video.');
 		}
 	}

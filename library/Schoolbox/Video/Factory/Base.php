@@ -12,6 +12,7 @@
 
 namespace Schoolbox\Video\Factory;
 
+use Schoolbox\Permission\Access\Access;
 use \Schoolbox\Video\QueueMapper;
 use Schoolbox\Video\ResourceVideo;
 use \Schoolbox\Video\ResourceVideoMapper;
@@ -21,11 +22,11 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\FileMapper as Submis
 abstract class Base {
 
 	/**
-	 * An instance of group handler
+	 * Folder permission access
 	 *
-	 * @var null
+	 * @var Access
 	 */
-	protected $groupHandler = null;
+	protected $access = null;
 
 	/**
 	 * The type of video (submission, sbfs, storage etc)
@@ -48,7 +49,7 @@ abstract class Base {
 	 * @param $type
 	 */
 	public function __construct($id, $type) {
-		$this->setGroupHandler(new \Group());
+		$this->setAccess(Access::getInstance());
 		$this->setType($type);
 		$this->setId($id);
 	}
@@ -90,26 +91,22 @@ abstract class Base {
 	 */
 	abstract protected function permissionCheck($video);
 
-	/* Getters/Setters
-	 */
+    /**
+     * @return Access
+     */
+    public function getAccess()
+    {
+        return $this->access;
+    }
 
-	/**
-	 * Set group handler
-	 *
-	 * @param null $groupHandler
-	 */
-	protected function setGroupHandler($groupHandler) {
-		$this->groupHandler = $groupHandler;
-	}
+    /**
+     * @param Access $access
+     */
+    public function setAccess($access)
+    {
+        $this->access = $access;
+    }
 
-	/**
-	 * Get group handler
-	 *
-	 * @return \Group
-	 */
-	protected function getGroupHandler() {
-		return $this->groupHandler;
-	}
 
 	/**
 	 * Set id

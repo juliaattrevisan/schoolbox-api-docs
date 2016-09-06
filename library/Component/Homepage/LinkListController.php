@@ -7,14 +7,6 @@
  */
 class Component_Homepage_LinkListController extends Component_Homepage_ControllerAbstract
 {
-
-    /**
-     * Group handler
-     *
-     * @var Group
-     */
-    private $groupHandler;
-
     /**
      * Link Mapper
      *
@@ -42,7 +34,6 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             return $this->hasContextWriteAccess();
         }
         
-        $this->groupHandler = new Group();
         $this->setLinkMapper(new \Schoolbox\Resource\LinkMapper());
         return true;
     }
@@ -118,7 +109,6 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                         'LINK_POSTED_BY_ID' => $currentLink->getOwner()->getId(),
                         'LINK_POSTED_DATE' => $currentLink->getSubmitted()->getShort(),
                         'LINK_COMMENT' => nl2br(Scrub::text($currentLink->getComment())),
-                        'ON_OFF' => ++$j % 2 ? '' : 'dark',
                         'HIDDEN' => $currentLink->getHidden() ? 'hidden' : '',
                     )
                 );

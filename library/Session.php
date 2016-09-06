@@ -5,7 +5,9 @@ use Schoolbox\Notif\Notifactory;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\NotFound as SchoolboxNotFoundException;
-
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Model as Folder;
 class Session
 {
     /**
@@ -410,7 +412,7 @@ class Session
     function setSynergyInfo($userHandler)
     {
         $synUser = new External_User;
-        $groupHandler = new Group;
+        $groupHandler = new Group();
         $folderMapper = new \Schoolbox\Resource\Folder\Mapper();
 
         $synergy_id = $_SESSION['sid'];
@@ -460,8 +462,8 @@ class Session
                                         }
                                     }
 
-                                    if ($cat instanceof \Schoolbox\Resource\Folder\Model) {
-                                        if ($groupHandler->getPermission($cat->getId()) >= READ_ACCESS) {
+                                    if ($cat instanceof Folder) {
+                                        if (Access::getInstance()->getFolderAccess($_SESSION['user'], [$cat->getId()]) >= UserAccess::ACCESS_READ) {
                                             if (!in_array($cat->getId(), $subjectIDList)) {
                                                 $subject['id'] = $cat->getId();
                                                 $subject['name'] = $cat->getName();
@@ -506,7 +508,7 @@ class Session
                         }
 
                         //Try to fetch without campus code
-                        if (!($result instanceof \Schoolbox\Resource\Folder\Model)) {
+                        if (!($result instanceof Folder)) {
                             try {
                                 $homepageCode = $subject['code'];
                                 $result = $folderMapper->findByCode($subject['code']);
@@ -515,7 +517,7 @@ class Session
                             }
                         }
 
-                        if ($result instanceof \Schoolbox\Resource\Folder\Model) {
+                        if ($result instanceof Folder) {
                             if (!in_array($result->getId(), $catList)) {
                                 $subject['id'] = $result->getId();
                                 $subject['name'] = $result->getName();

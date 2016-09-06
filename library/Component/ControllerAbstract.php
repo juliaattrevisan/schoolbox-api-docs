@@ -957,7 +957,7 @@ abstract class Component_ControllerAbstract
      * @param User $user
      * @return static
      */
-    protected function setUser(User $user)
+    public function setUser(User $user)
     {
         $this->user = $user;
         return $this;

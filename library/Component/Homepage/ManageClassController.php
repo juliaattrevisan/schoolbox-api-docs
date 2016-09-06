@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,13 +6,16 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Permission\Access\UserAccessMapper;
+
+
 class Component_Homepage_ManageClassController extends Component_Homepage_ControllerAbstract
 {
 
     /**
-     * @var Group
+     * @var UserAccessMapper
      */
-    private $groupHandler;
+    var $access;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -28,7 +30,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             return $this->hasContextWriteAccess();
         }
 
-        $this->groupHandler = new Group();
+        $this->access = \Schoolbox\Permission\Access\UserAccessMapper::getInstance();
         return true;
     }
 
@@ -70,8 +72,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         /* Output student grades link to students of this class */
         if ($this->contentPermission == READ_ACCESS && (
-                $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext()->getId()) ||
-                $this->groupHandler->involvedInSubject($this->getContext()->getCodeString()))
+            $this->access->involvedInGroup($_SESSION['user'], $this->getContext()->getId()) ||
+                $this->access->involvedInSubject($_SESSION['user'], $this->getContext()->getCodeString()))
         ) {
             $this->parse('student_grades_block', 'student_grades');
         } else {

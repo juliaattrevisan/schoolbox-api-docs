@@ -12,9 +12,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
     /** @var \Schoolbox\Resource\Textbox\Model */
     protected $textbox;
 
-    /** @var Group */
-    protected $groupHandler;
-
     /**
      * Prepares data for the render function. Business logic.
      *
@@ -30,8 +27,6 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                 return false;
             }
         }
-
-        $this->groupHandler = new Group();
 
         try {
             $this->textbox = \Schoolbox\Resource\Textbox\Mapper::getInstance()->findById($this->getConfig('textbox'));

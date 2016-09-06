@@ -23,8 +23,8 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
         $this->contextPermission = FULL_ACCESS;
 
         if($this->isUsingAltSource()){
-            $g = new Group;
-            $this->contentPermission = min($g->getPermission($this->getSource()->getId()), $this->getMaximumPermission());
+            $accessor = \Schoolbox\Permission\Access\Access::getInstance();
+            $this->contentPermission = min($accessor->getFolderAccess($this->getUser(),[$this->getSource()->getId()]), $this->getMaximumPermission());
         } else {
             $this->contentPermission = FULL_ACCESS;
         }

@@ -131,7 +131,7 @@ $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
 /* BUILD COMPONENTRY */
-$componentFactory = new Component_Homepage_Factory(new \Schoolbox\User(), $this);
+$componentFactory = new Component_Homepage_Factory($_SESSION['user'], $this);
 if($_GET['readonly']) {
     $componentFactory->setMaximumPermission($virtualPermission);
 }

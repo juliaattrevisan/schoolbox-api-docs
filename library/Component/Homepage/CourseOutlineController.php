@@ -16,8 +16,6 @@ use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Collection;
-use Schoolbox\User;
-use Schoolbox\UserMapper;
 
 class Component_Homepage_CourseOutlineController extends Component_Homepage_ControllerAbstract
 {
@@ -68,7 +66,6 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         }
         
         // Get the list of students for this class (in which method?)
-        $group_handler = new Group();
         $code          = $this->getContext()->getCodeString();
 
         // Get the list of units for this course, as well as who has actually
@@ -82,15 +79,14 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
             // collate access for each unit
             foreach ($this->unit_list as $instance)  {
                 $unitId = $instance->getUnitCategory()->getId();
-                $this->accessList[$unitId] = \Schoolbox\Permission\Access\Access::getInstance()->getFolderAccess($_SESSION['user'], [ $unitId ]);
+                $this->accessList[$unitId] = \Schoolbox\Permission\Access\Access::getInstance()->getFolderAccess($this->getUser(), [ $unitId ]);
             }
 
             // Try to get original course folder from each unit in course.
             foreach ($this->unit_list as $unit) {
                 try {
                     $this->originalCourse = Folder\Mapper::getInstance()->findCheaplyById(
-                        Folder\Mapper::getInstance()->findCheaplyById($unit->getUnitCategory()->getId())
-                            ->getParent()->getId()
+                        Folder\Mapper::getInstance()->findCheaplyById($unit->getUnitCategory()->getId())->getParent()->getId()
                     );
                     // I have a course folder, so:
                     break;
@@ -100,39 +96,8 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
                 }
             }
 
-            $classStudentIdList = array();
-            $groupStudentIdList = array();
-            if ($code && Config::get('external_enable')) {
-                $class_handler    = new External_Class();
-                $classStudentList = $class_handler->getStudents($code);
-                if (is_array($classStudentList)) {
-                    $externalIdList     = array_map(
-                        function ($student) {
-                            return $student['synergy_id'];
-                        },
-                        $classStudentList
-                    );
-                    $classStudentIdList = \Schoolbox\UserMapper::getInstance()
-                        ->findByColumn('synergy_id', $externalIdList)
-                        ->getColumnValues('id');
-                }
-            }
-            $groupStudentList = $group_handler->getMemberList($this->getContext()->getId());
-            if (is_array($groupStudentList)) {
-                $groupStudentIdList = array_unique(
-                    array_map(
-                        function ($student) {
-                            return $student['uid'];
-                        },
-                        $groupStudentList
-                    )
-                );
-            }
-            /** @var User[] $userCollection */
-            $userCollection = UserMapper::getInstance()->findByColumn(
-                'id', array_merge($classStudentIdList, $groupStudentIdList),
-                array('order' => array('lastname' => 'asc', 'firstname' => 'asc'))
-            );
+            $userCollection = \Schoolbox\Permission\Access\UserAccessMapper::getInstance()->findStudentsInCategory($this->getContext());
+
             foreach ($userCollection as $userObject) {
                 $this->student_list[] = array(
                     'uid'        => $userObject->getId(),
@@ -158,7 +123,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
             );
             $this_student_id = null;
             if ($this->readOnly) {
-                $this_student_id = $_SESSION['id'];
+                $this_student_id = $this->getUser()->getId();
             }
             $this->completion_list = Task\InstanceCompletionMapper::getInstance()->findLatestForList(
                 $task_list, $this_student_id
