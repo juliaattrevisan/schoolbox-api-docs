@@ -16,7 +16,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
 
-$kernel = new Schoolbox\Application\Daemon\Kernel('Convert Quiz and Due Work Instances', [
+$kernel = new Schoolbox\Application\Daemon\Kernel('Convert Quiz and Due Work', [
     'verbose' => [ false, false, false ],
     'errors'  => E_ALL,
 ]);
@@ -84,9 +84,15 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
     // Go
     $selectQuizzesQuery->execute();
-    $log->debug(sprintf('%d quizzes found', $selectQuizzesQuery->rowCount()));
     $selectDueWorksQuery->execute();
-    $log->debug(sprintf('%d quizzes found', $selectDueWorksQuery->rowCount()));
+    $log->debug(
+        sprintf(
+            '%d assessments found (%d due works, %d quizzes)',
+            ($selectQuizzesQuery->rowCount() + $selectDueWorksQuery->rowCount()),
+            $selectDueWorksQuery->rowCount(),
+            $selectQuizzesQuery->rowCount()
+        )
+    );
     $successCount = 0;
     $failureCount = 0;
     $rows = array_merge($selectDueWorksQuery->fetchAll(PDO::FETCH_ASSOC), $selectQuizzesQuery->fetchAll(PDO::FETCH_ASSOC));
@@ -100,17 +106,18 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         $openDate    = $row['open_date'];
         $dueDate     = $row['due_date'];
 
-        // Convert this task
+        // What type of assessable is this?
         if ($quizId) {
             $log->info(sprintf('Converting quiz "%s" (id: %d)...', $title, $quizId));
         } elseif ($boxId) {
-            $log->info(sprintf('Converting due work "%s" (id: %d)...', $title, $quizId));
+            $log->info(sprintf('Converting due work "%s" (id: %d)...', $title, $boxId));
         } else {
             $log->warning('Assessment is neither a quiz or due work - not sure how that happened but it did!');
             $failureCount++;
             continue;
         }
 
+        // Convert this task
         try {
             $db->beginTransaction();
 
@@ -152,7 +159,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
         } catch (PDOException $e) {
             $log->warning($e->getMessage());
-            $log->error(sprintf('Task instance "%s" could not be converted!', $title), [$e]);
+            $log->error(sprintf('%s "%s" could not be converted!', ($quizId ? 'Quiz' : 'Due Work'), $title), [$e]);
             $failureCount++;
             $db->rollBack();
 
