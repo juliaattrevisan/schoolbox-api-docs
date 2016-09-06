@@ -22,67 +22,39 @@ use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use \Schoolbox\Learning\Assessment\AbstractResponse;
 use \Schoolbox\Learning\Assessment\Participant;
 
-class Minimum implements ISummator
+class Minimum extends AbstractSummator
 {
+    /** @var float */
+    protected $min;
+
     /**
-     * Execute summation strategy
-     *
-     * Don't do $allAssessables->sort() as this will actually
-     * change the ordering of this object, by reference
-     *
-     * Accommodate a set of negative values
-     *
-     * @param Collection $allAssessables
-     * @param User $user
-     * @return null|int|float
+     * @inheritDoc
      */
-    public function summate(Collection $allAssessables, User $user)
+    protected function aggregate($val)
     {
-        $min = null;
-
-        if ($allAssessables->count()) {
-
-            /** @var AbstractAssessment $currentAssessable */
-            foreach ($allAssessables as $currentAssessable) {
-
-                try {
-                    /** @var Participant $participant */
-                    $participant = $currentAssessable->findParticipant($user);
-
-                    /** @var AbstractResponse $currentResponse */
-                    if ($participant) {
-
-                        /* Only use numeric marks in Average computation
-                         * to prevent Tasks from influencing your result
-                         */
-                        $feedback = $participant->findMostRecentFeedback(
-                            $currentAssessable,
-                            Participant::TRAVERSAL_MARKED
-                        );
-
-                        /* Null should not be the minimum
-                         */
-                        if ($feedback && $feedback->isMarked()) {
-                            $markValue = $feedback->calculateMark();
-
-                            /* $min is being set for the first time to a non-null value
-                             * If you don't do this check for $min == null, summate() will
-                             * always return null (any actual value is never less than null)
-                             */
-                            if ($markValue < $min || $min == null) {
-                                $min = $markValue;
-                            }
-                        }
-                    }
-                }
-                /* noop $user not found in Assessable's Participant collection
-                 */
-                catch (\UnexpectedValueException $e) {
-                }
-
-            }
+        /* $min is being set for the first time to a non-null value
+         * If you don't do this check for $min == null, summate() will
+         * always return null (any actual value is never less than null)
+         */
+        if ($val < $this->min || $this->min == null) {
+            $this->min = $val;
         }
-
-        return $min;
     }
+
+    /**
+     * @inheritDoc
+     */
+    protected function reset()
+    {
+        $this->min = null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function finalise()
+    {
+        return $this->min;
+    }
+
 }

@@ -20,7 +20,8 @@ interface ISummator
      *
      * @param Collection $allAssessables
      * @param User $user
-     * @return mixed
+     * @param bool $publishedOnly
+     * @return float|null
      */
-    public function summate(Collection $allAssessables, User $user);
+    public function summate(Collection $allAssessables, User $user, $publishedOnly);
 }

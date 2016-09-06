@@ -12,62 +12,39 @@
 namespace Schoolbox\Learning\Assessment\Summator;
 
 use \Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\IFeedback;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use \Schoolbox\Learning\Assessment\AbstractResponse;
 use \Schoolbox\Learning\Assessment\Participant;
 
-class Maximum implements ISummator
+class Maximum extends AbstractSummator
 {
+    /** @var float */
+    protected $max;
+
     /**
-     * Execute summation strategy
-     *
-     * Don't do $allAssessables->sort() as this will actually
-     * change the ordering of this object, by reference
-     *
-     * Accommodate a set of negative values
-     *
-     * @param Collection $allAssessables
-     * @param User $user
-     * @return null|int|float
+     * @inheritDoc
      */
-    public function summate(Collection $allAssessables, User $user)
+    protected function aggregate($val)
     {
-        $max = null;
-
-        if ($allAssessables->count()) {
-
-            /** @var AbstractAssessment $currentAssessable */
-            foreach ($allAssessables as $currentAssessable) {
-
-                try {
-                    /** @var Participant $participant */
-                    $participant = $currentAssessable->findParticipant($user);
-
-                    /** @var AbstractResponse $currentResponse */
-                    if ($participant) {
-
-                        /* Only use numeric marks in Average computation
-                         * to prevent Tasks from influencing your result
-                         */
-                        $feedback = $participant->findMostRecentFeedback($currentAssessable, Participant::TRAVERSAL_MARKED);
-
-                        if ($feedback && $feedback->isMarked()) {
-                            $markValue = $feedback->calculateMark();
-
-                            if ($markValue > $max) {
-                                $max = $markValue;
-                            }
-                        }
-                    }
-                }
-                /* noop $user not found in Assessable's Participant collection
-                 */
-                catch (\UnexpectedValueException $e) {
-                }
-            }
-        }
-
-        return $max;
+        $this->max = max($this->max, $val);
     }
+
+    /**
+     * @inheritDoc
+     */
+    protected function reset()
+    {
+        $this->max = null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function finalise()
+    {
+        return $this->max;
+    }
+
 }

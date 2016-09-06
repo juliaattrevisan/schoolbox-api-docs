@@ -14,62 +14,44 @@
 namespace Schoolbox\Learning\Assessment\Summator;
 
 use \Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\IFeedback;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use \Schoolbox\Learning\Assessment\AbstractResponse;
 use \Schoolbox\Learning\Assessment\Participant;
 
-class Average implements ISummator
+class Average extends AbstractSummator
 {
+    /** @var float */
+    protected $sum;
+
+    /** @var int */
+    protected $numItems;
+
     /**
-     * Execute summation strategy for a particular Participant
-     *
-     * @param Collection $allAssessables
-     * @param User $user
-     * @return null|int|float
+     * @inheritDoc
      */
-    public function summate(Collection $allAssessables, User $user)
+    protected function aggregate($val)
     {
-        if ($allAssessables->count()) {
-            $numItems    = 0;
-            $sum         = 0;
-
-            /** @var AbstractAssessment $currentAssessable */
-            foreach ($allAssessables as $currentAssessable) {
-
-                /** @var Participant $participant */
-                try {
-                    $participant = $currentAssessable->findParticipant($user);
-
-                    /** @var AbstractResponse $currentResponse */
-                    if ($participant) {
-
-                        /* Only use numeric marks in Average computation
-                         * to prevent Tasks from influencing your result
-                         */
-                        $feedback = $participant->findMostRecentFeedback($currentAssessable, Participant::TRAVERSAL_MARKED);
-
-                        if ($feedback && $feedback->isMarked()) {
-                            $markValue = $feedback->calculateMark();
-
-                            if ($markValue) {
-                                $sum += $markValue;
-                                $numItems++;
-                            }
-                        }
-                    }
-                }
-                /* noop $user not found in Assessable's Participant collection
-                 */
-                catch (\UnexpectedValueException $e) {
-                }
-            }
-
-            if ($numItems) {
-                return (float)$sum / (float)$numItems;
-            }
-        }
-
-        return null;
+        $this->sum += $val;
+        $this->numItems++;
     }
+
+    /**
+     * @inheritDoc
+     */
+    protected function reset()
+    {
+        $this->sum = null;
+        $this->numItems = 0;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function finalise()
+    {
+        return (float)$this->sum / (float)$this->numItems;
+    }
+
 }
