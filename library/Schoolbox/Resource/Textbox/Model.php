@@ -7,7 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
-namespace Schoolbox\Textbox;
+namespace Schoolbox\Resource\Textbox;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Folder\Model as Folder;

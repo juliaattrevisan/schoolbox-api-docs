@@ -7,8 +7,8 @@
  * @version     SVN: $Id$
  */
 use Schoolbox\Collection;
-use Schoolbox\Textbox\Model;
-use Schoolbox\Textbox\Mapper;
+use Schoolbox\Resource\Textbox\Model;
+use Schoolbox\Resource\Textbox\Mapper;
 
 class Component_Config_TextboxSearch extends Component_Config_Abstract
 {

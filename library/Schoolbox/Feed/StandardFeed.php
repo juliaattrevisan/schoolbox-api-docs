@@ -38,7 +38,7 @@ class StandardFeed extends Feed
                 new Schoolbox\Resource\Folder\Notifier($conf),
                 new Schoolbox\Resource\File\Notifier($conf),
                 new Schoolbox\Resource\LinkNotifier($conf),
-                new Schoolbox\Textbox\Notifier($conf),
+                new Schoolbox\Resource\Textbox\Notifier($conf),
                 new SocialStream\PostNotifier($conf),
                 new Schoolbox\Forum\ThreadNotifier($conf),
                 new Schoolbox\Forum\PostNotifier($conf)
