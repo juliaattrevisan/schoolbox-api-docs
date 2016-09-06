@@ -236,7 +236,7 @@ class RoutePermissionMapper extends Mapper {
 
 		while($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			// no multiword (ie '.#.') support
-			$regex = '`' . str_replace('*','([^\.]+)', $r['msg_route_key']) . '`';
+			$regex = '`' . str_replace('*','([^\.]+)', $r['msg_route_key']) . '\.`';
 
 			if(preg_match($regex, $topic, $matches, PREG_OFFSET_CAPTURE)) {
 				// literal leftness, wildcard rightness, applied level
