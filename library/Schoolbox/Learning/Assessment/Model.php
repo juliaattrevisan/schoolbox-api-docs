@@ -66,10 +66,9 @@ class Model
      */
     public function __construct()
     {
-        $this->project     = new Project\Model();
-        $this->publishDate = Alaress_Date_Format::now();
-        $this->openDate    = Alaress_Date_Format::now();
-        $this->dueDate     = Alaress_Date_Format::now();
+        $this->publishDate = new \Alaress_Date_NullDate();
+        $this->openDate    = new \Alaress_Date_NullDate();
+        $this->dueDate     = new \Alaress_Date_NullDate();
     }
 
     /* Getters/Setters */
