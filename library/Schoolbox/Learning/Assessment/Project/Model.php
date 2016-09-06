@@ -5,12 +5,12 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment\Project;
+namespace Schoolbox\Learning\Assessment\Project;
 
 /**
  * Class Model
  *
- * @package Schoolbox\Assessment\Project
+ * @package Schoolbox\Learning\Assessment\Project
  */
 class Model
 {

@@ -5,14 +5,14 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment;
+namespace Schoolbox\Learning\Assessment\Project;
 
 use Schoolbox\Mapper as BaseMapper;
 
 /**
- * The base mapper for an assessment.
+ * Class Mapper
  *
- * @package Schoolbox\Assessment
+ * @package Schoolbox\Learning\Assessment\Project
  * @method Model createModel($idValue = null)
  */
 class Mapper extends BaseMapper
@@ -22,16 +22,11 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('assessment');
+        $this->hasTable('project');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('title', self::TYPE_STRING);
         $this->uses('description', self::TYPE_STRING);
-        $this->uses('publish_date', self::TYPE_DATETIME);
-        $this->uses('open_date', self::TYPE_DATETIME);
-        $this->uses('due_date', self::TYPE_DATETIME);
         $this->uses('weight', self::TYPE_INTEGER);
-        $this->uses('sequence', self::TYPE_INTEGER);
-        $this->joins('project_id', Project\Mapper::getInstance(), null, null, null, 'project');
     }
 }

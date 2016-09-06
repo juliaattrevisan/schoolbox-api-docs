@@ -5,14 +5,14 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Assessment;
+namespace Schoolbox\Learning\Assessment;
 
 use Alaress_Date_Format;
 
 /**
  * The base model for an assessment.
  *
- * @package Schoolbox\Assessment
+ * @package Schoolbox\Learning\Assessment
  */
 class Model
 {
