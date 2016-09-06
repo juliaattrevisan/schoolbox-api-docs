@@ -162,15 +162,13 @@
     /**
      * isURL extension - checks that what you've entered is a HTTP, HTTPS, FTP
      * or relative URL.
+     * Should match a (possible full) subset of values permitted in library/Url.php::isValidUrl()
      */
     var regExURL = new RegExp("^((((http)|(ftp))s?://[\\w-]+(\\.[\\w-]+)+(/\\S*)?)|(/\\S*))$");
     $.validator.addMethod("isURL", function (value, element) {
         if (this.optional(element)) {
             return true;
         }
-
-        // Does value start with http:// | https:// | ftp:// | ftps:// | /,
-        // then have no internal whitespace ?
         return regExURL.test(value.trim().toLowerCase());
     }, "Please enter a URL beginning with http://, https://, ftp://, or a relative URL (beginning with /)");
 
