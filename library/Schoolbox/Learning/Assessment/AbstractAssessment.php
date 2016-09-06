@@ -258,10 +258,12 @@ abstract class AbstractAssessment implements IAssessable
 
     /**
      * @param \Alaress_Date_Format $dueAt
+     * @return $this
      */
     public function setDueAt($dueAt)
     {
         $this->dueAt = $dueAt;
+        return $this;
     }
 
     /**
