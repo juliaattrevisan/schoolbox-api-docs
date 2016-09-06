@@ -83,7 +83,7 @@ class APNS extends AbstractService
         $message = new Message();
 
         $message->setId($id);
-        $message->setBadge(0);
+        $message->setBadge(1);
         $message->setAlert($alert);
         $message->setSound('default');
 
