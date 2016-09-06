@@ -197,13 +197,13 @@ class Queue extends ResourceVideo
             if ($rotation) {
                 switch ($rotation) {
                     case 90:
-                        $rotate = 'transpose=1';
+                        $rotate = 'transpose=1 -metadata:s:v rotate=0';
                         break;
                     case 180:
-                        $rotate = 'transpose=1,transpose=1';
+                        $rotate = 'transpose=1,transpose=1 -metadata:s:v rotate=0';
                         break;
                     case 270:
-                        $rotate = 'transpose=2';
+                        $rotate = 'transpose=2 -metadata:s:v rotate=0';
                         break;
                     default:
                         $rotate = '';
