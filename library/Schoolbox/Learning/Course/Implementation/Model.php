@@ -10,13 +10,13 @@ namespace Schoolbox\Learning\Course\Implementation;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Implementation\Unit\Model as UnitImplementationModel;
-use Schoolbox\Learning\Course\Specification\Model as CourseSpecificationModel;
+use Schoolbox\Learning\Course\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\Specification\Model as CourseSpecification;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * An Course Implementation is an import of a Course Specification onto a Folder.
@@ -44,21 +44,21 @@ class Model implements AssessmentContext, ISoftDeletable
      *
      * TODO review whether this relation needs to exist
      *
-     * @var FolderModel
+     * @var Folder
      */
     protected $folder;
 
     /**
      * The Course Specification which this object was created from.
      *
-     * @var CourseSpecificationModel
+     * @var CourseSpecification
      */
     protected $specification;
 
     /**
      * The Unit Implementations that are a part of this object.
      *
-     * @var Collection|UnitImplementationModel[]
+     * @var Collection|UnitImplementation[]
      */
     protected $units;
 
@@ -67,17 +67,17 @@ class Model implements AssessmentContext, ISoftDeletable
      */
     public function __construct()
     {
-        $this->folder = new FolderModel();
+        $this->folder = new Folder();
         $this->units = new Collection();
         $this->createdAt = new \Alaress_Date_NullDate();
         $this->deletedAt = new \Alaress_Date_NullDate();
-        $this->specification = new CourseSpecificationModel();
+        $this->specification = new CourseSpecification();
     }
 
     /* Getters/Setters */
 
     /**
-     * @return FolderModel
+     * @return Folder
      */
     public function getFolder()
     {
@@ -85,7 +85,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @param FolderModel $folder
+     * @param Folder $folder
      * @return static
      */
     public function setFolder($folder)
@@ -95,7 +95,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @return CourseSpecificationModel
+     * @return CourseSpecification
      */
     public function getSpecification()
     {
@@ -103,7 +103,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @param CourseSpecificationModel $specification
+     * @param CourseSpecification $specification
      * @return static
      */
     public function setSpecification($specification)
@@ -113,7 +113,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @return Collection|UnitImplementationModel[]
+     * @return Collection|UnitImplementation[]
      */
     public function getUnits()
     {
@@ -121,7 +121,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @param Collection|UnitImplementationModel[] $units
+     * @param Collection|UnitImplementation[] $units
      * @return static
      */
     public function setUnits($units)

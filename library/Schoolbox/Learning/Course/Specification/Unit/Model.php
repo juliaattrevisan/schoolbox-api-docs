@@ -11,12 +11,12 @@ use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Specification\Model as CourseModel;
+use Schoolbox\Learning\Course\Specification\Model as CourseSpecification;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * A Unit Specification is a collection of Assessable objects. It exists on a Folder.
@@ -45,7 +45,7 @@ class Model implements AssessmentContext, ISoftDeletable
      *
      * TODO review if this relation is required - this object can't exist without Folders
      *
-     * @var FolderModel
+     * @var Folder
      */
     protected $folder;
 
@@ -54,7 +54,7 @@ class Model implements AssessmentContext, ISoftDeletable
      *
      * TODO review if this relation is required - this object can't exist without a Course Unit
      *
-     * @var CourseModel
+     * @var CourseSpecification
      */
     protected $course;
 
@@ -70,8 +70,8 @@ class Model implements AssessmentContext, ISoftDeletable
      */
     public function __construct()
     {
-        $this->folder = new FolderModel();
-        $this->course = new CourseModel();
+        $this->folder = new Folder();
+        $this->course = new CourseSpecification();
         $this->createdAt = new \Alaress_Date_NullDate();
         $this->deletedAt = new \Alaress_Date_NullDate();
         $this->assessables = new Collection();
@@ -80,7 +80,7 @@ class Model implements AssessmentContext, ISoftDeletable
     /* Getters/Setters */
 
     /**
-     * @return FolderModel
+     * @return Folder
      */
     public function getFolder()
     {
@@ -88,7 +88,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @param FolderModel $folder
+     * @param Folder $folder
      * @return static
      */
     public function setFolder($folder)
@@ -98,7 +98,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @return CourseModel
+     * @return CourseSpecification
      */
     public function getCourse()
     {
@@ -106,7 +106,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @param CourseModel $course
+     * @param CourseSpecification $course
      * @return static
      */
     public function setCourse($course)

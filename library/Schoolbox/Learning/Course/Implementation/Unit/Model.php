@@ -12,8 +12,8 @@ use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\AssessmentContext;
-use Schoolbox\Learning\Course\Implementation\Model as CourseImplementationModel;
-use Schoolbox\Learning\Course\Specification\Unit\Model as UnitSpecificationModel;
+use Schoolbox\Learning\Course\Implementation\Model as CourseImplementation;
+use Schoolbox\Learning\Course\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -49,7 +49,7 @@ class Model implements AssessmentContext, ISoftDeletable
      *
      * TODO review if this relation is required - this object can't exist without its Course Implementation
      *
-     * @var CourseImplementationModel
+     * @var CourseImplementation
      */
     protected $course;
 
@@ -58,7 +58,7 @@ class Model implements AssessmentContext, ISoftDeletable
      *
      * Replaces the previous Unit Instance class' unit_category field.
      *
-     * @var UnitSpecificationModel
+     * @var UnitSpecification
      */
     protected $specification;
 
@@ -107,8 +107,8 @@ class Model implements AssessmentContext, ISoftDeletable
      */
     public function __construct()
     {
-        $this->specification = new UnitSpecificationModel();
-        $this->course = new CourseImplementationModel();
+        $this->specification = new UnitSpecification();
+        $this->course = new CourseImplementation();
         $this->openDate = new \Alaress_Date_NullDate();
         $this->dueDate = new \Alaress_Date_NullDate();
         $this->createdAt = new \Alaress_Date_NullDate();
@@ -122,10 +122,10 @@ class Model implements AssessmentContext, ISoftDeletable
      * This method doesn't clear this object's assessables, or set this object's
      * name or spec - it simply clones the spec's assessables into this object.
      *
-     * @param UnitSpecificationModel $unitSpec
+     * @param UnitSpecification $unitSpec
      * @return static
      */
-    public function populateAssessablesFromSpecification(UnitSpecificationModel $unitSpec)
+    public function populateAssessablesFromSpecification(UnitSpecification $unitSpec)
     {
         foreach ($unitSpec->getAssessables() as $assessable) {
             // Maybe each assessable has a clone method?
@@ -139,7 +139,7 @@ class Model implements AssessmentContext, ISoftDeletable
     /* Getters/Setters */
 
     /**
-     * @return UnitSpecificationModel
+     * @return UnitSpecification
      */
     public function getSpecification()
     {
@@ -147,7 +147,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @param UnitSpecificationModel $specification
+     * @param UnitSpecification $specification
      * @return static
      */
     public function setSpecification($specification)
@@ -237,7 +237,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @return CourseImplementationModel
+     * @return CourseImplementation
      */
     public function getCourse()
     {
@@ -245,7 +245,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @param CourseImplementationModel $course
+     * @param CourseImplementation $course
      * @return static
      */
     public function setCourse($course)

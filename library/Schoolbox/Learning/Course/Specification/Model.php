@@ -14,7 +14,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
-use Schoolbox\Resource\Folder\Model as FolderModel;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * A Course Specification is a collection of Unit Specifications. It exists on a Folder.
@@ -43,7 +43,7 @@ class Model implements AssessmentContext, ISoftDeletable
      *
      * TODO review whether this relation needs to exist
      *
-     * @var FolderModel
+     * @var Folder
      */
     protected $folder;
 
@@ -59,7 +59,7 @@ class Model implements AssessmentContext, ISoftDeletable
      */
     public function __construct()
     {
-        $this->folder = new FolderModel();
+        $this->folder = new Folder();
         $this->units = new Collection();
         $this->createdAt = new \Alaress_Date_NullDate();
         $this->deletedAt = new \Alaress_Date_NullDate();
@@ -68,7 +68,7 @@ class Model implements AssessmentContext, ISoftDeletable
     /* Getters/Setters */
 
     /**
-     * @return FolderModel
+     * @return Folder
      */
     public function getFolder()
     {
@@ -76,7 +76,7 @@ class Model implements AssessmentContext, ISoftDeletable
     }
 
     /**
-     * @param FolderModel $folder
+     * @param Folder $folder
      * @return static
      */
     public function setFolder($folder)
