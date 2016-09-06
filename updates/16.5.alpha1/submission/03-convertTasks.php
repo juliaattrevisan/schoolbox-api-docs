@@ -32,7 +32,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     ");
     $insertAssessmentQuery = $db->prepare("
         INSERT INTO assessment (project_id, title, description, publish_date, open_date, due_date, weight, sequence)
-        VALUES (:projectId, :title, '', NULL, NULL, :weight, 0, 1)
+        VALUES (:projectId, :title, '', NULL, NULL, NULL, :weight, 1)
     ");
     $insertProjectRelationQuery = $db->prepare("
         INSERT INTO project_course_unit (project_id, course_unit_id)
