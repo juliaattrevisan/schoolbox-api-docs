@@ -5741,3 +5741,460 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2016-06-01 11:31:15
+-- MySQL dump 10.13  Distrib 5.5.50, for debian-linux-gnu (x86_64)
+--
+-- Host: sbc-syd-rds-1.c7aj8nnmop0u.ap-southeast-2.rds.amazonaws.com    Database: meetup2016
+-- ------------------------------------------------------
+-- Server version	5.5.5-10.1.14-MariaDB
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ups_condition`
+--
+
+DROP TABLE IF EXISTS `ups_condition`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ups_condition` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `rule_id` int(10) unsigned NOT NULL,
+  `condition_type_id` int(10) unsigned NOT NULL,
+  `arguments` varchar(512) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `rule_id` (`rule_id`),
+  KEY `condition_type_id` (`condition_type_id`),
+  CONSTRAINT `ups_condition_ibfk_1` FOREIGN KEY (`rule_id`) REFERENCES `ups_rule` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `ups_condition_ibfk_2` FOREIGN KEY (`condition_type_id`) REFERENCES `ups_condition_type` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ups_condition`
+--
+
+LOCK TABLES `ups_condition` WRITE;
+/*!40000 ALTER TABLE `ups_condition` DISABLE KEYS */;
+INSERT INTO `ups_condition` VALUES (1,6,2,'[true]');
+INSERT INTO `ups_condition` VALUES (2,11,2,'[true]');
+INSERT INTO `ups_condition` VALUES (3,14,2,'[true]');
+/*!40000 ALTER TABLE `ups_condition` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2016-08-11  1:05:10
+-- MySQL dump 10.13  Distrib 5.5.50, for debian-linux-gnu (x86_64)
+--
+-- Host: sbc-syd-rds-1.c7aj8nnmop0u.ap-southeast-2.rds.amazonaws.com    Database: meetup2016
+-- ------------------------------------------------------
+-- Server version	5.5.5-10.1.14-MariaDB
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ups_condition_type`
+--
+
+DROP TABLE IF EXISTS `ups_condition_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ups_condition_type` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ups_condition_type`
+--
+
+LOCK TABLES `ups_condition_type` WRITE;
+/*!40000 ALTER TABLE `ups_condition_type` DISABLE KEYS */;
+INSERT INTO `ups_condition_type` VALUES (1,'ExternalUserValueIn');
+INSERT INTO `ups_condition_type` VALUES (2,'UserExists');
+/*!40000 ALTER TABLE `ups_condition_type` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2016-08-11  1:05:10
+-- MySQL dump 10.13  Distrib 5.5.50, for debian-linux-gnu (x86_64)
+--
+-- Host: sbc-syd-rds-1.c7aj8nnmop0u.ap-southeast-2.rds.amazonaws.com    Database: meetup2016
+-- ------------------------------------------------------
+-- Server version	5.5.5-10.1.14-MariaDB
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ups_config`
+--
+
+DROP TABLE IF EXISTS `ups_config`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ups_config` (
+  `role_type` enum('student','parent','staff') NOT NULL,
+  `enabled` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`role_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ups_config`
+--
+
+LOCK TABLES `ups_config` WRITE;
+/*!40000 ALTER TABLE `ups_config` DISABLE KEYS */;
+INSERT INTO `ups_config` VALUES ('student',0);
+INSERT INTO `ups_config` VALUES ('parent',0);
+INSERT INTO `ups_config` VALUES ('staff',0);
+/*!40000 ALTER TABLE `ups_config` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2016-08-11  1:05:10
+-- MySQL dump 10.13  Distrib 5.5.50, for debian-linux-gnu (x86_64)
+--
+-- Host: sbc-syd-rds-1.c7aj8nnmop0u.ap-southeast-2.rds.amazonaws.com    Database: meetup2016
+-- ------------------------------------------------------
+-- Server version	5.5.5-10.1.14-MariaDB
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ups_custom_hydrator`
+--
+
+DROP TABLE IF EXISTS `ups_custom_hydrator`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ups_custom_hydrator` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `class` varchar(256) NOT NULL,
+  `role_type` enum('student','parent','staff') NOT NULL,
+  `enabled` tinyint(1) NOT NULL DEFAULT '1',
+  `sequence` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `role_type_3` (`role_type`,`sequence`),
+  UNIQUE KEY `role_type_4` (`role_type`,`class`),
+  KEY `class` (`class`),
+  KEY `role_type` (`role_type`),
+  KEY `role_type_2` (`role_type`,`enabled`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ups_custom_hydrator`
+--
+
+LOCK TABLES `ups_custom_hydrator` WRITE;
+/*!40000 ALTER TABLE `ups_custom_hydrator` DISABLE KEYS */;
+INSERT INTO `ups_custom_hydrator` VALUES (1,'Schoolbox\\Sync\\Hydrator\\Custom\\AddParentToAllChildCampuses','parent',1,0);
+INSERT INTO `ups_custom_hydrator` VALUES (2,'Schoolbox\\Sync\\Hydrator\\Custom\\SkipParentIfNoChildren','parent',1,1);
+/*!40000 ALTER TABLE `ups_custom_hydrator` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2016-08-11  1:05:10
+-- MySQL dump 10.13  Distrib 5.5.50, for debian-linux-gnu (x86_64)
+--
+-- Host: sbc-syd-rds-1.c7aj8nnmop0u.ap-southeast-2.rds.amazonaws.com    Database: meetup2016
+-- ------------------------------------------------------
+-- Server version	5.5.5-10.1.14-MariaDB
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ups_effect`
+--
+
+DROP TABLE IF EXISTS `ups_effect`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ups_effect` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `rule_id` int(10) unsigned NOT NULL,
+  `user_property` varchar(64) NOT NULL,
+  `effect_type_id` int(10) unsigned NOT NULL,
+  `arguments` varchar(512) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `rule_id_2` (`rule_id`,`user_property`),
+  KEY `rule_id` (`rule_id`),
+  KEY `effect_type_id` (`effect_type_id`),
+  CONSTRAINT `ups_effect_ibfk_1` FOREIGN KEY (`rule_id`) REFERENCES `ups_rule` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `ups_effect_ibfk_2` FOREIGN KEY (`effect_type_id`) REFERENCES `ups_effect_type` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ups_effect`
+--
+
+LOCK TABLES `ups_effect` WRITE;
+/*!40000 ALTER TABLE `ups_effect` DISABLE KEYS */;
+INSERT INTO `ups_effect` VALUES (1,3,'userAccessRemove',2,'[[\"172\",\"173\",\"118\",\"174\",\"175\",\"176\",\"162\",\"164\",\"167\",\"169\",\"170\",\"120\"]]');
+INSERT INTO `ups_effect` VALUES (2,3,'userAccessRead',1,'[\"{:year.level}\",{\"1\":\"172\",\"2\":\"173\",\"3\":\"118\",\"4\":\"174\",\"5\":\"175\",\"6\":\"176\",\"7\":\"162\",\"8\":\"164\",\"9\":\"120\",\"10\":\"167\",\"11\":\"169\",\"12\":\"170\"}]');
+INSERT INTO `ups_effect` VALUES (3,1,'userAccessRemove',2,'[[\"172\",\"173\",\"118\",\"174\",\"175\",\"176\",\"162\",\"164\",\"120\",\"167\",\"169\",\"170\"]]');
+INSERT INTO `ups_effect` VALUES (4,1,'userAccessRead',1,'[\"{:students.year.level}\",{\"1\":\"172\",\"2\":\"173\",\"3\":\"118\",\"4\":\"174\",\"5\":\"175\",\"6\":\"176\",\"7\":\"162\",\"8\":\"164\",\"9\":\"120\",\"10\":\"167\",\"11\":\"169\",\"12\":\"170\"}]');
+INSERT INTO `ups_effect` VALUES (5,4,'userAccessRemove',2,'[[\"172\",\"173\",\"118\",\"174\",\"175\",\"176\",\"162\",\"164\",\"120\",\"167\",\"169\",\"170\"]]');
+INSERT INTO `ups_effect` VALUES (6,4,'userAccessWrite',1,'[\"{:meta.position}\",{\"YLCO9\":\"120\"}]');
+INSERT INTO `ups_effect` VALUES (7,5,'externalId',2,'[\"{:id}\"]');
+INSERT INTO `ups_effect` VALUES (8,5,'username',2,'[\"{:account.login}\"]');
+INSERT INTO `ups_effect` VALUES (9,5,'title',2,'[\"{:title}\"]');
+INSERT INTO `ups_effect` VALUES (10,5,'firstname',2,'[\"{:preferredName}\"]');
+INSERT INTO `ups_effect` VALUES (11,5,'lastname',2,'[\"{:lastname}\"]');
+INSERT INTO `ups_effect` VALUES (12,5,'localEmail',2,'[true]');
+INSERT INTO `ups_effect` VALUES (13,5,'useInternalMail',2,'[false]');
+INSERT INTO `ups_effect` VALUES (14,5,'webmail',2,'[true]');
+INSERT INTO `ups_effect` VALUES (15,6,'enabled',2,'[true]');
+INSERT INTO `ups_effect` VALUES (16,6,'hideContacts',2,'[false]');
+INSERT INTO `ups_effect` VALUES (17,6,'hideTimetable',2,'[false]');
+INSERT INTO `ups_effect` VALUES (18,5,'eportfolioEnable',2,'[true]');
+INSERT INTO `ups_effect` VALUES (19,7,'year',1,'[\"{:year.level}\",{\"12\":\"12\",\"11\":\"11\",\"10\":\"10\",\"9\":\"9\",\"8\":\"8\",\"7\":\"7\",\"6\":\"6\",\"5\":\"5\",\"4\":\"4\",\"3\":\"3\",\"2\":\"2\",\"1\":\"1\",\"0\":\"Prep\",\"30\":\"ELC\",\"40\":\"ELC\",\"-1\":\"ELC\"}]');
+INSERT INTO `ups_effect` VALUES (20,8,'campusCollection',1,'[\"{:campus.code}\",{\"S\":\"1\",\"J\":\"2\"}]');
+INSERT INTO `ups_effect` VALUES (21,9,'schoolHouse',1,'[\"{:house.code|uc}\",{\"BU\":\"1\",\"PR\":\"2\",\"RI\":\"3\",\"TO\":\"4\"}]');
+INSERT INTO `ups_effect` VALUES (22,10,'externalId',2,'[\"{:id}\"]');
+INSERT INTO `ups_effect` VALUES (23,10,'username',2,'[\"{:account.login}\"]');
+INSERT INTO `ups_effect` VALUES (24,10,'title',2,'[\"{:title}\"]');
+INSERT INTO `ups_effect` VALUES (25,10,'firstname',2,'[\"{:preferredName}\"]');
+INSERT INTO `ups_effect` VALUES (26,10,'lastname',2,'[\"{:lastname}\"]');
+INSERT INTO `ups_effect` VALUES (27,10,'role',2,'[\"4\"]');
+INSERT INTO `ups_effect` VALUES (28,10,'altEmail',2,'[\"{:email.address}\"]');
+INSERT INTO `ups_effect` VALUES (29,10,'localEmail',2,'[false]');
+INSERT INTO `ups_effect` VALUES (30,10,'useInternalMail',2,'[false]');
+INSERT INTO `ups_effect` VALUES (31,10,'webmail',2,'[false]');
+INSERT INTO `ups_effect` VALUES (32,10,'eportfolioEnable',2,'[false]');
+INSERT INTO `ups_effect` VALUES (33,11,'enabled',2,'[true]');
+INSERT INTO `ups_effect` VALUES (34,11,'hideContacts',2,'[false]');
+INSERT INTO `ups_effect` VALUES (35,11,'hideTimetable',2,'[false]');
+INSERT INTO `ups_effect` VALUES (36,12,'role',1,'[\"{:campus.code}\",{\"S\":\"3\",\"J\":\"5\"}]');
+INSERT INTO `ups_effect` VALUES (37,13,'externalId',2,'[\"{:id}\"]');
+INSERT INTO `ups_effect` VALUES (38,13,'username',2,'[\"{:account.login}\"]');
+INSERT INTO `ups_effect` VALUES (39,13,'title',2,'[\"{:title}\"]');
+INSERT INTO `ups_effect` VALUES (40,13,'firstname',2,'[\"{:preferredName}\"]');
+INSERT INTO `ups_effect` VALUES (41,13,'lastname',2,'[\"{:lastname}\"]');
+INSERT INTO `ups_effect` VALUES (42,13,'role',2,'[\"2\"]');
+INSERT INTO `ups_effect` VALUES (43,13,'localEmail',2,'[true]');
+INSERT INTO `ups_effect` VALUES (44,13,'useInternalMail',2,'[false]');
+INSERT INTO `ups_effect` VALUES (45,13,'webmail',2,'[true]');
+INSERT INTO `ups_effect` VALUES (46,13,'eportfolioEnable',2,'[true]');
+INSERT INTO `ups_effect` VALUES (47,14,'enabled',2,'[true]');
+INSERT INTO `ups_effect` VALUES (48,14,'hideContacts',2,'[false]');
+INSERT INTO `ups_effect` VALUES (49,14,'hideTimetable',2,'[false]');
+INSERT INTO `ups_effect` VALUES (50,15,'campusCollection',1,'[\"{:campus.code}\",{\"S\":\"1\",\"J\":\"2\"}]');
+/*!40000 ALTER TABLE `ups_effect` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2016-08-11  1:05:10
+-- MySQL dump 10.13  Distrib 5.5.50, for debian-linux-gnu (x86_64)
+--
+-- Host: sbc-syd-rds-1.c7aj8nnmop0u.ap-southeast-2.rds.amazonaws.com    Database: meetup2016
+-- ------------------------------------------------------
+-- Server version	5.5.5-10.1.14-MariaDB
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ups_effect_type`
+--
+
+DROP TABLE IF EXISTS `ups_effect_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ups_effect_type` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ups_effect_type`
+--
+
+LOCK TABLES `ups_effect_type` WRITE;
+/*!40000 ALTER TABLE `ups_effect_type` DISABLE KEYS */;
+INSERT INTO `ups_effect_type` VALUES (2,'literal');
+INSERT INTO `ups_effect_type` VALUES (1,'Map');
+INSERT INTO `ups_effect_type` VALUES (3,'Skip');
+/*!40000 ALTER TABLE `ups_effect_type` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2016-08-11  1:05:10
+-- MySQL dump 10.13  Distrib 5.5.50, for debian-linux-gnu (x86_64)
+--
+-- Host: sbc-syd-rds-1.c7aj8nnmop0u.ap-southeast-2.rds.amazonaws.com    Database: meetup2016
+-- ------------------------------------------------------
+-- Server version	5.5.5-10.1.14-MariaDB
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `ups_rule`
+--
+
+DROP TABLE IF EXISTS `ups_rule`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ups_rule` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `role_type` enum('student','parent','staff') NOT NULL,
+  `enabled` tinyint(1) NOT NULL DEFAULT '1',
+  `sequence` int(10) unsigned NOT NULL,
+  `name` varchar(256) DEFAULT NULL,
+  `description` text,
+  PRIMARY KEY (`id`),
+  KEY `role_type` (`role_type`),
+  KEY `role_type_2` (`role_type`,`enabled`)
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ups_rule`
+--
+
+LOCK TABLES `ups_rule` WRITE;
+/*!40000 ALTER TABLE `ups_rule` DISABLE KEYS */;
+INSERT INTO `ups_rule` VALUES (1,'parent',1,1,'Year Level Groups','This rule adds parents to the appropriate year level page dynamically.');
+INSERT INTO `ups_rule` VALUES (3,'student',1,1,'Year Level Pages','This rule adds students to the appropriate year level page dynamically.');
+INSERT INTO `ups_rule` VALUES (4,'staff',1,1,'Year Level Groups','This rule adds year level coordinators to the appropriate year level communication page with write access dynamically.');
+INSERT INTO `ups_rule` VALUES (5,'student',1,2,'General Information','');
+INSERT INTO `ups_rule` VALUES (6,'student',1,3,'Options set on creation only','');
+INSERT INTO `ups_rule` VALUES (7,'student',1,7,'Year Level','');
+INSERT INTO `ups_rule` VALUES (8,'student',1,5,'Campus','');
+INSERT INTO `ups_rule` VALUES (9,'student',1,6,'House','');
+INSERT INTO `ups_rule` VALUES (10,'parent',1,2,'General Information','');
+INSERT INTO `ups_rule` VALUES (11,'parent',1,3,'Options set on creation only','');
+INSERT INTO `ups_rule` VALUES (12,'student',1,4,'Role from Campus','');
+INSERT INTO `ups_rule` VALUES (13,'staff',1,2,'General Information','');
+INSERT INTO `ups_rule` VALUES (14,'staff',1,3,'Options set on creation only','');
+INSERT INTO `ups_rule` VALUES (15,'staff',1,4,'Campus','');
+/*!40000 ALTER TABLE `ups_rule` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2016-08-11  1:05:10
