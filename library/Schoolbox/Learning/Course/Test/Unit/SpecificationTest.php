@@ -11,8 +11,6 @@ use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Collection;
-use Schoolbox\Learning\Course\Implementation as CourseImplementation;
-use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
