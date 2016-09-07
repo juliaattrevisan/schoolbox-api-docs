@@ -118,8 +118,6 @@ class Specification implements AssessmentContext, ISoftDeletable
         if (is_object($this->getDeletedAt())) {
             $this->setDeletedAt(clone $this->getDeletedAt());
         }
-        if (is_object($this->getAssessables())) {
-            $this->setAssessables(clone $this->getAssessables());
-        }
+        $this->setAssessables($this->getAssessables()->deepClone());
     }
 }
