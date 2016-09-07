@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Course;
 
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Learning\Course\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\Unit\ImplementationFactory as UnitImplementationFactory;
@@ -39,16 +40,19 @@ class ImplementationFactory
      * Builds a Unit Implementation out of the given Unit Specification.
      *
      * @param CourseSpecification $courseSpecification
+     * @param Folder              $destination
      * @return CourseImplementation
      */
-    public function buildFromSpecification(CourseSpecification $courseSpecification)
+    public function build(CourseSpecification $courseSpecification, Folder $destination)
     {
-        $courseImplementation = new CourseImplementation();
+        $implementation = new CourseImplementation();
         foreach ($courseSpecification->getUnits() as $unitSpecification) {
-            $courseImplementation->getUnits()->add(
-                $this->unitImplementationFactory->buildFromSpecification($unitSpecification)
+            $implementation->getUnits()->add(
+                $this->unitImplementationFactory->build($unitSpecification)
             );
         }
-        return $courseImplementation;
+        return $implementation
+            ->setFolder($destination)
+            ->setSpecification($courseSpecification);
     }
 }

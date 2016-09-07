@@ -23,7 +23,7 @@ class ImplementationFactory
      * @param UnitSpecification $unitSpecification
      * @return UnitImplementation
      */
-    public function buildFromSpecification(UnitSpecification $unitSpecification)
+    public function build(UnitSpecification $unitSpecification)
     {
         $implementation = new UnitImplementation();
         foreach ($unitSpecification->getAssessables() as $assessable) {
@@ -32,6 +32,8 @@ class ImplementationFactory
             $newAssessable->setId(null);
             $implementation->getAssessables()->add($newAssessable);
         }
-        return $implementation;
+        return $implementation
+            ->setTitle($unitSpecification->getFolder()->getName())
+            ->setSpecification($unitSpecification);
     }
 }
