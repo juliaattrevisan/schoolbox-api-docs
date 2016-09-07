@@ -1,3 +1,5 @@
+{% import 'sub/breadcrumbs.twig' as breadcrumbs %}
+
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <!-- END custom_head -->
@@ -18,7 +20,12 @@
             <div class="content collapsible">
                 <div class="small-6 columns no-pad">
                     <h3 data-collapser="optional-1" class="icon-down-arrow">Assessment Title</h3>
-                    <p class="meta">Course Title &rsaquo; Class Title &rsaquo; Unit Title</p>
+                    {{ breadcrumbs.basic(
+                        [ 'Course Title',    routeLookup('sportsfixtures.getLanding') ],
+                        [ 'Class Title',      routeLookup('sportsfixturesSport.getList') ],
+                        [ sport.name,    routeLookup('sportsfixturesSport.getEntity', { entityId: sport.id }) ],
+                        [ division.name | default(action ~ ' Unit Title') ]
+                    ) }}
                 </div>
                 <div class="small-4 columns hide-for-small-only">
                     <div class="progress">

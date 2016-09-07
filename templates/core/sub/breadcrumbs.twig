@@ -18,3 +18,21 @@
         {% endfor %}
     </ul>
 {% endmacro %}
+
+{# Basic version of breadcrumbs #}
+{% macro basic() %}
+    {# preprocess varargs to strip blanks, in lieu of an array_filter |filter #}
+    {% set crumbs = [] %}
+
+    {% for i in varargs if i[0] %}
+        {% set crumbs = crumbs|merge([ i ]) %}
+    {% endfor %}
+
+    <ul class="breadcrumb-basic meta">
+        {% for crumb in crumbs %}
+            <li{% if loop.last %} class="active"{% endif %}>
+                <a{% if crumb[1] %} href="{{ crumb[1] }}"{% endif %}>{{ crumb[0] }} {% if not loop.last %}&rsaquo; {% endif %}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
