@@ -345,7 +345,6 @@ class Gateway
             AND subtab.sub_code IN ('9994','9995','9996','9997','9998','9999')
             AND tchsub.year_num = :year
             ORDER BY
-                tchsub.semester ASC,
                 teacher.tch_name ASC
         ";
         $params = array(
