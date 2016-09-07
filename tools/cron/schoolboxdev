@@ -37,6 +37,6 @@ MAILTO="support@schoolbox.com.au"
 */20 * * * *	root	php /usr/share/schoolboxdev/tools/quiz/autoFinish.php >> /var/log/schoolboxdev/quiz.log 2>&1
 
 # Pastoral DocMan upload - Every 5 minutes
-*/5 * * * *     root    php /usr/share/schoolboxdev/tools/docman/process.php >> /var/log/schoolbox/docman.log 2>&1
+*/5 * * * *     root    php /usr/share/schoolboxdev/tools/docman/pastoralUpload.php >> /var/log/schoolbox/docman.log 2>&1
 
 # End of file - do not delete

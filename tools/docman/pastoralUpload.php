@@ -27,7 +27,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('DocMan', array(
 $kernel->run(function($di, $loop, $log, $opts) {
 
     // Only process if its actually enabled in config
-    if (!Config::get('external_pastoral_docman')) {
+    if (!$di->get('config')->get("external_pastoral_docman")) {
         exit;
     }
 
@@ -43,25 +43,24 @@ $kernel->run(function($di, $loop, $log, $opts) {
     $pastoralUploadQueueMapper = new PastoralUploadQueueMapper();
 
     $lock = new Alaress_Lock('pastoral_upload.lock');
+
     if (!$lock->acquire()) {
-        $log->critical("A video processor is already running, checking timeout");
-        // Check timeout: if any processing video has been processing for more than
-        // x minutes, then kill their process, mark as failed and start over.
-        // (Should never be more than one video processing at once (per server)).
+        $log->critical("A pastoral uploader is already running, checking timeout.");
+        // Check existing upload process for timeout (should never be more than uploading at once).
         $timeout = intval(Config::get('pastoral_processing_timeout'));
         if ($timeout <= 0) {
-            $log->alert("Timeout of DocMan processing is disabled.");
+            $log->alert("Timeout of pastoral uploading is disabled.");
             exit;
         } elseif (($num_timed_out = $pastoralUploadQueueMapper->markProcessingAsFailed($timeout)) > 0) {
-            $log->warning("Processing of $num_timed_out video(s) has timed out - marking these as failed, and continuing");
+            $log->warning("Processing of $num_timed_out pastoral upload(s) has timed out - marking these as failed, and continuing");
             $lock->killProcess();
             $lock->acquire();
         } else {
-            $log->info("No DocMan processing has timed out");
+            $log->info("No pastoral uploader has timed out.");
             exit;
         }
     }
-    $log->info("Processing of DocMan started");
+    $log->info("Uploading of pastoral files started");
 
     /** @var PastoralUploadQueueModel[] $pendingQueue */
     $pendingQueue = $pastoralUploadQueueMapper->getPending();
@@ -76,23 +75,21 @@ $kernel->run(function($di, $loop, $log, $opts) {
         $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PROCESSING);
         $pastoralUploadQueueMapper->save($file);
 
-        /* Process video */
+        // Upload file to DocMan
+
         try {
-            if ($file->process() == true) {
-                $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_COMPLETED);
-            } else {
-                $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_FAILED);
-            }
+            $file->uploadDocman();
+            $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_COMPLETED);
         } catch (Exception $e) {
             $log->error("$e", array($e));
             $file->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_FAILED);
         }
 
         if ($file->getStatus() === PastoralUploadQueueMapper::UPLOAD_STATUS_FAILED) {
-            $log->error("Process of media #$file_id failed");
+            $log->error("Uploading of file #$file_id failed");
             $failed++;
         } else {
-            $log->info("Process of media #$file_id completed\n");
+            $log->info("Uploading of file #$file_id completed\n");
             $success++;
         }
 
@@ -101,5 +98,5 @@ $kernel->run(function($di, $loop, $log, $opts) {
     }
 
     $lock->release();
-    $log->info("Processing of DocMan completed: $success succeeded, $failed failed");
+    $log->info("Processing of pastoral upload completed: $success succeeded, $failed failed");
 });

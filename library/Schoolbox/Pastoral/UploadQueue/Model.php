@@ -173,88 +173,77 @@ class Model implements ISoftDeletable
 
 
     /**
-     * Determines if file is audio or video and does corresponding processing
+     * Upload this file to Synergetic DocMan
      * @returns boolean
      */
-    public function process()
+    public function uploadDocman()
     {
         $storageMapper = StorageMapper::getInstance();
-
-        try {
-            $storageObject = $storageMapper->findByHash($this->getHash());
-        } catch (MapperException $e) {
-            return false;
-        }
+        $storageObject = $storageMapper->findByHash($this->getHash());
 
         // This whole thing is a bit of an ass, unfortunately Synergetic stores its DocMan files in
         // the actual database- which means we need to shove the file into a SQL query as a hex string
-        // which is totally inefficent and very slow :(
+        // which is totally inefficient and very slow :(
 
         // Temporarily increase the memory limit and timeout so we can get the file across to Synergetic
 
         ini_set('memory_limit', '2048M');
         set_time_limit(0);
 
-        try {
-            // Save the file into to the database
+        // Save the file into to the database
 
-            $hex = "0x" . bin2hex($storageObject->read());
-            $externalId = $this->getExternalId();
-            $studentExternalId = $this->getStudentExternalId();
-            $date = date("Y-m-d H:i:s");
-            $sourceDate = $storageObject->getCreatedAt()->getDatabase();
-            $extension = strtoupper($storageObject->getExtension());
+        $hex = "0x" . bin2hex($storageObject->read());
+        $externalId = $this->getExternalId();
+        $studentExternalId = $this->getStudentExternalId();
+        $date = date("Y-m-d H:i:s");
+        $sourceDate = $storageObject->getCreatedAt()->getDatabase();
+        $extension = strtoupper($storageObject->getExtension());
 
-            $query = "
-             INSERT INTO SynergyOneMedia.dbo.tDocuments
-             (
-               Description,
-               DocumentCreatedByID,
-               DocumentModifiedByID,
-               Document,
-               DocumentCreatedDate,
-               DocumentModifiedDate,
-               SourceDate,           
-               DocumentType
-             )
-             VALUES
-             (
-               'Imported from Schoolbox',
-               {$externalId},
-               {$externalId},
-               {$hex},
-               '{$date}',
-               '{$date}',
-               '{$sourceDate}',
-               '{$extension}'
-             );            
+        $query = "
+            INSERT INTO SynergyOneMedia.dbo.tDocuments
+            (
+                Description,
+                DocumentCreatedByID,
+                DocumentModifiedByID,
+                Document,
+                DocumentCreatedDate,
+                DocumentModifiedDate,
+                SourceDate,           
+                DocumentType
+            )
+            VALUES
+            (
+                'Imported from Schoolbox',
+                {$externalId},
+                {$externalId},
+                {$hex},
+                '{$date}',
+                '{$date}',
+                '{$sourceDate}',
+                '{$extension}'
+            );            
         ";
 
-            $database = \MSSQL::getInstance();
-            $database->query($query);
-            $documentReferencesSeq = $database->getOne("SELECT @@IDENTITY");
+        $database = \MSSQL::getInstance();
+        $database->query($query);
+        $documentReferencesSeq = $database->getOne("SELECT @@IDENTITY");
 
-            // Add a document reference to the student so it shows up on their record
+        // Add a document reference to the student so it shows up on their record
 
-            $query =
-                "
-             INSERT INTO SynergyOneMedia.dbo.DocumentReferences
-             (
-               ID,
-               DocumentReferencesSeq
-             )
-             VALUES
-             (
-               {$studentExternalId},
-               {$documentReferencesSeq}
-             );            
+        $query =
+        "
+            INSERT INTO SynergyOneMedia.dbo.DocumentReferences
+            (
+                ID,
+                DocumentReferencesSeq
+            )
+            VALUES
+            (
+                {$studentExternalId},
+                {$documentReferencesSeq}
+            );            
         ";
 
-            $database->query($query);
-            return true;
-
-        } catch (\Exception $e) {
-            return false;
-        }
+        $database->query($query);
     }
 }
