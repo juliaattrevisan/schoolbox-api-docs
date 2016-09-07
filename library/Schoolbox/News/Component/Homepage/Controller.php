@@ -75,6 +75,8 @@ class Controller extends Component_Homepage_ControllerAbstract
             } catch (\Exception $e) {
             }
         }
+
+        return true;
     }
 
     /**
@@ -115,11 +117,12 @@ class Controller extends Component_Homepage_ControllerAbstract
 
     /**
      * @param FolderMapper $folderMapper
-     * @return FolderMapper
+     * @return $this
      */
     public function setFolderMapper($folderMapper)
     {
         $this->folderMapper = $folderMapper;
+        return $this;
     }
 
     /**
