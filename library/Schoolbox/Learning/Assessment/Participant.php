@@ -224,9 +224,7 @@ class Participant
                 }
             }
             else if ($type == self::TRAVERSAL_MARKED) {
-                if ($latestFeedback->isMarked()) {
-                    return $latestFeedback;
-                }
+                return $latestFeedback;
             }
 
             return null;

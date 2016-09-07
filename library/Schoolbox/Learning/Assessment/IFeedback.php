@@ -14,14 +14,6 @@ use \Schoolbox\User;
 
 interface IFeedback
 {
-
-    /**
-     * This IAssessable has a non-null Mark value
-     *
-     * @return bool
-     */
-    public function isMarked();
-
     /**
      * Determine whether this Feedback has been published.
      * If the publish date is null, it's a draft

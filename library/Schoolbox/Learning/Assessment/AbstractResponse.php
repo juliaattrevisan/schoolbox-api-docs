@@ -75,23 +75,7 @@ class AbstractResponse implements IResponse
     public function findMostRecentFeedback()
     {
         if ($this->getAllFeedback()->count()) {
-            $latest = $this->getAllFeedback()->first();
-
-            foreach ($this->getAllFeedback() as $currentFeedback) {
-                if ($currentFeedback->isMarked()) {
-                    return $currentFeedback;
-                }
-            }
-
-            /* If the ->first() instance is actually null
-             * and all the other Feedbacks are also null
-             * return null
-             *
-             * Otherwise return the Feedback itself
-             */
-            if ($latest->isMarked()) {
-                return $latest;
-            }
+            return $this->getAllFeedback()->first();
         }
 
         return null;
@@ -112,7 +96,7 @@ class AbstractResponse implements IResponse
 
             foreach ($this->getAllFeedback() as $currentFeedback) {
                 if ($currentFeedback->isPublished()) {
-                    if ($currentFeedback->getPublishedAt()->gt($latest->getPublishedAt()) && $currentFeedback->isMarked()) {
+                    if ($currentFeedback->getPublishedAt()->gt($latest->getPublishedAt())) {
                         $latest = $currentFeedback;
                     }
                 }
@@ -124,7 +108,7 @@ class AbstractResponse implements IResponse
              *
              * Otherwise return the Feedback itself
              */
-            if ($latest->isPublished() && $latest->isMarked()) {
+            if ($latest->isPublished()) {
                 return $latest;
             }
         }
