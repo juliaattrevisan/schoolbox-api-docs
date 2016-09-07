@@ -715,6 +715,32 @@ $rotate-th-width: $square-grid-td-size;
 
 }
 
+// Collapsible content
+.collapsible {
+	@extend .clearfix;
+	.information-list{
+		clear: both;
+	}
+}
+
+[data-collapser] {
+	color: inherit;
+
+	&:before {
+		color: $content-ui-foreground;
+		line-height: inherit;
+		text-decoration: none;
+		font-size: 1rem; // icon size
+	}
+	&:hover{
+		cursor: pointer;
+	}
+	&:hover:before {
+		text-decoration: none !important; // forgive me, for I have sinned
+	}
+
+}
+
 nav {
   @extend .hide-for-print;
 }

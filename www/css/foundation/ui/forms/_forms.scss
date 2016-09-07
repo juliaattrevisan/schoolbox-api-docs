@@ -602,26 +602,6 @@ section > fieldset {
         opacity: 0.8;
     }
 
-	&.collapsible {
-
-		> legend {
-			color: inherit;
-			width: auto;
-
-			&:before {
-                color: $content-ui-foreground;
-                line-height: inherit;
-                text-decoration: none;
-				font-size: 1rem; // lock this to 16px;
-			}
-			&:hover:before {
-				text-decoration: none !important; // forgive me, for I have sinned
-			}
-
-		}
-
-	}
-
 	// second sibling onwards
 	~ fieldset {
 		border-top: solid $fieldset-border-width $body-bg;
