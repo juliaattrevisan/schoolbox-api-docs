@@ -103,4 +103,16 @@ class Specification implements AssessmentContext, ISoftDeletable
         $this->assessables = $assessables;
         return $this;
     }
+
+    /**
+     * Deep clone object properties.
+     */
+    public function __clone()
+    {
+        $this
+            ->setCreatedAt(clone $this->getCreatedAt())
+            ->setUpdatedAt(clone $this->getUpdatedAt())
+            ->setDeletedAt(clone $this->getDeletedAt())
+            ->setAssessables(clone $this->getAssessables());
+    }
 }
