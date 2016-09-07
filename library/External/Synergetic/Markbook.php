@@ -8,6 +8,7 @@
 use \Schoolbox\Assessment\Component\SubmissionBox;
 use \Schoolbox\Assessment\Activity;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
+use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use \Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
 use \Schoolbox\UserMapper;
@@ -245,7 +246,14 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $activity->setCategory($box->getCategory());
             $marker = UserMapper::getInstance()->findById($result->getMarker()->getId());
             $student = UserMapper::getInstance()->findById($result->getOwner()->getId());
-            $mark = $result->getNormalizedMark();
+
+            // If the mark type is set to none then we shouldn't be saving a normalised mark
+            if ($box->getMarkType()->getId() != SubmissionBox\MarkType::TYPE_NONE) {
+                $mark = $result->getNormalizedMark();
+            } else {
+                $mark = null;
+            }
+
             $comment = $result->getComment();
             $dueDate = $box->getDueDate();
         } elseif ($result instanceof Attempt) {
