@@ -293,7 +293,10 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         unset($diff['hidden']);
         unset($diff['modified']);
 
-        $categoryId = $category->getId();
+        // manuel hydration
+        if (!$category->getName()) {
+            $category = $this->folderMapper->findById($categoryId);
+        }
 
         $bob = new Builder();
 
