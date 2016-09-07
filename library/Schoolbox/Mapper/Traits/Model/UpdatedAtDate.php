@@ -33,7 +33,7 @@ trait UpdatedAtDate
      *
      * @return $this
      */
-    public function setUpdatedAt($updatedAt)
+    public function setUpdatedAt(Alaress_Date_Format $updatedAt = null)
     {
         $this->updatedAt = $updatedAt;
         return $this;
