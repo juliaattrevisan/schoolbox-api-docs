@@ -125,26 +125,42 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
+     * Get the Human Readable Mark value for a particular User
+     *
+     * Optionally get the Published Human Readable Mark or the
+     * currently-unpublished Human Readable Mark
+     *
      * @param User $user
      * @param bool $publishedOnly
      * @return string
      */
     public function getHumanReadableMark(User $user, $publishedOnly)
     {
-        return $this->getMark($user, $publishedOnly, true);
+        return $this->getMark($user, $publishedOnly, false);
     }
 
     /**
+     * Get the Normalised Mark value for a particular User
+     *
+     * Optionally get the Published Normalised Mark or the
+     * currently-unpublished Normalised Mark
+     *
      * @param User $user
      * @param bool $publishedOnly
      * @return float|null
      */
     public function getNormalisedMark(User $user, $publishedOnly)
     {
-        return $this->getMark($user, $publishedOnly, false);
+        return $this->getMark($user, $publishedOnly, true);
     }
 
     /**
+     * Get the Mark for a particular User
+     *
+     * This is a macro method which can extract the normalised/human-readable
+     * versions of the Mark. Also accounts for whether the Mark was in a Feedback
+     * that was Published, or not.
+     *
      * @param User $user
      * @param $publishedOnly
      * @param $normalised
@@ -154,20 +170,25 @@ abstract class AbstractAssessment implements IAssessable
     {
         $participant = $this->getParticipant($user);
 
+        /* Get the Mark that was Published
+         */
         if ($publishedOnly) {
             $feedback = $participant->findMostRecentPublishedFeedback($this);
-
-        } else {
+        }
+        /* Otherwise just use the latest Feedback's current Mark value
+         */
+        else {
             $feedback = $participant->findMostRecentFeedback($this);
         }
 
+        /* If you're after the Normalised numeric mark
+         */
         if ($normalised) {
             return $feedback->getNormalisedMark();
         }
 
         return $feedback->getHumanReadableMark();
     }
-
 
     /* Traversals
      */
