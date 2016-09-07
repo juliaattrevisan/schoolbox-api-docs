@@ -506,7 +506,7 @@ class Bootstrap implements BootstrapInterface {
         );
 
         // Enable mappers to be injectable, but instantiated only when required
-        $di->set('mapperFactory', $di->lazyNew(MapperFactory::class));
+        $di->set('mapperFactory', $di->lazyNew(MapperFactory::class, ['injector' => $di]));
 
 
         // load dependencies into the kernel itself
