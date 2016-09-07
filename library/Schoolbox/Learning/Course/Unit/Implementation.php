@@ -234,7 +234,10 @@ class Implementation implements AssessmentContext, ISoftDeletable
      */
     public function getFolder()
     {
-        return $this->getCourse()->getFolder();
+        if ($this->getCourse() instanceof CourseImplementation) {
+            return $this->getCourse()->getFolder();
+        }
+        return null;
     }
 
     /**
@@ -275,8 +278,6 @@ class Implementation implements AssessmentContext, ISoftDeletable
         if (is_object($this->getDeletedAt())) {
             $this->setDeletedAt(clone $this->getDeletedAt());
         }
-        if (is_object($this->getAssessables())) {
-            $this->setAssessables(clone $this->getAssessables());
-        }
+        $this->setAssessables($this->getAssessables()->deepClone());
     }
 }
