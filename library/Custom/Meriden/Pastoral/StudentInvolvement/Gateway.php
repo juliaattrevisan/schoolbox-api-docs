@@ -326,8 +326,7 @@ class Gateway
         $query = "
             SELECT DISTINCT
                 teacher.tch_code,
-                teacher.tch_name,
-                tchsub.semester
+                teacher.tch_name
             FROM teacher
             INNER JOIN tchsub
                 ON tchsub.tch_code = teacher.tch_code
