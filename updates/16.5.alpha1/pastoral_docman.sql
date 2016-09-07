@@ -49,9 +49,9 @@ INSERT INTO config (
   hidden,
   required
 ) VALUES (
-  'pastoral_processing_timeout',
+  'pastoral_upload_timeout',
   '3600',
-  'Pastoral Care External SIS Upload Processing Timeout',
+  'Pastoral Care Attachment SIS Upload Timeout',
   'The maximum number of seconds that the system will attempt to upload a pastoral attachment to the SIS before timing out and being marked as failed. (Set to 0 or less to disable timeout.)',
   1,
   null,

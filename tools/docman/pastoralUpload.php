@@ -47,7 +47,7 @@ $kernel->run(function($di, $loop, $log, $opts) {
     if (!$lock->acquire()) {
         $log->critical("A pastoral uploader is already running, checking timeout.");
         // Check existing upload process for timeout (should never be more than uploading at once).
-        $timeout = intval(Config::get('pastoral_processing_timeout'));
+        $timeout = intval(Config::get('pastoral_upload_timeout'));
         if ($timeout <= 0) {
             $log->alert("Timeout of pastoral uploading is disabled.");
             exit;
