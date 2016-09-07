@@ -717,7 +717,7 @@ $rotate-th-width: $square-grid-td-size;
 
 // Collapsible content
 .collapsible {
-	@extend .clearfix;
+	//@extend .clearfix;
 	.information-list{
 		clear: both;
 	}
