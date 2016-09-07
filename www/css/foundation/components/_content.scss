@@ -1375,8 +1375,16 @@ dl {
 
 .progress {
 	@include transition(all, 360ms, cubic-bezier(0.2, 1, 0, 1));
+	position: relative;
 	span {
 		@include transition(inherit, unquote(''), unquote(''), unquote(''));
+	}
+	.pipe-meter{
+		width: 0.5rem;
+		height: 2rem;
+		background-color: darken($accent-foreground, 5%);
+		position: absolute;
+		top: -9px;
 	}
 }
 
