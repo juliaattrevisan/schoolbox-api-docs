@@ -938,7 +938,7 @@ foreach ($project->getAssessables() as $currentAssessable) {
                 "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
                 $currentParticipant->getUser()->getId(),
                 implode('<br />', $allFiles),
-                $latestFeedback ? $latestFeedback->calculateMark() : '',
+                $latestFeedback ? $latestFeedback->getNormalisedMark() : '',
                 $latestFeedback ? $latestFeedback->getComment() : '',
                 $latestFeedback && $latestFeedback->isPublished() ? $latestFeedback->getPublishedAt()->getLocal() : 'Unpublished'
             );
@@ -976,7 +976,7 @@ foreach ($project->getAssessables() as $currentAssessable) {
                 "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
                 $currentParticipant->getUser()->getId(),
                 implode('<br />', $allFiles),
-                $latestFeedback ? $latestFeedback->calculateMark() : '',
+                $latestFeedback ? $latestFeedback->getNormalisedMark() : '',
                 '',
                 $latestFeedback && $latestFeedback->isPublished() ? $latestFeedback->getPublishedAt()->getLocal() : 'Unpublished'
             );
@@ -1032,11 +1032,12 @@ foreach ($project->getAssessables() as $currentAssessable) {
 
 echo "<h1>Marks</h1>";
 
-new \Alaress_Probe('ID, Title', 'Assessable Mark');
+new \Alaress_Probe('ID, Title', 'Normalised Mark', 'Human Readable Mark');
 try {
     new \Alaress_Probe(
         "{$project->getId()} {$project->getTitle()}",
-        "{$project->getNormalisedMark($hodes, false)}"
+        "{$project->getNormalisedMark($hodes, true)}",
+        "{$project->getHumanReadableMark($hodes, true)}"
     );
 }
 /* User not found
@@ -1044,6 +1045,7 @@ try {
 catch (\UnexpectedValueException $e) {
     new \Alaress_Probe(
         "{$project->getId()} {$project->getTitle()}",
+        '',
         ''
     );
 }
@@ -1052,7 +1054,8 @@ foreach ($project->getAssessables() as $currentAssessable) {
     try {
         new \Alaress_Probe(
             "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
-            "{$currentAssessable->getNormalisedMark($hodes, false)}"
+            "{$currentAssessable->getNormalisedMark($hodes, true)}",
+            "{$currentAssessable->getHumanReadableMark($hodes, true)}"
         );
     }
     /* User not found
@@ -1060,6 +1063,7 @@ foreach ($project->getAssessables() as $currentAssessable) {
     catch (\UnexpectedValueException $e) {
         new \Alaress_Probe(
             "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
+            '',
             ''
         );
     }
