@@ -41,11 +41,8 @@
         <div class="small-12 medium-4 column end">
             <dl>
                 <dt>Tutor</dt>
-                {# Show only the last tutor (as list is ordered by semester asc #}
                 {% for tutor in report.tutorGroupReport.tutors %}
-                    {% if loop.last %}
-                        <dd>{{ tutor.tch_name }}</dd>
-                    {% endif %}
+                    <dd>{{ tutor.tch_name }}</dd>
                 {% endfor %}
             </dl>
         </div>
