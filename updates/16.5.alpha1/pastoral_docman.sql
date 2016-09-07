@@ -10,10 +10,10 @@ INSERT INTO config (
   hidden,
   required
 ) VALUES (
-  'external_pastoral_docman',
+  'external_pastoral_upload',
   '0',
-  'External Pastoral DocMan Writeback',
-  'Enables saving of pastoral attachments to Synergetic DocMan.',
+  'External Pastoral Attachment Upload',
+  'Enables saving of pastoral attachments to external SIS (Synergetic Only).',
   3,
   '',
   7,

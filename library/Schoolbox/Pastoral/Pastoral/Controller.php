@@ -1131,7 +1131,7 @@ class Controller extends Base
 
                     if (!in_array($storageObject->getHash(), $retainedAttachments)) {
 
-                        if ($this->getDi()->get('config')->get("external_pastoral_docman")) {
+                        if ($this->getDi()->get('config')->get("external_pastoral_upload")) {
                             // Queue file for upload to Synergetic DocMan
                             $queue = new PastoralUploadQueueModel();
                             $queue->setPastoralId($record->getId());

@@ -27,7 +27,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('DocMan', array(
 $kernel->run(function($di, $loop, $log, $opts) {
 
     // Only process if its actually enabled in config
-    if (!$di->get('config')->get("external_pastoral_docman")) {
+    if (!$di->get('config')->get("external_pastoral_upload")) {
         exit;
     }
 
