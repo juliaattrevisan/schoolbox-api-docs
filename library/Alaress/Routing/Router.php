@@ -36,11 +36,12 @@ class Router
      */
     public function __construct($delimiter = '/', array $dictionary = null)
     {
-        $this->root = new Trie('');
-
         if (empty($delimiter)) {
             throw new \InvalidArgumentException("Delimiter cannot be empty");
         }
+
+        $this->root = new Trie('');
+
         $this->delimiter = $delimiter;
 
         $this->setDictionary($dictionary ?: [
