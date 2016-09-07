@@ -184,10 +184,16 @@ abstract class AbstractAssessment implements IAssessable
         /* If you're after the Normalised numeric mark
          */
         if ($normalised) {
-            return $feedback->getNormalisedMark();
+            if ($feedback) {
+                return $feedback->getNormalisedMark();
+            }
         }
 
-        return $feedback->getHumanReadableMark();
+        if ($feedback) {
+            return $feedback->getHumanReadableMark();
+        }
+
+        return '';
     }
 
     /* Traversals

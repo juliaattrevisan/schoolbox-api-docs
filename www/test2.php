@@ -404,7 +404,7 @@ function dumpFeedback(Participant $participant, IAssessable $assessable, $indent
     if ($allFeedback->count()) {
         $feedback = $allFeedback->first();
 
-        $markValue = $feedback->calculateMark();
+        $markValue = $feedback->getNormalisedMark();
 
         if ($assessable instanceof Task) {
             $mark = "feedback: <em>{$feedback->getComment()}</em> [Completed]";
