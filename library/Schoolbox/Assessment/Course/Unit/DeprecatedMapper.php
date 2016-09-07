@@ -11,7 +11,6 @@ namespace Schoolbox\Assessment\Course\Unit;
 use Component_Homepage_CourseBuilderController;
 use PDO;
 use PDOStatement;
-use Schoolbox\Assessment\Course\Mapper as CourseMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\PredicateBuilder;

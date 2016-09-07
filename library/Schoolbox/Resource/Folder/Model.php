@@ -13,6 +13,9 @@ namespace Schoolbox\Resource\Folder;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\Implementation as CourseImplementation;
+use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\HomepageConfig;
@@ -27,7 +30,7 @@ use Schoolbox\ValueLabelInterface;
  *
  * @package Schoolbox\Resource\Folder
  */
-class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface
+class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext
 {
     use Node\Traits\HasCurriculumNodes;
 
@@ -74,6 +77,19 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      */
     protected $teacher_collection;
 
+    /**
+     * The Course Specification (if any!) that this folder has.
+     *
+     * @var CourseSpecification
+     */
+    protected $courseSpecification;
+
+    /**
+     * The Course Implementations that have been imported onto this folder.
+     *
+     * @var Collection|CourseImplementation[]
+     */
+    protected $courseImplementations;
 
     /**
      * Constructor
@@ -83,6 +99,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     {
         $this->setCodes(new Collection(array()));
         $this->setCurriculumNodes(new Collection());
+        $this->setCourseImplementations(new Collection());
     }
 
     /**
@@ -93,6 +110,16 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     public function hasHomepage()
     {
         return ($this->homepage instanceof HomepageConfig && $this->homepage->getTemplate()->getId());
+    }
+
+    /**
+     * Does this folder have a course specification?
+     *
+     * @return bool
+     */
+    public function hasCourseSpecification()
+    {
+        return ($this->courseSpecification instanceof CourseSpecification && $this->courseSpecification->getId());
     }
 
     /**
@@ -267,6 +294,16 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
+     * If an Assessable is in a folder, then its context is this folder.
+     *
+     * @return $this
+     */
+    public function getFolder()
+    {
+        return $this;
+    }
+
+    /**
      * Decide whether this node is a Root node
      *
      * @return bool
@@ -406,6 +443,42 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     public function setTaskCount($taskCount)
     {
         $this->taskCount = $taskCount;
+        return $this;
+    }
+
+    /**
+     * @return CourseSpecification
+     */
+    public function getCourseSpecification()
+    {
+        return $this->courseSpecification;
+    }
+
+    /**
+     * @param CourseSpecification $courseSpecification
+     * @return static
+     */
+    public function setCourseSpecification(CourseSpecification $courseSpecification)
+    {
+        $this->courseSpecification = $courseSpecification;
+        return $this;
+    }
+
+    /**
+     * @return Collection|CourseImplementation[]
+     */
+    public function getCourseImplementations()
+    {
+        return $this->courseImplementations;
+    }
+
+    /**
+     * @param Collection|CourseImplementation[] $courseImplementations
+     * @return static
+     */
+    public function setCourseImplementations(Collection $courseImplementations)
+    {
+        $this->courseImplementations = $courseImplementations;
         return $this;
     }
 }

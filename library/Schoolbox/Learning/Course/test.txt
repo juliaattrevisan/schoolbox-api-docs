@@ -1,0 +1,293 @@
+<?php
+
+// Copy this file to /www/test.php, then access /test.php on your vagrant box.
+
+require_once __DIR__ . '/../library/Bootstrap.php';
+
+
+// Create a Course Specification for a Folder
+$courseSpecFolder = new Schoolbox\Resource\Folder\Model();
+$courseSpecFolder->setId(51)->setName('Houses');
+$courseSpec       = new Schoolbox\Learning\Course\Specification();
+$courseSpec       = $courseSpec->setFolder($courseSpecFolder);
+// Add the Course Spec back to the Folder
+$courseSpecFolder = $courseSpecFolder->setCourseSpecification($courseSpec);
+
+
+// Create Unit Specifications for all the children of that Folder
+
+// Unit Spec: Fox House
+$foxSpecFolder = new Schoolbox\Resource\Folder\Model();
+$foxSpecFolder
+    ->setId(52)
+    ->setName('Fox House');
+$foxSpec = new Schoolbox\Learning\Course\Unit\Specification();
+$foxSpec->setFolder($foxSpecFolder);
+
+// Fox House Assessables
+$foxDueWork1 = new Schoolbox\Learning\Assessment\DueWork\Model();
+$foxDueWork1
+    ->setId(1)
+    ->setType((new \Schoolbox\Learning\Assessment\DueWork\Type())->setId(1)->setName('Essay'))
+    ->setTitle('Fox House Due Work')
+    ->setAcceptsMultiple()
+    ->showOnlySubmittedStudents();
+
+$foxDueWork2 = new Schoolbox\Learning\Assessment\DueWork\Model();
+$foxDueWork2
+    ->setId(2)
+    ->setType((new \Schoolbox\Learning\Assessment\DueWork\Type())->setId(2)->setName('Homework'))
+    ->setTitle('Fox House Due Work 2')
+    ->setAcceptsMultiple()
+    ->showOnlySubmittedStudents();
+
+$foxSpec->getAssessables()
+        ->add($foxDueWork1)
+        ->add($foxDueWork2);
+
+
+// Unit Spec: Oak House
+$oakSpecFolder = new Schoolbox\Resource\Folder\Model();
+$oakSpecFolder
+    ->setId(54)
+    ->setName('Oak House');
+$oakSpec = new Schoolbox\Learning\Course\Unit\Specification();
+$oakSpec->setFolder($oakSpecFolder);
+
+// Oak House Assessables
+$oakTask1 = new Schoolbox\Learning\Assessment\Task\Model();
+$oakTask1
+    ->setId(3)
+    ->setTitle('Oak Task 1');
+$oakTask2 = new Schoolbox\Learning\Assessment\Task\Model();
+$oakTask2
+    ->setId(4)
+    ->setTitle('Oak Task 2');
+
+$oakSpec->getAssessables()
+        ->add($oakTask1)
+        ->add($oakTask2);
+
+
+// Unit Spec: Thistle House
+$thistleSpecFolder = new Schoolbox\Resource\Folder\Model();
+$thistleSpecFolder
+    ->setId(55)
+    ->setName('Thistle House');
+$thistleSpec = new Schoolbox\Learning\Course\Unit\Specification();
+$thistleSpec->setFolder($thistleSpecFolder);
+
+// Thistle House Assessables
+$thistleQuiz1 = new Schoolbox\Learning\Assessment\Quiz\Model();
+$thistleQuiz1
+    ->setId(5)
+    ->setTitle('Thistle Quiz 1');
+$thistleQuiz2 = new Schoolbox\Learning\Assessment\Quiz\Model();
+$thistleQuiz2
+    ->setId(6)
+    ->setTitle('Thistle Quiz 2');
+
+$thistleSpec->getAssessables()
+            ->add($thistleQuiz1)
+            ->add($thistleQuiz2);
+
+
+// Unit Spec: Dalton House
+$daltonSpecFolder = new Schoolbox\Resource\Folder\Model();
+$daltonSpecFolder
+    ->setId(56)
+    ->setName('Dalton House');
+$daltonSpec = new Schoolbox\Learning\Course\Unit\Specification();
+$daltonSpec->setFolder($daltonSpecFolder);
+
+// Dalton House Assessables
+$daltonTask = new Schoolbox\Learning\Assessment\Task\Model();
+$daltonTask
+    ->setId(7)
+    ->setTitle('Dalton Task');
+
+$daltonQuiz = new Schoolbox\Learning\Assessment\Quiz\Model();
+$daltonQuiz
+    ->setId(8)
+    ->setTitle('Dalton Quiz');
+
+$daltonDueWork = new Schoolbox\Learning\Assessment\DueWork\Model();
+$daltonDueWork
+    ->setId(9)
+    ->setType((new \Schoolbox\Learning\Assessment\DueWork\Type())->setId(3)->setName('Assessment Task'))
+    ->setTitle('Dalton Due Work')
+    ->setAcceptsMultiple()
+    ->showOnlySubmittedStudents();
+
+$daltonSpec->getAssessables()
+           ->add($daltonTask)
+           ->add($daltonDueWork)
+           ->add($daltonQuiz);
+
+
+// Add all unit specs to course spec
+$courseSpec->getUnits()
+           ->add($foxSpec)
+           ->add($oakSpec)
+           ->add($thistleSpec)
+           ->add($daltonSpec);
+
+
+// Create Course Implementation for a class folder
+$unitImplementationFactory   = new \Schoolbox\Learning\Course\Unit\ImplementationFactory();
+$courseImplementationFactory = new \Schoolbox\Learning\Course\ImplementationFactory($unitImplementationFactory);
+
+
+// Create Course Implementations for a few class Folders
+
+
+// French: remove odd numbered unit specs
+$frenchClass = new Schoolbox\Resource\Folder\Model();
+$frenchClass->setId(237)->setName('9AH French');
+$frenchClassCourseImplementation = $courseImplementationFactory->build($courseSpec, $frenchClass);
+$newUnits = new \Schoolbox\Collection();
+foreach ($frenchClassCourseImplementation->getUnits() as $i => $unit) {
+    if ($i % 2 == 0) {
+        $newUnits->add(
+            $unit
+                ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth())
+                ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth())
+        );
+    }
+}
+$frenchClassCourseImplementation->setUnits($newUnits);
+
+
+// English: remove even numbered unit specs
+$englishClass = new Schoolbox\Resource\Folder\Model();
+$englishClass->setId(43)->setName('English 3 4');
+$englishClassCourseImplementation = $courseImplementationFactory->build($courseSpec, $englishClass);
+$newUnits = new \Schoolbox\Collection();
+foreach ($englishClassCourseImplementation->getUnits() as $i => $unit) {
+    if ($i % 2 == 1) {
+        $newUnits->add(
+            $unit
+                ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth()->addDays(3))
+                ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth()->addDays(3))
+        );
+    }
+}
+$englishClassCourseImplementation->setUnits($newUnits);
+
+
+// Science: retain all
+$scienceClass = new Schoolbox\Resource\Folder\Model();
+$scienceClass->setId(357)->setName('Science Unit 2');
+$scienceClassCourseImplementation = $courseImplementationFactory->build($courseSpec, $scienceClass);
+foreach ($scienceClassCourseImplementation->getUnits() as $i => $unit) {
+    $unit
+        ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth()->addDays(13))
+        ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth()->addDays(13));
+}
+
+
+// Add the Course Implementations back to the Spec Folder
+$courseSpecFolder = $courseSpecFolder->setCourseImplementations(
+    $courseSpecFolder->getCourseImplementations()
+                     ->add($frenchClassCourseImplementation)
+                     ->add($englishClassCourseImplementation)
+                     ->add($scienceClassCourseImplementation)
+);
+
+
+// Augmented/Diminished/Reordered Course Implementations for Science Class
+foreach ($scienceClassCourseImplementation->getUnits() as $unit) {
+    switch ($unit->getSpecification()->getFolder()->getId()) {
+        case 52:
+            // Fox House for Science Class:
+            // * Remove first assessable
+            // * Add another
+            $augmentTask = new Schoolbox\Learning\Assessment\Task\Model();
+            $augmentTask->setTitle('Science-only Task');
+            $unit->getAssessables()->slice(1)->add($augmentTask);
+            break;
+
+        case 55:
+            // Thistle House for Science Class:
+            // * Reorder assessables
+            $unit->getAssessables()->sortBy('title', 'desc');
+            break;
+
+        default:
+            break;
+    }
+}
+
+
+// Echo it out
+?>
+
+<h1>Course Specification Folder: <?= $courseSpecFolder->getNameWithCodes() ?> (#<?= $courseSpecFolder->getId() ?>)</h1>
+
+<hr />
+
+<h2>Course Specification</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>Unit Spec Folder Name</th>
+        <th>Unit Spec Folder ID</th>
+        <th>Assessments</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($courseSpecFolder->getCourseSpecification()->getUnits() as $unitSpec): ?>
+        <tr>
+            <td><?= $unitSpec->getFolder()->getNameWithCodes() ?></td>
+            <td><?= $unitSpec->getFolder()->getId() ?></td>
+            <td>
+                <ul>
+                    <?php foreach ($unitSpec->getAssessables() as $assessable): ?>
+                        <li><?= $assessable->getTitle() ?> (<?= $assessable->getTypeName() ?> #<?= $assessable->getId() ?>)</li>
+                    <?php endforeach; ?>
+                </ul>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+    </tbody>
+</table>
+
+<hr />
+
+<h2>Course Implementations</h2>
+
+<?php foreach ($courseSpecFolder->getCourseImplementations() as $courseImplementation): ?>
+    <h3><?= $courseImplementation->getFolder()->getNameWithCodes() ?></h3>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Unit Title</th>
+            <th>Unit Spec Folder Name</th>
+            <th>Unit Spec Folder ID</th>
+            <th>Open Date</th>
+            <th>Close Date</th>
+            <th>Assessments</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($courseImplementation->getUnits() as $unitImplementation): ?>
+            <tr>
+                <td><?= $unitImplementation->getTitle() ?></td>
+                <td><?= $unitImplementation->getSpecification()->getFolder()->getNameWithCodes() ?></td>
+                <td><?= $unitImplementation->getSpecification()->getFolder()->getId() ?></td>
+                <td><?= $unitImplementation->getOpenDate()->getDatabase() ?></td>
+                <td><?= $unitImplementation->getDueDate()->getDatabase() ?></td>
+                <td>
+                    <ul>
+                        <?php foreach ($unitImplementation->getAssessables() as $assessable): ?>
+                            <li><?= $assessable->getTitle() ?> (<?= $assessable->getTypeName() ?> #<?= $assessable->getId() ?>)</li>
+                        <?php endforeach; ?>
+                    </ul>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+<?php endforeach; ?>

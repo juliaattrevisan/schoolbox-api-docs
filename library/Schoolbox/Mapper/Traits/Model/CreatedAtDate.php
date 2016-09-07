@@ -33,7 +33,7 @@ trait CreatedAtDate
      *
      * @return $this
      */
-    public function setCreatedAt($createdAt)
+    public function setCreatedAt(Alaress_Date_Format $createdAt = null)
     {
         $this->createdAt = $createdAt;
         return $this;

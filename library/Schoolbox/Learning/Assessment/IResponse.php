@@ -124,7 +124,7 @@ interface IResponse
      *
      * @return $this
      */
-    public function setCreatedAt($createdAt);
+    public function setCreatedAt(\Alaress_Date_Format $createdAt = null);
 
     /**
      * @return \Alaress_Date_Format
@@ -136,7 +136,7 @@ interface IResponse
      *
      * @return $this
      */
-    public function setUpdatedAt($updatedAt);
+    public function setUpdatedAt(\Alaress_Date_Format $updatedAt = null);
 
     /**
      * @return \Alaress_Date_Format
@@ -147,5 +147,5 @@ interface IResponse
      * @param  \Alaress_Date_Format $deletedAt
      * @return $this
      */
-    public function setDeletedAt($deletedAt);
+    public function setDeletedAt(\Alaress_Date_Format $deletedAt = null);
 }
