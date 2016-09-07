@@ -14,10 +14,6 @@ use \Schoolbox\User;
 
 interface IFeedback
 {
-    /**
-     * Calculate the final mark for this IAssessable
-     */
-    public function calculateMark();
 
     /**
      * This IAssessable has a non-null Mark value

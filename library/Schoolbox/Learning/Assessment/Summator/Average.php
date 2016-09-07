@@ -3,7 +3,7 @@
  * Average
  *
  * Takes an Average of all the most recent normalisedMark Feedbacks for every
- * IResponse that was spawned. Tasks always return null for its calculateMark()
+ * IResponse that was spawned. Tasks always return null for its getNormalisedMark()
  * value, and are excluded from the Average calculations.
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>

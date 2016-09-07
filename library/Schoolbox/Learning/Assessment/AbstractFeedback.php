@@ -65,21 +65,13 @@ class AbstractFeedback implements IFeedback
     protected $publishedAt = null;
 
     /**
-     * Calculate the final mark for this IAssessable
-     */
-    public function calculateMark()
-    {
-        return $this->getNormalisedMark();
-    }
-
-    /**
      * This IAssessable has a non-null Mark value
      *
      * @return bool
      */
     public function isMarked()
     {
-        return $this->calculateMark() !== null;
+        return $this->getNormalisedMark() !== null;
     }
 
     /**

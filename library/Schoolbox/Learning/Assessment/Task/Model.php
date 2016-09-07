@@ -31,17 +31,4 @@ class Model extends AbstractAssessment
     {
         return 'Task';
     }
-
-    /**
-     * @inheritdoc
-     *
-     * Use the most recent Published Feedback as the official value
-     *
-     * @param User $user
-     * @return string
-     */
-    public function calculateMark(User $user)
-    {
-        return $this->getParticipant($user)->findMostRecentPublishedFeedback($this)->calculateMark();
-    }
 }
