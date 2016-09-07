@@ -139,10 +139,12 @@ class Factory
     public function buildSubject($year, User $student, $subjectCode)
     {
         $subject = new Subject();
-        $externalData = $this->getGateway()->getSubject($subjectCode);
+        $externalData = $this->getGateway()->getSubject($year, $subjectCode);
+        $externalData = $this->augmentSubjectWithTeacher($externalData);
         $subject
             ->setName($externalData['sub_desc'])
             ->setDescription($externalData['outline_text'])
+            ->setTeachers($externalData['teachers'])
             ->setStudent($student)
             ->setYear($year)
             ->setSubjectCode($subjectCode)

@@ -532,32 +532,54 @@ class Gateway
     }
 
     /**
-     * Gets the subject outlines for a given subject code.
+     * Gets the subject outlines and teacher codes for a given subject code.
      *
+     * @param int    $year
      * @param string $subjectCode
      *
      * @return array
      */
-    public function getSubject($subjectCode)
+    public function getSubject($year, $subjectCode)
     {
         $query = "
-            SELECT
+            SELECT DISTINCT
                 st.sub_desc,
                 so.outline_text,
-                so.outline_url
+                so.outline_url,
+                ts.tch_code
             FROM suboutline so
-            INNER JOIN subtab st ON so.sub_code=st.sub_code AND so.cmpy_code=st.cmpy_code
+            INNER JOIN subtab st
+                ON so.sub_code=st.sub_code AND so.cmpy_code=st.cmpy_code
+            LEFT JOIN tchsub ts
+                ON st.sub_code = ts.sub_code AND st.cmpy_code = ts.cmpy_code
             WHERE so.sub_code = :code
-            AND so.cmpy_code = '01'
+            AND   ts.year_num = :year
+            AND   ts.class    = :class
+            AND   so.cmpy_code = '01'
         ";
-        list(, $code, ) = explode('-', $subjectCode);
+        list(, $code, $class) = explode('-', $subjectCode);
         $params = array(
-            ':code' => $this->getDatabase()->smartQuote($code),
+            ':code'  => $this->getDatabase()->smartQuote($code),
+            ':year'  => $this->getDatabase()->smartQuote($year),
+            ':class' => $this->getDatabase()->smartQuote($class),
         );
-        $result = $this->getDatabase()->trimRow(
-            $this->getDatabase()->getRow(strtr($query, $params))
+        $allResults = $this->getDatabase()->trimAll(
+            $this->getDatabase()->getAll(strtr($query, $params))
         );
-        return $result ?: array();
+
+        // Reduce to one result
+        $result = [];
+        foreach ($allResults as $singleResult) {
+            if (empty($result)) {
+                $result = $singleResult;
+                $result['tch_code'] = [];
+            }
+            $result['tch_code'][] = $singleResult['tch_code'];
+        }
+        if (!empty($result['tch_code'])) {
+            $result['tch_code'] = array_unique(array_filter($result['tch_code']));
+        }
+        return $result;
     }
 
     /**
