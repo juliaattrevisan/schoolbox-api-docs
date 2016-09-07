@@ -377,6 +377,14 @@ class Module {
         return $this->getInjector()->get('externalUser');
     }
 
+    /**
+     * @return \External_TimetableInterface
+     */
+    protected function getExternalTimetable()
+    {
+        return $this->getInjector()->get('externalTimetable');
+    }
+
 
 
     /**

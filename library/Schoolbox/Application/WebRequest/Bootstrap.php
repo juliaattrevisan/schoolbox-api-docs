@@ -511,6 +511,9 @@ class Bootstrap implements BootstrapInterface {
         // Register External_User service
         $di->set('externalUser', $di->lazyNew(\External_User::class));
 
+        // Register External_Timetable service
+        $di->set('externalTimetable', $di->lazyNew(\External_Timetable::class));
+
 
         // load dependencies into the kernel itself
         $this->kernel->setDependencyInjector($di);
