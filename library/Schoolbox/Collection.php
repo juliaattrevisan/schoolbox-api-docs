@@ -739,10 +739,12 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function __clone()
     {
+        $cloneStack = [];
         foreach ($this as $key => $value) {
             if (is_object($value)) {
-                $this[$key] = clone $value;
+                $cloneStack[$key] = clone $value;
             }
         }
+        $this->setStack($cloneStack);
     }
 }
