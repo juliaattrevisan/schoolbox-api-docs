@@ -82,6 +82,25 @@ abstract class AbstractAssessment implements IAssessable
         $this->setAllParticipants(new Collection());
     }
 
+    /**
+     * George Cloney
+     */
+    public function __clone()
+    {
+        $this->setPublishAt($this->getPublishAt() instanceof \Alaress_Date_Format ? clone $this->getPublishAt() : null);
+        $this->setOpenAt($this->getOpenAt() instanceof \Alaress_Date_Format ? clone $this->getOpenAt() : null);
+        $this->setDueAt($this->getDueAt() instanceof \Alaress_Date_Format ? clone $this->getDueAt() : null);
+        $this->setCloseAt($this->getCloseAt() instanceof \Alaress_Date_Format ? clone $this->getCloseAt() : null);
+
+        /* Explicitly dump away all the Participants
+         */
+        $this->setAllParticipants(new Collection());
+
+        $this->getCreatedAt($this->getCreatedAt() instanceof \Alaress_Date_Format ? clone $this->getCreatedAt() : null);
+        $this->getUpdatedAt($this->getUpdatedAt() instanceof \Alaress_Date_Format ? clone $this->getUpdatedAt() : null);
+        $this->setDeletedAt($this->getDeletedAt() instanceof \Alaress_Date_Format ? clone $this->getDeletedAt() : null);
+    }
+
     /* Delegation Methods
      */
 
@@ -258,10 +277,12 @@ abstract class AbstractAssessment implements IAssessable
 
     /**
      * @param \Alaress_Date_Format $dueAt
+     * @return $this
      */
     public function setDueAt($dueAt)
     {
         $this->dueAt = $dueAt;
+        return $this;
     }
 
     /**
