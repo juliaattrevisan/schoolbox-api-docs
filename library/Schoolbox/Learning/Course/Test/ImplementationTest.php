@@ -83,8 +83,8 @@ class ImplementationTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(2, $impl->getUnits());
         $this->assertEquals(555, $impl->getUnits()->first()->getId());
         $this->assertEquals(666, $impl->getUnits()->last()->getId());
-        $this->assertCount(1, $impl->getUnits());
-        $this->assertEquals(777, $impl->getUnits()->first()->getId());
+        $this->assertCount(1, $clone->getUnits());
+        $this->assertEquals(777, $clone->getUnits()->first()->getId());
 
         // Clone doesn't deep-clone folder or spec (these are non-dependent objects)
         $clone->getFolder()->setId(6789);
