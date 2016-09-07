@@ -8,7 +8,6 @@
 use \Schoolbox\Assessment\Component\SubmissionBox;
 use \Schoolbox\Assessment\Activity;
 use \Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use \Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use \Schoolbox\Assessment\Component\OnlineAssessment\Attempt;
 use \Schoolbox\UserMapper;
