@@ -735,16 +735,18 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     }
 
     /**
-     * Cloning a collection clones all the objects within it.
+     * Creates a deep clone of this collection.
+     *
+     * @return Collection
      */
-    public function __clone()
+    public function deepClone()
     {
-        $cloneStack = [];
+        $clone = new Collection();
         foreach ($this as $key => $value) {
             if (is_object($value)) {
-                $cloneStack[$key] = clone $value;
+                $clone[$key] = clone $value;
             }
         }
-        $this->setStack($cloneStack);
+        return $clone;
     }
 }
