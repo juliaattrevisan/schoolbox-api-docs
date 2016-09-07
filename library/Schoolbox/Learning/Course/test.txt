@@ -57,11 +57,11 @@ $oakSpec->setFolder($oakSpecFolder);
 // Oak House Assessables
 $oakTask1 = new Schoolbox\Learning\Assessment\Task\Model();
 $oakTask1
-    ->setId(1)
+    ->setId(3)
     ->setTitle('Oak Task 1');
 $oakTask2 = new Schoolbox\Learning\Assessment\Task\Model();
 $oakTask2
-    ->setId(2)
+    ->setId(4)
     ->setTitle('Oak Task 2');
 
 $oakSpec->getAssessables()
@@ -80,11 +80,11 @@ $thistleSpec->setFolder($thistleSpecFolder);
 // Thistle House Assessables
 $thistleQuiz1 = new Schoolbox\Learning\Assessment\Quiz\Model();
 $thistleQuiz1
-    ->setId(1)
+    ->setId(5)
     ->setTitle('Thistle Quiz 1');
 $thistleQuiz2 = new Schoolbox\Learning\Assessment\Quiz\Model();
 $thistleQuiz2
-    ->setId(2)
+    ->setId(6)
     ->setTitle('Thistle Quiz 2');
 
 $thistleSpec->getAssessables()
@@ -103,17 +103,17 @@ $daltonSpec->setFolder($daltonSpecFolder);
 // Dalton House Assessables
 $daltonTask = new Schoolbox\Learning\Assessment\Task\Model();
 $daltonTask
-    ->setId(3)
+    ->setId(7)
     ->setTitle('Dalton Task');
 
 $daltonQuiz = new Schoolbox\Learning\Assessment\Quiz\Model();
 $daltonQuiz
-    ->setId(3)
+    ->setId(8)
     ->setTitle('Dalton Quiz');
 
 $daltonDueWork = new Schoolbox\Learning\Assessment\DueWork\Model();
 $daltonDueWork
-    ->setId(3)
+    ->setId(9)
     ->setType((new \Schoolbox\Learning\Assessment\DueWork\Type())->setId(3)->setName('Assessment Task'))
     ->setTitle('Dalton Due Work')
     ->setAcceptsMultiple()
@@ -133,27 +133,57 @@ $courseSpec->getUnits()
            ->add($daltonSpec);
 
 
+// Create Course Implementation for a class folder
+$unitImplementationFactory   = new \Schoolbox\Learning\Course\Unit\ImplementationFactory();
+$courseImplementationFactory = new \Schoolbox\Learning\Course\ImplementationFactory($unitImplementationFactory);
+
+
 // Create Course Implementations for a few class Folders
+
+
+// French: remove odd numbered unit specs
 $frenchClass = new Schoolbox\Resource\Folder\Model();
 $frenchClass->setId(237)->setName('9AH French');
-$frenchClassCourseImplementation = new \Schoolbox\Learning\Course\Implementation();
-$frenchClassCourseImplementation = $frenchClassCourseImplementation
-    ->setFolder($frenchClass)
-    ->setSpecification($courseSpec);
+$frenchClassCourseImplementation = $courseImplementationFactory->build($courseSpec, $frenchClass);
+$newUnits = new \Schoolbox\Collection();
+foreach ($frenchClassCourseImplementation->getUnits() as $i => $unit) {
+    if ($i % 2 == 0) {
+        $newUnits->add(
+            $unit
+                ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth())
+                ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth())
+        );
+    }
+}
+$frenchClassCourseImplementation->setUnits($newUnits);
 
+
+// English: remove even numbered unit specs
 $englishClass = new Schoolbox\Resource\Folder\Model();
 $englishClass->setId(43)->setName('English 3 4');
-$englishClassCourseImplementation = new \Schoolbox\Learning\Course\Implementation();
-$englishClassCourseImplementation = $englishClassCourseImplementation
-    ->setFolder($englishClass)
-    ->setSpecification($courseSpec);
+$englishClassCourseImplementation = $courseImplementationFactory->build($courseSpec, $englishClass);
+$newUnits = new \Schoolbox\Collection();
+foreach ($englishClassCourseImplementation->getUnits() as $i => $unit) {
+    if ($i % 2 == 1) {
+        $newUnits->add(
+            $unit
+                ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth()->addDays(3))
+                ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth()->addDays(3))
+        );
+    }
+}
+$englishClassCourseImplementation->setUnits($newUnits);
 
+
+// Science: retain all
 $scienceClass = new Schoolbox\Resource\Folder\Model();
 $scienceClass->setId(357)->setName('Science Unit 2');
-$scienceClassCourseImplementation = new \Schoolbox\Learning\Course\Implementation();
-$scienceClassCourseImplementation = $scienceClassCourseImplementation
-    ->setFolder($scienceClass)
-    ->setSpecification($courseSpec);
+$scienceClassCourseImplementation = $courseImplementationFactory->build($courseSpec, $scienceClass);
+foreach ($scienceClassCourseImplementation->getUnits() as $i => $unit) {
+    $unit
+        ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth()->addDays(13))
+        ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth()->addDays(13));
+}
 
 
 // Add the Course Implementations back to the Spec Folder
@@ -163,44 +193,6 @@ $courseSpecFolder = $courseSpecFolder->setCourseImplementations(
                      ->add($englishClassCourseImplementation)
                      ->add($scienceClassCourseImplementation)
 );
-
-
-// Create Unit Implementations for the Unit Specs in the Course Spec, and add them to each class.
-// French: only add even numbered unit specs
-// English: only add odd numbered unit specs
-// Science: add all unit specs
-$i = 1;
-foreach ($courseSpec->getUnits() as $unitSpec) {
-    $title = $i . ': ' . $unitSpec->getFolder()->getName();
-    if ($i % 2 == 0) {
-        $frenchClassUnitImplementation = new \Schoolbox\Learning\Course\Unit\Implementation();
-        $frenchClassUnitImplementation
-            ->setTitle($title)
-            ->setSpecification($unitSpec)
-            ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth())
-            ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth())
-            ->populateAssessablesFromSpecification($unitSpec);
-        $frenchClassCourseImplementation->getUnits()->add($frenchClassUnitImplementation);
-    } else {
-        $englishClassUnitImplementation = new \Schoolbox\Learning\Course\Unit\Implementation();
-        $englishClassUnitImplementation
-            ->setTitle($title)
-            ->setSpecification($unitSpec)
-            ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth()->addDays(3))
-            ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth()->addDays(3))
-            ->populateAssessablesFromSpecification($unitSpec);
-        $englishClassCourseImplementation->getUnits()->add($englishClassUnitImplementation);
-    }
-    $scienceClassUnitImplementation = new \Schoolbox\Learning\Course\Unit\Implementation();
-    $scienceClassUnitImplementation
-        ->setTitle($title)
-        ->setSpecification($unitSpec)
-        ->setOpenDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->startOfMonth()->addDays(13))
-        ->setDueDate(Alaress_Date_Format::now()->startOfDay()->addMonths($i)->endOfMonth()->addDays(13))
-        ->populateAssessablesFromSpecification($unitSpec);
-    $scienceClassCourseImplementation->getUnits()->add($scienceClassUnitImplementation);
-    $i++;
-}
 
 
 // Augmented/Diminished/Reordered Course Implementations for Science Class
@@ -285,8 +277,8 @@ foreach ($scienceClassCourseImplementation->getUnits() as $unit) {
                 <td><?= $unitImplementation->getTitle() ?></td>
                 <td><?= $unitImplementation->getSpecification()->getFolder()->getNameWithCodes() ?></td>
                 <td><?= $unitImplementation->getSpecification()->getFolder()->getId() ?></td>
-                <td><?= $unitImplementation->getOpenDate()->getUsingFormat('Y-m-d H:i:s') ?></td>
-                <td><?= $unitImplementation->getDueDate()->getUsingFormat('Y-m-d H:i:s') ?></td>
+                <td><?= $unitImplementation->getOpenDate()->getDatabase() ?></td>
+                <td><?= $unitImplementation->getDueDate()->getDatabase() ?></td>
                 <td>
                     <ul>
                         <?php foreach ($unitImplementation->getAssessables() as $assessable): ?>
