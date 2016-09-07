@@ -80,7 +80,7 @@ class Specification implements AssessmentContext, ISoftDeletable
      * @param Folder $folder
      * @return static
      */
-    public function setFolder($folder)
+    public function setFolder(Folder $folder)
     {
         $this->folder = $folder;
         return $this;
@@ -98,7 +98,7 @@ class Specification implements AssessmentContext, ISoftDeletable
      * @param Collection|IAssessable[] $assessables
      * @return static
      */
-    public function setAssessables($assessables)
+    public function setAssessables(Collection $assessables)
     {
         $this->assessables = $assessables;
         return $this;

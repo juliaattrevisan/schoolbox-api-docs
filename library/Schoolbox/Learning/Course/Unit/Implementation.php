@@ -151,7 +151,7 @@ class Implementation implements AssessmentContext, ISoftDeletable
      * @param UnitSpecification $specification
      * @return static
      */
-    public function setSpecification($specification)
+    public function setSpecification(UnitSpecification $specification)
     {
         $this->specification = $specification;
         return $this;
@@ -169,7 +169,7 @@ class Implementation implements AssessmentContext, ISoftDeletable
      * @param Collection|IAssessable[] $assessables
      * @return static
      */
-    public function setAssessables($assessables)
+    public function setAssessables(Collection $assessables)
     {
         $this->assessables = $assessables;
         return $this;
@@ -205,7 +205,7 @@ class Implementation implements AssessmentContext, ISoftDeletable
      * @param Alaress_Date_Format $openDate
      * @return static
      */
-    public function setOpenDate($openDate)
+    public function setOpenDate(Alaress_Date_Format $openDate)
     {
         $this->openDate = $openDate;
         return $this;
@@ -223,7 +223,7 @@ class Implementation implements AssessmentContext, ISoftDeletable
      * @param Alaress_Date_Format $dueDate
      * @return static
      */
-    public function setDueDate($dueDate)
+    public function setDueDate(Alaress_Date_Format $dueDate)
     {
         $this->dueDate = $dueDate;
         return $this;
@@ -249,7 +249,7 @@ class Implementation implements AssessmentContext, ISoftDeletable
      * @param CourseImplementation $course
      * @return static
      */
-    public function setCourse($course)
+    public function setCourse(CourseImplementation $course)
     {
         $this->course = $course;
         return $this;
