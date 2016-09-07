@@ -61,6 +61,7 @@ class Specification implements AssessmentContext, ISoftDeletable
     public function __construct()
     {
         $this->createdAt = new \Alaress_Date_NullDate();
+        $this->updatedAt = new \Alaress_Date_NullDate();
         $this->deletedAt = new \Alaress_Date_NullDate();
         $this->assessables = new Collection();
     }
