@@ -370,6 +370,16 @@ class Module {
     }
 
     /**
+     * @return \External_UserInterface
+     */
+    protected function getExternalUser()
+    {
+        return $this->getInjector()->get('externalUser');
+    }
+
+
+
+    /**
      * Initializes controller classes into the dependency injector.
      *
      * @param ContainerInterface $injector The dependency injection container.
