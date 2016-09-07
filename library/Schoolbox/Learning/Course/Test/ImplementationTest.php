@@ -56,16 +56,6 @@ class ImplementationTest extends \PHPUnit_Framework_TestCase
              ->add((new UnitImplementation())->setId(555))
              ->add((new UnitImplementation())->setId(666));
 
-        // Verify attributes
-        $this->assertEquals(9876, $impl->getFolder()->getId());
-        $this->assertEquals(12345, $impl->getSpecification()->getId());
-        $this->assertCount(2, $impl->getUnits());
-        $this->assertEquals(555, $impl->getUnits()->first()->getId());
-        $this->assertEquals(666, $impl->getUnits()->last()->getId());
-        $this->assertEquals('2016-09-01 00:00:00', $impl->getCreatedAt()->getDatabase());
-        $this->assertEquals('2016-09-02 00:00:00', $impl->getUpdatedAt()->getDatabase());
-        $this->assertEquals('2016-09-03 00:00:00', $impl->getDeletedAt()->getDatabase());
-
         // Clone deep-clones dates and units (dependent objects)
         $clone = clone $impl;
         $clone->getCreatedAt()->addMonths(1);
@@ -74,6 +64,7 @@ class ImplementationTest extends \PHPUnit_Framework_TestCase
         $clone->getUnits()->first()->setId(777);
         $clone->getUnits()->slice(0, 1);
 
+        // Verify dependent attributes
         $this->assertEquals('2016-09-01 00:00:00', $impl->getCreatedAt()->getDatabase());
         $this->assertEquals('2016-10-01 00:00:00', $clone->getCreatedAt()->getDatabase());
         $this->assertEquals('2016-09-02 00:00:00', $impl->getUpdatedAt()->getDatabase());
@@ -90,6 +81,7 @@ class ImplementationTest extends \PHPUnit_Framework_TestCase
         $clone->getFolder()->setId(6789);
         $clone->getSpecification()->setId(54321);
 
+        // Verify non-dependent attributes
         $this->assertEquals(6789, $impl->getFolder()->getId());
         $this->assertEquals(6789, $clone->getFolder()->getId());
         $this->assertEquals(54321, $impl->getSpecification()->getId());

@@ -70,20 +70,6 @@ class ImplementationTest extends \PHPUnit_Framework_TestCase
              ->add((new Task())->setId(999))
              ->add((new Task())->setId(888));
 
-        // Verify attributes
-        $this->assertEquals('Something', $impl->getTitle());
-        $this->assertEquals(111, $impl->getCourse()->getId());
-        $this->assertEquals(9876, $impl->getFolder()->getId());
-        $this->assertEquals(12345, $impl->getSpecification()->getId());
-        $this->assertCount(2, $impl->getAssessables());
-        $this->assertEquals(999, $impl->getAssessables()->first()->getId());
-        $this->assertEquals(888, $impl->getAssessables()->last()->getId());
-        $this->assertEquals('2016-08-01 00:00:00', $impl->getOpenDate()->getDatabase());
-        $this->assertEquals('2016-10-01 00:00:00', $impl->getDueDate()->getDatabase());
-        $this->assertEquals('2016-09-01 00:00:00', $impl->getCreatedAt()->getDatabase());
-        $this->assertEquals('2016-09-02 00:00:00', $impl->getUpdatedAt()->getDatabase());
-        $this->assertEquals('2016-09-03 00:00:00', $impl->getDeletedAt()->getDatabase());
-
         // Clone deep-clones dates and units (dependent objects)
         $clone = clone $impl;
         $clone->setTitle('Nothing');
@@ -95,6 +81,7 @@ class ImplementationTest extends \PHPUnit_Framework_TestCase
         $clone->getAssessables()->first()->setId(777);
         $clone->getAssessables()->slice(0, 1);
 
+        // Verify dependent attributes
         $this->assertEquals('Nothing', $clone->getTitle());
         $this->assertEquals('Something', $impl->getTitle());
         $this->assertEquals('2016-09-01 00:00:00', $clone->getOpenDate()->getDatabase());
@@ -119,6 +106,7 @@ class ImplementationTest extends \PHPUnit_Framework_TestCase
         $clone->getCourse()->setId(222);
         $clone->getCourse()->getFolder()->setId(6789);
 
+        // Verify non-dependent attributes
         $this->assertEquals(222, $impl->getCourse()->getId());
         $this->assertEquals(6789, $impl->getFolder()->getId());
         $this->assertEquals(54321, $impl->getSpecification()->getId());
