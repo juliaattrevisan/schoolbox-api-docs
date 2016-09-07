@@ -108,10 +108,17 @@ class Specification implements AssessmentContext, ISoftDeletable
      */
     public function __clone()
     {
-        $this
-            ->setCreatedAt(clone $this->getCreatedAt())
-            ->setUpdatedAt(clone $this->getUpdatedAt())
-            ->setDeletedAt(clone $this->getDeletedAt())
-            ->setUnits(clone $this->getUnits());
+        if (is_object($this->getCreatedAt())) {
+            $this->setCreatedAt(clone $this->getCreatedAt());
+        }
+        if (is_object($this->getUpdatedAt())) {
+            $this->setUpdatedAt(clone $this->getUpdatedAt());
+        }
+        if (is_object($this->getDeletedAt())) {
+            $this->setDeletedAt(clone $this->getDeletedAt());
+        }
+        if (is_object($this->getUnits())) {
+            $this->setUnits(clone $this->getUnits());
+        }
     }
 }

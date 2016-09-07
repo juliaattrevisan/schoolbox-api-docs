@@ -260,11 +260,23 @@ class Implementation implements AssessmentContext, ISoftDeletable
      */
     public function __clone()
     {
-        // Always objects
-        $this
-            ->setCreatedAt(clone $this->getCreatedAt())
-            ->setUpdatedAt(clone $this->getUpdatedAt())
-            ->setDeletedAt(clone $this->getDeletedAt())
-            ->setAssessables(clone $this->getAssessables());
+        if (is_object($this->getOpenDate())) {
+            $this->setOpenDate(clone $this->getOpenDate());
+        }
+        if (is_object($this->getDueDate())) {
+            $this->setDueDate(clone $this->getDueDate());
+        }
+        if (is_object($this->getCreatedAt())) {
+            $this->setCreatedAt(clone $this->getCreatedAt());
+        }
+        if (is_object($this->getUpdatedAt())) {
+            $this->setUpdatedAt(clone $this->getUpdatedAt());
+        }
+        if (is_object($this->getDeletedAt())) {
+            $this->setDeletedAt(clone $this->getDeletedAt());
+        }
+        if (is_object($this->getAssessables())) {
+            $this->setAssessables(clone $this->getAssessables());
+        }
     }
 }
