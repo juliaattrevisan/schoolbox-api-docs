@@ -8,12 +8,13 @@
 
             {# Display topic tabs #}
 
+            {% set active = false %}
             {% for topic in topics %}
 
                 {# Only display topic if there is actually news in it #}
 
                 {% if news[topic.id] | length %}
-                    <dd {% if loop.first %}class="active"{% endif %}>
+                    <dd {% if not active %}class="active"{% set active = true %}{% endif %}>
                         <a href="#component{{ componentInstanceId }}-{{ topic.id }}">{{ topic.name }}</a>
                     </dd>
                 {% endif %}
@@ -34,8 +35,10 @@
 
                 {# Articles grouped by topic #}
 
+                {% set active = false %}
+
                 {% for topic in topics %}
-                    <ul class="news-list content {%  if loop.first %}active{% endif %}" id="component{{ componentInstanceId }}-{{ topic.id }}">
+                    <ul class="news-list content {% if not active and news[topic.id] | length %}active{% set active = true %}{% endif %}" id="component{{ componentInstanceId }}-{{ topic.id }}">
                         {% for item in news[topic.id] %}
                             <li>
                                 <div class="list-item">
