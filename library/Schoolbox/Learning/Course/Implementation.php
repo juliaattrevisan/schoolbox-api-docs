@@ -143,8 +143,6 @@ class Implementation implements AssessmentContext, ISoftDeletable
         if (is_object($this->getDeletedAt())) {
             $this->setDeletedAt(clone $this->getDeletedAt());
         }
-        if (is_object($this->getUnits())) {
-            $this->setUnits(clone $this->getUnits());
-        }
+        $this->setUnits($this->getUnits()->deepClone());
     }
 }
