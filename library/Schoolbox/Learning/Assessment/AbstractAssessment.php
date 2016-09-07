@@ -136,7 +136,10 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function getHumanReadableMark(User $user, $publishedOnly)
     {
-        return $this->getMark($user, $publishedOnly, false);
+        // TODO: Implement getHumanReadableMark() method. This method gets the output from getNormalisedMark, then pipes that into the mark scheme (which doesn't yet exist on this class)
+        // return $this->getMark($user, $publishedOnly, false);
+
+        return 'TODO: Pass NormalisedMark value through MarkScheme';
     }
 
     /**

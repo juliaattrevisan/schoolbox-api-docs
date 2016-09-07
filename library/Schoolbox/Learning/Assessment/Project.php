@@ -55,7 +55,8 @@ class Project extends AbstractAssessment
     public function getHumanReadableMark(User $user, $publishedOnly)
     {
         // TODO: Implement getHumanReadableMark() method. This method gets the output from getNormalisedMark, then pipes that into the mark scheme (which doesn't yet exist on this class)
-        return 'TODO';
+
+        return 'TODO: Pass NormalisedMark value through MarkScheme';
     }
 
     /**
