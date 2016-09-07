@@ -265,8 +265,6 @@ class Implementation implements AssessmentContext, ISoftDeletable
             ->setCreatedAt(clone $this->getCreatedAt())
             ->setUpdatedAt(clone $this->getUpdatedAt())
             ->setDeletedAt(clone $this->getDeletedAt())
-            ->setAssessables(clone $this->getAssessables())
-            ->setSpecification(clone $this->getSpecification())
-            ->setCourse(clone $this->getCourse());
+            ->setAssessables(clone $this->getAssessables());
     }
 }
