@@ -37,6 +37,7 @@ use Schoolbox\Error;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\Access as AccessMapper;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -112,6 +113,9 @@ class Controller extends Base\Base
     /** @var Access */
     protected $access;
 
+    /** @var AccessMapper */
+    protected $accessMapper;
+    
     /**
      * Set dependencies
      */
@@ -134,6 +138,7 @@ class Controller extends Base\Base
         $this->setUserAccessMapper(UserAccessMapper::getInstance());
         $this->setUserMapper(UserMapper::getInstance());
         $this->setErrorMapper(Error\Mapper::getInstance());
+        $this->setAccessMapper(AccessMapper::getInstance());
     }
 
 
@@ -1031,6 +1036,17 @@ class Controller extends Base\Base
 
         $allFolders = $this->getFolderMapper()->findAll();
 
+        $courseFolders = $this->getFolderMapper()->findAllChildren($this->getCourseMapper()->getFacultyNode()->getId());
+
+        // Need to NNIAN permission for inherited folders
+
+        foreach ($courseFolders as $folder) {
+            if ($folder->getInherit()) {
+                $permissions[$folder->getId()] = $this->getAccessMapper()->getFolderAccess($this->getUser(),
+                    [$folder->getId()]);
+            }
+        }
+        
         // Build flat array of nodes
         $nodes = array(0 => new TreeNode(NULL, 0, NULL));
         foreach($allFolders as $folder){
@@ -2504,6 +2520,25 @@ class Controller extends Base\Base
     public function setUserMapper($userMapper)
     {
         $this->userMapper = $userMapper;
+        return $this;
+    }
+
+    /**
+     * @return AccessMapper
+     */
+    public function getAccessMapper()
+    {
+        return $this->accessMapper;
+    }
+
+
+    /**
+     * @param AccessMapper $accessMapper
+     * @return static
+     */
+    public function setAccessMapper($accessMapper)
+    {
+        $this->accessMapper = $accessMapper;
         return $this;
     }
 
