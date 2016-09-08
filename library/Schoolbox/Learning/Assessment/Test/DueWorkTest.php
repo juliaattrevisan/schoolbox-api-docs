@@ -375,7 +375,6 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('2016-08-01 09:00:00', $submission->getCreatedAt()->getDatabase());
         $this->assertEquals('2016-08-01 09:00:00', $submission->getUpdatedAt()->getDatabase());
         $this->assertEquals(null, $submission->getDeletedAt());
-
     }
 
     /**
@@ -383,6 +382,24 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
      */
     public function testFeedback()
     {
+        $id = 2;
+        $title = 'Enter the Realm of Terroarrrr';
+        $description = 'Diablo was found in the land of terroarrrrr! Find him, and whack him!';
+        $typeName = 'Essay';
+
+        $files = [
+            [
+                'id' => 1,
+                'hash' => 'abcdefg12341234',
+                'filename' => 'myfile1.jpg'
+            ],
+            [
+                'id' => 2,
+                'hash' => 'zxvzxcvzxcv945786947',
+                'filename' => 'myfile2.jpg'
+            ],
+        ];
+
         $feedbackFiles = [
             [
                 'id' => 112,
@@ -392,19 +409,84 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-//        $feedback = (new DueWorkFeedback())
-//            ->setAssessable($dueWork)
-//            ->setNormalisedMark(-3)
-//            ->setComment('This is a flawed piece of work.')
-//            ->setAllFiles((new Collection())
-//                ->add((new DueWorkFeedbackFile())
-//                    ->setId($feedbackFiles[0]['id'])
-//                    ->setHash($feedbackFiles[0]['hash'])
-//                    ->setCrocodocId($feedbackFiles[0]['crocodocId'])
-//                    ->setFilename($feedbackFiles[0]['filename'])))
-//            ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
-//            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
-//            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
+        $dueWork = new DueWork();
+        $dueWork
+            ->setId($id)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setType((new DueWorkType())
+                ->setId(1)
+                ->setName($typeName))
+            ->setCreator($this->somodio)
+            ->setAllParticipants((new Collection())
+                ->add(new Participant($this->hodes))
+                ->add(new Participant($this->bsalem))
+                ->add(new Participant($this->sberryhill))
+                ->add(new Participant($this->asaxon)))
+            ->setAllFiles((new Collection())
+                ->add((new DueWorkFile())
+                    ->setId($files[0]['id'])
+                    ->setHash($files[0]['hash'])
+                    ->setFilename($files[0]['filename']))
+                ->add((new DueWorkFile())
+                    ->setId($files[1]['id'])
+                    ->setHash($files[1]['hash'])
+                    ->setFilename($files[1]['filename'])))
+            ->setPublishAt($this->thirteenDaysFromNow)
+            ->setOpenAt($this->fourteenDaysFromNow)
+            ->setDueAt($this->twentyDaysFromNow)
+            ->setCloseAt($this->thirtyDaysFromNow)
+            ->setCreatedAt($this->today)
+            ->setUpdatedAt($this->today);
+
+        $feedback = (new DueWorkFeedback())
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(-3)
+            ->setComment('This is a flawed piece of work.')
+            ->setReviewer($this->celia)
+            ->setAllFiles((new Collection())
+                ->add((new DueWorkFeedbackFile())
+                    ->setId($feedbackFiles[0]['id'])
+                    ->setHash($feedbackFiles[0]['hash'])
+                    ->setCrocodocId($feedbackFiles[0]['crocodocId'])
+                    ->setFilename($feedbackFiles[0]['filename'])))
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        /* Check that it linked to the Due Work correctly
+         */
+        $this->assertEquals(2, $feedback->getAssessable()->getId());
+        $this->assertEquals(-3, $feedback->getNormalisedMark());
+        $this->assertEquals('This is a flawed piece of work.', $feedback->getComment());
+
+        /* Authors
+         */
+        $this->assertEquals($this->celia->getId(), $feedback->getReviewer()->getId());
+
+        /* Files
+         */
+        for ($i = 0; $i < count($feedbackFiles); $i++) {
+            $currentFile = $feedbackFiles[$i];
+
+            $this->assertEquals($currentFile['id'], $feedback->getAllFiles()->getOffset($i)->getId());
+            $this->assertEquals($currentFile['hash'], $submission->getAllFiles()->getOffset($i)->getStorage()->getHash());
+            $this->assertEquals($currentFile['crocodocId'], $feedback->getAllFiles()->getOffset($i)->getCrocodocId());
+            $this->assertEquals($currentFile['filename'], $feedback->getAllFiles()->getOffset($i)->getFilename());
+        }
+
+        /* One of them has a Plagscan
+         */
+        $this->assertEquals($submissionFiles[0]['plagscan']['id'], $submission->getAllFiles()->getOffset(0)->getPlagscan()->getId());
+        $this->assertEquals($submissionFiles[0]['plagscan']['status'], $submission->getAllFiles()->getOffset(0)->getPlagscan()->getStatus());
+        $this->assertEquals($submissionFiles[0]['plagscan']['score'], $submission->getAllFiles()->getOffset(0)->getPlagscan()->getScore());
+        $this->assertEquals($submissionFiles[0]['plagscan']['html'], $submission->getAllFiles()->getOffset(0)->getPlagscan()->getHtml());
+
+        /* Dates
+         */
+        $this->assertEquals('2016-08-01 09:00:00', $submission->getCreatedAt()->getDatabase());
+        $this->assertEquals('2016-08-01 09:00:00', $submission->getUpdatedAt()->getDatabase());
+        $this->assertEquals(null, $submission->getDeletedAt());
     }
 //
 //    /**
