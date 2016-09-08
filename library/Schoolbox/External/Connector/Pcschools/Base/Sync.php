@@ -36,7 +36,7 @@ class Sync implements SyncInterface
         $query = "
             SELECT
                 S.STUDKEY       AS student_id,
-                ''              AS network_login,
+                ID.LOGIN        AS network_login,
                 ''              AS student_title,
                 S.GIVEN_NAME    AS student_given_name,
                 S.GIVEN_NAME    AS student_preferred,
@@ -50,6 +50,7 @@ class Sync implements SyncInterface
                 ''              AS student_boarding_house,
                 S.CAMPUS        AS student_campus
             FROM STUDENT S
+            LEFT JOIN [IDENTITY] AS ID ON S.STUDENT# = ID.MEMBER#
             WHERE (S.DATE_DEPART IS NULL OR DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0)
             ORDER BY S.STUDKEY ASC
         ";
@@ -145,7 +146,7 @@ class Sync implements SyncInterface
         $query = "
             SELECT
                 T.TEACHER_CODE   AS staff_id,
-                ''               AS network_login,
+                ID.LOGIN         AS network_login,
                 ''               AS active_flag,
                 T.SALUTATION     AS staff_title,
                 T.GIVEN_NAMES    AS staff_given_name,
@@ -159,6 +160,7 @@ class Sync implements SyncInterface
                 ''               AS staff_category,
                 ''               AS staff_department
             FROM TEACHER T
+            LEFT JOIN [IDENTITY] AS ID ON T.TEACHER# = ID.MEMBER#
             WHERE (T.DATE_LEFT IS NULL OR DATEDIFF(DAY, T.DATE_LEFT, '1753-01-01') = 0)
             ORDER BY T.TEACHER_CODE ASC
         ";
