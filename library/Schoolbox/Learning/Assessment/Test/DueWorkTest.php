@@ -447,7 +447,8 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ->setAllFiles((new Collection())
                 ->add((new DueWorkFeedbackFile())
                     ->setId($feedbackFiles[0]['id'])
-                    ->setHash($feedbackFiles[0]['hash'])
+                    ->setStorage((new Storage())
+                        ->setHash($feedbackFiles[0]['hash']))
                     ->setCrocodocId($feedbackFiles[0]['crocodocId'])
                     ->setFilename($feedbackFiles[0]['filename'])))
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -470,23 +471,17 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             $currentFile = $feedbackFiles[$i];
 
             $this->assertEquals($currentFile['id'], $feedback->getAllFiles()->getOffset($i)->getId());
-            $this->assertEquals($currentFile['hash'], $submission->getAllFiles()->getOffset($i)->getStorage()->getHash());
+            $this->assertEquals($currentFile['hash'], $feedback->getAllFiles()->getOffset($i)->getStorage()->getHash());
             $this->assertEquals($currentFile['crocodocId'], $feedback->getAllFiles()->getOffset($i)->getCrocodocId());
             $this->assertEquals($currentFile['filename'], $feedback->getAllFiles()->getOffset($i)->getFilename());
         }
 
-        /* One of them has a Plagscan
-         */
-        $this->assertEquals($submissionFiles[0]['plagscan']['id'], $submission->getAllFiles()->getOffset(0)->getPlagscan()->getId());
-        $this->assertEquals($submissionFiles[0]['plagscan']['status'], $submission->getAllFiles()->getOffset(0)->getPlagscan()->getStatus());
-        $this->assertEquals($submissionFiles[0]['plagscan']['score'], $submission->getAllFiles()->getOffset(0)->getPlagscan()->getScore());
-        $this->assertEquals($submissionFiles[0]['plagscan']['html'], $submission->getAllFiles()->getOffset(0)->getPlagscan()->getHtml());
-
         /* Dates
          */
-        $this->assertEquals('2016-08-01 09:00:00', $submission->getCreatedAt()->getDatabase());
-        $this->assertEquals('2016-08-01 09:00:00', $submission->getUpdatedAt()->getDatabase());
-        $this->assertEquals(null, $submission->getDeletedAt());
+        $this->assertEquals('2016-08-03 14:15:16', $feedback->getPublishedAt()->getDatabase());
+        $this->assertEquals('2016-08-01 13:14:15', $feedback->getCreatedAt()->getDatabase());
+        $this->assertEquals('2016-08-02 14:14:12', $feedback->getUpdatedAt()->getDatabase());
+        $this->assertEquals(null, $feedback->getDeletedAt());
     }
 //
 //    /**
