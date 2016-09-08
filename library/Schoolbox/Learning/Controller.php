@@ -104,6 +104,8 @@ class Controller extends Base
      */
     public function getDue(User $student)
     {
+        var_dump($student);die();
+
         // TODO - generate data
         $assessmentsDue = [
             Assessment\Controller::getDummyAssessment(2),

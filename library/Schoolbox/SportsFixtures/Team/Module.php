@@ -27,7 +27,7 @@ class Module extends RestfulModule
      */
     public function __construct(ContainerInterface $injector, RestfulModule $context)
     {
-        parent::__construct($injector, Mapper::getInstance(), 'teams', $context, 'sportsfixturesTeam');
+        parent::__construct($injector, $injector->get('mapperFactory')->get(Mapper::class), 'teams', $context, 'sportsfixturesTeam');
     }
 
     /**
@@ -60,7 +60,7 @@ class Module extends RestfulModule
             $matcher,
             '(?:postAddPlayers|postRemovePlayers|postReorderPlayers)',
             function ($params) {
-                return ['team' => Mapper::getInstance()->findById($params['entityId'])];
+                return ['team' => $this->getMapper()->findById($params['entityId'])];
             }
         );
     }

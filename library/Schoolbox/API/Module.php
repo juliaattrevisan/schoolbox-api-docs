@@ -60,7 +60,7 @@ class Module extends BaseModule {
             = $injector->lazyNew('Authenticator');
 
         $injector->setters['Schoolbox\\API\\Controller']['setRegistryMapper']
-            = $injector->lazyNew('Schoolbox\\MobileApp\\RegistryMapper');
+            = $this->getMapperFactory()->getLazy('Schoolbox\\MobileApp\\RegistryMapper');
 
     }
 

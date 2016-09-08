@@ -33,7 +33,7 @@ class Admin implements ModuleConfigInterface
 
         // Messages
 
-        $messagesModule = new Module($kernel->getDependencyInjector());
+        $messagesModule = new Module($di);
         $messagesModule->init('/adminv2/messages');
 
         // Admin home
@@ -67,7 +67,7 @@ class Admin implements ModuleConfigInterface
         $bulkAddFolders->init('/adminv2/bulk-add-folders');
 
         // Admin terms manager page
-        $terms = new \Schoolbox\Admin\Terms\Module($di, Term\Mapper::getInstance());
+        $terms = new \Schoolbox\Admin\Terms\Module($di);
         $terms->init('/adminv2/terms');
 
         // Pastoral care import page

@@ -28,21 +28,6 @@ class Module extends BaseModule
     protected $basename = 'learningFeedback';
 
     /**
-     * @var External_UserInterface
-     */
-    protected $externalDb;
-
-    /**
-     * @var UserMapper
-     */
-    protected $userMapper;
-
-    /**
-     * @var ErrorMapper
-     */
-    protected $errorMapper;
-
-    /**
      * @inheritdoc
      */
     public function initRoutes(Router $router, $basePath)
@@ -78,7 +63,7 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
-                    new Rule\IsUserOrParentOfUser($this->getExternalDb(), $this->getUserMapper(), 'studentId')
+                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
                 )
             );
 
@@ -105,7 +90,7 @@ class Module extends BaseModule
                 }
                 return [
                     'assessment' => $assessment,
-                    'student' => $student,
+                    'student'    => $student,
                 ];
             }
         );
@@ -140,7 +125,7 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'errorMapper' => $this->getErrorMapper(),
+                'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             ])
         );
     }
@@ -149,32 +134,11 @@ class Module extends BaseModule
      */
 
     /**
-     * @return External_UserInterface
-     */
-    protected function getExternalDb()
-    {
-        return $this->externalDb;
-    }
-
-    /**
-     * @param  External_UserInterface $externalDb
-     * @return static
-     */
-    public function setExternalDb($externalDb)
-    {
-        $this->externalDb = $externalDb;
-        return $this;
-    }
-
-    /**
      * @return UserMapper
      */
     protected function getUserMapper()
     {
-        if (!$this->userMapper) {
-            $this->userMapper = $this->getInjector()->get('mapperFactory')->get(UserMapper::class);
-        }
-        return $this->userMapper;
+        return $this->getMapperFactory()->get(UserMapper::class);
     }
 
     /**
@@ -182,9 +146,6 @@ class Module extends BaseModule
      */
     protected function getErrorMapper()
     {
-        if (!$this->errorMapper) {
-            $this->errorMapper = $this->getInjector()->get('mapperFactory')->get(ErrorMapper::class);
-        }
-        return $this->errorMapper;
+        return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 }

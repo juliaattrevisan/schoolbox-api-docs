@@ -28,7 +28,7 @@ class Module extends RestfulModule
      */
     public function __construct(ContainerInterface $injector, RestfulModule $context)
     {
-        parent::__construct($injector, Mapper::getInstance(), 'divisions', $context, 'sportsfixturesDivision');
+        parent::__construct($injector, $injector->get('mapperFactory')->get(Mapper::class), 'divisions', $context, 'sportsfixturesDivision');
     }
 
     /**
@@ -78,7 +78,7 @@ class Module extends RestfulModule
             $matcher,
             '(?:postModify|postAddPlayers|postRemovePlayers|postReorderPlayers|postUploadPlayers)',
             function ($params) {
-                $division = Mapper::getInstance()->findById($params['entityId']);
+                $division = $this->getMapper()->findById($params['entityId']);
                 return [
                     'params'   => $params,
                     'division' => $division
@@ -120,7 +120,7 @@ class Module extends RestfulModule
      */
     protected function preInitControllerDependencies(ContainerInterface $injector)
     {
-        $injector->params[Controller::class]['mapper'] = $injector->lazy(function () { Mapper::getInstance(); });
+        $injector->params[Controller::class]['mapper'] = $this->getMapperFactory()->getLazy(Mapper::class);
     }
 
 }

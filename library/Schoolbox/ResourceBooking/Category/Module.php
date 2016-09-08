@@ -16,8 +16,8 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Twig_Loader_Chain;
-use Twig_Loader_Filesystem;
 use Schoolbox\Permission\Access\UserAccess;
+
 
 class Module extends BaseModule
 {
@@ -35,15 +35,16 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutePreloads(PathMatcher $matcher) {
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
         // Add the item to params, if ID is in the route.
         $this->addRoutePreload(
             $matcher,
             '.*',
-            function($params) {
+            function($params)  {
                 if (array_key_exists('id', $params)) {
                     return array(
-                        'item' => Mapper::getInstance()->findById($params['id']),
+                        'item' => $this->getMapper()->findById($params['id']),
                     );
                 }
                 return array();
@@ -80,7 +81,7 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector) {
         $injector->setters['Schoolbox\\ResourceBooking\\Category\\Controller']['setMapper']
-            = $injector->lazyNew('Schoolbox\\ResourceBooking\\Category\\Mapper');
+            = $this->getMapperFactory()->getLazy('Schoolbox\\ResourceBooking\\Category\\Mapper');
         $injector->setters['Schoolbox\\ResourceBooking\\Category\\Controller']['setPaginator']
             = $injector->lazyNew(
             'Alaress\\Paginator\\UrlPaginator',
@@ -94,6 +95,17 @@ class Module extends BaseModule
             'controller:'.$this->basename,
             $injector->lazyNew('Schoolbox\\ResourceBooking\\Category\\Controller')
         );
+    }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return Mapper
+     */
+    protected function getMapper()
+    {
+        return $this->getMapperFactory()->get(Mapper::class);
     }
 
 }

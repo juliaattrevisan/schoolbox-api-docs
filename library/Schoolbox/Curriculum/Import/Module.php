@@ -35,6 +35,7 @@ class Module extends BaseModule
 
     /**
      * Only users with write permission to the curriculum service may import.
+     * @param Authorizer $authorizer
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
@@ -71,12 +72,12 @@ class Module extends BaseModule
             $injector->lazyNew('Schoolbox\\Curriculum\\Import\\Controller')
         );
         $injector->setters['Schoolbox\\Curriculum\\Import\\Controller']['setSourceMapper']
-            = $injector->lazyNew('Schoolbox\\Curriculum\\Source\\Mapper');
+            = $this->getMapperFactory()->getLazy('Schoolbox\\Curriculum\\Source\\Mapper');
         $injector->setters['Schoolbox\\Curriculum\\Import\\Controller']['setAreaMapper']
-            = $injector->lazyNew('Schoolbox\\Curriculum\\LearningArea\\Mapper');
+            = $this->getMapperFactory()->getLazy('Schoolbox\\Curriculum\\LearningArea\\Mapper');
         $injector->setters['Schoolbox\\Curriculum\\Import\\Controller']['setLevelMapper']
-            = $injector->lazyNew('Schoolbox\\Curriculum\\LearningLevel\\Mapper');
+            = $this->getMapperFactory()->getLazy('Schoolbox\\Curriculum\\LearningLevel\\Mapper');
         $injector->setters['Schoolbox\\Curriculum\\Import\\Controller']['setNodeMapper']
-            = $injector->lazyNew('Schoolbox\\Curriculum\\Node\\Mapper');
+            = $this->getMapperFactory()->getLazy('Schoolbox\\Curriculum\\Node\\Mapper');
     }
 }

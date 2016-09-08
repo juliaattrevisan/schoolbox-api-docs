@@ -10,6 +10,7 @@ namespace Config\Modules\Custom\Stk;
 use Alaress\Application\Kernel;
 use Custom\Stk\OleReport\Module as OleReportModule;
 use Config\Modules\ModuleConfigInterface;
+use External_User;
 
 
 /**
@@ -31,9 +32,6 @@ class OleReport implements ModuleConfigInterface
         $di = $kernel->getDependencyInjector();
         if ($di->get('config')->get('site_location') === 'stk') {
             $module = new OleReportModule($di);
-            $module
-                ->setExternalDb($di->newInstance('\\External_User'))
-                ->setUserMapper($di->newInstance('\\Schoolbox\\UserMapper'));
             $module->init('/modules/custom/stk/oleReport');
         }
     }

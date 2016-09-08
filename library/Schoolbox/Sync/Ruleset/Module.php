@@ -99,7 +99,7 @@ class Module extends BaseModule
             'controller:'.$this->basename,
             $injector->lazyNew(
                 Controller::class,
-                ['mimetypeMapper' => $injector->lazyNew(MimetypeMapper::class),]
+                ['mimetypeMapper' => $this->getMapperFactory()->getLazy(MimetypeMapper::class),]
             )
         );
     }

@@ -42,7 +42,7 @@ class Module extends RestfulModule
      */
     public function __construct(ContainerInterface $injector, RestfulModule $context)
     {
-        parent::__construct($injector, Mapper::getInstance(), 'results', $context, 'sportsfixturesResult');
+        parent::__construct($injector, $injector->get('mapperFactory')->get(Mapper::class), 'results', $context, 'sportsfixturesResult');
     }
 
     /**
@@ -138,14 +138,14 @@ class Module extends RestfulModule
         // these routes require that the entity exist
         $this->addRoutePreload($matcher, '(?:getCreateFormForTeam)', function ($params) {
             try {
-                $team = TeamMapper::getInstance()->findById($params['teamId']);
+                $team = $this->getTeamMapper()->findById($params['teamId']);
             }
             catch (MapperException $e) {
-                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
             }
 
             return [
-                'entity' => $this->mapper->createModel(),
+                'entity' => $this->getMapper()->createModel(),
                 'context' => $this->findContextById($params['contextId']),
                 'team' => $team
             ];
@@ -153,8 +153,8 @@ class Module extends RestfulModule
 
         $this->addRoutePreload($matcher, '(?:createResultForTeam)', function ($params) {
             return [
-                'entity' => $this->mapper->createModel(),
-                'team' => TeamMapper::getInstance()->createModel()
+                'entity' => $this->getMapper()->createModel(),
+                'team' => $this->getTeamMapper()->createModel()
             ];
         });
 
@@ -163,10 +163,10 @@ class Module extends RestfulModule
          */
         $this->addRoutePreload($matcher, '(?:getResultForTeam)', function ($params) {
             try {
-                $team = TeamMapper::getInstance()->findById($params['teamId']);
+                $team = $this->getTeamMapper()->findById($params['teamId']);
             }
             catch (MapperException $e) {
-                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_SPORTSFIXTURES_TEAM_NOT_FOUND);
             }
 
             return [
@@ -175,4 +175,25 @@ class Module extends RestfulModule
             ];
         });
     }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return TeamMapper
+     */
+    protected function getTeamMapper()
+    {
+        return $this->getMapperFactory()->get(TeamMapper::class);
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(ErrorMapper::class);
+    }
+
+
 }

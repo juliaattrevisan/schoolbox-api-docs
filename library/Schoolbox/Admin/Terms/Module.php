@@ -13,7 +13,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Schoolbox\Assessment\Term;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Twig_Loader_Chain;
 
 /**
@@ -26,20 +26,13 @@ class Module extends BaseModule
     protected $basename = 'adminTerms';
 
     /**
-     * @var Term\Mapper;
-     */
-    protected $termMapper;
-
-    /**
      * Constructor
      *
      * @param ContainerInterface $injector
-     * @param Term\Mapper        $mapper
      */
-    public function __construct(ContainerInterface $injector, Term\Mapper $mapper)
+    public function __construct(ContainerInterface $injector)
     {
         parent::__construct($injector);
-        $this->termMapper = $mapper;
     }
 
     /**
@@ -75,7 +68,7 @@ class Module extends BaseModule
         $this
             ->addRoutePreload($matcher, '.*', function($params) {
                 if (array_key_exists('id', $params)) {
-                    return ['term' => $this->termMapper->findById($params['id']),];
+                    return ['term' => $this->getTermMapper()->findById($params['id']),];
                 }
                 return [];
             })
@@ -91,7 +84,9 @@ class Module extends BaseModule
             'controller:'.$this->basename,
             $injector->lazyNew(
                 Controller::class,
-                ['termMapper' => $this->termMapper,]
+                [
+                    'termMapper' => $this->getMapperFactory()->getLazy(TermMapper::class),
+                ]
             )
         );
     }
@@ -102,5 +97,16 @@ class Module extends BaseModule
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return TermMapper
+     */
+    protected function getTermMapper()
+    {
+        return $this->getMapperFactory()->get(TermMapper::class);
     }
 }

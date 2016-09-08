@@ -24,22 +24,15 @@ class Learning implements ModuleConfigInterface
     public function configure($kernel)
     {
         $namespace  = 'learning';
-        $di         = $kernel->getDependencyInjector();
-        $externalDb = $di->newInstance(External_User::class);
+        $di = $kernel->getDependencyInjector();
 
         $learningModule = new LearningModule($di);
-        $learningModule
-            ->setExternalDb($externalDb)
-            ->init("/$namespace");
+        $learningModule->init("/$namespace");
 
         $assessmentModule = new AssessmentModule($di);
-        $assessmentModule
-            ->setExternalDb($externalDb)
-            ->init("/$namespace");
+        $assessmentModule->init("/$namespace");
 
         $feedbackModule = new FeedbackModule($di);
-        $feedbackModule
-            ->setExternalDb($externalDb)
-            ->init("/$namespace");
+        $feedbackModule->init("/$namespace");
     }
 }

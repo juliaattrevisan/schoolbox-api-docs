@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Custom\Meriden\Pastoral\StudentInvolvement\Subject;
 use External_UserInterface;
 use House;
 use HouseMapper;
@@ -28,24 +29,6 @@ use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
-    /**
-     * Dependency on external user database.
-     *
-     * Required for checking that the requesting user is the student's parent.
-     *
-     * @var External_UserInterface
-     */
-    protected $externalDb;
-
-    /**
-     * Dependency on user mapper.
-     *
-     * Required for checking that the requesting user is the student's parent.
-     *
-     * @var UserMapper
-     */
-    protected $userMapper;
-
     protected $basename = 'customMeridenPastoral';
 
     /**
@@ -79,7 +62,7 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
-                    new Rule\IsUserOrParentOfUser($this->externalDb, $this->userMapper, 'id')
+                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'id')
                 )
             )
         ;
@@ -91,15 +74,14 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
         // Search for the user
-        // TODO move the mappers out of here, inject their dependency
-        $userMapper = $this->userMapper;
+
         $this->addRoutePreload(
             $matcher,
             '(?:index|subject|currentReport)',
-            function ($params) use ($userMapper) {
-                $student = $userMapper->findWithSubjects($params['id']);
+            function ($params) {
+                $student = $this->getUserMapper()->findWithSubjects($params['id']);
                 $student->setSubjectCollection(
-                    SubjectMapper::getInstance()->findAllForStudent($student)
+                    $this->getSubjectMapper()->findAllForStudent($student)
                 );
                 try {
                     // School house is actually an integer.
@@ -111,7 +93,7 @@ class Module extends BaseModule
                     } else {
                         $houseId = $schoolHouse;
                     }
-                    $student->setSchoolHouse(HouseMapper::getInstance()->findById($houseId));
+                    $student->setSchoolHouse($this->getHouseMapper()->findById($houseId));
                 } catch (\Exception $e) {
                     // noop - the controller will die at this point anyway
                 }
@@ -144,9 +126,9 @@ class Module extends BaseModule
         $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['gateway']
             = $injector->lazyNew('Custom\\Meriden\\Pastoral\\StudentInvolvement\\Gateway');
         $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['categoryMapper']
-            = $injector->lazyNew(Folder\Mapper::class);
+            = $this->getMapperFactory()->getLazy(Folder\Mapper::class);
         $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['userMapper']
-            = $injector->lazyNew('Schoolbox\\UserMapper');
+            = $this->getMapperFactory()->getLazy('Schoolbox\\UserMapper');
         $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['gradesService']
             = Grades::getInstance();
 
@@ -159,25 +141,30 @@ class Module extends BaseModule
         );
     }
 
-    /**
-     * @param  External_UserInterface $externalDb
-     *
-     * @return $this
+    /* Getters / Setters
      */
-    public function setExternalDb($externalDb)
+
+    /**
+     * @return UserMapper
+     */
+    protected function getUserMapper()
     {
-        $this->externalDb = $externalDb;
-        return $this;
+        return $this->getMapperFactory()->get(UserMapper::class);
     }
 
     /**
-     * @param  UserMapper $userMapper
-     *
-     * @return $this
+     * @return HouseMapper
      */
-    public function setUserMapper($userMapper)
+    protected function getHouseMapper()
     {
-        $this->userMapper = $userMapper;
-        return $this;
+        return $this->getMapperFactory()->get(HouseMapper::class);
+    }
+
+    /**
+     * @return SubjectMapper
+     */
+    protected function getSubjectMapper()
+    {
+        return $this->getMapperFactory()->get(SubjectMapper::class);
     }
 }

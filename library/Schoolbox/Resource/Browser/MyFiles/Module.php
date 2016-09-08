@@ -29,8 +29,8 @@ class Module extends AbstractModule
     {
         return array_merge(parent::getSetterList($ci), [
             'setTreeBuilder'  => $ci->lazyNew(TreeBuilder::class),
-            'setFolderMapper' => $ci->lazyNew(My\Folder\Mapper::class),
-            'setFileMapper'   => $ci->lazyNew(My\File\Mapper::class),
+            'setFolderMapper' => $this->getMapperFactory()->getLazy(My\Folder\Mapper::class),
+            'setFileMapper'   => $this->getMapperFactory()->getLazy(My\File\Mapper::class),
             'setNodeType'     => NodeFactory::MYFILE,
         ]);
     }

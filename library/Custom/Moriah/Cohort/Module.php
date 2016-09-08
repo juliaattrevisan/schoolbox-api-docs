@@ -13,10 +13,9 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use External_UserInterface;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
-use Schoolbox\Assessment\Term;
-use Schoolbox\Resource\Folder;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
@@ -34,26 +33,6 @@ class Module extends BaseModule
     protected $basename = 'customMoriahCohort';
 
     /**
-     * @var UserMapper
-     */
-    protected $userMapper;
-
-    /**
-     * @var Folder\Mapper
-     */
-    protected $folderMapper;
-
-    /**
-     * @var Term\Mapper
-     */
-    protected $termMapper;
-
-    /**
-     * @var External_UserInterface
-     */
-    protected $externalDb;
-
-    /**
      * @inheritdoc
      */
     public function initRoutes(Router $router, $basePath)
@@ -61,17 +40,6 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'classList', $basePath, '/student/{studentId}');
         $this->addGetRoute($router, 'classReport', $basePath, '/student/{studentId}/class/{classId}');
         $this->addGetRoute($router, 'classReportForTerm', $basePath, '/student/{studentId}/class/{classId}/term/{termCode}');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function preInitControllerDependencies(ContainerInterface $injector)
-    {
-        $this->userMapper   = UserMapper::getInstance();
-        $this->folderMapper = Folder\Mapper::getInstance();
-        $this->termMapper   = Term\Mapper::getInstance();
-        $this->externalDb   = new \External_User();
     }
 
     /**
@@ -91,7 +59,7 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
-                    new Rule\IsParentOfUser($this->externalDb, $this->userMapper, 'studentId')
+                    new Rule\IsParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
                 )
             )
         );
@@ -106,21 +74,21 @@ class Module extends BaseModule
             $matcher,
             '(?:classList|classReport|classReportForTerm)',
             function ($params) {
-                return ['student' => $this->userMapper->findById($params['studentId']),];
+                return ['student' => $this->getUserMapper()->findById($params['studentId']),];
             }
         );
         $this->addRoutePreload(
             $matcher,
             '(?:classReport|classReportForTerm)',
             function ($params) {
-                return ['class' => $this->folderMapper->findById($params['classId']),];
+                return ['class' => $this->getFolderMapper()->findById($params['classId']),];
             }
         );
         $this->addRoutePreload(
             $matcher,
             'classReportForTerm',
             function ($params) {
-                return ['term' => $this->termMapper->findOneByColumn('code', $params['termCode']),];
+                return ['term' => $this->getTermMapper()->findOneByColumn('code', $params['termCode']),];
             }
         );
     }
@@ -143,11 +111,38 @@ class Module extends BaseModule
             $injector->lazyNew(
                 Controller::class,
                 [
-                    'folderMapper'       => $this->folderMapper,
-                    'unitInstanceMapper' => $injector->lazyNew(UnitInstanceMapper::class),
-                    'termMapper'         => $this->termMapper,
+                    'folderMapper'       => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                    'unitInstanceMapper' => $this->getMapperFactory()->getLazy(UnitInstanceMapper::class),
+                    'termMapper'         => $this->getMapperFactory()->getLazy(TermMapper::class),
                 ]
             )
         );
+    }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return UserMapper
+     */
+    protected function getUserMapper()
+    {
+        return $this->getMapperFactory()->get(UserMapper::class);
+    }
+
+    /**
+     * @return FolderMapper
+     */
+    protected function getFolderMapper()
+    {
+        return $this->getMapperFactory()->get(FolderMapper::class);
+    }
+
+    /**
+     * @return TermMapper
+     */
+    protected function getTermMapper()
+    {
+        return $this->getMapperFactory()->get(TermMapper::class);
     }
 }
