@@ -572,6 +572,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
 
         $submission = new DueWorkSubmission();
         $submission
+            ->setId(553)
             ->setAssessable($dueWork)
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
@@ -614,21 +615,59 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $submission->getAllFeedback()->add($feedback);
+        $dueWork->getParticipant($this->hodes)->getAllResponses()->add($submission);
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
+
+        /* Freefloating Feedback
+         *
+         * This feedback isn't associated with a particular Submission,
+         * just the Assessable itself
+         */
+        $floatingFeedback = (new DueWorkFeedback())
+            ->setId(4223)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(37)
+            ->setComment('Actually it is ok')
+            ->setReviewer($this->celia)
+            ->setAllFiles(new Collection())
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
         /* Check everything connects up
          */
         $this->assertEquals(2, $submission->getAssessable()->getId());
         $this->assertEquals(2, $feedback->getAssessable()->getId());
         $this->assertCount(1, $submission->getAllFeedback());
-        $this->assertCount(1, $dueWork->getParticipant($this->hodes)->getAllFeedbacks());
-        $this->assertEquals(3385, $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->first()->getId());
+
+        /* Total number of Submissions
+         */
+        $this->assertCount(1, $dueWork->getParticipant($this->hodes)->getAllResponses());
+        $this->assertCount(2, $dueWork->getParticipant($this->hodes)->findAllFeedbackForAssessable($dueWork));
+
+        /* Feedback setup
+         * The Freefloater isn't published
+         */
+        $this->assertEquals(3385, $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->getOffset(0)->getId());
+        $this->assertEquals(true, $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->getOffset(0)->isPublished());
+        $this->assertEquals(false, $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->getOffset(1)->isPublished());
+
+        /* Total number of Feedbacks
+         */
+        $this->assertCount(2, $dueWork->getParticipant($this->hodes)->getAllFeedbacks());
+        $this->assertCount(2, $dueWork->getParticipant($this->hodes)->findAllFeedbackForAssessable($dueWork));
+
+        /* Feedbacks directly associated with Assessable
+         * and not the Submission itself
+         */
+        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->getOffset(1)->getId());
     }
-//
-//    /**
-//     * Test that Due Work Feedback Marks are stored correctly
-//     */
-//    public function testMarks()
-//    {
-//    }
+
+    /**
+     * Test that Due Work Feedback Marks are stored correctly
+     */
+    public function testMarks()
+    {
+    }
 }
