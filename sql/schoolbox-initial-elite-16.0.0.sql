@@ -6011,12 +6011,6 @@ CREATE TABLE `ups_effect` (
 
 LOCK TABLES `ups_effect` WRITE;
 /*!40000 ALTER TABLE `ups_effect` DISABLE KEYS */;
-INSERT INTO `ups_effect` VALUES (1,3,'userAccessRemove',2,'[[\"172\",\"173\",\"118\",\"174\",\"175\",\"176\",\"162\",\"164\",\"167\",\"169\",\"170\",\"120\"]]');
-INSERT INTO `ups_effect` VALUES (2,3,'userAccessRead',1,'[\"{:year.level}\",{\"1\":\"172\",\"2\":\"173\",\"3\":\"118\",\"4\":\"174\",\"5\":\"175\",\"6\":\"176\",\"7\":\"162\",\"8\":\"164\",\"9\":\"120\",\"10\":\"167\",\"11\":\"169\",\"12\":\"170\"}]');
-INSERT INTO `ups_effect` VALUES (3,1,'userAccessRemove',2,'[[\"172\",\"173\",\"118\",\"174\",\"175\",\"176\",\"162\",\"164\",\"120\",\"167\",\"169\",\"170\"]]');
-INSERT INTO `ups_effect` VALUES (4,1,'userAccessRead',1,'[\"{:students.year.level}\",{\"1\":\"172\",\"2\":\"173\",\"3\":\"118\",\"4\":\"174\",\"5\":\"175\",\"6\":\"176\",\"7\":\"162\",\"8\":\"164\",\"9\":\"120\",\"10\":\"167\",\"11\":\"169\",\"12\":\"170\"}]');
-INSERT INTO `ups_effect` VALUES (5,4,'userAccessRemove',2,'[[\"172\",\"173\",\"118\",\"174\",\"175\",\"176\",\"162\",\"164\",\"120\",\"167\",\"169\",\"170\"]]');
-INSERT INTO `ups_effect` VALUES (6,4,'userAccessWrite',1,'[\"{:meta.position}\",{\"YLCO9\":\"120\"}]');
 INSERT INTO `ups_effect` VALUES (7,5,'externalId',2,'[\"{:id}\"]');
 INSERT INTO `ups_effect` VALUES (8,5,'username',2,'[\"{:account.login}\"]');
 INSERT INTO `ups_effect` VALUES (9,5,'title',2,'[\"{:title}\"]');
@@ -6171,9 +6165,6 @@ CREATE TABLE `ups_rule` (
 
 LOCK TABLES `ups_rule` WRITE;
 /*!40000 ALTER TABLE `ups_rule` DISABLE KEYS */;
-INSERT INTO `ups_rule` VALUES (1,'parent',1,1,'Year Level Groups','This rule adds parents to the appropriate year level page dynamically.');
-INSERT INTO `ups_rule` VALUES (3,'student',1,1,'Year Level Pages','This rule adds students to the appropriate year level page dynamically.');
-INSERT INTO `ups_rule` VALUES (4,'staff',1,1,'Year Level Groups','This rule adds year level coordinators to the appropriate year level communication page with write access dynamically.');
 INSERT INTO `ups_rule` VALUES (5,'student',1,2,'General Information','');
 INSERT INTO `ups_rule` VALUES (6,'student',1,3,'Options set on creation only','');
 INSERT INTO `ups_rule` VALUES (7,'student',1,7,'Year Level','');
