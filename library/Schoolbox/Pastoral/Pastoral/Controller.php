@@ -1244,7 +1244,7 @@ class Controller extends Base
     }
 
     /**
-     * @param $pastoralUploadQueueMapper
+     * @param PastoralUploadQueueMapper $pastoralUploadQueueMapper
      */
     public function setPastoralUploadQueueMapper($pastoralUploadQueueMapper) {
         $this->pastoralUploadQueueMapper = $pastoralUploadQueueMapper;
