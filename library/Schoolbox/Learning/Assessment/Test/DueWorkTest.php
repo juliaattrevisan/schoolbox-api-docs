@@ -440,6 +440,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ->setUpdatedAt($this->today);
 
         $feedback = (new DueWorkFeedback())
+            ->setId(3385)
             ->setAssessable($dueWork)
             ->setNormalisedMark(-3)
             ->setComment('This is a flawed piece of work.')
@@ -483,14 +484,146 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('2016-08-02 14:14:12', $feedback->getUpdatedAt()->getDatabase());
         $this->assertEquals(null, $feedback->getDeletedAt());
     }
-//
-//    /**
-//     * Test that Due Work can contain Responses and Feedback meaningfully
-//     * including the shortcut that Feedbacks have to their Due Work
-//     */
-//    public function testResponseWithFeedback()
-//    {
-//    }
+
+    /**
+     * Test that Due Work can contain Responses and Feedback meaningfully
+     * including the shortcut that Feedbacks have to their Due Work
+     */
+    public function testResponseWithFeedback()
+    {
+
+        $id = 2;
+        $title = 'Enter the Realm of Terroarrrr';
+        $description = 'Diablo was found in the land of terroarrrrr! Find him, and whack him!';
+        $typeName = 'Essay';
+
+        $files = [
+            [
+                'id' => 1,
+                'hash' => 'abcdefg12341234',
+                'filename' => 'myfile1.jpg'
+            ],
+            [
+                'id' => 2,
+                'hash' => 'zxvzxcvzxcv945786947',
+                'filename' => 'myfile2.jpg'
+            ],
+        ];
+
+        $submissionFiles = [
+            [
+                'id' => 11,
+                'hash' => 's89789d9hw3thsug8923u5',
+                'crocodocId' => 'vjfh-6677=eirj-01928333',
+                'filename' => 'mark this Sir.xlsx',
+                'plagscan' => [
+                    'id' => 1234,
+                    'status' => 1,
+                    'score' => '93% plagiariased',
+                    'html' => '<div><strong>YOU CHEATED</strong></div>'
+                ]
+            ],
+            [
+                'id' => 23,
+                'hash' => 'lk5j34kl5jousdio',
+                'crocodocId' => 'vjfh-6677=eirj-01928333',
+                'filename' => 'and this too.docx'
+            ],
+        ];
+
+        $feedbackFiles = [
+            [
+                'id' => 112,
+                'hash' => 'lj23lj2llj5l2jsdkjf90',
+                'crocodocId' => 'j239jf-23mndi9f-1234nns9fh-5nl6i0f',
+                'filename' => 'This is the correct response.txt',
+            ],
+        ];
+
+        $dueWork = new DueWork();
+        $dueWork
+            ->setId($id)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setType((new DueWorkType())
+                ->setId(1)
+                ->setName($typeName))
+            ->setCreator($this->somodio)
+            ->setAllParticipants((new Collection())
+                ->add(new Participant($this->hodes))
+                ->add(new Participant($this->bsalem))
+                ->add(new Participant($this->sberryhill))
+                ->add(new Participant($this->asaxon)))
+            ->setAllFiles((new Collection())
+                ->add((new DueWorkFile())
+                    ->setId($files[0]['id'])
+                    ->setHash($files[0]['hash'])
+                    ->setFilename($files[0]['filename']))
+                ->add((new DueWorkFile())
+                    ->setId($files[1]['id'])
+                    ->setHash($files[1]['hash'])
+                    ->setFilename($files[1]['filename'])))
+            ->setPublishAt($this->thirteenDaysFromNow)
+            ->setOpenAt($this->fourteenDaysFromNow)
+            ->setDueAt($this->twentyDaysFromNow)
+            ->setCloseAt($this->thirtyDaysFromNow)
+            ->setCreatedAt($this->today)
+            ->setUpdatedAt($this->today);
+
+        $submission = new DueWorkSubmission();
+        $submission
+            ->setAssessable($dueWork)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setAllFiles((new Collection())
+                ->add((new DueWorkSubmissionFile())
+                    ->setId($submissionFiles[0]['id'])
+                    ->setStorage((new Storage())
+                        ->setHash($submissionFiles[0]['hash']))
+                    ->setCrocodocId($submissionFiles[0]['crocodocId'])
+                    ->setFilename($submissionFiles[0]['filename'])
+                    ->setPlagscan((new DueWorkSubmissionFilePlagscan())
+                        ->setId($submissionFiles[0]['plagscan']['id'])
+                        ->setStatus($submissionFiles[0]['plagscan']['status'])
+                        ->setScore($submissionFiles[0]['plagscan']['score'])
+                        ->setHtml($submissionFiles[0]['plagscan']['html'])))
+                ->add((new DueWorkSubmissionFile())
+                    ->setId($submissionFiles[1]['id'])
+                    ->setStorage((new Storage())
+                        ->setHash($submissionFiles[1]['hash']))
+                    ->setCrocodocId($submissionFiles[1]['crocodocId'])
+                    ->setFilename($submissionFiles[1]['filename'])))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $feedback = (new DueWorkFeedback())
+            ->setId(3385)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(-3)
+            ->setComment('This is a flawed piece of work.')
+            ->setReviewer($this->celia)
+            ->setAllFiles((new Collection())
+                ->add((new DueWorkFeedbackFile())
+                    ->setId($feedbackFiles[0]['id'])
+                    ->setStorage((new Storage())
+                        ->setHash($feedbackFiles[0]['hash']))
+                    ->setCrocodocId($feedbackFiles[0]['crocodocId'])
+                    ->setFilename($feedbackFiles[0]['filename'])))
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $submission->getAllFeedback()->add($feedback);
+        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
+
+        /* Check everything connects up
+         */
+        $this->assertEquals(2, $submission->getAssessable()->getId());
+        $this->assertEquals(2, $feedback->getAssessable()->getId());
+        $this->assertCount(1, $submission->getAllFeedback());
+        $this->assertCount(1, $dueWork->getParticipant($this->hodes)->getAllFeedbacks());
+        $this->assertEquals(3385, $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->first()->getId());
+    }
 //
 //    /**
 //     * Test that Due Work Feedback Marks are stored correctly
