@@ -10,7 +10,7 @@
     <div class="small-12 columns island">
         <form action="#">
             <section>
-                {% block dueWork %}
+                {% block createDueWork %}
                 <fieldset class="content">
                     <legend>
                         File Attachments
@@ -69,9 +69,9 @@
                         <!--Rubric Here-->
                     </div>
                 </fieldset>
-                {% endblock dueWork %}
+                {% endblock createDueWork %}
 
-                {% block quiz %}
+                {% block createQuiz %}
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>Max Attempts
@@ -101,7 +101,20 @@
                         </label>
                     </div>
                 </fieldset>
-                {% endblock quiz %}
+                {% endblock creatQuiz %}
+
+                {% block createTask %}
+                    <fieldset class="content">
+                        <div class="small-10 columns">
+                            <label>Url
+                                <input type="text" placeholder="Url">
+                            </label>
+                        </div>
+                        <div class="small-2 columns">
+                            <a href="#" class="button icon-attach">Attach</a>
+                        </div>
+                    </fieldset>
+                {% endblock createTask %}
             </section>
             <div class="row">
                 <div class="small-6 column">
