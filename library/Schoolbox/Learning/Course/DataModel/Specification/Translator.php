@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Course\DataModel\Specification;
 
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 
 /**
  * Translation class between a Course Specification and its data model.
@@ -45,10 +46,46 @@ class Translator
                 ->setUpdatedAt($specification->getUpdatedAt())
                 ->setDeletedAt($specification->getDeletedAt())
             ;
+            // TODO add translation of assessables
             $dataModel->getUnits()->add($unitDataModel);
         }
 
         // If I am going to persist here, I need mappers to have been injected.
         return $dataModel;
+    }
+
+    /**
+     * Translates the data model to a domain model.
+     *
+     * @param Model $dataModel
+     * @return CourseSpecification
+     */
+    public function translateToDomainModel(Model $dataModel)
+    {
+        $specification = new CourseSpecification();
+        $specification
+            ->setId($dataModel->getId())
+            ->setFolder($dataModel->getFolder())
+            ->setCreatedAt($dataModel->getCreatedAt())
+            ->setUpdatedAt($dataModel->getUpdatedAt())
+            ->setDeletedAt($dataModel->getDeletedAt())
+        ;
+
+        // Constitute Unit Specs
+        foreach ($dataModel->getUnits() as $unitDataModel) {
+            // TODO move to a translator for unit specs
+            $unitSpecification = new UnitSpecification();
+            $unitSpecification
+                ->setId($unitDataModel->getId())
+                ->setFolder($unitDataModel->getFolder())
+                ->setCreatedAt($unitDataModel->getCreatedAt())
+                ->setUpdatedAt($unitDataModel->getUpdatedAt())
+                ->setDeletedAt($unitDataModel->getDeletedAt())
+            ;
+            // TODO add translation of assessables
+            $specification->getUnits()->add($unitSpecification);
+        }
+
+        return $specification;
     }
 }
