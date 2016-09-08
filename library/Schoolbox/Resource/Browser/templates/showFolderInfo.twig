@@ -1,5 +1,9 @@
 {% if access > 0 or user.isSuperuser %}
 
+    {% set colouring -%}
+        style="border-bottom: solid 0.25rem {{ folder.colour }};"
+    {%- endset %}
+
 <ul class="breadcrumb">
     {% for node in tree %}
         <li>
@@ -14,7 +18,9 @@
 
 <div class="row">
     <div class="small-4 column text-center meta-preview">
-        {% if folder.hasHomepage %}
+        {% if folder.hasCoverImage %}
+            <img class="icon" src="/storage/image.php?hash={{ folder.coverImage.hash }}&size=square128" alt="{{ folder.name }}" {{ colouring }} />
+        {% elseif folder.hasHomepage %}
             <a class="icon-{{ icon }} icon-64" title="View Homepage" href="/homepage/{{ folder.id }}"></a>
         {% else %}
             <div class="icon-{{ icon }} icon-64" alt="{{ folder.name }}"></div>
