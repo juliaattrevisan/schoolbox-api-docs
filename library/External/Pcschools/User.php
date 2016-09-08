@@ -432,7 +432,7 @@ class External_Pcschools_User implements External_UserInterface
                     '' AS StudentBoardingHouse,
                     S.CAMPUS AS StudentCampus
                 FROM STUDENT S
-                LEFT JOIN \"IDENTITY\" AS ID ON S.STUDENT# = ID.MEMBER#
+                LEFT JOIN [IDENTITY] AS ID ON S.STUDENT# = ID.MEMBER#
                 WHERE DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0
             ")
         );
@@ -637,7 +637,7 @@ class External_Pcschools_User implements External_UserInterface
                     S.CAMPUS AS StudentCampus,
                     S.SEX AS StudentGender
                 FROM FAMILY AS F
-                LEFT JOIN \"IDENTITY\" AS ID ON F.IDENTITY_ID# = ID.MEMBER#
+                LEFT JOIN [IDENTITY] AS ID ON F.IDENTITY_ID# = ID.MEMBER#
                 INNER JOIN STUDENT AS S ON F.FAMKEY = S.FAMILY_CODE
                 WHERE DATEDIFF(DAY, S.DATE_DEPART, '1753-01-01') = 0
             ")
@@ -737,7 +737,7 @@ class External_Pcschools_User implements External_UserInterface
                     T.STATUS AS StaffCategory,
                     '' AS StaffDepartment
                 FROM TEACHER T
-                LEFT JOIN \"IDENTITY\" AS ID ON T.TEACHER# = ID.MEMBER#
+                LEFT JOIN [IDENTITY] AS ID ON T.TEACHER# = ID.MEMBER#
                 LEFT JOIN CODEMAST AS T_CAMPUS ON T.CAMPUS = T_CAMPUS.CODE AND T_CAMPUS.TYPE = 'CAMPUS'
                 WHERE DATEDIFF(DAY, T.DATE_LEFT, '1753-01-01') = 0
             ")
