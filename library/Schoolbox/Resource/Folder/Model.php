@@ -10,15 +10,18 @@
 namespace Schoolbox\Resource\Folder;
 
 
+use Alaress\Color\Color;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Resource\AbstractFolder;
 use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\HomepageConfig;
+use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\ValueLabelInterface;
@@ -33,6 +36,7 @@ use Schoolbox\ValueLabelInterface;
 class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext
 {
     use Node\Traits\HasCurriculumNodes;
+    use DeletedAtDate;
 
     /**
      * A homepage instance
@@ -69,6 +73,12 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * @var \Schoolbox\Resource\Group
      */
     protected $group;
+
+    /** @var IStorage */
+    protected $coverImage;
+
+    /** @var Color */
+    protected $colour;
 
     /**
      * A collection of user instances
@@ -271,16 +281,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * Is deleted
-     *
-     * @return bool
-     */
-    public function isDeleted()
-    {
-        return ($this->getDeletedAt() instanceof \Alaress_Date_Format && !$this->getDeletedAt()->isNull());
-    }
-
-    /**
      * Return a value/label array pair
      *
      * @return array
@@ -404,26 +404,6 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * Set deleted at
-     *
-     * @param \Alaress_Date_Format $deletedAt
-     */
-    public function setDeletedAt($deletedAt)
-    {
-        $this->deletedAt = $deletedAt;
-    }
-
-    /**
-     * Get deleted at
-     *
-     * @return \Alaress_Date_Format
-     */
-    public function getDeletedAt()
-    {
-        return $this->deletedAt;
-    }
-
-    /**
      * Get task count
      *
      * @return int
@@ -481,4 +461,53 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
         $this->courseImplementations = $courseImplementations;
         return $this;
     }
+
+
+    /**
+     * @return Color
+     */
+    public function getColour()
+    {
+        return $this->colour;
+    }
+
+
+    /**
+     * @param Color $colour
+     * @return $this
+     */
+    public function setColour($colour)
+    {
+        $this->colour = $colour;
+        return $this;
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function hasCoverImage()
+    {
+        return $this->getCoverImage() instanceof IStorage && strlen($this->getCoverImage()->getHash());
+    }
+
+    /**
+     * @return IStorage
+     */
+    public function getCoverImage()
+    {
+        return $this->coverImage;
+    }
+
+
+    /**
+     * @param IStorage $coverImage
+     * @return $this
+     */
+    public function setCoverImage($coverImage)
+    {
+        $this->coverImage = $coverImage;
+        return $this;
+    }
+
 }
