@@ -127,7 +127,7 @@ class Healthcheck
 
     private function PcschoolsCheckConnection()
     {
-        $this->log .= "\nMaze Connection Check\n";
+        $this->log .= "\nPC School Connection Check\n";
         $this->MssqlConnection();
     }
 
@@ -252,7 +252,7 @@ class Healthcheck
 
     private function PcschoolsCheckTables()
     {
-        $this->log .= "\nPCSchools Permission Check - Tables\n";
+        $this->log .= "\nPC School Permission Check - Tables\n";
         $list[] = 'TIMEFILE';
         $list[] = 'SUB';
         $list[] = 'SUBJECT';
@@ -270,13 +270,33 @@ class Healthcheck
             $this->log .= "  $table : ";
             $db = new MSSQL();
             $db->debug = true;
-            $result = $db->query("SELECT TOP 1 * FROM $table");
+            $result = $db->query("SELECT TOP 1 * FROM [$table]");
             if ($result) {
                 $this->log .= "OK\n";
             } else {
                 $this->log .= "\n    Failed - ".mssql_get_last_message()."\n";
             }
             unset($db,$result);
+        }
+    }
+
+    private function PcschoolsCheckStoredProcedures()
+    {
+        $this->log .= "\nPC School Permission Check - Stored Procedures\n";
+        $db = new MSSQL();
+        $db->debug = true;
+        $splist[] = array(
+            'spSelTimetable',
+            array(
+                array('@DATE',           date('Ymd'),          SQLVARCHAR, false, false, -1),
+                array('@TIMEPERIOD',     '',                   SQLVARCHAR, false, false, -1),
+                array('@STUDKEY',        '',                   SQLVARCHAR, false, false, -1),
+                array('@TEACHERCODE',    '',                   SQLVARCHAR, false, false, -1),
+            )
+        );
+
+        foreach ($splist as $sp) {
+            $this->executeProcedure($db, $sp[0], $sp[1]);
         }
     }
 
