@@ -34,25 +34,6 @@
         </div>
     </div>
 
-    {# Teacher can go under course description #}
-    {% if report.subjectReport.teachers is not empty %}
-        <div class="row" id="course-teacher">
-            <div class="small-12 column">
-                <h2>Teachers</h2>
-                <section>
-                    {% for teacher in report.subjectReport.teachers %}
-                        <div class="small-12 avatar card">
-                            <a href="/search/user/{{ teacher.id }}" title="View Profile">
-                                <img src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square64" alt="{{ teacher.formatName }}">
-                                <p>{{ teacher.formatName }}</p>
-                            </a>
-                        </div>
-                    {% endfor %}
-                </section>
-            </div>
-        </div>
-    {% endif %}
-
     {# course grade - derived from grade for this class #}
     {% if report.subjectReport.namedGrades.courseGrade and report.subjectReport.namedGrades.courseGrade.assessment.isMarkShownToRole(user.role) %}
         <div class="row" id="course-info">
@@ -117,5 +98,23 @@
     {# Assessments #}
     {% if report.subjectReport.grades %}
         {% include '@customMeridenPastoral/sub/assessments.twig' with {work: report.subjectReport.grades, student: report.student} %}
+    {% endif %}
+
+    {# Class Teacher(s) #}
+    {% if report.subjectReport.teachers is not empty %}
+        <div class="row teacher-list" id="course-teacher">
+            <div class="small-12 column">
+                <section>
+                    {% for teacher in report.subjectReport.teachers %}
+                        <div class="small-12 avatar card">
+                            <a href="/search/user/{{ teacher.id }}" title="View Profile">
+                                <img class="teacher-image" src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square64" alt="{{ teacher.formatName }}">
+                                <p class="teacher-name">{{ teacher.formatName }}</p>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </section>
+            </div>
+        </div>
     {% endif %}
 </div>
