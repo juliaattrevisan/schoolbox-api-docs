@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Resource\Folder;
 
+use Alaress\Color\ColorFactory;
 use Alaress\Web\Controller\Base as BaseController;
 use ArrayAccess;
 use Homepage;
@@ -22,6 +23,9 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
+use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Resource\Group;
 use Schoolbox\Resource\GroupMapper;
@@ -151,6 +155,18 @@ class Controller extends BaseController
 
         $config = new ConfigLoader();
 
+        $zone = new Zone('coverImage');
+        $zone
+            ->setMulti(false)
+            ->setAttachPrompt('Attach a cover image')
+            ->setAttachmentsLabel('')
+            ->setMimeFilter('image/*')
+        ;
+
+        if ($folder->hasCoverImage()) {
+            $zone->attachFiles([ $folder->getCoverImage()->getHash() ]);
+        }
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@folder/modify.twig',
@@ -166,6 +182,7 @@ class Controller extends BaseController
                     'database'          => ucfirst($config->get('external_type')),
                     'curriculumTagging' => $config->get('curriculum_tagging_enabled'),
                     'writePermission'   => UserAccess::ACCESS_WRITE,
+                    'coverImageZone'    => $zone->getTwigContext(),
                 ),
             )
         );
@@ -222,6 +239,14 @@ class Controller extends BaseController
         if ($parentId != Mapper::FOLDER_ROOT)
             $folder->enableInherit();
 
+        $zone = new Zone('coverImage');
+        $zone
+            ->setMulti(false)
+            ->setAttachPrompt('Attach a cover image')
+            ->setAttachmentsLabel('')
+            ->setMimeFilter('image/*')
+        ;
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@folder/modify.twig',
@@ -236,6 +261,7 @@ class Controller extends BaseController
                     'database'          => ucfirst($config->get('external_type')),
                     'curriculumTagging' => $config->get('curriculum_tagging_enabled'),
                     'writePermission'   => UserAccess::ACCESS_WRITE,
+                    'coverImageZone'    => $zone->getTwigContext(),
                 ),
             )
         );
@@ -422,6 +448,15 @@ class Controller extends BaseController
             $user
         );
 
+        // apply candy
+        $model->setColour((new ColorFactory())->build($postData['colour']));
+
+        try {
+            $model->setCoverImage((new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst());
+
+        } catch (ResourceException $e) {
+            // no attachment, nothing to do
+        }
 
         $affectedIds = $folderMapper->save($model);
 
