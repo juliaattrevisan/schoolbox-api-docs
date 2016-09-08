@@ -31,8 +31,6 @@ use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
  *  Course Implementation - instead, it belonged directly to the Folder it was imported
  *  onto, and was also linked to a component on that Folder.)
  *
- * TODO unit tests
- *
  * @package Schoolbox\Learning\Course\Implementation\Unit
  */
 class Implementation implements AssessmentContext, ISoftDeletable
