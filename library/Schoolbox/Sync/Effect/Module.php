@@ -91,7 +91,7 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:' . $this->basename,
-            $injector->lazyNew('Schoolbox\\Sync\\Effect\\Controller')
+            $injector->lazyNew(Controller::class)
         );
     }
 }

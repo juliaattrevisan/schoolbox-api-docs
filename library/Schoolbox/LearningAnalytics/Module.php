@@ -302,7 +302,7 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew('Schoolbox\\LearningAnalytics\\Controller')
+            $injector->lazyNew(Controller::class)
         );
     }
 

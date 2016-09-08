@@ -77,7 +77,7 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew('Schoolbox\\User\\Controller'));
+        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
     }
 
     /* Getters / Setters

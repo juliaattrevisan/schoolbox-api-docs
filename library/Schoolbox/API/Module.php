@@ -14,6 +14,7 @@ use Alaress\Web\Router\PathMatcher;
 use Alaress\Web\Router\RouteCollection;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\MobileApp\RegistryMapper;
 
 class Module extends BaseModule {
 
@@ -53,14 +54,14 @@ class Module extends BaseModule {
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew('Schoolbox\\API\\Controller')
+            $injector->lazyNew(Controller::class)
         );
 
-        $injector->setters['Schoolbox\\API\\Controller']['setAuth']
+        $injector->setters[Controller::class]['setAuth']
             = $injector->lazyNew('Authenticator');
 
-        $injector->setters['Schoolbox\\API\\Controller']['setRegistryMapper']
-            = $this->getMapperFactory()->getLazy('Schoolbox\\MobileApp\\RegistryMapper');
+        $injector->setters[Controller::class]['setRegistryMapper']
+            = $this->getMapperFactory()->getLazy(RegistryMapper::class);
 
     }
 

@@ -44,7 +44,7 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initControllers(ContainerInterface $injector) {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew(\Schoolbox\Admin\Lists\Controller::class));
+        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
     }
 
     /**

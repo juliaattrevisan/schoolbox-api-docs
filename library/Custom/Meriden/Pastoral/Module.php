@@ -15,8 +15,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use Custom\Meriden\Pastoral\StudentInvolvement\Subject;
-use External_UserInterface;
 use House;
 use HouseMapper;
 use Schoolbox\Assessment\Grades;
@@ -25,7 +23,6 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
-use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
@@ -64,8 +61,7 @@ class Module extends BaseModule
                     new Rule\HasRole(Role::STAFF),
                     new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'id')
                 )
-            )
-        ;
+            );
     }
 
     /**
@@ -120,23 +116,25 @@ class Module extends BaseModule
     {
         // Inject the custom Meriden pastoral database connection too
         // a MSSQL connection should be a service?
-        $injector->params['Custom\\Meriden\\Pastoral\\Controller']['studentInvolvementFactory']
-            = $injector->lazyNew('Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory');
+        $injector->params[Controller::class]['studentInvolvementFactory']
+            = $injector->lazyNew(StudentInvolvement\Factory::class);
 
-        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['gateway']
-            = $injector->lazyNew('Custom\\Meriden\\Pastoral\\StudentInvolvement\\Gateway');
-        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['categoryMapper']
+        $injector->params[StudentInvolvement\Factory::class]['gateway']
+            = $injector->lazyNew(StudentInvolvement\Gateway::class);
+        $injector->params[StudentInvolvement\Factory::class]['categoryMapper']
             = $this->getMapperFactory()->getLazy(Folder\Mapper::class);
-        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['userMapper']
-            = $this->getMapperFactory()->getLazy('Schoolbox\\UserMapper');
-        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['gradesService']
+        $injector->params[StudentInvolvement\Factory::class]['userMapper']
+            = $this->getMapperFactory()->getLazy(UserMapper::class);
+        $injector->params[StudentInvolvement\Factory::class]['gradesService']
             = Grades::getInstance();
 
-        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Gateway']['database']
-            = $injector->lazyNew('MSSQL');
+        $injector->params[StudentInvolvement\Gateway::class]['database']
+            = $injector->lazy(function () {
+            return \MSSQL::getInstance();
+        });
 
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew('Custom\\Meriden\\Pastoral\\Controller')
         );
     }

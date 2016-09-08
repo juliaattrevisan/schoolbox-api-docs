@@ -11,7 +11,6 @@ namespace Schoolbox\Admin\BulkAddFolders;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;

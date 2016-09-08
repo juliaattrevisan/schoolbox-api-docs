@@ -18,6 +18,7 @@ use Aura\Router\Router;
 use Schoolbox\Permission\Access\UserAccess;
 use Twig_Loader_Chain;
 use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
+use Schoolbox\Curriculum\LearningArea\Mapper as LearningAreaMapper;
 
 class Module extends BaseModule
 {
@@ -104,14 +105,14 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew('Schoolbox\\Curriculum\\Controller')
+            $injector->lazyNew(Controller::class)
         );
-        $injector->setters['Schoolbox\\Curriculum\\Controller']['setNodeMapper']
-            = $this->getMapperFactory()->getLazy('Schoolbox\\Curriculum\\Node\\Mapper');
-        $injector->setters['Schoolbox\\Curriculum\\Controller']['setAreaMapper']
-            = $this->getMapperFactory()->getLazy('Schoolbox\\Curriculum\\LearningArea\\Mapper');
-        $injector->setters['Schoolbox\\Curriculum\\Controller']['setLevelMapper']
-            = $this->getMapperFactory()->getLazy('Schoolbox\\Curriculum\\LearningLevel\\Mapper');
+        $injector->setters[Controller::class]['setNodeMapper']
+            = $this->getMapperFactory()->getLazy(NodeMapper::class);
+        $injector->setters[Controller::class]['setAreaMapper']
+            = $this->getMapperFactory()->getLazy(LearningAreaMapper::class);
+        $injector->setters[Controller::class]['setLevelMapper']
+            = $this->getMapperFactory()->getLazy(LearningAreaMapper::class);
     }
 
     /* Getters / Setters

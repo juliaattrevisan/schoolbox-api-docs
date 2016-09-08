@@ -80,9 +80,9 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initControllers(ContainerInterface $injector) {
-        $injector->setters['Schoolbox\\ResourceBooking\\Category\\Controller']['setMapper']
-            = $this->getMapperFactory()->getLazy('Schoolbox\\ResourceBooking\\Category\\Mapper');
-        $injector->setters['Schoolbox\\ResourceBooking\\Category\\Controller']['setPaginator']
+        $injector->setters[Controller::class]['setMapper']
+            = $this->getMapperFactory()->getLazy(Mapper::class);
+        $injector->setters[Controller::class]['setPaginator']
             = $injector->lazyNew(
             'Alaress\\Paginator\\UrlPaginator',
             array(),
@@ -93,7 +93,7 @@ class Module extends BaseModule
         );
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew('Schoolbox\\ResourceBooking\\Category\\Controller')
+            $injector->lazyNew(Controller::class)
         );
     }
 

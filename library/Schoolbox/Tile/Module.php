@@ -24,6 +24,7 @@ use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Tile\Component\TileControllerInterface;
 use Schoolbox\Tile\Layout\Mapper as TileLayoutMapper;
 use Twig_Loader_Chain;
 use Schoolbox\Tile\Mapper as TileMapper;
@@ -94,7 +95,7 @@ class Module extends BaseModule
                 // Also, this component needs to be a tile grid.
                 if (!is_a(
                     $component->getDefinition()->getClass(),
-                    'Schoolbox\\Tile\\Component\\TileControllerInterface',
+                    TileControllerInterface::class,
                     true
                 )) {
                     throw new \RuntimeException('Component exists, but is not a tile layout');

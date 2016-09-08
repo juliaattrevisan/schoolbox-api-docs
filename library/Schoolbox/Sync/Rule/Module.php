@@ -88,7 +88,7 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew('Schoolbox\\Sync\\Rule\\Controller')
+            $injector->lazyNew(Controller::class)
         );
     }
 }
