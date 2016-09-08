@@ -45,4 +45,40 @@ class Model implements ISoftDeletable
         $this->updatedAt = new Alaress_Date_NullDate();
         $this->deletedAt = new Alaress_Date_NullDate();
     }
+
+    /**
+     * @return CourseSpecificationModel
+     */
+    public function getCourse()
+    {
+        return $this->course;
+    }
+
+    /**
+     * @param CourseSpecificationModel $course
+     * @return static
+     */
+    public function setCourse($course)
+    {
+        $this->course = $course;
+        return $this;
+    }
+
+    /**
+     * @return FolderModel
+     */
+    public function getFolder()
+    {
+        return $this->folder;
+    }
+
+    /**
+     * @param FolderModel $folder
+     * @return static
+     */
+    public function setFolder($folder)
+    {
+        $this->folder = $folder;
+        return $this;
+    }
 }
