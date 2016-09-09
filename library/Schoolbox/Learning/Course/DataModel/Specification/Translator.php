@@ -36,18 +36,9 @@ class Translator
 
         // Constituent Unit Specs - return in separate object, or this object?
         foreach ($specification->getUnits() as $unitSpecification) {
-            // TODO move to a translator for unit specs
-            $unitDataModel = new Unit\Model();
-            $unitDataModel
-                ->setCourse($dataModel)
-                ->setId($unitSpecification->getId())
-                ->setFolder($unitSpecification->getFolder())
-                ->setCreatedAt($specification->getCreatedAt())
-                ->setUpdatedAt($specification->getUpdatedAt())
-                ->setDeletedAt($specification->getDeletedAt())
-            ;
-            // TODO add translation of assessables
-            $dataModel->getUnits()->add($unitDataModel);
+            $dataModel->getUnits()->add(
+                $this->translateToUnitDataModel($unitSpecification, $dataModel)
+            );
         }
 
         // If I am going to persist here, I need mappers to have been injected.
@@ -73,19 +64,49 @@ class Translator
 
         // Constitute Unit Specs
         foreach ($dataModel->getUnits() as $unitDataModel) {
-            // TODO move to a translator for unit specs
-            $unitSpecification = new UnitSpecification();
-            $unitSpecification
-                ->setId($unitDataModel->getId())
-                ->setFolder($unitDataModel->getFolder())
-                ->setCreatedAt($unitDataModel->getCreatedAt())
-                ->setUpdatedAt($unitDataModel->getUpdatedAt())
-                ->setDeletedAt($unitDataModel->getDeletedAt())
-            ;
-            // TODO add translation of assessables
-            $specification->getUnits()->add($unitSpecification);
+            $specification->getUnits()->add($this->translateToUnitDomainModel($unitDataModel));
         }
 
         return $specification;
+    }
+
+    /**
+     * Translates the Unit Specification business domain model to a data model.
+     *
+     * @param UnitSpecification $unitSpecification
+     * @param Model             $dataModel         The course data model to put the new unit data model in
+     * @return Unit\Model
+     */
+    protected function translateToUnitDataModel(UnitSpecification $unitSpecification, Model $dataModel)
+    {
+        $unitDataModel = new Unit\Model();
+        $unitDataModel
+            ->setCourse($dataModel)
+            ->setId($unitSpecification->getId())
+            ->setFolder($unitSpecification->getFolder())
+            ->setCreatedAt($unitSpecification->getCreatedAt())
+            ->setUpdatedAt($unitSpecification->getUpdatedAt())
+            ->setDeletedAt($unitSpecification->getDeletedAt());
+        // TODO add translation of assessables
+        return $unitDataModel;
+    }
+
+    /**
+     * Translates the data model to a domain model.
+     *
+     * @param Unit\Model $unitDataModel
+     * @return UnitSpecification
+     */
+    protected function translateToUnitDomainModel(Unit\Model $unitDataModel)
+    {
+        $unitSpecification = new UnitSpecification();
+        $unitSpecification
+            ->setId($unitDataModel->getId())
+            ->setFolder($unitDataModel->getFolder())
+            ->setCreatedAt($unitDataModel->getCreatedAt())
+            ->setUpdatedAt($unitDataModel->getUpdatedAt())
+            ->setDeletedAt($unitDataModel->getDeletedAt());
+        // TODO add translation of assessables
+        return $unitSpecification;
     }
 }
