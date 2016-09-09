@@ -17,7 +17,6 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Component_Instance;
 use Component_InstanceMapper;
-use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -188,7 +187,7 @@ class Module extends BaseModule
         $injector->setters[TileController::class]['setStorageMapper']
             = $this->getMapperFactory()->getLazy(StorageMapper::class);
         $injector->setters[TileController::class]['setFolderMapper']
-            = $this->getMapperFactory()->getLazy(CategoryMapper::class);
+            = $this->getMapperFactory()->getLazy(FolderMapper::class);
         $injector->set(
             'controller:'.$this->basename,
             $injector->lazyNew(TileController::class)
