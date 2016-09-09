@@ -1,4 +1,5 @@
 <?php
+
 /**
  * RelativeUrlTest
  *
@@ -6,46 +7,51 @@
  * override with domain, http_host and hostname with whatever
  * values you require, so you don't need to use Cfg
  */
-class RelativeUrlTest extends PHPUnit_Framework_TestCase {
+class RelativeUrlTest extends PHPUnit_Framework_TestCase
+{
 
-	public function testCompleteUrl() {
-		$input = 'http://www.google.com';
-		$expected = true;
+    public function testCompleteUrl()
+    {
+        $input = 'http://www.google.com';
+        $expected = true;
 
-		$url = new Url($input, false);
+        $url = new Url($input, false);
 
-		$result = $url->isUrl();
+        $result = $url->isUrl();
 
-		$this->assertEquals($result, $expected);
-	}
+        $this->assertEquals($result, $expected);
+    }
 
-	public function testIncompleteUrl() {
-		$input = 'google';
-		$expected = false;
+    public function testIncompleteUrl()
+    {
+        $input = 'google';
+        $expected = false;
 
-		$url = new Url($input, false);
+        $url = new Url($input, false);
 
-		$result = $url->isUrl();
+        $result = $url->isUrl();
 
-		$this->assertEquals($result, $expected);
-	}
+        $this->assertEquals($result, $expected);
+    }
 
-	public function testRedirectUrl() {
-		$input = 'http://www.google.com';
-		$expected = '/redir.php?url=' . urlencode(base64_encode($input));
+    public function testRedirectUrl()
+    {
+        $input = 'http://www.google.com';
+        $expected = '/redir.php?url=' . urlencode(base64_encode($input));
 
-		$url = new Url($input, false);
+        $url = new Url($input, false);
 
-		$result = $url->getBase64EncodedRedirect();
+        $result = $url->getBase64EncodedRedirect();
 
-		$this->assertEquals($result, $expected);
-	}
+        $this->assertEquals($result, $expected);
+    }
 
     /*
      * isLocalURL tests
      */
 
-    public function testIsLocalURLHostname() {
+    public function testIsLocalURLHostname()
+    {
         $input = "http://portal/test.php";
 
         $url = new Url($input, false);
@@ -58,7 +64,8 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase {
 
     }
 
-    public function testIsLocalURLFQDN() {
+    public function testIsLocalURLFQDN()
+    {
         $input = "http://portal.test.local/test.php";
 
         $url = new Url($input, false);
@@ -71,7 +78,8 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase {
 
     }
 
-    public function testIsLocalURLAnotherDomain() {
+    public function testIsLocalURLAnotherDomain()
+    {
         $input = "http://portal.another.server/test.php";
 
         $url = new Url($input, false);
@@ -84,7 +92,8 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase {
 
     }
 
-    public function testIsLocalURLAnotherHost() {
+    public function testIsLocalURLAnotherHost()
+    {
         $input = "http://www.google.com/test.php";
 
         $url = new Url($input, false);
@@ -97,7 +106,8 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase {
 
     }
 
-    public function testIsLocalURLRelative() {
+    public function testIsLocalURLRelative()
+    {
         $input = "/test.php";
 
         $url = new Url($input, false);
