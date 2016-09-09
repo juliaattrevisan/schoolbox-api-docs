@@ -138,7 +138,7 @@ class Module extends BaseModule
             'eventMapper' => $this->getMapperFactory()->getLazy(Calendar\EventMapper::class)
         );
         $injector->setters[Controller::class]['setEventRecurrenceMapper']
-            = $this->getMapperFactory()->getLazy(Calendar\EventRecurrenceMapper::class);
+            = $injector->lazyNew(Calendar\EventRecurrenceMapper::class);
         $injector->setters[Controller::class]['setBookingMapper']
             = $this->getMapperFactory()->getLazy(Mapper::class);
         $injector->setters[Controller::class]['setResourceMapper']
