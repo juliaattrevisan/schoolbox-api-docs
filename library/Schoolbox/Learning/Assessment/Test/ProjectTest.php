@@ -139,9 +139,9 @@ class ProjectTest extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
 
-        $task = $this->spawnTask($project);
-        $dueWork = $this->spawnDueWork($project);
-        $quiz = $this->spawnQuiz($project);
+        $task = $this->spawnTask();
+        $dueWork = $this->spawnDueWork();
+        $quiz = $this->spawnQuiz();
 
         $project->setAssessables((new Collection())
             ->add($task)
@@ -152,9 +152,6 @@ class ProjectTest extends \Schoolbox\Learning\Assessment\Test\Defaults
          */
         $this->assertCount(3, $project->getAssessables());
 
-        /* I should be able to access each one's normalised mark from here
-         */
-
         /** @var Task $projectTask */
         $projectTask = $project->getAssessables()->getOffset(0);
 
@@ -164,6 +161,8 @@ class ProjectTest extends \Schoolbox\Learning\Assessment\Test\Defaults
         /** @var Quiz $projectQuiz */
         $projectQuiz = $project->getAssessables()->getOffset(2);
 
+        /* I should be able to access each one's normalised mark from here
+         */
         $this->assertEquals(null, $projectTask->getParticipant($this->hodes)->findMostRecentPublishedFeedback($projectTask)->getNormalisedMark());
         $this->assertEquals(100, $projectDueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback($projectDueWork)->getNormalisedMark());
 
@@ -182,7 +181,7 @@ class ProjectTest extends \Schoolbox\Learning\Assessment\Test\Defaults
      *
      * @return DueWork
      */
-    protected function spawnDueWork($project)
+    protected function spawnDueWork()
     {
 
         $id = 2;
@@ -362,7 +361,7 @@ class ProjectTest extends \Schoolbox\Learning\Assessment\Test\Defaults
     /**
      * Spawn a Task
      */
-    protected function spawnTask($project)
+    protected function spawnTask()
     {
         $id = 1234;
         $title = 'Read the Horadric Scrolls';
