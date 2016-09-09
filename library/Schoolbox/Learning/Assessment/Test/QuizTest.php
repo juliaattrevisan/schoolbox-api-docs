@@ -381,6 +381,20 @@ class QuizTest extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->setId(99762)
             ->setAssessable($quiz)
             ->setNormalisedMark(83)
+            ->setAllResponses([
+                [
+                    'mark' => 3 // Question 1
+                ],
+                [
+                    'mark' => 2 // Question 2
+                ],
+                [
+                    'mark' => 2 // Question 3
+                ],
+                [
+                    'mark' => 5 // Question 4
+                ]
+            ])
             ->setComment('This is the most recent published feedback')
             ->setReviewer($this->celia)
             ->setPublishedAt(new \Alaress_Date_Format('2016-09-25 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -403,5 +417,14 @@ class QuizTest extends \Schoolbox\Learning\Assessment\Test\Defaults
          * since it was published most recently on 2016-09-25 21:22:19)
          */
         $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getId());
+
+        /* Quiz's Normalised Mark is derived. It does not use the getter/setter
+         * for Normalised Mark like the other Assessables
+         */
+        $this->assertNotEquals(83, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getNormalisedMark());
+
+        /* Test its derived stuff instead
+         */
+        $this->assertEquals(12, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getNormalisedMark());
     }
 }
