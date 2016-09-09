@@ -71,7 +71,8 @@ UPDATE `course_unit_instance` SET `updated_at` = `created_at`;
 
 -- Add FK relation to course_instance once that table is populated
 ALTER TABLE `course_unit_instance`
-  ADD COLUMN `course_instance_id` INT(11) NOT NULL AFTER `id`;
+  ADD COLUMN `course_instance_id` INT(11) NOT NULL AFTER `id`,
+  ADD COLUMN `course_unit_id` INT(11) NOT NULL AFTER `course_instance_id`;
 
 CREATE TABLE `project` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,

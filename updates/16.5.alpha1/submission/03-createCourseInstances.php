@@ -55,10 +55,12 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         VALUES (:folderId, :courseId, :created, :created, NULL)
     ");
     $updateUnitInstanceQuery = $database->prepare("
-        UPDATE course_unit_instance 
-        SET    course_instance_id = :courseInstanceId 
-        WHERE  component_id = :componentId
-        AND    category_id = :folderId
+        UPDATE course_unit_instance cui
+        LEFT   JOIN course_unit cu ON cui.unit_category_id = cu.folder_id
+        SET    cui.course_instance_id = :courseInstanceId,
+               cui.course_unit_id = cu.id
+        WHERE  cui.component_id = :componentId
+        AND    cui.category_id = :folderId
     ");
     $updateComponentConfigurationQuery = $database->prepare("
         INSERT INTO component_config_instance (
