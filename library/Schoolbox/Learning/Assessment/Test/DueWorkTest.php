@@ -846,9 +846,10 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback($dueWork)->getId());
         $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback($dueWork)->getNormalisedMark());
 
-        /* Published Marks don't exist yet
+        /* Published Marks exist in 3385, which was published 2016-08-03 14:15:16 (which is
+         * also after $submission was spawned on 2016-08-01 09:00:00)
          */
-        $this->assertEquals(null, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback($dueWork));
+        $this->assertEquals(3385, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback($dueWork)->getId());
     }
 
     /**
