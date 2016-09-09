@@ -144,7 +144,7 @@ class Module extends BaseModule
         $injector->setters[Controller::class]['setResourceMapper']
             = $this->getMapperFactory()->getLazy(ItemMapper::class);
         $injector->setters[Controller::class]['setExternalTimetableHandler']
-            = $this->getMapperFactory()->getLazy('External_Timetable');
+            = $injector->get('externalTimetable');
         $injector->setters[Controller::class]['setCampusMapper']
             = $this->getMapperFactory()->getLazy(CampusMapper::class);
         $injector->set(
