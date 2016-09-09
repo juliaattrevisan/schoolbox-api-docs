@@ -258,8 +258,15 @@ class Participant
              */
             if ($type == self::TRAVERSAL_PUBLISHED) {
                 foreach ($allFeedbacks as $currentFeedback) {
-                    if ($currentFeedback->isPublished() && $currentFeedback->getPublishedAt()->gt($latestResponse->getUpdatedAt())) {
-                        $latestFeedback = $currentFeedback;
+                    if ($currentFeedback->isPublished()) {
+
+                        /* Look to the future!
+                         * Make sure this feedback is more recent than the previously-known latest feedback
+                         * Make sure this feedback is more recent than the response
+                         */
+                        if ($currentFeedback->getPublishedAt()->gt($latestFeedback->getPublishedAt()) && $currentFeedback->getPublishedAt()->gt($latestResponse->getUpdatedAt())) {
+                            $latestFeedback = $currentFeedback;
+                        }
                     }
                 }
 
