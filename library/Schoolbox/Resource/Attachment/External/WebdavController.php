@@ -49,7 +49,7 @@ class WebdavController extends NavigatorController implements ExternalInterface 
      */
     public function getRenderMethod()
     {
-        return self::RENDER_INLINE;
+        return self::RENDER_IFRAME;
     }
 
 
