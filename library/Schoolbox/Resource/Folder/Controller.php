@@ -12,6 +12,7 @@ use Alaress\Color\ColorFactory;
 use Alaress\Web\Controller\Base as BaseController;
 use ArrayAccess;
 use Homepage;
+use InvalidArgumentException;
 use OutOfBoundsException;
 use RangeException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -449,7 +450,11 @@ class Controller extends BaseController
         );
 
         // apply candy
-        $model->setColour((new ColorFactory())->build($postData['colour']));
+        try {
+            $model->setColour((new ColorFactory())->build($postData['colour']));
+        } catch (InvalidArgumentException $e) {
+            $model->setColour(null);
+        }
 
         try {
             $model->setCoverImage((new CollectorFactory())->build($postData['attachment'] ?: [])->getFirst());
