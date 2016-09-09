@@ -251,24 +251,29 @@ class Participant
                 }
             }
 
-            /* Find the most recent Feedback
-             *
-             * @var IFeedback $currentFeedback
-             */
-            foreach ($allFeedbacks as $currentFeedback) {
-                if ($currentFeedback->getUpdatedAt()->gt($latestFeedback->getUpdatedAt())) {
-                    $latestFeedback = $currentFeedback;
-                }
-            }
-
-            /* Compare to see which one is the most recent action to occur
+            /* Find the most recent feedback
+             * Compare to see which one is the most recent action to occur
              */
             if ($type == self::TRAVERSAL_PUBLISHED) {
-                if ($latestFeedback->isPublished() && $latestFeedback->getPublishedAt()->gt($latestResponse->getUpdatedAt())) {
+                foreach ($allFeedbacks as $currentFeedback) {
+                    if ($currentFeedback->isPublished() && $currentFeedback->getPublishedAt()->gt($latestResponse->getUpdatedAt())) {
+                        $latestFeedback = $currentFeedback;
+                    }
+                }
+
+                if ($latestFeedback->isPublished()) {
                     return $latestFeedback;
                 }
+
+                return null;
             }
             else if ($type == self::TRAVERSAL_MARKED) {
+                foreach ($allFeedbacks as $currentFeedback) {
+                    if ($currentFeedback->getUpdatedAt()->gt($latestFeedback->getUpdatedAt())) {
+                        $latestFeedback = $currentFeedback;
+                    }
+                }
+
                 if ($latestFeedback->getUpdatedAt()->gt($latestResponse->getUpdatedAt())) {
                     return $latestFeedback;
                 }
