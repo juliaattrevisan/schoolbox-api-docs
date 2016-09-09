@@ -194,14 +194,14 @@ class Controller extends Base\Base
      * Just a raw template render
      *
      * @param string $template
-     * @param array  $data
+     * @param array $data
      */
     protected function tpl($template, $data = [])
     {
         $content = [
             'template' => "@course/$template.twig",
-            'data'     => array_merge($data, ['currentUser' => $this->getUser()]),
-            'tab'      => 'course',
+            'data' => array_merge($data, ['currentUser' => $this->getUser()]),
+            'tab' => 'course',
         ];
 
         if ($this->getRequest()->isXhr()) {
@@ -235,13 +235,13 @@ class Controller extends Base\Base
 
     /**
      * @param Folder\Model $unit
-     * @param string       $controller
+     * @param string $controller
      * @return Component_Instance
      */
     protected function injectNewComponent(Folder\Model $unit, $controller = Component_Homepage_CourseBuilderController::class)
     {
         $definitionMapper = $this->getComponentDefinitionMapper();
-        $instanceMapper   = $this->getComponentInstanceMapper();
+        $instanceMapper = $this->getComponentInstanceMapper();
 
         // Doesn't exist. We need that to exist. Make it exist.
         $definition = $definitionMapper->findOneByColumn('class', $controller);
@@ -307,7 +307,7 @@ class Controller extends Base\Base
                 $data['access'][$unit->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $unitFolder->getId() ]);
                 $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unitFolder);
                 $data['returnUrl'][$unit->getId()] = $this->getReturnUrl($id, $unit->getId());
-                $data['usages'][$unit->getId() ] = $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id');
+                $data['usages'][$unit->getId()] = $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id');
 
                 // obtain the Course Builder Component Instance from the homepage.
                 $instances[$unit->getId()] = $this->getCourseBuilderInstance($unitFolder);
@@ -392,7 +392,7 @@ class Controller extends Base\Base
         $course = $this->getCourseSpecificationMapperProxy()->findById($post['id']);
 
         // Do not permit Courses to be moved to, or created in, Root
-        if(0 == $post['parent']){
+        if (0 == $post['parent']) {
 
             // ...unless already in Root
             if(0 != $course->getFolder()->getParent()->getId()) {
@@ -411,22 +411,24 @@ class Controller extends Base\Base
                     $this->getFolderMapper()->save($unit->getFolder()->setName($unitName));
                 }
             }
-        } else{
-            $this->sendError(new Base\Exception("Cannot create a Course without Units",["create at least 1 unit"]));
+        } else {
+            $this->sendError(new Base\Exception("Cannot create a Course without Units", ["create at least 1 unit"]));
             return;
         }
 
         // Robustly handle either int, CSV string, or any level of nested arrays
 
-        if(is_array($post['curriculumCodes'])){
+        if (is_array($post['curriculumCodes'])) {
             $tmpArr = [];
             $itr = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($post['curriculumCodes']));
-            foreach($itr as $codes){
-                $tmpArr = array_merge($tmpArr, explode(',',$codes));
+            foreach ($itr as $codes) {
+                $tmpArr = array_merge($tmpArr, explode(',', $codes));
             }
             $post['curriculumCodes'] = $tmpArr;
-        } else if(isset($post['curriculumCodes'])){
-            $post['curriculumCodes'] = explode(',', $post['curriculumCodes']);
+        } else {
+            if (isset($post['curriculumCodes'])) {
+                $post['curriculumCodes'] = explode(',', $post['curriculumCodes']);
+            }
         }
 
         $this->saveCourse($post, $rq->isXhr(), 'course.courseList');
@@ -437,7 +439,7 @@ class Controller extends Base\Base
      * Common logic to create and modify a course
      *
      * @param Values $post
-     * @param bool   $xhr
+     * @param bool $xhr
      * @param string $redir
      */
     protected function saveCourse(Values $post, $xhr, $redir)
@@ -476,10 +478,10 @@ class Controller extends Base\Base
      */
     protected function persistCourse($post)
     {
-        $mode   = BaseMapper::METHOD_CREATE;
+        $mode = BaseMapper::METHOD_CREATE;
         $parent = null;
         $errors = [];
-        $name   = trim($post->get('name'));
+        $name = trim($post->get('name'));
 
         if (!$name) {
             $errors[] = 'give the course a name';
@@ -490,7 +492,7 @@ class Controller extends Base\Base
         try {
             if ($parentId === "0" || $parentId > 0) {
                 $access = $this->getAccess()->getFolderAccess($user = $this->getUser(), [$parentId]);
-                if($access < UserAccess::ACCESS_WRITE){
+                if ($access < UserAccess::ACCESS_WRITE) {
                     $errors[] = "select a Faculty / Subject for which you have write access";
                 } else {
                     $parent = $this->getFolderMapper()->findById($parentId);
@@ -563,7 +565,7 @@ class Controller extends Base\Base
                 'name'            => $name,
                 'parent'          => $parent->getId(),
                 'curriculumCodes' => $codes,
-                'inherit'         => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
+                'inherit' => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
             ];
 
             if ($mode == BaseMapper::METHOD_CREATE) {
@@ -584,7 +586,7 @@ class Controller extends Base\Base
 
                     // leave these always off
                     'recursive' => false, // LEAVE THIS
-                    'code'      => null,  // LEAVE THIS
+                    'code' => null,  // LEAVE THIS
 
                 ]);
             } else {
@@ -592,7 +594,7 @@ class Controller extends Base\Base
                 /** @var Folder\Model $folder */
                 $datums = array_merge($datums, [
                     // configurable things
-                    'inherit'         => $folder->getInherit()
+                    'inherit' => $folder->getInherit()
                 ]);
             }
 
@@ -627,7 +629,7 @@ class Controller extends Base\Base
         // cast exception to primitives
         if ($problem instanceof Base\Exception) {
             $resolutions = $problem->getReasons();
-            $problem     = $problem->getMessage();
+            $problem = $problem->getMessage();
         }
 
         if (count($resolutions)) {
@@ -642,8 +644,8 @@ class Controller extends Base\Base
 
         $this->getResponse()->content->set([
             'template' => '@course/mage-error.twig',
-            'format'   => 'nochrome',
-            'data'     => [
+            'format' => 'nochrome',
+            'data' => [
                 'error' => [
                     'problem' => $problem,
                     'reasons' => $resolutions
@@ -663,7 +665,7 @@ class Controller extends Base\Base
      */
     protected function getReturnUrl($courseId, $unitId = null)
     {
-        $path = $this->getRouteIfAuthorized('course.modifyCourse', [ 'id' => $courseId ]);
+        $path = $this->getRouteIfAuthorized('course.modifyCourse', ['id' => $courseId]);
 
         if ($unitId) {
             $path .= "#$unitId";
@@ -683,10 +685,10 @@ class Controller extends Base\Base
     {
         $post = $this->getRequest()->post;
 
-        $name  = trim($post->get('name'));
+        $name = trim($post->get('name'));
 
         if (!$name) {
-            $this->sendError('Could not create unit', [ 'give the unit a name' ]);
+            $this->sendError('Could not create unit', ['give the unit a name']);
             return;
         }
 
@@ -709,13 +711,13 @@ class Controller extends Base\Base
                 'parent'          => $courseSpec->getFolder()->getId(),
 
                 // configurable things
-                'inherit'         => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
-                'template'        => $this->getConfigLoader()->get('course_builder_default_unit_page_template'),
-                'group'           => $rolePermissions,
+                'inherit' => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
+                'template' => $this->getConfigLoader()->get('course_builder_default_unit_page_template'),
+                'group' => $rolePermissions,
 
                 // leave these always off
-                'recursive'       => false, // LEAVE THIS
-                'code'            => null,  // LEAVE THIS
+                'recursive' => false, // LEAVE THIS
+                'code' => null,  // LEAVE THIS
             ]);
 
             // Persist the unit too
@@ -732,7 +734,7 @@ class Controller extends Base\Base
                 'returnUrl' => [
                     $folderId => $returnUrl
                 ],
-                'reveals'   => [ $folderId => new TaskBuilder($instance, null, $returnUrl) ],
+                'reveals' => [$folderId => new TaskBuilder($instance, null, $returnUrl)],
                 '_writable' => true,
                 '_expanded' => true
             ];
@@ -765,7 +767,7 @@ class Controller extends Base\Base
         // Check that the initiating user has write access to the newly-created folder, and if not,
         // explicitly give it to them. This covers the case where the template allows you to create a folder
         // to which you don't have appropriate access
-        if ($this->getAccess()->getFolderAccess($this->getUser(), [ $folder->getId() ]) < UserAccess::ACCESS_WRITE) {
+        if ($this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]) < UserAccess::ACCESS_WRITE) {
             $ua = $this->getUserAccessMapper()->createModel();
             $ua->setUser($this->getUser())
                 ->setAccessLevel(UserAccess::ACCESS_WRITE)
@@ -785,7 +787,8 @@ class Controller extends Base\Base
      * @api   GET /course/list
      * @level 160
      */
-    public function courseList() {
+    public function courseList()
+    {
         $this->displayCourseList('courseList');
     }
 
@@ -797,7 +800,8 @@ class Controller extends Base\Base
      * @api   GET /course/list/ajax
      * @level 160
      */
-    public function courseListAjax() {
+    public function courseListAjax()
+    {
         $this->displayCourseList('courseListResults');
     }
 
@@ -807,15 +811,16 @@ class Controller extends Base\Base
      *
      * @param string $template
      */
-    protected function displayCourseList($template) {
+    protected function displayCourseList($template)
+    {
 
         $query = $this->getRequest()->query;
 
         $component = $query->get('component');
-        $folder    = $query->get('folder');
-        $search    = $query->get('query');
+        $folder = $query->get('folder');
+        $search = $query->get('query');
 
-        $data  = $this->getCourseData($search);
+        $data = $this->getCourseData($search);
 
         // only offer suggestions if you're not searching
         if ($folder && !$search) {
@@ -830,19 +835,18 @@ class Controller extends Base\Base
         if ($this->getRequest()->isXhr()) {
             $options = [
                 'hasBreadcrumb' => false,
-                'hasAdd'        => false,
-                'hasTot'        => false,
-                'linkToUnits'   => false,
-                'hasClose'      => true,
+                'hasAdd' => false,
+                'hasTot' => false,
+                'linkToUnits' => false,
+                'hasClose' => true,
             ];
-        }
-        else {
+        } else {
             $options = [
                 'hasBreadcrumb' => true,
-                'hasAdd'        => true,
-                'hasTot'        => true,
-                'linkToUnits'   => true,
-                'hasClose'      => false,
+                'hasAdd' => true,
+                'hasTot' => true,
+                'linkToUnits' => true,
+                'hasClose' => false,
             ];
         }
 
@@ -861,7 +865,7 @@ class Controller extends Base\Base
      */
     protected function confirmAccess($folderId, $min = UserAccess::ACCESS_READ)
     {
-        return $this->getAccess()->getFolderAccess($this->getUser(), [ $folderId ]) >= $min;
+        return $this->getAccess()->getFolderAccess($this->getUser(), [$folderId]) >= $min;
     }
 
     /**
@@ -881,7 +885,7 @@ class Controller extends Base\Base
         foreach ($allCourses as $currentCourse) {
 
             // general search ignores Courses in Faculty
-            if(NULL === $searchParam) {
+            if (null === $searchParam) {
                 try {
                     if (!($this->getFolderMapper()->isDescendant($currentCourse->getFolder(), $this->getCourseSpecificationMapper()->getFacultyRootFolder()))) {
                         continue;
@@ -942,7 +946,7 @@ class Controller extends Base\Base
     protected function getLinkSuggestions(Folder\Model $folder)
     {
         // obtain curriculum codes...
-        $codes   = $folder->getCurriculumNodes()->getColumnValues('code');
+        $codes = $folder->getCurriculumNodes()->getColumnValues('code');
 
         // find all the folders that match this code, then filter for coarseness
         return $this->getFolderMapper()->findByCurriculumCode($codes)->filter(function ($result) {
@@ -987,8 +991,8 @@ class Controller extends Base\Base
     /**
      * Recursively convert TreeNode tree to nested array
      * @param TreeNode $node
-     * @param array $courseIds    Maps $courseId => $courseId
-     * @param array $permissions    Maps $folderId => permissionLevel
+     * @param array $courseIds Maps $courseId => $courseId
+     * @param array $permissions Maps $folderId => permissionLevel
      * @return array
      */
     private function recursiveTreeBuild(TreeNode $node, array $courseIds, array $permissions)
@@ -996,7 +1000,7 @@ class Controller extends Base\Base
         $array = array();
 
         // Special Case for SB Root
-        if(0 === $node->getId()){
+        if (0 === $node->getId()) {
             $array['id'] = 0;
             $array['text'] = "Root";
         } else {
@@ -1004,22 +1008,22 @@ class Controller extends Base\Base
             /** @var Folder\Model $folder */
             $folder = $node->getItem();
 
-            $array['id']      = $folder->getId();
-            $array['text']    = $folder->getName();
-            $array['type']    = $folder->getFolderType();
+            $array['id'] = $folder->getId();
+            $array['text'] = $folder->getName();
+            $array['type'] = $folder->getFolderType();
             $array['li_attr'] = array(
                 'data-permission' => $this->getPermissionString($permissions[$folder->getId()]),
-                'data-type'       => $folder->getFolderType(),
-                'data-id'         => $folder->getId()
+                'data-type' => $folder->getFolderType(),
+                'data-id' => $folder->getId()
             );
             $array['a_attr'] = array(
-                'href'            => '/homepage/' . $folder->getId()
+                'href' => '/homepage/' . $folder->getId()
             );
         }
 
         $array['children'] = array();
 
-        foreach($node->getChildren() as $childNode){
+        foreach ($node->getChildren() as $childNode) {
             // Permission Business Rules
             // not set => prune subtree
             // 0 => prune subtree
@@ -1030,19 +1034,19 @@ class Controller extends Base\Base
             // Folder Type Business Rules
             // isCourse => prune subtree
 
-            $childId  = $childNode->getId();
-            $isSuper  = $this->getUser()->isSuperuser();
+            $childId = $childNode->getId();
+            $isSuper = $this->getUser()->isSuperuser();
             $isDenied = !isset($permissions[$childId]) || UserAccess::ACCESS_DENY === $permissions[$childId];
-            $isCourse = array_key_exists($childId,$courseIds);
+            $isCourse = array_key_exists($childId, $courseIds);
 
-            if( ($isSuper || !$isDenied) && !$isCourse){
+            if (($isSuper || !$isDenied) && !$isCourse) {
                 $array['children'][] = $this->recursiveTreeBuild($childNode, $courseIds, $permissions);
             }
         }
 
         //sort children alphabetically
-        usort($array['children'], function($a,$b){
-            return strcasecmp($a['text'],$b['text']);
+        usort($array['children'], function ($a, $b) {
+            return strcasecmp($a['text'], $b['text']);
         });
 
         return $array;
@@ -1062,10 +1066,7 @@ class Controller extends Base\Base
         //  - stop at, and exclude, all Courses (folder that has > 0 units)
         //  - continue to exhaustion
 
-        $courseIds = $this->getCourseSpecificationMapperProxy()->findAll()->map(function($v) {
-            /** @var CourseSpecification $v */
-            return $v->getFolder()->getId();
-        })->getAll();
+        $courseIds = $this->courseMapper->findAllIds();
 
         // Enable later O(1) lookup
         $courseIds = array_combine($courseIds,$courseIds);
@@ -1102,21 +1103,38 @@ class Controller extends Base\Base
         $allFolders = $this->getFolderMapper()->findAll();
 
         // Build flat array of nodes
-        $nodes = array(0 => new TreeNode(NULL, 0, NULL));
-        foreach($allFolders as $folder){
+
+        $nodes = array(0 => new TreeNode(null, 0, null));
+
+        // Retrieve all children of the faculty root
+
+        $facultyRoot = $this->getCourseMapper()->getFacultyNode();
+        $facultyChildren = $this->getFolderMapper()->findAllChildren($facultyRoot->getParent()->getId(), true);
+
+        // Find permissions for all of the child folders and create nodes
+
+        $permissions = [];
+
+        foreach ($facultyChildren as $folder) {
+            $permissions[$folder->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [$folder->getId()]);
             $nodes[$folder->getId()] = new TreeNode($folder, $folder->getId(), $folder->getParent()->getId());
         }
 
         // O(N) Convert flat to tree
-        foreach($nodes as $id => $node){
+        foreach ($nodes as $id => $node) {
             // Ignore top level nodes and nodes with missing parents
-            if(NULL !== $node->getParent() && isset($nodes[$node->getParent()])) {
+            if (null !== $node->getParent() && isset($nodes[$node->getParent()])) {
                 $nodes[$node->getParent()]->addChild($node);
             }
         }
 
-        $courseRoot     = $nodes[$this->getCourseSpecificationMapper()->getFacultyRootFolder()->getId()];
-        $courseRootArr  = $this->recursiveTreeBuild($courseRoot,$courseIds,$permissions);
+        // Enable O(1) lookup
+
+        $courseIds = $this->courseMapper->findAllIds();
+        $courseIds = array_combine($courseIds, $courseIds);
+
+        $courseRoot = $nodes[$facultyRoot->getId()];
+        $courseRootArr = $this->recursiveTreeBuild($courseRoot, $courseIds, $permissions);
         $data['branch'] = $courseRootArr;
         $this->tpl('parentList', $data);
     }
@@ -1127,11 +1145,11 @@ class Controller extends Base\Base
      * @api   GET /course/import/{courseId}/class/{classCode}{/componentId}
      * @level 160
      *
-     * @param int    $courseId
+     * @param int $courseId
      * @param string $classCode
-     * @param int    $componentId  (Optional) the ID of the component the course is to be imported into
+     * @param int $componentId (Optional) the ID of the component the course is to be imported into
      */
-    public function import($courseId, $classCode, $componentId=null)
+    public function import($courseId, $classCode, $componentId = null)
     {
         $importer = new CourseImport();
 
@@ -1150,14 +1168,14 @@ class Controller extends Base\Base
      */
     public function importOwnership()
     {
-        $ownerships     = $this->getRequest()->post["ownership"];
+        $ownerships = $this->getRequest()->post["ownership"];
         $courseHomepage = trim($this->getRequest()->post["importCourse"]);
         $componentId = trim($this->getRequest()->post["componentId"]);
 
         // process ownership assignments
         // respond with stage 3: unit selection
         $this->tpl('unitImportForm', [
-            'homepage'       => implode(',', array_keys($ownerships)),
+            'homepage' => implode(',', array_keys($ownerships)),
             'courseHomepage' => $courseHomepage,
             'componentId'    => $componentId,
             'units'          => $this->getUnitSpecificationMapperProxy()->findAllByCourseFolderId($courseHomepage),
@@ -1209,7 +1227,7 @@ class Controller extends Base\Base
      */
     public function importUnits()
     {
-        $homepage       = trim($this->getRequest()->post["importFolders"]);
+        $homepage = trim($this->getRequest()->post["importFolders"]);
         $courseHomepage = trim($this->getRequest()->post["importCourse"]);
         $componentId = trim($this->getRequest()->post["componentId"]);
 
@@ -1222,51 +1240,48 @@ class Controller extends Base\Base
             return;
         }
 
-        if ($homepage == "" && $courseHomepage == "")
-        {
+        if ($homepage == "" && $courseHomepage == "") {
             // They didn't select anything
 
             $this->throwError('You must select at least one class and a course to import before you can proceed');
-        }
-        else if ($homepage == "")
-        {
-            // They didn't select a class code
+        } else {
+            if ($homepage == "") {
+                // They didn't select a class code
 
-            $this->throwError('You must select at least one class before you can proceed');
-        }
-        else if ($courseHomepage == "")
-        {
-            // They didn't select a course to import
+                $this->throwError('You must select at least one class before you can proceed');
+            } else {
+                if ($courseHomepage == "") {
+                    // They didn't select a course to import
 
-            $this->throwError('You must select a course to import before you can proceed');
-        }
-        else
-        {
-            $targetFolderIds = explode(',', $homepage);
+                    $this->throwError('You must select a course to import before you can proceed');
+                } else {
+                    $targetFolderIds = explode(',', $homepage);
 
-            $folders = $this->getFolderMapper()->findByColumn('id', $targetFolderIds);
+                    $folders = $this->getFolderMapper()->findByColumn('id', $targetFolderIds);
 
-            $possibleOwnerships = [];
+                    $possibleOwnerships = [];
 
-            foreach ($folders as $folder) {
-                $possibleOwnerships[$folder->getId()] = $this->getUserAccessMapper()->findUsersInCategory(
-                    $folder, Role::STAFF, UserAccess::ACCESS_WRITE
-                );
+                    foreach ($folders as $folder) {
+                        $possibleOwnerships[$folder->getId()] = $this->getUserAccessMapper()->findUsersInCategory(
+                            $folder, Role::STAFF, UserAccess::ACCESS_WRITE
+                        );
 
-                if (count($possibleOwnerships[$folder->getId()]) == 0) {
-                    // if nobody else was returned, jam the session user in there.
-                    $possibleOwnerships[$folder->getId()] = new Collection([ $this->getUser() ]);
+                        if (count($possibleOwnerships[$folder->getId()]) == 0) {
+                            // if nobody else was returned, jam the session user in there.
+                            $possibleOwnerships[$folder->getId()] = new Collection([$this->getUser()]);
+                        }
+                    }
+
+                    // Everything kosher, proceed with the mage
+                    // respond with stage 2: ownership
+                    $this->tpl('import/ownership', [
+                        'targetFolders' => $folders,
+                        'importCourse' => $courseHomepage,
+                        'ownershipCandidates' => $possibleOwnerships,
+                        'componentId' => $componentId
+                    ]);
                 }
             }
-
-            // Everything kosher, proceed with the mage
-            // respond with stage 2: ownership
-            $this->tpl('import/ownership', [
-                'targetFolders'       => $folders,
-                'importCourse'        => $courseHomepage,
-                'ownershipCandidates' => $possibleOwnerships,
-                'componentId'         => $componentId
-            ]);
         }
     }
 
@@ -1311,15 +1326,15 @@ class Controller extends Base\Base
         $units = new Collection();
 
         foreach ($unitCache as $key => $unitCurrent) {
-            $unit          = [];
-            $unit['id']    = $unitCurrent->getId();
-            $unit['name']  = $unitCache[$unitCurrent->getId()]->getName();
+            $unit = [];
+            $unit['id'] = $unitCurrent->getId();
+            $unit['name'] = $unitCache[$unitCurrent->getId()]->getName();
             $unit['items'] = new Collection();
 
             foreach ($unitDates as $unitDate) {
                 if ($unitDate["unit_id"] == $unitCurrent->getId()) {
                     $unit['open_date'] = $unitDate['open_date'];
-                    $unit['due_date']  = $unitDate['due_date'];
+                    $unit['due_date'] = $unitDate['due_date'];
                 }
             }
 
@@ -1334,7 +1349,7 @@ class Controller extends Base\Base
             if ($courseComponentId) {
                 $unitInstance = $this->getUnitInstanceMapper()->findByColumnList(
                     [
-                        'component_id'     => $courseComponentId,
+                        'component_id' => $courseComponentId,
                         'unit_category_id' => $key
                     ]
                 )->first();
@@ -1423,15 +1438,15 @@ class Controller extends Base\Base
             $temp->sortBy('created', 'asc');
 
             foreach ($temp as $current) {
-                $class  = 'Task';
+                $class = 'Task';
                 $detail = null;
                 try {
                     if ($current->getAssessment()->getId()) {
-                        $class  = 'OnlineAssessment';
+                        $class = 'OnlineAssessment';
                         $itemId = $current->getAssessment()->getId();
                         $detail = $this->getOnlineAssessmentMapper()->findById($itemId);
                     } elseif ($current->getSubmissionBox()->getId()) {
-                        $class  = 'SubmissionBox';
+                        $class = 'SubmissionBox';
                         $itemId = $current->getSubmissionBox()->getId();
                         $detail = $this->getSubmissionBoxMapper()->findById($itemId);
                     }
@@ -1452,10 +1467,10 @@ class Controller extends Base\Base
 
                 $unit['items']->add(
                     [
-                        'class'      => $class,
+                        'class' => $class,
                         'isAbstract' => $isAbstract,
-                        'item'       => $current,
-                        'detail'     => $detail
+                        'item' => $current,
+                        'detail' => $detail
                     ]
                 );
             }
@@ -1481,98 +1496,94 @@ class Controller extends Base\Base
     {
         $post = $this->getRequest()->post;
 
-        if (trim($post["homepage"]) == "")
-        {
+        if (trim($post["homepage"]) == "") {
             // The homepage ID has gone missing
 
             $this->throwError('No class code was specified');
-        }
-        else if (trim($post["course_homepage"]) == "")
-        {
-            // The course homepage ID has gone missing
+        } else {
+            if (trim($post["course_homepage"]) == "") {
+                // The course homepage ID has gone missing
 
-            $this->throwError('No course was specified');
-        }
-        else
-        {
-            $homepages = explode(",", $post["homepage"]);
+                $this->throwError('No course was specified');
+            } else {
+                $homepages = explode(",", $post["homepage"]);
 
-            // Test permissions. Must have write permission on the destination page and read permission
-            // on the course we are trying to import.
+                // Test permissions. Must have write permission on the destination page and read permission
+                // on the course we are trying to import.
 
-            // Test course page read access
+                // Test course page read access
 
-            if ($this->getAccess()->getFolderAccess($this->getUser(), [$post["course_homepage"]]) < READ_ACCESS) {
-                throw new Unauthorized();
-            }
-
-            // Test each homepage for write access
-
-            foreach ($homepages as $homepage) {
-                if ($this->getAccess()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
+                if ($this->getAccess()->getFolderAccess($this->getUser(), [$post["course_homepage"]]) < READ_ACCESS) {
                     throw new Unauthorized();
                 }
-            }
 
-            // Check all required dates have been specified
+                // Test each homepage for write access
 
-            $errorDate = false;
-            $foundUnit = false;
+                foreach ($homepages as $homepage) {
+                    if ($this->getAccess()->getFolderAccess($this->getUser(), [$homepage]) < WRITE_ACCESS) {
+                        throw new Unauthorized();
+                    }
+                }
 
-            foreach ($post["unit"] as $unit) {
-                if (!empty($unit['import'])) {
-                    $foundUnit = true;
+                // Check all required dates have been specified
 
-                    /* Add date validation
-                     */
-                    try {
-                        $openDate = \Alaress_Date_Format::newLocalShort($unit['open_date']);
-                        $dueDate  = \Alaress_Date_Format::newLocalShort($unit['due_date']);
-                        if ($openDate->gt($dueDate)) {
+                $errorDate = false;
+                $foundUnit = false;
+
+                foreach ($post["unit"] as $unit) {
+                    if (!empty($unit['import'])) {
+                        $foundUnit = true;
+
+                        /* Add date validation
+                         */
+                        try {
+                            $openDate = \Alaress_Date_Format::newLocalShort($unit['open_date']);
+                            $dueDate = \Alaress_Date_Format::newLocalShort($unit['due_date']);
+                            if ($openDate->gt($dueDate)) {
+                                $errorDate = true;
+                                $this->throwError('The open date must be before the close date');
+                                break;
+                            }
+                        } catch (\Exception $e) {
                             $errorDate = true;
-                            $this->throwError('The open date must be before the close date');
+                            $this->throwError('You must specify a valid open and close date for each unit you are importing');
                             break;
                         }
                     }
-                    catch (\Exception $e) {
-                        $errorDate = true;
-                        $this->throwError('You must specify a valid open and close date for each unit you are importing');
-                        break;
+                }
+
+                // Make sure at least one unit was specified
+
+                if (!$foundUnit) {
+                    $this->throwError('You must select at least one unit to import');
+                } elseif (!$errorDate) {
+                    /* Figger out when each task should open, due, late, etc
+                     * A superposition of Task Instances over Task Abstracts
+                     *
+                     * (a Task Abstract is one specified in the original Unit
+                     * but has not yet been imported)
+                     */
+                    try {
+                        $allTaskDates = $this->determineTaskDates(
+                            $post["unit"],
+                            $post->get('componentId')
+                        );
+                    } catch (MapperException $e) {
+                        $this->sendError($e->getMessage());
+                        return;
                     }
+
+                    // respond with stage 4: coursework list
+                    $this->tpl('unitImportResults', [
+                        'ownerships' => $post['ownerships'],
+                        'homepage' => $post["homepage"],
+                        'componentId' => $post["componentId"],
+                        'courseHomepage' => $post["course_homepage"],
+                        'unitDates' => $post["unit"],
+                        'units' => $allTaskDates['units'],
+                        'submitValue' => empty($post['ownerships']) ? 'Modify' : 'Import'
+                    ]);
                 }
-            }
-
-            // Make sure at least one unit was specified
-
-            if (!$foundUnit) {
-                $this->throwError('You must select at least one unit to import');
-            } elseif (!$errorDate) {
-                /* Figger out when each task should open, due, late, etc
-                 * A superposition of Task Instances over Task Abstracts
-                 *
-                 * (a Task Abstract is one specified in the original Unit
-                 * but has not yet been imported)
-                 */
-                try {
-                    $allTaskDates = $this->determineTaskDates(
-                        $post["unit"],
-                        $post->get('componentId')
-                    );
-                } catch (MapperException $e) {
-                    $this->sendError($e->getMessage());
-                    return;
-                }
-
-                // respond with stage 4: coursework list
-                $this->tpl('unitImportResults', [
-                    'ownerships'     => $post['ownerships'],
-                    'homepage'       => $post["homepage"],
-                    'componentId'    => $post["componentId"],
-                    'courseHomepage' => $post["course_homepage"],
-                    'unitDates'      => $post["unit"],
-                    'units'          => $allTaskDates['units'],
-                    'submitValue'    => empty($post['ownerships']) ? 'Modify' : 'Import'
-                ]);
             }
         }
     }
@@ -1793,10 +1804,8 @@ class Controller extends Base\Base
                         $taskInstances = $this->getTaskInstanceMapper()->findByColumn("course_unit_instance_id", $unit_instance->getId());
 
                         /** @var TaskInstance $taskInstance */
-                        foreach ($taskInstances as $taskInstance)
-                        {
-                            switch ($taskInstance->getType())
-                            {
+                        foreach ($taskInstances as $taskInstance) {
+                            switch ($taskInstance->getType()) {
                                 case Task::TYPE_DUE_WORK:
 
                                     // Due work
@@ -1864,8 +1873,8 @@ class Controller extends Base\Base
                         $unit_instance = new UnitInstance();
 
                         $unit_instance
-                            ->setWorkDates($post["work"]) // Override due work dates in cloner
-                            ->setQuizDates($post["quiz"]) // Override quiz dates in cloner
+                            ->setWorkDates($post["work"])// Override due work dates in cloner
+                            ->setQuizDates($post["quiz"])// Override quiz dates in cloner
                             ->setWorkOwner(isset($owners[$homepage]) ? $owners[$homepage] : $this->getUser())
                             ->setComponent($componentCache[$homepage])
                             ->setTitle($unitCache[$currentUnit['id']]->getName())
@@ -1973,15 +1982,15 @@ class Controller extends Base\Base
             }
 
             $unitOutput[$id] = [
-                'id'        => $id,
-                'name'      => $unitTitle,
+                'id' => $id,
+                'name' => $unitTitle,
                 'checkable' => $checkable,
             ];
 
             if (isset($values['selected'])) {
                 $unitOutput[$id]['checked'] = true;
                 $unitOutput[$id]['openDate'] = $selected->getOpenDate();
-                $unitOutput[$id]['dueDate']  = $selected->getDueDate();
+                $unitOutput[$id]['dueDate'] = $selected->getDueDate();
             }
         }
 
@@ -1992,23 +2001,22 @@ class Controller extends Base\Base
         if ($allComponents->count()) {
             $folderId = $allComponents->first()->getCategory()->getId();
             $destination = $this->getFolderMapper()->findCheaplyById($folderId);
-        }
-        else {
+        } else {
             /* TODO: Error; component never existed
              */
             $destination = $this->getFolderMapper()->createModel();
         }
 
         $this->tpl('import', [
-            '_part3'  => true,
-            'units'   => $unitOutput,
-            'folder'  => $destination,
+            '_part3' => true,
+            'units' => $unitOutput,
+            'folder' => $destination,
             'sources' => $course,
-            'destinations' => array_combine(['id','name'], $destination->findValueLabelPair()),
+            'destinations' => array_combine(['id', 'name'], $destination->findValueLabelPair()),
             'homepage' => $destination->getId(),
             'courseHomepage' => $course->getId(),
             'componentId' => $componentId,
-            'owner'       => $owner
+            'owner' => $owner
         ]);
     }
 
@@ -2028,13 +2036,13 @@ class Controller extends Base\Base
             return;
         }
 
-        $componentId    = $post['componentId'];
+        $componentId = $post['componentId'];
         $requiresDelete = false;
 
         try {
             /** @var Component_Instance $componentInstance */
             $componentInstance = $this->getComponentInstanceMapper()->findById($componentId);
-            $requiresDelete    = true;
+            $requiresDelete = true;
         } catch (MapperException $e) {
             // the component doesn't exist, so just fake it
             $componentInstance = $this->getComponentInstanceMapper()->createModel()->setId($componentId);
@@ -2051,7 +2059,7 @@ class Controller extends Base\Base
 
             $this->getResponse()->content->set([
                 'format' => 'json',
-                'data'   => true
+                'data' => true
             ]);
 
 
@@ -2067,12 +2075,12 @@ class Controller extends Base\Base
      * Save the given template for the given folder
      *
      * @param Folder\Model $model
-     * @param int          $template
+     * @param int $template
      */
     protected function saveHomepageConfig(Folder\Model $model, $template)
     {
         $confMapper = $this->getHomepageConfigMapper();
-        $tplMapper  = $this->getHomepageTemplateMapper();
+        $tplMapper = $this->getHomepageTemplateMapper();
 
         $homepageConfig = $confMapper->createModel()->setCategory($model);
 
