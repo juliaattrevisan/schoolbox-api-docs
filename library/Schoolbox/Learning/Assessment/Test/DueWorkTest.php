@@ -23,118 +23,8 @@ use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 
-class DueWorkTest extends \PHPUnit_Framework_TestCase
+class DueWorkTest extends \Schoolbox\Learning\Assessment\Test\Defaults
 {
-    /**
-     * @var User User
-     */
-    protected $hodes;
-
-    /**
-     * @var User
-     */
-    protected $sberryhill;
-
-    /**
-     * @var User
-     */
-    protected $slucier;
-
-    /**
-     * @var User
-     */
-    protected $bsalem;
-
-    /**
-     * @var User
-     */
-    protected $asaxon;
-
-    /**
-     * @var User
-     */
-    protected $celia;
-
-    /**
-     * @var User
-     */
-    protected $somodio;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $today;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $tomorrow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $thirteenDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $fourteenDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $twentyDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $thirtyDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $fortyDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $fiftyDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $sixtyDaysFromNow;
-
-    /**
-     * The Bestiary
-     */
-    protected function setup()
-    {
-        /* Dudes
-         */
-        $this->hodes = (new \Schoolbox\User)->setId(230)->setFirstname('David')->setLastname('Rhodes');
-        $this->sberryhill = (new \Schoolbox\User)->setId(15)->setFirstname('Scott')->setLastname('Berryhill');
-        $this->slucier = (new \Schoolbox\User)->setId(16)->setFirstname('Sam')->setLastname('Lucier');
-        $this->bsalem = (new \Schoolbox\User)->setId(32)->setFirstname('Bobby')->setLastname('Salem');
-        $this->asaxon = (new \Schoolbox\User)->setId(17)->setFirstname('Anita')->setLastname('Saxon');
-        $this->celia = (new \Schoolbox\User)->setId(3)->setFirstname('Celia')->setLastname('Glenn');
-        $this->somodio = (new \Schoolbox\User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio');
-
-        /* Times
-         */
-        $dateFormat = 'Y-m-d H:i:s';
-        $dateInit = '2016-09-08 11:30:00';
-
-        $this->today = new \Alaress_Date_Format($dateInit, $dateFormat);
-        $this->tomorrow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1);
-        $this->thirteenDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(13);
-        $this->fourteenDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(14);
-        $this->twentyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(20);
-        $this->thirtyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(30);
-        $this->fortyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(40);
-        $this->fiftyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(50);
-        $this->sixtyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(60);
-    }
 
     /**
      * Test that Due Work initialises into a usable state
@@ -150,9 +40,11 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test that Due Work basic details can be manufactured meaningfully
+     * Spawn a Due Work
+     *
+     * @return DueWork
      */
-    public function testBuild()
+    private function spawnDueWork()
     {
         $id = 2;
         $title = 'Enter the Realm of Terroarrrr';
@@ -201,6 +93,33 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ->setCloseAt($this->thirtyDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        return $dueWork;
+    }
+    /**
+     * Test that Due Work basic details can be manufactured meaningfully
+     */
+    public function testBuild()
+    {
+        $id = 2;
+        $title = 'Enter the Realm of Terroarrrr';
+        $description = 'Diablo was found in the land of terroarrrrr! Find him, and whack him!';
+        $typeName = 'Essay';
+
+        $files = [
+            [
+                'id' => 1,
+                'hash' => 'abcdefg12341234',
+                'filename' => 'myfile1.jpg'
+            ],
+            [
+                'id' => 2,
+                'hash' => 'zxvzxcvzxcv945786947',
+                'filename' => 'myfile2.jpg'
+            ],
+        ];
+
+        $dueWork = $this->spawnDueWork();
 
         /* Details
          */
@@ -248,24 +167,6 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
      */
     public function testResponses()
     {
-        $id = 2;
-        $title = 'Enter the Realm of Terroarrrr';
-        $description = 'Diablo was found in the land of terroarrrrr! Find him, and whack him!';
-        $typeName = 'Essay';
-
-        $files = [
-            [
-                'id' => 1,
-                'hash' => 'abcdefg12341234',
-                'filename' => 'myfile1.jpg'
-            ],
-            [
-                'id' => 2,
-                'hash' => 'zxvzxcvzxcv945786947',
-                'filename' => 'myfile2.jpg'
-            ],
-        ];
-
         $submissionFiles = [
             [
                 'id' => 11,
@@ -287,35 +188,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $dueWork = new DueWork();
-        $dueWork
-            ->setId($id)
-            ->setTitle($title)
-            ->setDescription($description)
-            ->setType((new DueWorkType())
-                ->setId(1)
-                ->setName($typeName))
-            ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
-            ->setAllFiles((new Collection())
-                ->add((new DueWorkFile())
-                    ->setId($files[0]['id'])
-                    ->setHash($files[0]['hash'])
-                    ->setFilename($files[0]['filename']))
-                ->add((new DueWorkFile())
-                    ->setId($files[1]['id'])
-                    ->setHash($files[1]['hash'])
-                    ->setFilename($files[1]['filename'])))
-            ->setPublishAt($this->thirteenDaysFromNow)
-            ->setOpenAt($this->fourteenDaysFromNow)
-            ->setDueAt($this->twentyDaysFromNow)
-            ->setCloseAt($this->thirtyDaysFromNow)
-            ->setCreatedAt($this->today)
-            ->setUpdatedAt($this->today);
+        $dueWork = $this->spawnDueWork();
 
         $submission = new DueWorkSubmission();
         $submission
@@ -382,24 +255,6 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
      */
     public function testFeedback()
     {
-        $id = 2;
-        $title = 'Enter the Realm of Terroarrrr';
-        $description = 'Diablo was found in the land of terroarrrrr! Find him, and whack him!';
-        $typeName = 'Essay';
-
-        $files = [
-            [
-                'id' => 1,
-                'hash' => 'abcdefg12341234',
-                'filename' => 'myfile1.jpg'
-            ],
-            [
-                'id' => 2,
-                'hash' => 'zxvzxcvzxcv945786947',
-                'filename' => 'myfile2.jpg'
-            ],
-        ];
-
         $feedbackFiles = [
             [
                 'id' => 112,
@@ -409,35 +264,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $dueWork = new DueWork();
-        $dueWork
-            ->setId($id)
-            ->setTitle($title)
-            ->setDescription($description)
-            ->setType((new DueWorkType())
-                ->setId(1)
-                ->setName($typeName))
-            ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
-            ->setAllFiles((new Collection())
-                ->add((new DueWorkFile())
-                    ->setId($files[0]['id'])
-                    ->setHash($files[0]['hash'])
-                    ->setFilename($files[0]['filename']))
-                ->add((new DueWorkFile())
-                    ->setId($files[1]['id'])
-                    ->setHash($files[1]['hash'])
-                    ->setFilename($files[1]['filename'])))
-            ->setPublishAt($this->thirteenDaysFromNow)
-            ->setOpenAt($this->fourteenDaysFromNow)
-            ->setDueAt($this->twentyDaysFromNow)
-            ->setCloseAt($this->thirtyDaysFromNow)
-            ->setCreatedAt($this->today)
-            ->setUpdatedAt($this->today);
+        $dueWork = $this->spawnDueWork();
 
         $feedback = (new DueWorkFeedback())
             ->setId(3385)
@@ -491,24 +318,6 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
      */
     public function testResponseWithFeedback()
     {
-        $id = 2;
-        $title = 'Enter the Realm of Terroarrrr';
-        $description = 'Diablo was found in the land of terroarrrrr! Find him, and whack him!';
-        $typeName = 'Essay';
-
-        $files = [
-            [
-                'id' => 1,
-                'hash' => 'abcdefg12341234',
-                'filename' => 'myfile1.jpg'
-            ],
-            [
-                'id' => 2,
-                'hash' => 'zxvzxcvzxcv945786947',
-                'filename' => 'myfile2.jpg'
-            ],
-        ];
-
         $submissionFiles = [
             [
                 'id' => 11,
@@ -539,35 +348,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $dueWork = new DueWork();
-        $dueWork
-            ->setId($id)
-            ->setTitle($title)
-            ->setDescription($description)
-            ->setType((new DueWorkType())
-                ->setId(1)
-                ->setName($typeName))
-            ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
-            ->setAllFiles((new Collection())
-                ->add((new DueWorkFile())
-                    ->setId($files[0]['id'])
-                    ->setHash($files[0]['hash'])
-                    ->setFilename($files[0]['filename']))
-                ->add((new DueWorkFile())
-                    ->setId($files[1]['id'])
-                    ->setHash($files[1]['hash'])
-                    ->setFilename($files[1]['filename'])))
-            ->setPublishAt($this->thirteenDaysFromNow)
-            ->setOpenAt($this->fourteenDaysFromNow)
-            ->setDueAt($this->twentyDaysFromNow)
-            ->setCloseAt($this->thirtyDaysFromNow)
-            ->setCreatedAt($this->today)
-            ->setUpdatedAt($this->today);
+        $dueWork = $this->spawnDueWork();
 
         $submission = new DueWorkSubmission();
         $submission
@@ -668,24 +449,6 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnpublishedFeedbacks()
     {
-        $id          = 2;
-        $title       = 'Enter the Realm of Terroarrrr';
-        $description = 'Diablo was found in the land of terroarrrrr! Find him, and whack him!';
-        $typeName    = 'Essay';
-
-        $files = [
-            [
-                'id'       => 1,
-                'hash'     => 'abcdefg12341234',
-                'filename' => 'myfile1.jpg'
-            ],
-            [
-                'id'       => 2,
-                'hash'     => 'zxvzxcvzxcv945786947',
-                'filename' => 'myfile2.jpg'
-            ],
-        ];
-
         $submissionFiles = [
             [
                 'id'         => 11,
@@ -716,45 +479,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $dueWork = new DueWork();
-        $dueWork
-            ->setId($id)
-            ->setTitle($title)
-            ->setDescription($description)
-            ->setType(
-                (new DueWorkType())
-                    ->setId(1)
-                    ->setName($typeName)
-            )
-            ->setCreator($this->somodio)
-            ->setAllParticipants(
-                (new Collection())
-                    ->add(new Participant($this->hodes))
-                    ->add(new Participant($this->bsalem))
-                    ->add(new Participant($this->sberryhill))
-                    ->add(new Participant($this->asaxon))
-            )
-            ->setAllFiles(
-                (new Collection())
-                    ->add(
-                        (new DueWorkFile())
-                            ->setId($files[0]['id'])
-                            ->setHash($files[0]['hash'])
-                            ->setFilename($files[0]['filename'])
-                    )
-                    ->add(
-                        (new DueWorkFile())
-                            ->setId($files[1]['id'])
-                            ->setHash($files[1]['hash'])
-                            ->setFilename($files[1]['filename'])
-                    )
-            )
-            ->setPublishAt($this->thirteenDaysFromNow)
-            ->setOpenAt($this->fourteenDaysFromNow)
-            ->setDueAt($this->twentyDaysFromNow)
-            ->setCloseAt($this->thirtyDaysFromNow)
-            ->setCreatedAt($this->today)
-            ->setUpdatedAt($this->today);
+        $dueWork = $this->spawnDueWork();
 
         $submission = new DueWorkSubmission();
         $submission
@@ -857,24 +582,6 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
      */
     public function testPublishedFeedbacks()
     {
-        $id = 2;
-        $title = 'Enter the Realm of Terroarrrr';
-        $description = 'Diablo was found in the land of terroarrrrr! Find him, and whack him!';
-        $typeName = 'Essay';
-
-        $files = [
-            [
-                'id' => 1,
-                'hash' => 'abcdefg12341234',
-                'filename' => 'myfile1.jpg'
-            ],
-            [
-                'id' => 2,
-                'hash' => 'zxvzxcvzxcv945786947',
-                'filename' => 'myfile2.jpg'
-            ],
-        ];
-
         $submissionFiles = [
             [
                 'id' => 11,
@@ -905,35 +612,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $dueWork = new DueWork();
-        $dueWork
-            ->setId($id)
-            ->setTitle($title)
-            ->setDescription($description)
-            ->setType((new DueWorkType())
-                ->setId(1)
-                ->setName($typeName))
-            ->setCreator($this->somodio)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
-            ->setAllFiles((new Collection())
-                ->add((new DueWorkFile())
-                    ->setId($files[0]['id'])
-                    ->setHash($files[0]['hash'])
-                    ->setFilename($files[0]['filename']))
-                ->add((new DueWorkFile())
-                    ->setId($files[1]['id'])
-                    ->setHash($files[1]['hash'])
-                    ->setFilename($files[1]['filename'])))
-            ->setPublishAt($this->thirteenDaysFromNow)
-            ->setOpenAt($this->fourteenDaysFromNow)
-            ->setDueAt($this->twentyDaysFromNow)
-            ->setCloseAt($this->thirtyDaysFromNow)
-            ->setCreatedAt($this->today)
-            ->setUpdatedAt($this->today);
+        $dueWork = $this->spawnDueWork();
 
         $submission = new DueWorkSubmission();
         $submission

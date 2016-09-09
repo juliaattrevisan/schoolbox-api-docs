@@ -33,131 +33,37 @@ use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
-class ProjectTest extends \PHPUnit_Framework_TestCase
+class ProjectTest extends \Schoolbox\Learning\Assessment\Test\Defaults
 {
-    /**
-     * @var User User
-     */
-    protected $hodes;
 
     /**
-     * @var User
+     * Setup
      */
-    protected $sberryhill;
-
-    /**
-     * @var User
-     */
-    protected $slucier;
-
-    /**
-     * @var User
-     */
-    protected $bsalem;
-
-    /**
-     * @var User
-     */
-    protected $asaxon;
-
-    /**
-     * @var User
-     */
-    protected $celia;
-
-    /**
-     * @var User
-     */
-    protected $somodio;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $today;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $tomorrow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $thirteenDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $fourteenDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $twentyDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $thirtyDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $fortyDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $fiftyDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $sixtyDaysFromNow;
-
-    /**
-     * The Bestiary
-     */
-    protected function setup()
+    public function setup()
     {
-        /* Dudes
-         */
-        $this->hodes = (new \Schoolbox\User)->setId(230)->setFirstname('David')->setLastname('Rhodes');
-        $this->sberryhill = (new \Schoolbox\User)->setId(15)->setFirstname('Scott')->setLastname('Berryhill');
-        $this->slucier = (new \Schoolbox\User)->setId(16)->setFirstname('Sam')->setLastname('Lucier');
-        $this->bsalem = (new \Schoolbox\User)->setId(32)->setFirstname('Bobby')->setLastname('Salem');
-        $this->asaxon = (new \Schoolbox\User)->setId(17)->setFirstname('Anita')->setLastname('Saxon');
-        $this->celia = (new \Schoolbox\User)->setId(3)->setFirstname('Celia')->setLastname('Glenn');
-        $this->somodio = (new \Schoolbox\User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio');
-
-        /* Times
-         */
-        $dateFormat = 'Y-m-d H:i:s';
-        $dateInit = '2016-09-08 11:30:00';
-
-        $this->today = new \Alaress_Date_Format($dateInit, $dateFormat);
-        $this->tomorrow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1);
-        $this->thirteenDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(13);
-        $this->fourteenDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(14);
-        $this->twentyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(20);
-        $this->thirtyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(30);
-        $this->fortyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(40);
-        $this->fiftyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(50);
-        $this->sixtyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(60);
+        parent::setup();
 
         /* A giant project instantiation consisting of a due work, task, quiz
          */
         $this->dueWork = $this->spawnDueWork();
-        $this->task = $this->spawnTask();
-        $this->quiz = $this->spawnQuiz();
+        $this->task    = $this->spawnTask();
+        $this->quiz    = $this->spawnQuiz();
     }
+
+    /**
+     * Test
+     */
+    public function testProject()
+    {
+    }
+
 
     /**
      * Spawn a Due Work
      *
      * @return DueWork
      */
-    private function spawnDueWork()
+    protected function spawnDueWork()
     {
 
         $id = 2;
@@ -337,7 +243,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     /**
      * Spawn a Task
      */
-    private function spawnTask()
+    protected function spawnTask()
     {
         $id = 1234;
         $title = 'Read the Horadric Scrolls';
@@ -403,7 +309,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
      *
      * @return $this
      */
-    private function spawnQuiz()
+    protected function spawnQuiz()
     {
         $id = 3;
         $title = 'How did you find The Prime Evil?';
@@ -492,12 +398,4 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
 
         return $quiz;
     }
-
-    /**
-     * Test
-     */
-    public function testProject()
-    {
-    }
-
 }

@@ -11,7 +11,6 @@
 
 use \Schoolbox\Collection;
 use \Schoolbox\User;
-use \Schoolbox\Resource\Storage\Model as Storage;
 
 use \Schoolbox\Learning\Assessment\Participant;
 
@@ -19,118 +18,8 @@ use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
-class QuizTest extends \PHPUnit_Framework_TestCase
+class QuizTest extends \Schoolbox\Learning\Assessment\Test\Defaults
 {
-    /**
-     * @var User User
-     */
-    protected $hodes;
-
-    /**
-     * @var User
-     */
-    protected $sberryhill;
-
-    /**
-     * @var User
-     */
-    protected $slucier;
-
-    /**
-     * @var User
-     */
-    protected $bsalem;
-
-    /**
-     * @var User
-     */
-    protected $asaxon;
-
-    /**
-     * @var User
-     */
-    protected $celia;
-
-    /**
-     * @var User
-     */
-    protected $somodio;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $today;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $tomorrow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $thirteenDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $fourteenDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $twentyDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $thirtyDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $fortyDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $fiftyDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $sixtyDaysFromNow;
-
-    /**
-     * The Bestiary
-     */
-    protected function setup()
-    {
-        /* Dudes
-         */
-        $this->hodes = (new \Schoolbox\User)->setId(230)->setFirstname('David')->setLastname('Rhodes');
-        $this->sberryhill = (new \Schoolbox\User)->setId(15)->setFirstname('Scott')->setLastname('Berryhill');
-        $this->slucier = (new \Schoolbox\User)->setId(16)->setFirstname('Sam')->setLastname('Lucier');
-        $this->bsalem = (new \Schoolbox\User)->setId(32)->setFirstname('Bobby')->setLastname('Salem');
-        $this->asaxon = (new \Schoolbox\User)->setId(17)->setFirstname('Anita')->setLastname('Saxon');
-        $this->celia = (new \Schoolbox\User)->setId(3)->setFirstname('Celia')->setLastname('Glenn');
-        $this->somodio = (new \Schoolbox\User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio');
-
-        /* Times
-         */
-        $dateFormat = 'Y-m-d H:i:s';
-        $dateInit = '2016-09-09 14:35:00';
-
-        $this->today = new \Alaress_Date_Format($dateInit, $dateFormat);
-        $this->tomorrow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1);
-        $this->thirteenDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(13);
-        $this->fourteenDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(14);
-        $this->twentyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(20);
-        $this->thirtyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(30);
-        $this->fortyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(40);
-        $this->fiftyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(50);
-        $this->sixtyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(60);
-    }
 
     /**
      * Test that Quiz initialises into a usable state

@@ -11,7 +11,6 @@
 
 use \Schoolbox\Collection;
 use \Schoolbox\User;
-use \Schoolbox\Resource\Storage\Model as Storage;
 
 use \Schoolbox\Learning\Assessment\Participant;
 
@@ -19,119 +18,8 @@ use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
 use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
-class TaskTest extends \PHPUnit_Framework_TestCase
+class TaskTest extends \Schoolbox\Learning\Assessment\Test\Defaults
 {
-
-    /**
-     * @var User User
-     */
-    protected $hodes;
-
-    /**
-     * @var User
-     */
-    protected $sberryhill;
-
-    /**
-     * @var User
-     */
-    protected $slucier;
-
-    /**
-     * @var User
-     */
-    protected $bsalem;
-
-    /**
-     * @var User
-     */
-    protected $asaxon;
-
-    /**
-     * @var User
-     */
-    protected $celia;
-
-    /**
-     * @var User
-     */
-    protected $somodio;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $today;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $tomorrow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $thirteenDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $fourteenDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $twentyDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $thirtyDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $fortyDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $fiftyDaysFromNow;
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    protected $sixtyDaysFromNow;
-
-    /**
-     * The Bestiary
-     */
-    protected function setup()
-    {
-        /* Dudes
-         */
-        $this->hodes = (new \Schoolbox\User)->setId(230)->setFirstname('David')->setLastname('Rhodes');
-        $this->sberryhill = (new \Schoolbox\User)->setId(15)->setFirstname('Scott')->setLastname('Berryhill');
-        $this->slucier = (new \Schoolbox\User)->setId(16)->setFirstname('Sam')->setLastname('Lucier');
-        $this->bsalem = (new \Schoolbox\User)->setId(32)->setFirstname('Bobby')->setLastname('Salem');
-        $this->asaxon = (new \Schoolbox\User)->setId(17)->setFirstname('Anita')->setLastname('Saxon');
-        $this->celia = (new \Schoolbox\User)->setId(3)->setFirstname('Celia')->setLastname('Glenn');
-        $this->somodio = (new \Schoolbox\User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio');
-
-        /* Times
-         */
-        $dateFormat = 'Y-m-d H:i:s';
-        $dateInit = '2016-09-09 14:35:00';
-
-        $this->today = new \Alaress_Date_Format($dateInit, $dateFormat);
-        $this->tomorrow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1);
-        $this->thirteenDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(13);
-        $this->fourteenDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(14);
-        $this->twentyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(20);
-        $this->thirtyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(30);
-        $this->fortyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(40);
-        $this->fiftyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(50);
-        $this->sixtyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(60);
-    }
 
     /**
      * Test that Task initialises into a usable state
@@ -144,9 +32,11 @@ class TaskTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test that Task basic details can be manufactured meaningfully
+     * Spawn a Task
+     *
+     * @return Task
      */
-    public function testBuild()
+    private function spawnTask()
     {
         $id = 1234;
         $title = 'Read the Horadric Scrolls';
@@ -168,6 +58,20 @@ class TaskTest extends \PHPUnit_Framework_TestCase
             ->setCloseAt($this->fourteenDaysFromNow)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
+
+        return $task;
+    }
+
+    /**
+     * Test that Task basic details can be manufactured meaningfully
+     */
+    public function testBuild()
+    {
+        $id = 1234;
+        $title = 'Read the Horadric Scrolls';
+        $description = 'There is a book by Deckard Cain which you must read before searching for Diablo.';
+
+        $task = $this->spawnTask();
 
         /* Details
          */
@@ -204,26 +108,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
      */
     public function testResponses()
     {
-        $id = 1234;
-        $title = 'Read the Horadric Scrolls';
-        $description = 'There is a book by Deckard Cain which you must read before searching for Diablo.';
-
-        $task = new Task();
-        $task
-            ->setId($id)
-            ->setTitle($title)
-            ->setDescription($description)
-            ->setCreator($this->celia)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
-            ->setPublishAt($this->thirteenDaysFromNow)
-            ->setOpenAt($this->thirteenDaysFromNow)
-            ->setDueAt($this->fourteenDaysFromNow)
-            ->setCloseAt($this->fourteenDaysFromNow)
-            ->setCreatedAt($this->today)
-            ->setUpdatedAt($this->today);
+        $task = $this->spawnTask();
 
         $completion = (new TaskCompletion);
         $completion
@@ -258,26 +143,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
      */
     public function testFeedback()
     {
-        $id = 1234;
-        $title = 'Read the Horadric Scrolls';
-        $description = 'There is a book by Deckard Cain which you must read before searching for Diablo.';
-
-        $task = new Task();
-        $task
-            ->setId($id)
-            ->setTitle($title)
-            ->setDescription($description)
-            ->setCreator($this->celia)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
-            ->setPublishAt($this->thirteenDaysFromNow)
-            ->setOpenAt($this->thirteenDaysFromNow)
-            ->setDueAt($this->fourteenDaysFromNow)
-            ->setCloseAt($this->fourteenDaysFromNow)
-            ->setCreatedAt($this->today)
-            ->setUpdatedAt($this->today);
+        $task = $this->spawnTask();
 
         $feedback = new TaskFeedback();
         $feedback
@@ -313,26 +179,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
      */
     public function testResponseWithFeedback()
     {
-        $id = 1234;
-        $title = 'Read the Horadric Scrolls';
-        $description = 'There is a book by Deckard Cain which you must read before searching for Diablo.';
-
-        $task = new Task();
-        $task
-            ->setId($id)
-            ->setTitle($title)
-            ->setDescription($description)
-            ->setCreator($this->celia)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
-            ->setPublishAt($this->thirteenDaysFromNow)
-            ->setOpenAt($this->thirteenDaysFromNow)
-            ->setDueAt($this->fourteenDaysFromNow)
-            ->setCloseAt($this->fourteenDaysFromNow)
-            ->setCreatedAt($this->today)
-            ->setUpdatedAt($this->today);
+        $task = $this->spawnTask();
 
         $completion = (new TaskCompletion);
         $completion
@@ -385,26 +232,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
      */
     public function testPublishedFeedback()
     {
-        $id = 1234;
-        $title = 'Read the Horadric Scrolls';
-        $description = 'There is a book by Deckard Cain which you must read before searching for Diablo.';
-
-        $task = new Task();
-        $task
-            ->setId($id)
-            ->setTitle($title)
-            ->setDescription($description)
-            ->setCreator($this->celia)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
-            ->setPublishAt($this->thirteenDaysFromNow)
-            ->setOpenAt($this->thirteenDaysFromNow)
-            ->setDueAt($this->fourteenDaysFromNow)
-            ->setCloseAt($this->fourteenDaysFromNow)
-            ->setCreatedAt($this->today)
-            ->setUpdatedAt($this->today);
+        $task = $this->spawnTask();
 
         $completion = (new TaskCompletion);
         $completion
@@ -441,26 +269,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
      */
     public function testUnublishedFeedback()
     {
-        $id = 1234;
-        $title = 'Read the Horadric Scrolls';
-        $description = 'There is a book by Deckard Cain which you must read before searching for Diablo.';
-
-        $task = new Task();
-        $task
-            ->setId($id)
-            ->setTitle($title)
-            ->setDescription($description)
-            ->setCreator($this->celia)
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
-            ->setPublishAt($this->thirteenDaysFromNow)
-            ->setOpenAt($this->thirteenDaysFromNow)
-            ->setDueAt($this->fourteenDaysFromNow)
-            ->setCloseAt($this->fourteenDaysFromNow)
-            ->setCreatedAt($this->today)
-            ->setUpdatedAt($this->today);
+        $task = $this->spawnTask();
 
         $completion = (new TaskCompletion);
         $completion
