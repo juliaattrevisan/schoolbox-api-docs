@@ -57,7 +57,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         INSERT INTO course_specification (folder_id, created_at, updated_at, deleted_at) VALUES (:folderId, NOW(), NOW(), :deleted)
     ");
     $insertNewUnitQuery   = $database->prepare("
-        INSERT INTO course_unit (folder_id, course_specification_id, created_at, updated_at, deleted_at)
+        INSERT INTO course_unit_specification (folder_id, course_specification_id, created_at, updated_at, deleted_at)
         VALUES (:folderId, :courseId, NOW(), NOW(), :deleted)
     ");
 

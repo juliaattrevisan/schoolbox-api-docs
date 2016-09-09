@@ -36,7 +36,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             cf.name AS course_name
         FROM course_unit_instance cui
         INNER JOIN folder f ON cui.category_id = f.id
-        INNER JOIN course_unit cu ON cui.unit_category_id = cu.folder_id
+        INNER JOIN course_unit_specification cu ON cui.unit_category_id = cu.folder_id
         INNER JOIN course_specification c ON cu.course_specification_id = c.id
         INNER JOIN folder cf ON c.folder_id = cf.id
         GROUP BY
@@ -56,9 +56,9 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     ");
     $updateUnitInstanceQuery = $database->prepare("
         UPDATE course_unit_instance cui
-        LEFT   JOIN course_unit cu ON cui.unit_category_id = cu.folder_id
+        LEFT   JOIN course_unit_specification cu ON cui.unit_category_id = cu.folder_id
         SET    cui.course_instance_id = :courseInstanceId,
-               cui.course_unit_id = cu.id
+               cui.course_unit_specification_id = cu.id
         WHERE  cui.component_id = :componentId
         AND    cui.category_id = :folderId
     ");

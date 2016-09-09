@@ -29,7 +29,7 @@ CREATE TABLE `course_specification` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-CREATE TABLE `course_unit` (
+CREATE TABLE `course_unit_specification` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `folder_id` INT UNSIGNED NOT NULL,
   `course_specification_id` INT UNSIGNED NOT NULL,
@@ -69,10 +69,10 @@ CHANGE COLUMN `id` `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT ;
 
 UPDATE `course_unit_instance` SET `updated_at` = `created_at`;
 
--- Add FK relation to course_instance once that table is populated
+-- Add FK relation to this table once that table is populated
 ALTER TABLE `course_unit_instance`
   ADD COLUMN `course_instance_id` INT(11) NOT NULL AFTER `id`,
-  ADD COLUMN `course_unit_id` INT(11) NOT NULL AFTER `course_instance_id`;
+  ADD COLUMN `course_unit_specification_id` INT(11) NOT NULL AFTER `course_instance_id`;
 
 CREATE TABLE `project` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -143,19 +143,19 @@ CREATE TABLE `project_course_unit_instance` (
 ENGINE = InnoDB;
 
 
-CREATE TABLE `project_course_unit` (
+CREATE TABLE `project_course_unit_specification` (
   `project_id` INT UNSIGNED NOT NULL,
-  `course_unit_id` INT UNSIGNED NOT NULL,
+  `course_unit_specification_id` INT UNSIGNED NOT NULL,
   INDEX `fk_project_course_unit_project_id_idx` (`project_id` ASC),
-  INDEX `fk_project_course_unit_course_unit_id_idx` (`course_unit_id` ASC),
+  INDEX `fk_project_course_unit_course_unit_specification_id_idx` (`course_unit_specification_id` ASC),
   CONSTRAINT `fk_project_course_unit_project_id`
     FOREIGN KEY (`project_id`)
     REFERENCES `project` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_project_course_unit_course_unit_id`
-    FOREIGN KEY (`course_unit_id`)
-    REFERENCES `course_unit` (`id`)
+  CONSTRAINT `fk_project_course_unit_course_unit_specification_id`
+    FOREIGN KEY (`course_unit_specification_id`)
+    REFERENCES `course_unit_specification` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
