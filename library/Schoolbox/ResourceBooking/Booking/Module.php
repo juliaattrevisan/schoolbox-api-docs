@@ -102,7 +102,7 @@ class Module extends BaseModule
         // This depends on the the item - managed items can only be booked by
         // moderators, otherwise they may be booked by any staff member.
         $canBookRule = new Auth\CanBookItem();
-        $canBookRule->setMapper($this->getMapper());
+        $canBookRule->setMapper($this->getItemMapper());
         $bookingCreateRule = new Rule\Any($baseManageRule, $canBookRule);
 
         // Cancel/edit rule:
@@ -165,7 +165,7 @@ class Module extends BaseModule
     }
 
     /**
-     * @return Mapper
+     * @return ItemMapper
      */
     protected function getItemMapper()
     {
