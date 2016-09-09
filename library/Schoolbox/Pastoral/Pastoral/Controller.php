@@ -925,19 +925,39 @@ class Controller extends Base
             }
 
             try {
-                /** @var PastoralTypeModel $type */
-                $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
+                if ($this->getRequest()->post["typeId"] != null) {
+                    /** @var PastoralTypeModel $type */
+                    $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
+                } else {
+                    $type = null;
+                }
+            } catch (MapperException $e) {
+                // Can't trust imported data from Synergetic
+                $type = null;
+            }
 
+            try {
                 if ($this->getRequest()->post["categoryId"] != null) {
                     /** @var PastoralCategoryModel $category */
                     $category = $this->getPastoralCategoryMapper()->findById($this->getRequest()->post["categoryId"]);
                 } else {
                     $category = null;
                 }
-                /** @var PastoralSeverityModel $severity */
-                $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
             } catch (MapperException $e) {
-                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                // Can't trust imported data from Synergetic
+                $category = null;
+            }
+
+            try {
+                if ($this->getRequest()->post["severityId"] != null) {
+                    /** @var PastoralSeverityModel $severity */
+                    $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
+                } else {
+                    $severity = null;
+                }
+            } catch (MapperException $e) {
+                // Can't trust imported data from Synergetic
+                $severity = null;
             }
 
             $record->setHeading($this->getRequest()->post["heading"]);
