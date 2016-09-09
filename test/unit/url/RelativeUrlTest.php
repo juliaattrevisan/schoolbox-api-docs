@@ -447,6 +447,11 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         $inputs = [
             ''                                               => '',
             '/'                                              => '/',
+            '#'                                              => '#',
+            '#tags'                                          => '#tags',
+            '?key'                                           => '?key',
+            '?key=val'                                       => '?key=val',
+            '?key=val&key2=val2'                             => '?key=val&key2=val2',
             '/path/to/file.ext'                              => '/path/to/file.ext',
             '//www.google.com/path/to/file.ext'              => '/path/to/file.ext',
             'www.google.com/path/to/file.ext'                => '/path/to/file.ext',
