@@ -90,16 +90,6 @@ ALTER TABLE `course_unit_implementation`
   DROP INDEX `course_unit_instance_category_id` ,
   ADD INDEX `course_unit_implementation_category_id` (`category_id` ASC);
 
-CREATE TABLE `project` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(250) NOT NULL,
-  `description` TEXT NULL,
-  `weight` INT(11) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_general_ci;
-
 
 CREATE TABLE `assessment` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -170,6 +160,8 @@ CREATE TABLE `project_course_unit_specification` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+
+-- New and existing assessment types
 -- TODO once conversions are completed, add FK constraints to these tables
 
 ALTER TABLE `assess`
@@ -198,3 +190,21 @@ INSERT INTO `component_config_definition` (
   'Imported Course',
   'The Imported Course that is displayed in this component'
 );
+
+-- The new project assessment type
+CREATE TABLE `project` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `assessment_id` INT UNSIGNED NOT NULL,
+  `title` VARCHAR(250) NOT NULL,
+  `description` TEXT NULL,
+  `weight` INT(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  INDEX `fk_project_assessment_id_idx` (`assessment_id` ASC),
+  CONSTRAINT `fk_project_course_unit_project_id`
+  FOREIGN KEY (`assessment_id`)
+  REFERENCES `assessment` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+  ENGINE = InnoDB
+  DEFAULT CHARACTER SET = utf8
+  COLLATE = utf8_general_ci;
