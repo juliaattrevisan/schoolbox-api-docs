@@ -264,7 +264,7 @@ class Participant
             /* Compare to see which one is the most recent action to occur
              */
             if ($type == self::TRAVERSAL_PUBLISHED) {
-                if ($latestFeedback->getUpdatedAt()->gt($latestResponse->getUpdatedAt()) && $latestFeedback->isPublished()) {
+                if ($latestFeedback->isPublished() && $latestFeedback->getPublishedAt()->gt($latestResponse->getUpdatedAt())) {
                     return $latestFeedback;
                 }
             }
