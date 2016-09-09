@@ -640,7 +640,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $feedback->getAssessable()->getId());
         $this->assertCount(1, $submission->getAllFeedback());
 
-        /* Total number of Submissions
+        /* Total number of Responses
          */
         $this->assertCount(1, $dueWork->getParticipant($this->hodes)->getAllResponses());
         $this->assertCount(2, $dueWork->getParticipant($this->hodes)->findAllFeedbackForAssessable($dueWork));

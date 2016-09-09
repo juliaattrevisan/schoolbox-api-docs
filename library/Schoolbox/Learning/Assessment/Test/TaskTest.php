@@ -200,7 +200,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test that Due Work Responses can be manufactured meaningfully
+     * Test that Task Responses can be manufactured meaningfully
      */
     public function testResponses()
     {
@@ -236,7 +236,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
 
         $task->getParticipant($this->hodes)->getAllResponses()->add($completion);
 
-        /* Check that it linked to the Due Work correctly
+        /* Check that it linked to the Task correctly
          */
         $this->assertEquals(1234, $completion->getAssessable()->getId());
 
@@ -308,8 +308,8 @@ class TaskTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test that Due Work can contain Responses and Feedback meaningfully
-     * including the shortcut that Feedbacks have to their Due Work
+     * Test that Task can contain Responses and Feedback meaningfully
+     * including the shortcut that Feedbacks have to their Task
      */
     public function testResponseWithFeedback()
     {
@@ -363,7 +363,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1234, $feedback->getAssessable()->getId());
         $this->assertCount(1, $completion->getAllFeedback());
 
-        /* Total number of Submissions
+        /* Total number of Responses
          */
         $this->assertCount(1, $task->getParticipant($this->hodes)->getAllResponses());
         $this->assertCount(1, $task->getParticipant($this->hodes)->findAllFeedbackForAssessable($task));
