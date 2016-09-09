@@ -74,6 +74,22 @@ ALTER TABLE `course_unit_instance`
   ADD COLUMN `course_implementation_id` INT(11) NOT NULL AFTER `id`,
   ADD COLUMN `course_unit_specification_id` INT(11) NOT NULL AFTER `course_implementation_id`;
 
+ALTER TABLE `course_unit_instance` RENAME TO `course_unit_implementation`;
+
+ALTER TABLE `course_unit_implementation`
+  DROP INDEX `course_unit_instance_component_id` ,
+  ADD INDEX `course_unit_implementation_component_id` (`component_id` ASC),
+  DROP INDEX `course_unit_instance_unit_category_id` ,
+  ADD INDEX `course_unit_implementation_unit_category_id` (`unit_category_id` ASC),
+  DROP INDEX `course_unit_instance_open_date` ,
+  ADD INDEX `course_unit_implementation_open_date` (`open_date` ASC),
+  DROP INDEX `course_unit_instance_due_date` ,
+  ADD INDEX `course_unit_implementation_due_date` (`due_date` ASC),
+  DROP INDEX `course_unit_instance_deleted_at` ,
+  ADD INDEX `course_unit_implementation_deleted_at` (`deleted_at` ASC),
+  DROP INDEX `course_unit_instance_category_id` ,
+  ADD INDEX `course_unit_implementation_category_id` (`category_id` ASC);
+
 CREATE TABLE `project` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(250) NOT NULL,
@@ -125,19 +141,19 @@ CREATE TABLE `project_folder` (
 ENGINE = InnoDB;
 
 
-CREATE TABLE `project_course_unit_instance` (
+CREATE TABLE `project_course_unit_implementation` (
   `project_id` INT UNSIGNED NOT NULL,
-  `course_unit_instance_id` INT UNSIGNED NOT NULL,
-  INDEX `fk_project_course_unit_instance_project_id_idx` (`project_id` ASC),
-  INDEX `fk_project_course_unit_instance_course_unit_instance_id_idx` (`course_unit_instance_id` ASC),
-  CONSTRAINT `fk_project_course_unit_instance_project_id`
+  `course_unit_implementation_id` INT UNSIGNED NOT NULL,
+  INDEX `fk_project_cui_project_id_idx` (`project_id` ASC),
+  INDEX `fk_project_cui_course_unit_implementation_id_idx` (`course_unit_implementation_id` ASC),
+  CONSTRAINT `fk_project_cui_project_id`
     FOREIGN KEY (`project_id`)
     REFERENCES `project` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
- CONSTRAINT `fk_project_course_unit_instance_course_unit_instance_id`
-   FOREIGN KEY (`course_unit_instance_id`)
-   REFERENCES `course_unit_instance` (`id`)
+ CONSTRAINT `fk_project_cui_course_unit_implementation_id`
+   FOREIGN KEY (`course_unit_implementation_id`)
+   REFERENCES `course_unit_implementation` (`id`)
    ON DELETE NO ACTION
    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
