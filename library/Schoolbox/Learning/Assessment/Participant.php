@@ -263,6 +263,9 @@ class Participant
                     }
                 }
 
+                /* Check in case the first one is the most recent anyway
+                 * and that it is also actually published
+                 */
                 if ($latestFeedback->isPublished()) {
                     return $latestFeedback;
                 }
