@@ -25,18 +25,14 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
     $db = Database::getInstance();
 
-    // Insert project and related information queries
-    $insertProjectQuery = $db->prepare("
-        INSERT INTO project (title, description, weight)
-        VALUES (:title, '', :weight)
-    ");
+    // Insert assessment and related information queries
     $insertAssessmentQuery = $db->prepare("
-        INSERT INTO assessment (project_id, title, description, publish_date, open_date, due_date, weight, sequence)
-        VALUES (:projectId, :title, '', :publish, :open, :due, :weight, 1)
+        INSERT INTO assessment (title, description, publish_date, open_date, due_date, weight, sequence)
+        VALUES (:title, '', :publish, :open, :due, :weight, 1)
     ");
-    $insertProjectRelationQuery = $db->prepare("
-        INSERT INTO project_course_unit_instance (project_id, course_unit_instance_id)
-        VALUES (:projectId, :courseUnitInstanceId)
+    $insertAssessmentRelationQuery = $db->prepare("
+        INSERT INTO assessment_course_unit_instance (assessment_id, course_unit_instance_id)
+        VALUES (:assessmentId, :courseUnitInstanceId)
     ");
 
     // Insert task query - most fields are just copied from the task instance
@@ -111,7 +107,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         try {
             $db->beginTransaction();
 
-            // Figure out project's weight, publish/open/due date
+            // Figure out assessment's weight, publish/open/due date
             $weight      = 0;
             $publishDate = null;
             $openDate    = null;
@@ -147,29 +143,20 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 }
             }
 
-            // Create project
-            $insertProjectQuery->execute([
-                'title'   => $title,
-                'weight'  => intval($weight),
-            ]);
-            $projectId = $db->lastInsertId();
-            $log->debug('Created project');
-
-            // Associate this project with the task's folder
-            $insertProjectRelationQuery->execute(['projectId' => $projectId, 'courseUnitInstanceId' => $courseUnitInstanceId]);
-            $log->debug('Created project/course instance relation');
-
             // Create assessment
             $insertAssessmentQuery->execute([
-                'projectId' => $projectId,
-                'title'     => $title,
-                'weight'    => intval($weight),
-                'publish'   => $publishDate,
-                'open'      => $openDate,
-                'due'       => $dueDate,
+                'title'   => $title,
+                'weight'  => intval($weight),
+                'publish'      => $publishDate,
+                'open'         => $openDate,
+                'due'          => $dueDate,
             ]);
             $assessmentId = $db->lastInsertId();
-            $log->debug('Created assessment/project relation');
+            $log->debug('Created assessment');
+
+            // Associate this assessment with the task's folder
+            $insertAssessmentRelationQuery->execute(['assessmentId' => $assessmentId, 'courseUnitInstanceId' => $courseUnitInstanceId]);
+            $log->debug('Created assessment/course implementation relation');
 
             // Create the task out of this assessment
             if ($quizId) {
