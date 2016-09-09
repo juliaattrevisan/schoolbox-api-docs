@@ -6,7 +6,7 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
- 
+
 namespace Schoolbox\ResourceBooking\Booking;
 
 use Alaress\Authorizer\Authorizer;
@@ -36,9 +36,9 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'book', $basePath, '/bookItem/{id}');
         $this->addGetRoute($router, 'edit', $basePath, '/{id}/edit');
         $this->addPostRoute($router, 'createBooking', $basePath, '/bookItem/{id}')
-               ->addValues(array('action' => 'createBooking'));
+            ->addValues(array('action' => 'createBooking'));
         $this->addPostRoute($router, 'update:post', $basePath, '/{id}/update')
-               ->addValues(array('action' => 'update'));
+            ->addValues(array('action' => 'update'));
         $this->addRoute($router, 'bookingCalendar', $basePath, '/itemCalendar/{id}');
 
         // Approving or rejecting a single booking
@@ -57,7 +57,7 @@ class Module extends BaseModule
         $this->addRoutePreload(
             $matcher,
             '(?:edit|update|approve|reject|setPending|cancel)',
-            function($params) {
+            function ($params) {
                 return array(
                     'item' => $this->getMapper()->findById($params['id']),
                 );
@@ -67,7 +67,7 @@ class Module extends BaseModule
         $this->addRoutePreload(
             $matcher,
             '(?:book|createBooking|bookingCalendar)',
-            function($params) {
+            function ($params) {
                 return array(
                     'item' => $this->getItemMapper()->findById($params['id']),
                 );
@@ -115,8 +115,7 @@ class Module extends BaseModule
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, '(?:book|createBooking)', $bookingCreateRule)
             ->addRoutePermission($authorizer, '(?:approve|reject|setPending)', $baseManageRule)
-            ->addRoutePermission($authorizer, '(?:cancel|edit|update:post)', $bookingEditRule)
-        ;
+            ->addRoutePermission($authorizer, '(?:cancel|edit|update:post)', $bookingEditRule);
     }
 
     /**
@@ -134,11 +133,10 @@ class Module extends BaseModule
     {
         $injector->setters[Controller::class]['setEventMapper']
             = $this->getMapperFactory()->getLazy(Calendar\EventMapper::class);
-        $injector->params[Calendar\EventRecurrenceMapper::class] = array(
-            'eventMapper' => $this->getMapperFactory()->getLazy(Calendar\EventMapper::class)
-        );
         $injector->setters[Controller::class]['setEventRecurrenceMapper']
-            = $injector->lazyNew(Calendar\EventRecurrenceMapper::class);
+            = $injector->lazyNew(Calendar\EventRecurrenceMapper::class, [
+            'eventMapper' => $this->getMapperFactory()->getLazy(Calendar\EventMapper::class)
+        ]);
         $injector->setters[Controller::class]['setBookingMapper']
             = $this->getMapperFactory()->getLazy(Mapper::class);
         $injector->setters[Controller::class]['setResourceMapper']
@@ -148,7 +146,7 @@ class Module extends BaseModule
         $injector->setters[Controller::class]['setCampusMapper']
             = $this->getMapperFactory()->getLazy(CampusMapper::class);
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class)
         );
     }
