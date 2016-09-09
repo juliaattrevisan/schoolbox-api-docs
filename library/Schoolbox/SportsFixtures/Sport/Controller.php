@@ -167,20 +167,10 @@ class Controller extends AbstractController
      */
     private function saveSport(Sport $sport, $name, $url, Collection $positions)
     {
-        if (!empty(trim($url))) {
-            $urlFormatter = new \Url($url);
-            if (!$urlFormatter->isLocalURL()) {
-                $urlFormatter->prependScheme();
-            }
-            $url = $urlFormatter->getUrl();
-
-            if (!$urlFormatter->isValidUrl()) {
-                throw new \InvalidArgumentException('URL is not a valid URL: ' . $url);
-            }
-        }
+        $urlFormatter = new \Url($url);
 
         $sport->setName(trim($name));
-        $sport->setUrl(trim($url));
+        $sport->setUrl($urlFormatter->getUrl());
         $sport->setUpdatedAt(\Alaress_Date_Format::now());
         $sport->setPositions($positions);
 
