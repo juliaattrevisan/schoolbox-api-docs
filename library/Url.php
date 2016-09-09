@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Url
  *
@@ -13,10 +14,10 @@ class Url
 {
 
     /** @var string */
-    private $url = '';
+    private $url;
 
     /** @var bool */
-    private $useCfg = false;
+    private $useCfg;
 
     /** @var string */
     private $siteHostname;
@@ -31,6 +32,7 @@ class Url
     /**
      * @param $url
      * @param bool $useCfg Decouples the class for unit testing
+     * @throws InvalidArgumentException If URL cannot be parsed at all
      */
     public function __construct($url, $useCfg = true)
     {
@@ -45,7 +47,16 @@ class Url
             if (isset($_SERVER['HTTP_HOST'])) {
                 $this->setServerHost($_SERVER['HTTP_HOST']);
             }
+        }
 
+        // Ensure URL is parsable
+        // Is this not a local or absolute URL ?
+        if (!($this->isLocalURL() || $this->isUrl())) {
+            // How 'bout if we prepend a scheme?
+            $this->prependScheme();
+            if (!$this->isUrl()) {
+                throw new InvalidArgumentException('Unable to parse URL: ' . $url);
+            }
         }
     }
 
@@ -69,31 +80,33 @@ class Url
         return strtolower(preg_replace($pattern, $replace, $this->getUrl()));
     }
 
-	/**
-	 * Is this a valid url?
-	 *
-	 * @return bool
-	 */
-    public function isUrl() {
-		$result = filter_var($this->getUrl(), FILTER_VALIDATE_URL);
+    /**
+     * Is this a valid url?
+     *
+     * @return bool
+     */
+    public function isUrl()
+    {
+        $result = filter_var($this->getUrl(), FILTER_VALIDATE_URL);
 
-		if ($result) {
-			return true;
-		}
+        if ($result) {
+            return true;
+        }
 
-		return false;
+        return false;
     }
 
-	/**
-	 * Prepend a scheme if one wasn't found
-	 */
-	public function prependScheme() {
-		$scheme = parse_url($this->getUrl(), PHP_URL_SCHEME);
+    /**
+     * Prepend a scheme if one wasn't found
+     */
+    public function prependScheme()
+    {
+        $scheme = parse_url($this->getUrl(), PHP_URL_SCHEME);
 
-		if (!$scheme) {
-			$this->setUrl('http://' . $this->getUrl());
-		}
-	}
+        if (!$scheme) {
+            $this->setUrl('http://' . $this->getUrl());
+        }
+    }
 
     /**
      * Returns true if the url is for a local page
@@ -109,17 +122,18 @@ class Url
 
         // get the first character of the url if it's already a local link
         $lead = substr($this->getUrl(), 0, 1);
-        if(in_array($lead, array("/", "#", "?"))) {
+        if (in_array($lead, array("/", "#", "?"))) {
             return true;
         }
 
         $urlParts = parse_url($this->getUrl());
 
-        if( in_array($urlParts['host'],
-            array($hostname,
+        if (in_array($urlParts['host'],
+            array(
+                $hostname,
                 $this->getServerHost(),
                 $this->getSiteHostname(),
-                $this->getSiteHostname().'.'.$this->getSiteDomain()
+                $this->getSiteHostname() . '.' . $this->getSiteDomain()
             )
         )) {
             return true;
@@ -203,7 +217,7 @@ class Url
      * Set useCfg. This determines whether to use the Cfg object, or
      * alternatively whatever input params you want
      *
-     * @param  $val
+     * @param bool $val
      * @return void
      */
     public function setUseCfg($val)
@@ -224,7 +238,7 @@ class Url
     /**
      * Set url to work on
      *
-     * @param  $val
+     * @param string $val
      * @return void
      */
     private function setUrl($val)
@@ -245,7 +259,7 @@ class Url
     /**
      * Set site hostname
      *
-     * @param  $val
+     * @param string $val
      * @return void
      */
     public function setSiteHostname($val)
@@ -266,7 +280,7 @@ class Url
     /**
      * Set site domain
      *
-     * @param  $val
+     * @param string $val
      * @return void
      */
     public function setSiteDomain($val)
@@ -286,7 +300,7 @@ class Url
 
     /**
      * Set server host ($_SERVER['HTTP_HOST'])
-     * @param  $val
+     * @param string $val
      * @return void
      */
     public function setServerHost($val)
