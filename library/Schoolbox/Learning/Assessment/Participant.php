@@ -206,25 +206,27 @@ class Participant
             $allFeedbacks = $this->findAllFeedbackForAssessable($assessable);
             $latestFeedback = $allFeedbacks->first();
 
-            /* Find the most recent Feedback
-             *
-             * @var IFeedback $currentFeedback
-             */
-            foreach ($allFeedbacks as $currentFeedback) {
-                if ($currentFeedback->getUpdatedAt()->gt($latestFeedback->getUpdatedAt())) {
-                    $latestFeedback = $currentFeedback;
-                }
-            }
-
             /* Compare to see whether $latestFeedback matches $type requirement
              */
             if ($type == self::TRAVERSAL_PUBLISHED) {
+                foreach ($allFeedbacks as $currentFeedback) {
+                    if ($currentFeedback->isPublished() && $currentFeedback->getPublishedAt()->gt($latestFeedback->getUpdatedAt())) {
+                        $latestFeedback = $currentFeedback;
+                    }
+                }
+
                 if ($latestFeedback->isPublished()) {
                     return $latestFeedback;
                 }
+
+                return null;
             }
             else if ($type == self::TRAVERSAL_MARKED) {
-                return $latestFeedback;
+                foreach ($allFeedbacks as $currentFeedback) {
+                    if ($currentFeedback->getUpdatedAt()->gt($latestFeedback->getUpdatedAt())) {
+                        $latestFeedback = $currentFeedback;
+                    }
+                }
             }
 
             return null;
