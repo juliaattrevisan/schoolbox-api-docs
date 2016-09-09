@@ -16,6 +16,11 @@ use \Schoolbox\Resource\Storage\Model as Storage;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\Assessment\Project as Project;
 
+use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
+use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
+use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
+use \Schoolbox\Learning\Assessment\Summator\Sum as SummatorSum;
+
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
@@ -37,33 +42,147 @@ class ProjectTest extends \Schoolbox\Learning\Assessment\Test\Defaults
 {
 
     /**
-     * Setup
+     * Test that Project initialises into a usable state
      */
-    public function setup()
+    public function testInit()
     {
-        parent::setup();
+        $project = new Project(new SummatorAverage);
 
-        /* A giant project instantiation consisting of a due work, task, quiz
-         */
-        $this->dueWork = $this->spawnDueWork();
-        $this->task    = $this->spawnTask();
-        $this->quiz    = $this->spawnQuiz();
+        $this->assertInstanceOf(Collection::class, $project->getAssessables());
+        $this->assertInstanceOf(SummatorAverage::class, $project->getSummator());
     }
 
     /**
-     * Test
+     * Test that Project basic details can be manufactured meaningfully
+     *
      */
-    public function testProject()
+    public function testBuild()
     {
+        $id = 5567;
+        $title = 'Find Diablo';
+        $description = 'The things you need to do in order to slay the prime evil';
+
+        $project = new Project(new SummatorAverage());
+        $project
+            ->setId($id)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setCreator($this->somodio)
+            ->setAllParticipants((new Collection())
+                ->add(new Participant($this->hodes))
+                ->add(new Participant($this->bsalem))
+                ->add(new Participant($this->sberryhill))
+                ->add(new Participant($this->asaxon)))
+            ->setPublishAt($this->tomorrow)
+            ->setOpenAt($this->tomorrow)
+            ->setDueAt($this->fiftyDaysFromNow)
+            ->setCloseAt($this->fiftyDaysFromNow)
+            ->setCreatedAt($this->today)
+            ->setUpdatedAt($this->today);
+
+        /* Details
+         */
+        $this->assertEquals($title, $project->getTitle());
+        $this->assertEquals($description, $project->getDescription());
+
+        /* Authored correctly?
+         */
+        $this->assertEquals($this->somodio->getId(), $project->getCreator()->getId());
+
+        /* Everybody on board?
+         */
+        $this->assertCount(4, $project->getAllParticipants());
+
+        /** @var User $currentUser */
+        foreach ([$this->hodes, $this->bsalem, $this->sberryhill, $this->asaxon] as $currentUser) {
+            $this->assertEquals($currentUser->getId(), $project->getParticipant($currentUser)->getUser()->getId());
+        }
+
+        /* Dates
+         */
+        $this->assertEquals($this->tomorrow->getDatabase(), $project->getPublishAt()->getDatabase());
+        $this->assertEquals($this->tomorrow->getDatabase(), $project->getOpenAt()->getDatabase());
+        $this->assertEquals($this->fiftyDaysFromNow->getDatabase(), $project->getDueAt()->getDatabase());
+        $this->assertEquals($this->fiftyDaysFromNow->getDatabase(), $project->getCloseAt()->getDatabase());
+
+        $this->assertEquals($this->today->getDatabase(), $project->getCreatedAt()->getDatabase());
+        $this->assertEquals($this->today->getDatabase(), $project->getUpdatedAt()->getDatabase());
+        $this->assertEquals(null, $project->getDeletedAt());
     }
 
+    /**
+     * Spawn a Project composite
+     *
+     * A giant project instantiation consisting of a due work, task, quiz
+     */
+    public function testAssessables()
+    {
+        $id = 5567;
+        $title = 'Find Diablo';
+        $description = 'The things you need to do in order to slay the prime evil';
+
+        $project = new Project(new SummatorAverage());
+        $project
+            ->setId($id)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setCreator($this->somodio)
+            ->setAllParticipants((new Collection())
+                ->add(new Participant($this->hodes))
+                ->add(new Participant($this->bsalem))
+                ->add(new Participant($this->sberryhill))
+                ->add(new Participant($this->asaxon)))
+            ->setPublishAt($this->tomorrow)
+            ->setOpenAt($this->tomorrow)
+            ->setDueAt($this->fiftyDaysFromNow)
+            ->setCloseAt($this->fiftyDaysFromNow)
+            ->setCreatedAt($this->today)
+            ->setUpdatedAt($this->today);
+
+        $task = $this->spawnTask($project);
+        $dueWork = $this->spawnDueWork($project);
+        $quiz = $this->spawnQuiz($project);
+
+        $project->setAssessables((new Collection())
+            ->add($task)
+            ->add($dueWork)
+            ->add($quiz));
+
+        /* There should be three
+         */
+        $this->assertCount(3, $project->getAssessables());
+
+        /* I should be able to access each one's normalised mark from here
+         */
+
+        /** @var Task $projectTask */
+        $projectTask = $project->getAssessables()->getOffset(0);
+
+        /** @var DueWork $projectDueWork */
+        $projectDueWork = $project->getAssessables()->getOffset(1);
+
+        /** @var Quiz $projectQuiz */
+        $projectQuiz = $project->getAssessables()->getOffset(2);
+
+        $this->assertEquals(null, $projectTask->getParticipant($this->hodes)->findMostRecentPublishedFeedback($projectTask)->getNormalisedMark());
+        $this->assertEquals(100, $projectDueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback($projectDueWork)->getNormalisedMark());
+
+        /* Quiz's Normalised Mark is derived. It does not use the getter/setter
+         * for Normalised Mark like the other Assessables
+         */
+        $this->assertNotEquals(83, $projectQuiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($projectQuiz)->getNormalisedMark());
+
+        /* Test its derived stuff instead
+         */
+        $this->assertEquals(12, $projectQuiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($projectQuiz)->getNormalisedMark());
+    }
 
     /**
      * Spawn a Due Work
      *
      * @return DueWork
      */
-    protected function spawnDueWork()
+    protected function spawnDueWork($project)
     {
 
         $id = 2;
@@ -243,7 +362,7 @@ class ProjectTest extends \Schoolbox\Learning\Assessment\Test\Defaults
     /**
      * Spawn a Task
      */
-    protected function spawnTask()
+    protected function spawnTask($project)
     {
         $id = 1234;
         $title = 'Read the Horadric Scrolls';
@@ -385,6 +504,20 @@ class ProjectTest extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->setId(99762)
             ->setAssessable($quiz)
             ->setNormalisedMark(83)
+            ->setAllResponses([
+                [
+                    'mark' => 3 // Question 1
+                ],
+                [
+                    'mark' => 2 // Question 2
+                ],
+                [
+                    'mark' => 2 // Question 3
+                ],
+                [
+                    'mark' => 5 // Question 4
+                ]
+            ])
             ->setComment('This is the most recent published feedback')
             ->setReviewer($this->celia)
             ->setPublishedAt(new \Alaress_Date_Format('2016-09-25 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -395,6 +528,7 @@ class ProjectTest extends \Schoolbox\Learning\Assessment\Test\Defaults
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $quiz->getParticipant($this->bsalem)->getAllResponses()->add($attempt);
+
 
         return $quiz;
     }
