@@ -111,13 +111,7 @@ CREATE TABLE `assessment` (
   `due_date` DATETIME NULL,
   `weight` INT(11) NOT NULL DEFAULT 0,
   `sequence` TINYINT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fk_asessment_project_id_idx` (`project_id` ASC),
-CONSTRAINT `fk_asessment_project_id`
-  FOREIGN KEY (`project_id`)
-  REFERENCES `project` (`id`)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION)
+  PRIMARY KEY (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_general_ci;
