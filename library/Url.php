@@ -1,9 +1,11 @@
 <?php
 
 /**
- * Url
- *
  * Formats urls into more meaningful stuff.
+ *
+ * Facilitates:
+ * * determining if URL is local to the SB instance
+ * * conversion from absolute to relative form
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -12,44 +14,59 @@
  */
 class Url
 {
-
     /** @var string */
     private $url;
 
-    /** @var bool */
-    private $useCfg;
-
-    /** @var string */
-    private $siteHostname;
-
-    /** @var string */
-    private $siteDomain;
-
-    /** @var string */
-    private $serverHost;
-
+    /** @var string. The hostname according to config */
+    private $siteHost;
 
     /**
-     * @param $url
-     * @param bool $useCfg Decouples the class for unit testing
-     * @throws InvalidArgumentException If URL cannot be parsed at all
+     * @param string $url
+     * @param string $siteHost Optional override to decouples the class for unit testing of 'relative' URLs
+     * @throws InvalidArgumentException If cannot parse URL
+     * @throws DomainException If cannot determine the SB instance's hostname
      */
-    public function __construct($url, $useCfg = true)
+    public function __construct($url, $siteHost = '')
     {
         $this->setUrl(trim($url));
 
-        $this->setUseCfg($useCfg);
+        // Did caller override the site's hostname ?
+        if ($siteHost) {
+            $this->setSiteHost($siteHost);
+        } else {
+            // TODO - Uncomment on conversion to PHP7. Unable to catch till then.
+//            try {
+                $site_hostname = trim(Cfg::get('site_hostname'));
+                $site_domain = trim(Cfg::get('site_domain'));
+//            }
+//            catch (Error $e){
+//                $site_hostname = '';
+//                $site_domain = '';
+//            }
 
-        if ($this->getUseCfg()) {
-            $this->setSiteHostname(Cfg::get('site_hostname'));
-            $this->setSiteDomain(Cfg::get('site_domain'));
-
-            if (isset($_SERVER['HTTP_HOST'])) {
-                $this->setServerHost($_SERVER['HTTP_HOST']);
+            // Is domain part set ?
+            if ($site_domain) {
+                // Is host part set ?
+                if ($site_hostname) {
+                    $this->setSiteHost($site_domain.'.'.$site_hostname);
+                } else {
+                    $this->setSiteHost($site_domain);
+                }
+            }
+            // Is host part set?
+            else if($site_hostname) {
+                $this->setSiteHost($site_hostname);
+            }
+            // Unable to determine instance hostname
+            else {
+                throw new DomainException('No hostname defined in DB or explicitly set');
             }
         }
 
-        // Ensure URL is parsable
+        /*
+         * Ensure the passed URL is parsable
+         */
+
         // Is this not a local or absolute URL ?
         if (!($this->isLocalURL() || $this->isUrl())) {
             // How 'bout if we prepend a scheme?
@@ -57,8 +74,34 @@ class Url
             if (!$this->isUrl()) {
                 throw new InvalidArgumentException('Unable to parse URL: ' . $url);
             }
+            // Restore passed-in value. Caller must prepend protocol explicitly
+            $this->setUrl($url);
         }
     }
+
+
+    /**
+     * Returns, eg, the 'www.example.com' from:
+     *
+     * * 'protocol://www.example.com'
+     * * '//www.example.com'
+     * * 'www.example.com'
+     * * 'www.example.com/path/to/file.ext'
+     * * 'www.example.com:8080'
+     *
+     * Note that this strips off port as well, eg 'localhost:8080/path/to/file.ext' => 'localhost'
+     * Returns FALSE if not found
+     *
+     * @return string|false
+     */
+    public function parseHostname()
+    {
+        $pattern = '/^(?:(?:[a-zA-Z]+:)?\/\/)?([a-zA-Z0-9.-]*)/';        // (?:noCapture)
+        $matches = [];
+        preg_match($pattern, $this->getUrl(), $matches);
+        return count($matches) > 1 ? $matches[1] : false;
+    }
+
 
     /**
      * Creates slugs from a string.
@@ -87,60 +130,67 @@ class Url
      */
     public function isUrl()
     {
-        $result = filter_var($this->getUrl(), FILTER_VALIDATE_URL);
-
-        if ($result) {
-            return true;
+        if(false === filter_var($this->getUrl(), FILTER_VALIDATE_URL)){
+            return false;
         }
-
-        return false;
+        return true;
     }
 
     /**
      * Prepend a scheme if one wasn't found
+     * @param string $scheme
      */
-    public function prependScheme()
+    public function prependScheme($scheme = 'http')
     {
-        $scheme = parse_url($this->getUrl(), PHP_URL_SCHEME);
+        $parsedScheme = parse_url($this->getUrl(), PHP_URL_SCHEME);
 
-        if (!$scheme) {
-            $this->setUrl('http://' . $this->getUrl());
+        if (!$parsedScheme) {
+            // Strip any leading double '//'
+            $url = preg_replace('|^//|', '', $this->getUrl());
+            $this->setUrl("$scheme://$url");
         }
     }
 
     /**
-     * Returns true if the url is for a local page
+     * Returns true if the URL is:
+     * * a relative URL, or
+     * * a local page according to DB config, or
+     * * a local page according to $_SERVER['HTTP_HOST']. (When a school's intranet hostname does not match DB config)
+     *
      * @return bool
      */
     public function isLocalURL()
     {
-        if ($this->getServerHost()) {
-            list($hostname, $domain) = explode('.', $this->getServerHost(), 2);
-        } else {
-            $hostname = $this->getSiteHostname();
-        }
-
-        // get the first character of the url if it's already a local link
-        $lead = substr($this->getUrl(), 0, 1);
-        if (in_array($lead, array("/", "#", "?"))) {
+        // Empty URL implies relatively equal to current path
+        if(0 === strlen($this->getUrl())){
             return true;
         }
 
-        $urlParts = parse_url($this->getUrl());
-
-        if (in_array($urlParts['host'],
-            array(
-                $hostname,
-                $this->getServerHost(),
-                $this->getSiteHostname(),
-                $this->getSiteHostname() . '.' . $this->getSiteDomain()
-            )
-        )) {
+        // Is this a relative URL ? (empty, or starts with '#', '?' or single '/' - but not double '//')
+        $pattern = '/^(\/(?!\/)|[#?])/';
+        if(preg_match($pattern, $this->getUrl())){
             return true;
         }
 
+        // parse_url() does not perform as expected for URLs such as 'www.example.com'
+        // In that case, it returns host='' + path='www.example.com'
+        $urlHostname = $this->parseHostname();
 
-        return false;
+        // Collate all non-empty possible matches
+        $localHostnames = [
+            $this->getSiteHost(),
+        ];
+
+        if($this->getServerHost()){
+            $localHostnames[] = $this->getServerHost();
+        }
+
+        // Does the URL match one of the 'local' hosts ?
+        if(in_array($urlHostname, $localHostnames)){
+            return true;
+        }
+
+       return false;
     }
 
     /**
@@ -148,36 +198,27 @@ class Url
      */
     public function isFTPURL()
     {
-        if (parse_url($this->getUrl(), PHP_URL_SCHEME) == 'ftp') {
-            return true;
-        } else {
-            return false;
-        }
+        return parse_url($this->getUrl(), PHP_URL_SCHEME) == 'ftp';
     }
 
     /**
-     * Get a relative url variant of $url
+     * Get a relative url variant of $url, regardless of whether it is a local URL
      *
-     * @return mixed
+     * eg 'ftp://www.google.com/path/to/file.ext' => '/path/to/file.ext'
+     *        '//www.google.com/path/to/file.ext' => '/path/to/file.ext'
+     *                        '/path/to/file.ext' => '/path/to/file.ext'
+     *
+     * @return string
      */
     public function getRelativeURL()
     {
-        /* Takes into account subdomain name e.g. ilearn/ and ilearn.joeys
+        /* Takes into account intranet name e.g. 'ilearn/' vs. 'ilearn.joeys.org/'
          * (that originally caused the issue with links not being correct)
          */
-        $hosts = array(
-            'http://' . $this->getSiteHostname() . '.' . $this->getSiteDomain(),
-            'https://' . $this->getSiteHostname() . '.' . $this->getSiteDomain(),
-            'http://' . $this->getSiteHostname(),
-            'https://' . $this->getSiteHostname(),
-        );
 
-        if ($this->getServerHost()) {
-            $hosts[] = 'http://' . $this->getServerHost();
-            $hosts[] = 'https://' . $this->getServerHost();
-        }
-
-        return str_replace($hosts, '', $this->getUrl());
+        // Strip any protocol and hostname
+        $pattern = '/^(?:(?:[a-zA-Z]+:)?\/\/)?(?:[a-zA-Z0-9.-]*)/';
+        return preg_replace($pattern, '', $this->getUrl());
     }
 
     /**
@@ -190,65 +231,10 @@ class Url
         return '/redir.php?url=' . urlencode(base64_encode($this->getUrl()));
     }
 
-    /**
-     * Returns whether the value is a HTTP, HTTPS, FTP or relative URL.
-     *
-     * This regex semantics should match the globally-available custom jquery validation
-     * method 'isURL' defined in jquery.validate.extensions.js
-     *
-     * @return bool
-     */
-    public function isValidUrl()
-    {
-        // If prefixed with a scheme, domain name must have 2 or more levels with chars from [\w-]
-        // If relative (prefixed with '/') remaining chars cannot have embedded spaces
-        // Absolute URLs can have any non-whitespace chars in their path (this is not strictly valid)
-        // TODO. This could be made more complex to filter more invalid paths, at the moment it's quite permissive.
-
-        $regExp = '#^((((http)|(ftp))s?://[\w-]+(\.[\w-]+)+(/\S*)?)|(/\S*))$#';
-
-        return preg_match($regExp, $this->url);
-    }
-
     /* Getters/Setters
       */
 
     /**
-     * Set useCfg. This determines whether to use the Cfg object, or
-     * alternatively whatever input params you want
-     *
-     * @param bool $val
-     * @return void
-     */
-    public function setUseCfg($val)
-    {
-        $this->useCfg = $val;
-    }
-
-    /**
-     * Get useCfg
-     *
-     * @return bool
-     */
-    private function getUseCfg()
-    {
-        return $this->useCfg;
-    }
-
-    /**
-     * Set url to work on
-     *
-     * @param string $val
-     * @return void
-     */
-    private function setUrl($val)
-    {
-        $this->url = $val;
-    }
-
-    /**
-     * Get url
-     *
      * @return string
      */
     public function getUrl()
@@ -257,64 +243,39 @@ class Url
     }
 
     /**
-     * Set site hostname
-     *
-     * @param string $val
-     * @return void
+     * @param string $url
+     * @return static
      */
-    public function setSiteHostname($val)
+    protected function setUrl($url)
     {
-        $this->siteHostname = $val;
+        $this->url = $url;
+        return $this;
     }
 
+
     /**
-     * Get site hostname
-     *
      * @return string
      */
-    private function getSiteHostname()
+    protected function getSiteHost()
     {
-        return $this->siteHostname;
+        return $this->siteHost;
     }
 
     /**
-     * Set site domain
-     *
-     * @param string $val
-     * @return void
+     * @param string $siteHost
+     * @return static
      */
-    public function setSiteDomain($val)
+    protected function setSiteHost($siteHost)
     {
-        $this->siteDomain = $val;
+        $this->siteHost = $siteHost;
+        return $this;
     }
 
     /**
-     * Get site domain
-     *
      * @return string
      */
-    private function getSiteDomain()
+    protected function getServerHost()
     {
-        return $this->siteDomain;
-    }
-
-    /**
-     * Set server host ($_SERVER['HTTP_HOST'])
-     * @param string $val
-     * @return void
-     */
-    public function setServerHost($val)
-    {
-        $this->serverHost = $val;
-    }
-
-    /**
-     * Get server host
-     *
-     * @return string
-     */
-    private function getServerHost()
-    {
-        return $this->serverHost;
+        return isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
     }
 }

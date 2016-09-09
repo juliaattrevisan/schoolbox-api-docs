@@ -9,128 +9,498 @@
  */
 class RelativeUrlTest extends PHPUnit_Framework_TestCase
 {
+    // Test __construct()
 
-    public function testCompleteUrl()
+//    /**
+//     * @expectedException DomainException
+//     * TODO Uncomment for PHP7
+//     */
+//    public function testNoSiteHostImplicit()
+//    {
+//        $input = 'www.example.com';
+//        new Url($input);
+//    }
+
+//    /**
+//     * @expectedException DomainException
+//     * TODO Uncomment for PHP7
+//     */
+//    public function testNoSiteHostExplicit()
+//    {
+//        $site = '';
+//        $input = 'www.example.com';
+//        new Url($input, $site);
+//    }
+
+    public function testIsParsableUrl()
     {
-        $input = 'http://www.google.com';
-        $expected = true;
-
-        $url = new Url($input, false);
-
-        $result = $url->isUrl();
-
-        $this->assertEquals($result, $expected);
+        $inputs = [
+            '',
+            '/',
+            '/path',
+            '/path/',
+            '/path/to/file',
+            '/path/to/file.ext',
+            '/path/to/file.ext#',
+            '/path/to/file.ext#tags',
+            '/path/to/file.ext?key',
+            '/path/to/file.ext?key=val',
+            '/path/to/file.ext?key=val&key2=val2',
+            '#',
+            '#tags',
+            '?',
+            '?key=val',
+            'www.google.com',
+            'google.com',
+            '//www.google.com',
+            'http://www.google.com',
+            'google.com/',
+            '//google.com/',
+            'http://localhost:8080',
+            '//localhost:8080/',
+            'localhost/path/to/',
+            'localhost/path/to/file',
+            'localhost/path/to/file.ext',
+            'xxx://localhost/path/to/file.ext',
+        ];
+        foreach ($inputs as $input) {
+            try {
+                $url = new Url($input, 'www.example.com');
+            } catch (InvalidArgumentException $e) {
+                $url = null;
+            }
+            $this->assertInstanceOf(Url::class, $url);
+        }
     }
 
-    public function testIncompleteUrl()
+    public function testIsNotParsableUrl()
     {
-        $input = 'google';
+        $inputs = [
+            '-www.google.com',
+            'goog le.com',
+            'goog*le.com/',
+            '://google.com/',
+            ':://localhost:8080',
+            ':ftp//localhost:8080/',
+        ];
+        foreach ($inputs as $input) {
+            try {
+                new Url($input, 'www.example.com');
+                $this->assertTrue(false, 'Failed to throw InvalidArgumentException: ' . $input);
+            } catch (InvalidArgumentException $e) {
+                $this->assertTrue(true);
+            }
+        }
+    }
+
+    // Test isUrl()
+
+    public function testIsUrl()
+    {
+        $inputs = [
+            'http://www.google.com',
+            'http://localhost',
+            'ftp://www.google.com',
+            'http://sbvagrant.alaress.com.au.really.long',
+            'http://www.google.com/',
+            'http://www.google.com:8080/',
+            'http://www.google.com/path',
+            'http://localhost/path/to/',
+            'http://localhost/path/to/file',
+            'http://localhost/path/to/file.ext',
+            'xxx://localhost/path/to/file.ext',
+        ];
+        foreach ($inputs as $input) {
+            try {
+                $url = new Url($input, 'www.example.com');
+                $this->assertTrue($url->isUrl(), "Failed asserting that '$input' is a Url");
+            } catch (InvalidArgumentException $e) {
+                //
+            }
+        }
+    }
+
+    public function testIsNotUrl()
+    {
+        $inputs = [
+            'www.google.com',
+            'google.com',
+            '//www.google.com',
+            '://www.google.com',
+            'google.com/',
+            '//google.com/',
+            '//localhost:8080',
+            'localhost/path/to/',
+            'localhost/path/to/file',
+            'localhost/path/to/file.ext',
+            '-localhost/path/to/file.ext',
+        ];
+        foreach ($inputs as $input) {
+            try {
+                $url = new Url($input, 'www.example.com');
+                $this->assertFalse($url->isUrl(), "Failed asserting that '$input' is not a Url");
+            } catch (InvalidArgumentException $e) {
+                //
+            }
+        }
+    }
+
+    // Test parseHostname()
+
+    public function testCanNotParseHostname()
+    {
+        $inputs = [
+            '',
+            '/',
+            '/path',
+            '/path/file.ext',
+            '/file.ext#tag',
+            '/file.ext?key',
+            '/file.ext?key=val',
+        ];
         $expected = false;
 
-        $url = new Url($input, false);
-
-        $result = $url->isUrl();
-
-        $this->assertEquals($result, $expected);
+        foreach ($inputs as $input) {
+            $url = new Url($input, 'sbvagrant.alaress.com.au');
+            $actual = $url->parseHostname($url->getUrl());
+            $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
+            $this->assertEquals($expected, $actual, $message);
+        }
     }
+
+    public function testCanParseHostname()
+    {
+        $inputs = [
+            'protocol://www.example.com'       => 'www.example.com',
+            '//www.example.com'                => 'www.example.com',
+            '//www.example.com/'               => 'www.example.com',
+            'www.example.com'                  => 'www.example.com',
+            'www.example.com/path/to/file.ext' => 'www.example.com',
+            'localhost/and.some.extra'         => 'localhost',
+            'localhost:8080'                   => 'localhost',
+            'localhost:8080/path/file.ext'     => 'localhost',
+            'localhost#tag'                    => 'localhost',
+            'localhost?key'                    => 'localhost',
+            'localhost?key=val'                => 'localhost',
+        ];
+
+        foreach($inputs as $input => $expected){
+            $url = new Url($input, 'sbvagrant.alaress.com.au');
+            $actual = $url->parseHostname();
+            $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
+            $this->assertEquals($expected, $actual, $message);
+        }
+    }
+
+
+    // Test getSlug()
+
+    public function testGetSlug()
+    {
+        $input = '/path/to/file.ext';
+        $url = new Url($input, 'sbvagrant.alaress.com.au');
+        $expected = '-path-to-fileext';
+        $this->assertEquals($url->getSlug(), $expected);
+    }
+
+    // Test prependScheme()
+
+    public function testNoProtocolUrl()
+    {
+        // No protocol
+        $inputs = [
+            'localhost',
+            'localhost:8080',
+            'www.google.com',
+            'www.google.com/',
+            'www.google.com/path',
+            'www.google.com/path/',
+            'www.google.com/path/file.ext',
+            'www.google.com/path/file.ext?',
+            'www.google.com/path/file.ext?key',
+            'www.google.com/path/file.ext?key=val',
+        ];
+
+        foreach ($inputs as $input) {
+            $url = new Url($input, 'sbvagrant.alaress.com.au');
+            $this->assertFalse($url->isUrl(), 'Failed to fail isULR() before prepending scheme: ' . $input);
+
+            // With protocol
+            $url->prependScheme();
+            $this->assertTrue($url->isUrl(), 'Failed to generate URL by prepending scheme: ' . $input);
+        }
+    }
+
+    // Test isLocalUrl()
+
+    public function test_IsLocalSite_IsLocalServer_IsRelative()
+    {
+        $site = 'sbvagrant.alaress.com.au';
+        $_SERVER['HTTP_HOST'] = $site;
+        $inputs = [
+            '/',
+            '/test',
+            '/test/',
+            '/test.php',
+            '/test/file.ext',
+            '/test/file.ext#tag',
+            '/test/file.ext?key=val',
+        ];
+        foreach ($inputs as $input) {
+            $url = new Url($input, $site);
+            $this->assertTrue($url->isLocalURL(), "Failed asserting that $input is a local Url");
+        }
+    }
+
+    public function test_IsLocalSite_IsLocalServer_NotRelative()
+    {
+        $site = 'sbvagrant.alaress.com.au';
+        $_SERVER['HTTP_HOST'] = $site;
+        $inputs = [
+            'sbvagrant.alaress.com.au',
+            'sbvagrant.alaress.com.au/',
+            'http://sbvagrant.alaress.com.au',
+            'sbvagrant.alaress.com.au/test.php',
+            'http://sbvagrant.alaress.com.au/test.php',
+            'http://sbvagrant.alaress.com.au/test.php#tag',
+            'http://sbvagrant.alaress.com.au/test.php?key=var'
+        ];
+        foreach ($inputs as $input) {
+            $url = new Url($input, $site);
+            $this->assertTrue($url->isLocalURL(), "Failed asserting that $input is a local Url");
+        }
+    }
+
+    public function test_IsLocalSite_NotLocalServer_IsRelative()
+    {
+        $site = 'sbvagrant.alaress.com.au';
+        $_SERVER['HTTP_HOST'] = 'some.other.intranet.alias';
+        $inputs = [
+            '',
+            '/',
+            '/test',
+            '/test/',
+            '/test.php',
+            '/test/file.ext',
+            '/test/file.ext#tag',
+            '/test/file.ext?key=val',
+        ];
+        foreach ($inputs as $input) {
+            $url = new Url($input, $site);
+            $this->assertTrue($url->isLocalURL(), "Failed asserting that $input is a local Url");
+        }
+    }
+
+    public function test_IsLocalSite_NotLocalServer_NotRelative()
+    {
+        $site = 'sbvagrant.alaress.com.au';
+        $_SERVER['HTTP_HOST'] = 'some.other.intranet.alias';
+        $inputs = [
+            'sbvagrant.alaress.com.au',
+            'sbvagrant.alaress.com.au/',
+            'http://sbvagrant.alaress.com.au',
+            'sbvagrant.alaress.com.au/test.php',
+            'http://sbvagrant.alaress.com.au/test.php',
+            'http://sbvagrant.alaress.com.au/test.php#tag',
+            'http://sbvagrant.alaress.com.au/test.php?key=var'
+        ];
+        foreach ($inputs as $input) {
+            $url = new Url($input, $site);
+            $this->assertTrue($url->isLocalURL(), "Failed asserting that $input is a local Url");
+        }
+    }
+
+    public function test_NotLocalSite_IsLocalServer_IsRelative()
+    {
+        $site = 'some.other.intranet.alias';
+        $_SERVER['HTTP_HOST'] = 'sbvagrant.alaress.com.au';
+        $inputs = [
+            '',
+            '/',
+            '/test',
+            '/test/',
+            '/test.php',
+            '/test/file.ext',
+            '/test/file.ext#tag',
+            '/test/file.ext?key=val',
+        ];
+        foreach ($inputs as $input) {
+            $url = new Url($input, $site);
+            $this->assertTrue($url->isLocalURL(), "Failed asserting that $input is a local Url");
+        }
+    }
+
+    public function test_NotLocalSite_IsLocalServer_NotRelative()
+    {
+        $site = 'some.other.intranet.alias';
+        $_SERVER['HTTP_HOST'] = 'sbvagrant.alaress.com.au';
+        $inputs = [
+            'sbvagrant.alaress.com.au',
+            'sbvagrant.alaress.com.au/',
+            '//sbvagrant.alaress.com.au',
+            '//sbvagrant.alaress.com.au/test.php',
+            'http://sbvagrant.alaress.com.au',
+            'sbvagrant.alaress.com.au/test.php',
+            'http://sbvagrant.alaress.com.au/test.php',
+            'http://sbvagrant.alaress.com.au/test.php#tag',
+            'http://sbvagrant.alaress.com.au/test.php?key=var'
+        ];
+        foreach ($inputs as $input) {
+            $url = new Url($input, $site);
+            $this->assertTrue($url->isLocalURL(), "Failed asserting that $input is a local Url");
+        }
+    }
+
+    public function test_NotLocalSite_NotLocalServer_IsRelative()
+    {
+        $site = 'some.other.intranet.alias';
+        $_SERVER['HTTP_HOST'] = 'some.other.intranet.alias';
+        $inputs = [
+            '',
+            '/',
+            '#',
+            '#tags',
+            '?key',
+            '?key=val',
+            '?key=val&key2=val2',
+            '/test',
+            '/test/',
+            '/test.php',
+            '/test/file.ext',
+            '/test/file.ext#tag',
+            '/test/file.ext?key=val',
+        ];
+        foreach ($inputs as $input) {
+            $url = new Url($input, $site);
+            $this->assertTrue($url->isLocalURL(), "Failed asserting that $input is a local Url");
+        }
+    }
+
+    public function test_NotLocalSite_NotLocalServer_NotRelative()
+    {
+        $site = 'sbvagrant.alaress.com.au';
+        $_SERVER['HTTP_HOST'] = 'sbvagrant.alaress.com.au';
+        $inputs = [
+            'portal',
+            'some.other.intranet.alias',
+            '//some.other.intranet.alias',
+            'some.other.intranet.alias/',
+            'http://some.other.intranet.alias',
+            'some.other.intranet.alias/test.php',
+            'http://some.other.intranet.alias/test.php',
+            'http://some.other.intranet.alias/test.php#tag',
+            'http://some.other.intranet.alias/test.php?key=var'
+        ];
+        foreach ($inputs as $input) {
+            $url = new Url($input, $site);
+            $this->assertFalse($url->isLocalURL(), "Failed asserting that $input is not a local Url");
+        }
+    }
+
+    // Test isFTPURL()
+    public function testIsFtpUrl()
+    {
+        $site = 'sbvagrant.alaress.com.au';
+        $inputs = [
+            'ftp://example',
+            'ftp://example.com',
+            'ftp://www.example.com.au',
+            'ftp://example.com/',
+            'ftp://example.com/path',
+            'ftp://example.com/path/',
+            'ftp://example.com/path/file',
+            'ftp://example.com/path/file.ext',
+            'ftp://example.com/path/file.ext#tag',
+            'ftp://example.com/path/file.ext?key',
+            'ftp://example.com/path/file.ext?key=val',
+            'ftp://example.com/path/file.ext?key=val&key2=val2',
+        ];
+        foreach ($inputs as $input) {
+            $url = new Url($input, $site);
+            $this->assertTrue($url->isFTPURL(), "Failed asserting that $input is a FTP Url");
+        }
+    }
+
+    public function testIsNotFtpUrl()
+    {
+        $site = 'sbvagrant.alaress.com.au';
+        $inputs = [
+            'ftp//example',
+            'ftp//:example',
+            'ftp',
+            'ftp.example.com',
+            'http://example.com',
+            'http://example.com?ftp',
+            'http://example.com?protocol=ftp',
+        ];
+        foreach ($inputs as $input) {
+            $url = new Url($input, $site);
+            $this->assertFalse($url->isFTPURL(), "Failed asserting that $input is not a FTP Url");
+        }
+    }
+
+    // Test getRelativeURL()
+
+    public function testGetRelativeUrl()
+    {
+        $site = 'sbvagrant.alaress.com.au';
+        $inputs = [
+            ''                                               => '',
+            '/'                                              => '/',
+            '/path/to/file.ext'                              => '/path/to/file.ext',
+            '//www.google.com/path/to/file.ext'              => '/path/to/file.ext',
+            'www.google.com/path/to/file.ext'                => '/path/to/file.ext',
+            'localhost/path/to/file.ext'                     => '/path/to/file.ext',
+            'sbvagrant.alaress.com.au/path/to/file.ext'      => '/path/to/file.ext',
+            'ftp://www.google.com/path/to/file.ext'          => '/path/to/file.ext',
+            'ftps://www.google.com/path/to/file.ext'         => '/path/to/file.ext',
+            'http://www.google.com/path/to/file.ext'         => '/path/to/file.ext',
+            'https://www.google.com/path/to/file.ext'        => '/path/to/file.ext',
+            'http://www.google.com/path/to/file.ext#tag'     => '/path/to/file.ext#tag',
+            'http://www.google.com/path/to/file.ext?key'     => '/path/to/file.ext?key',
+            'http://www.google.com/path/to/file.ext?key=val' => '/path/to/file.ext?key=val',
+        ];
+        foreach ($inputs as $input => $expected) {
+            $url = new Url($input, $site);
+            $actual = $url->getRelativeURL();
+            $this->assertEquals($expected, $url->getRelativeURL(),
+                "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual");
+        }
+    }
+
+    // test getBase64EncodedRedirect()
 
     public function testRedirectUrl()
     {
-        $input = 'http://www.google.com';
-        $expected = '/redir.php?url=' . urlencode(base64_encode($input));
+        $site = 'sbvagrant.alaress.com.au';
+        $inputs = [
+            '',
+            '/',
+            '/path/file',
+            '/path/file.ext',
+            'localhost',
+            'google.com',
+            'google.com.au.long.domain',
+            'http://localhost',
+            'http://localhost:8080',
+            'http://google.com',
+            'http://google.com/',
+            'http://google.com/path',
+            'http://google.com/path/',
+            'http://google.com/path/file.ext',
+            'http://google.com/path/file.ext#tag',
+            'http://google.com/path/file.ext#key=val',
+        ];
 
-        $url = new Url($input, false);
+        foreach ($inputs as $input) {
+            $expected = '/redir.php?url=' . urlencode(base64_encode($input));
 
-        $result = $url->getBase64EncodedRedirect();
+            $url = new Url($input, $site);
 
-        $this->assertEquals($result, $expected);
+            $actual = $url->getBase64EncodedRedirect();
+
+            $msg = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
+            $this->assertEquals($expected, $actual, $msg);
+        }
     }
-
-    /*
-     * isLocalURL tests
-     */
-
-    public function testIsLocalURLHostname()
-    {
-        $input = "http://portal/test.php";
-
-        $url = new Url($input, false);
-
-        $url->setServerHost('portal.test.local');
-        $url->setSiteDomain('portal');
-        $url->setSiteHostname('test.local');
-
-        $this->assertTrue($url->isLocalURL());
-
-    }
-
-    public function testIsLocalURLFQDN()
-    {
-        $input = "http://portal.test.local/test.php";
-
-        $url = new Url($input, false);
-
-        $url->setServerHost('portal.test.local');
-        $url->setSiteDomain('portal');
-        $url->setSiteHostname('test.local');
-
-        $this->assertTrue($url->isLocalURL());
-
-    }
-
-    public function testIsLocalURLAnotherDomain()
-    {
-        $input = "http://portal.another.server/test.php";
-
-        $url = new Url($input, false);
-
-        $url->setServerHost('portal.test.local');
-        $url->setSiteDomain('portal');
-        $url->setSiteHostname('test.local');
-
-        $this->assertFalse($url->isLocalURL());
-
-    }
-
-    public function testIsLocalURLAnotherHost()
-    {
-        $input = "http://www.google.com/test.php";
-
-        $url = new Url($input, false);
-
-        $url->setServerHost('portal.test.local');
-        $url->setSiteDomain('portal');
-        $url->setSiteHostname('test.local');
-
-        $this->assertFalse($url->isLocalURL());
-
-    }
-
-    public function testIsLocalURLRelative()
-    {
-        $input = "/test.php";
-
-        $url = new Url($input, false);
-
-        $url->setServerHost('portal.test.local');
-        $url->setSiteDomain('portal');
-        $url->setSiteHostname('test.local');
-
-        $this->assertTrue($url->isLocalURL());
-
-    }
-
-//	public function testRelativeUrl() {
-//		$input = '/ilearn';
-//		$expected = 'http://ilearn.joeys.org';
-//
-//		$url = new Url($input, false);
-//		$url->setSiteHostname('http://joeys.org');
-//		$url->setSiteDomain('joeys');
-//		$url->setServerHost('http://joeys.org.au');
-//
-//		$result = $url->getRelativeUrl();
-//
-//		$this->assertEquals($result, $expected);
-//	}
 }
