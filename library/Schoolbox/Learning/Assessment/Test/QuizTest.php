@@ -492,7 +492,6 @@ class QuizTest extends \PHPUnit_Framework_TestCase
             ->setId(99762)
             ->setAssessable($quiz)
             ->setNormalisedMark(83)
-            ->setComment('This is the most recent -published- feedback')
             ->setReviewer($this->celia)
             ->setPublishedAt(new \Alaress_Date_Format('2016-09-25 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-09-10 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -503,11 +502,16 @@ class QuizTest extends \PHPUnit_Framework_TestCase
 
         $quiz->getParticipant($this->bsalem)->getAllResponses()->add($attempt);
 
-        /* The most recent feedback and most recent published feedback
-         * 99761 and 99762 respectively
+        /* The most recent feedback is 99761
          */
-        var_dump($quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz));
         $this->assertEquals(99761, $quiz->getParticipant($this->bsalem)->findMostRecentFeedback($quiz)->getId());
-//        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getId());
+
+        /* The most recent feedback is NOT published yet
+         *
+         * The most recent feedback is the instance which is most recent in the group of feedbacks that
+         * took place after 2016-09-09 14:35:00, when the response was last updated (in this case, 99761
+         * since it was last updated most recently on 2016-09-17)
+         */
+        $this->assertEquals(null, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz));
     }
 }
