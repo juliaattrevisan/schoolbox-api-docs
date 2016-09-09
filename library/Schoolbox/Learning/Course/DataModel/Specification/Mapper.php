@@ -23,7 +23,7 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('course');
+        $this->hasTable('course_specification');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('folder_id', FolderMapper::class, 'id', null, null, null, 'folder');

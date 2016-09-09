@@ -25,17 +25,17 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('course_unit_instance');
+        $this->hasTable('course_unit_implementation');
         $this->hasModel(Model::class);
 
         // Identifier
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
 
         // Course Implementation
-        $this->joins('course_instance_id', CourseImplementationMapper::class, 'id', null, null, null, 'course');
+        $this->joins('course_implementation_id', CourseImplementationMapper::class, 'id', null, null, null, 'course');
 
         // Unit Specification
-        $this->joins('course_unit_id', UnitSpecificationMapper::class, 'id', null, null, null, 'specification');
+        $this->joins('course_unit_specification_id', UnitSpecificationMapper::class, 'id', null, null, null, 'specification');
 
         // The folder which this unit implementation is on
         $this->joins('category_id', FolderMapper::class, 'id', null, null, null, 'folder');

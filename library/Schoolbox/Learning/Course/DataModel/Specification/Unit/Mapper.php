@@ -24,10 +24,10 @@ class Mapper extends BaseMapper
      */
     protected function mapping()
     {
-        $this->hasTable('course_unit');
+        $this->hasTable('course_unit_specification');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('course_id', CourseSpecificationMapper::class, 'id', null, null, null, 'course');
+        $this->joins('course_specification_id', CourseSpecificationMapper::class, 'id', null, null, null, 'course');
         $this->joins('folder_id', FolderMapper::class, 'id', null, null, null, 'folder');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
