@@ -31,18 +31,18 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             cui.category_id,
             cui.component_id,
             MIN(cui.created_at) AS created_at,
-            cu.course_id,
+            cu.course_specification_id,
             f.name AS folder_name,
             cf.name AS course_name
         FROM course_unit_instance cui
         INNER JOIN folder f ON cui.category_id = f.id
         INNER JOIN course_unit cu ON cui.unit_category_id = cu.folder_id
-        INNER JOIN course c ON cu.course_id = c.id
+        INNER JOIN course_specification c ON cu.course_specification_id = c.id
         INNER JOIN folder cf ON c.folder_id = cf.id
         GROUP BY
             cui.category_id,
             cui.component_id,
-            cu.course_id,
+            cu.course_specification_id,
             f.name,
             cf.name
         ORDER BY cui.component_id
@@ -51,7 +51,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     // Insert and update objects
     // TODO figure out a deleted date for course instances
     $insertCourseInstanceQuery = $database->prepare("
-        INSERT INTO course_instance (folder_id, course_id, created_at, updated_at, deleted_at)
+        INSERT INTO course_instance (folder_id, course_specification_id, created_at, updated_at, deleted_at)
         VALUES (:folderId, :courseId, :created, :created, NULL)
     ");
     $updateUnitInstanceQuery = $database->prepare("
@@ -89,7 +89,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             sprintf(
                 'Creating course instance for course "%s" (#%d) on folder "%s" (#%d) (Component: #%d)',
                 $unitInstance['course_name'],
-                $unitInstance['course_id'],
+                $unitInstance['course_specification_id'],
                 $unitInstance['folder_name'],
                 $unitInstance['category_id'],
                 $unitInstance['component_id']
@@ -99,7 +99,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         try {
             $insertCourseInstanceQuery->execute([
                 'folderId' => $unitInstance['category_id'],
-                'courseId' => $unitInstance['course_id'],
+                'courseId' => $unitInstance['course_specification_id'],
                 'created'  => $unitInstance['created_at'],
             ]);
             $log->debug('Course instance created');

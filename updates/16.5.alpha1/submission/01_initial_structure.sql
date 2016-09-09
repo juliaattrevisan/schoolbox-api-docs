@@ -14,7 +14,7 @@ ADD CONSTRAINT `fk_folder_id`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
-CREATE TABLE `course` (
+CREATE TABLE `course_specification` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `folder_id` INT UNSIGNED NOT NULL,
   `created_at` DATETIME NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE `course` (
   `deleted_at` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `folder_id_UNIQUE` (`folder_id` ASC),
-  CONSTRAINT `fk_course_folder_id`
+  CONSTRAINT `fk_course_specification_folder_id`
     FOREIGN KEY (`folder_id`)
     REFERENCES `folder` (`id`)
     ON DELETE NO ACTION
@@ -32,16 +32,16 @@ ENGINE = InnoDB;
 CREATE TABLE `course_unit` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `folder_id` INT UNSIGNED NOT NULL,
-  `course_id` INT UNSIGNED NOT NULL,
+  `course_specification_id` INT UNSIGNED NOT NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `folder_id_UNIQUE` (`folder_id` ASC),
-  INDEX `fk_course_unit_course_id_idx` (`course_id` ASC),
-  CONSTRAINT `fk_course_unit_course_id`
-    FOREIGN KEY (`course_id`)
-    REFERENCES `course` (`id`)
+  INDEX `fk_course_unit_course_specification_id_idx` (`course_specification_id` ASC),
+  CONSTRAINT `fk_course_unit_course_specification_id`
+    FOREIGN KEY (`course_specification_id`)
+    REFERENCES `course_specification` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -49,16 +49,16 @@ ENGINE = InnoDB;
 CREATE TABLE `course_instance` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `folder_id` INT UNSIGNED NOT NULL,
-  `course_id` INT UNSIGNED NOT NULL,
+  `course_specification_id` INT UNSIGNED NOT NULL,
   `created_at` DATETIME NOT NULL,
   `updated_at` DATETIME NOT NULL,
   `deleted_at` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `folder_id_UNIQUE` (`folder_id` ASC),
-  INDEX `fk_course_instance_course_id_idx` (`course_id` ASC),
-  CONSTRAINT `fk_course_instance_course_id`
-  FOREIGN KEY (`course_id`)
-  REFERENCES `course` (`id`)
+  INDEX `fk_course_instance_course_specification_id_idx` (`course_specification_id` ASC),
+  CONSTRAINT `fk_course_instance_course_specification_id`
+  FOREIGN KEY (`course_specification_id`)
+  REFERENCES `course_specification` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

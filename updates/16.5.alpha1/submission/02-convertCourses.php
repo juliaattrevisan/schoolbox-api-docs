@@ -54,10 +54,10 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     // Insert new courses and units
     // TODO find out if there's a viable created_at field to use for either of these tables
     $insertNewCourseQuery = $database->prepare("
-        INSERT INTO course (folder_id, created_at, updated_at, deleted_at) VALUES (:folderId, NOW(), NOW(), :deleted)
+        INSERT INTO course_specification (folder_id, created_at, updated_at, deleted_at) VALUES (:folderId, NOW(), NOW(), :deleted)
     ");
     $insertNewUnitQuery   = $database->prepare("
-        INSERT INTO course_unit (folder_id, course_id, created_at, updated_at, deleted_at)
+        INSERT INTO course_unit (folder_id, course_specification_id, created_at, updated_at, deleted_at)
         VALUES (:folderId, :courseId, NOW(), NOW(), :deleted)
     ");
 
