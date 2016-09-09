@@ -1,7 +1,5 @@
 <?php
 /**
- * Model for course tasks.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -16,6 +14,12 @@ use Schoolbox\ISoftDeletable;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
+/**
+ * Model for course tasks.
+ *
+ * @deprecated Use \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model
+ *             and its related business domain classes instead.
+ */
 class UnitInstance implements ISoftDeletable {
 
     /**
