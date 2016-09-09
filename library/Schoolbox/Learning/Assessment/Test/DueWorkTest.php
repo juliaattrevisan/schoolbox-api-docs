@@ -1,4 +1,12 @@
 <?php
+/**
+ * DueWorkTest
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
 
 use \Schoolbox\Collection;
 use \Schoolbox\User;
@@ -15,14 +23,6 @@ use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 
-/**
- * DueWorkTest
- *
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2011, Alaress Pty Ltd
- * @link        http://www.alaress.com.au/
- * @version     SVN: $Id$
- */
 class DueWorkTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -818,10 +818,10 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
 
+        $submission->getAllFeedback()->add($feedback);
+
         $dueWork->getParticipant($this->hodes)->getAllResponses()->add($submission);
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
-
-        $submission->getAllFeedback()->add($feedback);
 
         /* Freefloating Feedback
          *
