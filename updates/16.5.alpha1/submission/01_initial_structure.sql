@@ -96,7 +96,6 @@ ALTER TABLE `course_unit_implementation`
 
 CREATE TABLE `assessment` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `project_id` INT UNSIGNED NOT NULL,
   `title` VARCHAR(250) NOT NULL,
   `description` TEXT NULL,
   `publish_date` DATETIME NULL,
