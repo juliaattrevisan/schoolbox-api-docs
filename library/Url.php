@@ -23,7 +23,7 @@ class Url
     /**
      * @param string $url
      * @param string $siteHost Optional override to decouples the class for unit testing of 'relative' URLs
-     * @throws DomainException If cannot determine the SB instance's hostname. This is required for determining relativity.
+     * @throws DomainException If cannot determine the SB instance's configured hostname. This is required for determining relativity.
      */
     public function __construct($url, $siteHost = '')
     {
@@ -33,15 +33,8 @@ class Url
         if ($siteHost) {
             $this->setSiteHost($siteHost);
         } else {
-            // TODO - Uncomment on conversion to PHP7. Unable to catch till then.
-//          try {
-                $site_hostname = trim(Cfg::get('site_hostname'));
-                $site_domain = trim(Cfg::get('site_domain'));
-//          }
-//          catch (Error $e){
-//              $site_hostname = '';
-//              $site_domain = '';
-//          }
+            $site_hostname = trim(Cfg::get('site_hostname'));
+            $site_domain = trim(Cfg::get('site_domain'));
 
             // Is domain part set ?
             if ($site_domain) {
@@ -54,13 +47,9 @@ class Url
             } // Is host part set?
             else if ($site_hostname) {
                 $this->setSiteHost($site_hostname);
-            }
-            // Can we fall back to Web Server ?
-            else if (isset($_SERVER['HTTP_HOST'])) {
-                $this->setSiteHost($_SERVER['HTTP_HOST']);
             } // Unable to determine instance hostname
             else {
-                throw new DomainException('No hostname explicitly set, defined in DB, or retrievable from $_SERVER');
+                throw new DomainException('No hostname explicitly set, or retrievable from Database');
             }
         }
     }
