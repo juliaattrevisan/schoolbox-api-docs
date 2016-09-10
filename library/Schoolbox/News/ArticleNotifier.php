@@ -114,7 +114,7 @@ class ArticleNotifier extends AbstractModuleNotifier {
 		$authorName = $user->formatName();
 
 		$topicName = $article->getTopic()->getName();
-		$url = new Url($topicName, false);
+		$url = new Url($topicName, '');
 		$topicSlug = $url->getSlug();
 
 		$roleIds = $article->getRoles()->filterBy('type', $roleType)->getColumnValues('id');

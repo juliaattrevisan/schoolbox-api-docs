@@ -97,7 +97,7 @@ class Renderer
 
             if ($url->isLocalUrl()) {
                 $linkUrl = $url->getRelativeURL();
-            } elseif ($url->isFTPURL()) {
+            } elseif ($url->isFtpUrl()) {
                 $linkUrl = $url->getUrl();
             } else {
                 $linkUrl = $url->getBase64EncodedRedirect();

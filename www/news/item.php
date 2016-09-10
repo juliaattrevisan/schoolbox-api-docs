@@ -42,7 +42,7 @@ if (!($article = $newsHandler->getByID($this->arg[0]))) {
 
 $topic = $newsHandler->getTopicByID($article['item_topic_id']);
 
-$url = new Url($topic['name'], false);
+$url = new Url($topic['name'], '');
 
 $user = $userHandler->getByID($article['item_owner']);
 $fullname = $userHandler->formatName($user);
@@ -95,7 +95,7 @@ array_unshift($topicList, array('name' => 'All'));
 
 // output the list of topics for the sidebar
 foreach ($topicList as $sidebarTopic) {
-    $topicUrl = new Url($sidebarTopic['name'], false);
+    $topicUrl = new Url($sidebarTopic['name'], '');
     $output = array(
         'LIST_TOPIC_NAME' => Scrub::text($sidebarTopic['name']),
         'LIST_TOPIC_CLEAN' => $topicUrl->getSlug(),

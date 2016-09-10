@@ -168,6 +168,7 @@ class Controller extends AbstractController
     private function saveSport(Sport $sport, $name, $url, Collection $positions)
     {
         $urlFormatter = new \Url($url);
+        $urlFormatter->normalise();
 
         $sport->setName(trim($name));
         $sport->setUrl($urlFormatter->getUrl());

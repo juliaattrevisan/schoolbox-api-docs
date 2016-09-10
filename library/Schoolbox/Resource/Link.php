@@ -177,7 +177,7 @@ class Link implements ISoftDeletable
      */
     public function isLocalUrl()
     {
-        return $this->url->isLocalURL();
+        return $this->url->isLocalUrl();
     }
 
     /**
@@ -187,7 +187,7 @@ class Link implements ISoftDeletable
      */
     public function isFtpUrl()
     {
-        return $this->url->isFTPURL();
+        return $this->url->isFtpUrl();
     }
 
 

@@ -3,6 +3,8 @@
 /**
  * Formats urls into more meaningful stuff.
  *
+ * Unit Tests: /test/unit/url/RelativeUrlTest.php
+ *
  * Facilitates:
  * * determining if URL is local to the SB instance
  * * conversion from absolute to relative form
@@ -21,16 +23,19 @@ class Url
     private $siteHost;
 
     /**
+     * Intentionally does not auto-prepend a protocol to otherwise valid absolute URLs.
+     * This ensures caller retains control of protocol prepending.
+     *
      * @param string $url
-     * @param string $siteHost Optional override to decouples the class for unit testing of 'relative' URLs
+     * @param string $siteHost Optional override to decouples the class for unit testing of 'relative' URLs or when DB not available.
      * @throws DomainException If cannot determine the SB instance's configured hostname. This is required for determining relativity.
      */
-    public function __construct($url, $siteHost = '')
+    public function __construct($url, $siteHost = null)
     {
         $this->setUrl(trim($url));
 
         // Did caller override the site's hostname ?
-        if ($siteHost) {
+        if (is_string($siteHost)) {
             $this->setSiteHost($siteHost);
         } else {
             $site_hostname = trim(Cfg::get('site_hostname'));
@@ -40,18 +45,56 @@ class Url
             if ($site_domain) {
                 // Is host part set ?
                 if ($site_hostname) {
-                    $this->setSiteHost($site_domain . '.' . $site_hostname);
+                    $this->setSiteHost($site_hostname . '.' . $site_domain);
                 } else {
                     $this->setSiteHost($site_domain);
                 }
             } // Is host part set?
-            else if ($site_hostname) {
-                $this->setSiteHost($site_hostname);
-            } // Unable to determine instance hostname
             else {
-                throw new DomainException('No hostname explicitly set, or retrievable from Database');
+                if ($site_hostname) {
+                    $this->setSiteHost($site_hostname);
+                } // Unable to determine instance hostname
+                else {
+                    throw new DomainException('No hostname explicitly set, or retrievable from Database');
+                }
             }
         }
+    }
+
+    /**
+     * If Local, convert to relative form.
+     * If Not Local, ensure protocol is present.
+     *
+     * @throws InvalidArgumentException If unable to parse URL
+     * @return static
+     */
+    public function normalise()
+    {
+        // This must go before isUrl() to ensure absolute but local URLs are converted to relative form.
+        if ($this->isLocalUrl()) {
+            $this->setUrl($this->getRelativeURL());
+            return $this;
+        }
+
+        // Already a valid absolute URL ?
+        if ($this->isUrl()) {
+            return $this;
+        }
+
+        // Not valid relative, not valid absolute.
+
+        // How about if we prepend a protocol ? Cache so we can restore original invalid value if required.
+        $url = $this->getUrl();
+        $this->prependScheme();
+
+        // Is it now valid ?
+        if ($this->isUrl()) {
+            return $this;
+        }
+
+        // Restore original value, and throw
+        $this->setUrl($url);
+        throw new \InvalidArgumentException('Url appears invalid: ' . $url);
     }
 
 
@@ -69,9 +112,9 @@ class Url
      *
      * @return string|false
      */
-    public function parseHostname()
+    public function getHostname()
     {
-        $pattern = '/^(?:(?:[a-zA-Z]+:)?\/\/)?([a-zA-Z0-9.-]*)/';        // (?:noCapture)
+        $pattern = '/^(?:(?:[a-zA-Z]+:)?\/\/)?([a-zA-Z0-9.-]*)/';
         $matches = [];
         preg_match($pattern, $this->getUrl(), $matches);
         return count($matches) > 1 ? $matches[1] : false;
@@ -101,6 +144,9 @@ class Url
     /**
      * Is this a valid url?
      *
+     * Note that this considers other-wise FQDN without a protocol
+     * to be invalid, eg 'www.google.com/index.php' is NOT a Url
+     *
      * @return bool
      */
     public function isUrl()
@@ -120,9 +166,7 @@ class Url
         $parsedScheme = parse_url($this->getUrl(), PHP_URL_SCHEME);
 
         if (!$parsedScheme) {
-            // Strip any leading double '//'
-            $url = preg_replace('|^//|', '', $this->getUrl());
-            $this->setUrl("$scheme://$url");
+            $this->setUrl(preg_replace('#^(//)?#', "$scheme://", $this->getUrl()));
         }
     }
 
@@ -134,66 +178,77 @@ class Url
      *
      * @return bool
      */
-    public function isLocalURL()
+    public function isLocalUrl()
     {
-        // Empty URL implies relatively equal to current path
-        if (0 === strlen($this->getUrl())) {
+        // Relative URLs are always local
+        if($this->isRelativeUrl()) {
             return true;
         }
 
-        // Is this a relative URL ? (empty, or starts with '#', '?' or single '/' - but not double '//')
-        $pattern = '/^(\/(?!\/)|[#?])/';
-        if (preg_match($pattern, $this->getUrl())) {
-            return true;
-        }
+        // Not relative, therefore need to check if hostnames match.
+
+        /* Takes into account intranet name e.g. 'ilearn/' vs. 'ilearn.joeys.org/'
+         * (that originally caused the issue with links not being correct)
+         */
 
         // parse_url() does not perform as expected for URLs such as 'www.example.com'
         // In that case, it returns host='' + path='www.example.com'
-        $urlHostname = $this->parseHostname();
+        $urlHostname = $this->getHostname();
 
         // Collate all non-empty possible matches
-        $localHostnames = [
-            $this->getSiteHost(),
-        ];
-
+        $localHostnames = [];
+        if ($this->getSiteHost()) {
+            $localHostnames[] = $this->getSiteHost();
+        }
         if ($this->getServerHost()) {
             $localHostnames[] = $this->getServerHost();
         }
 
         // Does the URL match one of the 'local' hosts ?
-        if (in_array($urlHostname, $localHostnames)) {
-            return true;
-        }
-
-        return false;
+        return in_array($urlHostname, $localHostnames);
     }
 
     /**
      * Returns true if url is an ftp link
      */
-    public function isFTPURL()
+    public function isFtpUrl()
     {
         return parse_url($this->getUrl(), PHP_URL_SCHEME) == 'ftp';
     }
 
     /**
-     * Get a relative url variant of $url, regardless of whether it is a local URL
+     * Get a relative url variant of $url (regardless of whether it is a local URL)
      *
      * eg 'ftp://www.google.com/path/to/file.ext' => '/path/to/file.ext'
      *        '//www.google.com/path/to/file.ext' => '/path/to/file.ext'
      *                        '/path/to/file.ext' => '/path/to/file.ext'
+     *          'www.google.com'                  => '/'
+     *          'www.google.com:8080'             => '/'
+     *          ''                                => ''
      *
      * @return string
      */
     public function getRelativeURL()
     {
-        /* Takes into account intranet name e.g. 'ilearn/' vs. 'ilearn.joeys.org/'
-         * (that originally caused the issue with links not being correct)
-         */
+        if($this->isRelativeUrl()) {
+            return $this->getUrl();
+        }
 
-        // Strip any protocol and hostname
-        $pattern = '/^(?:(?:[a-zA-Z]+:)?\/\/)?(?:[a-zA-Z0-9.-]*)/';
-        return preg_replace($pattern, '', $this->getUrl());
+        // Strip any protocol, hostname and port
+        $pattern = '/^(?:(?:[a-zA-Z]+:)?\/\/)?(?:[a-zA-Z0-9.-]*(:[0-9]+)?(?:\/)?)/';
+        return preg_replace($pattern, '/' , $this->getUrl());
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRelativeUrl()
+    {
+        // Is this a relative URL ? (empty, or starts with '#', '?' or single '/' - but not double '//')
+        $pattern = '/^(()|(\/(?!\/)|[#?]).*)$/';
+        if (preg_match($pattern, $this->getUrl())) {
+            return true;
+        }
     }
 
     /**

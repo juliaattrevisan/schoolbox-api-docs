@@ -968,7 +968,7 @@ class SitePage extends Page
             while ($link = $this->db->getNextArray()) {
                 $url = new Url($link['url']);
 
-                if ($url->isLocalURL()) {
+                if ($url->isLocalUrl()) {
                     $this->setVar(
                         "MLINK", "<a href=\"" . $url->getRelativeURL() . "\"><span>" . Scrub::text($link['description']) . "</span></a>"
                     );

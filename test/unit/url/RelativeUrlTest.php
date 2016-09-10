@@ -27,7 +27,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
 //     */
 //    public function testNoSiteHostExplicit()
 //    {
-//        $site = '';
+//        $site = null;
 //        $input = 'www.example.com';
 //        new Url($input, $site);
 //    }
@@ -65,7 +65,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         ];
         foreach ($inputs as $input) {
             $url = new Url($input, 'www.example.com');
-            $isLocalUrl = $url->isLocalURL();
+            $isLocalUrl = $url->isLocalUrl();
             $isUrl = $url->isUrl();
             $url->prependScheme();
             $isUrlAfterProtocolPrepended = $url->isUrl();
@@ -107,6 +107,9 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
             ':://localhost:8080',
             ':ftp//localhost:8080/',
             'www.google.com',
+            'www.google.com/',
+            'www.google.com/index',
+            'www.google.com/index.php',
             'google.com',
             '//www.google.com',
             '://www.google.com',
@@ -124,9 +127,9 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         }
     }
 
-    // Test parseHostname()
+    // Test getHostname()
 
-    public function testCanNotParseHostname()
+    public function testCanNotGetHostname()
     {
         $inputs = [
             '',
@@ -143,13 +146,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
 
         foreach ($inputs as $input) {
             $url = new Url($input, 'sbvagrant.alaress.com.au');
-            $actual = $url->parseHostname();
+            $actual = $url->getHostname();
             $message = "Failed asserting equality. Input: '$input', Expected: '$expected', Actual: '$actual'";
             $this->assertEquals($expected, $actual, $message);
         }
     }
 
-    public function testCanParseHostname()
+    public function testCanGetHostname()
     {
         $inputs = [
             'protocol://www.example.com'       => 'www.example.com',
@@ -167,9 +170,57 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
 
         foreach ($inputs as $input => $expected) {
             $url = new Url($input, 'sbvagrant.alaress.com.au');
-            $actual = $url->parseHostname();
+            $actual = $url->getHostname();
             $message = "Failed asserting equality. Input: '$input', Expected: '$expected', Actual: '$actual'";
             $this->assertEquals($expected, $actual, $message);
+        }
+    }
+
+    // Test normalise()
+
+    public function testNormaliseLocalUrl()
+    {
+        $inputs = [
+            'sbvagrant.alaress.com.au'                    => '/',
+            'sbvagrant.alaress.com.au/'                   => '/',
+            'sbvagrant.alaress.com.au:8080'               => '/',
+            'sbvagrant.alaress.com.au:8080/'              => '/',
+            'http://sbvagrant.alaress.com.au'             => '/',
+            'http://sbvagrant.alaress.com.au/'            => '/',
+            'http://sbvagrant.alaress.com.au:8080'        => '/',
+            'http://sbvagrant.alaress.com.au:8080/'       => '/',
+            'http://sbvagrant.alaress.com.au/homepage/43' => '/homepage/43',
+            '//sbvagrant.alaress.com.au/homepage/43'      => '/homepage/43',
+            '/homepage/43'                                => '/homepage/43',
+        ];
+        foreach ($inputs as $input => $expected) {
+            $url = new Url($input, 'sbvagrant.alaress.com.au');
+            $actual = $url->normalise()->getUrl();
+            $message = "Failed asserting equality. Input: '$input', Expected: '$expected', Actual: '$actual'";
+            $this->assertEquals($expected, $actual, $message);
+        }
+    }
+
+    public function testNormaliseNotLocalUrl()
+    {
+        $site = 'sbvagrant.alaress.com.au';
+        $inputs = [
+            'www.google.com'                    => '/',
+            'www.google.com/'                   => '/',
+            'www.google.com:8080'               => '/',
+            'www.google.com:8080/'              => '/',
+            'http://www.google.comu'            => '/',
+            'http://www.google.com/'            => '/',
+            'http://www.google.com:8080'        => '/',
+            'http://www.google.com:8080/'       => '/',
+            'http://www.google.com/homepage/43' => '/homepage/43',
+            '//www.google.com/homepage/43'      => '/homepage/43',
+        ];
+        foreach ($inputs as $input => $expected) {
+            $url = new Url($input, 'sbvagrant.alaress.com.au');
+            $actual = $url->normalise()->getUrl();
+            $message = "Failed asserting inequality. Input: '$input', Expected: '$expected', Actual: '$actual'";
+            $this->assertNotEquals($expected, $actual, $message);
         }
     }
 
@@ -229,7 +280,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         ];
         foreach ($inputs as $input) {
             $url = new Url($input, $site);
-            $this->assertTrue($url->isLocalURL(), "Failed asserting that '$input' is a local Url");
+            $this->assertTrue($url->isLocalUrl(), "Failed asserting that '$input' is a local Url");
         }
     }
 
@@ -248,7 +299,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         ];
         foreach ($inputs as $input) {
             $url = new Url($input, $site);
-            $this->assertTrue($url->isLocalURL(), "Failed asserting that '$input' is a local Url");
+            $this->assertTrue($url->isLocalUrl(), "Failed asserting that '$input' is a local Url");
         }
     }
 
@@ -268,7 +319,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         ];
         foreach ($inputs as $input) {
             $url = new Url($input, $site);
-            $this->assertTrue($url->isLocalURL(), "Failed asserting that '$input' is a local Url");
+            $this->assertTrue($url->isLocalUrl(), "Failed asserting that '$input' is a local Url");
         }
     }
 
@@ -287,7 +338,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         ];
         foreach ($inputs as $input) {
             $url = new Url($input, $site);
-            $this->assertTrue($url->isLocalURL(), "Failed asserting that '$input' is a local Url");
+            $this->assertTrue($url->isLocalUrl(), "Failed asserting that '$input' is a local Url");
         }
     }
 
@@ -307,7 +358,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         ];
         foreach ($inputs as $input) {
             $url = new Url($input, $site);
-            $this->assertTrue($url->isLocalURL(), "Failed asserting that '$input' is a local Url");
+            $this->assertTrue($url->isLocalUrl(), "Failed asserting that '$input' is a local Url");
         }
     }
 
@@ -328,7 +379,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         ];
         foreach ($inputs as $input) {
             $url = new Url($input, $site);
-            $this->assertTrue($url->isLocalURL(), "Failed asserting that '$input' is a local Url");
+            $this->assertTrue($url->isLocalUrl(), "Failed asserting that '$input' is a local Url");
         }
     }
 
@@ -353,7 +404,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         ];
         foreach ($inputs as $input) {
             $url = new Url($input, $site);
-            $this->assertTrue($url->isLocalURL(), "Failed asserting that '$input' is a local Url");
+            $this->assertTrue($url->isLocalUrl(), "Failed asserting that '$input' is a local Url");
         }
     }
 
@@ -374,7 +425,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         ];
         foreach ($inputs as $input) {
             $url = new Url($input, $site);
-            $this->assertFalse($url->isLocalURL(), "Failed asserting that '$input' is not a local Url");
+            $this->assertFalse($url->isLocalUrl(), "Failed asserting that '$input' is not a local Url");
         }
     }
 
@@ -398,7 +449,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         ];
         foreach ($inputs as $input) {
             $url = new Url($input, $site);
-            $this->assertTrue($url->isFTPURL(), "Failed asserting that '$input is a FTP Url");
+            $this->assertTrue($url->isFtpUrl(), "Failed asserting that '$input is a FTP Url");
         }
     }
 
@@ -416,7 +467,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         ];
         foreach ($inputs as $input) {
             $url = new Url($input, $site);
-            $this->assertFalse($url->isFTPURL(), "Failed asserting that '$input is not a FTP Url");
+            $this->assertFalse($url->isFtpUrl(), "Failed asserting that '$input is not a FTP Url");
         }
     }
 
