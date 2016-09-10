@@ -23,7 +23,7 @@ class Url
     /**
      * @param string $url
      * @param string $siteHost Optional override to decouples the class for unit testing of 'relative' URLs
-     * @throws DomainException If cannot determine the SB instance's hostname
+     * @throws DomainException If cannot determine the SB instance's hostname. This is required for determining relativity.
      */
     public function __construct($url, $siteHost = '')
     {
@@ -34,31 +34,33 @@ class Url
             $this->setSiteHost($siteHost);
         } else {
             // TODO - Uncomment on conversion to PHP7. Unable to catch till then.
-//            try {
+//          try {
                 $site_hostname = trim(Cfg::get('site_hostname'));
                 $site_domain = trim(Cfg::get('site_domain'));
-//            }
-//            catch (Error $e){
-//                $site_hostname = '';
-//                $site_domain = '';
-//            }
+//          }
+//          catch (Error $e){
+//              $site_hostname = '';
+//              $site_domain = '';
+//          }
 
             // Is domain part set ?
             if ($site_domain) {
                 // Is host part set ?
                 if ($site_hostname) {
-                    $this->setSiteHost($site_domain.'.'.$site_hostname);
+                    $this->setSiteHost($site_domain . '.' . $site_hostname);
                 } else {
                     $this->setSiteHost($site_domain);
                 }
-            }
-            // Is host part set?
-            else if($site_hostname) {
+            } // Is host part set?
+            else if ($site_hostname) {
                 $this->setSiteHost($site_hostname);
             }
-            // Unable to determine instance hostname
+            // Can we fall back to Web Server ?
+            else if (isset($_SERVER['HTTP_HOST'])) {
+                $this->setSiteHost($_SERVER['HTTP_HOST']);
+            } // Unable to determine instance hostname
             else {
-                throw new DomainException('No hostname defined in DB or explicitly set');
+                throw new DomainException('No hostname explicitly set, defined in DB, or retrievable from $_SERVER');
             }
         }
     }
@@ -114,7 +116,7 @@ class Url
      */
     public function isUrl()
     {
-        if(false === filter_var($this->getUrl(), FILTER_VALIDATE_URL)){
+        if (false === filter_var($this->getUrl(), FILTER_VALIDATE_URL)) {
             return false;
         }
         return true;
@@ -146,13 +148,13 @@ class Url
     public function isLocalURL()
     {
         // Empty URL implies relatively equal to current path
-        if(0 === strlen($this->getUrl())){
+        if (0 === strlen($this->getUrl())) {
             return true;
         }
 
         // Is this a relative URL ? (empty, or starts with '#', '?' or single '/' - but not double '//')
         $pattern = '/^(\/(?!\/)|[#?])/';
-        if(preg_match($pattern, $this->getUrl())){
+        if (preg_match($pattern, $this->getUrl())) {
             return true;
         }
 
@@ -165,16 +167,16 @@ class Url
             $this->getSiteHost(),
         ];
 
-        if($this->getServerHost()){
+        if ($this->getServerHost()) {
             $localHostnames[] = $this->getServerHost();
         }
 
         // Does the URL match one of the 'local' hosts ?
-        if(in_array($urlHostname, $localHostnames)){
+        if (in_array($urlHostname, $localHostnames)) {
             return true;
         }
 
-       return false;
+        return false;
     }
 
     /**
