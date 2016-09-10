@@ -23,7 +23,6 @@ class Url
     /**
      * @param string $url
      * @param string $siteHost Optional override to decouples the class for unit testing of 'relative' URLs
-     * @throws InvalidArgumentException If cannot parse URL
      * @throws DomainException If cannot determine the SB instance's hostname
      */
     public function __construct($url, $siteHost = '')
@@ -61,21 +60,6 @@ class Url
             else {
                 throw new DomainException('No hostname defined in DB or explicitly set');
             }
-        }
-
-        /*
-         * Ensure the passed URL is parsable
-         */
-
-        // Is this not a local or absolute URL ?
-        if (!($this->isLocalURL() || $this->isUrl())) {
-            // How 'bout if we prepend a scheme?
-            $this->prependScheme();
-            if (!$this->isUrl()) {
-                throw new InvalidArgumentException('Unable to parse URL: ' . $url);
-            }
-            // Restore passed-in value. Caller must prepend protocol explicitly
-            $this->setUrl($url);
         }
     }
 
