@@ -9,7 +9,9 @@ namespace Schoolbox\Learning\Course\DataModel\Implementation\Unit;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
+use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -39,6 +41,8 @@ class Model implements ISoftDeletable
     protected $specification;
 
     /**
+     * @deprecated use $this->getCourse()->getFolder() instead
+     *
      * @var FolderModel
      */
     protected $folder;
@@ -59,15 +63,25 @@ class Model implements ISoftDeletable
     protected $dueDate;
 
     /**
+     * The assessables that are a part of this unit implementation.
+     *
+     * TODO figure out whether they need to be translated or not
+     *
+     * @var IAssessable[]|Collection
+     */
+    protected $assessables;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
-        $this->openDate  = new Alaress_Date_NullDate();
-        $this->dueDate   = new Alaress_Date_NullDate();
-        $this->createdAt = new Alaress_Date_NullDate();
-        $this->updatedAt = new Alaress_Date_NullDate();
-        $this->deletedAt = new Alaress_Date_NullDate();
+        $this->openDate    = new Alaress_Date_NullDate();
+        $this->dueDate     = new Alaress_Date_NullDate();
+        $this->createdAt   = new Alaress_Date_NullDate();
+        $this->updatedAt   = new Alaress_Date_NullDate();
+        $this->deletedAt   = new Alaress_Date_NullDate();
+        $this->assessables = new Collection();
     }
 
     /**
@@ -175,6 +189,24 @@ class Model implements ISoftDeletable
     public function setDueDate($dueDate)
     {
         $this->dueDate = $dueDate;
+        return $this;
+    }
+
+    /**
+     * @return Collection|IAssessable[]
+     */
+    public function getAssessables()
+    {
+        return $this->assessables;
+    }
+
+    /**
+     * @param Collection|IAssessable[] $assessables
+     * @return static
+     */
+    public function setAssessables($assessables)
+    {
+        $this->assessables = $assessables;
         return $this;
     }
 }
