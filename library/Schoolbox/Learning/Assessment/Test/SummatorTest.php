@@ -70,6 +70,76 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
 
     /**
      * Test the unweighted average
+     * when there is no feedback
+     */
+    public function testUnweightedAverage5()
+    {
+        $project = $this->spawnProject();
+        $project->setAssessables((new Collection())
+            ->add($this->spawnDueWork3())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnDueWork())
+            ->add($this->spawnQuiz()));
+
+        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
+        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
+        foreach ($project->getAssessables() as $currentAssessable) {
+            $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(new Collection());
+
+            foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
+                $currentResponse->setAllFeedback(new Collection());
+            }
+        }
+
+        /* Published Average is null (nothing to calculate)
+         */
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+
+        /* Unpublished Average is null (nothing to calculate)
+         */
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
+    }
+
+    /**
+     * Test the unweighted average
+     * when there is nothing published
+     */
+    public function testUnweightedAverage4()
+    {
+        $project = $this->spawnProject();
+        $project->setAssessables((new Collection())
+            ->add($this->spawnDueWork3())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnDueWork())
+            ->add($this->spawnQuiz()));
+
+        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
+        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
+        foreach ($project->getAssessables() as $currentAssessable) {
+            foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
+                $currentFeedback->setPublishedAt(null);
+            }
+
+            foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
+                foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
+                    $currentFeedback->setPublishedAt(null);
+                }
+            }
+        }
+
+        /* Published Average is null (nothing to calculate)
+         */
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+
+        /* Unpublished Average is 98 + 77 + 100 + 5 / 4 = 70
+         */
+        $this->assertEquals(70, $project->getNormalisedMark($this->hodes, false));
+    }
+
+    /**
+     * Test the unweighted average
      * when there's one of each type
      */
     public function testUnweightedAverage1()
@@ -157,44 +227,6 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
         /* Unpublished Average is 98 + 77 + 100 + 5 / 4 = 70
          */
         $this->assertEquals(70, $project->getNormalisedMark($this->hodes, false));
-    }
-
-    /**
-     * Test the unweighted average
-     * when there is nothing published
-     */
-    public function testUnweightedAverage4()
-    {
-        $project = $this->spawnProject();
-        $project->setAssessables((new Collection())
-            ->add($this->spawnDueWork3())
-            ->add($this->spawnTask())
-            ->add($this->spawnDueWork2())
-            ->add($this->spawnDueWork())
-            ->add($this->spawnQuiz()));
-
-        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
-        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
-        foreach ($project->getAssessables() as $currentAssessable) {
-            foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
-                $currentFeedback->setPublishedAt(null);
-            }
-
-            foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
-                    $currentFeedback->setPublishedAt(null);
-                }
-            }
-        }
-
-        /* Published Average is null (nothing to calculate)
-         */
-        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
-
-        /* Unpublished Average is 98 + 77 + 100 + 5 / 4 = 70
-         */
-        $this->assertEquals(70, $project->getNormalisedMark($this->hodes, false));
-
     }
 
     /**
