@@ -32,7 +32,9 @@ class Translator
             ->setCreatedAt($unitSpecification->getCreatedAt())
             ->setUpdatedAt($unitSpecification->getUpdatedAt())
             ->setDeletedAt($unitSpecification->getDeletedAt());
-        // TODO add translation of assessables
+        // Set assessables directly is okay for now
+        // TODO add translation of assessables, or verify whether translation is required
+        $unitDataModel->setAssessables($unitSpecification->getAssessables());
         return $unitDataModel;
     }
 
@@ -51,7 +53,9 @@ class Translator
             ->setCreatedAt($unitDataModel->getCreatedAt())
             ->setUpdatedAt($unitDataModel->getUpdatedAt())
             ->setDeletedAt($unitDataModel->getDeletedAt());
-        // TODO add translation of assessables
+        // Set assessables directly is okay for now
+        // TODO add translation of assessables, or verify whether translation is required
+        $unitSpecification->setAssessables($unitDataModel->getAssessables());
         return $unitSpecification;
     }
 }
