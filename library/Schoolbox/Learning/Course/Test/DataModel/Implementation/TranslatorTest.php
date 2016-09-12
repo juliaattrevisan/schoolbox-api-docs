@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Course\Test\DataModel\Implementation;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationDataModel;
+use Schoolbox\Learning\Course\DataModel\Implementation\Translator as CourseTranslator;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationDataModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationDataModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationDataModel;
@@ -24,18 +25,18 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  */
 class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
-//    /**
-//     * @var CourseTranslator
-//     */
-//    protected $courseTranslator;
-//
-//    /**
-//     * Sets up course translator
-//     */
-//    protected function setUp()
-//    {
-//        $this->courseTranslator = new CourseTranslator(new UnitTranslator());
-//    }
+    /**
+     * @var CourseTranslator
+     */
+    protected $courseTranslator;
+
+    /**
+     * Sets up course translator
+     */
+    protected function setUp()
+    {
+        $this->courseTranslator = new CourseTranslator();
+    }
 
     /**
      * Test the translation of a Course Specification to its data model representation.
@@ -64,7 +65,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $courseImpl->getUnits()->add(new UnitImplementation())->add(new UnitImplementation());
 
         // Translate!
-        $courseDataModel = new CourseImplementationDataModel();
+        $courseDataModel = $this->courseTranslator->translateToDataModel($courseImpl);
 
         // Verify that some of these things are the same
         $this->assertSame($courseImpl->getFolder(), $courseDataModel->getFolder());
