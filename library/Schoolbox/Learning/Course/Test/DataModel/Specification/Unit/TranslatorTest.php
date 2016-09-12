@@ -79,8 +79,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($unitDataModel->getUpdatedAt()->getDatabase(), $unitSpec->getUpdatedAt()->getDatabase());
         $this->assertInstanceOf(Alaress_Date_NullDate::class, $unitDataModel->getDeletedAt());
 
-        // Content of units gets tested in the test case for UnitTranslator. Just verify that counts are the same.
-//        $this->assertCount(2, $unitDataModel->getUnits());
+        // Translation of assessables (if present) gets tested in a different test.
+        // Just verify that counts are the same.
+        $this->assertCount(2, $unitDataModel->getAssessables());
     }
 
     /**
