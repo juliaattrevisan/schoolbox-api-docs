@@ -160,6 +160,44 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
     }
 
     /**
+     * Test the unweighted average
+     * when there is nothing published
+     */
+    public function testUnweightedAverage4()
+    {
+        $project = $this->spawnProject();
+        $project->setAssessables((new Collection())
+            ->add($this->spawnDueWork3())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnDueWork())
+            ->add($this->spawnQuiz()));
+
+        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
+        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
+        foreach ($project->getAssessables() as $currentAssessable) {
+            foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
+                $currentFeedback->setPublishedAt(null);
+            }
+
+            foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
+                foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
+                    $currentFeedback->setPublishedAt(null);
+                }
+            }
+        }
+
+        /* Published Average is null (nothing to calculate)
+         */
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+
+        /* Unpublished Average is 98 + 77 + 100 + 5 / 4 = 70
+         */
+        $this->assertEquals(70, $project->getNormalisedMark($this->hodes, false));
+
+    }
+
+    /**
      * Spawn a Project with stuff in it
      *
      * @return Project
