@@ -86,25 +86,31 @@ class Translator
     public function translateToDomainModel(Model $dataModel)
     {
         $implementation = new CourseImplementation();
+        $implementation
+            ->setId($dataModel->getId())
+            ->setCreatedAt($dataModel->getCreatedAt())
+            ->setUpdatedAt($dataModel->getUpdatedAt())
+            ->setDeletedAt($dataModel->getDeletedAt())
+            ->setUnits(new Collection())
+        ;
+
+        // I am not going to translate the entire course spec. Just set its ID.
+        if ($dataModel->getSpecification() instanceof CourseSpecificationDataModel) {
+            $specification = new CourseSpecification();
+            $specification->setId($dataModel->getSpecification()->getId());
+            $implementation->setSpecification($specification);
+        }
+
+        // Allow translate if folder is empty, for now.
+        if ($dataModel->getFolder() instanceof FolderModel) {
+            $implementation->setFolder($dataModel->getFolder());
+        }
+
+        // Constitute Unit Implementations
+        foreach ($dataModel->getUnits() as $unitDataModel) {
+            $implementation->getUnits()->add($this->unitTranslator->translateToDomainModel($unitDataModel));
+        }
+
         return $implementation;
-//        $implementation
-//            ->setId($dataModel->getId())
-//            ->setCreatedAt($dataModel->getCreatedAt())
-//            ->setUpdatedAt($dataModel->getUpdatedAt())
-//            ->setDeletedAt($dataModel->getDeletedAt())
-//            ->setUnits(new Collection())
-//        ;
-//
-//        // Allow translate if folder is empty, for now.
-//        if ($dataModel->getFolder() instanceof FolderModel) {
-//            $implementation->setFolder($dataModel->getFolder());
-//        }
-//
-////        // Constitute Unit Specs
-////        foreach ($dataModel->getUnits() as $unitDataModel) {
-////            $implementation->getUnits()->add($this->unitTranslator->translateToDomainModel($unitDataModel));
-////        }
-//
-//        return $implementation;
     }
 }

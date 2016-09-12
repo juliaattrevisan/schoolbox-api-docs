@@ -79,4 +79,37 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         // Content of units gets tested in the test case for UnitTranslator. Just verify that counts are the same.
         $this->assertCount(2, $courseDataModel->getUnits());
     }
+
+    /**
+     * Test the translation of a Course Implementation's data model to its domain model representation.
+     */
+    public function testTranslateToDomainModel()
+    {
+        // Create a data model
+        $dataModel = new CourseImplementationDataModel();
+        $dataModel->setId(11)
+                  ->setFolder((new FolderModel())->setId(51)->setName('Houses'))
+                  ->setSpecification((new CourseSpecificationDataModel())->setId(39))
+                  ->setCreatedAt(new Alaress_Date_Format('2015-09-01 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+                  ->setUpdatedAt(new Alaress_Date_Format('2015-09-02 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+                  ->setDeletedAt(new Alaress_Date_NullDate());
+
+        // Add unit data models
+        $dataModel->getUnits()->add(new UnitImplementationDataModel())->add(new UnitImplementationDataModel());
+
+        // Translate!
+        $courseImpl = $this->courseTranslator->translateToDomainModel($dataModel);
+
+        // Verify that details are the same
+        $this->assertSame($dataModel->getFolder(), $courseImpl->getFolder());
+        // Course specification - should have the same ID, don't care about anything else
+        $this->assertEquals($dataModel->getSpecification()->getId(), $courseImpl->getSpecification()->getId());
+        $this->assertEquals($dataModel->getId(), $courseImpl->getId());
+        $this->assertEquals($dataModel->getCreatedAt()->getDatabase(), $courseImpl->getCreatedAt()->getDatabase());
+        $this->assertEquals($dataModel->getUpdatedAt()->getDatabase(), $courseImpl->getUpdatedAt()->getDatabase());
+        $this->assertInstanceOf(Alaress_Date_NullDate::class, $courseImpl->getDeletedAt());
+
+        // Content of units gets tested in the test case for UnitTranslator. Just verify that counts are the same.
+        $this->assertCount(2, $courseImpl->getUnits());
+    }
 }
