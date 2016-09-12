@@ -37,6 +37,12 @@ class Model extends AbstractFeedback
             $total += $currentResponse['available'];
         }
 
+        /* No marks because no questions with mark values
+         */
+        if ($total == 0) {
+            return null;
+        }
+
         return 100 * (float)$sum / (float)$total;
     }
 
