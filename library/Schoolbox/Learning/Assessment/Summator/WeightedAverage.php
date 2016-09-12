@@ -55,7 +55,7 @@ class WeightedAverage extends AbstractSummator
      */
     protected function aggregate($val, $assessableWeight, $totalWeight)
     {
-        if (!is_null($val)) {
+        if (!is_null($val) && $totalWeight > 0) {
             $this->weightedAverage += ($val * ($assessableWeight / $totalWeight));
 
             /* A useful place to diagnose problems
