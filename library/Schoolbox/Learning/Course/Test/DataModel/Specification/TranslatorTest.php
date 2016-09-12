@@ -9,7 +9,6 @@ namespace Schoolbox\Learning\Course\Test\DataModel\Specification;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
-use Schoolbox\Learning\Assessment\Task\Model as TaskModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseDataModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitDataModel;
@@ -73,6 +72,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testTranslateToDomainModel()
     {
+        // Create a data model
         $courseDataModel = new CourseDataModel();
         $courseDataModel->setId(11)
                         ->setFolder((new FolderModel())->setId(51)->setName('Houses'))
@@ -80,22 +80,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                         ->setUpdatedAt(new Alaress_Date_Format('2015-09-02 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
                         ->setDeletedAt(new Alaress_Date_NullDate());
 
-        // Units
-        $unitDataModel1 = new UnitDataModel();
-        $unitDataModel1->setId(1)
-                       ->setFolder((new FolderModel())->setId(52)->setName('Fox House'))
-                       ->setCreatedAt(new Alaress_Date_Format('2015-10-01 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-                       ->setUpdatedAt(new Alaress_Date_Format('2015-10-02 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-                       ->setDeletedAt(new Alaress_Date_NullDate());
-
-        $unitDataModel2 = new UnitDataModel();
-        $unitDataModel2->setId(2)
-                       ->setFolder((new FolderModel())->setId(54)->setName('Oak House'))
-                       ->setCreatedAt(new Alaress_Date_Format('2015-11-01 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-                       ->setUpdatedAt(new Alaress_Date_Format('2015-11-02 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-                       ->setDeletedAt(new Alaress_Date_Format('2015-11-03 12:00:00', Alaress_Date_Format::DATABASE_FORMAT));
-
-        $courseDataModel->getUnits()->add($unitDataModel1)->add($unitDataModel2);
+        // Add unit data models
+        $courseDataModel->getUnits()->add(new UnitDataModel())->add(new UnitDataModel());
 
         // Translate!
         $courseSpec = $this->courseTranslator->translateToDomainModel($courseDataModel);
