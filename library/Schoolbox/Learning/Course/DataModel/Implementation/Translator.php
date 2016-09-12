@@ -11,6 +11,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationDataModel;
 use Schoolbox\Learning\Course\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
+use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
@@ -18,23 +19,23 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
  */
 class Translator
 {
-//    /**
-//     * The Unit Translator is used to translate the Course Specification's
-//     * constituent Unit Specifications.
-//     *
-//     * @var Unit\Translator
-//     */
-//    protected $unitTranslator;
-//
-//    /**
-//     * Constructor
-//     *
-//     * @param Unit\Translator $unitTranslator
-//     */
-//    public function __construct(Unit\Translator $unitTranslator)
-//    {
-//        $this->unitTranslator = $unitTranslator;
-//    }
+    /**
+     * The Unit Translator is used to translate the Course Implementation's
+     * constituent Unit Implementations.
+     *
+     * @var Unit\Translator
+     */
+    protected $unitTranslator;
+
+    /**
+     * Constructor
+     *
+     * @param Unit\Translator $unitTranslator
+     */
+    public function __construct(Unit\Translator $unitTranslator)
+    {
+        $this->unitTranslator = $unitTranslator;
+    }
 
     /**
      * Translates the Course Implementation business domain model to a data model.
@@ -67,12 +68,10 @@ class Translator
             $dataModel->setFolder($implementation->getFolder());
         }
 
-//        // Constituent Unit Specs - return in separate object, or this object?
-//        foreach ($implementation->getUnits() as $unitSpecification) {
-//            $dataModel->getUnits()->add(
-//                $this->unitTranslator->translateToDataModel($unitSpecification, $dataModel)
-//            );
-//        }
+        // Constituent Unit Implementations
+        foreach ($implementation->getUnits() as $unitImplementation) {
+            $dataModel->getUnits()->add($this->unitTranslator->translateToDataModel($unitImplementation));
+        }
 
         // If I am going to persist here, I need mappers to have been injected.
         return $dataModel;
@@ -86,25 +85,26 @@ class Translator
      */
     public function translateToDomainModel(Model $dataModel)
     {
-        $specification = new CourseImplementation();
-        $specification
-            ->setId($dataModel->getId())
-            ->setCreatedAt($dataModel->getCreatedAt())
-            ->setUpdatedAt($dataModel->getUpdatedAt())
-            ->setDeletedAt($dataModel->getDeletedAt())
-            ->setUnits(new Collection())
-        ;
-
-        // Allow translate if folder is empty, for now.
-        if ($dataModel->getFolder() instanceof FolderModel) {
-            $specification->setFolder($dataModel->getFolder());
-        }
-
-//        // Constitute Unit Specs
-//        foreach ($dataModel->getUnits() as $unitDataModel) {
-//            $specification->getUnits()->add($this->unitTranslator->translateToDomainModel($unitDataModel));
+        $implementation = new CourseImplementation();
+        return $implementation;
+//        $implementation
+//            ->setId($dataModel->getId())
+//            ->setCreatedAt($dataModel->getCreatedAt())
+//            ->setUpdatedAt($dataModel->getUpdatedAt())
+//            ->setDeletedAt($dataModel->getDeletedAt())
+//            ->setUnits(new Collection())
+//        ;
+//
+//        // Allow translate if folder is empty, for now.
+//        if ($dataModel->getFolder() instanceof FolderModel) {
+//            $implementation->setFolder($dataModel->getFolder());
 //        }
-
-        return $specification;
+//
+////        // Constitute Unit Specs
+////        foreach ($dataModel->getUnits() as $unitDataModel) {
+////            $implementation->getUnits()->add($this->unitTranslator->translateToDomainModel($unitDataModel));
+////        }
+//
+//        return $implementation;
     }
 }

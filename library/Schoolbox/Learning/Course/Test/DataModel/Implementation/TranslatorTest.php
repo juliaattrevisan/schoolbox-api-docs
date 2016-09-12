@@ -12,6 +12,7 @@ use Alaress_Date_NullDate;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationDataModel;
 use Schoolbox\Learning\Course\DataModel\Implementation\Translator as CourseTranslator;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationDataModel;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Translator as UnitTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationDataModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationDataModel;
 use Schoolbox\Learning\Course\Implementation as CourseImplementation;
@@ -35,7 +36,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->courseTranslator = new CourseTranslator();
+        $this->courseTranslator = new CourseTranslator(new UnitTranslator());
     }
 
     /**
