@@ -13,7 +13,6 @@ use Schoolbox\Learning\Assessment\Task\Model as TaskModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseDataModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitDataModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitTranslator;
-use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
@@ -89,41 +88,46 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testTranslateToDomainModel()
     {
-//        $courseDataModel = new CourseDataModel();
-//        $courseDataModel->setId(11)
-//                        ->setFolder((new FolderModel())->setId(51)->setName('Houses'))
-//                        ->setCreatedAt(new Alaress_Date_Format('2015-09-01 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-//                        ->setUpdatedAt(new Alaress_Date_Format('2015-09-02 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-//                        ->setDeletedAt(new Alaress_Date_NullDate());
-//
-//        // Units
-//        $unitDataModel1 = new UnitDataModel();
-//        $unitDataModel1->setId(1)
-//                       ->setFolder((new FolderModel())->setId(52)->setName('Fox House'))
-//                       ->setCreatedAt(new Alaress_Date_Format('2015-10-01 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-//                       ->setUpdatedAt(new Alaress_Date_Format('2015-10-02 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-//                       ->setDeletedAt(new Alaress_Date_NullDate());
-//
-//        $unitDataModel2 = new UnitDataModel();
-//        $unitDataModel2->setId(2)
-//                       ->setFolder((new FolderModel())->setId(54)->setName('Oak House'))
-//                       ->setCreatedAt(new Alaress_Date_Format('2015-11-01 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-//                       ->setUpdatedAt(new Alaress_Date_Format('2015-11-02 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-//                       ->setDeletedAt(new Alaress_Date_Format('2015-11-03 12:00:00', Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $courseDataModel->getUnits()->add($unitDataModel1)->add($unitDataModel2);
-//
-//        // Translate!
-//        $courseSpec = $this->unitTranslator->translateToDomainModel($courseDataModel);
-//
-//        // Verify that details are the same
-//        $this->assertSame($courseDataModel->getFolder(), $courseSpec->getFolder());
-//        $this->assertEquals($courseDataModel->getId(), $courseSpec->getId());
-//        $this->assertEquals($courseDataModel->getCreatedAt()->getDatabase(), $courseSpec->getCreatedAt()->getDatabase());
-//        $this->assertEquals($courseDataModel->getUpdatedAt()->getDatabase(), $courseSpec->getUpdatedAt()->getDatabase());
-//        $this->assertInstanceOf(Alaress_Date_NullDate::class, $courseSpec->getDeletedAt());
-//
-//        // Content of units gets tested in the test case for UnitTranslator. Just verify that counts are the same.
-//        $this->assertCount(2, $courseSpec->getUnits());
+        // Basic course spec data model
+        $courseDataModel = new CourseDataModel();
+        $courseDataModel->setId(11)
+                        ->setFolder((new FolderModel())->setId(51)->setName('Houses'))
+                        ->setCreatedAt(new Alaress_Date_Format('2015-09-01 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+                        ->setUpdatedAt(new Alaress_Date_Format('2015-09-02 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+                        ->setDeletedAt(new Alaress_Date_NullDate());
+
+        // Unit spec data model
+        $unitDataModel = new UnitDataModel();
+        $unitDataModel->setId(1)
+                      ->setCourse($courseDataModel)
+                      ->setFolder((new FolderModel())->setId(52)->setName('Fox House'))
+                      ->setCreatedAt(new Alaress_Date_Format('2015-10-01 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+                      ->setUpdatedAt(new Alaress_Date_Format('2015-10-02 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+                      ->setDeletedAt(new Alaress_Date_NullDate());
+
+        // Assessables
+        $unitTask1 = new TaskModel();
+        $unitTask1->setId(1)->setTitle('Fox House Task 1');
+
+        $unitTask2 = new TaskModel();
+        $unitTask2->setId(2)->setTitle('Fox House Task 2');
+
+        $unitDataModel->getAssessables()->add($unitTask1)->add($unitTask2);
+
+//        $courseDataModel->getUnits()->add($unitDataModel);
+
+        // Translate!
+        $unitSpec = $this->unitTranslator->translateToDomainModel($unitDataModel);
+
+        // Verify that details are the same
+        $this->assertEquals($unitSpec->getId(), $unitDataModel->getId());
+        $this->assertSame($unitSpec->getFolder(), $unitDataModel->getFolder());
+        $this->assertEquals($unitSpec->getCreatedAt()->getDatabase(), $unitDataModel->getCreatedAt()->getDatabase());
+        $this->assertEquals($unitSpec->getUpdatedAt()->getDatabase(), $unitDataModel->getUpdatedAt()->getDatabase());
+        $this->assertInstanceOf(Alaress_Date_NullDate::class, $unitDataModel->getDeletedAt());
+
+        // Translation of assessables (if present) gets tested in a different test.
+        // Just verify that counts are the same.
+        $this->assertCount(2, $unitSpec->getAssessables());
     }
 }
