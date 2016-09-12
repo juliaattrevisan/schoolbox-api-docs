@@ -30,12 +30,14 @@ class Model extends AbstractFeedback
     public function getNormalisedMark()
     {
         $sum = 0;
+        $total = 0;
 
         foreach ($this->getAllResponses() as $currentResponse) {
             $sum += $currentResponse['mark'];
+            $total += $currentResponse['available'];
         }
 
-        return $sum;
+        return (float)$sum / (float)$total;
     }
 
     /* Getters/Setters

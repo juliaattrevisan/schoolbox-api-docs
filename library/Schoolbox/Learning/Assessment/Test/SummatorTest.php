@@ -287,6 +287,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
                 ->add(new Participant($this->bsalem))
                 ->add(new Participant($this->sberryhill))
                 ->add(new Participant($this->asaxon)))
+            ->setWeight(6)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
             ->setDueAt($this->twentyDaysFromNow)
@@ -341,6 +342,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
                 ->add(new Participant($this->bsalem))
                 ->add(new Participant($this->sberryhill))
                 ->add(new Participant($this->asaxon)))
+            ->setWeight(10)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
             ->setDueAt($this->twentyDaysFromNow)
@@ -395,6 +397,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
                 ->add(new Participant($this->bsalem))
                 ->add(new Participant($this->sberryhill))
                 ->add(new Participant($this->asaxon)))
+            ->setWeight(5)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
             ->setDueAt($this->twentyDaysFromNow)
@@ -487,6 +490,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
                 ->add(new Participant($this->hodes))
                 ->add(new Participant($this->sberryhill))
                 ->add(new Participant($this->asaxon)))
+            ->setWeight(4)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->thirteenDaysFromNow)
             ->setDueAt($this->fourteenDaysFromNow)
@@ -553,6 +557,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
                 ->add(new Participant($this->bsalem))
                 ->add(new Participant($this->sberryhill))
                 ->add(new Participant($this->asaxon)))
+            ->setWeight(8)
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -602,16 +607,20 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->setNormalisedMark(1)
             ->setAllResponses([
                 [
-                    'mark' => 1 // Question 1
+                    'mark' => 1, // Question 1
+                    'available' => 5
                 ],
                 [
-                    'mark' => 1 // Question 2
+                    'mark' => 1, // Question 2
+                    'available' => 5
                 ],
                 [
-                    'mark' => 1 // Question 3
+                    'mark' => 1, // Question 3
+                    'available' => 5
                 ],
                 [
-                    'mark' => 2 // Question 4
+                    'mark' => 2, // Question 4
+                    'available' => 5
                 ]
             ])
             ->setComment('This is the most recent feedback')
@@ -629,16 +638,20 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->setNormalisedMark(83)
             ->setAllResponses([
                 [
-                    'mark' => 3 // Question 1
+                    'mark' => 3, // Question 1,
+                    'available' => 5
                 ],
                 [
-                    'mark' => 2 // Question 2
+                    'mark' => 2, // Question 2
+                    'available' => 5
                 ],
                 [
-                    'mark' => 2 // Question 3
+                    'mark' => 2, // Question 3
+                    'available' => 5
                 ],
                 [
-                    'mark' => 5 // Question 4
+                    'mark' => 5, // Question 4
+                    'available' => 5
                 ]
             ])
             ->setComment('This is the most recent published feedback')
