@@ -28,9 +28,20 @@ class Minimum extends AbstractSummator
     protected $min;
 
     /**
+     * Weights are not used in this strategy
+     *
+     * @param Collection $allAssessables
+     * @return void
+     */
+    protected function calculateTotalWeight(Collection $allAssessables)
+    {
+        // noop
+    }
+
+    /**
      * @inheritDoc
      */
-    protected function aggregate($val)
+    protected function aggregate($val, $assessableWeight, $totalWeight)
     {
         /* $min is being set for the first time to a non-null value
          * If you don't do this check for $min == null, summate() will

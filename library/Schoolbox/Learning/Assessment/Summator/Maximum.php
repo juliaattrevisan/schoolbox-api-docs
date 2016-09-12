@@ -24,9 +24,20 @@ class Maximum extends AbstractSummator
     protected $max;
 
     /**
+     * Weights are not used in this strategy
+     *
+     * @param Collection $allAssessables
+     * @return void
+     */
+    protected function calculateTotalWeight(Collection $allAssessables)
+    {
+        // noop
+    }
+
+    /**
      * @inheritDoc
      */
-    protected function aggregate($val)
+    protected function aggregate($val, $assessableWeight, $totalWeight)
     {
         $this->max = max($this->max, $val);
     }
