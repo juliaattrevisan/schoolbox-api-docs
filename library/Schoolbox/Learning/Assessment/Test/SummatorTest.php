@@ -582,6 +582,41 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
     }
 
     /**
+     * A real belting
+     */
+    public function testWeightedAverage14() {
+        $project = $this->spawnProject(new SummatorWeightedAverage());
+        $project->setAssessables($this->massProduce());
+
+        /* Reset all but one of the weights
+         */
+        foreach ($project->getAssessables() as $currentAssessable) {
+            if ($currentAssessable->getId() != 10005) {
+                $currentAssessable->setWeight(null);
+            }
+        }
+
+        /* Due Work 1: Weight  null, NormalisedMark: P,null UP,18
+         * Due Work 2: Weight  null, NormalisedMark: P,null UP,91
+         * Due Work 3: Weight  null, NormalisedMark: P,null UP,89
+         * Due Work 4: Weight  null, NormalisedMark: P,null UP,null
+         * Due Work 5: Weight  4, NormalisedMark: P,null UP,76
+         * Due Work 6: Weight  null, NormalisedMark: P,null UP,null
+         * Due Work 7: Weight  null, NormalisedMark: P,null UP,96
+         *
+         * Total Weight: 66
+         *
+         * Published Weighted Average is: 0
+         *
+         * Unpublished Weighted Average is:
+         *      = 76*4/4
+         *      = 76
+         */
+        $this->assertEquals(0, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(76.00000000000, $project->getNormalisedMark($this->hodes, false));
+    }
+
+    /**
      * Mass produce a giant Due Work set
      *
      * @return Collection
