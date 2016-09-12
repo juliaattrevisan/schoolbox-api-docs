@@ -215,43 +215,7 @@ class Provisioner
 
                     // Run this user through the hydrators
                     try {
-
                         $ruleset->hydrate($externalUser, $internalUser);
-
-                        // Remove user from campuses if applicable
-
-                        if (count($internalUser->getCampusCollectionRemove())) {
-
-                            // We need to create a new campus collection for the user
-                            $newCampuses = new \Schoolbox\CampusCollection();
-
-                            // Go through all of the users current campuses
-                            foreach ($internalUser->getCampusCollection() as $index => $currentCampus) {
-                                $delete = false;
-
-                                // Go through all the campuses we need to delete
-                                foreach ($internalUser->getCampusCollectionRemove() as $currentRemove) {
-                                    if ($currentCampus->getId() == $currentRemove) {
-                                        // We need to delete this campus
-                                        $delete = true;
-                                        break;
-                                    }
-                                }
-
-                                // If we didn't have to delete this campus, the user should still be in it
-                                if (!$delete) {
-                                    $newCampuses->add($currentCampus);
-                                }
-                            }
-
-                            $internalUser->setCampusCollection($newCampuses);
-
-                            // If this is the only campus they're in, it has to be their default
-                            if ($newCampuses->count() == 1) {
-                                $internalUser->setDefaultCampus($newCampuses[0]);
-                            }
-                        }
-
                     } catch (SkipException $e) {
                         $commonContext['action'] = 'skip';
                         $this->logger->notice("Skipping user: ".$e->getMessage(), $commonContext);
