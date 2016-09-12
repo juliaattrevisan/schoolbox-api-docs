@@ -61,4 +61,15 @@ class WebdavController extends NavigatorController implements ExternalInterface 
         return 'network';
     }
 
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return sprintf(
+            '/drives/picker/webdav?mime=%s',
+            urlencode($this->mimeFilter)
+        );
+    }
+
 }

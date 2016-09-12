@@ -159,13 +159,15 @@ class TreeBuilder extends AbstractTreeBuilder
 
     /**
      * @param int $nodeId
+     * @param string $mime
      * @return Collection|Resource\AbstractFile[]
      */
-    protected function getNodeFiles($nodeId)
+    protected function getNodeFiles($nodeId, $mime='*/*')
     {
         // TODO cache this
         if ($this->fileLocator) {
-            return $this->fileLocator->findByFolderId($nodeId);
+            $files = $this->filterMime($this->fileLocator->findByFolderId($nodeId), $mime);
+            return $files;
         }
         return new Collection();
     }

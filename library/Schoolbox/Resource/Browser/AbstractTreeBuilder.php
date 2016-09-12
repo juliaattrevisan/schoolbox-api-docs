@@ -107,12 +107,12 @@ abstract class AbstractTreeBuilder
     /**
      * Builds a list of child nodes for $categoryId
      *
-     * @param  mixed $folderId
-     * @param  array $mustInclude
-     *
+     * @param mixed $folderId
+     * @param array $mustInclude
+     * @param string $mime
      * @return array
      */
-    public function buildChildNodes($folderId, $mustInclude = [])
+    public function buildChildNodes($folderId, $mustInclude = [], $mime = "*?*")
     {
         $output = [];
 
@@ -140,7 +140,7 @@ abstract class AbstractTreeBuilder
                 }
             }
             // include files (which only works if a file locator was given)
-            foreach ($this->getNodeFiles($folderId) as $file) {
+            foreach ($this->getNodeFiles($folderId, $mime) as $file) {
                 try {
                     $output[] = $this->buildFileNode($file);
                 } catch (Resource\Exception $e) {
@@ -381,6 +381,42 @@ abstract class AbstractTreeBuilder
         return $this->getPermissionString(UserAccess::ACCESS_FULL);
     }
 
+    /**
+     * Filter an array of files by a mime filter
+     * @param Collection $files
+     * @param string $mime
+     * @return Collection
+     */
+    protected function filterMime($files, $mime)
+    {
+        if ($mime != "*/*") {
+
+            $filesFiltered = new Collection();
+            $mimeFilterArray = explode("/", $mime);
+
+            /** @var \Schoolbox\Resource\File\Model $file */
+            foreach ($files as $file) {
+                $match = true;
+                $currentMime = explode("/", $file->getMime());
+
+                for ($i = 0; $i < 2; $i++) {
+                    if ($mimeFilterArray[$i] != "*") {
+                        if (strtolower($currentMime[$i] != strtolower($mimeFilterArray[$i]))) {
+                            $match = false;
+                        }
+                    }
+                }
+
+                if ($match) {
+                    $filesFiltered->add($file);
+                }
+            }
+
+            return $filesFiltered;
+        }
+
+        return $files;
+    }
 
     /**
      * Return the given folder's href
@@ -411,6 +447,5 @@ abstract class AbstractTreeBuilder
      * @param int $nodeId
      * @return Collection|Resource\AbstractFile[]
      */
-    protected abstract function getNodeFiles($nodeId);
-
+    protected abstract function getNodeFiles($nodeId, $mime);
 }

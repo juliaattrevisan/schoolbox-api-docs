@@ -50,7 +50,7 @@ foreach ($factory->getMappedControllers() as $controller) {
     $this->setVar(array(
         'SRC_SLUG'   => str_replace('/', '-', $controller->getSlug()),
         'SRC_ICON'   => $controller->getIcon(),
-        'SRC_LABEL'  => $controller->getLabel(),
+        'SRC_LABEL'  => $controller->getLabel() . $controller->getUrl(),
         'SRC_URL'    => $controller->getUrl(),
         'SRC_METHOD' => $controller->getRenderMethod()
     ));

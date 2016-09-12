@@ -1,0 +1,243 @@
+{# Load in required JS/CSS as we are not inside the chrome #}
+
+<script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={{ site_version }}"></script>
+<!--[if lt IE 10]>
+<link rel="stylesheet" type="text/css" href="/css/{{ site_location }}/chrome-foundation-ie9.css?v={{ site_version }}" />
+<![endif]-->
+<!--[if gte IE 10]> -->
+<link rel="stylesheet" type="text/css" href="/css/{{ site_location }}/chrome-foundation.css?v={{ site_version }}" />
+<!-- <![endif]-->
+
+{# Load JS for treeview #}
+
+<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css" />
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.scroll-to.js"></script>
+<script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
+
+
+
+{% if namespace == 'myFilesBrowser' %}
+    {% set fileController   = 'myFile' %}
+    {% set folderController = 'myFolder' %}
+    {% set folderVar = 'parent' %}
+{% elseif namespace == 'webDavBrowser' %}
+    {% set fileController   = 'networkFile' %}
+    {% set folderController = 'networkFolder' %}
+    {% set folderVar = 'parent' %}
+{% else %}
+    {% set fileController   = 'file' %}
+    {% set folderController = 'category' %}
+    {% set linkController   = 'link' %}
+    {% set folderVar = 'category' %}
+{% endif %}
+
+<script type="text/javascript">
+    $(function () {
+        var openNode = {{ folder.id }};
+
+        {# TODO put this in a new module #}
+        var tree = $('#tree'),
+                metaData         = $('#meta'),
+                listItem         = 'li',
+                folderInfoUri    = '/:id/info',
+                fileInfoUri      = '/file/:id/info',
+                linkInfoUri      = '/link/:id/info';
+
+        tree.resourceTree({
+            data: {
+                cache: {{ treedata | raw }},
+                ajaxParams: {
+                    url: '{{ routeLookup(namespace ~ '.listNodes') }}?mime={{ mime }}',
+                    token: '{folderId}'
+                }
+            }
+        });
+
+        // expose the jstree in all its splendour
+        var jstree = tree.jstree(true);
+
+        tree.on('select_node.jstree', function(event, jstree) {
+            jstree.instance.open_node(jstree.node.id);
+            var nodeId = jstree.node.li_attr['data-id'];
+            if (jstree.node.type == 'file') {
+                $.get('/drives/file/' + nodeId + '/ajax', function(e) {
+                    data = [{
+                        title:    e.title,
+                        mimeType: e.mimeType,
+                        filesize: e.filesize,
+                        hash:     '{{ source_slug }}:' + nodeId
+                    }];
+
+                    window.top.postMessage(JSON.stringify({ data: data }), location.origin);
+                });
+            } else if (jstree.node.type == 'folder') {
+                openNode = nodeId;
+            }
+        });
+
+        var $window    = $(window),
+                $hybrid    = $('#hybrid-bar'),
+                $footer    = $('#footer'),
+                $resources = $('#resources');
+
+
+        // On the initial open of the tree and all its open by default parts:
+        // scroll to it
+        tree.on('after_open.jstree.initial', function(event, jstree) {
+            var nodeId = jstree.node.id;
+
+            // If this node is the parent of the selected: scroll to the selected now
+            var initialNode = jstree.instance.get_children_dom(nodeId).filter('#'+{{ folder.id }});
+            if (initialNode.length) {
+                $resources.scrollTo(initialNode);
+                tree.off('.jstree.initial');
+            }
+        });
+
+        function rs()
+        {
+            var calcd = $window.height() - $hybrid.height() - $footer.height() - metaData.height() - 120;
+            $resources.height(Math.max(320, calcd));
+        }
+
+        rs();
+
+        $(window).on('resize', rs);
+
+        metaData.on('click', '[data-selectnode]', function (e) {
+            e.preventDefault();
+
+            var $anchor = $(this);
+            openNode    = $anchor.data('selectnode');
+            var target  = tree.find('a[id=' + openNode + '_anchor]');
+
+            target.trigger('click');
+        });
+
+        var loadingClass = 'icon-loading',
+                fileClass    = 'icon-document',
+                failClass    = 'icon-alert';
+
+        $('#async').fileDrop({
+            dictDefaultMessage:'You can drag files into this space.',
+            previewsContainer: '#preview-container',
+
+            addedfile: function (file) {
+
+                var name = file.name.substr(0, file.name.lastIndexOf('.')),
+                        data = {
+                            '{{ folderVar }}': openNode,
+                            description: name,
+                            comment: '',
+                            visible: 1
+                        };
+
+                var parent = [ openNode ],
+                        newNode = {
+                            text: name,
+                            icon: loadingClass,
+                            type: 'file',
+                            li_attr: {
+                                'data-permission': 'write'
+                            }
+                        };
+
+                var el = $(file.previewElement);
+
+                $.each(data, function (k, v) {
+
+                    // set data for ajax form submission on both preview elements
+                    el.data(k, v);
+                    newNode.li_attr['data-' + k] = v;
+
+                });
+
+                jstree.create_node(parent, newNode, 'last', function (freshNode) {
+                    $(file.previewElement).data('node', freshNode);
+                });
+            },
+
+            sending: function (file, xhr, formData) {
+
+                var data = $(file.previewElement).data();
+
+                if (data) {
+                    // jam file data into form data
+                    $.each(data, function (k, v) {
+                        formData.append(k, v);
+                    });
+                }
+            },
+
+            success: function (file, response) {
+
+                var newFileId = response.id,
+                        el        = $(file.previewElement),
+                        node      = el.data('node');
+
+                node.li_attr['data-id'] = newFileId;
+                node.icon = fileClass;
+
+                // update the "original" too
+                node.original.li_attr['data-id'] = newFileId;
+                node.original.icon = fileClass;
+
+                // get the li in the tree
+                var $li = $(jstree.get_node(node.id, true));
+
+                // manipulate the visual output
+                $li.data('id', newFileId)
+                        .find('.' + loadingClass)
+                        .removeClass(loadingClass)
+                        .addClass(fileClass);
+
+            },
+
+            error: function (file, response) {
+
+                var el   = $(file.previewElement),
+                        node = el.data('node');
+
+                node.icon = failClass;
+                node.original.icon = failClass;
+
+                var $li = $(jstree.get_node(node.id, true));
+
+                $li.find('.' + loadingClass).removeClass(loadingClass).addClass(failClass).attr('title', response.error);
+                $li.find('a.jstree-anchor').append('<span class="meta"> - ' + response.error + '</span>');
+            }
+        });
+
+        {# Add delete confirmation if it is available by intercepting delete requests #}
+        metaData.on('click', '[data-action="delete"]', function (event) {
+            event.preventDefault();
+
+            var deleteNode   = jstree.get_selected(true);
+            var selectParent = deleteNode[0].parent;
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this?',
+                confirmEvent: function (anchor) {
+                    $.post(anchor.attr('href'), {id: $(event.target).attr('data-folder-id') }).done(function () {
+                        jstree.delete_node(deleteNode);
+                        jstree.select_node(selectParent);
+                    });
+                }
+            });
+        });
+
+    });
+</script>
+{# /HEAD #}
+
+<div class="resource-browser row">
+    <div class="small-12 island">
+        <section>
+            <div class="scroller" id="resources">
+                <div id="tree" class="resource-tree"></div>
+            </div>
+        </section>
+    </div>
+</div>

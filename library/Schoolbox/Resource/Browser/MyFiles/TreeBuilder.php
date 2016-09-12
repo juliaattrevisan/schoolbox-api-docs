@@ -81,17 +81,18 @@ class TreeBuilder extends AbstractTreeBuilder
 
     /**
      * @param int $nodeId
+     * @param string $mime
      * @return Collection|Resource\AbstractFile[]
      */
-    protected function getNodeFiles($nodeId)
+    protected function getNodeFiles($nodeId, $mime='*/*')
     {
         /** @var Mapper $locator */
         $locator = $this->fileLocator;
 
-        return $locator->findByColumnList([
+        return $this->filterMime($locator->findByColumnList([
             'owner' => $this->user->getId(),
             'parent' => $nodeId
-        ]);
+        ]), $mime);
     }
 
 }

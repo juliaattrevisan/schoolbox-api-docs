@@ -45,8 +45,7 @@
           }
           else if (mth == 'iframe') {
             panel.removeClass('preload');
-            console.log(url);
-            panel.html($('<iframe/>').attr('src', url));
+            panel.html($('<iframe/>').attr('src', url).height(350));
           }
         }
       });

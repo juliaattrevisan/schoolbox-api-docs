@@ -19,8 +19,7 @@ use Schoolbox\Resource\Folder\IFolder;
 
 class TreeBuilder extends AbstractTreeBuilder
 {
-
-    /**
+   /**
      */
     public function __construct()
     {
@@ -64,15 +63,16 @@ class TreeBuilder extends AbstractTreeBuilder
         return $this->folderLocator->findByParentId($nodeId);
     }
 
-
     /**
      * @param int $nodeId
+     * @param string $mime
      * @return Collection|Resource\AbstractFile[]
      */
-    protected function getNodeFiles($nodeId)
+    protected function getNodeFiles($nodeId, $mime="*/*")
     {
         if ($this->fileLocator) {
-            return $this->fileLocator->findByFolderId($nodeId);
+            $files = $this->filterMime($this->fileLocator->findByFolderId($nodeId), $mime);
+            return $files;
         }
         return new Collection();
     }

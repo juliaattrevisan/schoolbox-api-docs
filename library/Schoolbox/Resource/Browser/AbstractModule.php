@@ -29,6 +29,8 @@ abstract class AbstractModule extends BaseModule
      */
     public function initRoutes(Router $router, $basePath)
     {
+        $this->addGetRoute($router, 'picker', $basePath, '/picker/{sourceSlug}');
+        $this->addGetRoute($router, 'getFileInfo', $basePath, '/file/{fileId}/ajax')->addTokens([ 'fileId' => '\d+' ]);
         $this->addGetRoute($router, 'browse', $basePath, '{/folderId}')->addTokens([ 'folderId' => '\d+' ]);
         $this->addGetRoute($router, 'listResources', $basePath, '/{folderId}/children')->addTokens([ 'folderId' => '\d+' ]);
         $this->addGetRoute($router, 'listNodes', $basePath, '/{folderId}/nodes')->addTokens([ 'folderId' => '\d+' ]);
