@@ -474,21 +474,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         $this->updatePastoralCareContacts($pastoral);
 
-        // TODO: Upload attachments to DocMan (SynergyOneMedia)
-
-        /*
-        $attachments = $this->getPastoralAttachmentMapper()->findByPastoralId($pastoral->getId());
-
-        foreach ($attachments as $attachment) {
-
-            $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($attachment->getHash());
-            $content = bin2hex($content);
-            $document = "0x".$content;
-
-            $this->getDatabase()->query("INSERT INTO tDocuments (Description, SourceRed, Document) VALUES ('Text', 'Imported from Schoolbox', '{$document}')");
-        }
-        */
-
         return $result;
     }
 
@@ -621,21 +606,6 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             $result = $this->getDatabase()->query($query);
 
             $this->updatePastoralCareContacts($pastoral);
-
-            // TODO: Upload attachments to DocMan (SynergyOneMedia)
-
-            /*
-            $attachments = $this->getPastoralAttachmentMapper()->findByPastoralId($pastoral->getId());
-
-            foreach ($attachments as $attachment) {
-
-                $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($attachment->getHash());
-                $content = bin2hex($content);
-                $document = "0x".$content;
-
-                $this->getDatabase()->query("INSERT INTO tDocuments (Description, SourceRed, Document) VALUES ('Text', 'Imported from Schoolbox', '{$document}')");
-            }
-            */
 
             return $result;
         }

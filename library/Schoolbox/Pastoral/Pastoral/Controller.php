@@ -14,7 +14,6 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Pastoral\Pastoral;
 use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
@@ -40,6 +39,8 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\File\Mapper as FileMapper;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Pastoral\UploadQueue\Mapper as PastoralUploadQueueMapper;
+use Schoolbox\Pastoral\UploadQueue\Model as PastoralUploadQueueModel;
 
 class Controller extends Base
 {
@@ -57,11 +58,16 @@ class Controller extends Base
      * @var PastoralCategoryMapper
      */
     protected $pastoralCategoryMapper;
-    
+
     /**
      * @var PastoralTypeMapper
      */
     protected $pastoralTypeMapper;
+
+    /**
+     * @var PastoralUploadQueueMapper
+     */
+    protected $pastoralUploadQueueMapper;
 
     /**
      * @var PastoralSeverityMapper
@@ -120,6 +126,7 @@ class Controller extends Base
         $this->setUserAccessMapper(UserAccessMapper::getInstance());
         $this->setPastoralCategoryMapper(PastoralCategoryMapper::getInstance());
         $this->setPastoralTypeMapper(PastoralTypeMapper::getInstance());
+        $this->setPastoralUploadQueueMapper(PastoralUploadQueueMapper::getInstance());
         $this->setPastoralSeverityMapper(PastoralSeverityMapper::getInstance());
         $this->setPastoralTagsMapper(PastoralTagsMapper::getInstance());
         $this->setPastoralCommentMapper(PastoralCommentMapper::getInstance());
@@ -495,7 +502,7 @@ class Controller extends Base
                     'teachers'          => $student->getTeacherCollection(),
                     'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
                     'READ_ACCESS'       => UserAccess::ACCESS_READ,
-                    'FULL_ACCESS'       => UserACcess::ACCESS_FULL,
+                    'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
                     'pastoralModerator' => $this->getPastoralModeratorLevel()
                 ),
             )
@@ -568,7 +575,7 @@ class Controller extends Base
                     'record'            => $pastoral,
                     'WRITE_ACCESS'      => UserAccess::ACCESS_WRITE,
                     'READ_ACCESS'       => UserAccess::ACCESS_READ,
-                    'FULL_ACCESS'       => UserACcess::ACCESS_FULL,
+                    'FULL_ACCESS'       => UserAccess::ACCESS_FULL,
                     'pastoralModerator' => $this->getPastoralModeratorLevel(),
                     'role'              => $this->getUser()->getRole()->getType(),
                 ),
@@ -811,7 +818,7 @@ class Controller extends Base
                     $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
 
                     try {
-                        /** @var PastoralCategoryModel $type */
+                        /** @var PastoralCategoryModel $category */
                         $category = $this->getPastoralCategoryMapper()->findById($this->getRequest()->post["categoryId"]);
                         $record->setCategory($category);
                     } catch (MapperException $e) {
@@ -850,7 +857,7 @@ class Controller extends Base
                         foreach ($this->getRequest()->post["user_id"] as $user_id) {
 
                             try {
-                                $user = $this->getUserMapper()->findbyId($user_id);
+                                $user = $this->getUserMapper()->findById($user_id);
                             } catch (MapperException $e) {
                                 throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                             }
@@ -920,7 +927,7 @@ class Controller extends Base
             try {
                 /** @var PastoralTypeModel $type */
                 $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
-                /** @var PastoralCategoryModel $type */
+                /** @var PastoralCategoryModel $category */
                 $category = $this->getPastoralCategoryMapper()->findById($this->getRequest()->post["categoryId"]);
                 /** @var PastoralSeverityModel $severity */
                 $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
@@ -1064,6 +1071,7 @@ class Controller extends Base
                 $pastoralExternal->createPastoral($record);
         }
 
+        /** @var PastoralModel $record */
         foreach ($records as $record)
         {
             // Delete attachments if required
@@ -1122,6 +1130,21 @@ class Controller extends Base
                     // Only add attachments which don't already exist
 
                     if (!in_array($storageObject->getHash(), $retainedAttachments)) {
+
+                        if ($this->getDi()->get('config')->get("external_pastoral_upload")) {
+                            // Queue file for upload to Synergetic DocMan
+                            $queue = new PastoralUploadQueueModel();
+                            $queue->setPastoralId($record->getId());
+                            $queue->setExternalId($this->getUser()->getExternalId());
+                            $queue->setStudentExternalId($record->getStudent()->getExternalId());
+                            $queue->setHash($storageObject->getHash());
+                            $queue->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
+                            $queue->setType($storageObject->getType());
+                            $queue->setCreatedAt(\Alaress_Date_Format::now());
+                            $queue->setUpdatedAt(\Alaress_Date_Format::now());
+                            $this->getPastoralUploadQueueMapper()->save($queue);
+                        }
+
                         $attachment = new PastoralAttachmentModel();
                         $attachment->setPastoralId($record->getId());
                         $attachment->setHash($storageObject->getHash());
@@ -1219,6 +1242,20 @@ class Controller extends Base
     public function getPastoralTypeMapper() {
         return $this->pastoralTypeMapper;
     }
+
+    /**
+     * @param PastoralUploadQueueMapper $pastoralUploadQueueMapper
+     */
+    public function setPastoralUploadQueueMapper($pastoralUploadQueueMapper) {
+        $this->pastoralUploadQueueMapper = $pastoralUploadQueueMapper;
+    }
+
+    /**
+     * @return PastoralUploadQueueMapper
+     */
+    public function getPastoralUploadQueueMapper() {
+        return $this->pastoralUploadQueueMapper;
+    }    
 
     /**
      * @param $pastoralCategoryMapper
