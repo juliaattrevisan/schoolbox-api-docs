@@ -37,7 +37,7 @@ class Model extends AbstractFeedback
             $total += $currentResponse['available'];
         }
 
-        return (float)$sum / (float)$total;
+        return 100 * (float)$sum / (float)$total;
     }
 
     /* Getters/Setters

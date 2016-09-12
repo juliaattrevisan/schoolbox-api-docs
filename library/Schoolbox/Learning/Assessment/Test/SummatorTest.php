@@ -133,9 +133,9 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
          */
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
 
-        /* Unpublished Average is 98 + 77 + 100 + 5 / 4 = 70
+        /* Unpublished Average is 98 + 77 + 100 + 60 / 4 = 83.75
          */
-        $this->assertEquals(70, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(83.75, $project->getNormalisedMark($this->hodes, false));
     }
 
 //    /**

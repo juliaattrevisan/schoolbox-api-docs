@@ -483,6 +483,6 @@ class QuizTest extends \Schoolbox\Learning\Assessment\Test\Defaults
 
         /* Test its derived stuff instead
          */
-        $this->assertEquals(12, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getNormalisedMark());
+        $this->assertEquals(60, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getNormalisedMark());
     }
 }

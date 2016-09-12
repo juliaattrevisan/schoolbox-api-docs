@@ -173,7 +173,7 @@ class ProjectTest extends \Schoolbox\Learning\Assessment\Test\Defaults
 
         /* Test its derived stuff instead
          */
-        $this->assertEquals(12, $projectQuiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($projectQuiz)->getNormalisedMark());
+        $this->assertEquals(60, $projectQuiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($projectQuiz)->getNormalisedMark());
     }
 
     /**
