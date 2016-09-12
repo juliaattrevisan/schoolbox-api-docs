@@ -52,8 +52,27 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
 
     /**
      * Test the unweighted average
+     * when there is nothing in here at all
      */
-    public function testUnweightedAverage()
+    public function testUnweightedAverage0()
+    {
+        $project = $this->spawnProject();
+        $project->setAssessables(new Collection());
+
+        /* Published Average is null
+         */
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+
+        /* Unpublished Average is null
+         */
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
+    }
+
+    /**
+     * Test the unweighted average
+     * when there's one of each type
+     */
+    public function testUnweightedAverage1()
     {
         /* There are three assessables for Hodes
          *
@@ -62,6 +81,10 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
          * Quiz (12 marks)
          */
         $project = $this->spawnProject();
+        $project->setAssessables((new Collection())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork())
+            ->add($this->spawnQuiz()));
 
         /* Published Average is 100 + 12 / 2 = 56
          */
@@ -70,6 +93,70 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
         /* Unpublished Average is 100 + 5 / 2 = 52.5
          */
         $this->assertEquals(52.5, $project->getNormalisedMark($this->hodes, false));
+    }
+
+    /**
+     * Test the unweighted average
+     * when there's more than one of a particular type
+     */
+    public function testUnweightedAverage2()
+    {
+        /* There are five assessables for Hodes
+         *
+         * Due Work 3 (98 marks)
+         * Task (null marks)
+         * Due Work 2 (77 marks)
+         * Due Work (100 marks)
+         * Quiz (12 marks)
+         */
+        $project = $this->spawnProject();
+        $project->setAssessables((new Collection())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnDueWork())
+            ->add($this->spawnQuiz()));
+
+        /* Published Average is 77 + 100 + 12 / 4 = 63
+         */
+        $this->assertEquals(63, $project->getNormalisedMark($this->hodes, true));
+
+        /* Unpublished Average is 77 + 100 + 5 / 4 = 60.67
+         *
+         * Use number_format to deal with precision problems
+         * "Failed asserting that 60.666666666666664 matches expected 60.666670000000003."
+         */
+        $this->assertEquals(60.67, number_format($project->getNormalisedMark($this->hodes, false), 2));
+    }
+
+    /**
+     * Test the unweighted average
+     * when there's more than one of a particular type
+     */
+    public function testUnweightedAverage3()
+    {
+        /* There are five assessables for Hodes
+         *
+         * Due Work 3 (98 marks)
+         * Task (null marks)
+         * Due Work 2 (77 marks)
+         * Due Work (100 marks)
+         * Quiz (12 marks)
+         */
+        $project = $this->spawnProject();
+        $project->setAssessables((new Collection())
+            ->add($this->spawnDueWork3())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnDueWork())
+            ->add($this->spawnQuiz()));
+
+        /* Published Average is 98 + 77 + 100 + 12 / 4 = 71.75
+         */
+        $this->assertEquals(71.75, $project->getNormalisedMark($this->hodes, true));
+
+        /* Unpublished Average is 98 + 77 + 100 + 5 / 4 = 70
+         */
+        $this->assertEquals(70, $project->getNormalisedMark($this->hodes, false));
     }
 
     /**
@@ -101,16 +188,115 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
 
-        $task = $this->spawnTask();
-        $dueWork = $this->spawnDueWork();
-        $quiz = $this->spawnQuiz();
-
-        $project->setAssessables((new Collection())
-            ->add($task)
-            ->add($dueWork)
-            ->add($quiz));
-
         return $project;
+    }
+
+    /**
+     * Spawn another Due Work
+     *
+     * @return DueWork
+     */
+    protected function spawnDueWork3()
+    {
+        $id = 13;
+        $title = 'Stay Awhile And Listen';
+        $description = 'I have a story to tell...';
+        $typeName = 'Homework';
+
+        $dueWork = new DueWork();
+        $dueWork
+            ->setId($id)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setType((new DueWorkType())
+                ->setId(2)
+                ->setName($typeName))
+            ->setCreator($this->somodio)
+            ->setAllParticipants((new Collection())
+                ->add(new Participant($this->hodes))
+                ->add(new Participant($this->bsalem))
+                ->add(new Participant($this->sberryhill))
+                ->add(new Participant($this->asaxon)))
+            ->setPublishAt($this->thirteenDaysFromNow)
+            ->setOpenAt($this->fourteenDaysFromNow)
+            ->setDueAt($this->twentyDaysFromNow)
+            ->setCloseAt($this->thirtyDaysFromNow)
+            ->setCreatedAt($this->today)
+            ->setUpdatedAt($this->today);
+
+        /* Freefloating Feedback
+         *
+         * This Feedback isn't associated with a particular Submission,
+         * just the Assessable itself
+         */
+        $floatingFeedback = (new DueWorkFeedback())
+            ->setId(9912)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(98)
+            ->setComment('The greatest story ever told!')
+            ->setReviewer($this->celia)
+            ->setAllFiles(new Collection())
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+
+        return $dueWork;
+    }
+
+    /**
+     * Spawn another Due Work
+     *
+     * @return DueWork
+     */
+    protected function spawnDueWork2()
+    {
+        $id = 7;
+        $title = 'Collect Horadric Gems';
+        $description = 'How many gems did you find?';
+        $typeName = 'Class Presentation';
+
+        $dueWork = new DueWork();
+        $dueWork
+            ->setId($id)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setType((new DueWorkType())
+                ->setId(2)
+                ->setName($typeName))
+            ->setCreator($this->somodio)
+            ->setAllParticipants((new Collection())
+                ->add(new Participant($this->hodes))
+                ->add(new Participant($this->bsalem))
+                ->add(new Participant($this->sberryhill))
+                ->add(new Participant($this->asaxon)))
+            ->setPublishAt($this->thirteenDaysFromNow)
+            ->setOpenAt($this->fourteenDaysFromNow)
+            ->setDueAt($this->twentyDaysFromNow)
+            ->setCloseAt($this->thirtyDaysFromNow)
+            ->setCreatedAt($this->today)
+            ->setUpdatedAt($this->today);
+
+        /* Freefloating Feedback
+         *
+         * This Feedback isn't associated with a particular Submission,
+         * just the Assessable itself
+         */
+        $floatingFeedback = (new DueWorkFeedback())
+            ->setId(7889)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(77)
+            ->setComment('cool collection of gems')
+            ->setReviewer($this->celia)
+            ->setAllFiles(new Collection())
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-11 11:12:23', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+
+        return $dueWork;
     }
 
     /**
@@ -120,7 +306,6 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
      */
     protected function spawnDueWork()
     {
-
         $id = 2;
         $title = 'Enter the Realm of Terroarrrr';
         $description = 'Diablo was found in the land of terroarrrrr! Find him, and whack him!';
