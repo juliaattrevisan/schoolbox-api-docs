@@ -98,5 +98,6 @@
 .e-report .teacher-list .teacher-name {
     position: absolute;
     bottom: 0;
+    padding-bottom: 0;
     right: 5.5rem;
 }
