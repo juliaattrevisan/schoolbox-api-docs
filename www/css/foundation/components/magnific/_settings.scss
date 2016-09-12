@@ -89,7 +89,29 @@ img.mfp-img{
 }
 
 @media #{$small-only} {
-	.mfp-arrow{
+	.mfp-arrow:before{
+		color: $white;
+		font-size: 4rem;
+		margin-top: 16px;
+	}
+	.mfp-arrow-left:after,
+	.mfp-arrow-right:after{
+		border: 0;
+		font-size: 61px;
+		top: -5px;
 		color: $black;
+		visibility: visible !important;
+		width: auto !important;
+	}
+	.mfp-container .mfp-arrow-left:after{
+		content: "\e655" !important;
+		margin-left: 26px;
+	}
+	.mfp-container .mfp-arrow-right:after{
+		content: "\e64b" !important;
+		margin-left: 2px;
+	}
+	.mfp-container .mfp-arrow-right:before {
+		margin-left: 0px;
 	}
 }
