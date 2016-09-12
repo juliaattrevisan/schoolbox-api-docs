@@ -2,6 +2,8 @@
 /**
  * AbstractSummator
  *
+ * Template Design Pattern
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -9,7 +11,6 @@
  */
 
 namespace Schoolbox\Learning\Assessment\Summator;
-
 
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -28,6 +29,10 @@ abstract class AbstractSummator implements ISummator
         }
 
         $this->reset();
+
+        /* Calculate weighting
+         */
+        $totalWeight = $this->calculateTotalWeight($allAssessables);
 
         /** @var IAssessable $currentAssessable */
         foreach ($allAssessables as $currentAssessable) {
@@ -48,7 +53,7 @@ abstract class AbstractSummator implements ISummator
                     $val = $feedback->getNormalisedMark();
 
                     if (!is_null($val)) {
-                        $this->aggregate($val);
+                        $this->aggregate($val, $currentAssessable->getWeight(), $totalWeight);
                     }
                 }
             }
@@ -62,10 +67,20 @@ abstract class AbstractSummator implements ISummator
     }
 
     /**
+     * The sum total weight of all the assessables
+     *
+     * @param Collection $allAssessables
+     * @return int
+     */
+    protected abstract function calculateTotalWeight(Collection $allAssessables);
+
+    /**
      * @param float $val
+     * @param int $assessableWeight
+     * @param int $totalWeight
      * @return void
      */
-    protected abstract function aggregate($val);
+    protected abstract function aggregate($val, $assessableWeight, $totalWeight);
 
     /**
      * @return void

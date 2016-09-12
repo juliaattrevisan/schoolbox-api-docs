@@ -14,11 +14,7 @@
 namespace Schoolbox\Learning\Assessment\Summator;
 
 use \Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\IFeedback;
 use \Schoolbox\User;
-use \Schoolbox\Learning\Assessment\AbstractAssessment;
-use \Schoolbox\Learning\Assessment\AbstractResponse;
-use \Schoolbox\Learning\Assessment\Participant;
 
 class Average extends AbstractSummator
 {
@@ -30,8 +26,17 @@ class Average extends AbstractSummator
 
     /**
      * @inheritDoc
+     *
+     * Not used in plain ol' Average
      */
-    protected function aggregate($val)
+    protected function calculateTotalWeight(Collection $allAssessables) {
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function aggregate($val, $assessableWeight, $totalWeight)
     {
         $this->sum += $val;
         $this->numItems++;
