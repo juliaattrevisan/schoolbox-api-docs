@@ -71,11 +71,11 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $unitDataModel = $this->unitTranslator->translateToDataModel($unitSpec, $courseDataModel);
 
         // Verify that some of these things are the same
-        $this->assertEquals($unitDataModel->getId(), $unitSpec->getId());
-        $this->assertSame($unitDataModel->getFolder(), $unitSpec->getFolder());
-        $this->assertSame($unitDataModel->getCourse(), $courseDataModel);
-        $this->assertEquals($unitDataModel->getCreatedAt()->getDatabase(), $unitSpec->getCreatedAt()->getDatabase());
-        $this->assertEquals($unitDataModel->getUpdatedAt()->getDatabase(), $unitSpec->getUpdatedAt()->getDatabase());
+        $this->assertEquals($unitSpec->getId(), $unitDataModel->getId());
+        $this->assertSame($unitSpec->getFolder(), $unitDataModel->getFolder());
+        $this->assertSame($unitSpec->getCourse(), $courseDataModel);
+        $this->assertEquals($unitSpec->getCreatedAt()->getDatabase(), $unitDataModel->getCreatedAt()->getDatabase());
+        $this->assertEquals($unitSpec->getUpdatedAt()->getDatabase(), $unitDataModel->getUpdatedAt()->getDatabase());
         $this->assertInstanceOf(Alaress_Date_NullDate::class, $unitDataModel->getDeletedAt());
 
         // Translation of assessables (if present) gets tested in a different test.
@@ -120,11 +120,11 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $unitSpec = $this->unitTranslator->translateToDomainModel($unitDataModel);
 
         // Verify that details are the same
-        $this->assertEquals($unitSpec->getId(), $unitDataModel->getId());
-        $this->assertSame($unitSpec->getFolder(), $unitDataModel->getFolder());
-        $this->assertEquals($unitSpec->getCreatedAt()->getDatabase(), $unitDataModel->getCreatedAt()->getDatabase());
-        $this->assertEquals($unitSpec->getUpdatedAt()->getDatabase(), $unitDataModel->getUpdatedAt()->getDatabase());
-        $this->assertInstanceOf(Alaress_Date_NullDate::class, $unitDataModel->getDeletedAt());
+        $this->assertEquals($unitDataModel->getId(), $unitSpec->getId());
+        $this->assertSame($unitDataModel->getFolder(), $unitSpec->getFolder());
+        $this->assertEquals($unitDataModel->getCreatedAt()->getDatabase(), $unitSpec->getCreatedAt()->getDatabase());
+        $this->assertEquals($unitDataModel->getUpdatedAt()->getDatabase(), $unitSpec->getUpdatedAt()->getDatabase());
+        $this->assertInstanceOf(Alaress_Date_NullDate::class, $unitSpec->getDeletedAt());
 
         // Translation of assessables (if present) gets tested in a different test.
         // Just verify that counts are the same.
