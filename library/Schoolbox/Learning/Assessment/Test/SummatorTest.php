@@ -284,7 +284,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
     }
 
     /**
-     * Test the unweighted average
+     * Test the weighted average
      * when there is nothing published
      */
     public function testWeightedAverage2()
@@ -324,111 +324,117 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
         $this->assertEquals(70.97, number_format($project->getNormalisedMark($this->hodes, false), 2));
     }
 
-//    /**
-//     * Test the unweighted average
-//     * when there's one of each type with published and unpublished feedback
-//     */
-//    public function testUnweightedAverage3()
-//    {
-//        /* There are three assessables for Hodes
-//         *
-//         * Due Work (100 marks)
-//         * Task (null marks)
-//         * Quiz (12 marks)
-//         */
-//        $project = $this->spawnProject();
-//        $project->setAssessables((new Collection())
-//            ->add($this->spawnTask())
-//            ->add($this->spawnDueWork())
-//            ->add($this->spawnQuiz()));
-//
-//        /* Published Average is
-//         *      = [100 + (100 * 12/20)] / 2
-//         *      = [100 + 60] / 2
-//         *      = 80
-//         */
-//        $this->assertEquals(80, $project->getNormalisedMark($this->hodes, true));
-//
-//        /* Unpublished Average is
-//         *      = [100 + (100 * 5/20)] / 2
-//         *      = [100 + 25] / 2
-//         *      = 62.5
-//         */
-//        $this->assertEquals(62.5, $project->getNormalisedMark($this->hodes, false));
-//    }
-//
-//    /**
-//     * Test the unweighted average
-//     * when there's more than one of a particular type with published and unpublished feedback
-//     */
-//    public function testUnweightedAverage4()
-//    {
-//        /* There are five assessables for Hodes
-//         *
-//         * Due Work 3 (98 marks)
-//         * Task (null marks)
-//         * Due Work 2 (77 marks)
-//         * Due Work (100 marks)
-//         * Quiz (12 marks)
-//         */
-//        $project = $this->spawnProject();
-//        $project->setAssessables((new Collection())
-//            ->add($this->spawnTask())
-//            ->add($this->spawnDueWork2())
-//            ->add($this->spawnDueWork())
-//            ->add($this->spawnQuiz()));
-//
-//        /* Published Average is
-//         *      = [77 + 100 + (100 * 12/20)] / 3
-//         *      = [177 + 60] / 4
-//         *      = 79
-//         */
-//        $this->assertEquals(79, $project->getNormalisedMark($this->hodes, true));
-//
-//        /* Unpublished Average is
-//         *      = [77 + 100 + (100 * 5/20)] / 3
-//         *      = [177 + 25] / 3
-//         *      = 67.33
-//         */
-//        $this->assertEquals(67.33, number_format($project->getNormalisedMark($this->hodes, false), 2));
-//    }
-//
-//    /**
-//     * Test the unweighted average
-//     * when there's more than one of a particular type with published and unpublished feedback
-//     */
-//    public function testUnweightedAverage5()
-//    {
-//        /* There are five assessables for Hodes
-//         *
-//         * Due Work 3 (98 marks)
-//         * Task (null marks)
-//         * Due Work 2 (77 marks)
-//         * Due Work (100 marks)
-//         * Quiz (12 marks)
-//         */
-//        $project = $this->spawnProject();
-//        $project->setAssessables((new Collection())
-//            ->add($this->spawnDueWork3())
-//            ->add($this->spawnTask())
-//            ->add($this->spawnDueWork2())
-//            ->add($this->spawnDueWork())
-//            ->add($this->spawnQuiz()));
-//
-//        /* Published Average is
-//         *      = [98 + 77 + 100 + (100 * 12/20)] / 4
-//         *      = [275 + 60] / 4
-//         *      = 83.75
-//         */
-//        $this->assertEquals(83.75, $project->getNormalisedMark($this->hodes, true));
-//
-//        /* Unpublished Average is
-//         *      = [98 + 77 + 100 + (100 * 5/20)] / 3
-//         *      = [275 + 25] / 4
-//         *      = 75
-//         */
-//        $this->assertEquals(75, $project->getNormalisedMark($this->hodes, false));
-//    }
+    /**
+     * Test the weighted average
+     * when there's one of each type with published and unpublished feedback
+     */
+    public function testWeightedAverage3()
+    {
+        /* There are three assessables for Hodes
+         *
+         * Due Work (100 marks)
+         * Task (null marks)
+         * Quiz (12 marks)
+         */
+        $project = $this->spawnProject(new SummatorWeightedAverage());
+        $project->setAssessables((new Collection())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork())
+            ->add($this->spawnQuiz()));
+
+        /* Published Weighted Average is
+         *      = [(100*5) + ((100 * 12/20)*8)] / 13
+         *      = [500 + 480] / 13
+         *      = 980 / 13
+         *      = 75.38
+         */
+        $this->assertEquals(75.38, number_format($project->getNormalisedMark($this->hodes, true), 2));
+
+        /* Unpublished Weighted Average is
+         *      = [(100*5) + ((100 * 5/20)*8)] / 13
+         *      = [500 + 200] / 13
+         *      = 700 / 13
+         *      = 53.85
+         */
+        $this->assertEquals(53.85, number_format($project->getNormalisedMark($this->hodes, false), 2));
+    }
+
+    /**
+     * Test the weighted average
+     * when there's more than one of a particular type with published and unpublished feedback
+     */
+    public function testWeightedAverage4()
+    {
+        /* There are five assessables for Hodes
+         *
+         * Due Work 3 (98 marks)
+         * Task (null marks)
+         * Due Work 2 (77 marks)
+         * Due Work (100 marks)
+         * Quiz (12 marks)
+         */
+        $project = $this->spawnProject(new SummatorWeightedAverage());
+        $project->setAssessables((new Collection())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnDueWork())
+            ->add($this->spawnQuiz()));
+
+        /* Published Weighted Average is
+         *      = [(77*10) + (100*5) + ((100 * 12/20)*8)] / 23
+         *      = [770 + 500 + 480] / 23
+         *      = 1750 / 23
+         *      = 76.09
+         */
+        $this->assertEquals(76.09, number_format($project->getNormalisedMark($this->hodes, true), 2));
+
+        /* Unpublished Weighted Average is
+         *      = [(77*10) + (100*5) + ((100 * 5/20)*8)] / 23
+         *      = [770 + 500 + 200] / 23
+         *      = 1470 / 23
+         *      = 63.91
+         */
+        $this->assertEquals(63.91, number_format($project->getNormalisedMark($this->hodes, false), 2));
+    }
+
+    /**
+     * Test the weighted average
+     * when there's more than one of a particular type with published and unpublished feedback
+     */
+    public function testWeightedAverage5()
+    {
+        /* There are five assessables for Hodes
+         *
+         * Due Work 3 (98 marks)
+         * Task (null marks)
+         * Due Work 2 (77 marks)
+         * Due Work (100 marks)
+         * Quiz (12 marks)
+         */
+        $project = $this->spawnProject(new SummatorWeightedAverage());
+        $project->setAssessables((new Collection())
+            ->add($this->spawnDueWork3())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnDueWork())
+            ->add($this->spawnQuiz()));
+
+        /* Published Weighted Average is
+         *      = [(98*6) + (77*10) + (100*5) + ((100 * 12/20)*8)] / 29
+         *      = [588 + 770 + 500 + 480] / 29
+         *      = 2338 / 29
+         *      = 80.62
+         */
+        $this->assertEquals(80.62, number_format($project->getNormalisedMark($this->hodes, true), 2));
+
+        /* Unpublished Weighted Average is
+        *      = [(98*6) * (77*10) + (100*5) + ((100 * 5/20)*8)] / 29
+        *      = [588 + 770 + 500 + 200] / 29
+        *      = 2058 / 29
+        *      = 70.97
+        */
+        $this->assertEquals(70.97, number_format($project->getNormalisedMark($this->hodes, false), 2));
+    }
 
     /**
      * Spawn a Project with stuff in it
