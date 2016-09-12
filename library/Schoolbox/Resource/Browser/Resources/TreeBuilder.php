@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -32,17 +32,17 @@ class TreeBuilder extends AbstractTreeBuilder
     protected $user;
 
     /**
-     * @param Folder\ILocator  $locator
-     * @param UnitMapper       $unitMapper
-     * @param User             $user
-     * @param string           $rootLabel
+     * @param Folder\ILocator $locator
+     * @param UnitMapper $unitMapper
+     * @param User $user
+     * @param string $rootLabel
      */
     public function __construct(Folder\ILocator $locator, UnitMapper $unitMapper, User $user, $rootLabel = 'Resources')
     {
         parent::__construct($locator, 'sbfsfile', $rootLabel);
 
-        $this->unitMapper       = $unitMapper;
-        $this->user             = $user;
+        $this->unitMapper = $unitMapper;
+        $this->user = $user;
     }
 
 
@@ -61,7 +61,7 @@ class TreeBuilder extends AbstractTreeBuilder
             $type = $folder->hasHomepage() ? 'home' : 'folder';
         }
 
-        return  $type;
+        return $type;
     }
 
 
@@ -74,7 +74,7 @@ class TreeBuilder extends AbstractTreeBuilder
     protected function getFolderName(IFolder $folder)
     {
         // Build the name of the category
-        $name       = $folder->getName();
+        $name = $folder->getName();
         $codeString = $folder->getCodeString();
         if ($codeString != '' && $codeString != $name) {
             $name .= " ($codeString)";
@@ -114,7 +114,7 @@ class TreeBuilder extends AbstractTreeBuilder
      */
     protected function getFolderPermission($folderId)
     {
-        return $this->getPermissionString(Access::getInstance()->getFolderAccess($this->user, [ $folderId ]));
+        return $this->getPermissionString(Access::getInstance()->getFolderAccess($this->user, [$folderId]));
     }
 
 
@@ -162,12 +162,11 @@ class TreeBuilder extends AbstractTreeBuilder
      * @param string $mime
      * @return Collection|Resource\AbstractFile[]
      */
-    protected function getNodeFiles($nodeId, $mime='*/*')
+    protected function getNodeFiles($nodeId, $mime = '*/*')
     {
         // TODO cache this
         if ($this->fileLocator) {
-            $files = $this->filterMime($this->fileLocator->findByFolderId($nodeId), $mime);
-            return $files;
+            return $this->filterMime($this->fileLocator->findByFolderId($nodeId), $mime);
         }
         return new Collection();
     }
@@ -188,7 +187,7 @@ class TreeBuilder extends AbstractTreeBuilder
             return $this->generateFileArray($file, $file->getTitle(),
                 [
                     'data-permission' => $permission,
-                    'data-type'       => 'file'
+                    'data-type' => 'file'
                 ],
                 [
                     'href' => $this->getFileHref($file),
@@ -201,9 +200,9 @@ class TreeBuilder extends AbstractTreeBuilder
                 'link',
                 $file->getDescription(),
                 [
-                    'data-id'         => $file->getId(),
+                    'data-id' => $file->getId(),
                     'data-permission' => $permission,
-                    'data-type'       => 'link'
+                    'data-type' => 'link'
                 ],
                 [
                     'href' => $file->getHref(),

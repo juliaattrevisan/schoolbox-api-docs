@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -35,14 +35,14 @@ abstract class AbstractTreeBuilder
 
     /**
      * @param Folder\ILocator $locator
-     * @param string          $namespace
-     * @param string          $rootNodeLabel
+     * @param string $namespace
+     * @param string $rootNodeLabel
      */
     public function __construct(Folder\ILocator $locator, $namespace, $rootNodeLabel = 'Top Level')
     {
         $this->folderLocator = $locator;
         $this->rootNodeLabel = $rootNodeLabel;
-        $this->namespace     = $namespace;
+        $this->namespace = $namespace;
     }
 
 
@@ -70,7 +70,7 @@ abstract class AbstractTreeBuilder
 
         // build a list of parentage
         $parentList[] = $parentId = $categoryId;
-        $i            = 0;
+        $i = 0;
         while ($parentId > 0) {
             if ($i++ > 100) {
                 break;
@@ -95,7 +95,7 @@ abstract class AbstractTreeBuilder
 
         // Open $categoryId's node and its parents
         foreach ($partialTree as &$leaf) {
-            $leaf['state']['opened']   = in_array($leaf['id'], $parentList) || $leaf['id'] == 0;
+            $leaf['state']['opened'] = in_array($leaf['id'], $parentList) || $leaf['id'] == 0;
             $leaf['state']['selected'] = ($leaf['id'] == $categoryId);
         }
         unset($leaf);
@@ -126,7 +126,7 @@ abstract class AbstractTreeBuilder
                 $this->getRootNodeLabel(),
                 [
                     'data-permission' => $this->getFolderPermission($folderId),
-                    'data-type'       => 'folder'
+                    'data-type' => 'folder'
                 ]
             );
 
@@ -164,7 +164,7 @@ abstract class AbstractTreeBuilder
 
     /**
      * @param IFolder $folder
-     * @param array   $mustInclude
+     * @param array $mustInclude
      * @throws Resource\Exception
      * @return array
      */
@@ -194,7 +194,7 @@ abstract class AbstractTreeBuilder
         return $this->generateFolderArray($folder, $type, $name,
             [
                 'data-permission' => $permission,
-                'data-type'       => $type
+                'data-type' => $type
             ],
             [
                 'href' => $href
@@ -218,7 +218,7 @@ abstract class AbstractTreeBuilder
         return $this->generateFileArray($file, $file->getTitle(),
             [
                 'data-permission' => $permission,
-                'data-type'       => 'file'
+                'data-type' => 'file'
             ],
             [
                 'href' => $this->getFileHref($file),
@@ -229,10 +229,10 @@ abstract class AbstractTreeBuilder
 
     /**
      * @param IFolder $folder
-     * @param string  $type
-     * @param string  $name
-     * @param array   $liAttributes
-     * @param array   $aAttributes
+     * @param string $type
+     * @param string $name
+     * @param array $liAttributes
+     * @param array $aAttributes
      * @return array
      */
     protected function generateFolderArray(IFolder $folder, $type, $name = null, array $liAttributes = null, array $aAttributes = null)
@@ -243,9 +243,9 @@ abstract class AbstractTreeBuilder
 
     /**
      * @param Resource\AbstractFile $file
-     * @param string                $name
-     * @param array                 $liAttributes
-     * @param array                 $aAttributes
+     * @param string $name
+     * @param array $liAttributes
+     * @param array $aAttributes
      * @return array
      */
     protected function generateFileArray(Resource\AbstractFile $file, $name = null, array $liAttributes = null, array $aAttributes = null)
@@ -255,22 +255,22 @@ abstract class AbstractTreeBuilder
 
 
     /**
-     * @param int     $nodeId
-     * @param int     $parentId
-     * @param string  $type
-     * @param string  $name
-     * @param array   $liAttributes
-     * @param array   $aAttributes
+     * @param int $nodeId
+     * @param int $parentId
+     * @param string $type
+     * @param string $name
+     * @param array $liAttributes
+     * @param array $aAttributes
      * @return array
      */
     protected function generateNodeArray($nodeId, $parentId, $type, $name, array $liAttributes = null, array $aAttributes = null)
     {
         $array = array(
-            'id'       => $nodeId,
-            'parent'   => $parentId ?: '0',
-            'text'     => $name,
+            'id' => $nodeId,
+            'parent' => $parentId ?: '0',
+            'text' => $name,
             'children' => 0,
-            'type'     => $type,
+            'type' => $type,
         );
 
         if ($type == 'file' || $type == 'link') {
@@ -382,24 +382,33 @@ abstract class AbstractTreeBuilder
     }
 
     /**
-     * Filter an array of files by a mime filter
+     * Filter a collection of files by a mime filter
      * @param Collection $files
-     * @param string $mime
+     * @param string $mime MIME type filter (e.g. 'image/jpeg', 'image/*')
      * @return Collection
      */
     protected function filterMime($files, $mime)
     {
+        // Check if the mime if a wildcard
         if ($mime != "*/*") {
 
             $filesFiltered = new Collection();
+
+            // Split the mime filter on '/'
+
             $mimeFilterArray = explode("/", $mime);
+
+            // Iterate all files in the collection
 
             /** @var \Schoolbox\Resource\File\Model $file */
             foreach ($files as $file) {
                 $match = true;
+
+                // Get the current files mime type string split into an array
                 $currentMime = explode("/", $file->getMime());
 
                 for ($i = 0; $i < 2; $i++) {
+                    // If current filter is wildcard, dont need to test
                     if ($mimeFilterArray[$i] != "*") {
                         if (strtolower($currentMime[$i] != strtolower($mimeFilterArray[$i]))) {
                             $match = false;
@@ -407,6 +416,7 @@ abstract class AbstractTreeBuilder
                     }
                 }
 
+                // If both sides of the mime filter matched, we want to return this file
                 if ($match) {
                     $filesFiltered->add($file);
                 }
@@ -415,6 +425,7 @@ abstract class AbstractTreeBuilder
             return $filesFiltered;
         }
 
+        // Wildcard filter, nothing to do
         return $files;
     }
 
@@ -445,6 +456,7 @@ abstract class AbstractTreeBuilder
 
     /**
      * @param int $nodeId
+     * @param string $mime
      * @return Collection|Resource\AbstractFile[]
      */
     protected abstract function getNodeFiles($nodeId, $mime);
