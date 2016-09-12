@@ -35,6 +35,13 @@ class Project extends AbstractAssessment
     protected $summator;
 
     /**
+     * Number of decimal places used in a Normalised Mark value
+     *
+     * @var int
+     */
+    protected $precision = 11;
+
+    /**
      * Project constructor.
      *
      * @param ISummator $summator
@@ -69,7 +76,13 @@ class Project extends AbstractAssessment
      */
     public function getNormalisedMark(User $user, $publishedOnly)
     {
-        return $this->getSummator()->summate($this->getAssessables(), $user, $publishedOnly);
+        $val = $this->getSummator()->summate($this->getAssessables(), $user, $publishedOnly);
+
+        if (is_null($val)) {
+            return null;
+        }
+
+        return number_format($val, $this->getPrecision());
     }
 
     /**
@@ -158,6 +171,8 @@ class Project extends AbstractAssessment
         if ($this->numAssessables()) {
             return 100 * ($this->numPublished() / $this->numParticipants());
         }
+
+        return null;
     }
 
     /**
@@ -207,5 +222,13 @@ class Project extends AbstractAssessment
     {
         $this->summator = $summator;
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPrecision()
+    {
+        return $this->precision;
     }
 }
