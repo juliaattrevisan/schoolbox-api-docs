@@ -464,6 +464,24 @@ class ProjectTest extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->setId(99759)
             ->setAssessable($quiz)
             ->setNormalisedMark(98)
+            ->setAllResponses([
+                [
+                    'mark' => 1, // Question 1,
+                    'available' => 5
+                ],
+                [
+                    'mark' => 1, // Question 2
+                    'available' => 5
+                ],
+                [
+                    'mark' => 1, // Question 3
+                    'available' => 5
+                ],
+                [
+                    'mark' => 2, // Question 4
+                    'available' => 5
+                ]
+            ])
             ->setReviewer($this->celia)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-15 03:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -477,6 +495,24 @@ class ProjectTest extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->setId(99760)
             ->setAssessable($quiz)
             ->setNormalisedMark(45)
+            ->setAllResponses([
+                [
+                    'mark' => 1, // Question 1,
+                    'available' => 5
+                ],
+                [
+                    'mark' => 1, // Question 2
+                    'available' => 5
+                ],
+                [
+                    'mark' => 1, // Question 3
+                    'available' => 5
+                ],
+                [
+                    'mark' => 2, // Question 4
+                    'available' => 5
+                ]
+            ])
             ->setReviewer($this->celia)
             ->setPublishedAt(new \Alaress_Date_Format('2016-09-16 05:31:29', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-09-12 12:12:12', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -490,6 +526,24 @@ class ProjectTest extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->setId(99761)
             ->setAssessable($quiz)
             ->setNormalisedMark(1)
+            ->setAllResponses([
+                [
+                    'mark' => 1, // Question 1,
+                    'available' => 5
+                ],
+                [
+                    'mark' => 1, // Question 2
+                    'available' => 5
+                ],
+                [
+                    'mark' => 1, // Question 3
+                    'available' => 5
+                ],
+                [
+                    'mark' => 2, // Question 4
+                    'available' => 5
+                ]
+            ])
             ->setComment('This is the most recent feedback')
             ->setReviewer($this->celia)
             ->setCreatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -505,16 +559,20 @@ class ProjectTest extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->setNormalisedMark(83)
             ->setAllResponses([
                 [
-                    'mark' => 3 // Question 1
+                    'mark' => 3, // Question 1,
+                    'available' => 5
                 ],
                 [
-                    'mark' => 2 // Question 2
+                    'mark' => 2, // Question 2
+                    'available' => 5
                 ],
                 [
-                    'mark' => 2 // Question 3
+                    'mark' => 2, // Question 3
+                    'available' => 5
                 ],
                 [
-                    'mark' => 5 // Question 4
+                    'mark' => 5, // Question 4
+                    'available' => 5
                 ]
             ])
             ->setComment('This is the most recent published feedback')
