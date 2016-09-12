@@ -31,7 +31,6 @@ abstract class AbstractSummator implements ISummator
 
         /** @var IAssessable $currentAssessable */
         foreach ($allAssessables as $currentAssessable) {
-
             try {
                 /** @var Participant $participant */
                 $participant = $currentAssessable->getParticipant($user);
@@ -41,27 +40,22 @@ abstract class AbstractSummator implements ISummator
                  */
                 if ($publishedOnly) {
                     $feedback = $participant->findMostRecentPublishedFeedback($currentAssessable, Participant::TRAVERSAL_MARKED);
-
                 } else {
-
                     $feedback = $participant->findMostRecentFeedback($currentAssessable, Participant::TRAVERSAL_MARKED);
                 }
 
                 if ($feedback) {
-
                     $val = $feedback->getNormalisedMark();
 
                     if (!is_null($val)) {
                         $this->aggregate($val);
                     }
                 }
-
             }
             catch (\UnexpectedValueException $e) {
                 /* noop $user not found in Assessable's Participant collection
                  */
             }
-
         }
 
         return $this->finalise();
