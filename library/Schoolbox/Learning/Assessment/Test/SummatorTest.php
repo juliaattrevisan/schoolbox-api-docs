@@ -72,7 +72,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
      * Test the unweighted average
      * when there is no feedback
      */
-    public function testUnweightedAverage5()
+    public function testUnweightedAverage1()
     {
         $project = $this->spawnProject();
         $project->setAssessables((new Collection())
@@ -105,7 +105,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
      * Test the unweighted average
      * when there is nothing published
      */
-    public function testUnweightedAverage4()
+    public function testUnweightedAverage2()
     {
         $project = $this->spawnProject();
         $project->setAssessables((new Collection())
@@ -140,9 +140,9 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
 
     /**
      * Test the unweighted average
-     * when there's one of each type
+     * when there's one of each type with published and unpublished feedback
      */
-    public function testUnweightedAverage1()
+    public function testUnweightedAverage3()
     {
         /* There are three assessables for Hodes
          *
@@ -167,9 +167,9 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
 
     /**
      * Test the unweighted average
-     * when there's more than one of a particular type
+     * when there's more than one of a particular type with published and unpublished feedback
      */
-    public function testUnweightedAverage2()
+    public function testUnweightedAverage4()
     {
         /* There are five assessables for Hodes
          *
@@ -200,9 +200,9 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
 
     /**
      * Test the unweighted average
-     * when there's more than one of a particular type
+     * when there's more than one of a particular type with published and unpublished feedback
      */
-    public function testUnweightedAverage3()
+    public function testUnweightedAverage5()
     {
         /* There are five assessables for Hodes
          *
