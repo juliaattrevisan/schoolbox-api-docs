@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Course\DataModel\Specification;
 
+use Schoolbox\Collection;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 
@@ -50,6 +51,7 @@ class Translator
             ->setCreatedAt($specification->getCreatedAt())
             ->setUpdatedAt($specification->getUpdatedAt())
             ->setDeletedAt($specification->getDeletedAt())
+            ->setUnits(new Collection());
         ;
 
         // Constituent Unit Specs - return in separate object, or this object?
