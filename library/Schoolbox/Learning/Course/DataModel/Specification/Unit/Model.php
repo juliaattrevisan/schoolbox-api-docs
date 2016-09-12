@@ -70,7 +70,7 @@ class Model implements ISoftDeletable
      * @param CourseSpecificationModel $course
      * @return static
      */
-    public function setCourse($course)
+    public function setCourse(CourseSpecificationModel $course)
     {
         $this->course = $course;
         return $this;
@@ -88,7 +88,7 @@ class Model implements ISoftDeletable
      * @param FolderModel $folder
      * @return static
      */
-    public function setFolder($folder)
+    public function setFolder(FolderModel $folder)
     {
         $this->folder = $folder;
         return $this;
@@ -106,7 +106,7 @@ class Model implements ISoftDeletable
      * @param Collection|IAssessable[] $assessables
      * @return static
      */
-    public function setAssessables($assessables)
+    public function setAssessables(Collection $assessables)
     {
         $this->assessables = $assessables;
         return $this;
