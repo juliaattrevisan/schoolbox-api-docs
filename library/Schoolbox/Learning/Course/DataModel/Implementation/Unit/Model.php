@@ -41,13 +41,6 @@ class Model implements ISoftDeletable
     protected $specification;
 
     /**
-     * @deprecated use $this->getCourse()->getFolder() instead
-     *
-     * @var FolderModel
-     */
-    protected $folder;
-
-    /**
      * @var string
      */
     protected $title;
@@ -117,24 +110,6 @@ class Model implements ISoftDeletable
     public function setSpecification($specification)
     {
         $this->specification = $specification;
-        return $this;
-    }
-
-    /**
-     * @return FolderModel
-     */
-    public function getFolder()
-    {
-        return $this->folder;
-    }
-
-    /**
-     * @param FolderModel $folder
-     * @return static
-     */
-    public function setFolder($folder)
-    {
-        $this->folder = $folder;
         return $this;
     }
 

@@ -78,7 +78,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($unitImpl->getId(), $unitDataModel->getId());
         $this->assertEquals($unitImpl->getTitle(), $unitDataModel->getTitle());
         $this->assertEquals($unitImpl->getSpecification()->getId(), $unitDataModel->getSpecification()->getId());
-        $this->assertSame($unitImpl->getCourse()->getId(), $unitDataModel->getCourse()->getId());
+        $this->assertEquals($unitImpl->getCourse()->getId(), $unitDataModel->getCourse()->getId());
         $this->assertEquals($unitImpl->getOpenDate()->getDatabase(), $unitDataModel->getOpenDate()->getDatabase());
         $this->assertEquals($unitImpl->getDueDate()->getDatabase(), $unitDataModel->getDueDate()->getDatabase());
         $this->assertEquals($unitImpl->getCreatedAt()->getDatabase(), $unitDataModel->getCreatedAt()->getDatabase());
@@ -126,7 +126,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         // Verify that details are the same
         $this->assertEquals($dataModel->getId(), $unitImpl->getId());
         $this->assertEquals($dataModel->getTitle(), $unitImpl->getTitle());
-        $this->assertSame($dataModel->getFolder(), $unitImpl->getFolder());
+        $this->assertEquals($dataModel->getSpecification()->getId(), $unitImpl->getSpecification()->getId());
+        $this->assertEquals($dataModel->getCourse()->getId(), $unitImpl->getCourse()->getId());
         $this->assertEquals($dataModel->getCreatedAt()->getDatabase(), $unitImpl->getCreatedAt()->getDatabase());
         $this->assertEquals($dataModel->getUpdatedAt()->getDatabase(), $unitImpl->getUpdatedAt()->getDatabase());
         $this->assertInstanceOf(Alaress_Date_NullDate::class, $unitImpl->getDeletedAt());
