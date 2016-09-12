@@ -8,9 +8,12 @@
 namespace Schoolbox\Learning\Course\DataModel\Implementation\Unit;
 
 use Schoolbox\Collection;
+use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationDataModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationDataModel;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationDataModel;
 use Schoolbox\Learning\Course\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
@@ -22,42 +25,45 @@ class Translator
     /**
      * Translates the Unit Implementation business domain model to a data model.
      *
-     * @param UnitImplementation $implementation
+     * @param UnitImplementation $unitImpl
      * @return Model
      */
-    public function translateToDataModel(UnitImplementation $implementation)
+    public function translateToDataModel(UnitImplementation $unitImpl)
     {
-        return new Model();
-//        // Is there ever a need to get a data model without persisting?
-//        // I don't know?
-//        $dataModel = new Model();
-//        $dataModel
-//            ->setId($implementation->getId())
-//            ->setCreatedAt($implementation->getCreatedAt())
-//            ->setUpdatedAt($implementation->getUpdatedAt())
-//            ->setDeletedAt($implementation->getDeletedAt())
-//            ->setUnits(new Collection());
-//        ;
-//
-//        // I am not going to translate the entire course spec. Just set its ID.
-//        if ($implementation->getSpecification() instanceof CourseSpecification) {
-//            $specModel = new CourseSpecificationDataModel();
-//            $specModel->setId($implementation->getSpecification()->getId());
-//            $dataModel->setSpecification($specModel);
-//        }
-//
-//        // Allow translate if folder is empty, for now.
-//        if ($implementation->getFolder() instanceof FolderModel) {
-//            $dataModel->setFolder($implementation->getFolder());
-//        }
-//
-//        // Constituent Unit Implementations
-//        foreach ($implementation->getUnits() as $unitImplementation) {
-//            $dataModel->getUnits()->add(new UnitImplementation());
-//        }
-//
-//        // If I am going to persist here, I need mappers to have been injected.
-//        return $dataModel;
+        // Is there ever a need to get a data model without persisting?
+        // I don't know?
+        $dataModel = new Model();
+        $dataModel
+            ->setId($unitImpl->getId())
+            ->setTitle($unitImpl->getTitle())
+            ->setOpenDate($unitImpl->getOpenDate())
+            ->setDueDate($unitImpl->getDueDate())
+            ->setCreatedAt($unitImpl->getCreatedAt())
+            ->setUpdatedAt($unitImpl->getUpdatedAt())
+            ->setDeletedAt($unitImpl->getDeletedAt())
+            ->setAssessables(new Collection())
+        ;
+
+        // Basic course and spec translation
+        // TODO figure out if these need proper translation
+        if ($unitImpl->getSpecification() instanceof UnitSpecification) {
+            $specModel = new UnitSpecificationDataModel();
+            $specModel->setId($unitImpl->getSpecification()->getId());
+            $dataModel->setSpecification($specModel);
+        }
+
+        if ($unitImpl->getCourse() instanceof CourseImplementation) {
+            $courseModel = new CourseImplementationDataModel();
+            $courseModel->setId($unitImpl->getCourse()->getId());
+            $dataModel->setCourse($courseModel);
+        }
+
+        // Set assessables directly is okay for now
+        // TODO add translation of assessables, or verify whether translation is required
+        $dataModel->setAssessables($unitImpl->getAssessables());
+
+        // If I am going to persist here, I need mappers to have been injected.
+        return $dataModel;
     }
 
     /**

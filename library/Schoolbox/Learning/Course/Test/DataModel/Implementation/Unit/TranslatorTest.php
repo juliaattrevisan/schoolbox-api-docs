@@ -39,7 +39,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test the translation of a Unit Specification to its data model representation.
+     * Test the translation of a Unit Implementation to its data model representation.
      */
     public function testTranslateToDataModel()
     {
@@ -69,13 +69,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                  ->setUpdatedAt(new Alaress_Date_Format('2015-10-02 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
                  ->setDeletedAt(new Alaress_Date_NullDate());
 
-//        // Unit Specification's Assessables
-//        $unitTask1 = new TaskModel();
-//        $unitTask1->setId(1)->setTitle('Fox House Task 1');
-//
-//        $unitTask2 = new TaskModel();
-//        $unitTask2->setId(2)->setTitle('Fox House Task 2');
-
         $unitImpl->getAssessables()->add(new TaskModel())->add(new TaskModel());
 
         // Translate!
@@ -83,6 +76,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         // Verify that some of these things are the same
         $this->assertEquals($unitImpl->getId(), $unitDataModel->getId());
+        $this->assertEquals($unitImpl->getTitle(), $unitDataModel->getTitle());
         $this->assertEquals($unitImpl->getSpecification()->getId(), $unitDataModel->getSpecification()->getId());
         $this->assertSame($unitImpl->getCourse()->getId(), $unitDataModel->getCourse()->getId());
         $this->assertEquals($unitImpl->getOpenDate()->getDatabase(), $unitDataModel->getOpenDate()->getDatabase());
