@@ -6,6 +6,9 @@
  * IResponse that was spawned. Tasks always return null for its getNormalisedMark()
  * value, and are excluded from the Average calculations.
  *
+ * This might be helpful (yes, I know...)
+ * https://support.microsoft.com/en-au/kb/214049
+ *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
