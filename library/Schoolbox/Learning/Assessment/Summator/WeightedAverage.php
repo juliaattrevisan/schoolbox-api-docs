@@ -59,9 +59,8 @@ class WeightedAverage extends AbstractSummator
             $this->weightedAverage += ($val * ($assessableWeight / $totalWeight));
 
             /* A useful place to diagnose problems
-             *
-             * echo " $val*{$assessableWeight}/{$totalWeight} ";
              */
+            //echo " $val*{$assessableWeight}/{$totalWeight} ";
         }
     }
 
