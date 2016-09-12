@@ -54,6 +54,16 @@
             key: 'selectall',
             checkboxName: 'group[]'
         });
+
+        // Ensure URL is valid
+        $('#form').alaressValidate({
+            rules: {
+                'url': {
+                    isURL: true
+                }
+            }
+        })
+
     });
 </script>
 <!-- END custom_head -->
