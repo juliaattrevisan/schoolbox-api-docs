@@ -1,3 +1,10 @@
+<script>
+    // Hide chrome is the page is loaded inside an iframe
+    if (window.location != window.parent.location) {
+        $('#hybrid-bar,aside').hide();
+    }
+</script>
+
 <div class="row">
     <div class="small-12 columns">
         <h1>Network Drives Login</h1>
