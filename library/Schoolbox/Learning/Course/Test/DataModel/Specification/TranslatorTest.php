@@ -10,22 +10,38 @@ namespace Schoolbox\Learning\Course\Test\DataModel\Specification;
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use Schoolbox\Learning\Assessment\Task\Model as TaskModel;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseDataModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseTranslator;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitDataModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitTranslator;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Resource\Folder\Model as FolderModel;;
 
 /**
- * Test for the specification translator
+ * Test for the Course Specification translator.
  */
 class TranslatorTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var CourseTranslator
+     */
+    protected $courseTranslator;
+
+    /**
+     * Sets up course translator
+     */
+    protected function setUp()
+    {
+        $this->courseTranslator = new CourseTranslator(new UnitTranslator());
+    }
+
+    /**
+     * Test the translation of a Course Specification to its data model representation.
+     */
     public function testTranslateToDataModel()
     {
-        // Build my example domain model
-
-        // Create a Course Specification for a Folder
+        // Create a Course Specification
         $courseSpecFolder = new FolderModel();
         $courseSpecFolder->setId(51)->setName('Houses');
 
@@ -35,11 +51,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                    ->setUpdatedAt(new Alaress_Date_Format('2015-09-02 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
                    ->setDeletedAt(new Alaress_Date_NullDate());
 
-//        // Add the Course Spec back to the Folder
-//        $courseSpecFolder->setCourseSpecification($courseSpec);
-
-
-        // Unit Spec: Fox House
+        // Create a Unit Spec: Fox House
         $foxSpecFolder = new FolderModel();
         $foxSpecFolder->setId(52)->setName('Fox House');
 
@@ -59,7 +71,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $foxSpec->getAssessables()->add($foxTask1)->add($foxTask2);
 
 
-        // Unit Spec: Oak House
+        // Create a Unit Spec: Oak House
         // (This one happens to have been deleted)
         $oakSpecFolder = new FolderModel();
         $oakSpecFolder->setId(54)->setName('Oak House');
@@ -85,10 +97,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
 
         // Translate!
-        $unitTranslator   = new UnitTranslator();
-        $courseTranslator = new CourseTranslator($unitTranslator);
-
-        $courseDataModel  = $courseTranslator->translateToDataModel($courseSpec);
+        $courseDataModel = $this->courseTranslator->translateToDataModel($courseSpec);
 
         // Verify that some of these things are the same
         $this->assertSame($courseSpec->getFolder(), $courseDataModel->getFolder());
