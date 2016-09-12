@@ -9,7 +9,7 @@ namespace Schoolbox\Learning\Course\DataModel\Specification;
 
 use Schoolbox\Collection;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
-use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
  * Translation class between a Course Specification and its data model.
@@ -47,12 +47,16 @@ class Translator
         $dataModel = new Model();
         $dataModel
             ->setId($specification->getId())
-            ->setFolder($specification->getFolder())
             ->setCreatedAt($specification->getCreatedAt())
             ->setUpdatedAt($specification->getUpdatedAt())
             ->setDeletedAt($specification->getDeletedAt())
             ->setUnits(new Collection());
         ;
+
+        // Allow translate if folder is empty, for now.
+        if ($specification->getFolder() instanceof FolderModel) {
+            $dataModel->setFolder($specification->getFolder());
+        }
 
         // Constituent Unit Specs - return in separate object, or this object?
         foreach ($specification->getUnits() as $unitSpecification) {
@@ -76,11 +80,16 @@ class Translator
         $specification = new CourseSpecification();
         $specification
             ->setId($dataModel->getId())
-            ->setFolder($dataModel->getFolder())
             ->setCreatedAt($dataModel->getCreatedAt())
             ->setUpdatedAt($dataModel->getUpdatedAt())
             ->setDeletedAt($dataModel->getDeletedAt())
+            ->setUnits(new Collection())
         ;
+
+        // Allow translate if folder is empty, for now.
+        if ($dataModel->getFolder() instanceof FolderModel) {
+            $specification->setFolder($dataModel->getFolder());
+        }
 
         // Constitute Unit Specs
         foreach ($dataModel->getUnits() as $unitDataModel) {

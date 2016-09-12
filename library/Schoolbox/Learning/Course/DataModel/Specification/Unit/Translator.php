@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Course\DataModel\Specification\Unit;
 
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseDataModel;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
  * Translation class between a Unit Specification and its data model.
@@ -28,10 +29,15 @@ class Translator
         $unitDataModel
             ->setCourse($dataModel)
             ->setId($unitSpecification->getId())
-            ->setFolder($unitSpecification->getFolder())
             ->setCreatedAt($unitSpecification->getCreatedAt())
             ->setUpdatedAt($unitSpecification->getUpdatedAt())
             ->setDeletedAt($unitSpecification->getDeletedAt());
+
+        // Allow translate if folder is empty, for now.
+        if ($unitSpecification->getFolder() instanceof FolderModel) {
+            $unitDataModel->setFolder($unitSpecification->getFolder());
+        }
+
         // Set assessables directly is okay for now
         // TODO add translation of assessables, or verify whether translation is required
         $unitDataModel->setAssessables($unitSpecification->getAssessables());
@@ -49,10 +55,15 @@ class Translator
         $unitSpecification = new UnitSpecification();
         $unitSpecification
             ->setId($unitDataModel->getId())
-            ->setFolder($unitDataModel->getFolder())
             ->setCreatedAt($unitDataModel->getCreatedAt())
             ->setUpdatedAt($unitDataModel->getUpdatedAt())
             ->setDeletedAt($unitDataModel->getDeletedAt());
+
+        // Allow translate if folder is empty, for now.
+        if ($unitDataModel->getFolder() instanceof FolderModel) {
+            $unitSpecification->setFolder($unitDataModel->getFolder());
+        }
+
         // Set assessables directly is okay for now
         // TODO add translation of assessables, or verify whether translation is required
         $unitSpecification->setAssessables($unitDataModel->getAssessables());
