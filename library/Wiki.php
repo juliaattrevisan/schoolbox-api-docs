@@ -328,7 +328,7 @@ class Wiki extends DeprecatedModel implements \Schoolbox\IHomepageCleanable
 
 					/* Generate a slug for a new article that wonn't exist
 					 */
-					$url = new Url(trim($currentMatch));
+					$url = new Url($currentMatch);
 					$slug = $url->getSlug();
 
 					$pattern[] = $allMatches[0][$i];

@@ -27,7 +27,8 @@ class Url
      * This ensures caller retains control of protocol prepending.
      *
      * @param string $url
-     * @param string $siteHost Optional override to decouples the class for unit testing of 'relative' URLs or when DB not available.
+     * @param string|bool $siteHost Optional override to decouples the class for unit testing of 'relative' URLs or when DB not available.
+     *                              false equates to empty 'sitehost', that is, none used. As opposed to null which means use default.
      * @throws DomainException If cannot determine the SB instance's configured hostname. This is required for determining relativity.
      */
     public function __construct($url, $siteHost = null)
@@ -35,8 +36,10 @@ class Url
         $this->setUrl(trim($url));
 
         // Did caller override the site's hostname ?
-        if (is_string($siteHost)) {
-            $this->setSiteHost($siteHost);
+        if (null !== $siteHost) {
+            // 'false' equates to '', ie no siteHost.
+            // This is used in scenarios when caller just needs toSlug() functionality, (eg notifiers running in CLI)
+            $this->setSiteHost(strval($siteHost));
         } else {
             $site_hostname = trim(Cfg::get('site_hostname'));
             $site_domain = trim(Cfg::get('site_domain'));

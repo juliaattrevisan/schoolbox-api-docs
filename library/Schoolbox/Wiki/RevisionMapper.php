@@ -208,7 +208,7 @@ class RevisionMapper extends Mapper implements FeedableMapperInterface
                 continue;
             }
             // Generate a slug for a new article that won't exist
-            $url       = new \Url(trim($match));
+            $url       = new \Url($match);
             $slug      = $url->getSlug();
             $pattern[] = $matches[0][$i];
             $replace[] = "<a href='/wiki/{$categoryId}/{$slug}'>";

@@ -12,11 +12,10 @@ $groupHandler = new Group();
 if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) || is_array($_POST['category']))) {
 
     $url = new Url($_POST['url']);
-    if(!($url->isUrl() || $url->isLocalUrl())){
-        $url->prependScheme();
-        if(!$url->isUrl()){
-            error(139);
-        }
+    try{
+        $url->normalise();
+    } catch (InvalidArgumentException $e) {
+        error(\Schoolbox\Error\Mapper::ERROR_LINK_FORMAT);
     }
 
     if (is_numeric($_POST['linkID'])) {
@@ -33,7 +32,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
             error(2);
         }
 
-        $link->setUrl($_POST['url']);
+        $link->setUrl($url->getUrl());
         $link->setDescription($_POST['description']);
         $link->setComment($_POST['comment']);
         $link->setHidden($_POST['visible'] ? false : true);
@@ -45,7 +44,7 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
         $link = LinkMapper::getInstance()->createModel();
         $link->setOwner($_SESSION['id']);
 
-        $link->setUrl($_POST['url']);
+        $link->setUrl($url->getUrl());
         $link->setDescription($_POST['description']);
         $link->setComment($_POST['comment']);
         $link->setHidden($_POST['visible'] ? false : true);
