@@ -51,7 +51,12 @@ class Average extends AbstractSummator
      */
     protected function finalise()
     {
+        /* If there are no items, return null
+         */
+        if (!$this->numItems) {
+            return null;
+        }
+
         return (float)$this->sum / (float)$this->numItems;
     }
-
 }
