@@ -66,18 +66,18 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $courseImpl->getUnits()->add(new UnitImplementation())->add(new UnitImplementation());
 
         // Translate!
-        $courseDataModel = $this->courseTranslator->translateToDataModel($courseImpl);
+        $dataModel = $this->courseTranslator->translateToDataModel($courseImpl);
 
         // Verify that some of these things are the same
-        $this->assertSame($courseImpl->getFolder(), $courseDataModel->getFolder());
+        $this->assertSame($courseImpl->getFolder(), $dataModel->getFolder());
         // Course specification - should have the same ID, don't care about anything else
-        $this->assertEquals($courseImpl->getSpecification()->getId(), $courseDataModel->getSpecification()->getId());
-        $this->assertEquals($courseImpl->getCreatedAt()->getDatabase(), $courseDataModel->getCreatedAt()->getDatabase());
-        $this->assertEquals($courseImpl->getUpdatedAt()->getDatabase(), $courseDataModel->getUpdatedAt()->getDatabase());
-        $this->assertInstanceOf(Alaress_Date_NullDate::class, $courseDataModel->getDeletedAt());
+        $this->assertEquals($courseImpl->getSpecification()->getId(), $dataModel->getSpecification()->getId());
+        $this->assertEquals($courseImpl->getCreatedAt()->getDatabase(), $dataModel->getCreatedAt()->getDatabase());
+        $this->assertEquals($courseImpl->getUpdatedAt()->getDatabase(), $dataModel->getUpdatedAt()->getDatabase());
+        $this->assertInstanceOf(Alaress_Date_NullDate::class, $dataModel->getDeletedAt());
 
         // Content of units gets tested in the test case for UnitTranslator. Just verify that counts are the same.
-        $this->assertCount(2, $courseDataModel->getUnits());
+        $this->assertCount(2, $dataModel->getUnits());
     }
 
     /**

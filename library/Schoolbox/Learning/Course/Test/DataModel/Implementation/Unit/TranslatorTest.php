@@ -72,22 +72,22 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $unitImpl->getAssessables()->add(new TaskModel())->add(new TaskModel());
 
         // Translate!
-        $unitDataModel = $this->unitTranslator->translateToDataModel($unitImpl);
+        $dataModel = $this->unitTranslator->translateToDataModel($unitImpl);
 
         // Verify that some of these things are the same
-        $this->assertEquals($unitImpl->getId(), $unitDataModel->getId());
-        $this->assertEquals($unitImpl->getTitle(), $unitDataModel->getTitle());
-        $this->assertEquals($unitImpl->getSpecification()->getId(), $unitDataModel->getSpecification()->getId());
-        $this->assertEquals($unitImpl->getCourse()->getId(), $unitDataModel->getCourse()->getId());
-        $this->assertEquals($unitImpl->getOpenDate()->getDatabase(), $unitDataModel->getOpenDate()->getDatabase());
-        $this->assertEquals($unitImpl->getDueDate()->getDatabase(), $unitDataModel->getDueDate()->getDatabase());
-        $this->assertEquals($unitImpl->getCreatedAt()->getDatabase(), $unitDataModel->getCreatedAt()->getDatabase());
-        $this->assertEquals($unitImpl->getUpdatedAt()->getDatabase(), $unitDataModel->getUpdatedAt()->getDatabase());
-        $this->assertInstanceOf(Alaress_Date_NullDate::class, $unitDataModel->getDeletedAt());
+        $this->assertEquals($unitImpl->getId(), $dataModel->getId());
+        $this->assertEquals($unitImpl->getTitle(), $dataModel->getTitle());
+        $this->assertEquals($unitImpl->getSpecification()->getId(), $dataModel->getSpecification()->getId());
+        $this->assertEquals($unitImpl->getCourse()->getId(), $dataModel->getCourse()->getId());
+        $this->assertEquals($unitImpl->getOpenDate()->getDatabase(), $dataModel->getOpenDate()->getDatabase());
+        $this->assertEquals($unitImpl->getDueDate()->getDatabase(), $dataModel->getDueDate()->getDatabase());
+        $this->assertEquals($unitImpl->getCreatedAt()->getDatabase(), $dataModel->getCreatedAt()->getDatabase());
+        $this->assertEquals($unitImpl->getUpdatedAt()->getDatabase(), $dataModel->getUpdatedAt()->getDatabase());
+        $this->assertInstanceOf(Alaress_Date_NullDate::class, $dataModel->getDeletedAt());
 
         // Translation of assessables (if present) gets tested in a different test.
         // Just verify that counts are the same.
-        $this->assertCount(2, $unitDataModel->getAssessables());
+        $this->assertCount(2, $dataModel->getAssessables());
     }
 
     /**

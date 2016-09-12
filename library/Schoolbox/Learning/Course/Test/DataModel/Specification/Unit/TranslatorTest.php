@@ -68,19 +68,19 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $unitSpec->getAssessables()->add($unitTask1)->add($unitTask2);
 
         // Translate!
-        $unitDataModel = $this->unitTranslator->translateToDataModel($unitSpec, $courseDataModel);
+        $dataModel = $this->unitTranslator->translateToDataModel($unitSpec, $courseDataModel);
 
         // Verify that some of these things are the same
-        $this->assertEquals($unitSpec->getId(), $unitDataModel->getId());
-        $this->assertSame($unitSpec->getFolder(), $unitDataModel->getFolder());
-        $this->assertSame($unitSpec->getCourse(), $courseDataModel);
-        $this->assertEquals($unitSpec->getCreatedAt()->getDatabase(), $unitDataModel->getCreatedAt()->getDatabase());
-        $this->assertEquals($unitSpec->getUpdatedAt()->getDatabase(), $unitDataModel->getUpdatedAt()->getDatabase());
-        $this->assertInstanceOf(Alaress_Date_NullDate::class, $unitDataModel->getDeletedAt());
+        $this->assertEquals($unitSpec->getId(), $dataModel->getId());
+        $this->assertSame($unitSpec->getFolder(), $dataModel->getFolder());
+        $this->assertSame($courseDataModel, $dataModel->getCourse());
+        $this->assertEquals($unitSpec->getCreatedAt()->getDatabase(), $dataModel->getCreatedAt()->getDatabase());
+        $this->assertEquals($unitSpec->getUpdatedAt()->getDatabase(), $dataModel->getUpdatedAt()->getDatabase());
+        $this->assertInstanceOf(Alaress_Date_NullDate::class, $dataModel->getDeletedAt());
 
         // Translation of assessables (if present) gets tested in a different test.
         // Just verify that counts are the same.
-        $this->assertCount(2, $unitDataModel->getAssessables());
+        $this->assertCount(2, $dataModel->getAssessables());
     }
 
     /**
@@ -97,8 +97,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                         ->setDeletedAt(new Alaress_Date_NullDate());
 
         // Unit spec data model
-        $unitDataModel = new UnitDataModel();
-        $unitDataModel->setId(1)
+        $dataModel = new UnitDataModel();
+        $dataModel->setId(1)
                       ->setCourse($courseDataModel)
                       ->setFolder((new FolderModel())->setId(52)->setName('Fox House'))
                       ->setCreatedAt(new Alaress_Date_Format('2015-10-01 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -112,18 +112,16 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $unitTask2 = new TaskModel();
         $unitTask2->setId(2)->setTitle('Fox House Task 2');
 
-        $unitDataModel->getAssessables()->add($unitTask1)->add($unitTask2);
-
-//        $courseDataModel->getUnits()->add($unitDataModel);
+        $dataModel->getAssessables()->add($unitTask1)->add($unitTask2);
 
         // Translate!
-        $unitSpec = $this->unitTranslator->translateToDomainModel($unitDataModel);
+        $unitSpec = $this->unitTranslator->translateToDomainModel($dataModel);
 
         // Verify that details are the same
-        $this->assertEquals($unitDataModel->getId(), $unitSpec->getId());
-        $this->assertSame($unitDataModel->getFolder(), $unitSpec->getFolder());
-        $this->assertEquals($unitDataModel->getCreatedAt()->getDatabase(), $unitSpec->getCreatedAt()->getDatabase());
-        $this->assertEquals($unitDataModel->getUpdatedAt()->getDatabase(), $unitSpec->getUpdatedAt()->getDatabase());
+        $this->assertEquals($dataModel->getId(), $unitSpec->getId());
+        $this->assertSame($dataModel->getFolder(), $unitSpec->getFolder());
+        $this->assertEquals($dataModel->getCreatedAt()->getDatabase(), $unitSpec->getCreatedAt()->getDatabase());
+        $this->assertEquals($dataModel->getUpdatedAt()->getDatabase(), $unitSpec->getUpdatedAt()->getDatabase());
         $this->assertInstanceOf(Alaress_Date_NullDate::class, $unitSpec->getDeletedAt());
 
         // Translation of assessables (if present) gets tested in a different test.
