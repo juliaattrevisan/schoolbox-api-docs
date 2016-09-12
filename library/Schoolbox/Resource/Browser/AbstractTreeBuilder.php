@@ -112,7 +112,7 @@ abstract class AbstractTreeBuilder
      * @param string $mime
      * @return array
      */
-    public function buildChildNodes($folderId, $mustInclude = [], $mime = "*?*")
+    public function buildChildNodes($folderId, $mustInclude = [], $mime = "*/*")
     {
         $output = [];
 
