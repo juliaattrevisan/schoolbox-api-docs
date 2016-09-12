@@ -53,6 +53,15 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
     protected $project;
 
     /**
+     * For floating point comparisons
+     *
+     * See assertEquals() in https://phpunit.de/manual/current/en/appendixes.assertions.html
+     *
+     * @var float
+     */
+    protected $delta = 0.00000000005;
+
+    /**
      * Test the unweighted average
      * when there is nothing in here at all
      */
@@ -208,9 +217,9 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
         /* Unpublished Average is
          *      = [77 + 100 + (100 * 5/20)] / 3
          *      = [177 + 25] / 3
-         *      = 67.33
+         *      = 67.33333333333
          */
-        $this->assertEquals(67.33, number_format($project->getNormalisedMark($this->hodes, false), 2));
+        $this->assertEquals(67.33333333333, $project->getNormalisedMark($this->hodes, false));
     }
 
     /**
@@ -319,9 +328,9 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
          *      = [(98*6) + (77*10) + (100*5) + ((100 * 5/20)*8)] / 29
          *      = [588 + 770 + 500 + 200] / 29
          *      = 2058 / 29
-         *      = 70.97
+         *      = 70.96551724138
          */
-        $this->assertEquals(70.97, number_format($project->getNormalisedMark($this->hodes, false), 2));
+        $this->assertEquals(70.96551724138, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
     }
 
     /**
@@ -346,17 +355,17 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
          *      = [(100*5) + ((100 * 12/20)*8)] / 13
          *      = [500 + 480] / 13
          *      = 980 / 13
-         *      = 75.38
+         *      = 75.38461538462
          */
-        $this->assertEquals(75.38, number_format($project->getNormalisedMark($this->hodes, true), 2));
+        $this->assertEquals(75.38461538462, $project->getNormalisedMark($this->hodes, true), '', $this->delta);
 
         /* Unpublished Weighted Average is
          *      = [(100*5) + ((100 * 5/20)*8)] / 13
          *      = [500 + 200] / 13
          *      = 700 / 13
-         *      = 53.85
+         *      = 53.84615384615
          */
-        $this->assertEquals(53.85, number_format($project->getNormalisedMark($this->hodes, false), 2));
+        $this->assertEquals(53.84615384615, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
     }
 
     /**
@@ -384,17 +393,17 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
          *      = [(77*10) + (100*5) + ((100 * 12/20)*8)] / 23
          *      = [770 + 500 + 480] / 23
          *      = 1750 / 23
-         *      = 76.09
+         *      = 76.08695652174
          */
-        $this->assertEquals(76.09, number_format($project->getNormalisedMark($this->hodes, true), 2));
+        $this->assertEquals(76.08695652174, $project->getNormalisedMark($this->hodes, true));
 
         /* Unpublished Weighted Average is
          *      = [(77*10) + (100*5) + ((100 * 5/20)*8)] / 23
          *      = [770 + 500 + 200] / 23
          *      = 1470 / 23
-         *      = 63.91
+         *      = 63.91304347826
          */
-        $this->assertEquals(63.91, number_format($project->getNormalisedMark($this->hodes, false), 2));
+        $this->assertEquals(63.91304347826, $project->getNormalisedMark($this->hodes, false));
     }
 
     /**
@@ -423,17 +432,17 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
          *      = [(98*6) + (77*10) + (100*5) + ((100 * 12/20)*8)] / 29
          *      = [588 + 770 + 500 + 480] / 29
          *      = 2338 / 29
-         *      = 80.62
+         *      = 80.62068965517
          */
-        $this->assertEquals(80.62, number_format($project->getNormalisedMark($this->hodes, true), 2));
+        $this->assertEquals(80.62068965517, $project->getNormalisedMark($this->hodes, true));
 
         /* Unpublished Weighted Average is
         *      = [(98*6) * (77*10) + (100*5) + ((100 * 5/20)*8)] / 29
         *      = [588 + 770 + 500 + 200] / 29
         *      = 2058 / 29
-        *      = 70.97
+        *      = 70.96551724138
         */
-        $this->assertEquals(70.97, number_format($project->getNormalisedMark($this->hodes, false), 2));
+        $this->assertEquals(70.96551724138, $project->getNormalisedMark($this->hodes, false));
     }
 
     /**
