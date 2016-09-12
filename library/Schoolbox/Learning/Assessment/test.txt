@@ -75,6 +75,7 @@ $dueWork1
     ->setId(1)
     ->setTitle('My First Due Work')
     ->setType($type)
+    ->setWeight(5)
     ->setAcceptsMultiple()
     ->showOnlySubmittedStudents()
     ->setAllParticipants($allParticipants)
@@ -83,7 +84,7 @@ $dueWork1
 $feedbackFile1 = new DueWorkFeedbackFile();
 $feedbackFile1
     ->setId(12)
-    ->setHash('lj23lj2llj5l2jsdkjf90')
+//    ->setHash('lj23lj2llj5l2jsdkjf90')
     ->setCrocodocId('j239jf-23mndi9f-1234nns9fh-5nl6i0f')
     ->setFilename('This is the correct response.txt');
 
@@ -180,6 +181,7 @@ $dueWork2
     ->setId(2)
     ->setTitle('My Second Due Work')
     ->setType($type)
+    ->setWeight(4)
     ->setHasRubric(true)
     ->setAcceptsSingle()
     ->showOnlySubmittedStudents()
@@ -250,6 +252,7 @@ $dueWork3
     ->setId(3)
     ->setTitle('My Third Due Work')
     ->setType($type)
+    ->setWeight(4)
     ->showAllSubmissibleStudents()
     ->setAllParticipants($allParticipants);
 
@@ -306,6 +309,7 @@ $quiz1 = new Quiz();
 $quiz1
     ->setId(1)
     ->setTitle('Quiz of the Century')
+    ->setWeight(2)
     ->setAllParticipants($allParticipants);
 
 $feedback1 = new QuizReview();
@@ -389,6 +393,7 @@ $quiz2 = new Quiz();
 $quiz2
     ->setId(2)
     ->setTitle('A quiz nobody has tried')
+    ->setWeight(5)
     ->setAllParticipants($allParticipants);
 
 $feedback = new QuizReview();
@@ -691,11 +696,14 @@ $selectedUser = $hodes;
 echo "<h1>Summators for {$selectedUser->getFullName()}</h1>";
 
 $allSummators = [
+    new Summator\WeightedAverage(),
     new Summator\Average(),
     new Summator\Maximum(),
     new Summator\Minimum(),
     new Summator\Sum()
 ];
+
+new \Alaress_Probe('Summator', 'Published Mark', 'Unpublished Mark');
 
 foreach ($allSummators as $currentSummator) {
     $project = new Project($currentSummator);
@@ -712,7 +720,7 @@ foreach ($allSummators as $currentSummator) {
         ->add($task3)
     ;
 
-    new \Alaress_Probe(get_class($currentSummator), $project->getNormalisedMark($selectedUser, false));
+    new \Alaress_Probe((new ReflectionClass($currentSummator))->getShortName(), $project->getNormalisedMark($selectedUser, true), $project->getNormalisedMark($selectedUser, false));
 }
 
 
@@ -1040,8 +1048,8 @@ try {
         "{$project->getHumanReadableMark($hodes, true)}"
     );
 }
-/* User not found
- */
+    /* User not found
+     */
 catch (\UnexpectedValueException $e) {
     new \Alaress_Probe(
         "{$project->getId()} {$project->getTitle()}",
@@ -1058,8 +1066,8 @@ foreach ($project->getAssessables() as $currentAssessable) {
             "{$currentAssessable->getHumanReadableMark($hodes, true)}"
         );
     }
-    /* User not found
-     */
+        /* User not found
+         */
     catch (\UnexpectedValueException $e) {
         new \Alaress_Probe(
             "{$currentAssessable->getId()} {$currentAssessable->getTitle()}",
