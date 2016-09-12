@@ -274,56 +274,56 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             }
         }
 
-        /* Published Average is null (nothing to calculate)
+        /* Published Weighted Average is null (nothing to calculate)
          */
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
 
-        /* Unpublished Average is null (nothing to calculate)
+        /* Unpublished Weighted Average is null (nothing to calculate)
          */
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
     }
 
-//    /**
-//     * Test the unweighted average
-//     * when there is nothing published
-//     */
-//    public function testUnweightedAverage2()
-//    {
-//        $project = $this->spawnProject();
-//        $project->setAssessables((new Collection())
-//            ->add($this->spawnDueWork3())
-//            ->add($this->spawnTask())
-//            ->add($this->spawnDueWork2())
-//            ->add($this->spawnDueWork())
-//            ->add($this->spawnQuiz()));
-//
-//        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
-//        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
-//        foreach ($project->getAssessables() as $currentAssessable) {
-//            foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
-//                $currentFeedback->setPublishedAt(null);
-//            }
-//
-//            foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-//                foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
-//                    $currentFeedback->setPublishedAt(null);
-//                }
-//            }
-//        }
-//
-//        /* Published Average is null (nothing to calculate)
-//         */
-//        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
-//
-//        /* Unpublished Average is
-//         *      = [98 + 77 + 100 + (100 * 5/20)] / 4
-//         *      = [98 + 77 + 100 + 25] / 4
-//         *      = 300/4
-//         *      = 75
-//         */
-//        $this->assertEquals(75, $project->getNormalisedMark($this->hodes, false));
-//    }
-//
+    /**
+     * Test the unweighted average
+     * when there is nothing published
+     */
+    public function testWeightedAverage2()
+    {
+        $project = $this->spawnProject(new SummatorWeightedAverage());
+        $project->setAssessables((new Collection())
+            ->add($this->spawnDueWork3())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnDueWork())
+            ->add($this->spawnQuiz()));
+
+        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
+        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
+        foreach ($project->getAssessables() as $currentAssessable) {
+            foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
+                $currentFeedback->setPublishedAt(null);
+            }
+
+            foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
+                foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
+                    $currentFeedback->setPublishedAt(null);
+                }
+            }
+        }
+
+        /* Published Weighted Average is null (nothing to calculate)
+         */
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+
+        /* Unpublished Weighted Average is
+         *      = [(98*6) + (77*10) + (100*5) + ((100 * 5/20)*8)] / 29
+         *      = [588 + 770 + 500 + 200] / 29
+         *      = 2058 / 29
+         *      = 70.97
+         */
+        $this->assertEquals(70.97, number_format($project->getNormalisedMark($this->hodes, false), 2));
+    }
+
 //    /**
 //     * Test the unweighted average
 //     * when there's one of each type with published and unpublished feedback

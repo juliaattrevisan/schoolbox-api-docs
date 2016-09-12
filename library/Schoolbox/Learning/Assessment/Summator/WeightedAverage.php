@@ -18,17 +18,14 @@ use \Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use \Schoolbox\User;
 
+use \Schoolbox\Learning\Assessment\Task\Model as Task;
+
 class WeightedAverage extends AbstractSummator
 {
     /**
      * @var float
      */
-    protected $sum;
-
-    /**
-     * @var int
-     */
-    protected $numItems;
+    protected $weightedAverage;
 
     /**
      * Calculate the total weighting of all IAssessables
@@ -42,7 +39,12 @@ class WeightedAverage extends AbstractSummator
 
         /** @var IAssessable $currentAssessable */
         foreach ($allAssessables as $currentAssessable) {
-            $totalWeight += $currentAssessable->getWeight();
+
+            /* Tasks don't count
+             */
+            if (!($currentAssessable instanceof Task)) {
+                $totalWeight += $currentAssessable->getWeight();
+            }
         }
 
         return $totalWeight;
@@ -53,10 +55,7 @@ class WeightedAverage extends AbstractSummator
      */
     protected function aggregate($val, $assessableWeight, $totalWeight)
     {
-        /* TODO: Do weighted stuff here
-         */
-        $this->sum += $val;
-        $this->numItems++;
+        $this->weightedAverage += ($val * ($assessableWeight/$totalWeight));
     }
 
     /**
@@ -64,8 +63,7 @@ class WeightedAverage extends AbstractSummator
      */
     protected function reset()
     {
-        $this->sum = null;
-        $this->numItems = 0;
+        $this->weightedAverage = null;
     }
 
     /**
@@ -73,12 +71,6 @@ class WeightedAverage extends AbstractSummator
      */
     protected function finalise()
     {
-        /* If there are no items, return null
-         */
-        if (!$this->numItems) {
-            return null;
-        }
-
-        return (float)$this->sum / (float)$this->numItems;
+        return (float)$this->weightedAverage;
     }
 }
