@@ -563,7 +563,7 @@ class SitePage extends Page
     }
 
 
-    function backToTheFuture($page)
+    static function backToTheFuture($page)
     {
         /* In Dans honour, time is ours */
         if (is_array($_SESSION['history'])) {
