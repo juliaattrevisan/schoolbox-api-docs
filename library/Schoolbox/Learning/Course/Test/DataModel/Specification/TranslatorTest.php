@@ -16,7 +16,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitDataMode
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitTranslator;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
-use Schoolbox\Resource\Folder\Model as FolderModel;;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
  * Test for the Course Specification translator.
