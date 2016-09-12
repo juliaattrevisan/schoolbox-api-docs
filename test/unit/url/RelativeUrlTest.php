@@ -25,12 +25,25 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
 //     * @expectedException DomainException
 //     * TODO Uncomment for PHP7
 //     */
-//    public function testNoSiteHostExplicit()
+//    public function testNoSiteHostDefaultImplicit()
 //    {
 //        $site = null;
 //        $input = 'www.example.com';
 //        new Url($input, $site);
 //    }
+
+    public function testNoSiteHostExplicit()
+    {
+        if(isset($_SERVER['HTTP_HOST'])){
+            unset($_SERVER['HTTP_HOST']);
+        }
+
+        $input = 'www.example.com';
+        $url = new Url($input, false);
+
+        // We should be able to retrieve the hostName with no siteHost or serverHost context
+        $this->assertEquals($input, $url->getHostname());
+    }
 
     public function testIsParsableUrl()
     {
