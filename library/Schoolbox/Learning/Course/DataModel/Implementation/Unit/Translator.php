@@ -74,26 +74,35 @@ class Translator
      */
     public function translateToDomainModel(Model $dataModel)
     {
-        $implementation = new UnitImplementation();
-        return $implementation;
-//        $implementation
-//            ->setId($dataModel->getId())
-//            ->setCreatedAt($dataModel->getCreatedAt())
-//            ->setUpdatedAt($dataModel->getUpdatedAt())
-//            ->setDeletedAt($dataModel->getDeletedAt())
-//            ->setUnits(new Collection())
-//        ;
-//
-//        // Allow translate if folder is empty, for now.
-//        if ($dataModel->getFolder() instanceof FolderModel) {
-//            $implementation->setFolder($dataModel->getFolder());
-//        }
-//
-////        // Constitute Unit Specs
-////        foreach ($dataModel->getUnits() as $unitDataModel) {
-////            $implementation->getUnits()->add($this->unitTranslator->translateToDomainModel($unitDataModel));
-////        }
-//
-//        return $implementation;
+        $unitImpl = new UnitImplementation();
+        $unitImpl
+            ->setId($dataModel->getId())
+            ->setTitle($dataModel->getTitle())
+            ->setOpenDate($dataModel->getOpenDate())
+            ->setDueDate($dataModel->getDueDate())
+            ->setCreatedAt($dataModel->getCreatedAt())
+            ->setUpdatedAt($dataModel->getUpdatedAt())
+            ->setDeletedAt($dataModel->getDeletedAt())
+            ->setAssessables(new Collection())
+        ;
+
+        // Basic course and spec translation
+        if ($dataModel->getSpecification() instanceof UnitSpecificationDataModel) {
+            $unitSpec = new UnitSpecification();
+            $unitSpec->setId($dataModel->getSpecification()->getId());
+            $unitImpl->setSpecification($unitSpec);
+        }
+
+        if ($dataModel->getCourse() instanceof CourseImplementationDataModel) {
+            $courseImpl = new CourseImplementation();
+            $courseImpl->setId($dataModel->getCourse()->getId());
+            $unitImpl->setCourse($courseImpl);
+        }
+
+        // Set assessables directly is okay for now
+        // TODO add translation of assessables, or verify whether translation is required
+        $unitImpl->setAssessables($dataModel->getAssessables());
+
+        return $unitImpl;
     }
 }
