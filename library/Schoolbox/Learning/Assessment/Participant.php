@@ -227,6 +227,8 @@ class Participant
                         $latestFeedback = $currentFeedback;
                     }
                 }
+
+                return $latestFeedback;
             }
 
             return null;
