@@ -18,7 +18,9 @@ use \Schoolbox\Resource\Storage\Model as Storage;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\Assessment\Project as Project;
 
+use \Schoolbox\Learning\Assessment\Summator\ISummator;
 use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
+use \Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedAverage;
 use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
 use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
 use \Schoolbox\Learning\Assessment\Summator\Sum as SummatorSum;
@@ -56,7 +58,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
      */
     public function testUnweightedAverage0()
     {
-        $project = $this->spawnProject();
+        $project = $this->spawnProject(new SummatorAverage());
         $project->setAssessables(new Collection());
 
         /* Published Average is null
@@ -74,7 +76,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
      */
     public function testUnweightedAverage1()
     {
-        $project = $this->spawnProject();
+        $project = $this->spawnProject(new SummatorAverage());
         $project->setAssessables((new Collection())
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
@@ -107,7 +109,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
      */
     public function testUnweightedAverage2()
     {
-        $project = $this->spawnProject();
+        $project = $this->spawnProject(new SummatorAverage());
         $project->setAssessables((new Collection())
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
@@ -154,7 +156,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
          * Task (null marks)
          * Quiz (12 marks)
          */
-        $project = $this->spawnProject();
+        $project = $this->spawnProject(new SummatorAverage());
         $project->setAssessables((new Collection())
             ->add($this->spawnTask())
             ->add($this->spawnDueWork())
@@ -189,7 +191,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
          * Due Work (100 marks)
          * Quiz (12 marks)
          */
-        $project = $this->spawnProject();
+        $project = $this->spawnProject(new SummatorAverage());
         $project->setAssessables((new Collection())
             ->add($this->spawnTask())
             ->add($this->spawnDueWork2())
@@ -225,7 +227,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
          * Due Work (100 marks)
          * Quiz (12 marks)
          */
-        $project = $this->spawnProject();
+        $project = $this->spawnProject(new SummatorAverage());
         $project->setAssessables((new Collection())
             ->add($this->spawnDueWork3())
             ->add($this->spawnTask())
@@ -249,17 +251,198 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
     }
 
     /**
+     * Test the weighted average
+     * when there is no feedback
+     */
+    public function testWeightedAverage1()
+    {
+        $project = $this->spawnProject(new SummatorWeightedAverage());
+        $project->setAssessables((new Collection())
+            ->add($this->spawnDueWork3())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnDueWork())
+            ->add($this->spawnQuiz()));
+
+        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
+        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
+        foreach ($project->getAssessables() as $currentAssessable) {
+            $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(new Collection());
+
+            foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
+                $currentResponse->setAllFeedback(new Collection());
+            }
+        }
+
+        /* Published Average is null (nothing to calculate)
+         */
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+
+        /* Unpublished Average is null (nothing to calculate)
+         */
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
+    }
+
+//    /**
+//     * Test the unweighted average
+//     * when there is nothing published
+//     */
+//    public function testUnweightedAverage2()
+//    {
+//        $project = $this->spawnProject();
+//        $project->setAssessables((new Collection())
+//            ->add($this->spawnDueWork3())
+//            ->add($this->spawnTask())
+//            ->add($this->spawnDueWork2())
+//            ->add($this->spawnDueWork())
+//            ->add($this->spawnQuiz()));
+//
+//        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
+//        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
+//        foreach ($project->getAssessables() as $currentAssessable) {
+//            foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
+//                $currentFeedback->setPublishedAt(null);
+//            }
+//
+//            foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
+//                foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
+//                    $currentFeedback->setPublishedAt(null);
+//                }
+//            }
+//        }
+//
+//        /* Published Average is null (nothing to calculate)
+//         */
+//        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+//
+//        /* Unpublished Average is
+//         *      = [98 + 77 + 100 + (100 * 5/20)] / 4
+//         *      = [98 + 77 + 100 + 25] / 4
+//         *      = 300/4
+//         *      = 75
+//         */
+//        $this->assertEquals(75, $project->getNormalisedMark($this->hodes, false));
+//    }
+//
+//    /**
+//     * Test the unweighted average
+//     * when there's one of each type with published and unpublished feedback
+//     */
+//    public function testUnweightedAverage3()
+//    {
+//        /* There are three assessables for Hodes
+//         *
+//         * Due Work (100 marks)
+//         * Task (null marks)
+//         * Quiz (12 marks)
+//         */
+//        $project = $this->spawnProject();
+//        $project->setAssessables((new Collection())
+//            ->add($this->spawnTask())
+//            ->add($this->spawnDueWork())
+//            ->add($this->spawnQuiz()));
+//
+//        /* Published Average is
+//         *      = [100 + (100 * 12/20)] / 2
+//         *      = [100 + 60] / 2
+//         *      = 80
+//         */
+//        $this->assertEquals(80, $project->getNormalisedMark($this->hodes, true));
+//
+//        /* Unpublished Average is
+//         *      = [100 + (100 * 5/20)] / 2
+//         *      = [100 + 25] / 2
+//         *      = 62.5
+//         */
+//        $this->assertEquals(62.5, $project->getNormalisedMark($this->hodes, false));
+//    }
+//
+//    /**
+//     * Test the unweighted average
+//     * when there's more than one of a particular type with published and unpublished feedback
+//     */
+//    public function testUnweightedAverage4()
+//    {
+//        /* There are five assessables for Hodes
+//         *
+//         * Due Work 3 (98 marks)
+//         * Task (null marks)
+//         * Due Work 2 (77 marks)
+//         * Due Work (100 marks)
+//         * Quiz (12 marks)
+//         */
+//        $project = $this->spawnProject();
+//        $project->setAssessables((new Collection())
+//            ->add($this->spawnTask())
+//            ->add($this->spawnDueWork2())
+//            ->add($this->spawnDueWork())
+//            ->add($this->spawnQuiz()));
+//
+//        /* Published Average is
+//         *      = [77 + 100 + (100 * 12/20)] / 3
+//         *      = [177 + 60] / 4
+//         *      = 79
+//         */
+//        $this->assertEquals(79, $project->getNormalisedMark($this->hodes, true));
+//
+//        /* Unpublished Average is
+//         *      = [77 + 100 + (100 * 5/20)] / 3
+//         *      = [177 + 25] / 3
+//         *      = 67.33
+//         */
+//        $this->assertEquals(67.33, number_format($project->getNormalisedMark($this->hodes, false), 2));
+//    }
+//
+//    /**
+//     * Test the unweighted average
+//     * when there's more than one of a particular type with published and unpublished feedback
+//     */
+//    public function testUnweightedAverage5()
+//    {
+//        /* There are five assessables for Hodes
+//         *
+//         * Due Work 3 (98 marks)
+//         * Task (null marks)
+//         * Due Work 2 (77 marks)
+//         * Due Work (100 marks)
+//         * Quiz (12 marks)
+//         */
+//        $project = $this->spawnProject();
+//        $project->setAssessables((new Collection())
+//            ->add($this->spawnDueWork3())
+//            ->add($this->spawnTask())
+//            ->add($this->spawnDueWork2())
+//            ->add($this->spawnDueWork())
+//            ->add($this->spawnQuiz()));
+//
+//        /* Published Average is
+//         *      = [98 + 77 + 100 + (100 * 12/20)] / 4
+//         *      = [275 + 60] / 4
+//         *      = 83.75
+//         */
+//        $this->assertEquals(83.75, $project->getNormalisedMark($this->hodes, true));
+//
+//        /* Unpublished Average is
+//         *      = [98 + 77 + 100 + (100 * 5/20)] / 3
+//         *      = [275 + 25] / 4
+//         *      = 75
+//         */
+//        $this->assertEquals(75, $project->getNormalisedMark($this->hodes, false));
+//    }
+
+    /**
      * Spawn a Project with stuff in it
      *
+     * @param ISummator $summatorStrategy
      * @return Project
      */
-    protected function spawnProject()
+    protected function spawnProject(ISummator $summatorStrategy)
     {
         $id = 5567;
         $title = 'Find Diablo';
         $description = 'The things you need to do in order to slay the prime evil';
 
-        $project = new Project(new SummatorAverage());
+        $project = new Project($summatorStrategy);
         $project
             ->setId($id)
             ->setTitle($title)

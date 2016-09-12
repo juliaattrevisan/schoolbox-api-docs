@@ -18,7 +18,7 @@ use \Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\IAssessable;
 use \Schoolbox\User;
 
-class WeightedAverage
+class WeightedAverage extends AbstractSummator
 {
     /**
      * @var float
