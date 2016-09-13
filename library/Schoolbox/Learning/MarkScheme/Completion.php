@@ -13,7 +13,7 @@ use RangeException;
 /**
  * Completion is unique in that it is a one-way transform.
  *
- * This is because both Teacher- and Self-assessed are considered '
+ * This is because both Teacher- and Self-assessed are considered 'Completed'
  *
  * The NORMALISED_* constants are floats to maintain interface, but their
  * actual value has no semantic meaning.

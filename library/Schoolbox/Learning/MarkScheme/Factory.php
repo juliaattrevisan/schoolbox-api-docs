@@ -63,7 +63,6 @@ class Factory
      */
     protected function spawnForQuiz(Quiz $quiz)
     {
-        // TODO - this method should iterate over each question in each section of the quiz, and sum the marks available.
         return new TotalMarkFractional($quiz->getMaxMark());
     }
 

@@ -25,7 +25,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
     public function __construct($totalMark)
     {
         $this->validateTotalMark($totalMark);
-        $this->setTotalMark($totalMark);
+        $this->totalMark = $totalMark;
     }
 
     /**
@@ -56,12 +56,12 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
     public function getNormalisedMark($humanReadableMark)
     {
         $matches = [];
-        $pattern = '^\s*([0-9.]+)';
+        $pattern = '|^\s*([0-9.]+)|';
         if(!preg_match($pattern, $humanReadableMark, $matches)){
             throw new InvalidArgumentException("Unable to parse numerator: $humanReadableMark");
         }
 
-        $floatVal = floatval($matches[1] / $this->getTotalMark());
+        $floatVal = floatval($matches[1] / $this->getTotalMark() * 100);
         $this->validateNormalisedMark($floatVal);
         return $floatVal;
     }

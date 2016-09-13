@@ -40,8 +40,8 @@ class TotalMarkFractional extends TotalMarkAbstract
      */
     public function __construct($totalMark)
     {
-        parent::__construct($totalMark);
         $this->setOriginalTotalMark($totalMark);
+        parent::__construct($totalMark);
     }
 
 
@@ -111,7 +111,7 @@ class TotalMarkFractional extends TotalMarkAbstract
     /**
      * @return float
      */
-    function getGranularityNumerator()
+    protected function getGranularityNumerator()
     {
         return self::GRANULARITY_NUMERATOR;
     }
@@ -119,7 +119,7 @@ class TotalMarkFractional extends TotalMarkAbstract
     /**
      * @return float
      */
-    function getGranularityDenominator()
+    protected function getGranularityDenominator()
     {
         return self::GRANULARITY_DENOMINATOR;
     }

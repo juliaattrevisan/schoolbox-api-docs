@@ -71,7 +71,7 @@ class TotalMarkWholeNumber extends TotalMarkAbstract
     /**
      * @return float
      */
-    function getGranularityNumerator()
+    protected function getGranularityNumerator()
     {
         return self::GRANULARITY_NUMERATOR;
     }
@@ -79,7 +79,7 @@ class TotalMarkWholeNumber extends TotalMarkAbstract
     /**
      * @return float
      */
-    function getGranularityDenominator()
+    protected function getGranularityDenominator()
     {
         return self::GRANULARITY_DENOMINATOR;
     }
