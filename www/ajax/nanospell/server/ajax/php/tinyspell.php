@@ -2,8 +2,7 @@
 error_reporting(E_ERROR);
 try{ini_set("memory_limit","255M");}catch(Exception $e){}
 //  Freeing up memory where available improoves performance on larger dictionaries.
-$token = explode("\n","".file_get_contents("../../license/key.lic"));
-$token = trim($token[0]); 
+$token = "TINYMCE-SPELL.FP5ENHR5LUNMZA.RXKXD.5P791YVKK.LEXGM.LVFMF.1xOEMPRODUCT";
 $rawPostData = file_get_contents('php://input');
 $post        = json_decode($rawPostData);
 require('lib.php');
