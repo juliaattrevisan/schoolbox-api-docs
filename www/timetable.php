@@ -70,7 +70,7 @@ if ($_SESSION['user']->getRole()->isParent()) {
         }
     } else {
         // Output my own timetable (all campuses)
-        /** @var Schoolbox\User $userObject **/
+        /** @var Schoolbox\User $userObject */
         $userList[] = $_SESSION['user'];
     }
 }
@@ -78,7 +78,7 @@ if ($_SESSION['user']->getRole()->isParent()) {
 foreach ($userList as $user) {
     $checkedCampusList = [];
 
-    if(!$user->getHideTimetable()) {
+    if (!$user->getHideTimetable()) {
 
         foreach ($user->getCampusCollection() as $campus) {
             $campusCode = $campus->getExtTimetableCode();
@@ -172,7 +172,7 @@ foreach ($userList as $user) {
                                 $this->parse('day_header_listing', 'day_header', true);
                             }
 
-                            $outputPeriod = array(
+                            $this->setVar([
                                 'PERIOD_DESC'    => '',
                                 'PERIOD_CODE'    => '',
                                 'PERIOD_ROOM'    => '',
@@ -181,24 +181,11 @@ foreach ($userList as $user) {
                                 'PERIOD_COLOUR'  => '',
                                 'PERIOD_URL'     => '',
                                 'DAY_CLASS'      => '',
-                            );
+                            ]);
 
-                            if ($is_current_period) {
-                                if ($dayCount == $dayCurrent) {
-                                    // current period, also current day: intersection
-                                    $this->setVar('DAY_CLASS', 'timetable-subject-active');
-                                } else {
-                                    // current period, not current day: display row
-                                    $this->setVar('DAY_CLASS', '');
-                                }
-                            } else {
-                                if ($dayCount == $dayCurrent) {
-                                    // not current period, but is current day: display column
-                                    $this->setVar('DAY_CLASS', '');
-                                } else {
-                                    // neither current period nor current day
-                                    $this->setVar('DAY_CLASS', '');
-                                }
+                            // current period, also current day: intersection
+                            if ($is_current_period && $dayCount == $dayCurrent) {
+                                $this->setVar('DAY_CLASS', 'timetable-subject-active');
                             }
 
                             $this->setVar('period_class_link_block', '');
@@ -241,13 +228,13 @@ foreach ($userList as $user) {
                                         }
                                     } // staff, or external_db is disabled
 
-                                    $outputPeriod = array(
+                                    $this->setVar([
                                         'PERIOD_DESC'   => Scrub::Text($class['description']),
                                         'PERIOD_CODE'   => '(' . Scrub::Text($class['code']) . ')',
                                         'PERIOD_ROOM'   => Scrub::Text($class['room']),
                                         'PERIOD_STAFF'  => Scrub::Text($period_staff),
                                         'PERIOD_COLOUR' => Scrub::text($subjectColourMap[$class['code']]),
-                                    );
+                                    ]);
 
                                     /* Lookup subject code and check permissions, if read access provide a link to the user */
                                     if (!isset($catCache[$class['code']])) {
@@ -260,7 +247,6 @@ foreach ($userList as $user) {
                                         }
                                     }
 
-                                    $this->setVar($outputPeriod);
 
                                     if ($catCache[$class['code']] && $groupHandler->getPermission($catCache[$class['code']]) >= READ_ACCESS) {
                                         // Yes you really do need to double url-encode this
@@ -278,7 +264,6 @@ foreach ($userList as $user) {
                                 }
 
                             } else {
-                                $this->setVar($outputPeriod);
                                 $this->setVar('period_class_link_block', '');
                                 $this->parse('period_class_block', 'period_class');
                             }
@@ -309,8 +294,7 @@ if ($numTimetables > 1) {
     $this->setVar(array(
         'NUM_PEOPLE_CLASS' => ''
     ));
-}
-else {
+} else {
     $this->setVar(array(
         'NUM_PEOPLE_CLASS' => 'hide'
     ));
@@ -318,10 +302,9 @@ else {
 
 if ($numTimetables) {
     $this->setVar(array(
-    'no_timetable_block' => ''
+        'no_timetable_block' => ''
     ));
-}
-else {
+} else {
     $this->setVar('timetable_listing', '');
     $this->parse('no_timetable_block', 'no_timetable');
 }
