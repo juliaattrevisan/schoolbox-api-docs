@@ -70,6 +70,13 @@ class Model extends AbstractAssessment
     protected $hasRubric = false;
 
     /**
+     * Only relevant if this DueWork's MarkType is 'TotalMark'
+     *
+     * @var float
+     */
+    private $maxMark;
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -276,6 +283,24 @@ class Model extends AbstractAssessment
     public function setHasRubric($hasRubric)
     {
         $this->hasRubric = $hasRubric;
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getMaxMark()
+    {
+        return $this->maxMark;
+    }
+
+    /**
+     * @param float $maxMark
+     * @return static
+     */
+    public function setMaxMark($maxMark)
+    {
+        $this->maxMark = $maxMark;
         return $this;
     }
 }
