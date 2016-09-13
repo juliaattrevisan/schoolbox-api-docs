@@ -21,7 +21,7 @@ class Component_Config_Textbox extends Component_Config_Abstract
      */
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
-        $textboxMapper = new \Schoolbox\Textbox\Mapper();
+        $textboxMapper = new \Schoolbox\Resource\Textbox\Mapper();
 
         // has an internal block for the select element
 

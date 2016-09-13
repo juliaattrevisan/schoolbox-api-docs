@@ -31,6 +31,7 @@ use Schoolbox\Realtime\Schedule\Trigger\TriggerBundle;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\File\Model as File;
+use Schoolbox\Resource\Textbox\Model as Textbox;
 use Schoolbox\Role;
 use Schoolbox\User;
 
@@ -292,7 +293,10 @@ abstract class ResourceNotifier extends AbstractModuleNotifier implements Source
         unset($diff['hidden']);
         unset($diff['modified']);
 
-        $categoryId = $category->getId();
+        // manuel hydration
+        if (!$category->getName()) {
+            $category = $this->folderMapper->findById($categoryId);
+        }
 
         $bob = new Builder();
 

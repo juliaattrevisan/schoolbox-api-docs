@@ -102,7 +102,7 @@ class LogMapper extends Mapper {
 		));
 
 		$this->hasJoin('text', array(
-			'mapper'    => \Schoolbox\Textbox\Mapper::class,
+			'mapper'    => \Schoolbox\Resource\Textbox\Mapper::class,
 			'this_key'  => 'objectId',
 			'other_key' => 'textBoxID'
 		));
@@ -221,8 +221,8 @@ class LogMapper extends Mapper {
 
 
     /**
-     * @param Link|File\Model|Folder\Model|Textbox $object
-     * @param User                                 $user
+     * @param Link|File\Model|Folder\Model|Textbox\Model $object
+     * @param User                                       $user
      */
     public function logCreate($object, $user)
     {
@@ -230,8 +230,8 @@ class LogMapper extends Mapper {
     }
 
     /**
-     * @param Link|File\Model|Folder\Model|Textbox $object
-     * @param User                                 $user
+     * @param Link|File\Model|Folder\Model|Textbox\Model $object
+     * @param User                                       $user
      */
     public function logRead($object, $user)
     {
@@ -239,8 +239,8 @@ class LogMapper extends Mapper {
     }
 
     /**
-     * @param Link|File\Model|Folder\Model|Textbox $object
-     * @param User                                 $user
+     * @param Link|File\Model|Folder\Model|Textbox\Model $object
+     * @param User                                       $user
      */
     public function logUpdate($object, $user)
     {
@@ -248,8 +248,8 @@ class LogMapper extends Mapper {
     }
 
     /**
-     * @param Link|File\Model|Folder\Model|Textbox $object
-     * @param User                                 $user
+     * @param Link|File\Model|Folder\Model|Textbox\Model $object
+     * @param User                                       $user
      */
     public function logDelete($object, $user)
     {
@@ -257,9 +257,9 @@ class LogMapper extends Mapper {
     }
 
     /**
-     * @param string                               $action
-     * @param Link|File\Model|Folder\Model|Textbox $object
-     * @param User                                 $user
+     * @param string                                     $action
+     * @param Link|File\Model|Folder\Model|Textbox\Model $object
+     * @param User                                       $user
      * @throws Mapper\Exception
      */
     protected function putLog($action, $object, $user)

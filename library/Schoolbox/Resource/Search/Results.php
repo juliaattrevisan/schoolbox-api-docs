@@ -31,7 +31,7 @@ use Schoolbox\Resource\Link\Search\Renderer as LinkRenderer;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Search\Renderer as FolderRenderer;
 
-use Schoolbox\Resource\TextboxMapper;
+use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Resource\Textbox\Search\Renderer as TextboxRenderer;
 
 use Schoolbox\Resource\File;

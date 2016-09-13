@@ -18,7 +18,7 @@ class Library_Splash {
     /**
      * A textbox mapper
      *
-     * @var \Schoolbox\Textbox\Mapper
+     * @var \Schoolbox\Resource\Textbox\Mapper
      */
     private $textboxMapper;
 
@@ -26,7 +26,7 @@ class Library_Splash {
         $this->setTemplateFile($templateFile);
         $this->setCategoryID($categoryID);
         $this->setFileMapper(Schoolbox\Resource\File\Mapper::getInstance());
-        $this->setTextboxMapper(new \Schoolbox\Textbox\Mapper());
+        $this->setTextboxMapper(new \Schoolbox\Resource\Textbox\Mapper());
     }
 
     public function setVar($token, $textboxID) {
@@ -109,7 +109,7 @@ class Library_Splash {
     /**
      * Set textbox mapper
      *
-     * @param \Schoolbox\Textbox\Mapper $textboxMapper
+     * @param \Schoolbox\Resource\Textbox\Mapper $textboxMapper
      */
     private function setTextboxMapper($textboxMapper)
     {
@@ -119,7 +119,7 @@ class Library_Splash {
     /**
      * Return textbox mapper
      *
-     * @return \Schoolbox\Textbox\Mapper
+     * @return \Schoolbox\Resource\Textbox\Mapper
      */
     private function getTextboxMapper()
     {

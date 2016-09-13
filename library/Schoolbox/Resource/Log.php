@@ -79,7 +79,7 @@ class Log {
 
 
 	/**
-	 * @param Link|File\Model|Folder\Model|Textbox $object
+	 * @param Link|File\Model|Folder\Model|Textbox\Model $object
 	 * @return self
 	 */
 	public function setObject($object) {
@@ -96,7 +96,7 @@ class Log {
 			$this->objectId = $object->getId();
 			$this->objectKind = LogMapper::KIND_FOLDER;
 		}
-		elseif($object instanceof Textbox) {
+		elseif($object instanceof Textbox\Model) {
 			$this->objectId = $object->getId();
 			$this->objectKind = LogMapper::KIND_CONTENT;
 		}
@@ -108,7 +108,7 @@ class Log {
 
 
 	/**
-	 * @return Link|File\Model|Folder\Model|Textbox
+	 * @return Link|File\Model|Folder\Model|Textbox\Model
 	 */
 	public function getObject() {
 		switch($this->objectKind) {
@@ -119,7 +119,7 @@ class Log {
 			case LogMapper::KIND_FOLDER:
 				return Folder\Mapper::getInstance()->findById($this->objectId);
 			case LogMapper::KIND_CONTENT:
-				return TextboxMapper::getInstance()->findById($this->objectId);
+				return Textbox\Mapper::getInstance()->findById($this->objectId);
 		}
 		return null;
 	}

@@ -8,13 +8,17 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Textbox;
+namespace Schoolbox\Resource\Textbox;
 
-use Schoolbox\Textbox\Model;
+use Schoolbox\Resource\Textbox\Search\Result;
+use Schoolbox\User;
+use Schoolbox\Mapper\Searchable;
 use Schoolbox\Collection;
-use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
-class Mapper extends \Schoolbox\Mapper
+class Mapper extends \Schoolbox\Mapper implements Searchable
 {
 
     /**
@@ -25,7 +29,7 @@ class Mapper extends \Schoolbox\Mapper
     protected function mapping()
     {
         $this->hasTable('textBox');
-        $this->hasModel('\\Schoolbox\\Textbox\\Model');
+        $this->hasModel(Model::class);
 
         $this->hasMap(
             array(
@@ -72,9 +76,27 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasJoin(
             'category', array(
                 'multiple'  => false,
-                'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
+                'mapper'    => FolderMapper::class,
                 'this_key'  => 'categoryID',
                 'other_key' => 'id',
+            )
+        );
+
+        $this->hasJoin(
+            'perms',
+            array(
+                'mapper' => RoleAccessMapper::class,
+                'this_key' => 'categoryID',
+                'other_key' => 'cid'
+            )
+        );
+
+        $this->hasJoin(
+            'userAccess',
+            array(
+                'mapper' => UserAccessMapper::class,
+                'this_key' => 'categoryID',
+                'other_key' => 'sid'
             )
         );
 
@@ -122,77 +144,28 @@ class Mapper extends \Schoolbox\Mapper
     }
 
     /**
-     * Search
+     * Performs a search with the given parameters, and returns a Collection of the resultant set.
      *
-     * @param $keyword
+     * This also returns a count of all the items found in the search, not limited
+     * by params
+     *
+     * @param User $user
+     * @param string $keyword
      * @param int $offset
      * @param int $limit
-     * @param null $count
-     * @param string $sort_by
-     * @param string $sort_dir
-     * @return \Schoolbox\Collection
+     * @param string $sortProperty
+     * @param string $sortDirection
+     * @return Collection
      */
-    public function search($keyword, $offset = 0, $limit = 20, &$count = null, $sort_by = 'cname', $sort_dir = 'ASC')
+    public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
     {
-        $folderMapper = new FolderMapper();
-
-        $offset     = (int)$offset;
-        $limit      = (int)$limit;
-        $sortBy     = 'name';
-        $sortDir    = strtoupper($sort_dir) == 'ASC' ? 'ASC' : 'DESC';
-        $searchTerm = "%{$keyword}%";
-
-        /* Search for matching in mapper's columns
-         */
-        $found = false;
-
-        foreach ($this->map as $m) {
-            if ($m['column'] == $sort_by) {
-                $sortBy = "t.{$sort_by}";
-                $found  = true;
-                break;
-            }
+        if ($limit == 0) {
+            $limit = self::DEFAULT_LIMIT;
         }
 
-        /* Search for matching in join's columns
-         */
-        if (!$found) {
-            foreach ($folderMapper->map as $m) {
-                if ($m['column'] == $sort_by) {
-                    $sortBy = "c.{$sort_by}";
-                    break;
-                }
-            }
-        }
+        $searcher = new Result();
+        $searcher->search($user, $this, $keyword, $sortProperty, $sortDirection, $offset, $limit);
 
-        $query = "
-             SELECT
-            	{$this->getColumnString('t')},
-            	{$folderMapper->getColumnString('c')}
-            FROM `{$this->table}` t
-            LEFT JOIN {$this->getJoinSql('category', 't', 'c')}
-            WHERE t.heading LIKE :like
-            AND t.deleted IS NULL
-            AND c.deleted_at IS NULL
-            ORDER BY {$sortBy} {$sortDir}
-            LIMIT {$offset}, {$limit}
-        ";
-
-        $statement = $this->database->prepare($query);
-        $statement->bindParam(':like', $searchTerm);
-        $statement->execute();
-
-        $collection = new Collection();
-
-        foreach ($statement as $row) {
-            $textbox  = $this->hydrate($row, 't');
-            $folder = $folderMapper->hydrate($row, 'c');
-
-            $textbox->setCategory($folder);
-
-            $collection->add($textbox);
-        }
-
-        return $collection;
+        return $searcher;
     }
 }

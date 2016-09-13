@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Textbox;
+namespace Schoolbox\Resource\Textbox;
 
 
 use Alaress\Async\Notification\Instance\Builder;
@@ -23,6 +23,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Resource\ResourceNotifier;
+use Schoolbox\Resource\Textbox;
 use Schoolbox\User;
 
 class Notifier extends ResourceNotifier {
@@ -123,7 +124,7 @@ class Notifier extends ResourceNotifier {
 
 
 	/**
-	 * @param Textbox $resource
+	 * @param Model $resource
 	 * @return Folder
 	 */
 	protected function getResourceCategory($resource) {
