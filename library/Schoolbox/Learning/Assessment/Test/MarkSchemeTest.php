@@ -176,10 +176,8 @@ class MarkSchemeTest extends \PHPUnit_Framework_TestCase
     public function test_Completion_GetHumanReadable_Valid()
     {
         $inputs = [
-            [Completion::NORMALISED_INCOMPLETE,                Completion::HUMAN_READABLE_INCOMPLETE],
-            [Completion::NORMALISED_SELF_ASSESSED,             Completion::HUMAN_READABLE_COMPLETE],
-            [Completion::NORMALISED_TEACHER_ASSESSED,          Completion::HUMAN_READABLE_COMPLETE],
-            [Completion::NORMALISED_SELF_AND_TEACHER_ASSESSED, Completion::HUMAN_READABLE_COMPLETE],
+            [Completion::NORMALISED_INCOMPLETE, Completion::HUMAN_READABLE_INCOMPLETE],
+            [Completion::NORMALISED_COMPLETE,   Completion::HUMAN_READABLE_COMPLETE],
         ];
 
         $markScheme = new Completion();

@@ -10,36 +10,13 @@ namespace Schoolbox\Learning\MarkScheme;
 use InvalidArgumentException;
 use RangeException;
 
-/**
- * Completion is unique in that it is a one-way transform.
- *
- * This is because both Teacher- and Self-assessed are considered 'Completed'
- *
- * The NORMALISED_* constants are floats to maintain interface, but their
- * actual value has no semantic meaning.
- * Hence, we cannot map back from
- */
 class Completion extends AbstractMarkScheme
 {
-    // Note: These are enum, NOT representative of real normalised marks.
-    // Set to negative numbers to ensure distinct from valid real normalised marks
-    // Pass these to getHumanReadableMark() to transform into a human-readable form
-    const NORMALISED_INCOMPLETE                = -0;
-    const NORMALISED_SELF_ASSESSED             = -1;
-    const NORMALISED_TEACHER_ASSESSED          = -2;
-    const NORMALISED_SELF_AND_TEACHER_ASSESSED = -3;
+    const NORMALISED_INCOMPLETE = self::NORMALISED_MARK_MIN;
+    const NORMALISED_COMPLETE   = self::NORMALISED_MARK_MAX;
 
-    const HUMAN_READABLE_INCOMPLETE                = 'Not Completed';
-    const HUMAN_READABLE_SELF_ASSESSED             = 'Completed';
-    const HUMAN_READABLE_TEACHER_ASSESSED          = 'Completed';
-    const HUMAN_READABLE_SELF_AND_TEACHER_ASSESSED = 'Completed';
-
-    private static $validHumanReadableMarks = [
-        self::HUMAN_READABLE_INCOMPLETE,
-        self::HUMAN_READABLE_SELF_ASSESSED,
-        self::HUMAN_READABLE_TEACHER_ASSESSED,
-        self::HUMAN_READABLE_SELF_AND_TEACHER_ASSESSED,
-    ];
+    const HUMAN_READABLE_INCOMPLETE = 'Not Completed';
+    const HUMAN_READABLE_COMPLETE   = 'Completed';
 
 
     /**
@@ -52,34 +29,33 @@ class Completion extends AbstractMarkScheme
      */
     public function getHumanReadableMark($normalisedMark)
     {
-        // Note that this does not range-check normalised-mark, as it is enum, not real value
+        $this->validateNormalisedMark($normalisedMark);
 
         switch($normalisedMark){
             case self::NORMALISED_INCOMPLETE:
                 return self::HUMAN_READABLE_INCOMPLETE;
-            case self::NORMALISED_SELF_ASSESSED:
-                return self::HUMAN_READABLE_SELF_ASSESSED;
-            case self::NORMALISED_TEACHER_ASSESSED:
-                return self::HUMAN_READABLE_TEACHER_ASSESSED;
-            case self::NORMALISED_SELF_AND_TEACHER_ASSESSED:
-                return self::HUMAN_READABLE_SELF_AND_TEACHER_ASSESSED;
+            case self::NORMALISED_COMPLETE:
+                return self::HUMAN_READABLE_COMPLETE;
             default:
                 throw new InvalidArgumentException("Unknown normalised mark: $normalisedMark");
         }
     }
 
     /**
-     * For now, no normalised mark is returned for 'Completion' markScheme.
-     * In the future, this may return {0|100} to represent {Incomplete|Complete}
+     * Returns 0|100 representing Incomplete|Complete
      *
-     * @param string $humanReadableMark eg 'Self-assessed'
-     * @return null
+     * @param string $humanReadableMark eg 'Completed'
+     * @return float
      */
     public function getNormalisedMark($humanReadableMark)
     {
-        if(!in_array($humanReadableMark, self::$validHumanReadableMarks)){
-            throw new InvalidArgumentException("Unknown human readable mark: $humanReadableMark");
+        switch($humanReadableMark){
+            case self::HUMAN_READABLE_INCOMPLETE:
+                return self::NORMALISED_INCOMPLETE;
+            case self::HUMAN_READABLE_COMPLETE:
+                return self::NORMALISED_COMPLETE;
+            default:
+                throw new InvalidArgumentException("Unknown human-readable mark: $humanReadableMark");
         }
-        return null;
     }
 }

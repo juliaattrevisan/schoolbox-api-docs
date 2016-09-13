@@ -28,7 +28,7 @@ class None extends AbstractMarkScheme
      * No normalised mark returned
      *
      * @param string $humanReadableMark
-     * @return float
+     * @return null
      */
     public function getNormalisedMark($humanReadableMark)
     {
