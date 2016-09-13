@@ -29,4 +29,40 @@ class Model extends AbstractAssessment
         return 'Quiz';
     }
 
+    /**
+     * @return float
+     */
+    public function getMaxMark()
+    {
+        // TODO replicate this logic with objects when they become available
+        $totalMarksAvailable = 0.0;
+        foreach ($this->getSections() as $section) {
+            foreach ($section as $question) {
+                $totalMarksAvailable += $question['marks'];
+            }
+        }
+        return $totalMarksAvailable;
+    }
+
+    /**
+     * Stub method.
+     * TODO - Replace with real method.
+     */
+    protected function getSections()
+    {
+        return [
+            [
+                ['marks' => 1],
+            ],
+            [
+                ['marks' => 1], ['marks' => 1],
+            ],
+            [
+                ['marks' => 1.5], ['marks' => 2.5],
+            ],
+            [
+                ['marks' => 3.75], ['marks' => 1.25],
+            ]
+        ];
+    }
 }
