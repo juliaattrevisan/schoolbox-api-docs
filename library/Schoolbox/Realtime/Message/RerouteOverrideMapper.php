@@ -60,7 +60,7 @@ class RerouteOverrideMapper extends Mapper {
 		$coll = $this->findByColumn('user_id', array(0, $userId));
 		$regex = '`'. str_replace('*','[^\.]', $route) . '`';
 
-		return $coll->filterByCallback(function($override) use ($regex) {
+		return $coll->filter(function($override) use ($regex) {
 			/** @var RerouteOverride $override */
 			return preg_match($regex, $override->getRouteKey());
 		});
@@ -129,6 +129,10 @@ class RerouteOverrideMapper extends Mapper {
             }
             $userIds[] = $userId;
         }
+
+        $placeholders = Mapper\PredicateBuilder::getArrayPlaceholders($userIds, 'user');
+        $parameters   = Mapper\PredicateBuilder::getArrayParameters($userIds, 'user');
+
         // Check all permutations of route key:
         // exact match
         // starts with
@@ -147,7 +151,7 @@ class RerouteOverrideMapper extends Mapper {
                   OR
                   `msg_route_key` LIKE :endKey
             )
-            AND `user_id` IN {$this->getArrayPlaceholders($userIds, 'user')}
+            AND `user_id` IN $placeholders
             AND `delivery` = :delivery
         ";
         $quotedKey = $this->getDatabase()->quoteForLike($routeKey);
@@ -158,7 +162,7 @@ class RerouteOverrideMapper extends Mapper {
             'middleKey' => '%.'.$quotedKey.'.%',
             'endKey'    => '%.'.$quotedKey,
         );
-        $params = array_merge($params, $this->getArrayParameters($userIds, 'user'));
+        $params = array_merge($params, $parameters);
         $statement = $this->getDatabase()->prepare($query);
         $statement->execute($params);
         return $this->hydrateList($statement);
