@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Test;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\Learning\MarkScheme\Percentage;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
@@ -208,124 +209,6 @@ class MarkSchemeTest extends \PHPUnit_Framework_TestCase
         $markScheme->getNormalisedMark($input);
     }
 
-    // Mark Scheme = TotalMark
-
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function test_TotalMark_Fractional_Denominator()
-    {
-        $input = 10.5;
-        new TotalMarkWholeNumber($input);
-    }
-
-    /**
-     * @expectedException RangeException
-     */
-    public function test_TotalMark_Negative_Denominator()
-    {
-        $input = -10;
-        new TotalMarkWholeNumber($input);
-    }
-
-    /**
-     * @expectedException RangeException
-     */
-    public function test_TotalMark_Zero_Denominator()
-    {
-        $input = 0;
-        new TotalMarkWholeNumber($input);
-    }
-
-    public function test_TotalMark_getHumanReadable()
-    {
-        $inputs = [
-            [0,        '0 / 100'],
-            [0.1,      '0 / 100'],
-            [0.2,   '0.25 / 100'],
-            [0.3,   '0.25 / 100'],
-            [01,       '1 / 100'],
-            [1.0,      '1 / 100'],
-            [99.4,  '99.5 / 100'],
-            [99.7, '99.75 / 100'],
-            [99.9,   '100 / 100'],
-            [100,    '100 / 100'],
-            [100.0,  '100 / 100'],
-        ];
-        $totalMark = 100;
-        $markScheme = new TotalMarkWholeNumber($totalMark);
-
-        foreach($inputs as $pair){
-            $input = $pair[0];
-            $expected = $pair[1];
-
-            $actual = $markScheme->getHumanReadableMark($input);
-            $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
-            $this->assertEquals($expected, $actual, $message);
-        }
-    }
-
-    /**
-     * @expectedException RangeException
-     */
-    public function test_TotalMark_GetHumanReadable_NegativeNumerator()
-    {
-        $input = -10;
-        $totalMark = 100;
-        $markScheme = new TotalMarkWholeNumber($totalMark);
-        $markScheme->getHumanReadableMark($input);
-    }
-
-    /**
-     * @expectedException RangeException
-     */
-    public function test_TotalMark_NumeratorTooHigh()
-    {
-        $input = 100.25;
-        $totalMark = 100;
-        $markScheme = new TotalMarkWholeNumber($totalMark);
-        $markScheme->getHumanReadableMark($input);
-    }
-
-    public function test_TotalMark_getNormalised()
-    {
-        $inputs = [
-            '0'   => 0.0,
-            ' 0'  => 0.0,
-            '0.0' => 0.0,
-            '0 '  => 0.0,
-            '1'   => 1.0,
-            '45'  => 45.0,
-            '100' => 100.0,
-        ];
-        $totalMark = 100;
-        $markScheme = new TotalMarkWholeNumber($totalMark);
-
-        foreach($inputs as $input => $expected){
-            $actual = $markScheme->getNormalisedMark($input);
-            $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
-            $this->assertEquals($expected, $actual, $message);
-        }
-    }
-
-    public function test_TotalMark_getNormalised_Recurring()
-    {
-        $inputs = [
-            '0'     => 0.0,
-            '1'     => 0.3333333333,
-            '3'     => 1.0,
-        ];
-        $totalMark = 3;
-        $delta = 0.00001;
-        $markScheme = new TotalMarkWholeNumber($totalMark);
-
-        foreach($inputs as $input => $expected){
-
-            $actual = $markScheme->getNormalisedMark($input);
-            $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
-            $this->assertLessThan($expected - $actual, $delta, $message);
-        }
-    }
 
     // Mark Scheme = LetterGrade
 
@@ -436,5 +319,297 @@ class MarkSchemeTest extends \PHPUnit_Framework_TestCase
     }
 
 
+
+    // Mark Scheme = TotalMarkWholeNumber
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function test_TotalMarkWholeNumber_Fractional_Denominator()
+    {
+        $input = 10.5;
+        new TotalMarkWholeNumber($input);
+    }
+
+    /**
+     * @expectedException RangeException
+     */
+    public function test_TotalMarkWholeNumber_Negative_Denominator()
+    {
+        $input = -10;
+        new TotalMarkWholeNumber($input);
+    }
+
+    /**
+     * @expectedException RangeException
+     */
+    public function test_TotalMarkWholeNumber_Zero_Denominator()
+    {
+        $input = 0;
+        new TotalMarkWholeNumber($input);
+    }
+
+    /**
+     * @expectedException \BadMethodCallException
+     */
+    public function test_TotalMarkWholeNumber_setDenominator()
+    {
+        $input = 50;
+        $markScheme = new TotalMarkWholeNumber(50);
+        $markScheme->setTotalMark($input);
+    }
+
+    public function test_TotalMarkWholeNumber_getHumanReadable()
+    {
+        $inputs = [
+            [0,        '0 / 100'],
+            [0.1,      '0 / 100'],
+            [0.2,   '0.25 / 100'],
+            [0.3,   '0.25 / 100'],
+            [01,       '1 / 100'],
+            [1.0,      '1 / 100'],
+            [99.4,  '99.5 / 100'],
+            [99.7, '99.75 / 100'],
+            [99.9,   '100 / 100'],
+            [100,    '100 / 100'],
+            [100.0,  '100 / 100'],
+        ];
+        $totalMark = 100;
+        $markScheme = new TotalMarkWholeNumber($totalMark);
+
+        foreach($inputs as $pair){
+            $input = $pair[0];
+            $expected = $pair[1];
+
+            $actual = $markScheme->getHumanReadableMark($input);
+            $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
+            $this->assertEquals($expected, $actual, $message);
+        }
+    }
+
+    /**
+     * @expectedException RangeException
+     */
+    public function test_TotalMarkWholeNumber_GetHumanReadable_NegativeNumerator()
+    {
+        $input = -10;
+        $totalMark = 100;
+        $markScheme = new TotalMarkWholeNumber($totalMark);
+        $markScheme->getHumanReadableMark($input);
+    }
+
+    /**
+     * @expectedException RangeException
+     */
+    public function test_TotalMarkWholeNumber_NumeratorTooHigh()
+    {
+        $input = 100.25;
+        $totalMark = 100;
+        $markScheme = new TotalMarkWholeNumber($totalMark);
+        $markScheme->getHumanReadableMark($input);
+    }
+
+    public function test_TotalMarkWholeNumber_getNormalised()
+    {
+        $inputs = [
+            '0'   => 0.0,
+            ' 0'  => 0.0,
+            '0.0' => 0.0,
+            '0 '  => 0.0,
+            '1'   => 1.0,
+            '45'  => 45.0,
+            '100' => 100.0,
+        ];
+        $totalMark = 100;
+        $markScheme = new TotalMarkWholeNumber($totalMark);
+
+        foreach($inputs as $input => $expected){
+            $actual = $markScheme->getNormalisedMark($input);
+            $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
+            $this->assertEquals($expected, $actual, $message);
+        }
+    }
+
+    public function test_TotalMarkWholeNumber_getNormalised_Recurring()
+    {
+        $inputs = [
+            '0'     => 0.0,
+            '1'     => 33.333333333,
+            '3'     => 100.0,
+        ];
+        $totalMark = 3;
+        $delta = 0.00001;
+        $markScheme = new TotalMarkWholeNumber($totalMark);
+
+        foreach($inputs as $input => $expected){
+
+            $actual = $markScheme->getNormalisedMark($input);
+            $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
+            $this->assertLessThan($delta, abs($expected - $actual), $message);
+        }
+    }
+
+
+    // Mark Scheme = TotalMarkFractional
+
+    /**
+     * @expectedException RangeException
+     */
+    public function test_TotalMarkFractional_NegativeTotal()
+    {
+        $input = -1.0;
+        new TotalMarkFractional($input);
+    }
+
+    /**
+     * @expectedException RangeException
+     */
+    public function test_TotalMarkFractional_SetTotalNegative()
+    {
+        $input = -50.0;
+
+        $totalMark = 50.0;
+        $markScheme = new TotalMarkFractional($totalMark);
+        $markScheme->setTotalMark($input);
+    }
+
+    /**
+     * @expectedException RangeException
+     */
+    public function test_TotalMarkFractional_SetTotalExceedOriginal()
+    {
+        $input = 60.0;
+
+        $totalMark = 50.0;
+        $markScheme = new TotalMarkFractional($totalMark);
+        $markScheme->setTotalMark($input);
+    }
+
+    public function test_TotalMarkFractional_SetTotalValid()
+    {
+        $inputs = [
+            0,
+            0.0,
+            10.0,
+            49.999999,
+            50,
+            50.0,
+            50.000000,
+        ];
+
+        $originalTotalMark = 50.0;
+        $markScheme = new TotalMarkFractional($originalTotalMark);
+
+        foreach($inputs as $newTotalMark){
+            $markScheme->setTotalMark($newTotalMark);
+        }
+    }
+
+    /**
+     * @expectedException RangeException
+     */
+    public function test_TotalMarkFractional_getHumanReadable_tooLow()
+    {
+        $inputs = -1.0;
+
+        $totalMark = 50.0;
+        $markScheme = new TotalMarkFractional($totalMark);
+        $markScheme->getHumanReadableMark($inputs);
+    }
+
+    /**
+     * @expectedException RangeException
+     */
+    public function test_TotalMarkFractional_getHumanReadable_tooHigh()
+    {
+        $inputs = 100.0001;
+
+        $totalMark = 50.0;
+        $markScheme = new TotalMarkFractional($totalMark);
+        $markScheme->getHumanReadableMark($inputs);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function test_TotalMarkFractional_getNormalised_Null()
+    {
+        $input = null;
+
+        $totalMark = 50.0;
+        $markScheme = new TotalMarkFractional($totalMark);
+        $markScheme->getNormalisedMark($input);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function test_TotalMarkFractional_getNormalised_Empty()
+    {
+        $input = '';
+
+        $totalMark = 50.0;
+        $markScheme = new TotalMarkFractional($totalMark);
+        $markScheme->getNormalisedMark($input);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function test_TotalMarkFractional_getNormalised_Invalid()
+    {
+        $input = 'ten';
+
+        $totalMark = 50.0;
+        $markScheme = new TotalMarkFractional($totalMark);
+        $markScheme->getNormalisedMark($input);
+    }
+
+
+    public function test_TotalMarkFractional_getNormalised()
+    {
+        $inputs = [
+            '0'          => 0.0,
+            '0.0'        => 0.0,
+            ' 0'         => 0.0,
+            ' 0 '        => 0.0,
+            '1.5'        => 1.5,
+            '50'         => 50.0,
+            '66.6666666' => 66.6666666,
+            '99.99'      => 99.99,
+            '100'        => 100.0,
+        ];
+
+        $totalMark = 100.0;
+        $markScheme = new TotalMarkFractional($totalMark);
+
+        foreach($inputs as $input => $expected){
+            $actual = $markScheme->getNormalisedMark($input);
+            $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
+            $this->assertEquals($expected, $actual, $message);
+        }
+    }
+
+    public function test_TotalMarkFractional_getNormalised_Recursive()
+    {
+        $inputs = [
+            '0'   =>   0.0,
+            '1'   =>  33.33333333,
+            '2'   =>  66.66666666,
+            '3'   => 100.0,
+            '0.1' =>   3.33333333,
+
+        ];
+
+        $totalMark = 3;
+        $delta = 0.00001;
+        $markScheme = new TotalMarkFractional($totalMark);
+
+        foreach($inputs as $input => $expected){
+            $actual = $markScheme->getNormalisedMark($input);
+            $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
+            $this->assertLessThan($delta, abs($expected - $actual), $message);
+        }
+    }
 
 }
