@@ -68,21 +68,35 @@
                                 <div class="small-12 card wrap-down">
                                     {# Theres no need for the all the twig access checks like the list page, if the user got to this screen they can view everything #}
                                     <a href="/search/user/{{ record.owner.getId() }}">
-                                        <img class="show-on-print" src="/portrait.php?userId={{ record.getStudent().getExternalId() }}&amp;size=square64" width="64">
+                                        <img class="show-on-print" src="/portrait.php?userId={{ record.getStudent().getExternalId() }}&amp;size=square64" width="64"><br>
                                     </a>
                                     <h4>{{ record.getStudent().getFirstname }} {{ record.getStudent().getLastname }} - {{ record.getHeading() }}</h4>
                                     <p class="spaced meta">
                                         Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getCreatedAt().getShort() }}
                                     </p>
 
-                                    {# Show tags #}
-                                    {% if record.tagsList | length > 0 %}
-                                        <p class="spaced">
-                                            {% for tag in record.tagsList %}
-                                                <span class="hide-on-print neutral label">{{ tag.name }}</span>
-                                                <b class="show-for-print"> {{ tag.name }}</b>
-                                            {% endfor %}
-                                        </p>
+                                    {# Display tags #}
+                                    {% if role != 'parent' %}
+                                        {% if record.points != 0 or (record.tagsList | length) > 0 %}
+                                            <p class="spaced">
+                                                {% if record.points != 0 %}
+                                                    {% if record.points < 0 %}
+                                                        {% set labelClass='alert' %}
+                                                    {% endif %}
+                                                    {% if record.points > 0 %}
+                                                        {% set labelClass='success' %}
+                                                    {% endif %}
+                                                    <span class="{{ labelClass }} label hide-on-print">{{ record.points }} Point{% if record.points < -1 or record.points > 1 %}s{% endif %}</span>
+                                                    <b class="show-for-print"> {{ record.points }} Point{% if record.points < -1 or record.points > 1 %}s{% endif %}</b>
+                                                {% endif %}
+                                                {% if record.tagsList | length > 0 %}
+                                                    {% for tag in record.tagsList %}
+                                                        <span class="neutral label hide-on-print">{{ tag.name }}</span>
+                                                        <b class="show-for-print"> {{ tag.name }}</b>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </p>
+                                        {% endif %}
                                     {% endif %}
 
                                     {# Hide meta from parents#}
