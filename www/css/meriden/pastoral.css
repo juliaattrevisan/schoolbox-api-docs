@@ -86,3 +86,18 @@
     margin-top: 1.5rem;
     padding: 0;
 }
+
+/** Teacher list - avatarcards are right-aligned, text is bottom **/
+.e-report .teacher-list {
+    padding-top: 0.5rem;
+}
+.e-report .teacher-list .teacher-image {
+    float:right;
+    margin: 0;
+}
+.e-report .teacher-list .teacher-name {
+    position: absolute;
+    bottom: 0;
+    padding-bottom: 0;
+    right: 5.5rem;
+}

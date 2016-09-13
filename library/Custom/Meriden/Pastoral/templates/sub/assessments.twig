@@ -8,8 +8,8 @@
                 <tr>
                     <th>Title</th>
                     <th>Result</th>
-                    <th>Standard Deviation %</th>
                     <th>Mean %</th>
+                    <th>Standard Deviation %</th>
                     <th>Date Due</th>
                 </tr>
                 </thead>
@@ -56,8 +56,8 @@
                 {% endif %}
             </td>
             <td>{{ workItem.pretty_mark }}</td>
-            <td>{{ workItem.distribution.continuous.sd.pretty_mark }}</td>
             <td>{{ workItem.distribution.continuous.mean.pretty_mark }}</td>
+            <td>{{ workItem.distribution.continuous.sd.pretty_mark }}</td>
             <td>
                 {% if workItem.assessment %}
                     {{ workItem.assessment.dueDate|date('jS F') }}
