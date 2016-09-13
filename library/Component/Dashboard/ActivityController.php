@@ -15,6 +15,9 @@ class Component_Dashboard_ActivityController extends Component_Dashboard_Control
 
     protected $activity;
 
+    /** @var  array */
+    private $catList;
+
     public function __construct (Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Group $group, Activity $activity) {
         parent::__construct($instance, $user, $sitepage);
 

@@ -38,8 +38,6 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
         /* Check primary key is being used correctly!
          */
         $this->sitepage->setVar('ID', isset($context) ? $context->getUserId() : -1);
-
-        $this->postConstruct();
     }
 
     /**
@@ -143,9 +141,11 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
      * Sets the Eportfolio_Page_Instance this component draws its data from
      *
      * @param Eportfolio_Page_Instance $source
+     * @return static
      */
     public function setSource($source) {
         $this->source = $source;
+        return $this;
     }
 
     /**

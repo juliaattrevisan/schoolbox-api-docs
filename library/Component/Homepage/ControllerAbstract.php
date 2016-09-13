@@ -27,8 +27,6 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
         // Control permission: always based on current context
         $this->contentPermission = min($accessor->getFolderAccess($this->getUser(), [$this->getSource()->getId()]), $this->getMaximumPermission());
         $this->contextPermission = min($accessor->getFolderAccess($this->getUser(), [$this->getContext()->getId()]), $this->getMaximumPermission());
-
-        $this->postConstruct();
     }
 
 

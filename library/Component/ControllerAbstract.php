@@ -44,16 +44,16 @@ abstract class Component_ControllerAbstract
     protected $sitepage;
 
     /**
-     * The folder the component is on, if any.
+     * The folder|page the component is on, if any.
      *
-     * @var Folder|null
+     * @var Folder|Eportfolio_Page_Instance|null
      */
     protected $context;
 
     /**
-     * The folder the component pulls data from, if any.
+     * The folder|page the component pulls data from, if any.
      *
-     * @var Folder
+     * @var Folder|Eportfolio_Page_Instance|null
      */
     protected $source;
 
@@ -178,15 +178,6 @@ abstract class Component_ControllerAbstract
         } else {
             $this->setSource($context);
         }
-
-        $this->postConstruct();
-    }
-
-    /**
-     * Hook method for components to perform their own dynamic setup() amendments
-     */
-    protected function postConstruct()
-    {
     }
 
     /**
@@ -928,7 +919,7 @@ abstract class Component_ControllerAbstract
      */
 
     /**
-     * @return \Schoolbox\Resource\Folder\Model
+     * @return Folder|Eportfolio_Page_Instance|null
      */
     public function getContext()
     {
@@ -936,10 +927,10 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @param Folder|null $context
+     * @param Folder|Eportfolio_Page_Instance|null $context
      * @return static
      */
-    protected function setContext(Folder $context = null)
+    protected function setContext($context = null)
     {
         $this->context = $context;
         return $this;
