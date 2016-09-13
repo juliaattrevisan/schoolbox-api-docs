@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\Assessment\Test;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\Learning\MarkScheme\Percentage;
-use Schoolbox\Learning\MarkScheme\TotalMark;
+use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevel;
@@ -216,7 +216,7 @@ class MarkSchemeTest extends \PHPUnit_Framework_TestCase
     public function test_TotalMark_Fractional_Denominator()
     {
         $input = 10.5;
-        new TotalMark($input);
+        new TotalMarkWholeNumber($input);
     }
 
     /**
@@ -225,7 +225,7 @@ class MarkSchemeTest extends \PHPUnit_Framework_TestCase
     public function test_TotalMark_Negative_Denominator()
     {
         $input = -10;
-        new TotalMark($input);
+        new TotalMarkWholeNumber($input);
     }
 
     /**
@@ -234,7 +234,7 @@ class MarkSchemeTest extends \PHPUnit_Framework_TestCase
     public function test_TotalMark_Zero_Denominator()
     {
         $input = 0;
-        new TotalMark($input);
+        new TotalMarkWholeNumber($input);
     }
 
     public function test_TotalMark_getHumanReadable()
@@ -253,7 +253,7 @@ class MarkSchemeTest extends \PHPUnit_Framework_TestCase
             [100.0,  '100 / 100'],
         ];
         $totalMark = 100;
-        $markScheme = new TotalMark($totalMark);
+        $markScheme = new TotalMarkWholeNumber($totalMark);
 
         foreach($inputs as $pair){
             $input = $pair[0];
@@ -272,7 +272,7 @@ class MarkSchemeTest extends \PHPUnit_Framework_TestCase
     {
         $input = -10;
         $totalMark = 100;
-        $markScheme = new TotalMark($totalMark);
+        $markScheme = new TotalMarkWholeNumber($totalMark);
         $markScheme->getHumanReadableMark($input);
     }
 
@@ -283,8 +283,48 @@ class MarkSchemeTest extends \PHPUnit_Framework_TestCase
     {
         $input = 100.25;
         $totalMark = 100;
-        $markScheme = new TotalMark($totalMark);
+        $markScheme = new TotalMarkWholeNumber($totalMark);
         $markScheme->getHumanReadableMark($input);
+    }
+
+    public function test_TotalMark_getNormalised()
+    {
+        $inputs = [
+            '0'   => 0.0,
+            ' 0'  => 0.0,
+            '0.0' => 0.0,
+            '0 '  => 0.0,
+            '1'   => 1.0,
+            '45'  => 45.0,
+            '100' => 100.0,
+        ];
+        $totalMark = 100;
+        $markScheme = new TotalMarkWholeNumber($totalMark);
+
+        foreach($inputs as $input => $expected){
+            $actual = $markScheme->getNormalisedMark($input);
+            $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
+            $this->assertEquals($expected, $actual, $message);
+        }
+    }
+
+    public function test_TotalMark_getNormalised_Recurring()
+    {
+        $inputs = [
+            '0'     => 0.0,
+            '1'     => 0.3333333333,
+            '3'     => 1.0,
+        ];
+        $totalMark = 3;
+        $delta = 0.00001;
+        $markScheme = new TotalMarkWholeNumber($totalMark);
+
+        foreach($inputs as $input => $expected){
+
+            $actual = $markScheme->getNormalisedMark($input);
+            $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
+            $this->assertLessThan($expected - $actual, $delta, $message);
+        }
     }
 
     // Mark Scheme = LetterGrade
