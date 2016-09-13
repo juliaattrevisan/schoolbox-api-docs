@@ -14,6 +14,9 @@ use Schoolbox\Resource\Textbox\Search\Result;
 use Schoolbox\User;
 use Schoolbox\Mapper\Searchable;
 use Schoolbox\Collection;
+use Schoolbox\Permission\Access\RoleAccessMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Mapper extends \Schoolbox\Mapper implements Searchable
 {
@@ -73,9 +76,27 @@ class Mapper extends \Schoolbox\Mapper implements Searchable
         $this->hasJoin(
             'category', array(
                 'multiple'  => false,
-                'mapper'    => '\\Schoolbox\\Resource\\Folder\\Mapper',
+                'mapper'    => FolderMapper::class,
                 'this_key'  => 'categoryID',
                 'other_key' => 'id',
+            )
+        );
+
+        $this->hasJoin(
+            'perms',
+            array(
+                'mapper' => RoleAccessMapper::class,
+                'this_key' => 'categoryID',
+                'other_key' => 'cid'
+            )
+        );
+
+        $this->hasJoin(
+            'userAccess',
+            array(
+                'mapper' => UserAccessMapper::class,
+                'this_key' => 'categoryID',
+                'other_key' => 'sid'
             )
         );
 
