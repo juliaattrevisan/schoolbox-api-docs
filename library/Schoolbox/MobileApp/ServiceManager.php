@@ -95,11 +95,14 @@ class ServiceManager
             return;
         }
 
+        // TODO retrieve the list of unread messages for this user - until SA-359 is complete, this is not possible...
+        $unreadCount = 1;
+
         foreach ($registered as $provider => $registries) {
             try {
                 $service = $this->getService($provider);
                 $tokens  = $registries->getColumnValues('token');
-                $this->pushToService($service, $tokens, $data);
+                $this->pushToService($service, $tokens, $data, $unreadCount);
 
             } catch (InvalidArgumentException $e) {
                 // service not available
@@ -113,14 +116,15 @@ class ServiceManager
      * @param ServiceInterface $service
      * @param array            $tokens
      * @param array            $data
+     * @param int              $unreadCount
      */
-    protected function pushToService(ServiceInterface $service, $tokens, $data)
+    protected function pushToService(ServiceInterface $service, $tokens, $data, $unreadCount = 0)
     {
         $provider = $service->getProviderName();
 
         try {
             $this->log->info("Sending data to " . count($tokens) . " $provider devices");
-            $service->send($tokens, $data);
+            $service->send($tokens, $data, $unreadCount);
 
         } catch (OutOfBoundsException $e) {
             // bad API key, which will require a daemon restart, so remove this service from use

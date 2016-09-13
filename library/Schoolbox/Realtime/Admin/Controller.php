@@ -329,7 +329,7 @@ class Controller extends BaseController
 
         $log = new Logger($write, $write, \Monolog\Logger::DEBUG, [], true);
 
-        $factory = new MobileApp\ServiceManagerFactory($conf, $log);
+        $factory = new MobileApp\ServiceManagerFactory($conf, $log, MobileApp\RegistryMapper::getInstance());
         $cloudManager = $factory->build([ MobileApp\Registry::PROVIDER_APPLE, MobileApp\Registry::PROVIDER_GOOGLE ]);
 
         $redis = Redis::getClientInstance();

@@ -38,11 +38,12 @@ class GCM extends AbstractService
 
 
     /**
+     * @param RegistryMapper $registryMapper
      * @param string $apiKey
      */
-    public function __construct($apiKey)
+    public function __construct(RegistryMapper $registryMapper, $apiKey)
     {
-        parent::__construct();
+        parent::__construct($registryMapper);
         $this->apiKey = $apiKey;
     }
 
@@ -60,11 +61,12 @@ class GCM extends AbstractService
      * @param array  $registrationIds
      * @param int    $id
      * @param string $title
+     * @param int    $unreadCount
      * @throws RuntimeException if your API key is bad
      * @throws OverflowException if the max payload size (4KB) is exceeded
      * @return bool
      */
-    public function propagate(array $registrationIds, $id, $title)
+    public function propagate(array $registrationIds, $id, $title, $unreadCount = 0)
     {
         $data = [
             'id'           => $id,
@@ -113,8 +115,7 @@ class GCM extends AbstractService
 
                         if ($result['error'] == 'NotRegistered') {
                             // we need to delete this token, it will only break things
-                            // TODO remove the singletonness...
-                            RegistryMapper::getInstance()->deleteByColumn('app_token', $regId);
+                            $this->deleteToken($regId);
                         }
 
                     } else {

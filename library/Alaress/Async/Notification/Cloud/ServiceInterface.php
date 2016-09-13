@@ -24,9 +24,10 @@ interface ServiceInterface
     /**
      * @param array $tokens
      * @param array $data
+     * @param int   $unreadCount
      * @return bool
      */
-    public function send(array $tokens, array $data);
+    public function send(array $tokens, array $data, $unreadCount = 0);
 
 
     /**

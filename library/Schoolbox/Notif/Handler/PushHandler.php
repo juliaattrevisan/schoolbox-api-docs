@@ -35,7 +35,7 @@ class PushHandler extends AbstractProcessingHandler
     {
         parent::__construct($level, $bubble);
 
-        $factory = new MobileApp\ServiceManagerFactory(ConfigMapper::getInstance(), $log);
+        $factory = new MobileApp\ServiceManagerFactory(ConfigMapper::getInstance(), $log, MobileApp\RegistryMapper::getInstance());
         $this->cloudManager = $factory->build([ MobileApp\Registry::PROVIDER_APPLE, MobileApp\Registry::PROVIDER_GOOGLE ]);
     }
 

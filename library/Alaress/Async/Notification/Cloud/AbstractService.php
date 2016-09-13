@@ -13,6 +13,7 @@ use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Async\Notification\Notification;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
+use Schoolbox\MobileApp\RegistryMapper;
 use Schoolbox\Realtime\Notification\Decorator;
 
 abstract class AbstractService implements ServiceInterface
@@ -28,12 +29,18 @@ abstract class AbstractService implements ServiceInterface
     /** @var Decorator */
     protected $decorator;
 
+    /** @var RegistryMapper */
+    private $registryMapper;
+
 
     /**
      * AbstractService constructor.
+     *
+     * @param RegistryMapper $registryMapper
      */
-    public function __construct()
+    public function __construct(RegistryMapper $registryMapper)
     {
+        $this->registryMapper = $registryMapper;
         $this->decorator = new Decorator();
     }
 
@@ -65,10 +72,11 @@ abstract class AbstractService implements ServiceInterface
     /**
      * @param array $tokens
      * @param array $data
+     * @param int   $unreadCount
      * @throws \Exception
      * @return bool
      */
-    public function send(array $tokens, array $data)
+    public function send(array $tokens, array $data, $unreadCount = 0)
     {
         // it's like reconstituting orange juice... it's just not right *sigh*
         $n = new Notification([ Instance::jsonUnserialize($data[0]) ]);
@@ -77,7 +85,7 @@ abstract class AbstractService implements ServiceInterface
 
         $title = $this->decorator->renderTitleAsPlaintext($n);
 
-        return $this->propagate($tokens, $id, $title);
+        return $this->propagate($tokens, $id, $title, $unreadCount);
     }
 
 
@@ -106,12 +114,21 @@ abstract class AbstractService implements ServiceInterface
 
 
     /**
-     * @param array $tokens
-     * @param int   $id
+     * @param string $token
+     * @return void
+     */
+    protected function deleteToken($token)
+    {
+        $this->registryMapper->deleteByColumn('app_token', $token);
+    }
+
+    /**
+     * @param array  $tokens
+     * @param int    $id
      * @param string $title
+     * @param int    $unreadCount
      * @return bool
      */
-    protected abstract function propagate(array $tokens, $id, $title);
-
+    protected abstract function propagate(array $tokens, $id, $title, $unreadCount = 0);
 
 }

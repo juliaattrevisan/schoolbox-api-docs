@@ -45,13 +45,14 @@ class APNS extends AbstractService
 
 
     /**
+     * @param RegistryMapper $registryMapper
      * @param int    $environment
      * @param string $certificatePath
      * @param string $passPhrase
      */
-    public function __construct($environment, $certificatePath, $passPhrase = null)
+    public function __construct(RegistryMapper $registryMapper, $environment, $certificatePath, $passPhrase = null)
     {
-        parent::__construct();
+        parent::__construct($registryMapper);
         $this->client      = new Client();
         $this->environment = $environment;
         $this->certPath    = $certificatePath;
@@ -72,9 +73,10 @@ class APNS extends AbstractService
      * @param array  $tokens
      * @param int    $id
      * @param string $title
+     * @param int    $unreadCount
      * @return bool
      */
-    public function propagate(array $tokens, $id, $title)
+    public function propagate(array $tokens, $id, $title, $unreadCount = 0)
     {
         $alert = new Message\Alert();
 
@@ -83,7 +85,7 @@ class APNS extends AbstractService
         $message = new Message();
 
         $message->setId($id);
-        $message->setBadge(0);
+        $message->setBadge($unreadCount);
         $message->setAlert($alert);
         $message->setSound('default');
 
@@ -93,6 +95,8 @@ class APNS extends AbstractService
 
             } catch (InvalidArgumentException $e) {
                 // your token is not a hex string
+                $this->getLog()->debug("Invalid token: '$token': removing from registry");
+                $this->deleteToken($token);
                 continue;
             }
 
@@ -141,7 +145,7 @@ class APNS extends AbstractService
                         $this->report($prefix, "Invalid token", Logger::INFO, '?');
                         // we need to delete this token, it will only break things
                         // TODO remove the singletonness...
-                        RegistryMapper::getInstance()->deleteByColumn('app_token', $token);
+                        $this->deleteToken($token);
                         $this->client->close();
                         break;
                     case Response::RESULT_UNKNOWN_ERROR:
