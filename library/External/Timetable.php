@@ -81,7 +81,13 @@ class External_Timetable implements External_TimetableInterface
      */
     function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, $user = null)
     {
-        return $this->getCachedResult(__FUNCTION__, func_get_args(), $this->getTimeout());
+        // Period number is more subject to change than most information:
+        // set max cache time to 1 minute.
+        $timeout = $this->getTimeout();
+        if (isset($timeout)) {
+            $timeout = min(60, $timeout);
+        }
+        return $this->getCachedResult(__FUNCTION__, func_get_args(), $timeout);
     }
 
     /**
