@@ -25,8 +25,6 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
      */
     public function setup(Eportfolio_Page_Instance $context = null, array $config = array())
     {
-        parent::setup($context, $config);
-
         /** @var Schoolbox\User $_SESSION['user'] */
         if ($_SESSION['user']->isSuperuser()) {
             $this->contentPermission = \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
