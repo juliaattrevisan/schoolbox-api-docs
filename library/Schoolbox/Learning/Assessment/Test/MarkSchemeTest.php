@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\Learning\MarkScheme\Percentage;
@@ -23,53 +24,142 @@ class MarkSchemeTest extends \PHPUnit_Framework_TestCase
 {
     // MarkScheme = 'None'
 
-    public function test_None_ValidNormalisedMark()
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function test_None_getHumanReadable_Null()
     {
-        $input = 20.0;
-        $expected = null;
+        $input = null;
         $markScheme = new None();
-        $actual = $markScheme->getHumanReadableMark($input);
-        $this->assertEquals($expected, $actual);
+        $markScheme->getHumanReadableMark($input);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function test_None_getHumanReadable_Empty()
+    {
+        $input = '';
+        $markScheme = new None();
+        $markScheme->getHumanReadableMark($input);
     }
 
     /**
      * @expectedException RangeException
      */
-    public function test_None_InvalidNormalisedMark()
+    public function test_None_getHumanReadable_TooLow()
     {
         $input = -20.0;
         $markScheme = new None();
         $markScheme->getHumanReadableMark($input);
     }
 
-
-    public function test_None_GetNormalised()
+    /**
+     * @expectedException RangeException
+     */
+    public function test_None_getHumanReadable_TooHigh()
     {
-        $input = 20.0;
-        $expected = null;
+        $input = 120.0;
         $markScheme = new None();
-        $actual = $markScheme->getNormalisedMark($input);
-        $this->assertEquals($expected, $actual);
+        $markScheme->getHumanReadableMark($input);
     }
 
-    // MarkScheme = 'Completion'
 
-    public function test_Completion_GetHumanReadable()
+    public function test_None_getHumanReadable_Valid()
     {
         $inputs = [
-            Completion::NORMALISED_INCOMPLETE                => Completion::HUMAN_READABLE_INCOMPLETE,
-            Completion::NORMALISED_SELF_ASSESSED             => Completion::HUMAN_READABLE_SELF_ASSESSED,
-            Completion::NORMALISED_TEACHER_ASSESSED          => Completion::HUMAN_READABLE_TEACHER_ASSESSED,
-            Completion::NORMALISED_SELF_AND_TEACHER_ASSESSED => Completion::HUMAN_READABLE_SELF_AND_TEACHER_ASSESSED,
+            0,
+            0.0,
+            50,
+            99.99,
+            100,
+            100.000,
         ];
+        $expected = null;
+        $markScheme = new None();
 
-        $markScheme = new Completion();
-
-        foreach($inputs as $input => $expected){
+        foreach($inputs as $input){
             $actual = $markScheme->getHumanReadableMark($input);
             $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
             $this->assertEquals($expected, $actual, $message);
         }
+    }
+
+    public function test_None_GetNormalised_Null()
+    {
+        $input = null;
+        $expected = null;
+        $markScheme = new None();
+        $actual = $markScheme->getNormalisedMark($input);
+        $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    public function test_None_GetNormalised_Empty()
+    {
+        $input = '';
+        $expected = null;
+        $markScheme = new None();
+        $actual = $markScheme->getNormalisedMark($input);
+        $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+
+
+
+
+    public function test_None_GetNormalised_Valid()
+    {
+        $inputs = [
+            null,
+            '',
+            'a big dinosaur',
+            20.5,
+        ];
+        $expected = null;
+        $markScheme = new None();
+        foreach($inputs as $input){
+            $actual = $markScheme->getNormalisedMark($input);
+            $this->assertEquals($expected, $actual);
+        }
+    }
+
+
+
+
+
+
+    // MarkScheme = 'Completion'
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function test_Completion_GetHumanReadable_Null()
+    {
+        $input = null;
+        $markScheme = new Completion();
+        $markScheme->getHumanReadableMark($input);
+    }
+
+    /**
+     * @expectedException RangeException
+     */
+    public function test_Completion_GetHumanReadable_TooLow()
+    {
+        $input = -1;
+        $markScheme = new Completion();
+        $markScheme->getHumanReadableMark($input);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function test_Completion_GetHumanReadable_InvalidType()
+    {
+        $input = 'zero';
+        $markScheme = new Completion();
+        $markScheme->getHumanReadableMark($input);
     }
 
     /**
@@ -77,28 +167,62 @@ class MarkSchemeTest extends \PHPUnit_Framework_TestCase
      */
     public function test_Completion_GetHumanReadable_Invalid()
     {
-        $input = 20.0;
+        $input = '50.0';
         $markScheme = new Completion();
         $markScheme->getHumanReadableMark($input);
     }
 
-    public function test_Completion_GetNormalised()
+
+    public function test_Completion_GetHumanReadable_Valid()
     {
         $inputs = [
-            Completion::HUMAN_READABLE_INCOMPLETE,
-            Completion::HUMAN_READABLE_SELF_ASSESSED,
-            Completion::HUMAN_READABLE_TEACHER_ASSESSED,
-            Completion::HUMAN_READABLE_SELF_AND_TEACHER_ASSESSED,
+            [Completion::NORMALISED_INCOMPLETE,                Completion::HUMAN_READABLE_INCOMPLETE],
+            [Completion::NORMALISED_SELF_ASSESSED,             Completion::HUMAN_READABLE_COMPLETE],
+            [Completion::NORMALISED_TEACHER_ASSESSED,          Completion::HUMAN_READABLE_COMPLETE],
+            [Completion::NORMALISED_SELF_AND_TEACHER_ASSESSED, Completion::HUMAN_READABLE_COMPLETE],
         ];
 
         $markScheme = new Completion();
-        $expected = null;
 
-        foreach($inputs as $input){
-            $actual = $markScheme->getNormalisedMark($input);
+        foreach($inputs as $pair){
+            $input = $pair[0];
+            $expected = $pair[1];
+
+            $actual = $markScheme->getHumanReadableMark($input);
             $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
             $this->assertEquals($expected, $actual, $message);
         }
+    }
+
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function test_Completion_GetNormalised_Null()
+    {
+        $input = null;
+        $markScheme = new Completion();
+        $markScheme->getNormalisedMark($input);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function test_Completion_GetNormalised_Empty()
+    {
+        $input = '';
+        $markScheme = new Completion();
+        $markScheme->getNormalisedMark($input);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function test_Completion_GetNormalised_Whitespace()
+    {
+        $input = '     ';
+        $markScheme = new Completion();
+        $markScheme->getNormalisedMark($input);
     }
 
     /**
@@ -111,7 +235,27 @@ class MarkSchemeTest extends \PHPUnit_Framework_TestCase
         $markScheme->getNormalisedMark($input);
     }
 
+
+    public function test_Completion_GetNormalised_Valid()
+    {
+        $inputs = [
+            Completion::HUMAN_READABLE_INCOMPLETE => IMarkScheme::NORMALISED_MARK_MIN,
+            Completion::HUMAN_READABLE_COMPLETE   => IMarkScheme::NORMALISED_MARK_MAX,
+        ];
+
+        $markScheme = new Completion();
+
+        foreach($inputs as $input => $expected){
+            $actual = $markScheme->getNormalisedMark($input);
+            $message = "Failed asserting equality. Input: $input, Expected: $expected, Actual: $actual";
+            $this->assertEquals($expected, $actual, $message);
+        }
+    }
+
+
+
     // MarkScheme = Percentage
+
     public function test_Percentage_getHumanReadable_Valid()
     {
         $inputs = [
