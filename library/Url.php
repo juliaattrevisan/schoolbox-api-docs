@@ -27,20 +27,15 @@ class Url
      * This ensures caller retains control of protocol prepending.
      *
      * @param string $url
-     * @param string|bool $siteHost Optional override to decouples the class for unit testing of 'relative' URLs or when DB not available.
-     *                              false equates to empty 'sitehost', that is, none used. As opposed to null which means use default.
+     * @param string|null $siteHost Override data-base configured siteHost. Used in tests or CLI context.
      * @throws DomainException If cannot determine the SB instance's configured hostname. This is required for determining relativity.
      */
     public function __construct($url, $siteHost = null)
     {
         $this->setUrl(trim($url));
 
-        // Did caller override the site's hostname ?
-        if (null !== $siteHost) {
-            // 'false' equates to '', ie no siteHost.
-            // This is used in scenarios when caller just needs toSlug() functionality, (eg notifiers running in CLI)
-            $this->setSiteHost(strval($siteHost));
-        } else {
+        // No override, use config
+        if(null === $siteHost) {
             $site_hostname = trim(Cfg::get('site_hostname'));
             $site_domain = trim(Cfg::get('site_domain'));
 
@@ -58,9 +53,11 @@ class Url
                     $this->setSiteHost($site_hostname);
                 } // Unable to determine instance hostname
                 else {
-                    throw new DomainException('No hostname explicitly set, or retrievable from Database');
+                    throw new DomainException('No hostname explicitly supplied, or retrievable from Database');
                 }
             }
+        } else {
+            $this->setSiteHost(strval($siteHost));
         }
     }
 
@@ -138,8 +135,10 @@ class Url
         $pattern[] = '/(\s|-|\/)+/';
         $replace[] = '-';
 
-        $pattern[] = '/\+/';
-        $replace[] = 'p';
+        // Unknown purpose. Commented out 2016/09/13.
+        // TODO Remove after adequate elapse and nothing has broken.
+//        $pattern[] = '/\+/';
+//        $replace[] = 'p';
 
         return strtolower(preg_replace($pattern, $replace, $this->getUrl()));
     }

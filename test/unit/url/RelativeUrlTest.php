@@ -75,7 +75,26 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
             'localhost/path/to/file',
             'localhost/path/to/file.ext',
             'xxx://localhost/path/to/file.ext',
+            '                             ',
+            null,
+            '####',
+            'xxxxxxxxxxxxxxxxxxxxxxxxx',
+            '# # # # # #',
+            '#24#32#111',
+            '#11 #22 #33 #44',
+            '                                                    #',
+            '#%20',
+            '#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<',
+            "\t\t\t\t\t",
+            'https://www.google.com.au/maps/@-16.444564,167.78601,15.79z',
+            'https://www.google.com.au/search?q=port+sandwich&source=lnms&tbm=isch&sa=X&ved=0ahUKEwiBwY3pqIvPAhWKdT4KHdQMAnoQ_AUICSgC&biw=1440&bih=2440',
+            'https://www.google.com.au/search?q=port+sandwich&source=lnms&tbm=isch&sa=X&ved=0ahUKEwiBwY3pqIvPAhWKdT4KHdQMAnoQ_AUICSgC&biw=1440&bih=2440#tbm=isch&q=amri+sannang',
+            'https://r4---sn-hp57knlr.googlevideo.com/videogoodput?id=o-AHvq-LuViir31d8PVjfR03aK-PNK5sIqzXA6yp9YVo1z&source=goodput&range=0-4999&expire=1473738350&ip=115.70.195.253&ms=pm&mm=35&pl=24&nh=IgpwcjA0Lm1pYTA0Kgw3Ny42Ny43MS4xMTM&sparams=id,source,range,expire,ip,ms,mm,pl,nh&signature=83ACEE13CA7D5FEBB0032BCFA8141D13C3D789A8.5BC8828E42BA3D3382DFFCD57EE56AE8C9A673E0&key=cms1&cpn=UXM9r8K_nTA6vBu6',
+            '//r4---sn-hp57knlr.googlevideo.com/videogoodput?id=o-AHvq-LuViir31d8PVjfR03aK-PNK5sIqzXA6yp9YVo1z&source=goodput&range=0-4999&expire=1473738350&ip=115.70.195.253&ms=pm&mm=35&pl=24&nh=IgpwcjA0Lm1pYTA0Kgw3Ny42Ny43MS4xMTM&sparams=id,source,range,expire,ip,ms,mm,pl,nh&signature=83ACEE13CA7D5FEBB0032BCFA8141D13C3D789A8.5BC8828E42BA3D3382DFFCD57EE56AE8C9A673E0&key=cms1&cpn=UXM9r8K_nTA6vBu6',
+            'r4---sn-hp57knlr.googlevideo.com/videogoodput?id=o-AHvq-LuViir31d8PVjfR03aK-PNK5sIqzXA6yp9YVo1z&source=goodput&range=0-4999&expire=1473738350&ip=115.70.195.253&ms=pm&mm=35&pl=24&nh=IgpwcjA0Lm1pYTA0Kgw3Ny42Ny43MS4xMTM&sparams=id,source,range,expire,ip,ms,mm,pl,nh&signature=83ACEE13CA7D5FEBB0032BCFA8141D13C3D789A8.5BC8828E42BA3D3382DFFCD57EE56AE8C9A673E0&key=cms1&cpn=UXM9r8K_nTA6vBu6',
         ];
+
+
         foreach ($inputs as $input) {
             $url = new Url($input, 'www.example.com');
             $isLocalUrl = $url->isLocalUrl();
@@ -86,6 +105,30 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
             $this->assertTrue($isParsableUrl, "Failed to assert that '$input' is a parsable URL");
         }
     }
+
+    public function testNotParsableUrl()
+    {
+        $inputs = [
+            '...',
+            '////',
+            'I am the destroyer of worlds',
+            rawurlencode(' '),
+            'https://schoolbox.atlassian.net/browse/SD-10?jql=text and sandwiches',
+            'a%20',
+            '<iframe src="http://www.google.com"></iframe>',
+        ];
+
+        foreach ($inputs as $input) {
+            $url = new Url($input, 'www.example.com');
+            $isLocalUrl = $url->isLocalUrl();
+            $isUrl = $url->isUrl();
+            $url->prependScheme();
+            $isUrlAfterProtocolPrepended = $url->isUrl();
+            $isParsableUrl = $isLocalUrl || $isUrl || $isUrlAfterProtocolPrepended;
+            $this->assertFalse($isParsableUrl, "'$input' is a parsable URL");
+        }
+    }
+
 
     // Test isUrl()
 
