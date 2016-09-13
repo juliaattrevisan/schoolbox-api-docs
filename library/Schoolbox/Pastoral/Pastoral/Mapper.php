@@ -64,6 +64,7 @@ class Mapper extends BaseMapper
         $this->uses('body', self::TYPE_STRING);
         $this->uses('heading', self::TYPE_STRING);
         $this->uses('private', self::TYPE_BOOLEAN);
+        $this->uses('points', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME);
         $this->uses('updated_at', self::TYPE_DATETIME);
         $this->uses('deleted_at', self::TYPE_DATETIME);

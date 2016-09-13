@@ -44,6 +44,9 @@ class Model implements ISoftDeletable
     /** @var string */
     protected $body;
 
+    /** @var int */
+    protected $points;
+
     /** @var bool */
     protected $private;
 
@@ -191,6 +194,24 @@ class Model implements ISoftDeletable
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @param int $points
+     * @return self
+     */
+    public function setPoints($points)
+    {
+        $this->points = $points;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPoints()
+    {
+        return $this->points;
     }
 
     /**

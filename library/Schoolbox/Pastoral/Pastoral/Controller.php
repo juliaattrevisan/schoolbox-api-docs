@@ -516,6 +516,7 @@ class Controller extends Base
                 $record->setStudent($student);
                 $record->setHeading($post["heading"]);
                 $record->setType($type);
+                $record->setPoints($post["points"]);
                 $record->setSeverity($severity);
                 $record->setBody($post["body"]);
                 $record->setPrivate($post["private"]);
@@ -629,6 +630,7 @@ class Controller extends Base
             $record->setHeading($post["heading"]);
             $record->setType($type);
             $record->setCategory($category);
+            $record->setPoints($post["points"]);
             $record->setSeverity($severity);
             $record->setBody($post["body"]);
             $record->setPrivate($post["private"]);
