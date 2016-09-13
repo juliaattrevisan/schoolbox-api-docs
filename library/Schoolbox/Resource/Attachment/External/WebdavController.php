@@ -49,7 +49,7 @@ class WebdavController extends NavigatorController implements ExternalInterface 
      */
     public function getRenderMethod()
     {
-        return self::RENDER_INLINE;
+        return self::RENDER_IFRAME;
     }
 
 
@@ -59,6 +59,17 @@ class WebdavController extends NavigatorController implements ExternalInterface 
     public function getIcon()
     {
         return 'network';
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return sprintf(
+            '/drives/picker/webdav?mime=%s',
+            urlencode($this->mimeFilter)
+        );
     }
 
 }

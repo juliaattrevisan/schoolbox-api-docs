@@ -44,7 +44,8 @@
             });
           }
           else if (mth == 'iframe') {
-            panel.html($('<iframe/>').attr('src', url));
+            panel.removeClass('preload');
+            panel.html($('<iframe/>').attr('src', url).height(350));
           }
         }
       });

@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -28,7 +28,7 @@ class TreeBuilder extends AbstractTreeBuilder
 
     /**
      * @param Folder\ILocator $locator
-     * @param User            $user
+     * @param User $user
      */
     public function __construct(Folder\ILocator $locator, User $user)
     {
@@ -73,7 +73,7 @@ class TreeBuilder extends AbstractTreeBuilder
 
         // TODO cache this
         return $locator->findByColumnList([
-            'owner'  => $this->user->getId(),
+            'owner' => $this->user->getId(),
             'parent' => $nodeId,
         ]);
     }
@@ -81,17 +81,18 @@ class TreeBuilder extends AbstractTreeBuilder
 
     /**
      * @param int $nodeId
+     * @param string $mime
      * @return Collection|Resource\AbstractFile[]
      */
-    protected function getNodeFiles($nodeId)
+    protected function getNodeFiles($nodeId, $mime = '*/*')
     {
         /** @var Mapper $locator */
         $locator = $this->fileLocator;
 
-        return $locator->findByColumnList([
+        return $this->filterMime($locator->findByColumnList([
             'owner' => $this->user->getId(),
             'parent' => $nodeId
-        ]);
+        ]), $mime);
     }
 
 }

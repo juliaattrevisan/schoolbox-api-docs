@@ -13,23 +13,24 @@
 /** @var SitePage $this */
 
 if (strlen($_POST['password'])) {
-	$_SESSION['password'] = $_POST['password'];
+    $_SESSION['password'] = $_POST['password'];
 
-	/* Redirect
-	 */
+    /* Redirect
+     */
     $redir = isset($this->arg[0]) && $this->arg[0] == 'lite'
         ? '/ajax/resource/tree/webdav'
-        : '/drives';
+        : $_POST['iframe'] == 1
+            ? '/drives/picker/webdav'
+            : '/drives';
 
-	$this->localRedir($redir);
-}
-else {
-	$this->setFile(TEMPLATE_content, 'cms/networkLogin.html');
+    $this->localRedir($redir);
+} else {
+    $this->setFile(TEMPLATE_content, 'cms/networkLogin.html');
     $this->setBlock(TEMPLATE_content, 'lite', 'lite_block');
 
     $this->setVar(array(
         'NETWORK_DRIVES_USERNAME' => $_SESSION['username'],
-        'SELF'                    => '/cms/networkLogin/' . implode('/', $this->arg)
+        'SELF' => '/cms/networkLogin/' . implode('/', $this->arg)
     ));
 
     if (isset($this->arg[0]) && $this->arg[0] == 'lite') {

@@ -1,3 +1,5 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="/socialstream/browser/browser.js"></script>
 <script type="application/javascript">
   $(function () {
     $('#ab-{SOURCE_SLUG}').socialstreamBrowser({
@@ -5,9 +7,6 @@
       modal: false,
       isolate: true,
       mimeFilter: {MIME_FILTER},
-      loadedCallback: function () {
-          this.removeClass('preload');
-      },
       submitCallback: function (url, filename, meta) {
         var i, hash, data;
 

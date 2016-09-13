@@ -1,6 +1,6 @@
 <?php
 /**
- * 
+ *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2015, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
@@ -154,7 +154,6 @@ abstract class AbstractController extends BaseController
      */
     protected function getFolderData($folderId)
     {
-
         $access = $this->getAccess([$folderId]);
 
         // special case for root, just let that through to the keeper
@@ -171,7 +170,7 @@ abstract class AbstractController extends BaseController
         } catch (Resource\Exception $e) {
             $tree = [];
         }
-        
+
         return [
             'tree'      => $tree,
             'folder'    => $folder,
@@ -201,6 +200,50 @@ abstract class AbstractController extends BaseController
         }
     }
 
+    /**
+     * Display embeddable file picker
+     * @param int $folderId
+     * @param $sourceSlug
+     */
+    public function picker($sourceSlug)
+    {
+        $mime = $this->getRequest()->query['mime'];
+
+        if (empty($mime)) {
+            $mime = "*/*";
+        }
+
+        $folderId = $this->getSession()->get('resourcesID', 0, $this->namespace);
+
+        try {
+            $data = $this->getFolderData($folderId);
+
+            // add files to that
+            $data['files'] = $this->fileMapper->findByFolderId($folderId)->getAll();
+            $data['treedata'] = json_encode($this->treeBuilder->buildPartialTree($folderId));
+            $data['namespace'] = $this->namespace;
+        }
+        catch (\Exception $e) {
+            //Reset folderid to try and avoid error
+            $folderId = 0;
+            $this->getSession()->set('resourcesID', $folderId, $this->namespace);
+            $data = $this->getFolderData($folderId);
+
+            // add files to that
+            $data['files'] = $this->fileMapper->findByFolderId($folderId)->getAll();
+            $data['treedata'] = json_encode($this->treeBuilder->buildPartialTree($folderId));
+            $data['namespace'] = $this->namespace;
+
+        }
+
+        $data['site_location'] = \Config::get('site_location');
+        $data['site_version'] = \Config::get('site_version');
+        $data['source_slug'] = $sourceSlug;
+        $data['mime'] = $mime;
+
+        $html = $this->buildUnthemedHtmlOutput('@resourceBrowser/picker.twig', $data);
+        $this->getResponse()->content->set($html);
+    }
 
     /**
      * Displays 3-panel browser
@@ -259,9 +302,15 @@ abstract class AbstractController extends BaseController
      */
     public function listNodes($folderId)
     {
+        $mime = $this->getRequest()->query["mime"];
+
+        if (empty($mime)) {
+            $mime = "*/*";
+        }
+
         $this->getResponse()->content->set([
             'format' => 'json',
-            'data'   => $this->treeBuilder->buildChildNodes($folderId)
+            'data'   => $this->treeBuilder->buildChildNodes($folderId, [], $mime)
         ]);
     }
 
@@ -331,6 +380,27 @@ abstract class AbstractController extends BaseController
             'format'   => 'nochrome',
             'data'     => $data,
         ]);
+    }
+
+    /**
+     * @api GET /resources/file/:fileId/ajax
+     * @level 150
+     *
+     * @param int $fileId
+     */
+    public function getFileInfo($fileId)
+    {
+        $file = $this->getFile($fileId);
+
+        $data = [
+            'title' => $file->getFilename(),
+            'mimeType' => $file->getMime(),
+            'filesize' => $file->getSize()
+        ];
+
+        $this->getResponse()->content->set(
+            $this->buildJsonOutput($data)
+        );
     }
 
     /**

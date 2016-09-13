@@ -1,3 +1,10 @@
+<script>
+    // Hide chrome is the page is loaded inside an iframe
+    if (window.location != window.parent.location) {
+        $('#hybrid-bar,aside').hide();
+    }
+</script>
+
 <div class="row">
     <div class="small-12 columns">
         <h1>Network Drives Login</h1>
@@ -13,6 +20,7 @@
 <div class="row">
     <div class="small-12 island">
         <form action="{SELF}" method="post" id="network-login">
+            <input type="hidden" name="iframe" id="iframe">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -34,6 +42,12 @@
         </form>
     </div>
 </div>
+
+<script>
+    $(function () {
+        $('#iframe').val((window.location != window.parent.location) ? 1 : 0);
+    });
+</script>
 
 <!-- BEGIN lite -->
 <script type="text/javascript">

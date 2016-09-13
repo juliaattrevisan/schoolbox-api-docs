@@ -349,7 +349,7 @@ class Controller extends Base\Base
             if(0 != $parentId = $this->courseMapper->findCheaplyById($post['id'])->getParent()->getId()) {
                 $this->sendError(
                     new Base\Exception("Course cannot reside directly in root",
-                    ["move this Course out of root"]));
+                        ["move this Course out of root"]));
                 return;
             }
         }
@@ -1010,8 +1010,8 @@ class Controller extends Base\Base
 
         // Generate User-based Folder permission map
         $userAccesses = $this->userAccessMapper->findByColumnList( array(
-            'uid' => $this->getUser()->getId(),
-            'service' => UserAccess::SERVICE_HOMEPAGE,
+                'uid' => $this->getUser()->getId(),
+                'service' => UserAccess::SERVICE_HOMEPAGE,
             )
         );
         $userPermissions = array();
