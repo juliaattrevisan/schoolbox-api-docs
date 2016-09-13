@@ -10,6 +10,8 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
 
@@ -264,6 +266,30 @@ interface IAssessable
      * @return $this
      */
     public function setWeight($weight);
+
+    /**
+     * @return MarkType
+     */
+    public function getMarkType();
+
+    /**
+     * @param MarkType $markType
+     * @return static
+     */
+    public function setMarkType(MarkType $markType);
+
+    /**
+     * @return GradeGroup|null
+     */
+    public function getGradeGroup();
+
+    /**
+     * Must allow nulls (eg for Tasks and Quiz, which for the moment cannot have LetterGrade MarkTypes)
+     *
+     * @param GradeGroup|null $gradeGroup
+     * @return static
+     */
+    public function setGradeGroup(GradeGroup $gradeGroup);
 
     /**
      * Get the person who created this IAssessable

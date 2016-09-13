@@ -16,6 +16,7 @@ namespace Schoolbox\Learning\Assessment\Quiz;
 
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 
 class Model extends AbstractAssessment
 {
@@ -64,5 +65,17 @@ class Model extends AbstractAssessment
                 ['marks' => 3.75], ['marks' => 1.25],
             ]
         ];
+    }
+
+    /**
+     * @param GradeGroup|null $gradeGroup
+     * @return static
+     */
+    public function setGradeGroup(GradeGroup $gradeGroup = null)
+    {
+        if(null !== $gradeGroup){
+            throw new \InvalidArgumentException('Quiz cannot currently have mark type of Letter Grade.');
+        }
+        return $this;
     }
 }

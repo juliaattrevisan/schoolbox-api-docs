@@ -11,6 +11,8 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use \Schoolbox\Collection;
 use \Schoolbox\User;
 use \Schoolbox\Mapper\Traits\Model\Id;
@@ -73,6 +75,16 @@ abstract class AbstractAssessment implements IAssessable
      * @var User
      */
     protected $creator;
+
+    /**
+     * @var MarkType
+     */
+    protected $markType;
+
+    /**
+     * @var GradeGroup|null
+     */
+    protected $gradeGroup;
 
     /**
      * Assessable constructor.
@@ -429,6 +441,42 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+    /**
+     * @return MarkType
+     */
+    public function getMarkType()
+    {
+        return $this->markType;
+    }
 
+    /**
+     * @param MarkType $markType
+     * @return static
+     */
+    public function setMarkType(MarkType $markType)
+    {
+        $this->markType = $markType;
+        return $this;
+    }
+
+    /**
+     * @return GradeGroup|null
+     */
+    public function getGradeGroup()
+    {
+        return $this->gradeGroup;
+    }
+
+    /**
+     * Default behaviour is not to permit nulls. Sub-classes can override this (eg Quiz + Task)
+     *
+     * @param GradeGroup $gradeGroup
+     * @return static
+     */
+    public function setGradeGroup(GradeGroup $gradeGroup)
+    {
+        $this->gradeGroup = $gradeGroup;
+        return $this;
+    }
 }
 
