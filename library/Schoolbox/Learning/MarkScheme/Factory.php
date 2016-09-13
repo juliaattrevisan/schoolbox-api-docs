@@ -64,7 +64,7 @@ class Factory
     protected function spawnForQuiz(Quiz $quiz)
     {
         // TODO - this method should iterate over each question in each section of the quiz, and sum the marks available.
-        return new TotalMarkFractional($quiz->getTotalMark());
+        return new TotalMarkFractional($quiz->getMaxMark());
     }
 
     /**
@@ -83,7 +83,7 @@ class Factory
                 return new TotalMarkWholeNumber($dueWork->getMaxMark());
             case MarkType::TYPE_LETTER:
                 /** @var GradeGroup $gradeGroup */
-                $gradeGroup = GradeGroupMapper::getInstance()->findById($dueWork->getGradeGroupId());
+                $gradeGroup = GradeGroupMapper::getInstance()->findById($dueWork->getGradeGroup());
                 return new LetterGrade($gradeGroup);
             default:
                 throw new \InvalidArgumentException("Unknown MarkType: $markTypeId");
@@ -104,7 +104,7 @@ class Factory
                 return new None();
             case MarkType::TYPE_LETTER:
                 /** @var GradeGroup $gradeGroup */
-                $gradeGroup = GradeGroupMapper::getInstance()->findById($project->getGradeGroupId());
+                $gradeGroup = GradeGroupMapper::getInstance()->findById($project->getGradeGroup());
                 return new LetterGrade($gradeGroup);
             default:
                 throw new \InvalidArgumentException("Unknown MarkType: $markTypeId");
