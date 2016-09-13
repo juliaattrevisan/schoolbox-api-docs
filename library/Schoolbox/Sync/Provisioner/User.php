@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Sync\Provisioner;
 
+use Schoolbox\CampusCollection;
 use Schoolbox\User as SchoolboxUser;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -22,6 +23,14 @@ class User extends SchoolboxUser
      * @var array
      */
     protected $accessRemoveList = [];
+
+    /**
+     * A list of campus instances to remove for this
+     * particular user instance
+     *
+     * @var array
+     */
+    protected $campusRemoveList = [];
 
     /**
      * Get user access read
@@ -83,6 +92,46 @@ class User extends SchoolboxUser
     public function setUserAccessRemove($userAccessRemove)
     {
         $this->accessRemoveList = $userAccessRemove;
+    }
+
+    /**
+     * Get campus collection remove
+     *
+     * @return mixed
+     */
+    public function getCampusCollectionRemove()
+    {
+        return $this->campusRemoveList;
+    }
+
+    /**
+     * Remove selected CampusCollection instances.
+     *
+     * Any campuses in $campusCollectionRemove are removed from this user's
+     * campus collection.
+     *
+     * @param $campusCollectionRemove
+     */
+    public function setCampusCollectionRemove($campusCollectionRemove)
+    {
+        $newCampusCollection = new CampusCollection();
+        foreach ($this->getCampusCollection() as $existingCampus) {
+            // $campusCollectionRemove is provided as a list of IDs
+            $isCampusRemoved = false;
+            foreach ($campusCollectionRemove as $campusRemoveId) {
+                if ($campusRemoveId == $existingCampus->getId()) {
+                    $isCampusRemoved = true;
+                    break;
+                }
+            }
+            if (!$isCampusRemoved) {
+                $newCampusCollection->add($existingCampus);
+            }
+        }
+        $this->setCampusCollection($newCampusCollection);
+
+        // And add to the list to remove, if this actually does anything anymore!
+        $this->campusRemoveList = $campusCollectionRemove;
     }
 
     /**

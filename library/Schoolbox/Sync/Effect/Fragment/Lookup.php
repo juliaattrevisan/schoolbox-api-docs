@@ -28,6 +28,7 @@ class Lookup {
         'residentialHouse' => '\HouseResidentialMapper',
         'schoolHouse' => '\HouseMapper',
         'role' => '\Schoolbox\RoleMapper',
+        'campusCollectionRemove' => '\Schoolbox\CampusMapper',
         'campusCollection' => '\Schoolbox\CampusMapper',
         'userAccessRead' => '\Schoolbox\Resource\GroupMapper',
         'userAccessWrite' => '\Schoolbox\Resource\GroupMapper',

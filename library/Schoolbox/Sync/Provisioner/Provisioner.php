@@ -260,7 +260,7 @@ class Provisioner
 
                     $this->logger->log($level, $message, $context);
 
-                    try{                        
+                    try{
                         if(!$update){
                             // Dry Run
                             $this->sanityCheck($internalUser);
