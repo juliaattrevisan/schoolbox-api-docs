@@ -7,26 +7,25 @@
  * @version     SVN: $Id$
  */
 
-use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 abstract class Component_Homepage_ControllerAbstract extends Component_ControllerAbstract
 {
     /**
-     * @param Folder\Model $context If provided, the folder to render this component in
-     * @param array        $config
+     * Permission setup
+     *
+     * @param Folder|null $context null when called from admin homepage config screen
+     * @param array|null  $config
      */
-    public function setup(Folder\Model $context = null, array $config = array())
+    public function setup(Folder $context = null, array $config = array())
     {
-        if (!$context instanceof Folder\Model) {
-            $context = new Folder\Model();
-        }
         parent::setup($context, $config);
 
         $accessor = \Schoolbox\Permission\Access\Access::getInstance();
         // Content permission: based on alt source if it's there
         // Control permission: always based on current context
-        $this->contentPermission = min($accessor->getFolderAccess($this->getUser(), [$this->getSource()->getId()]), $this->getMaximumPermission());
-        $this->contextPermission = min($accessor->getFolderAccess($this->getUser(), [$this->getContext()->getId()]), $this->getMaximumPermission());
+        $this->setContentPermission(min($accessor->getFolderAccess($this->getUser(), [$this->getSource()->getId()]), $this->getMaximumPermission()));
+        $this->setContextPermission(min($accessor->getFolderAccess($this->getUser(), [$this->getContext()->getId()]), $this->getMaximumPermission()));
     }
 
 
@@ -54,7 +53,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
     {
         // DETERMINE WHAT TO DISPLAY
         // there is configuration
-        list ($hasWriteAccess, $processConfig) = $this->determineConfigPermissions($this->instance->getConfigArray());
+        list ($hasWriteAccess, $processConfig) = $this->determineConfigPermissions($this->getInstance()->getConfigArray());
 
         $this->setupConfigRendering($targetHandle);
 
@@ -67,7 +66,7 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
              */
             $this->applyCollapsedState();
 
-            $this->sitepage->parse('settings_collapse_block', 'settings_collapse');
+            $this->getSitePage()->parse('settings_collapse_block', 'settings_collapse');
         }
         else {
             /* If you want to process the config, then do so and display it
@@ -84,14 +83,14 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
 
                 if(!$is_for_template) {
                     // We don't show the collapse option when building templates
-                    $this->sitepage->parse('settings_collapse_block', 'settings_collapse');
+                    $this->getSitePage()->parse('settings_collapse_block', 'settings_collapse');
                 }
-                $this->sitepage->parse('settings_link_block', 'settings_link');
-                $this->sitepage->parse('settings_close_block', 'settings_close');
+                $this->getSitePage()->parse('settings_link_block', 'settings_link');
+                $this->getSitePage()->parse('settings_close_block', 'settings_close');
             }
         }
 
-        $this->sitepage->parse($targetHandle, 'configTpl', false);
+        $this->getSitePage()->parse($targetHandle, 'configTpl', false);
 
         return true;
     }
@@ -150,5 +149,44 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
                 'CONFIG_COLLAPSED_STATE' => $state['data'],
             )
         );
+    }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return Folder
+     */
+    public function getContext()
+    {
+        return parent::getContext();
+    }
+
+    /**
+     * @param Folder|null $context null when used on admin homepage config screen
+     * @return static
+     */
+    protected function setContext(Folder $context = null)
+    {
+        parent::setContext($context);
+        return $this;
+    }
+
+    /**
+     * @return Folder|null
+     */
+    public function getSource()
+    {
+        return parent::getSource();
+    }
+
+    /**
+     * @param Folder|null $source
+     * @return static
+     */
+    public function setSource(Folder $source = null)
+    {
+        parent::setSource($source);
+        return $this;
     }
 }

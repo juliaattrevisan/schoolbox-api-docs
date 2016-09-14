@@ -31,43 +31,43 @@ abstract class Component_ControllerAbstract
     /**
      * @var Component_Instance
      */
-    protected $instance;
+    private $instance;
 
     /**
      * @var User
      */
-    protected $user;
+    private $user;
 
     /**
      * @var SitePage
      */
-    protected $sitepage;
+    private $sitepage;
 
     /**
      * The folder|page the component is on, if any.
      *
      * @var Folder|Eportfolio_Page_Instance|null
      */
-    protected $context;
+    private $context;
 
     /**
      * The folder|page the component pulls data from, if any.
      *
      * @var Folder|Eportfolio_Page_Instance|null
      */
-    protected $source;
+    private $source;
 
     /**
      * @var array
      */
-    protected $config;
+    private $config;
 
     /**
      * Permission for component contents.
      *
      * @var int
      */
-    protected $contentPermission = DENY_ACCESS;
+    private $contentPermission = DENY_ACCESS;
 
     /**
      * Permission for component controls, as opposed to the component content.
@@ -78,7 +78,7 @@ abstract class Component_ControllerAbstract
      *
      * @var int
      */
-    protected $contextPermission = DENY_ACCESS;
+    private $contextPermission = DENY_ACCESS;
 
     /**
      * The maximum permission allowed for this component.
@@ -87,7 +87,7 @@ abstract class Component_ControllerAbstract
      *
      * @var int
      */
-    protected $maximumPermission = FULL_ACCESS;
+    private $maximumPermission = FULL_ACCESS;
 
     /**
      * @var array
@@ -104,14 +104,14 @@ abstract class Component_ControllerAbstract
      *
      * @var string
      */
-    protected $componentName = '';
+    private $componentName = '';
 
     /**
      * Link that the component header points to. Usually nowhere?
      *
      * @var string
      */
-    protected $componentHref = '#';
+    private $componentHref = '#';
 
     /**
      * Configuration template to use.
@@ -119,20 +119,20 @@ abstract class Component_ControllerAbstract
      * Usually determined by `$this->determineTemplate()`, but can be set with
      * `$this->setConfigurationTemplate()`.
      */
-    protected $configurationTemplate = '';
+    private $configurationTemplate = '';
 
     /** @var FolderMapper $folderMapper */
-    protected $folderMapper;
+    private $folderMapper;
 
     /** @var ErrorMapper $errorMapper */
-    protected $errorMapper;
+    private $errorMapper;
 
     /**
      * Constructor
      *
-     * @param Component_Instance $instance
-     * @param User $user
-     * @param SitePage $sitepage
+     * @param Component_Instance                   $instance
+     * @param User                                 $user
+     * @param SitePage                             $sitepage
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
@@ -140,21 +140,20 @@ abstract class Component_ControllerAbstract
             ->setInstance($instance)
             ->setUser($user)
             ->setSitePage($sitepage)
-            ->setConfig($instance->getConfigArray())
             ->setFolderMapper(FolderMapper::getInstance())
-            ->setErrorMapper(ErrorMapper::getInstance())
-            ->setContext($this->getFolderMapper()->createModel())
-            ->setSource($this->getFolderMapper()->createModel());
+            ->setErrorMapper(ErrorMapper::getInstance());
     }
 
     /**
-     * Provide global config details to the component in preparation for business logic.
+     * Setup operations common to all component types.
      *
-     * May perform setup operations common to all component types.
+     * Responsible for permission setup + instance configuration
      *
-     * @param mixed $context Type is clarified in subclasses
-     * @param array $config
-     * @return void
+     * Cannot inject $context via constructor due to esoteric Reflection
+     * in library/Component/FactoryAbstract::buildDependencyList()
+     *
+     * @param Folder|Eportfolio_Page_Instance|null $context
+     * @param array|null                           $config
      */
     public function setup($context = null, array $config = array())
     {
@@ -176,9 +175,10 @@ abstract class Component_ControllerAbstract
             }
             $this->setSource($source);
         } else {
-            $this->setSource($context);
+            $this->setSource($this->getContext());
         }
     }
+
 
     /**
      * Prepares data for the render function. Business logic.
@@ -471,8 +471,8 @@ abstract class Component_ControllerAbstract
     /**
      * Render each config element into the statue
      *
-     * @param $processConfig
-     * @param $is_for_template
+     * @param bool $processConfig
+     * @param bool $is_for_template
      * @return int
      */
     protected function renderConfigElements($processConfig, $is_for_template)
@@ -486,7 +486,7 @@ abstract class Component_ControllerAbstract
          * element and set it up, to save some processing
          */
         // every config key has a corresponding controller and template to be called
-        foreach ($this->instance->getConfigArray() as $key => $params) {
+        foreach ($this->getInstance()->getConfigArray() as $key => $params) {
 
             /* Special case for componentname default value when empty
              */
@@ -512,11 +512,11 @@ abstract class Component_ControllerAbstract
 
             $fields = array();
 
-            if ($this->sortFields) {
+            if ($this->getSortFields()) {
                 $fields['sort'] = $this->sortFields;
             }
 
-            if ($this->filterFields) {
+            if ($this->getFilterFields()) {
                 $fields['filter'] = $this->filterFields;
             }
 
@@ -591,9 +591,8 @@ abstract class Component_ControllerAbstract
      * @param string $key
      * @param SitePage $page
      * @param array $params
-     * @param array $allConfigs All configurations for this component
      */
-    protected function parseConfigInstance($conf, $key, $page, $params, $allConfigs = array())
+    protected function parseConfigInstance($conf, $key, $page, $params)
     {
         $templateFile = "component/config/$key.html";
 
@@ -907,7 +906,10 @@ abstract class Component_ControllerAbstract
         if (!$this->hasReadAccess() || ($this->isUsingAltSource() && $this->getSource()->isDeleted())) {
             return false;
         }
-        return true;
+
+        // Dashboard components that pull data from a homepage
+        // source will be null until a homepage is selected
+        return null != $this->getSource();
     }
 
 
@@ -1043,7 +1045,7 @@ abstract class Component_ControllerAbstract
     /**
      * Gets the Folder, if any, this component draws its data from
      *
-     * @return Schoolbox\Resource\Folder\Model
+     * @return Folder|Eportfolio_Page_Instance|null
      */
     public function getSource()
     {
@@ -1053,7 +1055,7 @@ abstract class Component_ControllerAbstract
     /**
      * Sets the Folder, if any, this component draws its data from
      *
-     * @param Schoolbox\Resource\Folder\Model $source
+     * @param Folder|Eportfolio_Page_Instance|null $source
      * @return static
      */
     public function setSource($source)
@@ -1178,6 +1180,42 @@ abstract class Component_ControllerAbstract
     protected function setSitePage(SitePage $sitePage)
     {
         $this->sitepage = $sitePage;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getContextPermission()
+    {
+        return $this->contextPermission;
+    }
+
+    /**
+     * @param int $contextPermission
+     * @return $this
+     */
+    protected function setContextPermission($contextPermission)
+    {
+        $this->contextPermission = $contextPermission;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getContentPermission()
+    {
+        return $this->contentPermission;
+    }
+
+    /**
+     * @param int $contentPermission
+     * @return $this
+     */
+    protected function setContentPermission($contentPermission)
+    {
+        $this->contentPermission = $contentPermission;
         return $this;
     }
 
