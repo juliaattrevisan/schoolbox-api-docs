@@ -11,11 +11,13 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 abstract class Component_Config_Abstract
 {
+    /** @var Folder|null */
+    private $folder;
 
-    protected $cat;
-
-    protected $filterFields = null;
-    protected $sortFields = null;
+    // Defined on respective Component Controller, and passed in
+    // via Component/ControllerAbstract::renderConfigElements()
+    private $filterFields = null;
+    private $sortFields = null;
 
     /**
      * Does this config option show on templates? Most do, but some don't (e.g.
@@ -23,7 +25,7 @@ abstract class Component_Config_Abstract
      *
      * @var bool
      */
-    protected $is_shown_on_template = true;
+    private $is_shown_on_template = true;
 
     /**
      * Constructor
@@ -31,7 +33,7 @@ abstract class Component_Config_Abstract
      * Folder should be an instance of \Schoolbox\Resource\Folder\Model
      * but may be either handler array or instance, for now
      *
-     * @param $folder
+     * @param Folder|null $folder
      * @param null $fields
      */
     public function __construct($folder, $fields = null)
@@ -46,15 +48,6 @@ abstract class Component_Config_Abstract
         }
     }
 
-    /**
-     * Get folder
-     *
-     * @return mixed
-     */
-    protected function getCategory()
-    {
-        return $this->folder;
-    }
 
     /**
      * Converts value from a form into a value that can be stored in a database.
@@ -66,16 +59,6 @@ abstract class Component_Config_Abstract
     public function dehydrate($value, Component_ControllerAbstract $controller)
     {
         return $value;
-    }
-
-    /**
-     * Is this config option shown on templates?
-     *
-     * @return bool
-     */
-    public function isShownOnTemplate()
-    {
-        return $this->is_shown_on_template;
     }
 
     /**
@@ -97,4 +80,43 @@ abstract class Component_Config_Abstract
         $configValue,
         Component_ControllerAbstract $component = null
     );
+
+    /* Getters / Setters
+     */
+
+    /**
+     * Get folder
+     *
+     * @return Folder|null
+     */
+    protected function getFolder()
+    {
+        return $this->folder;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getFilterFields()
+    {
+        return $this->filterFields;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getSortFields()
+    {
+        return $this->sortFields;
+    }
+
+    /**
+     * Is this config option shown on templates?
+     *
+     * @return bool
+     */
+    public function isShownOnTemplate()
+    {
+        return $this->is_shown_on_template;
+    }
 }

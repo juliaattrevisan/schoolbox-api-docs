@@ -21,7 +21,7 @@ class Component_Config_Video extends Component_Config_Abstract
             $sourceId = $component->getConfig('src');
         } else {
             $sortConfig = array();
-            $sourceId = $this->getCategory()->getId();
+            $sourceId = $this->getFolder()->getId();
         }
 
         $videoMapper = new \Schoolbox\Video\ResourceVideoMapper();

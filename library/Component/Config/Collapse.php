@@ -18,7 +18,7 @@ class Component_Config_Collapse extends Component_Config_Abstract
      * @param string $key
      * @param string $keyblock
      * @param mixed $configValue
-     * @param Component_ControllerAbstract $component
+     * @param Component_ControllerAbstract|null $component
      * @internal param array $allConfigs
      */
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)

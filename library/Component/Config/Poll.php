@@ -17,7 +17,9 @@ class Component_Config_Poll extends Component_Config_Abstract
         $pollHandler = new Poll();
 
         // has an internal block for the select element
-        $pollList = $pollHandler->getAllByCategory($this->getCategory()->getId());
+        $pollList = $this->getFolder()
+            ? $pollHandler->getAllByCategory($this->getFolder()->getId())
+            : new \Schoolbox\Collection();
 
         $page->setBlock($keyblock, 'poll_select', 'poll_select_block');
         $page->setVar('poll_select_block', '');
