@@ -2,19 +2,25 @@
 // The kernel contains the dependency injection engine.
 // If you inject the dependency injection engine into Sitepage,
 // it can use Twig to generate component content.
+
+use \Schoolbox\User;
+
 /** @var \Schoolbox\Application\WebRequest\Kernel $kernel */
 $kernel = require_once dirname(__FILE__) . '/../../../library/Bootstrap.php';
 
 $page = new SitePage();
 
-if (!($_SESSION['user']->isSuperuser())) {
+/** @var User $user */
+$user = $_SESSION['user'];
+
+if (!($user->isSuperuser())) {
     error(19);
 }
 
 $page->setDi($kernel->getDependencyInjector());
 $groupHandler = new Group(HOMEPAGE_SERVICE);
 
-if (!($_SESSION['user']->isSuperuser())) {
+if (!($user->isSuperuser())) {
     error(19);
 }
 
@@ -84,7 +90,7 @@ if ($_POST['type'] == 'components') {
     }
 
     $factoryFactory = new Component_FactoryFactory();
-    $factory        = $factoryFactory->build($_POST['context'], new Schoolbox\User(), $page, true);
+    $factory        = $factoryFactory->build($_POST['context'], new User(), $page, true);
 
     // $component instanceof Component_ControllerAbstract
     $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
@@ -95,7 +101,6 @@ if ($_POST['type'] == 'components') {
     if (!($component instanceof Component_ControllerAbstract)) {
         die("<h2>Error adding component</h2><p>Could not find component to instantiate.</p>");
     }
-    $factoryFactory = new Component_FactoryFactory();
     $renderer       = new Component_Renderer();
     $renderer->renderAdminComponent($page, $component);
     $page->outputPage(true);
@@ -118,14 +123,14 @@ if ($_POST['type'] == 'components') {
         // Create a controller object for the config class to use when
         // dehydrating config values into database
         $factoryFactory   = new Component_FactoryFactory();
-        $componentFactory = $factoryFactory->build($instance->getModule(), new Schoolbox\User(), $page, true);
+        $componentFactory = $factoryFactory->build($instance->getModule(), new User(), $page, true);
         $controller       = $componentFactory->buildComponent($instance);
 
         /** @var Component_ConfigDefinition $confD */
         foreach ($configDefinitionCollection as $confD) {
             $key = $confD->getKey();
             if (isset($config[$key])) {
-                $configItem = Component_Config_Factory::build($key, $folder, $config);
+                $configItem = Component_Config_Factory::build($key, null, $config);
                 $value      = $configItem->dehydrate($config[$key], $controller);
 
                 // this should be 1:1 relation, so return only the first instance of this definition

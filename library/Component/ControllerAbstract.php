@@ -150,8 +150,8 @@ abstract class Component_ControllerAbstract
      *
      * Responsible for permission setup
      *
-     * Note: Cannot inject $context in constructor because Component Factories
-     * don't know about Folders or Eportfolio_Page_Instances
+     * Note: Cannot inject $context in constructor because in many scenarios it is
+     *       irrelevant (eg admin config) and causes un-necessary processing.
      *
      * @param Folder|Eportfolio_Page_Instance|null $context
      */
