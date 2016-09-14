@@ -4,7 +4,6 @@
  * @copyright Copyright 2016, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
-
 namespace Schoolbox\Learning\Assessment\Test;
 
 use Schoolbox\Learning\MarkScheme\None;
@@ -24,7 +23,6 @@ use \InvalidArgumentException;
 use \DomainException;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 
-
 class FactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -37,7 +35,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $factory = new MarkSchemeFactory();
         $factory->spawnMarkSchemeFor($task);
     }
-
 
     /**
      * @dataProvider provider_task_markTypeValid
@@ -61,7 +58,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $factory = new MarkSchemeFactory();
         $factory->spawnMarkSchemeFor($quiz);
     }
-
 
     /**
      * @dataProvider provider_quiz_markTypeValid
@@ -98,8 +94,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf($expectedMarkScheme, $markScheme);
     }
 
-
-
     /**
      * @dataProvider provider_project_markTypeInvalid
      * @param Project $project
@@ -122,9 +116,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $markScheme = $factory->spawnMarkSchemeFor($project);
         $this->assertInstanceOf($expectedMarkScheme, $markScheme);
     }
-
-
-
 
     // ==================== Data Providers ====================
 
@@ -168,7 +159,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-
     /**
      * @return Quiz[][]
      */
@@ -204,7 +194,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-
     /**
      * @return Project[][]
      */
@@ -218,7 +207,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-
     /**
      * @return Project[][]
      */
@@ -231,12 +219,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-
-
-
-
-
-
     /**
      * @param int $id
      * @return MarkType
@@ -246,7 +228,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $markType = new MarkType();
         $markType->setId($id);
 
-        switch($id){
+        switch ($id) {
             case 1:
                 return $markType
                     ->setName('Percentage (%)')
@@ -294,7 +276,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         }
     }
 
-
     /**
      * @return GradeGroup
      */
@@ -305,13 +286,13 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         $gradeGroup->setName('Competency');
 
         $levelDatums = [
-            ['13',  '0', '20', 'Needs Attention'],
+            ['13', '0',  '20', 'Needs Attention'],
             ['14', '40', '53', 'Acceptable'],
             ['15', '60', '68', 'Good'],
             ['16', '75', '88', 'Very Good'],
             ['17', '90', '95', 'Excellent'],
         ];
-        foreach($levelDatums as $levelDatum){
+        foreach ($levelDatums as $levelDatum) {
             $level = new GradeLevel();
             $level->setId($levelDatum[0]);
             $level->setLowerBound($levelDatum[1]);
@@ -321,7 +302,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
 
             $gradeGroup->addGradeLevel($level);
         }
-
         return $gradeGroup;
     }
 }
