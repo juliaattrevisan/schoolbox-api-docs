@@ -125,7 +125,7 @@ if ($_POST['type'] == 'components') {
         foreach ($configDefinitionCollection as $confD) {
             $key = $confD->getKey();
             if (isset($config[$key])) {
-                $configItem = Component_Config_Factory::build($key, $category, $config);
+                $configItem = Component_Config_Factory::build($key, $folder, $config);
                 $value      = $configItem->dehydrate($config[$key], $controller);
 
                 // this should be 1:1 relation, so return only the first instance of this definition

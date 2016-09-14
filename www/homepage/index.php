@@ -7,8 +7,8 @@
  * @version     SVN: $Id$
  *
  */
-$categoryMapper = new \Schoolbox\Resource\Folder\Mapper();
-$category = null;
+$folderMapper = new \Schoolbox\Resource\Folder\Mapper();
+$folder = null;
 
 $groupID = $_SESSION['gid'];
 $prefix = 'code';
@@ -18,7 +18,7 @@ $prefix = 'code';
  */
 if (preg_match('/^[0-9]+$/', $this->arg[0])) {
     try {
-        $category = $categoryMapper->findById($this->arg[0]);
+        $folder = $folderMapper->findById($this->arg[0]);
     } catch (\Schoolbox\Mapper\Exception $e) {
         $this->pageNotFound();
     }
@@ -27,8 +27,8 @@ if (preg_match('/^[0-9]+$/', $this->arg[0])) {
 	 * numerical value i.e. treat the int as if it were a category code string
 	 */
     try {
-        if (!$category) {
-            $category = $categoryMapper->findByCode($this->arg[0]);
+        if (!$folder) {
+            $folder = $folderMapper->findByCode($this->arg[0]);
         }
     } catch (\Schoolbox\Mapper\Exception $e) {
         $this->pageNotFound();
@@ -45,7 +45,7 @@ elseif (($this->arg[0] == $prefix) && (count($this->arg) > 1)) {
 
     try {
         // TODO investigate whether this needs to be double-decoded, or decoded at all
-        $category = $categoryMapper->findByCode(urldecode(urldecode($code)));
+        $folder = $folderMapper->findByCode(urldecode(urldecode($code)));
     } catch (\Exception $e) {
         $this->pageNotFound();
     }
@@ -64,13 +64,13 @@ elseif (!is_numeric($this->arg[0])) {
  *
  * Check that it's not softdeleted
  */
-if (!($category instanceof \Schoolbox\Resource\Folder\Model) || $category->isDeleted()) {
+if (!($folder instanceof \Schoolbox\Resource\Folder\Model) || $folder->isDeleted()) {
     error(18);
 }
 
 // confirm that the user has permission to view this page
 $access = \Schoolbox\Permission\Access\Access::getInstance();
-if (($actualPermission = $access->getFolderAccess($_SESSION['user'], [$category->getId()])) < READ_ACCESS) {
+if (($actualPermission = $access->getFolderAccess($_SESSION['user'], [$folder->getId()])) < READ_ACCESS) {
     error(14);
 }
 
@@ -82,7 +82,7 @@ if ($actualPermission > READ_ACCESS && $_GET['readonly']) {
 }
 
 // setup the homepage handler
-$homepageHandler = new Homepage($category->getId());
+$homepageHandler = new Homepage($folder->getId());
 
 // Color mangling
 $colorFactory = new \Alaress\Color\ColorFactory();
@@ -107,17 +107,17 @@ foreach ($homepageHandler->getColorList() as $key => $color) {
 
 // this category doesn't have a template, therefore doesn't have a homepage: redirect to resource browser.
 if (!$homepageHandler->getTemplate()) {
-    $this->localRedir('/resources/'.$category->getId());
+    $this->localRedir('/resources/'.$folder->getId());
 }
 
 // moving forward! log the pageview
 $mapper = new Schoolbox\Resource\Folder\Log\Mapper();
-$mapper->incrementHitcount($_SESSION['user'], $category->getId());
-$categoryMapper->logPageView($category);
+$mapper->incrementHitcount($_SESSION['user'], $folder->getId());
+$folderMapper->logPageView($folder);
 
 /* BUILD PAGE */
 $this->setFile(TEMPLATE_content, 'homepage/index.html');
-$this->setTitle($category->getName());
+$this->setTitle($folder->getName());
 $this->setBlock('custom_head', 'modify_layout', 'modify_layout_block');
 $this->setBlock('custom_head', 'allowed_files', 'allowed_files_block');
 $this->setBlock(TEMPLATE_content, 'edit_page', 'edit_page_block');
@@ -135,7 +135,7 @@ $componentFactory = new Component_Homepage_Factory($_SESSION['user'], $this);
 if($_GET['readonly']) {
     $componentFactory->setMaximumPermission($virtualPermission);
 }
-$componentCollection = $componentFactory->buildComponentList($category->getId());
+$componentCollection = $componentFactory->buildComponentList($folder->getId());
 
 // Decide which of parent/student view butonyes to show, if either
 $this->setVar('readonly_switch_on_block', '');
@@ -305,7 +305,7 @@ $manageFolderController = new Component_Homepage_ManageFolderController(
     $this
 );
 $manageFolderController->setMaximumPermission($virtualPermission);
-$manageFolderController->setup($category, array());
+$manageFolderController->setup($folder, array());
 $manageFolderController->execute();
 $manageFolderController->renderTemplate('page_controls');
 
@@ -316,7 +316,7 @@ $manageClassController = new Component_Homepage_ManageClassController(
     $this
 );
 $manageClassController->setMaximumPermission($virtualPermission);
-$manageClassController->setup($category, array());
+$manageClassController->setup($folder, array());
 $manageClassController->execute();
 if ($manageClassController->renderTemplate('manage_class')) {
     $this->parse('manage_class_block', 'manage_class');
@@ -330,7 +330,7 @@ $this->parse('page_controls_block', 'page_controls');
 $sessionUser = $_SESSION['user'];
 
 if ($sessionUser->getRole()->isStaff()) {
-    $codeString = Scrub::text($category->getTruncatedCodeString());
+    $codeString = Scrub::text($folder->getTruncatedCodeString());
 }
 else {
     $codeString = '';
@@ -338,10 +338,10 @@ else {
 
 $allWidths = $homepageHandler->getColumnWidths();
 $this->setVar(array(
-    'HEADING' => Scrub::text($category->getName()) . ($codeString ? ' (' . $codeString . ')' : ''),
-    'HEADING_JS' => json_encode($category->getName() . ($codeString ? ' (' . $codeString . ')' : '')),
-    'CODE' => urlencode(urlencode($category->getCodeString())),
-    'ID' => $category->getId(),
+    'HEADING' => Scrub::text($folder->getName()) . ($codeString ? ' (' . $codeString . ')' : ''),
+    'HEADING_JS' => json_encode($folder->getName() . ($codeString ? ' (' . $codeString . ')' : '')),
+    'CODE' => urlencode(urlencode($folder->getCodeString())),
+    'ID' => $folder->getId(),
     'USER_TOKEN' => $_SESSION['key'],
 ));
 
@@ -421,7 +421,8 @@ foreach ($componentCollection as $component) {
     $templateHandle = "component_{$instance->getId()}";
 
 
-    $component->setup($category, $instance->getConfigArray());
+    $component->setup($folder, $instance->getConfigArray());
+
 
     if ($component->execute()) {
         if ($component->renderTemplate($templateHandle) !== false) {
