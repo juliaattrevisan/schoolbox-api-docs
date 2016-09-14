@@ -223,7 +223,27 @@ class Participant
             }
             else if ($type == self::TRAVERSAL_MARKED) {
                 foreach ($allFeedbacks as $currentFeedback) {
-                    if ($currentFeedback->getUpdatedAt()->gt($latestFeedback->getUpdatedAt())) {
+
+                    /* In case publishAt is actually more recent than updatedAt value
+                     */
+                    $mostRecentDatetime = $latestFeedback->getUpdatedAt();
+
+                    /* Find the most recent datetime of $latestFeedback
+                     * by comparing its updatedAt to its publishedAt (if any)
+                     */
+                    if ($latestFeedback->isPublished() && $latestFeedback->getPublishedAt()->gt($latestFeedback->getUpdatedAt())) {
+                        $mostRecentDatetime = $latestFeedback->getPublishedAt();
+                    }
+
+                    /* Compare this datetime against currentFeedback's
+                     * publishAt and updatedAt to see which one is more recent
+                     */
+                    if ($currentFeedback->isPublished()) {
+                        if ($currentFeedback->getPublishedAt()->gt($mostRecentDatetime)) {
+                            $latestFeedback = $currentFeedback;
+                        }
+                    }
+                    else if ($currentFeedback->getUpdatedAt()->gt($mostRecentDatetime)) {
                         $latestFeedback = $currentFeedback;
                     }
                 }
@@ -283,15 +303,35 @@ class Participant
             }
             else if ($type == self::TRAVERSAL_MARKED) {
                 foreach ($allFeedbacks as $currentFeedback) {
-                    if ($currentFeedback->getUpdatedAt()->gt($latestFeedback->getUpdatedAt())) {
+
+                    /* In case publishAt is actually more recent than updatedAt value
+                     */
+                    $mostRecentDatetime = $latestFeedback->getUpdatedAt();
+
+                    /* Find the most recent datetime of $latestFeedback
+                     * by comparing its updatedAt to its publishedAt (if any)
+                     */
+                    if ($latestFeedback->isPublished() && $latestFeedback->getPublishedAt()->gt($latestFeedback->getUpdatedAt())) {
+                        $mostRecentDatetime = $latestFeedback->getPublishedAt();
+                    }
+
+                    /* Compare this datetime against currentFeedback's
+                     * publishAt and updatedAt to see which one is more recent
+                     */
+                    if ($currentFeedback->isPublished()) {
+                        if ($currentFeedback->getPublishedAt()->gt($mostRecentDatetime)) {
+                            $latestFeedback = $currentFeedback;
+                        }
+                    }
+                    elseif ($currentFeedback->getUpdatedAt()->gt($mostRecentDatetime)) {
                         $latestFeedback = $currentFeedback;
                     }
                 }
 
-                if ($latestFeedback->getUpdatedAt()->gt($latestResponse->getUpdatedAt())) {
-                    return $latestFeedback;
-                }
+                return $latestFeedback;
             }
+
+            return null;
         }
 
         return $outcome;

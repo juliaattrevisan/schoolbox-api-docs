@@ -38,6 +38,7 @@ class Average extends AbstractSummator
      */
     protected function aggregate($val, $assessableWeight, $totalWeight)
     {
+        echo " {$val} ";
         $this->sum += $val;
         $this->numItems++;
     }

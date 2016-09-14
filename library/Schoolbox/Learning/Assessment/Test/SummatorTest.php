@@ -179,11 +179,11 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
         $this->assertEquals(80, $project->getNormalisedMark($this->hodes, true));
 
         /* Most Recent Average is
-         *      = [100 + (100 * 5/20)] / 2
+         *      = [100 + (100 * 12/20)] / 2
          *      = [100 + 25] / 2
-         *      = 62.5
+         *      = 80 (most recent feedback also happens to be most recent published feedback)
          */
-        $this->assertEquals(62.5, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(80, $project->getNormalisedMark($this->hodes, false));
     }
 
     /**
@@ -215,11 +215,11 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
         $this->assertEquals(79, $project->getNormalisedMark($this->hodes, true));
 
         /* Most Recent Average is
-         *      = [77 + 100 + (100 * 5/20)] / 3
-         *      = [177 + 25] / 3
-         *      = 67.33333333333
+         *      = [77 + 100 + (100 * 12/20)] / 3
+         *      = [177 + 60] / 3
+         *      = 79 (most recent feedback also happens to be most recent published feedback)
          */
-        $this->assertEquals(67.33333333333, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(79, $project->getNormalisedMark($this->hodes, false));
     }
 
     /**
@@ -252,11 +252,11 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
         $this->assertEquals(83.75, $project->getNormalisedMark($this->hodes, true));
 
         /* Most Recent Average is
-         *      = [98 + 77 + 100 + (100 * 5/20)] / 3
-         *      = [275 + 25] / 4
-         *      = 75
+         *      = [98 + 77 + 100 + (100 * 12/20)] / 3
+         *      = [275 + 60] / 4
+         *      = 83.75
          */
-        $this->assertEquals(75, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(83.75, $project->getNormalisedMark($this->hodes, false));
     }
 
     /**
@@ -360,12 +360,12 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
         $this->assertEquals(75.38461538462, $project->getNormalisedMark($this->hodes, true), '', $this->delta);
 
         /* Most Recent Weighted Average is
-         *      = [(100*5) + ((100 * 5/20)*8)] / 13
-         *      = [500 + 200] / 13
-         *      = 700 / 13
-         *      = 53.84615384615
+         *      = [(100*5) + ((100 * 12/20)*8)] / 13
+         *      = [500 + 480] / 13
+         *      = 980 / 13
+         *      = 75.38461538462
          */
-        $this->assertEquals(53.84615384615, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
+        $this->assertEquals(75.38461538462, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
     }
 
     /**
@@ -398,12 +398,12 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
         $this->assertEquals(76.08695652174, $project->getNormalisedMark($this->hodes, true));
 
         /* Most Recent Weighted Average is
-         *      = [(77*10) + (100*5) + ((100 * 5/20)*8)] / 23
-         *      = [770 + 500 + 200] / 23
-         *      = 1470 / 23
-         *      = 63.91304347826
+         *      = [(77*10) + (100*5) + ((100 * 12/20)*8)] / 23
+         *      = [770 + 500 + 480] / 23
+         *      = 1750 / 23
+         *      = 76.08695652174
          */
-        $this->assertEquals(63.91304347826, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(76.08695652174, $project->getNormalisedMark($this->hodes, false));
     }
 
     /**
@@ -437,12 +437,12 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
         $this->assertEquals(80.62068965517, $project->getNormalisedMark($this->hodes, true));
 
         /* Most Recent Weighted Average is
-        *      = [(98*6) * (77*10) + (100*5) + ((100 * 5/20)*8)] / 29
-        *      = [588 + 770 + 500 + 200] / 29
-        *      = 2058 / 29
-        *      = 70.96551724138
+         *      = [(98*6) + (77*10) + (100*5) + ((100 * 12/20)*8)] / 29
+         *      = [588 + 770 + 500 + 480] / 29
+         *      = 2338 / 29
+         *      = 80.62068965517
         */
-        $this->assertEquals(70.96551724138, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(80.62068965517, $project->getNormalisedMark($this->hodes, false));
     }
 
     /** Really go to town */
@@ -1203,97 +1203,85 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
 
         /* Most Recent Minimum
+         * Minimum of (25,
+         */
+        $this->assertEquals(25, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
+    }
+
+    /**
+     * Test the minimum
+     * when there's one of each type with published and unpublished feedback
+     */
+    public function testMinimum3()
+    {
+        /* There are three assessables for Hodes
+         */
+        $project = $this->spawnProject(new SummatorMinimum());
+        $project->setAssessables((new Collection())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnQuiz()));
+
+        /* Most Recent Published Minimum
+         *      12/20 = 60 (Quiz 99762)
+         *      77 (Due Work 7889)
+         */
+        $this->assertEquals(60, $project->getNormalisedMark($this->hodes, true), '', $this->delta);
+
+        /* Most Recent Minimum
+         *      12/20 = 60 (Quiz 99762)
+         *      77 (Due Work 7889)
          */
         $this->assertEquals(60, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
     }
-//
-//    /**
-//     * Test the minimum
-//     * when there's one of each type with published and unpublished feedback
-//     */
-//    public function testMinimum3()
-//    {
-//        /* There are three assessables for Hodes
-//         *
-//         * Due Work 2 (77 marks)
-//         * Task (null marks)
-//         * Quiz (12 marks)
-//         */
-//        $project = $this->spawnProject(new SummatorMinimum());
-//        $project->setAssessables((new Collection())
-//            ->add($this->spawnTask())
-//            ->add($this->spawnDueWork2())
-//            ->add($this->spawnQuiz()));
-//
-//        /* Published Minimum
-//         */
-//        $this->assertEquals(77, $project->getNormalisedMark($this->hodes, true), '', $this->delta);
-//
-//        /* Unpublished Minimum
-//         */
-//        $this->assertEquals(77, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
-//    }
-//
-//    /**
-//     * Test the minimum
-//     * when there's more than one of a particular type with published and unpublished feedback
-//     */
-//    public function testMinimum4()
-//    {
-//        /* There are five assessables for Hodes
-//         *
-//         * Due Work 3 (98 marks)
-//         * Task (null marks)
-//         * Due Work 2 (77 marks)
-//         * Due Work (100 marks)
-//         * Quiz (12 marks)
-//         */
-//        $project = $this->spawnProject(new SummatorMinimum());
-//        $project->setAssessables((new Collection())
-//            ->add($this->spawnTask())
-//            ->add($this->spawnDueWork3())
-//            ->add($this->spawnDueWork2())
-//            ->add($this->spawnQuiz()));
-//
-//        /* Published Minimum
-//         */
-//        $this->assertEquals(98, $project->getNormalisedMark($this->hodes, true));
-//
-//        /* Unpublished Minimum
-//         */
-//        $this->assertEquals(98, $project->getNormalisedMark($this->hodes, false));
-//    }
-//
-//    /**
-//     * Test the minimum
-//     * when there's more than one of a particular type with published and unpublished feedback
-//     */
-//    public function testMinimum5()
-//    {
-//        /* There are five assessables for Hodes
-//         *
-//         * Due Work 3 (98 marks)
-//         * Task (null marks)
-//         * Due Work 2 (77 marks)
-//         * Due Work (100 marks)
-//         * Quiz (12 marks)
-//         */
-//        $project = $this->spawnProject(new SummatorMinimum());
-//        $project->setAssessables((new Collection())
-//            ->add($this->spawnDueWork3())
-//            ->add($this->spawnTask())
-//            ->add($this->spawnDueWork2())
-//            ->add($this->spawnDueWork())
-//            ->add($this->spawnQuiz()));
-//
-//        /* Published Minimum
-//         */
-//        $this->assertEquals(100, $project->getNormalisedMark($this->hodes, true));
-//
-//        /* Unpublished Minimum
-//        */
-//        $this->assertEquals(100, $project->getNormalisedMark($this->hodes, false));
-//    }
+
+    /**
+     * Test the minimum
+     * when there's more than one of a particular type with published and unpublished feedback
+     */
+    public function testMinimum4()
+    {
+        $project = $this->spawnProject(new SummatorMinimum());
+        $project->setAssessables((new Collection())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork3())
+            ->add($this->spawnDueWork2()));
+
+        /* Most Recent Published Minimum
+         *      77 (Due Work 7889)
+         *      98 (Due Work 9912)
+         */
+        $this->assertEquals(77, $project->getNormalisedMark($this->hodes, true));
+
+        /* Most Recent Minimum
+         */
+        $this->assertEquals(77, $project->getNormalisedMark($this->hodes, false));
+    }
+
+    /**
+     * Test the minimum
+     * when there's more than one of a particular type with published and unpublished feedback
+     */
+    public function testMinimum5()
+    {
+        $project = $this->spawnProject(new SummatorMinimum());
+        $project->setAssessables((new Collection())
+            ->add($this->spawnDueWork3())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnDueWork()));
+
+        /* Most Recent Published Minimum
+         *      77 (Due Work 7889)
+         *      98 (Due Work 9912)
+         *      100 (Due Work 4236)
+         */
+        $this->assertEquals(77, $project->getNormalisedMark($this->hodes, true));
+
+        /* Most Recent Minimum
+        */
+        $this->assertEquals(77, $project->getNormalisedMark($this->hodes, false));
+    }
 //
 //    /** Really go to town */
 //
@@ -2520,7 +2508,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
                     'available' => 5
                 ]
             ])
-            ->setComment('This is the most recent feedback')
+            ->setComment('Some ancient feedback')
             ->setReviewer($this->celia)
             ->setCreatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT));
@@ -2551,11 +2539,11 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
                     'available' => 5
                 ]
             ])
-            ->setComment('This is the most recent published feedback')
+            ->setComment('This is the most recent published feedback; also this is the most recent feedback')
             ->setReviewer($this->celia)
             ->setPublishedAt(new \Alaress_Date_Format('2016-09-25 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-09-10 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-09-10 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-09-10 21:22:29', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $attempt->getAllFeedback()->add($feedback);
         $quiz->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
