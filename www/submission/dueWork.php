@@ -288,18 +288,17 @@ $definition = $cdm->findOneByColumn('class', 'Component_Dashboard_UpcomingWorkCo
 $instance   = new Component_Instance();
 $instance->setDefinition($definition);
 
+// apply configs
+$instance->setConfig(new \Schoolbox\Collection([
+    (new Component_ConfigDefinition())->setKey('actionable')->setLabel('actionable')->setValue(true),
+    (new Component_ConfigDefinition())->setKey('allow_parents')->setLabel('allow_parents')->setValue(true),
+    (new Component_ConfigDefinition())->setKey('size')->setLabel('size')->setValue(0),
+    (new Component_ConfigDefinition())->setKey('user')->setLabel('user')->setValue($userID),
+]));
+
 $dueWorkController = $chf->buildComponent($instance);
 
-// apply configs
-$dueWorkController->setup(
-    array(),
-    array(
-        'actionable'    => array('label' => 'actionable', 'value' => true),
-        'allow_parents' => array('label' => 'allow_parents', 'value' => true),
-        'size'          => array('label' => 'size', 'value' => 0),
-        'user'          => array('label' => 'user', 'value' => $userID),
-    )
-);
+$dueWorkController->setup();
 
 $dueWorkController->execute();
 $dueWorkController->renderTemplate('UPCOMING_WORK');

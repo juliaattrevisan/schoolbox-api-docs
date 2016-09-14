@@ -149,10 +149,7 @@ if ($page->detectAjax()) {
 
             /** @var Component_Homepage_CourseOutlineController $controller */
             $controller = $chf->buildComponent($component);
-            $controller->setup(
-                $category,
-                $controller->getInstance()->getConfigArray()
-            );
+            $controller->setup($category);
 
             $target = "component_position_{$controller->getInstance()->getPosition()}";
             $handle = TEMPLATE_content;

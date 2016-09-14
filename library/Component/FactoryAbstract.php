@@ -21,7 +21,7 @@ abstract class Component_FactoryAbstract {
     protected $identifier;
 
     /**
-     * @var Array
+     * @var array
      */
     protected $dependencyList;
 

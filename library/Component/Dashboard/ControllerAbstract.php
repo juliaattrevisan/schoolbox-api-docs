@@ -16,11 +16,10 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
      * Sets up a dashboard component.
      *
      * @param null       $context
-     * @param array|null $config
      */
-    public function setup($context = null, array $config = array())
+    public function setup($context = null)
     {
-        parent::setup($context, $config);
+        parent::setup($context);
 
         $this->setContextPermission(UserAccess::ACCESS_FULL);
 

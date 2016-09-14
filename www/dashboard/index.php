@@ -24,7 +24,7 @@ foreach ($componentCollection as $component) {
     $templateTarget = "component_position_{$instance->getPosition()}";
     $templateHandle = "component_{$instance->getId()}";
 
-    $component->setup(null, $instance->getConfigArray());
+    $component->setup();
 
     if ($component->execute()) {
         $component->parseConfig();

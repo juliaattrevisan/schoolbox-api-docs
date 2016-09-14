@@ -55,7 +55,7 @@ if ($firstTemplate instanceof \Schoolbox\Resource\HomepageTemplate) {
 $occupiedPositionList = [];
 $componentCounts      = [];
 foreach ($componentFactory->buildComponentList($cid) as $component) {
-    /** @var Component_ControllerAbstract $component */
+    /** @var Component_Homepage_ControllerAbstract $component */
     $instance_id   = $component->getInstance()->getId();
     $position_no   = $component->getInstance()->getPosition();
     $position      = "position_{$position_no}";
@@ -67,10 +67,7 @@ foreach ($componentFactory->buildComponentList($cid) as $component) {
         $this->setFile($position, 'adminv2/component/placeholder.html');
     }
 
-    $component->setup(
-        new Schoolbox\Resource\Folder\Model(),
-        $component->getInstance()->getConfigArray()
-    );
+    $component->setup();
 
     $this->setVar(array(
         'COMPONENT_INSTANCE_ID'     => $instance_id,

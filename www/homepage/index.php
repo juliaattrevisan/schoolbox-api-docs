@@ -305,7 +305,7 @@ $manageFolderController = new Component_Homepage_ManageFolderController(
     $this
 );
 $manageFolderController->setMaximumPermission($virtualPermission);
-$manageFolderController->setup($folder, array());
+$manageFolderController->setup($folder);
 $manageFolderController->execute();
 $manageFolderController->renderTemplate('page_controls');
 
@@ -316,7 +316,7 @@ $manageClassController = new Component_Homepage_ManageClassController(
     $this
 );
 $manageClassController->setMaximumPermission($virtualPermission);
-$manageClassController->setup($folder, array());
+$manageClassController->setup($folder);
 $manageClassController->execute();
 if ($manageClassController->renderTemplate('manage_class')) {
     $this->parse('manage_class_block', 'manage_class');
@@ -421,7 +421,7 @@ foreach ($componentCollection as $component) {
     $templateHandle = "component_{$instance->getId()}";
 
 
-    $component->setup($folder, $instance->getConfigArray());
+    $component->setup($folder);
 
 
     if ($component->execute()) {

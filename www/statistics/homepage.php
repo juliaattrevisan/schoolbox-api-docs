@@ -86,7 +86,7 @@ foreach ($componentCollection as $component) {
 
     /* omfg you have got to be kidding
      */
-    $component->setup($folder, $component->getInstance()->getConfigArray());
+    $component->setup($folder);
 
     if ($component->execute() !== false) {
         if ($component->renderTemplate($templateHandle) !== false) {

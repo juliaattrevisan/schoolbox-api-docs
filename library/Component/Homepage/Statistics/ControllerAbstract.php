@@ -25,25 +25,15 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
     private $validGroups = array('student','parent','staff','guest');
 
     /**
-     * @param Folder     $context
-     * @param array|null $config
+     * @param Folder $context
      */
-    public function setup(Folder $context, array $config = array())
+    public function setup(Folder $context)
     {
-        parent::setup($context, $config);
+        parent::setup($context);
 
         $accessor = \Schoolbox\Permission\Access\Access::getInstance();
 
-        /* ffs arrays
-         * TODO: This should just be an object, never an array
-         */
-        if (is_object($context)) {
-            $contextId = $context->getId();
-            $this->setContentPermission($accessor->getFolderAccess($this->getUser(), [$context->getId()]));
-        } elseif (is_array($context)) {
-            $contextId = $context['id'];
-            $this->setContentPermission($accessor->getFolderAccess($this->getUser(), [$context['id']]));
-        }
+        $this->setContentPermission($accessor->getFolderAccess($this->getUser(), [$context->getId()]));
 
         $args = $this->getSitePage()->arg;
 
@@ -73,7 +63,7 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
         $this->groupType = isset($args[3]) && in_array($args[3], $this->validGroups) ? $args[3] : 'all';
 
         $this->getSitePage()->setVar(array(
-            'ID'    => $contextId,
+            'ID'    => $context->getId(),
             'GROUP' => $this->groupType
         ));
     }

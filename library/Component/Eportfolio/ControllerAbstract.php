@@ -23,10 +23,11 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
      * Apply permissions here
      *
      * @param Eportfolio_Page_Instance|null $context Null when used in admin ePortfolio screen
-     * @param array|null                    $config
-     */
-    public function setup(Eportfolio_Page_Instance $context = null, array $config = array())
+      */
+    public function setup(Eportfolio_Page_Instance $context = null)
     {
+        parent::setup($context);
+
         /** @var Schoolbox\User $_SESSION['user'] */
         if ($_SESSION['user']->isSuperuser()) {
             $this->setContentPermission(UserAccess::ACCESS_FULL);

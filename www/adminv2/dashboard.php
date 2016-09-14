@@ -74,10 +74,7 @@ foreach ($componentFactory->buildComponentList($groupList[0]['id']) as $componen
         'component.definition.name' => Scrub::text($defintionName),
     ));
 
-    $component->setup(
-        array(),
-        $component->getInstance()->getConfigArray()
-    );
+    $component->setup();
     $component->setConfigurationTemplate('component/config/_templatewrapper.html');
     $component->parseConfigForTemplate();
 

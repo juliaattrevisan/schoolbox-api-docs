@@ -138,6 +138,7 @@ abstract class Component_ControllerAbstract
     {
         $this
             ->setInstance($instance)
+            ->setConfig($instance->getConfigArray())
             ->setUser($user)
             ->setSitePage($sitepage)
             ->setFolderMapper(FolderMapper::getInstance())
@@ -147,18 +148,16 @@ abstract class Component_ControllerAbstract
     /**
      * Setup operations common to all component types.
      *
-     * Responsible for permission setup + instance configuration
+     * Responsible for permission setup
      *
-     * Cannot inject $context via constructor due to esoteric Reflection
-     * in library/Component/FactoryAbstract::buildDependencyList()
+     * Note: Cannot inject $context in constructor because Component Factories
+     * don't know about Folders or Eportfolio_Page_Instances
      *
      * @param Folder|Eportfolio_Page_Instance|null $context
-     * @param array|null                           $config
      */
-    public function setup($context = null, array $config = array())
+    public function setup($context = null)
     {
         $this->setContext($context);
-        $this->setConfig($config);
 
         if ($this->isUsingAltSource()) {
             // remove any non-numeric values from the source config (legacy support)

@@ -15,11 +15,10 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
      * Permission setup
      *
      * @param Folder|null $context null when called from admin homepage config screen
-     * @param array|null  $config
      */
-    public function setup(Folder $context = null, array $config = array())
+    public function setup(Folder $context = null)
     {
-        parent::setup($context, $config);
+        parent::setup($context);
 
         $accessor = \Schoolbox\Permission\Access\Access::getInstance();
         // Content permission: based on alt source if it's there
