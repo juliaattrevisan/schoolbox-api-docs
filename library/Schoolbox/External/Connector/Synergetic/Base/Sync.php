@@ -69,8 +69,7 @@ class Sync implements SyncInterface
                 CASE WHEN Community.DefaultEmailCode = 'O' 
                   THEN Community.OccupEmail 
                   ELSE Community.Email 
-                END AS student_default_email,
-                StudentEmail                   AS student_email,
+                END AS student_email,
                 StudentOccupEmail              AS student_work_email,
                 vStudents.StudentYearLevel     AS student_year_level,
                 vStudents.StudentHouse         AS student_house,
