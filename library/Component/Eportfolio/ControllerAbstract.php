@@ -22,10 +22,10 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
     /**
      * Apply permissions here
      *
-     * @param Eportfolio_Page_Instance $context
-     * @param array|null               $config          Why is this passed a second time?
+     * @param Eportfolio_Page_Instance|null $context Null when used in admin ePortfolio screen
+     * @param array|null                    $config
      */
-    public function setup(Eportfolio_Page_Instance $context, array $config = array())
+    public function setup(Eportfolio_Page_Instance $context = null, array $config = array())
     {
         /** @var Schoolbox\User $_SESSION['user'] */
         if ($_SESSION['user']->isSuperuser()) {
@@ -150,7 +150,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
     }
 
     /**
-     * @return Eportfolio_Page_Instance
+     * @return Eportfolio_Page_Instance|null
      */
     public function getContext()
     {
@@ -158,10 +158,10 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
     }
 
     /**
-     * @param Eportfolio_Page_Instance $context
+     * @param Eportfolio_Page_Instance|null $context
      * @return static
      */
-    protected function setContext(Eportfolio_Page_Instance $context)
+    protected function setContext(Eportfolio_Page_Instance $context = null)
     {
         parent::setContext($context);
         return $this;
