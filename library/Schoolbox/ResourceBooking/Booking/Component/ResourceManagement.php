@@ -51,7 +51,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
             return false;
         }
 
-        $this->templateEngine = $this->sitepage->getDi()->get('templateEngine');
+        $this->templateEngine = $this->getSitePage()->getDi()->get('templateEngine');
         $this->bookingMapper  = Booking\Mapper::getInstance();
 
         // Get next few days of bookings
@@ -64,7 +64,7 @@ class ResourceManagement extends Component_Dashboard_ControllerAbstract
         $endTime   = strtotime("00:00 +$days day", $_SERVER['REQUEST_TIME']);
 
         $bookingApi = new Calendar_Api_EventType_ResourceBooking_Moderation_Default(
-            $this->user, array()
+            $this->getUser(), array()
         );
         $bookingApi->setStatus(
             array(

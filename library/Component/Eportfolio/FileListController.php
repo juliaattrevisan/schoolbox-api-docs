@@ -52,11 +52,11 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 			'list_item_block' => ''
 		));
 
-		$allItems = $this->mapperClass->findForPage($this->instance->getIdentifier());
+		$allItems = $this->mapperClass->findForPage($this->getInstance()->getIdentifier());
 
 		/* Show edit buttons
 		 */
-		if ($this->contentPermission >= WRITE_ACCESS) {
+		if ($this->getContentPermission() >= WRITE_ACCESS) {
 			$this->parse('dropzone_block', 'dropzone');
 			$this->parse('modify_button_block', 'modify_button');
 		} else {
@@ -81,7 +81,7 @@ class Component_Eportfolio_FileListController extends Component_Eportfolio_Contr
 
 				/* Controls
 				 */
-				if ($this->contentPermission >= WRITE_ACCESS) {
+				if ($this->getContentPermission() >= WRITE_ACCESS) {
 					$this->parse('has_unpublish_form_block', 'has_unpublish_form');
 				}
 

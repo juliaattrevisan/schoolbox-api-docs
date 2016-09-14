@@ -106,7 +106,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             }
         }
 
-        if ($this->contentPermission >= WRITE_ACCESS) {
+        if ($this->getContentPermission() >= WRITE_ACCESS) {
             $this->parse('select_video_block', 'select_video');
         } else {
             $this->setVar('select_video_block', '');

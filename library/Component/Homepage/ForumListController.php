@@ -60,8 +60,8 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
         // Set up component name
         $this->setVar(
             array(
-                'COMPONENT_CONFIG_SRC_ID'   => $this->source->getId(),
-                'COMPONENT_CONFIG_SRC_NAME' => $this->source->getName(),
+                'COMPONENT_CONFIG_SRC_ID'   => $this->getSource()->getId(),
+                'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getName(),
                 'COMPONENT_HANDLE'          => strtolower($templateHandle),
                 'COMPONENT_NAME'            => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
             )
@@ -91,7 +91,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
             $this->setVar("forum_block", '');
 
             $forumHandler = new Forum();
-            $threadList = $forumHandler->getRecentThreadList($this->source->getId(), $this->getConfig());
+            $threadList = $forumHandler->getRecentThreadList($this->getSource()->getId(), $this->getConfig());
 
             // Iterate
             if (is_array($threadList)) {
@@ -121,7 +121,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
                     $this->setVar('forum_reply_block', '');
 
-                    if ($is_post_allowed && ($thread['locked'] != 'true' || $this->contentPermission >= FULL_ACCESS)) {
+                    if ($is_post_allowed && ($thread['locked'] != 'true' || $this->getContentPermission() >= FULL_ACCESS)) {
                         $this->parse('forum_reply_block', 'forum_reply');
                     }
 
@@ -135,4 +135,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
         return true;
     }
+
+    /* Getters / Setters
+     */
 }

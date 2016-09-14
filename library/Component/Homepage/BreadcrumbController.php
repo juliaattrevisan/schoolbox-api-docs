@@ -24,7 +24,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
         $this->setBlock($templateHandle, 'source_folder_deleted', 'source_folder_deleted_block');
         $this->setBlock($templateHandle, 'source_folder_exists', 'source_folder_exists_block');
 
-        if ($this->contentPermission < WRITE_ACCESS && $this->getConfig('compactMode')) {
+        if ($this->getContentPermission() < WRITE_ACCESS && $this->getConfig('compactMode')) {
             /* Remove headers */
             $this->setVar('CONFIGURATION', '');
             $this->setBlock('source_folder_exists', 'header', 'header_block');
@@ -46,7 +46,7 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
             $this->setBlock('source_folder_exists', 'category_breadcrumb', 'category_breadcrumb_block');
             $this->setVar('category_breadcrumb_block', '');
 
-            foreach ($this->getFolderMapper()->findParents($this->source) as $parent) {
+            foreach ($this->getFolderMapper()->findParents($this->getSource()) as $parent) {
                 /** @var Category $parent */
                 $this->setVar('BREADCRUMB_CATEGORY_ID', $parent->getId());
                 $this->setVar('BREADCRUMB_CATEGORY_NAME', $parent->getName());
@@ -54,8 +54,8 @@ class Component_Homepage_BreadcrumbController extends Component_Homepage_Control
                 $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
             }
 
-            $this->setVar('BREADCRUMB_CATEGORY_ID', $this->source->getId());
-            $this->setVar('BREADCRUMB_CATEGORY_NAME', $this->source->getName());
+            $this->setVar('BREADCRUMB_CATEGORY_ID', $this->getSource()->getId());
+            $this->setVar('BREADCRUMB_CATEGORY_NAME', $this->getSource()->getName());
             $this->setVar('BREADCRUMB_CATEGORY_CLASS', 'last');
             $this->parse('category_breadcrumb_block', 'category_breadcrumb', true);
             $this->parse('source_folder_exists_block','source_folder_exists');

@@ -64,7 +64,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
             $this->setVar('HOMEPAGE_URL_JS', json_encode($url));
             $this->parse('addmylinks_block', 'addmylinks');
         }
-        if ($this->contentPermission >= FULL_ACCESS) {
+        if ($this->getContentPermission() >= FULL_ACCESS) {
             //is owner of area
             if ($this->getContext()->getInherit()) {
                 $this->setVar("manage_page_block", "");
@@ -75,7 +75,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
             $this->setVar("manage_page_block", "");
         }
 
-        if ($this->contentPermission >= WRITE_ACCESS) {
+        if ($this->getContentPermission() >= WRITE_ACCESS) {
             //has write access
             $this->parse("stats_data_block", "stats_data");
         } else {
@@ -112,7 +112,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
 
         /* Only write-access people can view statistics
 		 */
-        if ($this->contentPermission >= WRITE_ACCESS) {
+        if ($this->getContentPermission() >= WRITE_ACCESS) {
             $this->parse('view_stats_block', 'view_stats');
         } else {
             $this->setVar('view_stats_block', '');

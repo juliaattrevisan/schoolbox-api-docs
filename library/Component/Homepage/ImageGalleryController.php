@@ -82,7 +82,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
             );
 
             // Controls such as Post News
-            if ($this->contentPermission < WRITE_ACCESS) {
+            if ($this->getContentPermission() < WRITE_ACCESS) {
                 $this->setVar(
                     array(
                         'submit_image_gallery_block' => ''

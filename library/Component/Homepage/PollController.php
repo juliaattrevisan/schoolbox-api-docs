@@ -67,7 +67,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
 
                 $pollData = $pollHandler->getData($poll['pollID']);
 
-                if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID']) || $this->sitepage->arg[1] == 'pollResults') {
+                if ($pollHandler->hasVoted($poll['pollID']) || !$pollHandler->open($poll['pollID']) || $this->getSitePage()->arg[1] == 'pollResults') {
                     /* Show poll as user has voted or the poll has closed to votes */
 
                     $this->setVar(
@@ -119,7 +119,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                     $this->parse('poll_vote_block', 'poll_vote');
                 }
 
-                if ($this->contentPermission < WRITE_ACCESS) {
+                if ($this->getContentPermission() < WRITE_ACCESS) {
                     $this->setVar("modify_poll_block", "");
                     $this->setVar('new_poll_block', '');
                 } else {
@@ -140,7 +140,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                 $this->setVar('poll_vote_block', '');
                 $this->setVar('modify_poll_block', '');
 
-                if ($this->contentPermission < WRITE_ACCESS) {
+                if ($this->getContentPermission() < WRITE_ACCESS) {
                     $this->setVar('new_poll_block', '');
                 } else {
                     $this->parse('new_poll_block', 'new_poll');
@@ -163,7 +163,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             $this->setVar('show_results_block', '');
             $this->setVar('modify_poll_block', '');
 
-            if ($this->contentPermission < WRITE_ACCESS) {
+            if ($this->getContentPermission() < WRITE_ACCESS) {
                 $this->setVar('new_poll_block', '');
             } else {
                 $this->parse('new_poll_block', 'new_poll');

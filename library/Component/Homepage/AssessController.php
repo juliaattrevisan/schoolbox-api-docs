@@ -42,7 +42,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
         $sectionHandler = new Assess_Section();
         $userHandler    = new User();
 
-        if ($this->contentPermission >= WRITE_ACCESS) {
+        if ($this->getContentPermission() >= WRITE_ACCESS) {
             $this->parse('createAssessment_block', 'createAssessment');
         } else {
             $this->setVar('createAssessment_block', '');
@@ -56,7 +56,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
             foreach ($allAssess as $currentAssess) {
                 /* Hide it from students if the start date hasn't passed yet
              	 */
-                if (($this->contentPermission >= WRITE_ACCESS) || $assessHandler->isOpen($currentAssess)) {
+                if (($this->getContentPermission() >= WRITE_ACCESS) || $assessHandler->isOpen($currentAssess)) {
                     $createdTime = new Alaress_Date_Format($currentAssess['created_at'], 'Y-m-d H:i:s');
 
                     $author = $userHandler->getByID($currentAssess['user_id']);
@@ -244,7 +244,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
 
                     // Only show results link if this assessment isn't a task,
                     // and this user has write access
-                    if (!isset($currentAssess['task_id']) && $this->contentPermission >= WRITE_ACCESS) {
+                    if (!isset($currentAssess['task_id']) && $this->getContentPermission() >= WRITE_ACCESS) {
                         $this->parse('resultLink_block', 'resultLink');
                     } else {
                         $this->setVar('resultLink_block', '');
@@ -253,7 +253,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                     /* This allows all users with write access to modify
                      */
                     $this->setVar('teacherLink_block', '');
-                    if ($this->contentPermission >= WRITE_ACCESS) {
+                    if ($this->getContentPermission() >= WRITE_ACCESS) {
                         $this->parse('teacherLink_block', 'teacherLink');
                     }
 

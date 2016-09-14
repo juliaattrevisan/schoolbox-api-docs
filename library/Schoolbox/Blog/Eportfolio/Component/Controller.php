@@ -20,7 +20,7 @@ use Schoolbox\Blog\Eportfolio\Post\Mapper as EportfolioBlogMapper;
 use Schoolbox\Blog\Eportfolio\Post\Model as EportfolioBlogModel;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Eportfolio_Page_Instance;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use SitePage;
@@ -30,16 +30,14 @@ class Controller extends Component_Eportfolio_ControllerAbstract
     /**
      * Injectable constructor
      *
-     * @param Component_Instance $instance
-     * @param User               $user
-     * @param SitePage           $sitepage
+     * @param Component_Instance       $instance
+     * @param User                     $user
+     * @param SitePage                 $sitepage
      */
-    public function __construct(
-        Component_Instance $instance,
-        User $user,
-        SitePage $sitepage
-    ) {
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
+    {
         parent::__construct($instance, $user, $sitepage);
+
         $this->setEportfolioBlogMapper(EportfolioBlogMapper::getInstance());
         $this->setEportfolioBlogImageMapper(EportfolioBlogImageMapper::getInstance());
         $this->setEportfolioBlogCommentMapper(EportfolioBlogCommentMapper::getInstance());

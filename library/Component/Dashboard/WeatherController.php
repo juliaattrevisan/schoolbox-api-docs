@@ -8,26 +8,27 @@
  * @version     SVN: $Id$
  *
  */
-
-class Component_Dashboard_WeatherController extends Component_Dashboard_ControllerAbstract {
+class Component_Dashboard_WeatherController extends Component_Dashboard_ControllerAbstract
+{
 
     protected $weather;
     protected $weatherController;
     protected $forecastDays = 3;
 
 
-    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage) {
+    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage)
+    {
         parent::__construct($instance, $user, $sitepage);
         $this->weatherController = new Weather_Wunderground();
     }
-
 
     /**
      * Prepares data for the render function. Business logic.
      *
      * @return bool Whether to continue on and attempt Component render
      */
-    public function execute() {
+    public function execute()
+    {
         if (!Cfg::get('weather_enable')) {
             return false;
         }
@@ -43,31 +44,33 @@ class Component_Dashboard_WeatherController extends Component_Dashboard_Controll
     }
 
 
-    public function renderTemplate($templateHandle) {
+    public function renderTemplate($templateHandle)
+    {
         if (!$this->loadTemplate($templateHandle, 'weather')) {
             return false;
         }
 
-        $this->sitepage->setBlock($templateHandle, 'weather_forecast', 'weather_forecast_block');
-        $this->sitepage->setBlock($templateHandle, 'weather_unavailable', 'weather_unavailable_block');
-        $this->sitepage->setBlock('weather_forecast', 'temp_now', 'temp_now_block');
-        $this->sitepage->setBlock('weather_forecast', 'temp_range', 'temp_range_block');
+        $this->getSitePage()->setBlock($templateHandle, 'weather_forecast', 'weather_forecast_block');
+        $this->getSitePage()->setBlock($templateHandle, 'weather_unavailable', 'weather_unavailable_block');
+        $this->getSitePage()->setBlock('weather_forecast', 'temp_now', 'temp_now_block');
+        $this->getSitePage()->setBlock('weather_forecast', 'temp_range', 'temp_range_block');
 
-        $this->sitepage->setVar('weather_forecast_block', '');
-        $this->sitepage->setVar('weather_unavailable_block', '');
+        $this->getSitePage()->setVar('weather_forecast_block', '');
+        $this->getSitePage()->setVar('weather_unavailable_block', '');
 
         if ($this->weather['location']['city']) {
             $this->renderForecast();
         } else {
-            $this->sitepage->parse('weather_unavailable_block', 'weather_unavailable');
-            $this->sitepage->setVar('WEATHER_LOCATION', '');
+            $this->getSitePage()->parse('weather_unavailable_block', 'weather_unavailable');
+            $this->getSitePage()->setVar('WEATHER_LOCATION', '');
         }
 
         return true;
     }
 
 
-    protected function renderForecast() {
+    protected function renderForecast()
+    {
         $imageLocation = '/weather/image.php?path=';
 
         $currentConditions = $this->weather['current'];

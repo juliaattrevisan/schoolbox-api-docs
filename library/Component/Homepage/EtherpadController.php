@@ -102,14 +102,14 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
             foreach ($allPads as $currentPad) {
                 $this->setVar(
                     array(
-                        'HOMEPAGE_ID' => $this->instance->getIdentifier(),
+                        'HOMEPAGE_ID' => $this->getInstance()->getIdentifier(),
                         'ETHERPAD_PAD_ID' => $currentPad->getId(),
                         'ETHERPAD_NAME' => $currentPad->getDisplayName(),
                         'ETHERPAD_UPDATED_AT' => $currentPad->getUpdatedAt()->getShort(),
                     )
                 );
 
-                if ($this->contentPermission > READ_ACCESS) {
+                if ($this->getContentPermission() > READ_ACCESS) {
                     $this->parse('etherpad_has_modify_block', 'etherpad_has_modify');
                 }
 
@@ -126,7 +126,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 
             /* Only provide Create Document button to those with write access
              */
-            if ($this->contentPermission > READ_ACCESS) {
+            if ($this->getContentPermission() > READ_ACCESS) {
                 $this->setVar('SOURCE_ID', $this->getSource()->getId());
                 $this->parse('etherpad_has_create_block', 'etherpad_has_create');
             }

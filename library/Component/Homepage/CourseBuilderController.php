@@ -76,7 +76,7 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
         }
 
         // Permission denied if user doesn't have write access to category
-        if ($this->contentPermission < WRITE_ACCESS) {
+        if ($this->getContentPermission() < WRITE_ACCESS) {
             return false;
         }
 
@@ -123,7 +123,7 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
         foreach ($this->task_list as $task) {
 
             // mash sitepage vars into a twig... what could possibly go wrong...
-            $this->setVar('TASK_ITEM', $this->sitepage->getTwig()->render('@course/task/writable.twig', [
+            $this->setVar('TASK_ITEM', $this->getSitePage()->getTwig()->render('@course/task/writable.twig', [
                 'unit'        => [ 'id' => $unitId ],
                 'returnUrl'   => [ $unitId => $returnUrl ],
                 'task'        => $task,
@@ -134,7 +134,7 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
             $this->parse('task_block', 'task', true);
         }
 
-        $this->setVar('CREATE_MODAL', $this->sitepage->getTwig()->render('@course/task/reveal-modal.twig', [
+        $this->setVar('CREATE_MODAL', $this->getSitePage()->getTwig()->render('@course/task/reveal-modal.twig', [
             'reveal' => new TaskBuilder($this->getInstance(), null, $returnUrl)
         ]));
 

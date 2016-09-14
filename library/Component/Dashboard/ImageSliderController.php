@@ -49,7 +49,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         }
         $this->parseConfig();
 
-        if ($this->contentPermission < READ_ACCESS) {
+        if ($this->getContentPermission() < READ_ACCESS) {
             return false;
         }
 
@@ -96,7 +96,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
 
         // Load images for the current homepage
         $allFiles = $this->getFileMapper()->findForFolders(
-            [ $this->source->getId() ], array(
+            [ $this->getSource()->getId() ], array(
                 'filter'  => array('image'),
                 'sort'    => $this->getConfig('sort'),
                 'sortdir' => $this->getConfig('sortdir'),

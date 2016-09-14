@@ -30,7 +30,7 @@ class Component_Homepage_ChatController extends Component_Homepage_ControllerAbs
             $this->parse('chat_state_active_block', 'chat_state_active');
         } else {
             $this->setVar('chat_state_active_block', '');
-            if ($this->contentPermission > 1) {
+            if ($this->getContentPermission() > 1) {
                 $this->parse('chat_state_inactive_block', 'chat_state_inactive');
             } else {
                 $this->setVar('chat_state_inactive_block', '');
@@ -39,11 +39,11 @@ class Component_Homepage_ChatController extends Component_Homepage_ControllerAbs
 
         $this->setVar(
             array(
-                'CHAT_COMPONENT_ID' => $this->instance->getId(),
+                'CHAT_COMPONENT_ID' => $this->getInstance()->getId(),
                 'CHAT_USER_ID'      => $this->getUser()->getId(),
                 'CHAT_USER_EXT_ID'  => $this->getUser()->getExternalId(),
                 'CHAT_USER_NAME'    => Scrub::text($this->getUser()->getFullName()),
-                'CHAT_USER_PERM'    => $this->contentPermission,
+                'CHAT_USER_PERM'    => $this->getContentPermission(),
                 'CHAT_STATE'        => $this->getConfig('state'),
             )
         );

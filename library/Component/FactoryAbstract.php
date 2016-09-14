@@ -134,9 +134,10 @@ abstract class Component_FactoryAbstract {
      *
      * @param String $class
      * @param Integer $offset
-     * @return Array
+     * @return array
      */
-    protected function buildDependencyList ($class, $offset = 0) {
+    protected function buildDependencyList ($class, $offset = 0)
+    {
         $dependencyList = array();
 
         $classReflection = new ReflectionClass($class);

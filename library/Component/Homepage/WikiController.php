@@ -79,7 +79,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
 
             $this->setVar(
                 array(
-                    'WIKI_CATEGORY_ID' => $this->source->getId()
+                    'WIKI_CATEGORY_ID' => $this->getSource()->getId()
                 )
             );
 
@@ -88,11 +88,11 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
             /* First check that Allow Create is active. If it is, continue;
              * otherwise proceed to the usual getPermission()
              */
-            $value = \Component_ConfigMapper::getInstance()->findValue('allowCreate', $this->instance->getId());
+            $value = \Component_ConfigMapper::getInstance()->findValue('allowCreate', $this->getInstance()->getId());
 
-            if (((int)$value === 1) && ($this->contentPermission < WRITE_ACCESS)) {
+            if (((int)$value === 1) && ($this->getContentPermission() < WRITE_ACCESS)) {
                 $this->parse("submit_wiki_block", "submit_wiki");
-            } elseif ($this->contentPermission < WRITE_ACCESS) {
+            } elseif ($this->getContentPermission() < WRITE_ACCESS) {
                 $this->setVar("submit_wiki_block", "");
             } else {
                 /* Allow Create is off
@@ -139,7 +139,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
                         )
                     );
 
-                    if (($this->contentPermission >= READ_ACCESS && $wiki['locked'] == 'false') || $this->contentPermission >= WRITE_ACCESS) {
+                    if (($this->getContentPermission() >= READ_ACCESS && $wiki['locked'] == 'false') || $this->getContentPermission() >= WRITE_ACCESS) {
                         $this->parse('modify_wiki_block', 'modify_wiki');
                     }
 

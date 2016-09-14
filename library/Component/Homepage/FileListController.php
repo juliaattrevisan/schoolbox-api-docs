@@ -122,7 +122,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                     'filter' => $filter,
                     'sort' => $this->getConfig('sort'),
                     'sortdir' => $this->getConfig('sortdir'),
-                    'getHidden' => $this->contentPermission >= WRITE_ACCESS,
+                    'getHidden' => $this->getContentPermission() >= WRITE_ACCESS,
                 )
             );
 
@@ -132,7 +132,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             if (count($fileList)) {
                 $j = 0;
                 foreach ($fileList as $file) {
-                    if ($file->isHidden() && $this->contentPermission < WRITE_ACCESS) {
+                    if ($file->isHidden() && $this->getContentPermission() < WRITE_ACCESS) {
                         continue;
                     }
                     // exclude files associated with due work
@@ -173,7 +173,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                         $this->setVar('file_url_block', '');
                         $this->parse('file_no_url_block', 'file_no_url');
                     }
-                    if ($this->contentPermission >= WRITE_ACCESS) {
+                    if ($this->getContentPermission() >= WRITE_ACCESS) {
                         $this->parse('modify_file_block', 'modify_file');
                     } else {
                         $this->setVar('modify_file_block', '');
@@ -187,7 +187,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             }
             //setup block for submission button
             $this->setVar('FILE_CAT_ID', $this->getSource()->getId());
-            if ($this->contentPermission < WRITE_ACCESS) {
+            if ($this->getContentPermission() < WRITE_ACCESS) {
                 $this->setVar("submit_file_block", "");
             } else {
                 $this->parse("submit_file_block", "submit_file");

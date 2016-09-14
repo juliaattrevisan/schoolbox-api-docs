@@ -1,6 +1,4 @@
 <?php
-use Schoolbox\Resource\Folder;
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -55,7 +53,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
             $this->setVar('image_scroller_block', '');
 
             // Load images for the current homepage
-            $allFiles = $this->getFolderMapper()->findImages($this->source, 0, true);
+            $allFiles = $this->getFolderMapper()->findImages($this->getSource(), 0, true);
 
             if ($this->getConfig('randomStartingSlide')) {
                 $this->setVar('COMPONENT_RANDOM_SLIDE', rand(1, count($allFiles)));
@@ -63,10 +61,10 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
                 $this->setVar('COMPONENT_RANDOM_SLIDE', 1);
             }
             // Have update form to back to this homepage, not the gallery's homepage
-            $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source->getId());
+            $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->getSource()->getId());
 
             // Controls such as Post Images
-            if ($this->contentPermission < WRITE_ACCESS) {
+            if ($this->getContentPermission() < WRITE_ACCESS) {
                 $this->setVar("submit_image_scroller_block", "");
             } else {
                 $this->parse("submit_image_scroller_block", "submit_image_scroller");

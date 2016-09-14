@@ -71,7 +71,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setVar('WORK_TERM', Schoolbox\Assessment\Term\Mapper::getInstance()->findForToday()->getCode());
 
         /* Output student grades link to students of this class */
-        if ($this->contentPermission == READ_ACCESS && (
+        if ($this->getContentPermission() == READ_ACCESS && (
             $this->access->involvedInGroup($_SESSION['user'], $this->getContext()->getId()) ||
                 $this->access->involvedInSubject($_SESSION['user'], $this->getContext()->getCodeString()))
         ) {
@@ -81,13 +81,13 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
 
-        if (Cfg::get('external_enable') == false || $this->contentPermission < WRITE_ACCESS || $this->getContext()->getCodeString() == '') {
+        if (Cfg::get('external_enable') == false || $this->getContentPermission() < WRITE_ACCESS || $this->getContext()->getCodeString() == '') {
             $this->setVar('class_list_block', '');
         } else {
             $this->parse('class_list_block', 'class_list');
         }
         
-        if ($this->contentPermission >= WRITE_ACCESS && $_SESSION['user']->getRole()->isStaff()) {
+        if ($this->getContentPermission() >= WRITE_ACCESS && $_SESSION['user']->getRole()->isStaff()) {
             $this->parse('class_mark_block', 'class_mark');
         } else {
             $this->setVar('class_mark_block', '');

@@ -57,7 +57,7 @@ class Component_Eportfolio_LinkListController extends Component_Eportfolio_Contr
 
 		/* Controls
 		 */
-		if ($this->contentPermission >= WRITE_ACCESS) {
+		if ($this->getContentPermission() >= WRITE_ACCESS) {
 			$this->parse('has_create_form_block', 'has_create_form');
 		}
 
@@ -91,7 +91,7 @@ class Component_Eportfolio_LinkListController extends Component_Eportfolio_Contr
 
 				/* Controls
 				 */
-				if ($this->contentPermission >= WRITE_ACCESS) {
+				if ($this->getContentPermission() >= WRITE_ACCESS) {
 					$this->parse('has_modify_button_block', 'has_modify_button');
 					$this->parse('has_modify_form_block', 'has_modify_form');
 					$this->parse('has_delete_form_block', 'has_delete_form');

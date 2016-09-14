@@ -9,6 +9,7 @@
  */
 
 use Schoolbox\Mapper\Exception as MapperException;
+use \Schoolbox\User;
 
 class Component_Dashboard_TimetableController extends Component_Dashboard_ControllerAbstract
 {
@@ -21,6 +22,9 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
     private $currentPeriod = array();
 
     protected $timetable = array();
+
+    /** @var Group */
+    private $group;
 
     /**
      * @var Schoolbox\Collection
@@ -121,7 +125,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         }
 
         $campus_list = array();
-        foreach ($this->user->getCampusCollection() as $campus) {
+        foreach ($this->getUser()->getCampusCollection() as $campus) {
             $campus_list[$campus->getId()] = $campus;
         }
 

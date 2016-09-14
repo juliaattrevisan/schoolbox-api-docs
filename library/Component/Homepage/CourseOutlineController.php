@@ -71,7 +71,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         // Get the list of units for this course, as well as who has actually
         // completed each unit.
         $this->unit_list = UnitInstanceMapper::getInstance()->findForComponent($this->getInstance());
-        $this->readOnly  = $this->contentPermission < WRITE_ACCESS;
+        $this->readOnly  = $this->getContentPermission() < WRITE_ACCESS;
 
         // Build student list
         if (count($this->unit_list)) {
@@ -566,7 +566,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
 
                 }
 
-                $zone->renderIntoSitePage($this->sitepage, 'ATTACH_ZONE');
+                $zone->renderIntoSitePage($this->getSitePage(), 'ATTACH_ZONE');
 
                 $this->parse('unit_task_modify_form_block', 'unit_task_modify_form');
             } elseif ($task->getType() == Task::TYPE_DUE_WORK) {
@@ -627,7 +627,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
             ->setThumbnailSize(32);
 
         if ($target) {
-            $zone->renderIntoSitePage($this->sitepage, $target);
+            $zone->renderIntoSitePage($this->getSitePage(), $target);
         }
 
         return $zone;

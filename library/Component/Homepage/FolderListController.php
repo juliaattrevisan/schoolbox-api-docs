@@ -58,14 +58,14 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
                 Folder\Mapper::getInstance(),
                 Schoolbox\Assessment\Course\Unit\DeprecatedMapper::getInstance(),
                 $this->getUser(),
-                $this->sitepage->getLocalisedTerm('resource', true, true)
+                $this->getSitePage()->getLocalisedTerm('resource', true, true)
             );
-            $allFolders = $treeBuilder->buildChildNodes($this->source->getId());
+            $allFolders = $treeBuilder->buildChildNodes($this->getSource()->getId());
 
             $this->setVar('folders_block', '');
 
             $maxFolders = $this->getConfig('size');
-            if (count($allFolders) && $this->contentPermission > DENY_ACCESS) {
+            if (count($allFolders) && $this->getContentPermission() > DENY_ACCESS) {
                 $j = 0;
 
                 $this->setVar('folders_block', '');
@@ -84,7 +84,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
                     $this->setVar($output);
 
-                    if ($this->contentPermission >= WRITE_ACCESS) {
+                    if ($this->getContentPermission() >= WRITE_ACCESS) {
                         $this->parse('modify_folder_block', 'modify_folder');
                     } else {
                         $this->setVar('modify_folder_block', '');
@@ -99,16 +99,16 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             $this->setVar(
                 array(
                     'COMPONENT_NAME' => strlen(trim($this->getConfig('componentname'))) ? $this->getConfig('componentname') : $this->getComponentName(),
-                    'COMPONENT_CONFIG_SRC_ID' => $this->source->getId(),
-                    'COMPONENT_CONFIG_SRC_NAME' => $this->source->getName(),
+                    'COMPONENT_CONFIG_SRC_ID' => $this->getSource()->getId(),
+                    'COMPONENT_CONFIG_SRC_NAME' => $this->getSource()->getName(),
                     'COMPONENT_HANDLE' => strtolower($templateHandle)
                 )
             );
 
             //setup block for submission button
-            $this->setVar('FOLDER_CAT_ID', $this->source->getId());
+            $this->setVar('FOLDER_CAT_ID', $this->getSource()->getId());
 
-            if ($this->contentPermission < WRITE_ACCESS) {
+            if ($this->getContentPermission() < WRITE_ACCESS) {
                 $this->setVar("submit_folder_block", "");
             } else {
                 $this->parse("submit_folder_block", "submit_folder");

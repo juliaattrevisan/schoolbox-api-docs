@@ -30,7 +30,7 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
         $this->setBlock($templateHandle, "drop_staff", "drop_staff_block");
         $this->setBlock('drop_staff', 'drop_file', 'drop_file_block');
 
-        if ($this->contentPermission < WRITE_ACCESS) {
+        if ($this->getContentPermission() < WRITE_ACCESS) {
             $this->setVar('drop_success_block', '');
             if ($_SESSION['dropSuccess']) {
                 $this->parse('drop_success_block', 'drop_success', true);
@@ -43,7 +43,7 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
                 ->setAttachPrompt('Add a file')
                 ->setModalTitle('Select file')
                 ->setAttachmentsLabel('')
-                ->renderIntoSitePage($this->sitepage, 'ATTACH_ZONE');
+                ->renderIntoSitePage($this->getSitePage(), 'ATTACH_ZONE');
 
             $this->parse('drop_student_block', 'drop_student');
             $this->setVar('drop_staff_block', '');

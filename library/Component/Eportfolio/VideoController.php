@@ -106,7 +106,7 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
 
                 if ($video->getStatus() == "completed") {
                     $this->parse('video_list_block', 'video_list', true);
-                }                 elseif ($this->contentPermission >= WRITE_ACCESS) {
+                }                 elseif ($this->getContentPermission() >= WRITE_ACCESS) {
                     $this->setVar(array(
                         'VIDEO_LIST_STATUS' => $video->getStatus(),
                         'VIDEO_LIST_STATUSIMG' => $video->getStatusImage(),
@@ -124,7 +124,7 @@ class Component_Eportfolio_VideoController extends Component_Eportfolio_Controll
             $this->setVar('default_video_block', '');
         }
 
-        if ($this->contentPermission >= WRITE_ACCESS) {
+        if ($this->getContentPermission() >= WRITE_ACCESS) {
             $this->parse('dropzone_block', 'dropzone');
             $this->parse('submit_video_block', 'submit_video');
         } else {

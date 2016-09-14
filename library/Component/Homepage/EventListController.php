@@ -66,10 +66,10 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         // Render all events for group using html renderer
         $eventRenderer = new Lister(
             $calendarApi,
-            $this->start->getUnixTimestamp(),
-            $this->end->getUnixTimestamp(),
+            $this->start->getUnixTimeStamp(),
+            $this->end->getUnixTimeStamp(),
             $_SESSION['user'],
-            $this->sitepage,
+            $this->getSitePage(),
             $_SESSION['user']
         );
         foreach ($eventRenderer->getAllEvents() as $currentEvent) {
@@ -104,7 +104,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
         //setup block for submission button
         $this->setBlock($templateHandle, "submit_event", "submit_event_block");
-        if ($this->contentPermission < WRITE_ACCESS) {
+        if ($this->getContentPermission() < WRITE_ACCESS) {
             $this->setVar(array(
                     'submit_event_block' => '',
                     'import_events_block' => ''

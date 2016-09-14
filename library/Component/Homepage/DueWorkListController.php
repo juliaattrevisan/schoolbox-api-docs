@@ -156,7 +156,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                     $displayActions = false;
                     $displayHistory = true;
                 }
-            } elseif ($this->contentPermission >= WRITE_ACCESS && $_SESSION['user']->getRole()->isStaff()) {
+            } elseif ($this->getContentPermission() >= WRITE_ACCESS && $_SESSION['user']->getRole()->isStaff()) {
                 // what to display if staff
                 if (!$isTask) {
                     $displayResults = true;
@@ -205,7 +205,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         }
 
         //setup block for submission button
-        if ($this->contentPermission < WRITE_ACCESS) {
+        if ($this->getContentPermission() < WRITE_ACCESS) {
             $this->setVar("submit_dw_block", "");
         } else {
             $this->parse("submit_dw_block", "submit_dw");
@@ -217,7 +217,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
         // Allow students or staff acting as students to see the view results buttons.
         // (Staff have no context for actually following the view result button)
-        if ($this->contentPermission == READ_ACCESS) {
+        if ($this->getContentPermission() == READ_ACCESS) {
             $groupHandler = new Group;
 
             // is the current user a member of this category?
