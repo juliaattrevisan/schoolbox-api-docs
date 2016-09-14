@@ -1514,171 +1514,171 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
         $this->assertEquals(44, $project->getNormalisedMark($this->hodes, true));
         $this->assertEquals(55, $project->getNormalisedMark($this->hodes, false));
     }
-//
-//    /**
-//     * A more intricate mixture
-//     */
-//    public function testMinimum12()
-//    {
-//        /**
-//         * A Due Work with multiple floating feedback
-//         */
-//        $id = 10001;
-//        $title = 'First Due Work';
-//        $description = 'The first due work to do';
-//        $typeName = 'Homework';
-//
-//        $dueWork = new DueWork();
-//        $dueWork
-//            ->setId($id)
-//            ->setTitle($title)
-//            ->setDescription($description)
-//            ->setType((new DueWorkType())
-//                ->setId(2)
-//                ->setName($typeName))
-//            ->setCreator($this->somodio)
-//            ->setAllParticipants((new Collection())
-//                ->add(new Participant($this->hodes))
-//                ->add(new Participant($this->bsalem))
-//                ->add(new Participant($this->sberryhill))
-//                ->add(new Participant($this->asaxon)))
-//            ->setWeight(20)
-//            ->setPublishAt($this->thirteenDaysFromNow)
-//            ->setOpenAt($this->fourteenDaysFromNow)
-//            ->setDueAt($this->twentyDaysFromNow)
-//            ->setCloseAt($this->thirtyDaysFromNow)
-//            ->setCreatedAt($this->today)
-//            ->setUpdatedAt($this->today);
-//
-//        /* Freefloating Feedback
-//         *
-//         * This Feedback isn't associated with a particular Submission,
-//         * just the Assessable itself
-//         */
-//        $floatingFeedback = (new DueWorkFeedback())
-//            ->setId(90011)
-//            ->setAssessable($dueWork)
-//            ->setNormalisedMark(44)
-//            ->setReviewer($this->celia)
-//            ->setAllFiles(new Collection())
-//            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
-//            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
-//            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
-//
-//        $floatingFeedback = (new DueWorkFeedback())
-//            ->setId(90011)
-//            ->setAssessable($dueWork)
-//            ->setNormalisedMark(55)
-//            ->setComment('A revision to the previous feedback, unpublished')
-//            ->setReviewer($this->celia)
-//            ->setAllFiles(new Collection())
-//            ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
-//            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
-//
-//
-//        /**
-//         * A Due Work with multiple floating feedback
-//         */
-//        $id = 10001;
-//        $title = 'First Due Work';
-//        $description = 'The first due work to do';
-//        $typeName = 'Homework';
-//
-//        $dueWork2 = new DueWork();
-//        $dueWork2
-//            ->setId($id)
-//            ->setTitle($title)
-//            ->setDescription($description)
-//            ->setType((new DueWorkType())
-//                ->setId(2)
-//                ->setName($typeName))
-//            ->setCreator($this->somodio)
-//            ->setAllParticipants((new Collection())
-//                ->add(new Participant($this->hodes))
-//                ->add(new Participant($this->bsalem))
-//                ->add(new Participant($this->sberryhill))
-//                ->add(new Participant($this->asaxon)))
-//            ->setWeight(20)
-//            ->setPublishAt($this->thirteenDaysFromNow)
-//            ->setOpenAt($this->fourteenDaysFromNow)
-//            ->setDueAt($this->twentyDaysFromNow)
-//            ->setCloseAt($this->thirtyDaysFromNow)
-//            ->setCreatedAt($this->today)
-//            ->setUpdatedAt($this->today);
-//
-//        /* Freefloating Feedback
-//         *
-//         * This Feedback isn't associated with a particular Submission,
-//         * just the Assessable itself
-//         */
-//        $floatingFeedback = (new DueWorkFeedback())
-//            ->setId(90121)
-//            ->setAssessable($dueWork)
-//            ->setNormalisedMark(41)
-//            ->setReviewer($this->celia)
-//            ->setAllFiles(new Collection())
-//            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
-//            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
-//            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
-//
-//        $floatingFeedback = (new DueWorkFeedback())
-//            ->setId(90122)
-//            ->setAssessable($dueWork)
-//            ->setNormalisedMark(55)
-//            ->setComment('A revision to the previous feedback, unpublished')
-//            ->setReviewer($this->celia)
-//            ->setAllFiles(new Collection())
-//            ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
-//            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
-//
-//        $submission = new DueWorkSubmission();
-//        $submission
-//            ->setId(70121)
-//            ->setAssessable($dueWork)
-//            ->setSubmittedBy($this->hodes)
-//            ->setSubmittedOnBehalfOf($this->hodes)
-//            ->setCreatedAt(new \Alaress_Date_Format('2016-08-23 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT))
-//            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-23 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $feedback = (new DueWorkFeedback())
-//            ->setId(90123)
-//            ->setAssessable($dueWork)
-//            ->setNormalisedMark(71)
-//            ->setComment('Some additional feedback, recently updated but not published')
-//            ->setReviewer($this->celia)
-//            ->setAllFiles(new Collection())
-//            ->setCreatedAt(new \Alaress_Date_Format('2016-08-24 01:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
-//            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-24 16:16:16', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $submission->getAllFeedback()->add($feedback);
-//        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
-//
-//        $floatingFeedback = (new DueWorkFeedback())
-//            ->setId(90124)
-//            ->setAssessable($dueWork)
-//            ->setNormalisedMark(73)
-//            ->setComment('Thought about it some more and decided to recompose my entire Feedback')
-//            ->setReviewer($this->celia)
-//            ->setAllFiles(new Collection())
-//            ->setCreatedAt(new \Alaress_Date_Format('2016-09-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT))
-//            ->setUpdatedAt(new \Alaress_Date_Format('2016-09-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT));
-//
-//        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
-//
-//        $project = $this->spawnProject(new SummatorMinimum());
-//        $project->setAssessables((new Collection())->add($dueWork));
-//
-//        $this->assertEquals(41, $project->getNormalisedMark($this->hodes, true));
-//        $this->assertEquals(73, $project->getNormalisedMark($this->hodes, false));
-//    }
+
+    /**
+     * A more intricate mixture
+     */
+    public function testMinimum12()
+    {
+        /**
+         * A Due Work with multiple floating feedback
+         */
+        $id = 10001;
+        $title = 'First Due Work';
+        $description = 'The first due work to do';
+        $typeName = 'Homework';
+
+        $dueWork = new DueWork();
+        $dueWork
+            ->setId($id)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setType((new DueWorkType())
+                ->setId(2)
+                ->setName($typeName))
+            ->setCreator($this->somodio)
+            ->setAllParticipants((new Collection())
+                ->add(new Participant($this->hodes))
+                ->add(new Participant($this->bsalem))
+                ->add(new Participant($this->sberryhill))
+                ->add(new Participant($this->asaxon)))
+            ->setWeight(20)
+            ->setPublishAt($this->thirteenDaysFromNow)
+            ->setOpenAt($this->fourteenDaysFromNow)
+            ->setDueAt($this->twentyDaysFromNow)
+            ->setCloseAt($this->thirtyDaysFromNow)
+            ->setCreatedAt($this->today)
+            ->setUpdatedAt($this->today);
+
+        /* Freefloating Feedback
+         *
+         * This Feedback isn't associated with a particular Submission,
+         * just the Assessable itself
+         */
+        $floatingFeedback = (new DueWorkFeedback())
+            ->setId(90011)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(44)
+            ->setReviewer($this->celia)
+            ->setAllFiles(new Collection())
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+
+        $floatingFeedback = (new DueWorkFeedback())
+            ->setId(90011)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(55)
+            ->setComment('A revision to the previous feedback, unpublished')
+            ->setReviewer($this->celia)
+            ->setAllFiles(new Collection())
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+
+
+        /**
+         * A Due Work with multiple floating feedback
+         */
+        $id = 10002;
+        $title = 'Second Due Work';
+        $description = 'The second due work to do';
+        $typeName = 'Homework';
+
+        $dueWork2 = new DueWork();
+        $dueWork2
+            ->setId($id)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setType((new DueWorkType())
+                ->setId(2)
+                ->setName($typeName))
+            ->setCreator($this->somodio)
+            ->setAllParticipants((new Collection())
+                ->add(new Participant($this->hodes))
+                ->add(new Participant($this->bsalem))
+                ->add(new Participant($this->sberryhill))
+                ->add(new Participant($this->asaxon)))
+            ->setWeight(20)
+            ->setPublishAt($this->thirteenDaysFromNow)
+            ->setOpenAt($this->fourteenDaysFromNow)
+            ->setDueAt($this->twentyDaysFromNow)
+            ->setCloseAt($this->thirtyDaysFromNow)
+            ->setCreatedAt($this->today)
+            ->setUpdatedAt($this->today);
+
+        /* Freefloating Feedback
+         *
+         * This Feedback isn't associated with a particular Submission,
+         * just the Assessable itself
+         */
+        $floatingFeedback = (new DueWorkFeedback())
+            ->setId(90121)
+            ->setAssessable($dueWork2)
+            ->setNormalisedMark(41)
+            ->setReviewer($this->celia)
+            ->setAllFiles(new Collection())
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+
+        $floatingFeedback = (new DueWorkFeedback())
+            ->setId(90122)
+            ->setAssessable($dueWork2)
+            ->setNormalisedMark(55)
+            ->setComment('A revision to the previous feedback, unpublished')
+            ->setReviewer($this->celia)
+            ->setAllFiles(new Collection())
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+
+        $submission = new DueWorkSubmission();
+        $submission
+            ->setId(70121)
+            ->setAssessable($dueWork2)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-23 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-23 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $feedback = (new DueWorkFeedback())
+            ->setId(90123)
+            ->setAssessable($dueWork2)
+            ->setNormalisedMark(71)
+            ->setComment('Some additional feedback, recently updated but not published')
+            ->setReviewer($this->celia)
+            ->setAllFiles(new Collection())
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-24 01:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-24 16:16:16', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $submission->getAllFeedback()->add($feedback);
+        $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+
+        $floatingFeedback = (new DueWorkFeedback())
+            ->setId(90124)
+            ->setAssessable($dueWork2)
+            ->setNormalisedMark(73)
+            ->setComment('Thought about it some more and decided to recompose my entire Feedback')
+            ->setReviewer($this->celia)
+            ->setAllFiles(new Collection())
+            ->setCreatedAt(new \Alaress_Date_Format('2016-09-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-09-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+
+        $project = $this->spawnProject(new SummatorMinimum());
+        $project->setAssessables((new Collection())->add($dueWork)->add($dueWork2));
+
+        $this->assertEquals(41, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(55, $project->getNormalisedMark($this->hodes, false));
+    }
     
     /**
      * Mass produce a giant Due Work set
