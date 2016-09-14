@@ -7,9 +7,6 @@
 
 namespace Schoolbox\Learning\MarkScheme;
 
-
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
@@ -26,35 +23,34 @@ class Factory
      * @param IAssessable $assessable
      * @return IMarkScheme
      */
-    public function spawnMarkScheme(IAssessable $assessable)
+    public function spawnMarkSchemeFor(IAssessable $assessable)
     {
-        $class = get_class($assessable);
-
-        switch ($class) {
-            case Task::class:
-                /** @var Task $assessable */
-                return $this->spawnForTask($assessable);
-            case Quiz::class:
-                /** @var Quiz $assessable */
-                return $this->spawnForQuiz($assessable);
-            case DueWork::class:
-                /** @var DueWork $assessable */
-                return $this->spawnForDueWork($assessable);
-            case Project::class:
-                /** @var Project $assessable */
-                return $this->spawnForProject($assessable);
-            default:
-                throw new \InvalidArgumentException("Unknown IAssessable: $class");
+        if ($assessable instanceof Task) {
+            return $this->spawnForTask($assessable);
+        } elseif ($assessable instanceof Quiz) {
+            return $this->spawnForQuiz($assessable);
+        } elseif ($assessable instanceof DueWork) {
+            return $this->spawnForDueWork($assessable);
+        } elseif ($assessable instanceof Project) {
+            return $this->spawnForProject($assessable);
+        } else {
+            throw new \InvalidArgumentException('Unknown IAssessable class: ' . get_class($assessable));
         }
     }
 
     /**
      * @param Task $task
+     * @throws \DomainException if MarkType is invalid for Tasks
      * @return Completion
      */
     protected function spawnForTask(Task $task)
     {
-        return new Completion();
+        switch ($task->getMarkType()->getId()) {
+            case MarkType::TYPE_COMPLETION:
+                return new Completion();
+            default:
+                throw new \DomainException("Invalid MarkType for Task: " . $task->getMarkType()->getName());
+        }
     }
 
     /**
@@ -63,7 +59,12 @@ class Factory
      */
     protected function spawnForQuiz(Quiz $quiz)
     {
-        return new TotalMarkFractional($quiz->getMaxMark());
+        switch ($quiz->getMarkType()->getId()) {
+            case MarkType::TYPE_TOTAL:
+                return new TotalMarkFractional($quiz->getMaxMark());
+            default:
+                throw new \DomainException("Invalid MarkType for Quiz: " . $quiz->getMarkType()->getName());
+        }
     }
 
     /**
@@ -72,8 +73,7 @@ class Factory
      */
     protected function spawnForDueWork(DueWork $dueWork)
     {
-        $markTypeId = $dueWork->getMarkType()->getId();
-        switch ($markTypeId) {
+        switch ($dueWork->getMarkType()->getId()) {
             case MarkType::TYPE_PERCENT:
                 return new Percentage();
             case MarkType::TYPE_NONE:
@@ -81,11 +81,9 @@ class Factory
             case MarkType::TYPE_TOTAL:
                 return new TotalMarkWholeNumber($dueWork->getMaxMark());
             case MarkType::TYPE_LETTER:
-                /** @var GradeGroup $gradeGroup */
-                $gradeGroup = GradeGroupMapper::getInstance()->findById($dueWork->getGradeGroup());
-                return new LetterGrade($gradeGroup);
+                return new LetterGrade($dueWork->getGradeGroup());
             default:
-                throw new \InvalidArgumentException("Unknown MarkType: $markTypeId");
+                throw new \DomainException("Invalid MarkType for DueWork: " . $dueWork->getMarkType()->getName());
         }
     }
 
@@ -95,20 +93,15 @@ class Factory
      */
     protected function spawnForProject(Project $project)
     {
-        $markTypeId = $project->getMarkType()->getId();
-        switch ($markTypeId) {
+        switch ($project->getMarkType()->getId()) {
             case MarkType::TYPE_PERCENT:
                 return new Percentage();
             case MarkType::TYPE_NONE:
                 return new None();
             case MarkType::TYPE_LETTER:
-                /** @var GradeGroup $gradeGroup */
-                $gradeGroup = GradeGroupMapper::getInstance()->findById($project->getGradeGroup());
-                return new LetterGrade($gradeGroup);
+                return new LetterGrade($project->getGradeGroup());
             default:
-                throw new \InvalidArgumentException("Unknown MarkType: $markTypeId");
+                throw new \DomainException("Invalid MarkType for Project: " . $project->getMarkType()->getName());
         }
     }
-
-
 }
