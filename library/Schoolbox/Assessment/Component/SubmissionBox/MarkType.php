@@ -8,123 +8,131 @@
  */
 
 namespace Schoolbox\Assessment\Component\SubmissionBox;
+
 use Schoolbox;
-use Schoolbox\Resource;
 
-class MarkType {
-
-	const TYPE_PERCENT    = 1;
-	const TYPE_LETTER     = 2;
-	const TYPE_TOTAL      = 3;
-	const TYPE_FREE       = 4;
-	const TYPE_RUBRIC     = 5;
-	const TYPE_NONE       = 6;
+class MarkType
+{
+    const TYPE_PERCENT    = 1;
+    const TYPE_LETTER     = 2;
+    const TYPE_TOTAL      = 3;
+    const TYPE_FREE       = 4;
+    const TYPE_RUBRIC     = 5;
+    const TYPE_NONE       = 6;
     const TYPE_COMPLETION = 7;
 
-	/**
-	 * @var int
-	 */
-	protected $id;
+    /**
+     * @var int
+     */
+    private $id;
 
-	/**
-	 * @var string
-	 */
-	protected $name;
+    /**
+     * @var string
+     */
+    private $name;
 
-	/**
-	 * @var string
-	 */
-	protected $slug;
+    /**
+     * @var string
+     */
+    private $slug;
 
-	/**
-	 * @var string
-	 */
-	protected $comment;
+    /**
+     * @var string
+     */
+    private $comment;
 
-	/**
-	 * @var bool
-	 */
-	protected $enabled;
+    /**
+     * @var bool
+     */
+    private $enabled;
 
-	/**
-	 * @param string $comment
-	 * @return $this
-	 */
-	public function setComment($comment) {
-		$this->comment = $comment;
-		return $this;
-	}
+    /**
+     * @param string $comment
+     * @return static
+     */
+    public function setComment($comment)
+    {
+        $this->comment = $comment;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getComment() {
-		return $this->comment;
-	}
+    /**
+     * @return string
+     */
+    public function getComment()
+    {
+        return $this->comment;
+    }
 
-	/**
-	 * @param boolean $enabled
-	 * @return $this
-	 */
-	public function setEnabled($enabled) {
-		$this->enabled = $enabled;
-		return $this;
-	}
+    /**
+     * @param boolean $enabled
+     * @return static
+     */
+    public function setEnabled($enabled)
+    {
+        $this->enabled = $enabled;
+        return $this;
+    }
 
-	/**
-	 * @return boolean
-	 */
-	public function getEnabled() {
-		return $this->enabled;
-	}
+    /**
+     * @return boolean
+     */
+    public function getEnabled()
+    {
+        return $this->enabled;
+    }
 
-	/**
-	 * @param int $id
-	 * @return $this
-	 */
-	public function setId($id) {
-		$this->id = $id;
-		return $this;
-	}
+    /**
+     * @param int $id
+     * @return static
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * @param string $name
-	 *
-	 * @return $this
-	 */
-	public function setName($name) {
-		$this->name = $name;
-		return $this;
-	}
+    /**
+     * @param string $name
+     * @return static
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getName() {
-		return $this->name;
-	}
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
-	/**
-	 * @param string $slug
-	 * @return $this
-	 */
-	public function setSlug($slug) {
-		$this->slug = $slug;
-		return $this;
-	}
+    /**
+     * @param string $slug
+     * @return static
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getSlug() {
-		return $this->slug;
-	}
-
+    /**
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
 }
