@@ -567,8 +567,13 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             $private_details = "'" . str_replace("'", "''", $pastoral->getHeading()) . "\r\n\r\n" . str_replace("'", "''", $pastoral->getBodyText()) . "'";
 
             // Pastoral event type code
-            $type = $this->getPastoralTypeMapper()->findById($pastoral->getType()->getId());
-            $type_code = "'" . $type->getExternalCode() . "'";
+            if($pastoral->getType() instanceof PastoralTypeModel) {
+                $type = $this->getPastoralTypeMapper()->findById($pastoral->getType()->getId());
+                $type_sql = "TypeCode = '".$type->getExternalCode()."', ";
+            }
+            else {
+                $type_sql = '';
+            }
 
             // Pastoral category code
             if($pastoral->getCategory() instanceof PastoralCategoryModel) {
@@ -596,7 +601,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         ItemDate = '{$item_date}',
                         Details = {$details},
                         PrivateDetails = {$private_details},
-                        TypeCode = {$type_code},
+                        {$type_sql}
                         {$category_sql}
                         ModifiedDate = '{$modified_date}',
                         ModifiedById = {$modified_by_id},
