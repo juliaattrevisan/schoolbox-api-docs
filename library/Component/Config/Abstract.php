@@ -25,7 +25,7 @@ abstract class Component_Config_Abstract
      *
      * @var bool
      */
-    private $is_shown_on_template = true;
+    protected $is_shown_on_template = true;
 
     /**
      * Constructor

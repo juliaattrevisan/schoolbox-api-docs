@@ -522,7 +522,7 @@ abstract class Component_ControllerAbstract
             // attempt to build a configuration instance from the key provided
             if ($conf = Component_Config_Factory::build($key, $this->context, $fields)) {
                 if (!($is_for_template && !$conf->isShownOnTemplate())) {
-                    $this->parseConfigInstance($conf, $key, $this->sitepage, $params, $this->instance->getConfigArray());
+                    $this->parseConfigInstance($conf, $key, $this->sitepage, $params);
                     ++$configCount;
                 }
             }
