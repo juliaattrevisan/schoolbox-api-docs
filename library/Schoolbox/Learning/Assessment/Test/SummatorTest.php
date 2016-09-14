@@ -70,11 +70,11 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
         $project = $this->spawnProject(new SummatorAverage());
         $project->setAssessables(new Collection());
 
-        /* Published Average is null
+        /* Most Recent Published Average is null
          */
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
 
-        /* Unpublished Average is null
+        /* Most Recent Average is null
          */
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
     }
@@ -103,11 +103,11 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             }
         }
 
-        /* Published Average is null (nothing to calculate)
+        /* Most Recent Published Average is null (nothing to calculate)
          */
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
 
-        /* Unpublished Average is null (nothing to calculate)
+        /* Most Recent Average is null (nothing to calculate)
          */
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
     }
@@ -140,11 +140,11 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             }
         }
 
-        /* Published Average is null (nothing to calculate)
+        /* Most Recent Published Average is null (nothing to calculate)
          */
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
 
-        /* Unpublished Average is
+        /* Most Recent Average is
          *      = [98 + 77 + 100 + (100 * 5/20)] / 4
          *      = [98 + 77 + 100 + 25] / 4
          *      = 300/4
@@ -171,14 +171,14 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
 
-        /* Published Average is
+        /* Most Recent Published Average is
          *      = [100 + (100 * 12/20)] / 2
          *      = [100 + 60] / 2
          *      = 80
          */
         $this->assertEquals(80, $project->getNormalisedMark($this->hodes, true));
 
-        /* Unpublished Average is
+        /* Most Recent Average is
          *      = [100 + (100 * 5/20)] / 2
          *      = [100 + 25] / 2
          *      = 62.5
@@ -207,14 +207,14 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
 
-        /* Published Average is
+        /* Most Recent Published Average is
          *      = [77 + 100 + (100 * 12/20)] / 3
          *      = [177 + 60] / 4
          *      = 79
          */
         $this->assertEquals(79, $project->getNormalisedMark($this->hodes, true));
 
-        /* Unpublished Average is
+        /* Most Recent Average is
          *      = [77 + 100 + (100 * 5/20)] / 3
          *      = [177 + 25] / 3
          *      = 67.33333333333
@@ -244,14 +244,14 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
 
-        /* Published Average is
+        /* Most Recent Published Average is
          *      = [98 + 77 + 100 + (100 * 12/20)] / 4
          *      = [275 + 60] / 4
          *      = 83.75
          */
         $this->assertEquals(83.75, $project->getNormalisedMark($this->hodes, true));
 
-        /* Unpublished Average is
+        /* Most Recent Average is
          *      = [98 + 77 + 100 + (100 * 5/20)] / 3
          *      = [275 + 25] / 4
          *      = 75
@@ -283,11 +283,11 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             }
         }
 
-        /* Published Weighted Average is null (nothing to calculate)
+        /* Most Recent Published Weighted Average is null (nothing to calculate)
          */
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
 
-        /* Unpublished Weighted Average is null (nothing to calculate)
+        /* Most Recent Weighted Average is null (nothing to calculate)
          */
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
     }
@@ -320,11 +320,11 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             }
         }
 
-        /* Published Weighted Average is null (nothing to calculate)
+        /* Most Recent Published Weighted Average is null (nothing to calculate)
          */
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
 
-        /* Unpublished Weighted Average is
+        /* Most Recent Weighted Average is
          *      = [(98*6) + (77*10) + (100*5) + ((100 * 5/20)*8)] / 29
          *      = [588 + 770 + 500 + 200] / 29
          *      = 2058 / 29
@@ -351,7 +351,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
 
-        /* Published Weighted Average is
+        /* Most Recent Published Weighted Average is
          *      = [(100*5) + ((100 * 12/20)*8)] / 13
          *      = [500 + 480] / 13
          *      = 980 / 13
@@ -359,7 +359,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
          */
         $this->assertEquals(75.38461538462, $project->getNormalisedMark($this->hodes, true), '', $this->delta);
 
-        /* Unpublished Weighted Average is
+        /* Most Recent Weighted Average is
          *      = [(100*5) + ((100 * 5/20)*8)] / 13
          *      = [500 + 200] / 13
          *      = 700 / 13
@@ -389,7 +389,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
 
-        /* Published Weighted Average is
+        /* Most Recent Published Weighted Average is
          *      = [(77*10) + (100*5) + ((100 * 12/20)*8)] / 23
          *      = [770 + 500 + 480] / 23
          *      = 1750 / 23
@@ -397,7 +397,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
          */
         $this->assertEquals(76.08695652174, $project->getNormalisedMark($this->hodes, true));
 
-        /* Unpublished Weighted Average is
+        /* Most Recent Weighted Average is
          *      = [(77*10) + (100*5) + ((100 * 5/20)*8)] / 23
          *      = [770 + 500 + 200] / 23
          *      = 1470 / 23
@@ -428,7 +428,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
 
-        /* Published Weighted Average is
+        /* Most Recent Published Weighted Average is
          *      = [(98*6) + (77*10) + (100*5) + ((100 * 12/20)*8)] / 29
          *      = [588 + 770 + 500 + 480] / 29
          *      = 2338 / 29
@@ -436,7 +436,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
          */
         $this->assertEquals(80.62068965517, $project->getNormalisedMark($this->hodes, true));
 
-        /* Unpublished Weighted Average is
+        /* Most Recent Weighted Average is
         *      = [(98*6) * (77*10) + (100*5) + ((100 * 5/20)*8)] / 29
         *      = [588 + 770 + 500 + 200] / 29
         *      = 2058 / 29
@@ -464,13 +464,13 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
         *
         * Total Weight: 66
         *
-        * Published Weighted Average is:
+        * Most Recent Published Weighted Average is:
         *       = [(18*20/66) + (91*11/66) + (89*1/66) + (96*22/66)]
         *       = [360/66 + 1001/66 + 89/66 + 2112/66]
         *       = 3562/66
         *       = 53.96969696970
         *
-        * Unpublished Weighted Average is:
+        * Most Recent Weighted Average is:
         *       = [(18*20/66) + (91*11/66) + (89*1/66) + (76*4/66) + (96*22/66)]
         *       = [360/66 + 1001/66 + 89/66 + 304/66 + 2112/66]
         *       = 3866/66
@@ -503,8 +503,8 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
          *
          * Total Weight: 66
          *
-         * Published Weighted Average is: 0
-         * Unpublished Weighted Average is: 0
+         * Most Recent Published Weighted Average is: 0
+         * Most Recent Weighted Average is: 0
          */
         $this->assertEquals(0.00000000000, $project->getNormalisedMark($this->hodes, true));
         $this->assertEquals(0.00000000000, $project->getNormalisedMark($this->hodes, false));
@@ -535,12 +535,12 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
          *
          * Total Weight: 66
          *
-         * Published Weighted Average is:
+         * Most Recent Published Weighted Average is:
          *      = [(18*0/66) + (91*0/66) + (89*0/66) + (96*0/66)]
          *      = [0 + 0 + 0 + 0]
          *      = 0
          *
-         * Unpublished Weighted Average is:
+         * Most Recent Weighted Average is:
          *      = 76*4/4
          *      = 76
          */
@@ -571,9 +571,9 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
          *
          * Total Weight: 66
          *
-         * Published Weighted Average is: null
+         * Most Recent Published Weighted Average is: null
          *
-         * Unpublished Weighted Average is:
+         * Most Recent Weighted Average is:
          *      = 76*4/4
          *      = 76
          */
@@ -606,9 +606,9 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
          *
          * Total Weight: 66
          *
-         * Published Weighted Average is: 0
+         * Most Recent Published Weighted Average is: 0
          *
-         * Unpublished Weighted Average is:
+         * Most Recent Weighted Average is:
          *      = 76*4/4
          *      = 76
          */
@@ -640,11 +640,11 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             }
         }
 
-        /* Published Maximum is null (nothing to calculate)
+        /* Most Recent Published Maximum is null (nothing to calculate)
          */
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
 
-        /* Unpublished Maximum is null (nothing to calculate)
+        /* Most Recent Maximum is null (nothing to calculate)
          */
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
     }
@@ -677,11 +677,11 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             }
         }
 
-        /* Published Maximum
+        /* Most Recent Published Maximum
          */
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
 
-        /* Unpublished Maximum
+        /* Most Recent Maximum
          */
         $this->assertEquals(100, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
     }
@@ -704,11 +704,11 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->add($this->spawnDueWork2())
             ->add($this->spawnQuiz()));
 
-        /* Published Maximum
+        /* Most Recent Published Maximum
          */
         $this->assertEquals(77, $project->getNormalisedMark($this->hodes, true), '', $this->delta);
 
-        /* Unpublished Maximum
+        /* Most Recent Maximum
          */
         $this->assertEquals(77, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
     }
@@ -734,11 +734,11 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->add($this->spawnDueWork2())
             ->add($this->spawnQuiz()));
 
-        /* Published Maximum
+        /* Most Recent Published Maximum
          */
         $this->assertEquals(98, $project->getNormalisedMark($this->hodes, true));
 
-        /* Unpublished Maximum
+        /* Most Recent Maximum
          */
         $this->assertEquals(98, $project->getNormalisedMark($this->hodes, false));
     }
@@ -765,11 +765,11 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->add($this->spawnDueWork())
             ->add($this->spawnQuiz()));
 
-        /* Published Maximum
+        /* Most Recent Published Maximum
          */
         $this->assertEquals(100, $project->getNormalisedMark($this->hodes, true));
 
-        /* Unpublished Maximum
+        /* Most Recent Maximum
         */
         $this->assertEquals(100, $project->getNormalisedMark($this->hodes, false));
     }
@@ -1136,6 +1136,527 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
         $this->assertEquals(73, $project->getNormalisedMark($this->hodes, false));
     }
 
+
+    /**
+     * Test the minimum
+     * when there is no feedback
+     */
+    public function testMinimum1()
+    {
+        $project = $this->spawnProject(new SummatorMinimum());
+        $project->setAssessables((new Collection())
+            ->add($this->spawnDueWork3())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnDueWork())
+            ->add($this->spawnQuiz()));
+
+        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
+        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
+        foreach ($project->getAssessables() as $currentAssessable) {
+            $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(new Collection());
+
+            foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
+                $currentResponse->setAllFeedback(new Collection());
+            }
+        }
+
+        /* Most Recent Published Minimum is null (nothing to calculate)
+         */
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+
+        /* Most Recent Unpublished Minimum is null (nothing to calculate)
+         */
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
+    }
+
+    /**
+     * Test the minimum
+     * when there is nothing published
+     */
+    public function testMinimum2()
+    {
+        $project = $this->spawnProject(new SummatorMinimum());
+        $project->setAssessables((new Collection())
+            ->add($this->spawnDueWork3())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnDueWork())
+            ->add($this->spawnQuiz()));
+
+        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
+        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
+        foreach ($project->getAssessables() as $currentAssessable) {
+            foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
+                $currentFeedback->setPublishedAt(null);
+            }
+
+            foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
+                foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
+                    $currentFeedback->setPublishedAt(null);
+                }
+            }
+        }
+
+        /* Most Recent Published Minimum
+         */
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+
+        /* Most Recent Minimum
+         */
+        $this->assertEquals(60, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
+    }
+//
+//    /**
+//     * Test the minimum
+//     * when there's one of each type with published and unpublished feedback
+//     */
+//    public function testMinimum3()
+//    {
+//        /* There are three assessables for Hodes
+//         *
+//         * Due Work 2 (77 marks)
+//         * Task (null marks)
+//         * Quiz (12 marks)
+//         */
+//        $project = $this->spawnProject(new SummatorMinimum());
+//        $project->setAssessables((new Collection())
+//            ->add($this->spawnTask())
+//            ->add($this->spawnDueWork2())
+//            ->add($this->spawnQuiz()));
+//
+//        /* Published Minimum
+//         */
+//        $this->assertEquals(77, $project->getNormalisedMark($this->hodes, true), '', $this->delta);
+//
+//        /* Unpublished Minimum
+//         */
+//        $this->assertEquals(77, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
+//    }
+//
+//    /**
+//     * Test the minimum
+//     * when there's more than one of a particular type with published and unpublished feedback
+//     */
+//    public function testMinimum4()
+//    {
+//        /* There are five assessables for Hodes
+//         *
+//         * Due Work 3 (98 marks)
+//         * Task (null marks)
+//         * Due Work 2 (77 marks)
+//         * Due Work (100 marks)
+//         * Quiz (12 marks)
+//         */
+//        $project = $this->spawnProject(new SummatorMinimum());
+//        $project->setAssessables((new Collection())
+//            ->add($this->spawnTask())
+//            ->add($this->spawnDueWork3())
+//            ->add($this->spawnDueWork2())
+//            ->add($this->spawnQuiz()));
+//
+//        /* Published Minimum
+//         */
+//        $this->assertEquals(98, $project->getNormalisedMark($this->hodes, true));
+//
+//        /* Unpublished Minimum
+//         */
+//        $this->assertEquals(98, $project->getNormalisedMark($this->hodes, false));
+//    }
+//
+//    /**
+//     * Test the minimum
+//     * when there's more than one of a particular type with published and unpublished feedback
+//     */
+//    public function testMinimum5()
+//    {
+//        /* There are five assessables for Hodes
+//         *
+//         * Due Work 3 (98 marks)
+//         * Task (null marks)
+//         * Due Work 2 (77 marks)
+//         * Due Work (100 marks)
+//         * Quiz (12 marks)
+//         */
+//        $project = $this->spawnProject(new SummatorMinimum());
+//        $project->setAssessables((new Collection())
+//            ->add($this->spawnDueWork3())
+//            ->add($this->spawnTask())
+//            ->add($this->spawnDueWork2())
+//            ->add($this->spawnDueWork())
+//            ->add($this->spawnQuiz()));
+//
+//        /* Published Minimum
+//         */
+//        $this->assertEquals(100, $project->getNormalisedMark($this->hodes, true));
+//
+//        /* Unpublished Minimum
+//        */
+//        $this->assertEquals(100, $project->getNormalisedMark($this->hodes, false));
+//    }
+//
+//    /** Really go to town */
+//
+//    /**
+//     * A real belting
+//     */
+//    public function testMinimum6() {
+//        $project = $this->spawnProject(new SummatorMinimum());
+//        $project->setAssessables($this->massProduce());
+//
+//        /* Due Work 1: Weight 20, NormalisedMark: P,18 UP,18
+//         * Due Work 2: Weight 11, NormalisedMark: P,91 UP,91
+//         * Due Work 3: Weight  1, NormalisedMark: P,89 UP,89
+//         * Due Work 4: Weight  4, NormalisedMark: P,null UP,null
+//         * Due Work 5: Weight  4, NormalisedMark: P,null UP,76
+//         * Due Work 6: Weight  4, NormalisedMark: P,null UP,null
+//         * Due Work 7: Weight 22, NormalisedMark: P,96 UP,96
+//         */
+//
+//        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, true));
+//        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, false));
+//    }
+//
+//    /**
+//     * A real belting
+//     */
+//    public function testMinimum7() {
+//        $project = $this->spawnProject(new SummatorMinimum());
+//        $project->setAssessables($this->massProduce());
+//
+//        /* Reset all the weights to zero
+//         */
+//        foreach ($project->getAssessables() as $currentAssessable) {
+//            $currentAssessable->setWeight(0);
+//        }
+//
+//        /* Due Work 1: Weight  0, NormalisedMark: P,18 UP,18
+//         * Due Work 2: Weight  0, NormalisedMark: P,91 UP,91
+//         * Due Work 3: Weight  0, NormalisedMark: P,89 UP,89
+//         * Due Work 4: Weight  0, NormalisedMark: P,null UP,null
+//         * Due Work 5: Weight  0, NormalisedMark: P,null UP,76
+//         * Due Work 6: Weight  0, NormalisedMark: P,null UP,null
+//         * Due Work 7: Weight  0, NormalisedMark: P,96 UP,96
+//         */
+//        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, true));
+//        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, false));
+//    }
+//
+//    /**
+//     * A real belting
+//     */
+//    public function testMinimum8() {
+//        $project = $this->spawnProject(new SummatorMinimum());
+//        $project->setAssessables($this->massProduce());
+//
+//        /* Reset all but one of the weights
+//         */
+//        foreach ($project->getAssessables() as $currentAssessable) {
+//            if ($currentAssessable->getId() != 10005) {
+//                $currentAssessable->setWeight(0);
+//            }
+//        }
+//
+//        /* Due Work 1: Weight  0, NormalisedMark: P,18 UP,18
+//         * Due Work 2: Weight  0, NormalisedMark: P,91 UP,91
+//         * Due Work 3: Weight  0, NormalisedMark: P,89 UP,89
+//         * Due Work 4: Weight  0, NormalisedMark: P,null UP,null
+//         * Due Work 5: Weight  4, NormalisedMark: P,null UP,76
+//         * Due Work 6: Weight  0, NormalisedMark: P,null UP,null
+//         * Due Work 7: Weight  0, NormalisedMark: P,96 UP,96
+//         */
+//        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, true));
+//        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, false));
+//    }
+//
+//    /**
+//     * A real belting
+//     */
+//    public function testMinimum9() {
+//        $project = $this->spawnProject(new SummatorMinimum());
+//        $project->setAssessables($this->massProduce());
+//
+//        /* Reset all but one of the weights
+//         */
+//        foreach ($project->getAssessables() as $currentAssessable) {
+//            $currentAssessable->setWeight(null);
+//        }
+//
+//        /* Due Work 1: Weight  null, NormalisedMark: P,null UP,18
+//         * Due Work 2: Weight  null, NormalisedMark: P,null UP,91
+//         * Due Work 3: Weight  null, NormalisedMark: P,null UP,89
+//         * Due Work 4: Weight  null, NormalisedMark: P,null UP,null
+//         * Due Work 5: Weight  null, NormalisedMark: P,null UP,76
+//         * Due Work 6: Weight  null, NormalisedMark: P,null UP,null
+//         * Due Work 7: Weight  null, NormalisedMark: P,null UP,96
+//         */
+//        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, true));
+//        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, false));
+//    }
+//
+//    /**
+//     * A real belting
+//     */
+//    public function testMinimum10() {
+//        $project = $this->spawnProject(new SummatorMinimum());
+//        $project->setAssessables($this->massProduce());
+//
+//        /* Reset all but one of the weights
+//         */
+//        foreach ($project->getAssessables() as $currentAssessable) {
+//            if ($currentAssessable->getId() != 10005) {
+//                $currentAssessable->setWeight(null);
+//            }
+//        }
+//
+//        /* Due Work 1: Weight  null, NormalisedMark: P,null UP,18
+//         * Due Work 2: Weight  null, NormalisedMark: P,null UP,91
+//         * Due Work 3: Weight  null, NormalisedMark: P,null UP,89
+//         * Due Work 4: Weight  null, NormalisedMark: P,null UP,null
+//         * Due Work 5: Weight  4, NormalisedMark: P,null UP,76
+//         * Due Work 6: Weight  null, NormalisedMark: P,null UP,null
+//         * Due Work 7: Weight  null, NormalisedMark: P,null UP,96
+//         */
+//        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, true));
+//        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, false));
+//    }
+//
+//    /**
+//     * A more intricate mixture
+//     */
+//    public function testMinimum11()
+//    {
+//        /**
+//         * A Due Work with multiple floating feedback
+//         */
+//        $id = 10001;
+//        $title = 'First Due Work';
+//        $description = 'The first due work to do';
+//        $typeName = 'Homework';
+//
+//        $dueWork = new DueWork();
+//        $dueWork
+//            ->setId($id)
+//            ->setTitle($title)
+//            ->setDescription($description)
+//            ->setType((new DueWorkType())
+//                ->setId(2)
+//                ->setName($typeName))
+//            ->setCreator($this->somodio)
+//            ->setAllParticipants((new Collection())
+//                ->add(new Participant($this->hodes))
+//                ->add(new Participant($this->bsalem))
+//                ->add(new Participant($this->sberryhill))
+//                ->add(new Participant($this->asaxon)))
+//            ->setWeight(20)
+//            ->setPublishAt($this->thirteenDaysFromNow)
+//            ->setOpenAt($this->fourteenDaysFromNow)
+//            ->setDueAt($this->twentyDaysFromNow)
+//            ->setCloseAt($this->thirtyDaysFromNow)
+//            ->setCreatedAt($this->today)
+//            ->setUpdatedAt($this->today);
+//
+//        /* Freefloating Feedback
+//         *
+//         * This Feedback isn't associated with a particular Submission,
+//         * just the Assessable itself
+//         */
+//        $floatingFeedback = (new DueWorkFeedback())
+//            ->setId(90011)
+//            ->setAssessable($dueWork)
+//            ->setNormalisedMark(44)
+//            ->setReviewer($this->celia)
+//            ->setAllFiles(new Collection())
+//            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
+//            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
+//            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+//
+//        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+//
+//        $floatingFeedback = (new DueWorkFeedback())
+//            ->setId(90011)
+//            ->setAssessable($dueWork)
+//            ->setNormalisedMark(55)
+//            ->setComment('A revision to the previous feedback, unpublished')
+//            ->setReviewer($this->celia)
+//            ->setAllFiles(new Collection())
+//            ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
+//            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT));
+//
+//        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+//
+//        $project = $this->spawnProject(new SummatorMinimum());
+//        $project->setAssessables((new Collection())->add($dueWork));
+//
+//        $this->assertEquals(44, $project->getNormalisedMark($this->hodes, true));
+//        $this->assertEquals(55, $project->getNormalisedMark($this->hodes, false));
+//    }
+//
+//    /**
+//     * A more intricate mixture
+//     */
+//    public function testMinimum12()
+//    {
+//        /**
+//         * A Due Work with multiple floating feedback
+//         */
+//        $id = 10001;
+//        $title = 'First Due Work';
+//        $description = 'The first due work to do';
+//        $typeName = 'Homework';
+//
+//        $dueWork = new DueWork();
+//        $dueWork
+//            ->setId($id)
+//            ->setTitle($title)
+//            ->setDescription($description)
+//            ->setType((new DueWorkType())
+//                ->setId(2)
+//                ->setName($typeName))
+//            ->setCreator($this->somodio)
+//            ->setAllParticipants((new Collection())
+//                ->add(new Participant($this->hodes))
+//                ->add(new Participant($this->bsalem))
+//                ->add(new Participant($this->sberryhill))
+//                ->add(new Participant($this->asaxon)))
+//            ->setWeight(20)
+//            ->setPublishAt($this->thirteenDaysFromNow)
+//            ->setOpenAt($this->fourteenDaysFromNow)
+//            ->setDueAt($this->twentyDaysFromNow)
+//            ->setCloseAt($this->thirtyDaysFromNow)
+//            ->setCreatedAt($this->today)
+//            ->setUpdatedAt($this->today);
+//
+//        /* Freefloating Feedback
+//         *
+//         * This Feedback isn't associated with a particular Submission,
+//         * just the Assessable itself
+//         */
+//        $floatingFeedback = (new DueWorkFeedback())
+//            ->setId(90011)
+//            ->setAssessable($dueWork)
+//            ->setNormalisedMark(44)
+//            ->setReviewer($this->celia)
+//            ->setAllFiles(new Collection())
+//            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
+//            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
+//            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+//
+//        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+//
+//        $floatingFeedback = (new DueWorkFeedback())
+//            ->setId(90011)
+//            ->setAssessable($dueWork)
+//            ->setNormalisedMark(55)
+//            ->setComment('A revision to the previous feedback, unpublished')
+//            ->setReviewer($this->celia)
+//            ->setAllFiles(new Collection())
+//            ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
+//            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT));
+//
+//        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+//
+//
+//        /**
+//         * A Due Work with multiple floating feedback
+//         */
+//        $id = 10001;
+//        $title = 'First Due Work';
+//        $description = 'The first due work to do';
+//        $typeName = 'Homework';
+//
+//        $dueWork2 = new DueWork();
+//        $dueWork2
+//            ->setId($id)
+//            ->setTitle($title)
+//            ->setDescription($description)
+//            ->setType((new DueWorkType())
+//                ->setId(2)
+//                ->setName($typeName))
+//            ->setCreator($this->somodio)
+//            ->setAllParticipants((new Collection())
+//                ->add(new Participant($this->hodes))
+//                ->add(new Participant($this->bsalem))
+//                ->add(new Participant($this->sberryhill))
+//                ->add(new Participant($this->asaxon)))
+//            ->setWeight(20)
+//            ->setPublishAt($this->thirteenDaysFromNow)
+//            ->setOpenAt($this->fourteenDaysFromNow)
+//            ->setDueAt($this->twentyDaysFromNow)
+//            ->setCloseAt($this->thirtyDaysFromNow)
+//            ->setCreatedAt($this->today)
+//            ->setUpdatedAt($this->today);
+//
+//        /* Freefloating Feedback
+//         *
+//         * This Feedback isn't associated with a particular Submission,
+//         * just the Assessable itself
+//         */
+//        $floatingFeedback = (new DueWorkFeedback())
+//            ->setId(90121)
+//            ->setAssessable($dueWork)
+//            ->setNormalisedMark(41)
+//            ->setReviewer($this->celia)
+//            ->setAllFiles(new Collection())
+//            ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
+//            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
+//            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+//
+//        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+//
+//        $floatingFeedback = (new DueWorkFeedback())
+//            ->setId(90122)
+//            ->setAssessable($dueWork)
+//            ->setNormalisedMark(55)
+//            ->setComment('A revision to the previous feedback, unpublished')
+//            ->setReviewer($this->celia)
+//            ->setAllFiles(new Collection())
+//            ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
+//            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT));
+//
+//        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+//
+//        $submission = new DueWorkSubmission();
+//        $submission
+//            ->setId(70121)
+//            ->setAssessable($dueWork)
+//            ->setSubmittedBy($this->hodes)
+//            ->setSubmittedOnBehalfOf($this->hodes)
+//            ->setCreatedAt(new \Alaress_Date_Format('2016-08-23 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT))
+//            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-23 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT));
+//
+//        $feedback = (new DueWorkFeedback())
+//            ->setId(90123)
+//            ->setAssessable($dueWork)
+//            ->setNormalisedMark(71)
+//            ->setComment('Some additional feedback, recently updated but not published')
+//            ->setReviewer($this->celia)
+//            ->setAllFiles(new Collection())
+//            ->setCreatedAt(new \Alaress_Date_Format('2016-08-24 01:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+//            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-24 16:16:16', \Alaress_Date_Format::DATABASE_FORMAT));
+//
+//        $submission->getAllFeedback()->add($feedback);
+//        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+//
+//        $floatingFeedback = (new DueWorkFeedback())
+//            ->setId(90124)
+//            ->setAssessable($dueWork)
+//            ->setNormalisedMark(73)
+//            ->setComment('Thought about it some more and decided to recompose my entire Feedback')
+//            ->setReviewer($this->celia)
+//            ->setAllFiles(new Collection())
+//            ->setCreatedAt(new \Alaress_Date_Format('2016-09-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT))
+//            ->setUpdatedAt(new \Alaress_Date_Format('2016-09-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT));
+//
+//        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+//
+//        $project = $this->spawnProject(new SummatorMinimum());
+//        $project->setAssessables((new Collection())->add($dueWork));
+//
+//        $this->assertEquals(41, $project->getNormalisedMark($this->hodes, true));
+//        $this->assertEquals(73, $project->getNormalisedMark($this->hodes, false));
+//    }
+    
     /**
      * Mass produce a giant Due Work set
      *
