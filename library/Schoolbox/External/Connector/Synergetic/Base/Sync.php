@@ -66,6 +66,10 @@ class Sync implements SyncInterface
                 vStudents.StudentPreferred     AS student_preferred,
                 vStudents.StudentSurname       AS student_surname,
                 StudentGender                  AS student_gender,
+                CASE WHEN Community.DefaultEmailCode = 'O' 
+                  THEN Community.OccupEmail 
+                  ELSE Community.Email 
+                END AS student_default_email,
                 StudentEmail                   AS student_email,
                 StudentOccupEmail              AS student_work_email,
                 vStudents.StudentYearLevel     AS student_year_level,
