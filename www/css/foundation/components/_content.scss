@@ -754,7 +754,7 @@ nav {
 		@include list-interaction('expander', 'pointer');
 	}
 
-    &.sortable, &.sortableCard {
+    &.sortable, &.sortable-card {
         .ui-sortable-helper {
             border-bottom: none;
             background-color: $row-action-hover-background;

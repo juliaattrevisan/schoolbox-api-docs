@@ -84,9 +84,9 @@
 	}
 
 	$interaction-map: (
-		selectableCard: 'selector',
-		sortableCard:   'grip',
-		expandableCard: 'expander'
+		selectable-card: 'selector',
+		sortable-card:   'grip',
+		expandable-card: 'expander'
 	);
 
 	@each $interaction, $selector in $interaction-map {
@@ -117,7 +117,7 @@
 		}
 	}
 
-	.expandableCard {
+	.expandable-card {
 		.column, .columns {
 			margin-left: 3.5rem;
 			padding-left: 0;

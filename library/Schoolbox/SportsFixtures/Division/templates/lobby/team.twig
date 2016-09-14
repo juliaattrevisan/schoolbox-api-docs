@@ -1,5 +1,5 @@
 <section data-team="{{ team.id }}">
-    <ul class="information-list sortableCard expandableCard"
+    <ul class="information-list sortable-card expandable-card"
         data-add-players-action="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: team.id}) }}"
         data-remove-players-action="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: team.id}) }}"
         data-reorder-players-action="{{ routeLookup('sportsfixturesTeam.postReorderPlayers', {entityId: team.id}) }}"
@@ -21,7 +21,7 @@
             <div class="toast" data-alert data-team-indicator></div>
         </li>
         <li>
-            <ul class="information-list sortableCard"
+            <ul class="information-list sortable-card"
                 data-add-players-action="{{ routeLookup('sportsfixturesTeam.postAddPlayers', {entityId: team.id}) }}"
                 data-remove-players-action="{{ routeLookup('sportsfixturesTeam.postRemovePlayers', {entityId: team.id}) }}"
                 data-reorder-players-action="{{ routeLookup('sportsfixturesTeam.postReorderPlayers', {entityId: team.id}) }}"
