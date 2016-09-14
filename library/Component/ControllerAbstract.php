@@ -138,9 +138,9 @@ abstract class Component_ControllerAbstract
     {
         $this
             ->setInstance($instance)
-            ->setConfig($instance->getConfigArray())
             ->setUser($user)
             ->setSitePage($sitepage)
+            ->setConfig($instance->getConfigArray())
             ->setFolderMapper(FolderMapper::getInstance())
             ->setErrorMapper(ErrorMapper::getInstance());
     }
@@ -174,7 +174,7 @@ abstract class Component_ControllerAbstract
             }
             $this->setSource($source);
         } else {
-            $this->setSource($this->getContext());
+            $this->setSource($context);
         }
     }
 
