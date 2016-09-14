@@ -617,6 +617,290 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
     }
 
     /**
+     * Test the maximum
+     * when there is no feedback
+     */
+    public function testMaximum1()
+    {
+        $project = $this->spawnProject(new SummatorMaximum());
+        $project->setAssessables((new Collection())
+            ->add($this->spawnDueWork3())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnDueWork())
+            ->add($this->spawnQuiz()));
+
+        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
+        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
+        foreach ($project->getAssessables() as $currentAssessable) {
+            $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(new Collection());
+
+            foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
+                $currentResponse->setAllFeedback(new Collection());
+            }
+        }
+
+        /* Published Maximum is null (nothing to calculate)
+         */
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+
+        /* Unpublished Maximum is null (nothing to calculate)
+         */
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
+    }
+
+    /**
+     * Test the maximum
+     * when there is nothing published
+     */
+    public function testMaximum2()
+    {
+        $project = $this->spawnProject(new SummatorMaximum());
+        $project->setAssessables((new Collection())
+            ->add($this->spawnDueWork3())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnDueWork())
+            ->add($this->spawnQuiz()));
+
+        /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
+        /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
+        foreach ($project->getAssessables() as $currentAssessable) {
+            foreach ($currentAssessable->getParticipant($this->hodes)->getAllFeedbacks() as $currentFeedback) {
+                $currentFeedback->setPublishedAt(null);
+            }
+
+            foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
+                foreach ($currentResponse->getAllFeedback() as $currentFeedback) {
+                    $currentFeedback->setPublishedAt(null);
+                }
+            }
+        }
+
+        /* Published Maximum
+         */
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+
+        /* Unpublished Maximum
+         */
+        $this->assertEquals(100, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
+    }
+
+    /**
+     * Test the maximum
+     * when there's one of each type with published and unpublished feedback
+     */
+    public function testMaximum3()
+    {
+        /* There are three assessables for Hodes
+         *
+         * Due Work 2 (77 marks)
+         * Task (null marks)
+         * Quiz (12 marks)
+         */
+        $project = $this->spawnProject(new SummatorMaximum());
+        $project->setAssessables((new Collection())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnQuiz()));
+
+        /* Published Maximum
+         */
+        $this->assertEquals(77, $project->getNormalisedMark($this->hodes, true), '', $this->delta);
+
+        /* Unpublished Maximum
+         */
+        $this->assertEquals(77, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
+    }
+
+    /**
+     * Test the maximum
+     * when there's more than one of a particular type with published and unpublished feedback
+     */
+    public function testMaximum4()
+    {
+        /* There are five assessables for Hodes
+         *
+         * Due Work 3 (98 marks)
+         * Task (null marks)
+         * Due Work 2 (77 marks)
+         * Due Work (100 marks)
+         * Quiz (12 marks)
+         */
+        $project = $this->spawnProject(new SummatorMaximum());
+        $project->setAssessables((new Collection())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork3())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnQuiz()));
+
+        /* Published Maximum
+         */
+        $this->assertEquals(98, $project->getNormalisedMark($this->hodes, true));
+
+        /* Unpublished Maximum
+         */
+        $this->assertEquals(98, $project->getNormalisedMark($this->hodes, false));
+    }
+
+    /**
+     * Test the maximum
+     * when there's more than one of a particular type with published and unpublished feedback
+     */
+    public function testMaximum5()
+    {
+        /* There are five assessables for Hodes
+         *
+         * Due Work 3 (98 marks)
+         * Task (null marks)
+         * Due Work 2 (77 marks)
+         * Due Work (100 marks)
+         * Quiz (12 marks)
+         */
+        $project = $this->spawnProject(new SummatorMaximum());
+        $project->setAssessables((new Collection())
+            ->add($this->spawnDueWork3())
+            ->add($this->spawnTask())
+            ->add($this->spawnDueWork2())
+            ->add($this->spawnDueWork())
+            ->add($this->spawnQuiz()));
+
+        /* Published Maximum
+         */
+        $this->assertEquals(100, $project->getNormalisedMark($this->hodes, true));
+
+        /* Unpublished Maximum
+        */
+        $this->assertEquals(100, $project->getNormalisedMark($this->hodes, false));
+    }
+
+    /** Really go to town */
+
+    /**
+     * A real belting
+     */
+    public function testMaximum6() {
+        $project = $this->spawnProject(new SummatorMaximum());
+        $project->setAssessables($this->massProduce());
+
+        /* Due Work 1: Weight 20, NormalisedMark: P,18 UP,18
+         * Due Work 2: Weight 11, NormalisedMark: P,91 UP,91
+         * Due Work 3: Weight  1, NormalisedMark: P,89 UP,89
+         * Due Work 4: Weight  4, NormalisedMark: P,null UP,null
+         * Due Work 5: Weight  4, NormalisedMark: P,null UP,76
+         * Due Work 6: Weight  4, NormalisedMark: P,null UP,null
+         * Due Work 7: Weight 22, NormalisedMark: P,96 UP,96
+         */
+
+        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, false));
+    }
+
+    /**
+     * A real belting
+     */
+    public function testMaximum7() {
+        $project = $this->spawnProject(new SummatorMaximum());
+        $project->setAssessables($this->massProduce());
+
+        /* Reset all the weights to zero
+         */
+        foreach ($project->getAssessables() as $currentAssessable) {
+            $currentAssessable->setWeight(0);
+        }
+
+        /* Due Work 1: Weight  0, NormalisedMark: P,18 UP,18
+         * Due Work 2: Weight  0, NormalisedMark: P,91 UP,91
+         * Due Work 3: Weight  0, NormalisedMark: P,89 UP,89
+         * Due Work 4: Weight  0, NormalisedMark: P,null UP,null
+         * Due Work 5: Weight  0, NormalisedMark: P,null UP,76
+         * Due Work 6: Weight  0, NormalisedMark: P,null UP,null
+         * Due Work 7: Weight  0, NormalisedMark: P,96 UP,96
+         */
+        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, false));
+    }
+
+    /**
+     * A real belting
+     */
+    public function testMaximum8() {
+        $project = $this->spawnProject(new SummatorMaximum());
+        $project->setAssessables($this->massProduce());
+
+        /* Reset all but one of the weights
+         */
+        foreach ($project->getAssessables() as $currentAssessable) {
+            if ($currentAssessable->getId() != 10005) {
+                $currentAssessable->setWeight(0);
+            }
+        }
+
+        /* Due Work 1: Weight  0, NormalisedMark: P,18 UP,18
+         * Due Work 2: Weight  0, NormalisedMark: P,91 UP,91
+         * Due Work 3: Weight  0, NormalisedMark: P,89 UP,89
+         * Due Work 4: Weight  0, NormalisedMark: P,null UP,null
+         * Due Work 5: Weight  4, NormalisedMark: P,null UP,76
+         * Due Work 6: Weight  0, NormalisedMark: P,null UP,null
+         * Due Work 7: Weight  0, NormalisedMark: P,96 UP,96
+         */
+        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, false));
+    }
+
+    /**
+     * A real belting
+     */
+    public function testMaximum9() {
+        $project = $this->spawnProject(new SummatorMaximum());
+        $project->setAssessables($this->massProduce());
+
+        /* Reset all but one of the weights
+         */
+        foreach ($project->getAssessables() as $currentAssessable) {
+            $currentAssessable->setWeight(null);
+        }
+
+        /* Due Work 1: Weight  null, NormalisedMark: P,null UP,18
+         * Due Work 2: Weight  null, NormalisedMark: P,null UP,91
+         * Due Work 3: Weight  null, NormalisedMark: P,null UP,89
+         * Due Work 4: Weight  null, NormalisedMark: P,null UP,null
+         * Due Work 5: Weight  null, NormalisedMark: P,null UP,76
+         * Due Work 6: Weight  null, NormalisedMark: P,null UP,null
+         * Due Work 7: Weight  null, NormalisedMark: P,null UP,96
+         */
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(null, $project->getNormalisedMark($this->hodes, false));
+    }
+
+    /**
+     * A real belting
+     */
+    public function testMaximum10() {
+        $project = $this->spawnProject(new SummatorMaximum());
+        $project->setAssessables($this->massProduce());
+
+        /* Reset all but one of the weights
+         */
+        foreach ($project->getAssessables() as $currentAssessable) {
+            if ($currentAssessable->getId() != 10005) {
+                $currentAssessable->setWeight(null);
+            }
+        }
+
+        /* Due Work 1: Weight  null, NormalisedMark: P,null UP,18
+         * Due Work 2: Weight  null, NormalisedMark: P,null UP,91
+         * Due Work 3: Weight  null, NormalisedMark: P,null UP,89
+         * Due Work 4: Weight  null, NormalisedMark: P,null UP,null
+         * Due Work 5: Weight  4, NormalisedMark: P,null UP,76
+         * Due Work 6: Weight  null, NormalisedMark: P,null UP,null
+         * Due Work 7: Weight  null, NormalisedMark: P,null UP,96
+         */
+        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(96, $project->getNormalisedMark($this->hodes, false));
+    }
+
+    /**
      * Mass produce a giant Due Work set
      *
      * @return Collection
