@@ -41,9 +41,9 @@ use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecification
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
-use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Browser\AbstractTreeBuilder;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -54,14 +54,9 @@ use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-
-use Alaress\Web\Controller\Base as BaseController;
-use Alaress\Web\Output\ThemedHtml;
-use InvalidArgumentException;
 use Schoolbox\Config;
 use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
-use Schoolbox\Mapper;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Folder\IFolder;
 
