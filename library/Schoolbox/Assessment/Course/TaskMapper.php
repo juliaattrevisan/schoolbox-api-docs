@@ -10,6 +10,7 @@
 namespace Schoolbox\Assessment\Course;
 
 use Schoolbox;
+//use Schoolbox\Assessment\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -52,12 +53,20 @@ class TaskMapper extends Schoolbox\Mapper {
             'type'       => self::TYPE_MODEL,
             'join'       => 'submission_box',
         ));
+
+
+        // Please forgive my historical naming choices here!
+        // assess_id:     join from this task onto a quiz (will be removed, but needs to be kept for import purposes)
+        // assessment_id: join from this task onto the assessment it belongs to
         $this->hasMap(array(
             'column'     => 'assess_id',
             'property'   => 'assessment',
             'type'       => self::TYPE_MODEL,
             'join'       => 'assessment',
         ));
+//        $this->joins('assessment_id', AssessmentMapper::class, null, null, null, 'assessment', 'assessment');
+
+
         $this->hasMap(array(
             'column'     => 'user_id',
             'property'   => 'owner',

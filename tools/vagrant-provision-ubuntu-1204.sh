@@ -98,7 +98,9 @@ sed -i 's/xxxxxxxx/vagrantx/g' /vagrant/www/conf/conf.php;
 sed -i 's/xxxxxx/tnp879/g' /vagrant/www/conf/conf.php;
 
 echo "$vag Installing vendor submodules with composer";
+sudo php5dismod -s cli xdebug
 /vagrant/tools/composer.sh;
+sudo php5enmod -s cli xdebug
 
 echo "$vag Building SQL updates";
 cd tools;
@@ -132,7 +134,6 @@ echo "$vag Applying UTF8 schema patch";
 echo "$vag Removing existing apache vhosts";
 rm -f /etc/apache2/sites-enabled/10*;
 rm -f /etc/apache2/sites-enabled/*schoolbox*;
-sed -i 's/vagrant\/data\/vagrant-xhdebug/vagrant\/vagrant-xhdebug/g' /etc/apache2/sites-enabled/*xhdebug*.conf;
 
 echo "$vag Enabling Schoolbox apache vhost";
 sed 's/usr\/share\/schoolbox/vagrant/g' /vagrant/tools/apache-vhost-schoolbox > /etc/apache2/sites-available/schoolbox.conf;
@@ -149,7 +150,7 @@ sed -i 's/php_flag\ html_errors\ off/php_flag\ html_errors\ on/g' /etc/apache2/s
 sed -i 's/var\/log\/apache2/vagrant/g' /etc/apache2/sites-available/schoolbox-dav.conf;
 sed -i 's/*:80/*:8000/g' /etc/apache2/sites-available/schoolbox-dav.conf;
 a2ensite schoolbox-dav.conf
-puppet apply -e 'package { "javascript-common": ensure => absent }' > /dev/null;
+#puppet apply -e 'package { "javascript-common": ensure => absent }' > /dev/null;
 
 echo "$vag Enabling Schoolbox nginx vhost";
 cp -f /vagrant/tools/nginx-vhost-schoolbox-websocket.conf /etc/nginx/conf.d/;

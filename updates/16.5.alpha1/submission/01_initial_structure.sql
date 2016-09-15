@@ -90,20 +90,12 @@ ALTER TABLE `course_unit_implementation`
   DROP INDEX `course_unit_instance_category_id` ,
   ADD INDEX `course_unit_implementation_category_id` (`category_id` ASC);
 
-CREATE TABLE `project` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(250) NOT NULL,
-  `description` TEXT NULL,
-  `weight` INT(11) NOT NULL DEFAULT 0,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8
-COLLATE = utf8_general_ci;
 
+
+-- Assessments and their relations
 
 CREATE TABLE `assessment` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `project_id` INT UNSIGNED NOT NULL,
   `title` VARCHAR(250) NOT NULL,
   `description` TEXT NULL,
   `publish_date` DATETIME NULL,
@@ -111,47 +103,41 @@ CREATE TABLE `assessment` (
   `due_date` DATETIME NULL,
   `weight` INT(11) NOT NULL DEFAULT 0,
   `sequence` TINYINT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `fk_asessment_project_id_idx` (`project_id` ASC),
-CONSTRAINT `fk_asessment_project_id`
-  FOREIGN KEY (`project_id`)
-  REFERENCES `project` (`id`)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION)
+  PRIMARY KEY (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
 COLLATE = utf8_general_ci;
 
 
-CREATE TABLE `project_folder` (
-  `project_id` INT UNSIGNED NOT NULL,
+CREATE TABLE `assessment_folder` (
+  `assessment_id` INT UNSIGNED NOT NULL,
   `folder_id` INT UNSIGNED NOT NULL,
-  INDEX `fk_project_folder_folder_id_idx` (`folder_id` ASC),
-  INDEX `fk_project_folder_project_id_idx` (`project_id` ASC),
-  CONSTRAINT `fk_project_folder_folder_id`
+  INDEX `fk_assessment_folder_folder_id_idx` (`folder_id` ASC),
+  INDEX `fk_assessment_folder_assessment_id_idx` (`assessment_id` ASC),
+  CONSTRAINT `fk_assessment_folder_folder_id`
     FOREIGN KEY (`folder_id`)
     REFERENCES `folder` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_project_folder_project_id`
-    FOREIGN KEY (`project_id`)
-    REFERENCES `project` (`id`)
+  CONSTRAINT `fk_assessment_folder_assessment_id`
+    FOREIGN KEY (`assessment_id`)
+    REFERENCES `assessment` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
-CREATE TABLE `project_course_unit_implementation` (
-  `project_id` INT UNSIGNED NOT NULL,
+CREATE TABLE `assessment_course_unit_implementation` (
+  `assessment_id` INT UNSIGNED NOT NULL,
   `course_unit_implementation_id` INT UNSIGNED NOT NULL,
-  INDEX `fk_project_cui_project_id_idx` (`project_id` ASC),
-  INDEX `fk_project_cui_course_unit_implementation_id_idx` (`course_unit_implementation_id` ASC),
-  CONSTRAINT `fk_project_cui_project_id`
-    FOREIGN KEY (`project_id`)
-    REFERENCES `project` (`id`)
+  INDEX `fk_assessment_course_unit_implementation_assessment_id_idx` (`assessment_id` ASC),
+  INDEX `fk_assessment_course_unit_implementation_cui_id_idx` (`course_unit_implementation_id` ASC),
+  CONSTRAINT `fk_assessment_course_unit_implementation_assessment_id`
+    FOREIGN KEY (`assessment_id`)
+    REFERENCES `assessment` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
- CONSTRAINT `fk_project_cui_course_unit_implementation_id`
+ CONSTRAINT `fk_assessment_course_unit_implementation_cui_id`
    FOREIGN KEY (`course_unit_implementation_id`)
    REFERENCES `course_unit_implementation` (`id`)
    ON DELETE NO ACTION
@@ -159,17 +145,17 @@ CREATE TABLE `project_course_unit_implementation` (
 ENGINE = InnoDB;
 
 
-CREATE TABLE `project_course_unit_specification` (
-  `project_id` INT UNSIGNED NOT NULL,
+CREATE TABLE `assessment_course_unit_specification` (
+  `assessment_id` INT UNSIGNED NOT NULL,
   `course_unit_specification_id` INT UNSIGNED NOT NULL,
-  INDEX `fk_project_course_unit_project_id_idx` (`project_id` ASC),
-  INDEX `fk_project_course_unit_course_unit_specification_id_idx` (`course_unit_specification_id` ASC),
-  CONSTRAINT `fk_project_course_unit_project_id`
-    FOREIGN KEY (`project_id`)
-    REFERENCES `project` (`id`)
+  INDEX `fk_assessment_course_unit_specification_assessment_id_idx` (`assessment_id` ASC),
+  INDEX `fk_assessment_course_unit_specification_cus_id_idx` (`course_unit_specification_id` ASC),
+  CONSTRAINT `fk_assessment_course_unit_specification_assessment_id`
+    FOREIGN KEY (`assessment_id`)
+    REFERENCES `assessment` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_project_course_unit_course_unit_specification_id`
+  CONSTRAINT `fk_assessment_course_unit_specification_cus_id`
     FOREIGN KEY (`course_unit_specification_id`)
     REFERENCES `course_unit_specification` (`id`)
     ON DELETE NO ACTION
@@ -177,10 +163,12 @@ CREATE TABLE `project_course_unit_specification` (
 ENGINE = InnoDB;
 
 
+-- New and existing assessment types
+
 ALTER TABLE `assess`
 ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `category_id`;
 
-ALTER TABLE `task_instance`
+ALTER TABLE `task`
 ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `id`;
 
 ALTER TABLE `submission_box`
@@ -200,3 +188,21 @@ INSERT INTO `component_config_definition` (
   'Imported Course',
   'The Imported Course that is displayed in this component'
 );
+
+-- The new project assessment type
+CREATE TABLE `project` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `assessment_id` INT UNSIGNED NOT NULL,
+  `title` VARCHAR(250) NOT NULL,
+  `description` TEXT NULL,
+  `weight` INT(11) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  INDEX `fk_project_assessment_id_idx` (`assessment_id` ASC),
+  CONSTRAINT `fk_project_course_unit_project_id`
+  FOREIGN KEY (`assessment_id`)
+  REFERENCES `assessment` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+  ENGINE = InnoDB
+  DEFAULT CHARACTER SET = utf8
+  COLLATE = utf8_general_ci;
