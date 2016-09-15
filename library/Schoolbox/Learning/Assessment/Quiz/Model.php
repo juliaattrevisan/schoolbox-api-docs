@@ -15,11 +15,23 @@
 namespace Schoolbox\Learning\Assessment\Quiz;
 
 use \Schoolbox\User;
+use Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Learning\Assessment\Quiz\Section as QuizSection;
 
 class Model extends AbstractAssessment
 {
+    /** @var Collection|QuizSection[] */
+    private $sections;
+
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->sections = new Collection();
+    }
+
     /**
      * @inheritdoc
      *
@@ -45,26 +57,23 @@ class Model extends AbstractAssessment
         return $totalMarksAvailable;
     }
 
+
     /**
-     * Stub method.
-     * TODO - Replace with real method.
+     * @return Collection|QuizSection[]
      */
-    protected function getSections()
+    public function getSections()
     {
-        return [
-            [
-                ['marks' => 1],
-            ],
-            [
-                ['marks' => 1], ['marks' => 1],
-            ],
-            [
-                ['marks' => 1.5], ['marks' => 2.5],
-            ],
-            [
-                ['marks' => 3.75], ['marks' => 1.25],
-            ]
-        ];
+        return $this->sections;
+    }
+
+    /**
+     * @param Collection|QuizSection[] $sections
+     * @return $this
+     */
+    public function setSections(Collection $sections)
+    {
+        $this->sections = $sections;
+        return $this;
     }
 
     /**
