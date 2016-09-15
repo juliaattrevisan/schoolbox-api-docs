@@ -57,6 +57,10 @@ class TotalMarkFractional extends TotalMarkAbstract
      */
     protected function validateTotalMark($totalMark)
     {
+        if(!(is_float($totalMark) || is_double($totalMark) || is_int($totalMark))) {
+            throw new InvalidArgumentException('TotalMark must be float or int: '.gettype($totalMark));
+        }
+
         $totalMarkMin = $this->getTotalMarkMin();
         if($totalMark < $totalMarkMin){
             throw new RangeException("Total mark must be greater than or equal to $totalMarkMin: $totalMark");
@@ -71,14 +75,37 @@ class TotalMarkFractional extends TotalMarkAbstract
     /**
      * Returns a string representation of a normalised Mark
      *
-     * Granularity of numerator & denominator depends on sub-class
-     *
      * @param float          $normalisedMark
      * @param IResponse|null $response
      * @throws InvalidArgumentException if normalised mark is outside valid range
      * @return string
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
+    {
+        $this->checkQuizAttempt($response);
+        return parent::getHumanReadableMark($normalisedMark, $response);
+    }
+
+
+    /**
+     * Converts string numerator to float using stored denominator
+     *
+     * @param string         $humanReadableMark
+     * @param IResponse|null $response
+     * @return float
+     */
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null)
+    {
+        $this->checkQuizAttempt($response);
+        return parent::getNormalisedMark($humanReadableMark, $response);
+    }
+
+    /**
+     * Checks if the response is a QuizAttempt, if so, update $totalMark with max marks available in the attempt.
+     *
+     * @param IResponse|null $response
+     */
+    protected function checkQuizAttempt(IResponse $response = null)
     {
         // Special Case for Quiz where total marks available can vary per Attempt
         if ($response instanceof QuizAttempt) {
@@ -89,9 +116,7 @@ class TotalMarkFractional extends TotalMarkAbstract
                 $availableMarks += $answer->getQuestion()->getMarks();
             }
             $this->setTotalMark($availableMarks);
-
         }
-        return parent::getHumanReadableMark($normalisedMark, $response);
     }
 
 

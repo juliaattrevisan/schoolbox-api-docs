@@ -7,6 +7,12 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\Quiz\Question as QuizQuestion;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizAnswer;
+use Schoolbox\Learning\Assessment\Quiz\Section as QuizSection;
+use Schoolbox\Learning\Assessment\Quiz\Solution as QuizSolution;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use \InvalidArgumentException;
 use \RangeException;
@@ -17,53 +23,30 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException RangeException
      */
-    public function test_TotalMarkFractional_NegativeTotal()
+    public function test_NegativeTotal()
     {
         $input = -1.0;
         new TotalMarkFractional($input);
     }
 
     /**
-     * @expectedException RangeException
+     * @dataProvider provider_invalidTotalMarks
+     * @expectedException InvalidArgumentException
+     * @param mixed $totalMark
      */
-    public function test_SetTotalNegative()
+    public function test_TotalWrongType($totalMark)
     {
-        $input = -50.0;
-        $totalMark = 50.0;
-        $markScheme = new TotalMarkFractional($totalMark);
-        $markScheme->setTotalMark($input);
-    }
-
-    /**
-     * @expectedException RangeException
-     */
-    public function test_SetTotalExceedOriginal()
-    {
-        $input = 60.0;
-        $totalMark = 50.0;
-        $markScheme = new TotalMarkFractional($totalMark);
-        $markScheme->setTotalMark($input);
+        new TotalMarkFractional($totalMark);
     }
 
     /**
      * @dataProvider provider_setValidTotal
-     * @param float $totalMark
-     * @param float $originalTotalMark
-     */
-    public function test_SetTotalValid($totalMark, $originalTotalMark)
-    {
-        $markScheme = new TotalMarkFractional($originalTotalMark);
-        $markScheme->setTotalMark($totalMark);
-
-    }
-
-    /**
      * @expectedException RangeException
+     * @param float $totalMark
      */
-    public function test_getHumanReadable_tooLow()
+    public function test_getHumanReadable_tooLow($totalMark)
     {
         $normalised = -1.0;
-        $totalMark = 50.0;
         $markScheme = new TotalMarkFractional($totalMark);
         $markScheme->getHumanReadableMark($normalised);
     }
@@ -141,7 +124,83 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $this->assertLessThan($delta, abs($expected - $actual), $message);
     }
 
+    /**
+     * @dataProvider provider_normalisedToHumanReadable
+     * @param float  $normalised
+     * @param float  $totalMark
+     * @param string $humanReadable
+     */
+    public function test_getHumanReadable($normalised, $totalMark, $humanReadable)
+    {
+        $markScheme = new TotalMarkFractional($totalMark);
+        $actual = $markScheme->getHumanReadableMark($normalised);
+        $message = "Failed asserting equality. Input: $normalised, Expected: $humanReadable, Actual: $actual";
+        $this->assertEquals($humanReadable, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_normalisedToHumanReadableRecurring
+     * @param float  $normalised
+     * @param float  $totalMark
+     * @param string $humanReadable
+     */
+    public function test_getHumanReadableFromRecurring($normalised, $totalMark, $humanReadable)
+    {
+        $markScheme = new TotalMarkFractional($totalMark);
+        $actual = $markScheme->getHumanReadableMark($normalised);
+        $message = "Failed asserting equality. Input: $normalised, Expected: $humanReadable, Actual: $actual";
+        $this->assertEquals($humanReadable, $actual, $message);
+    }
+
+
+    public function test_getNormalised_Quiz()
+    {
+        $quiz = $this->getDummyQuiz();
+        $quizTotalMarks = $quiz->getMaxMark();
+
+        $quizAttempt = $quiz->getResponses()->first();
+        $humanReadable = 1;
+        $expected = 50.0;
+
+        $markScheme = new TotalMarkFractional($quizTotalMarks);
+        $actual = $markScheme->getNormalisedMark($humanReadable, $quizAttempt);
+
+        $message = "Failed asserting equality. Input: $humanReadable, Expected: $expected, Actual: $actual";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    public function test_getHumanReadable_Quiz()
+    {
+        $quiz = $this->getDummyQuiz();
+
+        $quizTotalMarks = $quiz->getMaxMark();
+
+        $quizAttempt = $quiz->getResponses()->first();
+        $normalised = 50.0;
+        $expected = '1 / 2';
+
+        $markScheme = new TotalMarkFractional($quizTotalMarks);
+        $actual = $markScheme->getHumanReadableMark($normalised, $quizAttempt);
+
+        $message = "Failed asserting equality. Input: $normalised, Expected: $expected, Actual: $actual";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
     // ==================== Data Providers ====================
+
+    public function provider_invalidTotalMarks()
+    {
+        return [
+            [null],
+            [''],
+            ['10'],
+            ['ten'],
+            [new \stdClass()],
+            [true],
+            [false],
+            [[100]],
+        ];
+    }
 
     public function provider_humanReadableToRecurringNormalised()
     {
@@ -183,5 +242,167 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
             ['99.99',      $totalMark, 99.99],
             ['100',        $totalMark, 100.0],
         ];
+    }
+
+    public function provider_normalisedToHumanReadable()
+    {
+        $totalMark = 100;
+        return [
+            [0.0,      $totalMark,   '0 / 100'],
+            [1.0,      $totalMark,   '1 / 100'],
+            [10.00001, $totalMark,  '10 / 100'],
+            [99.9,     $totalMark, '100 / 100'],
+            [100,      $totalMark, '100 / 100'],
+        ];
+    }
+
+    public function provider_normalisedToHumanReadableRecurring()
+    {
+        $totalMark = 3;
+        return [
+            [0.0,      $totalMark,   '0 / 3'],
+            [33.3333,  $totalMark,   '1 / 3'],
+            [66.66666, $totalMark,   '2 / 3'],
+            [99.9,     $totalMark,   '3 / 3'],
+            [50,       $totalMark, '1.5 / 3'],
+        ];
+    }
+
+    /**
+     * Generate a Quiz with attached Sections, Attempts, Questions, and Answers
+     *
+     * The quiz has 1 section with 3 questions worth 1 mark each.
+     * The quiz has 1 attempt with 2 answers, 1 of which is correct (ie norm mark = 50.0)
+     */
+    private function getDummyQuiz()
+    {
+        $solution1 = new QuizSolution([
+            'answer_id'   => 1,
+            'question_id' => 1,
+            'sequence'    => 1,
+            'answer'      => "Jerome's Hair",
+            'deleted_at'  => null,
+        ]);
+        $solution2 = new QuizSolution([
+            'answer_id'   => 2,
+            'question_id' => 2,
+            'sequence'    => 2,
+            'answer'      => "Happiness",
+            'deleted_at'  => null,
+        ]);
+        $solution3 = new QuizSolution([
+            'answer_id'   => 3,
+            'question_id' => 3,
+            'sequence'    => 3,
+            'answer'      => "30.2 Years",
+            'deleted_at'  => null,
+        ]);
+
+        $question1 = new QuizQuestion([
+            'question_id' => 1,
+            'section_id'  => 1,
+            'sequence'    => 1,
+            'type_id'     => 1,
+            'marks'       => 1.0,
+            'question'    => '<div class=\"ff4\">What does Jerome (Vincent) place on the comb at his workstation?</div>',
+            'config'      => null,
+            'deleted_at'  => null,
+        ]);
+        $question2 = new QuizQuestion([
+            'question_id' => 2,
+            'section_id'  => 1,
+            'sequence'    => 2,
+            'type_id'     => 1,
+            'marks'       => 1.0,
+            'question'    => '<div class=\"ff4\">They used to say that a child conceived in love has a greater chance</div>',
+            'config'      => null,
+            'deleted_at'  => null,
+        ]);
+        $question3 = new QuizQuestion([
+            'question_id' => 3,
+            'section_id'  => 1,
+            'sequence'    => 3,
+            'type_id'     => 1,
+            'marks'       => 1.0,
+            'question'    => '<p><span>What is Jerome\'s (Vincent\'s) life expectancy?</span></p>',
+            'config'      => null,
+            'deleted_at'  => null,
+        ]);
+
+
+        $section = new QuizSection([
+            'section_id'  => 1,
+            'assess_id'   => 1,
+            'sequence'    => 1,
+            'title'       => 'The one and only Section',
+            'description' => 'This is a quiz section. blah blah blah',
+            'random'      => 1,
+            'pool'        => 2,
+            'deleted_at'  => null,
+        ]);
+
+        $attempt = new QuizAttempt();
+
+        $answer1 = new QuizAnswer([
+            'response_id'        => 1,
+            'attempt_id'         => 1,
+            'section_id'         => 1,
+            'question_id'        => 1,
+            'response'           => 'toothpaste',
+            'comment'            => "No, that's not the correct answer",
+            'mark'               => 0.0,
+            'automarked_already' => 'false',
+            'updated_at'         => '2012-07-04 13:42:15',
+            'deleted_at'         => null,
+        ]);
+
+        $answer2 = new QuizAnswer([
+            'response_id'        => 2,
+            'attempt_id'         => 1,
+            'section_id'         => 1,
+            'question_id'        => 2,
+            'response'           => 'Being happy',
+            'comment'            => "Correct. Although the correct term is 'Happiness'",
+            'mark'               => 1.0,
+            'automarked_already' => 'false',
+            'updated_at'         => '2012-07-04 13:42:30',
+            'deleted_at'         => null,
+        ]);
+
+        $quiz = new Quiz();
+
+        // Link Questions to Solutions
+        $question1->setSolution($solution1);
+        $question2->setSolution($solution2);
+        $question3->setSolution($solution3);
+
+        // Link Answers to Questions
+        $answer1->setQuestion($question1);
+        $answer2->setQuestion($question2);
+
+        // Link Questions to Answers
+        $question1->getAnswers()->add($answer1);
+        $question2->getAnswers()->add($answer2);
+
+        // Add Answers to Attempt
+        $attempt->getAllFeedback()->add($answer1);
+        $attempt->getAllFeedback()->add($answer2);
+
+        // Add Questions to Section
+        $section->getQuestions()->add($question1);
+        $section->getQuestions()->add($question2);
+        $section->getQuestions()->add($question3);
+
+        // Add Section to Quiz
+        $quiz->getSections()->add($section);
+
+        // Add Attempt to Quiz
+        $quiz->getResponses()->add($attempt);
+
+        // Add Answers to Quiz
+        $quiz->getFeedbacks()->add($answer1);
+        $quiz->getFeedbacks()->add($answer2);
+
+        return $quiz;
     }
 }

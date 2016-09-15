@@ -45,8 +45,11 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
     {
         $this->validateNormalisedMark($normalisedMark);
 
-        $rounded = (round($normalisedMark / $this->getGranularityNumerator())) * $this->getGranularityNumerator();
-        $total = (round($this->getTotalMark() / $this->getGranularityDenominator())) * $this->getGranularityDenominator();
+        $rounded = (round($normalisedMark * $this->getTotalMark() / IMarkScheme::NORMALISED_MARK_MAX
+                / $this->getGranularityNumerator())) * $this->getGranularityNumerator();
+
+        $total = (round($this->getTotalMark() / $this->getGranularityDenominator()))
+                * $this->getGranularityDenominator();
 
         return "$rounded / $total";
     }
