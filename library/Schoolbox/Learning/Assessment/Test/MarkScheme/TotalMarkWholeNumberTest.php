@@ -151,19 +151,22 @@ class TotalMarkWholeNumberTest extends \PHPUnit_Framework_TestCase
 
     public function provider_normalisedToHumanReadable()
     {
-        $totalMark = 100;
+        $totalMark = 200;
         return [
-            [0,     $totalMark,     '0 / 100'],
-            [0.1,   $totalMark,     '0 / 100'],
-            [0.2,   $totalMark,  '0.25 / 100'],
-            [0.3,   $totalMark,  '0.25 / 100'],
-            [01,    $totalMark,     '1 / 100'],
-            [1.0,   $totalMark,     '1 / 100'],
-            [99.4,  $totalMark,  '99.5 / 100'],
-            [99.7,  $totalMark, '99.75 / 100'],
-            [99.9,  $totalMark,   '100 / 100'],
-            [100,   $totalMark,   '100 / 100'],
-            [100.0, $totalMark,   '100 / 100'],
+            [0,     $totalMark,      '0 / 200'],
+            [0.05,   $totalMark,     '0 / 200'],
+            [0.1,   $totalMark,   '0.25 / 200'],
+            [0.2,   $totalMark,    '0.5 / 200'],
+            [0.3,   $totalMark,    '0.5 / 200'],
+            [0.375,  $totalMark,  '0.75 / 200'],
+            [01,    $totalMark,      '2 / 200'],
+            [1.0,   $totalMark,      '2 / 200'],
+            [99.4,  $totalMark, '198.75 / 200'],
+            [99.7,  $totalMark,  '199.5 / 200'],
+            [99.9,  $totalMark, '199.75 / 200'],
+            [99.95,  $totalMark,   '200 / 200'],
+            [100,   $totalMark,    '200 / 200'],
+            [100.0, $totalMark,    '200 / 200'],
         ];
     }
 
