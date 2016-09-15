@@ -50,14 +50,14 @@ interface IResponse
     /**
      * Get a Collection of all the Feedback instances associated with this IResponse
      *
-     * @return Collection
+     * @return Collection|IFeedback[]
      */
     public function getAllFeedback();
 
     /**
      * Set a Collection of all the Feedback instances associated with this IResponse
      *
-     * @param Collection $allFeedback
+     * @param Collection|IFeedback[] $allFeedback
      * @return $this
      */
     public function setAllFeedback($allFeedback);
