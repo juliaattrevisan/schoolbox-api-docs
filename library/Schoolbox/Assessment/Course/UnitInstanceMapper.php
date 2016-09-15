@@ -26,7 +26,7 @@ use Alaress_Date_Format;
 class UnitInstanceMapper extends BaseMapper {
 
     protected function mapping() {
-        $this->hasTable('course_unit_instance');
+        $this->hasTable('course_unit_implementation');
         $this->hasModel('\\Schoolbox\\Assessment\\Course\\UnitInstance');
         $this->hasMap(array(
             'column'     => 'id',
