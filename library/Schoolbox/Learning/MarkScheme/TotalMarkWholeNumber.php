@@ -11,12 +11,14 @@ use InvalidArgumentException;
 use RangeException;
 
 /**
- * Only permits integer TotalMark (as opposed to fractional)
+ * Only permits integer TotalMark (as opposed to fractional). Suitable for DueWork.
  *
  * TotalMark cannot be mutated after construction. This is because
  * this class is intended for DueWork, which have a constant $totalMark.
  *
- * eg '3.75 / 5'. This is used for DueWork
+ * eg '3.75 / 5'
+ *
+ * @method int getTotalMark()
  */
 class TotalMarkWholeNumber extends TotalMarkAbstract
 {
@@ -45,16 +47,6 @@ class TotalMarkWholeNumber extends TotalMarkAbstract
 
     /* Getters / Setters
      */
-
-    /**
-     *  Overridden purely for type-hint
-     *
-     * @return int
-     */
-    protected function getTotalMark()
-    {
-        return parent::getTotalMark();
-    }
 
     /**
      * Whole-Number TotalMark cannot have denominator reset after construction.

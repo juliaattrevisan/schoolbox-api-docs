@@ -11,7 +11,7 @@ use InvalidArgumentException;
 use RangeException;
 
 /**
- * Permits fractional TotalMark
+ * Permits fractional TotalMark suitable for Quiz.
  *
  * TotalMark CAN be mutated after construction. This is because
  * this class is intended for Quiz, where the $totalMark may vary depending on which questions
@@ -23,7 +23,9 @@ use RangeException;
  * Before use, a caller must check if a response $totalMarks may differ, and if so, call setTotalMark()
  * The value passed in must be less than or equal to the original value
  *
- * eg, 'X / 3.75'. This would be used for Quiz
+ * eg, 'X / 3.75'
+ *
+ * @method float getTotalMark()
  */
 class TotalMarkFractional extends TotalMarkAbstract
 {
@@ -83,16 +85,6 @@ class TotalMarkFractional extends TotalMarkAbstract
     {
         $this->originalTotalMark = $totalMark;
         return $this;
-    }
-
-    /**
-     * Overridden purely for type-hint
-     *
-     * @return float
-     */
-    protected function getTotalMark()
-    {
-        return parent::getTotalMark();
     }
 
     /**
