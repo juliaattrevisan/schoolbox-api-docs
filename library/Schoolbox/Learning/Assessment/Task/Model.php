@@ -88,4 +88,12 @@ class Model extends AbstractAssessment
         }
         return $this;
     }
+
+    /**
+     * @return null
+     */
+    public function getMaxMark()
+    {
+        return null;
+    }
 }

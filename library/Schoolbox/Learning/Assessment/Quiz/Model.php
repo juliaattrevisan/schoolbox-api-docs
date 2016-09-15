@@ -47,11 +47,10 @@ class Model extends AbstractAssessment
      */
     public function getMaxMark()
     {
-        // TODO replicate this logic with objects when they become available
         $totalMarksAvailable = 0.0;
         foreach ($this->getSections() as $section) {
-            foreach ($section as $question) {
-                $totalMarksAvailable += $question['marks'];
+            foreach ($section->getQuestions() as $question) {
+                $totalMarksAvailable += $question->getMarks();
             }
         }
         return $totalMarksAvailable;

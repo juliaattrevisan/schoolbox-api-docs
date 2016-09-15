@@ -247,6 +247,16 @@ interface IAssessable
     public function setCloseAt($closeAt);
 
     /**
+     * Quiz    - all marks available in all sections
+     * DueWork - max mark
+     * Task    - null
+     * Project - null
+     *
+     * @return float|null
+     */
+    public function getMaxMark();
+
+    /**
      * Get the weight
      *
      * A multiplier applied to a Normalised Mark

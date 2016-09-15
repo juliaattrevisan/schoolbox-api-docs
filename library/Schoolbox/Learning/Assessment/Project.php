@@ -231,4 +231,12 @@ class Project extends AbstractAssessment
     {
         return $this->precision;
     }
+
+    /**
+     * @return null
+     */
+    public function getMaxMark()
+    {
+        return null;
+    }
 }
