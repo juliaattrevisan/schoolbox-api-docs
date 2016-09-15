@@ -7,7 +7,7 @@ $return        = array();
 
 $allTextboxes = $textboxMapper->search($_SESSION['user'], $_GET['query']);
 
-foreach ($allTextboxes as $currentTextbox) {
+foreach ($allTextboxes->getResult() as $currentTextbox) {
     $return[] = array(
         'id'   => $currentTextbox->getId(),
         'name' => "{$currentTextbox->getCategory()->getName()}: {$currentTextbox->getHeading()}",
