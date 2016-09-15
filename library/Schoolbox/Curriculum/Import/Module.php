@@ -16,7 +16,9 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Permission\Access\UserAccess;
 use Twig_Loader_Chain;
-use Twig_Loader_Filesystem;
+use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
+use Schoolbox\Curriculum\Source\Mapper as SourceMapper;
+use Schoolbox\Curriculum\LearningArea\Mapper as LearningAreaMapper;
 
 class Module extends BaseModule
 {
@@ -35,6 +37,7 @@ class Module extends BaseModule
 
     /**
      * Only users with write permission to the curriculum service may import.
+     * @param Authorizer $authorizer
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
@@ -68,15 +71,15 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew('Schoolbox\\Curriculum\\Import\\Controller')
+            $injector->lazyNew(Controller::class)
         );
-        $injector->setters['Schoolbox\\Curriculum\\Import\\Controller']['setSourceMapper']
-            = $injector->lazyNew('Schoolbox\\Curriculum\\Source\\Mapper');
-        $injector->setters['Schoolbox\\Curriculum\\Import\\Controller']['setAreaMapper']
-            = $injector->lazyNew('Schoolbox\\Curriculum\\LearningArea\\Mapper');
-        $injector->setters['Schoolbox\\Curriculum\\Import\\Controller']['setLevelMapper']
-            = $injector->lazyNew('Schoolbox\\Curriculum\\LearningLevel\\Mapper');
-        $injector->setters['Schoolbox\\Curriculum\\Import\\Controller']['setNodeMapper']
-            = $injector->lazyNew('Schoolbox\\Curriculum\\Node\\Mapper');
+        $injector->setters[Controller::class]['setSourceMapper']
+            = $this->getMapperFactory()->getLazy(SourceMapper::class);
+        $injector->setters[Controller::class]['setAreaMapper']
+            = $this->getMapperFactory()->getLazy(LearningAreaMapper::class);
+        $injector->setters[Controller::class]['setLevelMapper']
+            = $this->getMapperFactory()->getLazy(LearningAreaMapper::class);
+        $injector->setters[Controller::class]['setNodeMapper']
+            = $this->getMapperFactory()->getLazy(NodeMapper::class);
     }
 }

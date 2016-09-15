@@ -107,7 +107,7 @@ class Module extends BaseModule
 
         // dependencies
         $injector->setters[Controller::class]['setFactory'] = $injector->lazyNew(Factory::class);
-        $injector->setters[Controller::class]['setMapper']  = $injector->lazyNew(RubricMapper::class);
+        $injector->setters[Controller::class]['setMapper']  = $this->getMapperFactory()->getLazy(RubricMapper::class);
 
     }
 

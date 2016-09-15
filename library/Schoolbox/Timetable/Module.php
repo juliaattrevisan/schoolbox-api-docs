@@ -27,12 +27,6 @@ use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
-    /**
-     * Dependency on external timetable database.
-     *
-     * @var External_Timetable
-     */
-    protected $externalDb;
 
     protected $basename = 'timetable';
 
@@ -66,26 +60,8 @@ class Module extends BaseModule
             'controller:'.$this->basename,
             $injector->lazyNew(
                 Controller::class,
-                ['externalTimetable' => $this->getExternalDb()]
+                ['externalTimetable' => $this->getExternalTimetable()]
             )
         );
-    }
-
-    /**
-     * @param  External_Timetable $externalDb
-     * @return $this
-     */
-    public function setExternalDb($externalDb)
-    {
-        $this->externalDb = $externalDb;
-        return $this;
-    }
-
-    /**
-     * @return External_Timetable
-     */
-    public function getExternalDb()
-    {
-        return $this->externalDb;
     }
 }

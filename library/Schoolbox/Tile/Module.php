@@ -17,65 +17,21 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Component_Instance;
 use Component_InstanceMapper;
-use External_UserInterface;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\RoleAccessMapper;
-use Schoolbox\Resource\Folder;
-use Schoolbox\Resource\Storage;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Schoolbox\Tile\Component\TileControllerInterface;
+use Schoolbox\Tile\Layout\Mapper as TileLayoutMapper;
 use Twig_Loader_Chain;
-use Twig_Loader_Filesystem;
+use Schoolbox\Tile\Mapper as TileMapper;
+use Schoolbox\Tile\Controller as TileController;
+
 
 class Module extends BaseModule
 {
-    /**
-     * Dependency on tile mapper.
-     *
-     * Required for fetching the tile to insert into.
-     *
-     * @var Mapper
-     */
-    protected $mapper;
-
-    /**
-     * Dependency on category mapper.
-     *
-     * Required for fetching the category that the component belongs to.
-     *
-     * @var Folder\Mapper
-     */
-    protected $categoryMapper;
-
-    /**
-     * Dependency on component instance mapper.
-     *
-     * Required for fetching the component from the database so that access
-     * permission to this page may be checked.
-     *
-     * @var Component_InstanceMapper
-     */
-    protected $componentInstanceMapper;
-
-    /**
-     * Dependency on role access mapper.
-     *
-     * Required for checking the user's access to the homepage that this tile
-     * belongs to, based on the role level permissions for that homepage.
-     *
-     * @var RoleAccessMapper
-     */
-    protected $roleAccessMapper;
-
-    /**
-     * Dependency on external user database.
-     *
-     * Required for checking that the requesting user is a teacher of the class
-     * homepage that this component is on.
-     *
-     * @var External_UserInterface
-     */
-    protected $externalDb;
-
     protected $basename = 'tile';
 
     /**
@@ -97,23 +53,17 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
-        // Add the component and homepage to params,
-        // as they're used in permission checks
-        $mapper          = $this->getMapper();
-        $catMapper       = $this->getCategoryMapper();
-        $componentMapper = $this->getComponentInstanceMapper();
-
         // Routes that take a tile ID:
         // Look up the tile, and reverse lookup the component from its layout
         $this->addRoutePreload(
             $matcher,
             '(?:edit|update|update:post|delete|delete:post)',
-            function ($params) use ($mapper, $componentMapper) {
-                $item = $mapper->findById(
+            function ($params) {
+                $item = $this->getTileMapper()->findById(
                     $params['id'],
                     array('joins' => array('backgroundImage',),)
                 );
-                $component = $componentMapper->findComponentByConfigValue(
+                $component = $this->getComponentInstanceMapper()->findComponentByConfigValue(
                     'layoutId',
                     $item->getTileLayout()->getId()
                 )->first();
@@ -131,8 +81,8 @@ class Module extends BaseModule
         $this->addRoutePreload(
             $matcher,
             '(?:add|create|layout|layoutForm)',
-            function ($params) use ($componentMapper) {
-                $component = array_pop($componentMapper->findByInstanceId($params['componentId']));
+            function ($params) {
+                $component = array_pop($this->getComponentInstanceMapper()->findByInstanceId($params['componentId']));
 
                 // Component must actually exist.
                 // This should cause an error that is recorded, but doesn't
@@ -144,7 +94,7 @@ class Module extends BaseModule
                 // Also, this component needs to be a tile grid.
                 if (!is_a(
                     $component->getDefinition()->getClass(),
-                    'Schoolbox\\Tile\\Component\\TileControllerInterface',
+                    TileControllerInterface::class,
                     true
                 )) {
                     throw new \RuntimeException('Component exists, but is not a tile layout');
@@ -162,16 +112,16 @@ class Module extends BaseModule
         $this->addRoutePreload(
             $matcher,
             "(?:add|create|layout|layoutForm|edit|update|update:post|delete|delete:post)",
-            function ($params) use ($catMapper) {
+            function ($params) {
                 // augment params with homepage from category
                 if ($params['component']->getModule() == 'homepage') {
 
                     // Support tile alt source to potentially soft-deleted homepage
                     $folderId   = $params['component']->getIdentifier();
-                    $columnName = $catMapper->getIdentifier()['column'];
+                    $columnName = $this->getFolderMapper()->getIdentifier()['column'];
 
                     return array(
-                        'homepage' => $catMapper->findByColumn($columnName, $folderId, ['deleted' => true])->first(),
+                        'homepage' => $this->getFolderMapper()->findByColumn($columnName, $folderId, ['deleted' => true])->first(),
                     );
                 }
                 return array();
@@ -184,6 +134,7 @@ class Module extends BaseModule
      * * Superusers
      * * Any user who has write permission to that homepage
      * * Any user who is the teacher of a class connected to that page
+     * @param Authorizer $authorizer
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
@@ -227,110 +178,65 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->setters['Schoolbox\\Tile\\Controller']['setMapper']
-            = $injector->lazyNew('Schoolbox\\Tile\\Mapper');
-        $injector->setters['Schoolbox\\Tile\\Controller']['setLayoutMapper']
-            = $injector->lazyNew('Schoolbox\\Tile\\Layout\\Mapper');
-        $injector->setters['Schoolbox\\Tile\\Controller']['setComponentConfigMapper']
-            = $injector->lazyNew('Component_ConfigMapper');
-        $injector->setters['Schoolbox\\Tile\\Controller']['setStorageMapper']
-            = $injector->lazyNew(Storage\Mapper::class);
-        $injector->setters['Schoolbox\\Tile\\Controller']['setFolderMapper']
-            = $this->getCategoryMapper();
+        $injector->setters[TileController::class]['setMapper']
+            = $this->getMapperFactory()->getLazy(TileMapper::class);
+        $injector->setters[TileController::class]['setLayoutMapper']
+            = $this->getMapperFactory()->getLazy(TileLayoutMapper::class);
+        $injector->setters[TileController::class]['setComponentConfigMapper']
+            = $this->getMapperFactory()->getLazy(ConfigMapper::class);
+        $injector->setters[TileController::class]['setStorageMapper']
+            = $this->getMapperFactory()->getLazy(StorageMapper::class);
+        $injector->setters[TileController::class]['setFolderMapper']
+            = $this->getMapperFactory()->getLazy(FolderMapper::class);
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew('Schoolbox\\Tile\\Controller')
+            $injector->lazyNew(TileController::class)
         );
     }
 
-    /**
-     * @param  Folder\Mapper $categoryMapper
-     * @return $this
+    /* Getters / Setters
      */
-    public function setCategoryMapper($categoryMapper)
+
+    /**
+     * Required for fetching the folder that the component belongs to.
+     *
+     * @return FolderMapper
+     */
+    public function getFolderMapper()
     {
-        $this->categoryMapper = $categoryMapper;
-        return $this;
+        return $this->getMapperFactory()->get(FolderMapper::class);
     }
 
     /**
-     * @return Folder\Mapper
-     */
-    public function getCategoryMapper()
-    {
-        return $this->categoryMapper;
-    }
-
-    /**
-     * @param  Component_InstanceMapper $componentInstanceMapper
-     * @return $this
-     */
-    public function setComponentInstanceMapper($componentInstanceMapper)
-    {
-        $this->componentInstanceMapper = $componentInstanceMapper;
-        return $this;
-    }
-
-    /**
+     * Required for fetching the component from the database so that access
+     * permission to this page may be checked.
+     *
      * @return Component_InstanceMapper
      */
     public function getComponentInstanceMapper()
     {
-        return $this->componentInstanceMapper;
+        return $this->getMapperFactory()->get(Component_InstanceMapper::class);
     }
 
     /**
+     * Required for checking the user's access to the homepage that this tile
+     * belongs to, based on the role level permissions for that homepage.
+     *
      * @return RoleAccessMapper
      */
     public function getRoleAccessMapper()
     {
-        return $this->roleAccessMapper;
+        return $this->getMapperFactory()->get(RoleAccessMapper::class);
     }
 
     /**
-     * @param  RoleAccessMapper $roleAccessMapper
+     * Required for fetching the tile to insert into.
      *
-     * @return $this
-     */
-    public function setRoleAccessMapper($roleAccessMapper)
-    {
-        $this->roleAccessMapper = $roleAccessMapper;
-        return $this;
-    }
-
-    /**
-     * @param  Mapper $mapper
-     * @return $this
-     */
-    public function setMapper($mapper)
-    {
-        $this->mapper = $mapper;
-        return $this;
-    }
-
-    /**
      * @return Mapper
      */
-    public function getMapper()
+    public function getTileMapper()
     {
-        return $this->mapper;
+        return $this->getMapperFactory()->get(Mapper::class);
     }
 
-    /**
-     * @param  External_UserInterface $externalDb
-     * @return $this
-     */
-    public function setExternalDb($externalDb)
-    {
-        $this->externalDb = $externalDb;
-        return $this;
-    }
-
-    /**
-     * @return External_UserInterface
-     */
-    public function getExternalDb()
-    {
-        return $this->externalDb;
-    }
 }

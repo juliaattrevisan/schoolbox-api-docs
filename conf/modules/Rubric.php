@@ -21,7 +21,8 @@ class Rubric implements ModuleConfigInterface
      * @param Kernel $kernel
      * @return void
      */
-    public function configure($kernel) {
+    public function configure($kernel)
+    {
         $di = $kernel->getDependencyInjector();
 
         $module = new Module($di);

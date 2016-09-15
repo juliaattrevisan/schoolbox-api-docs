@@ -17,7 +17,8 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Permission\Access\UserAccess;
 use Twig_Loader_Chain;
-use Twig_Loader_Filesystem;
+use Schoolbox\Curriculum\Node\Mapper as NodeMapper;
+use Schoolbox\Curriculum\LearningArea\Mapper as LearningAreaMapper;
 
 class Module extends BaseModule
 {
@@ -51,15 +52,14 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
         // Add the item to params, if ID is in the route.
-        // TODO DI this
-        $nodeMapper = new Node\Mapper();
+
         $this->addRoutePreload(
             $matcher,
             '.*',
-            function ($params) use ($nodeMapper) {
+            function ($params) {
                 if (array_key_exists('id', $params)) {
                     return array(
-                        'item' => $nodeMapper->findById($params['id']),
+                        'item' => $this->getNodeMapper()->findById($params['id']),
                     );
                 }
                 return array();
@@ -70,6 +70,7 @@ class Module extends BaseModule
     /**
      * Everyone has read permission to a curriculum, but only users with write
      * permission to the curriculum service may create or modify them.
+     * @param Authorizer $authorizer
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
@@ -104,13 +105,24 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew('Schoolbox\\Curriculum\\Controller')
+            $injector->lazyNew(Controller::class)
         );
-        $injector->setters['Schoolbox\\Curriculum\\Controller']['setNodeMapper']
-            = $injector->lazyNew('Schoolbox\\Curriculum\\Node\\Mapper');
-        $injector->setters['Schoolbox\\Curriculum\\Controller']['setAreaMapper']
-            = $injector->lazyNew('Schoolbox\\Curriculum\\LearningArea\\Mapper');
-        $injector->setters['Schoolbox\\Curriculum\\Controller']['setLevelMapper']
-            = $injector->lazyNew('Schoolbox\\Curriculum\\LearningLevel\\Mapper');
+        $injector->setters[Controller::class]['setNodeMapper']
+            = $this->getMapperFactory()->getLazy(NodeMapper::class);
+        $injector->setters[Controller::class]['setAreaMapper']
+            = $this->getMapperFactory()->getLazy(LearningAreaMapper::class);
+        $injector->setters[Controller::class]['setLevelMapper']
+            = $this->getMapperFactory()->getLazy(LearningAreaMapper::class);
+    }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return NodeMapper
+     */
+    protected function getNodeMapper()
+    {
+        return $this->getMapperFactory()->get(NodeMapper::class);
     }
 }

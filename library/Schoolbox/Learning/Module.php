@@ -29,31 +29,6 @@ class Module extends BaseModule
     protected $basename = 'learning';
 
     /**
-     * @var External_UserInterface
-     */
-    protected $externalDb;
-
-    /**
-     * @var UserMapper
-     */
-    protected $userMapper;
-
-    /**
-     * @var FolderMapper
-     */
-    protected $folderMapper;
-
-    /**
-     * @var TermMapper
-     */
-    protected $termMapper;
-
-    /**
-     * @var ErrorMapper
-     */
-    protected $errorMapper;
-
-    /**
      * @inheritdoc
      */
     public function initRoutes(Router $router, $basePath)
@@ -96,7 +71,7 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
-                    new Rule\IsUserOrParentOfUser($this->getExternalDb(), $this->getUserMapper(), 'studentId')
+                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
                 )
             );
     }
@@ -122,12 +97,13 @@ class Module extends BaseModule
             }
         );
 
+
         $this->addRoutePreload(
             $matcher,
             '(?:getDue)',
             function ($params) {
                 try {
-                    $student = $this->getUserMapper()->findById($params['userId']);
+                    $student = $this->getUserMapper()->findById($params['studentId']);
                 } catch (MapperException $e) {
                     $student = $this->getUserMapper()->createModel();
                 }
@@ -181,7 +157,7 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'errorMapper' => $this->getErrorMapper(),
+                'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             ])
         );
     }
@@ -190,39 +166,11 @@ class Module extends BaseModule
      */
 
     /**
-     * @return External_UserInterface
-     */
-    protected function getExternalDb()
-    {
-        return $this->externalDb;
-    }
-
-    /**
-     * @param  External_UserInterface $externalDb
-     * @return static
-     */
-    public function setExternalDb($externalDb)
-    {
-        $this->externalDb = $externalDb;
-        return $this;
-    }
-
-    /**
      * @return UserMapper
      */
     protected function getUserMapper()
     {
-        return $this->userMapper;
-    }
-
-    /**
-     * @param  UserMapper $userMapper
-     * @return static
-     */
-    public function setUserMapper(UserMapper $userMapper)
-    {
-        $this->userMapper = $userMapper;
-        return $this;
+        return $this->getMapperFactory()->get(UserMapper::class);
     }
 
     /**
@@ -230,17 +178,7 @@ class Module extends BaseModule
      */
     protected function getFolderMapper()
     {
-        return $this->folderMapper;
-    }
-
-    /**
-     * @param  FolderMapper $folderMapper
-     * @return static
-     */
-    public function setFolderMapper(FolderMapper $folderMapper)
-    {
-        $this->folderMapper = $folderMapper;
-        return $this;
+        return $this->getMapperFactory()->get(FolderMapper::class);
     }
 
     /**
@@ -248,17 +186,7 @@ class Module extends BaseModule
      */
     protected function getTermMapper()
     {
-        return $this->termMapper;
-    }
-
-    /**
-     * @param  TermMapper $termMapper
-     * @return static
-     */
-    public function setTermMapper(TermMapper $termMapper)
-    {
-        $this->termMapper = $termMapper;
-        return $this;
+        return $this->getMapperFactory()->get(TermMapper::class);
     }
 
     /**
@@ -266,16 +194,6 @@ class Module extends BaseModule
      */
     protected function getErrorMapper()
     {
-        return $this->errorMapper;
-    }
-
-    /**
-     * @param  ErrorMapper $errorMapper
-     * @return static
-     */
-    public function setErrorMapper(ErrorMapper $errorMapper)
-    {
-        $this->errorMapper = $errorMapper;
-        return $this;
+        return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 }

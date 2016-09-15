@@ -19,7 +19,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Role;
 use Twig_Error_Loader;
 use Twig_Loader_Chain;
-use Twig_Loader_Filesystem;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Module extends BaseModule
 {
@@ -59,19 +59,17 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
         // Add the item to params, if box_id is in the route.
-        // TODO DI these
-        $boxMapper = SubmissionBoxMapper::getInstance();
-        $catMapper = \Schoolbox\Resource\Folder\Mapper::getInstance();
+
         $this->addRoutePreload(
             $matcher,
             '.*',
-            function ($params) use ($boxMapper, $catMapper) {
+            function ($params) {
                 if (array_key_exists('box_id', $params)) {
 
-                    $box = $boxMapper->findById($params['box_id']);
+                    $box = $this->getSubmissionBoxMapper()->findById($params['box_id']);
 
                     // yeah... sure... doing this manually isn't outrageous at all...
-                    $box->setCategory($catMapper->findById($box->getCategory()->getId()));
+                    $box->setCategory($this->getFolderMapper()->findById($box->getCategory()->getId()));
 
                     return array(
                         'box' => $box,
@@ -103,5 +101,24 @@ class Module extends BaseModule
             'controller:'.$this->basename,
             $injector->lazyNew(Controller::class)
         );
+    }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return SubmissionBoxMapper
+     */
+    protected function getSubmissionBoxMapper()
+    {
+        return $this->getMapperFactory()->get(SubmissionBoxMapper::class);
+    }
+
+    /**
+     * @return FolderMapper
+     */
+    protected function getFolderMapper()
+    {
+        return $this->getMapperFactory()->get(FolderMapper::class);
     }
 } 

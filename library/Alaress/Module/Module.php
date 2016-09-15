@@ -17,6 +17,7 @@ use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Router\PathMatcher;
 use Alaress\Web\Router\RouteCollection;
 use LogicException;
+use Schoolbox\MapperFactory;
 use Twig_Loader_Chain;
 use Twig_Loader_Filesystem;
 
@@ -359,6 +360,32 @@ class Module {
         $templateLoader->addLoader($loader);
         return $this;
     }
+
+    /**
+     * @return MapperFactory
+     */
+    protected function getMapperFactory()
+    {
+        return $this->getInjector()->get('mapperFactory');
+    }
+
+    /**
+     * @return \External_UserInterface
+     */
+    protected function getExternalUser()
+    {
+        return $this->getInjector()->get('externalUser');
+    }
+
+    /**
+     * @return \External_TimetableInterface
+     */
+    protected function getExternalTimetable()
+    {
+        return $this->getInjector()->get('externalTimetable');
+    }
+
+
 
     /**
      * Initializes controller classes into the dependency injector.

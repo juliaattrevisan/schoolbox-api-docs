@@ -34,16 +34,6 @@ class Module extends BaseModule
     protected $basename = 'customStkOleReport';
 
     /**
-     * @var External_UserInterface
-     */
-    protected $externalDb;
-
-    /**
-     * @var UserMapper
-     */
-    protected $userMapper;
-
-    /**
      * @inheritdoc
      */
     public function initRoutes(Router $router, $basePath)
@@ -62,11 +52,11 @@ class Module extends BaseModule
             '(?:reportList)',
             function ($params) {
                 try {
-                    $student = UserMapper::getInstance()->findById($params['studentId']);
-                } catch (MapperException $e){
-                    $student = new User();
+                    $student = $this->getUserMapper()->findById($params['studentId']);
+                } catch (MapperException $e) {
+                    $student = $this->getUserMapper()->createModel();
                 }
-                return [ 'student' => $student, ];
+                return ['student' => $student,];
             }
         );
 
@@ -75,12 +65,12 @@ class Module extends BaseModule
             '(?:sendReport)',
             function ($params) {
                 try {
-                    $student = UserMapper::getInstance()->findById($params['studentId']);
-                } catch (MapperException $e){
-                    $student = new User();
+                    $student = $this->getUserMapper()->findById($params['studentId']);
+                } catch (MapperException $e) {
+                    $student = $this->getUserMapper()->createModel();
                 }
                 return [
-                    'student'  => $student,
+                    'student' => $student,
                     'reportId' => $params['reportId']
                 ];
             }
@@ -102,9 +92,11 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'database' => MSSQL::getInstance(),
+                'database' => $injector->lazy(function () {
+                    return MSSQL::getInstance();
+                }),
             ])
         );
     }
@@ -130,29 +122,19 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
-                    new Rule\IsUserOrParentOfUser($this->externalDb, $this->userMapper, 'studentId')
+                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
                 )
-            )
-        ;
+            );
     }
 
-    /**
-     * @param  External_UserInterface $externalDb
-     * @return static
+    /* Getters / Setters
      */
-    public function setExternalDb($externalDb)
-    {
-        $this->externalDb = $externalDb;
-        return $this;
-    }
 
     /**
-     * @param  UserMapper $userMapper
-     * @return static
+     * @return UserMapper
      */
-    public function setUserMapper(UserMapper $userMapper)
+    protected function getUserMapper()
     {
-        $this->userMapper = $userMapper;
-        return $this;
+        return $this->getMapperFactory()->get(UserMapper::class);
     }
 }

@@ -16,6 +16,7 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Schoolbox\Curriculum\Source;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\UserMapper;
 
 class Module extends BaseModule
 {
@@ -33,6 +34,7 @@ class Module extends BaseModule
 
     /**
      * Only users with write permission to the curriculum service may import.
+     * @param Authorizer $authorizer
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
@@ -57,9 +59,9 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->params[Controller::class]['mapper']
-            = $injector->lazyNew(Mapper::class);
+            = $this->getMapperFactory()->getLazy(UserMapper::class);
         $injector->params[Controller::class]['sourceMapper']
-            = $injector->lazyNew(Source\Mapper::class);
+            = $this->getMapperFactory()->getLazy(Source\Mapper::class);
         $injector->set(
             'controller:'.$this->basename,
             $injector->lazyNew(Controller::class)

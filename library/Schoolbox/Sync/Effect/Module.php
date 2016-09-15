@@ -17,7 +17,6 @@ use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
 use Twig_Loader_Chain;
-use Schoolbox\Mapper\Exception;
 
 class Module extends BaseModule
 {
@@ -28,7 +27,8 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initRoutes(Router $router, $basePath) {
+    public function initRoutes(Router $router, $basePath)
+    {
         $this->addPostRoute($router, 'add', $basePath, "/add/{ruleId}");
 
         /* Special case
@@ -49,11 +49,12 @@ class Module extends BaseModule
      *
      * {@inheritdoc}
      */
-    public function initRoutePreloads(PathMatcher $matcher) {
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
         $this->addRoutePreload(
             $matcher,
             '(?:add|addSkip|delete|change)',
-            function($params) {
+            function ($params) {
                 return array(
                     'params' => $params,
                 );
@@ -89,8 +90,8 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->set(
-            'controller:'.$this->basename,
-            $injector->lazyNew('Schoolbox\\Sync\\Effect\\Controller')
+            'controller:' . $this->basename,
+            $injector->lazyNew(Controller::class)
         );
     }
 }

@@ -15,7 +15,6 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
-use External_UserInterface;
 use House;
 use HouseMapper;
 use Schoolbox\Assessment\Grades;
@@ -24,28 +23,9 @@ use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
-use Twig_Loader_Filesystem;
 
 class Module extends BaseModule
 {
-    /**
-     * Dependency on external user database.
-     *
-     * Required for checking that the requesting user is the student's parent.
-     *
-     * @var External_UserInterface
-     */
-    protected $externalDb;
-
-    /**
-     * Dependency on user mapper.
-     *
-     * Required for checking that the requesting user is the student's parent.
-     *
-     * @var UserMapper
-     */
-    protected $userMapper;
-
     protected $basename = 'customMeridenPastoral';
 
     /**
@@ -79,10 +59,9 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
-                    new Rule\IsUserOrParentOfUser($this->externalDb, $this->userMapper, 'id')
+                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'id')
                 )
-            )
-        ;
+            );
     }
 
     /**
@@ -91,15 +70,14 @@ class Module extends BaseModule
     public function initRoutePreloads(PathMatcher $matcher)
     {
         // Search for the user
-        // TODO move the mappers out of here, inject their dependency
-        $userMapper = $this->userMapper;
+
         $this->addRoutePreload(
             $matcher,
             '(?:index|subject|currentReport)',
-            function ($params) use ($userMapper) {
-                $student = $userMapper->findWithSubjects($params['id']);
+            function ($params) {
+                $student = $this->getUserMapper()->findWithSubjects($params['id']);
                 $student->setSubjectCollection(
-                    SubjectMapper::getInstance()->findAllForStudent($student)
+                    $this->getSubjectMapper()->findAllForStudent($student)
                 );
                 try {
                     // School house is actually an integer.
@@ -111,7 +89,7 @@ class Module extends BaseModule
                     } else {
                         $houseId = $schoolHouse;
                     }
-                    $student->setSchoolHouse(HouseMapper::getInstance()->findById($houseId));
+                    $student->setSchoolHouse($this->getHouseMapper()->findById($houseId));
                 } catch (\Exception $e) {
                     // noop - the controller will die at this point anyway
                 }
@@ -138,46 +116,53 @@ class Module extends BaseModule
     {
         // Inject the custom Meriden pastoral database connection too
         // a MSSQL connection should be a service?
-        $injector->params['Custom\\Meriden\\Pastoral\\Controller']['studentInvolvementFactory']
-            = $injector->lazyNew('Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory');
+        $injector->params[Controller::class]['studentInvolvementFactory']
+            = $injector->lazyNew(StudentInvolvement\Factory::class);
 
-        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['gateway']
-            = $injector->lazyNew('Custom\\Meriden\\Pastoral\\StudentInvolvement\\Gateway');
-        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['categoryMapper']
-            = $injector->lazyNew(Folder\Mapper::class);
-        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['userMapper']
-            = $injector->lazyNew('Schoolbox\\UserMapper');
-        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Factory']['gradesService']
+        $injector->params[StudentInvolvement\Factory::class]['gateway']
+            = $injector->lazyNew(StudentInvolvement\Gateway::class);
+        $injector->params[StudentInvolvement\Factory::class]['categoryMapper']
+            = $this->getMapperFactory()->getLazy(Folder\Mapper::class);
+        $injector->params[StudentInvolvement\Factory::class]['userMapper']
+            = $this->getMapperFactory()->getLazy(UserMapper::class);
+        $injector->params[StudentInvolvement\Factory::class]['gradesService']
             = Grades::getInstance();
 
-        $injector->params['Custom\\Meriden\\Pastoral\\StudentInvolvement\\Gateway']['database']
-            = $injector->lazyNew('MSSQL');
+        $injector->params[StudentInvolvement\Gateway::class]['database']
+            = $injector->lazy(function () {
+            return \MSSQL::getInstance();
+        });
 
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew('Custom\\Meriden\\Pastoral\\Controller')
         );
     }
 
-    /**
-     * @param  External_UserInterface $externalDb
-     *
-     * @return $this
+    /* Getters / Setters
      */
-    public function setExternalDb($externalDb)
+
+    /**
+     * @return UserMapper
+     */
+    protected function getUserMapper()
     {
-        $this->externalDb = $externalDb;
-        return $this;
+        return $this->getMapperFactory()->get(UserMapper::class);
     }
 
     /**
-     * @param  UserMapper $userMapper
-     *
-     * @return $this
+     * @return HouseMapper
      */
-    public function setUserMapper($userMapper)
+    protected function getHouseMapper()
     {
-        $this->userMapper = $userMapper;
-        return $this;
+        return $this->getMapperFactory()->get(HouseMapper::class);
+    }
+
+    /**
+     * @return SubjectMapper
+     */
+    protected function getSubjectMapper()
+    {
+        return $this->getMapperFactory()->get(SubjectMapper::class);
     }
 }

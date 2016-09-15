@@ -37,6 +37,7 @@ class Module extends BaseModule
      */
     protected $basename = 'eportfolioBlog';
 
+
     /**
      * {@inheritdoc}
      */
@@ -161,27 +162,27 @@ class Module extends BaseModule
                 $newParams = [];
                 try {
                     if (array_key_exists('ownerId', $params)) {
-                        $newParams['owner'] = UserMapper::getInstance()->findById($params['ownerId']);
+                        $newParams['owner'] = $this->getUserMapper()->findById($params['ownerId']);
                     }
                     if (array_key_exists('commentId', $params)) {
                         /** @var EportfolioBlogCommentModel $comment */
-                        $comment              = EportfolioBlogCommentMapper::getInstance()->findById($params['commentId']);
+                        $comment              = $this->getEportfolioBlogCommentMapper()->findById($params['commentId']);
                         $newParams['comment'] = $comment;
                         // Add blog in next step
                         $params['id']         = $comment->getBlog()->getId();
                     }
                     if (array_key_exists('id', $params)) {
                         /** @var EportfolioBlogModel $blog */
-                        $blog              = EportfolioBlogMapper::getInstance()->findById($params['id']);
+                        $blog              = $this->getEportfolioBlogMapper()->findById($params['id']);
                         $newParams['blog'] = $blog;
                         // Add page in next step
                         $params['pageId']  = $blog->getPageId();
                     }
                     if (array_key_exists('pageId', $params)) {
-                        $newParams['page'] = EportfolioPageMapper::getInstance()->findById($params['pageId']);
+                        $newParams['page'] = $this->getEportfolioPageMapper()->findById($params['pageId']);
                     }
                 } catch (MapperException $e) {
-                    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                 }
                 return $newParams;
             }
@@ -202,5 +203,49 @@ class Module extends BaseModule
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return UserMapper
+     */
+    protected function getUserMapper()
+    {
+        return $this->getMapperFactory()->get(UserMapper::class);
+    }
+
+    /**
+     * @return EportfolioBlogCommentMapper
+     */
+    protected function getEportfolioBlogCommentMapper()
+    {
+        return $this->getMapperFactory()->get(EportfolioBlogCommentMapper::class);
+    }
+
+    /**
+     * @return EportfolioBlogMapper
+     */
+    protected function getEportfolioBlogMapper()
+    {
+        return $this->getMapperFactory()->get(EportfolioBlogMapper::class);
+    }
+
+    /**
+     * @return EportfolioPageMapper
+     */
+    protected function getEportfolioPageMapper()
+    {
+        return $this->getMapperFactory()->get(EportfolioPageMapper::class);
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 }

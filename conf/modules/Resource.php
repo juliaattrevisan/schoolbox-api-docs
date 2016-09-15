@@ -11,6 +11,7 @@ namespace Config\Modules;
 use Alaress\Application\Kernel;
 use Schoolbox;
 
+// TODO - this class name is illegal in PHP7. Needs to be changed to other than 'Resource'
 class Resource implements ModuleConfigInterface
 {
 

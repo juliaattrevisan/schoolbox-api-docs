@@ -11,13 +11,14 @@ namespace Schoolbox\ResourceBooking\Item;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Authorizer\Failure;
 use Alaress\Authorizer\Rule;
+use Alaress\Paginator\UrlPaginator;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
+use Schoolbox\RoleMapper;
+use Schoolbox\UserMapper;
 use Twig_Loader_Chain;
-use Twig_Loader_Filesystem;
 use Schoolbox\Permission\Access\UserAccess;
 
 class Module extends BaseModule
@@ -36,7 +37,8 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutePreloads(PathMatcher $matcher) {
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
         // Add the item to params, if ID is in the route.
         $this->addRoutePreload(
             $matcher,
@@ -44,7 +46,7 @@ class Module extends BaseModule
             function($params) {
                 if (array_key_exists('id', $params)) {
                     return array(
-                        'item' => Mapper::getInstance()->findById($params['id']),
+                        'item' => $this->getMapper()->findById($params['id']),
                     );
                 }
                 return array();
@@ -81,16 +83,16 @@ class Module extends BaseModule
      * {@inheritdoc}
      */
     public function initControllers(ContainerInterface $injector) {
-        $injector->setters['Schoolbox\\ResourceBooking\\Item\\Controller']['setMapper']
-            = $injector->lazyNew('Schoolbox\\ResourceBooking\\Item\\Mapper');
-        $injector->setters['Schoolbox\\ResourceBooking\\Item\\Controller']['setUserMapper']
-            = $injector->lazyNew('Schoolbox\\UserMapper');
-        $injector->setters['Schoolbox\\ResourceBooking\\Item\\Controller']['setRoleMapper']
-            = $injector->lazyNew('Schoolbox\\RoleMapper');
+        $injector->setters[Controller::class]['setMapper']
+            = $this->getMapperFactory()->getLazy(Mapper::class);
+        $injector->setters[Controller::class]['setUserMapper']
+            = $this->getMapperFactory()->getLazy(UserMapper::class);
+        $injector->setters[Controller::class]['setRoleMapper']
+            = $this->getMapperFactory()->getLazy(RoleMapper::class);
         // Paginator needs the count per page and amount set.
-        $injector->setters['Schoolbox\\ResourceBooking\\Item\\Controller']['setPaginator']
+        $injector->setters[Controller::class]['setPaginator']
             = $injector->lazyNew(
-                'Alaress\\Paginator\\UrlPaginator',
+                UrlPaginator::class,
                 array(),
                 array(
                     'setPageSize' => 10,
@@ -99,8 +101,19 @@ class Module extends BaseModule
         );
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew('Schoolbox\\ResourceBooking\\Item\\Controller')
+            $injector->lazyNew(Controller::class)
         );
+    }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return Mapper
+     */
+    protected function getMapper()
+    {
+        return $this->getMapperFactory()->get(Mapper::class);
     }
 
 }

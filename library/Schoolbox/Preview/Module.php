@@ -56,13 +56,6 @@ class Module extends BaseModule
     /**
      * {@inheritdoc}
      */
-    public function initRoutePermissions(Authorizer $authorizer)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/Templates');
@@ -75,7 +68,7 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew('Schoolbox\\Preview\\Controller')
+            $injector->lazyNew(Controller::class)
         );
     }
 }

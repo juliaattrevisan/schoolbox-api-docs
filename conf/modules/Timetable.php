@@ -24,7 +24,6 @@ class Timetable implements ModuleConfigInterface
     public function configure($kernel)
     {
         $module = new Module($kernel->getDependencyInjector());
-        $module->setExternalDb(new \External_Timetable());
         $module->init('/timetable');
     }
 }

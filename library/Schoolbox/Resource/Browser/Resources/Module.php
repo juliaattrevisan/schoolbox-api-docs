@@ -51,9 +51,9 @@ class Module extends AbstractModule
         // add/override the parent list
         return array_merge(parent::getSetterList($ci), [
             'setTreeBuilder'      => $ci->lazyNew(Resource\Browser\Resources\TreeBuilder::class),
-            'setFolderMapper'     => $ci->lazyNew(Resource\Folder\Mapper::class),
-            'setFileMapper'       => $ci->lazyNew(Resource\File\Mapper::class),
-            'setLinkMapper'       => $ci->lazyNew(Resource\LinkMapper::class),
+            'setFolderMapper'     => $this->getMapperFactory()->getLazy(Resource\Folder\Mapper::class),
+            'setFileMapper'       => $this->getMapperFactory()->getLazy(Resource\File\Mapper::class),
+            'setLinkMapper'       => $this->getMapperFactory()->getLazy(Resource\LinkMapper::class),
             'setNodeType'         => Resource\Browser\NodeFactory::SBFS,
         ]);
     }
@@ -66,11 +66,14 @@ class Module extends AbstractModule
     {
         $setters = $this->getSetterList($injector);
 
-        $injector->params[TreeBuilder::class]['taskMapper']       = $injector->lazyNew(TaskMapper::class);
+        $injector->params[TreeBuilder::class]['taskMapper']       = $this->getMapperFactory()->getLazy(TaskMapper::class);
         $injector->params[TreeBuilder::class]['locator']          = $setters['setFolderMapper'];
         $injector->setters[TreeBuilder::class]['setFileLocator']  = $injector->lazy(
             function () use ($injector) {
-                return new Resource\File\CompositeLocator(new Resource\File\Mapper(), new Resource\LinkMapper());
+                return new Resource\File\CompositeLocator(
+                    $this->getMapperFactory()->get(Resource\File\Mapper::class),
+                    $this->getMapperFactory()->get(Resource\LinkMapper::class)
+                );
             }
         );
 

@@ -25,7 +25,8 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use Twig_Loader_Chain;
 
@@ -35,6 +36,7 @@ class Module extends BaseModule
      * @var string
      */
     protected $basename = 'blog';
+
 
     /**
      * {@inheritdoc}
@@ -118,7 +120,7 @@ class Module extends BaseModule
         $permissionRule = new Rule\HasHomepageAccess(
             $accessLevel,
             function ($params) {
-                if ($params['folder'] instanceof Folder\Model) {
+                if ($params['folder'] instanceof Folder) {
                     return $params['folder']->getId();
                 }
                 if ($params['blog'] instanceof BlogModel) {
@@ -146,23 +148,23 @@ class Module extends BaseModule
                 try {
                     if (array_key_exists('commentId', $params)) {
                         /** @var BlogCommentModel $comment */
-                        $comment              = BlogCommentMapper::getInstance()->findById($params['commentId']);
+                        $comment              = $this->getBlogCommentMapper()->findById($params['commentId']);
                         $newParams['comment'] = $comment;
                         // Load blog in next step
                         $params['id']         = $comment->getBlog()->getId();
                     }
                     if (array_key_exists('id', $params)) {
                         /** @var BlogModel $blog */
-                        $blog               = BlogMapper::getInstance()->findById($params['id']);
+                        $blog               = $this->getBlogMapper()->findById($params['id']);
                         $newParams['blog']  = $blog;
                         // Load folder in next step
                         $params['folderId'] = $blog->getFolder()->getId();
                     }
                     if (array_key_exists('folderId', $params)) {
-                        $newParams['folder'] = Folder\Mapper::getInstance()->findById($params['folderId']);
+                        $newParams['folder'] = $this->getFolderMapper()->findById($params['folderId']);
                     }
                 } catch (MapperException $e) {
-                    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_RESOURCE_NOT_FOUND);
                 }
                 return $newParams;
             }
@@ -183,5 +185,40 @@ class Module extends BaseModule
     public function initTemplatePaths(Twig_Loader_Chain $templateLoader)
     {
         $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return BlogCommentMapper
+     */
+    protected function getBlogCommentMapper()
+    {
+        return $this->getMapperFactory()->get(BlogCommentMapper::class);
+    }
+
+    /**
+     * @return BlogMapper
+     */
+    protected function getBlogMapper()
+    {
+        return $this->getMapperFactory()->get(BlogMapper::class);
+    }
+
+    /**
+     * @return FolderMapper
+     */
+    protected function getFolderMapper()
+    {
+        return $this->getMapperFactory()->get(FolderMapper::class);
+    }
+
+    /**
+     * @return ErrorMapper
+     */
+    protected function getErrorMapper()
+    {
+        return $this->getMapperFactory()->get(ErrorMapper::class);
     }
 }

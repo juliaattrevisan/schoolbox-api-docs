@@ -122,15 +122,12 @@ class Module extends BaseModule
 
         /* Load folders
          */
-        $unitInstanceMapper = new UnitInstanceMapper();
-        $folderMapper = new FolderMapper();
         $allUnitInstances = new Collection();
-        $termMapper = new TermMapper();
 
         /* Try to find the parent course folder which spawned minions
          */
         try {
-            $courseFolder = $folderMapper->findById($params['courseId']);
+            $courseFolder = $this->getFolderMapper()->findById($params['courseId']);
         }
         catch (\Exception $e) {
             error(148);
@@ -143,7 +140,7 @@ class Module extends BaseModule
         if (isset($params['term'])) {
             try {
                 /** @var TermModel $term */
-                $term = $termMapper->findOneByColumn('code', $params['term']);
+                $term = $this->getTermMapper()->findOneByColumn('code', $params['term']);
 
                 $from = $term->getStart();
                 $to   = $term->getActualFinish();
@@ -153,13 +150,13 @@ class Module extends BaseModule
             }
         }
         else {
-            $term = $termMapper->createModel();
+            $term = $this->getTermMapper()->createModel();
 
-            $from = $termMapper->findOldest()->getStart();
+            $from = $this->getTermMapper()->findOldest()->getStart();
             $to   = new \Alaress_Date_NullDate();
         }
 
-        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $from, $to);
+        $allFoldersUsingCourse = $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($courseFolder, $from, $to);
 
         /* Acrobatics
          */
@@ -181,7 +178,7 @@ class Module extends BaseModule
                 /* All the unit instances associated with folders which used the same
                  * $courseFolder as a source. Filter it based due dates between $from and $to
                  */
-                $allUnitInstances = $unitInstanceMapper->findForFolderDueBetween($allCategoryIds, $from, $to);
+                $allUnitInstances = $this->getUnitInstanceMapper()->findForFolderDueBetween($allCategoryIds, $from, $to);
             }
             catch (Exception $e) {
                 error(159);
@@ -224,15 +221,12 @@ class Module extends BaseModule
 
         /* Load folders
          */
-        $unitInstanceMapper = new UnitInstanceMapper();
-        $folderMapper = new FolderMapper();
         $allUnitInstances = new Collection();
-        $termMapper = new TermMapper();
 
         /* Try to find the parent course folder which spawned minions
          */
         try {
-            $courseFolder = $folderMapper->findById($params['courseId']);
+            $courseFolder = $this->getFolderMapper()->findById($params['courseId']);
         }
         catch (\Exception $e) {
             error(148);
@@ -245,7 +239,7 @@ class Module extends BaseModule
         if (isset($params['term'])) {
             try {
                 /** @var TermModel $term */
-                $term = $termMapper->findOneByColumn('code', $params['term']);
+                $term = $this->getTermMapper()->findOneByColumn('code', $params['term']);
 
                 $from = $term->getStart();
                 $to   = $term->getActualFinish();
@@ -255,13 +249,13 @@ class Module extends BaseModule
             }
         }
         else {
-            $term = $termMapper->createModel();
+            $term = $this->getTermMapper()->createModel();
 
-            $from = $termMapper->findOldest()->getStart();
+            $from = $this->getTermMapper()->findOldest()->getStart();
             $to   = new \Alaress_Date_NullDate();
         }
 
-        $allFoldersUsingCourse = $unitInstanceMapper->findAllFoldersUsingCourse($courseFolder, $from, $to);
+        $allFoldersUsingCourse = $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($courseFolder, $from, $to);
 
         /* No acrobatics required
          */
@@ -270,7 +264,7 @@ class Module extends BaseModule
             /* All the unit instances associated with the specified folder which used the same
              * $courseFolder as a source. Filter it based due dates between $from and $to
          */
-            $allUnitInstances = $unitInstanceMapper->findForFolderDueBetween([$params['folderId']], $from, $to);
+            $allUnitInstances = $this->getUnitInstanceMapper()->findForFolderDueBetween([$params['folderId']], $from, $to);
         }
         catch (Exception $e) {
             error(159);
@@ -308,7 +302,35 @@ class Module extends BaseModule
     {
         $injector->set(
             'controller:'.$this->basename,
-            $injector->lazyNew('Schoolbox\\LearningAnalytics\\Controller')
+            $injector->lazyNew(Controller::class)
         );
     }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return UnitInstanceMapper
+     */
+    protected function getUnitInstanceMapper()
+    {
+        return $this->getMapperFactory()->get(UnitInstanceMapper::class);
+    }
+
+    /**
+     * @return FolderMapper
+     */
+    protected function getFolderMapper()
+    {
+        return $this->getMapperFactory()->get(FolderMapper::class);
+    }
+
+    /**
+     * @return TermMapper
+     */
+    protected function getTermMapper()
+    {
+        return $this->getMapperFactory()->get(TermMapper::class);
+    }
+
 }

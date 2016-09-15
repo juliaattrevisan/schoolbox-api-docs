@@ -42,7 +42,7 @@ class Module extends BaseModule
             'impersonate',
             function ($params) {
                 return array(
-                    'user' => UserMapper::getInstance()->findById($params['userId']),
+                    'user' => $this->getUserMapper()->findById($params['userId']),
                 );
             }
         );
@@ -77,6 +77,17 @@ class Module extends BaseModule
      */
     public function initControllers(ContainerInterface $injector)
     {
-        $injector->set('controller:'.$this->basename, $injector->lazyNew('Schoolbox\\User\\Controller'));
+        $injector->set('controller:'.$this->basename, $injector->lazyNew(Controller::class));
+    }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return UserMapper
+     */
+    protected function getUserMapper()
+    {
+        return $this->getMapperFactory()->get(UserMapper::class);
     }
 }

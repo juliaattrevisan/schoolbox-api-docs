@@ -6,7 +6,7 @@
  * @copyright Copyright 2014, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
  */
- 
+
 namespace Schoolbox\ResourceBooking\Booking;
 
 use Alaress\Authorizer\Authorizer;
@@ -36,9 +36,9 @@ class Module extends BaseModule
         $this->addGetRoute($router, 'book', $basePath, '/bookItem/{id}');
         $this->addGetRoute($router, 'edit', $basePath, '/{id}/edit');
         $this->addPostRoute($router, 'createBooking', $basePath, '/bookItem/{id}')
-               ->addValues(array('action' => 'createBooking'));
+            ->addValues(array('action' => 'createBooking'));
         $this->addPostRoute($router, 'update:post', $basePath, '/{id}/update')
-               ->addValues(array('action' => 'update'));
+            ->addValues(array('action' => 'update'));
         $this->addRoute($router, 'bookingCalendar', $basePath, '/itemCalendar/{id}');
 
         // Approving or rejecting a single booking
@@ -57,9 +57,9 @@ class Module extends BaseModule
         $this->addRoutePreload(
             $matcher,
             '(?:edit|update|approve|reject|setPending|cancel)',
-            function($params) {
+            function ($params) {
                 return array(
-                    'item' => Mapper::getInstance()->findById($params['id']),
+                    'item' => $this->getMapper()->findById($params['id']),
                 );
             }
         );
@@ -67,9 +67,9 @@ class Module extends BaseModule
         $this->addRoutePreload(
             $matcher,
             '(?:book|createBooking|bookingCalendar)',
-            function($params) {
+            function ($params) {
                 return array(
-                    'item' => ItemMapper::getInstance()->findById($params['id']),
+                    'item' => $this->getItemMapper()->findById($params['id']),
                 );
             }
         );
@@ -95,28 +95,27 @@ class Module extends BaseModule
             new Rule\HasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL)
         );
         $isItemModeratorRule = new Auth\CanModerateBooking();
-        $isItemModeratorRule->setMapper(Mapper::getInstance());
+        $isItemModeratorRule->setMapper($this->getMapper());
         $baseManageRule->addRule($isItemModeratorRule);
 
         // Create booking:
         // This depends on the the item - managed items can only be booked by
         // moderators, otherwise they may be booked by any staff member.
         $canBookRule = new Auth\CanBookItem();
-        $canBookRule->setMapper(ItemMapper::getInstance());
+        $canBookRule->setMapper($this->getItemMapper());
         $bookingCreateRule = new Rule\Any($baseManageRule, $canBookRule);
 
         // Cancel/edit rule:
         // booking can be cancelled by a moderator, or the owner of the booking.
         $isOwnerRule = new Auth\UserOwnsBooking();
-        $isOwnerRule->setMapper(Mapper::getInstance());
+        $isOwnerRule->setMapper($this->getMapper());
         $bookingEditRule = new Rule\Any($baseManageRule, $isOwnerRule);
 
         $this
             ->addRoutePermission($authorizer, '.*', new Rule\IsLoggedIn())
             ->addRoutePermission($authorizer, '(?:book|createBooking)', $bookingCreateRule)
             ->addRoutePermission($authorizer, '(?:approve|reject|setPending)', $baseManageRule)
-            ->addRoutePermission($authorizer, '(?:cancel|edit|update:post)', $bookingEditRule)
-        ;
+            ->addRoutePermission($authorizer, '(?:cancel|edit|update:post)', $bookingEditRule);
     }
 
     /**
@@ -133,23 +132,41 @@ class Module extends BaseModule
     public function initControllers(ContainerInterface $injector)
     {
         $injector->setters[Controller::class]['setEventMapper']
-            = $injector->lazyNew(Calendar\EventMapper::class);
-        $injector->params[Calendar\EventRecurrenceMapper::class] = array(
-            'eventMapper' => $injector->lazyNew(Calendar\EventMapper::class)
-        );
+            = $this->getMapperFactory()->getLazy(Calendar\EventMapper::class);
         $injector->setters[Controller::class]['setEventRecurrenceMapper']
-            = $injector->lazyNew(Calendar\EventRecurrenceMapper::class);
+            = $injector->lazyNew(Calendar\EventRecurrenceMapper::class, [
+            'eventMapper' => $this->getMapperFactory()->getLazy(Calendar\EventMapper::class)
+        ]);
         $injector->setters[Controller::class]['setBookingMapper']
-            = $injector->lazyNew(Mapper::class);
+            = $this->getMapperFactory()->getLazy(Mapper::class);
         $injector->setters[Controller::class]['setResourceMapper']
-            = $injector->lazyNew(ItemMapper::class);
+            = $this->getMapperFactory()->getLazy(ItemMapper::class);
         $injector->setters[Controller::class]['setExternalTimetableHandler']
-            = $injector->lazyNew('External_Timetable');
+            = $injector->get('externalTimetable');
         $injector->setters[Controller::class]['setCampusMapper']
-            = $injector->lazyNew(CampusMapper::class);
+            = $this->getMapperFactory()->getLazy(CampusMapper::class);
         $injector->set(
-            'controller:'.$this->basename,
+            'controller:' . $this->basename,
             $injector->lazyNew(Controller::class)
         );
+    }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return Mapper
+     */
+    protected function getMapper()
+    {
+        return $this->getMapperFactory()->get(Mapper::class);
+    }
+
+    /**
+     * @return ItemMapper
+     */
+    protected function getItemMapper()
+    {
+        return $this->getMapperFactory()->get(ItemMapper::class);
     }
 }

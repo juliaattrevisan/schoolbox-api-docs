@@ -56,9 +56,9 @@ class Module extends BaseModule
             '(displayResetForm|reset)',
             function ($params) {
                 try {
-                    $token = Mapper::getInstance()->findById($params['token']);
+                    $token = $this->getMapper()->findById($params['token']);
                 } catch (MapperException $e) {
-                    $token = Mapper::getInstance()->createModel();
+                    $token = $this->getMapper()->createModel();
                 }
                 return ['reset' => $token,];
             }
@@ -84,8 +84,8 @@ class Module extends BaseModule
                 Controller::class,
                 [
                     'passwordService'        => $injector->lazyNew(PasswordService::class),
-                    'userMapper'             => UserMapper::getInstance(),
-                    'resetMapper'            => Mapper::getInstance(),
+                    'userMapper'             => $this->getMapperFactory()->getLazy(UserMapper::class),
+                    'resetMapper'            => $this->getMapperFactory()->getLazy(Mapper::class),
                     'communityPortalFactory' => $injector->lazyNew(CommunityPortalFactory::class),
                     'mailFactory'            => $injector->lazyNew(
                         Mail\TwigEmailFactory::class,
@@ -100,4 +100,25 @@ class Module extends BaseModule
             )
         );
     }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return Mapper
+     */
+    protected function getMapper()
+    {
+        return $this->getMapperFactory()->get(Mapper::class);
+    }
+
+    /**
+     * @return UserMapper
+     */
+    protected function getUserMapper()
+    {
+        return $this->getMapperFactory()->get(UserMapper::class);
+    }
+
+
 }
