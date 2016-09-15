@@ -8,7 +8,6 @@
  */
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\Mapper\Exception as MapperException;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 spl_autoload_call('\\Schoolbox\\Application\\Daemon');
@@ -29,34 +28,38 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     // Find old courses and units
     $selectOldCoursesQuery = $database->prepare("
         SELECT DISTINCT
-            `folder`.`id`,
-            `folder`.`name`
-        FROM folder
-        LEFT JOIN `folder` AS `unit` ON `folder`.`id` = `unit`.`parent`
+            `course`.`id`,
+            `course`.`name`,
+            `course`.`deleted_at`
+        FROM `folder` AS `course`
+        LEFT JOIN `folder` AS `unit` ON `course`.`id` = `unit`.`parent`
         INNER JOIN component_instance ci ON ci.identifier = unit.id AND ci.module = 'homepage'
         LEFT JOIN component_definition cd ON ci.component_definition_id = cd.id
-        WHERE `folder`.`deleted_at` IS NULL
-        AND `cd`.`class` = 'Component_Homepage_CourseBuilderController'
-        AND `unit`.`deleted_at` IS NULL
+        WHERE `cd`.`class` = 'Component_Homepage_CourseBuilderController'
     ");
     $selectOldUnitsQuery = $database->prepare("
         SELECT DISTINCT
-            `folder`.`id`,
-            `folder`.`name`
-        FROM `folder`
-        LEFT JOIN folder AS course ON `folder`.parent = course.id
-        RIGHT JOIN component_instance ci ON ci.identifier = `folder`.id AND ci.module = 'homepage'
+            `unit`.`id`,
+            `unit`.`name`,
+            `unit`.`deleted_at`
+        FROM `folder` AS `unit`
+        LEFT JOIN folder AS course ON `unit`.parent = course.id
+        RIGHT JOIN component_instance ci ON ci.identifier = `unit`.id AND ci.module = 'homepage'
         LEFT JOIN component_definition cd ON ci.component_definition_id = cd.id
-        LEFT JOIN `task` AS `t` ON `folder`.`id` = `t`.`category_id` AND `t`.`deleted_at` IS NULL
-        WHERE `folder`.`deleted_at` IS NULL
-        AND `cd`.`class` = 'Component_Homepage_CourseBuilderController'
-        AND `course`.`deleted_at` IS NULL
-        AND `folder`.`parent` = :parent
+        LEFT JOIN `task` AS `t` ON `unit`.`id` = `t`.`category_id` AND `t`.`deleted_at` IS NULL
+        WHERE `cd`.`class` = 'Component_Homepage_CourseBuilderController'
+        AND   `unit`.`parent` = :parent
     ");
 
     // Insert new courses and units
-    $insertNewCourseQuery = $database->prepare("INSERT INTO course (folder_id) VALUES (:folderId)");
-    $insertNewUnitQuery   = $database->prepare("INSERT INTO course_unit (folder_id, course_id) VALUES (:folderId, :courseId)");
+    // TODO find out if there's a viable created_at field to use for either of these tables
+    $insertNewCourseQuery = $database->prepare("
+        INSERT INTO course (folder_id, created_at, updated_at, deleted_at) VALUES (:folderId, NOW(), NOW(), :deleted)
+    ");
+    $insertNewUnitQuery   = $database->prepare("
+        INSERT INTO course_unit (folder_id, course_id, created_at, updated_at, deleted_at)
+        VALUES (:folderId, :courseId, NOW(), NOW(), :deleted)
+    ");
 
 
     // Go
@@ -68,11 +71,14 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         // Convert just this course
         $log->info(sprintf('Converting course "%s" (id: %d)...', $deprecatedCourse['name'], $deprecatedCourse['id']));
         try {
-            $insertNewCourseQuery->execute(['folderId' => $deprecatedCourse['id']]);
+            $insertNewCourseQuery->execute([
+                'folderId' => $deprecatedCourse['id'],
+                'deleted'  => $deprecatedCourse['deleted_at'],
+            ]);
             $log->debug(sprintf('Course "%s" converted', $deprecatedCourse['name']));
             $courseId = $database->lastInsertId();
             $successCount++;
-        } catch (MapperException $e) {
+        } catch (PDOException $e) {
             $log->error(sprintf('Course "%s" could not be converted!', $deprecatedCourse['name']), [$e]);
             $failureCount++;
             continue;
@@ -88,10 +94,14 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         foreach ($selectOldUnitsQuery as $deprecatedUnit) {
             $log->info(sprintf('Converting unit "%s" (id: %d)...', $deprecatedUnit['name'], $deprecatedUnit['id']));
             try {
-                $insertNewUnitQuery->execute(['folderId' => $deprecatedUnit['id'], 'courseId' => $courseId]);
+                $insertNewUnitQuery->execute([
+                    'folderId' => $deprecatedUnit['id'],
+                    'courseId' => $courseId,
+                    'deleted'  => $deprecatedUnit['deleted_at'],
+                ]);
                 $log->debug(sprintf('Unit "%s" converted', $deprecatedUnit['name']));
                 $unitSuccessCount++;
-            } catch (MapperException $e) {
+            } catch (PDOException $e) {
                 $log->error(sprintf('Unit "%s" could not be converted!', $deprecatedUnit['name']), [$e]);
                 $unitFailureCount++;
             }

@@ -1,7 +1,5 @@
 <?php
 /**
- * Mapper for the unit instance model.
- *
  * @author    Amri Sannang <amri.sannang@alaress.com.au>
  * @copyright Copyright 2013, Alaress Pty Ltd
  * @link      http://www.alaress.com.au/
@@ -19,7 +17,12 @@ use Schoolbox\User;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Alaress_Date_Format;
 
-
+/**
+ * Mapper for the unit instance model.
+ *
+ * @deprecated Use \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper
+ *             and its related business domain classes instead.
+ */
 class UnitInstanceMapper extends BaseMapper {
 
     protected function mapping() {
