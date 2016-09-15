@@ -318,6 +318,61 @@ class TaskTest extends \Schoolbox\Learning\Assessment\Test\Defaults
         $this->assertEquals(null, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->getNormalisedMark());
         $this->assertEquals(true, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->isPublished());
     }
+
+    /**
+     * What happens if you update an already-published feedback?
+     */
+    public function testUpdateFeedbackAfterPublish()
+    {
+        $task = $this->spawnTask();
+
+        $completion = (new TaskCompletion);
+        $completion
+            ->setId(883)
+            ->setAssessable($task)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $feedback = new TaskFeedback();
+        $feedback
+            ->setId(87)
+            ->setAssessable($task)
+            ->setComment('This is the most recently published feedback, updated after publishing')
+            ->setNormalisedMark(999999)
+            ->setReviewer($this->celia)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2017-08-27 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $floatingFeedback = new TaskFeedback();
+        $floatingFeedback
+            ->setId(89)
+            ->setAssessable($task)
+            ->setComment('Helly was here')
+            ->setNormalisedMark(8888888)
+            ->setReviewer($this->celia)
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:20', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:20', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $completion->getAllFeedback()->add($feedback);
+
+        $task->getParticipant($this->hodes)->getAllResponses()->add($completion);
+        $task->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
+        $task->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+
+        /* The most recent feedback was published 2016-09-15 01:27:33
+         */
+        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->getId());
+        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback($task)->getId());
+
+        /* Most recent feedback has a normalised mark of null
+         * Tasks always return null for normalised marks
+         */
+        $this->assertEquals(null, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->getNormalisedMark());
+        $this->assertEquals(true, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->isPublished());
+    }
 }
 
 

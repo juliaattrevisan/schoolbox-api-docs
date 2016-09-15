@@ -480,4 +480,183 @@ class QuizTest extends \Schoolbox\Learning\Assessment\Test\Defaults
          */
         $this->assertEquals(60, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getNormalisedMark());
     }
+
+    /**
+     * What happens if you update an already-published feedback?
+     */
+    public function testUpdateFeedbackAfterPublish()
+    {
+        $id = 3;
+        $title = 'How did you find The Prime Evil?';
+        $description = 'A quick pop quiz about how you died your way to Diablo.';
+
+        $quiz = (new Quiz())
+            ->setId($id)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setCreator($this->somodio)
+            ->setAllParticipants((new Collection())
+                ->add(new Participant($this->hodes))
+                ->add(new Participant($this->bsalem))
+                ->add(new Participant($this->sberryhill))
+                ->add(new Participant($this->asaxon)))
+            ->setPublishAt($this->twentyDaysFromNow)
+            ->setOpenAt($this->twentyDaysFromNow)
+            ->setDueAt($this->thirtyDaysFromNow)
+            ->setCloseAt($this->fortyDaysFromNow)
+            ->setCreatedAt($this->today)
+            ->setUpdatedAt($this->today);
+
+        $attempt = (new QuizAttempt);
+        $attempt
+            ->setId(8655)
+            ->setAssessable($quiz)
+            ->setSubmittedBy($this->bsalem)
+            ->setSubmittedOnBehalfOf($this->bsalem)
+            ->setCreatedAt($this->today)
+            ->setUpdatedAt($this->today);
+
+        $feedback = new QuizReview();
+        $feedback
+            ->setId(99759)
+            ->setAssessable($quiz)
+            ->setNormalisedMark(98)
+            ->setAllResponses([
+                [
+                    'mark' => 4, // Question 1,
+                    'available' => 5
+                ],
+                [
+                    'mark' => 0, // Question 2
+                    'available' => 5
+                ],
+                [
+                    'mark' => 2, // Question 3
+                    'available' => 5
+                ],
+                [
+                    'mark' => 1, // Question 4
+                    'available' => 5
+                ]
+            ])
+            ->setReviewer($this->celia)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-15 03:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $attempt->getAllFeedback()->add($feedback);
+        $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
+
+        $feedback = new QuizReview();
+        $feedback
+            ->setId(99760)
+            ->setAssessable($quiz)
+            ->setNormalisedMark(45)
+            ->setAllResponses([
+                [
+                    'mark' => 5, // Question 1,
+                    'available' => 5
+                ],
+                [
+                    'mark' => 5, // Question 2
+                    'available' => 5
+                ],
+                [
+                    'mark' => 3, // Question 3
+                    'available' => 5
+                ],
+                [
+                    'mark' => 3, // Question 4
+                    'available' => 5
+                ]
+            ])
+            ->setReviewer($this->celia)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-09-16 05:31:29', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-09-12 12:12:12', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-09-12 12:12:12', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $attempt->getAllFeedback()->add($feedback);
+        $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
+
+        $feedback = new QuizReview();
+        $feedback
+            ->setId(99761)
+            ->setAssessable($quiz)
+            ->setNormalisedMark(1)
+            ->setAllResponses([
+                [
+                    'mark' => 1, // Question 1,
+                    'available' => 5
+                ],
+                [
+                    'mark' => 1, // Question 2
+                    'available' => 5
+                ],
+                [
+                    'mark' => 1, // Question 3
+                    'available' => 5
+                ],
+                [
+                    'mark' => 2, // Question 4
+                    'available' => 5
+                ]
+            ])
+            ->setReviewer($this->celia)
+            ->setCreatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $attempt->getAllFeedback()->add($feedback);
+        $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
+
+        $feedback = new QuizReview();
+        $feedback
+            ->setId(99762)
+            ->setAssessable($quiz)
+            ->setNormalisedMark(83)
+            ->setAllResponses([
+                [
+                    'mark' => 3, // Question 1,
+                    'available' => 5
+                ],
+                [
+                    'mark' => 2, // Question 2
+                    'available' => 5
+                ],
+                [
+                    'mark' => 2, // Question 3
+                    'available' => 5
+                ],
+                [
+                    'mark' => 5, // Question 4
+                    'available' => 5
+                ]
+            ])
+            ->setComment('This is the most recent published feedback; also most recent feedback')
+            ->setReviewer($this->celia)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-09-25 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-09-10 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2017-09-10 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $attempt->getAllFeedback()->add($feedback);
+        $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
+
+        $quiz->getParticipant($this->bsalem)->getAllResponses()->add($attempt);
+
+        /* The most recent feedback is 99762
+         */
+        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentFeedback($quiz)->getId());
+
+        /* The most recent feedback is also published
+         */
+        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getId());
+
+        /* Quiz's Normalised Mark is derived. It does not use the getter/setter
+         * for Normalised Mark like the other Assessables
+         */
+        $this->assertNotEquals(83, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getNormalisedMark());
+
+        /* Test its derived stuff instead
+         */
+        $this->assertEquals(60, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getNormalisedMark());
+    }
 }

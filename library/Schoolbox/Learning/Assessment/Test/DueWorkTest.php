@@ -719,4 +719,91 @@ class DueWorkTest extends \Schoolbox\Learning\Assessment\Test\Defaults
          */
         $this->assertEquals(100, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback($dueWork)->getNormalisedMark());
     }
+
+    /**
+     * What happens if you update an already-published feedback?
+     */
+    public function testUpdateFeedbackAfterPublish()
+    {
+        $dueWork = $this->spawnDueWork();
+
+        $submission = new DueWorkSubmission();
+        $submission
+            ->setId(553)
+            ->setAssessable($dueWork)
+            ->setSubmittedBy($this->hodes)
+            ->setSubmittedOnBehalfOf($this->hodes)
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $feedback = (new DueWorkFeedback())
+            ->setId(3385)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(-3)
+            ->setComment('This is a flawed piece of work.')
+            ->setReviewer($this->celia)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dueWork->getParticipant($this->hodes)->getAllResponses()->add($submission);
+        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
+
+        $submission->getAllFeedback()->add($feedback);
+
+        /* Freefloating Feedback
+         *
+         * This Feedback isn't associated with a particular Submission,
+         * just the Assessable itself
+         */
+        $floatingFeedback = (new DueWorkFeedback())
+            ->setId(4223)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(37)
+            ->setComment('The most recently published, but updated after publishing')
+            ->setReviewer($this->celia)
+            ->setAllFiles(new Collection())
+            ->setPublishedAt(new \Alaress_Date_Format('2016-10-06 22:22:13', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2017-08-12 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+
+        $floatingFeedback = (new DueWorkFeedback())
+            ->setId(4236)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(100)
+            ->setReviewer($this->celia)
+            ->setAllFiles(new Collection())
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-06 23:43:43', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 23:41:41', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 23:41:41', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+
+        $floatingFeedback = (new DueWorkFeedback())
+            ->setId(4225)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(10)
+            ->setComment('this is the second most recent')
+            ->setReviewer($this->celia)
+            ->setAllFiles(new Collection())
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-06 23:23:25', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 23:23:21', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+
+        /* The most recently published feedback is 4223
+         */
+        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback($dueWork)->getId());
+
+        /* The most recent feedback is also 4223
+         */
+        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback($dueWork)->getId());
+
+        /* The mark for hodes should be 37
+         */
+        $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback($dueWork)->getNormalisedMark());
+    }
 }
