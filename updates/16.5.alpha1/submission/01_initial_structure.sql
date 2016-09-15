@@ -131,15 +131,15 @@ CREATE TABLE `assessment_course_unit_implementation` (
   `assessment_id` INT UNSIGNED NOT NULL,
   `course_unit_implementation_id` INT UNSIGNED NOT NULL,
   INDEX `fk_assessment_course_unit_implementation_assessment_id_idx` (`assessment_id` ASC),
-  INDEX `fk_assessment_course_unit_implementation_course_unit_implementation_id_idx` (`course_unit_implementation_id` ASC),
+  INDEX `fk_assessment_course_unit_implementation_cui_id_idx` (`course_unit_implementation_id` ASC),
   CONSTRAINT `fk_assessment_course_unit_implementation_assessment_id`
     FOREIGN KEY (`assessment_id`)
     REFERENCES `assessment` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
- CONSTRAINT `fk_assessment_course_unit_implementation_course_unit_implementation_id`
+ CONSTRAINT `fk_assessment_course_unit_implementation_cui_id`
    FOREIGN KEY (`course_unit_implementation_id`)
-   REFERENCES `course_unit_instance` (`id`)
+   REFERENCES `course_unit_implementation` (`id`)
    ON DELETE NO ACTION
    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -149,13 +149,13 @@ CREATE TABLE `assessment_course_unit_specification` (
   `assessment_id` INT UNSIGNED NOT NULL,
   `course_unit_specification_id` INT UNSIGNED NOT NULL,
   INDEX `fk_assessment_course_unit_specification_assessment_id_idx` (`assessment_id` ASC),
-  INDEX `fk_assessment_course_unit_specification_course_unit_specification_id_idx` (`course_unit_specification_id` ASC),
+  INDEX `fk_assessment_course_unit_specification_cus_id_idx` (`course_unit_specification_id` ASC),
   CONSTRAINT `fk_assessment_course_unit_specification_assessment_id`
     FOREIGN KEY (`assessment_id`)
     REFERENCES `assessment` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_assessment_course_unit_specification_course_unit_specification_id`
+  CONSTRAINT `fk_assessment_course_unit_specification_cus_id`
     FOREIGN KEY (`course_unit_specification_id`)
     REFERENCES `course_unit_specification` (`id`)
     ON DELETE NO ACTION
