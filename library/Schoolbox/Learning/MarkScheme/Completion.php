@@ -20,7 +20,7 @@ class Completion extends AbstractMarkScheme
     /**
      * Returns a string representation of a normalised Mark
      *
-     * @param float          $normalisedMark
+     * @param mixed          $normalisedMark Ignored.
      * @param IResponse|null $response
      * @throws RangeException if normalised mark is outside valid range
      * @throws InvalidArgumentException if enum not matched
@@ -30,7 +30,7 @@ class Completion extends AbstractMarkScheme
     {
         if(null === $response){
             return self::HUMAN_READABLE_INCOMPLETE;
-        } else if (0 === $response->getAllFeedback()->count()){
+        } else if (null === $response->getAllFeedback() || 0 === $response->getAllFeedback()->count()){
             return self::HUMAN_READABLE_STUDENT_COMPLETED;
         } else {
             return self::HUMAN_READABLE_TEACHER_COMPLETED;

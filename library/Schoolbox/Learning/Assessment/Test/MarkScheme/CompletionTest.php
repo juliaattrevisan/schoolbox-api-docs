@@ -7,6 +7,8 @@
 
 namespace Schoolbox\Learning\Assessment\Test;
 
+use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\Completion;
 use \InvalidArgumentException;
@@ -15,129 +17,142 @@ use \RangeException;
 class CompletionTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException InvalidArgumentException
+     * @dataProvider provider_normalised
+     * @param mixed $normalised
      */
-    public function test_GetHumanReadable_Null()
+    public function test_getHumanReadable_IncompleteImplicit($normalised)
     {
-        $normalised = null;
-        $markScheme = new Completion();
-        $markScheme->getHumanReadableMark($normalised);
-    }
+        $expected = Completion::HUMAN_READABLE_INCOMPLETE;
 
-    /**
-     * @expectedException RangeException
-     */
-    public function test_GetHumanReadable_TooLow()
-    {
-        $normalised = -1;
-        $markScheme = new Completion();
-        $markScheme->getHumanReadableMark($normalised);
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function test_GetHumanReadable_InvalidType()
-    {
-        $normalised = 'zero';
-        $markScheme = new Completion();
-        $markScheme->getHumanReadableMark($normalised);
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function test_GetHumanReadable_Invalid()
-    {
-        $normalised = '50.0';
-        $markScheme = new Completion();
-        $markScheme->getHumanReadableMark($normalised);
-    }
-
-
-    /**
-     * @dataProvider provider_normalisedToHumanReadable
-     * @param float $normalised
-     * @param string $expected
-     */
-    public function test_GetHumanReadable_Valid($normalised, $expected)
-    {
         $markScheme = new Completion();
         $actual = $markScheme->getHumanReadableMark($normalised);
-        $message = "Failed asserting equality. Input: $normalised, Expected: $expected, Actual: $actual";
-        $this->assertEquals($expected, $actual, $message);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @dataProvider provider_normalised
+     * @param mixed $normalised
+     */
+    public function test_getHumanReadable_IncompleteExplicit($normalised)
+    {
+        $response = null;
+        $expected = Completion::HUMAN_READABLE_INCOMPLETE;
+
+        $markScheme = new Completion();
+        $actual = $markScheme->getHumanReadableMark($normalised, $response);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @dataProvider provider_normalised
+     * @param mixed $normalised
+     */
+    public function test_getHumanReadable_StudentCompleted($normalised)
+    {
+        $response = new TaskCompletion();
+        $expected = Completion::HUMAN_READABLE_STUDENT_COMPLETED;
+
+        $markScheme = new Completion();
+        $actual = $markScheme->getHumanReadableMark($normalised, $response);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @dataProvider provider_normalised
+     * @param mixed $normalised
+     */
+    public function test_getHumanReadable_TeacherCompleted($normalised)
+    {
+        $response = new TaskCompletion();
+        $response->getAllFeedback()->add(new TaskFeedback());
+        $expected = Completion::HUMAN_READABLE_TEACHER_COMPLETED;
+
+        $markScheme = new Completion();
+        $actual = $markScheme->getHumanReadableMark($normalised, $response);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @dataProvider provider_normalised
+     * @param mixed $normalised
+     */
+    public function test_getNormalised_IncompleteImplicit($normalised)
+    {
+        $expected = null;
+
+        $markScheme = new Completion();
+        $actual = $markScheme->getNormalisedMark($normalised);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @dataProvider provider_normalised
+     * @param mixed $normalised
+     */
+    public function test_getNormalised_IncompleteExplicit($normalised)
+    {
+        $response = null;
+        $expected = null;
+
+        $markScheme = new Completion();
+        $actual = $markScheme->getNormalisedMark($normalised, $response);
+        $this->assertEquals($expected, $actual);
     }
 
 
     /**
-     * @expectedException InvalidArgumentException
+     * @dataProvider provider_normalised
+     * @param mixed $normalised
      */
-    public function test_GetNormalised_Null()
+    public function test_getNormalised_StudentCompleted($normalised)
     {
-        $humanReadable = null;
-        $markScheme = new Completion();
-        $markScheme->getNormalisedMark($humanReadable);
-    }
+        $response = new TaskCompletion();
+        $expected = null;
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function test_GetNormalised_Empty()
-    {
-        $humanReadable = '';
         $markScheme = new Completion();
-        $markScheme->getNormalisedMark($humanReadable);
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function test_GetNormalised_Whitespace()
-    {
-        $humanReadable = '     ';
-        $markScheme = new Completion();
-        $markScheme->getNormalisedMark($humanReadable);
-    }
-
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function test_GetNormalised_Invalid()
-    {
-        $humanReadable = 'some_unknown_human_readable_value';
-        $markScheme = new Completion();
-        $markScheme->getNormalisedMark($humanReadable);
+        $actual = $markScheme->getNormalisedMark($normalised, $response);
+        $this->assertEquals($expected, $actual);
     }
 
 
     /**
-     * @dataProvider provider_humanReadableToNormalised
-     * @param string $humanReadable
-     * @param float $expected
+     * @dataProvider provider_humanReadable
+     * @param mixed $normalised
      */
-    public function test_GetNormalised_Valid($humanReadable, $expected)
+    public function test_getNormalised_TeacherCompleted($normalised)
     {
+        $response = new TaskCompletion();
+        $response->getAllFeedback()->add(new TaskFeedback());
+        $expected = null;
+
         $markScheme = new Completion();
-        $actual = $markScheme->getNormalisedMark($humanReadable);
-        $message = "Failed asserting equality. Input: $humanReadable, Expected: $expected, Actual: $actual";
-        $this->assertEquals($expected, $actual, $message);
+        $actual = $markScheme->getNormalisedMark($normalised, $response);
+        $this->assertEquals($expected, $actual);
     }
 
     // ==================== Data Providers ====================
 
-    public function provider_normalisedToHumanReadable()
+    public function provider_normalised()
     {
         return [
-            [Completion::NORMALISED_INCOMPLETE, Completion::HUMAN_READABLE_INCOMPLETE],
-            [Completion::NORMALISED_COMPLETE,   Completion::HUMAN_READABLE_COMPLETE],
+            [null],
+            [-1],
+            [10],
+            [50],
+            [200],
+            ['   '],
+            ['some random string'],
+            [IMarkScheme::NORMALISED_MARK_MIN],
+            [IMarkScheme::NORMALISED_MARK_MAX],
         ];
     }
 
-    public function provider_humanReadableToNormalised()
+    public function provider_humanReadable()
     {
         return [
-            [Completion::HUMAN_READABLE_INCOMPLETE, IMarkScheme::NORMALISED_MARK_MIN],
-            [Completion::HUMAN_READABLE_COMPLETE,   IMarkScheme::NORMALISED_MARK_MAX],
+            [Completion::HUMAN_READABLE_INCOMPLETE],
+            [Completion::HUMAN_READABLE_STUDENT_COMPLETED],
+            [Completion::HUMAN_READABLE_TEACHER_COMPLETED],
         ];
     }
 
