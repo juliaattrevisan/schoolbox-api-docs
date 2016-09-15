@@ -230,7 +230,7 @@ class TaskTest extends \Schoolbox\Learning\Assessment\Test\Defaults
      * Test that Tasks can contain Responses and Feedback meaningfully
      * including the shortcut that Feedbacks have to their Task
      */
-    public function testPublishedFeedback()
+    public function testMostRecentPublishedFeedback()
     {
         $task = $this->spawnTask();
 
@@ -267,7 +267,7 @@ class TaskTest extends \Schoolbox\Learning\Assessment\Test\Defaults
      * Test that Tasks can contain Responses and Feedback meaningfully
      * including the shortcut that Feedbacks have to their Task
      */
-    public function testUnublishedFeedback()
+    public function testMostRecentFeedback()
     {
         $task = $this->spawnTask();
 
@@ -295,6 +295,7 @@ class TaskTest extends \Schoolbox\Learning\Assessment\Test\Defaults
         $floatingFeedback
             ->setId(89)
             ->setAssessable($task)
+            ->setComment('Helly was here')
             ->setNormalisedMark(8888888)
             ->setReviewer($this->celia)
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:20', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -308,13 +309,16 @@ class TaskTest extends \Schoolbox\Learning\Assessment\Test\Defaults
 
         /* The most recent feedback was published 2016-09-15 01:27:33
          */
-        $this->assertEquals(89, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->getId());
+        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->getId());
         $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback($task)->getId());
 
         /* Most recent feedback has a normalised mark of null
          * Tasks always return null for normalised marks
          */
         $this->assertEquals(null, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->getNormalisedMark());
-        $this->assertEquals(false, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->isPublished());
+        $this->assertEquals(true, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->isPublished());
     }
 }
+
+
+

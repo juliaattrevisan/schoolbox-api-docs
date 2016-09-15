@@ -305,7 +305,7 @@ class QuizTest extends \Schoolbox\Learning\Assessment\Test\Defaults
      * Test that Tasks can contain Responses and Feedback meaningfully
      * including the shortcut that Feedbacks have to their Task
      */
-    public function testPublishedFeedback()
+    public function testMostRecentPublishedFeedback()
     {
         $id = 3;
         $title = 'How did you find The Prime Evil?';
@@ -422,7 +422,6 @@ class QuizTest extends \Schoolbox\Learning\Assessment\Test\Defaults
                     'available' => 5
                 ]
             ])
-            ->setComment('This is the most recent feedback')
             ->setReviewer($this->celia)
             ->setCreatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT));
@@ -453,7 +452,7 @@ class QuizTest extends \Schoolbox\Learning\Assessment\Test\Defaults
                     'available' => 5
                 ]
             ])
-            ->setComment('This is the most recent published feedback')
+            ->setComment('This is the most recent published feedback; also most recent feedback')
             ->setReviewer($this->celia)
             ->setPublishedAt(new \Alaress_Date_Format('2016-09-25 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-09-10 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -464,15 +463,11 @@ class QuizTest extends \Schoolbox\Learning\Assessment\Test\Defaults
 
         $quiz->getParticipant($this->bsalem)->getAllResponses()->add($attempt);
 
-        /* The most recent feedback is 99761
+        /* The most recent feedback is 99762
          */
-        $this->assertEquals(99761, $quiz->getParticipant($this->bsalem)->findMostRecentFeedback($quiz)->getId());
+        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentFeedback($quiz)->getId());
 
-        /* The most recent feedback is NOT published yet
-         *
-         * The most recent feedback is the instance which is most recent in the group of feedbacks that
-         * took place after 2016-09-09 14:35:00, when the response was last updated (in this case, 99762
-         * since it was published most recently on 2016-09-25 21:22:19)
+        /* The most recent feedback is also published
          */
         $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getId());
 

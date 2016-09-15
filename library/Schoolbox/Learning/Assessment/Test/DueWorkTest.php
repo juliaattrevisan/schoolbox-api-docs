@@ -447,7 +447,7 @@ class DueWorkTest extends \Schoolbox\Learning\Assessment\Test\Defaults
     /**
      * Test that Due Work Feedback Marks are stored correctly
      */
-    public function testUnpublishedFeedbacks()
+    public function testMostRecentFeedbacks()
     {
         $submissionFiles = [
             [
@@ -561,12 +561,12 @@ class DueWorkTest extends \Schoolbox\Learning\Assessment\Test\Defaults
             ->setReviewer($this->celia)
             ->setAllFiles(new Collection())
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-12 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
         /* The most recent feedback is the unpublished one
-         * This is 4223 and its currently drafted normalised mark of 37
+         * This is 3385 and its currently drafted normalised mark of -3
          */
         $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback($dueWork)->getId());
         $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback($dueWork)->getNormalisedMark());
@@ -580,7 +580,7 @@ class DueWorkTest extends \Schoolbox\Learning\Assessment\Test\Defaults
     /**
      * Test that Due Work Feedback Marks are stored correctly
      */
-    public function testPublishedFeedbacks()
+    public function testMostRecentPublishedFeedbacks()
     {
         $submissionFiles = [
             [

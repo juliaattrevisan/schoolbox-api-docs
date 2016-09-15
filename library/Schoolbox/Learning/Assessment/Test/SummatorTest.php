@@ -1651,7 +1651,7 @@ class Summator extends \Schoolbox\Learning\Assessment\Test\Defaults
         $feedback = (new DueWorkFeedback())
             ->setId(90123)
             ->setAssessable($dueWork2)
-            ->setNormalisedMark(71)
+            ->setNormalisedMark(91)
             ->setComment('Some additional feedback, recently updated but not published')
             ->setReviewer($this->celia)
             ->setAllFiles(new Collection())
