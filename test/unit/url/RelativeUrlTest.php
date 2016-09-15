@@ -77,6 +77,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
             'xxx://localhost/path/to/file.ext',
             '                             ',
             null,
+            false,
             '####',
             'xxxxxxxxxxxxxxxxxxxxxxxxx',
             '# # # # # #',
@@ -156,6 +157,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
     public function testIsNotUrl()
     {
         $inputs = [
+            null,
+            false,
+            '         ',
+            '',
+            '\t\t\t',
+            "\t\t\t\t",
+            "\n",
             '-www.google.com',
             'goog le.com',
             'goog*le.com/',
@@ -188,6 +196,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
     public function testCanNotGetHostname()
     {
         $inputs = [
+            null,
+            false,
+            '         ',
+            '',
+            '\t\t\t',
+            "\t\t\t\t",
+            "\n",
             '',
             '/',
             '/path',
@@ -237,6 +252,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
     public function testNormaliseLocalUrl()
     {
         $inputs = [
+            null                                          => '',
+            false                                         => '',
+            '         '                                   => '',
+            ''                                            => '',
+            '\t\t\t'                                      => '',
+            "\t\t\t\t"                                    => '',
+            "\n"                                          => '',
             'sbvagrant.alaress.com.au'                    => '/',
             'sbvagrant.alaress.com.au/'                   => '/',
             'sbvagrant.alaress.com.au:8080'               => '/',
@@ -261,6 +283,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
     {
         $site = 'sbvagrant.alaress.com.au';
         $inputs = [
+            null                                => '',
+            false                               => '',
+            '         '                         => '',
+            ''                                  => '',
+            '\t\t\t'                            => '',
+            "\t\t\t\t"                          => '',
+            "\n"                                => '',
             'www.google.com'                    => '/',
             'www.google.com/'                   => '/',
             'www.google.com:8080'               => '/',
@@ -289,6 +318,19 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         $url = new Url($input, 'sbvagrant.alaress.com.au');
         $expected = '-path-to-fileext';
         $this->assertEquals($url->getSlug(), $expected);
+
+        /* Test a series of names which should be sluggable
+         */
+        $inputs = [
+            'mongy mongy mongy'                              => 'mongy-mongy-mongy',
+            'this is my file that I have given unto you.txt' => 'this-is-my-file-that-I-have-given-unto-you.txt',
+        ];
+
+        foreach ($inputs as $input => $expected) {
+            $url = new Url($input, '');
+            $actual = $url->getUrl();
+            $this->assertEquals($expected, $actual);
+        }
     }
 
     // Test prependScheme()
@@ -297,6 +339,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
     {
         // No protocol
         $inputs = [
+            null,
+            false,
+            '         ',
+            '',
+            '\t\t\t',
+            "\t\t\t\t",
+            "\n",
             'localhost',
             'localhost:8080',
             'www.google.com',
@@ -311,7 +360,7 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
 
         foreach ($inputs as $input) {
             $url = new Url($input, 'sbvagrant.alaress.com.au');
-            $this->assertFalse($url->isUrl(), "Failed to fail isULR() before prepending scheme: '$input'");
+            $this->assertFalse($url->isUrl(), "Failed to fail isURL() before prepending scheme: '$input'");
 
             // With protocol
             $url->prependScheme();
@@ -326,6 +375,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         $site = 'sbvagrant.alaress.com.au';
         $_SERVER['HTTP_HOST'] = $site;
         $inputs = [
+            null,
+            false,
+            '         ',
+            '',
+            '\t\t\t',
+            "\t\t\t\t",
+            "\n",
             '/',
             '/test',
             '/test/',
@@ -345,6 +401,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         $site = 'sbvagrant.alaress.com.au';
         $_SERVER['HTTP_HOST'] = $site;
         $inputs = [
+            null,
+            false,
+            '         ',
+            '',
+            '\t\t\t',
+            "\t\t\t\t",
+            "\n",
             'sbvagrant.alaress.com.au',
             'sbvagrant.alaress.com.au/',
             'http://sbvagrant.alaress.com.au',
@@ -364,7 +427,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         $site = 'sbvagrant.alaress.com.au';
         $_SERVER['HTTP_HOST'] = 'some.other.intranet.alias';
         $inputs = [
+            null,
+            false,
+            '         ',
             '',
+            '\t\t\t',
+            "\t\t\t\t",
+            "\n",
             '/',
             '/test',
             '/test/',
@@ -384,6 +453,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         $site = 'sbvagrant.alaress.com.au';
         $_SERVER['HTTP_HOST'] = 'some.other.intranet.alias';
         $inputs = [
+            null,
+            false,
+            '         ',
+            '',
+            '\t\t\t',
+            "\t\t\t\t",
+            "\n",
             'sbvagrant.alaress.com.au',
             'sbvagrant.alaress.com.au/',
             'http://sbvagrant.alaress.com.au',
@@ -403,7 +479,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         $site = 'some.other.intranet.alias';
         $_SERVER['HTTP_HOST'] = 'sbvagrant.alaress.com.au';
         $inputs = [
+            null,
+            false,
+            '         ',
             '',
+            '\t\t\t',
+            "\t\t\t\t",
+            "\n",
             '/',
             '/test',
             '/test/',
@@ -423,6 +505,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         $site = 'some.other.intranet.alias';
         $_SERVER['HTTP_HOST'] = 'sbvagrant.alaress.com.au';
         $inputs = [
+            null,
+            false,
+            '         ',
+            '',
+            '\t\t\t',
+            "\t\t\t\t",
+            "\n",
             'sbvagrant.alaress.com.au',
             'sbvagrant.alaress.com.au/',
             '//sbvagrant.alaress.com.au',
@@ -444,6 +533,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         $site = 'some.other.intranet.alias';
         $_SERVER['HTTP_HOST'] = 'some.other.intranet.alias';
         $inputs = [
+            null,
+            false,
+            '         ',
+            '',
+            '\t\t\t',
+            "\t\t\t\t",
+            "\n",
             '',
             '/',
             '#',
@@ -469,6 +565,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
         $site = 'sbvagrant.alaress.com.au';
         $_SERVER['HTTP_HOST'] = 'sbvagrant.alaress.com.au';
         $inputs = [
+            null,
+            false,
+            '         ',
+            '',
+            '\t\t\t',
+            "\t\t\t\t",
+            "\n",
             'portal',
             'some.other.intranet.alias',
             '//some.other.intranet.alias',
@@ -490,6 +593,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
     {
         $site = 'sbvagrant.alaress.com.au';
         $inputs = [
+            null,
+            false,
+            '         ',
+            '',
+            '\t\t\t',
+            "\t\t\t\t",
+            "\n",
             'ftp://example',
             'ftp://example.com',
             'ftp://www.example.com.au',
@@ -559,6 +669,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
     {
         $site = 'sbvagrant.alaress.com.au';
         $inputs = [
+            null                                             => '',
+            false                                            => '', // fails
+            '             '                                  => '',
+            '\t\t\t'                                         => '', // fails
+            "\t\t\t"                                         => '',
+            "\n"                                             => '',
+            "&%20"                                           => '', // fails w/
             ''                                               => '',
             '/'                                              => '/',
             '#'                                              => '#',
@@ -593,7 +710,13 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
     {
         $site = 'sbvagrant.alaress.com.au';
         $inputs = [
+            null,
+            false,
+            '         ',
             '',
+            '\t\t\t',
+            "\t\t\t\t",
+            "\n",
             '/',
             '/path/file',
             '/path/file.ext',
