@@ -14,6 +14,7 @@ namespace Schoolbox\Learning\Assessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use \Schoolbox\Collection;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
 use \Schoolbox\Mapper\Traits\Model\Id;
 use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -79,12 +80,17 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @var MarkType
      */
-    protected $markType;
+    private $markType;
 
     /**
      * @var GradeGroup|null
      */
-    protected $gradeGroup;
+    private $gradeGroup;
+
+    /**
+     * @var IMarkScheme
+     */
+    private $markScheme;
 
     /**
      * Assessable constructor.
@@ -476,6 +482,24 @@ abstract class AbstractAssessment implements IAssessable
     public function setGradeGroup(GradeGroup $gradeGroup)
     {
         $this->gradeGroup = $gradeGroup;
+        return $this;
+    }
+
+    /**
+     * @return IMarkScheme
+     */
+    public function getMarkScheme()
+    {
+        return $this->markScheme;
+    }
+
+    /**
+     * @param IMarkScheme $markScheme
+     * @return static
+     */
+    public function setMarkScheme(IMarkScheme $markScheme)
+    {
+        $this->markScheme = $markScheme;
         return $this;
     }
 }

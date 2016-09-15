@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
 
@@ -290,6 +291,17 @@ interface IAssessable
      * @return static
      */
     public function setGradeGroup(GradeGroup $gradeGroup);
+
+    /**
+     * @return IMarkScheme
+     */
+    public function getMarkScheme();
+
+    /**
+     * @param IMarkScheme $markScheme
+     * @return static
+     */
+    public function setMarkScheme(IMarkScheme $markScheme);
 
     /**
      * Get the person who created this IAssessable
