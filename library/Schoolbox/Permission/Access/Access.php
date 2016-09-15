@@ -91,6 +91,13 @@ class Access
                     return UserAccess::ACCESS_FULL;
                 }
             }
+            else if( $this->cachedFolderAccess[$user->getId()][0] == UserAccess::ACCESS_FULL ) {
+                // Cached full access found
+                return UserAccess::ACCESS_FULL;
+            }
+            else {
+                // cms access cached as denied, falling through to next check
+            }
         }
         catch (Mapper\Exception $e)
         {
