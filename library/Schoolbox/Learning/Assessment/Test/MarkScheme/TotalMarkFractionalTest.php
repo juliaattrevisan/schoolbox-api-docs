@@ -155,11 +155,15 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
 
     public function test_getNormalised_Quiz()
     {
+        // Quiz has total marks of 3.0
         $quiz = $this->getDummyQuiz();
         $quizTotalMarks = $quiz->getMaxMark();
 
+        // Attempt has total marks of 2.0
         $quizAttempt = $quiz->getResponses()->first();
         $humanReadable = 1;
+
+        // 1 / 2.0 * 100.0
         $expected = 50.0;
 
         $markScheme = new TotalMarkFractional($quizTotalMarks);
@@ -169,15 +173,58 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual, $message);
     }
 
+    /**
+     * This is distinct from test above in that it does NOT pass in the Quiz
+     * response. So although the attempt total available marks = 2.0, if the attempt is not present,
+     * the MarkScheme uses the quiz total marks = 3.0 instead.
+     */
+    public function test_getNormalised_Quiz_Total()
+    {
+        // Quiz has total marks of 3.0
+        $quiz = $this->getDummyQuiz();
+        $quizTotalMarks = $quiz->getMaxMark();
+
+        $humanReadable = 1;
+
+        // 1 / 3.0 * 100.0
+        $expected = 33.333333;
+        $delta = 0.00001;
+
+        $markScheme = new TotalMarkFractional($quizTotalMarks);
+        $actual = $markScheme->getNormalisedMark($humanReadable);
+
+        $message = "Failed asserting equality. Input: $humanReadable, Expected: $expected, Actual: $actual";
+        $this->assertLessThan($delta, abs($expected - $actual), $message);
+    }
+
     public function test_getHumanReadable_Quiz()
     {
         $quiz = $this->getDummyQuiz();
 
         $quizTotalMarks = $quiz->getMaxMark();
 
+        // Attempt has total marks of 2.0
         $quizAttempt = $quiz->getResponses()->first();
         $normalised = 50.0;
         $expected = '1 / 2';
+
+        $markScheme = new TotalMarkFractional($quizTotalMarks);
+        $actual = $markScheme->getHumanReadableMark($normalised, $quizAttempt);
+
+        $message = "Failed asserting equality. Input: $normalised, Expected: $expected, Actual: $actual";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    public function test_getHumanReadable_Quiz_Fractional()
+    {
+        $quiz = $this->getDummyQuiz();
+
+        $quizTotalMarks = $quiz->getMaxMark();
+
+        // Attempt has total marks of 2.0
+        $quizAttempt = $quiz->getResponses()->first();
+        $normalised = 87.6;
+        $expected = '1.75 / 2';
 
         $markScheme = new TotalMarkFractional($quizTotalMarks);
         $actual = $markScheme->getHumanReadableMark($normalised, $quizAttempt);
