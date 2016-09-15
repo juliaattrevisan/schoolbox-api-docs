@@ -61,8 +61,8 @@ abstract class AbstractTreeBuilder
      * This method loads $categoryId's children, then its parent's direct
      * children, and repeats all the way up to the parent node.
      *
-     * @param  mixed $categoryId
-     *
+     * @param mixed $categoryId
+     * @param string $baseFolder
      * @return array
      */
     public function buildPartialTree($categoryId, $baseFolder='#')

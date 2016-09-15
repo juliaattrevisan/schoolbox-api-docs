@@ -1079,27 +1079,10 @@ class Controller extends Base\Base
 
         $folderId = $this->getSession()->get('resourcesID', $this->getCourseMapper()->getFacultyNode()->getId(), $this->namespace);
 
-        $folder = $this->getFolderMapper()->findById($folderId);
         $data = [
-            'tree'      => [],
-            'folder'    => $folder,
-            'folderId'  => $folder->getId(),
-            'icon'      => $treeBuilder->getFolderIcon($folder),
-            'access'    => FULL_ACCESS,
-            'user'      => $this->getUser(),
-            'conf'      => $this->conf,
-            'namespace' => $this->namespace,
+            'treedata' => json_encode($treeBuilder->buildPartialTree($folderId, $folderId)),
+            'folderId' => $folderId
         ];
-
-        // add files to that
-        $data['files'] = [];
-        $treedata = $treeBuilder->buildPartialTree($folderId, $folderId);
-
-        $data['treedata'] = json_encode($treedata);
-
-        $data['namespace'] = $this->namespace;
-        $data['site_location'] = \Config::get('site_location');
-        $data['site_version'] = \Config::get('site_version');
 
         $this->tpl('picker', $data);
     }
