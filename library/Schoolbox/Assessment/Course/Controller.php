@@ -40,10 +40,12 @@ use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationMapperProxy;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted as MapperExceptionDeleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Browser\AbstractTreeBuilder;
+use Schoolbox\Resource\Browser\Resources\TreeBuilder;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Ancestry;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -1065,9 +1067,9 @@ class Controller extends Base\Base
      */
     public function parentList()
     {
-        $treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
+        $treeBuilder = new TreeBuilder(
             Folder\Mapper::getInstance(),
-            \Schoolbox\Assessment\Course\Unit\DeprecatedMapper::getInstance(),
+            CourseUnitMapper::getInstance(),
             $_SESSION['user'],
             'Courses'
         );
@@ -1713,7 +1715,7 @@ class Controller extends Base\Base
                     if (!isset($unitCache[$currentUnit['id']])) {
                         try {
                             $unitCache[$currentUnit['id']] = $this->getFolderMapper()->findById($currentUnit['id']);
-                        } catch (MapperException\Deleted $e) {
+                        } catch (MapperExceptionDeleted $e) {
                             // accommodate deleted units
                             $unitCache[$currentUnit['id']] = $e->getDeletedObject();
                         } catch (\Exception $e) {
@@ -2783,7 +2785,7 @@ class Controller extends Base\Base
     /**
      * @param int $fileId
      * @return FileInterface
-     * @throws Mapper\Exception
+     * @throws MapperException
      */
     protected function getFile($fileId)
     {
@@ -2794,7 +2796,7 @@ class Controller extends Base\Base
         if (method_exists($file, 'setOwner')) {
             try {
                 $file->setOwner($this->userMapper->findById($file->getOwner()->getId()));
-            } catch (Mapper\Exception $e) {
+            } catch (MapperException $e) {
                 $file->setOwner($this->userMapper->createModel());
             }
         }
@@ -2811,11 +2813,11 @@ class Controller extends Base\Base
         try {
             return $this->getFolder($folderId);
 
-        } catch (Mapper\Exception\Deleted $e) {
+        } catch (MapperExceptionDeleted $e) {
             // Deleted: load the parent (recursively)
             return $this->findFolder($e->getDeletedObject()->getParent()->getId());
 
-        } catch (Mapper\Exception $e) {
+        } catch (MapperException $e) {
             return $this->folderMapper->createModel()->setId(0);
 
         }
@@ -2825,7 +2827,7 @@ class Controller extends Base\Base
     /**
      * @param int $folderId
      * @return FolderInterface
-     * @throws Mapper\Exception
+     * @throws MapperException
      */
     protected function getFolder($folderId)
     {
@@ -2843,4 +2845,3 @@ class Controller extends Base\Base
     }
 
 }
-
