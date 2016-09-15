@@ -77,10 +77,10 @@ class Controller extends Base\Base
     protected $taskInstanceMapper = null;
 
     /** @var CourseMapper */
-    protected $courseMapper;
+    protected $deprecatedCourseMapper;
 
     /** @var Unit\DeprecatedMapper */
-    protected $unitMapper;
+    protected $deprecatedUnitMapper;
 
     /** @var Component_DefinitionMapper */
     protected $componentDefinitionMapper;
@@ -117,8 +117,8 @@ class Controller extends Base\Base
      */
     public function __construct()
     {
-        $this->setCourseMapper(CourseMapper::getInstance());
-        $this->setUnitMapper(Unit\DeprecatedMapper::getInstance());
+        $this->setDeprecatedCourseMapper(CourseMapper::getInstance());
+        $this->setDeprecatedUnitMapper(Unit\DeprecatedMapper::getInstance());
         $this->setSubmissionBoxMapper(SubmissionBoxMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
         $this->setOnlineAssessmentMapper(OnlineAssessmentMapper::getInstance());
@@ -230,7 +230,7 @@ class Controller extends Base\Base
             try {
                 // First, check whether or not this is already a course. We don't want to barr access to courses that
                 // are already courses.
-                $folder = $this->getCourseMapper()->findById($id);
+                $folder = $this->getDeprecatedCourseMapper()->findById($id);
 
             } catch (MapperException $e) {
                 // It was not a course: you may modify a FOLDER to convert it into a course by adding units.
@@ -244,7 +244,7 @@ class Controller extends Base\Base
                 }
 
                 // check ancestry
-                if (!$this->getCourseMapper()->mayBeConvertedToCourse($folder)) {
+                if (!$this->getDeprecatedCourseMapper()->mayBeConvertedToCourse($folder)) {
                     throw $this->getErrorMapper()->generateException(172);
                 }
             }
@@ -255,7 +255,7 @@ class Controller extends Base\Base
 
             $data['folder'] = $folder;
             $data['access'][$folder->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $folder->getId() ]);
-            $data['units']  = $this->getUnitMapper()->findByCourseId($folder->getId());
+            $data['units']  = $this->getDeprecatedUnitMapper()->findByCourseId($folder->getId());
 
             foreach ($data['units'] as $unit) {
                 $data['access'][$unit->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $unit->getId() ]);
@@ -346,7 +346,7 @@ class Controller extends Base\Base
         if(0 == $post['parent']){
 
             // ...unless already in Root
-            if(0 != $parentId = $this->courseMapper->findCheaplyById($post['id'])->getParent()->getId()) {
+            if(0 != $parentId = $this->deprecatedCourseMapper->findCheaplyById($post['id'])->getParent()->getId()) {
                 $this->sendError(
                     new Base\Exception("Course cannot reside directly in root",
                         ["move this Course out of root"]));
@@ -472,14 +472,14 @@ class Controller extends Base\Base
         if ($id) {
             try {
                 // do checks to make sure it exists
-                $folder = $this->getCourseMapper()->findById($id);
+                $folder = $this->getDeprecatedCourseMapper()->findById($id);
                 $mode = BaseMapper::METHOD_UPDATE;
 
                 // Sanity check for existing courses:
                 // * Don't allow moving outside of faculty root
                 //   (Keeping a course in a folder outside fac root is okay)
                 if ($folder->getParent()->getId() != $parentId
-                    && !$this->getCourseMapper()->isValidCourseLocation($parent)
+                    && !$this->getDeprecatedCourseMapper()->isValidCourseLocation($parent)
                 ) {
                     throw new Base\Exception("Courses may not be moved outside the faculty folder");
                 }
@@ -493,7 +493,7 @@ class Controller extends Base\Base
             if ($parentId == 0) {
                 throw new Base\Exception("Courses may not be created in the root folder");
             }
-            if (!$this->getCourseMapper()->isValidCourseLocation($parent)) {
+            if (!$this->getDeprecatedCourseMapper()->isValidCourseLocation($parent)) {
                 throw new Base\Exception("Courses may not be created outside the faculty folder");
             }
         }
@@ -807,7 +807,7 @@ class Controller extends Base\Base
      */
     protected function getCourseData($searchParam)
     {
-        $allCourses = $this->getCourseMapper()->findCourseListByName($searchParam, [ 'order' => [ 'name' => 'ASC' ] ]);
+        $allCourses = $this->getDeprecatedCourseMapper()->findCourseListByName($searchParam, ['order' => ['name' => 'ASC' ] ]);
 
         $data = [];
 
@@ -816,7 +816,7 @@ class Controller extends Base\Base
             // general search ignores Courses in Faculty
             if(NULL === $searchParam) {
                 try {
-                    if (!$this->getCourseMapper()->inFacultyArea($currentCourse)) {
+                    if (!$this->getDeprecatedCourseMapper()->inFacultyArea($currentCourse)) {
                         continue;
                     }
                 } catch (MapperException $e) {
@@ -839,7 +839,7 @@ class Controller extends Base\Base
 
             $data['courses'][] = $currentCourse;
 
-            $allUnits = $this->getUnitMapper()->findByCourseId($currentCourse->getId());
+            $allUnits = $this->getDeprecatedUnitMapper()->findByCourseId($currentCourse->getId());
 
             // Append to unit index, by ID
             foreach ($allUnits as $currentUnit) {
@@ -869,7 +869,7 @@ class Controller extends Base\Base
      */
     protected function getLineage(Folder\Model $course)
     {
-        return $this->getAncestry()->findParentsCheaply($course, $this->getCourseMapper()->getFacultyNode());
+        return $this->getAncestry()->findParentsCheaply($course, $this->getDeprecatedCourseMapper()->getFacultyNode());
     }
 
 
@@ -886,7 +886,7 @@ class Controller extends Base\Base
 
         // find all the folders that match this code, then filter for coarseness
         return $this->getFolderMapper()->findByCurriculumCode($codes)->filter(function ($folder) {
-            return $this->courseMapper->verifyCourse($folder);
+            return $this->deprecatedCourseMapper->verifyCourse($folder);
         });
     }
 
@@ -995,7 +995,7 @@ class Controller extends Base\Base
         //  - stop at, and exclude, all Courses (folder that has > 0 units)
         //  - continue to exhaustion
 
-        $courseIds = $this->courseMapper->findAllIds();
+        $courseIds = $this->deprecatedCourseMapper->findAllIds();
 
         // Enable later O(1) lookup
         $courseIds = array_combine($courseIds,$courseIds);
@@ -1045,7 +1045,7 @@ class Controller extends Base\Base
             }
         }
 
-        $courseRoot     = $nodes[$this->getCourseMapper()->getFacultyNode()->getId()];
+        $courseRoot     = $nodes[$this->getDeprecatedCourseMapper()->getFacultyNode()->getId()];
         $courseRootArr  = $this->recursiveTreeBuild($courseRoot,$courseIds,$permissions);
         $data['branch'] = $courseRootArr;
         $this->tpl('parentList', $data);
@@ -1087,7 +1087,7 @@ class Controller extends Base\Base
             'homepage'       => implode(',', array_keys($ownerships)),
             'courseHomepage' => $courseHomepage,
             'componentId'    => $componentId,
-            'units'          => $this->getUnitMapper()->findByCourseId($courseHomepage),
+            'units'          => $this->getDeprecatedUnitMapper()->findByCourseId($courseHomepage),
             'ownerships'     => implode(',', array_map(
                     function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
             )
@@ -1141,7 +1141,7 @@ class Controller extends Base\Base
         $componentId = trim($this->getRequest()->post["componentId"]);
 
         try {
-            $this->getCourseMapper()->findById($courseHomepage);
+            $this->getDeprecatedCourseMapper()->findById($courseHomepage);
 
         } catch (MapperException $e) {
             // the nominated "course" is not actually a course...
@@ -1220,7 +1220,7 @@ class Controller extends Base\Base
         foreach ($unitDates as $unit) {
             if ($unit['import'] && !isset($unitCache[$unit['unit_id']])) {
                 try {
-                    $u = $this->getUnitMapper()->findById($unit['unit_id']);
+                    $u = $this->getDeprecatedUnitMapper()->findById($unit['unit_id']);
                 } catch (MapperException\Deleted $e) {
                     // ignore deletions here; the assumption is that any unit passed into here is legit. If you modify a class import and
                     // any source units have been deleted, their existence still needs to be honoured.
@@ -2036,10 +2036,10 @@ class Controller extends Base\Base
      * @param Folder\Model $model
      */
     protected function recurseInheritance(Folder\Model $model) {
-        $folders = $this->getCourseMapper()->findAllChildren($model->getId(), true);
+        $folders = $this->getDeprecatedCourseMapper()->findAllChildren($model->getId(), true);
         foreach ($folders as $folder) {
             $folder->setInherit($model->getInherit());
-            $this->getCourseMapper()->save($folder);
+            $this->getDeprecatedCourseMapper()->save($folder);
             $this->recurseInheritance($folder);
         }
     }
@@ -2213,38 +2213,38 @@ class Controller extends Base\Base
      *
      * @return CourseMapper
      */
-    protected function getCourseMapper()
+    protected function getDeprecatedCourseMapper()
     {
-        return $this->courseMapper;
+        return $this->deprecatedCourseMapper;
     }
 
     /**
      * Set course mapper
      *
-     * @param CourseMapper $courseMapper
+     * @param CourseMapper $deprecatedCourseMapper
      */
-    public function setCourseMapper($courseMapper)
+    public function setDeprecatedCourseMapper($deprecatedCourseMapper)
     {
-        $this->courseMapper = $courseMapper;
+        $this->deprecatedCourseMapper = $deprecatedCourseMapper;
     }
 
 
     /**
      * @return Unit\DeprecatedMapper
      */
-    public function getUnitMapper()
+    public function getDeprecatedUnitMapper()
     {
-        return $this->unitMapper;
+        return $this->deprecatedUnitMapper;
     }
 
 
     /**
-     * @param Unit\DeprecatedMapper $unitMapper
+     * @param Unit\DeprecatedMapper $deprecatedUnitMapper
      * @return static
      */
-    public function setUnitMapper($unitMapper)
+    public function setDeprecatedUnitMapper($deprecatedUnitMapper)
     {
-        $this->unitMapper = $unitMapper;
+        $this->deprecatedUnitMapper = $deprecatedUnitMapper;
         return $this;
     }
 
@@ -2549,7 +2549,7 @@ class Controller extends Base\Base
      */
     public function getAncestry()
     {
-        return $this->getCourseMapper()->getAncestry();
+        return $this->getDeprecatedCourseMapper()->getAncestry();
     }
 
 }
