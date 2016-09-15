@@ -31,7 +31,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         VALUES (:title, '', :publish, :open, :due, :weight, 1)
     ");
     $insertAssessmentRelationQuery = $db->prepare("
-        INSERT INTO assessment_course_unit_instance (assessment_id, course_unit_instance_id)
+        INSERT INTO assessment_course_unit_implementation (assessment_id, course_unit_implementation_id)
         VALUES (:assessmentId, :courseUnitInstanceId)
     ");
 
@@ -80,7 +80,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             ti.box_id,
             ci.category_id
         FROM task_instance ti
-        INNER JOIN course_unit_instance ci ON ti.course_unit_instance_id = ci.id
+        INNER JOIN course_unit_implementation ci ON ti.course_unit_instance_id = ci.id
         ORDER BY ti.id ASC
     ");
     $selectQuizQuery               = $db->prepare("SELECT weight, start, finish FROM assess WHERE assess_id = :assessId");

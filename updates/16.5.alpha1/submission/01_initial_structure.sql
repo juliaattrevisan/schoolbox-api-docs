@@ -127,18 +127,18 @@ CREATE TABLE `assessment_folder` (
 ENGINE = InnoDB;
 
 
-CREATE TABLE `assessment_course_unit_instance` (
+CREATE TABLE `assessment_course_unit_implementation` (
   `assessment_id` INT UNSIGNED NOT NULL,
-  `course_unit_instance_id` INT UNSIGNED NOT NULL,
-  INDEX `fk_assessment_course_unit_instance_assessment_id_idx` (`assessment_id` ASC),
-  INDEX `fk_assessment_course_unit_instance_course_unit_instance_id_idx` (`course_unit_instance_id` ASC),
-  CONSTRAINT `fk_assessment_course_unit_instance_assessment_id`
+  `course_unit_implementation_id` INT UNSIGNED NOT NULL,
+  INDEX `fk_assessment_course_unit_implementation_assessment_id_idx` (`assessment_id` ASC),
+  INDEX `fk_assessment_course_unit_implementation_course_unit_implementation_id_idx` (`course_unit_implementation_id` ASC),
+  CONSTRAINT `fk_assessment_course_unit_implementation_assessment_id`
     FOREIGN KEY (`assessment_id`)
     REFERENCES `assessment` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
- CONSTRAINT `fk_assessment_course_unit_instance_course_unit_instance_id`
-   FOREIGN KEY (`course_unit_instance_id`)
+ CONSTRAINT `fk_assessment_course_unit_implementation_course_unit_implementation_id`
+   FOREIGN KEY (`course_unit_implementation_id`)
    REFERENCES `course_unit_instance` (`id`)
    ON DELETE NO ACTION
    ON UPDATE NO ACTION)
