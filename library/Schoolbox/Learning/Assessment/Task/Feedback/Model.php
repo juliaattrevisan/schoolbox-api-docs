@@ -11,6 +11,7 @@
 namespace Schoolbox\Learning\Assessment\Task\Feedback;
 
 use \Schoolbox\Learning\Assessment\AbstractFeedback;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 
 class Model extends AbstractFeedback
 {
@@ -18,12 +19,12 @@ class Model extends AbstractFeedback
     /**
      * Calculate the final mark for this IAssessable
      *
-     * Tasks aren't marked and always return null
+     * This object's existence indicates a Teacher has marked the task is Complete.
      *
-     * @return null
+     * @return float
      */
     public function getNormalisedMark()
     {
-        return null;
+        return IMarkScheme::NORMALISED_MARK_MAX;
     }
 }
