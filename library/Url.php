@@ -28,10 +28,15 @@ class Url
      *
      * @param string $url
      * @param string|null $siteHost Override data-base configured siteHost. Used in tests or CLI context.
+     * @throws InvalidArgumentException if $url is not a string
      * @throws DomainException If cannot determine the SB instance's configured hostname. This is required for determining relativity.
      */
     public function __construct($url, $siteHost = null)
     {
+        if (!is_string($url)) {
+            throw new InvalidArgumentException("URL must be a string. Type: " . gettype($url));
+        }
+
         $this->setUrl(trim($url));
 
         // No override, use config
@@ -114,10 +119,30 @@ class Url
      */
     public function getHostname()
     {
-        $pattern = '/^(?:(?:[a-zA-Z]+:)?\/\/)?([a-zA-Z0-9.-]*)/';
+        $pattern = '/^(?:(?:[a-zA-Z]+:)?\/\/)?([a-zA-Z0-9.-]*)(?:[\/?#])?/';
         $matches = [];
         preg_match($pattern, $this->getUrl(), $matches);
-        return count($matches) > 1 ? $matches[1] : false;
+
+        if(!count($matches)){
+            return false;
+        }
+
+        // Check for zero-length labels, or labels that start or end with '-'
+
+        $labels = explode('.', $matches[1]);
+        foreach($labels as $label){
+            if('' === $label && count($labels)){
+                return false;
+            }
+            $subLabels = explode('-', $label);
+            foreach($subLabels as $subLabel){
+                if('' === $subLabel && count($subLabels)){
+                    return false;
+                }
+            }
+        }
+
+        return $matches[1];
     }
 
 
