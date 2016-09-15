@@ -27,8 +27,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
  *  which had at least one child Folder which contained a Course Builder component.
  *  This class puts this concept into a concrete class.)
  *
- * TODO unit tests
- *
  * @package Schoolbox\Learning\Course
  */
 class Specification implements AssessmentContext, ISoftDeletable
@@ -117,8 +115,6 @@ class Specification implements AssessmentContext, ISoftDeletable
         if (is_object($this->getDeletedAt())) {
             $this->setDeletedAt(clone $this->getDeletedAt());
         }
-        if (is_object($this->getUnits())) {
-            $this->setUnits(clone $this->getUnits());
-        }
+        $this->setUnits($this->getUnits()->deepClone());
     }
 }

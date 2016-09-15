@@ -28,8 +28,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
  *  related directly to the Folder the Course Specification was imported onto, and
  *  linked to a component.)
  *
- * TODO unit tests
- *
  * @package Schoolbox\Learning\Course\Implementation
  */
 class Implementation implements AssessmentContext, ISoftDeletable
@@ -143,8 +141,6 @@ class Implementation implements AssessmentContext, ISoftDeletable
         if (is_object($this->getDeletedAt())) {
             $this->setDeletedAt(clone $this->getDeletedAt());
         }
-        if (is_object($this->getUnits())) {
-            $this->setUnits(clone $this->getUnits());
-        }
+        $this->setUnits($this->getUnits()->deepClone());
     }
 }
