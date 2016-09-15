@@ -11,6 +11,7 @@ use InvalidArgumentException;
 use DomainException;
 
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Learning\Assessment\IResponse;
 
 class LetterGrade extends AbstractMarkScheme
 {
@@ -28,12 +29,13 @@ class LetterGrade extends AbstractMarkScheme
     /**
      * Returns a string representation of a normalised Mark
      *
-     * @param float $normalisedMark
+     * @param float          $normalisedMark
+     * @param IResponse|null $response
      * @throws InvalidArgumentException if normalised mark is outside valid range
      * @throws DomainException if unable to locate corresponding GradeLevel
      * @return string
      */
-    public function getHumanReadableMark($normalisedMark)
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
         $this->validateNormalisedMark($normalisedMark);
 
@@ -49,11 +51,12 @@ class LetterGrade extends AbstractMarkScheme
     /**
      * Converts Caption to float.
      *
-     * @param string $humanReadableMark eg 'Excellent'
+     * @param string         $humanReadableMark eg 'Excellent'
+     * @param IResponse|null $response
      * @throws DomainException if unable to locate corresponding GradeLevel
      * @return float
      */
-    public function getNormalisedMark($humanReadableMark)
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null)
     {
         foreach ($this->getGradeGroup()->getGradeLevels() as $gradeLevel) {
             if ($gradeLevel->getCaption() == $humanReadableMark) {

@@ -7,6 +7,8 @@
 
 namespace Schoolbox\Learning\MarkScheme;
 
+use Schoolbox\Learning\Assessment\IResponse;
+
 /**
  * A MarkScheme is used for conversion between HumanReadable and Normalised Marks.
  * A Normalised Mark is a float between 0.0 and 100.0 inclusive.
@@ -21,18 +23,20 @@ interface IMarkScheme
     /**
      * Returns a string representation of a mark.
      *
-     * @param float $normalisedMark
+     * @param float          $normalisedMark
+     * @param IResponse|null $response
      * @return string|null
      */
-    public function getHumanReadableMark($normalisedMark);
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null);
 
     /**
      * Returns a float from 0 to 100.0 inclusive.
      *
      * @param string $humanReadableMark
+     * @param IResponse|null $response
      * @return float|null
      */
-    public function getNormalisedMark($humanReadableMark);
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null);
 
 
 }

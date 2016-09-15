@@ -8,17 +8,19 @@
 namespace Schoolbox\Learning\MarkScheme;
 
 use InvalidArgumentException;
+use Schoolbox\Learning\Assessment\IResponse;
 
 class None extends AbstractMarkScheme
 {
     /**
      * No human-readable mark returned
      *
-     * @param float $normalisedMark
+     * @param float          $normalisedMark
+     * @param IResponse|null $response
      * @throws InvalidArgumentException if normalised mark is outside valid range
      * @return string
      */
-    public function getHumanReadableMark($normalisedMark)
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
         $this->validateNormalisedMark($normalisedMark);
         return null;
@@ -27,10 +29,11 @@ class None extends AbstractMarkScheme
     /**
      * No normalised mark returned
      *
-     * @param string $humanReadableMark
+     * @param string         $humanReadableMark
+     * @param IResponse|null $response
      * @return null
      */
-    public function getNormalisedMark($humanReadableMark)
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null)
     {
         return null;
     }

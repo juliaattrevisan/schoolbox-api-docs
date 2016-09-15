@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\MarkScheme;
 
 use \InvalidArgumentException;
+use Schoolbox\Learning\Assessment\IResponse;
 
 /**
  * Common logic for 'TotalMark' schemes
@@ -35,11 +36,12 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      *
      * Granularity of numerator & denominator depends on sub-class
      *
-     * @param float $normalisedMark
+     * @param float          $normalisedMark
+     * @param IResponse|null $response
      * @throws InvalidArgumentException if normalised mark is outside valid range
      * @return string
      */
-    public function getHumanReadableMark($normalisedMark)
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
         $this->validateNormalisedMark($normalisedMark);
 
@@ -52,10 +54,11 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
     /**
      * Converts string numerator to float using stored denominator
      *
-     * @param string $humanReadableMark
+     * @param string         $humanReadableMark
+     * @param IResponse|null $response
      * @return float
      */
-    public function getNormalisedMark($humanReadableMark)
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null)
     {
         $matches = [];
         $pattern = '/^\s*([0-9.]+)/';
@@ -69,7 +72,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
     }
 
     /**
-     * @param int|float $totalMark
+     * @param float $totalMark
      */
     abstract protected function validateTotalMark($totalMark);
 
@@ -90,7 +93,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @param int|float $totalMark
      * @return static
      */
-    public function setTotalMark($totalMark)
+    protected function setTotalMark($totalMark)
     {
         $this->totalMark = $totalMark;
     }

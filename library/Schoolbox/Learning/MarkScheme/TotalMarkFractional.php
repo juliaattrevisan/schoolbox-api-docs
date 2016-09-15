@@ -93,7 +93,7 @@ class TotalMarkFractional extends TotalMarkAbstract
      * @param float $totalMark
      * @return static
      */
-    public function setTotalMark($totalMark)
+    protected function setTotalMark($totalMark)
     {
         $this->validateTotalMark($totalMark);
         parent::setTotalMark($totalMark);

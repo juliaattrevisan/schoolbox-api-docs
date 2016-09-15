@@ -9,16 +9,18 @@ namespace Schoolbox\Learning\MarkScheme;
 
 use InvalidArgumentException;
 use RangeException;
+use Schoolbox\Learning\Assessment\IResponse;
 
 class Percentage extends AbstractMarkScheme
 {
     /**
      * Returns a string representation of a normalised Mark
      *
-     * @param float $normalisedMark
+     * @param float          $normalisedMark
+     * @param IResponse|null $response
      * @return string
      */
-    public function getHumanReadableMark($normalisedMark)
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
         $this->validateNormalisedMark($normalisedMark);
 
@@ -29,12 +31,13 @@ class Percentage extends AbstractMarkScheme
     /**
      * Converts percentage string to float, and ensures float lies between 0.0 and 100.0 inclusive
 
-     * @param string $humanReadableMark eg '90 %'
+     * @param string         $humanReadableMark eg '90 %'
+     * @param IResponse|null $response
      * @throws InvalidArgumentException If cannot parse a float
      * @throws RangeException if parsed value is outside valid range
      * @return float
      */
-    public function getNormalisedMark($humanReadableMark)
+    public function getNormalisedMark($humanReadableMark, IResponse $response = null)
     {
         // Cannot merely use floatval(), as that returns 0 on failed parsing.
 
