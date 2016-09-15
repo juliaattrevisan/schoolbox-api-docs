@@ -366,8 +366,8 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
             $result = 0;
             $i = 0;
             for (; $i < count($get_methods); $i++) {
-                $a_value = $a->$get_methods[$i]();
-                $b_value = $b->$get_methods[$i]();
+                $a_value = $a->{$get_methods[$i]}();
+                $b_value = $b->{$get_methods[$i]}();
 
                 if ($a_value instanceof \IComparable && $b_value instanceof \IComparable) {
                     $result = $a_value->compare($b_value);
