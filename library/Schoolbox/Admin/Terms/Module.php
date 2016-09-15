@@ -26,16 +26,6 @@ class Module extends BaseModule
     protected $basename = 'adminTerms';
 
     /**
-     * Constructor
-     *
-     * @param ContainerInterface $injector
-     */
-    public function __construct(ContainerInterface $injector)
-    {
-        parent::__construct($injector);
-    }
-
-    /**
      * @inheritdoc
      */
     public function initRoutes(Router $router, $basePath)
