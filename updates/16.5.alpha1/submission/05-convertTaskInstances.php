@@ -85,7 +85,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     ");
     $selectQuizQuery               = $db->prepare("SELECT weight, start, finish FROM assess WHERE assess_id = :assessId");
     $selectDueWorkQuery            = $db->prepare("SELECT weight, publish_date, open_date, date FROM submission_box WHERE id = :boxId");
-    $selectCourseUnitInstanceQuery = $db->prepare("SELECT open_date, due_date FROM course_unit_instance WHERE id = :courseUnitInstanceId");
+    $selectCourseUnitInstanceQuery = $db->prepare("SELECT open_date, due_date FROM course_unit_implementation WHERE id = :courseUnitInstanceId");
 
 
     // Go

@@ -32,7 +32,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     ");
     $insertAssessmentRelationQuery = $db->prepare("
         INSERT INTO assessment_course_unit_specification (assessment_id, course_unit_specification_id)
-        VALUES (:assessmentId, (SELECT id FROM course_unit WHERE folder_id = :folderId LIMIT 1))
+        VALUES (:assessmentId, (SELECT id FROM course_unit_specification WHERE folder_id = :folderId LIMIT 1))
     ");
 
     // Update assessment type queries
