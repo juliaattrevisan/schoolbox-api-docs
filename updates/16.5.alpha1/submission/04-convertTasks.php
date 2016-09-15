@@ -31,7 +31,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         VALUES (:title, '', NULL, NULL, NULL, :weight, 1)
     ");
     $insertAssessmentRelationQuery = $db->prepare("
-        INSERT INTO assessment_course_unit (assessment_id, course_unit_id)
+        INSERT INTO assessment_course_unit_specification (assessment_id, course_unit_specification_id)
         VALUES (:assessmentId, (SELECT id FROM course_unit WHERE folder_id = :folderId LIMIT 1))
     ");
 
