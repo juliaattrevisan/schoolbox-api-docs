@@ -11,18 +11,23 @@
 namespace Schoolbox\Learning\Assessment\Quiz\Feedback;
 
 use \Schoolbox\Learning\Assessment\AbstractFeedback;
+use Schoolbox\Learning\Assessment\Quiz\Question as QuizQuestion;
 
+/**
+ * This is a Student's Response to an individual Question
+ * that was asked in the Quiz's Sections
+ */
 class Model extends AbstractFeedback
 {
     /**
-     * All the Responses to this Quiz
-     *
-     * These are Students' Responses to individual Questions
-     * that were asked in the Quiz's Sections
-     *
      * @var array
      */
-    protected $allResponses = [];
+    private $response = [];
+
+    /**
+     * @var QuizQuestion
+     */
+    private $question;
 
     /**
      * Calculate the final mark for this IAssessable
@@ -50,20 +55,21 @@ class Model extends AbstractFeedback
      */
 
     /**
-     * @return array
+     * @return QuizQuestion
      */
-    public function getAllResponses()
+    public function getQuestion()
     {
-        return $this->allResponses;
+        return $this->question;
     }
 
     /**
-     * @param array $allResponses
-     * @return self
+     * @param QuizQuestion $question
+     * @return static
+     * @todo add Type Declaration when implemented
      */
-    public function setAllResponses($allResponses)
+    public function setQuestion($question)
     {
-        $this->allResponses = $allResponses;
+        $this->question = $question;
         return $this;
     }
 }

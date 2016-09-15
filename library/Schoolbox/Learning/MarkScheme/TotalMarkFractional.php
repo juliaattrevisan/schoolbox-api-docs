@@ -9,6 +9,9 @@ namespace Schoolbox\Learning\MarkScheme;
 
 use InvalidArgumentException;
 use RangeException;
+use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
 
 /**
  * Permits fractional TotalMark suitable for Quiz.
@@ -63,6 +66,32 @@ class TotalMarkFractional extends TotalMarkAbstract
         if($totalMark > $originalTotalMark){
             throw new RangeException("Total mark cannot exceed original total mark. Original: $originalTotalMark, Total: $totalMark");
         }
+    }
+
+    /**
+     * Returns a string representation of a normalised Mark
+     *
+     * Granularity of numerator & denominator depends on sub-class
+     *
+     * @param float          $normalisedMark
+     * @param IResponse|null $response
+     * @throws InvalidArgumentException if normalised mark is outside valid range
+     * @return string
+     */
+    public function getHumanReadableMark($normalisedMark, IResponse $response = null)
+    {
+        // Special Case for Quiz where total marks available can vary per Attempt
+        if ($response instanceof QuizAttempt) {
+            $availableMarks = 0.0;
+            /** @var QuizFeedback[] $answers */
+            $answers = $response->getAllFeedback();
+            foreach($answers as $answer) {
+                $availableMarks += $answer->getQuestion()->getMarks();
+            }
+            $this->setTotalMark($availableMarks);
+
+        }
+        return parent::getHumanReadableMark($normalisedMark, $response);
     }
 
 
