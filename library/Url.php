@@ -215,7 +215,7 @@ class Url
      */
     public function isFtpUrl()
     {
-        return parse_url($this->getUrl(), PHP_URL_SCHEME) == 'ftp';
+        return in_array(parse_url($this->getUrl(), PHP_URL_SCHEME), ['ftp', 'ftps']);
     }
 
     /**

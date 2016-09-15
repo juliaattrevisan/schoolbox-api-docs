@@ -502,6 +502,18 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
             'ftp://example.com/path/file.ext?key',
             'ftp://example.com/path/file.ext?key=val',
             'ftp://example.com/path/file.ext?key=val&key2=val2',
+            'ftps://example',
+            'ftps://example.com',
+            'ftps://www.example.com.au',
+            'ftps://example.com/',
+            'ftps://example.com/path',
+            'ftps://example.com/path/',
+            'ftps://example.com/path/file',
+            'ftps://example.com/path/file.ext',
+            'ftps://example.com/path/file.ext#tag',
+            'ftps://example.com/path/file.ext?key',
+            'ftps://example.com/path/file.ext?key=val',
+            'ftps://example.com/path/file.ext?key=val&key2=val2',
         ];
         foreach ($inputs as $input) {
             $url = new Url($input, $site);
@@ -513,6 +525,14 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
     {
         $site = 'sbvagrant.alaress.com.au';
         $inputs = [
+            null,
+            false,
+            '',
+            '             ',
+            '\t\t\t',
+            "\t\t\t",
+            "\n",
+            "&%20",
             'ftp//example',
             'ftp//:example',
             'ftp',
@@ -520,6 +540,12 @@ class RelativeUrlTest extends PHPUnit_Framework_TestCase
             'http://example.com',
             'http://example.com?ftp',
             'http://example.com?protocol=ftp',
+            'ftps//example',
+            'ftps//:example',
+            'ftps',
+            'ftps.example.com',
+            'http://example.com?ftps',
+            'http://example.com?protocol=ftps',
         ];
         foreach ($inputs as $input) {
             $url = new Url($input, $site);
