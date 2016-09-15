@@ -162,6 +162,13 @@
         $('[data-source]').on('click', function (e) {
             e.preventDefault();
 
+            $.magnificPopup.open({
+                items: {
+                    src: "<div class='preview loader'></div>",
+                    type: 'inline'
+                }
+            });
+
             var $selector = $(this),
                 target = $selector.data('source'),
                 $input = $('[name="' + target + '"]');
@@ -179,7 +186,7 @@
 
                 modal.foundation('reveal', 'close');
             });
-            $(document).on('opened', '[data-reveal]', function () {
+            $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
                 $.magnificPopup.close();
             });
         });
