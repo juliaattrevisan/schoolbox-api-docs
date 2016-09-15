@@ -164,15 +164,11 @@ ENGINE = InnoDB;
 
 
 -- New and existing assessment types
--- TODO once conversions are completed, add FK constraints to these tables
 
 ALTER TABLE `assess`
 ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `category_id`;
 
 ALTER TABLE `task`
-ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `id`;
-
-ALTER TABLE `task_instance`
 ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `id`;
 
 ALTER TABLE `submission_box`
