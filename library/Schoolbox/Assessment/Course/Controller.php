@@ -55,6 +55,16 @@ use Schoolbox\Role;
 use Schoolbox\UserMapper;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
+use Alaress\Web\Controller\Base as BaseController;
+use Alaress\Web\Output\ThemedHtml;
+use InvalidArgumentException;
+use Schoolbox\Config;
+use Schoolbox\Resource\File\IFile as FileInterface;
+use Schoolbox\Resource\Folder\IFolder as FolderInterface;
+use Schoolbox\Mapper;
+use Schoolbox\Resource;
+use Schoolbox\Resource\Folder\IFolder;
+
 class Controller extends Base\Base
 {
 
@@ -1060,6 +1070,40 @@ class Controller extends Base\Base
      */
     public function parentList()
     {
+        $treeBuilder = new \Schoolbox\Resource\Browser\Resources\TreeBuilder(
+            Folder\Mapper::getInstance(),
+            \Schoolbox\Assessment\Course\Unit\DeprecatedMapper::getInstance(),
+            $_SESSION['user'],
+            'Courses'
+        );
+
+        $folderId = $this->getSession()->get('resourcesID', $this->getCourseMapper()->getFacultyNode()->getId(), $this->namespace);
+
+        $folder = $this->getFolderMapper()->findById($folderId);
+        $data = [
+            'tree'      => [],
+            'folder'    => $folder,
+            'folderId'  => $folder->getId(),
+            'icon'      => $treeBuilder->getFolderIcon($folder),
+            'access'    => FULL_ACCESS,
+            'user'      => $this->getUser(),
+            'conf'      => $this->conf,
+            'namespace' => $this->namespace,
+        ];
+
+        // add files to that
+        $data['files'] = [];
+        $treedata = $treeBuilder->buildPartialTree($folderId, $folderId);
+
+        $data['treedata'] = json_encode($treedata);
+
+        $data['namespace'] = $this->namespace;
+        $data['site_location'] = \Config::get('site_location');
+        $data['site_version'] = \Config::get('site_version');
+
+
+
+
         // the valid list of parents:
         //  - start at facultyTop $this->getCourseMapper()->getFacultyNode(),
         //  - recurse into every folder for which the user has WRITE access
@@ -1136,7 +1180,7 @@ class Controller extends Base\Base
         $courseRoot = $nodes[$facultyRoot->getId()];
         $courseRootArr = $this->recursiveTreeBuild($courseRoot, $courseIds, $permissions);
         $data['branch'] = $courseRootArr;
-        $this->tpl('parentList', $data);
+        $this->tpl('picker', $data);
     }
 
     /**
@@ -2718,6 +2762,185 @@ class Controller extends Base\Base
     public function getAncestry()
     {
         return $this->getFolderMapper()->getAncestry();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    /** @var AbstractTreeBuilder */
+    protected $treeBuilder;
+
+    /** @var \Schoolbox\Mapper|Resource\File\ILocator */
+    protected $fileMapper;
+
+    /** @var Config\Loader */
+    protected $conf;
+
+
+
+    /** @var string */
+    protected $namespace;
+
+
+    /** @var string */
+    protected $nodeType;
+
+    /**
+     * Which tab gets highlighted?
+     *
+     * @var string
+     */
+    protected $tab = 'resources';
+
+
+    /**
+     * @param AbstractTreeBuilder $treeBuilder
+     * @return self
+     */
+    public function setTreeBuilder($treeBuilder)
+    {
+        $this->treeBuilder = $treeBuilder;
+        return $this;
+    }
+
+
+    /**
+     * @param Config\Loader $conf
+     * @return self
+     */
+    public function setConfig($conf)
+    {
+        $this->conf = $conf;
+        return $this;
+    }
+
+
+    /**
+     * @param \Schoolbox\Mapper|Resource\File\ILocator $fileMapper
+     * @return self
+     */
+    public function setFileMapper($fileMapper)
+    {
+        $this->fileMapper = $fileMapper;
+        return $this;
+    }
+
+
+    /**
+     * @param string $namespace
+     * @return self
+     */
+    public function setNamespace($namespace)
+    {
+        $this->namespace = $namespace;
+        return $this;
+    }
+
+
+    /**
+     * @param string $nodeType
+     * @return self
+     */
+    public function setNodeType($nodeType)
+    {
+        $this->nodeType = $nodeType;
+        return $this;
+    }
+
+    /**
+     * @param int $fileId
+     * @return FileInterface
+     * @throws Mapper\Exception
+     */
+    protected function getFile($fileId)
+    {
+        /** @var FileInterface $file */
+        $file = $this->fileMapper->findById($fileId);
+
+        // urgh...
+        if (method_exists($file, 'setOwner')) {
+            try {
+                $file->setOwner($this->userMapper->findById($file->getOwner()->getId()));
+            } catch (Mapper\Exception $e) {
+                $file->setOwner($this->userMapper->createModel());
+            }
+        }
+
+        return $file;
+    }
+
+    /**
+     * @param int $folderId
+     * @return FolderInterface
+     */
+    protected function findFolder($folderId)
+    {
+        try {
+            return $this->getFolder($folderId);
+
+        } catch (Mapper\Exception\Deleted $e) {
+            // Deleted: load the parent (recursively)
+            return $this->findFolder($e->getDeletedObject()->getParent()->getId());
+
+        } catch (Mapper\Exception $e) {
+            return $this->folderMapper->createModel()->setId(0);
+
+        }
+    }
+
+
+    /**
+     * @param int $folderId
+     * @return FolderInterface
+     * @throws Mapper\Exception
+     */
+    protected function getFolder($folderId)
+    {
+        return $this->folderMapper->findById($folderId);
+    }
+
+    /**
+     * @param  string $tab
+     * @return $this
+     */
+    public function setTab($tab)
+    {
+        $this->tab = $tab;
+        return $this;
     }
 
 }

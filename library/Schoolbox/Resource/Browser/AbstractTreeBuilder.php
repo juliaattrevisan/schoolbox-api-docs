@@ -65,7 +65,7 @@ abstract class AbstractTreeBuilder
      *
      * @return array
      */
-    public function buildPartialTree($categoryId)
+    public function buildPartialTree($categoryId, $baseFolder='#')
     {
 
         // build a list of parentage
@@ -83,14 +83,32 @@ abstract class AbstractTreeBuilder
         }
 
         // Build the root node
-        $partialTree = $this->buildChildNodes('#');
+        $partialTree = $this->buildChildNodes($baseFolder);
 
-        // Build the parent nodes
-        foreach ($parentList as $parentCategoryId) {
-            $partialTree = array_merge(
-                $partialTree,
-                $this->buildChildNodes($parentCategoryId, $parentList)
-            );
+        if ($baseFolder == '#') {
+            // Build the parent nodes
+            foreach ($parentList as $parentCategoryId) {
+                $partialTree = array_merge(
+                    $partialTree,
+                    $this->buildChildNodes($parentCategoryId, $parentList)
+                );
+            }
+        } else {
+            $found = false;
+            foreach ($parentList as $parentCategoryId) {
+                $nodes = $this->buildChildNodes($parentCategoryId, $parentList);
+                foreach ($nodes as $node) {
+                    if ($node['id'] == $baseFolder) {
+                        $node['parent'] = '#';
+                        $partialTree[] = $node;
+                        $found = true;
+                        break;
+                    }
+                }
+                if ($found) {
+                    break;
+                }
+            }
         }
 
         // Open $categoryId's node and its parents
@@ -402,23 +420,26 @@ abstract class AbstractTreeBuilder
 
             /** @var \Schoolbox\Resource\File\Model $file */
             foreach ($files as $file) {
-                $match = true;
-
                 // Get the current files mime type string split into an array
-                $currentMime = explode("/", $file->getMime());
 
-                for ($i = 0; $i < 2; $i++) {
-                    // If current filter is wildcard, dont need to test
-                    if ($mimeFilterArray[$i] != "*") {
-                        if (strtolower($currentMime[$i] != strtolower($mimeFilterArray[$i]))) {
-                            $match = false;
+                if (method_exists($file, 'getMime')) {
+                    $match = true;
+
+                    $currentMime = explode("/", $file->getMime());
+
+                    for ($i = 0; $i < 2; $i++) {
+                        // If current filter is wildcard, dont need to test
+                        if ($mimeFilterArray[$i] != "*") {
+                            if (strtolower($currentMime[$i] != strtolower($mimeFilterArray[$i]))) {
+                                $match = false;
+                            }
                         }
                     }
-                }
 
-                // If both sides of the mime filter matched, we want to return this file
-                if ($match) {
-                    $filesFiltered->add($file);
+                    // If both sides of the mime filter matched, we want to return this file
+                    if ($match) {
+                        $filesFiltered->add($file);
+                    }
                 }
             }
 

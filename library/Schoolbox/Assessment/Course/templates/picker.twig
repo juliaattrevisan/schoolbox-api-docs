@@ -1,0 +1,92 @@
+{# Load in required JS/CSS as we are not inside the chrome #}
+
+<script type="text/javascript" src="/javascript/components/schoolbox.min.js?v={{ site_version }}"></script>
+<!--[if lt IE 10]>
+<link rel="stylesheet" type="text/css" href="/css/{{ site_location }}/chrome-foundation-ie9.css?v={{ site_version }}"/>
+<![endif]-->
+<!--[if gte IE 10]> -->
+<link rel="stylesheet" type="text/css" href="/css/{{ site_location }}/chrome-foundation.css?v={{ site_version }}"/>
+<!-- <![endif]-->
+
+{# Load JS for treeview #}
+
+<link rel="stylesheet" href="/javascript/components/jstree/dist/themes/default/style.css"/>
+<script type="text/javascript" src="/javascript/components/jstree/dist/jstree.js"></script>
+<script type="text/javascript" src="/javascript/jquery.resourceTree.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.scroll-to.js"></script>
+<script type="text/javascript" src="/javascript/jquery.fileDrop.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        var tree = $('#tree');
+
+        tree.resourceTree({
+            data: {
+                cache: {{ treedata | raw }},
+                ajaxParams: {
+                    url: '{{ routeLookup('resourceBrowser' ~ '.listNodes') }}?mime=none',
+                    token: '{folderId}'
+                }
+            }
+        });
+
+        var jstree = tree.jstree(true);
+
+        tree.on('select_node.jstree', function (event, jstree) {
+
+            {# Store the folder node ID and name for returning to the modals parent when closed #}
+
+            jstree.instance.open_node(jstree.node.id);
+            var nodeId = jstree.node.li_attr['data-id'];
+
+            $('[data-label]')
+                    .data('selection', nodeId)
+                    .data('label', jstree.node.text);
+
+            $('[data-select],[data-selection]')
+                    .attr('disabled', jstree.node.parent == '#');
+        });
+
+        var $resources = $('#resources');
+
+        {# On the initial open of the tree and all its open by default parts scroll to it #}
+
+        tree.on('after_open.jstree.initial', function (event, jstree) {
+            var nodeId = jstree.node.id;
+
+            // If this node is the parent of the selected: scroll to the selected now
+            var initialNode = jstree.instance.get_children_dom(nodeId).filter('#' +{{ folderId }});
+            if (initialNode.length) {
+                $resources.scrollTo(initialNode);
+                tree.off('.jstree.initial');
+            } else if (tree.focused !== undefined) {
+                $('[data-select],[data-selection]').attr('disabled', tree.focused().parent == '#');
+            }
+        });
+
+        $resources.height(400);
+    });
+</script>
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>Select Folder</h1>
+        <p>Click on the faculty folder in which you want to put the course below.</p>
+    </div>
+</div>
+<div class="resource-browser row">
+    <div class="small-12 island">
+        <section>
+            <div class="scroller" id="resources">
+                <div id="tree" class="resource-tree"></div>
+            </div>
+        </section>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 island">
+        <a data-selection data-label="">
+            <button disabled class="button expand" data-select>Use This Folder</button>
+        </a>
+    </div>
+</div>

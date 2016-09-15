@@ -162,13 +162,6 @@
         $('[data-source]').on('click', function (e) {
             e.preventDefault();
 
-            $.magnificPopup.open({
-                items: {
-                    src: "<div class='preview loader'></div>",
-                    type: 'inline'
-                }
-            });
-
             var $selector = $(this),
                 target = $selector.data('source'),
                 $input = $('[name="' + target + '"]');
@@ -181,13 +174,12 @@
                 var $selection = $(this);
 
                 // selector takes the name, input takes the ID
-                $selector.addClass('icon-folder').text($selection.text());
+                $selector.addClass('icon-folder').text($selection.data('label'));
                 $input.val($selection.data('selection'));
 
                 modal.foundation('reveal', 'close');
             });
-
-            $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
+            $(document).on('opened', '[data-reveal]', function () {
                 $.magnificPopup.close();
             });
         });
