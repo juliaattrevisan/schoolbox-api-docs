@@ -125,43 +125,40 @@ do
 		if [ -f $instdir/updates/$release/scripts_list ];
 		then
 			# Run SQL update scripts for this release
-			for sqlscript in `grep "\.sql" $instdir/updates/$release/scripts_list`
+			for scriptcmd in `egrep "\.php|\.sql" $instdir/updates/$release/scripts_list`
 			do
-				script="$instdir/updates/$release/$sqlscript";
+				script="$instdir/updates/$release/$scriptcmd";
 				# Check script listed in scripts_list actually exists
 				if [ -f $script ];
 				then
-					mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $script 2>&1;
-					# Check for and report errors
-					if [ $? -ne 0 ];
-					then
-						echo "Error running update: $script";
-						errorint=1;
-						errormsg="$errormsg,$script";
-					fi
-				fi
-			done
-			
-			# Run PHP update scripts for this release
-			for phpscript in `grep "\.php" $instdir/updates/$release/scripts_list`
-			do
-				script="$instdir/updates/$release/$phpscript";
-				# Check script listed in scripts_list actually exists
-				if [ -f $script ];
-				then
-					scriptpath=${script%/*};
-					cd $scriptpath;
-					phpscript=${phpscript##*/};
-					php -f $phpscript 2>&1;
-					# Check for and report errors
-					if [ $? -ne 0 ];
-					then
-						cd $curdir;
-						echo "Error running update: $script";
-						errorint=1;
-						errormsg="$errormsg,$script";
-					fi
-					cd $curdir;
+				    if [[ $scriptcmd == *".sql" ]]
+				    then
+                        mysql -h $sqlhost -u $sqluser -p$sqlpasswd $sqldb < $script 2>&1;
+                        # Check for and report errors
+                        if [ $? -ne 0 ];
+                        then
+                            echo "Error running update: $script";
+                            errorint=1;
+                            errormsg="$errormsg,$script";
+                        fi
+                    fi
+                    if [[ $scriptcmd == *".php" ]]
+                    then
+                        scriptpath=${script%/*};
+                        cd $scriptpath;
+                        phpscript=${scriptcmd##*/};
+                        echo $phpscript;
+                        php -f $phpscript 2>&1;
+                        # Check for and report errors
+                        if [ $? -ne 0 ];
+                        then
+                            cd $curdir;
+                            echo "Error running update: $script";
+                            errorint=1;
+                            errormsg="$errormsg,$script";
+                        fi
+                        cd $curdir;
+                    fi
 				fi
 			done
 			
