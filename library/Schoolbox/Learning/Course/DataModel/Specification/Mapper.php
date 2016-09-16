@@ -11,6 +11,7 @@ use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
  * Mapper for the data model for Course Specifications.
@@ -20,6 +21,15 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
  */
 class Mapper extends BaseMapper
 {
+    /**
+     * The base faculty folder.
+     *
+     * A course specification's folder should be a child of this folder.
+     *
+     * @var FolderModel
+     */
+    protected $facultyRootFolder;
+
     /**
      * Setup data source, model and data mappings.
      */
@@ -32,6 +42,18 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+    /**
+     * Load the faculty root folder - this is used for validating whether a
+     * folder can be made into a course.
+     */
+    protected function loadFacultyRootFolder()
+    {
+        /** @var FolderMapper $folderMapper */
+        $folderMapper        = $this->getJoinMapper('folder');
+        $facultyRootFolderId = preg_replace('/[^0-9]/', '', $this->getConfigLoader()->get('course_homepage'));
+        $this->setFacultyRootFolder($folderMapper->findCheaplyById($facultyRootFolderId));
     }
 
     /**
@@ -92,5 +114,29 @@ class Mapper extends BaseMapper
     public function findByName($searchParam, $options = [])
     {
         return $this->findByColumn('f.name', "%{$this->database->quoteForLike($searchParam)}%", $options);
+    }
+
+    /* Getters/setters =(^_^)= */
+
+    /**
+     * @return FolderModel
+     */
+    public function getFacultyRootFolder()
+    {
+        // Lazy-load
+        if (!($this->getFacultyRootFolder() instanceof FolderModel)) {
+            $this->loadFacultyRootFolder();
+        }
+        return $this->facultyRootFolder;
+    }
+
+    /**
+     * @param FolderModel $facultyRootFolder
+     * @return static
+     */
+    public function setFacultyRootFolder($facultyRootFolder)
+    {
+        $this->facultyRootFolder = $facultyRootFolder;
+        return $this;
     }
 }

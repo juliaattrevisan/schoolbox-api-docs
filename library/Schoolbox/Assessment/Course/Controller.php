@@ -911,7 +911,7 @@ class Controller extends Base\Base
      */
     protected function getLineage(Folder\Model $course)
     {
-        return $this->getAncestry()->findParentsCheaply($course, $this->getDeprecatedCourseMapper()->getFacultyNode());
+        return $this->getAncestry()->findParentsCheaply($course, $this->getCourseMapper()->getFacultyRootFolder());
     }
 
 
@@ -1087,7 +1087,7 @@ class Controller extends Base\Base
             }
         }
 
-        $courseRoot     = $nodes[$this->getDeprecatedCourseMapper()->getFacultyNode()->getId()];
+        $courseRoot     = $nodes[$this->getCourseMapper()->getFacultyRootFolder()->getId()];
         $courseRootArr  = $this->recursiveTreeBuild($courseRoot,$courseIds,$permissions);
         $data['branch'] = $courseRootArr;
         $this->tpl('parentList', $data);
