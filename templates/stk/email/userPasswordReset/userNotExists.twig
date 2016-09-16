@@ -1,0 +1,41 @@
+{% extends 'schoolmail.twig' %}
+{% block content %}
+    <table cellpadding="0" cellspacing="0" border="0" align="center" width="100%">
+        <tr>{{ fn.spacer('parents.saintkentigern.com', 16, 0) }}</tr>
+        <tr>
+            <td width="640">
+                <p>Hi,</p>
+            </td>
+        </tr>
+        <tr>{{ fn.spacer('parents.saintkentigern.com', 8, 0) }}</tr>
+        <tr>
+            <td width="640">
+                <p>
+                    You have requested a password reset for your
+                    account on <a href="http://parents.saintkentigern.com/">{{ config.title }}</a>,
+                    but no account is associated with this email address.
+                </p>
+            </td>
+        </tr>
+        <tr>{{ fn.spacer('parents.saintkentigern.com', 8, 0) }}</tr>
+        <tr>
+            <td width="640">
+                <p>
+                    If you have an account on <a href="http://parents.saintkentigern.com/">{{ config.title }}</a>,
+                    please attempt the reset password process again, with the email address
+                    that is associated with your account.
+                </p>
+            </td>
+        </tr>
+        <tr>{{ fn.spacer('parents.saintkentigern.com', 8, 0) }}</tr>
+        <tr>
+            <td width="640">
+                <p>
+                    If you do not have an account on <a href="http://parents.saintkentigern.com/">{{ config.title }}</a>,
+                    or you did not request a password reset, please ignore this email.
+                </p>
+            </td>
+        </tr>
+        <tr>{{ fn.spacer('parents.saintkentigern.com', 16, 0, 2) }}</tr>
+    </table>
+{% endblock %}

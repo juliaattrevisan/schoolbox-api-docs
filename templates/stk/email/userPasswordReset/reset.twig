@@ -1,0 +1,55 @@
+{% extends 'schoolmail.twig' %}
+{% block content %}
+    <table cellpadding="0" cellspacing="0" border="0" align="center" width="100%">
+        <tr>{{ fn.spacer('parents.saintkentigern.com', 16, 0) }}</tr>
+        <tr>
+            <td width="640">
+                <p>Hi {{ user.getFirstName() }},</p>
+            </td>
+        </tr>
+        <tr>{{ fn.spacer('parents.saintkentigern.com', 8, 0) }}</tr>
+        <tr>
+            <td width="640">
+                <p>
+                    {% if user.getEnabled() %}
+                        You have requested a password reset for your
+                        account on <a href="http://parents.saintkentigern.com/">{{ config.title }}</a>.
+                        Please follow the link below, or copy and paste it into your browser,
+                        to reset your password:
+                    {% else %}
+                        You have requested a password reset for your
+                        account on <a href="http://parents.saintkentigern.com/">{{ config.title }}</a>,
+                        but your account is not enabled. You may not reset your password
+                        until your account is re-enabled.
+                    {% endif %}
+                </p>
+            </td>
+        </tr>
+        {% if user.getEnabled() %}
+            <tr>{{ fn.spacer('parents.saintkentigern.com', 8, 0) }}</tr>
+            <tr>
+                <td width="640">
+                    {% if config.forgotten_password == '0' %}
+                        <p>Username: {{ user.getUsername() }}</p>
+                    {% endif %}
+                    <p>
+                        Reset Link:
+                        <a href="http://parents.saintkentigern.com/passwordReset/{{ reset.getToken()|e('html_attr') }}">
+                            http://parents.saintkentigern.com/passwordReset/{{ reset.getToken() }}
+                        </a>
+                    </p>
+                </td>
+            </tr>
+            <tr>{{ fn.spacer('parents.saintkentigern.com', 8, 0) }}</tr>
+            <tr>
+                <td width="640">
+                    <p>
+                        (The above link will expire on {{ reset.getExpiry().getLong() }}.
+                        If you did not request a password reset, please ignore this email.)
+                    </p>
+                </td>
+            </tr>
+        {% endif %}
+        <tr>{{ fn.spacer('parents.saintkentigern.com', 16, 0, 2) }}</tr>
+    </table>
+{% endblock %}
