@@ -25,7 +25,6 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
 use Schoolbox\Assessment\Course\Import\Import as CourseImport;
-use Schoolbox\Assessment\Course\DeprecatedMapper as CourseMapper;
 use Schoolbox\Assessment\Course\DeprecatedModel as CourseModel;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
@@ -81,9 +80,6 @@ class Controller extends Base\Base
     /** @var TaskInstanceMapper */
     protected $taskInstanceMapper = null;
 
-    /** @var CourseMapper */
-    protected $deprecatedCourseMapper;
-
     /** @var Unit\DeprecatedMapper */
     protected $deprecatedUnitMapper;
 
@@ -133,7 +129,6 @@ class Controller extends Base\Base
     public function __construct()
     {
         // Deprecated course/unit specification mappers
-        $this->setDeprecatedCourseMapper(CourseMapper::getInstance());
         $this->setDeprecatedUnitMapper(Unit\DeprecatedMapper::getInstance());
 
         // Modern course/unit specification mappers
@@ -2243,27 +2238,6 @@ class Controller extends Base\Base
 
     /* Getters/Setters
      */
-
-    /**
-     * Get course mapper
-     *
-     * @return CourseMapper
-     */
-    protected function getDeprecatedCourseMapper()
-    {
-        return $this->deprecatedCourseMapper;
-    }
-
-    /**
-     * Set course mapper
-     *
-     * @param CourseMapper $deprecatedCourseMapper
-     */
-    public function setDeprecatedCourseMapper($deprecatedCourseMapper)
-    {
-        $this->deprecatedCourseMapper = $deprecatedCourseMapper;
-    }
-
 
     /**
      * @return Unit\DeprecatedMapper
