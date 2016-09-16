@@ -116,6 +116,35 @@ class Mapper extends BaseMapper
         return $this->findByColumn('f.name', "%{$this->database->quoteForLike($searchParam)}%", $options);
     }
 
+    /**
+     * Validator for if a folder is a valid folder for a course.
+     *
+     * It is valid if it's a child of the faculty node.
+     *
+     * @param FolderModel $folder
+     * @return bool
+     */
+    public function isFolderValid(FolderModel $folder)
+    {
+//        // If the folder hasn't changed, it's fine for now.
+//        // (This permits courses to be created outside of the faculty node.)
+//        if ($previous instanceof Model
+//            && $previous->getFolder()->getId()
+//            && $previous->getFolder()->getId() == $model->getFolder()->getId()
+//        ) {
+//            return true;
+//        }
+
+        // The folder must be in the faculty node.
+        /** @var FolderMapper $folderMapper */
+        $folderMapper = $this->getJoinMapper('folder');
+        if (!$folderMapper->isDescendant($folder, $this->getFacultyRootFolder())) {
+            return false;
+//            throw new \UnexpectedValueException('The course\'s folder must be in the faculty root');
+        }
+        return true;
+    }
+
     /* Getters/setters =(^_^)= */
 
     /**
@@ -124,7 +153,7 @@ class Mapper extends BaseMapper
     public function getFacultyRootFolder()
     {
         // Lazy-load
-        if (!($this->getFacultyRootFolder() instanceof FolderModel)) {
+        if (!($this->facultyRootFolder instanceof FolderModel)) {
             $this->loadFacultyRootFolder();
         }
         return $this->facultyRootFolder;

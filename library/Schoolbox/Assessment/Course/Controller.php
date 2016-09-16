@@ -508,7 +508,7 @@ class Controller extends Base\Base
                 // * Don't allow moving outside of faculty root
                 //   (Keeping a course in a folder outside fac root is okay)
                 if ($folder->getParent()->getId() != $parentId
-                    && !$this->getDeprecatedCourseMapper()->isValidCourseLocation($parent)
+                    && !$this->getCourseMapper()->isFolderValid($parent)
                 ) {
                     throw new Base\Exception("Courses may not be moved outside the faculty folder");
                 }
@@ -522,7 +522,7 @@ class Controller extends Base\Base
             if ($parentId == 0) {
                 throw new Base\Exception("Courses may not be created in the root folder");
             }
-            if (!$this->getDeprecatedCourseMapper()->isValidCourseLocation($parent)) {
+            if (!$this->getCourseMapper()->isFolderValid($parent)) {
                 throw new Base\Exception("Courses may not be created outside the faculty folder");
             }
 
@@ -857,7 +857,7 @@ class Controller extends Base\Base
             // general search ignores Courses in Faculty
             if(NULL === $searchParam) {
                 try {
-                    if (!$this->getDeprecatedCourseMapper()->inFacultyArea($currentCourse->getFolder())) {
+                    if (!($this->getFolderMapper()->isDescendant($currentCourse->getFolder(), $this->getCourseMapper()->getFacultyRootFolder()))) {
                         continue;
                     }
                 } catch (MapperException $e) {

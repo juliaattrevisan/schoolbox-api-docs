@@ -204,9 +204,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $fileMapper = $this->getJoinMapper('files');
 
         $limit = (int)$limit;
-        
+
         $opts = [ 'filter' => 'image' ];
-        
+
         if ($limit) {
             $opts['size'] = $limit;
         }
@@ -258,6 +258,35 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             return false;
         }
         return true;
+    }
+
+    /**
+     * Is $possibleDescendant a descendant of $possibleAncestor?
+     *
+     * @param Model $possibleDescendant The folder that may be a descendant of $possibleAncestor
+     * @param Model $possibleAncestor
+     * @return bool
+     */
+    public function isDescendant(Model $possibleDescendant, Model $possibleAncestor)
+    {
+        foreach ($this->findParents($possibleDescendant, null, true) as $ancestor) {
+            if ($ancestor->getId() == $possibleAncestor->getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Is $possibleAncestor an ancestor of $possibleDescendant?
+     *
+     * @param Model $possibleAncestor The folder that may be an ancestor of $possibleDescendant
+     * @param Model $possibleDescendant
+     * @return bool
+     */
+    public function isAncestor(Model $possibleAncestor, Model $possibleDescendant)
+    {
+        return $this->isDescendant($possibleDescendant, $possibleAncestor);
     }
 
     /**
