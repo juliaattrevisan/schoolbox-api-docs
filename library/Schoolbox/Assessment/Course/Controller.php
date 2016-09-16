@@ -37,7 +37,7 @@ use Schoolbox\Error;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseSpecificationTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecificationTranslator;
-use Schoolbox\Learning\Course\Specification as CourseSpecifcation;
+use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -515,7 +515,7 @@ class Controller extends Base\Base
             }
 
             // Create the course specification (no units yet)
-            $courseSpecification = new CourseSpecifcation();
+            $courseSpecification = new CourseSpecification();
         }
 
         try {
