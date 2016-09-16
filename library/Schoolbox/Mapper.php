@@ -1502,10 +1502,18 @@ abstract class Mapper implements IMapper, Serializable
         $order_parts = array();
         if (!empty($options['order'])) {
             foreach ($options['order'] as $column => $order_option) {
-                $escaped_name = $this->database->quoteIdentifier($column);
+                // Is there a . in escaped_name? Assume it's a sort on a join
+                $parts = explode('.', $column, 2);
+                if (count($parts) === 1) {
+                    $prefix     = $quoted_table;
+                    $columnName = $this->database->quoteIdentifier($column);
+                } else {
+                    $prefix     = $this->database->quoteIdentifier($parts[0]);
+                    $columnName = $this->database->quoteIdentifier($parts[1]);
+                }
                 $order_option = strtoupper($order_option);
                 if (in_array($order_option, array('ASC', 'DESC'))) {
-                    $order_parts[] = "$quoted_table.$escaped_name $order_option";
+                    $order_parts[] = "$prefix.$columnName $order_option";
                 }
             }
         }
