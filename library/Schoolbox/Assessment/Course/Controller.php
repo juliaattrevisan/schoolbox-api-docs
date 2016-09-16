@@ -35,6 +35,7 @@ use Schoolbox\Collection;
 use Schoolbox\Curriculum;
 use Schoolbox\Error;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseSpecificationTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecificationTranslator;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
@@ -372,7 +373,7 @@ class Controller extends Base\Base
         if(0 == $post['parent']){
 
             // ...unless already in Root
-            if(0 != $parentId = $this->deprecatedCourseMapper->findCheaplyById($post['id'])->getParent()->getId()) {
+            if(0 != $parentId = $this->getFolderMapper()->findCheaplyById($post['id'])->getParent()->getId()) {
                 $this->sendError(
                     new Base\Exception("Course cannot reside directly in root",
                         ["move this Course out of root"]));
@@ -1040,7 +1041,10 @@ class Controller extends Base\Base
         //  - stop at, and exclude, all Courses (folder that has > 0 units)
         //  - continue to exhaustion
 
-        $courseIds = $this->deprecatedCourseMapper->findAllIds();
+        $courseIds = $this->getCourseMapper()->findAll()->map(function($v) {
+            /** @var CourseSpecificationModel $v */
+            return $v->getFolder()->getId();
+        })->getAll();
 
         // Enable later O(1) lookup
         $courseIds = array_combine($courseIds,$courseIds);
