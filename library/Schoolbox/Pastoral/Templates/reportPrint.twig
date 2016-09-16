@@ -1,3 +1,5 @@
+{% set filters = 'students=' ~ students ~ '&authors=' ~  authors  ~ '&severity=' ~  severity  ~ '&types=' ~  types  ~ '&years=' ~  years  ~ '&tags=' ~  tags  ~ '&before=' ~  before  ~ '&after=' ~  after ~ '&order=' ~ order %}
+
 <div class="hide-on-print">
     <div class="row">
         <div class="small-12 island">
@@ -19,7 +21,7 @@
 
     <ul class="breadcrumb hide-on-print">
         <li><a href="{{ routeLookup('pastoral.getReportBuilder') }}">Pastoral Care Report Generator</a></li>
-        <li><a target="_blank" href="{{ routeLookup('pastoral.getReport') }}?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Report Results</a></li>
+        <li><a target="_blank" href="{{ routeLookup('pastoral.getReport') }}?{{ filters }}">Report Results</a></li>
         <li class="active"><a href="#">Print</a></li>
     </ul>
 

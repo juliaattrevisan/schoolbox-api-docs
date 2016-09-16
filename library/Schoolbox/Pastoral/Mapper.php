@@ -272,6 +272,7 @@ class Mapper extends BaseMapper
      * @param $tags
      * @param $order
      * @param $involved
+     * @param $years
      * @return Collection
      */
     public function findAllReport(
@@ -284,7 +285,8 @@ class Mapper extends BaseMapper
         $students,
         $tags,
         $order,
-        $involved
+        $involved,
+        $years
     ) {
         // Create filter SQL
 
@@ -312,6 +314,26 @@ class Mapper extends BaseMapper
         if ($types != '') {
             $criteria[] = "type_id IN ({$types})";
         }
+
+        $array_years = explode(",", $years);
+
+        $years_sql = '';
+
+        if ($years != '') {
+
+            $years_sql .= "";
+
+            foreach ($array_years as $year) {
+                if ($years_sql != "") {
+                    $years_sql .= ",";
+                }
+                $years_sql .= "'" . str_replace("'", "''", $year) . "'";
+            }
+
+            $years_sql = "`s`.year IN ({$years_sql})";
+        }
+
+        $criteria[] = $years_sql;
 
         $criteria_sql = "";
 

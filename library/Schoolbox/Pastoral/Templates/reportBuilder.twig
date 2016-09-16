@@ -17,16 +17,28 @@
             $('[data-check-type]').prop('checked', $(e.target)[0].checked);
         });
 
+        $('[data-check-all-year]').change(function (e) {
+            $('[data-check-year]').prop('checked', $(e.target)[0].checked);
+        });
+
         {# Whenever a type checkbox is changed disable the 'Select All' box #}
 
         $('[data-check-type]').change(function (e) {
             $('[data-check-all]').prop('checked', false);
         });
 
+        $('[data-check-year]').change(function (e) {
+            $('[data-check-all-year]').prop('checked', false);
+        });
+
         {# If we are changing report criteria this will tick the 'Select All' box if every type was selected #}
 
         if ($('[data-check-type]:checked').length == $('[data-check-type]').length) {
             $('[data-check-all]').prop('checked', true);
+        }
+
+        if ($('[data-check-year]:checked').length == $('[data-check-year]').length) {
+            $('[data-check-all-year]').prop('checked', true);
         }
 
         {# Setup selectize boxes #}
@@ -141,6 +153,9 @@
                 var students = $('#filterStudents');
                 var authors = $('#filterAuthors');
 
+                var years = '';
+                var years_array = $('[name="years[]"]');
+
                 if (students.val() != null)
                     $('#students').val(students.val().join());
 
@@ -157,6 +172,17 @@
                 }
 
                 $('#types').val(types);
+
+                for (var i = 0; i < years_array.length; i++) {
+                    if (years_array[i].checked) {
+                        if (years != '') {
+                            years += ",";
+                        }
+                        years += years_array[i].value;
+                    }
+                }
+
+                $('#years').val(years);
 
                 $('#formReport').submit();
             }
@@ -182,6 +208,7 @@
     <div class="small-12 island">
 
         <form id="formReport" action="{{ routeLookup('pastoral.getReport') }}" method="get">
+            <input type="hidden" id="years" name="years">
             <input type="hidden" id="students" name="students">
             <input type="hidden" id="authors" name="authors">
             <input type="hidden" id="severity" name="severity">
@@ -285,6 +312,36 @@
                     {% else %}
                         <input type="hidden" id="involved-checkbox" value="1">
                     {% endif %}
+                </div>
+            </div>
+        </section>
+
+
+        <h2 class="subheader">Year Levels</h2>
+        <ul class="meta">
+            Select the year levels you want included in the report
+        </ul>
+
+        <section>
+            <div class="small-12 columns content">
+                <div class="checklist" data-equalizer-watch="">
+                    <input id="year-all" data-check-all-year type="checkbox">
+                    <label for="year-all">Select All</label>
+                    {% for year in years %}
+                        <input data-check-year id="year-{{ year }}" name="years[]" value="{{ year }}" type="checkbox"
+                                {% for yearSelected in yearsSelected %}
+                                    {% if yearSelected == year %}
+                                        checked
+                                    {% endif %}
+                                {% endfor %}
+                        >
+                        <label for="year-{{ year }}">
+                            {{ year }}
+                        </label>
+                    {% endfor %}
+                    <label id="year_error" for="datetime_after" class="error" style="display:none;">
+                        You must select at least one year level to show in the report
+                    </label>
                 </div>
             </div>
         </section>

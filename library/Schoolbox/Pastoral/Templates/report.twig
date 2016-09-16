@@ -1,3 +1,5 @@
+{% set filters = 'students=' ~ students ~ '&authors=' ~  authors  ~ '&severity=' ~  severity  ~ '&types=' ~  types  ~ '&years=' ~  years  ~ '&tags=' ~  tags  ~ '&before=' ~  before  ~ '&after=' ~  after ~ '&order=' ~ order %}
+
 <script>
     $(function () {
         function popupCenter(url, title, w, h) {
@@ -18,7 +20,7 @@
 
         $("[data-print]").click(function() {
             popupCenter(
-                    '{{ routeLookup('pastoral.getReportPrint') }}?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}&order={{ order }}&involved={{ involved }}',
+                    '{{ routeLookup('pastoral.getReportPrint') }}?{{ filters | raw }}',
                     'Print Pastoral Record',
                     900,
                     500);
@@ -183,7 +185,7 @@
                     <p class="no-margin">No pastoral records matched your search criteria, please review your criteria and try again.</p>
                 </div>
             </section>
-            <a class="button submit expand" href="{{ routeLookup('pastoral.getReportBuilder') }}?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}&involved={{ involved }}">Change Report Criteria</a>
+            <a class="button submit expand" href="{{ routeLookup('pastoral.getReportBuilder') }}?{{ filters}}">Change Report Criteria</a>
         </div>
 
     {% endif %}
@@ -194,20 +196,20 @@
     <br>
     <div class="row">
         <div class="small-12 island">
-            <a class="button submit expand" href="{{ routeLookup('pastoral.getReportBuilder') }}?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}&involved={{ involved }}">Change Report Criteria</a>
+            <a class="button submit expand" href="{{ routeLookup('pastoral.getReportBuilder') }}?{{ filters}}">Change Report Criteria</a>
 
             {% if results | length > 0 and totalPages > 1 %}
                 <br><br>
                 <ul class="pagination">
-                    <li class="arrow"><a href="?pageCurrent=1&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">«</a></li>
-                    <li class="arrow {% if pageCurrent == 1 %}unavailable{% endif %}"><a href="{% if pageCurrent == 1 %}#{% else %}?pageCurrent={{ pageCurrent - 1 }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}{% endif %}">‹</a></li>
+                    <li class="arrow"><a href="?pageCurrent=1{{ filters }}">«</a></li>
+                    <li class="arrow {% if pageCurrent == 1 %}unavailable{% endif %}"><a href="{% if pageCurrent == 1 %}#{% else %}?pageCurrent={{ pageCurrent - 1 }}&(( filters }}{% endif %}">‹</a></li>
                     {% for i in range (max(1, pageCurrent - ( pagesToDisplay - (min(totalPages, pageCurrent +  pagesToDisplay - (pageCurrent - max(1, pageCurrent - (pagesToDisplay / 2) ))) - pageCurrent))), min(totalPages, pageCurrent + pagesToDisplay - (pageCurrent - max(1, pageCurrent - (pagesToDisplay / 2)))))  %}
                         <li {% if i == pageCurrent %} class='active' {% endif %}>
-                            <a href="?pageCurrent={{ i }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">{{ i }}</a>
+                            <a href="?pageCurrent={{ i }}&(( filters }}">{{ i }}</a>
                         </li>
                     {% endfor %}
-                    <li class="arrow"><a href="{% if pageCurrent == totalPages %}#{% else %}?pageCurrent={{ pageCurrent + 1 }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}{% endif %}">›</a></li>
-                    <li class="arrow"><a href="?pageCurrent={{ totalPages }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">»</a></li>
+                    <li class="arrow"><a href="{% if pageCurrent == totalPages %}#{% else %}?pageCurrent={{ pageCurrent + 1 }}&(( filters }}{% endif %}">›</a></li>
+                    <li class="arrow"><a href="?pageCurrent={{ totalPages }}&(( filters }}">»</a></li>
                 </ul>
             {% endif %}
         </div>

@@ -130,6 +130,7 @@ class Controller extends Base
                     'authors' => $this->getRequest()->query["authors"],
                     'severity' => $this->getRequest()->query["severity"],
                     'types' => $this->getRequest()->query["types"],
+                    'years' => $this->getRequest()->query["years"],
                     'tags' => $this->getRequest()->query["tags"],
                     'before' => $this->getRequest()->query["before"],
                     'after' => $this->getRequest()->query["after"],
@@ -159,6 +160,7 @@ class Controller extends Base
                     'before' => $this->getRequest()->query["before"],
                     'after' => $this->getRequest()->query["after"],
                     'order' => $this->getRequest()->query["order"],
+                    'years' => $this->getRequest()->query["years"],
                     'involved' => $this->getRequest()->query["involved"]
                 ),
             )
@@ -204,11 +206,13 @@ class Controller extends Base
 
         // And render this thing out
 
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@pastoral/reportBuilder.twig',
                 'data' => array(
                     'session' => $_SESSION,
+                    'years' => $this->getUserMapper()->getYearLevels(),
                     'types' => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
                     'severities' => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
                     'tags' => $this->getPastoralTagsMapper()->findAll(),
@@ -216,6 +220,7 @@ class Controller extends Base
                     'authorsSelected' => $authorsSelected,
                     'severitySelected' => $this->getRequest()->query["severity"],
                     'typesSelected' => array_filter(explode(",", $this->getRequest()->query["types"])),
+                    'yearsSelected' => explode(",", $this->getRequest()->query["years"]),
                     'tagsSelected' => array_filter(explode(",", $this->getRequest()->query["tags"])),
                     'beforeSelected' => $this->getRequest()->query["before"],
                     'afterSelected' => $this->getRequest()->query["after"],
@@ -1028,6 +1033,12 @@ class Controller extends Base
             $types = $this->getRequest()->query["types"];
         }
 
+        if (!isset($this->getRequest()->query["years"])) {
+            $years = '';
+        } else {
+            $years = $this->getRequest()->query["years"];
+        }
+
         if (!isset($this->getRequest()->query["severity"])) {
             $severity = '';
         } else {
@@ -1067,7 +1078,7 @@ class Controller extends Base
         // Get matching records
 
         return $this->getPastoralMapper()->findAllReport($this->getUser(), $before_date, $after_date, $severity, $types,
-            $authors, $students, $tags, $order, $involved);
+            $authors, $students, $tags, $order, $involved, $years);
     }
 
     /**

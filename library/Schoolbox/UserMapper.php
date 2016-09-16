@@ -853,6 +853,27 @@ class UserMapper extends Mapper
     }
 
     /**
+     * Retrieve a list of all year levels currently assigned to users
+     * @return array
+     */
+    public function getYearLevels()
+    {
+        $query = "SELECT DISTINCT year FROM user WHERE year IS NOT NULL AND year <> '' ORDER BY LENGTH(year), year";
+        $statement = $this->getDatabase()->prepare($query);
+
+        $statement->execute();
+        $results = $statement->fetchAll();
+
+        $years = [];
+
+        foreach ($results as $result) {
+            $years[] = $result["year"];
+        }
+
+        return $years;
+    }
+
+    /**
      * Post-save callback for updating a user's default campus.
      *
      * @param User $user
