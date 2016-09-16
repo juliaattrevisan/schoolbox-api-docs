@@ -843,9 +843,11 @@ class Controller extends Base\Base
     protected function getCourseData($searchParam)
     {
         // Use the new mapper to get the list of courses
-//        $allCourses = $this->getDeprecatedCourseMapper()->findCourseListByName($searchParam, ['order' => ['name' => 'ASC' ] ]);
         /** @var CourseSpecification[] $allCourses */
-        $allCourses = $this->getCourseMapper()->findAll()->map([$this->getTranslator(), 'translateToDomainModel']);
+        $allCourses = $this->getCourseMapper()->findByName(
+            $searchParam,
+            ['order' => ['f.name' => 'ASC' ]]
+        )->map([$this->getTranslator(), 'translateToDomainModel']);
 
         $data = [];
 

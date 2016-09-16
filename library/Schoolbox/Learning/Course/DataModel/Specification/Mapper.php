@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Course\DataModel\Specification;
 
 use PDOStatement;
+use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
@@ -53,7 +54,7 @@ class Mapper extends BaseMapper
      * Hydrate joined folders
      *
      * @param PDOStatement $statement
-     * @return \Schoolbox\Collection
+     * @return Collection|Model[]
      */
     public function hydrateSelect(PDOStatement $statement)
     {
@@ -65,5 +66,17 @@ class Mapper extends BaseMapper
             $modelList->add($model);
         }
         return $modelList;
+    }
+
+    /**
+     * List the courses. Convenience method for findByColumn('name', LIKE($name));
+     *
+     * @param string $searchParam
+     * @param array  $options
+     * @return Collection|Model[]
+     */
+    public function findByName($searchParam, $options = [])
+    {
+        return $this->findByColumn('f.name', "%{$this->database->quoteForLike($searchParam)}%", $options);
     }
 }
