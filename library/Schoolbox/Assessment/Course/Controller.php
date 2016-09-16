@@ -36,6 +36,8 @@ use Schoolbox\Error;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseSpecificationTranslator;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecificationTranslator;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Mapper as BaseMapper;
@@ -87,6 +89,11 @@ class Controller extends Base\Base
      * @var CourseSpecificationMapper
      */
     protected $courseSpecificationMapper;
+
+    /**
+     * @var UnitSpecificationMapper
+     */
+    protected $unitSpecificationMapper;
 
     /**
      * @var CourseSpecificationTranslator
@@ -2568,6 +2575,24 @@ class Controller extends Base\Base
     public function setCourseSpecificationMapper($courseSpecificationMapper)
     {
         $this->courseSpecificationMapper = $courseSpecificationMapper;
+        return $this;
+    }
+
+    /**
+     * @return UnitSpecificationMapper
+     */
+    public function getUnitSpecificationMapper()
+    {
+        return $this->unitSpecificationMapper;
+    }
+
+    /**
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @return static
+     */
+    public function setUnitSpecificationMapper($unitSpecificationMapper)
+    {
+        $this->unitSpecificationMapper = $unitSpecificationMapper;
         return $this;
     }
 
