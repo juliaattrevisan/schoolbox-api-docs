@@ -140,6 +140,7 @@ class Controller extends Base\Base
 
         // Modern course/unit specification mappers
         $this->setCourseSpecificationMapper(CourseSpecificationMapper::getInstance());
+        $this->setUnitSpecificationMapper(UnitSpecificationMapper::getInstance());
 
         // Mapper/domain translation layer
         $this->setTranslator(new CourseSpecificationTranslator(new UnitSpecificationTranslator()));
@@ -887,7 +888,8 @@ class Controller extends Base\Base
             $data['courses'][] = $currentCourse->getFolder();
 
             // This still uses folders for now
-            $allUnits = $this->getDeprecatedUnitMapper()->findByCourseId($currentCourse->getFolder()->getId());
+//            $allUnits = $this->getDeprecatedUnitMapper()->findByCourseId($currentCourse->getFolder()->getId());
+            $allUnits = $this->getUnitSpecificationMapper()->findByColumn('course_id', $currentCourse->getId());
 
             // Append to unit index, by ID
             foreach ($allUnits as $currentUnit) {
