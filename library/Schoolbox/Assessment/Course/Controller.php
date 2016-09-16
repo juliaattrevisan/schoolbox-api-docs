@@ -256,20 +256,23 @@ class Controller extends Base\Base
                 $folder = $course->getFolder();
 
             } catch (MapperException $e) {
-                // It was not a course: you may modify a FOLDER to convert it into a course by adding units.
-                // As such, we now search for folders rather than explicitly courses, but said course:
-                //   - must live in the faculty root; and
-                //   - must not have any course descendants itself
-                try {
-                    $folder = $this->getFolderMapper()->findById($id);
-                } catch (MapperException $e) {
-                    throw $this->getErrorMapper()->generateException(13);
-                }
+                // It should no longer be possible for a folder to exist without a course spec.
+                throw $this->getErrorMapper()->generateException(172);
 
-                // check ancestry
-                if (!$this->getDeprecatedCourseMapper()->mayBeConvertedToCourse($folder)) {
-                    throw $this->getErrorMapper()->generateException(172);
-                }
+//                // It was not a course: you may modify a FOLDER to convert it into a course by adding units.
+//                // As such, we now search for folders rather than explicitly courses, but said course:
+//                //   - must live in the faculty root; and
+//                //   - must not have any course descendants itself
+//                try {
+//                    $folder = $this->getFolderMapper()->findById($id);
+//                } catch (MapperException $e) {
+//                    throw $this->getErrorMapper()->generateException(13);
+//                }
+//
+//                // check ancestry
+//                if (!$this->getDeprecatedCourseMapper()->mayBeConvertedToCourse($folder)) {
+//                    throw $this->getErrorMapper()->generateException(172);
+//                }
             }
 
             $folder->setParent($this->getFolderMapper()->findById($folder->getParent()->getId()));
