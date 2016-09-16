@@ -91,6 +91,11 @@ class Controller extends Base\Base
      */
     protected $courseMapper;
 
+    /**
+     * @var CourseSpecificationTranslator
+     */
+    protected $translator;
+
     /** @var Component_DefinitionMapper */
     protected $componentDefinitionMapper;
 
@@ -132,6 +137,9 @@ class Controller extends Base\Base
 
         // Modern course/unit specification mappers
         $this->setCourseMapper(CourseSpecificationMapper::getInstance());
+
+        // Mapper/domain translation layer
+        $this->setTranslator(new CourseSpecificationTranslator(new UnitSpecificationTranslator()));
 
         $this->setSubmissionBoxMapper(SubmissionBoxMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
@@ -483,14 +491,11 @@ class Controller extends Base\Base
         // extract codes
         $codes = $post->get('curriculumCodes', []);
 
-        // Translate
-        $translator = new CourseSpecificationTranslator(new UnitSpecificationTranslator());
-
         if ($id) {
             try {
                 // Retrieve the course specification
                 // (Note that $id is currently the folder ID, not the course spec ID.)
-                $courseSpecification = $translator->translateToDomainModel(
+                $courseSpecification = $this->getTranslator()->translateToDomainModel(
                     $this->getCourseMapper()->findOneByColumn('folder_id', $id)
                 );
 
@@ -568,7 +573,7 @@ class Controller extends Base\Base
 
             // Persist the course spec as well
             $courseSpecification->setFolder($folder);
-            CourseSpecificationMapper::getInstance()->save($translator->translateToDataModel($courseSpecification));
+            $this->getCourseMapper()->save($this->getTranslator()->translateToDataModel($courseSpecification));
 
             return $folder;
 
@@ -837,7 +842,10 @@ class Controller extends Base\Base
      */
     protected function getCourseData($searchParam)
     {
-        $allCourses = $this->getDeprecatedCourseMapper()->findCourseListByName($searchParam, ['order' => ['name' => 'ASC' ] ]);
+        // Use the new mapper to get the list of courses
+//        $allCourses = $this->getDeprecatedCourseMapper()->findCourseListByName($searchParam, ['order' => ['name' => 'ASC' ] ]);
+        /** @var CourseSpecification[] $allCourses */
+        $allCourses = $this->getCourseMapper()->findAll()->map([$this->getTranslator(), 'translateToDomainModel']);
 
         $data = [];
 
@@ -846,7 +854,7 @@ class Controller extends Base\Base
             // general search ignores Courses in Faculty
             if(NULL === $searchParam) {
                 try {
-                    if (!$this->getDeprecatedCourseMapper()->inFacultyArea($currentCourse)) {
+                    if (!$this->getDeprecatedCourseMapper()->inFacultyArea($currentCourse->getFolder())) {
                         continue;
                     }
                 } catch (MapperException $e) {
@@ -856,20 +864,21 @@ class Controller extends Base\Base
             }
 
             // confirm you at least have read access...
-            if (!$this->confirmAccess($currentCourse->getId())) {
+            if (!$this->confirmAccess($currentCourse->getFolder()->getId())) {
                 continue;
             }
 
             try {
-                $data['lineage'][$currentCourse->getId()] = $this->getLineage($currentCourse);
+                $data['lineage'][$currentCourse->getFolder()->getId()] = $this->getLineage($currentCourse->getFolder());
             } catch (MapperException $e) {
                 // somehow, against all odds, one of my ancestors has been deleted
                 continue;
             }
 
-            $data['courses'][] = $currentCourse;
+            $data['courses'][] = $currentCourse->getFolder();
 
-            $allUnits = $this->getDeprecatedUnitMapper()->findByCourseId($currentCourse->getId());
+            // This still uses folders for now
+            $allUnits = $this->getDeprecatedUnitMapper()->findByCourseId($currentCourse->getFolder()->getId());
 
             // Append to unit index, by ID
             foreach ($allUnits as $currentUnit) {
@@ -878,7 +887,7 @@ class Controller extends Base\Base
                     continue;
                 }
 
-                $data['units'][$currentCourse->getId()][] = $currentUnit;
+                $data['units'][$currentCourse->getFolder()->getId()][] = $currentUnit;
             }
 
             /* Also store the path to this Course
@@ -2588,6 +2597,24 @@ class Controller extends Base\Base
     public function setCourseMapper($courseMapper)
     {
         $this->courseMapper = $courseMapper;
+        return $this;
+    }
+
+    /**
+     * @return CourseSpecificationTranslator
+     */
+    public function getTranslator()
+    {
+        return $this->translator;
+    }
+
+    /**
+     * @param CourseSpecificationTranslator $translator
+     * @return static
+     */
+    public function setTranslator($translator)
+    {
+        $this->translator = $translator;
         return $this;
     }
 
