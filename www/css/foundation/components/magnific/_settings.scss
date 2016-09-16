@@ -1,10 +1,117 @@
 /** Settings for Magnific
     Modal for image gallery and previewing things
-    **/
-
-
+**/
 .mfp-iframe-scaler {
-  iframe {
-    background: #FFFFFF;
-  }
+	iframe {
+		background: #FFFFFF;
+	}
+}
+
+img.mfp-img{
+	padding: 3rem 0 6rem;
+}
+
+.mfp-figure:after{
+	top: 3rem;
+	bottom: 6rem;
+}
+
+.mfp-image-holder .mfp-close,
+.mfp-iframe-holder .mfp-close{
+	background: rgba(0,0,0,0.5);
+	border-radius: 5rem;
+	top: 0.3rem;
+	right: -2.3rem;
+	padding: 0;
+	font-size: 2rem;
+	width: 2.5rem;
+	height: 0.75rem;
+	text-align: center;
+	line-height: 2rem;
+
+	&:hover{
+		background: rgba(0,0,0,1);
+		cursor: pointer;
+	}
+}
+.mfp-arrow{
+	color: $white;
+	opacity: 0.5;
+	&:hover{
+		color: $white;
+		opacity: 1;
+	}
+	&:before{
+		border: 0;
+		opacity: 1;
+		margin-top: 30px;
+		@extend .icon-48;
+	}
+}
+
+.mfp-container .mfp-arrow-left:before{
+	@extend .icon-previous;
+}
+
+.mfp-container .mfp-arrow-right:before{
+	@extend .icon-next;
+	margin-left: 20px;
+}
+
+.mfp-bottom-bar{
+	background: $black;
+	margin: 0;
+	position: fixed;
+	top: auto;
+	bottom: 0;
+	padding: 1rem;
+	.mfp-title {
+		text-align: center;
+		padding: 0;
+	}
+	.mfp-counter{
+		text-align: center;
+		margin: 10px 0 0 0;
+		position: relative;
+		top: auto;
+		right: auto;
+	}
+}
+
+@media #{$medium-down} {
+	.mfp-image-holder .mfp-close,
+	.mfp-iframe-holder .mfp-close{
+		right: auto;
+		left: 50%;
+		top: 0;
+		margin-left: -20px;
+	}
+}
+
+@media #{$small-only} {
+	.mfp-arrow:before{
+		color: $white;
+		font-size: 4rem;
+		margin-top: 16px;
+	}
+	.mfp-arrow-left:after,
+	.mfp-arrow-right:after{
+		border: 0;
+		font-size: 61px;
+		top: -5px;
+		color: $black;
+		visibility: visible !important;
+		width: auto !important;
+	}
+	.mfp-container .mfp-arrow-left:after{
+		content: "\e655" !important;
+		margin-left: 26px;
+	}
+	.mfp-container .mfp-arrow-right:after{
+		content: "\e64b" !important;
+		margin-left: 2px;
+	}
+	.mfp-container .mfp-arrow-right:before {
+		margin-left: 0px;
+	}
 }
