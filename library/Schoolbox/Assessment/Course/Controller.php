@@ -86,6 +86,11 @@ class Controller extends Base\Base
     /** @var Unit\DeprecatedMapper */
     protected $deprecatedUnitMapper;
 
+    /**
+     * @var CourseSpecificationMapper
+     */
+    protected $courseMapper;
+
     /** @var Component_DefinitionMapper */
     protected $componentDefinitionMapper;
 
@@ -126,6 +131,7 @@ class Controller extends Base\Base
         $this->setDeprecatedUnitMapper(Unit\DeprecatedMapper::getInstance());
 
         // Modern course/unit specification mappers
+        $this->setCourseMapper(CourseSpecificationMapper::getInstance());
 
         $this->setSubmissionBoxMapper(SubmissionBoxMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
@@ -482,6 +488,12 @@ class Controller extends Base\Base
 
         if ($id) {
             try {
+                // Retrieve the course specification
+                // (Note that $id is currently the folder ID, not the course spec ID.)
+                $courseSpecification = $translator->translateToDomainModel(
+                    $this->getCourseMapper()->findOneByColumn('folder_id', $id)
+                );
+
                 // do checks to make sure it exists
                 $folder = $this->getDeprecatedCourseMapper()->findById($id);
                 $mode = BaseMapper::METHOD_UPDATE;
@@ -497,12 +509,6 @@ class Controller extends Base\Base
             } catch (BaseMapper\Exception $e) {
                 throw new Base\Exception("Could not save because " . $e->getMessage());
             }
-
-            // Retrieve the course specification
-            // (Note that $id is currently the folder ID, not the course spec ID.)
-            $courseSpecification = $translator->translateToDomainModel(
-                CourseSpecificationMapper::getInstance()->findOneByColumn('folder_id', $id)
-            );
         } else {
             // Sanity checks for new courses:
             // * Don't allow a course to be created in root folder
@@ -2567,6 +2573,23 @@ class Controller extends Base\Base
         $this->taskInstanceMapper = $taskInstanceMapper;
     }
 
+    /**
+     * @return CourseSpecificationMapper
+     */
+    public function getCourseMapper(): CourseSpecificationMapper
+    {
+        return $this->courseMapper;
+    }
+
+    /**
+     * @param CourseSpecificationMapper $courseMapper
+     * @return static
+     */
+    public function setCourseMapper($courseMapper)
+    {
+        $this->courseMapper = $courseMapper;
+        return $this;
+    }
 
     /**
      * @return Ancestry
