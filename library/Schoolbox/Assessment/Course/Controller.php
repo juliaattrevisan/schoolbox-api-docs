@@ -86,7 +86,7 @@ class Controller extends Base\Base
     /**
      * @var CourseSpecificationMapper
      */
-    protected $courseMapper;
+    protected $courseSpecificationMapper;
 
     /**
      * @var CourseSpecificationTranslator
@@ -132,7 +132,7 @@ class Controller extends Base\Base
         $this->setDeprecatedUnitMapper(Unit\DeprecatedMapper::getInstance());
 
         // Modern course/unit specification mappers
-        $this->setCourseMapper(CourseSpecificationMapper::getInstance());
+        $this->setCourseSpecificationMapper(CourseSpecificationMapper::getInstance());
 
         // Mapper/domain translation layer
         $this->setTranslator(new CourseSpecificationTranslator(new UnitSpecificationTranslator()));
@@ -248,7 +248,7 @@ class Controller extends Base\Base
             try {
                 // First, check whether or not this is already a course. We don't want to barr access to courses that
                 // are already courses.
-                $course = $this->getCourseMapper()->findByFolderId($id);
+                $course = $this->getCourseSpecificationMapper()->findByFolderId($id);
                 $folder = $course->getFolder();
 
             } catch (MapperException $e) {
@@ -496,7 +496,7 @@ class Controller extends Base\Base
                 // Retrieve the course specification
                 // (Note that $id is currently the folder ID, not the course spec ID.)
                 $courseSpecification = $this->getTranslator()->translateToDomainModel(
-                    $this->getCourseMapper()->findByFolderId($id)
+                    $this->getCourseSpecificationMapper()->findByFolderId($id)
                 );
 
                 // do checks to make sure it exists
@@ -507,7 +507,7 @@ class Controller extends Base\Base
                 // * Don't allow moving outside of faculty root
                 //   (Keeping a course in a folder outside fac root is okay)
                 if ($folder->getParent()->getId() != $parentId
-                    && !$this->getCourseMapper()->isFolderValid($parent)
+                    && !$this->getCourseSpecificationMapper()->isFolderValid($parent)
                 ) {
                     throw new Base\Exception("Courses may not be moved outside the faculty folder");
                 }
@@ -521,7 +521,7 @@ class Controller extends Base\Base
             if ($parentId == 0) {
                 throw new Base\Exception("Courses may not be created in the root folder");
             }
-            if (!$this->getCourseMapper()->isFolderValid($parent)) {
+            if (!$this->getCourseSpecificationMapper()->isFolderValid($parent)) {
                 throw new Base\Exception("Courses may not be created outside the faculty folder");
             }
 
@@ -573,7 +573,7 @@ class Controller extends Base\Base
 
             // Persist the course spec as well
             $courseSpecification->setFolder($folder);
-            $this->getCourseMapper()->save($this->getTranslator()->translateToDataModel($courseSpecification));
+            $this->getCourseSpecificationMapper()->save($this->getTranslator()->translateToDataModel($courseSpecification));
 
             return $folder;
 
@@ -844,7 +844,7 @@ class Controller extends Base\Base
     {
         // Use the new mapper to get the list of courses
         /** @var CourseSpecification[] $allCourses */
-        $allCourses = $this->getCourseMapper()->findByName(
+        $allCourses = $this->getCourseSpecificationMapper()->findByName(
             $searchParam,
             ['order' => ['f.name' => 'ASC' ]]
         )->map([$this->getTranslator(), 'translateToDomainModel']);
@@ -856,7 +856,7 @@ class Controller extends Base\Base
             // general search ignores Courses in Faculty
             if(NULL === $searchParam) {
                 try {
-                    if (!($this->getFolderMapper()->isDescendant($currentCourse->getFolder(), $this->getCourseMapper()->getFacultyRootFolder()))) {
+                    if (!($this->getFolderMapper()->isDescendant($currentCourse->getFolder(), $this->getCourseSpecificationMapper()->getFacultyRootFolder()))) {
                         continue;
                     }
                 } catch (MapperException $e) {
@@ -910,7 +910,7 @@ class Controller extends Base\Base
      */
     protected function getLineage(Folder\Model $course)
     {
-        return $this->getAncestry()->findParentsCheaply($course, $this->getCourseMapper()->getFacultyRootFolder());
+        return $this->getAncestry()->findParentsCheaply($course, $this->getCourseSpecificationMapper()->getFacultyRootFolder());
     }
 
 
@@ -928,7 +928,7 @@ class Controller extends Base\Base
         // find all the folders that match this code, then filter for coarseness
         return $this->getFolderMapper()->findByCurriculumCode($codes)->filter(function ($result) {
             /** @var Folder\Model $result */
-            return $this->getCourseMapper()->countByColumn('folder_id', $result->getId()) > 0;
+            return $this->getCourseSpecificationMapper()->countByColumn('folder_id', $result->getId()) > 0;
         });
     }
 
@@ -1037,7 +1037,7 @@ class Controller extends Base\Base
         //  - stop at, and exclude, all Courses (folder that has > 0 units)
         //  - continue to exhaustion
 
-        $courseIds = $this->getCourseMapper()->findAll()->map(function($v) {
+        $courseIds = $this->getCourseSpecificationMapper()->findAll()->map(function($v) {
             /** @var CourseSpecificationModel $v */
             return $v->getFolder()->getId();
         })->getAll();
@@ -1090,7 +1090,7 @@ class Controller extends Base\Base
             }
         }
 
-        $courseRoot     = $nodes[$this->getCourseMapper()->getFacultyRootFolder()->getId()];
+        $courseRoot     = $nodes[$this->getCourseSpecificationMapper()->getFacultyRootFolder()->getId()];
         $courseRootArr  = $this->recursiveTreeBuild($courseRoot,$courseIds,$permissions);
         $data['branch'] = $courseRootArr;
         $this->tpl('parentList', $data);
@@ -1186,7 +1186,7 @@ class Controller extends Base\Base
         $componentId = trim($this->getRequest()->post["componentId"]);
 
         try {
-            $this->getCourseMapper()->findByFolderId($courseHomepage);
+            $this->getCourseSpecificationMapper()->findByFolderId($courseHomepage);
 
         } catch (MapperException $e) {
             // the nominated "course" is not actually a course...
@@ -2556,18 +2556,18 @@ class Controller extends Base\Base
     /**
      * @return CourseSpecificationMapper
      */
-    public function getCourseMapper()
+    public function getCourseSpecificationMapper()
     {
-        return $this->courseMapper;
+        return $this->courseSpecificationMapper;
     }
 
     /**
-     * @param CourseSpecificationMapper $courseMapper
+     * @param CourseSpecificationMapper $courseSpecificationMapper
      * @return static
      */
-    public function setCourseMapper($courseMapper)
+    public function setCourseSpecificationMapper($courseSpecificationMapper)
     {
-        $this->courseMapper = $courseMapper;
+        $this->courseSpecificationMapper = $courseSpecificationMapper;
         return $this;
     }
 
