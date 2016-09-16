@@ -588,28 +588,25 @@ class Controller extends Base
                 foreach ($attachmentObjects as $storageObject) {
                     // Only add attachments which don't already exist
 
-                    if (!in_array($storageObject->getHash(), $retainedAttachments)) {
-
-                        if ($this->getDi()->get('config')->get("external_pastoral_upload")) {
-                            // Queue file for upload to Synergetic DocMan
-                            $queue = new PastoralUploadQueueModel();
-                            $queue->setPastoralId($record->getId());
-                            $queue->setExternalId($this->getUser()->getExternalId());
-                            $queue->setStudentExternalId($record->getStudent()->getExternalId());
-                            $queue->setHash($storageObject->getHash());
-                            $queue->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
-                            $queue->setType($storageObject->getType());
-                            $queue->setCreatedAt(\Alaress_Date_Format::now());
-                            $queue->setUpdatedAt(\Alaress_Date_Format::now());
-                            $this->getPastoralUploadQueueMapper()->save($queue);
-                        }
-
-                        $attachment = new PastoralAttachmentModel();
-                        $attachment->setPastoralId($record->getId());
-                        $attachment->setHash($storageObject->getHash());
-                        $attachment->setUpdatedAt(\Alaress_Date_Format::now());
-                        $this->getPastoralAttachmentMapper()->save($attachment);
+                    if ($this->getDi()->get('config')->get("external_pastoral_upload")) {
+                        // Queue file for upload to Synergetic DocMan
+                        $queue = new PastoralUploadQueueModel();
+                        $queue->setPastoralId($record->getId());
+                        $queue->setExternalId($this->getUser()->getExternalId());
+                        $queue->setStudentExternalId($record->getStudent()->getExternalId());
+                        $queue->setHash($storageObject->getHash());
+                        $queue->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
+                        $queue->setType($storageObject->getType());
+                        $queue->setCreatedAt(\Alaress_Date_Format::now());
+                        $queue->setUpdatedAt(\Alaress_Date_Format::now());
+                        $this->getPastoralUploadQueueMapper()->save($queue);
                     }
+
+                    $attachment = new PastoralAttachmentModel();
+                    $attachment->setPastoralId($record->getId());
+                    $attachment->setHash($storageObject->getHash());
+                    $attachment->setUpdatedAt(\Alaress_Date_Format::now());
+                    $this->getPastoralAttachmentMapper()->save($attachment);
                 }
             }
         }
