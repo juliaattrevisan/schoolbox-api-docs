@@ -18,8 +18,8 @@
     </script>
 
     <ul class="breadcrumb hide-on-print">
-        <li><a href="/pastoral/report-builder">Pastoral Care Report Generator</a></li>
-        <li><a target="_blank" href="/pastoral/report?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Report Results</a></li>
+        <li><a href="{{ routeLookup('pastoral.getReportBuilder') }}">Pastoral Care Report Generator</a></li>
+        <li><a target="_blank" href="{{ routeLookup('pastoral.getReport') }}?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Report Results</a></li>
         <li class="active"><a href="#">Print</a></li>
     </ul>
 
@@ -163,7 +163,7 @@
                         <p class="no-margin">No pastoral records matched your search criteria, please review your criteria and try again.</p>
                     </div>
                 </section>
-                <a class="button submit expand" href="/pastoral/report-builder?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Change Report Criteria</a>
+                <a class="button submit expand" href="{{ routeLookup('pastoral.getReportBuilder') }}?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}&involved={{ involved }}">Change Report Criteria</a>
             </div>
 
         {% endif %}

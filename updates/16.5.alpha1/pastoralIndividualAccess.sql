@@ -1,4 +1,4 @@
-INSERT INTO schoolbox.config (
+INSERT INTO config (
   name, 
   value, 
   title, 

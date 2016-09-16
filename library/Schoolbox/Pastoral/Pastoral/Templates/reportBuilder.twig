@@ -166,7 +166,7 @@
 </script>
 
 <ul class="breadcrumb">
-    <li class="active"><a href="/pastoral/report-builder">Pastoral Care Report Generator</a></li>
+    <li class="active"><a href="#">Pastoral Care Report Generator</a></li>
 </ul>
 
 <div class="actions-small-1 row">
@@ -181,7 +181,7 @@
 <div class="row">
     <div class="small-12 island">
 
-        <form id="formReport" action="/pastoral/report" method="get">
+        <form id="formReport" action="{{ routeLookup('pastoral.getReport') }}" method="get">
             <input type="hidden" id="students" name="students">
             <input type="hidden" id="authors" name="authors">
             <input type="hidden" id="severity" name="severity">
@@ -278,7 +278,7 @@
                             records in the system. To filter the report to show only those incidents in which you are
                             involved click on the checkbox below.
                         </p>
-                        <input id="involved-checkbox" name="involved-checkbox" value="1" type="checkbox">
+                        <input id="involved-checkbox" name="involved-checkbox" value="1" type="checkbox" {{ involved }}>
                         <label for="involved-checkbox">
                             Only show records in which you are the author or an audience member
                         </label>

@@ -18,7 +18,7 @@
 
         $("[data-print]").click(function() {
             popupCenter(
-                    '/pastoral/report-print?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}&order={{ order }}&involved={{ involved }}',
+                    '{{ routeLookup('pastoral.getReportPrint') }}?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}&order={{ order }}&involved={{ involved }}',
                     'Print Pastoral Record',
                     900,
                     500);
@@ -26,7 +26,7 @@
     });
 </script>
 <ul class="breadcrumb hide-on-print">
-    <li><a href="/pastoral/report-builder">Pastoral Care Report Generator</a></li>
+    <li><a href="{{ routeLookup('pastoral.getReportBuilder') }}">Pastoral Care Report Generator</a></li>
     <li class="active"><a href="#">Report Results</a></li>
 </ul>
 
@@ -183,7 +183,7 @@
                     <p class="no-margin">No pastoral records matched your search criteria, please review your criteria and try again.</p>
                 </div>
             </section>
-            <a class="button submit expand" href="/pastoral/report-builder?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Change Report Criteria</a>
+            <a class="button submit expand" href="{{ routeLookup('pastoral.getReportBuilder') }}?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}&involved={{ involved }}">Change Report Criteria</a>
         </div>
 
     {% endif %}
@@ -194,7 +194,7 @@
     <br>
     <div class="row">
         <div class="small-12 island">
-            <a class="button submit expand" href="/pastoral/report-builder?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Change Report Criteria</a>
+            <a class="button submit expand" href="{{ routeLookup('pastoral.getReportBuilder') }}?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}&involved={{ involved }}">Change Report Criteria</a>
 
             {% if results | length > 0 and totalPages > 1 %}
                 <br><br>

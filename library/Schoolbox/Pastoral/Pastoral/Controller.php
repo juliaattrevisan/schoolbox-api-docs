@@ -219,7 +219,8 @@ class Controller extends Base
                     'tagsSelected' => array_filter(explode(",", $this->getRequest()->query["tags"])),
                     'beforeSelected' => $this->getRequest()->query["before"],
                     'afterSelected' => $this->getRequest()->query["after"],
-                    'superUser' => $this->getPastoralModeratorLevel() >= UserAccess::ACCESS_READ || $this->getUser()->getSuperuser()
+                    'superUser' => $this->getPastoralModeratorLevel() >= UserAccess::ACCESS_READ || $this->getUser()->getSuperuser(),
+                    'involved' => $this->getRequest()->query["involved"] == 'true' ? 'checked' : ''
                 ),
             )
         );
@@ -433,11 +434,10 @@ class Controller extends Base
     }
 
     /**
-     * Insert/update a pastoral care record
-     * @param PastoralModel $record
+     * Insert a pastoral care record
      * @throws SchoolboxException
      */
-    public function postSave($record)
+    public function postInsert()
     {
         $post = $this->getRequest()->post;
 
@@ -450,197 +450,104 @@ class Controller extends Base
         /** @var Collection|Model $records */
         $records = new Collection();
 
-        if (empty($record)) {
+        // Make an array of all students this record needs to be created on
 
-            // Creating new pastoral record
+        $students = array();
 
-            // Make an array of all students this record needs to be created on
+        // The student the user was currently viewing
 
-            $students = array();
+        $students[$post["student_id"]] = 1;
 
-            // The student the user was currently viewing
+        // And any other students specified on the pastoral record
 
-            $students[$post["student_id"]] = 1;
-
-            // And any other students specified on the pastoral record
-
-            if (is_array($post["duplicate_id"])) {
-                foreach ($post["duplicate_id"] as $studentId) {
-                    if (trim($studentId) != '') {
-                        $students[$studentId] = 1;
-                    }
+        if (is_array($post["duplicate_id"])) {
+            foreach ($post["duplicate_id"] as $studentId) {
+                if (trim($studentId) != '') {
+                    $students[$studentId] = 1;
                 }
             }
+        }
 
-            // Create a post date, so they are all the same
+        // Create a post date, so they are all the same
 
-            $createdAt = \Alaress_Date_Format::now();
+        $createdAt = \Alaress_Date_Format::now();
 
-            // Go through every kid
+        // Go through every kid
 
-            foreach ($students as $student_id => $value) {
+        foreach ($students as $student_id => $value) {
 
-                $record = new PastoralModel();
+            $record = new PastoralModel();
 
-                // If this is not the first record, set the parent ID
+            // If this is not the first record, set the parent ID
 
-                if (isset($parent)) {
-                    $record->setParent($parent);
-                }
+            if (isset($parent)) {
+                $record->setParent($parent);
+            }
+
+            try {
+                /** @var User $student */
+                $student = $this->getUserMapper()->findById($student_id);
+            } catch (\Exception $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+            }
+
+            try {
+                /** @var PastoralTypeModel $type */
+                $type = $this->getPastoralTypeMapper()->findById($post["typeId"]);
 
                 try {
-                    /** @var User $student */
-                    $student = $this->getUserMapper()->findById($student_id);
-                } catch (\Exception $e) {
-                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
-                }
-
-                try {
-                    /** @var PastoralTypeModel $type */
-                    $type = $this->getPastoralTypeMapper()->findById($post["typeId"]);
-
-                    try {
-                        /** @var PastoralCategoryModel $category */
-                        $category = $this->getPastoralCategoryMapper()->findById($post["categoryId"]);
-                        $record->setCategory($category);
-                    } catch (MapperException $e) {
-                        // Noop, this can be blank
-                    }
-
-                    /** @var PastoralSeverityModel $severity */
-                    $severity = $this->getPastoralSeverityMapper()->findById($post["severityId"]);
+                    /** @var PastoralCategoryModel $category */
+                    $category = $this->getPastoralCategoryMapper()->findById($post["categoryId"]);
+                    $record->setCategory($category);
                 } catch (MapperException $e) {
-                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                    // Noop, this can be blank
                 }
 
-                $record->setStudent($student);
-                $record->setHeading($post["heading"]);
-                $record->setType($type);
-                $record->setPoints($post["points"]);
-                $record->setSeverity($severity);
-                $record->setBody($post["body"]);
-                $record->setPrivate($post["private"]);
-                $record->setOwner($this->getUser());
-                $record->setCreatedAt($createdAt);
-                $this->getPastoralMapper()->setSessionData($_SESSION);
-                $this->getPastoralMapper()->save($record);
+                /** @var PastoralSeverityModel $severity */
+                $severity = $this->getPastoralSeverityMapper()->findById($post["severityId"]);
+            } catch (MapperException $e) {
+                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+            }
 
-                $records->add($record);
+            $record->setStudent($student);
+            $record->setHeading($post["heading"]);
+            $record->setType($type);
+            $record->setPoints($post["points"]);
+            $record->setSeverity($severity);
+            $record->setBody($post["body"]);
+            $record->setPrivate($post["private"]);
+            $record->setOwner($this->getUser());
+            $record->setCreatedAt($createdAt);
+            $this->getPastoralMapper()->setSessionData($_SESSION);
+            $this->getPastoralMapper()->save($record);
 
-                // Store the first records ID for use as parent for subsequent copies
+            $records->add($record);
 
-                if (!isset($parent)) {
-                    $parent = $record;
-                }
+            // Store the first records ID for use as parent for subsequent copies
 
-                // Save the authorised users
+            if (!isset($parent)) {
+                $parent = $record;
+            }
 
-                if (isset($post["user_id"])) {
-                    if (is_array($post["user_id"])) {
-                        foreach ($post["user_id"] as $user_id) {
+            // Save the authorised users
 
-                            try {
-                                $user = $this->getUserMapper()->findById($user_id);
-                            } catch (MapperException $e) {
-                                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
-                            }
+            if (isset($post["user_id"])) {
+                if (is_array($post["user_id"])) {
+                    foreach ($post["user_id"] as $user_id) {
 
-                            $access = new PastoralAccessModel();
-                            $access->setPastoralId($record->getId());
-                            $access->setUser($user);
-                            $this->getPastoralAccessMapper()->save($access);
-                        }
-                    }
-                }
-
-                // Save the tags
-
-                $tags = explode(",", $post["tags"]);
-
-                foreach ($tags as $tagCurrent) {
-                    if (trim($tagCurrent) != '') {
-                        $tag = new PastoralTagsModel();
-                        $tag->setName($tagCurrent);
-                        $tag->setPastoralId($record->getId());
-                        $this->getPastoralTagsMapper()->save($tag);
-                    }
-                }
-
-                // Save the audiences
-
-                foreach ($post["role"] as $role_id => $checked) {
-                    if ($checked) {
                         try {
-                            /** @var \Schoolbox\Role $role */
-                            $role = $this->getRoleMapper()->findById($role_id);
+                            $user = $this->getUserMapper()->findById($user_id);
                         } catch (MapperException $e) {
                             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                         }
 
                         $access = new PastoralAccessModel();
                         $access->setPastoralId($record->getId());
-                        $access->setRole($role);
+                        $access->setUser($user);
                         $this->getPastoralAccessMapper()->save($access);
                     }
                 }
-
-                $pastoralExternal->createPastoral($record);
             }
-        } else {
-            // Modifying existing record
-
-            $records->add($record);
-
-            try {
-                if ($this->getRequest()->post["typeId"] != null) {
-                    /** @var PastoralTypeModel $type */
-                    $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
-                } else {
-                    $type = null;
-                }
-            } catch (MapperException $e) {
-                // Can't trust imported data from Synergetic
-                $type = null;
-            }
-
-            try {
-                if ($this->getRequest()->post["categoryId"] != null) {
-                    /** @var PastoralCategoryModel $category */
-                    $category = $this->getPastoralCategoryMapper()->findById($this->getRequest()->post["categoryId"]);
-                } else {
-                    $category = null;
-                }
-            } catch (MapperException $e) {
-                // Can't trust imported data from Synergetic
-                $category = null;
-            }
-
-            try {
-                if ($this->getRequest()->post["severityId"] != null) {
-                    /** @var PastoralSeverityModel $severity */
-                    $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
-                } else {
-                    $severity = null;
-                }
-            } catch (MapperException $e) {
-                // Can't trust imported data from Synergetic
-                $severity = null;
-            }
-
-            $record->setHeading($post["heading"]);
-            $record->setType($type);
-            $record->setCategory($category);
-            $record->setPoints($post["points"]);
-            $record->setSeverity($severity);
-            $record->setBody($post["body"]);
-            $record->setPrivate($post["private"]);
-            $record->setUpdatedAt(\Alaress_Date_Format::now());
-            $this->getPastoralMapper()->setSessionData($_SESSION);
-            $this->getPastoralMapper()->save($record);
-
-            // Delete old tags
-
-            $this->getPastoralTagsMapper()->deleteByColumn("pastoral_id", $record->getId());
 
             // Save the tags
 
@@ -655,114 +562,261 @@ class Controller extends Base
                 }
             }
 
-            // Delete user permissions
-
-            $accessRoles = $record->getAccessList();
-
-            $deleteIds = [];
-
-            if (trim($post["deleteIds"]) != "") {
-                $deleteIds = explode(",", $post["deleteIds"]);
-
-                foreach ($deleteIds as $user_id) {
-                    foreach ($accessRoles as $role) {
-                        if ($role->getUser()->getId() == $user_id) {
-                            $this->getPastoralAccessMapper()->delete($role);
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // Update the authorised users
-
-            if (isset($post["user_id"])) {
-                if (is_array($post["user_id"])) {
-                    foreach ($post["user_id"] as $user_id) {
-
-                        $found = false;
-
-                        // Don't re-add deleted users
-
-                        foreach ($accessRoles as $role) {
-                            if ($role->getUser()->getId() == $user_id) {
-                                if (in_array($user_id, $deleteIds)) {
-                                    $found = true;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (!$found) {
-
-                            try {
-                                $user = $this->getUserMapper()->findById($user_id);
-                            } catch (MapperException $e) {
-                                throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
-                            }
-
-                            $access = new PastoralAccessModel();
-                            $access->setPastoralId($record->getId());
-                            $access->setUser($user);
-                            $this->getPastoralAccessMapper()->save($access);
-                        }
-                    }
-                }
-            }
-
-            // Update the role based audience
+            // Save the audiences
 
             foreach ($post["role"] as $role_id => $checked) {
-
                 if ($checked) {
-
-                    // Add this access if it doesn't already exist
-
-                    $found = false;
-
-                    foreach ($accessRoles as $role) {
-                        if ($role->getRole()->getId() == $role_id) {
-                            $found = true;
-                            break;
-                        }
-                    }
-
-
                     try {
                         /** @var \Schoolbox\Role $role */
                         $role = $this->getRoleMapper()->findById($role_id);
                     } catch (MapperException $e) {
-                        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                        throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
                     }
 
-                    if (!$found) {
-                        $access = new PastoralAccessModel();
-                        $access->setPastoralId($record->getId());
-                        $access->setRole($role);
-                        $this->getPastoralAccessMapper()->save($access);
-                    }
-
-                } else {
-
-                    // Delete this access if it exists because its no longer ticked
-
-                    $access = $this->getPastoralAccessMapper()->findByColumnList([
-                            'pastoral_id' => $record->getId(),
-                            'role_id' => $role_id
-                        ]
-                    );
-
-                    $this->getPastoralAccessMapper()->delete($access);
+                    $access = new PastoralAccessModel();
+                    $access->setPastoralId($record->getId());
+                    $access->setRole($role);
+                    $this->getPastoralAccessMapper()->save($access);
                 }
             }
 
-            // Update external record
+            $pastoralExternal->createPastoral($record);
+        }
 
-            if ($record->getExternalId() != "") {
-                $pastoralExternal->updatePastoral($record);
-            } else {
-                $pastoralExternal->createPastoral($record);
+        /** @var PastoralModel $record */
+        foreach ($records as $record) {
+
+            // Save attachments
+
+            if (is_array($post['attachment'])) {
+                $attachmentObjects = (new CollectorFactory())->build($post['attachment'])->getAll();
+
+                /** @var \Schoolbox\Resource\Storage\Model $storageObject */
+                foreach ($attachmentObjects as $storageObject) {
+                    // Only add attachments which don't already exist
+
+                    if (!in_array($storageObject->getHash(), $retainedAttachments)) {
+
+                        if ($this->getDi()->get('config')->get("external_pastoral_upload")) {
+                            // Queue file for upload to Synergetic DocMan
+                            $queue = new PastoralUploadQueueModel();
+                            $queue->setPastoralId($record->getId());
+                            $queue->setExternalId($this->getUser()->getExternalId());
+                            $queue->setStudentExternalId($record->getStudent()->getExternalId());
+                            $queue->setHash($storageObject->getHash());
+                            $queue->setStatus(PastoralUploadQueueMapper::UPLOAD_STATUS_PENDING);
+                            $queue->setType($storageObject->getType());
+                            $queue->setCreatedAt(\Alaress_Date_Format::now());
+                            $queue->setUpdatedAt(\Alaress_Date_Format::now());
+                            $this->getPastoralUploadQueueMapper()->save($queue);
+                        }
+
+                        $attachment = new PastoralAttachmentModel();
+                        $attachment->setPastoralId($record->getId());
+                        $attachment->setHash($storageObject->getHash());
+                        $attachment->setUpdatedAt(\Alaress_Date_Format::now());
+                        $this->getPastoralAttachmentMapper()->save($attachment);
+                    }
+                }
             }
+        }
+
+        // Go back to students pastoral record
+
+        $this->getResponse()->redirect->afterPost("/pastoral/{$post["student_id"]}");
+    }
+
+    /**
+     * Update a pastoral care record
+     * @param PastoralModel $record
+     * @throws SchoolboxException
+     */
+    public function postUpdate($record)
+    {
+        $post = $this->getRequest()->post;
+
+        // External interface
+
+        $pastoralExternal = new \External_Pastoral();
+
+        // Keep track of IDs created
+
+        /** @var Collection|Model $records */
+        $records = new Collection();
+
+        $records->add($record);
+
+        try {
+            if ($this->getRequest()->post["typeId"] != null) {
+                /** @var PastoralTypeModel $type */
+                $type = $this->getPastoralTypeMapper()->findById($this->getRequest()->post["typeId"]);
+            } else {
+                $type = null;
+            }
+        } catch (MapperException $e) {
+            // Can't trust imported data from Synergetic
+            $type = null;
+        }
+
+        try {
+            if ($this->getRequest()->post["categoryId"] != null) {
+                /** @var PastoralCategoryModel $category */
+                $category = $this->getPastoralCategoryMapper()->findById($this->getRequest()->post["categoryId"]);
+            } else {
+                $category = null;
+            }
+        } catch (MapperException $e) {
+            // Can't trust imported data from Synergetic
+            $category = null;
+        }
+
+        try {
+            if ($this->getRequest()->post["severityId"] != null) {
+                /** @var PastoralSeverityModel $severity */
+                $severity = $this->getPastoralSeverityMapper()->findById($this->getRequest()->post["severityId"]);
+            } else {
+                $severity = null;
+            }
+        } catch (MapperException $e) {
+            // Can't trust imported data from Synergetic
+            $severity = null;
+        }
+
+        $record->setHeading($post["heading"]);
+        $record->setType($type);
+        $record->setCategory($category);
+        $record->setPoints($post["points"]);
+        $record->setSeverity($severity);
+        $record->setBody($post["body"]);
+        $record->setPrivate($post["private"]);
+        $record->setUpdatedAt(\Alaress_Date_Format::now());
+        $this->getPastoralMapper()->setSessionData($_SESSION);
+        $this->getPastoralMapper()->save($record);
+
+        // Delete old tags
+
+        $this->getPastoralTagsMapper()->deleteByColumn("pastoral_id", $record->getId());
+
+        // Save the tags
+
+        $tags = explode(",", $post["tags"]);
+
+        foreach ($tags as $tagCurrent) {
+            if (trim($tagCurrent) != '') {
+                $tag = new PastoralTagsModel();
+                $tag->setName($tagCurrent);
+                $tag->setPastoralId($record->getId());
+                $this->getPastoralTagsMapper()->save($tag);
+            }
+        }
+
+        // Delete user permissions
+
+        $accessRoles = $record->getAccessList();
+
+        $deleteIds = [];
+
+        if (trim($post["deleteIds"]) != "") {
+            $deleteIds = explode(",", $post["deleteIds"]);
+
+            foreach ($deleteIds as $user_id) {
+                foreach ($accessRoles as $role) {
+                    if ($role->getUser()->getId() == $user_id) {
+                        $this->getPastoralAccessMapper()->delete($role);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Update the authorised users
+
+        if (isset($post["user_id"])) {
+            if (is_array($post["user_id"])) {
+                foreach ($post["user_id"] as $user_id) {
+
+                    $found = false;
+
+                    // Don't re-add deleted users
+
+                    foreach ($accessRoles as $role) {
+                        if ($role->getUser()->getId() == $user_id) {
+                            if (in_array($user_id, $deleteIds)) {
+                                $found = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!$found) {
+
+                        try {
+                            $user = $this->getUserMapper()->findById($user_id);
+                        } catch (MapperException $e) {
+                            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_USER_NOT_FOUND);
+                        }
+
+                        $access = new PastoralAccessModel();
+                        $access->setPastoralId($record->getId());
+                        $access->setUser($user);
+                        $this->getPastoralAccessMapper()->save($access);
+                    }
+                }
+            }
+        }
+
+        // Update the role based audience
+
+        foreach ($post["role"] as $role_id => $checked) {
+
+            if ($checked) {
+
+                // Add this access if it doesn't already exist
+
+                $found = false;
+
+                foreach ($accessRoles as $role) {
+                    if ($role->getRole()->getId() == $role_id) {
+                        $found = true;
+                        break;
+                    }
+                }
+
+
+                try {
+                    /** @var \Schoolbox\Role $role */
+                    $role = $this->getRoleMapper()->findById($role_id);
+                } catch (MapperException $e) {
+                    throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+                }
+
+                if (!$found) {
+                    $access = new PastoralAccessModel();
+                    $access->setPastoralId($record->getId());
+                    $access->setRole($role);
+                    $this->getPastoralAccessMapper()->save($access);
+                }
+
+            } else {
+
+                // Delete this access if it exists because its no longer ticked
+
+                $access = $this->getPastoralAccessMapper()->findByColumnList([
+                        'pastoral_id' => $record->getId(),
+                        'role_id' => $role_id
+                    ]
+                );
+
+                $this->getPastoralAccessMapper()->delete($access);
+            }
+        }
+
+        // Update external record
+
+        if ($record->getExternalId() != "") {
+            $pastoralExternal->updatePastoral($record);
+        } else {
+            $pastoralExternal->createPastoral($record);
         }
 
         /** @var PastoralModel $record */

@@ -14,6 +14,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Pastoral\Authorizer\Rule\IsCommentOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsInAudience;
 use Schoolbox\Pastoral\Authorizer\Rule\IsOwner;
 use Schoolbox\Pastoral\Authorizer\Rule\IsParentAccessAllowed;
@@ -67,7 +68,8 @@ class Module extends BaseModule
                 '/{studentId}' => 'getIndex',
             ],
             'POST' => [
-                '/save/{recordId}' => 'postSave',
+                '/insert' => 'postInsert',
+                '/update/{recordId}' => 'postUpdate',
                 '/delete/{recordId}' => 'postDelete',
                 '/comment-save/{recordId}' => 'postCommentSave',
                 '/comment-delete/{commentId}' => 'postCommentDelete',
@@ -191,7 +193,7 @@ class Module extends BaseModule
         );
 
         $this->addRoutePermission($authorizer,
-            'getReportBuilder|getReport|getReportPrint|getInsert|postComment|postCommentDelete', $permissionStaff);
+            'getReportBuilder|getReport|getReportPrint|getInsert|postInsert|postComment|postCommentDelete', $permissionStaff);
 
         // Only staff, or parents of the student can view a students pastoral care record list page
 
@@ -221,28 +223,44 @@ class Module extends BaseModule
         $this->addRoutePermission($authorizer, 'getIndex', $permissionIndex);
 
         // Only staff that are superusers, pastoral moderators (with write perms) or the owner of a record can update it
-
         $permissionUpdate = new Rule\All(
 
             // Must be logged in
             new Rule\IsLoggedIn(),
 
-            new Rule\All
-            (
-                // Must be a staff member
-                new Rule\HasRole(Role::STAFF),
+            // Must be a staff member
+            new Rule\HasRole(Role::STAFF),
 
-                // And either superuser, moderator or owner of record
-                new Rule\Any
-                (
-                    new Rule\IsSuperuser(),
-                    new IsPastoralModeratorWrite(),
-                    new IsOwner()
-                )
+            // And either superuser, moderator or owner of record
+            new Rule\Any
+            (
+                new Rule\IsSuperuser(),
+                new IsPastoralModeratorWrite(),
+                new IsOwner()
             )
         );
 
-        $this->addRoutePermission($authorizer, 'getUpdate|postSave|postDelete', $permissionUpdate);
+        $this->addRoutePermission($authorizer, 'getUpdate|postUpdate|postDelete', $permissionUpdate);
+
+        // Only staff that are superusers, pastoral moderators (with write perms) or the owner of a record can update it
+        $permissionDeleteComment = new Rule\All(
+
+        // Must be logged in
+            new Rule\IsLoggedIn(),
+
+            // Must be a staff member
+            new Rule\HasRole(Role::STAFF),
+
+            // And either superuser, moderator or owner of record
+            new Rule\Any
+            (
+                new Rule\IsSuperuser(),
+                new IsPastoralModeratorWrite(),
+                new IsCommentOwner()
+            )
+        );
+
+        $this->addRoutePermission($authorizer, 'postCommentDelete', $permissionDeleteComment);
     }
 
     /**
