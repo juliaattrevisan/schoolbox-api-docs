@@ -2072,20 +2072,6 @@ class Controller extends Base\Base
     }
 
     /**
-     * Recursively apply inheritance. Why? Not sure. Cut-Paste from /cms/categoryForm.php
-     *
-     * @param Folder\Model $model
-     */
-    protected function recurseInheritance(Folder\Model $model) {
-        $folders = $this->getDeprecatedCourseMapper()->findAllChildren($model->getId(), true);
-        foreach ($folders as $folder) {
-            $folder->setInherit($model->getInherit());
-            $this->getDeprecatedCourseMapper()->save($folder);
-            $this->recurseInheritance($folder);
-        }
-    }
-
-    /**
      * Delete unit INSTANCE. This will delete the instance and all its content.
      *
      * @api   POST /course/unit/delete
