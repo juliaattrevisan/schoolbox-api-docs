@@ -931,8 +931,9 @@ class Controller extends Base\Base
         $codes   = $folder->getCurriculumNodes()->getColumnValues('code');
 
         // find all the folders that match this code, then filter for coarseness
-        return $this->getFolderMapper()->findByCurriculumCode($codes)->filter(function ($folder) {
-            return $this->deprecatedCourseMapper->verifyCourse($folder);
+        return $this->getFolderMapper()->findByCurriculumCode($codes)->filter(function ($result) {
+            /** @var Folder\Model $result */
+            return $this->getCourseMapper()->countByColumn('folder_id', $result->getId()) > 0;
         });
     }
 
