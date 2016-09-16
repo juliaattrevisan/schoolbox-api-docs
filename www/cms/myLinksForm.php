@@ -5,19 +5,21 @@ $page = new SitePage();
 $myLinksHandler = new MyLinks();
 
 if (isset($_REQUEST['url']) && $_REQUEST['url'] && isset($_REQUEST['description']) && $_REQUEST['description']) {
-	$url = new Url($_REQUEST['url']);
-	if (!($url->isURL() || $url->isLocalURL())) {
-		error(139);
-	}
+	$urlFormatter = new Url($_REQUEST['url']);
+    try{
+        $urlFormatter->normalise();
+    } catch (InvalidArgumentException $e) {
+        error(\Schoolbox\Error\Mapper::ERROR_LINK_FORMAT);
+    }
 
-	$url = Scrub::text(trim($_REQUEST['url']));
+    $url = Scrub::text($urlFormatter->getUrl());
 
 	/* Create/update
 	 */
 	$existing = $myLinksHandler->getByID($_POST['linkID']);
 
 	if ($existing) {
-		$existing['url'] = $_REQUEST['url'];
+		$existing['url'] = $url;
 		$existing['description'] = $_REQUEST['description'];
 
 		$myLinksHandler->update($existing);

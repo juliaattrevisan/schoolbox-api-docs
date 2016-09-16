@@ -30,7 +30,7 @@ if ($authenticator->canModify()) {
 		 */
 		$url = new Url($content);
 
-		if(!$url->isLocalURL()){
+		if(!$url->isLocalUrl()){
 			$url->prependScheme();
 		}
 
@@ -53,7 +53,7 @@ if ($authenticator->canModify()) {
 		 */
 		$url = new Url($content);
 
-		if(!$url->isLocalURL()){
+		if(!$url->isLocalUrl()){
 			$url->prependScheme();
 		}
 

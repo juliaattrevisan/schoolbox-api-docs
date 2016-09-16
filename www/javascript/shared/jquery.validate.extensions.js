@@ -162,22 +162,15 @@
     /**
      * isURL extension - checks that what you've entered is a HTTP, HTTPS, FTP
      * or relative URL.
+     * Should match a (possible full) subset of values permitted in library/Url.php::isValidUrl()
      */
+    var regExURL = new RegExp("^((((http)|(ftp))s?://[\\w-]+(\\.[\\w-]+)*(/\\S*)?)|([/#?]\\S*))$");
     $.validator.addMethod("isURL", function (value, element) {
         if (this.optional(element)) {
             return true;
         }
-
-        // Create a link out of the value, and get its protocol that way.
-        var anchor = $('<a />').attr('href', value);
-        switch (anchor.prop('protocol')) {
-            case 'http:':
-            case 'https:':
-            case 'ftp:':
-                return true;
-        }
-        return false;
-    }, "Please enter a URL beginning with http://, https://, ftp://, or a relative URL (beginning with /)");
+        return regExURL.test(value.trim().toLowerCase());
+    }, "Please enter a URL beginning with http://, https://, ftp://, or a relative URL (beginning with '/', '#', or '?')");
 
     /**
      * equalsOther extension - checks that the value of this field equals that of some other field.

@@ -102,7 +102,7 @@ class Controller extends Base
 
         /* Local Chain
          */
-        if ($url->isLocalURL()) {
+        if ($url->isLocalUrl()) {
             $user = $_SESSION['user'];
             if (!$user instanceof User) {
                 $user = new User();

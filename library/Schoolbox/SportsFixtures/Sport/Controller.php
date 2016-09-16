@@ -167,8 +167,11 @@ class Controller extends AbstractController
      */
     private function saveSport(Sport $sport, $name, $url, Collection $positions)
     {
-        $sport->setName($name);
-        $sport->setUrl($url);
+        $urlFormatter = new \Url($url);
+        $urlFormatter->normalise();
+
+        $sport->setName(trim($name));
+        $sport->setUrl($urlFormatter->getUrl());
         $sport->setUpdatedAt(\Alaress_Date_Format::now());
         $sport->setPositions($positions);
 

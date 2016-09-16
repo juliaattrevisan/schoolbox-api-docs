@@ -1,8 +1,13 @@
 <?php
+
 /**
- * Url
- *
  * Formats urls into more meaningful stuff.
+ *
+ * Unit Tests: /test/unit/url/RelativeUrlTest.php
+ *
+ * Facilitates:
+ * * determining if URL is local to the SB instance
+ * * conversion from absolute to relative form
  *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
@@ -11,43 +16,135 @@
  */
 class Url
 {
-
     /** @var string */
-    private $url = '';
+    private $url;
 
-    /** @var bool */
-    private $useCfg = false;
+    /** @var string. The hostname according to config */
+    private $siteHost;
 
-    /** @var string */
-    private $siteHostname;
+    /**
+     * Intentionally does not auto-prepend a protocol to otherwise valid absolute URLs.
+     * This ensures caller retains control of protocol prepending.
+     *
+     * @param string $url
+     * @param string|null $siteHost Override data-base configured siteHost. Used in tests or CLI context.
+     * @throws InvalidArgumentException if $url is not a string
+     * @throws DomainException If cannot determine the SB instance's configured hostname. This is required for determining relativity.
+     */
+    public function __construct($url, $siteHost = null)
+    {
+        if (!is_string($url)) {
+            throw new InvalidArgumentException("URL must be a string. Type: " . gettype($url));
+        }
 
-    /** @var string */
-    private $siteDomain;
+        $this->setUrl(trim($url));
 
-    /** @var string */
-    private $serverHost;
+        // No override, use config
+        if(null === $siteHost) {
+            $site_hostname = trim(Cfg::get('site_hostname'));
+            $site_domain = trim(Cfg::get('site_domain'));
+
+            // Is domain part set ?
+            if ($site_domain) {
+                // Is host part set ?
+                if ($site_hostname) {
+                    $this->setSiteHost($site_hostname . '.' . $site_domain);
+                } else {
+                    $this->setSiteHost($site_domain);
+                }
+            } // Is host part set?
+            else {
+                if ($site_hostname) {
+                    $this->setSiteHost($site_hostname);
+                } // Unable to determine instance hostname
+                else {
+                    throw new DomainException('No hostname explicitly supplied, or retrievable from Database');
+                }
+            }
+        } else {
+            $this->setSiteHost(strval($siteHost));
+        }
+    }
+
+    /**
+     * If Local, convert to relative form.
+     * If Not Local, ensure protocol is present.
+     *
+     * @throws InvalidArgumentException If unable to parse URL
+     * @return static
+     */
+    public function normalise()
+    {
+        // This must go before isUrl() to ensure absolute but local URLs are converted to relative form.
+        if ($this->isLocalUrl()) {
+            $this->setUrl($this->getRelativeURL());
+            return $this;
+        }
+
+        // Already a valid absolute URL ?
+        if ($this->isUrl()) {
+            return $this;
+        }
+
+        // Not valid relative, not valid absolute.
+
+        // How about if we prepend a protocol ? Cache so we can restore original invalid value if required.
+        $url = $this->getUrl();
+        $this->prependScheme();
+
+        // Is it now valid ?
+        if ($this->isUrl()) {
+            return $this;
+        }
+
+        // Restore original value, and throw
+        $this->setUrl($url);
+        throw new \InvalidArgumentException('Url appears invalid: ' . $url);
+    }
 
 
     /**
-     * @param $url
-     * @param bool $useCfg Decouples the class for unit testing
+     * Returns, eg, the 'www.example.com' from:
+     *
+     * * 'protocol://www.example.com'
+     * * '//www.example.com'
+     * * 'www.example.com'
+     * * 'www.example.com/path/to/file.ext'
+     * * 'www.example.com:8080'
+     *
+     * Note that this strips off port as well, eg 'localhost:8080/path/to/file.ext' => 'localhost'
+     * Returns FALSE if not found
+     *
+     * @return string|false
      */
-    public function __construct($url, $useCfg = true)
+    public function getHostname()
     {
-        $this->setUrl(trim($url));
+        $pattern = '/^(?:(?:[a-zA-Z]+:)?\/\/)?([a-zA-Z0-9.-]*)(?:[\/?#])?/';
+        $matches = [];
+        preg_match($pattern, $this->getUrl(), $matches);
 
-        $this->setUseCfg($useCfg);
-
-        if ($this->getUseCfg()) {
-            $this->setSiteHostname(Cfg::get('site_hostname'));
-            $this->setSiteDomain(Cfg::get('site_domain'));
-
-            if (isset($_SERVER['HTTP_HOST'])) {
-                $this->setServerHost($_SERVER['HTTP_HOST']);
-            }
-
+        if(!count($matches)){
+            return false;
         }
+
+        // Check for zero-length labels, or labels that start or end with '-'
+
+        $labels = explode('.', $matches[1]);
+        foreach($labels as $label){
+            if('' === $label && count($labels)){
+                return false;
+            }
+            $subLabels = explode('-', $label);
+            foreach($subLabels as $subLabel){
+                if('' === $subLabel && count($subLabels)){
+                    return false;
+                }
+            }
+        }
+
+        return $matches[1];
     }
+
 
     /**
      * Creates slugs from a string.
@@ -63,107 +160,122 @@ class Url
         $pattern[] = '/(\s|-|\/)+/';
         $replace[] = '-';
 
-        $pattern[] = '/\+/';
-        $replace[] = 'p';
+        // Unknown purpose. Commented out 2016/09/13.
+        // TODO Remove after adequate elapse and nothing has broken.
+//        $pattern[] = '/\+/';
+//        $replace[] = 'p';
 
         return strtolower(preg_replace($pattern, $replace, $this->getUrl()));
     }
 
-	/**
-	 * Is this a valid url?
-	 *
-	 * @return bool
-	 */
-    public function isUrl() {
-		$result = filter_var($this->getUrl(), FILTER_VALIDATE_URL);
-
-		if ($result) {
-			return true;
-		}
-
-		return false;
-    }
-
-	/**
-	 * Prepend a scheme if one wasn't found
-	 */
-	public function prependScheme() {
-		$scheme = parse_url($this->getUrl(), PHP_URL_SCHEME);
-
-		if (!$scheme) {
-			$this->setUrl('http://' . $this->getUrl());
-		}
-	}
-
     /**
-     * Returns true if the url is for a local page
+     * Is this a valid url?
+     *
+     * Note that this considers other-wise FQDN without a protocol
+     * to be invalid, eg 'www.google.com/index.php' is NOT a Url
+     *
      * @return bool
      */
-    public function isLocalURL()
+    public function isUrl()
     {
+        if (false === filter_var($this->getUrl(), FILTER_VALIDATE_URL)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Prepend a scheme if one wasn't found
+     * @param string $scheme
+     */
+    public function prependScheme($scheme = 'http')
+    {
+        $parsedScheme = parse_url($this->getUrl(), PHP_URL_SCHEME);
+
+        if (!$parsedScheme) {
+            $this->setUrl(preg_replace('#^(//)?#', "$scheme://", $this->getUrl()));
+        }
+    }
+
+    /**
+     * Returns true if the URL is:
+     * * a relative URL, or
+     * * a local page according to DB config, or
+     * * a local page according to $_SERVER['HTTP_HOST']. (When a school's intranet hostname does not match DB config)
+     *
+     * @return bool
+     */
+    public function isLocalUrl()
+    {
+        // Relative URLs are always local
+        if($this->isRelativeUrl()) {
+            return true;
+        }
+
+        // Not relative, therefore need to check if hostnames match.
+
+        /* Takes into account intranet name e.g. 'ilearn/' vs. 'ilearn.joeys.org/'
+         * (that originally caused the issue with links not being correct)
+         */
+
+        // parse_url() does not perform as expected for URLs such as 'www.example.com'
+        // In that case, it returns host='' + path='www.example.com'
+        $urlHostname = $this->getHostname();
+
+        // Collate all non-empty possible matches
+        $localHostnames = [];
+        if ($this->getSiteHost()) {
+            $localHostnames[] = $this->getSiteHost();
+        }
         if ($this->getServerHost()) {
-            list($hostname, $domain) = explode('.', $this->getServerHost(), 2);
-        } else {
-            $hostname = $this->getSiteHostname();
+            $localHostnames[] = $this->getServerHost();
         }
 
-        // get the first character of the url if it's already a local link
-        $lead = substr($this->getUrl(), 0, 1);
-        if(in_array($lead, array("/", "#", "?"))) {
-            return true;
-        }
-
-        $urlParts = parse_url($this->getUrl());
-
-        if( in_array($urlParts['host'],
-            array($hostname,
-                $this->getServerHost(),
-                $this->getSiteHostname(),
-                $this->getSiteHostname().'.'.$this->getSiteDomain()
-            )
-        )) {
-            return true;
-        }
-
-
-        return false;
+        // Does the URL match one of the 'local' hosts ?
+        return in_array($urlHostname, $localHostnames);
     }
 
     /**
      * Returns true if url is an ftp link
      */
-    public function isFTPURL()
+    public function isFtpUrl()
     {
-        if (parse_url($this->getUrl(), PHP_URL_SCHEME) == 'ftp') {
-            return true;
-        } else {
-            return false;
-        }
+        return in_array(parse_url($this->getUrl(), PHP_URL_SCHEME), ['ftp', 'ftps']);
     }
 
     /**
-     * Get a relative url variant of $url
+     * Get a relative url variant of $url (regardless of whether it is a local URL)
      *
-     * @return mixed
+     * eg 'ftp://www.google.com/path/to/file.ext' => '/path/to/file.ext'
+     *        '//www.google.com/path/to/file.ext' => '/path/to/file.ext'
+     *                        '/path/to/file.ext' => '/path/to/file.ext'
+     *          'www.google.com'                  => '/'
+     *          'www.google.com:8080'             => '/'
+     *          ''                                => ''
+     *
+     * @return string
      */
     public function getRelativeURL()
     {
-        /* Takes into account subdomain name e.g. ilearn/ and ilearn.joeys
-         * (that originally caused the issue with links not being correct)
-         */
-        $hosts = array(
-            'http://' . $this->getSiteHostname() . '.' . $this->getSiteDomain(),
-            'https://' . $this->getSiteHostname() . '.' . $this->getSiteDomain(),
-            'http://' . $this->getSiteHostname(),
-            'https://' . $this->getSiteHostname(),
-        );
-
-        if ($this->getServerHost()) {
-            $hosts[] = 'http://' . $this->getServerHost();
-            $hosts[] = 'https://' . $this->getServerHost();
+        if($this->isRelativeUrl()) {
+            return $this->getUrl();
         }
 
-        return str_replace($hosts, '', $this->getUrl());
+        // Strip any protocol, hostname and port
+        $pattern = '/^(?:(?:[a-zA-Z]+:)?\/\/)?(?:[a-zA-Z0-9.-]*(:[0-9]+)?(?:\/)?)/';
+        return preg_replace($pattern, '/' , $this->getUrl());
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRelativeUrl()
+    {
+        // Is this a relative URL ? (empty, or starts with '#', '?' or single '/' - but not double '//')
+        $pattern = '/^(()|(\/(?!\/)|[#?]).*)$/';
+        if (preg_match($pattern, $this->getUrl())) {
+            return true;
+        }
     }
 
     /**
@@ -180,41 +292,6 @@ class Url
       */
 
     /**
-     * Set useCfg. This determines whether to use the Cfg object, or
-     * alternatively whatever input params you want
-     *
-     * @param  $val
-     * @return void
-     */
-    public function setUseCfg($val)
-    {
-        $this->useCfg = $val;
-    }
-
-    /**
-     * Get useCfg
-     *
-     * @return bool
-     */
-    private function getUseCfg()
-    {
-        return $this->useCfg;
-    }
-
-    /**
-     * Set url to work on
-     *
-     * @param  $val
-     * @return void
-     */
-    private function setUrl($val)
-    {
-        $this->url = $val;
-    }
-
-    /**
-     * Get url
-     *
      * @return string
      */
     public function getUrl()
@@ -223,64 +300,39 @@ class Url
     }
 
     /**
-     * Set site hostname
-     *
-     * @param  $val
-     * @return void
+     * @param string $url
+     * @return static
      */
-    public function setSiteHostname($val)
+    protected function setUrl($url)
     {
-        $this->siteHostname = $val;
+        $this->url = $url;
+        return $this;
     }
 
+
     /**
-     * Get site hostname
-     *
      * @return string
      */
-    private function getSiteHostname()
+    protected function getSiteHost()
     {
-        return $this->siteHostname;
+        return $this->siteHost;
     }
 
     /**
-     * Set site domain
-     *
-     * @param  $val
-     * @return void
+     * @param string $siteHost
+     * @return static
      */
-    public function setSiteDomain($val)
+    protected function setSiteHost($siteHost)
     {
-        $this->siteDomain = $val;
+        $this->siteHost = $siteHost;
+        return $this;
     }
 
     /**
-     * Get site domain
-     *
      * @return string
      */
-    private function getSiteDomain()
+    protected function getServerHost()
     {
-        return $this->siteDomain;
-    }
-
-    /**
-     * Set server host ($_SERVER['HTTP_HOST'])
-     * @param  $val
-     * @return void
-     */
-    public function setServerHost($val)
-    {
-        $this->serverHost = $val;
-    }
-
-    /**
-     * Get server host
-     *
-     * @return string
-     */
-    private function getServerHost()
-    {
-        return $this->serverHost;
+        return isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
     }
 }
