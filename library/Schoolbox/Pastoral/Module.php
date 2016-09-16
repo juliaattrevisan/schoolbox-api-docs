@@ -7,7 +7,7 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Pastoral\Pastoral;
+namespace Schoolbox\Pastoral;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
@@ -27,7 +27,7 @@ use Twig_Loader_Chain;
 use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Comment\Mapper as PastoralCommentMapper;
-use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 
 class Module extends BaseModule

@@ -7,14 +7,14 @@
  * @link      http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Pastoral\Pastoral;
+namespace Schoolbox\Pastoral;
 
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
-use Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\Access\Model as PastoralAccessModel;
 use Schoolbox\Pastoral\Attachment\Mapper as PastoralAttachmentMapper;
@@ -219,7 +219,6 @@ class Controller extends Base
                     'tagsSelected' => array_filter(explode(",", $this->getRequest()->query["tags"])),
                     'beforeSelected' => $this->getRequest()->query["before"],
                     'afterSelected' => $this->getRequest()->query["after"],
-                    'superUser' => $this->getPastoralModeratorLevel() >= UserAccess::ACCESS_READ || $this->getUser()->getSuperuser(),
                     'involved' => $this->getRequest()->query["involved"] == 'true' ? 'checked' : ''
                 ),
             )
@@ -285,9 +284,7 @@ class Controller extends Base
                     'studentContacts' => $studentContacts,
                     'role' => $this->getUser()->getRole()->getType(),
                     'types' => $this->getPastoralTypeMapper()->findAll()->sortBy('name', 'asc'),
-                    'teachers' => $student->getTeacherCollection(),
-                    'showDelete' => $this->getPastoralModeratorLevel() >= FULL_ACCESS,
-                    'showModify' => $this->getPastoralModeratorLevel() >= WRITE_ACCESS
+                    'teachers' => $student->getTeacherCollection()
                 ),
             )
         );
@@ -325,8 +322,6 @@ class Controller extends Base
                 'data' => array(
                     'session' => $_SESSION,
                     'record' => $record,
-                    'showDelete' => $this->getPastoralModeratorLevel() >= FULL_ACCESS,
-                    'showModify' => $this->getPastoralModeratorLevel() >= WRITE_ACCESS,
                     'role' => $this->getUser()->getRole()->getType(),
                 ),
             )
@@ -383,8 +378,6 @@ class Controller extends Base
                     'categories' => $this->getPastoralCategoryMapper()->findAll()->sortBy('name', 'asc'),
                     'severities' => $this->getPastoralSeverityMapper()->findAll()->sortBy('order', 'asc'),
                     'roles' => $this->getRoleMapper()->findAll(),
-                    'showDelete' => $this->getPastoralModeratorLevel() >= FULL_ACCESS,
-                    'pastoralModerator' => $this->getPastoralModeratorLevel(),
                     'attachzone' => $this->getAttachZone($this->getPastoralAttachmentMapper()->findByPastoralId($record->getId())),
                 ),
             )

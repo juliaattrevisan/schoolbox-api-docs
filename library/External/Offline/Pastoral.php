@@ -9,17 +9,17 @@
  * @copyright   Copyright 2015, Alaress Pty Ltd
  */
 
-use \Schoolbox\Pastoral\Pastoral;
+use \Schoolbox\Pastoral;
 
 class External_Offline_Pastoral implements External_PastoralInterface
 {
     /**
      * Returns the pastoral record if it exists
      *
-     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
+     * @param \Schoolbox\Pastoral\Model $pastoral
      * @return array
      */
-    public function getPastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
+    public function getPastoral(\Schoolbox\Pastoral\Model $pastoral)
     {
         // NOOP
         return array();
@@ -28,10 +28,10 @@ class External_Offline_Pastoral implements External_PastoralInterface
     /**
      * Creates a new pastoral record in the external database
      *
-     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
+     * @param \Schoolbox\Pastoral\Model $pastoral
      * @return array
      */
-    public function createPastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
+    public function createPastoral(\Schoolbox\Pastoral\Model $pastoral)
     {
         // NOOP
         return array();
@@ -40,10 +40,10 @@ class External_Offline_Pastoral implements External_PastoralInterface
     /**
      * Updates an existing pastoral record
      *
-     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
+     * @param \Schoolbox\Pastoral\Model $pastoral
      * @return array
      */
-    public function updatePastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
+    public function updatePastoral(\Schoolbox\Pastoral\Model $pastoral)
     {
         // NOOP
         return array();
@@ -107,7 +107,7 @@ class External_Offline_Pastoral implements External_PastoralInterface
     /**
      * @inheritDoc
      */
-    public function deletePastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
+    public function deletePastoral(\Schoolbox\Pastoral\Model $pastoral)
     {
         // NOOP
         return false;

@@ -5,7 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 
-namespace Schoolbox\Pastoral\Pastoral;
+namespace Schoolbox\Pastoral;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper as BaseMapper;
@@ -15,8 +15,8 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
-use Schoolbox\Pastoral\Pastoral;
-use Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
+use Schoolbox\Pastoral;
+use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\Tags\Mapper as PastoralTagsMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;

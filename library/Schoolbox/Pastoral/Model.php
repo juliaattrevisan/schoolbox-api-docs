@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 
-namespace Schoolbox\Pastoral\Pastoral;
+namespace Schoolbox\Pastoral;
 
 use Schoolbox\Pastoral;
 use Schoolbox\Collection;

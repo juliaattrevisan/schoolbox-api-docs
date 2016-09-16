@@ -26,7 +26,7 @@ class Pastoral implements ModuleConfigInterface
         $di = $kernel->getDependencyInjector();
 
         if ($di->get('config')->get('pastoral_enabled')) {
-            $pastoralModule = new \Schoolbox\Pastoral\Pastoral\Module($di);
+            $pastoralModule = new \Schoolbox\Pastoral\Module($di);
             $pastoralModule->init('/pastoral');
         }
     }

@@ -5,7 +5,7 @@
  * @copyright   Copyright 2016, Alaress Pty Ltd
  */
 
-use \Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
+use \Schoolbox\Pastoral\Model as PastoralModel;
 use \Schoolbox\Pastoral\Comment\Model as PastoralCommentModel;
 
 class External_Pastoral implements External_PastoralInterface

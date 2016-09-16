@@ -6,7 +6,7 @@
  * @copyright   Copyright 2016, Alaress Pty Ltd
  */
 
-use \Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
+use \Schoolbox\Pastoral\Model as PastoralModel;
 
 interface External_PastoralInterface
 {
