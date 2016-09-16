@@ -495,7 +495,7 @@ class Controller extends Base\Base
                 );
 
                 // do checks to make sure it exists
-                $folder = $this->getDeprecatedCourseMapper()->findById($id);
+                $folder = $this->getFolderMapper()->findById($id);
                 $mode = BaseMapper::METHOD_UPDATE;
 
                 // Sanity check for existing courses:
@@ -2576,7 +2576,7 @@ class Controller extends Base\Base
     /**
      * @return CourseSpecificationMapper
      */
-    public function getCourseMapper(): CourseSpecificationMapper
+    public function getCourseMapper()
     {
         return $this->courseMapper;
     }
