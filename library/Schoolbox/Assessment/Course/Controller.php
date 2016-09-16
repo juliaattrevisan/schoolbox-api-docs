@@ -121,8 +121,12 @@ class Controller extends Base\Base
      */
     public function __construct()
     {
+        // Deprecated course/unit specification mappers
         $this->setDeprecatedCourseMapper(CourseMapper::getInstance());
         $this->setDeprecatedUnitMapper(Unit\DeprecatedMapper::getInstance());
+
+        // Modern course/unit specification mappers
+
         $this->setSubmissionBoxMapper(SubmissionBoxMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
         $this->setOnlineAssessmentMapper(OnlineAssessmentMapper::getInstance());
@@ -495,9 +499,10 @@ class Controller extends Base\Base
             }
 
             // Retrieve the course specification
-            // (Note that $id will be the folder ID, not the course spec ID.)
-            $courseSpecification = $translator->translateToDomainModel(CourseSpecificationMapper::getInstance()->findById($id));
-            $courseSpecification->setFolder($parent);
+            // (Note that $id is currently the folder ID, not the course spec ID.)
+            $courseSpecification = $translator->translateToDomainModel(
+                CourseSpecificationMapper::getInstance()->findOneByColumn('folder_id', $id)
+            );
         } else {
             // Sanity checks for new courses:
             // * Don't allow a course to be created in root folder
@@ -511,7 +516,6 @@ class Controller extends Base\Base
 
             // Create the course specification (no units yet)
             $courseSpecification = new CourseSpecifcation();
-            $courseSpecification->setFolder($parent);
         }
 
         try {
@@ -557,6 +561,7 @@ class Controller extends Base\Base
             $folder = $this->persistFolder($datums);
 
             // Persist the course spec as well
+            $courseSpecification->setFolder($folder);
             CourseSpecificationMapper::getInstance()->save($translator->translateToDataModel($courseSpecification));
 
             return $folder;
