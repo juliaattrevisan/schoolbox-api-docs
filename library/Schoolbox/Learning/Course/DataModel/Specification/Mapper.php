@@ -69,6 +69,20 @@ class Mapper extends BaseMapper
     }
 
     /**
+     * Finds the course for this folder ID.
+     *
+     * @param int   $folderId
+     * @param array $options
+     * @return Model
+     * @throws BaseMapper\Exception if no instance of model is found
+     * @throws BaseMapper\Exception\Deleted if the model was found but has been deleted
+     */
+    public function findByFolderId($folderId, $options = [])
+    {
+        return $this->findOneByColumn('folder_id', $folderId, $options);
+    }
+
+    /**
      * List the courses. Convenience method for findByColumn('name', LIKE($name));
      *
      * @param string $searchParam

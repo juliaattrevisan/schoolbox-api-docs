@@ -252,7 +252,8 @@ class Controller extends Base\Base
             try {
                 // First, check whether or not this is already a course. We don't want to barr access to courses that
                 // are already courses.
-                $folder = $this->getDeprecatedCourseMapper()->findById($id);
+                $course = $this->getCourseMapper()->findByFolderId($id);
+                $folder = $course->getFolder();
 
             } catch (MapperException $e) {
                 // It was not a course: you may modify a FOLDER to convert it into a course by adding units.
@@ -496,7 +497,7 @@ class Controller extends Base\Base
                 // Retrieve the course specification
                 // (Note that $id is currently the folder ID, not the course spec ID.)
                 $courseSpecification = $this->getTranslator()->translateToDomainModel(
-                    $this->getCourseMapper()->findOneByColumn('folder_id', $id)
+                    $this->getCourseMapper()->findByFolderId($id)
                 );
 
                 // do checks to make sure it exists
@@ -1182,7 +1183,7 @@ class Controller extends Base\Base
         $componentId = trim($this->getRequest()->post["componentId"]);
 
         try {
-            $this->getDeprecatedCourseMapper()->findById($courseHomepage);
+            $this->getCourseMapper()->findByFolderId($courseHomepage);
 
         } catch (MapperException $e) {
             // the nominated "course" is not actually a course...
