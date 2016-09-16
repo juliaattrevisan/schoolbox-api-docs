@@ -34,6 +34,10 @@ use Schoolbox\Assessment\Course\Unit\DeprecatedMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum;
 use Schoolbox\Error;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseSpecificationTranslator;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecificationTranslator;
+use Schoolbox\Learning\Course\Specification as CourseSpecifcation;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -469,6 +473,9 @@ class Controller extends Base\Base
         // extract codes
         $codes = $post->get('curriculumCodes', []);
 
+        // Translate
+        $translator = new CourseSpecificationTranslator(new UnitSpecificationTranslator());
+
         if ($id) {
             try {
                 // do checks to make sure it exists
@@ -486,6 +493,11 @@ class Controller extends Base\Base
             } catch (BaseMapper\Exception $e) {
                 throw new Base\Exception("Could not save because " . $e->getMessage());
             }
+
+            // Retrieve the course specification
+            // (Note that $id will be the folder ID, not the course spec ID.)
+            $courseSpecification = $translator->translateToDomainModel(CourseSpecificationMapper::getInstance()->findById($id));
+            $courseSpecification->setFolder($parent);
         } else {
             // Sanity checks for new courses:
             // * Don't allow a course to be created in root folder
@@ -496,6 +508,10 @@ class Controller extends Base\Base
             if (!$this->getDeprecatedCourseMapper()->isValidCourseLocation($parent)) {
                 throw new Base\Exception("Courses may not be created outside the faculty folder");
             }
+
+            // Create the course specification (no units yet)
+            $courseSpecification = new CourseSpecifcation();
+            $courseSpecification->setFolder($parent);
         }
 
         try {
@@ -539,6 +555,9 @@ class Controller extends Base\Base
             }
 
             $folder = $this->persistFolder($datums);
+
+            // Persist the course spec as well
+            CourseSpecificationMapper::getInstance()->save($translator->translateToDataModel($courseSpecification));
 
             return $folder;
 
