@@ -2612,7 +2612,7 @@ class Controller extends Base\Base
      */
     public function getAncestry()
     {
-        return $this->getDeprecatedCourseMapper()->getAncestry();
+        return $this->getFolderMapper()->getAncestry();
     }
 
 }

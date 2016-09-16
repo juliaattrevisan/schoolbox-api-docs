@@ -81,6 +81,15 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     protected $interimNodes = array();
 
     /**
+     * A cache of ancestral Folder instances, to save
+     * on re-querying the same Folder from the db over
+     * and over again
+     *
+     * @var Ancestry
+     */
+    protected $ancestry;
+
+    /**
      * Mapper constructor.
      */
     public function __construct() {
@@ -161,6 +170,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteCategoryCodes'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteCategoryCodes'));
 
+        $this->ancestry = new Ancestry($this);
     }
 
     /**
@@ -1442,5 +1452,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function setGroupMapper($groupMapper) {
         $this->groupMapper = $groupMapper;
         return $this;
+    }
+
+    /**
+     * @return Ancestry
+     */
+    public function getAncestry()
+    {
+        return $this->ancestry;
     }
 }
