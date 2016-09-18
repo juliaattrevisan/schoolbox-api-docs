@@ -889,7 +889,7 @@ class Controller extends Base\Base
 
             // This still uses folders for now
 //            $allUnits = $this->getDeprecatedUnitMapper()->findByCourseId($currentCourse->getFolder()->getId());
-            $allUnits = $this->getUnitSpecificationMapper()->findByColumn('course_id', $currentCourse->getId());
+            $allUnits = $this->getUnitSpecificationMapper()->findByColumn('course_specification_id', $currentCourse->getId());
 
             // Append to unit index, by ID
             foreach ($allUnits as $currentUnit) {
