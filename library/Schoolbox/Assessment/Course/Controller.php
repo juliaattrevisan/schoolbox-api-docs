@@ -285,7 +285,7 @@ class Controller extends Base\Base
 
             $data['folder'] = $folder;
             $data['access'][$folder->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $folder->getId() ]);
-            $data['units']  = $this->getDeprecatedUnitMapper()->findByCourseId($folder->getId());
+            $data['units']  = $this->getUnitSpecificationMapper()->findByCourseFolderId($folder->getId());
 
             foreach ($data['units'] as $unit) {
                 $data['access'][$unit->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $unit->getId() ]);
@@ -888,8 +888,7 @@ class Controller extends Base\Base
             $data['courses'][] = $currentCourse->getFolder();
 
             // This still uses folders for now
-//            $allUnits = $this->getDeprecatedUnitMapper()->findByCourseId($currentCourse->getFolder()->getId());
-            $allUnits = $this->getUnitSpecificationMapper()->findByColumn('course_specification_id', $currentCourse->getId());
+            $allUnits = $this->getUnitSpecificationMapper()->findByCourseId($currentCourse->getId());
 
             // Append to unit index, by ID
             foreach ($allUnits as $currentUnit) {
@@ -1141,7 +1140,7 @@ class Controller extends Base\Base
             'homepage'       => implode(',', array_keys($ownerships)),
             'courseHomepage' => $courseHomepage,
             'componentId'    => $componentId,
-            'units'          => $this->getDeprecatedUnitMapper()->findByCourseId($courseHomepage),
+            'units'          => $this->getUnitSpecificationMapper()->findByCourseFolderId($courseHomepage),
             'ownerships'     => implode(',', array_map(
                     function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
             )
@@ -1274,7 +1273,7 @@ class Controller extends Base\Base
         foreach ($unitDates as $unit) {
             if ($unit['import'] && !isset($unitCache[$unit['unit_id']])) {
                 try {
-                    $u = $this->getDeprecatedUnitMapper()->findById($unit['unit_id']);
+                    $u = $this->getUnitSpecificationMapper()->findByFolderId($unit['unit_id']);
                 } catch (MapperException\Deleted $e) {
                     // ignore deletions here; the assumption is that any unit passed into here is legit. If you modify a class import and
                     // any source units have been deleted, their existence still needs to be honoured.
