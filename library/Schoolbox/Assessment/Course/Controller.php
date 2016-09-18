@@ -29,7 +29,6 @@ use Schoolbox\Assessment\Course\DeprecatedModel as CourseModel;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
 use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
-use Schoolbox\Assessment\Course\Unit\DeprecatedMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum;
 use Schoolbox\Error;
@@ -82,9 +81,6 @@ class Controller extends Base\Base
     /** @var TaskInstanceMapper */
     protected $taskInstanceMapper = null;
 
-    /** @var Unit\DeprecatedMapper */
-    protected $deprecatedUnitMapper;
-
     /**
      * @var CourseSpecificationMapper
      */
@@ -135,8 +131,7 @@ class Controller extends Base\Base
      */
     public function __construct()
     {
-        // Deprecated course/unit specification mappers
-        $this->setDeprecatedUnitMapper(Unit\DeprecatedMapper::getInstance());
+        // Deprecated course/unit specification mappers - all gone!
 
         // Modern course/unit specification mappers
         $this->setCourseSpecificationMapper(CourseSpecificationMapper::getInstance());
@@ -2246,26 +2241,6 @@ class Controller extends Base\Base
 
     /* Getters/Setters
      */
-
-    /**
-     * @return Unit\DeprecatedMapper
-     */
-    public function getDeprecatedUnitMapper()
-    {
-        return $this->deprecatedUnitMapper;
-    }
-
-
-    /**
-     * @param Unit\DeprecatedMapper $deprecatedUnitMapper
-     * @return static
-     */
-    public function setDeprecatedUnitMapper($deprecatedUnitMapper)
-    {
-        $this->deprecatedUnitMapper = $deprecatedUnitMapper;
-        return $this;
-    }
-
 
     /**
      * Get folder mapper
