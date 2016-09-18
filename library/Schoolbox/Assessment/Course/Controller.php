@@ -888,7 +888,7 @@ class Controller extends Base\Base
             // Append to unit index, by ID
             foreach ($allUnits as $currentUnit) {
                 // confirm you at least have read access...s
-                if (!$this->confirmAccess($currentUnit->getId())) {
+                if (!$this->confirmAccess($currentUnit->getFolder()->getId())) {
                     continue;
                 }
 
