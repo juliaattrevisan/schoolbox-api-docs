@@ -11,8 +11,8 @@
 <ul class="breadcrumb">
     <li><a href="{{ routeLookup('course.courseList') }}">Courses</a></li>
     <li class="active">
-        {% if folder.id %}
-            <a href="{{ routeLookup('course.modifyCourse', { id: folder.id }) }}">Modify Course</a>
+        {% if course.id %}
+            <a href="{{ routeLookup('course.modifyCourse', { id: course.id }) }}">Modify Course</a>
         {% else %}
             <a href="{{ routeLookup('course.newCourse') }}">New Course</a>
         {% endif %}
@@ -21,14 +21,14 @@
 <div class="row">
     <div class="small-12 actions-small-1 island">
         <div class="list-item">
-            <h1>{{ folder.id ? 'Modify' : 'New' }} Course</h1>
+            <h1>{{ course.id ? 'Modify' : 'New' }} Course</h1>
         </div>
-            {% if folder.id %}
+            {% if course.id %}
         <nav>
-                {% if folder.hasHomepage %}
-            <a class="icon-home" href="/homepage/{{ folder.id }}" title="View Homepage"></a>
+                {% if course.folder.hasHomepage %}
+            <a class="icon-home" href="/homepage/{{ course.folder.id }}" title="View Homepage"></a>
                 {% else %}
-            <a class="icon-folder" href="/resources/{{ folder.id }}" title="View Resources"></a>
+            <a class="icon-folder" href="/resources/{{ course.folder.id }}" title="View Resources"></a>
                 {% endif %}
         </nav>
             {% endif %}
@@ -39,13 +39,13 @@
         <section>
             <fieldset class="content" data-mage="course-info">
                 <legend>Course Information</legend>
-                <input type="hidden" name="id" value="{{ folder.id }}">
+                <input type="hidden" name="id" value="{{ course.id }}">
                 <div class="small-12 column">
                     <label>Name
                         {% if query|length %}
                             {% set val = query %}
                         {% else %}
-                            {% set val = folder.name %}
+                            {% set val = course.folder.name %}
                         {% endif %}
                         <input type="text" name="name" value="{{ val }}" placeholder="What's this course called?" required />
                     </label>
@@ -54,7 +54,7 @@
                     {% include 'sub/selectorShard.twig' with {
                             'formLabel': 'Faculty / Subject',
                             'formInputName': 'parent',
-                            'folder': folder.parent,
+                            'folder': course.folder.parent,
                             'activator': 'data-course-selector',
                             'title': 'Click to change the faculty / subject this course belongs to'
                         }
@@ -64,36 +64,39 @@
                 {% if curriculumEnabled %}
                 <div class="small-12 column">
                     <label>Curriculum Codes
-                        {% include 'sub/curriculumCodeSelector.twig' with { renderButton: false, codeList: folder.curriculumNodes } %}
+                        {% include 'sub/curriculumCodeSelector.twig' with { renderButton: false, codeList: course.folder.curriculumNodes } %}
                     </label>
                 </div>
                 {% endif %}
 
-                {% if not folder.id %}
+                {% if not course.id %}
                 <div data-mage-submitrow>
                     <div class="small-12 medium-8 column">
                         {# Don't delete the inline style, it's needed -#}
                         <p data-mage-error style="display:none;" class="alert alert-box icon-alert"></p>
                     </div>
                     <div class="small-12 medium-4 column">
-                        <input type="submit" class="button" value="Next" data-mage-next="unit-info" data-mage-working="Working..." formaction="{{ folder.id ? routeLookup('course.updateCourse') : routeLookup('course.createCourse') }}" />
+                        <input type="submit" class="button" value="Next"
+                               data-mage-next="unit-info"
+                               data-mage-working="Working..."
+                               formaction="{{ course.id ? routeLookup('course.updateCourse') : routeLookup('course.createCourse') }}" />
                     </div>
                 </div>
                 {% endif %}
             </fieldset>
-            <fieldset id="unit-info" class="content" data-mage="unit-info" {% if not folder.id %} disabled="disabled"{% endif %}>
+            <fieldset id="unit-info" class="content" data-mage="unit-info" {% if not course.id %} disabled="disabled"{% endif %}>
                 <legend>Units</legend>
                 <div class="small-12 column no-pad">
                     {# Don't delete the inline style, it's needed -#}
-                    <ul class="information-list" {% if not folder.id %}style="display:none;"{% endif %} data-mage-collapsed>
+                    <ul class="information-list" {% if not course.id %}style="display:none;"{% endif %} data-mage-collapsed>
                     {% for unit in course.units %}
                         {% if access[unit.id] > 0 %}
                             {% include '@course/unit.twig' with { unit: unit, i: loop.index, '_writable': access[unit.id] > 1 } %}
                         {% endif %}
                     {% endfor %}
-                    {% if not folder.id or access[folder.id] > 1 %}
+                    {% if not course.id or access[course.folder.id] > 1 %}
                         <li class="actions-small-1" data-unit>
-                            <input type="hidden" name="id" value="{{ folder.id }}" data-folder-id>
+                            <input type="hidden" name="id" value="{{ course.id }}" data-folder-id>
                             <div class="list-item content">
                                 <div class="small-1 column">
                                     <span class="icon-add"></span>
@@ -119,10 +122,10 @@
                 </div>
             </fieldset>
         </section>
-        {% if not folder.id or access[folder.id] > 1 %}
+        {% if not course.id or access[course.folder.id] > 1 %}
         <div class="row" data-mage="unit-info">
             {# Don't delete the inline style, it's needed -#}
-            <div class="small-12 column" {% if not folder.id %}data-mage-collapsed style="display: none;"{% endif %}>
+            <div class="small-12 column" {% if not course.id %}data-mage-collapsed style="display: none;"{% endif %}>
                 <input type="submit" name="submit" value="Save Course" data-mage-working="Saving..." data-mage-next="main-course" />
             </div>
         </div>

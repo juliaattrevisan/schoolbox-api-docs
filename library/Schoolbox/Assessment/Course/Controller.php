@@ -378,11 +378,21 @@ class Controller extends Base\Base
         // if something got passed, don't care: overriding it
         $post['id'] = $id;
 
+        // Load course
+        $course = $this->getCourseSpecificationTranslator()->translateToDomainModel(
+            $this->getCourseSpecificationMapper()->findById($post['id'])
+        );
+        // TODO: figure out if course should load units by default
+        $course->setUnits(
+            $this->getUnitSpecificationMapper()->findByCourseId($post['id'])
+                 ->map([$this->getUnitSpecificationTranslator(), 'translateToDomainModel'])
+        );
+
         // Do not permit Courses to be moved to, or created in, Root
         if(0 == $post['parent']){
 
             // ...unless already in Root
-            if(0 != $parentId = $this->getFolderMapper()->findCheaplyById($post['id'])->getParent()->getId()) {
+            if(0 != $course->getFolder()->getParent()->getId()) {
                 $this->sendError(
                     new Base\Exception("Course cannot reside directly in root",
                         ["move this Course out of root"]));
@@ -392,10 +402,11 @@ class Controller extends Base\Base
 
         if (is_array($post['unitname'])) {
             // save unit name changes
-            foreach ($post['unitname'] as $unitId => $unitName) {
-                $this->getFolderMapper()->save(
-                    $this->getFolderMapper()->findById($unitId)->setName($unitName)
-                );
+            foreach ($course->getUnits() as $unit) {
+                $unitName = $post['unitname'][$unit->getId()];
+                if (isset($unitName)) {
+                    $this->getFolderMapper()->save($unit->getFolder()->setName($unitName));
+                }
             }
         } else{
             $this->sendError(new Base\Exception("Cannot create a Course without Units",["create at least 1 unit"]));
