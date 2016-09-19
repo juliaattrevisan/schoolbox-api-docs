@@ -251,6 +251,8 @@ class Controller extends Base\Base
     /**
      * Form to modify a course
      *
+     * TODO: modify this to take a course ID instead of a folder ID
+     *
      * @api   GET /course/modify/{id}
      * @level 160
      *
