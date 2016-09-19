@@ -2200,6 +2200,8 @@ class Controller extends Base\Base
     /**
      * Restore a Course instance via rebuilding its component
      *
+     * @deprecated Course (implementation) existence is not tied to the existence of its component anymore.
+     *
      * @api   POST /course/import/restore
      * @level 160
      *
@@ -2282,6 +2284,7 @@ class Controller extends Base\Base
     public function deleteUnitSpecification($id)
     {
         // TODO: make delete of folder and unit atomic
+
         $unitSpecModel = $this->getUnitSpecificationMapper()->findById($id);
 
         // Delete unit spec
