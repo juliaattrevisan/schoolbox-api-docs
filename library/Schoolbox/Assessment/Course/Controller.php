@@ -92,9 +92,22 @@ class Controller extends Base\Base
     protected $unitSpecificationMapper;
 
     /**
+     * Translates between course specification data and domain models
+     *
+     * TODO: figure out if this should be a part of the course spec mapper
+     *
      * @var CourseSpecificationTranslator
      */
-    protected $translator;
+    protected $courseSpecificationTranslator;
+
+    /**
+     * Translates between unit specification data and domain models
+     *
+     * TODO: figure out if this should be a part of the unit spec mapper
+     *
+     * @var UnitSpecificationTranslator
+     */
+    protected $unitSpecificationTranslator;
 
     /** @var Component_DefinitionMapper */
     protected $componentDefinitionMapper;
@@ -138,7 +151,9 @@ class Controller extends Base\Base
         $this->setUnitSpecificationMapper(UnitSpecificationMapper::getInstance());
 
         // Mapper/domain translation layer
-        $this->setTranslator(new CourseSpecificationTranslator(new UnitSpecificationTranslator()));
+        $unitSpecTranslator = new UnitSpecificationTranslator();
+        $this->setCourseSpecificationTranslator(new CourseSpecificationTranslator($unitSpecTranslator));
+        $this->setUnitSpecificationTranslator($unitSpecTranslator);
 
         $this->setSubmissionBoxMapper(SubmissionBoxMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
@@ -499,7 +514,7 @@ class Controller extends Base\Base
             try {
                 // Retrieve the course specification
                 // (Note that $id is currently the folder ID, not the course spec ID.)
-                $courseSpecification = $this->getTranslator()->translateToDomainModel(
+                $courseSpecification = $this->getCourseSpecificationTranslator()->translateToDomainModel(
                     $this->getCourseSpecificationMapper()->findByFolderId($id)
                 );
 
@@ -577,7 +592,7 @@ class Controller extends Base\Base
 
             // Persist the course spec as well
             $courseSpecification->setFolder($folder);
-            $this->getCourseSpecificationMapper()->save($this->getTranslator()->translateToDataModel($courseSpecification));
+            $this->getCourseSpecificationMapper()->save($this->getCourseSpecificationTranslator()->translateToDataModel($courseSpecification));
 
             return $folder;
 
@@ -851,7 +866,7 @@ class Controller extends Base\Base
         $allCourses = $this->getCourseSpecificationMapper()->findByName(
             $searchParam,
             ['order' => ['f.name' => 'ASC' ]]
-        )->map([$this->getTranslator(), 'translateToDomainModel']);
+        )->map([$this->getCourseSpecificationTranslator(), 'translateToDomainModel']);
 
         $data = [];
 
@@ -2583,18 +2598,36 @@ class Controller extends Base\Base
     /**
      * @return CourseSpecificationTranslator
      */
-    public function getTranslator()
+    public function getCourseSpecificationTranslator()
     {
-        return $this->translator;
+        return $this->courseSpecificationTranslator;
     }
 
     /**
-     * @param CourseSpecificationTranslator $translator
+     * @param CourseSpecificationTranslator $courseSpecificationTranslator
      * @return static
      */
-    public function setTranslator($translator)
+    public function setCourseSpecificationTranslator($courseSpecificationTranslator)
     {
-        $this->translator = $translator;
+        $this->courseSpecificationTranslator = $courseSpecificationTranslator;
+        return $this;
+    }
+
+    /**
+     * @return UnitSpecificationTranslator
+     */
+    public function getUnitSpecificationTranslator()
+    {
+        return $this->unitSpecificationTranslator;
+    }
+
+    /**
+     * @param UnitSpecificationTranslator $unitSpecificationTranslator
+     * @return static
+     */
+    public function setUnitSpecificationTranslator($unitSpecificationTranslator)
+    {
+        $this->unitSpecificationTranslator = $unitSpecificationTranslator;
         return $this;
     }
 
