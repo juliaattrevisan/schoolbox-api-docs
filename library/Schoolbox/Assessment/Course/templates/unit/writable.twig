@@ -14,9 +14,9 @@
     </nav>
     <ul id="unit-{{ unit.id }}-modify" class="f-dropdown" data-dropdown-content>
         {% if unit.hasHomepage %}
-            <li><a href="/homepage/{{ unit.id }}" class="icon-home">View Homepage</a></li>
+            <li><a href="/homepage/{{ unit.folder.id }}" class="icon-home">View Homepage</a></li>
         {% else %}
-            <li><a href="/resources/{{ unit.id }}" class="icon-folder">Browse Resources</a></li>
+            <li><a href="/resources/{{ unit.folder.id }}" class="icon-folder">Browse Resources</a></li>
         {% endif %}
         <li><a href="/course/unit/{{ unit.id }}/delete" class="icon-delete" data-delete="{{ unit.id }}">Delete Unit</a></li>
     </ul>
