@@ -113,6 +113,9 @@ class Mapper extends BaseMapper
      */
     public function findByName($searchParam, $options = [])
     {
+        if (strlen($searchParam) === 0) {
+            return $this->findAll($options);
+        }
         return $this->findByColumn('f.name', "%{$this->database->quoteForLike($searchParam)}%", $options);
     }
 
