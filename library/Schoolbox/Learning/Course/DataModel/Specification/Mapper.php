@@ -87,6 +87,8 @@ class Mapper extends BaseMapper
             $model->setFolder($this->hydrateJoin($row, 'folder', 'f'));
             $modelList->add($model);
         }
+
+        // TODO: consider whether units should be populated here
         return $modelList;
     }
 
