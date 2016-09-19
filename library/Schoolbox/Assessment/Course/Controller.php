@@ -2246,17 +2246,29 @@ class Controller extends Base\Base
     }
 
     /**
-     * Delete a course by blowing away all its units
+     * Delete a course specification
      *
-     * @api   POST /course/delete
+     * @api   POST /course/delete/{id}
      * @level 160
+     *
+     * @param int $id The course to delete
      */
-    public function deleteCourse()
+    public function deleteCourseSpecification($id)
     {
+        // TODO: make delete of folder and course atomic
+
+        $courseSpecModel = $this->getCourseSpecificationMapper()->findById($id);
+        $unitSpecModels  = $this->getUnitSpecificationMapper()->findByCourseId($id);
+
+        // Delete course specs
+        $this->getCourseSpecificationMapper()->delete($courseSpecModel);
+
+        // Delete constituent units
+        $this->getUnitSpecificationMapper()->delete($unitSpecModels);
+
         /** @var Folder\Controller $folderController */
         $folderController = $this->getController('folder');
-
-        $folderController->recursiveDelete($this->getRequest()->post->get('courseId'), $this->getUser());
+        $folderController->recursiveDelete($courseSpecModel->getFolder()->getId(), $this->getUser());
     }
 
     /**

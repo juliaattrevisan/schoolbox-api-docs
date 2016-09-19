@@ -59,7 +59,7 @@
 
             {# Course delete: standard folder delete -#}
             {% if currentUser.isSuperuser() %}
-        <li><a href="#" class="icon-delete" data-course-delete-id="{{ course.id }}" data-action="course-delete">Delete</a></li>
+        <li><a href="{{ routeLookup('course.deleteCourseSpecification', {id: course.id}) }}" class="icon-delete" data-course-delete-id="{{ course.id }}" data-action="course-delete">Delete</a></li>
             {% endif %}
 
     </ul>

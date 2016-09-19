@@ -80,7 +80,8 @@ class Module extends BaseModule
                 '/new'              => 'createCourse',
                 '/modify/{id}'      => 'updateCourse',
                 '/finalise'         => 'persistCourse',
-                '/delete'           => 'deleteCourse',
+                // AFAICT this was never used - I'm re-purposing it
+                '/delete/{id}'      => 'deleteCourseSpecification',
             ]
         ];
 
