@@ -280,6 +280,7 @@ class Controller extends Base\Base
 
             $data['folder'] = $folder;
             $data['access'][$folder->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $folder->getId() ]);
+            // TODO: figure out how this should work with course specification
             $data['units']  = $this->getUnitSpecificationMapper()->findByCourseFolderId($folder->getId());
 
             foreach ($data['units'] as $unit) {
@@ -883,6 +884,7 @@ class Controller extends Base\Base
             $data['courses'][] = $currentCourse->getFolder();
 
             // This still uses folders for now
+            // TODO: figure out how this should work with course specifications
             $allUnits = $this->getUnitSpecificationMapper()->findByCourseId($currentCourse->getId());
 
             // Append to unit index, by ID
@@ -1120,6 +1122,9 @@ class Controller extends Base\Base
     /**
      * This POST is the result of import stage 2
      *
+     * TODO: replace component ID parameter with course implementation ID?
+     * TODO: figure out how this should work with course specification
+     *
      * @api   POST /course/import/ownership
      * @level 160
      */
@@ -1254,6 +1259,8 @@ class Controller extends Base\Base
      * (a Task Abstract is one specified in the original Unit
      * but has not yet been imported)
      *
+     * TODO: make this take a course implementation ID, not a course component ID
+     *
      * @param $unitDates array User-selected dates for a Unit, (via POST, typically)
      * @param $courseComponentId int A componentId related to this course >.<
      * @return array
@@ -1265,6 +1272,7 @@ class Controller extends Base\Base
 
         /* Make a local cache for unit information
          */
+        // TODO: figure out how this should work with course implementation
         foreach ($unitDates as $unit) {
             if ($unit['import'] && !isset($unitCache[$unit['unit_id']])) {
                 try {
