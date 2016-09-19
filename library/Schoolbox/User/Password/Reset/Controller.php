@@ -176,27 +176,29 @@ class Controller extends Base
                     $email = $this->mailFactory->build('userPasswordReset/userNotAllowedReset.twig');
                 }
 
-                // If the user entered a username- we need to retrieve their email address, otherwise we can just use what they entered
+                // If the user entered a username- try to retrieve their email address from the user record
 
                 if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
                     $emailAddress = $user->getEmail();
                 }
 
-                // Send the email
+                // Only try and send the email if we got a valid address in the end
 
-                $email->setFrom($config->get('password_change_email_from'), $config->get('mail_from_name'));
-                $email->setSubject($config->get('title') . ' Password Reset');
+                if (filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
 
-                $email->setContext([
-                    'user' => $user,
-                    'reset' => $reset,
-                    'hideUnsubscribe' => true
-                ]);
+                    $email->setFrom($config->get('password_change_email_from'), $config->get('mail_from_name'));
+                    $email->setSubject($config->get('title') . ' Password Reset');
+                    $email->setContext([
+                        'user' => $user,
+                        'reset' => $reset,
+                        'hideUnsubscribe' => true
+                    ]);
 
-                $email->send([
-                    'name' => $user->formatName(),
-                    'email' => $emailAddress
-                ]);
+                    $email->send([
+                        'name' => $user->formatName(),
+                        'email' => $emailAddress
+                    ]);
+                }
             }
         } else {
 
