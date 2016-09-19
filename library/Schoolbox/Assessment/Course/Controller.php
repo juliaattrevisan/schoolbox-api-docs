@@ -516,16 +516,17 @@ class Controller extends Base\Base
         // extract codes
         $codes = $post->get('curriculumCodes', []);
 
+        $folderId = null;
         if ($id) {
             try {
                 // Retrieve the course specification
-                // (Note that $id is currently the folder ID, not the course spec ID.)
                 $courseSpecification = $this->getCourseSpecificationTranslator()->translateToDomainModel(
-                    $this->getCourseSpecificationMapper()->findByFolderId($id)
+                    $this->getCourseSpecificationMapper()->findById($id)
                 );
 
                 // do checks to make sure it exists
-                $folder = $this->getFolderMapper()->findById($id);
+                $folder = $courseSpecification->getFolder();
+                $folderId = $folder->getId();
                 $mode = BaseMapper::METHOD_UPDATE;
 
                 // Sanity check for existing courses:
@@ -557,7 +558,7 @@ class Controller extends Base\Base
         try {
             $datums = [
                 // the basics
-                'categoryID'      => $id,
+                'categoryID'      => $folderId,
                 'name'            => $name,
                 'parent'          => $parent->getId(),
                 'curriculumCodes' => $codes,
@@ -576,7 +577,7 @@ class Controller extends Base\Base
 
 
                     // configurable things
-                    'inherit'         => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
+                    'inherit'   => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
                     'template'  => $this->getConfigLoader()->get('course_builder_default_course_page_template'),
                     'group'     => $rolePermissions,
 
