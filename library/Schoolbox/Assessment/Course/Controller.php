@@ -1076,8 +1076,14 @@ class Controller extends Base\Base
 
         $folderId = $this->getSession()->get('resourcesID', $this->getCourseMapper()->getFacultyNode()->getId(), $this->namespace);
 
+        if ($folderId == 0) {
+            $treeData = $treeBuilder->buildPartialTree($folderId);
+        } else {
+            $treeData = $treeBuilder->buildPartialTree($folderId, $folderId);
+        }
+
         $data = [
-            'treedata' => json_encode($treeBuilder->buildPartialTree($folderId, $folderId)),
+            'treedata' => json_encode($treeData),
             'folderId' => $folderId
         ];
 
