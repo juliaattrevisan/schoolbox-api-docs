@@ -818,7 +818,7 @@ class Group extends DeprecatedModel
 
         $query = "SELECT groups.id, groups.`name`, COUNT(*) total
 				  FROM groups
-				  JOIN `user` ON groups.id=`user`.group_id
+				  JOIN `user` ON groups.id=`user`.group_id AND `user`.deleted_at IS NULL
 				  GROUP BY groups.id
 				  ORDER BY groups.`name`";
 
@@ -827,7 +827,7 @@ class Group extends DeprecatedModel
         while ($group = $this->db->getNextArray($result)) {
             $query = "SELECT COUNT(DISTINCT `user`.id) as loggedIn
 						FROM login_log
-						JOIN `user` ON login_log.username=`user`.username
+						JOIN `user` ON login_log.username=`user`.username AND `user`.deleted_at IS NULL
 						WHERE `date` > DATE_SUB(NOW(), INTERVAL " . (Cfg::get('session_length') * 2) . " SECOND)
 						AND group_id = '{$group['id']}'
 						AND login = 1";
