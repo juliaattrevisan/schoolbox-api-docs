@@ -50,6 +50,16 @@ do
 	fi
 done < schoolboxdemo-$demo_data_version-sha1-cached.txt;
 
+mariadbcheck=`dpkg -l | grep 'mariadb-server' | wc -l`;
+if [ $mariadbcheck -eq 0 ];
+then
+	echo "$vag Installing MariaDB";
+	apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db >/dev/null 2>&1;
+	add-apt-repository 'deb [arch=amd64,i386] http://mirror.aarnet.edu.au/pub/MariaDB/repo/10.1/ubuntu trusty main' >/dev/null 2>&1;
+	apt-get update >/dev/null 2>&1; 
+	DEBIAN_FRONTEND=noninteractive apt-get install -q -y -o DPkg::Options::=--force-confold mariadb-server mariadb-client mariadb-server-10.1 mariadb-client-10.1 libmariadbclient18 mariadb-client-core-10.1 mariadb-server-core-10.1 mariadb-common >/dev/null 2>&1;
+fi
+
 echo "$vag Ensuring MySQL is running";
 #service mysql restart > /dev/null 2>&1;
 service mysql start > /dev/null 2>&1;
