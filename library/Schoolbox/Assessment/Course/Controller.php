@@ -39,6 +39,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecificationTranslator;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -249,14 +250,12 @@ class Controller extends Base\Base
 
 
     /**
-     * Form to modify a course
-     *
-     * TODO: modify this to take a course ID instead of a folder ID
+     * Form to modify a course specification
      *
      * @api   GET /course/modify/{id}
      * @level 160
      *
-     * @param int    $id
+     * @param int    $id   The ID of the course specification that is being modified
      * @param string $name
      */
     public function modifyCourse($id = null, $name = null)
@@ -268,8 +267,14 @@ class Controller extends Base\Base
             try {
                 // First, check whether or not this is already a course. We don't want to barr access to courses that
                 // are already courses.
-                $course = $this->getCourseSpecificationMapper()->findByFolderId($id);
+                $course = $this->getCourseSpecificationMapper()->findById($id);
                 $folder = $course->getFolder();
+
+                // Populate units
+                $course->setUnits(
+                    $this->getUnitSpecificationMapper()->findByCourseId($course->getId(), ['order' => ['f.name' => 'asc']])
+                         ->map([$this->getUnitSpecificationTranslator(), 'translateToDomainModel'])
+                );
 
             } catch (MapperException $e) {
                 // It should no longer be possible for a folder to exist without a course spec.
@@ -297,17 +302,18 @@ class Controller extends Base\Base
 
             $data['folder'] = $folder;
             $data['access'][$folder->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $folder->getId() ]);
-            // TODO: figure out how this should work with course specification
-            $data['units']  = $this->getUnitSpecificationMapper()->findByCourseFolderId($folder->getId());
+            $data['course'] = $course;
 
-            foreach ($data['units'] as $unit) {
-                $data['access'][$unit->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $unit->getId() ]);
-                $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unit);
+            foreach ($course->getUnits() as $unit) {
+                /** @var UnitSpecification $unit */
+                $unitFolder = $unit->getFolder();
+                $data['access'][$unit->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $unitFolder->getId() ]);
+                $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unitFolder);
                 $data['returnUrl'][$unit->getId()] = $this->getReturnUrl($id, $unit->getId());
                 $data['usages'][$unit->getId() ] = $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id');
 
                 // obtain the Course Builder Component Instance from the homepage.
-                $instances[$unit->getId()] = $this->getCourseBuilderInstance($unit);
+                $instances[$unit->getId()] = $this->getCourseBuilderInstance($unitFolder);
 
                 foreach ($data['tasks'][$unit->getId()] as $task) {
                     /** @var Task $task */

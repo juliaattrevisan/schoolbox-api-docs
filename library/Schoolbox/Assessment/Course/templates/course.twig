@@ -86,9 +86,9 @@
                 <div class="small-12 column no-pad">
                     {# Don't delete the inline style, it's needed -#}
                     <ul class="information-list" {% if not folder.id %}style="display:none;"{% endif %} data-mage-collapsed>
-                    {% for unit in units %}
+                    {% for unit in course.units %}
                         {% if access[unit.id] > 0 %}
-                            {% include '@course/unit.twig' with { i: loop.index, '_writable': access[unit.id] > 1 } %}
+                            {% include '@course/unit.twig' with { unit: unit, i: loop.index, '_writable': access[unit.id] > 1 } %}
                         {% endif %}
                     {% endfor %}
                     {% if not folder.id or access[folder.id] > 1 %}
