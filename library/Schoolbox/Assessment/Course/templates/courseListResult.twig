@@ -14,9 +14,9 @@
 
     <div class="list-item">
         <div class="compact card small-12">
-            <a href="{{ linkhref }}" data-course-id="{{ course.id }}" data-course-name="{{ course.name }}" data-component-id="{{ component.id }}">
+            <a href="{{ linkhref }}" data-course-id="{{ course.id }}" data-course-name="{{ course.folder.name }}" data-component-id="{{ component.id }}">
                 <div class="icon-course icon-16"></div>
-                <h3>{{ course.name }}</h3>
+                <h3>{{ course.folder.name }}</h3>
             </a>
             <p class="meta">
                 {{ cparents[0].name }}
@@ -27,12 +27,12 @@
         </div>
         <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="{{ collapsePrefix }}-{{ course.id }}">
             <ul class="unit-list">
-                    {% for unit in units[course.id] %}
+                    {% for unit in course.units %}
                 <li>
                         {% if linkToUnits %}
-                    <a title="Visit {{ unit.name }} homepage" href="/homepage/{{ unit.id }}">{{ unit.name }}</a>
+                    <a title="Visit {{ unit.folder.name }} homepage" href="/homepage/{{ unit.id }}">{{ unit.folder.name }}</a>
                         {% else %}
-                    {{ unit.name }}
+                    {{ unit.folder.name }}
                         {% endif %}
                 </li>
                     {% endfor %}
@@ -42,24 +42,24 @@
     <nav>
         <a href="#" class="icon-down-arrow" data-collapser="{{ collapsePrefix }}-{{ course.id }}"></a>
             {% if hasTot %}
-        <a href="#" class="icon-overflow" data-dropdown="courseDropdown-{{ course.getId() }}" aria-expanded="false" title="Actions"></a>
+        <a href="#" class="icon-overflow" data-dropdown="courseDropdown-{{ course.id }}" aria-expanded="false" title="Actions"></a>
             {% endif %}
     </nav>
 
         {% if hasTot %}
-    <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ course.getId() }}">
+    <ul class="f-dropdown" data-dropdown-content id="courseDropdown-{{ course.id }}">
         <li>
-            {% if course.hasHomepage() %}
-                <a href="/homepage/{{ course.getId() }}/" class="icon-home">Course Homepage</a>
+            {% if course.folder.hasHomepage %}
+                <a href="/homepage/{{ course.id }}/" class="icon-home">Course Homepage</a>
             {% else %}
-                <a href="/resources/{{ course.getId() }}/" class="icon-folder">Course Resources</a>
+                <a href="/resources/{{ course.id }}/" class="icon-folder">Course Resources</a>
             {% endif %}
         </li>
-        <li><a href="{{ routeLookup('course.modifyCourse', {id: course.getId()}) }}" class="icon-modify">Modify</a></li>
+        <li><a href="{{ routeLookup('course.modifyCourse', {id: course.id}) }}" class="icon-modify">Modify</a></li>
 
             {# Course delete: standard folder delete -#}
             {% if currentUser.isSuperuser() %}
-        <li><a href="#" class="icon-delete" data-course-delete-id="{{ course.getId }}" data-action="course-delete">Delete</a></li>
+        <li><a href="#" class="icon-delete" data-course-delete-id="{{ course.id }}" data-action="course-delete">Delete</a></li>
             {% endif %}
 
     </ul>

@@ -891,32 +891,26 @@ class Controller extends Base\Base
                 continue;
             }
 
+            /* Also store the path to this Course
+             */
             try {
-                $data['lineage'][$currentCourse->getFolder()->getId()] = $this->getLineage($currentCourse->getFolder());
+                $data['lineage'][$currentCourse->getId()] = $this->getLineage($currentCourse->getFolder());
             } catch (MapperException $e) {
-                // somehow, against all odds, one of my ancestors has been deleted
+                // somehow, against all odds, one of my ancestors has been deleted: show nothing
                 continue;
             }
 
-            $data['courses'][] = $currentCourse->getFolder();
+            // Remove units whose folders aren't accessible by this user
+            $currentCourse->setUnits(
+                $this->getUnitSpecificationMapper()->findByCourseId(
+                    $currentCourse->getId(),
+                    ['order' => ['f.name' => 'ASC']]
+                )->filter(function($v) { return $this->confirmAccess($v->getFolder()->getId()); })
+                 ->map([$this->getUnitSpecificationTranslator(), 'translateToDomainModel'])
+            );
 
-            // This still uses folders for now
-            // TODO: figure out how this should work with course specifications
-            $allUnits = $this->getUnitSpecificationMapper()->findByCourseId($currentCourse->getId());
-
-            // Append to unit index, by ID
-            foreach ($allUnits as $currentUnit) {
-                // confirm you at least have read access...s
-                if (!$this->confirmAccess($currentUnit->getFolder()->getId())) {
-                    continue;
-                }
-
-                $data['units'][$currentCourse->getFolder()->getId()][] = $currentUnit;
-            }
-
-            /* Also store the path to this Course
-             */
-
+            // Add course directly into $data
+            $data['courses'][] = $currentCourse;
         }
 
         return $data;
