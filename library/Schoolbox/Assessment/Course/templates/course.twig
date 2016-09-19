@@ -143,12 +143,11 @@
             e.preventDefault();
 
             var $input = $(this);
-            var unitId = $input.data('delete');
 
             $(this).confirmDialog({
                 text: 'Are you sure you wish to delete this unit? This will also delete all coursework and content it contains.',
                 confirmEvent: function () {
-                    $.post('/resource/folder/delete', {id: unitId })
+                    $.post($input.attr('href'))
                         .done(function () {
                             var $listItem = $input.closest('[data-unit]');
                             $listItem.slideUp(400, function () {

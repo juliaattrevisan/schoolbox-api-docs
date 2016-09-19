@@ -18,7 +18,7 @@
         {% else %}
             <li><a href="/resources/{{ unit.folder.id }}" class="icon-folder">Browse Resources</a></li>
         {% endif %}
-        <li><a href="/course/unit/{{ unit.id }}/delete" class="icon-delete" data-delete="{{ unit.id }}">Delete Unit</a></li>
+        <li><a href="{{ routeLookup('course.deleteUnitSpecification', {id: unit.id}) }}" class="icon-delete" data-delete="{{ unit.id }}">Delete Unit</a></li>
     </ul>
     <div class="small-12 column {% if not _expanded %}hide{% endif %}" data-collapsable="unit-{{ unit.id }}" {% if not _expanded %}data-collapse-state="collapsed"{% endif %}>
         <ul class="information-list sortable" data-sortable data-task_list>

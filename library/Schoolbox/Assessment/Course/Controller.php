@@ -2272,6 +2272,27 @@ class Controller extends Base\Base
     }
 
     /**
+     * Delete a unit specification
+     *
+     * @api   POST /course/unit/delete/{id}
+     * @level 160
+     *
+     * @param int $id The unit spec to delete
+     */
+    public function deleteUnitSpecification($id)
+    {
+        // TODO: make delete of folder and unit atomic
+        $unitSpecModel = $this->getUnitSpecificationMapper()->findById($id);
+
+        // Delete unit spec
+        $this->getUnitSpecificationMapper()->delete($unitSpecModel);
+
+        /** @var Folder\Controller $folderController */
+        $folderController = $this->getController('folder');
+        $folderController->recursiveDelete($unitSpecModel->getFolder()->getId(), $this->getUser());
+    }
+
+    /**
      * Returns a HTTP 500 error with a specific text message
      *
      * @param $message
