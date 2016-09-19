@@ -20,7 +20,7 @@
                 {% for contact in contacts %}
                     <li class="actions-small-1">
                         <div class="list-item">
-                            <div class="avatar card small-12">
+                            <div class="card small-12">
                                 {% if contact.main %}
                                     <a href="/search/user/{{ contact.main.getId() }}">
                                         <img src="/portrait.php?userId={{ contact.StudentContactID }}&amp;size=square64"/>
@@ -77,7 +77,7 @@
 
                     <li class="actions-small-1">
                         <div class="list-item">
-                            <div class="avatar card small-12">
+                            <div class="card small-12">
                                 <span class="icon-home icon-32"></span>
                                 {% if contact.StudentContactAddress1 or contact.StudentContactAddress2 or contact.StudentContactAddress3 %}
                                     <p>{{ contact.StudentContactAddress1 }}</p>

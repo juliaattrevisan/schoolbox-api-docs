@@ -106,7 +106,7 @@
             <div class="small-12 column">
                 <section>
                     {% for teacher in report.subjectReport.teachers %}
-                        <div class="small-12 avatar card">
+                        <div class="small-12 card">
                             <img class="teacher-image" src="/portrait.php?userId={{ teacher.externalId }}&amp;size=square64" alt="{{ teacher.formatName }}">
                             <p class="teacher-name">{{ teacher.formatName }}</p>
                         </div>
