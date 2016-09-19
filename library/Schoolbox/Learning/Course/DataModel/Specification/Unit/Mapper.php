@@ -110,6 +110,6 @@ class Mapper extends BaseMapper
      */
     public function findByCourseFolderId($courseFolderId, $options = [])
     {
-        return $this->findByColumn('course.folder_id', $courseFolderId, $options);
+        return $this->findByColumn('c.folder_id', $courseFolderId, $options);
     }
 }
