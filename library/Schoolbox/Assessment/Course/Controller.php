@@ -703,10 +703,14 @@ class Controller extends Base\Base
                 $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
             }
 
+            // Get the course I'm saving into
+            $courseSpecDataModel = $this->getCourseSpecificationMapper()->findById($post['id']);
+            $courseSpec          = $this->getCourseSpecificationTranslator()->translateToDomainModel($courseSpecDataModel);
+
             $folder = $this->persistFolder([
                 // the basics (note lack of ID and Codes)
                 'name'            => $name,
-                'parent'          => $post['id'],
+                'parent'          => $courseSpec->getFolder()->getId(),
 
                 // configurable things
                 'inherit'         => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
@@ -718,15 +722,19 @@ class Controller extends Base\Base
                 'code'            => null,  // LEAVE THIS
             ]);
 
+            // Persist the unit too
+            $unitSpec = new UnitSpecification();
+            $unitSpec->setFolder($folder);
+            $unitSpecDataModel = $this->getUnitSpecificationTranslator()->translateToDataModel($unitSpec, $courseSpecDataModel);
+            $this->getUnitSpecificationMapper()->save($unitSpecDataModel);
+            $unitSpec->setId($unitSpecDataModel->getId());
+
             $instance  = $this->getCourseBuilderInstance($folder);
             $folderId  = $folder->getId();
             $returnUrl = $this->getReturnUrl($post['id'], $folderId);
 
             $data = [
-                'unit'  => [
-                    'id'   => $folderId,
-                    'name' => $folder->getName()
-                ],
+                'unit'      => $unitSpec,
                 'returnUrl' => [
                     $folderId => $returnUrl
                 ],
