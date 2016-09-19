@@ -143,6 +143,7 @@ class Report_Parent extends Report_Abstract
     {
         $this->getPage()->setFile(TEMPLATE_content, 'modules/report/parents.html');
         $this->getPage()->setBlock(TEMPLATE_content, 'student', 'student_block');
+        $this->getPage()->setBlock(TEMPLATE_content, 'has_boarder', 'has_boarder_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'has_year_selector', 'has_year_selector_block');
         $this->getPage()->setBlock('has_year_selector', 'year_selector_option', 'year_selector_option_block');
         $this->getPage()->setBlock(TEMPLATE_content, 'has_year_input', 'has_year_input_block');
@@ -160,6 +161,7 @@ class Report_Parent extends Report_Abstract
 
         $this->getPage()->setVar(
             array(
+                'has_boarder_block'            => '',
                 'student_block'                => '',
                 'contact_block'                => '',
                 'public_block'                 => '',
@@ -169,6 +171,10 @@ class Report_Parent extends Report_Abstract
                 'email_all_parents_link_block' => '',
             )
         );
+
+        if (Config::get('show_boarder_block')) {
+            $this->getPage()->parse('has_boarder_block', 'has_boarder');
+        }
 
         if (Config::get('modules_parentdirectory_emailall')) {
             $this->getPage()->parse('email_all_parents_block', 'email_all_parents');
@@ -189,6 +195,7 @@ class Report_Parent extends Report_Abstract
                 'SEARCH_NAME' => $this->getSearchName(),
                 'SEARCH_FORM' => $this->getSearchForm(),
                 'SEARCH_YEAR' => $this->getYearLevel(),
+                'SEARCH_WIDTH' => Config::get('show_boarder_block') ? 6 : 8,
                 'HEADING'     => $heading,
                 'REPLY_TO'    => $_SESSION['user']->getEmail(),
             )
