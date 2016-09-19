@@ -948,6 +948,7 @@ class Controller extends Base\Base
         // find all the folders that match this code, then filter for coarseness
         return $this->getFolderMapper()->findByCurriculumCode($codes)->filter(function ($result) {
             /** @var Folder\Model $result */
+            // TODO: test this with folders and courses which have curriculum codes
             return $this->getCourseSpecificationMapper()->countByColumn('folder_id', $result->getId()) > 0;
         });
     }
