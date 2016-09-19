@@ -36,9 +36,12 @@ $range-slider-handle-bg-hover-color: $content-ui-foreground;
 @import "../../../../../javascript/components/foundation/scss/foundation/components/range-slider";
 
 .range-slider{
-	@include box-shadow(inset, 4px, 1px, 10px, rgba(0,0,0,0.12));
+	@include box-shadow(inset, -2px, 2px, 0px, rgba(0,0,0,0.10));
 
 	.range-slider-handle{
-		@include box-shadow(0px, 3px, 6px, rgba(0,0,0,0.4));
+		top: -0.65rem;
+		height: 2.25rem;
+		width: 2.25rem;
+		@include border-radius(1.25rem);
 	}
 }
