@@ -443,18 +443,18 @@ class Controller extends Base\Base
 
         try {
             // attempt to persist this course based on the given POST data
-            $folder = $this->persistCourse($post);
+            $courseSpec = $this->persistCourse($post);
 
             if ($xhr) {
                 // respond to XHR with JSON
                 $rs->content->set([
                     'format' => 'json',
-                    'data'   => [ 'id' => $folder->getId() ]
+                    'data'   => [ 'id' => $courseSpec->getId() ]
                 ]);
 
             } else {
                 // respond to synchronous POST with redirect
-                $rs->redirect->afterPost($this->getRouteIfAuthorized($redir, [ $folder->getId() ]));
+                $rs->redirect->afterPost($this->getRouteIfAuthorized($redir, [ $courseSpec->getId() ]));
             }
 
         } catch (Base\Exception $e) {
@@ -469,7 +469,7 @@ class Controller extends Base\Base
      *
      * @param Values $post
      * @throws Base\Exception
-     * @return Folder\Model
+     * @return CourseSpecification
      */
     protected function persistCourse($post)
     {
@@ -599,9 +599,12 @@ class Controller extends Base\Base
 
             // Persist the course spec as well
             $courseSpecification->setFolder($folder);
-            $this->getCourseSpecificationMapper()->save($this->getCourseSpecificationTranslator()->translateToDataModel($courseSpecification));
+            $courseSpecDataModel = $this->getCourseSpecificationTranslator()->translateToDataModel($courseSpecification);
+            $this->getCourseSpecificationMapper()->save($courseSpecDataModel);
 
-            return $folder;
+            // Course spec data model ID was set as part of save action
+            $courseSpecification->setId($courseSpecDataModel->getId());
+            return $courseSpecification;
 
         } catch (ServiceNotFound $e) {
             // quite simple not able to find things we need. bye bye.
