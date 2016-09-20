@@ -1069,8 +1069,8 @@ class Controller extends Base\Base
         //  - stop at, and exclude, all Courses (folder that has > 0 units)
         //  - continue to exhaustion
 
-        $courseIds = $this->getCourseSpecificationMapper()->findAll()->map(function($v) {
-            /** @var CourseSpecificationModel $v */
+        $courseIds = $this->getCourseSpecificationMapperProxy()->findAll()->map(function($v) {
+            /** @var CourseSpecification $v */
             return $v->getFolder()->getId();
         })->getAll();
 
