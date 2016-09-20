@@ -41,6 +41,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpe
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\SpecificationMapperProxy as CourseSpecificationMapperProxy;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationMapperProxy;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -97,6 +98,11 @@ class Controller extends Base\Base
      * @var UnitSpecificationMapper
      */
     protected $unitSpecificationMapper;
+
+    /**
+     * @var UnitSpecificationMapperProxy
+     */
+    protected $unitSpecificationMapperProxy;
 
     /**
      * Translates between course specification data and domain models
@@ -166,6 +172,12 @@ class Controller extends Base\Base
             new CourseSpecificationMapperProxy(
                 $this->getCourseSpecificationMapper(),
                 $this->getCourseSpecificationTranslator()
+            )
+        );
+        $this->setUnitSpecificationMapperProxy(
+            new UnitSpecificationMapperProxy(
+                $this->getUnitSpecificationMapper(),
+                $this->getUnitSpecificationTranslator()
             )
         );
 
@@ -2698,6 +2710,24 @@ class Controller extends Base\Base
     public function setCourseSpecificationMapperProxy($courseSpecificationMapperProxy)
     {
         $this->courseSpecificationMapperProxy = $courseSpecificationMapperProxy;
+        return $this;
+    }
+
+    /**
+     * @return UnitSpecificationMapperProxy
+     */
+    public function getUnitSpecificationMapperProxy(): UnitSpecificationMapperProxy
+    {
+        return $this->unitSpecificationMapperProxy;
+    }
+
+    /**
+     * @param UnitSpecificationMapperProxy $unitSpecificationMapperProxy
+     * @return static
+     */
+    public function setUnitSpecificationMapperProxy($unitSpecificationMapperProxy)
+    {
+        $this->unitSpecificationMapperProxy = $unitSpecificationMapperProxy;
         return $this;
     }
 
