@@ -2,6 +2,10 @@
 iframe {
   width: 100%;
   height: rem-calc(($base-font-size) * 25);
+  &.synergetic {
+    // Increase height of synergetic's iframe (1000px)
+    height: rem-calc(($base-font-size) * 62.5);
+  }
 }
 
 .scroll-wrapper {
