@@ -10,6 +10,11 @@
 use Schoolbox\User;
 use \Schoolbox\Permission\Access\UserAccess;
 
+
+/**
+ * @method Eportfolio_Page_Instance|null getContext()
+ * @method Eportfolio_Page_Instance|null getSource()
+ */
 abstract class Component_Eportfolio_ControllerAbstract extends Component_ControllerAbstract
 {
     /**
@@ -151,14 +156,6 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
     }
 
     /**
-     * @return Eportfolio_Page_Instance|null
-     */
-    public function getContext()
-    {
-        return parent::getContext();
-    }
-
-    /**
      * @param Eportfolio_Page_Instance|null $context
      * @return static
      */
@@ -169,21 +166,12 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
     }
 
     /**
-     * Gets the Eportfolio_Page_Instance this component draws its data from
-     *
-     * @return Eportfolio_Page_Instance
-     */
-    public function getSource(){
-        return parent::getSource();
-    }
-
-    /**
      * Sets the Eportfolio_Page_Instance this component draws its data from
      *
-     * @param Eportfolio_Page_Instance $source
+     * @param Eportfolio_Page_Instance|null $source
      * @return static
      */
-    public function setSource($source) {
+    public function setSource(Eportfolio_Page_Instance $source = null) {
         parent::setSource($source);
         return $this;
     }

@@ -9,6 +9,10 @@
 
 use Schoolbox\Resource\Folder\Model as Folder;
 
+/**
+ * @method Folder getContext()
+ * @method Folder getSource()
+ */
 abstract class Component_Homepage_Statistics_ControllerAbstract extends Component_ControllerAbstract
 {
     /**
@@ -104,15 +108,6 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
      */
 
     /**
-     * @return Folder
-     */
-    public function getContext()
-    {
-        return parent::getContext();
-    }
-
-
-    /**
      * @param Folder $context
      * @return static
      */
@@ -120,14 +115,6 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
     {
         parent::setContext($context);
         return $this;
-    }
-
-    /**
-     * @return Folder
-     */
-    public function getSource()
-    {
-        return parent::getSource();
     }
 
     /**

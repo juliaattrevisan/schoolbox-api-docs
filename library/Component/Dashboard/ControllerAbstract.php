@@ -10,6 +10,10 @@
 use \Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
 
+/**
+ * @method null getContext()
+ * @method Folder|null getSource()
+ */
 abstract class Component_Dashboard_ControllerAbstract extends Component_ControllerAbstract
 {
     /**
@@ -56,14 +60,6 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
      */
 
     /**
-     * @return null
-     */
-    public function getContext()
-    {
-        return parent::getContext();
-    }
-
-    /**
      * @param null $context
      * @return static
      */
@@ -72,14 +68,6 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
         // Dashboard components never have context
         parent::setContext(null);
         return $this;
-    }
-
-    /**
-     * @return Folder|null
-     */
-    public function getSource()
-    {
-        return parent::getSource();
     }
 
     /**
