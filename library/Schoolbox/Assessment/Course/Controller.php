@@ -2713,7 +2713,7 @@ class Controller extends Base\Base
     /**
      * @return UnitSpecificationMapperProxy
      */
-    public function getUnitSpecificationMapperProxy(): UnitSpecificationMapperProxy
+    public function getUnitSpecificationMapperProxy()
     {
         return $this->unitSpecificationMapperProxy;
     }
