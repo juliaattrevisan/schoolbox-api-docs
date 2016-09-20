@@ -23,8 +23,9 @@ use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 
-class DueWorkTest extends \Schoolbox\Learning\Assessment\Test\Defaults
+class DueWorkTest extends \PHPUnit_Framework_TestCase
 {
+    use \Schoolbox\Learning\Assessment\Test\Defaults;
 
     /**
      * Test that Due Work initialises into a usable state

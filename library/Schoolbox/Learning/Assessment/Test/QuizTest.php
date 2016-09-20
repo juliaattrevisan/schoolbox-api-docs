@@ -18,8 +18,9 @@ use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
-class QuizTest extends \Schoolbox\Learning\Assessment\Test\Defaults
+class QuizTest extends \PHPUnit_Framework_TestCase
 {
+    use \Schoolbox\Learning\Assessment\Test\Defaults;
 
     /**
      * Test that Quiz initialises into a usable state

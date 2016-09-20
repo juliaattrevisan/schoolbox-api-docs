@@ -35,7 +35,7 @@ use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
-class Defaults extends \PHPUnit_Framework_TestCase
+trait Defaults
 {
     /**
      * @var User User

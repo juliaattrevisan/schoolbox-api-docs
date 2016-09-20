@@ -18,8 +18,9 @@ use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
 use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
-class TaskTest extends \Schoolbox\Learning\Assessment\Test\Defaults
+class TaskTest extends \PHPUnit_Framework_TestCase
 {
+    use \Schoolbox\Learning\Assessment\Test\Defaults;
 
     /**
      * Test that Task initialises into a usable state

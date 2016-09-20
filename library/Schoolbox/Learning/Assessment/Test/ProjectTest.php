@@ -38,8 +38,9 @@ use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
-class ProjectTest extends \Schoolbox\Learning\Assessment\Test\Defaults
+class ProjectTest extends \PHPUnit_Framework_TestCase
 {
+    use \Schoolbox\Learning\Assessment\Test\Defaults;
 
     /**
      * Test that Project initialises into a usable state
