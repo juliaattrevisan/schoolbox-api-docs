@@ -1,0 +1,67 @@
+<?php
+/**
+ * Average
+ *
+ * Takes an Average of all the most recent normalisedMark Feedbacks for every
+ * IResponse that was spawned. Tasks always return null for its getNormalisedMark()
+ * value, and are excluded from the Average calculations.
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+namespace Schoolbox\Learning\Assessment\Summator;
+
+use \Schoolbox\Collection;
+use \Schoolbox\User;
+
+class Average extends AbstractSummator
+{
+    /** @var float */
+    protected $sum;
+
+    /** @var int */
+    protected $numItems;
+
+    /**
+     * @inheritDoc
+     *
+     * Not used in plain ol' Average
+     */
+    protected function calculateTotalWeight(Collection $allAssessables) {
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function aggregate($val, $assessableWeight, $totalWeight)
+    {
+        $this->sum += $val;
+        $this->numItems++;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function reset()
+    {
+        $this->sum = null;
+        $this->numItems = 0;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function finalise()
+    {
+        /* If there are no items, return null
+         */
+        if (!$this->numItems) {
+            return null;
+        }
+
+        return (float)$this->sum / (float)$this->numItems;
+    }
+}

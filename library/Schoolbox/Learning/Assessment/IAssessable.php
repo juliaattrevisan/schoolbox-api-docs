@@ -34,8 +34,23 @@ interface IAssessable
      *
      * @param User $user
      * @return Participant
+     * @throws \UnexpectedValueException
      */
-    public function findParticipant(User $user);
+    public function getParticipant(User $user);
+
+/**
+     * @param User $user
+     * @param bool $publishedOnly
+     * @return string
+     */
+    public function getHumanReadableMark(User $user, $publishedOnly);
+
+    /**
+     * @param User $user
+     * @param bool $publishedOnly
+     * @return float|null
+     */
+    public function getNormalisedMark(User $user, $publishedOnly);
 
     /* Traversals
      */
@@ -76,11 +91,11 @@ interface IAssessable
     public function numMarked();
 
     /**
-     * Calculate percentage of a Project that has been marked
+     * Calculate percentage of an IAssessable that has been marked
      *
-     * @return int
+     * @return float
      */
-    public function calculatePercentageMarked();
+    public function getPercentageMarked();
 
     /**
      * Calculate the number of Feedbacks that have been Published
@@ -91,11 +106,11 @@ interface IAssessable
     public function numPublished();
 
     /**
-     * Calculate percentage of a Project that has been Published
+     * Calculate percentage of an IAssessable that has been Published
      *
-     * @return int
+     * @return float
      */
-    public function calculatePercentagePublished();
+    public function getPercentagePublished();
 
     /* Getters/Setters
      */

@@ -65,24 +65,6 @@ class AbstractFeedback implements IFeedback
     protected $publishedAt = null;
 
     /**
-     * Calculate the final mark for this IAssessable
-     */
-    public function calculateMark()
-    {
-        return $this->getNormalisedMark();
-    }
-
-    /**
-     * This IAssessable has a mark value of null
-     *
-     * @return bool
-     */
-    public function isNullMark()
-    {
-        return $this->calculateMark() === null;
-    }
-
-    /**
      * Determine whether this Feedback has been published.
      * If the publish date is null, it's a draft
      *

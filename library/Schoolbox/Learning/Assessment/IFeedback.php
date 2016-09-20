@@ -15,18 +15,6 @@ use \Schoolbox\User;
 interface IFeedback
 {
     /**
-     * Calculate the final mark for this IAssessable
-     */
-    public function calculateMark();
-
-    /**
-     * This IAssessable has a mark value of null
-     *
-     * @return bool
-     */
-    public function isNullMark();
-
-    /**
      * Determine whether this Feedback has been published.
      * If the publish date is null, it's a draft
      *

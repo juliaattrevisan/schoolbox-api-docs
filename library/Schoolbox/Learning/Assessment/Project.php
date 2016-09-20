@@ -16,6 +16,8 @@
 namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
+use \Schoolbox\User;
+use \Schoolbox\Learning\Assessment\Summator\ISummator;
 
 class Project extends AbstractAssessment
 {
@@ -26,15 +28,61 @@ class Project extends AbstractAssessment
     protected $assessables;
 
     /**
-     * Project constructor.
+     * Summation strategy
+     *
+     * @var ISummator
      */
-    public function __construct()
+    protected $summator;
+
+    /**
+     * Number of decimal places used in a Normalised Mark value
+     *
+     * @var int
+     */
+    protected $precision = 11;
+
+    /**
+     * Project constructor.
+     *
+     * @param ISummator $summator
+     */
+    public function __construct(ISummator $summator)
     {
         /* I know Dr hates hook methods, so do this instead
          */
         parent::__construct();
 
         $this->setAssessables(new Collection());
+        $this->setSummator($summator);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getHumanReadableMark(User $user, $publishedOnly)
+    {
+        // TODO: Implement getHumanReadableMark() method. This method gets the output from getNormalisedMark, then pipes that into the mark scheme (which doesn't yet exist on this class)
+
+        return 'TODO: Pass NormalisedMark value through MarkScheme';
+    }
+
+    /**
+     * Calculate the final mark for this IAssessable, for a particular User
+     *
+     * Projects use Summator strategies to determine final marks
+     * for a Collection of Assessable instances
+     *
+     * @inheritDoc
+     */
+    public function getNormalisedMark(User $user, $publishedOnly)
+    {
+        $val = $this->getSummator()->summate($this->getAssessables(), $user, $publishedOnly);
+
+        if (is_null($val)) {
+            return null;
+        }
+
+        return number_format($val, $this->getPrecision());
     }
 
     /**
@@ -123,6 +171,8 @@ class Project extends AbstractAssessment
         if ($this->numAssessables()) {
             return 100 * ($this->numPublished() / $this->numParticipants());
         }
+
+        return null;
     }
 
     /**
@@ -154,5 +204,31 @@ class Project extends AbstractAssessment
     {
         $this->assessables = $assessables;
         return $this;
+    }
+
+    /**
+     * @return ISummator
+     */
+    public function getSummator()
+    {
+        return $this->summator;
+    }
+
+    /**
+     * @param ISummator $summator
+     * @return $this
+     */
+    public function setSummator($summator)
+    {
+        $this->summator = $summator;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPrecision()
+    {
+        return $this->precision;
     }
 }

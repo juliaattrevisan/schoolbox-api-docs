@@ -22,7 +22,7 @@ class Model extends AbstractFeedback
      *
      * @return null
      */
-    public function calculateMark()
+    public function getNormalisedMark()
     {
         return null;
     }

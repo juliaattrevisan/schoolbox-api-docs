@@ -13,9 +13,14 @@
 
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback\File;
 
+use \Schoolbox\Resource\Storage\IStorage;
+use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use \Schoolbox\Resource\File\StorableTrait;
 
-class Model
+class Model implements IStorage
 {
+    use StorableTrait;
+    use CreatedAtDate;
 
     /**
      * @var int
@@ -29,13 +34,6 @@ class Model
      * @var string
      */
     protected $crocodocId;
-
-    /**
-     * The hash of the file's contents
-     *
-     * @var string
-     */
-    protected $hash;
 
     /**
      * The filename which was submitted
@@ -80,9 +78,6 @@ class Model
         return $this->crocodocId;
     }
 
-    /* Getters/Setters
-     */
-
     /**
      * @param string $crocodocId
      * @return self
@@ -90,24 +85,6 @@ class Model
     public function setCrocodocId($crocodocId)
     {
         $this->crocodocId = $crocodocId;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getHash()
-    {
-        return $this->hash;
-    }
-
-    /**
-     * @param string $hash
-     * @return self
-     */
-    public function setHash($hash)
-    {
-        $this->hash = $hash;
         return $this;
     }
 

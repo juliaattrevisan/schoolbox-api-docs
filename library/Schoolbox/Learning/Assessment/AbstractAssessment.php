@@ -110,8 +110,9 @@ abstract class AbstractAssessment implements IAssessable
      *
      * @param User $user
      * @return Participant
+     * @throws \UnexpectedValueException
      */
-    public function findParticipant(User $user)
+    public function getParticipant(User $user)
     {
         /** @var Participant $currentParticipant */
         foreach ($this->getAllParticipants() as $currentParticipant) {
@@ -120,9 +121,82 @@ abstract class AbstractAssessment implements IAssessable
             }
         }
 
-        /* TODO: Throw exception when you can't find a user?
+        throw new \UnexpectedValueException();
+    }
+
+    /**
+     * Get the Human Readable Mark value for a particular User
+     *
+     * Optionally get the Published Human Readable Mark or the
+     * currently-unpublished Human Readable Mark
+     *
+     * @param User $user
+     * @param bool $publishedOnly
+     * @return string
+     */
+    public function getHumanReadableMark(User $user, $publishedOnly)
+    {
+        // TODO: Implement getHumanReadableMark() method. This method gets the output from getNormalisedMark, then pipes that into the mark scheme (which doesn't yet exist on this class)
+        // return $this->getMark($user, $publishedOnly, false);
+
+        return 'TODO: Pass NormalisedMark value through MarkScheme';
+    }
+
+    /**
+     * Get the Normalised Mark value for a particular User
+     *
+     * Optionally get the Published Normalised Mark or the
+     * currently-unpublished Normalised Mark
+     *
+     * @param User $user
+     * @param bool $publishedOnly
+     * @return float|null
+     */
+    public function getNormalisedMark(User $user, $publishedOnly)
+    {
+        return $this->getMark($user, $publishedOnly, true);
+    }
+
+    /**
+     * Get the Mark for a particular User
+     *
+     * This is a macro method which can extract the normalised/human-readable
+     * versions of the Mark. Also accounts for whether the Mark was in a Feedback
+     * that was Published, or not.
+     *
+     * @param User $user
+     * @param $publishedOnly
+     * @param $normalised
+     * @return float|null|string
+     */
+    private function getMark(User $user, $publishedOnly, $normalised)
+    {
+        $participant = $this->getParticipant($user);
+
+        /* Get the Mark that was Published
          */
-        throw new \OutOfBoundsException();
+        if ($publishedOnly) {
+            $feedback = $participant->findMostRecentPublishedFeedback($this);
+        }
+        /* Otherwise just use the latest Feedback's current Mark value
+         */
+        else {
+            $feedback = $participant->findMostRecentFeedback($this);
+        }
+
+        /* If you're after the Normalised numeric mark
+         */
+        if ($normalised) {
+            if ($feedback) {
+                return $feedback->getNormalisedMark();
+            }
+        }
+
+        if ($feedback) {
+            return $feedback->getHumanReadableMark();
+        }
+
+        return '';
     }
 
     /* Traversals
@@ -131,7 +205,7 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      *
-     * @return mixed
+     * @return int
      */
     public function numParticipants()
     {
@@ -159,10 +233,8 @@ abstract class AbstractAssessment implements IAssessable
 
     /**
      * @inheritdoc
-     *
-     * @return int
      */
-    public function calculatePercentageMarked()
+    public function getPercentageMarked()
     {
         return 100 * ($this->numMarked() / $this->numParticipants());
     }
@@ -187,7 +259,7 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function calculatePercentagePublished()
+    public function getPercentagePublished()
     {
         return 100 * ($this->numPublished() / $this->numParticipants());
     }

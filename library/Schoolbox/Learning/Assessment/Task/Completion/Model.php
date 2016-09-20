@@ -27,7 +27,6 @@ class Model extends AbstractResponse
     }
 
     /* Tasks always return Null marks for Feedbacks
-     * Exclude the isNullMark() check for Tasks
      */
 
     /**
@@ -58,7 +57,7 @@ class Model extends AbstractResponse
 
             foreach ($this->getAllFeedback() as $currentFeedback) {
                 if ($currentFeedback->getPublishedAt()) {
-                    if ($currentFeedback->getPublishedAt()->gt($latest->getPublishedAt()) && !$currentFeedback->isNullMark()) {
+                    if ($currentFeedback->getPublishedAt()->gt($latest->getPublishedAt())) {
                         $latest = $currentFeedback;
                     }
                 }

@@ -17,11 +17,11 @@
 
 namespace Schoolbox\Learning\Assessment\Task;
 
+use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 
 class Model extends AbstractAssessment
 {
-
     /**
      * @inheritdoc
      *
@@ -30,5 +30,49 @@ class Model extends AbstractAssessment
     public function getTypeName()
     {
         return 'Task';
+    }
+
+    /**
+     * Get the Human Readable Mark value for a particular User
+     *
+     * Optionally get the Published Human Readable Mark or the
+     * currently-unpublished Human Readable Mark
+     *
+     * @param User $user
+     * @param bool $publishedOnly
+     * @return string
+     */
+    public function getHumanReadableMark(User $user, $publishedOnly)
+    {
+        $participant = $this->getParticipant($user);
+
+        /* Get the Mark that was Published
+         */
+        if ($publishedOnly) {
+            $feedback = $participant->findMostRecentPublishedFeedback($this);
+
+            if ($feedback) {
+                return 'Published Feedback Exists';
+            }
+        }
+        /* Otherwise just use the latest Feedback's current Mark value
+         */
+        else {
+            $feedback = $participant->findMostRecentFeedback($this);
+
+            if ($feedback) {
+                return 'Feedback Exists';
+            }
+        }
+
+        /* If there was no Feedback, then check for Completions
+         */
+        $responseCount = $participant->findAllResponsesForAssessable($this)->count();
+
+        if ($responseCount) {
+            return 'Response Exists';
+        }
+
+        return 'Incomplete';
     }
 }

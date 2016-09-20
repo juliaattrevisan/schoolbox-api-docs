@@ -27,15 +27,23 @@ class Model extends AbstractFeedback
     /**
      * Calculate the final mark for this IAssessable
      */
-    public function calculateMark()
+    public function getNormalisedMark()
     {
         $sum = 0;
+        $total = 0;
 
         foreach ($this->getAllResponses() as $currentResponse) {
             $sum += $currentResponse['mark'];
+            $total += $currentResponse['available'];
         }
 
-        return $sum;
+        /* No marks because no questions with mark values
+         */
+        if ($total == 0) {
+            return null;
+        }
+
+        return 100 * (float)$sum / (float)$total;
     }
 
     /* Getters/Setters

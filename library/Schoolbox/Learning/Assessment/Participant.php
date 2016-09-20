@@ -128,7 +128,9 @@ class Participant
      */
     public function isAssessableMarked(IAssessable $assessable)
     {
-        return $this->assessableFeedbackTraversal($assessable, self::TRAVERSAL_MARKED);
+        $outcome = $this->assessableFeedbackTraversal($assessable, self::TRAVERSAL_MARKED);
+
+        return $outcome !== null;
     }
 
     /**
@@ -139,10 +141,37 @@ class Participant
      */
     public function isAssessablePublished(IAssessable $assessable)
     {
+        $outcome = $this->assessableFeedbackTraversal($assessable, self::TRAVERSAL_PUBLISHED);
+
+        return $outcome !== null;
+    }
+
+    /**
+     * Find the most recent published IFeedback for an IAssessable for this Participant
+     *
+     * @param IAssessable $assessable
+     * @return null|IFeedback
+     */
+    public function findMostRecentPublishedFeedback(IAssessable $assessable)
+    {
         return $this->assessableFeedbackTraversal($assessable, self::TRAVERSAL_PUBLISHED);
     }
 
     /**
+     * Find the most recent IFeedback for an IAssessable for this Participant
+     *
+     * @param IAssessable $assessable
+     * @return null|IFeedback
+     */
+    public function findMostRecentFeedback(IAssessable $assessable)
+    {
+        return $this->assessableFeedbackTraversal($assessable, self::TRAVERSAL_MARKED);
+    }
+
+    /**
+     * Finds the latest Feedback which determined whether an IAssessable was
+     * marked or published based on the $type arg.
+     *
      * A unified traversal of Feedbacks for the $assessable for this Participant
      *
      * This should probably be rammed away into its own class, as there will be
@@ -150,11 +179,11 @@ class Participant
      *
      * @param IAssessable $assessable
      * @param $type
-     * @return bool
+     * @return IFeedback|null
      */
     private function assessableFeedbackTraversal(IAssessable $assessable, $type)
     {
-        $outcome = false;
+        $outcome = null;
 
         $numResponses = $this->findAllResponsesForAssessable($assessable)->count();
         $numFeedbacks = $this->findAllFeedbackForAssessable($assessable)->count();
@@ -162,17 +191,67 @@ class Participant
         /* No Responses, No Feedback >>> not marked
          */
         if (!$numResponses && !$numFeedbacks) {
-            $outcome = false;
+            $outcome = null;
         }
         /* At least one Response, No Feedback >>> not marked
          */
         elseif ($numResponses && !$numFeedbacks) {
-            $outcome = false;
+            $outcome = null;
         }
         /* No Responses, at least one Feedback >>> marked
          */
         elseif (!$numResponses && $numFeedbacks) {
-            $outcome = true;
+
+            /** @var IFeedback $latestFeedback */
+            $allFeedbacks = $this->findAllFeedbackForAssessable($assessable);
+            $latestFeedback = $allFeedbacks->first();
+
+            /* Compare to see whether $latestFeedback matches $type requirement
+             */
+            if ($type == self::TRAVERSAL_PUBLISHED) {
+                foreach ($allFeedbacks as $currentFeedback) {
+                    if ($currentFeedback->isPublished() && $currentFeedback->getPublishedAt()->gt($latestFeedback->getUpdatedAt())) {
+                        $latestFeedback = $currentFeedback;
+                    }
+                }
+
+                if ($latestFeedback->isPublished()) {
+                    return $latestFeedback;
+                }
+
+                return null;
+            }
+            else if ($type == self::TRAVERSAL_MARKED) {
+                foreach ($allFeedbacks as $currentFeedback) {
+
+                    /* In case publishAt is actually more recent than updatedAt value
+                     */
+                    $mostRecentDatetime = $latestFeedback->getUpdatedAt();
+
+                    /* Find the most recent datetime of $latestFeedback
+                     * by comparing its updatedAt to its publishedAt (if any)
+                     */
+                    if ($latestFeedback->isPublished() && $latestFeedback->getPublishedAt()->gt($latestFeedback->getUpdatedAt())) {
+                        $mostRecentDatetime = $latestFeedback->getPublishedAt();
+                    }
+
+                    /* Compare this datetime against currentFeedback's
+                     * publishAt and updatedAt to see which one is more recent
+                     */
+                    if ($currentFeedback->isPublished()) {
+                        if ($currentFeedback->getPublishedAt()->gt($mostRecentDatetime)) {
+                            $latestFeedback = $currentFeedback;
+                        }
+                    }
+                    else if ($currentFeedback->getUpdatedAt()->gt($mostRecentDatetime)) {
+                        $latestFeedback = $currentFeedback;
+                    }
+                }
+
+                return $latestFeedback;
+            }
+
+            return null;
         }
         /* Time to inspect the stacks
          */
@@ -196,28 +275,63 @@ class Participant
                 }
             }
 
-            /* Find the most recent Feedback
-             *
-             * @var IFeedback $currentFeedback
-             */
-            foreach ($allFeedbacks as $currentFeedback) {
-                if ($currentFeedback->getUpdatedAt()->gt($latestFeedback->getUpdatedAt())) {
-                    $latestFeedback = $currentFeedback;
-                }
-            }
-
-            /* Compare to see which one is the most recent action to occur
+            /* Find the most recent feedback
+             * Compare to see which one is the most recent action to occur
              */
             if ($type == self::TRAVERSAL_PUBLISHED) {
-                if ($latestFeedback->getUpdatedAt()->gt($latestResponse->getUpdatedAt()) && $latestFeedback->isPublished()) {
-                    $outcome = true;
+                foreach ($allFeedbacks as $currentFeedback) {
+                    if ($currentFeedback->isPublished()) {
+
+                        /* Look to the future!
+                         * Make sure this feedback is more recent than the previously-known latest feedback
+                         * Make sure this feedback is more recent than the response
+                         */
+                        if ($currentFeedback->getPublishedAt()->gt($latestFeedback->getPublishedAt()) && $currentFeedback->getPublishedAt()->gt($latestResponse->getUpdatedAt())) {
+                            $latestFeedback = $currentFeedback;
+                        }
+                    }
                 }
+
+                /* Check in case the first one is the most recent anyway
+                 * and that it is also actually published
+                 */
+                if ($latestFeedback->isPublished()) {
+                    return $latestFeedback;
+                }
+
+                return null;
             }
             else if ($type == self::TRAVERSAL_MARKED) {
-                if ($latestFeedback->getUpdatedAt()->gt($latestResponse->getUpdatedAt())) {
-                    $outcome = true;
+                foreach ($allFeedbacks as $currentFeedback) {
+
+                    /* In case publishAt is actually more recent than updatedAt value
+                     */
+                    $mostRecentDatetime = $latestFeedback->getUpdatedAt();
+
+                    /* Find the most recent datetime of $latestFeedback
+                     * by comparing its updatedAt to its publishedAt (if any)
+                     */
+                    if ($latestFeedback->isPublished() && $latestFeedback->getPublishedAt()->gt($latestFeedback->getUpdatedAt())) {
+                        $mostRecentDatetime = $latestFeedback->getPublishedAt();
+                    }
+
+                    /* Compare this datetime against currentFeedback's
+                     * publishAt and updatedAt to see which one is more recent
+                     */
+                    if ($currentFeedback->isPublished()) {
+                        if ($currentFeedback->getPublishedAt()->gt($mostRecentDatetime)) {
+                            $latestFeedback = $currentFeedback;
+                        }
+                    }
+                    elseif ($currentFeedback->getUpdatedAt()->gt($mostRecentDatetime)) {
+                        $latestFeedback = $currentFeedback;
+                    }
                 }
+
+                return $latestFeedback;
             }
+
+            return null;
         }
 
         return $outcome;

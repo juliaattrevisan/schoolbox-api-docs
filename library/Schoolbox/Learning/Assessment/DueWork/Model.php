@@ -11,8 +11,8 @@
 namespace Schoolbox\Learning\Assessment\DueWork;
 
 use \Schoolbox\Collection;
+use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
-use \Schoolbox\Learning\Assessment\Participant;
 
 class Model extends AbstractAssessment
 {
@@ -184,6 +184,7 @@ class Model extends AbstractAssessment
     {
         return $this->getHasRubric();
     }
+
 
     /* Getters/Setters
      */
