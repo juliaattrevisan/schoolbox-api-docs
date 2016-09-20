@@ -255,7 +255,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(83.75, $project->getNormalisedMark($this->hodes, true));
 
         /* Most Recent Average is
-         *      = [98 + 77 + 100 + (100 * 12/20)] / 3
+         *      = [98 + 77 + 100 + (100 * 12/20)] / 4
          *      = [275 + 60] / 4
          *      = 83.75
          */
