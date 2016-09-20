@@ -31,6 +31,13 @@ class AbstractFeedback implements IFeedback
     protected $assessable;
 
     /**
+     * The IResponse to which this Feedback relates
+     *
+     * @var IResponse|null
+     */
+    private $response;
+
+    /**
      * Mark given to this Assessable
      *
      * @var string
@@ -189,6 +196,24 @@ class AbstractFeedback implements IFeedback
     public function setAssessable($assessable)
     {
         $this->assessable = $assessable;
+        return $this;
+    }
+
+    /**
+     * @return IResponse
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+    /**
+     * @param IResponse $response
+     * @return static
+     */
+    public function setResponse($response)
+    {
+        $this->response = $response;
         return $this;
     }
 }
