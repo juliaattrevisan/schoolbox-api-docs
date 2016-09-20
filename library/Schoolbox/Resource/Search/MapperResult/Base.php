@@ -10,11 +10,16 @@
 
 namespace Schoolbox\Resource\Search\MapperResult;
 
+use CallbackFilterIterator;
+use IteratorIterator;
+use LimitIterator;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Search\Sanitiser;
 use Schoolbox\User;
+use Traversable;
 
 abstract class Base
 {
@@ -104,6 +109,57 @@ abstract class Base
      * @return int
      */
     abstract protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser);
+
+    /**
+     * Builds a paged result set, filtered by whether $user can view it.
+     *
+     * @param Traversable $rawResult    The raw result set
+     * @param User        $user         The user that is viewing the result
+     * @param string      $folderColumn The column in $rawResult rows which contains the folder ID
+     * @param int         $offset       The number of results to offset by
+     * @param int         $limit        The max number of results to retrieve
+     * @return LimitIterator
+     */
+    protected function buildSearchResult(Traversable $rawResult, User $user, $folderColumn, $offset, $limit)
+    {
+        return new LimitIterator($this->buildFilteredResult($rawResult, $user, $folderColumn), $offset, $limit);
+    }
+
+    /**
+     * Determines the total number of results in a result set that are viewable by $user.
+     *
+     * @param Traversable $rawResult    The raw result set
+     * @param User        $user         The user that is viewing the result
+     * @param string      $folderColumn The column in $rawResult rows which contains the folder ID
+     * @return int
+     */
+    protected function buildSearchCount(Traversable $rawResult, User $user, $folderColumn)
+    {
+        $count = 0;
+        // Sadly CallbackFilterIterator isn't countable, so count manually
+        foreach ($this->buildFilteredResult($rawResult, $user, $folderColumn) as $blah) {
+            $count++;
+        }
+        return $count;
+    }
+
+    /**
+     * Builds a filtered result set, which returns only results viewable by a user.
+     *
+     * @param Traversable $rawResult    The raw result set
+     * @param User        $user         The user that is viewing the result
+     * @param string      $folderColumn The column in $rawResult rows which contains the folder ID
+     * @return CallbackFilterIterator
+     */
+    protected function buildFilteredResult(Traversable $rawResult, User $user, $folderColumn)
+    {
+        return new CallbackFilterIterator(
+            new IteratorIterator($rawResult),
+            function ($row) use ($user, $folderColumn) {
+                return $this->getAccessor()->getFolderAccess($user, [$row[$folderColumn]]) > UserAccess::ACCESS_DENY;
+            }
+        );
+    }
 
     /* Getters/Setters
      */

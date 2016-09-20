@@ -62,19 +62,7 @@ class Result extends Base
 
         $collection = $mapper->createCollection();
 
-        // Experimental iterator
-        $result = new \LimitIterator(
-            new \CallbackFilterIterator(
-                new \IteratorIterator($stmt),
-                function ($row) use ($user) {
-                    return $this->getAccessor()->getFolderAccess($user, [$row['c.id']]);
-                }
-            ),
-            $sanitiser->getOffset(),
-            $sanitiser->getLimit()
-        );
-
-        foreach ($result as $row) {
+        foreach ($this->buildSearchResult($stmt, $user, 'c.id', $sanitiser->getOffset(), $sanitiser->getLimit()) as $row) {
             $file = $mapper->hydrate($row, 'f');
             $storage = $mapper->hydrateJoin($row, 'hash', 's');
             $mime = $mapper->getJoinMapper('hash')->hydrateJoin($row, 'allowedFileExtension', 'e');
@@ -124,17 +112,6 @@ class Result extends Base
             'user_id' => $user->getId()
         ));
 
-        // Experimental iterator
-        $count  = 0;
-        $result = new \CallbackFilterIterator(
-            new \IteratorIterator($stmt),
-            function ($row) use ($user) {
-                return $this->getAccessor()->getFolderAccess($user, [$row['c.id']]);
-            }
-        );
-        foreach ($result as $row) {
-            $count++;
-        }
-        return $count;
+        return $this->buildSearchCount($stmt, $user, 'c.id');
     }
 }
