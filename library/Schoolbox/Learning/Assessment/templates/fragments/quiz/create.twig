@@ -1,29 +1,27 @@
-<fieldset class="content">
-    <div class="small-12 columns">
-        <label>Max Attempts
-            <select name="max-attempts" id="max-attempts">
-                <option data-slug="{{ option.slug }}" value="{{ descriptor.value }}" {{ descriptor.value.selected }}>{{ attempts.text }}</option>
-            </select>
+<div class="small-12 columns">
+    <label>Max Attempts
+        <select name="max-attempts" id="max-attempts">
+            <option data-slug="{{ option.slug }}" value="{{ descriptor.value }}" {{ descriptor.value.selected }}>{{ attempts.text }}</option>
+        </select>
+    </label>
+</div>
+<div class="small-4 columns">
+    <label for="duration">Duration</label>
+    <div class="switch round">
+        <input id="duration" type="checkbox" checked data-checkbox-group="duration" />
+        <label for="duration">
+            <span class="icon-approve"></span>
+            <span class="icon-cancel"></span>
         </label>
     </div>
-    <div class="small-4 columns">
-        <label for="duration">Duration</label>
-        <div class="switch round">
-            <input id="duration" type="checkbox" checked data-checkbox-group="duration" />
-            <label for="duration">
-                <span class="icon-approve"></span>
-                <span class="icon-cancel"></span>
-            </label>
-        </div>
-    </div>
-    <div class="small-4 columns">
-        <label>Hours
-            <input type="text" placeholder="Duration Hours">
-        </label>
-    </div>
-    <div class="small-4 columns">
-        <label>Minutes
-            <input type="text" placeholder="Duration Minutes">
-        </label>
-    </div>
-</fieldset>
+</div>
+<div class="small-4 columns">
+    <label>Hours
+        <input type="text" placeholder="Duration Hours">
+    </label>
+</div>
+<div class="small-4 columns">
+    <label>Minutes
+        <input type="text" placeholder="Duration Minutes">
+    </label>
+</div>

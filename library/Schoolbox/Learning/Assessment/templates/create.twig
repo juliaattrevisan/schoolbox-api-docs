@@ -36,23 +36,31 @@
         $('input[data-mage-next="part-2"]').mage({
             onXhrDone: function (data) {
 
+                /**
+                 * Update the heading and perform transitions
+                 *
+                 * @param type
+                 * @param selected
+                 */
+                function updateType(type, selected) {
+                    $('#assessmentType').text($('#assessmentType').text() + ': ' + type);
+
+                    var next = $('[data-mage="part-2-'+selected+'"]');
+                    next.removeAttr('disabled').removeClass('hide');
+                    next.find('[data-mage-collapsed]').hide().removeClass('hide').slideDown(600);
+                }
+
                 /* Switch between the Assessable types that you might
                  * have selected from part-1
                  */
                 var selected = $('#assessmentForm').find('input[name=assessmentType]:checked').val();
 
                 switch(selected) {
-                    case 'project':
-                    case 'dueWork':
-                    case 'quiz':
-                    case 'task':
-                        var next = $('[data-mage="part-2-'+selected+'"]');
-                        next.removeAttr('disabled').removeClass('hide');
-                        next.find('[data-mage-collapsed]').hide().removeClass('hide').slideDown(600);
-                        break;
-
-                    default:
-                        break;
+                    case 'project': updateType('Project', selected); break;
+                    case 'dueWork': updateType('Due Work', selected); break;
+                    case 'quiz': updateType('Quiz', selected); break;
+                    case 'task': updateType('Task', selected); break;
+                    default: break;
                 }
             }
         });
@@ -191,36 +199,28 @@
                 </fieldset>
 
                 <fieldset class="content">
-                    <legend>Assessment Type</legend>
+                    <legend id="assessmentType">Assessment Type</legend>
 
-                    <div class="small-12 column hide" data-mage="part-2-project">
+                    <div class="hide" data-mage="part-2-project">
                         <div data-mage-collapsed>
-                            <h2>Project</h2>
-
                             {% include '@learningAssessment/fragments/project/create.twig' %}
                         </div>
                     </div>
 
-                    <div class="small-12 column hide" data-mage="part-2-dueWork">
+                    <div class="hide" data-mage="part-2-dueWork">
                         <div data-mage-collapsed>
-                            <h2>Due Work</h2>
-
                             {% include '@learningAssessment/fragments/duework/create.twig' %}
                         </div>
                     </div>
 
-                    <div class="small-12 column hide" data-mage="part-2-task">
+                    <div class="hide" data-mage="part-2-task">
                         <div data-mage-collapsed>
-                            <h2>Task</h2>
-
                             {% include '@learningAssessment/fragments/task/create.twig' %}
                         </div>
                     </div>
 
-                    <div class="small-12 column hide" data-mage="part-2-quiz">
+                    <div class="hide" data-mage="part-2-quiz">
                         <div data-mage-collapsed>
-                            <h2>Quiz</h2>
-
                             {% include '@learningAssessment/fragments/quiz/create.twig' %}
                         </div>
                     </div>
