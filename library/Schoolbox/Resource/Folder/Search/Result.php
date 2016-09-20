@@ -46,7 +46,7 @@ class Result extends Base
             LEFT JOIN {$mapper->getJoinSql('homepages', 'c', 'hp')}
             WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
             AND   `c`.`deleted_at` IS NULL
-			ORDER BY {$sanitiser->getSortByWithAlias('c')} {$sanitiser->getSortDir()}
+            ORDER BY {$sanitiser->getSortByWithAlias('c')} {$sanitiser->getSortDir()}
         ";
 
         $statement = $mapper->getDatabase()->prepare($query);
@@ -99,13 +99,13 @@ class Result extends Base
     protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         $query = "
-			SELECT id
+            SELECT id
             FROM {$mapper->getTable()} c
             LEFT JOIN {$mapper->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$mapper->getJoinSql('homepages', 'c', 'hp')}
             WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
             AND   `c`.`deleted_at` IS NULL
-		";
+        ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
         $stmt->execute([

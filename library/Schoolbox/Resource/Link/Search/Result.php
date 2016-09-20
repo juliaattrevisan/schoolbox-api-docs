@@ -32,20 +32,20 @@ class Result extends Base
     protected function executeSearch(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         $query = "
-			SELECT
-				{$mapper->getColumnString('l')},
-				{$mapper->getJoinMapper('user')->getColumnString('u')},
-				{$mapper->getJoinMapper('folder')->getColumnString('c')},
-				MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()}) AS `score`
-			FROM
-				`{$mapper->getTable()}` `l`
-				LEFT JOIN {$mapper->getJoinSql('user', 'l', 'u')}
-				INNER JOIN {$mapper->getJoinSql('folder', 'l', 'c')}
-			WHERE
-				l.deleted_at IS NULL
-				AND MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()})
-			ORDER BY {$sanitiser->getSortByWithAlias('l')} {$sanitiser->getSortDir()}
-		";
+            SELECT
+                {$mapper->getColumnString('l')},
+                {$mapper->getJoinMapper('user')->getColumnString('u')},
+                {$mapper->getJoinMapper('folder')->getColumnString('c')},
+                MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()}) AS `score`
+            FROM
+                `{$mapper->getTable()}` `l`
+                LEFT JOIN {$mapper->getJoinSql('user', 'l', 'u')}
+                INNER JOIN {$mapper->getJoinSql('folder', 'l', 'c')}
+            WHERE
+                l.deleted_at IS NULL
+                AND MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()})
+            ORDER BY {$sanitiser->getSortByWithAlias('l')} {$sanitiser->getSortDir()}
+        ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
         $stmt->execute();
@@ -76,16 +76,16 @@ class Result extends Base
     protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         $query = "
-			SELECT
-				category
-			FROM
-				`{$mapper->getTable()}` `l`
-				LEFT JOIN {$mapper->getJoinSql('user', 'l', 'u')}
-				INNER JOIN {$mapper->getJoinSql('folder', 'l', 'c')}
-			WHERE
-				l.deleted_at IS NULL
-				AND MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()})
-		";
+            SELECT
+                category
+            FROM
+                `{$mapper->getTable()}` `l`
+                LEFT JOIN {$mapper->getJoinSql('user', 'l', 'u')}
+                INNER JOIN {$mapper->getJoinSql('folder', 'l', 'c')}
+            WHERE
+                l.deleted_at IS NULL
+                AND MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()})
+        ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
         $stmt->execute();

@@ -32,25 +32,25 @@ class Result extends Base
     protected function executeSearch(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         $query = "
-			SELECT
-			    {$mapper->getColumnString('f')},
-			    {$mapper->getJoinColumnString('hash', 's')},
-			    {$mapper->getJoinMapper('hash')->getJoinColumnString('allowedFileExtension', 'e')},
+            SELECT
+                {$mapper->getColumnString('f')},
+                {$mapper->getJoinColumnString('hash', 's')},
+                {$mapper->getJoinMapper('hash')->getJoinColumnString('allowedFileExtension', 'e')},
                 {$mapper->getJoinColumnString('owner', 'o')},
-				{$mapper->getJoinColumnString('category', 'c')},
-				MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()}) AS `score`
-			FROM
-				`{$mapper->getTable()}` `f`
-				LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
-				LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
-				LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
-				INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
-			WHERE
-				f.deleted_at IS NULL
-				AND f.hidden IS FALSE
-				AND MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()})
-			ORDER BY {$sanitiser->getSortByWithAlias('f')} {$sanitiser->getSortDir()}
-		";
+                {$mapper->getJoinColumnString('category', 'c')},
+                MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()}) AS `score`
+            FROM
+                `{$mapper->getTable()}` `f`
+                LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
+                LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
+                LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
+                INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
+            WHERE
+                f.deleted_at IS NULL
+                AND f.hidden IS FALSE
+                AND MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()})
+            ORDER BY {$sanitiser->getSortByWithAlias('f')} {$sanitiser->getSortDir()}
+        ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
         $stmt->execute();
@@ -85,19 +85,19 @@ class Result extends Base
     protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         $query = "
-			SELECT
-				c.id
-			FROM
-				`{$mapper->getTable()}` `f`
-				LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
-				LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
-				LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
-				INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
-			WHERE
-				f.deleted_at IS NULL
-				AND f.hidden IS FALSE
-				AND MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()})
-		";
+            SELECT
+                c.id
+            FROM
+                `{$mapper->getTable()}` `f`
+                LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
+                LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
+                LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
+                INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
+            WHERE
+                f.deleted_at IS NULL
+                AND f.hidden IS FALSE
+                AND MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()})
+        ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
         $stmt->execute();
