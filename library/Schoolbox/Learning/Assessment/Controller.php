@@ -127,6 +127,8 @@ class Controller extends Base
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
 
+        $dueWork = new DueWork();
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
             'assessment' => $dueWork
         ]));

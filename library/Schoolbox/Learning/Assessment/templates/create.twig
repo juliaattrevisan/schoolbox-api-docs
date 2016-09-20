@@ -65,7 +65,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Publish Date
-                            <input type="text" data-datepicker placeholder="Publish Date" value="{{ assessment.publishAt.localShort }}" />
+                            <input type="text" data-datepicker value="{{ assessment.publishAt.localShort }}" />
                         </label>
                     </div>
 
@@ -73,7 +73,7 @@
                         <div class="timepick">
                             <label>
                                 Publish Time
-                                <input type="text" data-timepicker placeholder="Publish Time" value="{{ assessment.publishAt.timeOnly }}" />
+                                <input type="text" data-timepicker value="{{ assessment.publishAt.timeOnly }}" />
                             </label>
                         </div>
                     </div>
@@ -81,7 +81,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Commencement Date
-                            <input data-datepicker type="text" autocomplete="off" placeholder="Commencement Date" value="{{ assessment.openAt.localShort }}" />
+                            <input data-datepicker type="text" autocomplete="off" value="{{ assessment.openAt.localShort }}" />
                         </label>
                     </div>
 
@@ -89,7 +89,7 @@
                         <div class="timepick">
                             <label>
                                 Commencement Time
-                                <input data-timepicker type="text" autocomplete="off" placeholder="Commencement Time" value="{{ assessment.openAt.timeOnly }}" />
+                                <input data-timepicker type="text" autocomplete="off" value="{{ assessment.openAt.timeOnly }}" />
                             </label>
                         </div>
                     </div>
@@ -97,7 +97,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Due Date
-                            <input data-datepicker type="text" autocomplete="off" placeholder="Due Date" value="{{ assessment.dueAt.localShort }}" />
+                            <input data-datepicker type="text" autocomplete="off" value="{{ assessment.dueAt.localShort }}" />
                         </label>
                     </div>
 
@@ -105,7 +105,7 @@
                         <div class="timepick">
                             <label>
                                 Due Time
-                                <input data-timepicker type="text" autocomplete="off" placeholder="Due Time" value="{{ assessment.dueAt.timeOnly }}" />
+                                <input data-timepicker type="text" autocomplete="off" value="{{ assessment.dueAt.timeOnly }}" />
                             </label>
                         </div>
                     </div>
@@ -113,7 +113,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Close Date
-                            <input data-datepicker type="text" autocomplete="off" placeholder="Close Date" value="{{ assessment.closeAt.localShort }}" />
+                            <input data-datepicker type="text" autocomplete="off" value="{{ assessment.closeAt.localShort }}" />
                         </label>
                     </div>
 
@@ -121,7 +121,7 @@
                         <div class="timepick">
                             <label>
                                 Close Time
-                                <input data-timepicker type="text" autocomplete="off" placeholder="Close Time" value="{{ assessment.closeAt.timeOnly }}" />
+                                <input data-timepicker type="text" autocomplete="off" value="{{ assessment.closeAt.timeOnly }}" />
                             </label>
                         </div>
                     </div>
@@ -129,15 +129,18 @@
                 <fieldset class="content">
                     <div class="column small-12">
                         <label>Curriculum Codes</label>
-                        <input id='user' name="userId" type='text' value='' placeholder="Curriculum Codes" data-selectizeuser required />
+                        <input id='user' name="userId" type='text' value='' data-selectizeuser required />
                     </div>
                 </fieldset>
-                <fieldset class="content">
+                <fieldset class="radiolist">
                     <legend>Type</legend>
-                    <input type="radio" name="project" value="Project" id="project" checked><label for="project">Project</label>
-                    <input type="radio" name="due-work" value="Due Work" id="due-work"><label for="due-work">Due Work</label>
-                    <input type="radio" name="quiz" value="Quiz" id="quiz" disabled><label for="quiz">Quiz</label>
-                    <input type="radio" name="task" value="Task" id="task" disabled><label for="task">Task</label>
+
+                    <div class="column small-12">
+                        <input type="radio" name="assessmentType" value="project" id="project"><label for="project" class="radio-label">Project</label>
+                        <input type="radio" name="assessmentType" value="dueWork" id="due-work"><label for="due-work" class="radio-label">Due Work</label>
+                        <input type="radio" name="assessmentType" value="quiz" id="quiz"><label for="quiz" class="radio-label">Quiz</label>
+                        <input type="radio" name="assessmentType" value="task" id="task"><label for="task" class="radio-label">Task</label>
+                    </div>
                 </fieldset>
             </section>
             <div class="row">
