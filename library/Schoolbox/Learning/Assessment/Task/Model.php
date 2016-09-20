@@ -96,4 +96,14 @@ class Model extends AbstractAssessment
     {
         return null;
     }
+
+    /**
+     * Tasks do not have any weight.
+     *
+     * @return int
+     */
+    public function getWeight()
+    {
+        return 0;
+    }
 }
