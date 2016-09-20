@@ -53,84 +53,8 @@ class Controller extends Base
      */
     public function getCreateAssessment()
     {
-
-        /* Dudes
-         */
-        $this->hodes = (new User)->setId(230)->setFirstname('David')->setLastname('Rhodes');
-        $this->sberryhill = (new User)->setId(15)->setFirstname('Scott')->setLastname('Berryhill');
-        $this->slucier = (new User)->setId(16)->setFirstname('Sam')->setLastname('Lucier');
-        $this->bsalem = (new User)->setId(32)->setFirstname('Bobby')->setLastname('Salem');
-        $this->asaxon = (new User)->setId(17)->setFirstname('Anita')->setLastname('Saxon');
-        $this->celia = (new User)->setId(3)->setFirstname('Celia')->setLastname('Glenn');
-        $this->somodio = (new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio');
-
-        /* Times
-         */
-        $dateFormat = 'Y-m-d H:i:s';
-        $dateInit = '2016-09-08 11:30:00';
-
-        $this->today = new \Alaress_Date_Format($dateInit, $dateFormat);
-        $this->tomorrow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1);
-        $this->thirteenDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(13);
-        $this->fourteenDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(14);
-        $this->twentyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(20);
-        $this->thirtyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(30);
-        $this->fortyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(40);
-        $this->fiftyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(50);
-        $this->sixtyDaysFromNow = (new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(60);
-
-        $id = 2;
-        $title = 'Enter the Realm of Terroarrrr';
-        $description = 'Diablo was found in the land of terroarrrrr! Find him, and whack him!';
-        $typeName = 'Essay';
-
-        $files = [
-            [
-                'id' => 1,
-                'hash' => 'abcdefg12341234',
-                'filename' => 'myfile1.jpg'
-            ],
-            [
-                'id' => 2,
-                'hash' => 'zxvzxcvzxcv945786947',
-                'filename' => 'myfile2.jpg'
-            ],
-        ];
-
-        $dueWork = new DueWork();
-        $dueWork
-            ->setId($id)
-            ->setTitle($title)
-            ->setDescription($description)
-            ->setType((new DueWorkType())
-                ->setId(1)
-                ->setName($typeName))
-            ->setCreator($_SESSION['user'])
-            ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
-            ->setAllFiles((new Collection())
-                ->add((new DueWorkFile())
-                    ->setId($files[0]['id'])
-                    ->setHash($files[0]['hash'])
-                    ->setFilename($files[0]['filename']))
-                ->add((new DueWorkFile())
-                    ->setId($files[1]['id'])
-                    ->setHash($files[1]['hash'])
-                    ->setFilename($files[1]['filename'])))
-            ->setPublishAt($this->thirteenDaysFromNow)
-            ->setOpenAt($this->fourteenDaysFromNow)
-            ->setDueAt($this->twentyDaysFromNow)
-            ->setCloseAt($this->thirtyDaysFromNow)
-            ->setCreatedAt($this->today)
-            ->setUpdatedAt($this->today);
-
-        $dueWork = new DueWork();
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
-            'assessment' => $dueWork
+            'assessment' => new DueWork()
         ]));
     }
 
