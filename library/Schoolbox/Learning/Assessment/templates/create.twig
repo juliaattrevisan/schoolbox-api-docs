@@ -25,13 +25,47 @@
     });
 </script>
 
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
+<script type="text/javascript">
+    $(function () {
+        // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
+        $('input[data-mage-next]').mage();
+
+        // overload with specific callbacks (or other config values)
+        $('input[data-mage-next="part-2"]').mage({
+            onXhrDone: function (data) {
+
+                /* Switch between the Assessable types that you might
+                 * have selected from part-1
+                 */
+                var selected = $('#assessmentForm').find('input[name=assessmentType]:checked').val();
+
+                switch(selected) {
+                    case 'project':
+                    case 'dueWork':
+                    case 'quiz':
+                    case 'task':
+                        var next = $('[data-mage="part-2-'+selected+'"]');
+                        next.removeAttr('disabled').removeClass('hide');
+                        next.find('[data-mage-collapsed]').hide().removeClass('hide').slideDown(600);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        });
+    });
+</script>
+
 <div class="row">
     <div class="small-12 columns"><h1>Create Assessment</h1></div>
 </div>
 
 <div class="row">
     <div class="small-12 columns island">
-        <form action="#">
+        <form action="#" id="assessmentForm">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -132,22 +166,98 @@
                         <input id='user' name="userId" type='text' value='' data-selectizeuser required />
                     </div>
                 </fieldset>
-                <fieldset class="radiolist">
+                <fieldset class="content">
                     <legend>Type</legend>
 
+                    <fieldset class="radiolist" data-assessment-type>
+                        <div class="column small-12">
+                            <input type="radio" name="assessmentType" value="project" id="project"><label for="project" class="radio-label">Project</label>
+                            <input type="radio" name="assessmentType" value="dueWork" id="due-work"><label for="due-work" class="radio-label">Due Work</label>
+                            <input type="radio" name="assessmentType" value="quiz" id="quiz"><label for="quiz" class="radio-label">Quiz</label>
+                            <input type="radio" name="assessmentType" value="task" id="task"><label for="task" class="radio-label">Task</label>
+                        </div>
+                    </fieldset>
+
                     <div class="column small-12">
-                        <input type="radio" name="assessmentType" value="project" id="project"><label for="project" class="radio-label">Project</label>
-                        <input type="radio" name="assessmentType" value="dueWork" id="due-work"><label for="due-work" class="radio-label">Due Work</label>
-                        <input type="radio" name="assessmentType" value="quiz" id="quiz"><label for="quiz" class="radio-label">Quiz</label>
-                        <input type="radio" name="assessmentType" value="task" id="task"><label for="task" class="radio-label">Task</label>
+                        <div class="row" data-mage-submitrow>
+                            <div class="small-12 medium-8 column">
+                                <p class="alert alert-box icon-alert" data-mage-error></p>
+                            </div>
+                            <div class="small-12 medium-4 column">
+                                <input type="submit" name="part-1" value="Next" data-mage-next="part-2" data-mage-working="Working..." />
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <legend>Assessment Type</legend>
+
+                    <div class="small-12 column hide" data-mage="part-2-project">
+                        <div data-mage-collapsed>
+                            <p>Project Screen</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                        </div>
+                    </div>
+
+                    <div class="small-12 column hide" data-mage="part-2-dueWork">
+                        <div data-mage-collapsed>
+                            <p>DueWork Screen</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                        </div>
+                    </div>
+
+                    <div class="small-12 column hide" data-mage="part-2-task" data-mage-collapsed>
+                        <div data-mage-collapsed>
+                            <p>Task Screen</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                        </div>
+                    </div>
+
+                    <div class="small-12 column hide" data-mage="part-2-quiz" data-mage-collapsed>
+                        <div data-mage-collapsed>
+                            <p>Quiz Screen</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                            <p>Lorem ipsum dolor sit amet</p>
+                        </div>
                     </div>
                 </fieldset>
             </section>
-            <div class="row">
-                <div class="small-12 column">
-                    <input type="submit" name="submit" value="Next" />
-                </div>
-            </div>
         </form>
     </div>
 </div>
