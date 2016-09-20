@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Course\Unit;
 
+use Schoolbox\Collection;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
@@ -53,6 +54,20 @@ class SpecificationMapperProxy
     }
 
     /**
+     * Proxy for `Mapper->findByCourseId()`.
+     *
+     * @param int $courseId
+     * @param array $options
+     * @return Specification[]|Collection
+     */
+    public function findByCourseId($courseId, $options = [])
+    {
+        return $this->mapper
+            ->findByCourseId($courseId, $options)
+            ->map([$this->translator, 'translateToDomainModel']);
+    }
+
+    /**
      * Proxy for `Mapper->save()`.
      *
      * @param Specification       $specification
@@ -72,14 +87,14 @@ class SpecificationMapperProxy
     /**
      * Proxy for `Mapper->delete()`.
      *
-     * @param Specification       $specification
-     * @param CourseSpecification $courseSpecification The course spec which contains $specification
+     * @param Specification $specification
      * @return Specification
      */
-    public function delete(Specification $specification, CourseSpecification $courseSpecification)
+    public function delete(Specification $specification)
     {
         // Convert to data model, then delete
-        $dataModel = $this->translator->translateToDataModel($specification, $courseSpecification);
+        // Don't need an intricate course spec
+        $dataModel = $this->translator->translateToDataModel($specification, new CourseSpecification());
         $this->mapper->delete($dataModel);
         return $specification;
     }

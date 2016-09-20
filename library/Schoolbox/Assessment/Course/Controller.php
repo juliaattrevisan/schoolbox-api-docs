@@ -2274,14 +2274,16 @@ class Controller extends Base\Base
     {
         // TODO: make delete of folder and course atomic
 
-        $courseSpec     = $this->getCourseSpecificationMapperProxy()->findById($id);
-        $unitSpecModels = $this->getUnitSpecificationMapper()->findByCourseId($id);
+        $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($id);
+        $unitSpecs  = $this->getUnitSpecificationMapperProxy()->findByCourseId($id);
 
         // Delete course specs
         $this->getCourseSpecificationMapperProxy()->delete($courseSpec);
 
         // Delete constituent units
-        $this->getUnitSpecificationMapper()->delete($unitSpecModels);
+        foreach ($unitSpecs as $unitSpec) {
+            $this->getUnitSpecificationMapperProxy()->delete($unitSpec);
+        }
 
         /** @var Folder\Controller $folderController */
         $folderController = $this->getController('folder');
@@ -2300,14 +2302,14 @@ class Controller extends Base\Base
     {
         // TODO: make delete of folder and unit atomic
 
-        $unitSpecModel = $this->getUnitSpecificationMapper()->findById($id);
+        $unitSpec = $this->getUnitSpecificationMapperProxy()->findById($id);
 
         // Delete unit spec
-        $this->getUnitSpecificationMapper()->delete($unitSpecModel);
+        $this->getUnitSpecificationMapperProxy()->delete($unitSpec);
 
         /** @var Folder\Controller $folderController */
         $folderController = $this->getController('folder');
-        $folderController->recursiveDelete($unitSpecModel->getFolder()->getId(), $this->getUser());
+        $folderController->recursiveDelete($unitSpec->getFolder()->getId(), $this->getUser());
     }
 
     /**
