@@ -247,12 +247,12 @@ interface IAssessable
     public function setCloseAt($closeAt);
 
     /**
-     * Quiz    - all marks available in all sections
-     * DueWork - max mark
+     * Quiz    - float: all marks available in all sections
+     * DueWork - int: max mark
      * Task    - null
      * Project - null
      *
-     * @return float|null
+     * @return float|int|null
      */
     public function getMaxMark();
 

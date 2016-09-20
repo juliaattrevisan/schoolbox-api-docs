@@ -72,7 +72,7 @@ class Model extends AbstractAssessment
     /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
      *
-     * @var float
+     * @var $int
      */
     private $maxMark;
 
@@ -287,7 +287,7 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @return float
+     * @return int
      */
     public function getMaxMark()
     {
@@ -295,7 +295,7 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @param float $maxMark
+     * @param int $maxMark
      * @return static
      */
     public function setMaxMark($maxMark)
