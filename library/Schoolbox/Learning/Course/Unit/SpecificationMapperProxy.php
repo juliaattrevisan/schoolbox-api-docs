@@ -68,6 +68,34 @@ class SpecificationMapperProxy
     }
 
     /**
+     * Proxy for `Mapper->findByFolderId()`.
+     *
+     * @param int $folderId
+     * @param array $options
+     * @return Specification[]|Collection
+     */
+    public function findByFolderId($folderId, $options = [])
+    {
+        return $this->mapper
+            ->findByFolderId($folderId, $options)
+            ->map([$this->translator, 'translateToDomainModel']);
+    }
+
+    /**
+     * Proxy for `Mapper->findByCourseFolderId()`.
+     *
+     * @param int $courseFolderId
+     * @param array $options
+     * @return Specification[]|Collection
+     */
+    public function findByCourseFolderId($courseFolderId, $options = [])
+    {
+        return $this->mapper
+            ->findByCourseFolderId($courseFolderId, $options)
+            ->map([$this->translator, 'translateToDomainModel']);
+    }
+
+    /**
      * Proxy for `Mapper->save()`.
      *
      * @param Specification       $specification

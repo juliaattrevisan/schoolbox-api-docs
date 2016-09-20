@@ -1178,7 +1178,7 @@ class Controller extends Base\Base
             'homepage'       => implode(',', array_keys($ownerships)),
             'courseHomepage' => $courseHomepage,
             'componentId'    => $componentId,
-            'units'          => $this->getUnitSpecificationMapper()->findByCourseFolderId($courseHomepage),
+            'units'          => $this->getUnitSpecificationMapperProxy()->findByCourseFolderId($courseHomepage),
             'ownerships'     => implode(',', array_map(
                     function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
             )
@@ -1314,11 +1314,11 @@ class Controller extends Base\Base
         foreach ($unitDates as $unit) {
             if ($unit['import'] && !isset($unitCache[$unit['unit_id']])) {
                 try {
-                    $u = $this->getUnitSpecificationMapper()->findByFolderId($unit['unit_id']);
+                    $u = $this->getUnitSpecificationMapperProxy()->findByFolderId($unit['unit_id']);
                 } catch (MapperException\Deleted $e) {
                     // ignore deletions here; the assumption is that any unit passed into here is legit. If you modify a class import and
                     // any source units have been deleted, their existence still needs to be honoured.
-                    $u = $e->getDeletedObject();
+                    $u = $this->getUnitSpecificationTranslator()->translateToDomainModel($e->getDeletedObject());
                 }
                 $unitCache[$unit['unit_id']] = $u;
             }
