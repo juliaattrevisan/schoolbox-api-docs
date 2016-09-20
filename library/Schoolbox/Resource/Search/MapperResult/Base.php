@@ -12,6 +12,7 @@ namespace Schoolbox\Resource\Search\MapperResult;
 
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Search\Sanitiser;
 use Schoolbox\User;
 
@@ -33,11 +34,22 @@ abstract class Base
     protected $count = 0;
 
     /**
-     * Constructor
+     * The object that is used to determine whether a user has access to a resource.
+     *
+     * @var Access
      */
-    public function __construct()
+    protected $accessor;
+
+    /**
+     * Constructor
+     *
+     * @param Access $accessor
+     */
+    public function __construct(Access $accessor = null)
     {
         $this->setResult(new Collection());
+        // TODO make $accessor injection mandatory
+        $this->setAccessor(($accessor instanceof Access) ? $accessor : Access::getInstance());
     }
 
     /**
@@ -134,5 +146,23 @@ abstract class Base
     public function getResult()
     {
         return $this->result;
+    }
+
+    /**
+     * @return Access
+     */
+    public function getAccessor()
+    {
+        return $this->accessor;
+    }
+
+    /**
+     * @param Access $accessor
+     * @return static
+     */
+    public function setAccessor($accessor)
+    {
+        $this->accessor = $accessor;
+        return $this;
     }
 }
