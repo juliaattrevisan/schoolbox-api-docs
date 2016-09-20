@@ -297,8 +297,7 @@ class Controller extends Base\Base
 
                 // Populate units
                 $course->setUnits(
-                    $this->getUnitSpecificationMapper()->findByCourseId($course->getId(), ['order' => ['f.name' => 'asc']])
-                         ->map([$this->getUnitSpecificationTranslator(), 'translateToDomainModel'])
+                    $this->getUnitSpecificationMapperProxy()->findByCourseId($course->getId(), ['order' => ['f.name' => 'asc']])
                 );
 
             } catch (MapperException $e) {
@@ -405,8 +404,7 @@ class Controller extends Base\Base
         $course = $this->getCourseSpecificationMapperProxy()->findById($post['id']);
         // TODO: figure out if course should load units by default
         $course->setUnits(
-            $this->getUnitSpecificationMapper()->findByCourseId($post['id'])
-                 ->map([$this->getUnitSpecificationTranslator(), 'translateToDomainModel'])
+            $this->getUnitSpecificationMapperProxy()->findByCourseId($post['id'])
         );
 
         // Do not permit Courses to be moved to, or created in, Root
@@ -739,9 +737,7 @@ class Controller extends Base\Base
             // Persist the unit too
             $unitSpec = new UnitSpecification();
             $unitSpec->setFolder($folder);
-            $unitSpecDataModel = $this->getUnitSpecificationTranslator()->translateToDataModel($unitSpec, $courseSpec);
-            $this->getUnitSpecificationMapper()->save($unitSpecDataModel);
-            $unitSpec->setId($unitSpecDataModel->getId());
+            $this->getUnitSpecificationMapperProxy()->save($unitSpec, $courseSpec);
 
             $instance  = $this->getCourseBuilderInstance($folder);
             $folderId  = $folder->getId();
@@ -928,11 +924,10 @@ class Controller extends Base\Base
 
             // Remove units whose folders aren't accessible by this user
             $currentCourse->setUnits(
-                $this->getUnitSpecificationMapper()->findByCourseId(
+                $this->getUnitSpecificationMapperProxy()->findByCourseId(
                     $currentCourse->getId(),
                     ['order' => ['f.name' => 'ASC']]
                 )->filter(function($v) { return $this->confirmAccess($v->getFolder()->getId()); })
-                 ->map([$this->getUnitSpecificationTranslator(), 'translateToDomainModel'])
             );
 
             // Add course directly into $data
