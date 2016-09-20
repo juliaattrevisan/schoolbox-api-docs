@@ -36,17 +36,17 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>Title
-                            <input type="text" value="{{ assessable.title }}" required />
+                            <input type="text" value="{{ assessment.title }}" required />
                         </label>
                     </div>
                     <div class="small-12 columns">
                         <label>Description
-                            <textarea name="description">{{ assessable.description }}</textarea>
+                            <textarea name="description">{{ assessment.description }}</textarea>
                         </label>
                     </div>
                     <div class="small-12 columns">
                         <label>Weight
-                            <input type="number" name="weight" value="{{ assessable.weight }}">
+                            <input type="number" name="weight" value="{{ assessment.weight }}">
                         </label>
                     </div>
                     <div class="small-12 columns">
@@ -65,7 +65,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Publish Date
-                            <input type="text" data-datepicker placeholder="Publish Date" value="{{ assessable.publishAt.localShort }}" />
+                            <input type="text" data-datepicker placeholder="Publish Date" value="{{ assessment.publishAt.localShort }}" />
                         </label>
                     </div>
 
@@ -73,7 +73,7 @@
                         <div class="timepick">
                             <label>
                                 Publish Time
-                                <input type="text" data-timepicker placeholder="Publish Time" value="{{ assessable.publishAt.timeOnly }}" />
+                                <input type="text" data-timepicker placeholder="Publish Time" value="{{ assessment.publishAt.timeOnly }}" />
                             </label>
                         </div>
                     </div>
@@ -81,7 +81,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Commencement Date
-                            <input data-datepicker type="text" autocomplete="off" placeholder="Commencement Date" value="{{ assessable.openAt.localShort }}" />
+                            <input data-datepicker type="text" autocomplete="off" placeholder="Commencement Date" value="{{ assessment.openAt.localShort }}" />
                         </label>
                     </div>
 
@@ -89,7 +89,7 @@
                         <div class="timepick">
                             <label>
                                 Commencement Time
-                                <input data-timepicker type="text" autocomplete="off" placeholder="Commencement Time" value="{{ assessable.openAt.timeOnly }}" />
+                                <input data-timepicker type="text" autocomplete="off" placeholder="Commencement Time" value="{{ assessment.openAt.timeOnly }}" />
                             </label>
                         </div>
                     </div>
@@ -97,7 +97,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Due Date
-                            <input data-datepicker type="text" autocomplete="off" placeholder="Due Date" value="{{ assessable.dueAt.localShort }}" />
+                            <input data-datepicker type="text" autocomplete="off" placeholder="Due Date" value="{{ assessment.dueAt.localShort }}" />
                         </label>
                     </div>
 
@@ -105,7 +105,7 @@
                         <div class="timepick">
                             <label>
                                 Due Time
-                                <input data-timepicker type="text" autocomplete="off" placeholder="Due Time" value="{{ assessable.dueAt.timeOnly }}" />
+                                <input data-timepicker type="text" autocomplete="off" placeholder="Due Time" value="{{ assessment.dueAt.timeOnly }}" />
                             </label>
                         </div>
                     </div>
@@ -113,7 +113,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Close Date
-                            <input data-datepicker type="text" autocomplete="off" placeholder="Close Date" value="{{ assessable.closeAt.localShort }}" />
+                            <input data-datepicker type="text" autocomplete="off" placeholder="Close Date" value="{{ assessment.closeAt.localShort }}" />
                         </label>
                     </div>
 
@@ -121,7 +121,7 @@
                         <div class="timepick">
                             <label>
                                 Close Time
-                                <input data-timepicker type="text" autocomplete="off" placeholder="Close Time" value="{{ assessable.closeAt.timeOnly }}" />
+                                <input data-timepicker type="text" autocomplete="off" placeholder="Close Time" value="{{ assessment.closeAt.timeOnly }}" />
                             </label>
                         </div>
                     </div>
