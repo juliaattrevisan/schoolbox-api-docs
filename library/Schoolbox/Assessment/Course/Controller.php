@@ -959,7 +959,12 @@ class Controller extends Base\Base
         return $this->getFolderMapper()->findByCurriculumCode($codes)->filter(function ($result) {
             /** @var Folder\Model $result */
             // TODO: test this with folders and courses which have curriculum codes
-            return $this->getCourseSpecificationMapper()->countByColumn('folder_id', $result->getId()) > 0;
+            try {
+                $this->getCourseSpecificationMapperProxy()->findByFolderId($result->getId());
+                return true;
+            } catch (MapperException $e) {
+                return false;
+            }
         });
     }
 
