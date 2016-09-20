@@ -86,7 +86,7 @@ class Result extends Base
     {
         $query = "
 			SELECT
-			    c.id AS `c.id`
+				c.id
 			FROM
 				`{$mapper->getTable()}` `f`
 				LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
@@ -102,6 +102,6 @@ class Result extends Base
         $stmt = $mapper->getDatabase()->prepare($query);
         $stmt->execute();
 
-        return $this->buildSearchCount($stmt, $user, 'c.id');
+        return $this->buildSearchCount($stmt, $user, 'id');
     }
 }
