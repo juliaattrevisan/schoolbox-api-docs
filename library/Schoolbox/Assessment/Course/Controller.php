@@ -280,9 +280,7 @@ class Controller extends Base\Base
             try {
                 // First, check whether or not this is already a course. We don't want to barr access to courses that
                 // are already courses.
-                $course = $this->getCourseSpecificationTranslator()->translateToDomainModel(
-                    $this->getCourseSpecificationMapper()->findById($id)
-                );
+                $course = $this->getCourseSpecificationMapperProxy()->findById($id);
                 $folder = $course->getFolder();
 
                 // Populate units
@@ -392,9 +390,7 @@ class Controller extends Base\Base
         $post['id'] = $id;
 
         // Load course
-        $course = $this->getCourseSpecificationTranslator()->translateToDomainModel(
-            $this->getCourseSpecificationMapper()->findById($post['id'])
-        );
+        $course = $this->getCourseSpecificationMapperProxy()->findById($post['id']);
         // TODO: figure out if course should load units by default
         $course->setUnits(
             $this->getUnitSpecificationMapper()->findByCourseId($post['id'])
@@ -2272,18 +2268,18 @@ class Controller extends Base\Base
     {
         // TODO: make delete of folder and course atomic
 
-        $courseSpecModel = $this->getCourseSpecificationMapper()->findById($id);
-        $unitSpecModels  = $this->getUnitSpecificationMapper()->findByCourseId($id);
+        $courseSpec     = $this->getCourseSpecificationMapperProxy()->findById($id);
+        $unitSpecModels = $this->getUnitSpecificationMapper()->findByCourseId($id);
 
         // Delete course specs
-        $this->getCourseSpecificationMapper()->delete($courseSpecModel);
+        $this->getCourseSpecificationMapperProxy()->delete($courseSpec);
 
         // Delete constituent units
         $this->getUnitSpecificationMapper()->delete($unitSpecModels);
 
         /** @var Folder\Controller $folderController */
         $folderController = $this->getController('folder');
-        $folderController->recursiveDelete($courseSpecModel->getFolder()->getId(), $this->getUser());
+        $folderController->recursiveDelete($courseSpec->getFolder()->getId(), $this->getUser());
     }
 
     /**
