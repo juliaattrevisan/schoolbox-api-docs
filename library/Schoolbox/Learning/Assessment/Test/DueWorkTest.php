@@ -8,6 +8,8 @@
  * @version     SVN: $Id$
  */
 
+namespace Schoolbox\Learning\Assessment\Test;
+
 use \Schoolbox\Collection;
 use \Schoolbox\User;
 use \Schoolbox\Resource\Storage\Model as Storage;
@@ -25,7 +27,7 @@ use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 
 class DueWorkTest extends \PHPUnit_Framework_TestCase
 {
-    use \Schoolbox\Learning\Assessment\Test\Defaults;
+    use Defaults;
 
     /**
      * Test that Due Work initialises into a usable state

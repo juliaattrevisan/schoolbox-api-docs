@@ -9,6 +9,8 @@
  * @version     SVN: $Id$
  */
 
+namespace Schoolbox\Learning\Assessment\Test;
+
 use \Schoolbox\Collection;
 use \Schoolbox\User;
 
@@ -20,7 +22,7 @@ use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
 class TaskTest extends \PHPUnit_Framework_TestCase
 {
-    use \Schoolbox\Learning\Assessment\Test\Defaults;
+    use Defaults;
 
     /**
      * Test that Task initialises into a usable state

@@ -9,6 +9,8 @@
  * @version     SVN: $Id$
  */
 
+namespace Schoolbox\Learning\Assessment\Test;
+
 use \Schoolbox\Collection;
 use \Schoolbox\User;
 
@@ -20,7 +22,7 @@ use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
 class QuizTest extends \PHPUnit_Framework_TestCase
 {
-    use \Schoolbox\Learning\Assessment\Test\Defaults;
+    use Defaults;
 
     /**
      * Test that Quiz initialises into a usable state

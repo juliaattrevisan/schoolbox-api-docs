@@ -9,6 +9,8 @@
  * @version     SVN: $Id$
  */
 
+namespace Schoolbox\Learning\Assessment\Test;
+
 use \Schoolbox\Collection;
 use \Schoolbox\User;
 use \Schoolbox\Resource\Storage\Model as Storage;
@@ -40,7 +42,7 @@ use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
 class ProjectTest extends \PHPUnit_Framework_TestCase
 {
-    use \Schoolbox\Learning\Assessment\Test\Defaults;
+    use Defaults;
 
     /**
      * Test that Project initialises into a usable state
