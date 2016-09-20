@@ -5,6 +5,14 @@
     [ 'Create Assessment',   routeLookup('sportsfixturesSport.getList') ]
 ) }}
 
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $.fn.alaressEditor();
+    });
+</script>
+
 <div class="row">
     <div class="small-12 columns"><h1>Create Assessment</h1></div>
 </div>
@@ -21,16 +29,8 @@
                     </div>
                     <div class="small-12 columns">
                         <label>Description
-                            <textarea>
-                            </textarea>
+                            <textarea name="description"></textarea>
                         </label>
-                        <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
-                        <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-                        <script type="text/javascript">
-                            $(function () {
-                                $.fn.alaressEditor();
-                            });
-                        </script>
                     </div>
                     <div class="small-12 columns">
                         <label>Weight
