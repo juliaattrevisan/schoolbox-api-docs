@@ -19,12 +19,15 @@ class Model extends AbstractFeedback
     /**
      * Calculate the final mark for this IAssessable
      *
-     * This object's existence indicates a Teacher has marked the task is Complete.
+     * This object's existence indicates a Teacher has marked the task as 'Complete'.
+     *
+     * While logically this equates to IMarkScheme::NORMALISED_MARK_MAX, for now we
+     * return null to simplify max/min aggregation logic.
      *
      * @return float
      */
     public function getNormalisedMark()
     {
-        return IMarkScheme::NORMALISED_MARK_MAX;
+        return null;
     }
 }
