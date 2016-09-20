@@ -45,7 +45,7 @@ $selectize-padding-y: 0;
 $selectize-padding-item-x: 0;
 $selectize-padding-item-y: 0;
 
-@import "../../../core/selectize/src/selectize.scss";
+@import "../../core/selectize/src/selectize.scss";
 
 /* selectize.scss uses a whole bunch of !important vars
  * so you have to bring a bigger bang to the party

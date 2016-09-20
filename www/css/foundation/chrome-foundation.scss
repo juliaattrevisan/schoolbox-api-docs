@@ -24,41 +24,40 @@
 // Must import before forms, as forms reimports buttons.scss
 @import "components/buttons";
 
-@import "components/ui/forms/forms";
+@import "ui/forms/forms";
 //@import "components/joyride";
 @import "components/tree";
 @import "components/masonry";
 @import "components/ups";
-@import "components/ui/preview";
+@import "ui/preview";
 @import "components/debugbar/debugbar";
 
 //////////////////////////////////////////////////////////
 // Refined UI Elements
 //
-// These override defaults in @import components/buttons
+// These override defaults in @import /buttons
 // We have refined these elements
 //////////////////////////////////////////////////////////
-@import "components/ui/button/button";
-@import "components/ui/button/list-actions";       // requires _button.scss
-@import "components/ui/button/header-actions";     // requires _list-actions.scss
-@import "components/ui/button/dropdown";
-@import "components/ui/button/tabs";
-@import "components/ui/navigation/navigation";
-@import "components/ui/navigation/notification";   // requires _button.scss
-@import "components/ui/navigation/breadcrumb";
-@import "components/ui/navigation/pagination";
-@import "components/ui/navigation/sub-nav";
+@import "ui/button/button";
+@import "ui/button/list-actions";       // requires _button.scss
+@import "ui/button/header-actions";     // requires _list-actions.scss
+@import "ui/button/dropdown";
+@import "ui/button/tabs";
+@import "ui/navigation/navigation";
+@import "ui/navigation/notification";   // requires _button.scss
+@import "ui/navigation/breadcrumb";
+@import "ui/navigation/pagination";
+@import "ui/navigation/sub-nav";
 
 //////////////////////////////////////////////////////////
 // Common UI Elements
 //
 // Specialist elements, plugins and widgets
 //////////////////////////////////////////////////////////
-@import "components/ui/data-tables";
-@import "components/ui/alert-boxes";
-@import "components/ui/anyslider";
-@import "components/ui/iframe";
-
+@import "ui/data-tables";
+@import "ui/alert-boxes";
+@import "ui/anyslider";
+@import "ui/iframe";
 
 // Layout
 @import "layout/footer";
@@ -107,18 +106,17 @@
 @import "../../javascript/components/foundation/scss/foundation/components/reveal";
 @import "../../javascript/components/foundation/scss/foundation/components/tooltips";
 @import "../../javascript/components/foundation/scss/foundation/components/flex-video";
-@import "components/ui/selectize.customisation";
+@import "ui/selectize.customisation";
 
 //Magnific Popup
 @import "../../javascript/components/magnific-popup/src/css/main";
 @import "components/magnific/settings";
 
-
 // combobox relies on selectize styles
-@import "components/ui/combobox";
+@import "ui/combobox";
 
 // jqmath
 @import "../../javascript/math/jqmath-0.4.0.css";
 
-// client custom CSS overrrides
+// client custom CSS overrides
 @import "utils/custom";

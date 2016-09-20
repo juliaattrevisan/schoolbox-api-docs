@@ -17,7 +17,7 @@ $tabs-content-padding: rem-calc(($base-font-size - 8));
 
 // $tabs-vertical-navigation-margin-bottom: 1.25rem;
 
-@import "../../../../../javascript/components/foundation/scss/foundation/components/tabs";
+@import "../../../../javascript/components/foundation/scss/foundation/components/tabs";
 
 .tabs {
     dd, li.tab-title {
