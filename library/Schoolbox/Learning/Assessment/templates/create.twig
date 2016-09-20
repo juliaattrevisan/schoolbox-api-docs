@@ -7,9 +7,21 @@
 
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
 <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+<script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
 <script type="text/javascript">
     $(function () {
+        /* Description
+         */
         $.fn.alaressEditor();
+
+        /* Datepickers
+         */
+        $('[data-datepicker]').datepicker();
+        $('[data-timepicker]').timepicker({
+            appendTo: function ($input) {
+                return $input.closest('.timepick');
+            }
+        });
     });
 </script>
 
@@ -24,17 +36,17 @@
                 <fieldset class="content">
                     <div class="small-12 columns">
                         <label>Title
-                            <input type="text" required />
+                            <input type="text" value="{{ assessable.title }}" required />
                         </label>
                     </div>
                     <div class="small-12 columns">
                         <label>Description
-                            <textarea name="description"></textarea>
+                            <textarea name="description">{{ assessable.description }}</textarea>
                         </label>
                     </div>
                     <div class="small-12 columns">
                         <label>Weight
-                            <input type="number" name="weight">
+                            <input type="number" name="weight" value="{{ assessable.weight }}">
                         </label>
                     </div>
                     <div class="small-12 columns">
@@ -46,37 +58,75 @@
                             </select>
                         </label>
                     </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Dates</legend>
 
-                    <div class="column small-12 medium-4">
-                        <label>Publish Date
-                            <input type="text" data-datepicker placeholder="Publish Date">
+                    <div class="column small-12 medium-6">
+                        <label>
+                            Publish Date
+                            <input type="text" data-datepicker placeholder="Publish Date" value="{{ assessable.publishAt.localShort }}" />
                         </label>
                     </div>
-                    <div class="column small-6 medium-4">
+
+                    <div class="column small-12 medium-6">
                         <div class="timepick">
-                            <label>Commencement Date
-                                <input data-timepicker type="text" autocomplete="off" placeholder="Commencement Date" />
+                            <label>
+                                Publish Time
+                                <input type="text" data-timepicker placeholder="Publish Time" value="{{ assessable.publishAt.timeOnly }}" />
                             </label>
                         </div>
                     </div>
-                    <div class="column small-6 medium-4">
+
+                    <div class="column small-12 medium-6">
+                        <label>
+                            Commencement Date
+                            <input data-datepicker type="text" autocomplete="off" placeholder="Commencement Date" value="{{ assessable.openAt.localShort }}" />
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
                         <div class="timepick">
-                            <label>Due Date
-                                <input data-timepicker type="text" autocomplete="off" placeholder="Due Date" />
+                            <label>
+                                Commencement Time
+                                <input data-timepicker type="text" autocomplete="off" placeholder="Commencement Time" value="{{ assessable.openAt.timeOnly }}" />
                             </label>
                         </div>
                     </div>
-                    <script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
-                    <script type="text/javascript">
-                        $(function () {
-                            $('[data-datepicker]').datepicker();
-                            $('[data-timepicker]').timepicker({
-                                appendTo: function ($input) {
-                                    return $input.closest('.timepick');
-                                }
-                            });
-                        });
-                    </script>
+
+                    <div class="column small-12 medium-6">
+                        <label>
+                            Due Date
+                            <input data-datepicker type="text" autocomplete="off" placeholder="Due Date" value="{{ assessable.dueAt.localShort }}" />
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <div class="timepick">
+                            <label>
+                                Due Time
+                                <input data-timepicker type="text" autocomplete="off" placeholder="Due Time" value="{{ assessable.dueAt.timeOnly }}" />
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>
+                            Close Date
+                            <input data-datepicker type="text" autocomplete="off" placeholder="Close Date" value="{{ assessable.closeAt.localShort }}" />
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <div class="timepick">
+                            <label>
+                                Close Time
+                                <input data-timepicker type="text" autocomplete="off" placeholder="Close Time" value="{{ assessable.closeAt.timeOnly }}" />
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
                     <div class="column small-12">
                         <label>Curriculum Codes</label>
                         <input id='user' name="userId" type='text' value='' placeholder="Curriculum Codes" data-selectizeuser required />
