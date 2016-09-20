@@ -45,19 +45,11 @@ class Result extends Base
 				LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
 				LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
 				INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
-				LEFT JOIN `perms` p ON `f`.category = `p`.cid
-					AND p.gid = :role_id
-					AND p.type >= :min_access
-				LEFT JOIN `userAccess` a ON `f`.category = `a`.sid
-					AND a.service = :service
-					AND a.uid = :user_id
 			WHERE
-				(p.cid OR a.sid)
-				AND f.deleted_at IS NULL
+				f.deleted_at IS NULL
 				AND f.hidden IS FALSE
 				AND MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()})
 			ORDER BY {$sanitiser->getSortByWithAlias('f')} {$sanitiser->getSortDir()}
-			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
 		";
 
         $stmt = $mapper->getDatabase()->prepare($query);
@@ -70,7 +62,19 @@ class Result extends Base
 
         $collection = $mapper->createCollection();
 
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        // Experimental iterator
+        $result = new \LimitIterator(
+            new \CallbackFilterIterator(
+                new \IteratorIterator($stmt),
+                function ($row) use ($user) {
+                    return $this->getAccessor()->getFolderAccess($user, [$row['c.id']]);
+                }
+            ),
+            $sanitiser->getOffset(),
+            $sanitiser->getLimit()
+        );
+
+        foreach ($result as $row) {
             $file = $mapper->hydrate($row, 'f');
             $storage = $mapper->hydrateJoin($row, 'hash', 's');
             $mime = $mapper->getJoinMapper('hash')->hydrateJoin($row, 'allowedFileExtension', 'e');
@@ -99,22 +103,15 @@ class Result extends Base
     {
         $query = "
 			SELECT
-			    COUNT(*) AS num
+			    c.id AS `c.id`
 			FROM
 				`{$mapper->getTable()}` `f`
 				LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
 				LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
 				LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
 				INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
-				LEFT JOIN `perms` p ON `f`.category = `p`.cid
-					AND p.gid = :role_id
-					AND p.type >= :min_access
-				LEFT JOIN `userAccess` a ON `f`.category = `a`.sid
-					AND a.service = :service
-					AND a.uid = :user_id
 			WHERE
-				(p.cid OR a.sid)
-				AND f.deleted_at IS NULL
+				f.deleted_at IS NULL
 				AND f.hidden IS FALSE
 				AND MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()})
 		";
@@ -127,8 +124,17 @@ class Result extends Base
             'user_id' => $user->getId()
         ));
 
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return (int)$row['num'];
+        // Experimental iterator
+        $count  = 0;
+        $result = new \CallbackFilterIterator(
+            new \IteratorIterator($stmt),
+            function ($row) use ($user) {
+                return $this->getAccessor()->getFolderAccess($user, [$row['c.id']]);
+            }
+        );
+        foreach ($result as $row) {
+            $count++;
+        }
+        return $count;
     }
 }
