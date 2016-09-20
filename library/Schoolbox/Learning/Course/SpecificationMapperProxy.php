@@ -36,7 +36,8 @@ class SpecificationMapperProxy
      */
     public function __construct(Mapper $mapper, Translator $translator)
     {
-        $this->mapper = $mapper;
+        $this->mapper     = $mapper;
+        $this->translator = $translator;
     }
 
     /**
