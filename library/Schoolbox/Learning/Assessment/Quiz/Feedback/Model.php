@@ -36,7 +36,7 @@ class Model extends AbstractFeedback
 
         $marksGiven = 0;
         foreach ($this->getResponse()->getAllResponses() as $response) {
-            $marksGiven += $response['mark'];
+            $marksGiven += $response->getMark();
         }
 
         return floatval(IMarkScheme::NORMALISED_MARK_MAX * $marksGiven / $marksAvailable);

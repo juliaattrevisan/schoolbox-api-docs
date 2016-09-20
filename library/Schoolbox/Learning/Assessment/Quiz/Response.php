@@ -10,7 +10,7 @@ namespace Schoolbox\Learning\Assessment\Quiz;
 use Schoolbox\Learning\Assessment\Quiz\Question as QuizQuestion;
 
 /**
- * DB entity wrapper
+ * Represents a student's answer to a Quiz Question
  */
 class Response
 {

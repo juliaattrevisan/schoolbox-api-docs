@@ -109,13 +109,7 @@ class TotalMarkFractional extends TotalMarkAbstract
     {
         // Special Case for Quiz where total marks available can vary per Attempt
         if ($response instanceof QuizAttempt) {
-            $availableMarks = 0.0;
-            /** @var QuizFeedback[] $answers */
-            $answers = $response->getAllFeedback();
-            foreach($answers as $answer) {
-                $availableMarks += $answer->getQuestion()->getMarks();
-            }
-            $this->setTotalMark($availableMarks);
+            $this->setTotalMark($response->getMarksAvailable());
         }
     }
 

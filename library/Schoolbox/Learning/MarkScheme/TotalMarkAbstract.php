@@ -59,7 +59,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      *
      * @param string         $humanReadableMark
      * @param IResponse|null $response
-     * @return float
+     * @return float|null Returns null if denominator = 0
      */
     public function getNormalisedMark($humanReadableMark, IResponse $response = null)
     {
@@ -67,6 +67,11 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
         $pattern = '/^\s*([0-9.]+)/';
         if(!preg_match($pattern, $humanReadableMark, $matches)){
             throw new InvalidArgumentException("Unable to parse numerator: $humanReadableMark");
+        }
+
+        // Prevent divide by 0 Errors
+        if(0 == $this->getTotalMark()){
+            return null;
         }
 
         $floatVal = floatval($matches[1] / $this->getTotalMark() * self::NORMALISED_MARK_MAX);

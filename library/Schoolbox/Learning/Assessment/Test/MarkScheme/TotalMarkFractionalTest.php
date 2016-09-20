@@ -9,10 +9,11 @@ namespace Schoolbox\Learning\Assessment\Test;
 
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
 use Schoolbox\Learning\Assessment\Quiz\Question as QuizQuestion;
-use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizAnswer;
+use Schoolbox\Learning\Assessment\Quiz\Response as QuizResponse;
 use Schoolbox\Learning\Assessment\Quiz\Section as QuizSection;
-use Schoolbox\Learning\Assessment\Quiz\Solution as QuizSolution;
+use Schoolbox\Learning\Assessment\Quiz\Answer as QuizAnswer;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use \InvalidArgumentException;
 use \RangeException;
@@ -316,34 +317,34 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Generate a Quiz with attached Sections, Attempts, Questions, and Answers
+     * Generate a Quiz with attached Attempts, Feedbacks, Questions + Responses
      *
-     * The quiz has 1 section with 3 questions worth 1 mark each.
+     * The quiz logically has 1 section with 3 questions worth 1 mark each.
      * The quiz has 1 attempt with 2 answers, 1 of which is correct (ie norm mark = 50.0)
      */
     private function getDummyQuiz()
     {
-        $solution1 = new QuizSolution([
-            'answer_id'   => 1,
-            'question_id' => 1,
-            'sequence'    => 1,
-            'answer'      => "Jerome's Hair",
-            'deleted_at'  => null,
-        ]);
-        $solution2 = new QuizSolution([
-            'answer_id'   => 2,
-            'question_id' => 2,
-            'sequence'    => 2,
-            'answer'      => "Happiness",
-            'deleted_at'  => null,
-        ]);
-        $solution3 = new QuizSolution([
-            'answer_id'   => 3,
-            'question_id' => 3,
-            'sequence'    => 3,
-            'answer'      => "30.2 Years",
-            'deleted_at'  => null,
-        ]);
+//        $answer1 = new QuizAnswer([
+//            'answer_id'   => 1,
+//            'question_id' => 1,
+//            'sequence'    => 1,
+//            'answer'      => "Jerome's Hair",
+//            'deleted_at'  => null,
+//        ]);
+//        $answer2 = new QuizAnswer([
+//            'answer_id'   => 2,
+//            'question_id' => 2,
+//            'sequence'    => 2,
+//            'answer'      => "Happiness",
+//            'deleted_at'  => null,
+//        ]);
+//        $answer3 = new QuizAnswer([
+//            'answer_id'   => 3,
+//            'question_id' => 3,
+//            'sequence'    => 3,
+//            'answer'      => "30.2 Years",
+//            'deleted_at'  => null,
+//        ]);
 
         $question1 = new QuizQuestion([
             'question_id' => 1,
@@ -388,9 +389,8 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
             'deleted_at'  => null,
         ]);
 
-        $attempt = new QuizAttempt();
 
-        $answer1 = new QuizAnswer([
+        $response1 = new QuizResponse([
             'response_id'        => 1,
             'attempt_id'         => 1,
             'section_id'         => 1,
@@ -403,7 +403,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
             'deleted_at'         => null,
         ]);
 
-        $answer2 = new QuizAnswer([
+        $response2 = new QuizResponse([
             'response_id'        => 2,
             'attempt_id'         => 1,
             'section_id'         => 1,
@@ -416,40 +416,47 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
             'deleted_at'         => null,
         ]);
 
+        $attempt = new QuizAttempt();
+        $feedback = new QuizFeedback();
+
         $quiz = new Quiz();
 
-        // Link Questions to Solutions
-        $question1->setSolution($solution1);
-        $question2->setSolution($solution2);
-        $question3->setSolution($solution3);
-
-        // Link Answers to Questions
-        $answer1->setQuestion($question1);
-        $answer2->setQuestion($question2);
-
-        // Link Questions to Answers
-        $question1->getAnswers()->add($answer1);
-        $question2->getAnswers()->add($answer2);
-
-        // Add Answers to Attempt
-        $attempt->getAllFeedback()->add($answer1);
-        $attempt->getAllFeedback()->add($answer2);
+        // Add Section to Quiz
+        $quiz->getSections()->add($section);
 
         // Add Questions to Section
         $section->getQuestions()->add($question1);
         $section->getQuestions()->add($question2);
         $section->getQuestions()->add($question3);
 
-        // Add Section to Quiz
-        $quiz->getSections()->add($section);
+        // Add Answers to Questions
+//        $question1->setAnswer($answer1);
+//        $question2->setAnswer($answer2);
+//        $question3->setAnswer($answer3);
 
         // Add Attempt to Quiz
         $quiz->getResponses()->add($attempt);
 
-        // Add Answers to Quiz
-        $quiz->getFeedbacks()->add($answer1);
-        $quiz->getFeedbacks()->add($answer2);
+        // Add Feedback to Quiz
+        $quiz->getFeedbacks()->add($feedback);
 
+        // Link Responses to Questions
+        $response1->setQuestion($question1);
+        $response2->setQuestion($question2);
+
+        // Link Questions to Responses
+        $question1->getResponses()->add($response1);
+        $question2->getResponses()->add($response2);
+
+        // Add Responses to Attempt
+        $attempt->getAllResponses()->add($response1);
+        $attempt->getAllResponses()->add($response2);
+
+        // Add Questions to Attempt
+        $attempt->getAllQuestions()->add($question1);
+        $attempt->getAllQuestions()->add($question2);
+
+//var_dump($quiz);die();
         return $quiz;
     }
 }

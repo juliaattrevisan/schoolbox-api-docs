@@ -8,24 +8,27 @@
 namespace Schoolbox\Learning\Assessment\Quiz;
 
 use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizAnswer;
+use Schoolbox\Learning\Assessment\Quiz\Response as QuizResponse;
 
+/**
+ * A Quiz Question authored by a Teacher
+ */
 class Question
 {
     /** @var array */
     private $question;
 
-    /** @var Solution */
-    private $solution;
+    /** @var Answer */
+    private $answer;
 
-    /** @var  Collection|QuizAnswer[] */
-    private $answers;
+    /** @var  Collection|QuizResponse[] */
+    private $responses;
 
 
     public function __construct(array $question)
     {
         $this->question = $question;
-        $this->answers = new Collection();
+        $this->responses = new Collection();
     }
 
     /**
@@ -37,38 +40,38 @@ class Question
     }
 
     /**
-     * @return Solution
+     * @return Answer
      */
-    public function getSolution()
+    public function getAnswer()
     {
-        return $this->solution;
+        return $this->answer;
     }
 
     /**
-     * @param Solution $solution
+     * @param Answer $answer
      * @return static
      */
-    public function setSolution(Solution $solution)
+    public function setAnswer(Answer $answer)
     {
-        $this->solution = $solution;
+        $this->answer = $answer;
         return $this;
     }
 
     /**
-     * @return Collection|QuizAnswer[]
+     * @return Collection|QuizResponse[]
      */
-    public function getAnswers()
+    public function getResponses()
     {
-        return $this->answers;
+        return $this->responses;
     }
 
     /**
-     * @param Collection|QuizAnswer[] $answers
+     * @param Collection|QuizResponse[] $responses
      * @return static
      */
-    public function setAnswers(Collection $answers)
+    public function setResponses(Collection $responses)
     {
-        $this->answers = $answers;
+        $this->responses = $responses;
         return $this;
     }
 

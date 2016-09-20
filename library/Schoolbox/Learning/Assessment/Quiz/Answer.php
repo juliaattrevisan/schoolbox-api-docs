@@ -7,14 +7,17 @@
 
 namespace Schoolbox\Learning\Assessment\Quiz;
 
-class Solution
+/**
+ * Represents the teacher-defined correct solution to a Quiz Question
+ */
+class Answer
 {
     /** @var array */
-    private $solution = [];
+    private $answer = [];
 
 
-    public function __construct(array $solution)
+    public function __construct(array $answer)
     {
-        $this->solution = $solution;
+        $this->answer = $answer;
     }
 }

@@ -9,6 +9,9 @@ namespace Schoolbox\Learning\Assessment\Quiz;
 
 use Schoolbox\Collection;
 
+/**
+ * A collection of Quiz Questions in a Quiz
+ */
 class Section
 {
     /** @var array */
