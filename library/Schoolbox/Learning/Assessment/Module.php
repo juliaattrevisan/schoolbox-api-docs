@@ -35,6 +35,13 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
+
+                /* Create an assessment
+                 * This is the first half containing shared data such as title,
+                 * description and dates
+                 */
+                '/assessment/create' => 'getCreateAssessment',
+
                 '/assessment/{assessmentId}/status'              => 'getStatus',
                 '/assessment/{assessmentId}/summary/{studentId}' => 'getSummary',
                 '/assessment/{assessmentId}/submit/{studentId}'  => 'getSubmitForm',

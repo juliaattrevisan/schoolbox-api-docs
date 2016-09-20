@@ -36,6 +36,17 @@ class Controller extends Base
     }
 
     /**
+     * Create an Assessment
+     */
+    public function getCreateAssessment()
+    {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
+        ]));
+    }
+
+
+
+    /**
      * Displays information regarding an assessment
      *
      * @api   GET /learning/assessment/:assessmentId/status
