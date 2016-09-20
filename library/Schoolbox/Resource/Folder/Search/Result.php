@@ -44,30 +44,19 @@ class Result extends Base
             FROM {$mapper->getTable()} c
             LEFT JOIN {$mapper->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$mapper->getJoinSql('homepages', 'c', 'hp')}
-            LEFT JOIN `perms` cp ON c.id = cp.cid
-                AND cp.gid = :gid
-                AND cp.type > 0
-            LEFT JOIN `userAccess` ca ON c.id = ca.sid
-                AND ca.service = 1
-                AND ca.uid = :uid
             WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
-            AND   (:superuser OR cp.cid OR ca.sid)
             AND   `c`.`deleted_at` IS NULL
 			ORDER BY {$sanitiser->getSortByWithAlias('c')} {$sanitiser->getSortDir()}
-			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
         ";
 
         $statement = $mapper->getDatabase()->prepare($query);
         $statement->execute([
             'likeKeyword' => '%'.$mapper->getDatabase()->quoteForLike($sanitiser->getUnquotedKeyword()).'%',
-            'gid'         => $user->getRole()->getId(),
-            'uid'         => $user->getId(),
-            'superuser'   => $user->isSuperuser(),
         ]);
 
         $results = new Collection();
 
-        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+        foreach ($this->buildSearchResult($statement, $user, 'c.id', $sanitiser->getOffset(), $sanitiser->getLimit()) as $row) {
             $folder = $mapper->hydrate($row, 'c');
 
             /* Accumulate folder codes here
@@ -110,32 +99,19 @@ class Result extends Base
     protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         $query = "
-			SELECT
-                COUNT(*) AS num
+			SELECT id
             FROM {$mapper->getTable()} c
             LEFT JOIN {$mapper->getJoinSql('codes', 'c', 'cc')}
             LEFT JOIN {$mapper->getJoinSql('homepages', 'c', 'hp')}
-            LEFT JOIN `perms` cp ON c.id = cp.cid
-                AND cp.gid = :gid
-                AND cp.type > 0
-            LEFT JOIN `userAccess` ca ON c.id = ca.sid
-                AND ca.service = 1
-                AND ca.uid = :uid
             WHERE (`c`.`name` LIKE :likeKeyword OR `cc`.`code` LIKE :likeKeyword)
-            AND   (:superuser OR cp.cid OR ca.sid)
             AND   `c`.`deleted_at` IS NULL
 		";
 
         $stmt = $mapper->getDatabase()->prepare($query);
         $stmt->execute([
             'likeKeyword' => '%'.$mapper->getDatabase()->quoteForLike($sanitiser->getUnquotedKeyword()).'%',
-            'gid'         => $user->getRole()->getId(),
-            'uid'         => $user->getId(),
-            'superuser'   => $user->isSuperuser(),
         ]);
 
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return (int)$row['num'];
+        return $this->buildSearchCount($stmt, $user, 'id');
     }
 }
