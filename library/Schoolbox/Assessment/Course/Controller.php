@@ -529,9 +529,7 @@ class Controller extends Base\Base
         if ($id) {
             try {
                 // Retrieve the course specification
-                $courseSpecification = $this->getCourseSpecificationTranslator()->translateToDomainModel(
-                    $this->getCourseSpecificationMapper()->findById($id)
-                );
+                $courseSpecification = $this->getCourseSpecificationMapperProxy()->findById($id);
 
                 // do checks to make sure it exists
                 $folder = $courseSpecification->getFolder();
@@ -608,11 +606,7 @@ class Controller extends Base\Base
 
             // Persist the course spec as well
             $courseSpecification->setFolder($folder);
-            $courseSpecDataModel = $this->getCourseSpecificationTranslator()->translateToDataModel($courseSpecification);
-            $this->getCourseSpecificationMapper()->save($courseSpecDataModel);
-
-            // Course spec data model ID was set as part of save action
-            $courseSpecification->setId($courseSpecDataModel->getId());
+            $this->getCourseSpecificationMapperProxy()->save($courseSpecification);
             return $courseSpecification;
 
         } catch (ServiceNotFound $e) {
@@ -889,11 +883,7 @@ class Controller extends Base\Base
     protected function getCourseData($searchParam)
     {
         // Use the new mapper to get the list of courses
-        /** @var CourseSpecification[] $allCourses */
-        $allCourses = $this->getCourseSpecificationMapper()->findByName(
-            $searchParam,
-            ['order' => ['f.name' => 'ASC' ]]
-        )->map([$this->getCourseSpecificationTranslator(), 'translateToDomainModel']);
+        $allCourses = $this->getCourseSpecificationMapperProxy()->findByName($searchParam);
 
         $data = [];
 
@@ -1231,7 +1221,7 @@ class Controller extends Base\Base
         $componentId = trim($this->getRequest()->post["componentId"]);
 
         try {
-            $this->getCourseSpecificationMapper()->findByFolderId($courseHomepage);
+            $this->getCourseSpecificationMapperProxy()->findByFolderId($courseHomepage);
 
         } catch (MapperException $e) {
             // the nominated "course" is not actually a course...

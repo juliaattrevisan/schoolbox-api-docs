@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Course;
 
+use Schoolbox\Collection;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper;
 
@@ -49,6 +50,30 @@ class SpecificationMapperProxy
     public function findById($id)
     {
         return $this->translator->translateToDomainModel($this->mapper->findById($id));
+    }
+
+    /**
+     * Proxy for `Mapper->findByFolderId()`.
+     *
+     * @param int $folderId
+     * @return Specification
+     */
+    public function findByFolderId($folderId)
+    {
+        return $this->translator->translateToDomainModel($this->mapper->findByFolderId($folderId));
+    }
+
+    /**
+     * Proxy for `Mapper->findByName()`.
+     *
+     * @param string $name
+     * @return Collection|Specification[]
+     */
+    public function findByName($name)
+    {
+        return $this->mapper
+            ->findByName($name, ['order' => ['f.name' => 'ASC' ]])
+            ->map([$this->translator, 'translateToDomainModel']);
     }
 
     /**
