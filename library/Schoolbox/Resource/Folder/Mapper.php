@@ -1156,7 +1156,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
      * @param int $limit
      * @param string $sortProperty
      * @param string $sortDirection
-     * @return Collection
+     * @return Result
      */
     public function search($user, $keyword, $offset = 0, $limit = self::DEFAULT_LIMIT, $sortProperty = '', $sortDirection = 'DESC')
     {
