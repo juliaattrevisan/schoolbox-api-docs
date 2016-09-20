@@ -53,8 +53,11 @@ class Controller extends Base
      */
     public function getCreateAssessment()
     {
+        $returnPath = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment');
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
-            'assessment' => new DueWork()
+            'assessment' => new DueWork(),
+            'returnUrl' =>  urlencode(base64_encode($returnPath))
         ]));
     }
 

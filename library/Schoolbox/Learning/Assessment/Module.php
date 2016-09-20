@@ -42,6 +42,10 @@ class Module extends BaseModule
                  */
                 '/assessment/create' => 'getCreateAssessment',
 
+                /* This is the second half containing assessable-specific data
+                 */
+                '/assessment/update' => 'getUpdateAssessment',
+
                 '/assessment/{assessmentId}/status'              => 'getStatus',
                 '/assessment/{assessmentId}/summary/{studentId}' => 'getSummary',
                 '/assessment/{assessmentId}/submit/{studentId}'  => 'getSubmitForm',
