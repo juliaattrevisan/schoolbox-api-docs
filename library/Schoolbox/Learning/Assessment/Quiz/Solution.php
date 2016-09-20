@@ -9,8 +9,6 @@ namespace Schoolbox\Learning\Assessment\Quiz;
 
 class Solution
 {
-    // TODO - This is all just placeholder for testing. Will be replaced by SA-701
-
     /** @var array */
     private $solution = [];
 

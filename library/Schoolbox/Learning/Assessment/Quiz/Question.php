@@ -12,8 +12,6 @@ use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizAnswer;
 
 class Question
 {
-    // TODO - This is all just placeholder for testing. Will be replaced by SA-701
-
     /** @var array */
     private $question;
 

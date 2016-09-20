@@ -11,8 +11,6 @@ use Schoolbox\Collection;
 
 class Section
 {
-    // TODO - This is all just placeholder for testing. Will be replaced by SA-701
-
     /** @var array */
     private $section;
 
