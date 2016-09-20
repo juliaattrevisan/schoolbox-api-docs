@@ -1,0 +1,130 @@
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<!-- END custom_head -->
+
+<div class="row">
+    <div class="small-12 columns"><h1>{{ assessment.type() }}</h1></div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns island">
+        <form action="#">
+            <section>
+                {% block createDueWork %}
+                <fieldset class="content">
+                    <legend>
+                        File Attachments
+                        <span data-tooltip class="hint has-tip tip-top" title="{% include sub/attachzone.twig %}">?</span>
+                    </legend>
+                    <div class="column small-12">
+                        {AFFIX_TWIG_LABEL_HERE}
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="column small-12 medium-4">
+                        <label>Publish Date
+                            <input type="text" data-datepicker placeholder="Publish Date">
+                        </label>
+                    </div>
+                    <div class="small-6 columns">
+                        <label>Marktype
+                            <select>
+                                <option>Letter Grade</option>
+                                <option>Rubric</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="small-6 columns">
+                        <label>Grading Scheme
+                            <select>
+                                <option>Standard</option>
+                                <option>Non Standard</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="small-6 columns">
+                        <div class="switch round">
+                            <label for="useRubric">Use Rubric</label>
+                            <input id="useRubric" type="checkbox" data-checkbox-group="example" />
+                            <label for="useRubric">
+                                <span class="icon-approve"></span>
+                                <span class="icon-cancel"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="small-6 columns">
+                        <div class="switch round">
+                            <label for="markPerCapability">Mark Per-Capability</label>
+                            <input id="markPerCapability" type="checkbox" data-checkbox-group="example" />
+                            <label for="markPerCapability">
+                                <span class="icon-approve"></span>
+                                <span class="icon-cancel"></span>
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset class="content">
+                    <div class="rubrics">
+                        <!--Rubric Here-->
+                    </div>
+                </fieldset>
+                {% endblock createDueWork %}
+
+                {% block createQuiz %}
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>Max Attempts
+                            <select name="max-attempts" id="max-attempts">
+                                <option data-slug="{{ option.slug }}" value="{{ descriptor.value }}" {{ descriptor.value.selected }}>{{ attempts.text }}</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="small-4 columns">
+                        <label for="duration">Duration</label>
+                        <div class="switch round">
+                            <input id="duration" type="checkbox" checked data-checkbox-group="duration" />
+                            <label for="duration">
+                                <span class="icon-approve"></span>
+                                <span class="icon-cancel"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="small-4 columns">
+                        <label>Hours
+                            <input type="text" placeholder="Duration Hours">
+                        </label>
+                    </div>
+                    <div class="small-4 columns">
+                        <label>Minutes
+                            <input type="text" placeholder="Duration Minutes">
+                        </label>
+                    </div>
+                </fieldset>
+                {% endblock creatQuiz %}
+
+                {% block createTask %}
+                    <fieldset class="content">
+                        <div class="small-10 columns">
+                            <label>Url
+                                <input type="text" placeholder="Url">
+                            </label>
+                        </div>
+                        <div class="small-2 columns">
+                            <a href="#" class="button icon-attach" data-value="attach">Attach</a>
+                            {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+                        </div>
+                    </fieldset>
+                {% endblock createTask %}
+            </section>
+            <div class="row">
+                <div class="small-6 column">
+                    <a href="#" class="button">Cancel</a>
+                </div>
+                <div class="small-6 column">
+                    <input type="submit" name="submit" value="Create" />
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
