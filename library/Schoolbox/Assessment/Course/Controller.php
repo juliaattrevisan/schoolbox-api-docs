@@ -39,6 +39,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecifi
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecificationTranslator;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
+use Schoolbox\Learning\Course\SpecificationMapperProxy as CourseSpecificationMapperProxy;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -86,6 +87,11 @@ class Controller extends Base\Base
      * @var CourseSpecificationMapper
      */
     protected $courseSpecificationMapper;
+
+    /**
+     * @var CourseSpecificationMapperProxy
+     */
+    protected $courseSpecificationMapperProxy;
 
     /**
      * @var UnitSpecificationMapper
@@ -152,9 +158,16 @@ class Controller extends Base\Base
         $this->setUnitSpecificationMapper(UnitSpecificationMapper::getInstance());
 
         // Mapper/domain translation layer
-        $unitSpecTranslator = new UnitSpecificationTranslator();
-        $this->setCourseSpecificationTranslator(new CourseSpecificationTranslator($unitSpecTranslator));
-        $this->setUnitSpecificationTranslator($unitSpecTranslator);
+        $this->setUnitSpecificationTranslator(new UnitSpecificationTranslator());
+        $this->setCourseSpecificationTranslator(new CourseSpecificationTranslator($this->getUnitSpecificationTranslator()));
+
+        // Proxy for course/unit specification mappers (experimental)
+        $this->setCourseSpecificationMapperProxy(
+            new CourseSpecificationMapperProxy(
+                $this->getCourseSpecificationMapper(),
+                $this->getCourseSpecificationTranslator()
+            )
+        );
 
         $this->setSubmissionBoxMapper(SubmissionBoxMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
@@ -2677,6 +2690,24 @@ class Controller extends Base\Base
     public function setUnitSpecificationTranslator($unitSpecificationTranslator)
     {
         $this->unitSpecificationTranslator = $unitSpecificationTranslator;
+        return $this;
+    }
+
+    /**
+     * @return CourseSpecificationMapperProxy
+     */
+    public function getCourseSpecificationMapperProxy()
+    {
+        return $this->courseSpecificationMapperProxy;
+    }
+
+    /**
+     * @param CourseSpecificationMapperProxy $courseSpecificationMapperProxy
+     * @return static
+     */
+    public function setCourseSpecificationMapperProxy($courseSpecificationMapperProxy)
+    {
+        $this->courseSpecificationMapperProxy = $courseSpecificationMapperProxy;
         return $this;
     }
 
