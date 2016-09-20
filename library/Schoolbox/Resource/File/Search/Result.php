@@ -53,12 +53,7 @@ class Result extends Base
 		";
 
         $stmt = $mapper->getDatabase()->prepare($query);
-        $stmt->execute(array(
-            'role_id' => $user->getRole()->getId(),
-            'service' => UserAccess::SERVICE_HOMEPAGE,
-            'min_access' => UserAccess::ACCESS_READ,
-            'user_id' => $user->getId()
-        ));
+        $stmt->execute();
 
         $collection = $mapper->createCollection();
 
@@ -105,12 +100,7 @@ class Result extends Base
 		";
 
         $stmt = $mapper->getDatabase()->prepare($query);
-        $stmt->execute(array(
-            'role_id' => $user->getRole()->getId(),
-            'min_access' => UserAccess::ACCESS_READ,
-            'service' => UserAccess::SERVICE_HOMEPAGE,
-            'user_id' => $user->getId()
-        ));
+        $stmt->execute();
 
         return $this->buildSearchCount($stmt, $user, 'c.id');
     }
