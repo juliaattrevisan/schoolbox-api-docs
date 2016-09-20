@@ -1,0 +1,60 @@
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+
+<fieldset class="content">
+    <legend>
+        File Attachments
+        <span data-tooltip class="hint has-tip tip-top" title="">?</span>
+    </legend>
+    <div class="column small-12">
+        {% include 'sub/attachzone.twig' %}
+    </div>
+</fieldset>
+<fieldset class="content">
+    <div class="column small-12 medium-4">
+        <label>Publish Date
+            <input type="text" data-datepicker placeholder="Publish Date">
+        </label>
+    </div>
+    <div class="small-6 columns">
+        <label>Marktype
+            <select>
+                <option>Letter Grade</option>
+                <option>Rubric</option>
+            </select>
+        </label>
+    </div>
+    <div class="small-6 columns">
+        <label>Grading Scheme
+            <select>
+                <option>Standard</option>
+                <option>Non Standard</option>
+            </select>
+        </label>
+    </div>
+    <div class="small-6 columns">
+        <div class="switch round">
+            <label for="useRubric">Use Rubric</label>
+            <input id="useRubric" type="checkbox" data-checkbox-group="example" />
+            <label for="useRubric">
+                <span class="icon-approve"></span>
+                <span class="icon-cancel"></span>
+            </label>
+        </div>
+    </div>
+    <div class="small-6 columns">
+        <div class="switch round">
+            <label for="markPerCapability">Mark Per-Capability</label>
+            <input id="markPerCapability" type="checkbox" data-checkbox-group="example" />
+            <label for="markPerCapability">
+                <span class="icon-approve"></span>
+                <span class="icon-cancel"></span>
+            </label>
+        </div>
+    </div>
+</fieldset>
+
+<fieldset class="content">
+    <div class="rubrics">
+        <!--Rubric Here-->
+    </div>
+</fieldset>

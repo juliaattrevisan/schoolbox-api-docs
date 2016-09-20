@@ -1,0 +1,11 @@
+<fieldset class="content">
+    <div class="small-10 columns">
+        <label>Url
+            <input type="text" placeholder="Url">
+        </label>
+    </div>
+    <div class="small-2 columns">
+        <a href="#" class="button icon-attach" data-value="attach">Attach</a>
+        {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+    </div>
+</fieldset>
