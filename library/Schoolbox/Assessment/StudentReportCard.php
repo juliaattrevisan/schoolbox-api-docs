@@ -1059,8 +1059,9 @@ class StudentReportCard
                     }
                 }
                 if (is_array($teacherList)) {
+                    $staffGroups = $groupHandler->getStaffGroupTypeIds();
                     foreach ($teacherList as $teacherSynID) {
-                        $teacher = $userHandler->getBySynergy($teacherSynID);
+                        $teacher = $userHandler->getBySynergyAndGroup($teacherSynID, $staffGroups);
                         if (is_array($teacher)) {
                             $teacherName     = $userHandler->formatName($teacher);
                             $emailObj        = new \Email();
