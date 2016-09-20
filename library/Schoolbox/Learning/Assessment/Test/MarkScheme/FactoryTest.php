@@ -6,6 +6,13 @@
  */
 namespace Schoolbox\Learning\Assessment\Test;
 
+use Schoolbox\Learning\Assessment\Summator\Average;
+use Schoolbox\Learning\Assessment\Summator\ISummator;
+use Schoolbox\Learning\Assessment\Summator\Maximum;
+use Schoolbox\Learning\Assessment\Summator\Minimum;
+use Schoolbox\Learning\Assessment\Summator\Sum;
+use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\Learning\MarkScheme\Percentage;
@@ -19,8 +26,8 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Project;
-use \InvalidArgumentException;
-use \DomainException;
+use InvalidArgumentException;
+use DomainException;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 
 class FactoryTest extends \PHPUnit_Framework_TestCase
@@ -199,23 +206,56 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      */
     public function provider_project_markTypeInvalid()
     {
-        return [
-            [(new Project())->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL))],
-            [(new Project())->setMarkType($this->getDummyMarkType(MarkType::TYPE_FREE))],
-            [(new Project())->setMarkType($this->getDummyMarkType(MarkType::TYPE_RUBRIC))],
-            [(new Project())->setMarkType($this->getDummyMarkType(MarkType::TYPE_COMPLETION))],
-        ];
+        $projects = [];
+        foreach($this->getSummators() as $summator){
+            $projects[] = [(new Project($summator))->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL))];
+            $projects[] = [(new Project($summator))->setMarkType($this->getDummyMarkType(MarkType::TYPE_FREE))];
+            $projects[] = [(new Project($summator))->setMarkType($this->getDummyMarkType(MarkType::TYPE_RUBRIC))];
+            $projects[] = [(new Project($summator))->setMarkType($this->getDummyMarkType(MarkType::TYPE_COMPLETION))];
+        }
+        return $projects;
     }
 
     /**
-     * @return Project[][]
+     * @return array $projects
+     * @var Project $projects[][0]
+     * @var IMarkScheme $projects[][1]
      */
     public function provider_project_markTypeValid()
     {
+        $projects = [];
+        foreach($this->getSummators() as $summator){
+            // Percentage
+            $project = new Project($summator);
+            $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+            $projects[] = [$project, Percentage::class];
+
+            // Letter Grade
+            $project = new Project($summator);
+            $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+            $project->setGradeGroup($this->getDummyLetterGradeGroup());
+            $projects[] = [$project, LetterGrade::class];
+
+            // Nonce
+            $project = new Project($summator);
+            $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+            $projects[] = [$project, None::class];
+        }
+        return $projects;
+    }
+
+
+    /**
+     * @return ISummator[]
+     */
+    private function getSummators()
+    {
         return [
-            [(new Project())->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT)), Percentage::class],
-            [(new Project())->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER))->setGradeGroup($this->getDummyLetterGradeGroup()), LetterGrade::class],
-            [(new Project())->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE)), None::class],
+            new Average(),
+            new Maximum(),
+            new Minimum(),
+            new Sum(),
+            new WeightedAverage(),
         ];
     }
 
@@ -223,7 +263,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
      * @param int $id
      * @return MarkType
      */
-    public function getDummyMarkType($id)
+    private function getDummyMarkType($id)
     {
         $markType = new MarkType();
         $markType->setId($id);
