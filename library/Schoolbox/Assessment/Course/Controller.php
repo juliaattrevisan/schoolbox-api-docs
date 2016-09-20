@@ -707,8 +707,7 @@ class Controller extends Base\Base
             }
 
             // Get the course I'm saving into
-            $courseSpecDataModel = $this->getCourseSpecificationMapper()->findById($post['id']);
-            $courseSpec          = $this->getCourseSpecificationTranslator()->translateToDomainModel($courseSpecDataModel);
+            $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($post['id']);
 
             $folder = $this->persistFolder([
                 // the basics (note lack of ID and Codes)
@@ -728,7 +727,7 @@ class Controller extends Base\Base
             // Persist the unit too
             $unitSpec = new UnitSpecification();
             $unitSpec->setFolder($folder);
-            $unitSpecDataModel = $this->getUnitSpecificationTranslator()->translateToDataModel($unitSpec, $courseSpecDataModel);
+            $unitSpecDataModel = $this->getUnitSpecificationTranslator()->translateToDataModel($unitSpec, $courseSpec);
             $this->getUnitSpecificationMapper()->save($unitSpecDataModel);
             $unitSpec->setId($unitSpecDataModel->getId());
 
