@@ -17,6 +17,8 @@
 
 namespace Schoolbox\Learning\Assessment\Task;
 
+use Schoolbox\Collection;
+use Schoolbox\Learning\MarkScheme\Completion;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
@@ -51,7 +53,7 @@ class Model extends AbstractAssessment
      */
     public function setGradeGroup(GradeGroup $gradeGroup = null)
     {
-        if(null !== $gradeGroup){
+        if (null !== $gradeGroup) {
             throw new \InvalidArgumentException('Tasks cannot have mark type of Letter Grade.');
         }
         return $this;

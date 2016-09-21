@@ -43,10 +43,6 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     *
-     */
-
-    /**
      * @dataProvider provider_task
      * @param Task $task
      * @param User $student
@@ -54,6 +50,22 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     public function test_getHumanReadable(Task $task, User $student, $expected)
     {
+        $actual = $task->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_task_publishedOnly
+     * @param Task $task
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_getHumanReadable_PublishedOnly(Task $task, User $student, $expected)
+    {
+        // A student-assessed response is always published
+        // A teacher-assessed feedback can be unpublished
+
         $actual = $task->getHumanReadableMark($student, true);
         $message = "User: {$student->getFirstname()}, Expected: $expected, Actual: $actual";
         $this->assertEquals($expected, $actual, $message);
@@ -73,6 +85,20 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function provider_task_publishedOnly()
+    {
+        $task = $this->getDummyTask();
+        return [
+            [$task, $this->getDummyStudent(1), Completion::HUMAN_READABLE_INCOMPLETE],
+            [$task, $this->getDummyStudent(2), Completion::HUMAN_READABLE_STUDENT_COMPLETED],
+            [$task, $this->getDummyStudent(3), Completion::HUMAN_READABLE_INCOMPLETE],
+            [$task, $this->getDummyStudent(4), Completion::HUMAN_READABLE_STUDENT_COMPLETED],
+        ];
+    }
+
+
+
+
     /**
      * Generates a task.
      * * user1: none
@@ -80,11 +106,13 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      * * user3: teacher-assessed
      * * user4: self-assessed then teacher-assessed
      *
+     * In all cases, QuizReviews are unpublished
+     *
      * @return Task
      */
     private function getDummyTask()
     {
-        $task = (new Task())->setMarkScheme(new Completion());
+        $task = (new Task())->setId(1)->setMarkScheme(new Completion());
 
         $student1 = $this->getDummyStudent(1);
         $student2 = $this->getDummyStudent(2);
@@ -109,24 +137,31 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         // user2: self-assessed
         $response2 = new TaskCompletion();
         $response2->setId(2);
+        $response2->setAssessable($task);
         $response2->setSubmittedBy($student2);
         $response2->setSubmittedOnBehalfOf($student2);
+        $response2->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $participant2->getAllResponses()->add($response2);
         $task->getResponses()->add($response2);
+
 
         // user3: teacher-assessed
         $response3 = new TaskCompletion();
         $response3->setId(3);
+        $response3->setAssessable($task);
         $response3->setSubmittedBy($teacher);
         $response3->setSubmittedOnBehalfOf($student3);
+        $response3->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $participant3->getAllResponses()->add($response3);
         $task->getResponses()->add($response3);
 
         $feedback3 = new TaskFeedback();
         $feedback3->setId(3);
+        $feedback3->setAssessable($task);
         $feedback3->setResponse($response3);
         $feedback3->setReviewer($teacher);
-//        $feedback3->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $feedback3->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $feedback3->setPublishedAt($this->getDummyDate(null));
         $participant3->getAllFeedbacks()->add($feedback3);
         $task->getFeedbacks()->add($feedback3);
         $response3->getAllFeedback()->add($feedback3);
@@ -134,21 +169,23 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         // user4: student-assessed then teacher-assessed
         $response4 = new TaskCompletion();
         $response4->setId(4);
+        $response4->setAssessable($task);
         $response4->setSubmittedBy($student4);
         $response4->setSubmittedOnBehalfOf($student4);
+        $response4->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
         $participant4->getAllResponses()->add($response4);
         $task->getResponses()->add($response4);
 
         $feedback4 = new TaskFeedback();
         $feedback4->setId(4);
+        $feedback4->setAssessable($task);
         $feedback4->setResponse($response4);
         $feedback4->setReviewer($teacher);
-//        $feedback3->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $feedback4->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $feedback4->setPublishedAt($this->getDummyDate(null));
         $participant4->getAllFeedbacks()->add($feedback4);
         $task->getFeedbacks()->add($feedback4);
         $response4->getAllFeedback()->add($feedback4);
-
-//var_dump($task);die();
 
         return $task;
     }
@@ -225,8 +262,11 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      * @param string $dateString eg '2016-08-08 21:03:19'
      * @return \Alaress_Date_Format
      */
-    private function getDummyDate($dateString)
+    private function getDummyDate($dateString = null)
     {
-        return new \Alaress_Date_Format($dateString, \Alaress_Date_Format::DATABASE_FORMAT);
+
+        return null === $dateString
+            ? new \Alaress_Date_NullDate()
+            : new \Alaress_Date_Format($dateString, \Alaress_Date_Format::DATABASE_FORMAT);
     }
 }

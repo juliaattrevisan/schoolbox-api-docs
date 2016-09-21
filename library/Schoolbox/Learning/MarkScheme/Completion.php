@@ -30,10 +30,12 @@ class Completion extends AbstractMarkScheme
     {
         if(null === $response){
             return self::HUMAN_READABLE_INCOMPLETE;
-        } else if (null === $response->getAllFeedback() || 0 === $response->getAllFeedback()->count()){
+        } else if (count($response->getAllFeedback())){
+            return self::HUMAN_READABLE_TEACHER_COMPLETED;
+        } else if($response->getSubmittedBy()->getId() === $response->getSubmittedOnBehalfOf()->getId() ) {
             return self::HUMAN_READABLE_STUDENT_COMPLETED;
         } else {
-            return self::HUMAN_READABLE_TEACHER_COMPLETED;
+            return self::HUMAN_READABLE_INCOMPLETE;
         }
     }
 

@@ -14,8 +14,12 @@ namespace Schoolbox\Learning\Assessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use \Schoolbox\Collection;
+use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use \Schoolbox\User;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Schoolbox\Mapper\Traits\Model\Id;
 use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use \Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
@@ -166,15 +170,36 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function getHumanReadableMark(User $user, $publishedOnly)
     {
-        $participant = $this->getParticipant($user);
+        $markScheme = $this->getMarkScheme();
+        $response = null;
 
-        $feedback = $publishedOnly
-            ? $participant->findMostRecentPublishedFeedback($this)
-            : $participant->findMostRecentFeedback($this);
+        // Special Case: Completion depends only presence of $response and/or $feedback
+        if ($markScheme instanceof Completion) {
+            $participant = $this->getParticipant($user);
 
-        $response = null === $feedback ? null : $feedback->getResponse();
+            $feedback = $publishedOnly
+                ? $participant->findMostRecentPublishedFeedback($this)
+                : $participant->findMostRecentFeedback($this);
 
-        return $this->getMarkScheme()->getHumanReadableMark($this->getNormalisedMark($user, $publishedOnly), $response);
+            if ($feedback) {
+                $response = $feedback->getResponse();
+            } else {
+                $response = $participant->findMostRecentResponse($this);
+
+                // Was this Assessment self-assessed ?
+                if ($response && $response->getSubmittedBy()->getId() === $response->getSubmittedOnBehalfOf()->getId()) {
+                    if($publishedOnly){
+                        // Ignore any unpublished teacher feedback
+                        $response = clone $response;
+                        $response->setAllFeedback(new Collection());
+                    }
+                } else {
+                    $response = null;
+                }
+            }
+        }
+
+        return $markScheme->getHumanReadableMark($this->getNormalisedMark($user, $publishedOnly), $response);
     }
 
     /**
