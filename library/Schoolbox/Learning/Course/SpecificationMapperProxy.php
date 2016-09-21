@@ -147,11 +147,19 @@ class SpecificationMapperProxy
         // Assign ID
         $specification->setId($dataModel->getId());
 
-        // Units (if supplied)
+        // Save units
+        $existingUnits = $this->unitMapper->findAllByCourseId($specification->getId());
+        $savedUnits    = new Collection();
+        foreach ($specification->getUnits() as $unit) {
+            $savedUnits->add($this->unitTranslator->translateToDataModel($unit, $specification));
+        }
+        $this->unitMapper->save($savedUnits);
+
         // Any units that exist but aren't in $specification->getUnits() are deleted!
-//        if ($saveUnits) {
-//            $existingUnits = '';
-//        }
+        $this->unitMapper->delete($existingUnits->diff($savedUnits, function (UnitModel $unit) {
+            return $unit->getId();
+        }));
+
         return $specification;
     }
 
