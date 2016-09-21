@@ -1,7 +1,16 @@
 <div class="small-12 columns">
     <label>Max Attempts
+        {% set maxAttempts = 10 %}
         <select name="max-attempts" id="max-attempts">
-            <option data-slug="{{ option.slug }}" value="{{ descriptor.value }}" {{ descriptor.value.selected }}>{{ attempts.text }}</option>
+
+            {% for i in 0..maxAttempts %}
+            {% if i == 0 %}
+                <option value="{{ i }}">Unlimited</option>
+            {% else %}
+                <option value="{{ i }}">{{ i }}</option>
+            {% endif %}
+            {% endfor %}
+
         </select>
     </label>
 </div>
