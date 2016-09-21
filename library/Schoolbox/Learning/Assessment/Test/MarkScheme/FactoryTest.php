@@ -24,6 +24,8 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevel;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Project;
 use InvalidArgumentException;
@@ -157,12 +159,12 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     public function provider_quiz_markTypeInvalid()
     {
         return [
-            [(new Quiz())->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT))],
-            [(new Quiz())->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER))],
-            [(new Quiz())->setMarkType($this->getDummyMarkType(MarkType::TYPE_FREE))],
-            [(new Quiz())->setMarkType($this->getDummyMarkType(MarkType::TYPE_RUBRIC))],
-            [(new Quiz())->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE))],
-            [(new Quiz())->setMarkType($this->getDummyMarkType(MarkType::TYPE_COMPLETION))],
+            [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT))],
+            [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER))],
+            [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_FREE))],
+            [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_RUBRIC))],
+            [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE))],
+            [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_COMPLETION))],
         ];
     }
 
@@ -172,7 +174,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
     public function provider_quiz_markTypeValid()
     {
         return [
-            [(new Quiz())->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL)), TotalMarkFractional::class],
+            [$this->getDummyQuiz()->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL)), TotalMarkFractional::class],
         ];
     }
 
@@ -343,5 +345,101 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
             $gradeGroup->addGradeLevel($level);
         }
         return $gradeGroup;
+    }
+
+    /**
+     * Generate a Quiz with attached Attempts, Feedbacks, Questions + Responses
+     *
+     * Quiz does not yet have a MarkType or MarkScheme attached, that is caller's responsibility
+     *
+     * The quiz logically has 1 section with 3 questions worth 1 mark each.
+     * The quiz has 1 attempt with 2 answers, 1 of which is correct (ie norm mark = 50.0)
+     */
+    private function getDummyQuiz()
+    {
+        $question1 = [
+            'question_id' => 1,
+            'section_id'  => 1,
+            'sequence'    => 1,
+            'type_id'     => 1,
+            'marks'       => 1.0,
+            'question'    => '<div class=\"ff4\">What does Jerome (Vincent) place on the comb at his workstation?</div>',
+            'config'      => null,
+            'deleted_at'  => null,
+        ];
+        $question2 = [
+            'question_id' => 2,
+            'section_id'  => 1,
+            'sequence'    => 2,
+            'type_id'     => 1,
+            'marks'       => 1.0,
+            'question'    => '<div class=\"ff4\">They used to say that a child conceived in love has a greater chance</div>',
+            'config'      => null,
+            'deleted_at'  => null,
+        ];
+        $question3 = [
+            'question_id' => 3,
+            'section_id'  => 1,
+            'sequence'    => 3,
+            'type_id'     => 1,
+            'marks'       => 1.0,
+            'question'    => '<p><span>What is Jerome\'s (Vincent\'s) life expectancy?</span></p>',
+            'config'      => null,
+            'deleted_at'  => null,
+        ];
+
+        $response1 = [
+            'response_id'        => 1,
+            'attempt_id'         => 1,
+            'section_id'         => 1,
+            'question_id'        => 1,
+            'response'           => 'toothpaste',
+            'comment'            => "No, that's not the correct answer",
+            'mark'               => 0.0,
+            'automarked_already' => 'false',
+            'updated_at'         => '2012-07-04 13:42:15',
+            'deleted_at'         => null,
+        ];
+
+        $response2 = [
+            'response_id'        => 2,
+            'attempt_id'         => 1,
+            'section_id'         => 1,
+            'question_id'        => 2,
+            'response'           => 'Being happy',
+            'comment'            => "Correct. Although the correct term is 'Happiness'",
+            'mark'               => 1.0,
+            'automarked_already' => 'false',
+            'updated_at'         => '2012-07-04 13:42:30',
+            'deleted_at'         => null,
+        ];
+
+        $quiz = new Quiz();
+        $attempt = new QuizAttempt();
+        $feedback = new QuizFeedback();
+
+        // Link them all together
+        $quiz->getResponses()->add($attempt);
+        $quiz->getFeedbacks()->add($feedback);
+        $feedback->setResponse($attempt);
+        $feedback->setAssessable($quiz);
+        $attempt->getAllFeedback()->add($feedback);
+        $attempt->setAssessable($quiz);
+
+        // Inject data
+        $quiz->setMaxMark($question1['marks'] + $question2['marks'] + $question3['marks']);
+
+        $attempt->setAllResponses([
+            [
+                'mark' => $response1['mark'],
+                'available' => $question1['marks'],
+            ],
+            [
+                'mark' => $response2['mark'],
+                'available' => $question2['marks'],
+            ],
+        ]);
+
+        return $quiz;
     }
 }

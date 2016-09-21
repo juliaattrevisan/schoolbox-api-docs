@@ -10,10 +10,6 @@ namespace Schoolbox\Learning\Assessment\Test;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
-use Schoolbox\Learning\Assessment\Quiz\Question as QuizQuestion;
-use Schoolbox\Learning\Assessment\Quiz\Response as QuizResponse;
-use Schoolbox\Learning\Assessment\Quiz\Section as QuizSection;
-use Schoolbox\Learning\Assessment\Quiz\Answer as QuizAnswer;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use \InvalidArgumentException;
 use \RangeException;
@@ -319,34 +315,14 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
     /**
      * Generate a Quiz with attached Attempts, Feedbacks, Questions + Responses
      *
+     * Quiz does not yet have a MarkType or MarkScheme attached, that is caller's responsibility
+     *
      * The quiz logically has 1 section with 3 questions worth 1 mark each.
      * The quiz has 1 attempt with 2 answers, 1 of which is correct (ie norm mark = 50.0)
      */
     private function getDummyQuiz()
     {
-//        $answer1 = new QuizAnswer([
-//            'answer_id'   => 1,
-//            'question_id' => 1,
-//            'sequence'    => 1,
-//            'answer'      => "Jerome's Hair",
-//            'deleted_at'  => null,
-//        ]);
-//        $answer2 = new QuizAnswer([
-//            'answer_id'   => 2,
-//            'question_id' => 2,
-//            'sequence'    => 2,
-//            'answer'      => "Happiness",
-//            'deleted_at'  => null,
-//        ]);
-//        $answer3 = new QuizAnswer([
-//            'answer_id'   => 3,
-//            'question_id' => 3,
-//            'sequence'    => 3,
-//            'answer'      => "30.2 Years",
-//            'deleted_at'  => null,
-//        ]);
-
-        $question1 = new QuizQuestion([
+        $question1 = [
             'question_id' => 1,
             'section_id'  => 1,
             'sequence'    => 1,
@@ -355,8 +331,8 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
             'question'    => '<div class=\"ff4\">What does Jerome (Vincent) place on the comb at his workstation?</div>',
             'config'      => null,
             'deleted_at'  => null,
-        ]);
-        $question2 = new QuizQuestion([
+        ];
+        $question2 = [
             'question_id' => 2,
             'section_id'  => 1,
             'sequence'    => 2,
@@ -365,8 +341,8 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
             'question'    => '<div class=\"ff4\">They used to say that a child conceived in love has a greater chance</div>',
             'config'      => null,
             'deleted_at'  => null,
-        ]);
-        $question3 = new QuizQuestion([
+        ];
+        $question3 = [
             'question_id' => 3,
             'section_id'  => 1,
             'sequence'    => 3,
@@ -375,22 +351,9 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
             'question'    => '<p><span>What is Jerome\'s (Vincent\'s) life expectancy?</span></p>',
             'config'      => null,
             'deleted_at'  => null,
-        ]);
+        ];
 
-
-        $section = new QuizSection([
-            'section_id'  => 1,
-            'assess_id'   => 1,
-            'sequence'    => 1,
-            'title'       => 'The one and only Section',
-            'description' => 'This is a quiz section. blah blah blah',
-            'random'      => 1,
-            'pool'        => 2,
-            'deleted_at'  => null,
-        ]);
-
-
-        $response1 = new QuizResponse([
+        $response1 = [
             'response_id'        => 1,
             'attempt_id'         => 1,
             'section_id'         => 1,
@@ -401,9 +364,9 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
             'automarked_already' => 'false',
             'updated_at'         => '2012-07-04 13:42:15',
             'deleted_at'         => null,
-        ]);
+        ];
 
-        $response2 = new QuizResponse([
+        $response2 = [
             'response_id'        => 2,
             'attempt_id'         => 1,
             'section_id'         => 1,
@@ -414,47 +377,35 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
             'automarked_already' => 'false',
             'updated_at'         => '2012-07-04 13:42:30',
             'deleted_at'         => null,
-        ]);
+        ];
 
+        $quiz = new Quiz();
         $attempt = new QuizAttempt();
         $feedback = new QuizFeedback();
 
-        $quiz = new Quiz();
-
-        // Add Section to Quiz
-        $quiz->getSections()->add($section);
-
-        // Add Questions to Section
-        $section->getQuestions()->add($question1);
-        $section->getQuestions()->add($question2);
-        $section->getQuestions()->add($question3);
-
-        // Add Answers to Questions
-//        $question1->setAnswer($answer1);
-//        $question2->setAnswer($answer2);
-//        $question3->setAnswer($answer3);
-
-        // Add Attempt to Quiz
+        // Link them all together
         $quiz->getResponses()->add($attempt);
-
-        // Add Feedback to Quiz
         $quiz->getFeedbacks()->add($feedback);
+        $feedback->setResponse($attempt);
+        $feedback->setAssessable($quiz);
+        $attempt->getAllFeedback()->add($feedback);
+        $attempt->setAssessable($quiz);
 
-        // Link Responses to Questions
-        $response1->setQuestion($question1);
-        $response2->setQuestion($question2);
+        // Inject data
+        $quiz->setMaxMark($question1['marks'] + $question2['marks'] + $question3['marks']);
 
-        // Link Questions to Responses
-        $question1->getResponses()->add($response1);
-        $question2->getResponses()->add($response2);
+        $attempt->setAllResponses([
+            [
+                'mark' => $response1['mark'],
+                'available' => $question1['marks'],
+            ],
+            [
+                'mark' => $response2['mark'],
+                'available' => $question2['marks'],
+            ],
+        ]);
 
-        // Add Responses to Attempt
-        $attempt->getAllResponses()->add($response1);
-        $attempt->getAllResponses()->add($response2);
 
-        // Add Questions to Attempt
-        $attempt->getAllQuestions()->add($question1);
-        $attempt->getAllQuestions()->add($question2);
 
 //var_dump($quiz);die();
         return $quiz;
