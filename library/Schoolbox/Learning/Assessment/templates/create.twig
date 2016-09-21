@@ -48,17 +48,38 @@
                     next.find('[data-mage-collapsed]').hide().removeClass('hide').slideDown(600);
                 }
 
+                /**
+                 * Update the returnUrl field, for Project
+                 */
+                function updateReturnUrl(returnUrl) {
+                    $.each($('#projectButtons').find('[data-return-url]'), function(index, element) {
+                        var newUrl = $(element).attr('href') + returnUrl;
+
+                        $(element).attr('href', newUrl);
+                    });
+                }
+
                 /* Switch between the Assessable types that you might
                  * have selected from part-1
                  */
                 var selected = $('#assessmentForm').find('input[name=assessmentType]:checked').val();
 
                 switch(selected) {
-                    case 'project': updateType('Project', selected); break;
-                    case 'dueWork': updateType('Due Work', selected); break;
-                    case 'quiz': updateType('Quiz', selected); break;
-                    case 'task': updateType('Task', selected); break;
-                    default: break;
+                    case 'project':
+                        updateType('Project', selected);
+                        updateReturnUrl(data.returnUrl);
+                        break;
+                    case 'dueWork':
+                        updateType('Due Work', selected);
+                        break;
+                    case 'quiz':
+                        updateType('Quiz', selected);
+                        break;
+                    case 'task':
+                        updateType('Task', selected);
+                        break;
+                    default:
+                        break;
                 }
             }
         });

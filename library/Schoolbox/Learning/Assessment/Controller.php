@@ -87,10 +87,10 @@ class Controller extends Base
          */
         $assessmentId = 1234567890;
 
-        $returnPath = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', [ 'assessmentId' => $assessmentId ] );
+        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', [ 'assessmentId' => $assessmentId ] );
 
         $data = [
-            'returnPath' => urlencode(base64_encode($returnPath))
+            'returnUrl' => urlencode(base64_encode($returnUrl))
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
