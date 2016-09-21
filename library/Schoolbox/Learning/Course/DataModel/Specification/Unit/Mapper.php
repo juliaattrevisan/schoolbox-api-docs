@@ -104,11 +104,11 @@ class Mapper extends BaseMapper
     /**
      * Finds all unit specs for this course spec.
      *
-     * @param int   $courseId
-     * @param array $options
+     * @param int|array $courseId
+     * @param array     $options
      * @return Collection|Model[]
      */
-    public function findByCourseId($courseId, $options = [])
+    public function findAllByCourseId($courseId, $options = [])
     {
         return $this->findByColumn('course_specification_id', $courseId, $options);
     }
@@ -116,11 +116,11 @@ class Mapper extends BaseMapper
     /**
      * Finds all unit specs for the course spec that is linked to this folder.
      *
-     * @param int   $courseFolderId
-     * @param array $options
+     * @param int|array $courseFolderId
+     * @param array     $options
      * @return Collection|Model[]
      */
-    public function findByCourseFolderId($courseFolderId, $options = [])
+    public function findAllByCourseFolderId($courseFolderId, $options = [])
     {
         return $this->findByColumn('c.folder_id', $courseFolderId, $options);
     }

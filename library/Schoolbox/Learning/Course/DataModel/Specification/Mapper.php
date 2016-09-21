@@ -121,7 +121,7 @@ class Mapper extends BaseMapper
      * @param array  $options
      * @return Collection|Model[]
      */
-    public function findByName($searchParam, $options = [])
+    public function findAllByName($searchParam, $options = [])
     {
         if (strlen($searchParam) === 0) {
             return $this->findAll($options);

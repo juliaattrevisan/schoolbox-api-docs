@@ -92,15 +92,15 @@ class SpecificationMapperProxy
     }
 
     /**
-     * Proxy for `Mapper->findByName()`.
+     * Proxy for `Mapper->findAllByName()`.
      *
      * @param string $name
      * @return Collection|Specification[]
      */
-    public function findByName($name)
+    public function findAllByName($name)
     {
         return $this->mapper
-            ->findByName($name, ['order' => ['f.name' => 'ASC' ]])
+            ->findAllByName($name, ['order' => ['f.name' => 'ASC' ]])
             ->map([$this->translator, 'translateToDomainModel']);
     }
 

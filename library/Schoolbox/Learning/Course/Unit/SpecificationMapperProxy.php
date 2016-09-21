@@ -62,16 +62,16 @@ class SpecificationMapperProxy
     }
 
     /**
-     * Proxy for `Mapper->findByCourseId()`.
+     * Proxy for `Mapper->findAllByCourseId()`.
      *
-     * @param int $courseId
-     * @param array $options
+     * @param int|array $courseId One or more course IDs
+     * @param array     $options
      * @return Specification[]|Collection
      */
-    public function findByCourseId($courseId, $options = [])
+    public function findAllByCourseId($courseId, $options = [])
     {
         return $this->mapper
-            ->findByCourseId($courseId, $options)
+            ->findAllByCourseId($courseId, $options)
             ->map([$this->translator, 'translateToDomainModel']);
     }
 
@@ -94,16 +94,16 @@ class SpecificationMapperProxy
     }
 
     /**
-     * Proxy for `Mapper->findByCourseFolderId()`.
+     * Proxy for `Mapper->findAllByCourseFolderId()`.
      *
-     * @param int $courseFolderId
-     * @param array $options
+     * @param int|array $courseFolderId One or more folder IDs
+     * @param array     $options
      * @return Specification[]|Collection
      */
-    public function findByCourseFolderId($courseFolderId, $options = [])
+    public function findAllByCourseFolderId($courseFolderId, $options = [])
     {
         return $this->mapper
-            ->findByCourseFolderId($courseFolderId, $options)
+            ->findAllByCourseFolderId($courseFolderId, $options)
             ->map([$this->translator, 'translateToDomainModel']);
     }
 

@@ -289,7 +289,7 @@ class Controller extends Base\Base
 
                 // Populate units
                 $course->setUnits(
-                    $this->getUnitSpecificationMapperProxy()->findByCourseId($course->getId(), ['order' => ['f.name' => 'asc']])
+                    $this->getUnitSpecificationMapperProxy()->findAllByCourseId($course->getId(), ['order' => ['f.name' => 'asc']])
                 );
 
             } catch (MapperException $e) {
@@ -395,7 +395,7 @@ class Controller extends Base\Base
         $course = $this->getCourseSpecificationMapperProxy()->findById($post['id']);
         // TODO: figure out if course should load units by default
         $course->setUnits(
-            $this->getUnitSpecificationMapperProxy()->findByCourseId($post['id'])
+            $this->getUnitSpecificationMapperProxy()->findAllByCourseId($post['id'])
         );
 
         // Do not permit Courses to be moved to, or created in, Root
@@ -881,7 +881,7 @@ class Controller extends Base\Base
     protected function getCourseData($searchParam)
     {
         // Use the new mapper to get the list of courses
-        $allCourses = $this->getCourseSpecificationMapperProxy()->findByName($searchParam);
+        $allCourses = $this->getCourseSpecificationMapperProxy()->findAllByName($searchParam);
 
         $data = [];
 
@@ -915,7 +915,7 @@ class Controller extends Base\Base
 
             // Remove units whose folders aren't accessible by this user
             $currentCourse->setUnits(
-                $this->getUnitSpecificationMapperProxy()->findByCourseId(
+                $this->getUnitSpecificationMapperProxy()->findAllByCourseId(
                     $currentCourse->getId(),
                     ['order' => ['f.name' => 'ASC']]
                 )->filter(function($v) { return $this->confirmAccess($v->getFolder()->getId()); })
@@ -1169,7 +1169,7 @@ class Controller extends Base\Base
             'homepage'       => implode(',', array_keys($ownerships)),
             'courseHomepage' => $courseHomepage,
             'componentId'    => $componentId,
-            'units'          => $this->getUnitSpecificationMapperProxy()->findByCourseFolderId($courseHomepage),
+            'units'          => $this->getUnitSpecificationMapperProxy()->findAllByCourseFolderId($courseHomepage),
             'ownerships'     => implode(',', array_map(
                     function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
             )
@@ -2261,7 +2261,7 @@ class Controller extends Base\Base
         // TODO: make delete of folder and course atomic
 
         $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($id);
-        $unitSpecs  = $this->getUnitSpecificationMapperProxy()->findByCourseId($id);
+        $unitSpecs  = $this->getUnitSpecificationMapperProxy()->findAllByCourseId($id);
 
         // Delete course specs
         $this->getCourseSpecificationMapperProxy()->delete($courseSpec);
