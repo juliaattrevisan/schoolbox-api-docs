@@ -44,13 +44,18 @@ class Module extends BaseModule
 
                 /* This is the second half containing assessable-specific data
                  */
-                '/assessment/update' => 'getUpdateAssessment',
+                '/assessment/update/{assessmentId}' => 'getUpdateAssessment',
 
                 '/assessment/{assessmentId}/status'              => 'getStatus',
                 '/assessment/{assessmentId}/summary/{studentId}' => 'getSummary',
                 '/assessment/{assessmentId}/submit/{studentId}'  => 'getSubmitForm',
             ],
-            'POST' => []
+            'POST' => [
+
+                /* Save the data from the Create screen
+                 */
+                '/assessment/create' => 'postCreateAssessment'
+            ]
         ];
 
         foreach ($routes['GET'] as $path => $alias) {

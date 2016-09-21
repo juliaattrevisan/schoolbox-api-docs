@@ -53,13 +53,30 @@ class Controller extends Base
      */
     public function getCreateAssessment()
     {
-        $returnPath = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment');
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
             'assessment' => new DueWork(),
-            'returnUrl' =>  urlencode(base64_encode($returnPath))
         ]));
     }
+
+    /**
+     * Save the data when creating an Assessment
+     */
+    public function postCreateAssessment()
+    {
+
+        /* TODO: Actually save data here
+         */
+        $assessmentId = 1234567890;
+
+        $returnPath = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', [ 'assessmentId' => $assessmentId ] );
+
+        $data = [
+            'returnPath' => urlencode(base64_encode($returnPath))
+        ];
+
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
 
 
 
