@@ -289,11 +289,6 @@ class Controller extends Base\Base
                 $course->setFolder($this->getFolderMapper()->findById($course->getFolder()->getId()));
                 $folder = $course->getFolder();
 
-                // Populate units
-                $course->setUnits(
-                    $this->getUnitSpecificationMapperProxy()->findAllByCourseId($course->getId(), ['order' => ['f.name' => 'asc']])
-                );
-
             } catch (MapperException $e) {
                 // It should no longer be possible for a folder to exist without a course spec.
                 throw $this->getErrorMapper()->generateException(172);
@@ -395,10 +390,6 @@ class Controller extends Base\Base
 
         // Load course
         $course = $this->getCourseSpecificationMapperProxy()->findById($post['id']);
-        // TODO: figure out if course should load units by default
-        $course->setUnits(
-            $this->getUnitSpecificationMapperProxy()->findAllByCourseId($post['id'])
-        );
 
         // Do not permit Courses to be moved to, or created in, Root
         if(0 == $post['parent']){
@@ -916,12 +907,10 @@ class Controller extends Base\Base
             }
 
             // Remove units whose folders aren't accessible by this user
-            $currentCourse->setUnits(
-                $this->getUnitSpecificationMapperProxy()->findAllByCourseId(
-                    $currentCourse->getId(),
-                    ['order' => ['f.name' => 'ASC']]
-                )->filter(function($v) { return $this->confirmAccess($v->getFolder()->getId()); })
-            );
+            $currentCourse->getUnits()->filter(function($unit) {
+                /** @var UnitSpecification $unit */
+                return $this->confirmAccess($unit->getFolder()->getId());
+            });
 
             // Add course directly into $data
             $data['courses'][] = $currentCourse;
@@ -2263,15 +2252,9 @@ class Controller extends Base\Base
         // TODO: make delete of folder and course atomic
 
         $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($id);
-        $unitSpecs  = $this->getUnitSpecificationMapperProxy()->findAllByCourseId($id);
 
-        // Delete course specs
+        // Delete course specs (this also deletes constituent units)
         $this->getCourseSpecificationMapperProxy()->delete($courseSpec);
-
-        // Delete constituent units
-        foreach ($unitSpecs as $unitSpec) {
-            $this->getUnitSpecificationMapperProxy()->delete($unitSpec);
-        }
 
         /** @var Folder\Controller $folderController */
         $folderController = $this->getController('folder');

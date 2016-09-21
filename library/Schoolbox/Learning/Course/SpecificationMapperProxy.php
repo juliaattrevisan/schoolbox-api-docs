@@ -126,9 +126,11 @@ class SpecificationMapperProxy
      */
     public function findAllByName($name)
     {
-        return $this->mapper
-            ->findAllByName($name, ['order' => ['f.name' => 'ASC' ]])
-            ->map([$this->translator, 'translateToDomainModel']);
+        return $this->loadUnitsForCollection(
+            $this->mapper
+                ->findAllByName($name, ['order' => ['f.name' => 'ASC' ]])
+                ->map([$this->translator, 'translateToDomainModel'])
+        );
     }
 
     /**
@@ -144,7 +146,12 @@ class SpecificationMapperProxy
         $this->mapper->save($dataModel);
         // Assign ID
         $specification->setId($dataModel->getId());
-        // TODO determine whether units should be saved here
+
+        // Units (if supplied)
+        // Any units that exist but aren't in $specification->getUnits() are deleted!
+//        if ($saveUnits) {
+//            $existingUnits = '';
+//        }
         return $specification;
     }
 
@@ -208,10 +215,11 @@ class SpecificationMapperProxy
         foreach ($allSpecs as $spec) {
             $ids[] = $spec->getId();
         }
-        $allUnits = $this->unitMapper->findAllByCourseId($ids)->groupByCallback(function ($v) {
-            /** @var UnitModel $v */
-            return $v->getCourse()->getId();
-        });
+        $allUnits = $this->unitMapper->findAllByCourseId($ids, ['order' => ['f.name' => 'asc']])
+            ->groupByCallback(function ($v) {
+                /** @var UnitModel $v */
+                return $v->getCourse()->getId();
+            });
 
         // Match unit specs to their course spec
         foreach ($allSpecs as $spec) {
