@@ -1,7 +1,6 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-    [ 'Learning', '#' ],
-    [ 'Classname', '#' ],
+    [ folder.name, '/homepage/' ~ folder.id ],
     [ 'Create Assessment', routeLookup('learningAssessment.getCreateAssessment') ]
 ) }}
 

@@ -17,6 +17,7 @@ use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 use \Alaress_Date_Format;
 use \Alaress_Date_NullDate;
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 use \Schoolbox\Resource\Storage\Model as Storage;
 
@@ -40,22 +41,38 @@ class Controller extends Base
     protected $errorMapper;
 
     /**
+     * @var FolderMapper
+     */
+    protected $folderMapper;
+
+    /**
      * Controller constructor.
+     * @param FolderMapper $folderMapper
      * @param ErrorMapper $errorMapper
      */
-    public function __construct(ErrorMapper $errorMapper)
+    public function __construct(FolderMapper $folderMapper, ErrorMapper $errorMapper)
     {
         $this->setErrorMapper($errorMapper);
+        $this->setFolderMapper($folderMapper);
     }
 
     /**
      * Create an Assessment
+     *
+     * @param $folderId
      */
     public function getCreateAssessment($folderId)
     {
-        $folder = new \Schoolbox\Resource\Folder\Model();
+        try {
+            $folder = $this->getFolderMapper()->findById($folderId);
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
+        }
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
             'assessment' => new DueWork(),
+            'folder' => $folder,
             'curriculumNodes' => $folder->getCurriculumNodes()
         ]));
     }
@@ -210,6 +227,24 @@ class Controller extends Base
         $this->errorMapper = $errorMapper;
         return $this;
     }
+
+    /**
+     * @return FolderMapper
+     */
+    protected function getFolderMapper()
+    {
+        return $this->folderMapper;
+    }
+
+    /**
+     * @param FolderMapper $folderMapper
+     */
+    protected function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+    }
+
+
 
     // ================ DUMMY DATA GENERATION ===============================================
 

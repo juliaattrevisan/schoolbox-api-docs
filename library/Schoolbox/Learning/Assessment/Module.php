@@ -19,6 +19,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use \External_UserInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Module extends BaseModule
 {
@@ -40,7 +41,7 @@ class Module extends BaseModule
                  * This is the first half containing shared data such as title,
                  * description and dates
                  */
-                '/assessment/create' => 'getCreateAssessment',
+                '/assessment/create/{folderId}' => 'getCreateAssessment',
 
                 /* This is the second half containing assessable-specific data
                  */
@@ -109,6 +110,7 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
+                'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
                 'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             ])
         );
