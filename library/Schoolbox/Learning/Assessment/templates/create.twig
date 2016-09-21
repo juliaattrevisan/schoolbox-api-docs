@@ -24,7 +24,6 @@
         });
     });
 </script>
-
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
 <script type="text/javascript">
@@ -66,6 +65,9 @@
         });
     });
 </script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
 
 <div class="row">
     <div class="small-12 columns"><h1>Create Assessment</h1></div>
@@ -172,6 +174,18 @@
                     <div class="column small-12">
                         <label>Curriculum Codes</label>
                         <input id='user' name="userId" type='text' value='' data-selectizeuser required />
+                    </div>
+
+                    <div class="small-12 large-10 columns">
+                        <label>
+                            Curriculum Codes
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Link this folder with a corresponding curriculum area, you can link multiple curriculum areas to this folder">?</span>
+                        </label>
+                        {% include 'sub/curriculumCodeSelector.twig' with {'codeList': curriculumNodes, 'renderButton': false} %}
+                    </div>
+                    <div class="small-12 large-2 columns">
+                        <label>Browse</label>
+                        {% include 'sub/curriculumBrowseButton.twig' %}
                     </div>
                 </fieldset>
                 <fieldset class="content">

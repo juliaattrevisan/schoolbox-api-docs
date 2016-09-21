@@ -51,10 +51,12 @@ class Controller extends Base
     /**
      * Create an Assessment
      */
-    public function getCreateAssessment()
+    public function getCreateAssessment($folderId)
     {
+        $folder = new \Schoolbox\Resource\Folder\Model();
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
             'assessment' => new DueWork(),
+            'curriculumNodes' => $folder->getCurriculumNodes()
         ]));
     }
 
