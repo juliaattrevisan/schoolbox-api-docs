@@ -159,6 +159,9 @@ class SpecificationMapperProxy
         // Convert to data model, then delete
         $dataModel = $this->translator->translateToDataModel($specification);
         $this->mapper->delete($dataModel);
+
+        // Delete all units that are a part of this unit (non-negotiable)
+        $this->unitMapper->delete($this->unitMapper->findAllByCourseId($specification->getId()));
         return $specification;
     }
 
