@@ -10,8 +10,10 @@ namespace Schoolbox\Learning\Course\DataModel\Specification\Unit;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
  * Mapper for the data model for Unit Specifications.
@@ -47,10 +49,12 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('folder', 'f')},
+                {$this->getJoinColumnString('folder.homepages', 'fh')},
                 {$this->getJoinColumnString('course', 'c')},
                 {$this->getJoinColumnString('course.folder', 'cf')}
             FROM {$this->database->quoteIdentifier($this->table)}
             INNER JOIN {$this->getJoinSql('folder', '', 'f')}
+            LEFT  JOIN {$this->getJoinSql('folder.homepages', 'f', 'fh')}
             INNER JOIN {$this->getJoinSql('course', '', 'c')}
             INNER JOIN {$this->getJoinSql('course.folder', 'c', 'cf')}
         ";
@@ -68,10 +72,18 @@ class Mapper extends BaseMapper
         foreach ($statement as $row) {
             /** @var Model $model */
             $model = $this->hydrate($row);
-            $model->setFolder($this->hydrateJoin($row, 'folder', 'f'));
+
+            /** @var FolderModel $folder */
+            $folder = $this->hydrateJoin($row, 'folder', 'f');
+            $folder->setHomepage($this->hydrateJoin($row, 'folder.homepages', 'fh'));
+            $model->setFolder($folder);
+
+            /** @var CourseSpecificationModel $course */
             $course = $this->hydrateJoin($row, 'course', 'c');
             $course->setFolder($this->hydrateJoin($row, 'course.folder', 'cf'));
             $model->setCourse($course);
+
+            // Add to list
             $modelList->add($model);
         }
         return $modelList;

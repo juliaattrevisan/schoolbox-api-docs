@@ -66,9 +66,11 @@ class Mapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('folder', 'f')}
+                {$this->getJoinColumnString('folder', 'f')},
+                {$this->getJoinColumnString('folder.homepages', 'fh')}
             FROM {$this->database->quoteIdentifier($this->table)}
             INNER JOIN {$this->getJoinSql('folder', '', 'f')}
+            LEFT  JOIN {$this->getJoinSql('folder.homepages', 'f', 'fh')}
         ";
     }
 
@@ -84,7 +86,13 @@ class Mapper extends BaseMapper
         foreach ($statement as $row) {
             /** @var Model $model */
             $model = $this->hydrate($row);
-            $model->setFolder($this->hydrateJoin($row, 'folder', 'f'));
+
+            /** @var FolderModel $folder */
+            $folder = $this->hydrateJoin($row, 'folder', 'f');
+            $folder->setHomepage($this->hydrateJoin($row, 'folder.homepages', 'fh'));
+            $model->setFolder($folder);
+
+            // Add
             $modelList->add($model);
         }
 
