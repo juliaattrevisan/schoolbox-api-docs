@@ -14,23 +14,47 @@
         </select>
     </label>
 </div>
-<div class="small-4 columns">
-    <label for="duration">Duration</label>
-    <div class="switch round">
-        <input id="duration" type="checkbox" checked data-checkbox-group="duration" />
-        <label for="duration">
-            <span class="icon-approve"></span>
-            <span class="icon-cancel"></span>
-        </label>
+
+<script type="text/javascript">
+    $(function() {
+        $('#quizDuration').on('click', function(event) {
+            if ($(this).is(':checked')) {
+                $('#quizDurationPanel').hide().removeClass('hide').slideDown(600);
+            }
+            else {
+                $('#quizDurationPanel').slideUp(600, function() {
+                    $(this).addClass('hide');
+                });
+            }
+        });
+    });
+</script>
+<div class="small-12 columns">
+    <div class="row">
+        <div class="small-12 columns">
+            <label for="quizDuration">Duration</label>
+            <div class="switch round">
+                <input id="quizDuration" type="checkbox" data-checkbox-group="quizDuration" />
+                <label for="quizDuration">
+                    <span class="icon-approve"></span>
+                    <span class="icon-cancel"></span>
+                </label>
+            </div>
+        </div>
     </div>
-</div>
-<div class="small-4 columns">
-    <label>Hours
-        <input type="text" placeholder="Duration Hours">
-    </label>
-</div>
-<div class="small-4 columns">
-    <label>Minutes
-        <input type="text" placeholder="Duration Minutes">
-    </label>
+
+    <div class="row hide" id="quizDurationPanel">
+        <div class="small-12 columns no-pad">
+            <div class="small-12 medium-6 columns">
+                <label>Hours
+                    <input type="text" name='quizDurationHours' />
+                </label>
+            </div>
+            <div class="small-12 medium-6 columns">
+                <label>Minutes
+                    <input type="text" name='quizDurationMinutes' />
+                </label>
+            </div>
+        </div>
+    </div>
 </div>
