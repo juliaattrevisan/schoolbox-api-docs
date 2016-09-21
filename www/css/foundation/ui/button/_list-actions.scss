@@ -67,7 +67,7 @@
 			}
 		}
 
-		.island, .column, .columns {
+		.island, .column, .columns, .card-new {
 			/* Inside a containing column, but not an action-
 			 * or information-list construct (e.g. h2 actions)
 			 *
@@ -76,7 +76,7 @@
 			 * always appear inside islands or columns
 			 */
 			.actions-#{$size}-#{$i} {
-				> nav {
+				nav {
 					right: 0;
 				}
 			}

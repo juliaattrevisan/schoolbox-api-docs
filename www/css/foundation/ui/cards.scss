@@ -1,14 +1,56 @@
+/*
+ * Cards can display an image, icon or mime.
+ * Headings, text, metadata, or a variety of other interface elements always exist.
+ * Can be used in conjunction with lists.
+ */
+.card-new{
+	.card-feature-image{
+		position: relative;
+		img{
+			width: 100%;
+		}
+		.class-colour{
+			height: 0.625rem;
+			width: 100%;
+			@include absolute (auto, auto, 0, auto);
+		}
+	}
+	.card-content{
+		padding: 0.5rem 1rem;
+		position: relative;
+		width: 100%;
+
+		h1,h2,h3,h4,h5,h6 {
+			margin-top: 0;
+			margin-bottom: 0;
+			// firefox fails to inherit when in links
+			color: inherit;
+		}
+
+		h2,h3,h4,h5,h6, p, .meta {
+			text-overflow: ellipsis;
+			overflow-x: hidden;
+			white-space: nowrap;
+		}
+
+		a {
+			h1,h2,h3,h4,h5,h6 {
+				color: inherit;
+			}
+		}
+
+		> p:last-child {
+			padding-bottom: 0.5rem;
+		}
+	}
+}
+
 .card {
 	// card "extends" column
 	float: left;
 	position: relative;
 	padding: 0.5rem 1rem 0 1rem;
 
-	/*
-	 * Displays an image to the left,
-	 * then follows text, metadata, or a variety of other interface elements.
-	 * Can be used in conjunction with lists
-	 */
 	img, [class^="icon-"] {
 		float: left;
 		margin: -0.5rem 1rem 0 -1rem;
