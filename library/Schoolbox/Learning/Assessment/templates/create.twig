@@ -1,8 +1,8 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
-    [ 'Learning',    routeLookup('sportsfixtures.getLanding') ],
-    [ 'Classname',   routeLookup('sportsfixturesSport.getList') ],
-    [ 'Create Assessment',   routeLookup('sportsfixturesSport.getList') ]
+    [ 'Learning', '#' ],
+    [ 'Classname', '#' ],
+    [ 'Create Assessment', routeLookup('learningAssessment.getCreateAssessment') ]
 ) }}
 
 <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
