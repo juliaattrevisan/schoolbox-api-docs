@@ -11,6 +11,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model;
+use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationMapperProxy;
 use Schoolbox\Mapper\Exception;
 
 /**
@@ -32,15 +33,25 @@ class SpecificationMapperProxy
     private $translator;
 
     /**
+     * @var UnitSpecificationMapperProxy
+     */
+    private $unitMapper;
+
+    /**
      * Constructor
      *
-     * @param Mapper     $mapper
-     * @param Translator $translator
+     * @param Mapper                       $mapper
+     * @param Translator                   $translator
+     * @param UnitSpecificationMapperProxy $unitMapper
      */
-    public function __construct(Mapper $mapper, Translator $translator)
-    {
+    public function __construct(
+        Mapper $mapper,
+        Translator $translator,
+        UnitSpecificationMapperProxy $unitMapper
+    ) {
         $this->mapper     = $mapper;
         $this->translator = $translator;
+        $this->unitMapper = $unitMapper;
     }
 
     /**

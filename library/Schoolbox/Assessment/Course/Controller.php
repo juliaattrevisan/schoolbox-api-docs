@@ -156,17 +156,18 @@ class Controller extends Base\Base
         $this->setUnitSpecificationTranslator(new UnitSpecificationTranslator());
         $this->setCourseSpecificationTranslator(new CourseSpecificationTranslator($this->getUnitSpecificationTranslator()));
 
-        // Proxy for course/unit specification mappers (experimental)
-        $this->setCourseSpecificationMapperProxy(
-            new CourseSpecificationMapperProxy(
-                $this->getCourseSpecificationMapper(),
-                $this->getCourseSpecificationTranslator()
-            )
-        );
+        // Proxy for course/unit specification mappers
         $this->setUnitSpecificationMapperProxy(
             new UnitSpecificationMapperProxy(
                 $this->getUnitSpecificationMapper(),
                 $this->getUnitSpecificationTranslator()
+            )
+        );
+        $this->setCourseSpecificationMapperProxy(
+            new CourseSpecificationMapperProxy(
+                $this->getCourseSpecificationMapper(),
+                $this->getCourseSpecificationTranslator(),
+                $this->getUnitSpecificationMapperProxy()
             )
         );
 
