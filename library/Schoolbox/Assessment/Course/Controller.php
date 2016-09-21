@@ -293,6 +293,9 @@ class Controller extends Base\Base
                 // First, check whether or not this is already a course. We don't want to barr access to courses that
                 // are already courses.
                 $course = $this->getCourseSpecificationMapperProxy()->findById($id);
+
+                // Rehydrate course folder so that curriculum codes exist
+                $course->setFolder($this->getFolderMapper()->findById($course->getFolder()->getId()));
                 $folder = $course->getFolder();
 
                 // Populate units
@@ -309,7 +312,6 @@ class Controller extends Base\Base
 
             $instances = [];
 
-            $data['folder'] = $folder;
             $data['access'][$folder->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $folder->getId() ]);
             $data['course'] = $course;
 
