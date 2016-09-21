@@ -167,7 +167,8 @@ class Controller extends Base\Base
             new CourseSpecificationMapperProxy(
                 $this->getCourseSpecificationMapper(),
                 $this->getCourseSpecificationTranslator(),
-                $this->getUnitSpecificationMapperProxy()
+                $this->getUnitSpecificationMapper(),
+                $this->getUnitSpecificationTranslator()
             )
         );
 

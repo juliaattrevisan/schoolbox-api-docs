@@ -11,7 +11,9 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Model;
-use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitTranslator;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitModel;
 use Schoolbox\Mapper\Exception;
 
 /**
@@ -33,25 +35,33 @@ class SpecificationMapperProxy
     private $translator;
 
     /**
-     * @var UnitSpecificationMapperProxy
+     * @var UnitMapper
      */
     private $unitMapper;
 
     /**
+     * @var UnitTranslator
+     */
+    private $unitTranslator;
+
+    /**
      * Constructor
      *
-     * @param Mapper                       $mapper
-     * @param Translator                   $translator
-     * @param UnitSpecificationMapperProxy $unitMapper
+     * @param Mapper         $mapper
+     * @param Translator     $translator
+     * @param UnitMapper     $unitMapper
+     * @param UnitTranslator $unitTranslator
      */
     public function __construct(
         Mapper $mapper,
         Translator $translator,
-        UnitSpecificationMapperProxy $unitMapper
+        UnitMapper $unitMapper,
+        UnitTranslator $unitTranslator
     ) {
-        $this->mapper     = $mapper;
-        $this->translator = $translator;
-        $this->unitMapper = $unitMapper;
+        $this->mapper         = $mapper;
+        $this->translator     = $translator;
+        $this->unitMapper     = $unitMapper;
+        $this->unitTranslator = $unitTranslator;
     }
 
     /**
@@ -160,5 +170,48 @@ class SpecificationMapperProxy
             $e->setDeletedObject($this->translator->translateToDomainModel($deleted));
         }
         return $e;
+    }
+
+    /**
+     * Loads all units specifications into a course specification.
+     *
+     * @param Specification $specification
+     * @return Specification
+     */
+    public function loadUnits(Specification $specification)
+    {
+        $collection = new Collection();
+        $collection->add($specification);
+        $this->loadUnitsForCollection($collection);
+        return $collection->first();
+    }
+
+    /**
+     * Loads all units specifications into all the course specifications in a collection.
+     *
+     * @param Collection|Specification[] $allSpecs
+     * @return Collection|Specification[]
+     */
+    public function loadUnitsForCollection(Collection $allSpecs)
+    {
+        // Load all the unit specs for all the supplied course specs
+        $ids = [];
+        foreach ($allSpecs as $spec) {
+            $ids[] = $spec->getId();
+        }
+        $allUnits = $this->unitMapper->findAllByCourseId($ids)->groupByCallback(function ($v) {
+            /** @var UnitModel $v */
+            return $v->getCourse()->getId();
+        });
+
+        // Match unit specs to their course spec
+        foreach ($allSpecs as $spec) {
+            if (isset($allUnits[$spec->getId()])) {
+                /** @var Collection|UnitModel[] $units */
+                $units = $allUnits[$spec->getId()];
+                $spec->setUnits($units->map([$this->unitTranslator, 'translateToDomainModel']));
+            }
+        }
+        return $allSpecs;
     }
 }
