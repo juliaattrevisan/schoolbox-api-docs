@@ -22,6 +22,12 @@ use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Resource\Storage\Model as Storage;
 
 use \Schoolbox\Learning\Assessment\Participant;
+use \Schoolbox\Learning\Assessment\Project as Project;
+
+use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
+use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
+use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
+use \Schoolbox\Learning\Assessment\Summator\Sum as SummatorSum;
 
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
@@ -31,6 +37,14 @@ use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbac
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
+
+use \Schoolbox\Learning\Assessment\Task\Model as Task;
+use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
+
+use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
 class Controller extends Base
 {
@@ -85,18 +99,47 @@ class Controller extends Base
 
         /* TODO: Actually save data here
          */
-        $assessmentId = 1234567890;
+        $id = 5567;
+        $title = 'Find Diablo';
+        $description = 'The things you need to do in order to slay the prime evil';
+
+        $project = new Project(new SummatorAverage());
+        $project
+            ->setId($id)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setCreator($_SESSION['user'])
+            ->setAllParticipants(new Collection())
+            ->setPublishAt(Alaress_Date_Format::now())
+            ->setOpenAt(Alaress_Date_Format::now())
+            ->setDueAt(Alaress_Date_Format::now())
+            ->setCloseAt(Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+
+        $assessmentId = $project->getId();
 
         $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', [ 'assessmentId' => $assessmentId ] );
 
         $data = [
+            'assessmentId' => $project->getId(),
             'returnUrl' => urlencode(base64_encode($returnUrl))
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
+    /**
+     * Create an Assessment within a particular Project
+     *
+     * @param $projectId
+     * @param $type
+     */
+    public function getCreateAssessmentWithinProject($projectId, $type)
+    {
+        new \Alaress_Probe($projectId, $type);
 
+    }
 
 
     /**

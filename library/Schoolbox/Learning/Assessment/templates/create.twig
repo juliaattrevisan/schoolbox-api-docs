@@ -49,11 +49,23 @@
                 }
 
                 /**
+                 * Update the New Task/Due Work/Quiz buttons in the Project panel
+                 * These need the assessment id
+                 */
+                function updateUrls(id) {
+                    $.each($('#projectButtons').find('[data-assessment-type]'), function(index, element) {
+                        var newUrl = $(element).attr('href') + id + '/new/' + $(element).attr('data-assessment-type');
+
+                        $(element).attr('href', newUrl);
+                    });
+                }
+
+                /**
                  * Update the returnUrl field, for Project
                  */
                 function updateReturnUrl(returnUrl) {
                     $.each($('#projectButtons').find('[data-return-url]'), function(index, element) {
-                        var newUrl = $(element).attr('href') + returnUrl;
+                        var newUrl = $(element).attr('href') + '?return_url=' + returnUrl;
 
                         $(element).attr('href', newUrl);
                     });
@@ -67,6 +79,7 @@
                 switch(selected) {
                     case 'project':
                         updateType('Project', selected);
+                        updateUrls(data.assessmentId);
                         updateReturnUrl(data.returnUrl);
                         break;
                     case 'dueWork':

@@ -45,7 +45,11 @@ class Module extends BaseModule
 
                 /* This is the second half containing assessable-specific data
                  */
-                '/assessment/update/{assessmentId}' => 'getUpdateAssessment',
+                '/assessment/{assessmentId}/update' => 'getUpdateAssessment',
+
+                /* Add assessments to a Project
+                 */
+                '/assessment/{assessmentId}/new/{assessmentType}' => 'getCreateAssessmentWithinProject',
 
                 '/assessment/{assessmentId}/status'              => 'getStatus',
                 '/assessment/{assessmentId}/summary/{studentId}' => 'getSummary',
