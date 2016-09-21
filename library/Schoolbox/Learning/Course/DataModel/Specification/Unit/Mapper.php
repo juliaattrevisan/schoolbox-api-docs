@@ -82,7 +82,7 @@ class Mapper extends BaseMapper
      *
      * @param int   $folderId
      * @param array $options
-     * @return Collection|Model[]
+     * @return Model
      */
     public function findByFolderId($folderId, $options = [])
     {

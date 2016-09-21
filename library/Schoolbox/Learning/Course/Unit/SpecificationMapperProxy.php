@@ -72,13 +72,11 @@ class SpecificationMapperProxy
      *
      * @param int $folderId
      * @param array $options
-     * @return Specification[]|Collection
+     * @return Specification
      */
     public function findByFolderId($folderId, $options = [])
     {
-        return $this->mapper
-            ->findByFolderId($folderId, $options)
-            ->map([$this->translator, 'translateToDomainModel']);
+        return $this->translator->translateToDomainModel($this->mapper->findByFolderId($folderId, $options));
     }
 
     /**
