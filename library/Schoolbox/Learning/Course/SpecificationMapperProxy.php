@@ -10,6 +10,8 @@ namespace Schoolbox\Learning\Course;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Course\DataModel\Specification\Translator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Model;
+use Schoolbox\Mapper\Exception;
 
 /**
  * A proxy that lies in front of `Schoolbox\Learning\Course\DataModel\Specification\Mapper`.
@@ -46,10 +48,16 @@ class SpecificationMapperProxy
      *
      * @param int $id
      * @return Specification
+     * @throws Exception if object wasn't found
+     * @throws Exception\Deleted if object was deleted
      */
     public function findById($id)
     {
-        return $this->translator->translateToDomainModel($this->mapper->findById($id));
+        try {
+            return $this->translator->translateToDomainModel($this->mapper->findById($id));
+        } catch (Exception\Deleted $e) {
+            throw $this->repopulateDeletedException($e);
+        }
     }
 
     /**
@@ -58,10 +66,16 @@ class SpecificationMapperProxy
      * @param int $folderId
      * @param array $options
      * @return Specification
+     * @throws Exception if object wasn't found
+     * @throws Exception\Deleted if object was deleted
      */
     public function findByFolderId($folderId, $options = [])
     {
-        return $this->translator->translateToDomainModel($this->mapper->findByFolderId($folderId, $options));
+        try {
+            return $this->translator->translateToDomainModel($this->mapper->findByFolderId($folderId, $options));
+        } catch (Exception\Deleted $e) {
+            throw $this->repopulateDeletedException($e);
+        }
     }
 
     /**
@@ -119,5 +133,21 @@ class SpecificationMapperProxy
         $dataModel = $this->translator->translateToDataModel($specification);
         $this->mapper->delete($dataModel);
         return $specification;
+    }
+
+    /**
+     * Helper for populating a deleted exception with a course specification,
+     * instead of the data model object.
+     *
+     * @param Exception\Deleted $e
+     * @return Exception\Deleted
+     */
+    protected function repopulateDeletedException(Exception\Deleted $e)
+    {
+        $deleted = $e->getDeletedObject();
+        if ($deleted instanceof Model) {
+            $e->setDeletedObject($this->translator->translateToDomainModel($deleted));
+        }
+        return $e;
     }
 }

@@ -1309,7 +1309,7 @@ class Controller extends Base\Base
                 } catch (MapperException\Deleted $e) {
                     // ignore deletions here; the assumption is that any unit passed into here is legit. If you modify a class import and
                     // any source units have been deleted, their existence still needs to be honoured.
-                    $u = $this->getUnitSpecificationTranslator()->translateToDomainModel($e->getDeletedObject());
+                    $u = $e->getDeletedObject();
                 }
                 $unitCache[$unit['unit_id']] = $u;
             }
