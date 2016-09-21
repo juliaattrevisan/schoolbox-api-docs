@@ -121,6 +121,17 @@ interface IFeedback
     public function setAssessable($assessable);
 
     /**
+     * @return IResponse
+     */
+    public function getResponse();
+
+    /**
+     * @param IResponse $response
+     * @return static
+     */
+    public function setResponse($response);
+
+    /**
      * Get the date when this IFeedback was made accessible to respondents
      * (typically students)
      *

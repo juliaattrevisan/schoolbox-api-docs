@@ -44,7 +44,7 @@ interface IAssessable
 /**
      * @param User $user
      * @param bool $publishedOnly
-     * @return string
+     * @return string|null
      */
     public function getHumanReadableMark(User $user, $publishedOnly);
 

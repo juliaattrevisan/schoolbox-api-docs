@@ -66,7 +66,7 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * A Collection of Participant instances
      *
-     * @var
+     * @var Collection|Participant[]
      */
     protected $allParticipants;
 
@@ -162,14 +162,19 @@ abstract class AbstractAssessment implements IAssessable
      *
      * @param User $user
      * @param bool $publishedOnly
-     * @return string
+     * @return string|null
      */
     public function getHumanReadableMark(User $user, $publishedOnly)
     {
-        // TODO: Implement getHumanReadableMark() method. This method gets the output from getNormalisedMark, then pipes that into the mark scheme (which doesn't yet exist on this class)
-        // return $this->getMark($user, $publishedOnly, false);
+        $participant = $this->getParticipant($user);
 
-        return 'TODO: Pass NormalisedMark value through MarkScheme';
+        $feedback = $publishedOnly
+            ? $participant->findMostRecentPublishedFeedback($this)
+            : $participant->findMostRecentFeedback($this);
+
+        $response = null === $feedback ? null : $feedback->getResponse();
+
+        return $this->getMarkScheme()->getHumanReadableMark($this->getNormalisedMark($user, $publishedOnly), $response);
     }
 
     /**
@@ -442,7 +447,7 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
-     * @return mixed
+     * @return Collection|Participant[]
      */
     public function getAllParticipants()
     {

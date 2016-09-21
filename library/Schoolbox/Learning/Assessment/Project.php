@@ -56,15 +56,6 @@ class Project extends AbstractAssessment
         $this->setSummator($summator);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getHumanReadableMark(User $user, $publishedOnly)
-    {
-        // TODO: Implement getHumanReadableMark() method. This method gets the output from getNormalisedMark, then pipes that into the mark scheme (which doesn't yet exist on this class)
-
-        return 'TODO: Pass NormalisedMark value through MarkScheme';
-    }
 
     /**
      * Calculate the final mark for this IAssessable, for a particular User
