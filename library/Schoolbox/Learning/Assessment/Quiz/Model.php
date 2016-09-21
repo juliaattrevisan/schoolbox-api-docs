@@ -14,22 +14,22 @@
 
 namespace Schoolbox\Learning\Assessment\Quiz;
 
-use \Schoolbox\User;
-use Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
-use Schoolbox\Learning\Assessment\Quiz\Section as QuizSection;
 
 class Model extends AbstractAssessment
 {
-    /** @var Collection|QuizSection[] */
-    private $sections;
+    /**
+     * Sum of all marks available across all questions in this Quiz
+     *
+     * @var float
+     */
+    private $maxMark;
 
 
     public function __construct()
     {
         parent::__construct();
-        $this->sections = new Collection();
     }
 
     /**
@@ -47,33 +47,19 @@ class Model extends AbstractAssessment
      */
     public function getMaxMark()
     {
-        $totalMarksAvailable = 0.0;
-        foreach ($this->getSections() as $section) {
-            foreach ($section->getQuestions() as $question) {
-                $totalMarksAvailable += $question->getMarks();
-            }
-        }
-        return $totalMarksAvailable;
-    }
-
-
-    /**
-     * @return Collection|QuizSection[]
-     */
-    public function getSections()
-    {
-        return $this->sections;
+        return $this->maxMark;
     }
 
     /**
-     * @param Collection|QuizSection[] $sections
-     * @return $this
+     * @param float $marksAvailable
+     * @return static
      */
-    public function setSections(Collection $sections)
+    public function setMaxMark($marksAvailable)
     {
-        $this->sections = $sections;
+        $this->maxMark = $marksAvailable;
         return $this;
     }
+
 
     /**
      * @param GradeGroup|null $gradeGroup

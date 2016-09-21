@@ -34,9 +34,9 @@ class Model extends AbstractFeedback
             return null;
         }
 
-        $marksGiven = 0;
+        $marksGiven = 0.0;
         foreach ($this->getResponse()->getAllResponses() as $response) {
-            $marksGiven += $response->getMark();
+            $marksGiven += $response['mark'];
         }
 
         return floatval(IMarkScheme::NORMALISED_MARK_MAX * $marksGiven / $marksAvailable);

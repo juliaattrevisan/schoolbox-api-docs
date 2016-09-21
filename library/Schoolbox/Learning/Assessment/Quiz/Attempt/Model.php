@@ -10,36 +10,18 @@
  */
 namespace Schoolbox\Learning\Assessment\Quiz\Attempt;
 
-use Schoolbox\Collection;
 use \Schoolbox\Learning\Assessment\AbstractResponse;
-use Schoolbox\Learning\Assessment\Quiz\Response as QuizResponse;
-use Schoolbox\Learning\Assessment\Quiz\Question as QuizQuestion;
 
 class Model extends AbstractResponse
 {
     /**
-     * All the Responses to this Quiz
+     * Responses given in this attempt, along with marks available
      *
-     * These are Students' Responses to individual Questions
-     * that were asked in the Quiz's Sections
-     *
-     * @var Collection|QuizResponse[]
+     * @var array $allResponses
+     * @var float $allResponses['mark']       Mark given to student for a question
+     * @var float $allResponses['available']  Marks available for a question
      */
-    protected $allResponses;
-
-    /**
-     * Questions asked in this feedback's QuizAttempt
-     *
-     * @var Collection|QuizQuestion[]
-     */
-    protected $allQuestions;
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->allResponses = new Collection();
-        $this->allQuestions = new Collection();
-    }
+    protected $allResponses = [];
 
 
     /**
@@ -59,15 +41,15 @@ class Model extends AbstractResponse
     public function getMarksAvailable()
     {
         $marksAvailable = 0.0;
-        foreach ($this->allQuestions as $question) {
-            $marksAvailable += $question->getMarks();
+        foreach ($this->allResponses as $response) {
+            $marksAvailable += $response['available'];
         }
         return $marksAvailable;
     }
 
 
     /**
-     * @return Collection|QuizResponse[]
+     * @return array
      */
     public function getAllResponses()
     {
@@ -75,30 +57,12 @@ class Model extends AbstractResponse
     }
 
     /**
-     * @param Collection|QuizResponse[] $allResponses
+     * @param array $allResponses
      * @return static
      */
-    public function setAllResponses($allResponses)
+    public function setAllResponses(array $allResponses)
     {
         $this->allResponses = $allResponses;
-        return $this;
-    }
-
-    /**
-     * @return Collection|QuizQuestion[]
-     */
-    public function getAllQuestions()
-    {
-        return $this->allQuestions;
-    }
-
-    /**
-     * @param Collection|QuizQuestion[] $allQuestions
-     * @return static
-     */
-    public function setAllQuestions($allQuestions)
-    {
-        $this->allQuestions = $allQuestions;
         return $this;
     }
 }
