@@ -345,30 +345,31 @@ class QuizTest extends \PHPUnit_Framework_TestCase
             ->setId(99759)
             ->setAssessable($quiz)
             ->setNormalisedMark(98)
-            ->setAllResponses([
-                [
-                    'mark' => 4, // Question 1,
-                    'available' => 5
-                ],
-                [
-                    'mark' => 0, // Question 2
-                    'available' => 5
-                ],
-                [
-                    'mark' => 2, // Question 3
-                    'available' => 5
-                ],
-                [
-                    'mark' => 1, // Question 4
-                    'available' => 5
-                ]
-            ])
             ->setReviewer($this->celia)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-15 03:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $attempt->getAllFeedback()->add($feedback);
+        $feedback->setResponse($attempt);
+        $attempt->setAllResponses([
+            [
+                'mark' => 4, // Question 1,
+                'available' => 5
+            ],
+            [
+                'mark' => 0, // Question 2
+                'available' => 5
+            ],
+            [
+                'mark' => 2, // Question 3
+                'available' => 5
+            ],
+            [
+                'mark' => 1, // Question 4
+                'available' => 5
+            ]
+        ]);
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -376,30 +377,31 @@ class QuizTest extends \PHPUnit_Framework_TestCase
             ->setId(99760)
             ->setAssessable($quiz)
             ->setNormalisedMark(45)
-            ->setAllResponses([
-                [
-                    'mark' => 5, // Question 1,
-                    'available' => 5
-                ],
-                [
-                    'mark' => 5, // Question 2
-                    'available' => 5
-                ],
-                [
-                    'mark' => 3, // Question 3
-                    'available' => 5
-                ],
-                [
-                    'mark' => 3, // Question 4
-                    'available' => 5
-                ]
-            ])
             ->setReviewer($this->celia)
             ->setPublishedAt(new \Alaress_Date_Format('2016-09-16 05:31:29', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-09-12 12:12:12', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-09-12 12:12:12', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $attempt->getAllFeedback()->add($feedback);
+        $feedback->setResponse($attempt);
+        $attempt->setAllResponses([
+            [
+                'mark' => 5, // Question 1,
+                'available' => 5
+            ],
+            [
+                'mark' => 5, // Question 2
+                'available' => 5
+            ],
+            [
+                'mark' => 3, // Question 3
+                'available' => 5
+            ],
+            [
+                'mark' => 3, // Question 4
+                'available' => 5
+            ]
+        ]);
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -407,29 +409,30 @@ class QuizTest extends \PHPUnit_Framework_TestCase
             ->setId(99761)
             ->setAssessable($quiz)
             ->setNormalisedMark(1)
-            ->setAllResponses([
-                [
-                    'mark' => 1, // Question 1,
-                    'available' => 5
-                ],
-                [
-                    'mark' => 1, // Question 2
-                    'available' => 5
-                ],
-                [
-                    'mark' => 1, // Question 3
-                    'available' => 5
-                ],
-                [
-                    'mark' => 2, // Question 4
-                    'available' => 5
-                ]
-            ])
             ->setReviewer($this->celia)
             ->setCreatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $attempt->getAllFeedback()->add($feedback);
+        $feedback->setResponse($attempt);
+        $attempt->setAllResponses([
+            [
+                'mark' => 1, // Question 1,
+                'available' => 5
+            ],
+            [
+                'mark' => 1, // Question 2
+                'available' => 5
+            ],
+            [
+                'mark' => 1, // Question 3
+                'available' => 5
+            ],
+            [
+                'mark' => 2, // Question 4
+                'available' => 5
+            ]
+        ]);
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -437,24 +440,6 @@ class QuizTest extends \PHPUnit_Framework_TestCase
             ->setId(99762)
             ->setAssessable($quiz)
             ->setNormalisedMark(83)
-            ->setAllResponses([
-                [
-                    'mark' => 3, // Question 1,
-                    'available' => 5
-                ],
-                [
-                    'mark' => 2, // Question 2
-                    'available' => 5
-                ],
-                [
-                    'mark' => 2, // Question 3
-                    'available' => 5
-                ],
-                [
-                    'mark' => 5, // Question 4
-                    'available' => 5
-                ]
-            ])
             ->setComment('This is the most recent published feedback; also most recent feedback')
             ->setReviewer($this->celia)
             ->setPublishedAt(new \Alaress_Date_Format('2016-09-25 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -462,6 +447,25 @@ class QuizTest extends \PHPUnit_Framework_TestCase
             ->setUpdatedAt(new \Alaress_Date_Format('2016-09-10 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $attempt->getAllFeedback()->add($feedback);
+        $feedback->setResponse($attempt);
+        $attempt->setAllResponses([
+            [
+                'mark' => 3, // Question 1,
+                'available' => 5
+            ],
+            [
+                'mark' => 2, // Question 2
+                'available' => 5
+            ],
+            [
+                'mark' => 2, // Question 3
+                'available' => 5
+            ],
+            [
+                'mark' => 5, // Question 4
+                'available' => 5
+            ]
+        ]);
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $quiz->getParticipant($this->bsalem)->getAllResponses()->add($attempt);
@@ -524,30 +528,31 @@ class QuizTest extends \PHPUnit_Framework_TestCase
             ->setId(99759)
             ->setAssessable($quiz)
             ->setNormalisedMark(98)
-            ->setAllResponses([
-                [
-                    'mark' => 4, // Question 1,
-                    'available' => 5
-                ],
-                [
-                    'mark' => 0, // Question 2
-                    'available' => 5
-                ],
-                [
-                    'mark' => 2, // Question 3
-                    'available' => 5
-                ],
-                [
-                    'mark' => 1, // Question 4
-                    'available' => 5
-                ]
-            ])
             ->setReviewer($this->celia)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-15 03:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $attempt->getAllFeedback()->add($feedback);
+        $feedback->setResponse($attempt);
+        $attempt->setAllResponses([
+            [
+                'mark' => 4, // Question 1,
+                'available' => 5
+            ],
+            [
+                'mark' => 0, // Question 2
+                'available' => 5
+            ],
+            [
+                'mark' => 2, // Question 3
+                'available' => 5
+            ],
+            [
+                'mark' => 1, // Question 4
+                'available' => 5
+            ]
+        ]);
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -555,30 +560,31 @@ class QuizTest extends \PHPUnit_Framework_TestCase
             ->setId(99760)
             ->setAssessable($quiz)
             ->setNormalisedMark(45)
-            ->setAllResponses([
-                [
-                    'mark' => 5, // Question 1,
-                    'available' => 5
-                ],
-                [
-                    'mark' => 5, // Question 2
-                    'available' => 5
-                ],
-                [
-                    'mark' => 3, // Question 3
-                    'available' => 5
-                ],
-                [
-                    'mark' => 3, // Question 4
-                    'available' => 5
-                ]
-            ])
             ->setReviewer($this->celia)
             ->setPublishedAt(new \Alaress_Date_Format('2016-09-16 05:31:29', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-09-12 12:12:12', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-09-12 12:12:12', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $attempt->getAllFeedback()->add($feedback);
+        $feedback->setResponse($attempt);
+        $attempt->setAllResponses([
+            [
+                'mark' => 5, // Question 1,
+                'available' => 5
+            ],
+            [
+                'mark' => 5, // Question 2
+                'available' => 5
+            ],
+            [
+                'mark' => 3, // Question 3
+                'available' => 5
+            ],
+            [
+                'mark' => 3, // Question 4
+                'available' => 5
+            ]
+        ]);
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -586,29 +592,30 @@ class QuizTest extends \PHPUnit_Framework_TestCase
             ->setId(99761)
             ->setAssessable($quiz)
             ->setNormalisedMark(1)
-            ->setAllResponses([
-                [
-                    'mark' => 1, // Question 1,
-                    'available' => 5
-                ],
-                [
-                    'mark' => 1, // Question 2
-                    'available' => 5
-                ],
-                [
-                    'mark' => 1, // Question 3
-                    'available' => 5
-                ],
-                [
-                    'mark' => 2, // Question 4
-                    'available' => 5
-                ]
-            ])
             ->setReviewer($this->celia)
             ->setCreatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $attempt->getAllFeedback()->add($feedback);
+        $feedback->setResponse($attempt);
+        $attempt->setAllResponses([
+            [
+                'mark' => 1, // Question 1,
+                'available' => 5
+            ],
+            [
+                'mark' => 1, // Question 2
+                'available' => 5
+            ],
+            [
+                'mark' => 1, // Question 3
+                'available' => 5
+            ],
+            [
+                'mark' => 2, // Question 4
+                'available' => 5
+            ]
+        ]);
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -616,24 +623,6 @@ class QuizTest extends \PHPUnit_Framework_TestCase
             ->setId(99762)
             ->setAssessable($quiz)
             ->setNormalisedMark(83)
-            ->setAllResponses([
-                [
-                    'mark' => 3, // Question 1,
-                    'available' => 5
-                ],
-                [
-                    'mark' => 2, // Question 2
-                    'available' => 5
-                ],
-                [
-                    'mark' => 2, // Question 3
-                    'available' => 5
-                ],
-                [
-                    'mark' => 5, // Question 4
-                    'available' => 5
-                ]
-            ])
             ->setComment('This is the most recent published feedback; also most recent feedback')
             ->setReviewer($this->celia)
             ->setPublishedAt(new \Alaress_Date_Format('2016-09-25 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -641,6 +630,25 @@ class QuizTest extends \PHPUnit_Framework_TestCase
             ->setUpdatedAt(new \Alaress_Date_Format('2017-09-10 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $attempt->getAllFeedback()->add($feedback);
+        $feedback->setResponse($attempt);
+        $attempt->setAllResponses([
+            [
+                'mark' => 3, // Question 1,
+                'available' => 5
+            ],
+            [
+                'mark' => 2, // Question 2
+                'available' => 5
+            ],
+            [
+                'mark' => 2, // Question 3
+                'available' => 5
+            ],
+            [
+                'mark' => 5, // Question 4
+                'available' => 5
+            ]
+        ]);
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $quiz->getParticipant($this->bsalem)->getAllResponses()->add($attempt);
