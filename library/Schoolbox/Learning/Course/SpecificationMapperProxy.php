@@ -75,7 +75,9 @@ class SpecificationMapperProxy
     public function findById($id)
     {
         try {
-            return $this->translator->translateToDomainModel($this->mapper->findById($id));
+            return $this->loadUnits(
+                $this->translator->translateToDomainModel($this->mapper->findById($id))
+            );
         } catch (Exception\Deleted $e) {
             throw $this->repopulateDeletedException($e);
         }
@@ -93,7 +95,9 @@ class SpecificationMapperProxy
     public function findByFolderId($folderId, $options = [])
     {
         try {
-            return $this->translator->translateToDomainModel($this->mapper->findByFolderId($folderId, $options));
+            return $this->loadUnits(
+                $this->translator->translateToDomainModel($this->mapper->findByFolderId($folderId, $options))
+            );
         } catch (Exception\Deleted $e) {
             throw $this->repopulateDeletedException($e);
         }
@@ -107,9 +111,11 @@ class SpecificationMapperProxy
      */
     public function findAll($options = [])
     {
-        return $this->mapper
-            ->findAll($options)
-            ->map([$this->translator, 'translateToDomainModel']);
+        return $this->loadUnitsForCollection(
+            $this->mapper
+                ->findAll($options)
+                ->map([$this->translator, 'translateToDomainModel'])
+        );
     }
 
     /**
@@ -178,7 +184,7 @@ class SpecificationMapperProxy
      * @param Specification $specification
      * @return Specification
      */
-    public function loadUnits(Specification $specification)
+    protected function loadUnits(Specification $specification)
     {
         $collection = new Collection();
         $collection->add($specification);
@@ -192,7 +198,7 @@ class SpecificationMapperProxy
      * @param Collection|Specification[] $allSpecs
      * @return Collection|Specification[]
      */
-    public function loadUnitsForCollection(Collection $allSpecs)
+    protected function loadUnitsForCollection(Collection $allSpecs)
     {
         // Load all the unit specs for all the supplied course specs
         $ids = [];
