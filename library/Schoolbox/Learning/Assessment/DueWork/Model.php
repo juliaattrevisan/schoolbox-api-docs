@@ -303,4 +303,30 @@ class Model extends AbstractAssessment
         $this->maxMark = $maxMark;
         return $this;
     }
+
+    /**
+     * DueWork does not use the MarkScheme. It merely returns the cached value.
+     *
+     * @param User $user
+     * @param bool $publishedOnly
+     * @return string|null
+     */
+    public function getHumanReadableMark(User $user, $publishedOnly)
+    {
+        $normalised = false;
+        return $this->getMark($user, $publishedOnly, $normalised);
+    }
+
+    /**
+     * DueWork does not use the MarkScheme. It merely returns the cached value.
+     *
+     * @param User $user
+     * @param bool $publishedOnly
+     * @return float|null
+     */
+    public function getNormalisedMark(User $user, $publishedOnly)
+    {
+        $normalised = true;
+        return $this->getMark($user, $publishedOnly, $normalised);
+    }
 }

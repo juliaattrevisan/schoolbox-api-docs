@@ -229,7 +229,7 @@ abstract class AbstractAssessment implements IAssessable
      * @param $normalised
      * @return float|null|string
      */
-    private function getMark(User $user, $publishedOnly, $normalised)
+    protected function getMark(User $user, $publishedOnly, $normalised)
     {
         $participant = $this->getParticipant($user);
 
