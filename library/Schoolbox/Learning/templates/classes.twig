@@ -1,0 +1,35 @@
+<div class="row">
+    <div class="small-12 columns">
+        <h1>My Classes</h1>
+    </div>
+</div>
+
+<div class="row">
+    {% for class in classList %}
+    <div class="small-12 medium-6 large-4 island">
+        <section>
+            <div class="card-new small-12">
+                <a href="/homepage/{{ class.code }}">
+                    <div class="card-feature-image" style="background-color:#c1e5ff;">
+                        <img src="https://placeimg.com/500/250/animals">
+                    </div>
+                </a>
+                <div class="card-content actions-small-1">
+                    <h3><a href="/homepage/{{ class.code }}">{{ class.name }}</a></h3>
+                    <p class="meta">{{ class.code }}</p>
+                    {% if currentUser.getRole.isStaff == true %}
+                    <nav>
+                        <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
+                    </nav>
+                    <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
+                        <li><a href="/subject/classList/{{ class.getCode }}" class="icon-class-list">Class List</a></li>
+                        <li><a href="{{ routeLookup('learning.getMarkbook', {}) }}" class="icon-curriculum">Markbook</a></li>
+                        <li><a href=" {{ routeLookup('learningAnalytics.course', {}) }} " class="icon-poll">Analytics</a></li>
+                    </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </div>
+    {% endfor %}
+</div>

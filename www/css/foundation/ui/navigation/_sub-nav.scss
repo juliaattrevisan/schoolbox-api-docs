@@ -12,7 +12,7 @@ $sub-nav-active-font-weight: $font-weight-normal;
 /* Somehow all those vars above get fed into the import below
  * which is an alternative to overrides to get what you want
  */
-@import "../../../../../javascript/components/foundation/scss/foundation/components/sub-nav";
+@import "../../../../javascript/components/foundation/scss/foundation/components/sub-nav";
 
 // Sub Navigation
 // .secondary is the sub-sub nav that first appeared in adminv2/setting

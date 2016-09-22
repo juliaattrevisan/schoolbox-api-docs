@@ -36,6 +36,7 @@ class Module extends BaseModule
         $routes = [
             'GET' => [
                 ''                                           => 'getPendingAssessments',
+                '/classes'                                  => 'getClasses',
                 '/markbook/{classId}'                        => 'getMarkbook',
                 '/due/{studentId}'                           => 'getDue',
                 '/grades/{studentId}/{termCode}'             => 'getGrades',
@@ -58,7 +59,7 @@ class Module extends BaseModule
      */
     public function initRoutePermissions(Authorizer $authorizer)
     {
-        $ruleRegexp = '(?:getMarkbook|getPendingAssessments)';
+        $ruleRegexp = '(?:getMarkbook|getPendingAssessments|getClasses)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn());
 

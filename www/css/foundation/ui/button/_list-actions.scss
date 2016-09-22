@@ -58,6 +58,16 @@
 						text-decoration: none;
 					}
 				}
+
+				a[aria-expanded="true"]{
+					background-color: $content-ui-background;
+					opacity: 1;
+					&:hover{
+						background-color: $content-ui-background;
+						opacity: 0.7;
+					}
+				}
+
 				input:checked + label {
 					a {
 						background-color: $button-color;
@@ -67,7 +77,7 @@
 			}
 		}
 
-		.island, .column, .columns {
+		.island, .column, .columns, .card-new {
 			/* Inside a containing column, but not an action-
 			 * or information-list construct (e.g. h2 actions)
 			 *
@@ -76,7 +86,7 @@
 			 * always appear inside islands or columns
 			 */
 			.actions-#{$size}-#{$i} {
-				> nav {
+				nav {
 					right: 0;
 				}
 			}

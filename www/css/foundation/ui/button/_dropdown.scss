@@ -14,7 +14,7 @@ $f-dropdown-list-separator-bg: $content-ui-foreground;
 $f-dropdown-content-padding: rem-calc(($base-font-size - 4));
 $f-dropdown-icon-align: 0.25rem;
 
-@import "../../../../../javascript/components/foundation/scss/foundation/components/dropdown";
+@import "../../../../javascript/components/foundation/scss/foundation/components/dropdown";
 
 // Dropdown
 .f-dropdown{

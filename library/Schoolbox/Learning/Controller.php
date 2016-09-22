@@ -60,6 +60,21 @@ class Controller extends Base
     }
 
     /**
+     * Displays a list of classes for the current logged in user
+     *
+     * @api GET /learning/classes
+     * @level 165
+     *
+     */
+    public function getClasses() {
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', [
+            'currentUser'   => $this->getUser(),
+            'classList'     => $this->getUser()->getSubjectCollection(),
+        ]));
+    }
+
+
+    /**
      * Displays a list of marks for students in the specified class
      *
      * @api   GET /learning/markbook/:classId
