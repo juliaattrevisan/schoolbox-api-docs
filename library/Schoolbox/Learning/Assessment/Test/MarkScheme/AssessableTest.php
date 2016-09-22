@@ -9,13 +9,15 @@ namespace Schoolbox\Learning\Assessment\Test\MarkScheme;
 
 
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
+use Schoolbox\Learning\Assessment\Summator\Average;
+use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
+use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
@@ -65,7 +67,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_Task_Completion_getHumanReadable(Task $task, User $student, $expected)
     {
         $actual = $task->getHumanReadableMark($student, false);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -94,7 +96,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_Quiz_TotalMarkFraction_getHumanReadable(Quiz $quiz, User $student, $expected)
     {
         $actual = $quiz->getHumanReadableMark($student, false);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -107,7 +109,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_Quiz_TotalMarkFraction_getHumanReadable_PublishedOnly(Quiz $quiz, User $student, $expected)
     {
         $actual = $quiz->getHumanReadableMark($student, true);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -120,7 +122,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_Quiz_TotalMarkFraction_getNormalised(Quiz $quiz, User $student, $expected)
     {
         $actual = $quiz->getNormalisedMark($student, false);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -133,7 +135,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_Quiz_TotalMarkFraction_getNormalised_PublishedOnly(Quiz $quiz, User $student, $expected)
     {
         $actual = $quiz->getNormalisedMark($student, true);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -146,7 +148,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_None_getHumanReadable(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($student, false);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -159,7 +161,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_None_getHumanReadable_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($student, true);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -172,7 +174,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_Percent_getHumanReadable(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($student, false);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -185,7 +187,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_Percent_getHumanReadable_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($student, true);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -198,7 +200,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_TotalMark_getHumanReadable(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($student, false);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -211,7 +213,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_TotalMark_getHumanReadable_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($student, true);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -224,7 +226,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_LetterGrade_getHumanReadable(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($student, false);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -237,7 +239,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_LetterGrade_getHumanReadable_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getHumanReadableMark($student, true);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -250,7 +252,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_None_getNormalised(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($student, false);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -263,7 +265,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_None_getNormalised_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($student, true);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -276,7 +278,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_Percent_getNormalised(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($student, false);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -289,7 +291,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_Percent_getNormalised_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($student, true);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -302,7 +304,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_TotalMark_getNormalised(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($student, false);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -315,7 +317,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_TotalMark_getNormalised_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($student, true);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -328,7 +330,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_LetterGrade_getNormalised(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($student, false);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -341,20 +343,759 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_LetterGrade_getNormalised_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($student, true);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
     /**
-     * @dataProvider provider_project_None_getHR
+     * @dataProvider provider_project_Min_getNorm
      * @param Project $project
      * @param User $student
      * @param string $expected
      */
-    public function test_Project_None_getHumanReadable(Project $project, User $student, $expected)
+    public function test_Project_Minimum_None_getNorm(Project $project, User $student, $expected)
+    {
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+
+        $actual = $project->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Min_getNorm_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Minimum_None_getNorm_publishedOnly(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Minimum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+
+        $actual = $project->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Min_getNorm
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Minimum_LetterGrade_getNorm(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Minimum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+
+        $actual = $project->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Min_getNorm_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Minimum_LetterGrade_getNorm_publishedOnly(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Minimum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+
+        $actual = $project->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Min_getNorm
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Minimum_Percent_getNorm(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Minimum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkScheme(new Percentage());
+
+        $actual = $project->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+
+    /**
+     * @dataProvider provider_project_Min_getNorm_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Minimum_Percent_getNorm_publishedOnly(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Minimum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkScheme(new Percentage());
+
+        $actual = $project->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Max_getNorm
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Maximum_None_getNorm(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Maximum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+
+        $actual = $project->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Max_getNorm_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Maximum_None_getNorm_publishedOnly(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Maximum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+
+        $actual = $project->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Max_getNorm
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Maximum_LetterGrade_getNorm(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Maximum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+
+        $actual = $project->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Max_getNorm_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Maximum_LetterGrade_getNorm_publishedOnly(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Maximum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+
+        $actual = $project->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Max_getNorm
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Maximum_Percent_getNorm(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Maximum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkScheme(new Percentage());
+
+        $actual = $project->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Max_getNorm_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Maximum_Percent_getNorm_publishedOnly(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Maximum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkScheme(new Percentage());
+
+        $actual = $project->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Average_getNorm
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Average_None_getNorm(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Average());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+
+        $actual = $project->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Average_getNorm_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Average_None_getNorm_publishedOnly(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Average());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+
+        $actual = $project->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Average_getNorm
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Average_LetterGrade_getNorm(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Average());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+
+        $actual = $project->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Average_getNorm_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Average_LetterGrade_getNorm_publishedOnly(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Average());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+
+        $actual = $project->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Average_getNorm
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Average_Percent_getNorm(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Average());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkScheme(new Percentage());
+
+        $actual = $project->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Average_getNorm_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Average_Percent_getNorm_publishedOnly(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Average());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkScheme(new Percentage());
+
+        $actual = $project->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_WeightedAverage_getNorm
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_WeightedAverage_None_getNorm(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new WeightedAverage());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+
+        $actual = $project->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_WeightedAverage_getNorm_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_WeightedAverage_None_getNorm_publishedOnly(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new WeightedAverage());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+
+        $actual = $project->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_WeightedAverage_getNorm
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_WeightedAverage_LetterGrade_getNorm(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new WeightedAverage());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+
+        $actual = $project->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_WeightedAverage_getNorm_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_WeightedAverage_LetterGrade_getNorm_publishedOnly(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new WeightedAverage());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+
+        $actual = $project->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_WeightedAverage_getNorm
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_WeightedAverage_Percent_getNorm(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new WeightedAverage());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkScheme(new Percentage());
+
+        $actual = $project->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_WeightedAverage_getNorm_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_WeightedAverage_Percent_getNorm_publishedOnly(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new WeightedAverage());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkScheme(new Percentage());
+
+        $actual = $project->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_None
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Minimum_None_getHR(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Minimum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+
+        $actual = $project->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_None
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Minimum_None_getHR_publishedOnly(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Minimum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+
+        $actual = $project->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Min_LetterGrade_getHR
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Minimum_LetterGrade_getHR(Project $project, User $student, $expected)
+    {
+        $actual = $project->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Min_LetterGrade_getHR_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Minimum_LetterGrade_getHR_publishedOnly(Project $project, User $student, $expected)
     {
         $actual = $project->getHumanReadableMark($student, true);
-        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Min_Percentage_getHR
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Minimum_Percentage_getHR(Project $project, User $student, $expected)
+    {
+        $actual = $project->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Min_Percentage_getHR_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Minimum_Percentage_getHR_publishedOnly(Project $project, User $student, $expected)
+    {
+        $actual = $project->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_None
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Maximum_None_getHR(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Maximum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+
+        $actual = $project->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_None
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Maximum_None_getHR_publishedOnly(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Maximum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+
+        $actual = $project->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Max_LetterGrade_getHR
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Maximum_LetterGrade_getHR(Project $project, User $student, $expected)
+    {
+        $actual = $project->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Max_LetterGrade_getHR_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Maximum_LetterGrade_getHR_publishedOnly(Project $project, User $student, $expected)
+    {
+        $actual = $project->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Max_Percentage_getHR
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Maximum_Percentage_getHR(Project $project, User $student, $expected)
+    {
+        $actual = $project->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Max_Percentage_getHR_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Maximum_Percentage_getHR_publishedOnly(Project $project, User $student, $expected)
+    {
+        $actual = $project->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_None
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Average_None_getHR(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Average());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+
+        $actual = $project->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_None
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Average_None_getHR_publishedOnly(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new Average());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+
+        $actual = $project->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Average_LetterGrade_getHR
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Average_LetterGrade_getHR(Project $project, User $student, $expected)
+    {
+        $actual = $project->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Average_LetterGrade_getHR_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Average_LetterGrade_getHR_publishedOnly(Project $project, User $student, $expected)
+    {
+        $actual = $project->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Average_Percent_getHR
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Average_Percentage_getHR(Project $project, User $student, $expected)
+    {
+        $actual = $project->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_Average_Percent_getHR_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_Average_Percentage_getHR_publishedOnly(Project $project, User $student, $expected)
+    {
+        $actual = $project->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_None
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_WeightedAverage_None_getHR(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new WeightedAverage());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+
+        $actual = $project->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_None
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_WeightedAverage_None_getHR_publishedOnly(Project $project, User $student, $expected)
+    {
+        $project->setSummator(new WeightedAverage());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+
+        $actual = $project->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_WeightedAverage_LetterGrade_getHR
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_WeightedAverage_LetterGrade_getHR(Project $project, User $student, $expected)
+    {
+        $actual = $project->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_WeightedAverage_LetterGrade_getHR_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_WeightedAverage_LetterGrade_getHR_publishedOnly(Project $project, User $student, $expected)
+    {
+        $actual = $project->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_WeightedAverage_Percent_getHR
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_WeightedAverage_Percentage_getHR(Project $project, User $student, $expected)
+    {
+        $actual = $project->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_WeightedAverage_Percent_getHR_publishedOnly
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_WeightedAverage_Percentage_getHR_publishedOnly(Project $project, User $student, $expected)
+    {
+        $actual = $project->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected', Actual: '$actual'";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -725,16 +1466,66 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function provider_project_None_getHR()
+    public function provider_project_Min_getNorm()
     {
         $project = $this->getDummyProject();
-        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
-        $project->setMarkScheme(new None());
+        $project->setSummator(new Minimum());
         return [
             [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), null],
+            [$project, $this->getDummyStudent(2), 50.0],
             [$project, $this->getDummyStudent(3), 50.0],
-            [$project, $this->getDummyStudent(4), null],
+            [$project, $this->getDummyStudent(4), 50.0],
+            [$project, $this->getDummyStudent(5), 100.0],
+            [$project, $this->getDummyStudent(6), 50.0],
+            [$project, $this->getDummyStudent(7), 100.0],
+            [$project, $this->getDummyStudent(8), 50.0],
+            [$project, $this->getDummyStudent(9), 100.0],
+        ];
+    }
+
+    public function provider_project_Min_getNorm_publishedOnly()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Minimum());
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 50.0],
+            [$project, $this->getDummyStudent(3), 50.0],
+            [$project, $this->getDummyStudent(4), 50.0],
+            [$project, $this->getDummyStudent(5), 33.333333333333],
+            [$project, $this->getDummyStudent(6), 50.0],
+            [$project, $this->getDummyStudent(7), 50.0],
+            [$project, $this->getDummyStudent(8), 50.0],
+            [$project, $this->getDummyStudent(9), 50.0],
+        ];
+    }
+
+    public function provider_project_Max_getNorm()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Maximum());
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 50.0],
+            [$project, $this->getDummyStudent(3), 50.0],
+            [$project, $this->getDummyStudent(4), 100.0],
+            [$project, $this->getDummyStudent(5), 100.0],
+            [$project, $this->getDummyStudent(6), 50.0],
+            [$project, $this->getDummyStudent(7), 100.0],
+            [$project, $this->getDummyStudent(8), 50.0],
+            [$project, $this->getDummyStudent(9), 100.0],
+        ];
+    }
+
+    public function provider_project_Max_getNorm_publishedOnly()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Maximum());
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 50.0],
+            [$project, $this->getDummyStudent(3), 50.0],
+            [$project, $this->getDummyStudent(4), 50.0],
             [$project, $this->getDummyStudent(5), 50.0],
             [$project, $this->getDummyStudent(6), 50.0],
             [$project, $this->getDummyStudent(7), 50.0],
@@ -743,15 +1534,404 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function provider_project_Average_getNorm()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Average());
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 50.0],
+            [$project, $this->getDummyStudent(3), 50.0],
+            [$project, $this->getDummyStudent(4), 75.0],
+            [$project, $this->getDummyStudent(5), 100.0],
+            [$project, $this->getDummyStudent(6), 50.0],
+            [$project, $this->getDummyStudent(7), 100.0],
+            [$project, $this->getDummyStudent(8), 50.0],
+            [$project, $this->getDummyStudent(9), 100.0],
+        ];
+    }
+
+    public function provider_project_Average_getNorm_publishedOnly()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Average());
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 50.0],
+            [$project, $this->getDummyStudent(3), 50.0],
+            [$project, $this->getDummyStudent(4), 50.0],
+            [$project, $this->getDummyStudent(5), 41.6666666666666],
+            [$project, $this->getDummyStudent(6), 50.0],
+            [$project, $this->getDummyStudent(7), 50.0],
+            [$project, $this->getDummyStudent(8), 50.0],
+            [$project, $this->getDummyStudent(9), 50.0],
+        ];
+    }
+
+    public function provider_project_WeightedAverage_getNorm()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new WeightedAverage());
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 50.0],
+            [$project, $this->getDummyStudent(3), 50.0],
+            [$project, $this->getDummyStudent(4), 60.0],
+            [$project, $this->getDummyStudent(5), 100.0],
+            [$project, $this->getDummyStudent(6), 50.0],
+            [$project, $this->getDummyStudent(7), 100.0],
+            [$project, $this->getDummyStudent(8), 50.0],
+            [$project, $this->getDummyStudent(9), 100.0],
+        ];
+    }
+
+    public function provider_project_WeightedAverage_getNorm_publishedOnly()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new WeightedAverage());
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 50.0],
+            [$project, $this->getDummyStudent(3), 50.0],
+            [$project, $this->getDummyStudent(4), 50.0],
+            [$project, $this->getDummyStudent(5), 46.666666666666666],
+            [$project, $this->getDummyStudent(6), 50.0],
+            [$project, $this->getDummyStudent(7), 50.0],
+            [$project, $this->getDummyStudent(8), 50.0],
+            [$project, $this->getDummyStudent(9), 50.0],
+        ];
+    }
+
+
+    public function provider_project_None()
+    {
+        $project = $this->getDummyProject();
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), null],
+            [$project, $this->getDummyStudent(3), null],
+            [$project, $this->getDummyStudent(4), null],
+            [$project, $this->getDummyStudent(5), null],
+            [$project, $this->getDummyStudent(6), null],
+            [$project, $this->getDummyStudent(7), null],
+            [$project, $this->getDummyStudent(8), null],
+            [$project, $this->getDummyStudent(9), null],
+        ];
+    }
+
+    public function provider_project_Min_LetterGrade_getHR()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Minimum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 'Acceptable'],
+            [$project, $this->getDummyStudent(3), 'Acceptable'],
+            [$project, $this->getDummyStudent(4), 'Acceptable'],
+            [$project, $this->getDummyStudent(5), 'Excellent'],
+            [$project, $this->getDummyStudent(6), 'Acceptable'],
+            [$project, $this->getDummyStudent(7), 'Excellent'],
+            [$project, $this->getDummyStudent(8), 'Acceptable'],
+            [$project, $this->getDummyStudent(9), 'Excellent'],
+        ];
+    }
+
+    public function provider_project_Min_LetterGrade_getHR_publishedOnly()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Minimum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 'Acceptable'],
+            [$project, $this->getDummyStudent(3), 'Acceptable'],
+            [$project, $this->getDummyStudent(4), 'Acceptable'],
+            [$project, $this->getDummyStudent(5), 'Needs Attention'],
+            [$project, $this->getDummyStudent(6), 'Acceptable'],
+            [$project, $this->getDummyStudent(7), 'Acceptable'],
+            [$project, $this->getDummyStudent(8), 'Acceptable'],
+            [$project, $this->getDummyStudent(9), 'Acceptable'],
+        ];
+    }
+
+    public function provider_project_Min_Percentage_getHR()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Minimum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkScheme(new Percentage());
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), '50 %'],
+            [$project, $this->getDummyStudent(3), '50 %'],
+            [$project, $this->getDummyStudent(4), '50 %'],
+            [$project, $this->getDummyStudent(5), '100 %'],
+            [$project, $this->getDummyStudent(6), '50 %'],
+            [$project, $this->getDummyStudent(7), '100 %'],
+            [$project, $this->getDummyStudent(8), '50 %'],
+            [$project, $this->getDummyStudent(9), '100 %'],
+        ];
+    }
+
+    public function provider_project_Min_Percentage_getHR_publishedOnly()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Minimum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkScheme(new Percentage());
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), '50 %'],
+            [$project, $this->getDummyStudent(3), '50 %'],
+            [$project, $this->getDummyStudent(4), '50 %'],
+            [$project, $this->getDummyStudent(5), '33 %'],
+            [$project, $this->getDummyStudent(6), '50 %'],
+            [$project, $this->getDummyStudent(7), '50 %'],
+            [$project, $this->getDummyStudent(8), '50 %'],
+            [$project, $this->getDummyStudent(9), '50 %'],
+        ];
+    }
+
+    public function provider_project_Max_LetterGrade_getHR()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Maximum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 'Acceptable'],
+            [$project, $this->getDummyStudent(3), 'Acceptable'],
+            [$project, $this->getDummyStudent(4), 'Excellent'],
+            [$project, $this->getDummyStudent(5), 'Excellent'],
+            [$project, $this->getDummyStudent(6), 'Acceptable'],
+            [$project, $this->getDummyStudent(7), 'Excellent'],
+            [$project, $this->getDummyStudent(8), 'Acceptable'],
+            [$project, $this->getDummyStudent(9), 'Excellent'],
+        ];
+    }
+
+    public function provider_project_Max_LetterGrade_getHR_publishedOnly()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Maximum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 'Acceptable'],
+            [$project, $this->getDummyStudent(3), 'Acceptable'],
+            [$project, $this->getDummyStudent(4), 'Acceptable'],
+            [$project, $this->getDummyStudent(5), 'Acceptable'],
+            [$project, $this->getDummyStudent(6), 'Acceptable'],
+            [$project, $this->getDummyStudent(7), 'Acceptable'],
+            [$project, $this->getDummyStudent(8), 'Acceptable'],
+            [$project, $this->getDummyStudent(9), 'Acceptable'],
+        ];
+    }
+
+    public function provider_project_Max_Percentage_getHR()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Maximum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkScheme(new Percentage());
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), '50 %'],
+            [$project, $this->getDummyStudent(3), '50 %'],
+            [$project, $this->getDummyStudent(4), '100 %'],
+            [$project, $this->getDummyStudent(5), '100 %'],
+            [$project, $this->getDummyStudent(6), '50 %'],
+            [$project, $this->getDummyStudent(7), '100 %'],
+            [$project, $this->getDummyStudent(8), '50 %'],
+            [$project, $this->getDummyStudent(9), '100 %'],
+        ];
+    }
+
+    public function provider_project_Max_Percentage_getHR_publishedOnly()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Maximum());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkScheme(new Percentage());
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), '50 %'],
+            [$project, $this->getDummyStudent(3), '50 %'],
+            [$project, $this->getDummyStudent(4), '50 %'],
+            [$project, $this->getDummyStudent(5), '50 %'],
+            [$project, $this->getDummyStudent(6), '50 %'],
+            [$project, $this->getDummyStudent(7), '50 %'],
+            [$project, $this->getDummyStudent(8), '50 %'],
+            [$project, $this->getDummyStudent(9), '50 %'],
+        ];
+    }
+
+    public function provider_project_Average_LetterGrade_getHR()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Average());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 'Acceptable'],
+            [$project, $this->getDummyStudent(3), 'Acceptable'],
+            [$project, $this->getDummyStudent(4), 'Very Good'],
+            [$project, $this->getDummyStudent(5), 'Excellent'],
+            [$project, $this->getDummyStudent(6), 'Acceptable'],
+            [$project, $this->getDummyStudent(7), 'Excellent'],
+            [$project, $this->getDummyStudent(8), 'Acceptable'],
+            [$project, $this->getDummyStudent(9), 'Excellent'],
+        ];
+    }
+
+    public function provider_project_Average_LetterGrade_getHR_publishedOnly()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Average());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 'Acceptable'],
+            [$project, $this->getDummyStudent(3), 'Acceptable'],
+            [$project, $this->getDummyStudent(4), 'Acceptable'],
+            [$project, $this->getDummyStudent(5), 'Acceptable'],
+            [$project, $this->getDummyStudent(6), 'Acceptable'],
+            [$project, $this->getDummyStudent(7), 'Acceptable'],
+            [$project, $this->getDummyStudent(8), 'Acceptable'],
+            [$project, $this->getDummyStudent(9), 'Acceptable'],
+        ];
+    }
+
+    public function provider_project_Average_Percent_getHR()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Average());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkScheme(new Percentage());
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), '50 %'],
+            [$project, $this->getDummyStudent(3), '50 %'],
+            [$project, $this->getDummyStudent(4), '75 %'],
+            [$project, $this->getDummyStudent(5), '100 %'],
+            [$project, $this->getDummyStudent(6), '50 %'],
+            [$project, $this->getDummyStudent(7), '100 %'],
+            [$project, $this->getDummyStudent(8), '50 %'],
+            [$project, $this->getDummyStudent(9), '100 %'],
+        ];
+    }
+
+    public function provider_project_Average_Percent_getHR_publishedOnly()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new Average());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkScheme(new Percentage());
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), '50 %'],
+            [$project, $this->getDummyStudent(3), '50 %'],
+            [$project, $this->getDummyStudent(4), '50 %'],
+            [$project, $this->getDummyStudent(5), '42 %'],
+            [$project, $this->getDummyStudent(6), '50 %'],
+            [$project, $this->getDummyStudent(7), '50 %'],
+            [$project, $this->getDummyStudent(8), '50 %'],
+            [$project, $this->getDummyStudent(9), '50 %'],
+        ];
+    }
+
+    public function provider_project_WeightedAverage_LetterGrade_getHR()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new WeightedAverage());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 'Acceptable'],
+            [$project, $this->getDummyStudent(3), 'Acceptable'],
+            [$project, $this->getDummyStudent(4), 'Good'],
+            [$project, $this->getDummyStudent(5), 'Excellent'],
+            [$project, $this->getDummyStudent(6), 'Acceptable'],
+            [$project, $this->getDummyStudent(7), 'Excellent'],
+            [$project, $this->getDummyStudent(8), 'Acceptable'],
+            [$project, $this->getDummyStudent(9), 'Excellent'],
+        ];
+    }
+
+    public function provider_project_WeightedAverage_LetterGrade_getHR_publishedOnly()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new WeightedAverage());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), 'Acceptable'],
+            [$project, $this->getDummyStudent(3), 'Acceptable'],
+            [$project, $this->getDummyStudent(4), 'Acceptable'],
+            [$project, $this->getDummyStudent(5), 'Acceptable'],
+            [$project, $this->getDummyStudent(6), 'Acceptable'],
+            [$project, $this->getDummyStudent(7), 'Acceptable'],
+            [$project, $this->getDummyStudent(8), 'Acceptable'],
+            [$project, $this->getDummyStudent(9), 'Acceptable'],
+        ];
+    }
+
+    public function provider_project_WeightedAverage_Percent_getHR()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new WeightedAverage());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkScheme(new Percentage());
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), '50 %'],
+            [$project, $this->getDummyStudent(3), '50 %'],
+            [$project, $this->getDummyStudent(4), '60 %'],
+            [$project, $this->getDummyStudent(5), '100 %'],
+            [$project, $this->getDummyStudent(6), '50 %'],
+            [$project, $this->getDummyStudent(7), '100 %'],
+            [$project, $this->getDummyStudent(8), '50 %'],
+            [$project, $this->getDummyStudent(9), '100 %'],
+        ];
+    }
+
+    public function provider_project_WeightedAverage_Percent_getHR_publishedOnly()
+    {
+        $project = $this->getDummyProject();
+        $project->setSummator(new WeightedAverage());
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $project->setMarkScheme(new Percentage());
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), '50 %'],
+            [$project, $this->getDummyStudent(3), '50 %'],
+            [$project, $this->getDummyStudent(4), '50 %'],
+            [$project, $this->getDummyStudent(5), '47 %'],
+            [$project, $this->getDummyStudent(6), '50 %'],
+            [$project, $this->getDummyStudent(7), '50 %'],
+            [$project, $this->getDummyStudent(8), '50 %'],
+            [$project, $this->getDummyStudent(9), '50 %'],
+        ];
+    }
+
 
 
 
     /**
      * Generates a task.
-     * * user1: none
-     * * user2: self-assessed
-     * * user3: teacher-assessed
-     * * user4: self-assessed then teacher-assessed
+     * * student 1: none
+     * * student 2: self-assessed
+     * * student 3: teacher-assessed
+     * * student 4: self-assessed then teacher-assessed
      *
      * In all cases, QuizReviews are unpublished
      *
@@ -768,10 +1948,10 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
 
         $teacher = $this->getDummyTeacher(101);
 
-        $participant1 = new Participant($student1);
-        $participant2 = new Participant($student2);
-        $participant3 = new Participant($student3);
-        $participant4 = new Participant($student4);
+        $participant1 = $this->getDummyParticipant($student1->getId());
+        $participant2 = $this->getDummyParticipant($student2->getId());
+        $participant3 = $this->getDummyParticipant($student3->getId());
+        $participant4 = $this->getDummyParticipant($student4->getId());
 
         $task->getAllParticipants()
             ->add($participant1)
@@ -868,11 +2048,11 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $student5 = $this->getDummyStudent(5);
 
 
-        $participant1 = new Participant($student1);
-        $participant2 = new Participant($student2);
-        $participant3 = new Participant($student3);
-        $participant4 = new Participant($student4);
-        $participant5 = new Participant($student5);
+        $participant1 = $this->getDummyParticipant($student1->getId());
+        $participant2 = $this->getDummyParticipant($student2->getId());
+        $participant3 = $this->getDummyParticipant($student3->getId());
+        $participant4 = $this->getDummyParticipant($student4->getId());
+        $participant5 = $this->getDummyParticipant($student5->getId());
 
         // student 1: no attempts
 
@@ -1052,15 +2232,15 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $student8 = $this->getDummyStudent(8);
         $student9 = $this->getDummyStudent(9);
 
-        $participant1 = new Participant($student1);
-        $participant2 = new Participant($student2);
-        $participant3 = new Participant($student3);
-        $participant4 = new Participant($student4);
-        $participant5 = new Participant($student5);
-        $participant6 = new Participant($student6);
-        $participant7 = new Participant($student7);
-        $participant8 = new Participant($student8);
-        $participant9 = new Participant($student9);
+        $participant1 = $this->getDummyParticipant($student1->getId());
+        $participant2 = $this->getDummyParticipant($student2->getId());
+        $participant3 = $this->getDummyParticipant($student3->getId());
+        $participant4 = $this->getDummyParticipant($student4->getId());
+        $participant5 = $this->getDummyParticipant($student5->getId());
+        $participant6 = $this->getDummyParticipant($student6->getId());
+        $participant7 = $this->getDummyParticipant($student7->getId());
+        $participant8 = $this->getDummyParticipant($student8->getId());
+        $participant9 = $this->getDummyParticipant($student9->getId());
 
         // student 1: no attempts
 
@@ -1263,7 +2443,35 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * Returns a project composed of 1 Task, 1 DueWork + 1 Quiz
+     * Returns a project composed of 1 Task (weight=0), 1 Quiz (weight=200) + 1 DueWork (weight=800)
+     *
+     * student 1: Task: -
+     *            Quiz: -
+     *            DueW: -
+     * student 2: Task: self-assessed
+     *            Quiz: 1 attempt + 1 published feedback (1/2)
+     *            DueW: 1 submission
+     * student 3: Task: teacher-assessed
+     *            Quiz: 1 attempt + 1 unpublished feedback (1/2)
+     *            DueW: 1 submission + 1 published feedback (50.0)
+     * student 4: Task: self-assessed then teacher-assessed
+     *            Quiz: 2 attempt + 1 published feedback (1/2) + 1 later unpublished feedback (2/2)
+     *            DueW: 1 submission + 1 unpublished feedback (50.0)
+     * student 5: Task: -
+     *            Quiz: 2 attempt + 1 published feedback (1/3) + 1 later unpublished feedback (2/2)
+     *            DueW: 1 submission + 1 published feedback (50.0) + 1 later unpublished feedback (100.0)
+     * student 6: Task: -
+     *            Quiz: -
+     *            DueW: 2 submission + 1 published floating feedback (50.0)
+     * student 7: Task: -
+     *            Quiz: -
+     *            DueW: 2 submission + 1 published floating feedback (50.0) + 1 later unpublished floating feedback (100.0)
+     * student 8: Task: -
+     *            Quiz: -
+     *            DueW: 0 submission + 1 published floating feedback (50.0)
+     * student 9: Task: -
+     *            Quiz: -
+     *            DueW: 0 submission + 1 published floating feedback (50.0) + 1 later unpublished floating feedback (100.0)
      *
      * @return Project
      */
@@ -1273,26 +2481,19 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
             ->setId(4)
             ->setGradeGroup($this->getDummyLetterGradeGroup());
 
-        $task = $this->getDummyTask();
-        $dueWork = $this->getDummyDueWork();
-        $quiz = $this->getDummyQuiz();
+        $task = $this->getDummyTask()->setWeight(0);
+        $dueWork = $this->getDummyDueWork()->setWeight(800);
+        $quiz = $this->getDummyQuiz()->setWeight(200);
 
         $project->getAssessables()
             ->add($task)
             ->add($dueWork)
             ->add($quiz);
 
-        // TODO up to here.
-        // Get unique list of Participants
-        // Add all Responses across Assessments to Participants, ensure Responses are unique
-        // Add all Feedbacks across Assessments to Participants, ensure Feedbacks are unique
-        // Add Participants to Project
-
-
-//        $project->setAllParticipants($task->getAllParticipants()
-//            ->mergeUnique($dueWork->getAllParticipants(), 'user')
-//            ->mergeUnique($quiz->getAllParticipants(), 'user'));
-
+        $project->setAllParticipants($task->getAllParticipants()
+            ->mergeUnique($dueWork->getAllParticipants(), 'user')
+            ->mergeUnique($quiz->getAllParticipants(), 'user')
+        );
 
         return $project;
     }
@@ -1383,6 +2584,17 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         return $gradeGroup;
     }
 
+
+
+
+    /**
+     * @param int $userId
+     * @return Participant
+     */
+    private function getDummyParticipant($userId)
+    {
+        return new Participant($this->getDummyStudent($userId));
+    }
 
     /**
      * @param int $userId
