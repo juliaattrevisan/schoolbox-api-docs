@@ -36,13 +36,17 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      *
      * Granularity of numerator & denominator depends on sub-class
      *
-     * @param float          $normalisedMark
+     * @param float|null     $normalisedMark
      * @param IResponse|null $response
      * @throws InvalidArgumentException if normalised mark is outside valid range
-     * @return string
+     * @return string|null
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
+        if(is_null($normalisedMark)){
+            return null;
+        }
+
         $this->validateNormalisedMark($normalisedMark);
 
         $rounded = (round($normalisedMark * $this->getTotalMark() / IMarkScheme::NORMALISED_MARK_MAX

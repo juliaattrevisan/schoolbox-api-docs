@@ -67,6 +67,15 @@ class AbstractFeedback implements IFeedback
     /**
      * The datetime at which this Feedback was made visible to Students
      *
+     * @todo Remove when implemented. Special case for Quiz:
+     *     if(assess_attempt.reviewed_at){
+     *         $publishedAt = assess_attempt.reviewed_at
+     *     } else if (all questions in attempt are automarked_already) {
+     *         $publishedAt = assess_attempt.finish
+     *     } else {
+     *         $publishedAt = null
+     *     }
+     *
      * @var \Alaress_Date_Format
      */
     protected $publishedAt = null;

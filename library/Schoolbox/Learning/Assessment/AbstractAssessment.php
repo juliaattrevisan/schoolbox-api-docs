@@ -256,7 +256,7 @@ abstract class AbstractAssessment implements IAssessable
             return $feedback->getHumanReadableMark();
         }
 
-        return '';
+        return null;
     }
 
     /* Traversals

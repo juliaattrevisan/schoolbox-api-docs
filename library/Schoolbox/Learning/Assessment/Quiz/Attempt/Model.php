@@ -15,14 +15,17 @@ use \Schoolbox\Learning\Assessment\AbstractResponse;
 class Model extends AbstractResponse
 {
     /**
-     * Responses given in this attempt, along with marks available
-     *
-     * @var array $allResponses
-     * @var float $allResponses['mark']       Mark given to student for a question
-     * @var float $allResponses['available']  Marks available for a question
+     * Total marks awarded in this attempt
+     * @var float
      */
-    protected $allResponses = [];
+    private $marksGiven;
 
+    /**
+     * Total marks available in this attempt
+     *
+     * @var float
+     */
+    private $marksAvailable;
 
     /**
      * Attempts are submitted at the updatedAt value
@@ -38,31 +41,36 @@ class Model extends AbstractResponse
     /**
      * @return float
      */
-    public function getMarksAvailable()
+    public function getMarksGiven()
     {
-        $marksAvailable = 0.0;
-        foreach ($this->allResponses as $response) {
-            $marksAvailable += $response['available'];
-        }
-        return $marksAvailable;
-    }
-
-
-    /**
-     * @return array
-     */
-    public function getAllResponses()
-    {
-        return $this->allResponses;
+        return $this->marksGiven;
     }
 
     /**
-     * @param array $allResponses
+     * @param float $marksGiven
      * @return static
      */
-    public function setAllResponses(array $allResponses)
+    public function setMarksGiven($marksGiven)
     {
-        $this->allResponses = $allResponses;
+        $this->marksGiven = $marksGiven;
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getMarksAvailable()
+    {
+        return $this->marksAvailable;
+    }
+
+    /**
+     * @param float $marksAvailable
+     * @return static
+     */
+    public function setMarksAvailable($marksAvailable)
+    {
+        $this->marksAvailable = $marksAvailable;
         return $this;
     }
 }

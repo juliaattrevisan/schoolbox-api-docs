@@ -19,8 +19,10 @@ abstract class AbstractMarkScheme implements IMarkScheme
      */
     protected function validateNormalisedMark($normalisedMark)
     {
-        if(!(is_float($normalisedMark)|| is_double($normalisedMark) || is_int($normalisedMark))){
-            throw new \InvalidArgumentException('Normalised mark type must be float, double, or int: '.gettype($normalisedMark));
+        if(!(is_float($normalisedMark) || is_double($normalisedMark) || is_int($normalisedMark))){
+            $type = gettype($normalisedMark);
+            $msg = "Normalised mark type must be float, double, or int: $normalisedMark ($type)";
+            throw new \InvalidArgumentException($msg);
         }
 
         if ($normalisedMark < IMarkScheme::NORMALISED_MARK_MIN || $normalisedMark > IMarkScheme::NORMALISED_MARK_MAX) {
