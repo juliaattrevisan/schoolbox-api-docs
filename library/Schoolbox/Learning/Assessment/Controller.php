@@ -71,6 +71,28 @@ class Controller extends Base
     }
 
     /**
+     * All the possible Mark Types to chooze from
+     * TODO: Replace with actual objects
+     */
+    private function getAllMarkTypes()
+    {
+        return [
+            [
+                'id'   => 1,
+                'name' => 'None'
+            ],
+            [
+                'id'   => 2,
+                'name' => 'Percentage'
+            ],
+            [
+                'id'   => 3,
+                'name' => 'Letter'
+            ]
+        ];
+    }
+
+    /**
      * Create an Assessment
      *
      * @param $folderId
@@ -85,8 +107,9 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
-            'assessment' => new DueWork(),
+            'assessment' => [],
             'folder' => $folder,
+            'allMarkTypes' => $this->getAllMarkTypes(),
             'curriculumNodes' => $folder->getCurriculumNodes()
         ]));
     }
@@ -126,6 +149,8 @@ class Controller extends Base
         $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', [ 'assessmentId' => $assessmentId ] );
         $suffix = '?return_url=' . urlencode(base64_encode($returnUrl));
 
+        /* TODO: Refactor this in a smarter way
+         */
         $allTypes = ['dueWork', 'task', 'quiz'];
         $allReturnUrls = [];
 
@@ -157,6 +182,10 @@ class Controller extends Base
     {
         /* TODO: Actually save data here
          */
+
+        /* TODO: Save the attributes common among all assessables
+         */
+
         new \Alaress_Probe($assessmentId, $this->getRequest()->post);
     }
 

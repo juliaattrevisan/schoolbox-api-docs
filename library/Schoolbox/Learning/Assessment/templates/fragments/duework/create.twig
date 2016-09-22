@@ -10,16 +10,27 @@
     </div>
 </fieldset>
 <fieldset>
-    <div class="column small-12 medium-4">
-        <label>Publish Date
-            <input type="text" data-datepicker placeholder="Publish Date">
+    <div class="column small-12 medium-6">
+        <label>
+            Publish Date
+            <input name="dueWorkPublishDate" type="text" placeholder="Publish Date" data-datepicker />
         </label>
     </div>
+    <div class="column small-12 medium-6">
+        <div class="timepick">
+            <label>
+                Publish Time
+                <input name="dueWorkPublishTime" type="text" placeholder="Publish Time" data-timepicker />
+            </label>
+        </div>
+    </div>
     <div class="small-6 columns">
-        <label>Marktype
-            <select>
-                <option>Letter Grade</option>
-                <option>Rubric</option>
+        <label>
+            Mark Type
+            <select name="dueWorkMarkType">
+                {% for currentMarkType in allMarkTypes %}
+                <option value="{{ currentMarkType.id }}">{{ currentMarkType.name }}</option>
+                {% endfor %}
             </select>
         </label>
     </div>
@@ -32,20 +43,20 @@
         </label>
     </div>
     <div class="small-6 columns">
+        <label for="dueWorkUseRubric">Use Rubric?</label>
         <div class="switch round">
-            <label for="useRubric">Use Rubric</label>
-            <input id="useRubric" type="checkbox" data-checkbox-group="example" />
-            <label for="useRubric">
+            <input name="dueWorkUseRubric" id="dueWorkUseRubric" type="checkbox"  />
+            <label for="dueWorkUseRubric">
                 <span class="icon-approve"></span>
                 <span class="icon-cancel"></span>
             </label>
         </div>
     </div>
     <div class="small-6 columns">
+        <label for="dueWorkMarkPerCapability">Mark Per-Capability</label>
         <div class="switch round">
-            <label for="markPerCapability">Mark Per-Capability</label>
-            <input id="markPerCapability" type="checkbox" data-checkbox-group="example" />
-            <label for="markPerCapability">
+            <input name="dueWorkMarkPerCapability" id="dueWorkMarkPerCapability" type="checkbox" />
+            <label for="dueWorkMarkPerCapability">
                 <span class="icon-approve"></span>
                 <span class="icon-cancel"></span>
             </label>
