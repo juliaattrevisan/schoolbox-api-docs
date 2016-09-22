@@ -29,6 +29,13 @@
                     next.find('[data-mage-collapsed]').hide().removeClass('hide').slideDown(600);
                 }
 
+                /**
+                 * Change form url to update route instead
+                 */
+                function updateFormAction(url) {
+                    $('#assessmentForm').attr('action', url);
+                }
+
                 /* Switch between the Assessable types that you might
                  * have selected from part-1
                  */
@@ -45,18 +52,18 @@
                         });
 
                         break;
-//                    case 'dueWork':
-//                        updateType('Due Work', selected);
-//                        updateFormUrl(data.updateRoute);
-//                        break;
-//                    case 'quiz':
-//                        updateType('Quiz', selected);
-//                        updateFormUrl(data.updateRoute);
-//                        break;
-//                    case 'task':
-//                        updateType('Task', selected);
-//                        updateFormUrl(data.updateRoute);
-//                        break;
+                    case 'dueWork':
+                        updateType('Due Work', selected);
+                        updateFormAction(data.updateRoute);
+                        break;
+                    case 'quiz':
+                        updateType('Quiz', selected);
+                        updateFormAction(data.updateRoute);
+                        break;
+                    case 'task':
+                        updateType('Task', selected);
+                        updateFormAction(data.updateRoute);
+                        break;
                     default:
                         break;
                 }
@@ -120,18 +127,51 @@
                     <div class="hide" data-mage="part-2-dueWork">
                         <div data-mage-collapsed>
                             {% include '@learningAssessment/fragments/duework/create.twig' %}
+                            
+                            <div class="column small-12">
+                                <div class="row" data-mage-submitrow>
+                                    <div class="small-12 medium-8 column">
+                                        <p class="alert alert-box icon-alert" data-mage-error></p>
+                                    </div>
+                                    <div class="small-12 medium-4 column">
+                                        <input type="submit" value="Next"  />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="hide" data-mage="part-2-task">
                         <div data-mage-collapsed>
                             {% include '@learningAssessment/fragments/task/create.twig' %}
+
+                            <div class="column small-12">
+                                <div class="row" data-mage-submitrow>
+                                    <div class="small-12 medium-8 column">
+                                        <p class="alert alert-box icon-alert" data-mage-error></p>
+                                    </div>
+                                    <div class="small-12 medium-4 column">
+                                        <input type="submit" value="Next"  />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="hide" data-mage="part-2-quiz">
                         <div data-mage-collapsed>
                             {% include '@learningAssessment/fragments/quiz/create.twig' %}
+
+                            <div class="column small-12">
+                                <div class="row" data-mage-submitrow>
+                                    <div class="small-12 medium-8 column">
+                                        <p class="alert alert-box icon-alert" data-mage-error></p>
+                                    </div>
+                                    <div class="small-12 medium-4 column">
+                                        <input type="submit" value="Next"  />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </fieldset>

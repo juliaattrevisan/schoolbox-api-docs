@@ -157,7 +157,7 @@ class Controller extends Base
     {
         /* TODO: Actually save data here
          */
-        new \Alaress_Probe($assessmentId);
+        new \Alaress_Probe($assessmentId, $this->getRequest()->post);
     }
 
     /**
@@ -184,9 +184,9 @@ class Controller extends Base
      */
     public function postCreateAssessmentWithinProject()
     {
-        /* TODO: Actually save data here
+        /* TODO: Actually save data here then redirect back to project update screen
          */
-        new \Alaress_Probe($_POST, $this->getResponse()->post);
+        new \Alaress_Probe($_POST, $this->getRequest()->post);
     }
 
 
