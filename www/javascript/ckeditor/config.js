@@ -78,7 +78,7 @@ var nanospell = {
 };
 
 nanospell.ckeditor('all', {
-    dictionary: "en_au,en,de,fr,it,id,es",
+    dictionary: "schoolbox",
     ignore_block_caps: true,
     ignore_non_alpha: true,
     server: "php"
