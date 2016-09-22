@@ -51,15 +51,20 @@ class Module extends BaseModule
                  */
                 '/assessment/{assessmentId}/new/{assessmentType}' => 'getCreateAssessmentWithinProject',
 
+
                 '/assessment/{assessmentId}/status'              => 'getStatus',
                 '/assessment/{assessmentId}/summary/{studentId}' => 'getSummary',
                 '/assessment/{assessmentId}/submit/{studentId}'  => 'getSubmitForm',
             ],
             'POST' => [
 
-                /* Save the data from the Create screen
+                /* Create an assessment
                  */
-                '/assessment/create' => 'postCreateAssessment'
+                '/assessment/create' => 'postCreateAssessment',
+
+                /* Add assessments to a Project
+                 */
+                '/assessment/{assessmentId}/new/{assessmentType}' => 'postCreateAssessmentWithinProject',
             ]
         ];
 

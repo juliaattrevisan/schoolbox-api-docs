@@ -128,10 +128,10 @@
                     </div>
                     <div class="small-12 columns">
                         <label>Visibility
-                            <select>
-                                <option>&#xe66b;&nbsp;&nbsp;&nbsp;Staff Only</option>
-                                <option>&#xe667;&nbsp;&nbsp;&nbsp;Staff and Students</option>
-                                <option>&#xe666;&nbsp;&nbsp;&nbsp;Staff, Students and their Parents</option>
+                            <select name="visibility">
+                                <option value="1">&#xe66b;&nbsp;&nbsp;&nbsp;Staff Only</option>
+                                <option value="2">&#xe667;&nbsp;&nbsp;&nbsp;Staff and Students</option>
+                                <option value="3">&#xe666;&nbsp;&nbsp;&nbsp;Staff, Students and their Parents</option>
                             </select>
                         </label>
                     </div>
@@ -142,7 +142,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Publish Date
-                            <input type="text" data-datepicker value="{{ assessment.publishAt.localShort }}" />
+                            <input name="publishDate" type="text" value="{{ assessment.publishAt.localShort }}" data-datepicker />
                         </label>
                     </div>
 
@@ -150,7 +150,7 @@
                         <div class="timepick">
                             <label>
                                 Publish Time
-                                <input type="text" data-timepicker value="{{ assessment.publishAt.timeOnly }}" />
+                                <input name="publishTime" type="text" value="{{ assessment.publishAt.timeOnly }}" data-timepicker />
                             </label>
                         </div>
                     </div>
@@ -158,7 +158,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Commencement Date
-                            <input data-datepicker type="text" autocomplete="off" value="{{ assessment.openAt.localShort }}" />
+                            <input name="commencementDate" type="text" autocomplete="off" value="{{ assessment.openAt.localShort }}" data-datepicker />
                         </label>
                     </div>
 
@@ -166,7 +166,7 @@
                         <div class="timepick">
                             <label>
                                 Commencement Time
-                                <input data-timepicker type="text" autocomplete="off" value="{{ assessment.openAt.timeOnly }}" />
+                                <input name="commencementTime" type="text" autocomplete="off" value="{{ assessment.openAt.timeOnly }}" data-timepicker />
                             </label>
                         </div>
                     </div>
@@ -174,7 +174,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Due Date
-                            <input data-datepicker type="text" autocomplete="off" value="{{ assessment.dueAt.localShort }}" />
+                            <input name="dueDate" type="text" autocomplete="off" value="{{ assessment.dueAt.localShort }}" data-datepicker />
                         </label>
                     </div>
 
@@ -182,7 +182,7 @@
                         <div class="timepick">
                             <label>
                                 Due Time
-                                <input data-timepicker type="text" autocomplete="off" value="{{ assessment.dueAt.timeOnly }}" />
+                                <input name="dueTime" type="text" autocomplete="off" value="{{ assessment.dueAt.timeOnly }}" data-timepicker />
                             </label>
                         </div>
                     </div>
@@ -190,7 +190,7 @@
                     <div class="column small-12 medium-6">
                         <label>
                             Close Date
-                            <input data-datepicker type="text" autocomplete="off" value="{{ assessment.closeAt.localShort }}" />
+                            <input name="closeDate" type="text" autocomplete="off" value="{{ assessment.closeAt.localShort }}" data-datepicker />
                         </label>
                     </div>
 
@@ -198,7 +198,7 @@
                         <div class="timepick">
                             <label>
                                 Close Time
-                                <input data-timepicker type="text" autocomplete="off" value="{{ assessment.closeAt.timeOnly }}" />
+                                <input name="closeTime" type="text" autocomplete="off" value="{{ assessment.closeAt.timeOnly }}" data-timepicker />
                             </label>
                         </div>
                     </div>

@@ -99,15 +99,11 @@ class Controller extends Base
 
         /* TODO: Actually save data here
          */
-        $id = 5567;
-        $title = 'Find Diablo';
-        $description = 'The things you need to do in order to slay the prime evil';
-
         $project = new Project(new SummatorAverage());
         $project
-            ->setId($id)
-            ->setTitle($title)
-            ->setDescription($description)
+            ->setId(5567)
+            ->setTitle('Find Diablo')
+            ->setDescription('The things you need to do in order to slay the prime evil')
             ->setCreator($_SESSION['user'])
             ->setAllParticipants(new Collection())
             ->setPublishAt(Alaress_Date_Format::now())
@@ -132,14 +128,36 @@ class Controller extends Base
     /**
      * Create an Assessment within a particular Project
      *
-     * @param $projectId
-     * @param $type
+     * @param $assessmentId
+     * @param $assessmentType
      */
-    public function getCreateAssessmentWithinProject($projectId, $type)
+    public function getCreateAssessmentWithinProject($assessmentId, $assessmentType)
     {
-        new \Alaress_Probe($projectId, $type);
 
+        /* TODO: Actually load data for $assessmentId here
+         */
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/createWithinProject.twig', [
+            'assessmentId' => $assessmentId,
+            'assessmentType' => $assessmentType,
+        ]));
     }
+
+    /**
+     * Save the data when creating an assessment within a Project
+     */
+    public function postCreateAssessmentWithinProject()
+    {
+
+        /* TODO: Save the assessment data
+         */
+        new \Alaress_Probe($_POST, $this->getResponse()->post);
+    }
+
+
+
+
+
 
 
     /**

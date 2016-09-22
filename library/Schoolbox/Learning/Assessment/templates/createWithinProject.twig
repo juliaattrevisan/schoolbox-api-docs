@@ -1,0 +1,211 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+    [ folder.name, '/homepage/' ~ folder.id ],
+    [ 'Create Assessment', routeLookup('learningAssessment.getCreateAssessment') ]
+) }}
+
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+<script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+        /* Description
+         */
+        $.fn.alaressEditor();
+
+        /* Datepickers
+         */
+        $('[data-datepicker]').datepicker();
+        $('[data-timepicker]').timepicker({
+            appendTo: function ($input) {
+                return $input.closest('.timepick');
+            }
+        });
+    });
+</script>
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
+<script type="text/javascript">
+    $(function () {
+        /**
+         * Update the heading and perform transitions
+         *
+         * @param type
+         * @param selected
+         */
+        function updateType(assessmentType, selected) {
+            $('#assessmentType').text($('#assessmentType').text() + ': ' + assessmentType);
+
+            var next = $('[data-mage="part-2-'+selected+'"]');
+            next.removeAttr('disabled').removeClass('hide');
+            next.find('[data-mage-collapsed]').hide().removeClass('hide').slideDown(600);
+        }
+
+        var assessmentType = '{{ assessmentType }}';
+
+        switch (assessmentType) {
+            case 'dueWork':
+                updateType('Due Work', assessmentType);
+                break;
+            case 'quiz':
+                updateType('Quiz', assessmentType);
+                break;
+            case 'task':
+                updateType('Task', assessmentType);
+                break;
+            default:
+                break;
+        }
+    });
+</script>
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="/curriculum/javascript/jquery.curriculumSelector.js"></script>
+
+<div class="row">
+    <div class="small-12 columns"><h1>Create Assessment</h1></div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns island">
+        <form action="{{ routeLookup('learningAssessment.postCreateAssessmentWithinProject', {assessmentId: assessmentId, assessmentType: assessmentType}) }}" id="assessmentForm" method="post">
+            <input type="hidden" name="projectId" value="{{ assessmentId }}" />
+            <input type="hidden" name="type" value="{{ assessmentType }}" />
+            <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>Title
+                            <input type="text" name="title" value="{{ assessment.title }}" required />
+                        </label>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>Description
+                            <textarea name="description">{{ assessment.description }}</textarea>
+                        </label>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>Weight
+                            <input type="number" name="weight" value="{{ assessment.weight }}">
+                        </label>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>Visibility
+                            <select name="visibility">
+                                <option value="1">&#xe66b;&nbsp;&nbsp;&nbsp;Staff Only</option>
+                                <option value="2">&#xe667;&nbsp;&nbsp;&nbsp;Staff and Students</option>
+                                <option value="3">&#xe666;&nbsp;&nbsp;&nbsp;Staff, Students and their Parents</option>
+                            </select>
+                        </label>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Dates</legend>
+
+                    <div class="column small-12 medium-6">
+                        <label>
+                            Publish Date
+                            <input name="publishDate" type="text" value="{{ assessment.publishAt.localShort }}" data-datepicker />
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <div class="timepick">
+                            <label>
+                                Publish Time
+                                <input name="publishTime" type="text" value="{{ assessment.publishAt.timeOnly }}" data-timepicker />
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>
+                            Commencement Date
+                            <input name="commencementDate" type="text" autocomplete="off" value="{{ assessment.openAt.localShort }}" data-datepicker />
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <div class="timepick">
+                            <label>
+                                Commencement Time
+                                <input name="commencementTime" type="text" autocomplete="off" value="{{ assessment.openAt.timeOnly }}" data-timepicker />
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>
+                            Due Date
+                            <input name="dueDate" type="text" autocomplete="off" value="{{ assessment.dueAt.localShort }}" data-datepicker />
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <div class="timepick">
+                            <label>
+                                Due Time
+                                <input name="dueTime" type="text" autocomplete="off" value="{{ assessment.dueAt.timeOnly }}" data-timepicker />
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <label>
+                            Close Date
+                            <input name="closeDate" type="text" autocomplete="off" value="{{ assessment.closeAt.localShort }}" data-datepicker />
+                        </label>
+                    </div>
+
+                    <div class="column small-12 medium-6">
+                        <div class="timepick">
+                            <label>
+                                Close Time
+                                <input name="closeTime" type="text" autocomplete="off" value="{{ assessment.closeAt.timeOnly }}" data-timepicker />
+                            </label>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 large-10 columns">
+                        <label>
+                            Curriculum Codes
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Link this folder with a corresponding curriculum area, you can link multiple curriculum areas to this folder">?</span>
+                        </label>
+                        {% include 'sub/curriculumCodeSelector.twig' with {'codeList': curriculumNodes, 'renderButton': false} %}
+                    </div>
+                    <div class="small-12 large-2 columns">
+                        <label>Browse</label>
+                        {% include 'sub/curriculumBrowseButton.twig' %}
+                    </div>
+                </fieldset>
+                <fieldset class="content">
+                    <legend id="assessmentType">Assessment Type</legend>
+
+                    <div class="hide" data-mage="part-2-dueWork">
+                        <div data-mage-collapsed>
+                            {% include '@learningAssessment/fragments/duework/create.twig' %}
+                        </div>
+                    </div>
+
+                    <div class="hide" data-mage="part-2-task">
+                        <div data-mage-collapsed>
+                            {% include '@learningAssessment/fragments/task/create.twig' %}
+                        </div>
+                    </div>
+
+                    <div class="hide" data-mage="part-2-quiz">
+                        <div data-mage-collapsed>
+                            {% include '@learningAssessment/fragments/quiz/create.twig' %}
+                        </div>
+                    </div>
+
+                    <div class="column small-12">
+                        <input type="submit" value="Submit" />
+                    </div>
+                </fieldset>
+            </section>
+        </form>
+    </div>
+</div>
