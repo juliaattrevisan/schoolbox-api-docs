@@ -1,7 +1,8 @@
 <div class="small-12 columns">
-    <label>Max Attempts
+    <label>
+        Max Attempts
         {% set maxAttempts = 10 %}
-        <select name="max-attempts" id="max-attempts">
+        <select name="quizMaxAttempts">
 
             {% for i in 0..maxAttempts %}
             {% if i == 0 %}
@@ -34,8 +35,8 @@
         <div class="small-12 columns">
             <label for="quizDuration">Duration</label>
             <div class="switch round">
-                <input id="quizDuration" type="checkbox" data-checkbox-group="quizDuration" />
-                <label for="quizDuration">
+                <input name="quizHasDuration" id="quizDuration" type="checkbox" />
+                <label for="quizHasDuration">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
                 </label>
@@ -47,12 +48,12 @@
         <div class="small-12 columns no-pad">
             <div class="small-12 medium-6 columns">
                 <label>Hours
-                    <input type="text" name='quizDurationHours' />
+                    <input name='quizDurationHours' type="text" />
                 </label>
             </div>
             <div class="small-12 medium-6 columns">
                 <label>Minutes
-                    <input type="text" name='quizDurationMinutes' />
+                    <input name='quizDurationMinutes' type="text" />
                 </label>
             </div>
         </div>
