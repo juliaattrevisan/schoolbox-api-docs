@@ -139,6 +139,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/createWithinProject.twig', [
             'assessmentId' => $assessmentId,
+            'assessmentName' => 'Diablo',
             'assessmentType' => $assessmentType,
         ]));
     }
