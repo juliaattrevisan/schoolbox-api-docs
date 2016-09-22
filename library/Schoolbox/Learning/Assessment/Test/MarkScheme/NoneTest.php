@@ -13,9 +13,6 @@ use \RangeException;
 
 class NoneTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function test_getHumanReadable_Null()
     {
         $normalised = null;

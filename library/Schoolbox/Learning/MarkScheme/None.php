@@ -22,7 +22,9 @@ class None extends AbstractMarkScheme
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
-        $this->validateNormalisedMark($normalisedMark);
+        if(!is_null($normalisedMark)){
+            $this->validateNormalisedMark($normalisedMark);
+        }
         return null;
     }
 
