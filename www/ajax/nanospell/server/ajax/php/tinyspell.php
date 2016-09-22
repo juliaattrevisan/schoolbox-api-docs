@@ -3,6 +3,11 @@
 $rawPostData = file_get_contents('php://input');
 $post        = json_decode($rawPostData);
 
+// TODO figure out how dictionaries should be installed
+$dicts = [
+    pspell_new('en'),
+];
+
 if (!$post->id) {
     die("JSON Data sent in unexpected format for Nanospell");
 }
@@ -11,10 +16,15 @@ if ($post->method == 'spellcheck') {
         'id'     => $post->id,
         'result' => []
     ];
-    $pspell = pspell_new('en');
     foreach ($post->params->words as $word) {
-        if (!pspell_check($pspell, $word)) {
-            $structure['result'][$word] = pspell_suggest($pspell, $word);
+        foreach ($dicts as $dict) {
+            $corrections = [];
+            if (!pspell_check($dict, $word)) {
+                $corrections = array_merge($corrections, pspell_suggest($dict, $word));
+            }
+            if (!empty($corrections)) {
+                $structure['result'][$word] = $corrections;
+            }
         }
     }
     echo json_encode($structure);
