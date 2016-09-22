@@ -112,6 +112,9 @@ class StudentReportCard
      */
     protected $folderMapper;
 
+    /** @var UserMapper */
+    private $userMapper;
+
     // 'andlers
     protected $groupHandler;
 
@@ -121,10 +124,6 @@ class StudentReportCard
         $this->viewingUserId = $viewingAs == -1 ? $_SESSION['id'] : $viewingAs;
         $this->targetUserId  = $studentUserId;
 
-        //Convert to user objects TODO: pass user objects initially
-        $this->setViewingUser(UserMapper::getInstance()->findById($this->viewingUserId));
-        $this->setTargetUser(UserMapper::getInstance()->findById($this->targetUserId));
-
         // dependencies
         $this->submissionMapper = new SubmissionBoxMapper();
         $this->showcaseMapper   = new ShowcaseMapper();
@@ -133,6 +132,13 @@ class StudentReportCard
         $this->groupHandler     = new \Group();
         $this->folderMapper     = new Folder\Mapper();
         $this->termMapper       = Term\Mapper::getInstance();
+        $this->userMapper       = UserMapper::getInstance();
+
+        //Convert to user objects TODO: pass user objects initially
+        $this->setViewingUser($this->userMapper->findById($this->viewingUserId));
+        $this->setTargetUser($this->userMapper->findById($this->targetUserId));
+
+
         // build permissions set
         $this->establishPermissions();
         // setup helper vars
@@ -1053,8 +1059,9 @@ class StudentReportCard
                     }
                 }
                 if (is_array($teacherList)) {
+                    $staffGroups = $groupHandler->getStaffGroupTypeIds();
                     foreach ($teacherList as $teacherSynID) {
-                        $teacher = $userHandler->getBySynergy($teacherSynID);
+                        $teacher = $userHandler->getBySynergyAndGroup($teacherSynID, $staffGroups);
                         if (is_array($teacher)) {
                             $teacherName     = $userHandler->formatName($teacher);
                             $emailObj        = new \Email();
