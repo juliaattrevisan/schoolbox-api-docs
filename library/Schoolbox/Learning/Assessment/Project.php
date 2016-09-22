@@ -67,13 +67,7 @@ class Project extends AbstractAssessment
      */
     public function getNormalisedMark(User $user, $publishedOnly)
     {
-        $val = $this->getSummator()->summate($this->getAssessables(), $user, $publishedOnly);
-
-        if (is_null($val)) {
-            return null;
-        }
-
-        return number_format($val, $this->getPrecision());
+        return $this->getSummator()->summate($this->getAssessables(), $user, $publishedOnly);
     }
 
     /**
