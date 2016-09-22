@@ -8,6 +8,9 @@
 namespace Schoolbox\Learning\Assessment\Test\MarkScheme;
 
 
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
@@ -18,7 +21,13 @@ use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\MarkScheme\Completion;
+use Schoolbox\Learning\MarkScheme\LetterGrade;
+use Schoolbox\Learning\MarkScheme\None;
+use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
+use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevel;
 use Schoolbox\User;
 use \InvalidArgumentException;
 
@@ -46,12 +55,12 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
 
 
     /**
-     * @dataProvider provider_task
+     * @dataProvider provider_task_completion_getHR
      * @param Task $task
      * @param User $student
      * @param string $expected
      */
-    public function test_Task_getHumanReadable(Task $task, User $student, $expected)
+    public function test_Task_Completion_getHumanReadable(Task $task, User $student, $expected)
     {
         $actual = $task->getHumanReadableMark($student, false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
@@ -59,12 +68,12 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider provider_task_publishedOnly
+     * @dataProvider provider_task_completion_getHR_publishedOnly
      * @param Task $task
      * @param User $student
      * @param string $expected
      */
-    public function test_Task_getHumanReadable_PublishedOnly(Task $task, User $student, $expected)
+    public function test_Task_Completion_getHumanReadable_PublishedOnly(Task $task, User $student, $expected)
     {
         // A student-assessed response is always published
         // A teacher-assessed feedback can be unpublished
@@ -75,12 +84,12 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider provider_quiz
+     * @dataProvider provider_quiz_totalMarkFraction_getHR
      * @param Quiz $quiz
      * @param User $student
      * @param string $expected
      */
-    public function test_Quiz_getHumanReadable(Quiz $quiz, User $student, $expected)
+    public function test_Quiz_TotalMarkFraction_getHumanReadable(Quiz $quiz, User $student, $expected)
     {
         $actual = $quiz->getHumanReadableMark($student, false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
@@ -88,14 +97,248 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider provider_quiz_publishedOnly
+     * @dataProvider provider_quiz_totalMarkFraction_getHR_publishedOnly
      * @param Quiz $quiz
      * @param User $student
      * @param string $expected
      */
-    public function test_Quiz_getHumanReadable_PublishedOnly(Quiz $quiz, User $student, $expected)
+    public function test_Quiz_TotalMarkFraction_getHumanReadable_PublishedOnly(Quiz $quiz, User $student, $expected)
     {
         $actual = $quiz->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_quiz_totalMarkFraction_getNorm
+     * @param Quiz $quiz
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Quiz_TotalMarkFraction_getNormalised(Quiz $quiz, User $student, $expected)
+    {
+        $actual = $quiz->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_quiz_totalMarkFraction_getNorm_publishedOnly
+     * @param Quiz $quiz
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Quiz_TotalMarkFraction_getNormalised_PublishedOnly(Quiz $quiz, User $student, $expected)
+    {
+        $actual = $quiz->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_dueWork_None_getHR
+     * @param DueWork $dueWork
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_DueWork_None_getHumanReadable(DueWork $dueWork, User $student, $expected)
+    {
+        $actual = $dueWork->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_dueWork_None_getHR_publishedOnly
+     * @param DueWork $dueWork
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_DueWork_None_getHumanReadable_publishedOnly(DueWork $dueWork, User $student, $expected)
+    {
+        $actual = $dueWork->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_dueWork_Percent_getHR
+     * @param DueWork $dueWork
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_DueWork_Percent_getHumanReadable(DueWork $dueWork, User $student, $expected)
+    {
+        $actual = $dueWork->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_dueWork_Percent_getHR_publishedOnly
+     * @param DueWork $dueWork
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_DueWork_Percent_getHumanReadable_publishedOnly(DueWork $dueWork, User $student, $expected)
+    {
+        $actual = $dueWork->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_dueWork_TotalMark_getHR
+     * @param DueWork $dueWork
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_DueWork_TotalMark_getHumanReadable(DueWork $dueWork, User $student, $expected)
+    {
+        $actual = $dueWork->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_dueWork_TotalMark_getHR_publishedOnly
+     * @param DueWork $dueWork
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_DueWork_TotalMark_getHumanReadable_publishedOnly(DueWork $dueWork, User $student, $expected)
+    {
+        $actual = $dueWork->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_dueWork_LetterGrade_getHR
+     * @param DueWork $dueWork
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_DueWork_LetterGrade_getHumanReadable(DueWork $dueWork, User $student, $expected)
+    {
+        $actual = $dueWork->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_dueWork_LetterGrade_getHR_publishedOnly
+     * @param DueWork $dueWork
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_DueWork_LetterGrade_getHumanReadable_publishedOnly(DueWork $dueWork, User $student, $expected)
+    {
+        $actual = $dueWork->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_dueWork_None_getNorm
+     * @param DueWork $dueWork
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_DueWork_None_getNormalised(DueWork $dueWork, User $student, $expected)
+    {
+        $actual = $dueWork->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_dueWork_None_getNorm_publishedOnly
+     * @param DueWork $dueWork
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_DueWork_None_getNormalised_publishedOnly(DueWork $dueWork, User $student, $expected)
+    {
+        $actual = $dueWork->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_dueWork_Percent_getNorm
+     * @param DueWork $dueWork
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_DueWork_Percent_getNormalised(DueWork $dueWork, User $student, $expected)
+    {
+        $actual = $dueWork->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_dueWork_Percent_getNorm_publishedOnly
+     * @param DueWork $dueWork
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_DueWork_Percent_getNormalised_publishedOnly(DueWork $dueWork, User $student, $expected)
+    {
+        $actual = $dueWork->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_dueWork_TotalMark_getNorm
+     * @param DueWork $dueWork
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_DueWork_TotalMark_getNormalised(DueWork $dueWork, User $student, $expected)
+    {
+        $actual = $dueWork->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_dueWork_TotalMark_getNorm_publishedOnly
+     * @param DueWork $dueWork
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_DueWork_TotalMark_getNormalised_publishedOnly(DueWork $dueWork, User $student, $expected)
+    {
+        $actual = $dueWork->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_dueWork_LetterGrade_getNorm
+     * @param DueWork $dueWork
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_DueWork_LetterGrade_getNormalised(DueWork $dueWork, User $student, $expected)
+    {
+        $actual = $dueWork->getNormalisedMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_dueWork_LetterGrade_getNorm_publishedOnly
+     * @param DueWork $dueWork
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_DueWork_LetterGrade_getNormalised_publishedOnly(DueWork $dueWork, User $student, $expected)
+    {
+        $actual = $dueWork->getNormalisedMark($student, true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -103,7 +346,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
 
     // ============= Data Providers =============
 
-    public function provider_task()
+    public function provider_task_completion_getHR()
     {
         $task = $this->getDummyTask();
         return [
@@ -114,7 +357,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function provider_task_publishedOnly()
+    public function provider_task_completion_getHR_publishedOnly()
     {
         $task = $this->getDummyTask();
         return [
@@ -125,7 +368,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function provider_quiz()
+    public function provider_quiz_totalMarkFraction_getHR()
     {
         $quiz = $this->getDummyQuiz();
         $quiz->setMarkScheme(new TotalMarkFractional($quiz->getMaxMark()));
@@ -138,7 +381,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function provider_quiz_publishedOnly()
+    public function provider_quiz_totalMarkFraction_getHR_publishedOnly()
     {
         $quiz = $this->getDummyQuiz();
         $quiz->setMarkScheme(new TotalMarkFractional($quiz->getMaxMark()));
@@ -148,6 +391,322 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
             [$quiz, $this->getDummyStudent(3), null],
             [$quiz, $this->getDummyStudent(4), '1 / 2'],
             [$quiz, $this->getDummyStudent(5), '1 / 3'],
+        ];
+    }
+
+    public function provider_quiz_totalMarkFraction_getNorm()
+    {
+        $quiz = $this->getDummyQuiz();
+        $quiz->setMarkScheme(new TotalMarkFractional($quiz->getMaxMark()));
+        return [
+            [$quiz, $this->getDummyStudent(1), null],
+            [$quiz, $this->getDummyStudent(2), 50.0],
+            [$quiz, $this->getDummyStudent(3), 50.0],
+            [$quiz, $this->getDummyStudent(4), 100.0],
+            [$quiz, $this->getDummyStudent(5), 100.0],
+        ];
+    }
+
+    public function provider_quiz_totalMarkFraction_getNorm_publishedOnly()
+    {
+        $quiz = $this->getDummyQuiz();
+        $quiz->setMarkScheme(new TotalMarkFractional($quiz->getMaxMark()));
+        return [
+            [$quiz, $this->getDummyStudent(1), null],
+            [$quiz, $this->getDummyStudent(2), 50.0],
+            [$quiz, $this->getDummyStudent(3), null],
+            [$quiz, $this->getDummyStudent(4), 50.0],
+            [$quiz, $this->getDummyStudent(5), 33.3333333333333],
+        ];
+    }
+
+
+    public function provider_dueWork_None_getHR()
+    {
+        $dueWork = $this->getDummyDueWork();
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
+        return [
+            [$dueWork, $this->getDummyStudent(1), null],
+            [$dueWork, $this->getDummyStudent(2), null],
+            [$dueWork, $this->getDummyStudent(3), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(4), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(5), '20 / 20'],
+            [$dueWork, $this->getDummyStudent(6), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(7), '20 / 20'],
+            [$dueWork, $this->getDummyStudent(8), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(9), '20 / 20'],
+        ];
+    }
+
+    public function provider_dueWork_None_getHR_publishedOnly()
+    {
+        $dueWork = $this->getDummyDueWork();
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
+        return [
+            [$dueWork, $this->getDummyStudent(1), null],
+            [$dueWork, $this->getDummyStudent(2), null],
+            [$dueWork, $this->getDummyStudent(3), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(4), null],
+            [$dueWork, $this->getDummyStudent(5), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(6), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(7), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(8), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(9), '10 / 20'],
+        ];
+    }
+
+    public function provider_dueWork_Percent_getHR()
+    {
+        $dueWork = $this->getDummyDueWork();
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $dueWork->setMarkScheme(new Percentage());
+        return [
+            [$dueWork, $this->getDummyStudent(1), null],
+            [$dueWork, $this->getDummyStudent(2), null],
+            [$dueWork, $this->getDummyStudent(3), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(4), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(5), '20 / 20'],
+            [$dueWork, $this->getDummyStudent(6), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(7), '20 / 20'],
+            [$dueWork, $this->getDummyStudent(8), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(9), '20 / 20'],
+        ];
+    }
+
+    public function provider_dueWork_Percent_getHR_publishedOnly()
+    {
+        $dueWork = $this->getDummyDueWork();
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $dueWork->setMarkScheme(new Percentage());
+        return [
+            [$dueWork, $this->getDummyStudent(1), null],
+            [$dueWork, $this->getDummyStudent(2), null],
+            [$dueWork, $this->getDummyStudent(3), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(4), null],
+            [$dueWork, $this->getDummyStudent(5), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(6), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(7), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(8), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(9), '10 / 20'],
+        ];
+    }
+
+    public function provider_dueWork_TotalMark_getHR()
+    {
+        $dueWork = $this->getDummyDueWork();
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL));
+        $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
+        return [
+            [$dueWork, $this->getDummyStudent(1), null],
+            [$dueWork, $this->getDummyStudent(2), null],
+            [$dueWork, $this->getDummyStudent(3), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(4), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(5), '20 / 20'],
+            [$dueWork, $this->getDummyStudent(6), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(7), '20 / 20'],
+            [$dueWork, $this->getDummyStudent(8), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(9), '20 / 20'],
+        ];
+    }
+
+    public function provider_dueWork_TotalMark_getHR_publishedOnly()
+    {
+        $dueWork = $this->getDummyDueWork();
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL));
+        $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
+        return [
+            [$dueWork, $this->getDummyStudent(1), null],
+            [$dueWork, $this->getDummyStudent(2), null],
+            [$dueWork, $this->getDummyStudent(3), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(4), null],
+            [$dueWork, $this->getDummyStudent(5), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(6), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(7), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(8), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(9), '10 / 20'],
+        ];
+    }
+
+    public function provider_dueWork_LetterGrade_getHR()
+    {
+        $dueWork = $this->getDummyDueWork();
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $dueWork->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        return [
+            [$dueWork, $this->getDummyStudent(1), null],
+            [$dueWork, $this->getDummyStudent(2), null],
+            [$dueWork, $this->getDummyStudent(3), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(4), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(5), '20 / 20'],
+            [$dueWork, $this->getDummyStudent(6), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(7), '20 / 20'],
+            [$dueWork, $this->getDummyStudent(8), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(9), '20 / 20'],
+        ];
+    }
+
+    public function provider_dueWork_LetterGrade_getHR_publishedOnly()
+    {
+        $dueWork = $this->getDummyDueWork();
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $dueWork->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        return [
+            [$dueWork, $this->getDummyStudent(1), null],
+            [$dueWork, $this->getDummyStudent(2), null],
+            [$dueWork, $this->getDummyStudent(3), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(4), null],
+            [$dueWork, $this->getDummyStudent(5), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(6), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(7), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(8), '10 / 20'],
+            [$dueWork, $this->getDummyStudent(9), '10 / 20'],
+        ];
+    }
+
+
+    public function provider_dueWork_None_getNorm()
+    {
+        $dueWork = $this->getDummyDueWork();
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $dueWork->setMarkScheme(new None());
+        return [
+            [$dueWork, $this->getDummyStudent(1), null],
+            [$dueWork, $this->getDummyStudent(2), null],
+            [$dueWork, $this->getDummyStudent(3), 50.0],
+            [$dueWork, $this->getDummyStudent(4), 50.0],
+            [$dueWork, $this->getDummyStudent(5), 100.0],
+            [$dueWork, $this->getDummyStudent(6), 50.0],
+            [$dueWork, $this->getDummyStudent(7), 100.0],
+            [$dueWork, $this->getDummyStudent(8), 50.0],
+            [$dueWork, $this->getDummyStudent(9), 100.0],
+        ];
+    }
+
+    public function provider_dueWork_None_getNorm_publishedOnly()
+    {
+        $dueWork = $this->getDummyDueWork();
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $dueWork->setMarkScheme(new None());
+        return [
+            [$dueWork, $this->getDummyStudent(1), null],
+            [$dueWork, $this->getDummyStudent(2), null],
+            [$dueWork, $this->getDummyStudent(3), 50.0],
+            [$dueWork, $this->getDummyStudent(4), null],
+            [$dueWork, $this->getDummyStudent(5), 50.0],
+            [$dueWork, $this->getDummyStudent(6), 50.0],
+            [$dueWork, $this->getDummyStudent(7), 50.0],
+            [$dueWork, $this->getDummyStudent(8), 50.0],
+            [$dueWork, $this->getDummyStudent(9), 50.0],
+        ];
+    }
+
+    public function provider_dueWork_Percent_getNorm()
+    {
+        $dueWork = $this->getDummyDueWork();
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $dueWork->setMarkScheme(new Percentage());
+        return [
+            [$dueWork, $this->getDummyStudent(1), null],
+            [$dueWork, $this->getDummyStudent(2), null],
+            [$dueWork, $this->getDummyStudent(3), 50.0],
+            [$dueWork, $this->getDummyStudent(4), 50.0],
+            [$dueWork, $this->getDummyStudent(5), 100.0],
+            [$dueWork, $this->getDummyStudent(6), 50.0],
+            [$dueWork, $this->getDummyStudent(7), 100.0],
+            [$dueWork, $this->getDummyStudent(8), 50.0],
+            [$dueWork, $this->getDummyStudent(9), 100.0],
+        ];
+    }
+
+    public function provider_dueWork_Percent_getNorm_publishedOnly()
+    {
+        $dueWork = $this->getDummyDueWork();
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
+        $dueWork->setMarkScheme(new Percentage());
+        return [
+            [$dueWork, $this->getDummyStudent(1), null],
+            [$dueWork, $this->getDummyStudent(2), null],
+            [$dueWork, $this->getDummyStudent(3), 50.0],
+            [$dueWork, $this->getDummyStudent(4), null],
+            [$dueWork, $this->getDummyStudent(5), 50.0],
+            [$dueWork, $this->getDummyStudent(6), 50.0],
+            [$dueWork, $this->getDummyStudent(7), 50.0],
+            [$dueWork, $this->getDummyStudent(8), 50.0],
+            [$dueWork, $this->getDummyStudent(9), 50.0],
+        ];
+    }
+
+    public function provider_dueWork_TotalMark_getNorm()
+    {
+        $dueWork = $this->getDummyDueWork();
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL));
+        $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
+        return [
+            [$dueWork, $this->getDummyStudent(1), null],
+            [$dueWork, $this->getDummyStudent(2), null],
+            [$dueWork, $this->getDummyStudent(3), 50.0],
+            [$dueWork, $this->getDummyStudent(4), 50.0],
+            [$dueWork, $this->getDummyStudent(5), 100.0],
+            [$dueWork, $this->getDummyStudent(6), 50.0],
+            [$dueWork, $this->getDummyStudent(7), 100.0],
+            [$dueWork, $this->getDummyStudent(8), 50.0],
+            [$dueWork, $this->getDummyStudent(9), 100.0],
+        ];
+    }
+
+    public function provider_dueWork_TotalMark_getNorm_publishedOnly()
+    {
+        $dueWork = $this->getDummyDueWork();
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_TOTAL));
+        $dueWork->setMarkScheme(new TotalMarkWholeNumber($dueWork->getMaxMark()));
+        return [
+            [$dueWork, $this->getDummyStudent(1), null],
+            [$dueWork, $this->getDummyStudent(2), null],
+            [$dueWork, $this->getDummyStudent(3), 50.0],
+            [$dueWork, $this->getDummyStudent(4), null],
+            [$dueWork, $this->getDummyStudent(5), 50.0],
+            [$dueWork, $this->getDummyStudent(6), 50.0],
+            [$dueWork, $this->getDummyStudent(7), 50.0],
+            [$dueWork, $this->getDummyStudent(8), 50.0],
+            [$dueWork, $this->getDummyStudent(9), 50.0],
+        ];
+    }
+
+    public function provider_dueWork_LetterGrade_getNorm()
+    {
+        $dueWork = $this->getDummyDueWork();
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $dueWork->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        return [
+            [$dueWork, $this->getDummyStudent(1), null],
+            [$dueWork, $this->getDummyStudent(2), null],
+            [$dueWork, $this->getDummyStudent(3), 50.0],
+            [$dueWork, $this->getDummyStudent(4), 50.0],
+            [$dueWork, $this->getDummyStudent(5), 100.0],
+            [$dueWork, $this->getDummyStudent(6), 50.0],
+            [$dueWork, $this->getDummyStudent(7), 100.0],
+            [$dueWork, $this->getDummyStudent(8), 50.0],
+            [$dueWork, $this->getDummyStudent(9), 100.0],
+        ];
+    }
+
+    public function provider_dueWork_LetterGrade_getNorm_publishedOnly()
+    {
+        $dueWork = $this->getDummyDueWork();
+        $dueWork->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
+        $dueWork->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
+        return [
+            [$dueWork, $this->getDummyStudent(1), null],
+            [$dueWork, $this->getDummyStudent(2), null],
+            [$dueWork, $this->getDummyStudent(3), 50.0],
+            [$dueWork, $this->getDummyStudent(4), null],
+            [$dueWork, $this->getDummyStudent(5), 50.0],
+            [$dueWork, $this->getDummyStudent(6), 50.0],
+            [$dueWork, $this->getDummyStudent(7), 50.0],
+            [$dueWork, $this->getDummyStudent(8), 50.0],
+            [$dueWork, $this->getDummyStudent(9), 50.0],
         ];
     }
 
@@ -421,6 +980,339 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         return $quiz;
     }
 
+    /**
+     * Generate a DueWork with attached Attempts, Feedbacks, + Participants
+     *
+     * DueWork has Total Marks of 20 and a 'Competency' Letter Grade Group {'Needs Attention' ... 'Excellent'}
+     *
+     * DueWork does not yet have a MarkType or MarkScheme attached, that is caller's responsibility
+     *
+     * All Feedbacks have HumanReadable cached in the TotalMarkWhole format, eg '10 / 20'
+     *
+     * * student 1: none
+     * * student 2: 1 submission
+     * * student 3: 1 submission + 1 published feedback (50.0)
+     * * student 4: 1 submission + 1 unpublished feedback (50.0)
+     * * student 5: 1 submission + 1 published feedback (50.0) + 1 later unpublished feedback (100.0)
+     * * student 6: 2 submission + 1 published floating feedback (50.0)
+     * * student 7: 2 submission + 1 published floating feedback (50.0) + 1 later unpublished floating feedback (100.0)
+     * * student 8: 0 submission + 1 published floating feedback (50.0)
+     * * student 9: 0 submission + 1 published floating feedback (50.0) + 1 later unpublished floating feedback (100.0)
+     *
+     * @return DueWork
+     */
+    private function getDummyDueWork()
+    {
+        // Create everything
+        $dueWork = (new DueWork())
+            ->setId(1)
+            ->setMaxMark(20)
+            ->setGradeGroup($this->getDummyLetterGradeGroup());
+
+        $student1 = $this->getDummyStudent(1);
+        $student2 = $this->getDummyStudent(2);
+        $student3 = $this->getDummyStudent(3);
+        $student4 = $this->getDummyStudent(4);
+        $student5 = $this->getDummyStudent(5);
+        $student6 = $this->getDummyStudent(6);
+        $student7 = $this->getDummyStudent(7);
+        $student8 = $this->getDummyStudent(8);
+        $student9 = $this->getDummyStudent(9);
+
+        $participant1 = new Participant($student1);
+        $participant2 = new Participant($student2);
+        $participant3 = new Participant($student3);
+        $participant4 = new Participant($student4);
+        $participant5 = new Participant($student5);
+        $participant6 = new Participant($student6);
+        $participant7 = new Participant($student7);
+        $participant8 = new Participant($student8);
+        $participant9 = new Participant($student9);
+
+        // student 1: no attempts
+
+        // student 2: 1 submission
+        $submission2 = (new DueWorkSubmission())
+            ->setId(2)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+
+        // student 3: 1 submission + 1 published feedback (50.0)
+        $submission3 = (new DueWorkSubmission())
+            ->setId(3)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+
+        $feedback3 = (new DueWorkFeedback())
+            ->setId(3)
+            ->setHumanReadableMark('10 / 20')
+            ->setNormalisedMark(50.0)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
+            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
+
+        // student 4: 1 submission + 1 unpublished feedback (50.0)
+        $submission4 = (new DueWorkSubmission())
+            ->setId(4)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+
+        $feedback4 = (new DueWorkFeedback())
+            ->setId(4)
+            ->setHumanReadableMark('10 / 20')
+            ->setNormalisedMark(50.0)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
+            ->setPublishedAt($this->getDummyDate(null));
+
+        // student 5: 1 submission + 1 published feedback (50.0) + 1 later unpublished feedback (100.0)
+        $submission5 = (new DueWorkSubmission())
+            ->setId(5)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+
+        $feedback5a = (new DueWorkFeedback())
+            ->setId(5)
+            ->setHumanReadableMark('10 / 20')
+            ->setNormalisedMark(50.0)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
+            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $feedback5b = (new DueWorkFeedback())
+            ->setId(6)
+            ->setHumanReadableMark('20 / 20')
+            ->setNormalisedMark(100.0)
+            ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'))
+            ->setPublishedAt($this->getDummyDate(null));
+
+        // student 6: 2 submission + 1 published floating feedback (50.0)
+        $submission6a = (new DueWorkSubmission())
+            ->setId(5)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $submission6b = (new DueWorkSubmission())
+            ->setId(6)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+
+        $feedback6 = (new DueWorkFeedback())
+            ->setId(7)
+            ->setHumanReadableMark('10 / 20')
+            ->setNormalisedMark(50.0)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
+            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
+
+        // student 7: 2 submission + 1 published floating feedback (50.0) + 1 later unpublished floating feedback (100.0)
+        $submission7a = (new DueWorkSubmission())
+            ->setId(7)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $submission7b = (new DueWorkSubmission())
+            ->setId(8)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+
+        $feedback7a = (new DueWorkFeedback())
+            ->setId(8)
+            ->setHumanReadableMark('10 / 20')
+            ->setNormalisedMark(50.0)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
+            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $feedback7b = (new DueWorkFeedback())
+            ->setId(9)
+            ->setHumanReadableMark('20 / 20')
+            ->setNormalisedMark(100.0)
+            ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'))
+            ->setPublishedAt($this->getDummyDate(null));
+
+        // student 8: 0 submission + 1 published floating feedback (50.0)
+        $feedback8 = (new DueWorkFeedback())
+            ->setId(10)
+            ->setHumanReadableMark('10 / 20')
+            ->setNormalisedMark(50.0)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
+            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
+
+        // student 9: 0 submission + 1 published floating feedback (50.0) + 1 later unpublished floating feedback (100.0)
+        $feedback9a = (new DueWorkFeedback())
+            ->setId(11)
+            ->setHumanReadableMark('10 / 20')
+            ->setNormalisedMark(50.0)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'))
+            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $feedback9b = (new DueWorkFeedback())
+            ->setId(12)
+            ->setHumanReadableMark('20 / 20')
+            ->setNormalisedMark(100.0)
+            ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'))
+            ->setPublishedAt($this->getDummyDate(null));
+
+        // Link them all together
+
+        // Add Participants to Assessable
+        $dueWork->getAllParticipants()
+            ->add($participant1)
+            ->add($participant2)
+            ->add($participant3)
+            ->add($participant4)
+            ->add($participant5)
+            ->add($participant6)
+            ->add($participant7)
+            ->add($participant8)
+            ->add($participant9);
+
+        // Add Responses to Assessable
+        $dueWork->getResponses()
+            ->add($submission2)
+            ->add($submission3)
+            ->add($submission4)
+            ->add($submission5)
+            ->add($submission6a)
+            ->add($submission6b)
+            ->add($submission7a)
+            ->add($submission7b);
+
+        // Add Assessable to Responses
+        $submission2->setAssessable($dueWork);
+        $submission3->setAssessable($dueWork);
+        $submission4->setAssessable($dueWork);
+        $submission5->setAssessable($dueWork);
+        $submission6a->setAssessable($dueWork);
+        $submission6b->setAssessable($dueWork);
+        $submission7a->setAssessable($dueWork);
+        $submission7b->setAssessable($dueWork);
+
+        // Add Feedback to Assessable
+        $dueWork->getFeedbacks()
+            ->add($feedback3)
+            ->add($feedback4)
+            ->add($feedback5a)
+            ->add($feedback5b)
+            ->add($feedback6)
+            ->add($feedback7a)
+            ->add($feedback7b)
+            ->add($feedback8)
+            ->add($feedback9a)
+            ->add($feedback9b);
+
+        // Add Assessable to Feedbacks
+        $feedback3->setAssessable($dueWork);
+        $feedback4->setAssessable($dueWork);
+        $feedback5a->setAssessable($dueWork);
+        $feedback5b->setAssessable($dueWork);
+        $feedback6->setAssessable($dueWork);
+        $feedback7a->setAssessable($dueWork);
+        $feedback7b->setAssessable($dueWork);
+        $feedback8->setAssessable($dueWork);
+        $feedback9a->setAssessable($dueWork);
+        $feedback9b->setAssessable($dueWork);
+
+        // Add Responses to Participants
+        $participant2->getAllResponses()->add($submission2);
+        $participant3->getAllResponses()->add($submission3);
+        $participant4->getAllResponses()->add($submission4);
+        $participant5->getAllResponses()->add($submission5);
+        $participant6->getAllResponses()->add($submission6a)->add($submission6b);
+        $participant7->getAllResponses()->add($submission7a)->add($submission7b);
+
+
+        // Add Feedbacks to Participants
+        $participant3->getAllFeedbacks()->add($feedback3);
+        $participant4->getAllFeedbacks()->add($feedback4);
+        $participant5->getAllFeedbacks()->add($feedback5a)->add($feedback5b);
+        $participant6->getAllFeedbacks()->add($feedback6);
+        $participant7->getAllFeedbacks()->add($feedback7a)->add($feedback7b);
+        $participant8->getAllFeedbacks()->add($feedback8);
+        $participant9->getAllFeedbacks()->add($feedback9a)->add($feedback9b);
+
+        // Add Responses to Feedbacks
+        $feedback3->setResponse($submission3);
+        $feedback4->setResponse($submission4);
+        $feedback5a->setResponse($submission5);
+        $feedback5b->setResponse($submission5);
+
+        // Add Feedbacks to Responses
+        $submission3->getAllFeedback()->add($feedback3);
+        $submission4->getAllFeedback()->add($feedback4);
+        $submission5->getAllFeedback()->add($feedback5a)->add($feedback5b);
+
+        return $dueWork;
+    }
+
+    /**
+     * @param int $markTypeId
+     * @return MarkType
+     */
+    private function getDummyMarkType($markTypeId)
+    {
+        $data = [
+            [1, 'Percentage (%)', 'percent', 'This should be a whole percentage between 0 and 100.', 1],
+            [2, 'Letter Grade', 'letter', 'Se1ect a letter grade from the list.', 1],
+            [3, 'Total Mark', 'raw', 'This should be a mark between 0 and {MAX_MARK}. It may be a whole number or a decimal.', 1],
+            [4, 'Free Type (legacy support)', 'free', 'Should be a letter (A), score (15/20), or percentage (88%).', 0],
+            [5, 'Rubric', 'rubric', 'To mark the Rubric you <b>must</b> select one result for each criterion. Simply click the squares to select the results.', 0],
+            [6, 'None', 'none', 'This due work is not marked.', 1],
+            [7, 'Completion', 'completion', 'Either \'Completed\' or \'Not Completed\'', 0],
+        ];
+
+        foreach($data as $row){
+            if($row[0] == $markTypeId){
+                return (new MarkType())
+                    ->setId($row[0])
+                    ->setName($row[1])
+                    ->setSlug($row[2])
+                    ->setComment($row[3])
+                    ->setEnabled($row[4]);
+            }
+        }
+        throw new InvalidArgumentException("Unknown markType id: $markTypeId");
+    }
+
+    private function getDummyLetterGradeGroup()
+    {
+        $data = [
+            [
+                'id' => 3,
+                'name' => 'Competency',
+                'grades' => [
+                    [
+                        'grade_id' => 13,
+                        'lower_bound' => 0,
+                        'raw_grade' => 20,
+                        'caption' => 'Needs Attention',
+                    ],
+                    [
+                        'grade_id' => 14,
+                        'lower_bound' => 40,
+                        'raw_grade' => 53,
+                        'caption' => 'Acceptable',
+                    ],
+                    [
+                        'grade_id' => 15,
+                        'lower_bound' => 60,
+                        'raw_grade' => 68,
+                        'caption' => 'Good',
+                    ],
+                    [
+                        'grade_id' => 16,
+                        'lower_bound' => 75,
+                        'raw_grade' => 88,
+                        'caption' => 'Very Good',
+                    ],
+                    [
+                        'grade_id' => 17,
+                        'lower_bound' => 90,
+                        'raw_grade' => 95,
+                        'caption' => 'Excellent',
+                    ],
+                ]
+            ]
+        ];
+        $gradeGroup = (new GradeGroup())
+            ->setId($data[0]['id'])
+            ->setName($data[0]['name']);
+
+        foreach ($data[0]['grades'] as $gradeLevelArr){
+            $gradeLevel = (new GradeLevel())
+                ->setGroup($gradeGroup)
+                ->setId($gradeLevelArr['grade_id'])
+                ->setLowerBound($gradeLevelArr['lower_bound'])
+                ->setRawGrade($gradeLevelArr['raw_grade'])
+                ->setCaption($gradeLevelArr['caption']);
+            $gradeGroup->getGradeLevels()->add($gradeLevel);
+        }
+        return $gradeGroup;
+    }
+
 
     /**
      * @param int $userId
@@ -449,6 +1341,18 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
                 break;
             case 5:
                 $user->setFirstname('Ethan (Student)');
+                break;
+            case 6:
+                $user->setFirstname('Fred (Student)');
+                break;
+            case 7:
+                $user->setFirstname('Gary (Student)');
+                break;
+            case 8:
+                $user->setFirstname('Harry (Student)');
+                break;
+            case 9:
+                $user->setFirstname('Issac (Student)');
                 break;
             default:
                 throw new InvalidArgumentException("Unknown userId: $userId");
