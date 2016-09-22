@@ -9,11 +9,13 @@ namespace Schoolbox\Learning\Assessment\Test\MarkScheme;
 
 
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
+use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
@@ -339,6 +341,19 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     public function test_DueWork_LetterGrade_getNormalised_publishedOnly(DueWork $dueWork, User $student, $expected)
     {
         $actual = $dueWork->getNormalisedMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_project_None_getHR
+     * @param Project $project
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Project_None_getHumanReadable(Project $project, User $student, $expected)
+    {
+        $actual = $project->getHumanReadableMark($student, true);
         $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
         $this->assertEquals($expected, $actual, $message);
     }
@@ -710,6 +725,24 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function provider_project_None_getHR()
+    {
+        $project = $this->getDummyProject();
+        $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_NONE));
+        $project->setMarkScheme(new None());
+        return [
+            [$project, $this->getDummyStudent(1), null],
+            [$project, $this->getDummyStudent(2), null],
+            [$project, $this->getDummyStudent(3), 50.0],
+            [$project, $this->getDummyStudent(4), null],
+            [$project, $this->getDummyStudent(5), 50.0],
+            [$project, $this->getDummyStudent(6), 50.0],
+            [$project, $this->getDummyStudent(7), 50.0],
+            [$project, $this->getDummyStudent(8), 50.0],
+            [$project, $this->getDummyStudent(9), 50.0],
+        ];
+    }
+
 
 
 
@@ -824,7 +857,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     {
         // Create everything
         $quiz = (new Quiz())
-            ->setId(1)
+            ->setId(2)
             ->setMaxMark(3.0)
             ->setHasFixedTotalMarks(false);
 
@@ -1005,7 +1038,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     {
         // Create everything
         $dueWork = (new DueWork())
-            ->setId(1)
+            ->setId(3)
             ->setMaxMark(20)
             ->setGradeGroup($this->getDummyLetterGradeGroup());
 
@@ -1227,6 +1260,43 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
 
         return $dueWork;
     }
+
+
+    /**
+     * Returns a project composed of 1 Task, 1 DueWork + 1 Quiz
+     *
+     * @return Project
+     */
+    public function getDummyProject()
+    {
+        $project = (new Project(new Minimum()))
+            ->setId(4)
+            ->setGradeGroup($this->getDummyLetterGradeGroup());
+
+        $task = $this->getDummyTask();
+        $dueWork = $this->getDummyDueWork();
+        $quiz = $this->getDummyQuiz();
+
+        $project->getAssessables()
+            ->add($task)
+            ->add($dueWork)
+            ->add($quiz);
+
+        // TODO up to here.
+        // Get unique list of Participants
+        // Add all Responses across Assessments to Participants, ensure Responses are unique
+        // Add all Feedbacks across Assessments to Participants, ensure Feedbacks are unique
+        // Add Participants to Project
+
+
+//        $project->setAllParticipants($task->getAllParticipants()
+//            ->mergeUnique($dueWork->getAllParticipants(), 'user')
+//            ->mergeUnique($quiz->getAllParticipants(), 'user'));
+
+
+        return $project;
+    }
+
 
     /**
      * @param int $markTypeId
