@@ -14,6 +14,9 @@ class Model {
     /** @var int */
     protected $id;
 
+    /** @var int */
+    protected $ownerId;
+
     /** @var string */
     protected $status;
 
@@ -73,6 +76,22 @@ class Model {
     public function getId() {
         return $this->id;
     }
+
+    /**
+     * @param int $ownerId
+     * @return self
+     */
+    public function setOwnerId($ownerId) {
+        $this->ownerId = $ownerId;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOwnerId() {
+        return $this->ownerId;
+    }    
 
     /**
      * @param \Alaress_Date_Format $createdAt

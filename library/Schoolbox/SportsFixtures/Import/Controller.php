@@ -171,6 +171,7 @@ class Controller extends Base
                         // Create a log entry
 
                         $log = new Import();
+                        $log->setOwnerId($this->getUser()->getId());
                         $log->setStatus(Controller::STATUS_RUNNING);
                         $log->setCreatedAt(\Alaress_Date_Format::now());
                         $log->setUpdatedAt(\Alaress_Date_Format::now());

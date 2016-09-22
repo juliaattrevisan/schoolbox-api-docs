@@ -46,7 +46,8 @@ class Notifier extends AbstractModuleNotifier
 
         // Work out who to send the message to
 
-        $envelope->broadcastToSuperusers($message);
+        $this->log->error("Sending to {$import->getOwnerId()} - A sports fixture import has {$import->getStatus()}");
+        $envelope->targetToUser($import->getOwnerId(), $message);
 
         return $envelope;
     }

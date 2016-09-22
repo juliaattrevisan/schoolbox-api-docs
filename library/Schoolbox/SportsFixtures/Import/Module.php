@@ -71,7 +71,7 @@ class Module extends BaseModule
         /* Apply route permissions here as you add them to initRoutes()
          * Note that if the perms change you need to log out/log in to refresh
          */
-        $this->addRoutePermission($authorizer, 'getUpload', $isSportsAdministrator);
+        $this->addRoutePermission($authorizer, '.*', $isSportsAdministrator);
     }
 
     /**
