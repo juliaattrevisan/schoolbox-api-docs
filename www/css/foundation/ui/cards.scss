@@ -6,13 +6,13 @@
 .card-new{
 	.card-feature-image{
 		position: relative;
+		padding-top: 55%;
+
 		img{
 			width: 100%;
-		}
-		.class-colour{
-			height: 0.625rem;
-			width: 100%;
-			@include absolute (auto, auto, 0, auto);
+			padding-bottom: 1rem;
+			position: absolute;
+			top:0;
 		}
 	}
 	.card-content{
