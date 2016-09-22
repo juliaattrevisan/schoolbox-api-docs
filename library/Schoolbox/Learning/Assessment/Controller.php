@@ -92,7 +92,10 @@ class Controller extends Base
     }
 
     /**
-     * Save the data when creating an Assessment
+     * Save the data when creating common details of an Assessment
+     *
+     * If it's a Project we need to save it so we can craft a returnUrl
+     * which gets used after we craft the Project's Assessables
      */
     public function postCreateAssessment()
     {
@@ -115,14 +118,46 @@ class Controller extends Base
 
         $assessmentId = $project->getId();
 
+        /* Figure out a returnUrl
+         *
+         * When spawning a Project, its constituent Assessables return to this url
+         * after they are spawned
+         */
         $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', [ 'assessmentId' => $assessmentId ] );
+        $suffix = '?return_url=' . urlencode(base64_encode($returnUrl));
 
+        $allTypes = ['dueWork', 'task', 'quiz'];
+        $allReturnUrls = [];
+
+        foreach ($allTypes as $currentType) {
+            $allReturnUrls[$currentType] = $this->getRouter()->generate('learningAssessment.getCreateAssessmentWithinProject', ['assessmentId' => $project->getId(), 'assessmentType' => $currentType]) . $suffix;
+        }
+
+        /* Final payload
+         */
         $data = [
             'assessmentId' => $project->getId(),
-            'returnUrl' => urlencode(base64_encode($returnUrl))
+            'allReturnUrls' => $allReturnUrls,
+
+            /* The next step of saving once you've chosen a type that isn't a project
+             */
+            'updateRoute' => $this->getRouter()->generate('learningAssessment.postUpdateAssessment', ['assessmentId' => $assessmentId]),
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
+    /**
+     * Save the data when creating a specific kind of Assessment
+     * This happens after the common details are saved
+     *
+     * @param $assessmentId
+     */
+    public function postUpdateAssessment($assessmentId)
+    {
+        /* TODO: Actually save data here
+         */
+        new \Alaress_Probe($assessmentId);
     }
 
     /**
@@ -149,8 +184,7 @@ class Controller extends Base
      */
     public function postCreateAssessmentWithinProject()
     {
-
-        /* TODO: Save the assessment data
+        /* TODO: Actually save data here
          */
         new \Alaress_Probe($_POST, $this->getResponse()->post);
     }
