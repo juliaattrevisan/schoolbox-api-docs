@@ -1,0 +1,25 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Fixtures',    routeLookup('sportsfixtures.getLanding') ],
+[ 'CSV Import',  routeLookup('sportsfixturesImport.getUpload') ]
+) }}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>CSV Import In Progress</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+
+        <section class="content">
+            <article>
+                <p>
+                    The import of your sports fixtures file is currently in progress. A notification will be sent when it has completed.
+                </p>
+            </article>
+        </section>
+
+    </div>
+</div>

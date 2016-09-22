@@ -1,0 +1,59 @@
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Fixtures',    routeLookup('sportsfixtures.getLanding') ],
+[ 'CSV Import',  routeLookup('sportsfixturesImport.getUpload') ]
+) }}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>CSV Import</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+
+        <section class="content">
+            <article>
+                <h2>Instructions Should Go here</h2>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi gravida volutpat volutpat. Donec facilisis scelerisque sem, id rutrum augue
+                    fermentum vitae. Nullam quis neque nec odio suscipit convallis. Nunc eu gravida quam. Quisque volutpat, ex vel maximus iaculis, tortor
+                    turpis ultricies diam, in facilisis augue tortor ut mi. Duis congue magna nec tortor eleifend placerat. Nullam aliquet in ipsum in lobortis.
+                    Duis scelerisque ex quis quam rutrum, eu condimentum magna malesuada. Donec tempor, lectus cursus faucibus varius, risus odio euismod mi, at
+                    vestibulum tortor purus viverra quam. Integer eu blandit est. Donec fermentum feugiat risus, pellentesque varius sem elementum ac. Proin sed
+                    quam sollicitudin, eleifend felis non, mattis nulla.
+                    Suspendisse volutpat, sem eu venenatis rhoncus, tellus diam aliquam purus, non interdum dui ipsum vitae mauris. Phasellus accumsan turpis at
+                    quam condimentum, varius auctor sem tempor. Ut eu tincidunt urna, a lobortis ex. Donec condimentum, ex semper pretium finibus, sem enim
+                    sagittis erat, non venenatis lectus elit sed libero. Donec ut mi metus. Proin vitae ipsum interdum, molestie mi sollicitudin, varius massa.
+                    Sed luctus eros non quam vestibulum posuere. Etiam malesuada tortor ut
+                    ligula imperdiet, ac tempus velit pellentesque. Duis tristique id tortor sit amet sagittis. Cras laoreet id felis tempor luctus. Fusce at
+                    nisi vel ipsum tempus tristique a nec ex. Duis ac mi sit amet tortor dapibus volutpat aliquam eu turpis. Sed nec elit sed lectus efficitur
+                    dignissim. Ut sed velit sit amet lectus consectetur maximus. Ut euismod aliquam posuere. Maecenas dictum sollicitudin ante, et bibendum eros
+                    vehicula non. Quisque bibendum iaculis viverra. Vivamus euismod ipsum ut orci suscipit cursus pretium at diam. Duis vestibulum urna sed erat
+                    porta mattis. Mauris ut nibh id tellus sodales
+                    consequat. Maecenas non tellus condimentum, vestibulum nisl id, vehicula sem. Mauris placerat condimentum rutrum. Aliquam erat volutpat.
+                    Duis a mauris vitae sapien ultricies pretium. Maecenas commodo faucibus imperdiet. Sed eu massa ac neque hendrerit rutrum. In volutpat
+                    turpis urna, vel posuere metus blandit sit amet. Fusce dictum tortor risus, nec tempus sapien interdum eget. Vivamus fermentum tincidunt
+                    pellentesque. Phasellus in metus enim. Nulla porta
+                    lorem et pellentesque condimentum. Nullam laoreet augue quis sapien ultricies, semper convallis arcu elementum. Nulla felis odio, pulvinar
+                    et imperdiet id, dictum ut dolor. Sed laoreet, lorem vel suscipit lobortis, sapien ligula euismod est, a ultricies eros neque sed orci.
+                    Etiam tristique consequat felis. Proin eget ornare urna. Donec fringilla vestibulum purus eget egestas.
+                </p>
+            </article>
+        </section>
+
+        <form method="post" enctype="multipart/form-data" action="{{ routeLookup('sportsfixturesImport.postUpload') }}">
+            <h2 class="subheader">Attach Files</h2>
+            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+
+            <ul class="flex-list buttons">
+                <li><input type="submit" data-submit value="Save"></li>
+                <li><input type="button" data-cancel class="button expand icon-cancel" value="Cancel Changes"></li>
+            </ul>
+        </form>
+
+    </div>
+</div>
