@@ -361,7 +361,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
             'response'           => 'toothpaste',
             'comment'            => "No, that's not the correct answer",
             'mark'               => 0.0,
-            'automarked_already' => 'false',
+            'automarked_already' => false,
             'updated_at'         => '2012-07-04 13:42:15',
             'deleted_at'         => null,
         ];
@@ -374,7 +374,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
             'response'           => 'Being happy',
             'comment'            => "Correct. Although the correct term is 'Happiness'",
             'mark'               => 1.0,
-            'automarked_already' => 'false',
+            'automarked_already' => false,
             'updated_at'         => '2012-07-04 13:42:30',
             'deleted_at'         => null,
         ];
@@ -394,7 +394,7 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
         // Inject data
         $quiz->setMaxMark($question1['marks'] + $question2['marks'] + $question3['marks']);
 
-        $attempt->setAllResponses([
+        $responses = [
             [
                 'mark' => $response1['mark'],
                 'available' => $question1['marks'],
@@ -403,11 +403,16 @@ class TotalMarkFractionalTest extends \PHPUnit_Framework_TestCase
                 'mark' => $response2['mark'],
                 'available' => $question2['marks'],
             ],
-        ]);
+        ];
+        $marksGiven = $marksAvailable = 0;
+        foreach($responses as $response){
+            $marksGiven += $response['mark'];
+            $marksAvailable += $response['available'];
+        }
 
+        $attempt->setMarksAvailable($marksAvailable);
+        $attempt->setMarksGiven($marksGiven);
 
-
-//var_dump($quiz);die();
         return $quiz;
     }
 }

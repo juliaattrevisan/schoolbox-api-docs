@@ -352,24 +352,32 @@ class QuizTest extends \PHPUnit_Framework_TestCase
 
         $attempt->getAllFeedback()->add($feedback);
         $feedback->setResponse($attempt);
-        $attempt->setAllResponses([
+        $responses = [
             [
                 'mark' => 4, // Question 1,
-                'available' => 5
+                'available' => 5,
             ],
             [
                 'mark' => 0, // Question 2
-                'available' => 5
+                'available' => 5,
             ],
             [
                 'mark' => 2, // Question 3
-                'available' => 5
+                'available' => 5,
             ],
             [
                 'mark' => 1, // Question 4
-                'available' => 5
+                'available' => 5,
             ]
-        ]);
+        ];
+        $marksGiven = $marksAvailable = 0;
+        foreach($responses as $response){
+            $marksGiven += $response['mark'];
+            $marksAvailable += $response['available'];
+        }
+
+        $attempt->setMarksAvailable($marksAvailable);
+        $attempt->setMarksGiven($marksGiven);
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -384,24 +392,32 @@ class QuizTest extends \PHPUnit_Framework_TestCase
 
         $attempt->getAllFeedback()->add($feedback);
         $feedback->setResponse($attempt);
-        $attempt->setAllResponses([
+        $responses = [
             [
                 'mark' => 5, // Question 1,
-                'available' => 5
+                'available' => 5,
             ],
             [
                 'mark' => 5, // Question 2
-                'available' => 5
+                'available' => 5,
             ],
             [
                 'mark' => 3, // Question 3
-                'available' => 5
+                'available' => 5,
             ],
             [
                 'mark' => 3, // Question 4
-                'available' => 5
+                'available' => 5,
             ]
-        ]);
+        ];
+        $marksGiven = $marksAvailable = 0;
+        foreach($responses as $response){
+            $marksGiven += $response['mark'];
+            $marksAvailable += $response['available'];
+        }
+
+        $attempt->setMarksAvailable($marksAvailable);
+        $attempt->setMarksGiven($marksGiven);
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -415,7 +431,7 @@ class QuizTest extends \PHPUnit_Framework_TestCase
 
         $attempt->getAllFeedback()->add($feedback);
         $feedback->setResponse($attempt);
-        $attempt->setAllResponses([
+        $responses = [
             [
                 'mark' => 1, // Question 1,
                 'available' => 5
@@ -432,7 +448,15 @@ class QuizTest extends \PHPUnit_Framework_TestCase
                 'mark' => 2, // Question 4
                 'available' => 5
             ]
-        ]);
+        ];
+        $marksGiven = $marksAvailable = 0;
+        foreach($responses as $response){
+            $marksGiven += $response['mark'];
+            $marksAvailable += $response['available'];
+        }
+
+        $attempt->setMarksAvailable($marksAvailable);
+        $attempt->setMarksGiven($marksGiven);
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -448,7 +472,7 @@ class QuizTest extends \PHPUnit_Framework_TestCase
 
         $attempt->getAllFeedback()->add($feedback);
         $feedback->setResponse($attempt);
-        $attempt->setAllResponses([
+        $responses = [
             [
                 'mark' => 3, // Question 1,
                 'available' => 5
@@ -465,7 +489,15 @@ class QuizTest extends \PHPUnit_Framework_TestCase
                 'mark' => 5, // Question 4
                 'available' => 5
             ]
-        ]);
+        ];
+        $marksGiven = $marksAvailable = 0;
+        foreach($responses as $response){
+            $marksGiven += $response['mark'];
+            $marksAvailable += $response['available'];
+        }
+
+        $attempt->setMarksAvailable($marksAvailable);
+        $attempt->setMarksGiven($marksGiven);
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $quiz->getParticipant($this->bsalem)->getAllResponses()->add($attempt);
@@ -535,7 +567,7 @@ class QuizTest extends \PHPUnit_Framework_TestCase
 
         $attempt->getAllFeedback()->add($feedback);
         $feedback->setResponse($attempt);
-        $attempt->setAllResponses([
+        $responses = [
             [
                 'mark' => 4, // Question 1,
                 'available' => 5
@@ -552,7 +584,15 @@ class QuizTest extends \PHPUnit_Framework_TestCase
                 'mark' => 1, // Question 4
                 'available' => 5
             ]
-        ]);
+        ];
+        $marksGiven = $marksAvailable = 0;
+        foreach($responses as $response){
+            $marksGiven += $response['mark'];
+            $marksAvailable += $response['available'];
+        }
+
+        $attempt->setMarksAvailable($marksAvailable);
+        $attempt->setMarksGiven($marksGiven);
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -567,7 +607,7 @@ class QuizTest extends \PHPUnit_Framework_TestCase
 
         $attempt->getAllFeedback()->add($feedback);
         $feedback->setResponse($attempt);
-        $attempt->setAllResponses([
+        $responses = [
             [
                 'mark' => 5, // Question 1,
                 'available' => 5
@@ -584,7 +624,15 @@ class QuizTest extends \PHPUnit_Framework_TestCase
                 'mark' => 3, // Question 4
                 'available' => 5
             ]
-        ]);
+        ];
+        $marksGiven = $marksAvailable = 0;
+        foreach($responses as $response){
+            $marksGiven += $response['mark'];
+            $marksAvailable += $response['available'];
+        }
+
+        $attempt->setMarksAvailable($marksAvailable);
+        $attempt->setMarksGiven($marksGiven);
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -598,7 +646,7 @@ class QuizTest extends \PHPUnit_Framework_TestCase
 
         $attempt->getAllFeedback()->add($feedback);
         $feedback->setResponse($attempt);
-        $attempt->setAllResponses([
+        $responses = [
             [
                 'mark' => 1, // Question 1,
                 'available' => 5
@@ -615,7 +663,15 @@ class QuizTest extends \PHPUnit_Framework_TestCase
                 'mark' => 2, // Question 4
                 'available' => 5
             ]
-        ]);
+        ];
+        $marksGiven = $marksAvailable = 0;
+        foreach($responses as $response){
+            $marksGiven += $response['mark'];
+            $marksAvailable += $response['available'];
+        }
+
+        $attempt->setMarksAvailable($marksAvailable);
+        $attempt->setMarksGiven($marksGiven);
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $feedback = new QuizReview();
@@ -631,7 +687,7 @@ class QuizTest extends \PHPUnit_Framework_TestCase
 
         $attempt->getAllFeedback()->add($feedback);
         $feedback->setResponse($attempt);
-        $attempt->setAllResponses([
+        $responses = [
             [
                 'mark' => 3, // Question 1,
                 'available' => 5
@@ -648,7 +704,15 @@ class QuizTest extends \PHPUnit_Framework_TestCase
                 'mark' => 5, // Question 4
                 'available' => 5
             ]
-        ]);
+        ];
+        $marksGiven = $marksAvailable = 0;
+        foreach($responses as $response){
+            $marksGiven += $response['mark'];
+            $marksAvailable += $response['available'];
+        }
+
+        $attempt->setMarksAvailable($marksAvailable);
+        $attempt->setMarksGiven($marksGiven);
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
 
         $quiz->getParticipant($this->bsalem)->getAllResponses()->add($attempt);

@@ -13,6 +13,7 @@ use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\Completion;
 use \InvalidArgumentException;
 use \RangeException;
+use Schoolbox\User;
 
 class CompletionTest extends \PHPUnit_Framework_TestCase
 {
@@ -46,10 +47,10 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provider_normalised
      * @param mixed $normalised
+     * @param TaskCompletion $response
      */
-    public function test_getHumanReadable_StudentCompleted($normalised)
+    public function test_getHumanReadable_StudentCompleted($normalised, TaskCompletion $response)
     {
-        $response = new TaskCompletion();
         $expected = Completion::HUMAN_READABLE_STUDENT_COMPLETED;
 
         $markScheme = new Completion();
@@ -134,16 +135,21 @@ class CompletionTest extends \PHPUnit_Framework_TestCase
 
     public function provider_normalised()
     {
+        // Self-assessed response
+        $response = new TaskCompletion();
+        $response->setSubmittedBy((new User())->setId(1));
+        $response->setSubmittedOnBehalfOf((new User())->setId(1));
+
         return [
-            [null],
-            [-1],
-            [10],
-            [50],
-            [200],
-            ['   '],
-            ['some random string'],
-            [IMarkScheme::NORMALISED_MARK_MIN],
-            [IMarkScheme::NORMALISED_MARK_MAX],
+            [null, $response],
+            [-1, $response],
+            [10, $response],
+            [50, $response],
+            [200, $response],
+            ['   ', $response],
+            ['some random string', $response],
+            [IMarkScheme::NORMALISED_MARK_MIN, $response],
+            [IMarkScheme::NORMALISED_MARK_MAX, $response],
         ];
     }
 

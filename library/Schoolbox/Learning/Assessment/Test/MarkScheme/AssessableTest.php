@@ -9,6 +9,8 @@ namespace Schoolbox\Learning\Assessment\Test\MarkScheme;
 
 
 use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
 use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
 use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
@@ -16,6 +18,7 @@ use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\MarkScheme\Completion;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\User;
 use \InvalidArgumentException;
 
@@ -48,7 +51,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      * @param User $student
      * @param string $expected
      */
-    public function test_getHumanReadable(Task $task, User $student, $expected)
+    public function test_Task_getHumanReadable(Task $task, User $student, $expected)
     {
         $actual = $task->getHumanReadableMark($student, false);
         $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
@@ -61,13 +64,39 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      * @param User $student
      * @param string $expected
      */
-    public function test_getHumanReadable_PublishedOnly(Task $task, User $student, $expected)
+    public function test_Task_getHumanReadable_PublishedOnly(Task $task, User $student, $expected)
     {
         // A student-assessed response is always published
         // A teacher-assessed feedback can be unpublished
 
         $actual = $task->getHumanReadableMark($student, true);
         $message = "User: {$student->getFirstname()}, Expected: $expected, Actual: $actual";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_quiz
+     * @param Quiz $quiz
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Quiz_getHumanReadable(Quiz $quiz, User $student, $expected)
+    {
+        $actual = $quiz->getHumanReadableMark($student, false);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
+        $this->assertEquals($expected, $actual, $message);
+    }
+
+    /**
+     * @dataProvider provider_quiz_publishedOnly
+     * @param Quiz $quiz
+     * @param User $student
+     * @param string $expected
+     */
+    public function test_Quiz_getHumanReadable_PublishedOnly(Quiz $quiz, User $student, $expected)
+    {
+        $actual = $quiz->getHumanReadableMark($student, true);
+        $message = "User: {$student->getFirstname()}, Expected: '$expected'', Actual: '$actual''";
         $this->assertEquals($expected, $actual, $message);
     }
 
@@ -96,6 +125,32 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function provider_quiz()
+    {
+        $quiz = $this->getDummyQuiz();
+        $quiz->setMarkScheme(new TotalMarkFractional($quiz->getMaxMark()));
+        return [
+            [$quiz, $this->getDummyStudent(1), null],
+            [$quiz, $this->getDummyStudent(2), '1 / 2'],
+            [$quiz, $this->getDummyStudent(3), '1 / 2'],
+            [$quiz, $this->getDummyStudent(4), '2 / 2'],
+            [$quiz, $this->getDummyStudent(5), '2 / 2'],
+        ];
+    }
+
+    public function provider_quiz_publishedOnly()
+    {
+        $quiz = $this->getDummyQuiz();
+        $quiz->setMarkScheme(new TotalMarkFractional($quiz->getMaxMark()));
+        return [
+            [$quiz, $this->getDummyStudent(1), null],
+            [$quiz, $this->getDummyStudent(2), '1 / 2'],
+            [$quiz, $this->getDummyStudent(3), null],
+            [$quiz, $this->getDummyStudent(4), '1 / 2'],
+            [$quiz, $this->getDummyStudent(5), '1 / 3'],
+        ];
+    }
+
 
 
 
@@ -119,7 +174,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $student3 = $this->getDummyStudent(3);
         $student4 = $this->getDummyStudent(4);
 
-        $teacher = $this->getDummyTeacher(5);
+        $teacher = $this->getDummyTeacher(101);
 
         $participant1 = new Participant($student1);
         $participant2 = new Participant($student2);
@@ -190,15 +245,182 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         return $task;
     }
 
-    private function getDummyStudents()
+    /**
+     * Generate a Quiz with attached Attempts, Feedbacks, + Participants
+     * The quiz logically has 1 section with 3 questions worth 1 mark each.
+     *
+     * Each student attempt was for 2 of the 3 questions
+     *
+     * * student 1: none
+     * * student 2: 1 attempt + 1 published feedback (1/2)
+     * * student 3: 1 attempt + 1 unpublished feedback (1/2)
+     * * student 4: 2 attempt + 1 published feedback (1/2) + 1 later unpublished feedback (2/2)
+     * * student 5: 2 attempt + 1 published feedback (1/3) + 1 later unpublished feedback (2/2)
+     *
+     * Quiz does not yet have a MarkType or MarkScheme attached, that is caller's responsibility
+     *
+     * @return Quiz
+     */
+    private function getDummyQuiz()
     {
-        return [
-            $this->getDummyStudent(1),
-            $this->getDummyStudent(2),
-            $this->getDummyStudent(3),
-            $this->getDummyStudent(4),
-        ];
+        // Create everything
+        $quiz = (new Quiz())
+            ->setId(1)
+            ->setMaxMark(3.0)
+            ->setHasFixedTotalMarks(false);
+
+        $student1 = $this->getDummyStudent(1);
+        $student2 = $this->getDummyStudent(2);
+        $student3 = $this->getDummyStudent(3);
+        $student4 = $this->getDummyStudent(4);
+        $student5 = $this->getDummyStudent(5);
+
+
+        $participant1 = new Participant($student1);
+        $participant2 = new Participant($student2);
+        $participant3 = new Participant($student3);
+        $participant4 = new Participant($student4);
+        $participant5 = new Participant($student5);
+
+        // student 1: no attempts
+
+        // student 2: 1 attempt + 1 published feedback (1/2)
+        $attempt2 = (new QuizAttempt())
+            ->setId(2)
+            ->setMarksGiven(1.0)
+            ->setMarksAvailable(2.0)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $feedback2 = (new QuizFeedback())
+            ->setId(2)
+            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'))
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+
+        // student 3: 1 attempt + 1 unpublished feedback (1/2)
+        $attempt3 = (new QuizAttempt())
+            ->setId(3)
+            ->setMarksGiven(1.0)
+            ->setMarksAvailable(2.0)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $feedback3 = (new QuizFeedback())
+            ->setId(3)
+            ->setPublishedAt($this->getDummyDate(null))
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+
+        // student 4: 2 attempt + 1 published feedback (1/2) + 1 unpublished feedback (2/2)
+        $attempt4a = (new QuizAttempt())
+            ->setId(4)
+            ->setMarksGiven(1.0)
+            ->setMarksAvailable(2.0)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $feedback4a = (new QuizFeedback())
+            ->setId(4)
+            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'))
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $attempt4b = (new QuizAttempt())
+            ->setId(5)
+            ->setMarksGiven(2.0)
+            ->setMarksAvailable(2.0)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $feedback4b = (new QuizFeedback())
+            ->setId(5)
+            ->setPublishedAt($this->getDummyDate(null))
+            ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'));
+
+        // student 5: 2 attempt + 1 published feedback (1/3) + 1 unpublished feedback (2/2)
+        $attempt5a = (new QuizAttempt())
+            ->setId(6)
+            ->setMarksGiven(1.0)
+            ->setMarksAvailable(3.0)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $feedback5a = (new QuizFeedback())
+            ->setId(6)
+            ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'))
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $attempt5b = (new QuizAttempt())
+            ->setId(7)
+            ->setMarksGiven(2.0)
+            ->setMarksAvailable(2.0)
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+        $feedback5b = (new QuizFeedback())
+            ->setId(7)
+            ->setPublishedAt($this->getDummyDate(null))
+            ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'));
+
+        // Link them all together
+
+        // Add Participants to Assessable
+        $quiz->getAllParticipants()
+            ->add($participant1)
+            ->add($participant2)
+            ->add($participant3)
+            ->add($participant4)
+            ->add($participant5);
+
+        // Add Responses to Assessable
+        $quiz->getResponses()
+            ->add($attempt2)
+            ->add($attempt3)
+            ->add($attempt4a)
+            ->add($attempt4b)
+            ->add($attempt5a)
+            ->add($attempt5b);
+
+        // Add Assessable to Responses
+        $attempt2->setAssessable($quiz);
+        $attempt3->setAssessable($quiz);
+        $attempt4a->setAssessable($quiz);
+        $attempt4b->setAssessable($quiz);
+        $attempt5a->setAssessable($quiz);
+        $attempt5b->setAssessable($quiz);
+
+        // Add Feedback to Assessable
+        $quiz->getFeedbacks()
+            ->add($feedback2)
+            ->add($feedback3)
+            ->add($feedback4a)
+            ->add($feedback4b)
+            ->add($feedback5a)
+            ->add($feedback5b);
+
+        // Add Assessable to Feedbacks
+        $feedback2->setAssessable($quiz);
+        $feedback3->setAssessable($quiz);
+        $feedback4a->setAssessable($quiz);
+        $feedback4b->setAssessable($quiz);
+        $feedback5a->setAssessable($quiz);
+        $feedback5b->setAssessable($quiz);
+
+        // Add Responses to Participants
+        $participant2->getAllResponses()->add($attempt2);
+        $participant3->getAllResponses()->add($attempt3);
+        $participant4->getAllResponses()->add($attempt4a)->add($attempt4b);
+        $participant5->getAllResponses()->add($attempt5a)->add($attempt5b);
+
+        // Add Feedbacks to Participants
+        $participant2->getAllFeedbacks()->add($feedback2);
+        $participant3->getAllFeedbacks()->add($feedback3);
+        $participant4->getAllFeedbacks()->add($feedback4a)->add($feedback4b);
+        $participant5->getAllFeedbacks()->add($feedback5a)->add($feedback5b);
+
+        // Add Responses to Feedbacks
+        $feedback2->setResponse($attempt2);
+        $feedback3->setResponse($attempt3);
+        $feedback4a->setResponse($attempt4a);
+        $feedback4b->setResponse($attempt4b);
+        $feedback5a->setResponse($attempt5a);
+        $feedback5b->setResponse($attempt5b);
+
+        // Add Feedbacks to Responses
+        $attempt2->getAllFeedback()->add($feedback2);
+        $attempt3->getAllFeedback()->add($feedback3);
+        $attempt4a->getAllFeedback()->add($feedback4a);
+        $attempt4b->getAllFeedback()->add($feedback4b);
+        $attempt5a->getAllFeedback()->add($feedback5a);
+        $attempt5b->getAllFeedback()->add($feedback5b);
+
+        return $quiz;
     }
+
 
     /**
      * @param int $userId
@@ -214,16 +436,19 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $user = (new User())->setId($userId);
         switch ($userId) {
             case 1:
-                $user->setFirstname('Andrew');
+                $user->setFirstname('Andrew (Student)');
                 break;
             case 2:
-                $user->setFirstname('Barry');
+                $user->setFirstname('Barry (Student)');
                 break;
             case 3:
-                $user->setFirstname('Charlie');
+                $user->setFirstname('Charlie (Student)');
                 break;
             case 4:
-                $user->setFirstname('David');
+                $user->setFirstname('David (Student)');
+                break;
+            case 5:
+                $user->setFirstname('Ethan (Student)');
                 break;
             default:
                 throw new InvalidArgumentException("Unknown userId: $userId");
@@ -233,7 +458,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param int $userId
+     * @param int $userId {101, 102}
      * @return User
      */
     private function getDummyTeacher($userId)
@@ -245,11 +470,11 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
 
         $user = (new User())->setId($userId);
         switch ($userId) {
-            case 5:
-                $user->setFirstname('Ethan');
+            case 101:
+                $user->setFirstname('Andy (Teacher)');
                 break;
-            case 6:
-                $user->setFirstname('Fred');
+            case 102:
+                $user->setFirstname('Boris (Teacher)');
                 break;
             default:
                 throw new InvalidArgumentException("Unknown userId: $userId");

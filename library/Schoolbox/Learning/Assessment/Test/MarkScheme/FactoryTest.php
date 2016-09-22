@@ -429,7 +429,7 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
         // Inject data
         $quiz->setMaxMark($question1['marks'] + $question2['marks'] + $question3['marks']);
 
-        $attempt->setAllResponses([
+        $responses = [
             [
                 'mark' => $response1['mark'],
                 'available' => $question1['marks'],
@@ -438,7 +438,15 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
                 'mark' => $response2['mark'],
                 'available' => $question2['marks'],
             ],
-        ]);
+        ];
+        $marksGiven = $marksAvailable = 0;
+        foreach($responses as $response){
+            $marksGiven += $response['mark'];
+            $marksAvailable += $response['available'];
+        }
+
+        $attempt->setMarksAvailable($marksAvailable);
+        $attempt->setMarksGiven($marksGiven);
 
         return $quiz;
     }

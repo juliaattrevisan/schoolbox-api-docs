@@ -2525,7 +2525,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setSubmittedOnBehalfOf($this->hodes)
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today)
-            ->setAllResponses($responses);
+            ->setMarksAvailable($marksAvailable)
+            ->setMarksGiven($marksGiven);
 
         $feedback = new QuizReview();
         $feedback
