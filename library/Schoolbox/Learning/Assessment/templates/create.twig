@@ -127,13 +127,8 @@
                         </label>
                     </div>
                     <div class="small-12 columns">
-                        <label>Visibility
-                            <select name="visibility">
-                                <option value="1">&#xe66b;&nbsp;&nbsp;&nbsp;Staff Only</option>
-                                <option value="2">&#xe667;&nbsp;&nbsp;&nbsp;Staff and Students</option>
-                                <option value="3">&#xe666;&nbsp;&nbsp;&nbsp;Staff, Students and their Parents</option>
-                            </select>
-                        </label>
+                        {% import 'sub/visibility.twig' as visibility %}
+                        {{ visibility.dropdown(0) }}
                     </div>
                 </fieldset>
                 <fieldset class="content">
