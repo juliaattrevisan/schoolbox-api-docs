@@ -17,14 +17,14 @@ if ($post->method == 'spellcheck') {
         'result' => []
     ];
     foreach ($post->params->words as $word) {
+        $corrections = [];
         foreach ($dicts as $dict) {
-            $corrections = [];
             if (!pspell_check($dict, $word)) {
                 $corrections = array_merge($corrections, pspell_suggest($dict, $word));
             }
-            if (!empty($corrections)) {
-                $structure['result'][$word] = $corrections;
-            }
+        }
+        if (!empty($corrections)) {
+            $structure['result'][$word] = $corrections;
         }
     }
     echo json_encode($structure);
