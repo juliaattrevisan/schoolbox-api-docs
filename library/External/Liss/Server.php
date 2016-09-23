@@ -32,371 +32,447 @@
  * @version     SVN: $Id$
  */
 
-class External_Liss_Server {
+use \Alaress\Lumberjack\Logger;
 
-	/**
-	 * Constructor
-	 */
-	public function __construct() {
-		$this->setup();
-	}
+class External_Liss_Server
+{
 
-	/**
-	 * Setup
-	 */
-	private function setup() {
 
-	}
+    /**
+     * Predefine a timetable_cycle record (this doesn't seem defined/accessible
+     * via liss, for some reason - it might be in TimetableStructure ttStructure
+     * which is not accessible to us)
+     *
+     * @return object|\Schoolbox\External\TimetableCycle
+     */
+    static public function getCycle()
+    {
+        $log = self::log();
+        $cycleMapper = new \Schoolbox\External\TimetableCycleMapper();
 
-	/**
-	 * Predefine a timetable_cycle record (this doesn't seem defined/accessible
-	 * via liss, for some reason - it might be in TimetableStructure ttStructure
-	 * which is not accessible to us)
-	 *
-	 * @return object|\Schoolbox\External\TimetableCycle
-	 */
-	static public function getCycle() {
-		$cycleMapper = new \Schoolbox\External\TimetableCycleMapper();
+        try {
+            /* TODO: Assume a particular cycle
+             */
+            $cycle = $cycleMapper->findById(1);
+            $log->info("publishBellTimes: Defaulting to using first existing timetable cycle");
+        } catch (\Exception $e) {
+            $log->warning("publishBellTimes: Failed to find existing cycle, automatically creating one");
+            $cycle = new \Schoolbox\External\TimetableCycle();
+            $cycle->setTitle('Main Timetable');
 
-		try {
-			/* TODO: Assume a particular cycle
-			 */
-			$cycle = $cycleMapper->findById(1);
-		}
-		catch (\Exception $e) {
-			$cycle = new \Schoolbox\External\TimetableCycle();
-			$cycle->setTitle('Main Timetable');
+            /* TODO: Undo these hardcoded values at some point
+             */
+            $cycle->setCycleLength(10);
+            $cycle->setDayLength(13);
+            $cycle->setRegular(1);
 
-			/* TODO: Undo these hardcoded values at some point
-			 */
-			$cycle->setCycleLength(10);
-			$cycle->setDayLength(13);
-			$cycle->setRegular(1);
+            $cycleMapper->save($cycle);
 
-			$cycleMapper->save($cycle);
+            /* Force a timetable_campus record
+             */
+            $timetableCampusMapper = new \Schoolbox\External\TimetableCampusMapper();
+            $timetableCampus = new \Schoolbox\External\TimetableCampus();
+            $timetableCampus->setCycle($cycle->getId());
 
-			/* Force a timetable_campus record
-			 */
-			$timetableCampusMapper = new \Schoolbox\External\TimetableCampusMapper();
-			$timetableCampus = new \Schoolbox\External\TimetableCampus();
-			$timetableCampus->setCycle($cycle->getId());
+            $now = new Alaress_Date_Format();
+            $timetableCampus->setCampus(\Schoolbox\CampusMapper::getInstance()->findById(1));
+            $timetableCampus->setStart($now->startOfYear());
+            $timetableCampus->setReset(null);
+            $timetableCampus->setFinish($now->endOfYear());
+            $timetableCampus->setStartDay(1);
 
-			/* TODO: Undo these hardcoded values at some point
-			 */
-			$timetableCampus->setCampus(1);
-			$timetableCampus->setStart('2014-01-01');
-			$timetableCampus->setReset(null);
-			$timetableCampus->setFinish('2014-12-31');
-			$timetableCampus->setStartDay(1);
+            $timetableCampusMapper->save($timetableCampus);
+        }
 
-			$timetableCampusMapper->save($timetableCampus);
-		}
+        return $cycle;
+    }
 
-		return $cycle;
-	}
+    /**
+     * Start the Liss server with the list of available methods
+     * and signatures here
+     */
+    public function start()
+    {
+        new xmlrpc_server(
+            array(
+                'liss.getRooms'                => array(
+                    'function' => 'External_Liss_Server::getRooms'
+                ),
+                'liss.getHello'                => array(
+                    'function' => 'External_Liss_Server::getRooms'
+                ),
+                'liss.publishStudents'         => array(
+                    'function' => 'External_Liss_Server::publishStudents',
+                ),
+                'liss.publishTeachers'         => array(
+                    'function' => 'External_Liss_Server::publishTeachers',
+                ),
+                'liss.publishBellTimes'        => array(
+                    'function' => 'External_Liss_Server::publishBellTimes',
+                ),
+                'liss.publishClasses'          => array(
+                    'function' => 'External_Liss_Server::publishClasses',
+                ),
+                'liss.publishClassMemberships' => array(
+                    'function' => 'External_Liss_Server::publishClassMemberships',
+                ),
+                'liss.publishTimetable'        => array(
+                    'function' => 'External_Liss_Server::publishTimetable',
+                ),
+                'liss.publishDailyData'        => array(
+                    'function' => 'External_Liss_Server::publishDailyData'
+                ),
+            )
+        );
+    }
 
-	/**
-	 * Start the Liss server with the list of available methods
-	 * and signatures here
-	 */
-	public function start() {
-		new xmlrpc_server(array(
-			'liss.getRooms' => array(
-				'function' => 'External_Liss_Server::getRooms'
-			),
-			'liss.getHello' => array(
-				'function' => 'External_Liss_Server::getRooms'
-			),
-			'liss.publishStudents' => array(
-				'function' => 'External_Liss_Server::publishStudents',
-			),
-			'liss.publishTeachers' => array(
-				'function' => 'External_Liss_Server::publishTeachers',
-			),
-			'liss.publishBellTimes' => array(
-				'function' => 'External_Liss_Server::publishBellTimes',
-			),
-			'liss.publishClasses' => array(
-				'function' => 'External_Liss_Server::publishClasses',
-			),
-			'liss.publishClassMemberships' => array(
-				'function' => 'External_Liss_Server::publishClassMemberships',
-			),
-			'liss.publishTimetable' => array(
-				'function' => 'External_Liss_Server::publishTimetable',
-			),
-		));
-	}
+    /**
+     * Spawn a log message
+     * @return Logger
+     */
+    static public function log()
+    {
+        $logFile = fopen(Cfg::get('logs_dir') . '/liss.log', 'a');
+        return $log = new Logger($logFile, $logFile, Monolog\Logger::INFO, [], true);
+    }
 
-	/**
-	 * Spawn a log message
-	 */
-	static public function log($data) {
-		$logger = new \Alaress_Log_File(dirname(__FILE__) . '/../../../mort.log', 'liss');
-		$logger->log($data);
-	}
+    /**
+     * getRooms() is required to connect to the LissTester from
+     * their SDK. Despite documentation saying that liss.hello
+     * should be the first you implement, getRooms() is actually
+     * called whenever you click Connect in the LissTester
+     *
+     * Don't delete it
+     *
+     * Discovered via apache mod_dumpio
+     *
+     * @param xmlrpcmsg $message
+     * @return xmlrpcresp
+     */
+    static public function getRooms(xmlrpcmsg $message)
+    {
+        $log = self::log();
+        $log->info("getRooms: unable to process request, not implemented");
+        return new xmlrpcresp(new xmlrpcval('got rooms', 'string'));
+    }
 
-	/**
-	 * getRooms() is required to connect to the LissTester from
-	 * their SDK. Despite documentation saying that liss.hello
-	 * should be the first you implement, getRooms() is actually
-	 * called whenever you click Connect in the LissTester
-	 *
-	 * Don't delete it
-	 *
-	 * Discovered via apache mod_dumpio
-	 *
-	 * @param xmlrpcmsg $message
-	 * @return xmlrpcresp
-	 */
-	public function getRooms(xmlrpcmsg $message) {
-		return new xmlrpcresp(new xmlrpcval('got rooms', 'string'));
-	}
+    /**
+     * Publish students to the Schoolbox
+     *
+     * @param xmlrpcmsg $message
+     * @return xmlrpcresp
+     */
+    static public function publishClassMemberships(xmlrpcmsg $message)
+    {
+        $log = self::log();
 
-	/**
-	 * Publish students to the Schoolbox
-	 *
-	 * @param xmlrpcmsg $message
-	 * @return xmlrpcresp
-	 */
-	static public function publishClassMemberships(xmlrpcmsg $message) {
-		$authenticator = new External_Liss_Authenticator($message->params[0]);
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
 
-		if ($authenticator->isAuthenticated()) {
-			$classInvolvementMapper = new \Schoolbox\External\ClassInvolvementMapper();
-			$classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
-			$userMapper = new \Schoolbox\UserMapper();
+        if ($authenticator->isAuthenticated()) {
+            $log->info("publishClassMemberships: processing request");
+            $classInvolvementMapper = new \Schoolbox\External\ClassInvolvementMapper();
+            $classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
+            $userMapper = new \Schoolbox\UserMapper();
 
-			$classInvolvementMapper->truncate();
+            $classInvolvementMapper->truncate();
 
-			$allData = $message->params[1]->me['array'];
+            $allData = $message->params[1]->me['array'];
 
-			foreach($allData as $currentData) {
-				$struct = $currentData->me['struct'];
+            foreach ($allData as $currentData) {
+                $struct = $currentData->me['struct'];
 
-				try {
-					$user = $userMapper->findByExternalId(trim((string)$struct['StudentId']->me['string']));
-					$class = $classEntryMapper->findOneByColumn('code', trim((string)$struct['ClassCode']->me['string']));
+                try {
+                    $user = $userMapper->findByExternalId(trim((string)$struct['StudentId']->me['string']));
+                    $class = $classEntryMapper->findOneByColumn('code', trim((string)$struct['ClassCode']->me['string']));
 
-					$classInvolvement = new \Schoolbox\External\ClassInvolvement();
-					$classInvolvement->setClass($class);
-					$classInvolvement->setUser($user);
-					$classInvolvementMapper->save($classInvolvement);
-				}
-				catch (\Exception $e) {
-					External_Liss_Server::log($e->getMessage());
-				}
-			}
+                    $classInvolvement = new \Schoolbox\External\ClassInvolvement();
+                    $classInvolvement->setClass($class);
+                    $classInvolvement->setUser($user);
+                    $classInvolvementMapper->save($classInvolvement);
+                } catch (\Exception $e) {
+                    $log->warning(sprintf("publishClassMemberships: Failed to put student %d in %s: %s", trim((string)$struct['StudentId']->me['string']), trim((string)$struct['ClassCode']->me['string']), $e->getMessage()));
+                }
+            }
 
-			return new xmlrpcresp(new xmlrpcval('Class Memberships imported', 'string'));
-		}
-		return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
-	}
+            $log->info("publishClassMemberships: completed request");
+            return new xmlrpcresp(new xmlrpcval('Class Memberships imported', 'string'));
+        }
+        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+    }
 
-	/**
-	 * Publish Teachers to the Schoolbox
-	 *
-	 * @param xmlrpcmsg $message
-	 * @return xmlrpcresp
-	 */
-	static public function publishTeachers(xmlrpcmsg $message) {
-		$authenticator = new External_Liss_Authenticator($message->params[0]);
+    /**
+     * Publish Teachers to the Schoolbox
+     *
+     * @param xmlrpcmsg $message
+     * @return xmlrpcresp
+     */
+    static public function publishTeachers(xmlrpcmsg $message)
+    {
+        $log = self::log();
 
-		if ($authenticator->isAuthenticated()) {
-			/* Respond without doing anything to avoid errors
-			 */
-			return new xmlrpcresp(new xmlrpcval('Teachers Imported', 'string'));
-		}
-		return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
-	}
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
 
-	/**
-	 * Publish students to the Schoolbox
-	 *
-	 * @param xmlrpcmsg $message
-	 * @return xmlrpcresp
-	 */
-	static public function publishStudents(xmlrpcmsg $message) {
-		$authenticator = new External_Liss_Authenticator($message->params[0]);
+        if ($authenticator->isAuthenticated()) {
+            /* Respond without doing anything to avoid errors
+             */
+            $log->info("publishTeachers: unable to process request, not implemented");
 
-		if ($authenticator->isAuthenticated()) {
-			/* Respond without doing anything to avoid errors
-			 */
-			return new xmlrpcresp(new xmlrpcval('Students Imported', 'string'));
-		}
-		return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
-	}
+            return new xmlrpcresp(new xmlrpcval('Teachers Imported', 'string'));
+        }
+        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+    }
 
-	/**
-	 * Publish classes to the Schoolbox
-	 *
-	 * @param xmlrpcmsg $message
-	 * @return xmlrpcresp
-	 */
-	static public function publishClasses(xmlrpcmsg $message) {
-		$authenticator = new External_Liss_Authenticator($message->params[0]);
+    /**
+     * Publish students to the Schoolbox
+     *
+     * @param xmlrpcmsg $message
+     * @return xmlrpcresp
+     */
+    static public function publishStudents(xmlrpcmsg $message)
+    {
+        $log = self::log();
 
-		if ($authenticator->isAuthenticated()) {
-			$academicYear = $message->params[1];
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
 
-			/* Truncate everything before re-adding
-			 */
-			$classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
-			$classEntryMapper->truncate();
+        if ($authenticator->isAuthenticated()) {
+            /* Respond without doing anything to avoid errors
+             */
+            $log->info("publishStudents: unable to process request, not implemented");
 
-			$allData = $message->params[2]->me['array'];
+            return new xmlrpcresp(new xmlrpcval('Students Imported', 'string'));
+        }
+        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+    }
 
-			foreach($allData as $currentData) {
-				$struct = $currentData->me['struct'];
+    /**
+     * Publish classes to the Schoolbox
+     *
+     * @param xmlrpcmsg $message
+     * @return xmlrpcresp
+     */
+    static public function publishClasses(xmlrpcmsg $message)
+    {
+        $log = self::log();
 
-				$classEntry = new \Schoolbox\External\ClassEntry();
-				$classEntry->setName((string)$struct['CourseName']->me['string']);
-				$classEntry->setCode(trim((string)$struct['ClassCode']->me['string']));
-				$classEntry->setDescription('');
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
 
-				$classEntryMapper->save($classEntry);
-			}
+        if ($authenticator->isAuthenticated()) {
 
-			return new xmlrpcresp(new xmlrpcval('Classes Imported', 'string'));
-		}
-		return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
-	}
+            $log->info("publishClasses: processing request");
 
-	/**
-	 * Publish timetable to the Schoolbox
-	 *
-	 * @param xmlrpcmsg $message
-	 * @return xmlrpcresp
-	 */
-	static public function publishTimetable(xmlrpcmsg $message) {
-		$authenticator = new External_Liss_Authenticator($message->params[0]);
+            $academicYear = $message->params[1];
 
-		if ($authenticator->isAuthenticated()) {
-			$timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
-			$classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
-			$userMapper = new \Schoolbox\UserMapper();
+            /* Truncate everything before re-adding
+             */
+            $classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
+            $classEntryMapper->truncate();
 
-			/* Truncate everything before re-adding
-			 */
-			$classPeriodMapper = new \Schoolbox\External\ClassPeriodMapper();
-			$classPeriodMapper->truncate();
+            $allData = $message->params[2]->me['array'];
+            $classCount = 0;
 
-			/* TODO: Default user for testing
-			 */
-			$defaultUser = $userMapper->findById(1); // changed to alaress user for testing
+            foreach ($allData as $currentData) {
+                $struct = $currentData->me['struct'];
 
-			$allData = $message->params[1]->me['array'];
+                $classEntry = new \Schoolbox\External\ClassEntry();
+                $classEntry->setName((string)$struct['CourseName']->me['string']);
+                $classEntry->setCode(trim((string)$struct['ClassCode']->me['string']));
+                $classEntry->setDescription('');
 
-			foreach($allData as $currentData) {
-				$struct = $currentData->me['struct'];
+                $classEntryMapper->save($classEntry);
+                $classCount++;
+            }
 
-				/* Find the Period data
-				 */
-				$allPeriods = $timetablePeriodMapper->findByColumnList(array(
-					'day' => $struct['DayNumber']->me['i4'],
-					'title' => $struct['Period']->me['string']
-				));
+            $log->info(sprintf("publishClasses: completed adding %d classes", $classCount));
 
-				/* Find the Class
-				 */
-				$allClasses = $classEntryMapper->findByColumn('code', trim($struct['ClassCode']->me['string']));
+            return new xmlrpcresp(new xmlrpcval('Classes Imported', 'string'));
+        }
+        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+    }
 
-				/* Find the Teacher
-				 */
-				$allTeachers = $userMapper->findByColumn('synergy_id', $struct['TeacherCode']->me['string']);
+    /**
+     * Publish timetable to the Schoolbox
+     *
+     * @param xmlrpcmsg $message
+     * @return xmlrpcresp
+     */
+    static public function publishTimetable(xmlrpcmsg $message)
+    {
+        $log = self::log();
 
-				/* TODO: Ram in a duff account for testing
-				 */
-				if (!$allTeachers->count()) {
-					$allTeachers->add($defaultUser);
-				}
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
 
-				/* Check that all three are provided
-				 * Save it!
-				 */
-				if ($allPeriods->count() && $allClasses->count() && $allTeachers->count()) {
-					$classPeriod = new \Schoolbox\External\ClassPeriod();
-					$classPeriod->setClass($allClasses->first()->getId());
-					$classPeriod->setPeriod($allPeriods->first()->getId());
-					$classPeriod->setTeacher($allTeachers->first()->getId());
-					$classPeriod->setRoom((string)$struct['RoomCode']->me['string']);
-					$classPeriodMapper->save($classPeriod);
-				}
-				/* These ones are broken
-				 */
-				else {
-					$counts = "{$allPeriods->count()} {$allClasses->count()} {$allTeachers->count()} for {$struct['ClassCode']->me['string']}\n";
+        if ($authenticator->isAuthenticated()) {
 
-					External_Liss_Server::log($counts);
-				}
-			}
+            $log->info("publishTimetable: processing request");
 
-			return new xmlrpcresp(new xmlrpcval('Timetable Imported', 'string'));
-		}
-		return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
-	}
+            $timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
+            $classEntryMapper = new \Schoolbox\External\ClassEntryMapper();
+            $userMapper = new \Schoolbox\UserMapper();
 
-	/**
-	 * Publish timetable to the Schoolbox
-	 *
-	 * @param xmlrpcmsg $message
-	 * @return xmlrpcresp
-	 */
-	static public function publishBellTimes(xmlrpcmsg $message) {
-		$authenticator = new External_Liss_Authenticator($message->params[0]);
-		$ttStructure = $message->params[1];
-		$cycle = External_Liss_Server::getCycle();
+            /* Truncate everything before re-adding
+             */
+            $classPeriodMapper = new \Schoolbox\External\ClassPeriodMapper();
+            $classPeriodMapper->truncate();
 
-		if ($authenticator->isAuthenticated()) {
-			$allData = $message->params[2]->me['array'];
+            /* TODO: Default user for testing
+             */
+            $defaultUser = $userMapper->findById(1); // changed to alaress user for testing
 
-			/* Truncate everything before re-adding
-			 */
-			$timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
-			$timetablePeriodMapper->truncate();
+            $allData = $message->params[1]->me['array'];
 
-			$collection = new \Schoolbox\Collection();
+            foreach ($allData as $currentData) {
+                $struct = $currentData->me['struct'];
 
-			foreach($allData as $currentData) {
-				$struct = $currentData->me['struct'];
+                /* Find the Period data
+                 */
+                $allPeriods = $timetablePeriodMapper->findByColumnList(
+                    array(
+                        'day'   => trim((string)$struct['DayNumber']->me['i4']),
+                        'title' => trim((string)$struct['Period']->me['string'])
+                    )
+                );
 
-				$dayNumber = (string)$struct['DayNumber']->me['i4'];
+                /* Find the Class
+                 */
+                $allClasses = $classEntryMapper->findByColumn('code', trim($struct['ClassCode']->me['string']));
 
-				$timetablePeriod = new \Schoolbox\External\TimetablePeriod();
-				$timetablePeriod->setCycle($cycle->getId());
-				$timetablePeriod->setTitle((string)$struct['Period']->me['string']);
-				$timetablePeriod->setDay($dayNumber);
-				$timetablePeriod->setStart((string)$struct['StartTime']->me['string']);
-				$timetablePeriod->setFinish((string)$struct['EndTime']->me['string']);
+                /* Find the Teacher
+                 */
+                $allTeachers = $userMapper->findByColumn('synergy_id', trim($struct['TeacherCode']->me['string']));
 
-				/* TODO: Undo these hardcoded values at some point
- 				 */
-				$timetablePeriod->setUsable(1);
+                /* TODO: Ram in a duff account for testing
+                 */
+                if (!$allTeachers->count()) {
+                    $allTeachers->add($defaultUser);
+                }
 
-				/* Start a collection for a day, if it's not already a collection
-				 */
-				if (!($collection->getOffset($dayNumber) instanceof \Schoolbox\Collection)) {
-					$collection->setOffset($dayNumber, new \Schoolbox\Collection());
-				}
+                /* Check that all three are provided
+                 * Save it!
+                 */
+                if ($allPeriods->count() && $allClasses->count() && $allTeachers->count()) {
+                    $classPeriod = new \Schoolbox\External\ClassPeriod();
+                    $classPeriod->setClass($allClasses->first()->getId());
+                    $classPeriod->setPeriod($allPeriods->first()->getId());
+                    $classPeriod->setTeacher($allTeachers->first()->getId());
+                    $classPeriod->setRoom((string)$struct['RoomCode']->me['string']);
+                    $classPeriodMapper->save($classPeriod);
+                } /* These ones are broken */
+                else {
+                    if ($allPeriods->count() == 0) {
+                        $log->warning(sprintf("publishTimetable: Failed to find period %s on day %s", trim((string)$struct['DayNumber']->me['i4']), trim((string)$struct['Period']->me['string'])));
+                    }
+                    if ($allClasses->count() == 0) {
+                        $log->warning(sprintf("publishTimetable: Failed to find class %s", trim($struct['ClassCode']->me['string'])));
+                    }
+                    if ($allTeachers->count() == 0) {
+                        $log->warning(sprintf("publishTimetable: Failed to find teacher %s", trim($struct['TeacherCode']->me['string'])));
+                    }
+                }
+            }
+            $log->info("publishTimetable: completed request");
 
-				$collection->getOffset($dayNumber)->add($timetablePeriod);
-			}
+            return new xmlrpcresp(new xmlrpcval('Timetable Imported', 'string'));
+        }
+        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+    }
 
-			$collection->reindex();
+    /**
+     * Publish timetable to the Schoolbox
+     *
+     * @param xmlrpcmsg $message
+     * @return xmlrpcresp
+     */
+    static public function publishBellTimes(xmlrpcmsg $message)
+    {
+        $log = self::log();
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+        $ttStructure = $message->params[1];
 
-			foreach($collection as $dayCollection) {
-				$i = 0;
+        if ($authenticator->isAuthenticated()) {
+            $log->info("publishBellTimes: processing request");
+            $cycle = External_Liss_Server::getCycle();
 
-				foreach($dayCollection as $timetablePeriod) {
-					$timetablePeriod->setSequence($i);
-					$timetablePeriodMapper->save($timetablePeriod);
+            $allData = $message->params[2]->me['array'];
 
-					$i++;
-				}
-			}
+            /* Truncate everything before re-adding */
+            $timetablePeriodMapper = new \Schoolbox\External\TimetablePeriodMapper();
+            $timetablePeriodMapper->truncate();
 
-			return new xmlrpcresp(new xmlrpcval('BellTimes Imported', 'string'));
-		}
-		return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
-	}
+            $collection = new \Schoolbox\Collection();
+
+            foreach ($allData as $currentData) {
+                $struct = $currentData->me['struct'];
+
+                $dayNumber = (string)$struct['DayNumber']->me['i4'];
+
+                $timetablePeriod = new \Schoolbox\External\TimetablePeriod();
+                $timetablePeriod->setCycle($cycle->getId());
+                $timetablePeriod->setTitle((string)$struct['Period']->me['string']);
+                $timetablePeriod->setDay($dayNumber);
+                $timetablePeriod->setStart((string)$struct['StartTime']->me['string']);
+                $timetablePeriod->setFinish((string)$struct['EndTime']->me['string']);
+
+                /* TODO: Undo these hardcoded values at some point
+                  */
+                $timetablePeriod->setUsable(1);
+
+                /* Start a collection for a day, if it's not already a collection
+                 */
+                if (!($collection->getOffset($dayNumber) instanceof \Schoolbox\Collection)) {
+                    $collection->setOffset($dayNumber, new \Schoolbox\Collection());
+                }
+
+                $collection->getOffset($dayNumber)->add($timetablePeriod);
+            }
+
+            $collection->reindex();
+
+            $log->info(sprintf("publishBellTimes: Collated %d days and %d periods into timetable structure",$collection->count(), $collection->first()->count()));
+
+
+            foreach ($collection as $dayCollection) {
+                $i = 0;
+
+                foreach ($dayCollection as $timetablePeriod) {
+                    $timetablePeriod->setSequence($i);
+                    $timetablePeriodMapper->save($timetablePeriod);
+
+                    $i++;
+                }
+            }
+            $log->info(sprintf("publishBellTimes: Saved timetable periods, process completed",$collection->count()));
+
+            return new xmlrpcresp(new xmlrpcval('BellTimes Imported', 'string'));
+        }
+        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+    }
+
+    /**
+     * publish daily timetable and room changes to schoolbox
+     *
+     * Not in use yet, but causes errors if schools try to send
+     * this data. Separated from getRooms() to allow for future use.
+     *
+     * @param xmlrpcmsg $message
+     * @return xmlrpcresp
+     */
+    static public function publishDailyData(xmlrpcmsg $message)
+    {
+        $log = self::log();
+
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+
+        if ($authenticator->isAuthenticated()) {
+            /* Respond without doing anything to avoid errors
+             */
+            $log->info("publishDailyData: unable to process request, not implemented");
+
+            /* Log data for use */
+            $allData = $message->params[1]->me['array'];
+            $log->info("publishDailyData: ".json_encode($allData));
+
+            return new xmlrpcresp(new xmlrpcval('Daily Data Imported', 'string'));
+        }
+        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+    }
 }
