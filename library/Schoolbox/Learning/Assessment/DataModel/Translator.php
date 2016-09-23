@@ -102,17 +102,17 @@ class Translator
 
         } elseif ($assessment instanceof Task) {
             // convert to task's model
-            // TODO add getLink() to Task\Model
-            // TODO add requiresConfirmation() to Task\Model
-            // TODO figure out what to do about owner field
             // task currently has its own ID, but that will be handled in the mapper proxy
             $model = TaskMapper::getInstance()->createModel();
             $model
                 ->setTitle($assessment->getTitle())
                 ->setLink('')
-                ->setRequiresConfirmation(false)
                 ->setOrder(0)
+                ->setOwner($assessment->getCreator())
             ;
+            // TODO add getLink() to Task
+            // TODO add requiresConfirmation() to Task
+            // TODO figure out what to do about owner field
             return $model;
 
         }
