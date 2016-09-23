@@ -8,9 +8,8 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper as QuizMapper;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper as DueWorkMapper;
-use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
+use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
@@ -33,7 +32,7 @@ class Translator
     public function translateToDataModel(IAssessable $assessment, $sequence)
     {
         // Extract assessment base model
-        $assessmentModel = Mapper::getInstance()->createModel();
+        $assessmentModel = new Model();
         $assessmentModel
             ->setId($assessment->getId())
             ->setTitle($assessment->getTitle())
@@ -57,7 +56,7 @@ class Translator
 
         } elseif ($assessment instanceof DueWork) {
             // convert to due work's model
-            $model = DueWorkMapper::getInstance()->createModel();
+            $model = new DueWorkModel();
             $model
                 ->setAssessmentModel($assessmentModel)
                 ->setName($assessment->getTitle())
@@ -83,7 +82,7 @@ class Translator
 
         } elseif ($assessment instanceof Quiz) {
             // convert to quiz's model
-            $model = QuizMapper::getInstance()->createModel();
+            $model = new QuizModel();
             $model
                 ->setAssessmentModel($assessmentModel)
                 ->setAvailability(QuizModel::AVAILABILITY_ASSESS)
@@ -105,7 +104,7 @@ class Translator
         } elseif ($assessment instanceof Task) {
             // convert to task's model
             // task currently has its own ID, but that will be handled in the mapper proxy
-            $model = TaskMapper::getInstance()->createModel();
+            $model = new TaskModel();
             $model
                 ->setAssessmentModel($assessmentModel)
                 ->setTitle($assessment->getTitle())
