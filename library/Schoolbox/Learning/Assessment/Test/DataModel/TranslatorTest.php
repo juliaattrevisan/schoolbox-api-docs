@@ -57,7 +57,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setTitle('Mr Test Task сказать')
-            // Tasks are always weight 0 but hear me out
+            // Tasks are always weight 0, so this doesn't matter
             ->setWeight(1000)
         ;
 
@@ -65,8 +65,11 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $taskModel = $this->translator->translateToDataModel($task, 3);
 
         $this->assertInstanceOf(TaskModel::class, $taskModel);
-        $this->assertEquals($task->getId(), $taskModel->getAssessmentModel()->getId());
+        $this->assertEquals(32, $taskModel->getAssessmentModel()->getId());
         $this->assertEquals(3, $taskModel->getAssessmentModel()->getSequence());
-        $this->assertEquals($task->getCreator()->getId(), $taskModel->getOwner()->getId());
+        $this->assertEquals(3, $taskModel->getOwner()->getId());
+        $this->assertEquals('Mr Test Task сказать', $taskModel->getTitle());
+        $this->assertEquals('https://www.something.com/', $taskModel->getLink());
+        $this->assertEquals(false, $taskModel->getRequiresConfirmation());
     }
 }
