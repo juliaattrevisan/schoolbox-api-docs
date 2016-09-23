@@ -14,8 +14,8 @@ use Schoolbox\Learning\Assessment\IResponse;
 class Completion extends AbstractMarkScheme
 {
     const HUMAN_READABLE_INCOMPLETE        = 'Not Completed';
-    const HUMAN_READABLE_STUDENT_COMPLETED = 'Student Assessed';
-    const HUMAN_READABLE_TEACHER_COMPLETED = 'Teacher Assessed';
+    const HUMAN_READABLE_STUDENT_COMPLETED = 'Student-Assessed';
+    const HUMAN_READABLE_TEACHER_COMPLETED = 'Teacher-Assessed';
 
     /**
      * Returns a string representation of a normalised Mark

@@ -78,7 +78,7 @@ class Model extends AbstractAssessment
      */
     public function setGradeGroup(GradeGroup $gradeGroup = null)
     {
-        if(null !== $gradeGroup){
+        if(!is_null($gradeGroup)){
             throw new \InvalidArgumentException('Quiz cannot currently have mark type of Letter Grade.');
         }
         return $this;

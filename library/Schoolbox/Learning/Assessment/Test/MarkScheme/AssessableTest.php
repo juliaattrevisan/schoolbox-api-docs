@@ -7,7 +7,6 @@
 
 namespace Schoolbox\Learning\Assessment\Test\MarkScheme;
 
-
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
@@ -2671,7 +2670,6 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      */
     private function getDummyDate($dateString = null)
     {
-
         return null === $dateString
             ? new \Alaress_Date_NullDate()
             : new \Alaress_Date_Format($dateString, \Alaress_Date_Format::DATABASE_FORMAT);
