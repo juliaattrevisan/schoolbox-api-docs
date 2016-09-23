@@ -374,7 +374,7 @@ class Participant
     }
 
     /**
-     * @return Collection
+     * @return Collection|IResponse[]
      */
     public function getAllResponses()
     {
@@ -382,7 +382,7 @@ class Participant
     }
 
     /**
-     * @param Collection $allResponses
+     * @param Collection|IResponse[] $allResponses
      */
     public function setAllResponses($allResponses)
     {
@@ -390,7 +390,7 @@ class Participant
     }
 
     /**
-     * @return Collection
+     * @return Collection|IFeedback[]
      */
     public function getAllFeedbacks()
     {
@@ -398,7 +398,7 @@ class Participant
     }
 
     /**
-     * @param Collection $allFeedbacks
+     * @param Collection|IFeedback[] $allFeedbacks
      */
     public function setAllFeedbacks($allFeedbacks)
     {

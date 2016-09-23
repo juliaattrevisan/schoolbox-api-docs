@@ -67,7 +67,23 @@ class Project extends AbstractAssessment
      */
     public function getNormalisedMark(User $user, $publishedOnly)
     {
-        return $this->getSummator()->summate($this->getAssessables(), $user, $publishedOnly);
+        // Get the Assessables that the Specified User has potential marks for
+        $markedAssessables = new Collection();
+
+        foreach($this->getAssessables() as $assessable){
+            foreach($assessable->getAllParticipants() as $participant){
+                if($participant->getUser()->getId() == $user->getId()){
+                    $isMarked = $publishedOnly
+                        ? $participant->isAssessablePublished($assessable)
+                        : $participant->isAssessableMarked($assessable);
+                    if($isMarked){
+                        $markedAssessables[$assessable->getId()] = $assessable;
+                    }
+                }
+            }
+        }
+
+        return $this->getSummator()->summate($markedAssessables, $user, $publishedOnly);
     }
 
     /**
@@ -174,7 +190,7 @@ class Project extends AbstractAssessment
      */
 
     /**
-     * @return Collection
+     * @return Collection|IAssessable[]
      */
     public function getAssessables()
     {
@@ -182,7 +198,7 @@ class Project extends AbstractAssessment
     }
 
     /**
-     * @param Collection $assessables
+     * @param Collection|IAssessable[] $assessables
      * @return self
      */
     public function setAssessables($assessables)

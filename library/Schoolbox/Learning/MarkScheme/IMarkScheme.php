@@ -23,7 +23,9 @@ interface IMarkScheme
     /**
      * Returns a string representation of a mark.
      *
-     * @param float          $normalisedMark
+     * If a Participant has no Response and/or Feedback, $normalisedMark and $humanReadable will be null
+     *
+     * @param float|null     $normalisedMark
      * @param IResponse|null $response
      * @return string|null
      */
@@ -32,7 +34,9 @@ interface IMarkScheme
     /**
      * Returns a float from 0 to 100.0 inclusive.
      *
-     * @param string $humanReadableMark
+     * If a Participant has no Response and/or Feedback, $normalisedMark and $humanReadable will be null
+     *
+     * @param string|null $humanReadableMark
      * @param IResponse|null $response
      * @return float|null
      */

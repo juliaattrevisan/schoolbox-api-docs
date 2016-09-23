@@ -1924,8 +1924,6 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     }
 
 
-
-
     /**
      * Generates a task.
      * * student 1: none
@@ -2515,8 +2513,8 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
             [7, 'Completion', 'completion', 'Either \'Completed\' or \'Not Completed\'', 0],
         ];
 
-        foreach($data as $row){
-            if($row[0] == $markTypeId){
+        foreach ($data as $row) {
+            if ($row[0] == $markTypeId) {
                 return (new MarkType())
                     ->setId($row[0])
                     ->setName($row[1])
@@ -2572,7 +2570,7 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
             ->setId($data[0]['id'])
             ->setName($data[0]['name']);
 
-        foreach ($data[0]['grades'] as $gradeLevelArr){
+        foreach ($data[0]['grades'] as $gradeLevelArr) {
             $gradeLevel = (new GradeLevel())
                 ->setGroup($gradeGroup)
                 ->setId($gradeLevelArr['grade_id'])
@@ -2583,8 +2581,6 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         }
         return $gradeGroup;
     }
-
-
 
 
     /**

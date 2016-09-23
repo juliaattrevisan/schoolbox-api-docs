@@ -37,6 +37,10 @@ class LetterGrade extends AbstractMarkScheme
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
+        if(is_null($normalisedMark)){
+            return null;
+        }
+
         $this->validateNormalisedMark($normalisedMark);
 
         foreach ($this->getGradeGroup()->getGradeLevels() as $gradeLevel) {

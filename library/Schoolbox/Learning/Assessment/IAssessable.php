@@ -331,17 +331,28 @@ interface IAssessable
     /**
      * Get a Collection of Participant instances
      *
-     * @return Collection
+     * @return Collection|Participant[]
      */
     public function getAllParticipants();
 
     /**
      * Set a Collection of Participant instances
      *
-     * @param mixed $allParticipants
+     * @param Collection|Participant[] $allParticipants
      * @return $this
      */
-    public function setAllParticipants($allParticipants);
+    public function setAllParticipants(Collection $allParticipants);
+
+    /**
+     * @return Collection|IFeedback[]
+     */
+    public function getFeedbacks();
+
+    /**
+     * @param Collection|IFeedback[] $feedbacks
+     * @return $this
+     */
+    public function setFeedbacks(Collection $feedbacks);
 
     /**
      * Created date

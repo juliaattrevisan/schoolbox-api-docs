@@ -480,10 +480,10 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
-     * @param mixed $allParticipants
+     * @param Collection $allParticipants
      * @return $this
      */
-    public function setAllParticipants($allParticipants)
+    public function setAllParticipants(Collection $allParticipants)
     {
         $this->allParticipants = $allParticipants;
         return $this;
@@ -572,12 +572,12 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
-     * @param Collection|IFeedback[] $responses
+     * @param Collection|IFeedback[] $feedbacks
      * @return $this
      */
-    public function setFeedbacks(Collection $responses)
+    public function setFeedbacks(Collection $feedbacks)
     {
-        $this->responses = $responses;
+        $this->feedbacks = $feedbacks;
         return $this;
     }
 }

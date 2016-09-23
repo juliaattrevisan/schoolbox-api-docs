@@ -82,6 +82,9 @@ class TotalMarkFractional extends TotalMarkAbstract
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
+        if(is_null($normalisedMark)){
+            return null;
+        }
         $this->checkQuizAttempt($response);
         return parent::getHumanReadableMark($normalisedMark, $response);
     }

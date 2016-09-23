@@ -18,10 +18,13 @@ class Percentage extends AbstractMarkScheme
      *
      * @param float          $normalisedMark
      * @param IResponse|null $response
-     * @return string
+     * @return string|null
      */
     public function getHumanReadableMark($normalisedMark, IResponse $response = null)
     {
+        if(is_null($normalisedMark)){
+            return null;
+        }
         $this->validateNormalisedMark($normalisedMark);
 
         $percentage = round($normalisedMark);
