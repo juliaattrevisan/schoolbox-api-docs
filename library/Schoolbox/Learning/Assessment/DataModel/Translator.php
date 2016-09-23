@@ -49,16 +49,17 @@ class Translator
         // The translation depends on the type of $assessment.
         // Probably doesn't always return a Model either, it will return an old
         // Quiz/DueWork/Task/Project model, with an Assessment attached.
-        // TODO add assessment object to all models
         // TODO figure out which fields on assessable sub-objects are now redundant
         if ($assessment instanceof Project) {
             // convert to project's model
             // TODO implement this
+            throw new UnexpectedValueException('$assessment is a project - this method is not implemented for projects yet');
 
         } elseif ($assessment instanceof DueWork) {
             // convert to due work's model
             $model = DueWorkMapper::getInstance()->createModel();
             $model
+                ->setAssessmentModel($assessmentModel)
                 ->setName($assessment->getTitle())
                 ->setDescription($assessment->getDescription())
                 ->setPublishDate($assessment->getPublishAt())
@@ -84,6 +85,7 @@ class Translator
             // convert to quiz's model
             $model = QuizMapper::getInstance()->createModel();
             $model
+                ->setAssessmentModel($assessmentModel)
                 ->setAvailability(QuizModel::AVAILABILITY_ASSESS)
                 ->setTitle($assessment->getTitle())
                 ->setDescription($assessment->getDescription())
@@ -105,6 +107,7 @@ class Translator
             // task currently has its own ID, but that will be handled in the mapper proxy
             $model = TaskMapper::getInstance()->createModel();
             $model
+                ->setAssessmentModel($assessmentModel)
                 ->setTitle($assessment->getTitle())
                 ->setOrder(0)
                 ->setOwner($assessment->getCreator())
