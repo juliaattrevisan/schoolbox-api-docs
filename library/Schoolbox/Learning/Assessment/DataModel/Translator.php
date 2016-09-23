@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\DataModel;
 
+use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper as QuizMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper as DueWorkMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
@@ -73,7 +74,7 @@ class Translator
                 ->setUseRubric($assessment->hasRubric())
                 ->setOwner($assessment->getCreator())
             ;
-            // TODO figure out mark visibility - it's likely obsolete as marks are explicitly published
+            // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
             // TODO figure out rubric result set
             // TODO figure out mark per rubric group
             // TODO set model's grade group, mark type, max mark based on mark scheme
@@ -83,11 +84,20 @@ class Translator
             // convert to quiz's model
             $model = QuizMapper::getInstance()->createModel();
             $model
+                ->setAvailability(QuizModel::AVAILABILITY_ASSESS)
                 ->setTitle($assessment->getTitle())
                 ->setDescription($assessment->getDescription())
                 ->setStart($assessment->getOpenAt())
                 ->setFinish($assessment->getDueAt())
+                ->setWeight($assessment->getWeight())
+                ->setAnonymousResult(false)
+                ->setUser($assessment->getCreator())
             ;
+            // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
+            // TODO add completion message to Quiz
+            // TODO add duration to Quiz
+            // TODO add max attempts
+            // TODO add notify author?
             return $model;
 
         } elseif ($assessment instanceof Task) {
