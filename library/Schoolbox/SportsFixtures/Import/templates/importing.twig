@@ -16,7 +16,13 @@
         <section class="content">
             <article>
                 <p>
-                    The import of your sports fixtures file is currently in progress. A notification will be sent when it has completed.
+                    The import of your sports fixtures file has started.
+                </p>
+                <p>
+                    A notification will be sent when it has completed or you can view the current import status by clicking the link below.
+                </p>
+                <p>
+                    <a href="{{ routeLookup('sportsfixturesImport.getImportProgress', {id: id}) }}">Click here to view import progress</a>
                 </p>
             </article>
         </section>
