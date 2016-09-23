@@ -155,6 +155,34 @@ class Storage extends BaseTransformation
             ),
         ),
 
+        /* Card images are 2:1 ratio.  So this is used on class card */
+        'cardImageLarge' => array(
+            array(
+                'method' => 'Rectangle',
+                'args' => array(
+                    'width' => 800,
+                    'height' => 400,
+                )
+            ),
+            array(
+                'method' => 'Sharpen'
+            ),
+        ),
+
+        /* Card images are 2:1 ratio.  So this is used on class card */
+        'cardImageSmall' => array(
+            array(
+                'method' => 'Rectangle',
+                'args' => array(
+                    'width' => 200,
+                    'height' => 100,
+                )
+            ),
+            array(
+                'method' => 'Sharpen'
+            ),
+        ),
+
         /* Test to find out whether Constrain skipped canvas creation
 		 * when resultant image dimension was the same as the original
 		 */

@@ -7,11 +7,14 @@
 namespace Schoolbox\Learning;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 use Schoolbox\Assessment\Term\Model as Term;
+use Timetable_ColourMapper;
 
 class Controller extends Base
 {
@@ -67,9 +70,28 @@ class Controller extends Base
      *
      */
     public function getClasses() {
+
+        /* Get Timetable colours to use as random colours for null set folders */
+        $colourList = Timetable_ColourMapper::getInstance()->findAll();
+        $colourIndex = 0;
+
+        $folderList = new Collection();
+
+        /* Convert external subjects to folders */
+        foreach($this->getUser()->getSubjectCollection() as $subject ) {
+            $folder = FolderMapper::getInstance()->findByCode($subject['code']);
+            if(! $folder->getColour() ) {
+                /* Apply colour from list if no colour exists */
+                $folder->setColour($colourList[$colourIndex]->getHexColour());
+                $colourIndex = ($colourIndex+1) % $colourList->count();
+            }
+            $folderList->add($folder);
+        }
+
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', [
             'currentUser'   => $this->getUser(),
-            'classList'     => $this->getUser()->getSubjectCollection(),
+            'classList'     => $folderList,
         ]));
     }
 

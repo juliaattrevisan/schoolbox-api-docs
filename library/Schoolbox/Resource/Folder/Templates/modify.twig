@@ -288,31 +288,23 @@
                                 </label>
                             </div>
                         </div>
-
                     {% endif %}
-
                 </div>
 
-                <fieldset id="synergetic-codes" class="content {{ folder.getInherit() ? 'hide' : '' }}">
-                    <div class="small-12 columns">
-
-                        {# Only superusers can change subject codes#}
-
-                        {% if user.isSuperuser %}
-
+                {% if user.isSuperuser %}
+                    {# Only superusers can change subject codes#}
+                    <fieldset id="synergetic-codes" class="content {{ folder.getInherit() ? 'hide' : '' }}">
+                        <div class="small-12 columns">
                             <label>
                                 {{ database }} Subject Codes
                                 <span data-tooltip class="hint has-tip tip-top" data-width="200" title="If you want this category to be a subject enter its code here. You may enter multiple codes by separating them with a comma">?</span>
                                 <input type="text" name="code" size="40" value="{{ folder.getCodeString }}" />
                             </label>
-
-                        {% endif %}
-
-                    </div>
-                </fieldset>
+                        </div>
+                    </fieldset>
+                {% endif %}
 
                 {# Only superusers can recurse permission changes, and its only relevant on modification #}
-
                 {% if user.isSuperuser and action == 'Modify' %}
 
                 <fieldset class="content">
