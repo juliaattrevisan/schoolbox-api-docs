@@ -106,7 +106,6 @@ class Translator
             $model = TaskMapper::getInstance()->createModel();
             $model
                 ->setTitle($assessment->getTitle())
-                ->setLink('')
                 ->setOrder(0)
                 ->setOwner($assessment->getCreator())
             ;
