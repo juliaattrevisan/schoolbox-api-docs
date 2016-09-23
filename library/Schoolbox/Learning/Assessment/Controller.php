@@ -115,6 +115,32 @@ class Controller extends Base
     }
 
     /**
+     * Find all the returnUrls
+     *
+     * @param int $assessmentId
+     * @return array
+     */
+    private function getAllReturnUrls($assessmentId)
+    {
+        /* Figure out a returnUrl
+         *
+         * When spawning a Project, its constituent Assessables return to this url
+         * after they are spawned
+         */
+        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', [ 'assessmentId' => $assessmentId ] );
+        $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
+
+        $allTypes = ['dueWork', 'task', 'quiz'];
+        $allReturnUrls = [];
+
+        foreach ($allTypes as $currentType) {
+            $allReturnUrls[$currentType] = $this->getRouter()->generate('learningAssessment.getCreateAssessmentWithinProject', ['assessmentId' => $assessmentId, 'assessmentType' => $currentType]) . $suffix;
+        }
+
+        return $allReturnUrls;
+    }
+
+    /**
      * Save the data when creating common details of an Assessment
      *
      * If it's a Project we need to save it so we can craft a returnUrl
@@ -141,28 +167,11 @@ class Controller extends Base
 
         $assessmentId = $project->getId();
 
-        /* Figure out a returnUrl
-         *
-         * When spawning a Project, its constituent Assessables return to this url
-         * after they are spawned
-         */
-        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', [ 'assessmentId' => $assessmentId ] );
-        $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
-
-        /* TODO: Refactor this in a smarter way
-         */
-        $allTypes = ['dueWork', 'task', 'quiz'];
-        $allReturnUrls = [];
-
-        foreach ($allTypes as $currentType) {
-            $allReturnUrls[$currentType] = $this->getRouter()->generate('learningAssessment.getCreateAssessmentWithinProject', ['assessmentId' => $project->getId(), 'assessmentType' => $currentType]) . $suffix;
-        }
-
         /* Final payload
          */
         $data = [
             'assessmentId' => $project->getId(),
-            'allReturnUrls' => $allReturnUrls,
+            'allReturnUrls' => $this->getAllReturnUrls($assessmentId),
 
             /* The next step of saving once you've chosen a type that isn't a project
              */
@@ -170,6 +179,50 @@ class Controller extends Base
         ];
 
         $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
+    /**
+     * Update an existing Assessment's details
+     *
+     * @param int $assessmentId
+     */
+    public function getUpdateAssessment($assessmentId)
+    {
+
+        /* TODO: Actually retrieve the data here
+         */
+
+        try {
+            $folder = $this->getFolderMapper()->findById(43);
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
+        }
+
+        $project = new Project(new SummatorAverage());
+        $project
+            ->setId(5567)
+            ->setTitle('Find Diablo')
+            ->setDescription('The things you need to do in order to slay the prime evil')
+            ->setCreator($_SESSION['user'])
+            ->setAllParticipants(new Collection())
+            ->setWeight(100)
+            ->setPublishAt(Alaress_Date_Format::now())
+            ->setOpenAt(Alaress_Date_Format::now())
+            ->setDueAt(Alaress_Date_Format::now())
+            ->setCloseAt(Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+
+        $assessmentId = $project->getId();
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
+            'assessment' => $project,
+            'folder' => $folder,
+            'allMarkTypes' => $this->getAllMarkTypes(),
+            'allReturnUrls' => $this->getAllReturnUrls($assessmentId),
+            'curriculumNodes' => $folder->getCurriculumNodes()
+        ]));
     }
 
     /**
