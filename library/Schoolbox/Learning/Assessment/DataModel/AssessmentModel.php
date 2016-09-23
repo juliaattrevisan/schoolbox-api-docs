@@ -32,7 +32,7 @@ trait AssessmentModel
      * @param Model $assessmentModel
      * @return static
      */
-    public function setAssessmentModel($assessmentModel)
+    public function setAssessmentModel(Model $assessmentModel)
     {
         $this->assessmentModel = $assessmentModel;
         return $this;
