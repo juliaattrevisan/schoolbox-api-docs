@@ -1,4 +1,6 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learningAssessment/fragments/submitRow.twig' as mage %}
+
 {{ bread.crumbs(
     [ folder.name, '/homepage/' ~ folder.id ],
     [ 'Create Assessment', routeLookup('learningAssessment.getCreateAssessment') ]
@@ -70,23 +72,22 @@
                     <div class="hide" data-mage="part-2-dueWork">
                         <div data-mage-collapsed>
                             {% include '@learningAssessment/fragments/duework/create.twig' %}
+                            {{ mage.submitRow('Save', '', '', '') }}
                         </div>
                     </div>
 
                     <div class="hide" data-mage="part-2-task">
                         <div data-mage-collapsed>
                             {% include '@learningAssessment/fragments/task/create.twig' %}
+                            {{ mage.submitRow('Save', '', '', '') }}
                         </div>
                     </div>
 
                     <div class="hide" data-mage="part-2-quiz">
                         <div data-mage-collapsed>
                             {% include '@learningAssessment/fragments/quiz/create.twig' %}
+                            {{ mage.submitRow('Save', '', '', '') }}
                         </div>
-                    </div>
-
-                    <div class="column small-12">
-                        <input type="submit" value="Submit" />
                     </div>
                 </fieldset>
             </section>
