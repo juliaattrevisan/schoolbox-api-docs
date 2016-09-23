@@ -39,7 +39,7 @@ $section = $sectionHandler->getByID($this->arg[1]);
 $attempt = $attemptHandler->getByID($this->arg[2]);
 // getListByAssessAndAttempt gets a rowset for some reason!
 $attemptList = $attemptHandler->getListByAssessAndAttempt($this->arg[0], $this->arg[2]);
-$attempt     = array_pop($attemptList);
+$attempt = array_pop($attemptList);
 
 if (!$assessHandler->isValidUrlAccess($this->arg[0])) {
     $this->pageNotFound();
@@ -109,37 +109,37 @@ try {
     error(112);
     exit;
 }
-$openDate      = new Alaress_Date_Format($assess['start'], Alaress_Date_Format::DATABASE_FORMAT);
-$dueDate       = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
-$attemptDate   = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
+$openDate = new Alaress_Date_Format($assess['start'], Alaress_Date_Format::DATABASE_FORMAT);
+$dueDate = new Alaress_Date_Format($assess['finish'], Alaress_Date_Format::DATABASE_FORMAT);
+$attemptDate = new Alaress_Date_Format($attempt['start'], Alaress_Date_Format::DATABASE_FORMAT);
 $attemptFinish = new Alaress_Date_Format($attempt['finish'], Alaress_Date_Format::DATABASE_FORMAT);
-$term          = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($dueDate);
+$term = Schoolbox\Assessment\Term\Mapper::getInstance()->findForDate($dueDate);
 $this->setVar(
     array(
-        'ASSESS_ASSESS_ID'                     => $assess['assess_id'],
-        'ASSESS_TITLE'                         => Scrub::text($assess['title']),
-        'ASSESS_START'                         => $openDate->getShort(),
-        'ASSESS_FINISH'                        => $dueDate->getShort(),
-        'ATTEMPT_ATTEMPT_ID'                   => $attemptId,
-        'ATTEMPT_START'                        => $attemptDate->getShort(),
-        'ATTEMPT_FINISH'                       => $attemptFinish->getShort(),
-        'ATTEMPT_TIME_TAKEN'                   => $assessHandler->sec2hms($attemptFinish->diffInSeconds($attemptDate, true)),
-        'ATTEMPT_TOTAL_MARKS'                  => number_format($attempt['totalMarks'], 2),
-        'ATTEMPT_TOTAL_AVAILABLE_MARKS'        => number_format($attempt['totalAvailableMarks'], 2),
-        'SECTION_TITLE'                        => Scrub::text($section['title']),
-        'SECTION_DESCRIPTION'                  => Scrub::html($section['description']),
-        'ASSESS_PREVIOUSLY_REVIEWED'           => $reviewedAt,
-        'RESPONDENT_NAME'                      => $userHandler->formatName($user),
-        'ASSESS_CATEGORY_NAME'                 => Scrub::text($folder->getName()),
-        'ASSESS_CATEGORY_ID'                   => $folder->getId(),
-        'ASSESS_DUEWORK_TERM'                  => $term->getCode(),
-        'resubmit_label_block'                 => '',
-        'visible_staff_block'                  => '',
-        'visible_staff_students_block'         => '',
+        'ASSESS_ASSESS_ID' => $assess['assess_id'],
+        'ASSESS_TITLE' => Scrub::text($assess['title']),
+        'ASSESS_START' => $openDate->getShort(),
+        'ASSESS_FINISH' => $dueDate->getShort(),
+        'ATTEMPT_ATTEMPT_ID' => $attemptId,
+        'ATTEMPT_START' => $attemptDate->getShort(),
+        'ATTEMPT_FINISH' => $attemptFinish->getShort(),
+        'ATTEMPT_TIME_TAKEN' => $assessHandler->sec2hms($attemptFinish->diffInSeconds($attemptDate, true)),
+        'ATTEMPT_TOTAL_MARKS' => number_format($attempt['totalMarks'], 2),
+        'ATTEMPT_TOTAL_AVAILABLE_MARKS' => number_format($attempt['totalAvailableMarks'], 2),
+        'SECTION_TITLE' => Scrub::text($section['title']),
+        'SECTION_DESCRIPTION' => Scrub::html($section['description']),
+        'ASSESS_PREVIOUSLY_REVIEWED' => $reviewedAt,
+        'RESPONDENT_NAME' => $userHandler->formatName($user),
+        'ASSESS_CATEGORY_NAME' => Scrub::text($folder->getName()),
+        'ASSESS_CATEGORY_ID' => $folder->getId(),
+        'ASSESS_DUEWORK_TERM' => $term->getCode(),
+        'resubmit_label_block' => '',
+        'visible_staff_block' => '',
+        'visible_staff_students_block' => '',
         'visible_staff_students_parents_block' => '',
-        'attemptFinished_block'                => '',
-        'attemptNotYetFinished_block'          => '',
-        'attemptUnfinished_block'              => '',
+        'attemptFinished_block' => '',
+        'attemptNotYetFinished_block' => '',
+        'attemptUnfinished_block' => '',
     )
 );
 
@@ -151,12 +151,10 @@ if (!isset($attempt['finish'])) {
     $close = new DateTime($assess['finish']);
     if ($close->getTimestamp() < $_SERVER['REQUEST_TIME']) {
         $this->parse('attemptUnfinished_block', 'attemptUnfinished');
-    }
-    else {
+    } else {
         $this->parse('attemptNotYetFinished_block', 'attemptNotYetFinished');
     }
-}
-else {
+} else {
     $this->parse('attemptFinished_block', 'attemptFinished');
 }
 
@@ -187,72 +185,76 @@ if ($allQuestions) {
     $randomQuestionNumber = 1;
 
     foreach ($allQuestions as $currentQuestion) {
-        $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
 
-        /* Load answer template into answerOption block
-         */
-        $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/review.html');
-        $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
+        if ($currentQuestion["type_id"] != null) {
 
-        $this->setBlock('answerFormFragment', 'writable_comment', 'writable_comment_block');
-        $this->setBlock('answerFormFragment', 'readonly_comment', 'readonly_comment_block');
+            $answerHandler = $factory->createAnswerModel($currentQuestion['type_id']);
 
-        $this->setBlock('answerFormFragment', 'writable_mark', 'writable_mark_block');
-        $this->setBlock('answerFormFragment', 'readonly_mark', 'readonly_mark_block');
+            /* Load answer template into answerOption block
+             */
+            $this->setFile('answerFormFragment', 'assess/answer/' . $factory->getQuestionType($currentQuestion['type_id']) . '/review.html');
+            $this->setBlock('answerFormFragment', 'answerOption', 'answerOption_block');
 
-        /* Reset answer options and marks from previous iteration
-         */
-        $this->setVar('answerOption_block', '');
-        $this->setVar('writable_comment_block', '');
-        $this->setVar('writable_mark_block', '');
-        $this->setVar('readonly_comment_block', '');
-        $this->setVar('readonly_mark_block', '');
+            $this->setBlock('answerFormFragment', 'writable_comment', 'writable_comment_block');
+            $this->setBlock('answerFormFragment', 'readonly_comment', 'readonly_comment_block');
 
-        $this->setVar(array(
-            'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
-            'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
-            'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
-            'QUESTION_MARKS' => $currentQuestion['marks'],
-        ));
+            $this->setBlock('answerFormFragment', 'writable_mark', 'writable_mark_block');
+            $this->setBlock('answerFormFragment', 'readonly_mark', 'readonly_mark_block');
 
-        /* If this is a randomised section, number each question incrementally
-           */
-        if ($section['random'] == 1) {
+            /* Reset answer options and marks from previous iteration
+             */
+            $this->setVar('answerOption_block', '');
+            $this->setVar('writable_comment_block', '');
+            $this->setVar('writable_mark_block', '');
+            $this->setVar('readonly_comment_block', '');
+            $this->setVar('readonly_mark_block', '');
+
             $this->setVar(array(
-                'QUESTION_SEQUENCE' => $randomQuestionNumber
+                'QUESTION_QUESTION_ID' => $currentQuestion['question_id'],
+                'QUESTION_SEQUENCE' => $currentQuestion['sequence'],
+                'QUESTION_QUESTION' => Scrub::html($currentQuestion['question']),
+                'QUESTION_MARKS' => $currentQuestion['marks'],
             ));
+
+            /* If this is a randomised section, number each question incrementally
+               */
+            if ($section['random'] == 1) {
+                $this->setVar(array(
+                    'QUESTION_SEQUENCE' => $randomQuestionNumber
+                ));
+            }
+
+            $randomQuestionNumber++;
+
+            /* Load individual answers
+             */
+            $answerHandler->reviewResponse($this, $attemptId, $currentQuestion['question_id']);
+
+            //
+            // Mark and comment blocks must be parsed before the answerInputs block
+            // gets parsed, so that the correct template vars are exposed to these
+            // blocks.
+            if ($readonly) {
+                $this->parse('readonly_comment_block', 'readonly_comment');
+                $this->parse('readonly_mark_block', 'readonly_mark');
+            } else {
+                $this->parse('writable_comment_block', 'writable_comment');
+                $this->parse('writable_mark_block', 'writable_mark');
+            }
+            $this->parse('answerInputs_block', 'answerFormFragment', true);
+            $this->parse('question_block', 'question', true);
+
+            /* Clear child blocks after parsing out the parent
+               */
+            $answerHandler->cleanupParse($this);
+
+            $this->setVar('answerFormFragment', '');
+            $this->setVar('answerInputs_block', '');
+        } else {
+            $this->setVar('question_block', '');
         }
-
-        $randomQuestionNumber++;
-
-        /* Load individual answers
-         */
-        $answerHandler->reviewResponse($this, $attemptId, $currentQuestion['question_id']);
-
-        //
-        // Mark and comment blocks must be parsed before the answerInputs block
-        // gets parsed, so that the correct template vars are exposed to these
-        // blocks.
-        if ($readonly) {
-            $this->parse('readonly_comment_block', 'readonly_comment');
-            $this->parse('readonly_mark_block',    'readonly_mark');
-        }
-        else {
-            $this->parse('writable_comment_block', 'writable_comment');
-            $this->parse('writable_mark_block',    'writable_mark');
-        }
-        $this->parse('answerInputs_block', 'answerFormFragment', true);
-        $this->parse('question_block', 'question', true);
-
-        /* Clear child blocks after parsing out the parent
-           */
-        $answerHandler->cleanupParse($this);
-
-        $this->setVar('answerFormFragment', '');
-        $this->setVar('answerInputs_block', '');
     }
-}
-else {
+} else {
     $this->setVar('question_block', '');
 }
 
