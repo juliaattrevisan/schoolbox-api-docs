@@ -57,6 +57,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setTitle('Mr Test Task сказать')
+            ->setLink('https://www.something.com/')
+            ->setSelfMarkable(true)
             // Tasks are always weight 0, so this doesn't matter
             ->setWeight(1000)
         ;

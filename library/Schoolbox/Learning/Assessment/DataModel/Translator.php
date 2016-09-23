@@ -110,6 +110,8 @@ class Translator
                 ->setTitle($assessment->getTitle())
                 ->setOrder(0)
                 ->setOwner($assessment->getCreator())
+                ->setLink($assessment->getLink())
+                ->setRequiresConfirmation(!$assessment->isSelfMarkable())
             ;
             // TODO add getLink() to Task
             // TODO add requiresConfirmation() to Task

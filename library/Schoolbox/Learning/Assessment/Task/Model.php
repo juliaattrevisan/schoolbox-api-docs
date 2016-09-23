@@ -36,6 +36,20 @@ class Model extends AbstractAssessment
     protected $url = '';
 
     /**
+     * The content this task links to (if any).
+     *
+     * @var string
+     */
+    protected $link;
+
+    /**
+     * Is this task self-markable?
+     *
+     * @var bool
+     */
+    protected $selfMarkable;
+
+    /**
      * @inheritdoc
      *
      * @return string
@@ -155,6 +169,49 @@ class Model extends AbstractAssessment
     public function setUrl($url)
     {
         $this->url = $url;
+        return $this;
+    }
+    /**
+     * @return string
+     */
+    public function getLink()
+    {
+        return $this->link;
+    }
+
+    /**
+     * @param string $link
+     * @return static
+     */
+    public function setLink($link)
+    {
+        $this->link = $link;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSelfMarkable()
+    {
+        return $this->getSelfMarkable();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getSelfMarkable()
+    {
+        return $this->selfMarkable;
+    }
+
+    /**
+     * @param bool $selfMarkable
+     * @return static
+     */
+    public function setSelfMarkable($selfMarkable)
+    {
+        $this->selfMarkable = $selfMarkable;
         return $this;
     }
 }
