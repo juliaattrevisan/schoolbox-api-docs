@@ -178,6 +178,8 @@
                             Folder Name
                             <input type="text" id="name" class="required" name="name" maxlength="100" size="40" value="{{ folder.getName }}" />
                         </label>
+                    </div>
+                    <div class="small-12 medium-6 columns">
                         <label>
                             Homepage Template
                             <span data-tooltip class="hint has-tip tip-top" data-width="200" title="If you would like a homepage associated with this folder select a basic layout to get started with">?</span>
@@ -191,11 +193,11 @@
 
                             </select>
                         </label>
-                        <label>
-                            Cover Image
-                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a cover image for this folder">?</span>
-                        </label>
-                        {% include 'sub/attachzone.twig' with { attachzone: coverImageZone } %}
+                        <div class="alert-box warning hide" data-template-warning>
+                            Warning! Changing the folders template will remove all existing components and content.
+                        </div>
+                    </div>
+                    <div class="small-12 medium-6 columns">
                         <label class="row">
                             <span class="small-12 column">
                                 Colour
@@ -205,9 +207,15 @@
                                 <input type="text" value="{{ folder.colour.asRgb }}" name="colour" data-colour-picker />
                             </span>
                         </label>
-                        <div class="alert-box warning hide" data-template-warning>
-                            Warning! Changing the folders template will remove all existing components and content.
-                        </div>
+                    </div>
+                    <div class="small-12 columns">
+                    <label>
+                            Cover Image
+                            <span data-tooltip class="hint has-tip tip-top" data-width="200" title="Select a cover image for this folder">?</span>
+                        </label>
+                        {% include 'sub/attachzone.twig' with { attachzone: coverImageZone } %}
+
+
                     </div>
                 </fieldset>
 
