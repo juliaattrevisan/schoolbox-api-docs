@@ -119,6 +119,9 @@ class External_Liss_Server
                 'liss.publishTimetable'        => array(
                     'function' => 'External_Liss_Server::publishTimetable',
                 ),
+                'liss.publishDailyData'        => array(
+                    'function' => 'External_Liss_Server::publishDailyData'
+                ),
             )
         );
     }
@@ -440,6 +443,35 @@ class External_Liss_Server
             $log->info(sprintf("publishBellTimes: Saved timetable periods, process completed",$collection->count()));
 
             return new xmlrpcresp(new xmlrpcval('BellTimes Imported', 'string'));
+        }
+        return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
+    }
+
+    /**
+     * publish daily timetable and room changes to schoolbox
+     *
+     * Not in use yet, but causes errors if schools try to send
+     * this data. Separated from getRooms() to allow for future use.
+     *
+     * @param xmlrpcmsg $message
+     * @return xmlrpcresp
+     */
+    static public function publishDailyData(xmlrpcmsg $message)
+    {
+        $log = self::log();
+
+        $authenticator = new External_Liss_Authenticator($message->params[0], $log);
+
+        if ($authenticator->isAuthenticated()) {
+            /* Respond without doing anything to avoid errors
+             */
+            $log->info("publishDailyData: unable to process request, not implemented");
+
+            /* Log data for use */
+            $allData = $message->params[1]->me['array'];
+            $log->info("publishDailyData: ".json_encode($allData));
+
+            return new xmlrpcresp(new xmlrpcval('Daily Data Imported', 'string'));
         }
         return new xmlrpcresp(new xmlrpcval('Authentication Failed', 'string'));
     }
