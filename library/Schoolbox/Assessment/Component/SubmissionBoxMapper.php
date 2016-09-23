@@ -28,6 +28,7 @@ use External_Markbook;
  * Class SubmissionBoxMapper
  *
  * @package Schoolbox\Assessment\Component
+ * @method SubmissionBox createModel($id=null)
  * @method SubmissionBox hydrate(array $row, $alias = '', $callback = null)
  * @method Collection|SubmissionBox[] findByColumnList($columnList, $options = [])
  */

@@ -15,6 +15,11 @@ use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
 
+/**
+ * Task mapper
+ *
+ * @method Task createModel($id=null)
+ */
 class TaskMapper extends Schoolbox\Mapper {
 
     protected function mapping() {

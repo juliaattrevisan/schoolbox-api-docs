@@ -11,6 +11,8 @@ use Schoolbox\Mapper as BaseMapper;
 
 /**
  * Class Mapper
+ *
+ * @method Model createModel($id=null)
  */
 class Mapper extends BaseMapper
 {

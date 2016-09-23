@@ -24,7 +24,7 @@ use Schoolbox\Mapper;
  * Class OnlineAssessmentMapper
  *
  * @package Schoolbox\Assessment\Component
- * @method OnlineAssessment createModel()
+ * @method OnlineAssessment createModel($id=null)
  * @method Collection|OnlineAssessment[] findByColumnList($columnList, $options = [])
  */
 class OnlineAssessmentMapper extends Mapper implements IActivityMapper, FeedableMapperInterface {

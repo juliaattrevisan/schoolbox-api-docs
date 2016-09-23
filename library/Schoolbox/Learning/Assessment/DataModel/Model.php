@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Alaress_Date_Format;
+use Alaress_Date_NullDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 
 /**
@@ -70,4 +71,140 @@ class Model
      * @var int
      */
     protected $sequence = 0;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->publishDate = new Alaress_Date_NullDate();
+        $this->openDate    = new Alaress_Date_NullDate();
+        $this->dueDate     = new Alaress_Date_NullDate();
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     * @return static
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     * @return static
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getPublishDate()
+    {
+        return $this->publishDate;
+    }
+
+    /**
+     * @param Alaress_Date_Format $publishDate
+     * @return static
+     */
+    public function setPublishDate(Alaress_Date_Format $publishDate = null)
+    {
+        $this->publishDate = $publishDate;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getOpenDate()
+    {
+        return $this->openDate;
+    }
+
+    /**
+     * @param Alaress_Date_Format $openDate
+     * @return static
+     */
+    public function setOpenDate(Alaress_Date_Format $openDate = null)
+    {
+        $this->openDate = $openDate;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getDueDate()
+    {
+        return $this->dueDate;
+    }
+
+    /**
+     * @param Alaress_Date_Format $dueDate
+     * @return static
+     */
+    public function setDueDate(Alaress_Date_Format $dueDate = null)
+    {
+        $this->dueDate = $dueDate;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWeight()
+    {
+        return $this->weight;
+    }
+
+    /**
+     * @param int $weight
+     * @return static
+     */
+    public function setWeight($weight)
+    {
+        $this->weight = $weight;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSequence()
+    {
+        return $this->sequence;
+    }
+
+    /**
+     * @param int $sequence
+     * @return static
+     */
+    public function setSequence($sequence)
+    {
+        $this->sequence = $sequence;
+        return $this;
+    }
 }
