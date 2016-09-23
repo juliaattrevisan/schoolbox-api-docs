@@ -129,7 +129,7 @@ class External_Liss_Server
      */
     static public function log()
     {
-        $logFile = fopen(Cfg::get('logs_dir') . '/liss.log');
+        $logFile = fopen(Cfg::get('logs_dir') . '/liss.log', 'a');
         return $log = new Logger($logFile, $logFile, Monolog\Logger::INFO, [], true);
     }
 
