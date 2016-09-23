@@ -466,22 +466,23 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         * Due Work 6: Weight  4, NormalisedMark: P,null UP,null
         * Due Work 7: Weight 22, NormalisedMark: P,96 UP,96
         *
-        * Total Weight: 66
+        * Total Weight Published: 54
+        * Total Weight UnPublished: 58
         *
         * Most Recent Published Weighted Average is:
-        *       = [(18*20/66) + (91*11/66) + (89*1/66) + (96*22/66)]
-        *       = [360/66 + 1001/66 + 89/66 + 2112/66]
-        *       = 3562/66
-        *       = 53.96969696970
+        *       = [(18*20) + (91*11) + (89*1) + (96*22)] / 54
+        *       = [360 + 1001 + 89 + 2112] / 54
+        *       = 3562/54
+        *       = 65.962962963
         *
         * Most Recent Weighted Average is:
-        *       = [(18*20/66) + (91*11/66) + (89*1/66) + (76*4/66) + (96*22/66)]
-        *       = [360/66 + 1001/66 + 89/66 + 304/66 + 2112/66]
-        *       = 3866/66
-        *       = 58.57575757576
+        *       = [(18*20) + (91*11) + (89*1) + (76*4) + (96*22)] / 58
+        *       = [360 + 1001 + 89 + 304 + 2112] / 58
+        *       = 3866/58
+        *       = 66.655172414
         */
-        $this->assertEquals(53.96969696970, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(58.57575757576, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(65.962962963, $project->getNormalisedMark($this->hodes, true), '', $this->delta);
+        $this->assertEquals(66.655172414, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
     }
 
     /**
@@ -1683,7 +1684,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(41, $project->getNormalisedMark($this->hodes, true));
         $this->assertEquals(55, $project->getNormalisedMark($this->hodes, false));
     }
-    
+
     /**
      * Mass produce a giant Due Work set
      *
