@@ -46,6 +46,9 @@ class Color implements IColumnType
      */
     public function hydrate($value, $mapper = null)
     {
+        if (is_null($value)) {
+            return null;
+        }
         return $this->buildFromValue($value);
     }
 
@@ -54,6 +57,10 @@ class Color implements IColumnType
      */
     public function dehydrate($value, $mapper = null)
     {
+        if (is_null($value)) {
+            return null;
+        }
+
         if ($value instanceof ColorObject) {
             return $value->getAsHexAlpha();
         }
