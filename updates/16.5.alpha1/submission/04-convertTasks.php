@@ -27,8 +27,8 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
     // Insert assessment and related information queries
     $insertAssessmentQuery = $db->prepare("
-        INSERT INTO assessment (title, description, publish_date, open_date, due_date, weight, sequence)
-        VALUES (:title, '', NULL, NULL, NULL, :weight, 1)
+        INSERT INTO assessment (title, description, publish_date, open_date, due_date, close_date, weight, sequence)
+        VALUES (:title, '', NULL, NULL, NULL, NULL, :weight, 1)
     ");
     $insertAssessmentRelationQuery = $db->prepare("
         INSERT INTO assessment_course_unit_specification (assessment_id, course_unit_specification_id)
