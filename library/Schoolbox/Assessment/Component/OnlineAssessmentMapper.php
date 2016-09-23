@@ -31,7 +31,7 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
 
 	protected function mapping () {
 		$this->hasTable('assess');
-		$this->hasModel('\\Schoolbox\\Assessment\\Component\\OnlineAssessment');
+		$this->hasModel(OnlineAssessment::class);
 		$this->hasMap(array(
 			'column'     => 'assess_id',
 			'property'   => 'id',
