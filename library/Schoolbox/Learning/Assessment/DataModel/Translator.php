@@ -26,9 +26,10 @@ class Translator
      * Translates the Assessment business domain model to a data model.
      *
      * @param IAssessable $assessment
+     * @param int         $sequence   The position of this assessment within its container
      * @return object Some sort of model
      */
-    public function translateToDataModel(IAssessable $assessment)
+    public function translateToDataModel(IAssessable $assessment, $sequence)
     {
         // Extract assessment base model
         $assessmentModel = Mapper::getInstance()->createModel();
@@ -39,6 +40,9 @@ class Translator
             ->setPublishDate($assessment->getPublishAt())
             ->setOpenDate($assessment->getOpenAt())
             ->setDueDate($assessment->getDueAt())
+            ->setCloseDate($assessment->getCloseAt())
+            ->setWeight($assessment->getWeight())
+            ->setSequence($sequence)
         ;
 
         // The translation depends on the type of $assessment.
