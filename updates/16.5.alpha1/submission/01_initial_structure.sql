@@ -101,6 +101,7 @@ CREATE TABLE `assessment` (
   `publish_date` DATETIME NULL,
   `open_date` DATETIME NULL,
   `due_date` DATETIME NULL,
+  `close_date` DATETIME NULL,
   `weight` INT(11) NOT NULL DEFAULT 0,
   `sequence` TINYINT NULL,
   PRIMARY KEY (`id`))

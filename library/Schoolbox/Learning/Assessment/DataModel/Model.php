@@ -49,11 +49,20 @@ class Model
     protected $openDate;
 
     /**
-     * The date/time at which participants are no longer able to create responses to this assessment.
+     * The date/time after which a participant's response will be marked as late.
      *
      * @var Alaress_Date_Format
      */
     protected $dueDate;
+
+    /**
+     * The date/time at which participants are no longer able to create responses to this assessment.
+     *
+     * TODO add close date to database and imports
+     *
+     * @var Alaress_Date_Format
+     */
+    protected $closeDate;
 
     /**
      * The comparative amount that this assessment affects a student's grade by.
@@ -169,6 +178,24 @@ class Model
     public function setDueDate(Alaress_Date_Format $dueDate = null)
     {
         $this->dueDate = $dueDate;
+        return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format
+     */
+    public function getCloseDate(): Alaress_Date_Format
+    {
+        return $this->closeDate;
+    }
+
+    /**
+     * @param Alaress_Date_Format $closeDate
+     * @return static
+     */
+    public function setCloseDate($closeDate)
+    {
+        $this->closeDate = $closeDate;
         return $this;
     }
 

@@ -28,6 +28,7 @@ class Mapper extends BaseMapper
         $this->uses('publish_date', self::TYPE_DATETIME);
         $this->uses('open_date', self::TYPE_DATETIME);
         $this->uses('due_date', self::TYPE_DATETIME);
+        $this->uses('close_date', self::TYPE_DATETIME);
         $this->uses('weight', self::TYPE_INTEGER);
         $this->uses('sequence', self::TYPE_INTEGER);
     }
