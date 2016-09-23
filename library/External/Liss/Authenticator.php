@@ -83,10 +83,10 @@ class External_Liss_Authenticator
         $isSchoolCorrect = (string)$struct['School']->me['string'] == $this->getSchoolCode();
 
         if ($isUsernameCorrect && $isPasswordCorrect && $isSchoolCorrect) {
-            $this->getLog()->info(sprintf('User %s at school %s has been authenticated', (string)$struct['UserName']->me['string'], (string)$struct['School']->me['string']));
+            $this->getLog()->info(sprintf('User \'%s\' at school \'%s\' has been authenticated', (string)$struct['UserName']->me['string'], (string)$struct['School']->me['string']));
 			return true;
 		}
-        $this->getLog()->warning(sprintf('User %s at school %s has failed to authenticate',  (string)$struct['UserName']->me['string'], (string)$struct['School']->me['string']));
+        $this->getLog()->error(sprintf('User \'%s\' at school \'%s\' has failed to authenticate',  (string)$struct['UserName']->me['string'], (string)$struct['School']->me['string']));
         return false;
     }
 
