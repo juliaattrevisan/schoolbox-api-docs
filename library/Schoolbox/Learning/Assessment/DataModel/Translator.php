@@ -28,7 +28,7 @@ class Translator
      *
      * @param IAssessable $assessment
      * @param int         $sequence   The position of this assessment within its container
-     * @return object Some sort of model
+     * @return IAssessableDataModel
      */
     public function translateToDataModel(IAssessable $assessment, $sequence)
     {
