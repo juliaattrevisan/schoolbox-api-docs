@@ -507,6 +507,9 @@ class Controller extends BaseController
 
         $codeCollection       = $codeMapper->createCollection();
 
+        $existingModel = $folderMapper->findById($model->getId());
+
+
         // Only superusers get to change class codes
         if ($user->isSuperuser()) {
             foreach (explode(',', $classCodeString) as $code) {
@@ -518,6 +521,9 @@ class Controller extends BaseController
                 }
             }
             $model->setCodes($codeCollection);
+        }
+        else if($model->getId()) {
+            $model->setCodes($existingModel->getCodes());
         }
 
         // Delete category codes here, allowing them to be recreated when the category gets saved.
@@ -534,7 +540,6 @@ class Controller extends BaseController
             );
 
         } elseif ($model->getId()) {
-            $existingModel = $folderMapper->findById($model->getId());
             $model->setCurriculumNodes($existingModel->getCurriculumNodes());
 
         }

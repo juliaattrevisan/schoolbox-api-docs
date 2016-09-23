@@ -12,6 +12,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\User;
 use Schoolbox\Assessment\Term\Model as Term;
 use Timetable_ColourMapper;
@@ -79,19 +80,25 @@ class Controller extends Base
 
         /* Convert external subjects to folders */
         foreach($this->getUser()->getSubjectCollection() as $subject ) {
-            $folder = FolderMapper::getInstance()->findByCode($subject['code']);
-            if(! $folder->getColour() ) {
-                /* Apply colour from list if no colour exists */
-                $folder->setColour($colourList[$colourIndex]->getHexColour());
-                $colourIndex = ($colourIndex+1) % $colourList->count();
+            try {
+                $folder = FolderMapper::getInstance()->findByCode($subject['code']);
+                if (!$folder->getColour()) {
+                    /* Apply colour from list if no colour exists */
+                    $folder->setColour($colourList[$colourIndex]->getHexColour());
+                    $colourIndex = ($colourIndex + 1) % $colourList->count();
+                }
+                $folderList->add($folder);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                //not found
             }
-            $folderList->add($folder);
         }
 
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/classes.twig', [
-            'currentUser'   => $this->getUser(),
-            'classList'     => $folderList,
+            'currentUser'    => $this->getUser(),
+            'currentSemester'=> TermMapper::getInstance()->findForToday(),
+            'classList'      => $folderList,
+
         ]));
     }
 

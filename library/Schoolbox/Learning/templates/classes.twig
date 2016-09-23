@@ -12,7 +12,7 @@
                 <a href="/homepage/{{ class.id }}">
                     <div class="card-feature-image" style="background-color:{{ class.colour }};">
                         {%  if class.coverImage.hash %}
-                        <img src="/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageSmall" srcset="/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge 1000w">
+                        <img src="/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageSmall" srcset="/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageSmall 200w, /storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge 800w">
                         {% endif %}
                     </div>
                 </a>
@@ -28,6 +28,14 @@
                         <li><a href="{{ routeLookup('learning.getMarkbook', {}) }}" class="icon-curriculum">Markbook</a></li>
                         <li><a href=" {{ routeLookup('learningAnalytics.course', {}) }} " class="icon-poll">Analytics</a></li>
                         <li><a href="/resource/folder/modify/{{ class.id }} " class="icon-modify">Modify</a></li>
+                    </ul>
+                    {% endif %}
+                    {%  if currentUser.getRole.isStudent == true %}
+                    <nav>
+                        <a href="#" class="icon-more" data-dropdown="class-options{{ class.id }}" aria-expanded="false" title="Actions"></a>
+                    </nav>
+                    <ul data-dropdown-content class="f-dropdown" id="class-options{{ class.id }}">
+                        <li><a href="/submission/allWork/{{ currentUser.id }}/{{ currentSemester.code }}/{{ class.id }}" class="icon-approve">Grades</a></li>
                     </ul>
                     {% endif %}
                 </div>
