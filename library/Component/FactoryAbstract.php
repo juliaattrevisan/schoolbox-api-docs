@@ -13,7 +13,7 @@ abstract class Component_FactoryAbstract {
     /**
      * @var String
      */
-    protected $module;
+    private $module;
 
     /**
      * @var Integer
@@ -182,6 +182,24 @@ abstract class Component_FactoryAbstract {
     public function setMaximumPermission($maximumPermission)
     {
         $this->maximumPermission = $maximumPermission;
+        return $this;
+    }
+
+    /**
+     * @return String
+     */
+    protected function getModule()
+    {
+        return $this->module;
+    }
+
+    /**
+     * @param $module
+     * @return static
+     */
+    protected function setModule($module)
+    {
+        $this->module = $module;
         return $this;
     }
 }
