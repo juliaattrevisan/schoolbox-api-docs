@@ -113,7 +113,6 @@ class Translator
             ;
             // TODO add getLink() to Task
             // TODO add requiresConfirmation() to Task
-            // TODO figure out what to do about owner field
             return $model;
 
         }
