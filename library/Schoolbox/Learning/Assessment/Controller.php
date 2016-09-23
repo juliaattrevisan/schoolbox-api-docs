@@ -147,7 +147,7 @@ class Controller extends Base
          * after they are spawned
          */
         $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', [ 'assessmentId' => $assessmentId ] );
-        $suffix = '?return_url=' . urlencode(base64_encode($returnUrl));
+        $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
 
         /* TODO: Refactor this in a smarter way
          */
@@ -174,7 +174,9 @@ class Controller extends Base
 
     /**
      * Save the data when creating a specific kind of Assessment
-     * This happens after the common details are saved
+     *
+     * This happens after the common details are saved and after
+     * you've chosen one of project, due work, task, or quiz
      *
      * @param $assessmentId
      */
@@ -205,6 +207,7 @@ class Controller extends Base
             'assessmentId' => $assessmentId,
             'assessmentName' => 'Diablo',
             'assessmentType' => $assessmentType,
+            'returnUrl' => $this->getRequest()->query['return_url']
         ]));
     }
 
@@ -215,7 +218,7 @@ class Controller extends Base
     {
         /* TODO: Actually save data here then redirect back to project update screen
          */
-        new \Alaress_Probe($_POST, $this->getRequest()->post);
+        new \Alaress_Probe($_POST, $this->getRequest()->post, 'Redirect to ' . (new Redirect())->decode($this->getRequest()->post['returnUrl']));
     }
 
 
