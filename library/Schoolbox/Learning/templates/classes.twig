@@ -10,11 +10,7 @@
         <section>
             <div class="card-new small-12">
                 <a href="/homepage/{{ class.id }}">
-                    <div class="card-feature-image" style="background-color:{{ class.colour }};">
-                        {%  if class.coverImage.hash %}
-                        <img src="/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageSmall" srcset="/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageSmall 200w, /storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge 800w">
-                        {% endif %}
-                    </div>
+                    <div class="card-feature-image" style="background-color:{{ class.colour }}; {%  if class.coverImage.hash %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
                 </a>
                 <div class="card-content actions-small-1">
                     <h3><a href="/homepage/{{ class.id }}">{{ class.name }}</a></h3>

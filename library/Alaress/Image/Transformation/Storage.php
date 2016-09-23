@@ -191,7 +191,7 @@ class Storage extends BaseTransformation
                 'method' => 'Constrain',
                 'args' => array(
                     'width' => 247,
-                    'height' => 204
+                    'height' => 204,
                 )
             )
         ),
