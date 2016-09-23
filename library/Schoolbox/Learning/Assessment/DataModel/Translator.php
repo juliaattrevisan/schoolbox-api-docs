@@ -49,6 +49,7 @@ class Translator
         // Probably doesn't always return a Model either, it will return an old
         // Quiz/DueWork/Task/Project model, with an Assessment attached.
         // TODO add assessment object to all models
+        // TODO figure out which fields on assessable sub-objects are now redundant
         if ($assessment instanceof Project) {
             // convert to project's model
             // TODO implement this
@@ -63,7 +64,19 @@ class Translator
                 ->setOpenDate($assessment->getOpenAt())
                 ->setDueDate($assessment->getDueAt())
                 ->setLateDate($assessment->getCloseAt())
+                ->setWorkType($assessment->getType())
+                ->setWeight($assessment->getWeight())
+                ->setAttachments($assessment->getAllFiles())
+                ->setSkipUnsubmitted(!$assessment->getShowSubmittedOnly())
+                ->setAcceptOnline($assessment->isAcceptSingle() || $assessment->isAcceptMulti())
+                ->setAcceptMultiple($assessment->isAcceptMulti())
+                ->setUseRubric($assessment->hasRubric())
+                ->setOwner($assessment->getCreator())
             ;
+            // TODO figure out mark visibility - it's likely obsolete as marks are explicitly published
+            // TODO figure out rubric result set
+            // TODO figure out mark per rubric group
+            // TODO set model's grade group, mark type, max mark based on mark scheme
             return $model;
 
         } elseif ($assessment instanceof Quiz) {
