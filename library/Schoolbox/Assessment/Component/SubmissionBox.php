@@ -706,20 +706,24 @@ class SubmissionBox implements ISoftDeletable
 
     /**
      * @param int $weight
+     * @return $this
      */
     public function setWeight($weight)
     {
         $this->weight = $weight;
+        return $this;
     }
 
     /**
      * Set skip unsubmitted
      *
      * @param int $skipUnsubmitted
+     * @return $this
      */
     public function setSkipUnsubmitted($skipUnsubmitted)
     {
         $this->skipUnsubmitted = $skipUnsubmitted;
+        return $this;
     }
 
     /**
