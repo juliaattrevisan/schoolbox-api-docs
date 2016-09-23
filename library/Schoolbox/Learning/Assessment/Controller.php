@@ -215,9 +215,11 @@ class Controller extends Base
             ->setUpdatedAt(Alaress_Date_Format::now());
 
         $assessmentId = $project->getId();
+        $assessmentType = 'project';
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/update.twig', [
             'assessment' => $project,
+            'assessmentType' => $assessmentType,
             'folder' => $folder,
             'allMarkTypes' => $this->getAllMarkTypes(),
             'allReturnUrls' => $this->getAllReturnUrls($assessmentId),
@@ -271,7 +273,7 @@ class Controller extends Base
     {
         /* TODO: Actually save data here then redirect back to project update screen
          */
-        new \Alaress_Probe($_POST, $this->getRequest()->post, 'Redirect to ' . (new Redirect())->decode($this->getRequest()->post['returnUrl']));
+        new \Alaress_Probe($_POST, $this->getRequest()->post, "Redirect to <a href='".(new Redirect())->decode($this->getRequest()->post['returnUrl'])."'>this url</a>");
     }
 
 

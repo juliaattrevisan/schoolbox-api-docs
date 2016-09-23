@@ -1,0 +1,50 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learningAssessment/fragments/submitRow.twig' as mage %}
+
+{{ bread.crumbs(
+[ folder.name, '/homepage/' ~ folder.id ],
+[ 'Update Assessment', routeLookup('learningAssessment.getUpdateAssessment') ]
+) }}
+
+<div class="row">
+    <div class="small-12 columns"><h1>Update Assessment</h1></div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns island">
+        <form action="{{ routeLookup('learningAssessment.postUpdateAssessment') }}" id="assessmentForm" method="post">
+            <section>
+                <fieldset class="content">
+                    {% include '@learningAssessment/fragments/common.twig' %}
+                </fieldset>
+                <fieldset class="content">
+                    <legend>Dates</legend>
+
+                    {% include '@learningAssessment/fragments/dates.twig' %}
+                </fieldset>
+                <fieldset class="content">
+                    {% include '@learningAssessment/fragments/curriculumCodes.twig' %}
+                </fieldset>
+
+                <fieldset class="content">
+
+                    {% if assessmentType == 'project' %}
+                        <input type="hidden" name="assessmentType" value="project" />
+                        {% include '@learningAssessment/fragments/project/create.twig' %}
+                    {% elseif assessmentType == 'dueWork' %}
+                        <input type="hidden" name="assessmentType" value="dueWork" />
+                        {% include '@learningAssessment/fragments/duework/create.twig' %}
+                    {% elseif assessmentType == 'task' %}
+                        <input type="hidden" name="assessmentType" value="task" />
+                        {% include '@learningAssessment/fragments/task/create.twig' %}
+                    {% elseif assessmentType == 'quiz' %}
+                        <input type="hidden" name="assessmentType" value="quiz" />
+                        {% include '@learningAssessment/fragments/quiz/create.twig' %}
+                    {% endif %}
+
+                    {{ mage.submitRow('Save', '', '', '') }}
+                </fieldset>
+            </section>
+        </form>
+    </div>
+</div>
