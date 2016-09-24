@@ -592,6 +592,26 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                     $settings['baseUri'] . '/StaffHome/' . $_SESSION['username'] . '/',
                 );
             }
+        } elseif ($site_location == 'stpauls') {
+            $settings = array(
+                'baseUri'  => 'https://files.stpauls.nsw.edu.au/',
+                'userName' => $_SESSION['username'],
+                'password' => $_SESSION['password'],
+            );
+            if ($groupHandler->isStaff()) {
+                $paths = [
+                    $settings['baseUri'] . 'StaffGroup/',
+                    $settings['baseUri'] . 'StaffPublic/',
+                    $settings['baseUri'] . 'StudentGroup/',
+                    $settings['baseUri'] . 'StudentPublic/',
+                ];
+            } elseif ($groupHandler->isStudent()) {
+                $paths = [
+                    $settings['baseUri'] . 'StudentGroup/',
+                    $settings['baseUri'] . 'StudentPublic/',
+                ];
+            }
+
         } elseif (in_array($site_location, array('core', 'demo'))) {
             $settings = array(
                 'baseUri' => 'http://webdave.alaress-dev.com.au/',
