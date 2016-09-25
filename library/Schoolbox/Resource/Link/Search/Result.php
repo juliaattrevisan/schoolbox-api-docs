@@ -32,40 +32,27 @@ class Result extends Base
     protected function executeSearch(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         $query = "
-			SELECT
-				{$mapper->getColumnString('l')},
-				{$mapper->getJoinMapper('user')->getColumnString('u')},
-				{$mapper->getJoinMapper('folder')->getColumnString('c')},
-				MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()}) AS `score`
-			FROM
-				`{$mapper->getTable()}` `l`
-				LEFT JOIN {$mapper->getJoinSql('user', 'l', 'u')}
-				INNER JOIN {$mapper->getJoinSql('folder', 'l', 'c')}
-				LEFT JOIN {$mapper->getJoinSql('perms', 'l', 'p')}
-					AND p.gid = :role_id
-					AND p.type >= :min_access
-				LEFT JOIN {$mapper->getJoinSql('userAccess', 'l', 'a')}
-					AND a.service = :service
-					AND a.uid = :user_id
-			WHERE
-				(p.cid OR a.sid)
-				AND l.deleted_at IS NULL
-				AND MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()})
-			ORDER BY {$sanitiser->getSortByWithAlias('l')} {$sanitiser->getSortDir()}
-			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
-		";
+            SELECT
+                {$mapper->getColumnString('l')},
+                {$mapper->getJoinMapper('user')->getColumnString('u')},
+                {$mapper->getJoinMapper('folder')->getColumnString('c')},
+                MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()}) AS `score`
+            FROM
+                `{$mapper->getTable()}` `l`
+                LEFT JOIN {$mapper->getJoinSql('user', 'l', 'u')}
+                INNER JOIN {$mapper->getJoinSql('folder', 'l', 'c')}
+            WHERE
+                l.deleted_at IS NULL
+                AND MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()})
+            ORDER BY {$sanitiser->getSortByWithAlias('l')} {$sanitiser->getSortDir()}
+        ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
-        $stmt->execute(array(
-            'role_id' => $user->getRole()->getId(),
-            'service' => UserAccess::SERVICE_HOMEPAGE,
-            'min_access' => UserAccess::ACCESS_READ,
-            'user_id' => $user->getId()
-        ));
+        $stmt->execute();
 
         $collection = $mapper->createCollection();
 
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        foreach ($this->buildSearchResult($stmt, $user, 'c.id', $sanitiser->getOffset(), $sanitiser->getLimit()) as $row) {
             $link = $mapper->hydrate($row, 'l');
             $owner = $mapper->hydrateJoin($row, 'user', 'u');
             $folder = $mapper->hydrateJoin($row, 'folder', 'c');
@@ -89,34 +76,20 @@ class Result extends Base
     protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         $query = "
-			SELECT
-			    COUNT(*) AS num
-			FROM
-				`{$mapper->getTable()}` `l`
-				LEFT JOIN {$mapper->getJoinSql('user', 'l', 'u')}
-				INNER JOIN {$mapper->getJoinSql('folder', 'l', 'c')}
-				LEFT JOIN {$mapper->getJoinSql('perms', 'l', 'p')}
-					AND p.gid = :role_id
-					AND p.type >= :min_access
-				LEFT JOIN {$mapper->getJoinSql('userAccess', 'l', 'a')}
-					AND a.service = :service
-					AND a.uid = :user_id
-			WHERE
-				(p.cid OR a.sid)
-				AND l.deleted_at IS NULL
-				AND MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()})
-		";
+            SELECT
+                category
+            FROM
+                `{$mapper->getTable()}` `l`
+                LEFT JOIN {$mapper->getJoinSql('user', 'l', 'u')}
+                INNER JOIN {$mapper->getJoinSql('folder', 'l', 'c')}
+            WHERE
+                l.deleted_at IS NULL
+                AND MATCH(`url`,`description`,`comment`) AGAINST ({$sanitiser->getKeyword()})
+        ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
-        $stmt->execute(array(
-            'role_id' => $user->getRole()->getId(),
-            'min_access' => UserAccess::ACCESS_READ,
-            'service' => UserAccess::SERVICE_HOMEPAGE,
-            'user_id' => $user->getId()
-        ));
+        $stmt->execute();
 
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return (int)$row['num'];
+        return $this->buildSearchCount($stmt, $user, 'category');
     }
 }

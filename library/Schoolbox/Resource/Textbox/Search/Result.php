@@ -32,38 +32,25 @@ class Result extends Base
     protected function executeSearch(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         $query = "
-			SELECT
-				{$mapper->getColumnString('t')},
-				{$mapper->getJoinMapper('category')->getColumnString('c')},
-				MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()}) AS `score`
-			FROM
-				`{$mapper->getTable()}` `t`
-				INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
-				LEFT JOIN {$mapper->getJoinSql('perms', 't', 'p')}
-					AND p.gid = :role_id
-					AND p.type >= :min_access
-				LEFT JOIN {$mapper->getJoinSql('userAccess', 't', 'a')}
-					AND a.service = :service
-					AND a.uid = :user_id
-			WHERE
-				(p.cid OR a.sid)
-				AND t.deleted IS NULL
-				AND MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()})
-			ORDER BY {$sanitiser->getSortByWithAlias('t')} {$sanitiser->getSortDir()}
-			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
-		";
+            SELECT
+                {$mapper->getColumnString('t')},
+                {$mapper->getJoinMapper('category')->getColumnString('c')},
+                MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()}) AS `score`
+            FROM
+                `{$mapper->getTable()}` `t`
+                INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
+            WHERE
+                t.deleted IS NULL
+                AND MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()})
+            ORDER BY {$sanitiser->getSortByWithAlias('t')} {$sanitiser->getSortDir()}
+        ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
-        $stmt->execute(array(
-            'role_id' => $user->getRole()->getId(),
-            'service' => UserAccess::SERVICE_HOMEPAGE,
-            'min_access' => UserAccess::ACCESS_READ,
-            'user_id' => $user->getId()
-        ));
+        $stmt->execute();
 
         $collection = $mapper->createCollection();
 
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        foreach ($this->buildSearchResult($stmt, $user, 'c.id', $sanitiser->getOffset(), $sanitiser->getLimit()) as $row) {
             $textbox = $mapper->hydrate($row, 't');
             $category = $mapper->hydrateJoin($row, 'category', 'c');
 
@@ -86,33 +73,19 @@ class Result extends Base
     protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         $query = "
-			SELECT
-			    COUNT(*) AS num
-			FROM
-				`{$mapper->getTable()}` `t`
-				INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
-				LEFT JOIN {$mapper->getJoinSql('perms', 't', 'p')}
-					AND p.gid = :role_id
-					AND p.type >= :min_access
-				LEFT JOIN {$mapper->getJoinSql('userAccess', 't', 'a')}
-					AND a.service = :service
-					AND a.uid = :user_id
-			WHERE
-				(p.cid OR a.sid)
-				AND t.deleted IS NULL
-				AND MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()})
-		";
+            SELECT
+                c.id
+            FROM
+                `{$mapper->getTable()}` `t`
+                INNER JOIN {$mapper->getJoinSql('category', 't', 'c')}
+            WHERE
+                t.deleted IS NULL
+                AND MATCH(`heading`,`body`) AGAINST ({$sanitiser->getKeyword()})
+        ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
-        $stmt->execute(array(
-            'role_id' => $user->getRole()->getId(),
-            'min_access' => UserAccess::ACCESS_READ,
-            'service' => UserAccess::SERVICE_HOMEPAGE,
-            'user_id' => $user->getId()
-        ));
+        $stmt->execute();
 
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return (int)$row['num'];
+        return $this->buildSearchCount($stmt, $user, 'id');
     }
 }

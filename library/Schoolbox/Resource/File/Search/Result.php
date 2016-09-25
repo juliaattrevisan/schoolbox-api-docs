@@ -32,45 +32,32 @@ class Result extends Base
     protected function executeSearch(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         $query = "
-			SELECT
-			    {$mapper->getColumnString('f')},
-			    {$mapper->getJoinColumnString('hash', 's')},
-			    {$mapper->getJoinMapper('hash')->getJoinColumnString('allowedFileExtension', 'e')},
+            SELECT
+                {$mapper->getColumnString('f')},
+                {$mapper->getJoinColumnString('hash', 's')},
+                {$mapper->getJoinMapper('hash')->getJoinColumnString('allowedFileExtension', 'e')},
                 {$mapper->getJoinColumnString('owner', 'o')},
-				{$mapper->getJoinColumnString('category', 'c')},
-				MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()}) AS `score`
-			FROM
-				`{$mapper->getTable()}` `f`
-				LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
-				LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
-				LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
-				INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
-				LEFT JOIN `perms` p ON `f`.category = `p`.cid
-					AND p.gid = :role_id
-					AND p.type >= :min_access
-				LEFT JOIN `userAccess` a ON `f`.category = `a`.sid
-					AND a.service = :service
-					AND a.uid = :user_id
-			WHERE
-				(p.cid OR a.sid)
-				AND f.deleted_at IS NULL
-				AND f.hidden IS FALSE
-				AND MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()})
-			ORDER BY {$sanitiser->getSortByWithAlias('f')} {$sanitiser->getSortDir()}
-			LIMIT {$sanitiser->getOffset()}, {$sanitiser->getLimit()}
-		";
+                {$mapper->getJoinColumnString('category', 'c')},
+                MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()}) AS `score`
+            FROM
+                `{$mapper->getTable()}` `f`
+                LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
+                LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
+                LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
+                INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
+            WHERE
+                f.deleted_at IS NULL
+                AND f.hidden IS FALSE
+                AND MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()})
+            ORDER BY {$sanitiser->getSortByWithAlias('f')} {$sanitiser->getSortDir()}
+        ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
-        $stmt->execute(array(
-            'role_id' => $user->getRole()->getId(),
-            'service' => UserAccess::SERVICE_HOMEPAGE,
-            'min_access' => UserAccess::ACCESS_READ,
-            'user_id' => $user->getId()
-        ));
+        $stmt->execute();
 
         $collection = $mapper->createCollection();
 
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        foreach ($this->buildSearchResult($stmt, $user, 'c.id', $sanitiser->getOffset(), $sanitiser->getLimit()) as $row) {
             $file = $mapper->hydrate($row, 'f');
             $storage = $mapper->hydrateJoin($row, 'hash', 's');
             $mime = $mapper->getJoinMapper('hash')->hydrateJoin($row, 'allowedFileExtension', 'e');
@@ -98,37 +85,23 @@ class Result extends Base
     protected function executeSearchCount(User $user, Mapper $mapper, Sanitiser $sanitiser)
     {
         $query = "
-			SELECT
-			    COUNT(*) AS num
-			FROM
-				`{$mapper->getTable()}` `f`
-				LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
-				LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
-				LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
-				INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
-				LEFT JOIN `perms` p ON `f`.category = `p`.cid
-					AND p.gid = :role_id
-					AND p.type >= :min_access
-				LEFT JOIN `userAccess` a ON `f`.category = `a`.sid
-					AND a.service = :service
-					AND a.uid = :user_id
-			WHERE
-				(p.cid OR a.sid)
-				AND f.deleted_at IS NULL
-				AND f.hidden IS FALSE
-				AND MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()})
-		";
+            SELECT
+                c.id
+            FROM
+                `{$mapper->getTable()}` `f`
+                LEFT JOIN {$mapper->getJoinSql('hash', 'f', 's')}
+                LEFT JOIN {$mapper->getJoinMapper('hash')->getJoinSql('allowedFileExtension', 's', 'e', true)}
+                LEFT JOIN {$mapper->getJoinSql('owner', 'f', 'o')}
+                INNER JOIN {$mapper->getJoinSql('category', 'f', 'c')}
+            WHERE
+                f.deleted_at IS NULL
+                AND f.hidden IS FALSE
+                AND MATCH(f.realname, f.description, f.comment) AGAINST ({$sanitiser->getKeyword()})
+        ";
 
         $stmt = $mapper->getDatabase()->prepare($query);
-        $stmt->execute(array(
-            'role_id' => $user->getRole()->getId(),
-            'min_access' => UserAccess::ACCESS_READ,
-            'service' => UserAccess::SERVICE_HOMEPAGE,
-            'user_id' => $user->getId()
-        ));
+        $stmt->execute();
 
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        return (int)$row['num'];
+        return $this->buildSearchCount($stmt, $user, 'id');
     }
 }
