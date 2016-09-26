@@ -416,4 +416,23 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('2016-10-12 12:00:00', $assessment->getDueAt()->getDatabase());
         $this->assertEquals('2016-10-13 12:00:00', $assessment->getCloseAt()->getDatabase());
     }
+
+    /**
+     * Test translating task-specific data model fields
+     */
+    public function testTranslateTaskToDomainModel()
+    {
+        $taskModel = (new TaskModel())
+            ->setAssessmentModel((new AssessmentModel()))
+            ->setLink('https://www.google.com.au/')
+            ->setRequiresConfirmation(false)
+        ;
+
+        /** @var Task $task */
+        $task = $this->translator->translateToDomainModel($taskModel);
+
+        $this->assertInstanceOf(Task::class, $task);
+        $this->assertEquals('https://www.google.com.au/', $task->getLink());
+        $this->assertTrue($task->getSelfMarkable());
+    }
 }
