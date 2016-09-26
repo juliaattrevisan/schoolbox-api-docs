@@ -418,21 +418,48 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Test translating task-specific data model fields
+     * Data provider for testTranslateTaskToDomainModel
+     *
+     * @return array
      */
-    public function testTranslateTaskToDomainModel()
+    public function getTestTranslateTaskToDomainModelData()
     {
-        $taskModel = (new TaskModel())
-            ->setAssessmentModel((new AssessmentModel()))
-            ->setLink('https://www.google.com.au/')
-            ->setRequiresConfirmation(false)
-        ;
+        return [
+            [
+                (new TaskModel())
+                    ->setAssessmentModel((new AssessmentModel()))
+                    ->setLink('https://www.google.com.au/')
+                    ->setRequiresConfirmation(false),
+                'https://www.google.com.au/',
+                true,
+            ],
+            [
+                (new TaskModel())
+                    ->setAssessmentModel((new AssessmentModel()))
+                    ->setLink(null)
+                    ->setRequiresConfirmation(true),
+                null,
+                false,
+            ],
+        ];
+    }
 
+    /**
+     * Test translating task-specific data model fields
+     *
+     * @dataProvider getTestTranslateTaskToDomainModelData
+     *
+     * @param TaskModel $taskModel
+     * @param string    $link
+     * @param bool      $selfMarkable
+     */
+    public function testTranslateTaskToDomainModel(TaskModel $taskModel, $link, $selfMarkable)
+    {
         /** @var Task $task */
         $task = $this->translator->translateToDomainModel($taskModel);
 
         $this->assertInstanceOf(Task::class, $task);
-        $this->assertEquals('https://www.google.com.au/', $task->getLink());
-        $this->assertTrue($task->getSelfMarkable());
+        $this->assertEquals($link, $task->getLink());
+        $this->assertEquals($selfMarkable, $task->getSelfMarkable());
     }
 }
