@@ -198,7 +198,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 )
                 ->add((new DueWorkFile())
                     ->setId(82)
-                    ->setFilename('a file.txt')
+                    ->setFilename('a sound.mp3')
                     ->setHash('0000000000000000000000000000000000000001')
                 )
             )
@@ -223,8 +223,17 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         // Test files
         $this->assertCount(3, $dueWorkModel->getAttachments());
+
         $this->assertInstanceOf(StorageModel::class, $dueWorkModel->getAttachments()[0]);
+        $this->assertEquals('a file.txt', $dueWorkModel->getAttachments()[0]->getFilename());
+        $this->assertEquals('1234567890123456789012345678901234567890', $dueWorkModel->getAttachments()[0]->getHash());
+
         $this->assertInstanceOf(StorageModel::class, $dueWorkModel->getAttachments()[1]);
+        $this->assertEquals('an image.png', $dueWorkModel->getAttachments()[1]->getFilename());
+        $this->assertEquals('0000000000000000000000000000000000000002', $dueWorkModel->getAttachments()[1]->getHash());
+
         $this->assertInstanceOf(StorageModel::class, $dueWorkModel->getAttachments()[2]);
+        $this->assertEquals('a sound.mp3', $dueWorkModel->getAttachments()[2]->getFilename());
+        $this->assertEquals('0000000000000000000000000000000000000001', $dueWorkModel->getAttachments()[2]->getHash());
     }
 }
