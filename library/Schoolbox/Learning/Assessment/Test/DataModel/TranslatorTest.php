@@ -92,14 +92,16 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         // Test generic fields
         $this->assertEquals(32, $taskModel->getAssessmentModel()->getId());
         $this->assertEquals(3, $taskModel->getAssessmentModel()->getSequence());
-        $this->assertEquals(3, $taskModel->getOwner()->getId());
         $this->assertEquals('2016-10-14 12:00:00', $taskModel->getAssessmentModel()->getPublishDate()->getDatabase());
         $this->assertEquals('2016-10-16 12:00:00', $taskModel->getAssessmentModel()->getOpenDate()->getDatabase());
         $this->assertEquals('2016-10-18 12:00:00', $taskModel->getAssessmentModel()->getDueDate()->getDatabase());
         $this->assertEquals('2016-10-23 13:00:00', $taskModel->getAssessmentModel()->getCloseDate()->getDatabase());
-        $this->assertEquals('Mr Test Task сказать', $taskModel->getTitle());
+        $this->assertEquals('Mr Test Task сказать', $taskModel->getAssessmentModel()->getTitle());
+        $this->assertEquals('Blaargh ничего', $taskModel->getAssessmentModel()->getDescription());
+        $this->assertEquals(1000, $taskModel->getAssessmentModel()->getWeight());
 
         // Test task-specific fields
+        $this->assertEquals(3, $taskModel->getOwner()->getId());
         $this->assertEquals('https://www.something.com/', $taskModel->getLink());
         $this->assertEquals(false, $taskModel->getRequiresConfirmation());
     }
@@ -135,16 +137,16 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         // Test generic fields
         $this->assertEquals(61, $quizModel->getAssessmentModel()->getId());
         $this->assertEquals(0, $quizModel->getAssessmentModel()->getSequence());
-        $this->assertEquals(151, $quizModel->getUser()->getId());
         $this->assertEquals('2016-10-14 12:00:00', $quizModel->getAssessmentModel()->getPublishDate()->getDatabase());
         $this->assertEquals('2016-10-16 12:00:00', $quizModel->getAssessmentModel()->getOpenDate()->getDatabase());
         $this->assertEquals('2016-10-18 12:00:00', $quizModel->getAssessmentModel()->getDueDate()->getDatabase());
         $this->assertEquals('2016-10-23 13:00:00', $quizModel->getAssessmentModel()->getCloseDate()->getDatabase());
-        $this->assertEquals('Test Task κάτι', $quizModel->getTitle());
-        $this->assertEquals('Blah blah blah τίποτα', $quizModel->getDescription());
-        $this->assertEquals(65, $quizModel->getWeight());
+        $this->assertEquals('Test Task κάτι', $quizModel->getAssessmentModel()->getTitle());
+        $this->assertEquals('Blah blah blah τίποτα', $quizModel->getAssessmentModel()->getDescription());
+        $this->assertEquals(65, $quizModel->getAssessmentModel()->getWeight());
 
         // Test quiz-specific fields
+        $this->assertEquals(151, $quizModel->getUser()->getId());
         $this->assertEquals(7, $quizModel->getMaxAttempts());
         $this->assertEquals(1500, $quizModel->getDuration());
         $this->assertEquals('You done the quiz, Συγχαρητήρια!', $quizModel->getCompletionMessage());
