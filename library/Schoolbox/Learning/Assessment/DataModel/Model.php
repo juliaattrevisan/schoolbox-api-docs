@@ -89,6 +89,7 @@ class Model
         $this->publishDate = new Alaress_Date_NullDate();
         $this->openDate    = new Alaress_Date_NullDate();
         $this->dueDate     = new Alaress_Date_NullDate();
+        $this->closeDate   = new Alaress_Date_NullDate();
     }
 
     /**
