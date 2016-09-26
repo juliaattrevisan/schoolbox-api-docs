@@ -24,27 +24,27 @@ class Controller extends Base
     /**
      * @var Mapper
      */
-    protected $mapper;
+    private $mapper;
 
     /**
      * @var Layout\Mapper
      */
-    protected $layoutMapper;
+    private $layoutMapper;
 
     /**
      * @var Component_ConfigMapper
      */
-    protected $componentConfigMapper;
+    private $componentConfigMapper;
 
     /**
      * @var Storage\Mapper
      */
-    protected $storageMapper;
+    private $storageMapper;
 
     /**
      * @var Folder\Mapper
      */
-    protected $folderMapper;
+    private $folderMapper;
 
     /**
      * Displays a form for editing a tile layout.
@@ -118,6 +118,7 @@ class Controller extends Base
                     'data'   => $layout,
                 )
             );
+            $this->getResponse()->status->setCode($code);
         } else {
             // redirect back to wherever
             switch ($component->getModule()) {
@@ -145,6 +146,7 @@ class Controller extends Base
      */
     public function add(Component_Instance $component)
     {
+        /** @var Model $model */
         $model = $this->getMapper()->createModel();
         $this->getResponse()->content->set(
             array(
@@ -340,11 +342,9 @@ class Controller extends Base
         $layoutId = $config['layoutId']['value'];
         $mapper   = $this->getLayoutMapper();
         try {
-            return $mapper->findById(
-                $layoutId,
-                array('joins' => array('tile'))
-            );
+            return $mapper->findById($layoutId);
         } catch (MapperException $e) {
+            /** @var Layout\Model $model */
             $model = $mapper->createModel();
             $mapper->save($model);
 
@@ -378,7 +378,7 @@ class Controller extends Base
      * @param  Mapper $mapper
      * @return $this
      */
-    public function setMapper($mapper)
+    public function setMapper(Mapper $mapper)
     {
         $this->mapper = $mapper;
         return $this;
@@ -396,7 +396,7 @@ class Controller extends Base
      * @param  Layout\Mapper $layoutMapper
      * @return $this
      */
-    public function setLayoutMapper($layoutMapper)
+    public function setLayoutMapper(Layout\Mapper $layoutMapper)
     {
         $this->layoutMapper = $layoutMapper;
         return $this;
@@ -412,9 +412,9 @@ class Controller extends Base
 
     /**
      * @param  Component_ConfigMapper $componentConfigMapper
-     * @return $this
+     * @return static
      */
-    public function setComponentConfigMapper($componentConfigMapper)
+    public function setComponentConfigMapper(Component_ConfigMapper $componentConfigMapper)
     {
         $this->componentConfigMapper = $componentConfigMapper;
         return $this;
