@@ -305,7 +305,16 @@ class Controller extends Base
         new \Alaress_Probe($_POST, $this->getRequest()->post, "Redirect to <a href='".(new Redirect())->decode($this->getRequest()->post['returnUrl'])."'>this url</a>");
     }
 
-
+    /**
+     * Delete an assessment
+     *
+     * @param $assessmentId
+     */
+    public function postDeleteAssessment($assessmentId)
+    {
+        /* TODO: soft-delete this assessment
+         */
+    }
 
 
 

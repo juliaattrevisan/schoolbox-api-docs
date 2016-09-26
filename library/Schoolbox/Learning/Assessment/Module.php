@@ -69,6 +69,10 @@ class Module extends BaseModule
                 /* Add assessments to a Project
                  */
                 '/assessment/{assessmentId}/new/{assessmentType}' => 'postCreateAssessmentWithinProject',
+
+                /* Delete an assessment
+                 */
+                '/assessment/{assessmentId}/delete' => 'postDeleteAssessment',
             ]
         ];
 
