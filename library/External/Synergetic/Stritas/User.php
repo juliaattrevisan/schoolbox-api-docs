@@ -56,7 +56,10 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                     vStudents.StudentSpecialNeedsFlag,
                     vStudents.StudentStudiesCode,
                     AlertMessage,
-                    vStudents.StudentBoarder
+                    vStudents.StudentBoarder,
+                    uStudentProgressiveAbsenceCount.AbsenceFullDaysForYear,
+                    uStudentProgressiveAbsenceCount.LateStartDaysForYear,
+                    uStudentProgressiveAbsenceCount.EarlyLeaveDaysForYear
                 FROM SynergyOne.dbo.vStudents vStudents
                     LEFT JOIN CommunityAlerts
                         ON CommunityAlerts.ID = StudentID
@@ -67,6 +70,8 @@ class External_Synergetic_Stritas_User extends External_Synergetic_User
                     LEFT JOIN luYearLevel ON vStudents.StudentCampus = luYearLevel.Campus
                         AND vStudents.StudentYearLevel = luYearLevel.Code
                     LEFT JOIN luHouse House ON StudentCampus = House.Campus AND StudentHouse = House.Code
+                    LEFT JOIN uStudentProgressiveAbsenceCount ON uStudentProgressiveAbsenceCount.ID = vStudents.StudentID
+                        AND uStudentProgressiveAbsenceCount.FileYear = '" . $this->getDatabase()->quote($currentYear) . "'
                 WHERE
                     vStudents.StudentID = '" . $this->getDatabase()->quote($synID) . "'
                     AND vStudents.FileSemester='" . $this->getDatabase()->quote($currentSemester) . "'
