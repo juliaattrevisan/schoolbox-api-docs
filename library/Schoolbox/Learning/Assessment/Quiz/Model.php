@@ -191,7 +191,7 @@ class Model extends AbstractAssessment
     /**
      * @return int
      */
-    public function getMaxAttempts(): int
+    public function getMaxAttempts()
     {
         return $this->maxAttempts;
     }
@@ -209,7 +209,7 @@ class Model extends AbstractAssessment
     /**
      * @return int
      */
-    public function getDuration(): int
+    public function getDuration()
     {
         return $this->duration;
     }
@@ -227,7 +227,7 @@ class Model extends AbstractAssessment
     /**
      * @return string
      */
-    public function getCompletionMessage(): string
+    public function getCompletionMessage()
     {
         return $this->completionMessage;
     }
