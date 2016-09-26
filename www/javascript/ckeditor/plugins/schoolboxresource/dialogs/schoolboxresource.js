@@ -973,6 +973,7 @@ CKEDITOR.dialog.add('schoolboxresourceDialog', function (editorInstance) {
             var fields = dialogFields(dialog);
 
             editorInstance.insertElement(inject(editorInstance, fields, fields.url.getValue()));
+            editorInstance.insertHtml('<p>&nbsp;</p>');
         },
 
         /**
