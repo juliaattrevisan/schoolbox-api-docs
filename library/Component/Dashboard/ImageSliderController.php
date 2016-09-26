@@ -1,11 +1,12 @@
 <?php
-
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2014, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Dashboard_ImageSliderController extends Component_Dashboard_ControllerAbstract
 {
 
@@ -49,7 +50,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         }
         $this->parseConfig();
 
-        if ($this->getContentPermission() < READ_ACCESS) {
+        if ($this->getContentPermission() < UserAccess::ACCESS_READ) {
             return false;
         }
 

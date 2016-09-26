@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,6 +6,9 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_ManageFolderController extends Component_Homepage_ControllerAbstract
 {
 
@@ -64,7 +66,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
             $this->setVar('HOMEPAGE_URL_JS', json_encode($url));
             $this->parse('addmylinks_block', 'addmylinks');
         }
-        if ($this->getContentPermission() >= FULL_ACCESS) {
+        if ($this->getContentPermission() >= UserAccess::ACCESS_FULL) {
             //is owner of area
             if ($this->getContext()->getInherit()) {
                 $this->setVar("manage_page_block", "");
@@ -75,7 +77,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
             $this->setVar("manage_page_block", "");
         }
 
-        if ($this->getContentPermission() >= WRITE_ACCESS) {
+        if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
             //has write access
             $this->parse("stats_data_block", "stats_data");
         } else {
@@ -94,13 +96,13 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
 
         $type = $this->groupHandler->involvedInGroup($_SESSION['id'], $this->getContext()->getId());
 
-        if ($type == DENY_ACCESS && $type !== null && $type !== false) {
+        if ($type == UserAccess::ACCESS_DENY && $type !== null && $type !== false) {
             // If you are subscribed but are awaiting authorisation
             $this->parse('subscribedModerated_block', 'subscribedModerated');
-        } elseif ($this->groupHandler->canSubscribe($this->getContext()->getId()) && ($type == READ_ACCESS || $type == WRITE_ACCESS)) {
-            // If you are subscribed with something greater than DENY_ACCESS and you can subscribe, display the unsubscribe button
+        } elseif ($this->groupHandler->canSubscribe($this->getContext()->getId()) && ($type == UserAccess::ACCESS_READ || $type == UserAccess::ACCESS_WRITE)) {
+            // If you are subscribed with something greater than ACCESS_DENY and you can subscribe, display the unsubscribe button
             $this->parse('subscribed_block', 'subscribed');
-        } elseif ($type == FULL_ACCESS) {
+        } elseif ($type == UserAccess::ACCESS_FULL) {
             // don't show anything
         } elseif ($this->groupHandler->canSubscribe($this->getContext()->getId())) {
             /* You aren't subscribed to the group yet.
@@ -112,7 +114,7 @@ class Component_Homepage_ManageFolderController extends Component_Homepage_Contr
 
         /* Only write-access people can view statistics
 		 */
-        if ($this->getContentPermission() >= WRITE_ACCESS) {
+        if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
             $this->parse('view_stats_block', 'view_stats');
         } else {
             $this->setVar('view_stats_block', '');

@@ -1,11 +1,12 @@
 <?php
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_NewsController extends Component_Homepage_ControllerAbstract
 {
 
@@ -90,13 +91,13 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
             $newsPermission = $this->getContentPermission();
 
             switch ($newsPermission) {
-                case FULL_ACCESS:
-                case WRITE_ACCESS:
+                case UserAccess::ACCESS_FULL:
+                case UserAccess::ACCESS_WRITE:
                     $this->parse("submit_news_block", "submit_news");
                 // no break, intentionally carry through
 
 
-                case READ_ACCESS:
+                case UserAccess::ACCESS_READ:
                     $newsList = $this->newsHandler->getAllForCategory(
                         $this->getSource()->getId(),
                         array('size' => $this->getConfig('size'))
@@ -115,7 +116,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
                 $j = 0;
                 foreach ($newsList as $news) {
                     // Student view: don't show unpublished even if I created it
-                    if ($newsPermission < WRITE_ACCESS && $news['published'] > $_SERVER['REQUEST_TIME']) {
+                    if ($newsPermission < UserAccess::ACCESS_WRITE && $news['published'] > $_SERVER['REQUEST_TIME']) {
                         continue;
                     }
 
@@ -139,8 +140,8 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
                     // news_edit_other allows users with write access to edit other's news
                     $canModify = $news['owner'] == $_SESSION['id']
-                        || $this->getContentPermission() >= FULL_ACCESS
-                        || ($this->getContentPermission() >= WRITE_ACCESS && Config::get('news_edit_other'));
+                        || $this->getContentPermission() >= UserAccess::ACCESS_FULL
+                        || ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && Config::get('news_edit_other'));
 
                     if ($canModify) {
                         $this->parse('can_modify_news_block', 'can_modify_news');
@@ -152,7 +153,7 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 
                     /* Anyone with write access can now see the publish date for news items
                      */
-                    if ($this->getContentPermission() >= WRITE_ACCESS) {
+                    if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                         $publishDate = new Alaress_Date_Format($news['published'], 'U');
 
                         if (strlen($news['published']) && $news['published'] > time()) {

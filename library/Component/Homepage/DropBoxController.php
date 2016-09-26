@@ -1,13 +1,13 @@
 <?php
-use Schoolbox\Collection;
-
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Collection;
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_DropBoxController extends Component_Homepage_ControllerAbstract
 {
 
@@ -30,7 +30,7 @@ class Component_Homepage_DropBoxController extends Component_Homepage_Controller
         $this->setBlock($templateHandle, "drop_staff", "drop_staff_block");
         $this->setBlock('drop_staff', 'drop_file', 'drop_file_block');
 
-        if ($this->getContentPermission() < WRITE_ACCESS) {
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
             $this->setVar('drop_success_block', '');
             if ($_SESSION['dropSuccess']) {
                 $this->parse('drop_success_block', 'drop_success', true);

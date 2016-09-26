@@ -7,6 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
 class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_ControllerAbstract {
 
 	/**
@@ -63,7 +64,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 
 		/* Controls
 		 */
-		if ($this->getContentPermission() >= WRITE_ACCESS) {
+		if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
 			$this->parse('has_create_form_block', 'has_create_form');
 		}
 
@@ -96,7 +97,7 @@ class Component_Eportfolio_AdvancedListController extends Component_Eportfolio_C
 
 				/* Controls
 				 */
-				if ($this->getContentPermission() >= WRITE_ACCESS) {
+				if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
 					$this->parse('has_modify_button_block', 'has_modify_button');
 					$this->parse('has_modify_form_block', 'has_modify_form');
 					$this->parse('has_delete_form_block', 'has_delete_form');

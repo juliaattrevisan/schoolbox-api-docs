@@ -1,12 +1,14 @@
 <?php
-use Schoolbox\Resource\Folder;
-
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\Resource\Folder;
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_FolderListController extends Component_Homepage_ControllerAbstract
 {
 
@@ -65,7 +67,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             $this->setVar('folders_block', '');
 
             $maxFolders = $this->getConfig('size');
-            if (count($allFolders) && $this->getContentPermission() > DENY_ACCESS) {
+            if (count($allFolders) && $this->getContentPermission() > UserAccess::ACCESS_DENY) {
                 $j = 0;
 
                 $this->setVar('folders_block', '');
@@ -84,7 +86,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
 
                     $this->setVar($output);
 
-                    if ($this->getContentPermission() >= WRITE_ACCESS) {
+                    if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                         $this->parse('modify_folder_block', 'modify_folder');
                     } else {
                         $this->setVar('modify_folder_block', '');
@@ -108,7 +110,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
             //setup block for submission button
             $this->setVar('FOLDER_CAT_ID', $this->getSource()->getId());
 
-            if ($this->getContentPermission() < WRITE_ACCESS) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->setVar("submit_folder_block", "");
             } else {
                 $this->parse("submit_folder_block", "submit_folder");

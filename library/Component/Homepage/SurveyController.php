@@ -1,12 +1,12 @@
 <?php
-
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_SurveyController extends Component_Homepage_ControllerAbstract
 {
 
@@ -59,7 +59,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 
         $allSurveys = $surveyHandler->getList($this->getContext()->getId());
 
-        if ($this->getContentPermission() >= WRITE_ACCESS) {
+        if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
             $this->parse('createSurvey_block', 'createSurvey');
         } else {
             $this->setVar('createSurvey_block', '');
@@ -72,7 +72,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
 
             foreach ($allSurveys as $currentSurvey) {
                 // Do not show the survey if you are a participant and the survey is not yet open
-                if (($this->getContentPermission() >= WRITE_ACCESS) || $surveyHandler->isOpen($currentSurvey)) {
+                if (($this->getContentPermission() >= UserAccess::ACCESS_WRITE) || $surveyHandler->isOpen($currentSurvey)) {
                     $createdTime = new Alaress_Date_Format($currentSurvey['created_at'], 'Y-m-d H:i:s');
 
                     $author = $userHandler->getByID($currentSurvey['user_id']);
@@ -174,7 +174,7 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
                     /* This allows all users with write access to modify
                      */
                     $this->setVar('teacherLink_block', '');
-                    if ($this->getContentPermission() >= WRITE_ACCESS) {
+                    if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                         $this->parse('teacherLink_block', 'teacherLink');
                     }
                     $this->parse('survey_block', 'survey', true);

@@ -7,7 +7,7 @@
  * @version     SVN: $Id$
  */
 use Schoolbox\Permission\Access\UserAccessMapper;
-
+use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_ManageClassController extends Component_Homepage_ControllerAbstract
 {
@@ -71,7 +71,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setVar('WORK_TERM', Schoolbox\Assessment\Term\Mapper::getInstance()->findForToday()->getCode());
 
         /* Output student grades link to students of this class */
-        if ($this->getContentPermission() == READ_ACCESS && (
+        if ($this->getContentPermission() == UserAccess::ACCESS_READ && (
             $this->access->involvedInGroup($this->getUser(), $this->getContext()->getId()) ||
                 $this->access->involvedInSubject($this->getUser(), $this->getContext()->getCodeString()))
         ) {
@@ -81,13 +81,13 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         }
 
 
-        if (Cfg::get('external_enable') == false || $this->getContentPermission() < WRITE_ACCESS || $this->getContext()->getCodeString() == '') {
+        if (Cfg::get('external_enable') == false || $this->getContentPermission() < UserAccess::ACCESS_WRITE || $this->getContext()->getCodeString() == '') {
             $this->setVar('class_list_block', '');
         } else {
             $this->parse('class_list_block', 'class_list');
         }
         
-        if ($this->getContentPermission() >= WRITE_ACCESS && $this->getUser()->getRole()->isStaff()) {
+        if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && $this->getUser()->getRole()->isStaff()) {
             $this->parse('class_mark_block', 'class_mark');
         } else {
             $this->setVar('class_mark_block', '');

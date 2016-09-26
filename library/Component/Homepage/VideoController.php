@@ -1,10 +1,11 @@
 <?php
 /**
- *
  * @author      James Leckie <jleckie@alaress.com.au>
  * @copyright   Copyright 2013, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_VideoController extends Component_Homepage_ControllerAbstract
 {
 
@@ -96,7 +97,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                 }
             }
 
-            if ($this->getContentPermission() < READ_ACCESS) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_READ) {
                 return false;
             }
 
@@ -132,7 +133,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                         )
                     );
 
-                    if ($this->getContentPermission() > READ_ACCESS) {
+                    if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
                         $this->parse('video_edit_block', 'video_edit', true);
                     } else {
                         $this->setVar('video_edit_block', '');
@@ -140,7 +141,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
 
                     if ($video->getStatus() == "completed") {
                         $this->parse('video_list_block', 'video_list', true);
-                    } elseif ($this->getContentPermission() >= WRITE_ACCESS) {
+                    } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                         $this->setVar(
                             array(
                                 'VIDEO_LIST_STATUS' => $video->getStatus(),
@@ -159,7 +160,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
                 $this->setVar('default_video_block', '');
             }
 
-            if ($this->getContentPermission() >= WRITE_ACCESS) {
+            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                 $this->parse('submit_video_block', 'submit_video');
             } else {
                 $this->setVar('submit_video_block', '');

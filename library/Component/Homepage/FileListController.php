@@ -1,11 +1,12 @@
 <?php
-
 /**
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_FileListController extends Component_Homepage_ControllerAbstract
 {
 
@@ -122,7 +123,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                     'filter' => $filter,
                     'sort' => $this->getConfig('sort'),
                     'sortdir' => $this->getConfig('sortdir'),
-                    'getHidden' => $this->getContentPermission() >= WRITE_ACCESS,
+                    'getHidden' => $this->getContentPermission() >= UserAccess::ACCESS_WRITE,
                 )
             );
 
@@ -130,9 +131,8 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
 
             /** @var Schoolbox\Resource\File\Model[] $fileList */
             if (count($fileList)) {
-                $j = 0;
                 foreach ($fileList as $file) {
-                    if ($file->isHidden() && $this->getContentPermission() < WRITE_ACCESS) {
+                    if ($file->isHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                         continue;
                     }
                     // exclude files associated with due work
@@ -173,7 +173,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
                         $this->setVar('file_url_block', '');
                         $this->parse('file_no_url_block', 'file_no_url');
                     }
-                    if ($this->getContentPermission() >= WRITE_ACCESS) {
+                    if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                         $this->parse('modify_file_block', 'modify_file');
                     } else {
                         $this->setVar('modify_file_block', '');
@@ -187,7 +187,7 @@ class Component_Homepage_FileListController extends Component_Homepage_Controlle
             }
             //setup block for submission button
             $this->setVar('FILE_CAT_ID', $this->getSource()->getId());
-            if ($this->getContentPermission() < WRITE_ACCESS) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->setVar("submit_file_block", "");
             } else {
                 $this->parse("submit_file_block", "submit_file");

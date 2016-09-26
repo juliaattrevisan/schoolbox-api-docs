@@ -10,6 +10,7 @@
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
+use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_DueWorkListController extends Component_Homepage_ControllerAbstract
 {
@@ -156,7 +157,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
                     $displayActions = false;
                     $displayHistory = true;
                 }
-            } elseif ($this->getContentPermission() >= WRITE_ACCESS && $this->getUser()->getRole()->isStaff()) {
+            } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && $this->getUser()->getRole()->isStaff()) {
                 // what to display if staff
                 if (!$isTask) {
                     $displayResults = true;
@@ -205,7 +206,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         }
 
         //setup block for submission button
-        if ($this->getContentPermission() < WRITE_ACCESS) {
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
             $this->setVar("submit_dw_block", "");
         } else {
             $this->parse("submit_dw_block", "submit_dw");
@@ -217,7 +218,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
         // Allow students or staff acting as students to see the view results buttons.
         // (Staff have no context for actually following the view result button)
-        if ($this->getContentPermission() == READ_ACCESS) {
+        if ($this->getContentPermission() == UserAccess::ACCESS_READ) {
             $groupHandler = new Group;
 
             // is the current user a member of this category?

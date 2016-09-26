@@ -15,6 +15,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Collection;
+use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_CourseBuilderController extends Component_Homepage_ControllerAbstract
 {
@@ -76,7 +77,7 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
         }
 
         // Permission denied if user doesn't have write access to category
-        if ($this->getContentPermission() < WRITE_ACCESS) {
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
             return false;
         }
 

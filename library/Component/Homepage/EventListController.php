@@ -7,6 +7,7 @@
  */
 
 use Calendar\Event\Collection\Lister;
+use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_EventListController extends Component_Homepage_ControllerAbstract
 {
@@ -52,6 +53,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         }
 
         $now         = Alaress_Date_Format::now();
+        /** @var Alaress_Date_Format $prevDay */
         $prevDay     = false;
         $this->start = $now->startOfDay();
         $this->end   = clone $this->start;
@@ -104,7 +106,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
 
         //setup block for submission button
         $this->setBlock($templateHandle, "submit_event", "submit_event_block");
-        if ($this->getContentPermission() < WRITE_ACCESS) {
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
             $this->setVar(array(
                     'submit_event_block' => '',
                     'import_events_block' => ''

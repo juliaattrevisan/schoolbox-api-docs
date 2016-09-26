@@ -1,13 +1,14 @@
 <?php
-use Schoolbox\Resource\File\Model;
-
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\Resource\File\Model;
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_AudioController extends Component_Homepage_ControllerAbstract
 {
 
@@ -138,13 +139,13 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
 
                         $this->setVar($output);
                         if ($audio->getStatus() == "completed") {
-                            if ($this->getContentPermission() > READ_ACCESS) {
+                            if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
                                 $this->parse('audio_edit_block', 'audio_edit', true);
                             } else {
                                 $this->setVar('audio_edit_block', '');
                             }
                             $this->parse('audio_list_block', 'audio_list', true);
-                        } elseif ($this->getContentPermission() >= WRITE_ACCESS) {
+                        } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                             $this->setVar(
                                 array(
                                     'AUDIO_LIST_STATUS' => $audio->getStatus(),
@@ -161,7 +162,7 @@ class Component_Homepage_AudioController extends Component_Homepage_ControllerAb
 
             //setup block for submission button
             $this->setBlock('source_folder_exists', "submit_file", "submit_file_block");
-            if ($this->getContentPermission() < WRITE_ACCESS) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->setVar("submit_file_block", "");
             } else {
                 $this->setVar('SOURCE_ID', $this->getSource()->getId());

@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  * 
  */
-
+use \Schoolbox\Permission\Access\UserAccess;
 abstract class Component_FactoryAbstract {
     /**
      * @var String
@@ -32,7 +32,7 @@ abstract class Component_FactoryAbstract {
      *
      * @var int
      */
-    protected $maximumPermission = FULL_ACCESS;
+    protected $maximumPermission = UserAccess::ACCESS_FULL;
 
 	/**
 	 * Constructor
@@ -116,7 +116,9 @@ abstract class Component_FactoryAbstract {
     public function getInstance ($instanceId) {
         /* @var $instance Component_Instance */
         $instance = Component_InstanceMapper::getInstance()->findById($instanceId);
-        $instance->setDefinition(Component_DefinitionMapper::getInstance()->findById($instance->getDefinitionId()));
+        /** @var Component_Definition $componentDefinition */
+        $componentDefinition = Component_DefinitionMapper::getInstance()->findById($instance->getDefinitionId());
+        $instance->setDefinition($componentDefinition);
 
         return $instance;
     }

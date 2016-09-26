@@ -1,12 +1,12 @@
 <?php
-
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_PollController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -119,7 +119,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                     $this->parse('poll_vote_block', 'poll_vote');
                 }
 
-                if ($this->getContentPermission() < WRITE_ACCESS) {
+                if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                     $this->setVar("modify_poll_block", "");
                     $this->setVar('new_poll_block', '');
                 } else {
@@ -140,7 +140,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
                 $this->setVar('poll_vote_block', '');
                 $this->setVar('modify_poll_block', '');
 
-                if ($this->getContentPermission() < WRITE_ACCESS) {
+                if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                     $this->setVar('new_poll_block', '');
                 } else {
                     $this->parse('new_poll_block', 'new_poll');
@@ -163,7 +163,7 @@ class Component_Homepage_PollController extends Component_Homepage_ControllerAbs
             $this->setVar('show_results_block', '');
             $this->setVar('modify_poll_block', '');
 
-            if ($this->getContentPermission() < WRITE_ACCESS) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->setVar('new_poll_block', '');
             } else {
                 $this->parse('new_poll_block', 'new_poll');

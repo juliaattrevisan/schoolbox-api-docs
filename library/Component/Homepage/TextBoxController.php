@@ -8,6 +8,7 @@
  */
 
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_TextBoxController extends Component_Homepage_ControllerAbstract
 {
@@ -99,7 +100,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
              * To just edit one homepage's textbox, you need write access to that homepage.
              */
             $editing = false;
-            if ($this->getContentPermission() >= WRITE_ACCESS && $this->getSitePage()->arg[2] == $this->getInstance()->getId()) {
+            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && $this->getSitePage()->arg[2] == $this->getInstance()->getId()) {
                 if ($this->getSitePage()->arg[1] == 'textBoxModify') {
                     $editing = true;
                     $this->setVar(
@@ -121,7 +122,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                 $this->parse('text_editable_block', 'text_editable');
             } else {
                 // modify links
-                if ($this->getContentPermission() >= WRITE_ACCESS) {
+                if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                     if ($this->getTextbox()->getId()) {
                         $this->parse('modify_text_block', 'modify_text');
                     } else {
@@ -142,7 +143,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         }
         $this->parseConfig();
 
-        if ($this->getContentPermission() < WRITE_ACCESS && $this->getConfig('compactMode')) {
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && $this->getConfig('compactMode')) {
             /* Remove headers */
             $this->setVar('CONFIGURATION', '');
             $this->setBlock($templateHandle, 'header', 'header_block');

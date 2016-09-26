@@ -7,6 +7,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_ClickviewController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -106,7 +108,7 @@ class Component_Homepage_ClickviewController extends Component_Homepage_Controll
             }
         }
 
-        if ($this->getContentPermission() >= WRITE_ACCESS) {
+        if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
             $this->parse('select_video_block', 'select_video');
         } else {
             $this->setVar('select_video_block', '');

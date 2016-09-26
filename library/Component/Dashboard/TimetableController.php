@@ -10,6 +10,7 @@
 
 use Schoolbox\Mapper\Exception as MapperException;
 use \Schoolbox\User;
+use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Dashboard_TimetableController extends Component_Dashboard_ControllerAbstract
 {
@@ -23,8 +24,8 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
     protected $timetable = array();
 
-    /** @var Group */
-    private $group;
+    /** @var \Schoolbox\Permission\Access\Access */
+    private $access;
 
     /**
      * @var Schoolbox\Collection
@@ -38,7 +39,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     protected $templateFile = 'timetable';
 
-    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, External_Timetable $externalTimetable)
+    public function __construct(Component_Instance $instance, User $user, SitePage $sitepage, External_Timetable $externalTimetable)
     {
         parent::__construct($instance, $user, $sitepage);
 
@@ -77,7 +78,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                     if ($day_number) {
                         $this->dayNumber[$campus_id] = $day_number;
                         $this->dayName[$campus_id] = $timetableHandler->getDayName($day_number);
-                        $this->currentPeriod[$campus_id] = $timetableHandler->getPeriodNumber($campus, 0, $user);
+                        $this->currentPeriod[$campus_id] = $timetableHandler->getPeriodNumber($campus, 0, $this->getUser());
                         $this->timetable[$campus_id] = $timetableHandler->getTimetableForDate(
                            $this->getUser()->getExternalId(), $this->getUser()->getId(), $campus, Alaress_Date_Format::now()
                         );
@@ -223,7 +224,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                                 try {
                                     $folder = $this->getFolderMapper()->findByCode($class['code']);
-                                    $hasLink = $this->access->getFolderAccess($this->getUser(), [$folder->getId()]) >= READ_ACCESS;
+                                    $hasLink = $this->access->getFolderAccess($this->getUser(), [$folder->getId()]) >= UserAccess::ACCESS_READ;
                                 }
                                 catch (MapperException $e) {
                                     $hasLink = false;

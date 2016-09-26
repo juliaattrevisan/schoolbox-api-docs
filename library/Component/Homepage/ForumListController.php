@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,6 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_ForumListController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -121,7 +122,7 @@ class Component_Homepage_ForumListController extends Component_Homepage_Controll
 
                     $this->setVar('forum_reply_block', '');
 
-                    if ($is_post_allowed && ($thread['locked'] != 'true' || $this->getContentPermission() >= FULL_ACCESS)) {
+                    if ($is_post_allowed && ($thread['locked'] != 'true' || $this->getContentPermission() >= UserAccess::ACCESS_FULL)) {
                         $this->parse('forum_reply_block', 'forum_reply');
                     }
 

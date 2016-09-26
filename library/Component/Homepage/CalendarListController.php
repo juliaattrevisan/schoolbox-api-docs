@@ -10,7 +10,7 @@
  * This component is deprecated, it was previously used to display a school's campus calendar on a homepage
  *
  */
-
+use \Schoolbox\Permission\Access\UserAccess;
 use Calendar\Event\Collection\Lister;
 
 class Component_Homepage_CalendarListController extends Component_Homepage_ControllerAbstract
@@ -78,6 +78,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
         }
 
         $now         = Alaress_Date_Format::now();
+        /** @var Alaress_Date_Format|bool $prevDay */
         $prevDay     = false;
         $this->start = $now->startOfDay();
         $this->end   = clone $this->start;
@@ -119,7 +120,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
 
         //setup block for submission button
         $this->setBlock($templateHandle, "submit_event", "submit_event_block");
-        if ($this->getContentPermission() < WRITE_ACCESS) {
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
             $this->setVar("submit_event_block", "");
         } else {
             $this->parse("submit_event_block", "submit_event");

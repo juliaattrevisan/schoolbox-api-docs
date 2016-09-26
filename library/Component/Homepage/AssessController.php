@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,6 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_AssessController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -42,7 +43,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
         $sectionHandler = new Assess_Section();
         $userHandler    = new User();
 
-        if ($this->getContentPermission() >= WRITE_ACCESS) {
+        if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
             $this->parse('createAssessment_block', 'createAssessment');
         } else {
             $this->setVar('createAssessment_block', '');
@@ -56,7 +57,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
             foreach ($allAssess as $currentAssess) {
                 /* Hide it from students if the start date hasn't passed yet
              	 */
-                if (($this->getContentPermission() >= WRITE_ACCESS) || $assessHandler->isOpen($currentAssess)) {
+                if (($this->getContentPermission() >= UserAccess::ACCESS_WRITE) || $assessHandler->isOpen($currentAssess)) {
                     $createdTime = new Alaress_Date_Format($currentAssess['created_at'], 'Y-m-d H:i:s');
 
                     $author = $userHandler->getByID($currentAssess['user_id']);
@@ -74,7 +75,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                     $this->setVar(
                         array(
                             'ASSESS_ASSESS_ID'            => $currentAssess['assess_id'],
-                            'ASSESS_TITLE'                => Scrub::Text($currentAssess['title']),
+                            'ASSESS_TITLE'                => Scrub::text($currentAssess['title']),
                             'ASSESS_START_DATE'           => date('jS M Y', strtotime($currentAssess['start'])),
                             'ASSESS_FINISH_RELATIVE_DATE' => $finishRelative->getRelativeTime(),
                             'ASSESS_DESCRIPTION'          => Scrub::html($currentAssess['description']),
@@ -189,7 +190,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
 
                     /* Quiz not yet at finished date
                      */
-                    if ($now->getUnixTimestamp() < $finish->getUnixTimestamp()) {
+                    if ($now->getUnixTimeStamp() < $finish->getUnixTimeStamp()) {
                         $this->setVar(
                             array(
                                 'ASSESS_FINISH_DATE' => $finish->getShort(),
@@ -244,7 +245,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
 
                     // Only show results link if this assessment isn't a task,
                     // and this user has write access
-                    if (!isset($currentAssess['task_id']) && $this->getContentPermission() >= WRITE_ACCESS) {
+                    if (!isset($currentAssess['task_id']) && $this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                         $this->parse('resultLink_block', 'resultLink');
                     } else {
                         $this->setVar('resultLink_block', '');
@@ -253,7 +254,7 @@ class Component_Homepage_AssessController extends Component_Homepage_ControllerA
                     /* This allows all users with write access to modify
                      */
                     $this->setVar('teacherLink_block', '');
-                    if ($this->getContentPermission() >= WRITE_ACCESS) {
+                    if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                         $this->parse('teacherLink_block', 'teacherLink');
                     }
 

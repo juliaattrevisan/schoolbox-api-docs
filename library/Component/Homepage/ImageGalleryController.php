@@ -1,12 +1,12 @@
 <?php
-
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_ImageGalleryController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -82,7 +82,7 @@ class Component_Homepage_ImageGalleryController extends Component_Homepage_Contr
             );
 
             // Controls such as Post News
-            if ($this->getContentPermission() < WRITE_ACCESS) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->setVar(
                     array(
                         'submit_image_gallery_block' => ''

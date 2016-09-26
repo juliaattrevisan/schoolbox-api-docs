@@ -16,6 +16,7 @@ use Schoolbox\Assessment\Course\UnitInstance;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Collection;
+use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_CourseOutlineController extends Component_Homepage_ControllerAbstract
 {
@@ -71,7 +72,7 @@ class Component_Homepage_CourseOutlineController extends Component_Homepage_Cont
         // Get the list of units for this course, as well as who has actually
         // completed each unit.
         $this->unit_list = UnitInstanceMapper::getInstance()->findForComponent($this->getInstance());
-        $this->readOnly  = $this->getContentPermission() < WRITE_ACCESS;
+        $this->readOnly  = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
 
         // Build student list
         if (count($this->unit_list)) {

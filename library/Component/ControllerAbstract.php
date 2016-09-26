@@ -67,7 +67,7 @@ abstract class Component_ControllerAbstract
      *
      * @var int
      */
-    private $contentPermission = DENY_ACCESS;
+    private $contentPermission = UserAccess::ACCESS_DENY;
 
     /**
      * Permission for component controls, as opposed to the component content.
@@ -78,16 +78,16 @@ abstract class Component_ControllerAbstract
      *
      * @var int
      */
-    private $contextPermission = DENY_ACCESS;
+    private $contextPermission = UserAccess::ACCESS_DENY;
 
     /**
      * The maximum permission allowed for this component.
      *
-     * Set to READ_ACCESS to force a read-only view of this component.
+     * Set to ACCESS_READ to force a read-only view of this component.
      *
      * @var int
      */
-    private $maximumPermission = FULL_ACCESS;
+    private $maximumPermission = UserAccess::ACCESS_FULL;
 
     /**
      * @var array
@@ -344,7 +344,7 @@ abstract class Component_ControllerAbstract
     {
         if (is_array($config) && count($config)) {
             // have write access
-            if ($this->contextPermission > READ_ACCESS) {
+            if ($this->contextPermission > UserAccess::ACCESS_READ) {
                 // display full configuration block
                 return array(true, true, true);
             } // do not have write access
@@ -358,7 +358,7 @@ abstract class Component_ControllerAbstract
         } // there is no configuration
         else {
             // have write access
-            if ($this->contextPermission > READ_ACCESS) {
+            if ($this->contextPermission > UserAccess::ACCESS_READ) {
                 // display delete option
                 return array(true, false, false);
             } // do not have write access

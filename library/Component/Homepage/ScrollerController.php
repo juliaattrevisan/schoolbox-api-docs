@@ -6,6 +6,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_ScrollerController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -64,7 +66,7 @@ class Component_Homepage_ScrollerController extends Component_Homepage_Controlle
             $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->getSource()->getId());
 
             // Controls such as Post Images
-            if ($this->getContentPermission() < WRITE_ACCESS) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->setVar("submit_image_scroller_block", "");
             } else {
                 $this->parse("submit_image_scroller_block", "submit_image_scroller");

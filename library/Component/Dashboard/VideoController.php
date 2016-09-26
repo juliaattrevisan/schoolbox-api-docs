@@ -1,10 +1,11 @@
 <?php
 /**
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2013, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Dashboard_VideoController extends Component_Dashboard_ControllerAbstract
 {
 
@@ -54,7 +55,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
 
         $this->source_category_id = $source;
 
-        if ($this->getContentPermission() < READ_ACCESS) {
+        if ($this->getContentPermission() < UserAccess::ACCESS_READ) {
             return false;
         }
 
@@ -143,7 +144,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
 
                     $this->parse('video_list_block', 'video_list', true);
                 } else {
-                    if ($this->getContentPermission() >= WRITE_ACCESS) {
+                    if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                         if (strlen($comment)) {
                             $this->setVar(array(
                                 'VIDEO_PENDING_COMMENT' => $comment

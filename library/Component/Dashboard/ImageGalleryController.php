@@ -1,12 +1,12 @@
 <?php
-
 /**
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use Schoolbox\Permission\Access\UserAccess;
+
 class Component_Dashboard_ImageGalleryController extends Component_Dashboard_ControllerAbstract
 {
 
@@ -61,7 +61,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
             return false;
         }
 
-        if ($this->getContentPermission() < READ_ACCESS) {
+        if ($this->getContentPermission() < UserAccess::ACCESS_READ) {
             return false;
         }
 

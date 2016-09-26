@@ -5,6 +5,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_LinkListController extends Component_Homepage_ControllerAbstract
 {
     /**
@@ -96,7 +98,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             $j = 0;
 
             foreach ($allLinks as $currentLink) {
-                if ($currentLink->getHidden() && $this->getContentPermission() < WRITE_ACCESS) {
+                if ($currentLink->getHidden() && $this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                     continue;
                 }
                 $this->setVar(
@@ -114,7 +116,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
                 );
 
                 // Controls
-                if ($this->getContentPermission() < WRITE_ACCESS) {
+                if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                     $this->setVar('modify_link_block', '');
                 } else {
                     $this->parse('modify_link_block', 'modify_link');
@@ -127,7 +129,7 @@ class Component_Homepage_LinkListController extends Component_Homepage_Controlle
             $this->setVar('LINK_CAT_ID', $this->getSource()->getId());
 
 
-            if ($this->getContentPermission() < WRITE_ACCESS) {
+            if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->setVar("submit_link_block", "");
             } else {
                 $this->parse("submit_link_block", "submit_link");
