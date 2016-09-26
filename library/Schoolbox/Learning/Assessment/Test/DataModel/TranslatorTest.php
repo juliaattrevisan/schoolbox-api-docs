@@ -11,6 +11,7 @@ use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
 use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\User;
@@ -61,6 +62,35 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test translation of generic assessment fields
+     */
+    public function testTranslateGenericFields()
+    {
+        $assessment = (new Task())
+            ->setId(32)
+            ->setCreator($this->teacher1)
+            ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setTitle('Mr Test Task сказать')
+            ->setDescription('Blaargh ничего')
+            ->setWeight(1000);
+
+        $assessmentModel = $this->translator->translateToDataModel($assessment, 3)->getAssessmentModel();
+
+        $this->assertEquals(32, $assessmentModel->getId());
+        $this->assertEquals(3, $assessmentModel->getSequence());
+        $this->assertEquals('2016-10-14 12:00:00', $assessmentModel->getPublishDate()->getDatabase());
+        $this->assertEquals('2016-10-16 12:00:00', $assessmentModel->getOpenDate()->getDatabase());
+        $this->assertEquals('2016-10-18 12:00:00', $assessmentModel->getDueDate()->getDatabase());
+        $this->assertEquals('2016-10-23 13:00:00', $assessmentModel->getCloseDate()->getDatabase());
+        $this->assertEquals('Mr Test Task сказать', $assessmentModel->getTitle());
+        $this->assertEquals('Blaargh ничего', $assessmentModel->getDescription());
+        $this->assertEquals(1000, $assessmentModel->getWeight());
+    }
+
+    /**
      * Test translating a task
      */
     public function testTranslateTaskToDataModel()
@@ -88,17 +118,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         // Test type
         $this->assertInstanceOf(TaskModel::class, $taskModel);
-
-        // Test generic fields
-        $this->assertEquals(32, $taskModel->getAssessmentModel()->getId());
-        $this->assertEquals(3, $taskModel->getAssessmentModel()->getSequence());
-        $this->assertEquals('2016-10-14 12:00:00', $taskModel->getAssessmentModel()->getPublishDate()->getDatabase());
-        $this->assertEquals('2016-10-16 12:00:00', $taskModel->getAssessmentModel()->getOpenDate()->getDatabase());
-        $this->assertEquals('2016-10-18 12:00:00', $taskModel->getAssessmentModel()->getDueDate()->getDatabase());
-        $this->assertEquals('2016-10-23 13:00:00', $taskModel->getAssessmentModel()->getCloseDate()->getDatabase());
-        $this->assertEquals('Mr Test Task сказать', $taskModel->getAssessmentModel()->getTitle());
-        $this->assertEquals('Blaargh ничего', $taskModel->getAssessmentModel()->getDescription());
-        $this->assertEquals(1000, $taskModel->getAssessmentModel()->getWeight());
 
         // Test task-specific fields
         $this->assertEquals(3, $taskModel->getOwner()->getId());
@@ -133,17 +152,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         // Test type
         $this->assertInstanceOf(QuizModel::class, $quizModel);
-
-        // Test generic fields
-        $this->assertEquals(61, $quizModel->getAssessmentModel()->getId());
-        $this->assertEquals(0, $quizModel->getAssessmentModel()->getSequence());
-        $this->assertEquals('2016-10-14 12:00:00', $quizModel->getAssessmentModel()->getPublishDate()->getDatabase());
-        $this->assertEquals('2016-10-16 12:00:00', $quizModel->getAssessmentModel()->getOpenDate()->getDatabase());
-        $this->assertEquals('2016-10-18 12:00:00', $quizModel->getAssessmentModel()->getDueDate()->getDatabase());
-        $this->assertEquals('2016-10-23 13:00:00', $quizModel->getAssessmentModel()->getCloseDate()->getDatabase());
-        $this->assertEquals('Test Task κάτι', $quizModel->getAssessmentModel()->getTitle());
-        $this->assertEquals('Blah blah blah τίποτα', $quizModel->getAssessmentModel()->getDescription());
-        $this->assertEquals(65, $quizModel->getAssessmentModel()->getWeight());
 
         // Test quiz-specific fields
         $this->assertEquals(151, $quizModel->getUser()->getId());
