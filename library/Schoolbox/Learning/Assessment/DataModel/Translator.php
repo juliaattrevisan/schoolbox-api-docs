@@ -93,12 +93,12 @@ class Translator
                 ->setWeight($assessment->getWeight())
                 ->setAnonymousResult(false)
                 ->setUser($assessment->getCreator())
+                ->setCompletionMessage($assessment->getCompletionMessage())
+                ->setDuration($assessment->getDuration())
+                ->setMaxAttempts($assessment->getMaxAttempts())
             ;
             // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
-            // TODO add completion message to Quiz
-            // TODO add duration to Quiz
-            // TODO add max attempts
-            // TODO add notify author?
+            // TODO add notify author? (I am reasonably sure this field is obsolete)
             return $model;
 
         } elseif ($assessment instanceof Task) {
