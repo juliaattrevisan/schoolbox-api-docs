@@ -38,6 +38,8 @@ class Translator
     public function translateToDataModel(IAssessable $assessment, $sequence)
     {
         // Extract assessment base model
+        // TODO add created/updated/deleted dates
+        // TODO figure out how to pass in the assessable's container
         $assessmentModel = new Model();
         $assessmentModel
             ->setId($assessment->getId())
