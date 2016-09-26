@@ -37,11 +37,10 @@ class Module extends BaseModule
         $routes = [
             'GET' => [
 
-                /* Create an assessment
-                 * This is the first half containing shared data such as title,
-                 * description and dates
+                /* Select an assessment
+                 *
                  */
-                '/assessment/create/{folderId}' => 'getCreateAssessment',
+                '/assessment/select/{folderId}' => 'getSelectAssessment',
 
                 /* This is the second half containing assessable-specific data
                  */
@@ -60,7 +59,7 @@ class Module extends BaseModule
 
                 /* Create an assessment
                  */
-                '/assessment/create' => 'postCreateAssessment',
+                '/assessment/select' => 'postSelectAssessment',
 
                 /* This is the second half containing assessable-specific data
                  */

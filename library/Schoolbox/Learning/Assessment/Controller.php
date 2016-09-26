@@ -93,11 +93,15 @@ class Controller extends Base
     }
 
     /**
-     * Create an Assessment
+     * Select an Assessment
+     *
+     * This is when you chooze what type of assessment it is, which
+     * returns you an appropriate fragment of common+assessmentType
+     * form inputs for you to fill out
      *
      * @param $folderId
      */
-    public function getCreateAssessment($folderId)
+    public function getSelectAssessment($folderId)
     {
         try {
             $folder = $this->getFolderMapper()->findById($folderId);
@@ -115,16 +119,10 @@ class Controller extends Base
     }
 
     /**
-     * Save the data when creating common details of an Assessment
-     *
-     * If it's a Project we need to save it so we can craft a returnUrl
-     * which gets used after we craft the Project's Assessables
+     * Return a fragment based on its type
      */
-    public function postCreateAssessment()
+    public function postSelectAssessment()
     {
-
-        /* Return a fragment based on its type
-         */
         switch($this->getRequest()->post['assessmentType']) {
             case 'project':
                 $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/create.twig', []));
