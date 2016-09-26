@@ -13,6 +13,10 @@
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
         $('input[data-mage-next]').mage();
 
+        /**
+         * Add common details
+         * Add assessmentType-specific details
+         */
         $('input[data-mage-next="part-2"]').mage({
             onXhrDone: function(data) {
                 $('#assessmentForm').find('[data-assessment-details]').html(data);
@@ -105,8 +109,10 @@
 
                 <fieldset class="content" data-mage="part-2" disabled="disabled">
                     <legend>Common Details</legend>
-                    <div class="small-12 columns hide" data-mage-collapsed data-assessment-details>
+                    <div class="small-12 columns hide" data-mage-collapsed>
+                        <div data-assessment-details></div>
 
+                        {{ mage.submitRow('Next', 'part-2', 'part-3', 'Working...') }}
                     </div>
                 </fieldset>
 
