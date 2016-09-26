@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
 
 /**
@@ -222,5 +223,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         // Test files
         $this->assertCount(3, $dueWorkModel->getAttachments());
+        $this->assertInstanceOf(StorageModel::class, $dueWorkModel->getAttachments()[0]);
+        $this->assertInstanceOf(StorageModel::class, $dueWorkModel->getAttachments()[1]);
+        $this->assertInstanceOf(StorageModel::class, $dueWorkModel->getAttachments()[2]);
     }
 }

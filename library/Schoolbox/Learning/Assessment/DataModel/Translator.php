@@ -15,6 +15,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Resource\Storage\Model as StorageModel;
 use UnexpectedValueException;
 
 /**
@@ -67,13 +68,23 @@ class Translator
                 ->setLateDate($assessment->getCloseAt())
                 ->setWorkType($assessment->getType())
                 ->setWeight($assessment->getWeight())
-                ->setAttachments($assessment->getAllFiles())
                 ->setSkipUnsubmitted(!$assessment->getShowSubmittedOnly())
                 ->setAcceptOnline($assessment->isAcceptSingle() || $assessment->isAcceptMulti())
                 ->setAcceptMultiple($assessment->isAcceptMulti())
                 ->setUseRubric($assessment->hasRubric())
                 ->setOwner($assessment->getCreator())
             ;
+
+            // Translate files
+            // TODO consider whether the DueWorkFile model is required - should Storage be used directly?
+            foreach ($assessment->getAllFiles() as $file) {
+                $model->addAttachment(
+                    (new StorageModel())
+                        ->setHash($file->getHash())
+                        ->setFilename($file->getFilename())
+                );
+            }
+
             // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
             // TODO figure out rubric result set
             // TODO figure out mark per rubric group
