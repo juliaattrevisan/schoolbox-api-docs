@@ -14,12 +14,17 @@
         $('input[data-mage-next]').mage();
 
         /**
-         * Add common details
-         * Add assessmentType-specific details
+         * Update new form action url
+         *
+         * Inject common details
+         * Inject assessmentType-specific details
          */
         $('input[data-mage-next="part-2"]').mage({
             onXhrDone: function(data) {
-                $('#assessmentForm').find('[data-assessment-details]').html(data);
+                $('#assessmentForm')
+                        .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment') }}')
+                        .find('[data-assessment-details]')
+                        .html(data);
             }
         });
 

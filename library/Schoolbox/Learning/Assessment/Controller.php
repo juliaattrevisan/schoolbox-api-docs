@@ -119,7 +119,7 @@ class Controller extends Base
     }
 
     /**
-     * Return a fragment based on its type
+     * Return a fragment corresponding to the type of assessment you choze
      */
     public function postSelectAssessment()
     {
@@ -143,6 +143,18 @@ class Controller extends Base
             default:
                 break;
         }
+    }
+
+    /**
+     * Save the Assessment's data
+     *
+     * This saves the combination of common+assessmentType-specific details
+     */
+    public function postCreateAssessment()
+    {
+        /* TODO: Actually save data here
+         */
+        new \Alaress_Probe($this->getRequest()->post);
     }
 
 

@@ -38,9 +38,16 @@ class Module extends BaseModule
             'GET' => [
 
                 /* Select an assessment
-                 *
                  */
                 '/assessment/select/{folderId}' => 'getSelectAssessment',
+
+
+
+
+
+
+
+
 
                 /* This is the second half containing assessable-specific data
                  */
@@ -57,9 +64,20 @@ class Module extends BaseModule
             ],
             'POST' => [
 
-                /* Create an assessment
+                /* Return a fragment corresponding to the type of assessment you choze
                  */
                 '/assessment/select' => 'postSelectAssessment',
+
+                /* Save the Assessment's data
+                 */
+                '/assessment/create' => 'postCreateAssessment',
+
+
+
+
+
+
+
 
                 /* This is the second half containing assessable-specific data
                  */
