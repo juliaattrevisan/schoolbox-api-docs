@@ -1120,7 +1120,7 @@ class External_Synergetic_User implements External_UserInterface
      *
      * @return MSSQL
      */
-    private function getDatabase()
+    protected function getDatabase()
     {
         return $this->database;
     }
