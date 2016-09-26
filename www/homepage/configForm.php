@@ -93,6 +93,7 @@ if (is_numeric($_REQUEST['cid'])) {
         $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
         $cList         = array_values($componentList);
 
+        /** @var Component_Homepage_ControllerAbstract $component */
         $component = $factory->buildComponent($cList[0]);
 
         if (!($component instanceof Component_ControllerAbstract)) {

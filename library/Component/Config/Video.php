@@ -7,10 +7,8 @@
  */
 class Component_Config_Video extends Component_Config_Abstract
 {
-
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
-
         /* Sort order
 		 */
         if ($component instanceof Component_ControllerAbstract) {
@@ -18,14 +16,18 @@ class Component_Config_Video extends Component_Config_Abstract
                 'sort' => $component->getConfig('sort'),
                 'sortdir' => $component->getConfig('sortdir')
             );
-            $sourceId = $component->getConfig('src');
+            $sourceId = $component->getSource() ? $component->getSource()->getId() : 0;
         } else {
             $sortConfig = array();
             $sourceId = $this->getContext()->getId();
         }
 
-        $videoMapper = new \Schoolbox\Video\ResourceVideoMapper();
-        $vidList = $videoMapper->findByCategory($sourceId, $sortConfig);
+        if($sourceId){
+            $videoMapper = new \Schoolbox\Video\ResourceVideoMapper();
+            $vidList = $videoMapper->findByCategory($sourceId, $sortConfig);
+        } else {
+            $vidList = new \Schoolbox\Collection();
+        }
 
         $page->setBlock($keyblock, 'video_select', 'video_select_block');
         $page->setVar('video_select_block', '');

@@ -5,6 +5,7 @@
  * @link        http://www.alaress.com.au/
  */
 use \Schoolbox\Permission\Access\UserAccess;
+use \Schoolbox\Video\ResourceVideoMapper;
 
 class Component_Homepage_VideoController extends Component_Homepage_ControllerAbstract
 {
@@ -51,7 +52,7 @@ class Component_Homepage_VideoController extends Component_Homepage_ControllerAb
         } else {
             $this->setVar('source_folder_deleted_block', '');
 
-            $videoResourceMapper = \Schoolbox\Video\ResourceVideoMapper::getInstance();
+            $videoResourceMapper = ResourceVideoMapper::getInstance();
 
             /* Sort order
              */
