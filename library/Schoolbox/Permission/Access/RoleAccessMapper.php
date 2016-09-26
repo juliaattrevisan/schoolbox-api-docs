@@ -21,10 +21,18 @@ class RoleAccessMapper extends Mapper
 {
 
     /**
+     * Cached permissions
+     * Nested array structure $cachedPermissions[role][cid]
+     * @var array
+     */
+    protected $cachedPermissions = [];
+
+    /**
     * @return void
     */
     protected function mapping()
     {
+
         $this->hasTable('perms');
         $this->hasModel('\\Schoolbox\\Permission\\Access\\RoleAccess');
 
@@ -189,7 +197,7 @@ class RoleAccessMapper extends Mapper
      * @param int  $service
      * @return RoleAccess
      */
-    public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE)
+    public function getAccess(User $user, $serviceIdentifier, $service = UserAccess::SERVICE_HOMEPAGE, $cache = true)
     {
         // let's avoid fatal errors in the face of unexpected failure
         if (!$user->getRole() instanceof Role) {
@@ -198,7 +206,7 @@ class RoleAccessMapper extends Mapper
             return $ra;
         }
 
-        if ($serviceIdentifier != 0 && $service == UserAccess::SERVICE_HOMEPAGE)
+        if ($serviceIdentifier != 0)
         {
             $folder = FolderMapper::getInstance()->findCheaplyById($serviceIdentifier, ['deleted' => true]);
 
@@ -211,12 +219,32 @@ class RoleAccessMapper extends Mapper
                 $serviceIdentifier = $permissionFolder->getId();
             }
         }
-        return $this->findOneByColumnList(
+
+        // Setup cache array for this user/service/sid if it doesn't already exist)
+
+        if (!isset($this->cachedPermissions[$user->getRole()->getId()])) {
+            $this->cachedPermissions[$user->getRole()->getId()] = [];
+        }
+
+
+        // Permission check #1 - Cached results
+
+        if (isset($this->cachedPermissions[$user->getRole()->getId()][$serviceIdentifier]) && $cache) {
+            // Found cached result, return it
+            return $this->cachedPermissions[$user->getRole()->getId()][$serviceIdentifier];
+        }
+
+
+        $result =  $this->findOneByColumnList(
             array(
                 'cid' => $serviceIdentifier,
                 'gid' => $user->getRole()->getId()
             )
         );
+        if($cache) {
+            $this->cachedPermissions[$user->getRole()->getId()][$serviceIdentifier] = $result;
+        }
+        return $result;
     }
 
 

@@ -24,17 +24,18 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
     public function setup($context = null, array $config = array())
     {
         parent::setup($context, $config);
-        $g = new Group();
+
+        $accessor = \Schoolbox\Permission\Access\Access::getInstance();
 
         /* ffs arrays
          * TODO: This should just be an object, never an array
          */
         if (is_object($context)) {
             $contextId = $context->getId();
-            $this->contentPermission = $g->getPermission($context->getId());
+            $this->contentPermission = $accessor->getFolderAccess($this->getUser(), [$context->getId()]);
         } elseif (is_array($context)) {
             $contextId = $context['id'];
-            $this->contentPermission = $g->getPermission($context['id']);
+            $this->contentPermission = $accessor->getFolderAccess($this->getUser(), [$context['id']]);
         }
 
         $args = $this->sitepage->arg;

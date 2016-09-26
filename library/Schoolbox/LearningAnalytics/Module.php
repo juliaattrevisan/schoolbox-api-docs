@@ -11,14 +11,12 @@
 namespace Schoolbox\LearningAnalytics;
 
 use Alaress\Module\Module as BaseModule;
-use Alaress\Authorizer\Rule;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
 use Alaress\Web\Router\PathMatcher;
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Twig_Loader_Chain;
-
-use Group;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Assessment\Course\UnitInstanceMapper;
@@ -114,9 +112,9 @@ class Module extends BaseModule
 
         /* Check permissions
          */
-        $group = new Group();
+        $accessor = new Access();
 
-        if ($group->getPermission($params['courseId']) < UserAccess::ACCESS_WRITE) {
+        if ($accessor->getFolderAccess($_SESSION['user'], [$params['courseId']]) < UserAccess::ACCESS_WRITE) {
             error(6);
         }
 
@@ -213,9 +211,9 @@ class Module extends BaseModule
 
         /* Check permissions
          */
-        $group = new Group();
+        $accessor = new Access();
 
-        if ($group->getPermission($params['folderId']) < UserAccess::ACCESS_WRITE) {
+        if ($accessor->getFolderAccess($_SESSION['user'], [$params['folderId']]) < UserAccess::ACCESS_WRITE) {
             error(6);
         }
 

@@ -87,7 +87,7 @@ if (is_numeric($_REQUEST['cid'])) {
             $instanceID = $_POST['reload'];
         }
 
-        $factory = new Component_Homepage_Factory(new \Schoolbox\User(), $page);
+        $factory = new Component_Homepage_Factory($page->getDi()->get('session')->get('user'), $page);
 
         // $component instanceof Component_ControllerAbstract
         $componentList = $componentInstanceMapper->findByInstanceId($instanceID);

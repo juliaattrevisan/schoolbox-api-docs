@@ -14,8 +14,8 @@
 namespace Schoolbox\Resource\Browser\Resources;
 
 
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
-use Schoolbox\Mapper;
 use Schoolbox\Resource\Browser\AbstractNode;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -32,9 +32,10 @@ class Node extends AbstractNode
 {
 
     /**
-     * @var \Group
+     * Library for determining permissions
+     * @var Access
      */
-    protected $groupHandler;
+    protected $access;
 
 
     /**
@@ -46,9 +47,9 @@ class Node extends AbstractNode
     {
         parent::__construct($nodeId, $mimeFilter);
 
-        $this->setFolderLocator(new FolderMapper());
-        $this->setFileLocator(new FileMapper());
-        $this->setGroupHandler(new \Group());
+        $this->setFolderLocator(FolderMapper::getInstance());
+        $this->setFileLocator(FileMapper::getInstance());
+        $this->setAccess(Access::getInstance());
 
         // Check we have permission to render node
         if ($nodeId > 0 && !$this->hasPermission($nodeId, READ_ACCESS)) {
@@ -58,22 +59,22 @@ class Node extends AbstractNode
 
 
     /**
-     * @param \Group $groupHandler
+     * @param Access $access
      * @return AbstractNode
      */
-    protected function setGroupHandler($groupHandler)
+    protected function setAccess($access)
     {
-        $this->groupHandler = $groupHandler;
+        $this->access = $access;
         return $this;
     }
 
 
     /**
-     * @return \Group
+     * @return Access
      */
-    protected function getGroupHandler()
+    protected function getAccess()
     {
-        return $this->groupHandler;
+        return $this->access;
     }
 
 
@@ -86,7 +87,7 @@ class Node extends AbstractNode
      */
     protected function hasPermission($nodeId, $minimumLevel)
     {
-        return $this->getGroupHandler()->getPermission($nodeId) >= $minimumLevel;
+        return $this->getAccess()->getFolderAccess($_SESSION['user'], [$nodeId]) >= $minimumLevel;
     }
 
 

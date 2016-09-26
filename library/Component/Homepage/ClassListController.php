@@ -11,11 +11,6 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 {
 
     /**
-     * @var Group
-     */
-    protected $groupHandler;
-
-    /**
      * Prepares data for the render function. Business logic.
      *
      * @return bool Whether to continue on and attempt Component render
@@ -28,7 +23,6 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             return $this->hasContextWriteAccess();
         }
 
-        $this->groupHandler = new Group();
         return true;
     }
 

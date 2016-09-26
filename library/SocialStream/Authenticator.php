@@ -11,6 +11,7 @@
 namespace SocialStream;
 
 use Component_Instance;
+use Schoolbox\Permission\Access\Access;
 
 /**
  * Class Authenticator
@@ -77,10 +78,10 @@ class Authenticator
             // instead deny access if there's no actual user
             $permission = DENY_ACCESS;
         } else {
-            $groupHandler = new \Group();
+            $accessor = Access::getInstance();
             //If we are dealing with a post, check its permission, else check permission of component for rendering purposes
             $homepageID = $this->getNewPost()->getHomepageId() ? $this->getNewPost()->getHomepageId() : $this->getInstance()->getIdentifier();
-            $permission = $groupHandler->getPermission($homepageID, $userId);
+            $permission = $accessor->getFolderAccess($this->getCurrentUser(), [$homepageID]);
         }
 
         return $permission;

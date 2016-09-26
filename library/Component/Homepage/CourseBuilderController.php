@@ -19,16 +19,6 @@ use Schoolbox\Collection;
 class Component_Homepage_CourseBuilderController extends Component_Homepage_ControllerAbstract
 {
     /**
-     * @var Group
-     */
-    protected $group_handler;
-
-    /**
-     * @var FolderModel
-     */
-    protected $category;
-
-    /**
      * @var Task[]
      */
     protected $task_list;
@@ -60,15 +50,10 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
             return $this->hasContextWriteAccess();
         }
 
-        $this->group_handler = new Group();
-        $categoryId          = $this->getContext()->getId();
-        if ($categoryId > 0) {
-            $this->category = FolderMapper::getInstance()->findById($categoryId);
-        }
-        $this->task_list = TaskMapper::getInstance()->findByCategory($this->category);
+        $this->task_list = TaskMapper::getInstance()->findByCategory($this->getContext());
 
         // What pages have this course?
-        $this->unitList             = UnitInstanceMapper::getInstance()->findByUnitCategoryId($categoryId);
+        $this->unitList             = UnitInstanceMapper::getInstance()->findByUnitCategoryId($this->getContext()->getId());
         $this->categoryWithUnitList = FolderMapper::getInstance()->findByColumn(
             'id',
             $this->unitList->map(
@@ -121,8 +106,8 @@ class Component_Homepage_CourseBuilderController extends Component_Homepage_Cont
 
         // Start spamming out tasks into the template
         $this->setVar('category_breadcrumb_block', '');
-        if ($this->category instanceof FolderModel) {
-            foreach (FolderMapper::getInstance()->findParents($this->category) as $parent) {
+        if ($this->getContext() instanceof FolderModel) {
+            foreach (FolderMapper::getInstance()->findParents($this->getContext(),null,true) as $parent) {
                 /** @var FolderModel $parent */
                 $this->setVar('PARENT_CATEGORY_ID', $parent->getId());
                 $this->setVar('PARENT_CATEGORY_NAME', $parent->getName());

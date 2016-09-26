@@ -10,11 +10,6 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
 {
 
     /**
-     * @var Group
-     */
-    private $groupHandler;
-
-    /**
      * @var CategoryNews
      */
     private $newsHandler;
@@ -32,7 +27,6 @@ class Component_Homepage_NewsController extends Component_Homepage_ControllerAbs
             return $this->hasContextWriteAccess();
         }
 
-        $this->groupHandler = new Group();
         $this->newsHandler  = new CategoryNews();
         return true;
     }

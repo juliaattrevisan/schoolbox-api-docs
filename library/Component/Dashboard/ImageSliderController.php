@@ -10,11 +10,6 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
 {
 
     /**
-     * @var Group
-     */
-    private $groupHandler;
-
-    /**
      * @var Schoolbox\Resource\File\Mapper
      */
     private $fileMapper;
@@ -38,7 +33,6 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
             return false;
         }
 
-        $this->groupHandler = new Group();
         $this->setFileMapper(Schoolbox\Resource\File\Mapper::getInstance());
         return true;
     }
@@ -55,7 +49,7 @@ class Component_Dashboard_ImageSliderController extends Component_Dashboard_Cont
         }
         $this->parseConfig();
 
-        if ($this->groupHandler->getPermission($this->source->getId()) < READ_ACCESS) {
+        if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 

@@ -54,11 +54,7 @@ class Component_Dashboard_VideoController extends Component_Dashboard_Controller
 
         $this->source_category_id = $source;
 
-        /* Check permissions
-         */
-        $group_handler = new Group();
-
-        if ($group_handler->getPermission($this->source_category_id) < READ_ACCESS) {
+        if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 

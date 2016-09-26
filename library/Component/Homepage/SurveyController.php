@@ -10,10 +10,6 @@
 class Component_Homepage_SurveyController extends Component_Homepage_ControllerAbstract
 {
 
-    /**
-     * @var Group
-     */
-    private $groupHandler;
 
     /**
      * Prepares data for the render function. Business logic.
@@ -28,7 +24,6 @@ class Component_Homepage_SurveyController extends Component_Homepage_ControllerA
             return $this->hasContextWriteAccess();
         }
 
-        $this->groupHandler = new Group();
         return true;
     }
 

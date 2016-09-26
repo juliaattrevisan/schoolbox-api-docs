@@ -34,12 +34,12 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     protected $templateFile = 'timetable';
 
-    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, Group $group, External_Timetable $externalTimetable)
+    public function __construct(Component_Instance $instance, \Schoolbox\User $user, SitePage $sitepage, External_Timetable $externalTimetable)
     {
         parent::__construct($instance, $user, $sitepage);
 
         $this->externalTimetable = $externalTimetable;
-        $this->group = $group;
+        $this->access = \Schoolbox\Permission\Access\Access::getInstance();
     }
 
     /**
@@ -49,9 +49,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
      */
     public function execute()
     {
-        $user = $_SESSION['user'];
-
-        if ($user->getHideTimetable()) {
+        if ($this->getUser()->getHideTimetable()) {
             return false;
         }
 
@@ -65,7 +63,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
         // Don't output a timetable if it has the same code as another that has
         // already been added.
         $checked_campus_list = array();
-        foreach ($_SESSION['user']->getCampusCollection() as $campus) {
+        foreach ($this->getUser()->getCampusCollection() as $campus) {
             if ($campus instanceof Schoolbox\Campus) {
                 $campus_id = $campus->getId();
                 $campus_code = $campus->getExtTimetableCode();
@@ -77,7 +75,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                         $this->dayName[$campus_id] = $timetableHandler->getDayName($day_number);
                         $this->currentPeriod[$campus_id] = $timetableHandler->getPeriodNumber($campus, 0, $user);
                         $this->timetable[$campus_id] = $timetableHandler->getTimetableForDate(
-                            $_SESSION['sid'], $_SESSION['id'], $campus, Alaress_Date_Format::now()
+                           $this->getUser()->getExternalId(), $this->getUser()->getId(), $campus, Alaress_Date_Format::now()
                         );
                     }
                 }
@@ -221,7 +219,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
 
                                 try {
                                     $folder = $this->getFolderMapper()->findByCode($class['code']);
-                                    $hasLink = $this->group->getPermission($folder->getId()) >= READ_ACCESS;
+                                    $hasLink = $this->access->getFolderAccess($this->getUser(), [$folder->getId()]) >= READ_ACCESS;
                                 }
                                 catch (MapperException $e) {
                                     $hasLink = false;
@@ -231,7 +229,7 @@ class Component_Dashboard_TimetableController extends Component_Dashboard_Contro
                                 if (strlen($class['code'])
                                     && Cfg::get('external_type') == 'synergetic'
                                     && Cfg::get('external_attendance')
-                                    && $_SESSION['user']->getRole()->isStaff()
+                                    && $this->getUser()->getRole()->isStaff()
                                     && $class['AttendanceEnabled']
                                 ) {
                                     $this->setVar(

@@ -11,12 +11,6 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
 {
 
     /**
-     * @var Group
-     */
-    private $groupHandler;
-
-
-    /**
      * Available sort fields for this component.
      *
      * @var array
@@ -36,7 +30,6 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
             return $this->hasContextWriteAccess();
         }
 
-        $this->groupHandler = new Group();
         return true;
     }
 

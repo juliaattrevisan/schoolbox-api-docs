@@ -11,13 +11,6 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
 {
 
     /**
-     * A group handler
-     *
-     * @var Group
-     */
-    private $groupHandler = null;
-
-    /**
      * File mapper
      *
      * @var null
@@ -49,7 +42,6 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
             return false;
         }
 
-        $this->setGroupHandler(new Group());
         $this->setFileMapper(new \Schoolbox\Resource\File\Mapper());
         return true;
     }
@@ -69,7 +61,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
             return false;
         }
 
-        if ($this->getGroupHandler()->getPermission($this->getSource()->getId()) < READ_ACCESS) {
+        if ($this->contentPermission < READ_ACCESS) {
             return false;
         }
 
@@ -162,26 +154,6 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
     private function getImagesPerRow()
     {
         return $this->imagesPerRow;
-    }
-
-    /**
-     * Set group handler
-     *
-     * @param \Group $groupHandler
-     */
-    private function setGroupHandler($groupHandler)
-    {
-        $this->groupHandler = $groupHandler;
-    }
-
-    /**
-     * Get group handler
-     *
-     * @return \Group
-     */
-    private function getGroupHandler()
-    {
-        return $this->groupHandler;
     }
 
     /**

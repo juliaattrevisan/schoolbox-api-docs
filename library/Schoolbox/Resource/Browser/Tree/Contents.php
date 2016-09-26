@@ -12,6 +12,7 @@
 
 namespace Schoolbox\Resource\Browser\Tree;
 
+use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Collection;
 use Schoolbox\Resource\LinkMapper;
@@ -81,14 +82,11 @@ class Contents
     private $fileMapper = null;
 
     /**
-     * An instance of group handler
+     * Folder permission access library
      *
-     * @var \Group
+     * @var Access
      */
-    private $groupHandler = null;
-
-
-
+    private $access = null;
 
 
     /**
@@ -102,15 +100,15 @@ class Contents
 
         /* Mappers
          */
-        $this->setLinkMapper(new LinkMapper());
-        $this->setFileMapper(new FileMapper());
+        $this->setLinkMapper(LinkMapper::getInstance());
+        $this->setFileMapper(FileMapper::getInstance());
 
 
         /* Other
          */
-        $this->setGroupHandler(new \Group());
+        $this->setAccess(Access::getInstance());
         $this->setCategory($category);
-        $this->setPermission($this->getGroupHandler()->getPermission($category->getId()));
+        $this->setPermission($this->getAccess()->getFolderAccess($_SESSION['user'], [$category->getId()]));
         $this->setFilterOptions($filterOptions);
 
 
@@ -257,24 +255,21 @@ class Contents
     }
 
     /**
-     * Set group handler
-     *
-     * @param \Group $groupHandler
+     * @return Access
      */
-    private function setGroupHandler($groupHandler)
+    public function getAccess()
     {
-        $this->groupHandler = $groupHandler;
+        return $this->access;
     }
 
     /**
-     * Get group handler
-     *
-     * @return \Group
+     * @param Access $access
      */
-    private function getGroupHandler()
+    public function setAccess($access)
     {
-        return $this->groupHandler;
+        $this->access = $access;
     }
+
 
     /**
      * Set permission

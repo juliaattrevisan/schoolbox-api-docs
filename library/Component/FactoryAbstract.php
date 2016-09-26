@@ -8,7 +8,7 @@
  * @version     SVN: $Id$
  * 
  */
- 
+
 abstract class Component_FactoryAbstract {
     /**
      * @var String
