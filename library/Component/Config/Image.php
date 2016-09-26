@@ -15,9 +15,9 @@ class Component_Config_Image extends Component_Config_Abstract
         $page->setBlock($keyblock, 'config_images', 'config_images_block');
         $page->setVar('config_images_block', '');
 
-        $allImages = $this->getFolder()
+        $allImages = $this->getContext()
             ? \Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
-                [$this->getFolder()->getId()],
+                [$this->getContext()->getId()],
                 [
                     'filter'    => ['image'],
                     'sort'      => 'date',

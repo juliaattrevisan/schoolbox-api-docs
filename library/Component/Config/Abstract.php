@@ -11,8 +11,12 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 abstract class Component_Config_Abstract
 {
-    /** @var Folder|null */
-    private $folder;
+    /**
+     * Where this Config's Component resides
+     *
+     * @var Folder|Eportfolio_Page_Instance|null
+     */
+    private $context;
 
     // Defined on respective Component Controller, and passed in
     // via Component/ControllerAbstract::renderConfigElements()
@@ -28,17 +32,12 @@ abstract class Component_Config_Abstract
     protected $is_shown_on_template = true;
 
     /**
-     * Constructor
-     *
-     * Folder should be an instance of \Schoolbox\Resource\Folder\Model
-     * but may be either handler array or instance, for now
-     *
-     * @param Folder|null $folder
+     * @param Folder|Eportfolio_Page_Instance|null $context
      * @param null $fields
      */
-    public function __construct($folder, $fields = null)
+    public function __construct($context, $fields = null)
     {
-        $this->folder = $folder;
+        $this->context = $context;
 
         if (isset($fields['sort'])) {
             $this->sortFields = $fields['sort'];
@@ -85,13 +84,11 @@ abstract class Component_Config_Abstract
      */
 
     /**
-     * Get folder
-     *
-     * @return Folder|null
+     * @return Folder|Eportfolio_Page_Instance|null
      */
-    protected function getFolder()
+    protected function getContext()
     {
-        return $this->folder;
+        return $this->context;
     }
 
     /**

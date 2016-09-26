@@ -33,8 +33,8 @@ class Component_Config_Textbox extends Component_Config_Abstract
             $allTextboxes = $textboxMapper->findByColumn('categoryID', $altSource);
         } else {
 
-            $allTextboxes = $this->getFolder()
-                ? $textboxMapper->findByColumn('categoryID', $this->getFolder()->getId())
+            $allTextboxes = $this->getContext()
+                ? $textboxMapper->findByColumn('categoryID', $this->getContext()->getId())
                 : new \Schoolbox\Collection();
         }
 
