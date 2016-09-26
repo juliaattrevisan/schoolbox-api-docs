@@ -1007,13 +1007,10 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Public accessor for $this->instance - use this instead of magic method
-     * obscuring a protected variable. (wat)
-     *
      * @param \Component_Instance $instance
      * @return static
      */
-    public function setInstance($instance)
+    public function setInstance(Component_Instance $instance)
     {
         $this->instance = $instance;
         return $this;
@@ -1111,7 +1108,7 @@ abstract class Component_ControllerAbstract
      * @param  Schoolbox\Resource\Folder\Mapper $folderMapper
      * @return $this
      */
-    public function setFolderMapper($folderMapper)
+    public function setFolderMapper(FolderMapper $folderMapper)
     {
         $this->folderMapper = $folderMapper;
         return $this;
@@ -1129,7 +1126,7 @@ abstract class Component_ControllerAbstract
      * @param  ErrorMapper $errorMapper
      * @return $this
      */
-    public function setErrorMapper($errorMapper)
+    public function setErrorMapper(ErrorMapper $errorMapper)
     {
         $this->errorMapper = $errorMapper;
         return $this;

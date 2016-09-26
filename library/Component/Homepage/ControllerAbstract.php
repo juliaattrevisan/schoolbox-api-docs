@@ -10,7 +10,7 @@
 use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
- * @method Folder getContext()
+ * @method Folder|null getContext()
  * @method Folder|null getSource()
  */
 abstract class Component_Homepage_ControllerAbstract extends Component_ControllerAbstract
@@ -24,11 +24,14 @@ abstract class Component_Homepage_ControllerAbstract extends Component_Controlle
     {
         parent::setup($context);
 
+        $contextId = $this->getContext() ? $this->getContext()->getId() : 0;
+        $sourceId = $this->getSource() ? $this->getSource()->getId() : 0;
+
         $accessor = \Schoolbox\Permission\Access\Access::getInstance();
         // Content permission: based on alt source if it's there
         // Control permission: always based on current context
-        $this->setContentPermission(min($accessor->getFolderAccess($this->getUser(), [$this->getSource()->getId()]), $this->getMaximumPermission()));
-        $this->setContextPermission(min($accessor->getFolderAccess($this->getUser(), [$this->getContext()->getId()]), $this->getMaximumPermission()));
+        $this->setContentPermission(min($accessor->getFolderAccess($this->getUser(), [$contextId]), $this->getMaximumPermission()));
+        $this->setContextPermission(min($accessor->getFolderAccess($this->getUser(), [$sourceId]), $this->getMaximumPermission()));
     }
 
 
