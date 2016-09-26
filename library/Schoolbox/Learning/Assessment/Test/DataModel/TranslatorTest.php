@@ -307,30 +307,11 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      */
     public function getTestTranslateDueWorkResponseAcceptanceData()
     {
-        $dueWork = (new DueWork())
-            // Generic fields
-            ->setId(908)
-            ->setCreator($this->teacher1)
-            ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-            ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-            ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
-            ->setTitle('Due Work Test งาน')
-            ->setDescription('Something ไม่มีอะไร')
-            ->setWeight(21)
-        ;
-
-        // Specific fields
-        $dueWork->setAcceptsMultiple();
-        yield [$dueWork, true, true,];
-
-        $dueWork->setAcceptsSingle();
-        yield [$dueWork, true, false,];
-
-        $dueWork->setAcceptsNone();
-        yield [$dueWork, false, false,];
-
-        return;
+        return [
+            [(new DueWork())->setAcceptsMultiple(), true, true,],
+            [(new DueWork())->setAcceptsSingle(), true, false,],
+            [(new DueWork())->setAcceptsNone(), false, false,],
+        ];
     }
 
     /**
