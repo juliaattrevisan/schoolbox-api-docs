@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel;
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\User;
 
@@ -29,6 +30,11 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     protected $teacher1;
 
     /**
+     * @var User
+     */
+    protected $teacher2;
+
+    /**
      * Set up
      */
     protected function setUp()
@@ -39,8 +45,17 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->teacher1 = (new User())
             ->setId(3)
             ->setExternalId(8)
+            ->setTitle('Ms')
             ->setFirstname('Celia')
             ->setLastname('Glenn')
+        ;
+
+        $this->teacher2 = (new User())
+            ->setId(151)
+            ->setExternalId(165)
+            ->setTitle('Mr')
+            ->setFirstname('Zane')
+            ->setLastname('Smith')
         ;
     }
 
@@ -50,6 +65,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTranslateTaskToDataModel()
     {
         $task = (new Task())
+            // Generic fields
             ->setId(32)
             ->setCreator($this->teacher1)
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -57,10 +73,13 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setTitle('Mr Test Task сказать')
-            ->setLink('https://www.something.com/')
-            ->setSelfMarkable(true)
+            // Description is ignored for tasks
+            ->setDescription('Blaargh ничего')
             // Tasks are always weight 0, so this doesn't matter
             ->setWeight(1000)
+            // Specific fields
+            ->setLink('https://www.something.com/')
+            ->setSelfMarkable(true)
         ;
 
         /** @var TaskModel $taskModel */
@@ -73,5 +92,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Mr Test Task сказать', $taskModel->getTitle());
         $this->assertEquals('https://www.something.com/', $taskModel->getLink());
         $this->assertEquals(false, $taskModel->getRequiresConfirmation());
+        $this->assertEquals('2016-10-14 12:00:00', $taskModel->getAssessmentModel()->getPublishDate()->getDatabase());
+        $this->assertEquals('2016-10-16 12:00:00', $taskModel->getAssessmentModel()->getOpenDate()->getDatabase());
+        $this->assertEquals('2016-10-18 12:00:00', $taskModel->getAssessmentModel()->getDueDate()->getDatabase());
+        $this->assertEquals('2016-10-23 13:00:00', $taskModel->getAssessmentModel()->getCloseDate()->getDatabase());
     }
 }
