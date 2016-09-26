@@ -401,19 +401,16 @@ abstract class Component_ControllerAbstract
     {
         if ($configTemplate = $this->getConfigurationTemplate()) {
             return $configTemplate;
-        } /* Admin area; used when configuring dashboard/homepage/eportfolio layouts
-         */
-        else {
-            if (in_array($this->instance->getModule(), array('homepage_template', 'eportfolio_template'))) {
-                return 'component/config/_templatewrapper.html';
-            } /* Public-facing pages for dashboard, homepage, eportfolio
-         */
-            else {
-                if (in_array($this->instance->getModule(), array('dashboard', 'homepage', 'eportfolio'))) {
-                    return 'component/config/' . $this->instance->getModule() . '_wrapper.html';
-                }
-            }
         }
+        // Admin area; used when configuring dashboard/homepage/eportfolio layouts
+        else if (in_array($this->instance->getModule(), ['homepage_template', 'eportfolio_template'])) {
+            return 'component/config/_templatewrapper.html';
+        }
+        // Public-facing pages for dashboard, homepage, eportfolio
+        else if (in_array($this->instance->getModule(), ['dashboard', 'homepage', 'eportfolio'])) {
+            return 'component/config/' . $this->instance->getModule() . '_wrapper.html';
+        }
+        throw new DomainException('Could not determine template file.');
     }
 
     /**
@@ -472,7 +469,6 @@ abstract class Component_ControllerAbstract
      *
      * @param bool $processConfig
      * @param bool $is_for_template
-     * @return int
      */
     protected function renderConfigElements($processConfig, $is_for_template)
     {
