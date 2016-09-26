@@ -136,7 +136,7 @@ if (is_numeric($_REQUEST['cid'])) {
             // dehydrating config values into database
             $cclass = $instance->getDefinition()->getClass();
             /** @var Component_Homepage_ControllerAbstract $controller */
-            $controller = new $cclass($instance, new \Schoolbox\User(), $page);
+            $controller = new $cclass($instance, $page->getDi()->get('session')->get('user'), $page);
             // No need to execute at all just to set configuration,
             // and doing so can break components that rely on context
 //            $controller->execute();
@@ -174,7 +174,7 @@ if (is_numeric($_REQUEST['cid'])) {
             if (SitePage::detectAjax()) {
                 // Just refetch the instance
                 $instance   = reset($componentInstanceMapper->findByInstanceId($instance->getId()));
-                $controller = new $cclass($instance, new \Schoolbox\User(), $page);
+                $controller = new $cclass($instance, $page->getDi()->get('session')->get('user'), $page);
                 $renderer   = new Component_Renderer();
                 $renderer->renderHomepageComponent($folder, $controller);
                 exit;

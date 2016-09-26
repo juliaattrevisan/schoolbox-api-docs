@@ -141,8 +141,7 @@ if (isset($_POST['description'])) {
                             $component = $components[$componentId];
                             if ($component instanceof Component_Instance
                                 && in_array($component->getIdentifier(), array_keys($pageIds))
-                                && $component->getDefinition()->getClass()
-                                == 'Component_Eportfolio_ImageController'
+                                && $component->getDefinition()->getClass() == 'Component_Eportfolio_ImageController'
                             ) {
                                 // set this component's image to this one
                                 foreach ($component->getConfig() as $config) {

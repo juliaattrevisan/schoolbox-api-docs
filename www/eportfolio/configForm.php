@@ -205,7 +205,7 @@ if (isset($_POST['page_id']) && is_numeric($_POST['page_id'])) {
                 // retrieve the instance so we know how to insert this data
                 $cclass = $instance->getDefinition()->getClass();
                 /** @var \Component_ControllerAbstract $controller */
-                $controller = new $cclass($instance, new \Schoolbox\User(), $page);
+                $controller = new $cclass($instance, $page->getDi()->get('session')->get('user'), $page);
                 $fields = $controller->getFilterFields();
                 $val = 0;
                 for ($i = 0; $i < count($fields); $i++) {
