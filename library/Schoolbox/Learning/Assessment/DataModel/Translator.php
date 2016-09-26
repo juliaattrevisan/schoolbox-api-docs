@@ -10,10 +10,15 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Course\Task as TaskModel;
+use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Summator\Average;
+use Schoolbox\Learning\Assessment\Summator\Maximum;
+use Schoolbox\Learning\Assessment\Summator\Minimum;
+use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use UnexpectedValueException;
@@ -53,8 +58,29 @@ class Translator
         // TODO figure out how to translate participants
         if ($assessment instanceof Project) {
             // convert to project's model
-            // TODO implement this
-            throw new UnexpectedValueException('$assessment is a project - this method is not implemented for projects yet');
+            $model = new ProjectModel();
+            $i     = 0;
+            foreach ($assessment->getAssessables() as $assessable) {
+                $subModel = $this->translateToDataModel($assessable, $i++);
+                // You can't have projects within projects
+                if ($subModel instanceof ProjectModel) {
+                    throw new UnexpectedValueException('A project may not contain another project');
+                }
+                $model->getAssessments()->add($subModel);
+            }
+
+            // Translate summator
+            if ($assessment->getSummator() instanceof Average) {
+                $model->setSummator(ProjectModel::SUMMATOR_AVERAGE);
+            } elseif ($assessment->getSummator() instanceof WeightedAverage) {
+                $model->setSummator(ProjectModel::SUMMATOR_WEIGHTED_AVERAGE);
+            } elseif ($assessment->getSummator() instanceof Minimum) {
+                $model->setSummator(ProjectModel::SUMMATOR_MINIMUM);
+            } elseif ($assessment->getSummator() instanceof Maximum) {
+                $model->setSummator(ProjectModel::SUMMATOR_MAXIMUM);
+            }
+
+            return $model;
 
         } elseif ($assessment instanceof DueWork) {
             // convert to due work's model
