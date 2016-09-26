@@ -61,7 +61,7 @@ class Component_Dashboard_ImageGalleryController extends Component_Dashboard_Con
             return false;
         }
 
-        if ($this->contentPermission < READ_ACCESS) {
+        if ($this->getContentPermission() < READ_ACCESS) {
             return false;
         }
 

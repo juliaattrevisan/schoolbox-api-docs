@@ -160,6 +160,6 @@ class Component_Renderer
             'USER_ID' => $eportfolioPage->getUserId(),
             'PAGE_ID' => $eportfolioPage->getPageId(),
         ));
-        $component->getPageTemplate()->pparse($templateTarget, $templateHandle);
+        $component->getPageTemplate()->pParse($templateTarget, $templateHandle);
     }
 }

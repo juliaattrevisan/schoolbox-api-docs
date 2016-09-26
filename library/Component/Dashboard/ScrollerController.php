@@ -38,7 +38,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
             return false;
         }
 
-        if ($this->contentPermission < READ_ACCESS) {
+        if ($this->getContentPermission() < READ_ACCESS) {
             return false;
         }
 
