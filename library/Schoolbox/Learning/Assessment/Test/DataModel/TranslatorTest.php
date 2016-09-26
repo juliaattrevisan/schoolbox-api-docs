@@ -156,6 +156,19 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(2, $projectModel->getAssessments()[2]->getAssessmentModel()->getSequence());
         $this->assertEquals(3, $projectModel->getAssessments()[2]->getAssessmentModel()->getId());
     }
+
+    /**
+     * Test translation of projects which contain projects.
+     *
+     * @expectedException \UnexpectedValueException
+     */
+    public function testTranslateProjectWithinProject()
+    {
+        $project = (new Project(new Average()))->setId(12);
+        $project->getAssessables()->add((new Project(new Minimum())));
+        $this->translator->translateToDataModel($project, 1);
+    }
+
     /**
      * Data provider for different due work response acceptance settings.
      */
