@@ -119,7 +119,10 @@ class Sync implements SyncInterface
                 ''               AS staff_campus,
                 ''               AS staff_category_type,
                 ''               AS staff_category,
-                ''               AS staff_department
+                ''               AS staff_department,
+                ''               AS staff_year_level,
+                ''               AS staff_year_level_description                
+                
             FROM Staff s
             LEFT JOIN People p ON s.peopleDenbighID = p.denbighID
         ");

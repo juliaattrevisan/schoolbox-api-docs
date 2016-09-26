@@ -158,7 +158,10 @@ class Sync implements SyncInterface
                 T.CAMPUS         AS staff_campus,
                 T.CLASSIFICATION AS staff_category_type,
                 ''               AS staff_category,
-                ''               AS staff_department
+                ''               AS staff_department,
+                ''               AS staff_year_level,
+                ''               AS staff_year_level_description                
+                
             FROM TEACHER T
             LEFT JOIN [IDENTITY] AS ID ON T.TEACHER# = ID.MEMBER#
             WHERE (T.DATE_LEFT IS NULL OR DATEDIFF(DAY, T.DATE_LEFT, '1753-01-01') = 0)
