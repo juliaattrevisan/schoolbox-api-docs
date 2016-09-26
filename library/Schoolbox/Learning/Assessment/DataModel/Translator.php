@@ -67,7 +67,6 @@ class Translator
                 ->setOpenDate($assessment->getOpenAt())
                 ->setDueDate($assessment->getDueAt())
                 ->setLateDate($assessment->getCloseAt())
-                ->setWorkType($assessment->getType())
                 ->setWeight($assessment->getWeight())
                 ->setSkipUnsubmitted(!$assessment->getShowSubmittedOnly())
                 ->setAcceptOnline($assessment->isAcceptSingle() || $assessment->isAcceptMulti())
@@ -85,6 +84,13 @@ class Translator
                         ->setFilename($file->getFilename())
                 );
             }
+
+            // Translate work type
+            $model->setWorkType(
+                (new DueWorkModel\WorkType())
+                    ->setId($assessment->getType()->getId())
+                    ->setName($assessment->getType()->getName())
+            );
 
             // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
             // TODO figure out rubric result set

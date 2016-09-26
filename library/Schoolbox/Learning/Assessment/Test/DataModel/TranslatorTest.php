@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel;
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
+use Schoolbox\Assessment\Component\SubmissionBox\WorkType as WorkTypeModel;
 use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Translator;
@@ -235,5 +236,10 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(StorageModel::class, $dueWorkModel->getAttachments()[2]);
         $this->assertEquals('a sound.mp3', $dueWorkModel->getAttachments()[2]->getFilename());
         $this->assertEquals('0000000000000000000000000000000000000001', $dueWorkModel->getAttachments()[2]->getHash());
+
+        // Test type
+        $this->assertInstanceOf(WorkTypeModel::class, $dueWorkModel->getWorkType());
+        $this->assertEquals(12, $dueWorkModel->getWorkType()->getId());
+        $this->assertEquals('A dumb type', $dueWorkModel->getWorkType()->getName());
     }
 }
