@@ -13,11 +13,14 @@ use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType as WorkTypeModel;
 use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
@@ -94,6 +97,61 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Mr Test Task сказать', $assessmentModel->getTitle());
         $this->assertEquals('Blaargh ничего', $assessmentModel->getDescription());
         $this->assertEquals(1000, $assessmentModel->getWeight());
+    }
+
+    /**
+     * Test translating a project
+     */
+    public function testTranslateProjectToDomainModel()
+    {
+        $project = (new Project(new WeightedAverage()))
+            // Generic fields
+            ->setId(16)
+            ->setCreator($this->teacher1)
+            ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setTitle('Mr Test Project ништа')
+            ->setDescription('A description сплат')
+            ->setWeight(13);
+
+        // Add sub-assessables
+        $project->getAssessables()
+                ->add((new Task())
+                    ->setId(1)
+                    ->setTitle('Sub-task')
+                )
+                ->add((new Quiz())
+                    ->setId(2)
+                    ->setTitle('Sub-quiz')
+                )
+                ->add((new DueWork())
+                    ->setId(3)
+                    ->setTitle('Sub-work')
+                );
+
+        /** @var ProjectModel $projectModel */
+        $projectModel = $this->translator->translateToDataModel($project, 1);
+
+        // Test project-specific fields
+        $this->assertInstanceOf(ProjectModel::class, $projectModel);
+        $this->assertEquals(ProjectModel::SUMMATOR_WEIGHTED_AVERAGE, $projectModel->getSummator());
+
+        // Test sub-assessables
+        $this->assertCount(3, $projectModel->getAssessments());
+
+        $this->assertInstanceOf(TaskModel::class, $projectModel->getAssessments()[0]);
+        $this->assertEquals(0, $projectModel->getAssessments()[0]->getAssessmentModel()->getSequence());
+        $this->assertEquals(1, $projectModel->getAssessments()[0]->getAssessmentModel()->getId());
+
+        $this->assertInstanceOf(QuizModel::class, $projectModel->getAssessments()[1]);
+        $this->assertEquals(1, $projectModel->getAssessments()[1]->getAssessmentModel()->getSequence());
+        $this->assertEquals(2, $projectModel->getAssessments()[1]->getAssessmentModel()->getId());
+
+        $this->assertInstanceOf(DueWorkModel::class, $projectModel->getAssessments()[2]);
+        $this->assertEquals(2, $projectModel->getAssessments()[2]->getAssessmentModel()->getSequence());
+        $this->assertEquals(3, $projectModel->getAssessments()[2]->getAssessmentModel()->getId());
     }
 
     /**
