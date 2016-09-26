@@ -85,16 +85,21 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         /** @var TaskModel $taskModel */
         $taskModel = $this->translator->translateToDataModel($task, 3);
 
+        // Test type
         $this->assertInstanceOf(TaskModel::class, $taskModel);
+
+        // Test generic fields
         $this->assertEquals(32, $taskModel->getAssessmentModel()->getId());
         $this->assertEquals(3, $taskModel->getAssessmentModel()->getSequence());
         $this->assertEquals(3, $taskModel->getOwner()->getId());
-        $this->assertEquals('Mr Test Task сказать', $taskModel->getTitle());
-        $this->assertEquals('https://www.something.com/', $taskModel->getLink());
-        $this->assertEquals(false, $taskModel->getRequiresConfirmation());
         $this->assertEquals('2016-10-14 12:00:00', $taskModel->getAssessmentModel()->getPublishDate()->getDatabase());
         $this->assertEquals('2016-10-16 12:00:00', $taskModel->getAssessmentModel()->getOpenDate()->getDatabase());
         $this->assertEquals('2016-10-18 12:00:00', $taskModel->getAssessmentModel()->getDueDate()->getDatabase());
         $this->assertEquals('2016-10-23 13:00:00', $taskModel->getAssessmentModel()->getCloseDate()->getDatabase());
+        $this->assertEquals('Mr Test Task сказать', $taskModel->getTitle());
+
+        // Test task-specific fields
+        $this->assertEquals('https://www.something.com/', $taskModel->getLink());
+        $this->assertEquals(false, $taskModel->getRequiresConfirmation());
     }
 }
