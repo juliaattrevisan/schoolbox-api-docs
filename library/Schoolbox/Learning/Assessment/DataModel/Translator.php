@@ -168,13 +168,35 @@ class Translator
         throw new UnexpectedValueException('$assessment is not a recognised assessment type');
     }
 
-//    /**
-//     * Translates the data model to a domain model.
-//     *
-//     * @param Model $dataModel
-//     * @return IAssessable
-//     */
-//    public function translateToDomainModel(Model $dataModel)
-//    {
-//    }
+    /**
+     * Translates the data model to a domain model.
+     *
+     * @param IAssessableDataModel $dataModel
+     * @return IAssessable
+     */
+    public function translateToDomainModel(IAssessableDataModel $dataModel)
+    {
+        if ($dataModel instanceof TaskModel) {
+            // TODO add dates to data model?
+            $assessable = new Task();
+
+            // Generic fields
+            $assessable
+                ->setId($dataModel->getAssessmentModel()->getId())
+                ->setTitle($dataModel->getAssessmentModel()->getTitle())
+                ->setDescription($dataModel->getAssessmentModel()->getDescription())
+                ->setWeight($dataModel->getAssessmentModel()->getWeight())
+                ->setPublishAt($dataModel->getAssessmentModel()->getPublishDate())
+                ->setOpenAt($dataModel->getAssessmentModel()->getOpenDate())
+                ->setDueAt($dataModel->getAssessmentModel()->getDueDate())
+                ->setCloseAt($dataModel->getAssessmentModel()->getCloseDate())
+            ;
+
+            // Specific fields
+            $assessable
+                ->setLink($dataModel->getLink())
+                ->setSelfMarkable(!$dataModel->getRequiresConfirmation());
+            return $assessable;
+        }
+    }
 }

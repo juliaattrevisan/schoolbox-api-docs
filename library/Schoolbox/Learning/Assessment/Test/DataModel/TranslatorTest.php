@@ -13,11 +13,13 @@ use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType as WorkTypeModel;
 use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Summator\Average;
@@ -76,7 +78,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     /**
      * Test translation of generic assessment fields
      */
-    public function testTranslateGenericFields()
+    public function testTranslateGenericFieldsToDataModel()
     {
         $assessment = (new Task())
             ->setId(32)
@@ -105,7 +107,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     /**
      * Test translating a project
      */
-    public function testTranslateProjectToDomainModel()
+    public function testTranslateProjectToDataModel()
     {
         $project = (new Project(new WeightedAverage()))
             // Generic fields
@@ -382,5 +384,36 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         // Test due work-specific fields
         $this->assertEquals($acceptsOnline, $dueWorkModel->getAcceptOnline());
         $this->assertEquals($acceptsMultiple, $dueWorkModel->getAcceptMultiple());
+    }
+
+    /**
+     * Test translating generic assessment data model fields to the domain object.
+     */
+    public function testTranslateGenericFieldsToDomainModel()
+    {
+        $dataModel = (new TaskModel())
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setId(401)
+                    ->setTitle('Some assessment\'s title')
+                    ->setDescription('Blargh')
+                    ->setWeight(51)
+                    ->setPublishDate(new Alaress_Date_Format('2016-10-10 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+                    ->setOpenDate(new Alaress_Date_Format('2016-10-11 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+                    ->setDueDate(new Alaress_Date_Format('2016-10-12 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+                    ->setCloseDate(new Alaress_Date_Format('2016-10-13 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+        );
+
+        /** @var IAssessable $assessment */
+        $assessment = $this->translator->translateToDomainModel($dataModel);
+
+        $this->assertEquals(401, $assessment->getId());
+        $this->assertEquals('Some assessment\'s title', $assessment->getTitle());
+        $this->assertEquals('Blargh', $assessment->getDescription());
+        $this->assertEquals(51, $assessment->getWeight());
+        $this->assertEquals('2016-10-10 12:00:00', $assessment->getPublishAt()->getDatabase());
+        $this->assertEquals('2016-10-11 12:00:00', $assessment->getOpenAt()->getDatabase());
+        $this->assertEquals('2016-10-12 12:00:00', $assessment->getDueAt()->getDatabase());
+        $this->assertEquals('2016-10-13 12:00:00', $assessment->getCloseAt()->getDatabase());
     }
 }
