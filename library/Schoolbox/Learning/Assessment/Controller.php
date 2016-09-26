@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 use \Alaress_Date_Format;
@@ -160,7 +161,7 @@ class Controller extends Base
             $folder = $this->getFolderMapper()->findById($this->getRequest()->post['folderId']);
         }
         catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
+            $this->sendError('Could not create assessment', [ 'select a valid Folder' ]);
         }
 
         switch($this->getRequest()->post['assessmentType']) {
@@ -181,36 +182,31 @@ class Controller extends Base
                 break;
 
             default:
-                /* TODO: Throw exception for unknown assessment type
-                 */
+                $this->sendError('Could not create assessment', [ 'select a valid assessment type' ]);
                 break;
         }
 
         /* Check dates are set to something
          */
-        $publishAt = $this->getRequest()->post['publishDate'] . ' ' . $this->getRequest()->post['publishTime'];
-        $openAt = $this->getRequest()->post['openDate'] . ' ' . $this->getRequest()->post['openTime'];
-        $dueAt = $this->getRequest()->post['dueDate'] . ' ' . $this->getRequest()->post['dueTime'];
-        $closeAt = $this->getRequest()->post['closeDate'] . ' ' . $this->getRequest()->post['closeTime'];
+        $publishAt = trim($this->getRequest()->post['publishDate'] . ' ' . $this->getRequest()->post['publishTime']);
+        $openAt = trim($this->getRequest()->post['openDate'] . ' ' . $this->getRequest()->post['openTime']);
+        $dueAt = trim($this->getRequest()->post['dueDate'] . ' ' . $this->getRequest()->post['dueTime']);
+        $closeAt = trim($this->getRequest()->post['closeDate'] . ' ' . $this->getRequest()->post['closeTime']);
 
         if (!strlen($publishAt)) {
-            /* TODO: Throw exception, invalid date
-             */
+            $this->sendError('Could not create assessment', [ 'set a publish date' ]);
         }
 
         if (!strlen($openAt)) {
-            /* TODO: Throw exception, invalid date
-             */
+            $this->sendError('Could not create assessment', [ 'set an open date' ]);
         }
 
         if (!strlen($dueAt)) {
-            /* TODO: Throw exception, invalid date
-             */
+            $this->sendError('Could not create assessment', [ 'set a due date' ]);
         }
 
         if (!strlen($closeAt)) {
-            /* TODO: Throw exception, invalid date
-             */
+            $this->sendError('Could not create assessment', [ 'set a close date' ]);
         }
 
         /* Start assembling assessment instance
@@ -247,9 +243,7 @@ class Controller extends Base
             $this->getResponse()->redirect->to($redirect);
         }
 
-        /* TODO: Throw exception for incomplete data
-         */
-        new \Alaress_Probe('is not valid at all');
+        $this->sendError('Could not create assessment', [ 'fill in all fields' ]);
     }
 
 
@@ -281,6 +275,45 @@ class Controller extends Base
 
 
 
+    /**
+     * Send a neat and tidy error back to the client
+     *
+     * TODO: I made a few fixes to this which need to be traitored
+     *
+     * @param $problem
+     * @param array $resolutions
+     * @param int $statusCode
+     * @throws SchoolboxException
+     */
+    protected function sendError($problem, array $resolutions = [], $statusCode = 400)
+    {
+        // cast exception to primitives
+        if ($problem instanceof \Alaress\Web\Controller\Exception) {
+            $resolutions = $problem->getReasons();
+            $problem     = $problem->getMessage();
+        }
+
+        if (count($resolutions)) {
+            $problem .= ". You need to ";
+        }
+
+        $this->getResponse()->status->set($statusCode);
+
+        if (!$this->getRequest()->isXhr()) {
+            throw $this->getErrorMapper()->generateException(105, null, $problem . implode(', ', $resolutions) . '.');
+        }
+
+        $this->getResponse()->content->set([
+            'template' => '@course/mage-error.twig',
+            'format'   => 'nochrome',
+            'data'     => [
+                'error' => [
+                    'problem' => $problem,
+                    'reasons' => $resolutions
+                ]
+            ]
+        ]);
+    }
 
 
 
