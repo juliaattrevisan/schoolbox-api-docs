@@ -321,6 +321,56 @@ abstract class AbstractAssessment implements IAssessable
         return 100 * ($this->numPublished() / $this->numParticipants());
     }
 
+    /* Validations
+     */
+
+    /**
+     * Check that all four dates are set validly
+     *
+     * @return bool
+     */
+    public function isValidDates()
+    {
+        /* Null dates are invalid
+         * Each date must be provided
+         */
+        if (!($this->getPublishAt() instanceof \Alaress_Date_Format) || ($this->getPublishAt() instanceof \Alaress_Date_NullDate)) {
+            return false;
+        }
+
+        if (!($this->getOpenAt() instanceof \Alaress_Date_Format) || ($this->getPublishAt() instanceof \Alaress_Date_NullDate)) {
+            return false;
+        }
+
+        if (!($this->getDueAt() instanceof \Alaress_Date_Format) || ($this->getPublishAt() instanceof \Alaress_Date_NullDate)) {
+            return false;
+        }
+
+        if (!($this->getCloseAt() instanceof \Alaress_Date_Format) || ($this->getPublishAt() instanceof \Alaress_Date_NullDate)) {
+            return false;
+        }
+
+        /* Check publish date against everything else
+         */
+        if ($this->getPublishAt()->gt($this->getOpenAt()) || $this->getPublishAt()->gt($this->getDueAt()) || $this->getPublishAt()->gt($this->getCloseAt())) {
+            return false;
+        }
+
+        /* Check open date against everything else
+         */
+        if ($this->getOpenAt()->gt($this->getDueAt()) || $this->getOpenAt()->gt($this->getCloseAt())) {
+            return false;
+        }
+
+        /* Check due date against everything else
+         */
+        if ($this->getDueAt()->gt($this->getCloseAt())) {
+            return false;
+        }
+
+        return true;
+    }
+
     /* Getters/Setters
      */
 
