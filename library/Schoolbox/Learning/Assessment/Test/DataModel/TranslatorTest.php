@@ -9,9 +9,13 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel;
 
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
+use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Course\Task as TaskModel;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Translator;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
+use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\User;
@@ -158,5 +162,65 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(7, $quizModel->getMaxAttempts());
         $this->assertEquals(1500, $quizModel->getDuration());
         $this->assertEquals('You done the quiz, Συγχαρητήρια!', $quizModel->getCompletionMessage());
+    }
+
+    /**
+     * Test translation to due work
+     */
+    public function testTranslateDueWorkToDataModel()
+    {
+        // TODO test variations
+        $dueWork = (new DueWork())
+            // Generic fields
+            ->setId(908)
+            ->setCreator($this->teacher1)
+            ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setTitle('Due Work Test งาน')
+            ->setDescription('Something ไม่มีอะไร')
+            ->setWeight(21)
+            // Specific fields
+            ->setAcceptsMultiple()
+            ->showOnlySubmittedStudents()
+            ->setAllFiles((new Collection())
+                ->add((new DueWorkFile())
+                    ->setId(33)
+                    ->setFilename('a file.txt')
+                    ->setHash('1234567890123456789012345678901234567890')
+                )
+                ->add((new DueWorkFile())
+                    ->setId(65)
+                    ->setFilename('an image.png')
+                    ->setHash('0000000000000000000000000000000000000002')
+                )
+                ->add((new DueWorkFile())
+                    ->setId(82)
+                    ->setFilename('a file.txt')
+                    ->setHash('0000000000000000000000000000000000000001')
+                )
+            )
+            ->setType((new DueWorkType())
+                ->setId(12)
+                ->setName('A dumb type')
+            )
+            ->setHasRubric(true)
+        ;
+
+        /** @var DueWorkModel $dueWorkModel */
+        $dueWorkModel = $this->translator->translateToDataModel($dueWork, 2);
+
+        // Test type
+        $this->assertInstanceOf(DueWorkModel::class, $dueWorkModel);
+
+        // Test due work-specific fields
+        $this->assertEquals(3, $dueWorkModel->getOwner()->getId());
+        $this->assertTrue($dueWorkModel->getAcceptOnline());
+        $this->assertTrue($dueWorkModel->getAcceptMultiple());
+        $this->assertTrue($dueWorkModel->getUseRubric());
+
+        // Test files
+        $this->assertCount(3, $dueWorkModel->getAttachments());
     }
 }
