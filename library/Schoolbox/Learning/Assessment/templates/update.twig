@@ -27,19 +27,28 @@
                 </fieldset>
 
                 <fieldset class="content">
-
+                    <legend>Assessments</legend>
                     {% if assessmentType == 'project' %}
                         <input type="hidden" name="assessmentType" value="project" />
-                        {% include '@learningAssessment/fragments/project/create.twig' %}
+                        <div class="small-12 columns">
+                            {% include '@learningAssessment/fragments/project/assessmentList.twig' %}
+                            {% include '@learningAssessment/fragments/project/create.twig' %}
+                        </div>
                     {% elseif assessmentType == 'dueWork' %}
                         <input type="hidden" name="assessmentType" value="dueWork" />
-                        {% include '@learningAssessment/fragments/duework/create.twig' %}
+                        <div class="small-12 columns">
+                            {% include '@learningAssessment/fragments/duework/create.twig' %}
+                        </div>
                     {% elseif assessmentType == 'task' %}
                         <input type="hidden" name="assessmentType" value="task" />
-                        {% include '@learningAssessment/fragments/task/create.twig' %}
+                        <div class="small-12 columns">
+                            {% include '@learningAssessment/fragments/task/create.twig' %}
+                        </div>
                     {% elseif assessmentType == 'quiz' %}
                         <input type="hidden" name="assessmentType" value="quiz" />
-                        {% include '@learningAssessment/fragments/quiz/create.twig' %}
+                        <div class="small-12 columns">
+                            {% include '@learningAssessment/fragments/quiz/create.twig' %}
+                        </div>
                     {% endif %}
 
                     {{ mage.submitRow('Save', '', '', '') }}

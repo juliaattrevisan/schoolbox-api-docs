@@ -1,0 +1,22 @@
+{% import '@learningAssessment/fragments/project/icon.twig' as icon %}
+
+<ul class="information-list">
+    {% for currentAssessment in assessment.assessables %}
+        <li class="actions-small-1">
+            <div class="list-item">
+                <div class="compact card small-12">
+                    <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {'assessmentId': currentAssessment.id}) }}">
+                        <div class="{{ icon.renderClass(currentAssessment.typeName) }}"></div>
+                        <h3>{{ currentAssessment.title }}</h3>
+                    </a>
+                </div>
+            </div>
+            <nav>
+                <a class="icon-modify no-text" href="{{ routeLookup('learningAssessment.getUpdateAssessment', {'assessmentId': currentAssessment.id}) }}" title="Modify"></a>
+                <a class="icon-delete no-text" href="{{ routeLookup('learningAssessment.getUpdateAssessment', {'assessmentId': currentAssessment.id}) }}" title="Delete"></a>
+            </nav>
+        </li>
+    {% else %}
+        No assessments in this project - create some
+    {% endfor %}
+</ul>
