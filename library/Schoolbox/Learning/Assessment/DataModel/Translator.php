@@ -50,6 +50,7 @@ class Translator
         // Probably doesn't always return a Model either, it will return an old
         // Quiz/DueWork/Task/Project model, with an Assessment attached.
         // TODO figure out which fields on assessable sub-objects are now redundant
+        // TODO figure out how to translate participants
         if ($assessment instanceof Project) {
             // convert to project's model
             // TODO implement this
