@@ -12,7 +12,6 @@
                 <a href="/homepage/{{ class.id }}">
                     <div class="card-feature-image" style="background-color:{{ class.colour }}; border-bottom: 10px solid {{ class.colour }};{%  if class.coverImage.hash %} background-image: url('/storage/image.php?hash={{ class.coverImage.hash }}&size=cardImageLarge'); background-size: cover; background-repeat: no-repeat; background-position: center; {% endif %}"></div>
                 </a>
-                <div class="class-colour"></div>
                 <div class="card-content actions-small-1">
                     <h3><a href="/homepage/{{ class.id }}">{{ class.name }}</a></h3>
                     <p class="meta">{{ class.getCodeString() }}</p>
