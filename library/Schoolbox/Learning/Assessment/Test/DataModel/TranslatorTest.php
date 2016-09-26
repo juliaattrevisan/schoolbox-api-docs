@@ -279,6 +279,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($dueWorkModel->getAcceptOnline());
         $this->assertTrue($dueWorkModel->getAcceptMultiple());
         $this->assertTrue($dueWorkModel->getUseRubric());
+        $this->assertTrue($dueWorkModel->getSkipUnsubmitted());
 
         // Test files
         $this->assertCount(3, $dueWorkModel->getAttachments());
