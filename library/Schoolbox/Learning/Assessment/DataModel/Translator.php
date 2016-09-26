@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Course\Task as TaskModel;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -60,16 +61,18 @@ class Translator
         // TODO figure out how to translate participants
         if ($assessment instanceof Project) {
             // convert to project's model
-            $model = new ProjectModel();
-            $i     = 0;
+            $model     = new ProjectModel();
+            $subModels = new Collection();
+            $i         = 0;
             foreach ($assessment->getAssessables() as $assessable) {
                 $subModel = $this->translateToDataModel($assessable, $i++);
                 // You can't have projects within projects
                 if ($subModel instanceof ProjectModel) {
                     throw new UnexpectedValueException('A project may not contain another project');
                 }
-                $model->getAssessments()->add($subModel);
+                $subModels->add($subModel);
             }
+            $model->setAssessments($subModels);
 
             // Translate summator
             if ($assessment->getSummator() instanceof Average) {
