@@ -1,3 +1,5 @@
+{% import '@learningAssessment/fragments/submitRow.twig' as mage %}
+
 {% include '@learningAssessment/fragments/common.twig' %}
 {% include '@learningAssessment/fragments/curriculumCodes.twig' %}
 {% include '@learningAssessment/fragments/dates.twig' %}
@@ -7,3 +9,5 @@
     <li><a href="{{ allReturnUrls['dueWork'] }}" data-assessment-type="dueWork" title="Create a new Due Work" class="button icon-due-work">New Due Work</a></li>
     <li><a href="{{ allReturnUrls['quiz'] }}" data-assessment-type="quiz" title="Create a new Quiz" class="button icon-quiz">New Quiz</a></li>
 </ul>
+
+{{ mage.submitRow('Next', 'part-2', 'part-3', 'Working...') }}

@@ -108,12 +108,13 @@
                 </fieldset>
 
                 <fieldset class="content" data-mage="part-2" disabled="disabled">
-                    <legend>Common Details</legend>
-                    <div class="small-12 columns hide" data-mage-collapsed>
-                        <div data-assessment-details></div>
+                    <legend>Assessment Details</legend>
+                    <div class="small-12 columns hide" data-mage-collapsed data-assessment-details></div>
+                </fieldset>
 
-                        {{ mage.submitRow('Next', 'part-2', 'part-3', 'Working...') }}
-                    </div>
+                <fieldset class="content" data-mage="part-3" disabled="disabled">
+                    <legend>Project Contents</legend>
+                    <div class="small-12 columns hide" data-mage-collapsed data-project-contents></div>
                 </fieldset>
 
                 {#<fieldset class="content">#}

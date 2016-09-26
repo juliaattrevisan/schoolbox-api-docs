@@ -1,3 +1,5 @@
+{% import '@learningAssessment/fragments/submitRow.twig' as mage %}
+
 {% include '@learningAssessment/fragments/common.twig' %}
 {% include '@learningAssessment/fragments/curriculumCodes.twig' %}
 {% include '@learningAssessment/fragments/dates.twig' %}
@@ -59,3 +61,5 @@
         <!--Rubric Here-->
     </div>
 </fieldset>
+
+{{ mage.submitRow('Next', 'part-2', '', 'Working...') }}
