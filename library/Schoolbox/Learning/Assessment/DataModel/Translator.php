@@ -113,8 +113,6 @@ class Translator
                 ->setLink($assessment->getLink())
                 ->setRequiresConfirmation(!$assessment->isSelfMarkable())
             ;
-            // TODO add getLink() to Task
-            // TODO add requiresConfirmation() to Task
             return $model;
 
         }
