@@ -185,7 +185,7 @@ class Model
     /**
      * @return Alaress_Date_Format
      */
-    public function getCloseDate(): Alaress_Date_Format
+    public function getCloseDate()
     {
         return $this->closeDate;
     }
