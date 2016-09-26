@@ -107,37 +107,11 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
-            'assessment' => [],
+//            'assessment' => [],
             'folder' => $folder,
-            'allMarkTypes' => $this->getAllMarkTypes(),
-            'curriculumNodes' => $folder->getCurriculumNodes()
+//            'allMarkTypes' => $this->getAllMarkTypes(),
+//            'curriculumNodes' => $folder->getCurriculumNodes()
         ]));
-    }
-
-    /**
-     * Find all the returnUrls
-     *
-     * @param int $assessmentId
-     * @return array
-     */
-    private function getAllReturnUrls($assessmentId)
-    {
-        /* Figure out a returnUrl
-         *
-         * When spawning a Project, its constituent Assessables return to this url
-         * after they are spawned
-         */
-        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', [ 'assessmentId' => $assessmentId ] );
-        $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
-
-        $allTypes = ['dueWork', 'task', 'quiz'];
-        $allReturnUrls = [];
-
-        foreach ($allTypes as $currentType) {
-            $allReturnUrls[$currentType] = $this->getRouter()->generate('learningAssessment.getCreateAssessmentWithinProject', ['assessmentId' => $assessmentId, 'assessmentType' => $currentType]) . $suffix;
-        }
-
-        return $allReturnUrls;
     }
 
     /**
@@ -149,172 +123,227 @@ class Controller extends Base
     public function postCreateAssessment()
     {
 
-        /* TODO: Actually save data here
+        /* Return a fragment based on its type
          */
-        $project = new Project(new SummatorAverage());
-        $project
-            ->setId(5567)
-            ->setTitle('Find Diablo')
-            ->setDescription('The things you need to do in order to slay the prime evil')
-            ->setCreator($_SESSION['user'])
-            ->setAllParticipants(new Collection())
-            ->setPublishAt(Alaress_Date_Format::now())
-            ->setOpenAt(Alaress_Date_Format::now())
-            ->setDueAt(Alaress_Date_Format::now())
-            ->setCloseAt(Alaress_Date_Format::now())
-            ->setCreatedAt(Alaress_Date_Format::now())
-            ->setUpdatedAt(Alaress_Date_Format::now());
+        switch($this->getRequest()->post['assessmentType']) {
+            case 'project':
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/create.twig', []));
+                break;
 
-        $assessmentId = $project->getId();
+            case 'dueWork':
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/dueWork/create.twig', []));
+                break;
 
-        /* Final payload
-         */
-        $data = [
-            'assessmentId' => $project->getId(),
-            'allReturnUrls' => $this->getAllReturnUrls($assessmentId),
+            case 'task':
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/task/create.twig', []));
+                break;
 
-            /* The next step of saving once you've chosen a type that isn't a project
-             */
-            'updateRoute' => $this->getRouter()->generate('learningAssessment.postUpdateAssessment', ['assessmentId' => $assessmentId]),
-        ];
+            case 'quiz':
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/quiz/create.twig', []));
+                break;
 
-        $this->getResponse()->content->set($this->buildJsonOutput($data));
-    }
-
-    /**
-     * Update an existing Assessment's details
-     *
-     * @param int $assessmentId
-     */
-    public function getUpdateAssessment($assessmentId)
-    {
-
-        /* TODO: Actually retrieve the data here
-         */
-
-        try {
-            $folder = $this->getFolderMapper()->findById(43);
+            default:
+                break;
         }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
-        }
-
-        $project = new Project(new SummatorAverage());
-        $project
-            ->setId(5567)
-            ->setTitle('Find Diablo')
-            ->setDescription('The things you need to do in order to slay the prime evil')
-            ->setCreator($_SESSION['user'])
-            ->setAllParticipants(new Collection())
-            ->setWeight(100)
-            ->setAssessables((new Collection())
-                ->add((new DueWork())
-                    ->setId(2)
-                    ->setTitle('Enter the Realm of Terroarrrr')
-                    ->setDescription('Diablo was found in the land of terroarrrrr! Find him, and whack him!')
-                    ->setType((new DueWorkType())
-                        ->setId(1)
-                        ->setName('Essay'))
-                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
-                    ->setPublishAt(Alaress_Date_Format::now())
-                    ->setOpenAt(Alaress_Date_Format::now())
-                    ->setDueAt(Alaress_Date_Format::now())
-                    ->setCloseAt(Alaress_Date_Format::now())
-                    ->setCreatedAt(Alaress_Date_Format::now())
-                    ->setUpdatedAt(Alaress_Date_Format::now()))
-                ->add((new DueWork())
-                    ->setId(2)
-                    ->setTitle('Enter the Realm of Terroarrrr')
-                    ->setDescription('Diablo was found in the land of terroarrrrr! Find him, and whack him!')
-                    ->setType((new DueWorkType())
-                        ->setId(1)
-                        ->setName('Essay'))
-                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
-                    ->setPublishAt(Alaress_Date_Format::now())
-                    ->setOpenAt(Alaress_Date_Format::now())
-                    ->setDueAt(Alaress_Date_Format::now())
-                    ->setCloseAt(Alaress_Date_Format::now())
-                    ->setCreatedAt(Alaress_Date_Format::now())
-                    ->setUpdatedAt(Alaress_Date_Format::now())))
-            ->setPublishAt(Alaress_Date_Format::now())
-            ->setOpenAt(Alaress_Date_Format::now())
-            ->setDueAt(Alaress_Date_Format::now())
-            ->setCloseAt(Alaress_Date_Format::now())
-            ->setCreatedAt(Alaress_Date_Format::now())
-            ->setUpdatedAt(Alaress_Date_Format::now());
-
-        $assessmentId = $project->getId();
-        $assessmentType = 'project';
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/update.twig', [
-            'assessment' => $project,
-            'assessmentType' => $assessmentType,
-            'folder' => $folder,
-            'allMarkTypes' => $this->getAllMarkTypes(),
-            'allReturnUrls' => $this->getAllReturnUrls($assessmentId),
-            'curriculumNodes' => $folder->getCurriculumNodes()
-        ]));
     }
 
-    /**
-     * Save the data when creating a specific kind of Assessment
-     *
-     * This happens after the common details are saved and after
-     * you've chosen one of project, due work, task, or quiz
-     *
-     * @param $assessmentId
-     */
-    public function postUpdateAssessment($assessmentId)
-    {
-        /* TODO: Actually save data here
-         */
 
-        /* TODO: Save the attributes common among all assessables
-         */
 
-        new \Alaress_Probe($assessmentId, $this->getRequest()->post);
-    }
+//        /* TODO: Actually save data here
+//         */
+//        $project = new Project(new SummatorAverage());
+//        $project
+//            ->setId(5567)
+//            ->setCreator($_SESSION['user'])
+//            ->setCreatedAt(Alaress_Date_Format::now())
+//            ->setUpdatedAt(Alaress_Date_Format::now());
+//
+//        $assessmentId = $project->getId();
+//
+//        /* Final payload
+//         */
+//        $data = [
+//            'assessmentId' => $project->getId(),
+//            'allReturnUrls' => $this->getAllReturnUrls($assessmentId),
+//
+//            /* The next step of saving once you've chosen a type that isn't a project
+//             */
+//            'updateRoute' => $this->getRouter()->generate('learningAssessment.postUpdateAssessment', ['assessmentId' => $assessmentId]),
+//        ];
+//
+//        $this->getResponse()->content->set($this->buildJsonOutput($data));
 
-    /**
-     * Create an Assessment within a particular Project
-     *
-     * @param $assessmentId
-     * @param $assessmentType
-     */
-    public function getCreateAssessmentWithinProject($assessmentId, $assessmentType)
-    {
 
-        /* TODO: Actually load data for $assessmentId here
-         */
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/createWithinProject.twig', [
-            'assessmentId' => $assessmentId,
-            'assessmentName' => 'Diablo',
-            'assessmentType' => $assessmentType,
-            'returnUrl' => $this->getRequest()->query['return_url']
-        ]));
-    }
 
-    /**
-     * Save the data when creating an assessment within a Project
-     */
-    public function postCreateAssessmentWithinProject()
-    {
-        /* TODO: Actually save data here then redirect back to project update screen
-         */
-        new \Alaress_Probe($_POST, $this->getRequest()->post, "Redirect to <a href='".(new Redirect())->decode($this->getRequest()->post['returnUrl'])."'>this url</a>");
-    }
 
-    /**
-     * Delete an assessment
-     *
-     * @param $assessmentId
-     */
-    public function postDeleteAssessment($assessmentId)
-    {
-        /* TODO: soft-delete this assessment
-         */
-    }
+
+
+
+
+
+
+//    /**
+//     * Find all the returnUrls
+//     *
+//     * @param int $assessmentId
+//     * @return array
+//     */
+//    private function getAllReturnUrls($assessmentId)
+//    {
+//        /* Figure out a returnUrl
+//         *
+//         * When spawning a Project, its constituent Assessables return to this url
+//         * after they are spawned
+//         */
+//        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', [ 'assessmentId' => $assessmentId ] );
+//        $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
+//
+//        $allTypes = ['dueWork', 'task', 'quiz'];
+//        $allReturnUrls = [];
+//
+//        foreach ($allTypes as $currentType) {
+//            $allReturnUrls[$currentType] = $this->getRouter()->generate('learningAssessment.getCreateAssessmentWithinProject', ['assessmentId' => $assessmentId, 'assessmentType' => $currentType]) . $suffix;
+//        }
+//
+//        return $allReturnUrls;
+//    }
+//
+//
+//    /**
+//     * Update an existing Assessment's details
+//     *
+//     * @param int $assessmentId
+//     */
+//    public function getUpdateAssessment($assessmentId)
+//    {
+//
+//        /* TODO: Actually retrieve the data here
+//         */
+//
+//        try {
+//            $folder = $this->getFolderMapper()->findById(43);
+//        }
+//        catch (MapperException $e) {
+//            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
+//        }
+//
+//        $project = new Project(new SummatorAverage());
+//        $project
+//            ->setId(5567)
+//            ->setTitle('Find Diablo')
+//            ->setDescription('The things you need to do in order to slay the prime evil')
+//            ->setCreator($_SESSION['user'])
+//            ->setAllParticipants(new Collection())
+//            ->setWeight(100)
+//            ->setAssessables((new Collection())
+//                ->add((new DueWork())
+//                    ->setId(2)
+//                    ->setTitle('Enter the Realm of Terroarrrr')
+//                    ->setDescription('Diablo was found in the land of terroarrrrr! Find him, and whack him!')
+//                    ->setType((new DueWorkType())
+//                        ->setId(1)
+//                        ->setName('Essay'))
+//                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
+//                    ->setPublishAt(Alaress_Date_Format::now())
+//                    ->setOpenAt(Alaress_Date_Format::now())
+//                    ->setDueAt(Alaress_Date_Format::now())
+//                    ->setCloseAt(Alaress_Date_Format::now())
+//                    ->setCreatedAt(Alaress_Date_Format::now())
+//                    ->setUpdatedAt(Alaress_Date_Format::now()))
+//                ->add((new DueWork())
+//                    ->setId(2)
+//                    ->setTitle('Enter the Realm of Terroarrrr')
+//                    ->setDescription('Diablo was found in the land of terroarrrrr! Find him, and whack him!')
+//                    ->setType((new DueWorkType())
+//                        ->setId(1)
+//                        ->setName('Essay'))
+//                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
+//                    ->setPublishAt(Alaress_Date_Format::now())
+//                    ->setOpenAt(Alaress_Date_Format::now())
+//                    ->setDueAt(Alaress_Date_Format::now())
+//                    ->setCloseAt(Alaress_Date_Format::now())
+//                    ->setCreatedAt(Alaress_Date_Format::now())
+//                    ->setUpdatedAt(Alaress_Date_Format::now())))
+//            ->setPublishAt(Alaress_Date_Format::now())
+//            ->setOpenAt(Alaress_Date_Format::now())
+//            ->setDueAt(Alaress_Date_Format::now())
+//            ->setCloseAt(Alaress_Date_Format::now())
+//            ->setCreatedAt(Alaress_Date_Format::now())
+//            ->setUpdatedAt(Alaress_Date_Format::now());
+//
+//        $assessmentId = $project->getId();
+//        $assessmentType = 'project';
+//
+//        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/update.twig', [
+//            'assessment' => $project,
+//            'assessmentType' => $assessmentType,
+//            'folder' => $folder,
+//            'allMarkTypes' => $this->getAllMarkTypes(),
+//            'allReturnUrls' => $this->getAllReturnUrls($assessmentId),
+//            'curriculumNodes' => $folder->getCurriculumNodes()
+//        ]));
+//    }
+//
+//    /**
+//     * Save the data when creating a specific kind of Assessment
+//     *
+//     * This happens after the common details are saved and after
+//     * you've chosen one of project, due work, task, or quiz
+//     *
+//     * @param $assessmentId
+//     */
+//    public function postUpdateAssessment($assessmentId)
+//    {
+//        /* TODO: Actually save data here
+//         */
+//
+//        /* TODO: Save the attributes common among all assessables
+//         */
+//
+//        new \Alaress_Probe($assessmentId, $this->getRequest()->post);
+//    }
+//
+//    /**
+//     * Create an Assessment within a particular Project
+//     *
+//     * @param $assessmentId
+//     * @param $assessmentType
+//     */
+//    public function getCreateAssessmentWithinProject($assessmentId, $assessmentType)
+//    {
+//
+//        /* TODO: Actually load data for $assessmentId here
+//         */
+//
+//        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/createWithinProject.twig', [
+//            'assessmentId' => $assessmentId,
+//            'assessmentName' => 'Diablo',
+//            'assessmentType' => $assessmentType,
+//            'returnUrl' => $this->getRequest()->query['return_url']
+//        ]));
+//    }
+//
+//    /**
+//     * Save the data when creating an assessment within a Project
+//     */
+//    public function postCreateAssessmentWithinProject()
+//    {
+//        /* TODO: Actually save data here then redirect back to project update screen
+//         */
+//        new \Alaress_Probe($_POST, $this->getRequest()->post, "Redirect to <a href='".(new Redirect())->decode($this->getRequest()->post['returnUrl'])."'>this url</a>");
+//    }
+//
+//    /**
+//     * Delete an assessment
+//     *
+//     * @param $assessmentId
+//     */
+//    public function postDeleteAssessment($assessmentId)
+//    {
+//        /* TODO: soft-delete this assessment
+//         */
+//    }
 
 
 
