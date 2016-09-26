@@ -20,6 +20,9 @@ use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Summator\Average;
+use Schoolbox\Learning\Assessment\Summator\Maximum;
+use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Resource\Storage\Model as StorageModel;
@@ -152,6 +155,38 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(DueWorkModel::class, $projectModel->getAssessments()[2]);
         $this->assertEquals(2, $projectModel->getAssessments()[2]->getAssessmentModel()->getSequence());
         $this->assertEquals(3, $projectModel->getAssessments()[2]->getAssessmentModel()->getId());
+    }
+    /**
+     * Data provider for different due work response acceptance settings.
+     */
+    public function getTestTranslateProjectSummatorData()
+    {
+        return [
+            [new Project(new WeightedAverage()), ProjectModel::SUMMATOR_WEIGHTED_AVERAGE,],
+            [new Project(new Average()), ProjectModel::SUMMATOR_AVERAGE,],
+            [new Project(new Minimum()), ProjectModel::SUMMATOR_MINIMUM,],
+            [new Project(new Maximum()), ProjectModel::SUMMATOR_MAXIMUM,],
+        ];
+    }
+
+    /**
+     * Test translation of acceptance response settings.
+     *
+     * @dataProvider getTestTranslateProjectSummatorData
+     *
+     * @param Project $project
+     * @param string  $summatorType
+     */
+    public function testTranslateProjectSummator(Project $project, $summatorType)
+    {
+        /** @var ProjectModel $projectModel */
+        $projectModel = $this->translator->translateToDataModel($project, 1);
+
+        // Test type
+        $this->assertInstanceOf(ProjectModel::class, $projectModel);
+
+        // Test summator
+        $this->assertEquals($summatorType, $projectModel->getSummator());
     }
 
     /**
