@@ -58,6 +58,11 @@ class Staff extends IteratorIterator
         ;
 
         $staff
+            ->getYear()
+            ->setLevel($currentResult['staff_year_level'])
+            ->setDescription($currentResult['staff_year_level_description']);
+
+        $staff
             ->getMeta()
             ->getCategory()
             ->setCode($currentResult['staff_category'])

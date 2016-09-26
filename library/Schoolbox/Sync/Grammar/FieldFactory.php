@@ -51,6 +51,7 @@ class FieldFactory
         switch($roleType) {
             case Role::STAFF:
                 $augment = [
+                    'year.level'         => 'Year Level',
                     'phoneWork.number'   => 'Work Phone Number',
                     'phoneWork.silent'   => 'Work Phone Silent Status',
                     'meta.department'    => 'Department',
