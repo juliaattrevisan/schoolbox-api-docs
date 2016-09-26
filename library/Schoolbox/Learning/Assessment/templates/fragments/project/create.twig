@@ -4,6 +4,8 @@
 {% include '@learningAssessment/fragments/curriculumCodes.twig' %}
 {% include '@learningAssessment/fragments/dates.twig' %}
 
+<input type="hidden" name="assessmentType" value="project" />
+
 <ul id="projectButtons" class="flex-list buttons">
     <li><a href="{{ allReturnUrls['task'] }}" data-assessment-type="task" title="Create a new Task" class="button icon-task">New Task</a></li>
     <li><a href="{{ allReturnUrls['dueWork'] }}" data-assessment-type="dueWork" title="Create a new Due Work" class="button icon-due-work">New Due Work</a></li>

@@ -22,9 +22,9 @@
         $('input[data-mage-next="part-2"]').mage({
             onXhrDone: function(data) {
                 $('#assessmentForm')
-                        .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment') }}')
-                        .find('[data-assessment-details]')
-                        .html(data);
+                    .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment') }}')
+                    .find('[data-assessment-details]')
+                    .html(data);
             }
         });
 
@@ -96,6 +96,8 @@
 <div class="row">
     <div class="small-12 columns island">
         <form action="{{ routeLookup('learningAssessment.postSelectAssessment') }}" id="assessmentForm" method="post">
+            <input type="hidden" name="folderId" value="{{ folder.id }}" />
+
             <section>
                 <fieldset class="content" data-mage="part-1">
                     <legend>Choose Assessment Type</legend>

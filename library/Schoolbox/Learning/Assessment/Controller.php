@@ -24,6 +24,7 @@ use \Schoolbox\Resource\Storage\Model as Storage;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\Assessment\Project as Project;
 
+use \Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedAverage;
 use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
 use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
 use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
@@ -111,8 +112,9 @@ class Controller extends Base
         }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
-//            'assessment' => [],
             'folder' => $folder,
+
+//            'assessment' => [],
 //            'allMarkTypes' => $this->getAllMarkTypes(),
 //            'curriculumNodes' => $folder->getCurriculumNodes()
         ]));
@@ -152,9 +154,102 @@ class Controller extends Base
      */
     public function postCreateAssessment()
     {
-        /* TODO: Actually save data here
+        $assessment = null;
+
+        try {
+            $folder = $this->getFolderMapper()->findById($this->getRequest()->post['folderId']);
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
+        }
+
+        switch($this->getRequest()->post['assessmentType']) {
+            case 'project':
+                $assessment = new Project(new SummatorWeightedAverage());
+                break;
+
+            case 'dueWork':
+                $assessment = new DueWork();
+                break;
+
+            case 'task':
+                $assessment = new Task();
+                break;
+
+            case 'quiz':
+                $assessment = new Quiz();
+                break;
+
+            default:
+                /* TODO: Throw exception for unknown assessment type
+                 */
+                break;
+        }
+
+        /* Check dates are set to something
          */
-        new \Alaress_Probe($this->getRequest()->post);
+        $publishAt = $this->getRequest()->post['publishDate'] . ' ' . $this->getRequest()->post['publishTime'];
+        $openAt = $this->getRequest()->post['openDate'] . ' ' . $this->getRequest()->post['openTime'];
+        $dueAt = $this->getRequest()->post['dueDate'] . ' ' . $this->getRequest()->post['dueTime'];
+        $closeAt = $this->getRequest()->post['closeDate'] . ' ' . $this->getRequest()->post['closeTime'];
+
+        if (!strlen($publishAt)) {
+            /* TODO: Throw exception, invalid date
+             */
+        }
+
+        if (!strlen($openAt)) {
+            /* TODO: Throw exception, invalid date
+             */
+        }
+
+        if (!strlen($dueAt)) {
+            /* TODO: Throw exception, invalid date
+             */
+        }
+
+        if (!strlen($closeAt)) {
+            /* TODO: Throw exception, invalid date
+             */
+        }
+
+        /* Start assembling assessment instance
+         */
+        $assessment
+            ->setTitle($this->getRequest()->post['title'])
+            ->setDescription($this->getRequest()->post['description'])
+            ->setCreator($_SESSION['user'])
+            ->setWeight($this->getRequest()->post['weight'])
+            ->setPublishAt(Alaress_Date_Format::newLocal($publishAt))
+            ->setOpenAt(Alaress_Date_Format::newLocal($openAt))
+            ->setDueAt(Alaress_Date_Format::newLocal($dueAt))
+            ->setCloseAt(Alaress_Date_Format::newLocal($closeAt))
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+
+        /* Verify that dates are temporally correct
+         */
+        if ($assessment->isValidDates()) {
+
+            /* TODO: Actually save data here
+             */
+
+            /* If it were a project, go back to the project's Update screen
+             * Otherwise return to the homepage
+             */
+            if ($assessment instanceof Project) {
+                $redirect = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessment->getId()]);
+            }
+            else {
+                $redirect = "/homepage/{$folder->getId()}";
+            }
+
+            $this->getResponse()->redirect->to($redirect);
+        }
+
+        /* TODO: Throw exception for incomplete data
+         */
+        new \Alaress_Probe('is not valid at all');
     }
 
 
