@@ -13,6 +13,8 @@ $folder = null;
 $groupID = $_SESSION['gid'];
 $prefix = 'code';
 
+/** @var SitePage $this */
+
 /* Retrieve the category ID from the URI, must be an integer and at least 1 character long
  * e.g. /homepage/43
  */
@@ -70,7 +72,7 @@ if (!($folder instanceof \Schoolbox\Resource\Folder\Model) || $folder->isDeleted
 
 // confirm that the user has permission to view this page
 $access = \Schoolbox\Permission\Access\Access::getInstance();
-if (($actualPermission = $access->getFolderAccess($_SESSION['user'], [$folder->getId()])) < READ_ACCESS) {
+if (($actualPermission = $access->getFolderAccess($this->getDi()->get('session')->get('user'), [$folder->getId()])) < READ_ACCESS) {
     error(14);
 }
 
@@ -112,7 +114,7 @@ if (!$homepageHandler->getTemplate()) {
 
 // moving forward! log the pageview
 $mapper = new Schoolbox\Resource\Folder\Log\Mapper();
-$mapper->incrementHitcount($_SESSION['user'], $folder->getId());
+$mapper->incrementHitcount($this->getDi()->get('session')->get('user'), $folder->getId());
 $folderMapper->logPageView($folder);
 
 /* BUILD PAGE */
@@ -131,7 +133,7 @@ $this->setBlock(TEMPLATE_content, 'customise_page', 'customise_page_block');
 $this->setBlock('custom_head', 'colour_list', 'colour_list_block');
 
 /* BUILD COMPONENTRY */
-$componentFactory = new Component_Homepage_Factory($_SESSION['user'], $this);
+$componentFactory = new Component_Homepage_Factory($this->getDi()->get('session')->get('user'), $this);
 if($_GET['readonly']) {
     $componentFactory->setMaximumPermission($virtualPermission);
 }
@@ -301,7 +303,7 @@ if ($virtualPermission >= WRITE_ACCESS) {
 //Setup control buttons
 $manageFolderController = new Component_Homepage_ManageFolderController(
     new Component_Instance(),
-    $_SESSION['user'],
+    $this->getDi()->get('session')->get('user'),
     $this
 );
 $manageFolderController->setMaximumPermission($virtualPermission);
@@ -312,7 +314,7 @@ $manageFolderController->renderTemplate('page_controls');
 //Setup class list buttons
 $manageClassController = new Component_Homepage_ManageClassController(
     new Component_Instance(),
-    $_SESSION['user'],
+    $this->getDi()->get('session')->get('user'),
     $this
 );
 $manageClassController->setMaximumPermission($virtualPermission);
@@ -327,7 +329,7 @@ if ($manageClassController->renderTemplate('manage_class')) {
 $this->parse('page_controls_block', 'page_controls');
 
 /** @var \Schoolbox\User $sessionUser */
-$sessionUser = $_SESSION['user'];
+$sessionUser = $this->getDi()->get('session')->get('user');
 
 if ($sessionUser->getRole()->isStaff()) {
     $codeString = Scrub::text($folder->getTruncatedCodeString());

@@ -74,9 +74,9 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         // We need the count of returns and submissions within the submission
         // boxes that have been retrieved.
         $submission_counts = array();
-        $isStudent         = $_SESSION['user']->getRole()->isStudent();
-        $isStaff           = $_SESSION['user']->getRole()->isStaff();
-        $userId            = $_SESSION['id'];
+        $isStudent         = $this->getUser()->getRole()->isStudent();
+        $isStaff           = $this->getUser()->getRole()->isStaff();
+        $userId            = $this->getUser()->getId();
         if ($isStudent) {
             $box_id_list       = $this->submissionList->getColumnValues('id');
             $submission_counts = SubmissionBox\Submission\FileMapper::getInstance()->findCountsForSubmissionBoxes(
@@ -150,13 +150,13 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             $this->setVar('duework_actions_block', '');
             $this->setVar('duework_due_date_block', '');
 
-            if ($_SESSION['user']->getRole()->isStudent()) {
+            if ($this->getUser()->getRole()->isStudent()) {
                 // what to display if student
                 if (!$isTask) {
                     $displayActions = false;
                     $displayHistory = true;
                 }
-            } elseif ($this->getContentPermission() >= WRITE_ACCESS && $_SESSION['user']->getRole()->isStaff()) {
+            } elseif ($this->getContentPermission() >= WRITE_ACCESS && $this->getUser()->getRole()->isStaff()) {
                 // what to display if staff
                 if (!$isTask) {
                     $displayResults = true;

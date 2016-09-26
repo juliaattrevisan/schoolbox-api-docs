@@ -45,7 +45,7 @@ if (is_array($templateList)) {
 }
 
 // Output the components for this template
-$componentFactory     = new Component_Eportfolio_Factory(new \Schoolbox\User(), $this, true);
+$componentFactory     = new Component_Eportfolio_Factory($this->getDi()->get('session')->get('user'), $this, true);
 $occupiedPositionList = [];
 $componentCounts      = [];
 foreach ($componentFactory->buildComponentList($templateList[0]['id']) as $component) {

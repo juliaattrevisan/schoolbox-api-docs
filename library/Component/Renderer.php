@@ -1,5 +1,6 @@
 <?php
 
+use \Schoolbox\Collection;
 /**
  * Really basic component renderer, copied out of /homepage/configForm.php
  *
@@ -13,7 +14,7 @@ class Component_Renderer
      * Renders all components for an admin page.
      *
      * @param SitePage $page
-     * @param Component_ControllerAbstract[] $componentCollection
+     * @param Collection|Component_ControllerAbstract[] $componentCollection
      */
     public function renderAllAdminComponents(SitePage $page, $componentCollection)
     {

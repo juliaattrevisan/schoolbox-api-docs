@@ -25,7 +25,7 @@ class Component_Dashboard_PapercutController extends Component_Dashboard_Control
 		$this->parseConfig();
 
 		$this->setVar(array(
-			'PAPERCUT_USERNAME' => $_SESSION['user']->getUsername(),
+			'PAPERCUT_USERNAME' => $this->getUser()->getUsername(),
 			'PAPERCUT_SERVER' => $this->getConfig('url'),
 		));
 

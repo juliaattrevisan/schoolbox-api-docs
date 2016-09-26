@@ -7,6 +7,7 @@
  * @version     SVN: $Id$
  */
 
+/** @var SitePage $this */
 if (isset($_GET['date_start']) && isset($_GET['date_end']) && isset($_GET['drop'])) {
     $this->localRedir('/'. implode('/', $_GET));
 }
@@ -75,7 +76,7 @@ $trail->renderIntoSitePage($this, 'BREADCRUMB', [
 ]);
 
 /* PARSE COMPONENTRY */
-$componentFactory = new Component_Homepage_Statistics_Factory(new \Schoolbox\User(), $this);
+$componentFactory = new Component_Homepage_Statistics_Factory($this->getDi()->get('session')->get('user'), $this);
 $componentCollection = $componentFactory->buildComponentList($folder->getId());
 $occupiedPositionList = array();
 $j = 0;

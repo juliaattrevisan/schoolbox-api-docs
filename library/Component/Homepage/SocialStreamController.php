@@ -48,7 +48,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
              * and disable javascript and hide links
              */
             $newPost = new \SocialStream_Post_String();
-            $currentUser = $_SESSION['user'];
+            $currentUser = $this->getUser();
             $authenticator = new \SocialStream\Authenticator($newPost, $this->getInstance(), $currentUser);
 
             if (!$authenticator->canComment() && !$authenticator->canCollaborate()) {

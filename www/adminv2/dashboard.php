@@ -9,8 +9,8 @@
  *
  */
 
-
-if (!$_SESSION['user']->isSuperuser()) {
+/** @var SitePage $this */
+if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
     error(19);
 }
 
@@ -48,7 +48,7 @@ if (is_array($groupList)) {
 }
 
 // Output the components for this group
-$componentFactory     = new Component_Dashboard_Factory(new \Schoolbox\User(), $this);
+$componentFactory     = new Component_Dashboard_Factory($this->getDi()->get('session')->get('user'), $this);
 $occupiedPositionList = [];
 $componentCounts      = [];
 foreach ($componentFactory->buildComponentList($groupList[0]['id']) as $component) {

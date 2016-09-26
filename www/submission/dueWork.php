@@ -7,6 +7,7 @@ use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 
+/** @var SitePage $this */
 if (!isset($this)) {
     require_once(dirname(__FILE__) . '/../../library/Bootstrap.php');
     SitePage::localRedir('/submission/dueWork');
@@ -172,7 +173,7 @@ if (!isset($categoryIDList)) {
 
 // output general data
 $output = array(
-    'CURRENT_DATE'   => date('F Y', $targetDate->getUnixTimestamp()),
+    'CURRENT_DATE'   => date('F Y', $targetDate->getUnixTimeStamp()),
     'NOT_TODAY'      => $targetDate->isToday() ? '' : 'not-today',
     'TODAY_DATE'     => date('Y-m-d'),
     'NEXT_MONTH'     => date('Y-m-d', strtotime('+1 month', $targetDate->getUnixTimeStamp())),
@@ -282,7 +283,7 @@ $selectedYear  = $targetDate->getYear();
 
 
 // create a custom instance of the upcoming work controller, and set it up for this context
-$chf        = new Component_Homepage_Factory(new Schoolbox\User(), $this);
+$chf        = new Component_Homepage_Factory($this->getDi()->get('session')->get('user'), $this);
 $cdm        = Component_DefinitionMapper::getInstance();
 $definition = $cdm->findOneByColumn('class', 'Component_Dashboard_UpcomingWorkController');
 $instance   = new Component_Instance();

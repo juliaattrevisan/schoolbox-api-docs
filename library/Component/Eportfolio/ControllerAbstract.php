@@ -33,8 +33,7 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
     {
         parent::setup($context);
 
-        /** @var Schoolbox\User $_SESSION['user'] */
-        if ($_SESSION['user']->isSuperuser()) {
+        if ($this->getUser()->isSuperuser()) {
             $this->setContentPermission(UserAccess::ACCESS_FULL);
         } elseif (!isset($context)) {
             $this->setContentPermission(UserAccess::ACCESS_DENY);

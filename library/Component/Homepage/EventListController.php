@@ -58,7 +58,7 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
         $this->end->addDays($dayLimit);
 
         // Produce API for schoolbox group events
-        $calendarApi  = new Calendar_Api_EventType_Event_Schoolbox_Group($_SESSION['user'], array());
+        $calendarApi  = new Calendar_Api_EventType_Event_Schoolbox_Group($this->getUser(), array());
         $calendarApi->setGroupId($this->getContext()->getId());
 
         $eventCount = 0;
@@ -68,9 +68,9 @@ class Component_Homepage_EventListController extends Component_Homepage_Controll
             $calendarApi,
             $this->start->getUnixTimeStamp(),
             $this->end->getUnixTimeStamp(),
-            $_SESSION['user'],
+            $this->getUser(),
             $this->getSitePage(),
-            $_SESSION['user']
+            $this->getUser()
         );
         foreach ($eventRenderer->getAllEvents() as $currentEvent) {
 

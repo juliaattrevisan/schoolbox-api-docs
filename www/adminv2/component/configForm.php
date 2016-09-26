@@ -90,7 +90,7 @@ if ($_POST['type'] == 'components') {
     }
 
     $factoryFactory = new Component_FactoryFactory();
-    $factory        = $factoryFactory->build($_POST['context'], new User(), $page, true);
+    $factory        = $factoryFactory->build($_POST['context'], $page->getDi()->get('session')->get('user'), $page, true);
 
     // $component instanceof Component_ControllerAbstract
     $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
@@ -123,7 +123,7 @@ if ($_POST['type'] == 'components') {
         // Create a controller object for the config class to use when
         // dehydrating config values into database
         $factoryFactory   = new Component_FactoryFactory();
-        $componentFactory = $factoryFactory->build($instance->getModule(), new User(), $page, true);
+        $componentFactory = $factoryFactory->build($instance->getModule(), $page->getDi()->get('session')->get('user'), $page, true);
         $controller       = $componentFactory->buildComponent($instance);
 
         /** @var Component_ConfigDefinition $confD */
@@ -160,7 +160,7 @@ if ($_POST['type'] == 'components') {
             // Just refetch the instance
             $instance         = reset($componentInstanceMapper->findByInstanceId($instance->getId()));
             $factoryFactory   = new Component_FactoryFactory();
-            $componentFactory = $factoryFactory->build($instance->getModule(), new Schoolbox\User(), $page, true);
+            $componentFactory = $factoryFactory->build($instance->getModule(), $page->getDi()->get('session')->get('user'), $page, true);
             $renderer         = new Component_Renderer();
             $renderer->renderAdminComponent($page, $componentFactory->buildComponent($instance));
             $page->outputPage(true);

@@ -72,8 +72,8 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
 
         /* Output student grades link to students of this class */
         if ($this->getContentPermission() == READ_ACCESS && (
-            $this->access->involvedInGroup($_SESSION['user'], $this->getContext()->getId()) ||
-                $this->access->involvedInSubject($_SESSION['user'], $this->getContext()->getCodeString()))
+            $this->access->involvedInGroup($this->getUser(), $this->getContext()->getId()) ||
+                $this->access->involvedInSubject($this->getUser(), $this->getContext()->getCodeString()))
         ) {
             $this->parse('student_grades_block', 'student_grades');
         } else {
@@ -87,7 +87,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
             $this->parse('class_list_block', 'class_list');
         }
         
-        if ($this->getContentPermission() >= WRITE_ACCESS && $_SESSION['user']->getRole()->isStaff()) {
+        if ($this->getContentPermission() >= WRITE_ACCESS && $this->getUser()->getRole()->isStaff()) {
             $this->parse('class_mark_block', 'class_mark');
         } else {
             $this->setVar('class_mark_block', '');
