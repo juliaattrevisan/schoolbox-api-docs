@@ -99,7 +99,7 @@ class Translator
                 ->setDueDate($assessment->getDueAt())
                 ->setLateDate($assessment->getCloseAt())
                 ->setWeight($assessment->getWeight())
-                ->setSkipUnsubmitted(!$assessment->getShowSubmittedOnly())
+                ->setSkipUnsubmitted($assessment->getShowSubmittedOnly())
                 ->setAcceptOnline($assessment->isAcceptSingle() || $assessment->isAcceptMulti())
                 ->setAcceptMultiple($assessment->isAcceptMulti())
                 ->setUseRubric($assessment->hasRubric())
