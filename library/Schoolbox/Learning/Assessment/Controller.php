@@ -333,16 +333,27 @@ class Controller extends Base
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
 
-        $assessmentId = $assessment->getId();
+        /* TODO: Determine type
+         */
         $assessmentType = 'project';
+
+        /* TODO: Figure out assessment's relationship to $folder in some way
+         */
+        try {
+            $folder = $this->getFolderMapper()->findById(43);
+        }
+        catch (MapperException $e) {
+            $this->sendError('Could not create assessment', [ 'select a valid Folder' ]);
+            return;
+        }
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/update.twig', [
             'assessment' => $assessment,
-//            'assessmentType' => $assessmentType,
-//            'folder' => $folder,
+            'assessmentType' => $assessmentType,
+            'folder' => $folder,
 //            'allMarkTypes' => $this->getAllMarkTypes(),
 //            'allReturnUrls' => $this->getAllReturnUrls($assessmentId),
-//            'curriculumNodes' => $folder->getCurriculumNodes()
+            'curriculumNodes' => $folder->getCurriculumNodes()
         ]));
     }
 
@@ -421,6 +432,7 @@ class Controller extends Base
             'project' => $project,
             'assessment' => [],
             'assessmentType' => $assessmentType,
+            'debugReturnUrl' => (new Redirect())->decode($this->getRequest()->query['return_url']),
             'returnUrl' => $this->getRequest()->query['return_url']
         ]));
     }
@@ -432,7 +444,9 @@ class Controller extends Base
     {
         /* TODO: Actually save data here then redirect back to project update screen
          */
-        new \Alaress_Probe($_POST, $this->getRequest()->post, "Redirect to <a href='".(new Redirect())->decode($this->getRequest()->post['returnUrl'])."'>this url</a>");
+        $returnUrl = (new Redirect())->decode($this->getRequest()->post['returnUrl']);
+
+        new \Alaress_Probe($_POST, $this->getRequest()->post, "Redirect to <a href='{$returnUrl}'>{$returnUrl}</a>");
     }
 
     /* Utility methods - these can probably be refactored elsewhere

@@ -7,7 +7,9 @@
 ) }}
 
 <div class="row">
-    <div class="small-12 columns"><h1>Update Assessment</h1></div>
+    <div class="small-12 columns">
+        <h1>Update Assessment</h1>
+    </div>
 </div>
 
 <div class="row">
@@ -16,17 +18,13 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        {% include '@learningAssessment/fragments/common.twig' %}
-                        {% include '@learningAssessment/fragments/dates.twig' %}
-                        {% include '@learningAssessment/fragments/curriculumCodes.twig' %}
 
                         {% if assessmentType == 'project' %}
                             <input type="hidden" name="assessmentType" value="project" />
-                            {% include '@learningAssessment/fragments/project/assessmentList.twig' %}
-                            {% include '@learningAssessment/fragments/project/create.twig' %}
+                            {% include '@learningAssessment/fragments/project/create.twig' with {update: true, assessmentList: allAssessments} %}
                         {% elseif assessmentType == 'dueWork' %}
                             <input type="hidden" name="assessmentType" value="dueWork" />
-                            {% include '@learningAssessment/fragments/duework/create.twig' %}
+                            {% include '@learningAssessment/fragments/dueWork/create.twig' %}
                         {% elseif assessmentType == 'task' %}
                             <input type="hidden" name="assessmentType" value="task" />
                             {% include '@learningAssessment/fragments/task/create.twig' %}
@@ -35,8 +33,6 @@
                             {% include '@learningAssessment/fragments/quiz/create.twig' %}
                         {% endif %}
                     </div>
-
-                    {{ mage.submitRow('Save', '', '', '') }}
                 </fieldset>
             </section>
         </form>

@@ -7,7 +7,10 @@
 ) }}
 
 <div class="row">
-    <div class="small-12 columns"><h1>Create Assessment in {{ project.title }}</h1></div>
+    <div class="small-12 columns">
+        <h1>Create Assessment in {{ project.title }}</h1>
+        {{ debugReturnUrl }}
+    </div>
 </div>
 
 <div class="row">
@@ -15,6 +18,7 @@
         <form action="{{ routeLookup('learningAssessment.postCreateAssessmentWithinProject', {assessmentId: project.id}) }}" method="post">
             <input type="hidden" name="projectId" value="{{ project.id }}" />
             <input type="hidden" name="type" value="{{ assessmentType }}" />
+            <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
 
             <section>
                 <fieldset class="content">
