@@ -30,7 +30,6 @@ use \Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedA
 use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
 use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
 use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
-use \Schoolbox\Learning\Assessment\Summator\Sum as SummatorSum;
 
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
@@ -63,13 +62,6 @@ class Controller extends Base
     protected $folderMapper;
 
     /**
-     * All the assessable types that can be spawned inside a project
-     *
-     * @var array
-     */
-    protected $allTypes = ['dueWork', 'task', 'quiz'];
-
-    /**
      * Controller constructor.
      * @param FolderMapper $folderMapper
      * @param ErrorMapper $errorMapper
@@ -100,6 +92,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
             'folder' => $folder,
+            'types' => new Types(),
         ]));
     }
 
@@ -128,8 +121,9 @@ class Controller extends Base
         /* Select the fragment to return
          */
         switch($this->getRequest()->post['assessmentType']) {
-            case 'project':
+            case Types::ASSESSMENT_PROJECT:
                 $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/create.twig', [
+                    'types' => new Types(),
                     'assessment' => $assessment,
                     'curriculumNodes' => $folder->getCurriculumNodes(),
                     'allSummators' => new SummatorCollection()
@@ -137,8 +131,9 @@ class Controller extends Base
 
                 break;
 
-            case 'dueWork':
+            case Types::ASSESSMENT_DUE_WORK:
                 $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/dueWork/create.twig', [
+                    'types' => new Types(),
                     'assessment' => $assessment,
                     'curriculumNodes' => $folder->getCurriculumNodes(),
                     'allMarkTypes' => $this->getAllMarkTypes(),
@@ -146,16 +141,18 @@ class Controller extends Base
 
                 break;
 
-            case 'task':
+            case Types::ASSESSMENT_TASK:
                 $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/task/create.twig', [
+                    'types' => new Types(),
                     'assessment' => $assessment,
                     'curriculumNodes' => $folder->getCurriculumNodes(),
                 ]));
 
                 break;
 
-            case 'quiz':
+            case Types::ASSESSMENT_QUIZ:
                 $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/quiz/create.twig', [
+                    'types' => new Types(),
                     'assessment' => $assessment,
                     'curriculumNodes' => $folder->getCurriculumNodes(),
                 ]));
@@ -188,19 +185,19 @@ class Controller extends Base
          * and spawn a new instance of it to manipulate
          */
         switch($this->getRequest()->post['assessmentType']) {
-            case 'project':
+            case Types::ASSESSMENT_PROJECT:
                 $assessment = new Project(new SummatorWeightedAverage());
                 break;
 
-            case 'dueWork':
+            case Types::ASSESSMENT_DUE_WORK:
                 $assessment = new DueWork();
                 break;
 
-            case 'task':
+            case Types::ASSESSMENT_TASK:
                 $assessment = new Task();
                 break;
 
-            case 'quiz':
+            case Types::ASSESSMENT_QUIZ:
                 $assessment = new Quiz();
                 break;
 
@@ -263,6 +260,7 @@ class Controller extends Base
              */
             if ($assessment instanceof Project) {
                 $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/createAssessment.twig', [
+                    'types' => new Types(),
                     'assessmentId' => $assessment->getId(),
                     'allReturnUrls' => $this->getAllReturnUrls($assessment->getId()),
                 ]));
@@ -335,19 +333,19 @@ class Controller extends Base
 
         /* TODO: Determine type
          */
-        $assessmentType = 'project';
+        $assessmentType = Types::ASSESSMENT_PROJECT;
 
         switch ($assessmentType) {
-            case 'project':
+            case Types::ASSESSMENT_PROJECT:
                 $template = 'updateProject.twig';
                 break;
-            case 'dueWork':
+            case Types::ASSESSMENT_DUE_WORK:
                 $template = 'updateDueWork.twig';
                 break;
-            case 'task':
+            case Types::ASSESSMENT_TASK:
                 $template = 'updateTask.twig';
                 break;
-            case 'quiz':
+            case Types::ASSESSMENT_QUIZ:
                 $template = 'updateQuiz.twig';
                 break;
             default:
@@ -369,9 +367,10 @@ class Controller extends Base
             'assessment' => $assessment,
             'assessmentType' => $assessmentType,
             'folder' => $folder,
-//            'allMarkTypes' => $this->getAllMarkTypes(),
-//            'allReturnUrls' => $this->getAllReturnUrls($assessmentId),
-            'curriculumNodes' => $folder->getCurriculumNodes()
+            'allReturnUrls' => $this->getAllReturnUrls($assessmentId),
+            'curriculumNodes' => $folder->getCurriculumNodes(),
+            //            'allMarkTypes' => $this->getAllMarkTypes(),
+            'allSummators' => new SummatorCollection(),
         ]));
     }
 
@@ -447,10 +446,10 @@ class Controller extends Base
             ->setUpdatedAt(Alaress_Date_Format::now());
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/createWithinProject.twig', [
+            'types' => new Types(),
             'project' => $project,
             'assessment' => [],
             'assessmentType' => $assessmentType,
-            'debugReturnUrl' => (new Redirect())->decode($this->getRequest()->query['return_url']),
             'returnUrl' => $this->getRequest()->query['return_url']
         ]));
     }
@@ -490,8 +489,10 @@ class Controller extends Base
          */
         $allReturnUrls = [];
 
-        foreach ($this->allTypes as $currentType) {
-            $allReturnUrls[$currentType] = $this->getRouter()->generate('learningAssessment.getCreateAssessmentWithinProject', ['assessmentId' => $assessmentId, 'assessmentType' => $currentType]) . $suffix;
+        $allTypes = new Types();
+
+        foreach ($allTypes->getTypes() as $title => $index) {
+            $allReturnUrls[$index] = $this->getRouter()->generate('learningAssessment.getCreateAssessmentWithinProject', ['assessmentId' => $assessmentId, 'assessmentType' => $index]) . $suffix;
         }
 
         return $allReturnUrls;

@@ -1,6 +1,6 @@
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-<input type="hidden" name="assessmentType" value="task" />
+<input type="hidden" name="assessmentType" value="{{ types.fromTitle('task') }}" />
 
 <div class="row">
     <div class="small-10 columns">
@@ -10,7 +10,7 @@
     </div>
     <div class="small-2 columns">
         <a href="#" class="button icon-attach" data-value="attach">Attach</a>
-        {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+        {#{% include 'sub/attachzone.twig' with { attachzone: attachzone } %}#}
     </div>
 </div>
 

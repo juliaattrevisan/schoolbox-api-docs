@@ -4,7 +4,7 @@
     <section>
         <fieldset class="content">
             <div class="small-12 columns">
-                <input type="hidden" name="assessmentType" value="quiz" />
+                <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
                 {% include '@learningAssessment/fragments/quiz/create.twig' %}
             </div>
         </fieldset>

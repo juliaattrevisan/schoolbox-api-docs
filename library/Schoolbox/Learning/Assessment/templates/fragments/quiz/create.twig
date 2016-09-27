@@ -4,7 +4,7 @@
 {% include '@learningAssessment/fragments/curriculumCodes.twig' %}
 {% include '@learningAssessment/fragments/dates.twig' %}
 
-<input type="hidden" name="assessmentType" value="quiz" />
+<input type="hidden" name="assessmentType" value="{{ types.fromTitle('quiz') }}" />
 
 <label>
     Max Attempts

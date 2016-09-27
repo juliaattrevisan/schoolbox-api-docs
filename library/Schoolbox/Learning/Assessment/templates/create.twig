@@ -128,10 +128,10 @@
                         <div class="column small-12">
                             <input type="hidden" name="folderId" value="{{ folder.id }}" />
 
-                            <input type="radio" name="assessmentType" value="project" id="project"><label for="project" class="radio-label">Project</label>
-                            <input type="radio" name="assessmentType" value="dueWork" id="due-work"><label for="due-work" class="radio-label">Due Work</label>
-                            <input type="radio" name="assessmentType" value="quiz" id="quiz"><label for="quiz" class="radio-label">Quiz</label>
-                            <input type="radio" name="assessmentType" value="task" id="task"><label for="task" class="radio-label">Task</label>
+                            <input type="radio" name="assessmentType" value="{{ types.getFromTitle('project') }}" id="project"><label for="project" class="radio-label">Project</label>
+                            <input type="radio" name="assessmentType" value="{{ types.getFromTitle('dueWork') }}" id="due-work"><label for="due-work" class="radio-label">Due Work</label>
+                            <input type="radio" name="assessmentType" value="{{ types.getFromTitle('task') }}" id="task"><label for="task" class="radio-label">Task</label>
+                            <input type="radio" name="assessmentType" value="{{ types.getFromTitle('quiz') }}" id="quiz"><label for="quiz" class="radio-label">Quiz</label>
                         </div>
                     </fieldset>
 
