@@ -73,6 +73,9 @@ class Module extends BaseModule
                  */
                 '/assessment/create' => 'postCreateAssessment',
 
+                /* Add assessments to a Project
+                 */
+                '/assessment/{assessmentId}/new' => 'postCreateAssessmentWithinProject',
 
 
 
@@ -84,9 +87,6 @@ class Module extends BaseModule
                  */
                 '/assessment/{assessmentId}/update' => 'postUpdateAssessment',
 
-                /* Add assessments to a Project
-                 */
-                '/assessment/{assessmentId}/new/{assessmentType}' => 'postCreateAssessmentWithinProject',
 
                 /* Delete an assessment
                  */

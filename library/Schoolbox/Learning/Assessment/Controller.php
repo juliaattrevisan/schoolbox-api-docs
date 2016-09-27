@@ -415,6 +415,16 @@ class Controller extends Base
         ]));
     }
 
+    /**
+     * Save the data when creating an assessment within a Project
+     */
+    public function postCreateAssessmentWithinProject()
+    {
+        /* TODO: Actually save data here then redirect back to project update screen
+         */
+        new \Alaress_Probe($_POST, $this->getRequest()->post, "Redirect to <a href='".(new Redirect())->decode($this->getRequest()->post['returnUrl'])."'>this url</a>");
+    }
+
     /* Utility methods - these can probably be refactored elsewhere
      */
 
@@ -576,16 +586,7 @@ class Controller extends Base
 //    }
 //
 
-//
-//    /**
-//     * Save the data when creating an assessment within a Project
-//     */
-//    public function postCreateAssessmentWithinProject()
-//    {
-//        /* TODO: Actually save data here then redirect back to project update screen
-//         */
-//        new \Alaress_Probe($_POST, $this->getRequest()->post, "Redirect to <a href='".(new Redirect())->decode($this->getRequest()->post['returnUrl'])."'>this url</a>");
-//    }
+
 //
 //    /**
 //     * Delete an assessment

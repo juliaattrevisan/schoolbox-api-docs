@@ -6,50 +6,13 @@
     [ 'Create Assessment', routeLookup('learningAssessment.getSelectAssessment') ]
 ) }}
 
-<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
-<script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
-<script type="text/javascript">
-    {#$(function () {#}
-
-        {#/**#}
-         {#* Update the heading and perform transitions#}
-         {#*#}
-         {#* @param assessmentType#}
-         {#* @param selected#}
-         {#*/#}
-        {#function updateType(assessmentType, selected) {#}
-            {#$('#assessmentType').text($('#assessmentType').text() + ': ' + assessmentType);#}
-
-            {#var next = $('[data-mage="part-2-'+selected+'"]');#}
-            {#next.removeAttr('disabled').removeClass('hide');#}
-            {#next.find('[data-mage-collapsed]').hide().removeClass('hide').slideDown(600);#}
-        {#}#}
-
-        {#var assessmentType = '{{ assessmentType }}';#}
-
-        {#switch (assessmentType) {#}
-            {#case 'dueWork':#}
-                {#updateType('Due Work', assessmentType);#}
-                {#break;#}
-            {#case 'quiz':#}
-                {#updateType('Quiz', assessmentType);#}
-                {#break;#}
-            {#case 'task':#}
-                {#updateType('Task', assessmentType);#}
-                {#break;#}
-            {#default:#}
-                {#break;#}
-        {#}#}
-    {#});#}
-</script>
-
 <div class="row">
     <div class="small-12 columns"><h1>Create Assessment in {{ project.title }}</h1></div>
 </div>
 
 <div class="row">
     <div class="small-12 columns island">
-        <form action="{{ routeLookup('learningAssessment.postCreateAssessmentWithinProject', {assessmentId: assessmentId, assessmentType: assessmentType}) }}" id="assessmentForm" method="post">
+        <form action="{{ routeLookup('learningAssessment.postCreateAssessmentWithinProject', {assessmentId: project.id}) }}" method="post">
             <input type="hidden" name="projectId" value="{{ project.id }}" />
             <input type="hidden" name="type" value="{{ assessmentType }}" />
 
