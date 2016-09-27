@@ -157,7 +157,7 @@ class Controller extends Base
         $this->import->setUpdatedAt(\Alaress_Date_Format::now());
         $this->getImportMapper()->save($this->import);
     }
-    
+
     /**
      * Insert an attach zone into the template
      *
@@ -255,16 +255,16 @@ class Controller extends Base
         }
     }
 
-
     /**
      * Reverse geocode an address
      * @param $string
      * @return array|null
      */
-    private function lookupAddress($string) {
+    private function lookupAddress($string)
+    {
 
-        $string = str_replace (" ", "+", urlencode($string));
-        $details_url = "http://maps.googleapis.com/maps/api/geocode/json?address=".$string."&sensor=false";
+        $string = str_replace(" ", "+", urlencode($string));
+        $details_url = "http://maps.googleapis.com/maps/api/geocode/json?address=" . $string . "&sensor=false";
 
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $details_url);
@@ -292,7 +292,8 @@ class Controller extends Base
      * Display import status
      * @param $id
      */
-    public function getImport($id) {
+    public function getImport($id)
+    {
 
         $this->getResponse()->content->set([
             'template' => '@sportsfixturesImport/importing.twig',
@@ -1374,27 +1375,27 @@ class Controller extends Base
 
                         for ($i = 11; $i < count($row); $i += 3) {
 
-                            if (!empty($row[$i]) || !empty($row[$i+1]) || !empty($row[$i+2])) {
+                            if (!empty($row[$i]) || !empty($row[$i + 1]) || !empty($row[$i + 2])) {
 
                                 $error = false;
 
                                 if (empty($row[$i])) {
-                                    $this->updateLog($storageObject, $reader->key(), ($i+1), "SKIPPED ITINERARY ITEM: No date specified");
+                                    $this->updateLog($storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: No date specified");
                                     $error = true;
                                 }
                                 if (empty($row[$i + 1])) {
-                                    $this->updateLog($storageObject, $reader->key(), ($i+1), "SKIPPED ITINERARY ITEM: No time specified");
+                                    $this->updateLog($storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: No time specified");
                                     $error = true;
                                 }
                                 if (empty($row[$i + 2])) {
-                                    $this->updateLog($storageObject, $reader->key(), ($i+1), "SKIPPED ITINERARY ITEM: No description specified");
+                                    $this->updateLog($storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: No description specified");
                                     $error = true;
                                 }
 
                                 try {
                                     $this->makeDateTime($row[$i], $row[$i + 1]);
                                 } catch (\Exception $e) {
-                                    $this->updateLog($storageObject, $reader->key(), ($i+1), "SKIPPED ITINERARY ITEM: Invalid date/time specified ({$row[$i]} {$row[$i+1]})");
+                                    $this->updateLog($storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: Invalid date/time specified ({$row[$i]} {$row[$i+1]})");
                                     $error = true;
                                 }
 
@@ -1800,7 +1801,7 @@ class Controller extends Base
     {
         $this->importErrorsMapper = $importErrorsMapper;
         return $this;
-    }    
+    }
 
     /**
      * @return TeamPlayerMapper
