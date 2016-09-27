@@ -73,27 +73,27 @@ class Controller extends Base
         $this->setFolderMapper($folderMapper);
     }
 
-    /**
-     * All the possible Mark Types to chooze from
-     * TODO: Replace with actual objects
-     */
-    private function getAllMarkTypes()
-    {
-        return [
-            [
-                'id'   => 1,
-                'name' => 'None'
-            ],
-            [
-                'id'   => 2,
-                'name' => 'Percentage'
-            ],
-            [
-                'id'   => 3,
-                'name' => 'Letter'
-            ]
-        ];
-    }
+//    /**
+//     * All the possible Mark Types to chooze from
+//     * TODO: Replace with actual objects
+//     */
+//    private function getAllMarkTypes()
+//    {
+//        return [
+//            [
+//                'id'   => 1,
+//                'name' => 'None'
+//            ],
+//            [
+//                'id'   => 2,
+//                'name' => 'Percentage'
+//            ],
+//            [
+//                'id'   => 3,
+//                'name' => 'Letter'
+//            ]
+//        ];
+//    }
 
     /**
      * Select an Assessment
@@ -115,8 +115,6 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
             'folder' => $folder,
-//            'allMarkTypes' => $this->getAllMarkTypes(),
-
         ]));
     }
 
@@ -142,6 +140,8 @@ class Controller extends Base
             ->setDueAt(Alaress_Date_Format::now())
             ->setCloseAt(Alaress_Date_Format::now());
 
+        /* Select the fragment to return
+         */
         switch($this->getRequest()->post['assessmentType']) {
             case 'project':
                 $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/create.twig', [
@@ -198,6 +198,9 @@ class Controller extends Base
             return;
         }
 
+        /* Figure out what kind of assessment was chosen
+         * and spawn a new instance of it to manipulate
+         */
         switch($this->getRequest()->post['assessmentType']) {
             case 'project':
                 $assessment = new Project(new SummatorWeightedAverage());
@@ -306,6 +309,8 @@ class Controller extends Base
         $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessmentId]);
         $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
 
+        /* TODO: Refactor this better
+         */
         $allTypes = ['dueWork', 'task', 'quiz'];
         $allReturnUrls = [];
 
