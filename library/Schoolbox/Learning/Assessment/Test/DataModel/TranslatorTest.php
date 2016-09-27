@@ -392,6 +392,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTranslateGenericFieldsToDomainModel()
     {
         $dataModel = (new TaskModel())
+            ->setId(15)
             ->setAssessmentModel(
                 (new AssessmentModel())
                     ->setId(401)
