@@ -104,6 +104,9 @@ CREATE TABLE `assessment` (
   `close_date` DATETIME NULL,
   `weight` INT(11) NOT NULL DEFAULT 0,
   `sequence` TINYINT NULL,
+  `created_at` DATETIME NOT NULL,
+  `updated_at` DATETIME NOT NULL,
+  `deleted_at` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8
