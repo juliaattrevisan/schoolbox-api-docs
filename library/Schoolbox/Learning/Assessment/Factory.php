@@ -17,14 +17,7 @@ namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\User;
 
-use Schoolbox\Learning\Assessment\Summator\ISummator;
-use \Schoolbox\Learning\Assessment\Summator\Collection as SummatorCollection;
-use \Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedAverage;
-use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
-use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
-use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
-
-use \Schoolbox\Learning\Assessment\Project as Project;
+use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
@@ -125,7 +118,7 @@ class Factory
          */
         switch($this->getType()) {
             case Types::ASSESSMENT_PROJECT:
-                $assessment = new Project(new SummatorWeightedAverage());
+                $assessment = new Project((new SummatorFactory($this->getSummator()))->produce());
                 break;
 
             case Types::ASSESSMENT_DUE_WORK:
