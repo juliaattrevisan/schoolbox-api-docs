@@ -21,7 +21,15 @@
 
                         {% if assessmentType == 'project' %}
                             <input type="hidden" name="assessmentType" value="project" />
-                            {% include '@learningAssessment/fragments/project/create.twig' with {update: true, assessmentList: allAssessments} %}
+                            {% include '@learningAssessment/fragments/project/create.twig' %}
+
+                            <div class="row">
+                                <div class="small-12 columns">
+                                    <h2>Assessments within {{ assessment.title }}</h2>
+                                    {% include '@learningAssessment/fragments/project/assessmentList.twig' %}
+                                    {% include '@learningAssessment/fragments/project/createAssessment.twig' %}
+                                </div>
+                            </div>
                         {% elseif assessmentType == 'dueWork' %}
                             <input type="hidden" name="assessmentType" value="dueWork" />
                             {% include '@learningAssessment/fragments/dueWork/create.twig' %}
