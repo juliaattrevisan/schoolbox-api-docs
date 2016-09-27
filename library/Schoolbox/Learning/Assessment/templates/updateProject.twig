@@ -12,11 +12,10 @@
 
     <h2 class="subheader">Assessments within {{ assessment.title }}</h2>
     <section>
-        <fieldset class="content">
-            <div class="small-12 columns">
-                {% include '@learningAssessment/fragments/project/assessmentList.twig' %}
-                {% include '@learningAssessment/fragments/project/createAssessment.twig' %}
-            </div>
-        </fieldset>
+        {% include '@learningAssessment/fragments/project/assessmentList.twig' %}
+
+        <div class="content">
+            {% include '@learningAssessment/fragments/project/createAssessment.twig' %}
+        </div>
     </section>
 {% endblock %}
