@@ -227,7 +227,10 @@ class Controller extends Base
 
                 if ($render) {
                     $result['errors'][] = [
-                        'created_at' => $error->getCreatedAt()->get24Hour() . ":" . $error->getCreatedAt()->getMinute() . ":" . $error->getCreatedAt()->getSecond(),
+                        'created_at' =>
+                            $error->getCreatedAt()->get24Hour() . ":" .
+                            ($error->getCreatedAt()->getMinute() < 10 ? '0' . $error->getCreatedAt()->getMinute() : $error->getCreatedAt()->getMinute()) . ":" .
+                            ($error->getCreatedAt()->getSecond() < 10 ? '0' . $error->getCreatedAt()->getSecond() : $error->getCreatedAt()->getSecond()),
                         'result' => $error->getResult(),
                         'filename' => $error->getFilename(),
                         'line' => $error->getLine(),
@@ -1279,7 +1282,7 @@ class Controller extends Base
                             $error = true;
                         }
                     }
-                    
+
                     if (!$error) {
 
                         try {
@@ -1287,15 +1290,15 @@ class Controller extends Base
                                 'division_id' => $division->getId(),
                                 'season_id' => $season->getId(),
                                 'venue_id' => $venue->getId(),
-                                'home_team_id' => $teamHome,
-                                'away_team_id' => $teamAway,
-                                'home_school_id' => $schoolHome,
-                                'away_school_id' => $schoolAway
+                                'home_team_id' => $teamHome == null ? null : $teamHome->getId(),
+                                'away_team_id' => $teamAway == null ? null : $teamAway->getId(),
+                                'home_school_id' => $schoolHome == null ? null : $schoolHome->getId(),
+                                'away_school_id' => $schoolAway == null ? null : $schoolAway->getId()
                             ]);
                         } catch (MapperException $e) {
                             $match = new Match();
                         }
-                        
+
                         $match->setDivision($division);
                         $match->setSeason($season);
                         $match->setVenue($venue);

@@ -1,6 +1,6 @@
 TYPE,SEASON,SPORT,DIVISION,MATCH NAME,DATE,TIME,VENUE,HOME TEAM,AWAY TEAM/SCHOOL,NOTES,ITINERARY DATE,ITINERARY TIME,ITINERARY DESCRIPTION,ITINERARY DATE,ITINERARY TIME,ITINERARY DESCRIPTION,ITINERARY DATE,ITINERARY TIME,ITINERARY DESCRIPTION,REPEAT… ITINERARY ITEMS
-Fixture,Spring 2016,Basketball,Firsts,Round One,01/09/16,08:30:00,Mazenod College,Raiders,Salesian College,This is the first match,01/09/16,07:30:00,Meet at buses,01/09/16,08:00:00,Arrive at Salesian College,01/09/16,15:00:00,Victory party,
-Fixture,Spring 2016,Basketball,Firsts,Round Two,05/09/16,08:30:00,Mazenod College,Raiders,Mazenod College,This is the second match,05/09/16,07:30:00,Meet at buses,,,,,,,
-Fixture,Spring 2016,Basketball,Firsts,Round Three,13/09/16,8:45:00,Avila College,Warriors,Salesian College,,13/09/16,07:30:00,Meet at buses,,,,,,,
-Fixture,Spring 2016,Basketball,Firsts,Semi Final,17/09/16,15:00:00,Xavier College,Warriors,Xavier College,,17/09/16,07:30:00,Meet at buses,17/09/16,15:30:00,Arrive at Xavier College,,,,
-Fixture,Spring 2016,Basketball,Firsts,Grand Final,22/09/16,17:00:00,Scotch College,Warriors,Avila College,Last match of the year!,10/10/16,07:30:00,Meet at buses,,,,,,,
+Fixture,Spring 2016,Basketball,Firsts,Round One,01/09/16,08:30:00,Mazenod College,Raiders,Salesian College,This is the first match,01/09/16,07:30:00,Meet at buses,01/09/16,08:00:00,Arrive at Salesian College,01/09/16,15:00:00,Victory party
+Fixture,Spring 2016,Basketball,Firsts,Round Two,05/09/16,08:30:00,Mazenod College,Raiders,Mazenod College,This is the second match,05/09/16,07:30:00,Meet at buses
+Fixture,Spring 2016,Basketball,Firsts,Round Three,13/09/16,8:45:00,Avila College,Warriors,Salesian College,,13/09/16,07:30:00,Meet at buses
+Fixture,Spring 2016,Basketball,Firsts,Semi Final,17/09/16,15:00:00,Xavier College,Warriors,Xavier College,,17/09/16,07:30:00,Meet at buses,17/09/16,15:30:00,Arrive at Xavier College
+Fixture,Spring 2016,Basketball,Firsts,Grand Final,22/09/16,17:00:00,Scotch College,Warriors,Avila College,Last match of the year!,10/10/16,07:30:00,Meet at buses
