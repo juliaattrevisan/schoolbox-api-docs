@@ -390,8 +390,21 @@ CREATE TABLE sportsfixtures_import
 (
 	id INT(11) NOT NULL AUTO_INCREMENT,
 	status VARCHAR(50) DEFAULT 'Pending',
-	result TEXT,
 	owner_id INT,
+	`created_at` DATETIME NOT NULL,
+	`updated_at` DATETIME NOT NULL,
+	`deleted_at` DATETIME NULL DEFAULT NULL,
+	PRIMARY KEY (`id`)
+) ENGINE=InnoDB CHARACTER SET=utf8;
+
+CREATE TABLE sportsfixtures_import_errors
+(
+	id INT(11) NOT NULL AUTO_INCREMENT,
+	import_id INT,
+	filename VARCHAR(255),
+	line INT,
+	`column` INT,
+	result TEXT,
 	`created_at` DATETIME NOT NULL,
 	`updated_at` DATETIME NOT NULL,
 	`deleted_at` DATETIME NULL DEFAULT NULL,

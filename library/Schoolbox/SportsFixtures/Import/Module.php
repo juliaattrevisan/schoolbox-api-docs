@@ -38,7 +38,8 @@ class Module extends BaseModule
         $routes = [
             'GET' => [
                 '/upload' => 'getUpload',
-                '/import-progress/{id}' => 'getImportProgress'
+                '/import/{id}' => 'getImport',
+                '/import-progress/{id}{/skip}' => 'getImportProgress'
             ],
             'POST' => [
                 '/upload' => 'postUpload',

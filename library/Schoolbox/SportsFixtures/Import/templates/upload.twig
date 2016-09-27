@@ -15,11 +15,31 @@
 <div class="row">
     <div class="small-12 island">
 
+
         <section class="content">
             <article>
-                <h2>Example Template</h2>
+                <h2>Instructions</h2>
                 <p>
-                    <a href="/sports.csv">Click here to download example template</a>
+                    Using the example templates below as a guide, download and populate each file with the required information
+                    then attach the completed files at the bottom of the page and click on the 'Import' button to import the data.
+                </p>
+            </article>
+        </section>
+
+        <section class="content">
+            <article>
+                <h2>Sample Template</h2>
+                <p>
+                    <a href="/sportsfixtures/import/sports.csv">Sports Template</a><br>
+                    <a href="/sportsfixtures/import/seasons.csv">Seasons Template</a><br>
+                    <a href="/sportsfixtures/import/positions.csv">Positions Template</a><br>
+                    <a href="/sportsfixtures/import/schools.csv">Schools Template</a><br>
+                    <a href="/sportsfixtures/import/venues.csv">Venues Template</a><br>
+                    <a href="/sportsfixtures/import/statuses.csv">Match Statuses Template</a><br>
+                    <a href="/sportsfixtures/import/coaches.csv">Coaches template</a><br>
+                    <a href="/sportsfixtures/import/divisions.csv">Divisions Template</a><br>
+                    <a href="/sportsfixtures/import/teams.csv">Teams Template</a><br>
+                    <a href="/sportsfixtures/import/fixture.csv">Fixture Template</a>
                 </p>
             </article>
         </section>
@@ -29,7 +49,7 @@
             {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
 
             <ul class="flex-list buttons">
-                <li><input type="submit" data-submit value="Save"></li>
+                <li><input type="submit" data-submit value="Import"></li>
                 <li><input type="button" data-cancel class="button expand icon-cancel" value="Cancel Changes"></li>
             </ul>
         </form>

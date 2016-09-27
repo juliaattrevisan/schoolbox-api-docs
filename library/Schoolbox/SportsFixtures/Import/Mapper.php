@@ -9,7 +9,6 @@
 
 namespace Schoolbox\SportsFixtures\Import;
 
-use Schoolbox\Pastoral\Log\Model as PastoralLogModel;
 use Schoolbox\Mapper as BaseMapper;
 
 class Mapper extends BaseMapper
@@ -24,7 +23,6 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('owner_id', self::TYPE_INTEGER);
         $this->uses('status', self::TYPE_STRING);
-        $this->uses('result', self::TYPE_STRING);
         $this->uses('updated_at', self::TYPE_DATETIME);
         $this->uses('created_at', self::TYPE_DATETIME);
     }

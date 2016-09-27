@@ -62,11 +62,16 @@ use Schoolbox\SportsFixtures\Coach\Model as Coach;
 use Schoolbox\SportsFixtures\Coach\Mapper as CoachMapper;
 use Schoolbox\SportsFixtures\Team\Player\Model as TeamPlayer;
 use Schoolbox\SportsFixtures\Team\Player\Mapper as TeamPlayerMapper;
+use Schoolbox\SportsFixtures\Team\Coach\Model as TeamCoach;
+use Schoolbox\SportsFixtures\Team\Coach\Mapper as TeamCoachMapper;
 use Schoolbox\SportsFixtures\Division\User\Model as DivisionUser;
 use Schoolbox\SportsFixtures\Division\User\Mapper as DivisionUserMapper;
 use Schoolbox\SportsFixtures\Import\Mapper as ImportMapper;
 use Schoolbox\SportsFixtures\Import\Model as Import;
+use Schoolbox\SportsFixtures\Import\Errors\Mapper as ImportErrorsMapper;
+use Schoolbox\SportsFixtures\Import\Errors\Model as ImportErrors;
 use Schoolbox\UserMapper;
+use Schoolbox\User;
 
 class Controller extends Base
 {
@@ -86,6 +91,12 @@ class Controller extends Base
     const STATUS_RUNNING = 'started';
     const STATUS_FAILED = 'failed';
     const STATUS_COMPLETED = 'completed';
+
+    /** @var Import $import */
+    private $import;
+
+    /** @var string $result */
+    private $result = '';
 
     /**
      * Controller constructor.
@@ -107,9 +118,46 @@ class Controller extends Base
         $this->setPositionMapper(PositionMapper::getInstance());
         $this->setStatusMapper(StatusMapper::getInstance());
         $this->setTeamPlayerMapper(TeamPlayerMapper::getInstance());
+        $this->setTeamCoachMapper(TeamCoachMapper::getInstance());
         $this->setImportMapper(ImportMapper::getInstance());
+        $this->setImportErrorsMapper(ImportErrorsMapper::getInstance());
     }
 
+    /**
+     * Update import progress in log table
+     * @param \Schoolbox\Resource\Storage\Model $file File currently being processed
+     * @param int $line Line number
+     * @param int $column Column number
+     * @param string $text Message to add to log
+     * @param string $status Status of CSV import
+     */
+    private function updateLog($file, $line, $column, $text, $status = Controller::STATUS_RUNNING)
+    {
+        // Record error
+
+        $importError = new ImportErrors();
+        $importError->setImportId($this->import->getId());
+        $importError->setLine($line);
+        $importError->setColumn($column);
+
+        if ($file != null) {
+            $importError->setHash($file->getHash());
+            $importError->setFilename("{$file->getFilename()}.{$file->getExtension()}");
+        }
+
+        $importError->setResult($text);
+        $importError->setCreatedAt(\Alaress_Date_Format::now());
+        $importError->setUpdatedAt(\Alaress_Date_Format::now());
+        $this->getImportErrorsMapper()->save($importError);
+
+        // Update import status
+
+        $this->import->setStatus($status);
+        $this->import->setCreatedAt(\Alaress_Date_Format::now());
+        $this->import->setUpdatedAt(\Alaress_Date_Format::now());
+        $this->getImportMapper()->save($this->import);
+    }
+    
     /**
      * Insert an attach zone into the template
      *
@@ -149,23 +197,72 @@ class Controller extends Base
 
     /**
      * Show import progress
+     * @param int $id Import ID
+     * @param int $skip Number of items to skip
      */
-    public function getImportProgress($id)
+    public function getImportProgress($id, $skip = 0)
     {
         try {
             $import = $this->getImportMapper()->findById($id);
+            $importErrors = $this->getImportErrorsMapper()->findByColumn('import_id', $id)->sortBy('id', 'asc');
 
-            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesImport/importProgress.twig', [
-                'import' => $import
-            ]));
+            $result = [];
+            $result['status'] = $import->getStatus();
+            $result['errors'] = [];
+
+            $count = 0;
+
+            /** @var ImportErrors $error */
+            foreach ($importErrors as $error) {
+
+                if ($skip > 0) {
+                    $render = false;
+                    $count++;
+                    if ($count > $skip) {
+                        $render = true;
+                    }
+                } else {
+                    $render = true;
+                }
+
+                if ($render) {
+                    $result['errors'][] = [
+                        'created_at' => $error->getCreatedAt()->get24Hour() . ":" . $error->getCreatedAt()->getMinute() . ":" . $error->getCreatedAt()->getSecond(),
+                        'result' => $error->getResult(),
+                        'filename' => $error->getFilename(),
+                        'line' => $error->getLine(),
+                        'column' => $error->getColumn()
+                    ];
+                }
+            }
+
+            $this->getResponse()->content->set([
+                'format' => 'json',
+                'data' => $this->buildJsonOutput($result)
+            ]);
+
         } catch (MapperException $e) {
 
-            // Requested import didn't exist, just go to the upload page
+            // Requested import didn't exist,
 
-            $this->getResponse()->content->set($this->buildHtmlOutput('@sportsfixturesImport/upload.twig', [
-                'attachzone' => $this->getAttachZone()
-            ]));
+            $this->getResponse()->content->set([
+                'format' => 'json',
+                'data' => []
+            ]);
         }
+    }
+
+    /**
+     * Display import status
+     * @param $id
+     */
+    public function getImport($id) {
+        $this->getResponse()->content->set([
+            'template' => '@sportsfixturesImport/importing.twig',
+            'data' => array(
+                'id' => $id
+            )
+        ]);
     }
 
     /**
@@ -173,7 +270,6 @@ class Controller extends Base
      */
     public function postUpload()
     {
-
         $post = $this->getRequest()->post;
 
         // We are going to read each line of the CSV data into arrays, process each line looking to see if a matching record already
@@ -185,22 +281,22 @@ class Controller extends Base
 
             // Create a log entry
 
-            $log = new Import();
-            $log->setOwnerId($this->getUser()->getId());
-            $log->setStatus(Controller::STATUS_RUNNING);
-            $log->setResult('Import in progress');
-            $log->setCreatedAt(\Alaress_Date_Format::now());
-            $log->setUpdatedAt(\Alaress_Date_Format::now());
-            $this->getImportMapper()->save($log);
+            // Start logging import progress
+
+            $this->import = new Import();
+            $this->import->setOwnerId($this->getUser()->getId());
+            $this->import->setStatus(Controller::STATUS_RUNNING);
+            $this->import->setResult($this->result);
+            $this->import->setCreatedAt(\Alaress_Date_Format::now());
+            $this->import->setUpdatedAt(\Alaress_Date_Format::now());
+            $this->getImportMapper()->save($this->import);
+
+            $this->updateLog(null, 0, 0, "Import started");
 
             $this->getResponse()->content->set([
-                'template' => '@sportsfixturesImport/importing.twig',
-                'data'     => array(
-                    'id' => $log->getId()
-                ),
                 'postOutput' => [
 
-                    function() use ($post, $log) {
+                    function () use ($post) {
 
                         // Give the script a chance to finish
 
@@ -212,73 +308,58 @@ class Controller extends Base
 
                         // Create blank arrays to hold everything
 
-                        $sports = [];
-                        $positions = [];
-                        $divisions = [];
-                        $venues = [];
-                        $schools = [];
-                        $statuses = [];
-                        $seasons = [];
-                        $teams = [];
-                        $fixtures = [];
-                        $coaches = [];
-
                         // Begin the import looking for entities that aren't dependent on others
 
                         try {
                             /** @var \Schoolbox\Resource\Storage\Model $storageObject */
                             foreach ($attachmentObjects as $storageObject) {
-                                $sports = array_merge($sports, $this->loadSports($storageObject));
-                                $seasons = array_merge($seasons, $this->loadSeasons($storageObject));
-                                $venues = array_merge($venues, $this->loadVenues($storageObject));
-                                $schools = array_merge($schools, $this->loadSchools($storageObject));
-                                $statuses = array_merge($statuses, $this->loadStatuses($storageObject));
+                                $this->loadSports($storageObject);
+                                $this->loadSeasons($storageObject);
+                                $this->loadVenues($storageObject);
+                                $this->loadSchools($storageObject);
+                                $this->loadStatuses($storageObject);
                             }
 
                             // Now we can load positions and division
 
                             /** @var \Schoolbox\Resource\Storage\Model $storageObject */
                             foreach ($attachmentObjects as $storageObject) {
-                                $positions = array_merge($positions, $this->loadPositions($storageObject, $sports));
-                                $divisions = array_merge($divisions, $this->loadDivisions($storageObject, $sports, $seasons));
+                                $this->loadPositions($storageObject);
+                                $this->loadDivisions($storageObject);
                             }
 
                             // Now we can load teams
 
                             /** @var \Schoolbox\Resource\Storage\Model $storageObject */
                             foreach ($attachmentObjects as $storageObject) {
-                                $teams = array_merge($teams, $this->loadTeams($storageObject, $divisions, $sports, $seasons));
+                                $this->loadTeams($storageObject);
                             }
 
                             // Now we can load coaches
 
                             /** @var \Schoolbox\Resource\Storage\Model $storageObject */
                             foreach ($attachmentObjects as $storageObject) {
-                                $coaches = array_merge($coaches, $this->loadCoaches($storageObject, $teams, $seasons, $sports, $divisions));
-                                $fixtures = array_merge($fixtures, $this->loadFixtures($storageObject, $divisions, $seasons, $venues, $teams, $schools));
+                                $this->loadCoaches($storageObject);
+                                $this->loadFixtures($storageObject);
                             }
 
                             // Success, update the status
 
-                            $log->setResult("{$fixtures['matchCount']} matches imported successfully");
-                            $log->setStatus(Controller::STATUS_COMPLETED);
-                            $log->setUpdatedAt(\Alaress_Date_Format::now());
-                            $this->getImportMapper()->save($log);
-                        }
-                        catch (\Exception $e) {
+                            $this->updateLog(null, 0, 0, "Import completed", Controller::STATUS_COMPLETED);
+
+                        } catch (\Exception $e) {
 
                             // Failed, record the error message
 
-                            $log->setResult("CSV Import failed. " . $e->getMessage());
-                            $log->setStatus(Controller::STATUS_FAILED);
-                            $log->setUpdatedAt(\Alaress_Date_Format::now());
-                            $this->getImportMapper()->save($log);
+                            $this->updateLog(null, 0, 0, "Import failed - {$e->getMessage()} {$e->getTraceAsString()}", Controller::STATUS_FAILED);
                         }
 
                         // All done!
                     }
                 ],
             ]);
+
+            $this->getResponse()->redirect->afterPost("/sportsfixtures/import/{$this->import->getId()}");
 
         } else {
 
@@ -313,7 +394,8 @@ class Controller extends Base
      * Convert a text date from CSV into Alaress_Date_Format
      * @param string $date Date in DD/MM/YY or DD/MM/YYYY
      * @param string $time Time in 24 hour format HH:MM:SS (defaults to midnight 00:00)
-     * @return \Alaress_Date_Format
+     * @return \Alaress_Date_Format|null
+     * @throws \Exception
      */
     private function makeDateTime($date, $time = "00:00:00")
     {
@@ -334,13 +416,11 @@ class Controller extends Base
     /**
      * Iterate a CSV file looking for sports
      * @param \Schoolbox\Resource\Storage\Model $storageObject
-     * @return array
+     * @throws \Exception
      */
     private function loadSports($storageObject)
     {
         // Go through the CSV and extract all of the information into an array
-
-        $sports = [];
 
         $reader = new Reader($storageObject->readStream());
 
@@ -348,128 +428,47 @@ class Controller extends Base
             $reader->next();
             $row = $reader->current();
 
-            $sport_key = $this->makeKey($row[1]);
-
             if ($this->compareKey($row[0], Controller::TYPE_SPORT)) {
 
+                $error = false;
+
                 if (empty(trim($row[1]))) {
-                    throw new \Exception('Sport names cannot be blank');
+                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED SPORT: No sport name specified");
+                    $error = true;
                 }
 
                 if (!empty($row[2])) {
                     $url = new \Url($row[2]);
 
                     if (!$url->isUrl()) {
-                        throw new \Exception("Invalid URL ({$row[2]}) specified on sport ({$row[1]})");
+                        $this->updateLog($storageObject, $reader->key(), 3, "SKIPPED SPORT: Invalid URL specified ({$row[2]})");
+                        $error = true;
                     }
                 }
 
-                $sports[$sport_key] = [
-                    'name' => $row[1],
-                    'url' => $row[2]
-                ];
-            }
-        }
+                try {
+                    $sport = $this->getSportMapper()->findOneByColumn('name', $row[1]);
+                } catch (MapperException $e) {
+                    $sport = new Sport();
+                }
 
-        // We've now got all of the data out of the csv, we need to link the entities to existing database records so we don't create
-        // duplicates during the import process, and while we are at it we will update any existing entries we find in the database
-        // with the data from the CSV import
-
-        // Get all sports from the database
-
-        $databaseSports = $this->getSportMapper()->findAll();
-
-        // Iterate CSV records
-
-        foreach ($sports as &$sport) {
-
-            // Iterate all database records looking for a name match
-
-            /** @var Sport $databaseSport */
-            foreach ($databaseSports as $databaseSport) {
-
-                // Look for an exact name match
-
-                if ($this->compareKey($databaseSport->getName(), $sport['name'])) {
-
-                    // We found a sport with the same name in the database, grab its ID
-
-                    $sport['id'] = $databaseSport->getId();
-
-                    // Update database records URL with the details from the CSV
-
-                    $databaseSport->setUrl($sport['url']);
-                    $this->getSportMapper()->save($databaseSport);
-
-                    break;
+                if (!$error) {
+                    $sport->setName($row[1]);
+                    $sport->setUrl($row[2]);
+                    $this->getSportMapper()->save($sport);
                 }
             }
-
-            // If the sport did not exist in the database
-
-            if (!isset($sport['id'])) {
-
-                // Sport did not exist in the database, we need to create a new record
-
-                $databaseSport = new Sport();
-                $databaseSport->setName($sport['name']);
-                $databaseSport->setUrl($sport['url']);
-                $this->getSportMapper()->save($databaseSport);
-
-                // Grab the ID of the new record for later use
-
-                $sport['id'] = $databaseSport->getId();
-
-                // Add it to the collection so we don't create it again if the user was smart enough to add it to the CSV twice
-
-                $databaseSports->add($databaseSport);
-            }
         }
-
-        // Add any database items that weren't already in the CSV to the array
-
-        foreach ($databaseSports as $databaseSport) {
-
-            $found = false;
-
-            foreach ($sports as &$sport) {
-                if ($sport['id'] == $databaseSport->getId()) {
-                    $found = true;
-                    break;
-                }
-            }
-
-            if (!$found) {
-
-                // Item was not in the CSV, whack it into the array
-
-                $sports_key = $databaseSport->getName();
-
-                $sports[$sports_key] = [
-                    'name' => $databaseSport->getName(),
-                    'url' => $databaseSport->getUrl(),
-                    'id' => $databaseSport->getId()
-                ];
-            }
-        }
-
-        // Return all of the possible sports
-
-        return $sports;
     }
 
     /**
      * Iterate a CSV file looking for positions
      * @param \Schoolbox\Resource\Storage\Model $storageObject
-     * @param array $sports Array of sports with their ID populated
-     * @return array
      * @throws \Exception
      */
-    private function loadPositions($storageObject, $sports)
+    private function loadPositions($storageObject)
     {
         // Go through the CSV and extract all of the information into an array
-
-        $positions = [];
 
         $reader = new Reader($storageObject->readStream());
 
@@ -480,150 +479,55 @@ class Controller extends Base
 
             if ($this->makeKey($row[0]) == Controller::TYPE_POSITION) {
 
+                $error = false;
+
+                if (empty(trim($row[1]))) {
+                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED POSITION: No sport name specified");
+                    $error = true;
+                }
+
                 if (empty(trim($row[2]))) {
-                    throw new \Exception('Sport names cannot be blank');
+                    $this->updateLog($storageObject, $reader->key(), 3, "SKIPPED POSITION: No position name specified");
+                    $error = true;
                 }
 
-                // Positions are sport specific so we need to load in the sport ID for later use
-
-                $sport_id = null;
-
-                foreach ($sports as $sport_key => $sport) {
-                    if ($this->compareKey($sport_key, $row[1])) {
-                        $sport_id = $sport['id'];
+                if (!$error) {
+                    try {
+                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[1]);
+                    } catch (MapperException $e) {
+                        $sport = new Sport();
+                        $sport->setName($row[2]);
+                        $this->getSportMapper()->save($sport);
                     }
-                }
 
-                // We can only use the position if it has a valid sport
+                    try {
+                        $position = $this->getPositionMapper()->findOneByColumnList([
+                            'sport_id' => $sport->getId(),
+                            'name' => $row[2]
+                        ]);
+                    } catch (MapperException $e) {
+                        $position = new Position();
+                    }
 
-                if ($sport_id != null) {
-
-                    $sport_key = $this->makeKey($row[1]);
-                    $position_key = $this->makeKey($row[2]);
-
-                    $positions[$sport_key][$position_key] = [
-                        'sport_id' => $sport_id,
-                        'sport_key' => $sport_key,
-                        'name' => $row[2]
-                    ];
-
-                } else {
-
-                    // The sport didn't exist in the database or CSV file- we have a problem with this one
-
-                    throw new \Exception("Position ({$row[2]}) requires a sport that does not exist ({$row[1]})");
+                    $position->setName($row[2]);
+                    $position->setSport($sport);
+                    $this->getPositionMapper()->save($position);
                 }
             }
         }
-
-        // We've now got all of the data out of the csv, we need to link the entities to existing database records so we don't create
-        // duplicates during the import process
-
-        $databasePositions = $this->getPositionMapper()->findAll();
-
-        foreach ($positions as $sport_key => $sportPositions) {
-
-            foreach ($sportPositions as &$position) {
-
-                /** @var Position $databasePosition */
-                foreach ($databasePositions as $databasePosition) {
-
-                    // Look for an exact name match within the sport
-
-                    if ($this->compareKey($databasePosition->getName(), $position['name']) &&          // Position names must match
-                        $databasePosition->getSport()->getId() == $position['sport_id']
-                    ) {
-                        // Sport ID must match
-                        // Position already existed in the database, grab its ID
-
-                        $position['id'] = $databasePosition->getId();
-                    }
-                }
-
-                // Check if we found a database record
-
-                if (!isset($position['id'])) {
-
-                    // Create a placeholder sport for saving
-
-                    $sport = new Sport();
-                    $sport->setId($position['sport_id']);
-
-                    // Position did not exist in the database, we need to create a new record
-
-                    $databasePosition = new Position();
-                    $databasePosition->setName($position['name']);
-                    $databasePosition->setSport($sport);
-                    $this->getPositionMapper()->save($databasePosition);
-
-                    // Grab the ID of the new record for later use
-
-                    $position['id'] = $databasePosition->getId();
-
-                    // Add it to the collection so we don't create it again
-
-                    $databasePositions->add($databasePosition);
-                }
-            }
-        }
-
-        // Add in any database items that weren't already in the CSV
-
-        foreach ($databasePositions as $databasePosition) {
-
-            // Looks like the mapper automatically creates a blank position- we don't want to pull those in
-
-            if (!empty($databasePosition->getName())) {
-
-                $found = false;
-
-                foreach ($positions as &$position) {
-                    if ($position['id'] == $databasePosition->getId()) {
-                        $found = true;
-                        break;
-                    }
-                }
-
-                if (!$found) {
-
-                    // Item was not in the CSV, whack it into the array because we might need it later
-
-                    // Need to load sport to get its name and ID
-
-                    $sport = $this->getSportMapper()->findById($databasePosition->getSport()->getId());
-
-                    $sport_key = $this->makeKey($sport->getName());
-                    $position_key = $this->makeKey($databasePosition->getName());
-
-                    $positions[$sport_key][$position_key] = [
-                        'sport_id' => $sport->getId(),
-                        'sport_key' => $sport_key,
-                        'name' => $databasePosition->getName(),
-                        'id' => $databasePosition->getId()
-                    ];
-                }
-            }
-        }
-
-        return $positions;
     }
 
     /**
      * Iterate a CSV file looking for divisions
      * @param \Schoolbox\Resource\Storage\Model $storageObject
-     * @param array $sports Array of sports with their ID populated
-     * @param array $seasons Array of seasons with their ID populated
-     * @return array
      * @throws \Exception
      */
-    private function loadDivisions($storageObject, $sports, $seasons)
+    private function loadDivisions($storageObject)
     {
         // Go through the CSV and extract all of the information into an array
 
         $reader = new Reader($storageObject->readStream());
         $reader->setLoadFromFirst(true);
-
-        $divisions = [];
 
         while ($reader->valid()) {
 
@@ -632,164 +536,110 @@ class Controller extends Base
 
             if ($this->makeKey($row[0]) == Controller::TYPE_DIVISION) {
 
-                if (empty(trim($row[3]))) {
-                    throw new \Exception('Division names cannot be blank');
+                $error = false;
+                $season = null;
+
+                if (empty(trim($row[1]))) {
+                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED DIVISION: No season name specified");
+                    $error = true;
+
+                } else {
+                    try {
+                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1]);
+                    } catch (MapperException $e) {
+                        $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED DIVISION: Season not found in database ({$row[1]})");
+                        $error = true;
+                    }
                 }
 
-                // Divisions can have any number of players added to it put their ID's into an array
+                if (empty(trim($row[2]))) {
+                    $this->updateLog($storageObject, $reader->key(), 3, "SKIPPED DIVISION: No sport name specified");
+                    $error = true;
+                }
 
-                $players = [];
-
-                for ($i = 5; $i < count($row); $i++) {
-                    if (is_numeric($row[$i])) {
-                        $players[] = $row[$i];
-                    }
+                if (empty(trim($row[3]))) {
+                    $this->updateLog($storageObject, $reader->key(), 4, "SKIPPED DIVISION: No division name specified");
+                    $error = true;
                 }
 
                 if (!empty($row[4])) {
                     $url = new \Url($row[4]);
 
                     if (!$url->isUrl()) {
-                        throw new \Exception("Invalid URL ({$row[4]}) specified on division ({$row[3]})");
+                        $this->updateLog($storageObject, $reader->key(), 5, "SKIPPED DIVISION: Invalid URL specified ({$row[4]})");
+                        $error = true;
                     }
                 }
 
-                $season_key = $this->makeKey($row[1]);
-                $sport_key = $this->makeKey($row[2]);
-                $division_key = $this->makeKey($row[3]);
+                if (!$error) {
 
-                $divisions[$season_key][$sport_key][$division_key] = [
-                    'name' => $row[3],
-                    'url' => $row[4],
-                    'players' => $players
-                ];
-            }
-        }
+                    // Find the sport associated with the division, and create if doesn't exist
 
-        // We've now got all of the data out of the csv, we need to link the entities to existing database records so we don't create
-        // duplicates during the import process
+                    try {
+                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2]);
+                    } catch (MapperException $e) {
+                        $sport = new Sport();
+                        $sport->setName($row[2]);
+                        $this->getSportMapper()->save($sport);
+                    }
 
-        $databaseDivisions = $this->getDivisionMapper()->findAll();
+                    // Create or update the division
 
-        foreach ($divisions as $season_key => &$divisionsSeasons) {
+                    try {
+                        $division = $this->getDivisionMapper()->findOneByColumnList([
+                            'sport_id' => $sport->getId(),
+                            'season_id' => $season->getId(),
+                            'name' => $row[3]
+                        ]);
+                    } catch (MapperException $e) {
+                        $division = new Division();
+                        $division->setName($row[3]);
+                        $division->setSeason($season);
+                        $division->setSport($sport);
+                        $this->getDivisionMapper()->save($division);
+                    }
 
-            foreach ($divisionsSeasons as $sport_key => &$divisionsCurrent) {
+                    // Add new players to division, this will not delete any existing players so as not to screw over existing
+                    // match participants/results
 
-                foreach ($divisionsCurrent as $division_key => &$division) {
+                    $players = [];
 
-                    // For a division to exist it needs to have a valid season and sport
-
-                    if (isset($sports[$sport_key]) && isset($seasons[$season_key])) {
-
-                        /** @var Position $databasePosition */
-                        foreach ($databaseDivisions as $databaseDivision) {
-
-                            if ($this->compareKey($databaseDivision->getName(), $division_key) &&                  // Names must match
-                                $databaseDivision->getSport()->getId() == $sports[$sport_key]['id'] &&          // Sports must match
-                                $databaseDivision->getSeason()->getId() == $seasons[$season_key]['id']          // Seasons must match
-                            ) {
-
-                                // Position already existed in the database, grab its ID
-
-                                $division['id'] = $databaseDivision->getId();
-                            }
+                    for ($i = 5; $i < count($row); $i++) {
+                        if (is_numeric($row[$i])) {
+                            $players[] = $row[$i];
                         }
+                    }
 
-                        // Check if we found a database record
+                    foreach ($players as $player) {
+                        try {
+                            $this->getDivisionUserMapper()->findOneByColumnList([
+                                'division_id' => $division->getId(),
+                                'user_id' => $player
+                            ]);
+                        } catch (MapperException $e) {
+                            $user = new User();
+                            $user->setId($player);
 
-                        if (!isset($division['id'])) {
-
-                            // Division did not exist in the database, we need to create a new record
-
-                            // Create a placeholder sport
-
-                            $sport = new Sport();
-                            $sport->setId($sports[$sport_key]['id']);
-
-                            // Create a placeholder season
-
-                            $season = new Season();
-                            $season->setId($seasons[$season_key]['id']);
-
-                            $databaseDivision = new Division();
-                            $databaseDivision->setName($division['name']);
-                            $databaseDivision->setUrl($division['url']);
-                            $databaseDivision->setSport($sport);
-                            $databaseDivision->setSeason($season);
-                            $this->getDivisionMapper()->save($databaseDivision);
-
-                            // Grab the ID of the new record for later use
-
-                            $division['id'] = $databaseDivision->getId();
-                        }
-                    } else {
-
-                        if (!isset($sports[$sport_key])) {
-                            throw new \Exception("Unknown sport ({$sport_key}) on division ({$division['name']})");
-                        } else {
-                            throw new \Exception("Unknown season ({$season_key}) on division ({$division['name']})");
+                            $divisionUser = new DivisionUser();
+                            $divisionUser->setDivision($division);
+                            $divisionUser->setSequence(0);
+                            $divisionUser->setUser($user);
+                            $this->getDivisionUserMapper()->save($divisionUser);
                         }
                     }
                 }
             }
         }
-
-        // Load in divisions from the database that weren't defined in the CSV
-
-        /** @var Division $databaseDivision */
-        foreach ($databaseDivisions as $databaseDivision) {
-
-            $found = false;
-
-            $season_key = $this->makeKey($databaseDivision->getSeason()->getName());
-            $sport_key = $this->makeKey($databaseDivision->getSport()->getName());
-            $division_key = $this->makeKey($databaseDivision->getName());
-
-            $divisionsCurrent = $divisions[$season_key][$sport_key];
-
-            foreach ($divisionsCurrent as $division) {
-
-                if ($division['id'] == $databaseDivision->getId()) {
-                    $found = true;
-                    break;
-                }
-            }
-
-            if (!$found) {
-
-                // Get players for this division from the database
-
-                $databasePlayers = $this->getDivisionUserMapper()->findByColumn('division_id', $databaseDivision->getId());
-
-                $players = [];
-
-                /** @var DivisionUser $playerCurrent */
-                foreach ($databasePlayers as $playerCurrent) {
-                    $players[] = $playerCurrent->getUser()->getExternalId();
-                }
-
-                $divisions[$season_key][$sport_key][$division_key] = [
-                    'id' => $databaseDivision->getId(),
-                    'name' => $databaseDivision->getName(),
-                    'url' => $databaseDivision->getUrl(),
-                    'players' => $players
-                ];
-            }
-        }
-
-        return $divisions;
     }
 
     /**
      * Iterate a CSV file looking for venues
      * @param \Schoolbox\Resource\Storage\Model $storageObject
-     * @return array
+     * @throws \Exception
      */
     private function loadVenues($storageObject)
     {
         $reader = new Reader($storageObject->readStream());
-
-        $venues = [];
 
         while ($reader->valid()) {
             $reader->next();
@@ -797,112 +647,44 @@ class Controller extends Base
 
             if ($this->makeKey($row[0]) == Controller::TYPE_VENUE) {
 
+                $error = false;
+
                 if (empty(trim($row[1]))) {
-                    throw new \Exception('Venue names cannot be blank');
+                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED VENUE: No venue name specified");
+                    $error = true;
                 }
 
-                $venue_key = $this->makeKey($row[1]);
+                if (!is_numeric($row[3]) && !empty(trim($row[3]))) {
+                    $this->updateLog($storageObject, $reader->key(), 4, "SKIPPED VENUE: Invalid latitude specified ({$row[3]})");
+                    $error = true;
+                }
 
-                $venues[$venue_key] = [
-                    'name' => $row[1],
-                    'address' => $row[2],
-                    'latitude' => $row[3],
-                    'longitude' => $row[4]
-                ];
-            }
-        }
+                if (!is_numeric($row[4]) && !empty(trim($row[4]))) {
+                    $this->updateLog($storageObject, $reader->key(), 5, "SKIPPED VENUE: Invalid longitude specified ({$row[4]})");
+                    $error = true;
+                }
 
-        // We've now got all of the data out of the csv, we need to link the entities to existing database records so we don't create
-        // duplicates during the import process, and while we are at it we will update any existing entries we find in the database
-        // with the data from the CSV import
+                if (!$error) {
+                    try {
+                        $venue = $this->getVenueMapper()->findOneByColumn('name', $row[1]);
+                    } catch (MapperException $e) {
+                        $venue = new Venue();
+                    }
 
-        $databaseVenues = $this->getVenueMapper()->findAll();
-
-        foreach ($venues as &$venue) {
-
-            if ((!empty($venue['latitude']) && !is_numeric($venue['latitude'])) || (!empty($venue['longitude']) && !is_numeric($venue['longitude']))) {
-                throw new \Exception("Venue ({$venue['name']}) latitude and longitude must both be numeric values");
-            }
-
-            /** @var Venue $databaseVenue */
-            foreach ($databaseVenues as $databaseVenue) {
-
-                // Look for an exact name match
-
-                if ($this->compareKey($databaseVenue->getName(), $venue['name'])) {
-
-                    // Venue already existed in the database, grab its ID
-
-                    $venue['id'] = $databaseVenue->getId();
-
-                    // Update URL with the details from the CSV
-
-                    $databaseVenue->setName($venue['name']);
-                    $databaseVenue->setAddress($venue['address']);
-
-                    $databaseVenue->setLatitude($venue['latitude']);
-                    $databaseVenue->setLongitude($venue['longitude']);
-                    $this->getVenueMapper()->save($databaseVenue);
+                    $venue->setName($row[1]);
+                    $venue->setAddress($row[2]);
+                    $venue->setLatitude($row[3]);
+                    $venue->setLongitude($row[4]);
+                    $this->getVenueMapper()->save($venue);
                 }
             }
-
-            // Check if we found a database record
-
-            if (!isset($venue['id'])) {
-
-                // Venue did not exist in the database, we need to create a new record
-
-                $databaseVenue = new Venue();
-                $databaseVenue->setName($venue['name']);
-                $databaseVenue->setAddress($venue['address']);
-                $databaseVenue->setLatitude($venue['latitude']);
-                $databaseVenue->setLongitude($venue['longitude']);
-                $this->getVenueMapper()->save($databaseVenue);
-
-                // Grab the ID of the new record for later use
-
-                $venue['id'] = $databaseVenue->getId();
-
-                // Add it to the collection so we don't create it again
-
-                $databaseVenues->add($databaseVenue);
-            }
         }
-
-        // Get details of venues from the database that didn't appear in the CSV
-
-        foreach ($databaseVenues as $databaseVenue) {
-
-            $found = false;
-
-            foreach ($venues as &$venue) {
-                if ($venue['id'] == $databaseVenue->getId()) {
-                    $found = true;
-                    break;
-                }
-            }
-
-            if (!$found) {
-
-                $venue_key = $this->makeKey($databaseVenue->getName());
-
-                $venues[$venue_key] = [
-                    'name' => $databaseVenue->getName(),
-                    'address' => $databaseVenue->getAddress(),
-                    'latitude' => $databaseVenue->getLatitude(),
-                    'longitude' => $databaseVenue->getLongitude(),
-                    'id' => $databaseVenue->getId()
-                ];
-            }
-        }
-
-        return $venues;
     }
 
     /**
      * Iterate a CSV file looking for schools
      * @param \Schoolbox\Resource\Storage\Model $storageObject
-     * @return array
+     * @throws \Exception
      */
     private function loadSchools($storageObject)
     {
@@ -910,98 +692,37 @@ class Controller extends Base
 
         $reader = new Reader($storageObject->readStream());
 
-        $schools = [];
-
         while ($reader->valid()) {
             $reader->next();
             $row = $reader->current();
 
-            $school_key = $this->makeKey($row[1]);
-
             if ($this->makeKey($row[0]) == Controller::TYPE_SCHOOL) {
 
+                $error = false;
+
                 if (empty(trim($row[1]))) {
-                    throw new \Exception("School names cannot be blank");
+                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED SCHOOL: No school name specified");
+                    $error = true;
                 }
 
-                $schools[$school_key] = [
-                    'name' => $row[1]
-                ];
-            }
-        }
+                if (!$error) {
+                    try {
+                        $school = $this->getSchoolMapper()->findOneByColumn('name', $row[1]);
+                    } catch (MapperException $e) {
+                        $school = new School();
+                    }
 
-        // We've now got all of the data out of the csv, we need to link the entities to existing database records so we don't create
-        // duplicates during the import process
-
-        $databaseSchools = $this->getSchoolMapper()->findAll();
-
-        foreach ($schools as &$school) {
-
-            /** @var School $databaseSchool */
-            foreach ($databaseSchools as $databaseSchool) {
-
-                // Look for an exact name match
-
-                if ($this->compareKey($databaseSchool->getName(), $school['name'])) {
-
-                    // School already existed in the database, grab its ID
-
-                    $school['id'] = $databaseSchool->getId();
+                    $school->setName($row[1]);
+                    $this->getSchoolMapper()->save($school);
                 }
             }
-
-            // Check if we found a database record
-
-            if (!isset($school['id'])) {
-
-                // School did not exist in the database, we need to create a new record
-
-                $databaseSchool = new School();
-                $databaseSchool->setName($school['name']);
-                $this->getSchoolMapper()->save($databaseSchool);
-
-                // Grab the ID of the new record for later use
-
-                $school['id'] = $databaseSchool->getId();
-
-                // Add it to the collection so we don't create it again
-
-                $databaseSchools->add($databaseSchool);
-            }
         }
-
-        // Get details of schools from the database that didn't appear in the CSV
-
-        /** @var School $databaseSchool */
-        foreach ($databaseSchools as $databaseSchool) {
-
-            $found = false;
-
-            foreach ($schools as &$school) {
-                if ($school['id'] == $databaseSchool->getId()) {
-                    $found = true;
-                    break;
-                }
-            }
-
-            if (!$found) {
-
-                $school_key = $this->makeKey($databaseSchool->getName());
-
-                $schools[$school_key] = [
-                    'name' => $databaseSchool->getName(),
-                    'id' => $databaseSchool->getId()
-                ];
-            }
-        }
-
-        return $schools;
     }
 
     /**
      * Iterate a CSV file looking for match statuses
      * @param \Schoolbox\Resource\Storage\Model $storageObject
-     * @return array
+     * @throws \Exception
      */
     private function loadStatuses($storageObject)
     {
@@ -1009,105 +730,41 @@ class Controller extends Base
 
         $reader = new Reader($storageObject->readStream());
 
-        $statuses = [];
-
         while ($reader->valid()) {
             $reader->next();
             $row = $reader->current();
 
             if ($this->makeKey($row[0]) == Controller::TYPE_STATUS) {
 
+                $error = false;
+
                 if (empty(trim($row[1]))) {
-                    throw new \Exception("Match statuses cannot be blank");
+                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED STATUS: No status name specified");
+                    $error = true;
                 }
 
-                $status_key = $this->makeKey($row[1]);
+                if (!$error) {
+                    try {
+                        $status = $this->getStatusMapper()->findOneByColumn('name', $row[1]);
+                    } catch (MapperException $e) {
+                        $status = new Status();
+                    }
 
-                $statuses[$status_key] = [
-                    'name' => $row[1]
-                ];
-            }
-        }
-
-        // We've now got all of the data out of the csv, we need to link the entities to existing database records so we don't create
-        // duplicates during the import process
-
-        $databaseStatuses = $this->getStatusMapper()->findAll();
-
-        foreach ($statuses as &$status) {
-
-            /** @var Status $databaseStatus */
-            foreach ($databaseStatuses as $databaseStatus) {
-
-                // Look for an exact name match
-
-                if ($this->compareKey($databaseStatus->getName(), $status['name'])) {
-
-                    // Status already existed in the database, grab its ID
-
-                    $status['id'] = $databaseStatus->getId();
+                    $status->setName($row[1]);
+                    $this->getStatusMapper()->save($status);
                 }
             }
-
-            // Check if we found a database record
-
-            if (!isset($status['id'])) {
-
-                // Status did not exist in the database, we need to create a new record
-
-                $databaseStatus = new Status();
-                $databaseStatus->setName($status['name']);
-                $this->getStatusMapper()->save($databaseStatus);
-
-                // Grab the ID of the new record for later use
-
-                $status['id'] = $databaseStatus->getId();
-
-                // Add it to the collection so we don't create it again
-
-                $databaseStatuses->add($databaseStatus);
-            }
         }
-
-        // Get details of statuses from the database that didn't appear in the CSV
-
-        /** @var Status $databaseStatus */
-        foreach ($databaseStatuses as $databaseStatus) {
-
-            $found = false;
-
-            foreach ($statuses as &$status) {
-                if ($status['id'] == $databaseStatus->getId()) {
-                    $found = true;
-                    break;
-                }
-            }
-
-            if (!$found) {
-
-                $status_key = $this->makeKey($databaseStatus->getName());
-
-                $statuses[$status_key] = [
-                    'name' => $databaseStatus->getName(),
-                    'id' => $databaseStatus->getId()
-                ];
-            }
-
-        }
-
-        return $statuses;
     }
 
     /**
      * Iterate a CSV file looking for seasons
      * @param \Schoolbox\Resource\Storage\Model $storageObject
-     * @return array
+     * @throws \Exception
      */
     private function loadSeasons($storageObject)
     {
         // Go through the CSV and extract all of the information into an array
-
-        $seasons = [];
 
         $reader = new Reader($storageObject->readStream());
 
@@ -1115,130 +772,79 @@ class Controller extends Base
             $reader->next();
             $row = $reader->current();
 
-            $season_key = $this->makeKey($row[1]);
-
             if ($this->makeKey($row[0]) == Controller::TYPE_SEASON) {
 
+                $error = false;
+
                 if (empty(trim($row[1]))) {
-                    throw new \Exception("Season names cannot be blank");
+                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED SEASON: No season name specified");
+                    $error = true;
                 }
 
-                $seasons[$season_key] = [
-                    'name' => $row[1],
-                    'start' => $row[2],
-                    'end' => $row[3]
-                ];
-            }
-        }
+                if (empty(trim($row[2]))) {
+                    $this->updateLog($storageObject, $reader->key(), 3, "SKIPPED SEASON: No start date specified");
+                    $error = true;
 
-        // We've now got all of the data out of the csv, we need to link the entities to existing database records so we don't create
-        // duplicates during the import process, and while we are at it we will update any existing entries we find in the database
-        // with the data from the CSV import
+                    // Kludge to stop storm complaining about not being set
+                    $startDate = null;
+                } else {
+                    try {
+                        $startDate = $this->makeDateTime($row[2]);
+                    } catch (\Exception $e) {
+                        $this->updateLog($storageObject, $reader->key(), 3, "SKIPPED SEASON: Invalid start date specified ({$row[2]})");
+                        $error = true;
 
-        // Get all seasons from the database
-
-        $databaseSeasons = $this->getSeasonMapper()->findAll();
-
-        foreach ($seasons as &$season) {
-
-            // We need the date/time in a format usable by the model
-
-            $dateStart = $this->makeDateTime($season['start']);
-            $dateEnd = $this->makeDateTime($season['end'], '23:59:59');
-
-            // Look for an exact name match
-
-            /** @var Season $databaseSeason */
-            foreach ($databaseSeasons as $databaseSeason) {
-
-                if ($this->compareKey($databaseSeason->getName(), $season['name'])) {
-
-                    // Season already existed in the database, grab its ID
-
-                    $season['id'] = $databaseSeason->getId();
-
-                    // Update season with the details from the CSV
-
-                    if ($dateStart != null && $dateEnd != null) {
-                        $databaseSeason->setStart($dateStart);
-                        $databaseSeason->setEnd($dateEnd);
-                        $this->getSeasonMapper()->save($databaseSeason);
-                    } else {
-                        throw new \Exception("Seasons must have a start and end date specified");
+                        // Kludge to stop storm complaining about not being set
+                        $startDate = null;
                     }
                 }
-            }
 
-            // Check if we found a database record
+                if (empty(trim($row[3]))) {
+                    $this->updateLog($storageObject, $reader->key(), 4, "SKIPPED SEASON: No end date specified");
+                    $error = true;
 
-            if (!isset($season['id'])) {
+                    // Kludge to stop storm complaining about not being set
+                    $endDate = null;
+                } else {
+                    try {
+                        $endDate = $this->makeDateTime($row[3], '23:59:59');
+                    } catch (\Exception $e) {
+                        $this->updateLog($storageObject, $reader->key(), 4, "SKIPPED SEASON: Invalid end date specified ({$row[3]})");
+                        $error = true;
 
-                // Season did not exist in the database, we need to create a new record
+                        // Kludge to stop storm complaining about not being set
+                        $endDate = null;
+                    }
+                }
 
-                $databaseSeason = new Season();
-                $databaseSeason->setName($season['name']);
-                $databaseSeason->setStart($dateStart);
-                $databaseSeason->setEnd($dateEnd);
-                $this->getSeasonMapper()->save($databaseSeason);
+                if (!$error) {
+                    try {
+                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1]);
+                    } catch (MapperException $e) {
+                        $season = new Season();
+                    }
 
-                // Grab the ID of the new record for later use
+                    $season->setName($row[1]);
+                    $season->setStart($startDate);
+                    $season->setEnd($endDate);
 
-                $season['id'] = $databaseSeason->getId();
-
-                // Add it to the collection so we don't create it again
-
-                $databaseSeasons->add($databaseSeason);
-            }
-        }
-
-        // Get details of seasons from the database that didn't appear in the CSV
-
-        /** @var Season $databaseSeason */
-        foreach ($databaseSeasons as $databaseSeason) {
-
-            $found = false;
-
-            foreach ($seasons as &$season) {
-                if ($season['id'] == $databaseSeason->getId()) {
-                    $found = true;
-                    break;
+                    $this->getSeasonMapper()->save($season);
                 }
             }
-
-            if (!$found) {
-                $seasons[strtolower(trim($databaseSeason->getName()))] = [
-                    'name' => $databaseSeason->getName(),
-                    'id' => $databaseSeason->getId(),
-
-                    // I don't think we need these at any point during the rest of the import process, but they're in there for completion
-
-                    'start' => $databaseSeason->getStart()->getLocalShort(),
-                    'end' => $databaseSeason->getEnd()->getLocalShort()
-                ];
-            }
-
         }
-
-        return $seasons;
     }
 
     /**
      * Iterate a CSV file looking for teams
      * @param \Schoolbox\Resource\Storage\Model $storageObject
-     * @param array $divisions Array of divisions with their ID populated
-     * @param array $sports Array of sports with their ID populated
-     * @param array $seasons Array of seasons with their ID populated
-     * @return array
      * @throws \Exception
      */
-    private function loadTeams($storageObject, $divisions, $sports, $seasons)
+    private function loadTeams($storageObject)
     {
         // Go through the CSV and extract all of the information into an array
 
         $reader = new Reader($storageObject->readStream());
         $reader->setLoadFromFirst(true);
-
-        $teams = [];
 
         while ($reader->valid()) {
 
@@ -1247,300 +853,135 @@ class Controller extends Base
 
             if ($this->makeKey($row[0]) == Controller::TYPE_TEAM) {
 
+                $error = false;
+                $season = null;
+
                 if (empty(trim($row[4]))) {
-                    throw new \Exception("Team names cannot be blank");
+                    $this->updateLog($storageObject, $reader->key(), 5, "SKIPPED TEAM: No team name specified");
+                    $error = true;
                 }
-
-                // Get the player ID's from the end of the row
-
-                $players = [];
-
-                for ($i = 6; $i < count($row); $i++) {
-                    if (is_numeric($row[$i])) {
-                        $players[] = $row[$i];
-                    }
-                }
-
-                $season_key = $this->makeKey($row[1]);
-                $sport_key = $this->makeKey($row[2]);
-                $division_key = $this->makeKey($row[3]);
-                $team_key = $this->makeKey($row[4]);
 
                 if (!empty($row[5])) {
                     $url = new \Url($row[5]);
 
                     if (!$url->isUrl()) {
-                        throw new \Exception("Invalid URL ({$row[5]}) specified on team ({$row[4]})");
+                        $this->updateLog($storageObject, $reader->key(), 6, "SKIPPED TEAM: Invalid URL specified ({$row[5]})");
+                        $error = true;
                     }
                 }
 
-                $teams[$season_key][$sport_key][$division_key][$team_key] = [
-                    'name' => $row[4],
-                    'url' => $row[5],
-                    'players' => $players,
-
-                    // This is a placeholder for the coaches we will populate below (these are located on a different row in the CSV)
-
-                    'coaches' => []
-                ];
-
-                // Load in division ID to make things easier later
-
-                if (!isset($sports[$sport_key])) {
-                    throw new \Exception("Unknown sport ({$sport_key}) when importing team ({$team_key}");
-                }
-
-                if (!isset($seasons[$season_key])) {
-                    throw new \Exception("Unknown season ({$season_key}) when importing team ({$team_key}");
-                }
-
-                if (!isset($divisions[$season_key][$sport_key][$division_key])) {
-                    throw new \Exception("Unknown division ({$division_key}) when importing team ({$team_key}");
-                }
-
-                $teams[$season_key][$sport_key][$division_key][$team_key]['division_id'] = $divisions[$season_key][$sport_key][$division_key]['id'];
-            }
-        }
-
-        // Load coaches into these teams, these are on other rows in the CSV
-
-        $reader = new Reader($storageObject->readStream());
-        $reader->setLoadFromFirst(true);
-
-        while ($reader->valid()) {
-
-            $reader->next();
-            $row = $reader->current();
-
-            if ($this->makeKey($row[0]) == Controller::TYPE_COACH) {
-
-                $season_key = $this->makeKey($row[1]);
-                $sport_key = $this->makeKey($row[2]);
-                $division_key = $this->makeKey($row[3]);
-                $team_key = $this->makeKey($row[4]);
-
-                for ($i = 4; $i < count($row); $i++) {
-                    if (!empty($row[$i])) {
-                        $teams[$season_key][$sport_key][$division_key][$team_key]['coaches'][] = $row[$i];
+                if (empty(trim($row[1]))) {
+                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED TEAM: No season name specified");
+                    $error = true;
+                } else {
+                    try {
+                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1]);
+                    } catch (MapperException $e) {
+                        $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED TEAM: Season not found in database ({$row[1]})");
+                        $error = true;
                     }
                 }
-            }
-        }
 
-        // We've now got all of the data out of the csv, we need to link the entities to existing database records so we don't create
-        // duplicates during the import process
+                if (empty(trim($row[2]))) {
+                    $this->updateLog($storageObject, $reader->key(), 3, "SKIPPED TEAM: No sport name specified");
+                    $error = true;
+                }
 
-        $databaseTeams = $this->getTeamMapper()->findAll();
+                if (empty(trim($row[3]))) {
+                    $this->updateLog($storageObject, $reader->key(), 4, "SKIPPED TEAM: No division name specified");
+                    $error = true;
+                }
 
-        foreach ($teams as $season_key => &$teamsSeasons) {
-            foreach ($teamsSeasons as $sport_key => &$teamsSports) {
-                foreach ($teamsSports as $division_key => &$teamsDivisions) {
-                    foreach ($teamsDivisions as $team_key => &$team) {
+                if (!$error) {
 
-                        // Make sure the division exists
+                    // Find the sport associated with the division, and create if doesn't exist
 
-                        if (isset($divisions[$season_key][$sport_key][$division_key])) {
+                    try {
+                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2]);
+                    } catch (MapperException $e) {
+                        $sport = new Sport();
+                        $sport->setName($row[2]);
+                        $this->getSportMapper()->save($sport);
+                    }
 
-                            /** @var Team $databaseTeam */
-                            foreach ($databaseTeams as $databaseTeam) {
+                    // Find the division associated with the division, and create if doesn't exist
 
-                                // Look for a match based on sport ID and exact name match of team
+                    try {
+                        $division = $this->getDivisionMapper()->findOneByColumnList([
+                            'name' => $row[3],
+                            'sport_id' => $sport->getId(),
+                            'season_id' => $season->getId()
+                        ]);
+                    } catch (MapperException $e) {
+                        $division = new Division();
+                        $division->setName($row[3]);
+                        $division->setSport($sport);
+                        $division->setSeason($season);
+                        $this->getDivisionMapper()->save($division);
+                    }
 
-                                if ($this->compareKey($databaseTeam->getName(), $team['name']) &&
-                                    $databaseTeam->getDivision()->getId() == $divisions[$season_key][$sport_key][$division_key]['id']
-                                ) {
-                                    // Team already existed in the database, grab its ID
+                    // Create/update the team
 
-                                    $team['id'] = $databaseTeam->getId();
-                                    $team['object'] = $databaseTeam;
+                    try {
+                        $team = $this->getTeamMapper()->findOneByColumnList([
+                            'name' => $row[4],
+                            'division_id' => $division->getId()
+                        ]);
+                    } catch (MapperException $e) {
+                        $team = new Team();
+                    }
 
-                                    $division = new Division();
-                                    $division->setId($divisions[$season_key][$sport_key][$division_key]["id"]);
+                    $team->setName($row[4]);
+                    $team->setUrl($row[5]);
+                    $team->setDivision($division);
+                    $this->getTeamMapper()->save($team);
 
-                                    // Update its details while we are there
 
-                                    $databaseTeam->setDivision($division);
-                                    $databaseTeam->setUrl($team['url']);
-                                    $this->getTeamMapper()->save($databaseTeam);
-                                }
+                    // Add new players to team, this will not delete any existing players so as not to screw over existing
+                    // match participants/results
+
+                    $players = [];
+
+                    for ($i = 6; $i < count($row); $i++) {
+                        if (is_numeric($row[$i])) {
+                            $players[] = $row[$i];
+                        }
+                    }
+
+                    foreach ($players as $player) {
+                        try {
+                            $this->getTeamPlayerMapper()->findOneByColumnList([
+                                'team_id' => $team->getId(),
+                                'user_id' => $player
+                            ]);
+                        } catch (MapperException $e) {
+                            try {
+                                $user = $this->getUserMapper()->findByExternalId($player);
+
+                                $teamPlayer = new TeamPlayer();
+                                $teamPlayer->setTeam($team);
+                                $teamPlayer->setSequence(0);
+                                $teamPlayer->setUser($user);
+                                $this->getTeamPlayerMapper()->save($teamPlayer);
+                            } catch (MapperException $e) {
+                                $this->updateLog($storageObject, $reader->key(), 0, "SKIPPED TEAM PLAYER: Unknown ID ({$player})");
                             }
-
-                            // Check if we found a database record
-
-                            if (!isset($team['id'])) {
-
-                                // Team did not exist in the database, we need to create a new record
-
-                                // Create a placeholder division
-
-                                $division = new Division();
-                                $division->setId($divisions[$season_key][$sport_key][$division_key]["id"]);
-
-                                $databaseTeam = new Team();
-                                $databaseTeam->setName($team['name']);
-                                $databaseTeam->setDivision($division);
-                                $databaseTeam->setUrl($team['url']);
-                                $this->getTeamMapper()->save($databaseTeam);
-
-                                // Grab the ID of the new record for later use
-
-                                $team['id'] = $databaseTeam->getId();
-
-                                // We need to store any new players in the division and team as well
-
-                                if (is_array($team['players'])) {
-                                    foreach ($team['players'] as $player) {
-
-                                        $user = $this->getUserMapper()->findByExternalId($player);
-
-                                        // Load player into division
-
-                                        $divisionUser = new DivisionUser();
-                                        $divisionUser->setUser($user);
-                                        $divisionUser->setDivision($division);
-                                        $divisionUser->setSequence(0);
-                                        $this->getDivisionUserMapper()->save($divisionUser);
-
-                                        // Load player into team
-
-                                        $teamPlayer = new TeamPlayer();
-                                        $teamPlayer->setTeam($databaseTeam);
-                                        $teamPlayer->setUser($user);
-                                        $teamPlayer->setSequence(0);
-                                        $this->getTeamPlayerMapper()->save($teamPlayer);
-                                    }
-                                }
-
-                            } else {
-
-                                // We need to add any players in the division and team that didn't already exist
-
-                                if (is_array($team['players'])) {
-                                    foreach ($team['players'] as $player) {
-
-                                        $user = $this->getUserMapper()->findByExternalId($player);
-
-                                        /** @var Team $teamObject */
-                                        $teamObject = $team['object'];
-
-                                        try {
-
-                                            // Try to find existing player/division combination
-
-                                            $this->getDivisionUserMapper()->findOneByColumnList([
-                                                'user_id' => $user->getId(),
-                                                'division_id' => $teamObject->getDivision()->getId()
-                                            ]);
-
-                                        } catch (\Exception $e) {
-
-                                            // Load player into division if it couldn't be found
-
-                                            $divisionUser = new DivisionUser();
-                                            $divisionUser->setUser($user);
-                                            $divisionUser->setDivision($teamObject->getDivision());
-                                            $divisionUser->setSequence(0);
-                                            $this->getDivisionUserMapper()->save($divisionUser);
-                                        }
-
-                                        try {
-
-                                            // Try to find existing player/team combination
-
-                                            $this->getTeamPlayerMapper()->findOneByColumnList([
-                                                'user_id' => $user->getId(),
-                                                'team_id' => $team['id']
-                                            ]);
-
-                                        } catch (\Exception $e) {
-
-                                            // Load player into team if it couldn't be found
-
-                                            $teamPlayer = new TeamPlayer();
-                                            $teamPlayer->setTeam($databaseTeam);
-                                            $teamPlayer->setUser($user);
-                                            $teamPlayer->setSequence(0);
-                                            $this->getTeamPlayerMapper()->save($teamPlayer);
-                                        }
-                                    }
-                                }
-                            }
-
-                        } else {
-
-                            // The division didn't exist- "Houston... we've got a problem"
-                            throw new \Exception("Unknown division ({$division_key}) when creating team ({$team_key})");
                         }
                     }
                 }
             }
         }
-
-        // Get details of teams from the database that didn't appear in the CSV
-
-        /** @var Team $databaseTeam */
-        foreach ($databaseTeams as $databaseTeam) {
-
-            $found = false;
-
-            $division = $this->getDivisionMapper()->findById($databaseTeam->getDivision()->getId());
-
-            $season_key = $this->makeKey($division->getSeason()->getName());
-            $sport_key = $this->makeKey($division->getSport()->getName());
-            $division_key = $this->makeKey($division->getName());
-
-            if (is_array($teams[$season_key][$sport_key][$division_key])) {
-                foreach ($teams[$season_key][$sport_key][$division_key] as &$team) {
-                    if ($team['id'] == $databaseTeam->getId()) {
-                        $found = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!$found) {
-                /** @var Division $division */
-                $division = $this->getDivisionMapper()->findById($databaseTeam->getDivision()->getId());
-
-                $season_key = $this->makeKey($division->getSeason()->getName());
-                $division_key = $this->makeKey($division->getName());
-                $sport_key = $this->makeKey($division->getSport()->getName());
-                $team_key = $this->makeKey($databaseTeam->getName());
-
-                $teams[$season_key][$sport_key][$division_key][$team_key] = [
-                    'name' => $databaseTeam->getName(),
-                    'url' => $databaseTeam->getUrl(),
-                    'id' => $databaseTeam->getId(),
-                    'object' => $databaseTeam,
-                    'division_id' => $division->getId(),
-
-                    // Not going to need these going forward so not going to bother grabbing from the DB
-
-                    'players' => [],
-                    'coaches' => []
-                ];
-            }
-        }
-
-        return $teams;
     }
 
     /**
      * Iterate a CSV file looking for coaches
      * @param \Schoolbox\Resource\Storage\Model $storageObject
-     * @param array $teams Array of teams with their ID populated
-     * @param array $seasons Array of seasons with their ID populated
-     * @param array $sports Array of sports with their ID populated
-     * @param array $divisions Array of divisions with their ID populated
-     * @return array
      * @throws \Exception
      */
-    private function loadCoaches($storageObject, $teams, $seasons, $sports, $divisions)
+    private function loadCoaches($storageObject)
     {
         $reader = new Reader($storageObject->readStream());
         $reader->setLoadFromFirst(true);
-
-        $coaches = [];
 
         while ($reader->valid()) {
             $reader->next();
@@ -1548,132 +989,128 @@ class Controller extends Base
 
             if ($this->makeKey($row[0]) == Controller::TYPE_COACH) {
 
-                $coachesArray = [];
+                $error = false;
+                $season = null;
 
-                for ($i = 4; $i < count($row); $i++) {
-                    if (is_numeric($row[$i])) {
-                        $coachesArray[] = $row[$i];
+                if (empty(trim($row[1]))) {
+                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED COACH: No season name specified");
+                    $error = true;
+                } else {
+                    try {
+                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1]);
+                    } catch (MapperException $e) {
+                        $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED COACH: Season not found in database ({$row[1]})");
+                        $error = true;
                     }
                 }
-
-                $season_key = $this->makeKey($row[1]);
-                $sport_key = $this->makeKey($row[2]);
-                $division_key = $this->makeKey($row[3]);
-                $team_key = $this->makeKey($row[4]);
-
-                if (!isset($sports[$sport_key])) {
-                    throw new \Exception("Unknown sport ({$sport_key}) when importing team ({$team_key}");
+                if (empty(trim($row[2]))) {
+                    $this->updateLog($storageObject, $reader->key(), 3, "SKIPPED COACH: No sport name specified");
+                    $error = true;
                 }
 
-                if (!isset($seasons[$season_key])) {
-                    throw new \Exception("Unknown season ({$season_key}) when importing coach");
+                if (empty(trim($row[3]))) {
+                    $this->updateLog($storageObject, $reader->key(), 4, "SKIPPED COACH: No division name specified");
+                    $error = true;
                 }
 
-                if (!isset($divisions[$season_key][$sport_key][$division_key])) {
-                    throw new \Exception("Unknown division ({$division_key}) when importing coach");
+                if (empty(trim($row[4]))) {
+                    $this->updateLog($storageObject, $reader->key(), 5, "SKIPPED COACH: No team name specified");
+                    $error = true;
                 }
 
-                if (!isset($teams[$season_key][$sport_key][$division_key][$team_key])) {
-                    throw new \Exception("Unknown team ({$team_key}) when importing coach");
-                }
+                if (!$error) {
 
-                $coaches[$season_key][$sport_key][$division_key][$team_key] = [
-                    'coaches' => $coachesArray,
-                    'team_id' => $teams[$season_key][$sport_key][$division_key][$team_key]['id']
-                ];
-            }
-        }
+                    // Find the sport associated with the division, and create if doesn't exist
 
+                    try {
+                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2]);
+                    } catch (MapperException $e) {
+                        $sport = new Sport();
+                        $sport->setName($row[2]);
+                        $this->getSportMapper()->save($sport);
+                    }
 
-        // We've now got all of the data out of the csv, we need to link the entities to existing database records so we don't create
-        // duplicates during the import process
+                    // Find the division associated with the division, and create if doesn't exist
 
-        $databaseCoaches = $this->getCoachMapper()->findAll();
-        $databaseTeams = $this->getTeamMapper()->findAll();
+                    try {
+                        $division = $this->getDivisionMapper()->findOneByColumnList([
+                            'name' => $row[3],
+                            'sport_id' => $sport->getId(),
+                            'season_id' => $season->getId()
+                        ]);
+                    } catch (MapperException $e) {
+                        $division = new Division();
+                        $division->setName($row[3]);
+                        $division->setSport($sport);
+                        $division->setSeason($season);
+                        $this->getDivisionMapper()->save($division);
+                    }
 
-        foreach ($coaches as $season_key => &$sportsSeasons) {
-            foreach ($sportsSeasons as $sport_key => &$sportsTeams) {
-                foreach ($sportsTeams as $division_key => &$coachesTeam) {
-                    foreach ($coachesTeam as $team_key => &$team) {
+                    try {
+                        $team = $this->getTeamMapper()->findOneByColumnList([
+                            'name' => $row[4],
+                            'division_id' => $division->getId()
+                        ]);
+                    } catch (MapperException $e) {
+                        $team = new Team();
+                        $team->setName($row[4]);
+                        $team->setDivision($division);
+                        $this->getTeamMapper()->save($team);
+                    }
 
-                        $coachCollection = new Collection();
+                    $coaches = [];
 
-                        foreach ($team["coaches"] as $coach) {
+                    for ($i = 4; $i < count($row); $i++) {
+                        if (is_numeric($row[$i])) {
+                            $coaches[] = $row[$i];
+                        }
+                    }
 
+                    foreach ($coaches as $coach) {
+                        try {
+                            $this->getCoachMapper()->findOneByColumnList([
+                                'user_id' => $coach
+                            ]);
+                        } catch (MapperException $e) {
                             try {
-
-                                // First we have to make sure all of the coaches have records in the coach table
-
                                 $user = $this->getUserMapper()->findByExternalId($coach);
 
-                                $found = false;
-
-                                /** @var Coach $coachCurrent */
-                                foreach ($databaseCoaches as $coachCurrent) {
-
-                                    $coachCurrent->setUser($this->getUserMapper()->findById($coachCurrent->getUser()->getId()));
-
-                                    if ($coachCurrent->getUser()->getExternalId() == $coach) {
-                                        $coachCollection->add($coachCurrent);
-                                        $found = true;
-                                        break;
-                                    }
+                                try {
+                                    $coach = $this->getCoachMapper()->findOneByColumn('user_id', $user->getId());
+                                } catch (MapperException $e) {
+                                    $coach = new Coach();
+                                    $coach->setUser($user);
+                                    $coach->setName($user->getFullName());
+                                    $this->getCoachMapper()->save($coach);
                                 }
 
-                                if (!$found) {
+                                $teamCoach = new TeamCoach();
+                                $teamCoach->setTeam($team);
+                                $teamCoach->setCoach($coach);
+                                $this->getTeamCoachMapper()->save($teamCoach);
 
-                                    $coachCurrent = new Coach();
-                                    $coachCurrent->setUser($user);
-                                    $coachCurrent->setName($user->getFullName());
-                                    $this->getCoachMapper()->save($coachCurrent);
+                            } catch (MapperException $e) {
 
-                                    $coachCollection->add($coachCurrent);
-                                }
-
-                            } catch (\Exception $e) {
-
-                                // Couldn't find the coach by their ID, gotta fail
-
-                                throw new \Exception("Unable to locate coach by ID ({$coach})");
-                            }
-                        }
-
-                        // Save the coaches onto the team
-
-                        /** @var Team $databaseTeam */
-                        foreach ($databaseTeams as $databaseTeam) {
-                            if ($databaseTeam->getId() == $team["team_id"]) {
-                                $databaseTeam->setCoaches($coachCollection);
-                                $this->getTeamMapper()->save($databaseTeam);
+                                $this->updateLog($storageObject, $reader->key(), 0, "SKIPPED COACH: Unknown ID ({$coach})");
                             }
                         }
                     }
                 }
             }
         }
-
-        return $coaches;
     }
 
     /**
      * Iterate a CSV file looking for match fixtures
      * @param \Schoolbox\Resource\Storage\Model $storageObject
-     * @param array $divisions Array of divisions with their ID populated
-     * @param array $seasons Array of seasons with their ID populated
-     * @param array $venues Array of venues with their ID populated
-     * @param array $teams Array of teams with their ID populated
-     * @param array $schools Array of schools with their ID populated
-     * @return array
      * @throws \Exception
      */
-    private function loadFixtures($storageObject, $divisions, $seasons, $venues, $teams, $schools)
+    private function loadFixtures($storageObject)
     {
-        $count = 0;
-
         $reader = new Reader($storageObject->readStream());
         $reader->setLoadFromFirst(true);
 
-        $fixtures = [];
+        $deleted = [];
 
         while ($reader->valid()) {
             $reader->next();
@@ -1681,195 +1118,271 @@ class Controller extends Base
 
             if (strtolower(trim($row[0])) == Controller::TYPE_FIXTURE) {
 
-                $itinerary = [];
+                $error = false;
+                $season = null;
 
-                for ($i = 11; $i < count($row); $i += 3) {
-                    if (!empty($row[$i])) {
-                        $itinerary[] = [
-                            'date' => $row[$i],
-                            'time' => $row[$i + 1],
-                            'description' => $row[$i + 2]
-                        ];
+                if (empty(trim($row[1]))) {
+                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED FIXTURE: No season name specified");
+                    $error = true;
+                } else {
+                    try {
+                        $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1]);
+                    } catch (MapperException $e) {
+                        $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED FIXTURE: Season not found in database ({$row[1]})");
+                        $error = true;
                     }
                 }
 
-                $season_key = $this->makeKey($row[1]);
-                $sport_key = $this->makeKey($row[2]);
-                $division_key = $this->makeKey($row[3]);
-                $venue_key = $this->makeKey($row[7]);
-                $home_team_key = $this->makeKey($row[8]);
-                $away_team_key = $this->makeKey($row[9]);
+                if (empty(trim($row[2]))) {
+                    $this->updateLog($storageObject, $reader->key(), 3, "SKIPPED FIXTURE: No sport name specified");
+                    $error = true;
+                }
 
-                $fixtures[$season_key][$sport_key][$division_key][] = [
-                    'venue_key' => $venue_key,
-                    'home_team_key' => $home_team_key,
-                    'away_team_key' => $away_team_key,
-                    'name' => $row[4],
-                    'date' => $row[5],
-                    'time' => $row[6],
-                    'note' => $row[9],
-                    'itinerary' => $itinerary
-                ];
-            }
-        }
+                if (empty(trim($row[3]))) {
+                    $this->updateLog($storageObject, $reader->key(), 4, "SKIPPED FIXTURE: No division name specified");
+                    $error = true;
+                }
 
-        // Delete any existing matches that have a combination of division, season and venue matching those found in the CSV- not sure
-        // if this is the best logic...
+                if (empty(trim($row[4]))) {
+                    $this->updateLog($storageObject, $reader->key(), 5, "SKIPPED FIXTURE: No match name specified");
+                    $error = true;
+                }
 
-        foreach ($fixtures as $season_key => &$fixturesSeasons) {
-            foreach ($fixturesSeasons as $sport_key => &$fixturesSports) {
-                foreach ($fixturesSports as $division_key => &$fixturesDivisions) {
-                    foreach ($fixturesDivisions as &$fixture) {
+                if (empty(trim($row[7]))) {
+                    $this->updateLog($storageObject, $reader->key(), 6, "SKIPPED FIXTURE: No venue name specified");
+                    $error = true;
+                }
 
-                        // Make sure the dependencies exist
+                if (empty(trim($row[8]))) {
+                    $this->updateLog($storageObject, $reader->key(), 7, "SKIPPED FIXTURE: No home team name specified");
+                    $error = true;
+                }
 
-                        if (!isset($divisions[$season_key][$sport_key][$division_key])) {
-                            throw new \Exception("Unable to find division when creating match ({$division_key})");
-                        }
+                if (empty(trim($row[9]))) {
+                    $this->updateLog($storageObject, $reader->key(), 8, "SKIPPED FIXTURE: No away team name specified");
+                    $error = true;
+                }
+                try {
+                    if ($this->makeDateTime($row[5], $row[6]) == null) {
+                        $this->updateLog($storageObject, $reader->key(), 6, "SKIPPED FIXTURE: No date/time specified");
+                        $error = true;
+                    }
+                } catch (\Exception $e) {
+                    $this->updateLog($storageObject, $reader->key(), 6, "SKIPPED FIXTURE: Invalid date/time specified ({$row[5]} {$row[6]})");
+                    $error = true;
+                }
 
-                        if (!isset($seasons[$season_key])) {
-                            throw new \Exception("Unable to find season when creating match ({$season_key})");
-                        }
+                if (!$error) {
 
-                        if (!isset($venues[$fixture['venue_key']])) {
-                            throw new \Exception("Unable to find season when creating match ({$fixture['venue_key']})");
-                        }
+                    // Find the sport associated with the division, and create if doesn't exist
 
-                        $division_id = $divisions[$season_key][$sport_key][$division_key]['id'];
-                        $season_id = $seasons[$season_key]['id'];
-                        $venue_id = $venues[$fixture['venue_key']]['id'];
+                    try {
+                        $sport = $this->getSportMapper()->findOneByColumn('name', $row[2]);
+                    } catch (MapperException $e) {
+                        $sport = new Sport();
+                        $sport->setName($row[2]);
+                        $this->getSportMapper()->save($sport);
+                    }
 
-                        $matches = $this->getMatchMapper()->deleteByColumnList([
-                            'division_id' => $division_id,
-                            'season_id' => $season_id,
-                            'venue_id' => $venue_id
+                    // Find the division associated with the division, and create if doesn't exist
+
+                    try {
+                        $division = $this->getDivisionMapper()->findOneByColumnList([
+                            'name' => $row[3],
+                            'sport_id' => $sport->getId(),
+                            'season_id' => $season->getId()
                         ]);
+                    } catch (MapperException $e) {
+                        $division = new Division();
+                        $division->setName($row[3]);
+                        $division->setSport($sport);
+                        $division->setSeason($season);
+                        $this->getDivisionMapper()->save($division);
                     }
-                }
-            }
-        }
 
-        foreach ($fixtures as $season_key => &$fixturesSeasons) {
-            foreach ($fixturesSeasons as $sport_key => &$fixturesSports) {
-                foreach ($fixturesSports as $division_key => &$fixturesDivisions) {
-                    foreach ($fixturesDivisions as &$fixture) {
+                    // Find the venue associated with the match
 
-                        // Make sure the dependencies exist
+                    try {
+                        $venue = $this->getVenueMapper()->findOneByColumnList([
+                            'name' => $row[7]
+                        ]);
+                    } catch (MapperException $e) {
+                        $venue = new Venue();
+                        $venue->setName($row[7]);
+                        $this->getVenueMapper()->save($venue);
+                    }
 
-                        if (!isset($divisions[$season_key][$sport_key][$division_key])) {
-                            throw new \Exception("Unable to find division when creating match ({$division_key})");
+                    // Find the teams associated with the match
+
+                    try {
+                        $teamHome = $this->getTeamMapper()->findOneByColumnList([
+                            'name' => $row[8],
+                            'division_id' => $division->getId()
+                        ]);
+                    } catch (MapperException $e) {
+                        /** @var Team $teamHome */
+                        $teamHome = null;
+                    }
+
+                    try {
+                        $teamAway = $this->getTeamMapper()->findOneByColumnList([
+                            'name' => $row[9],
+                            'division_id' => $division->getId()
+                        ]);
+                    } catch (MapperException $e) {
+                        /** @var Team $teamAway */
+                        $teamAway = null;
+                    }
+
+                    // Find the schools associated with the match
+
+                    try {
+                        $schoolHome = $this->getSchoolMapper()->findOneByColumnList([
+                            'name' => $row[8]
+                        ]);
+                    } catch (MapperException $e) {
+                        /** @var School $schoolHome */
+                        $schoolHome = null;
+                    }
+
+                    try {
+                        $schoolAway = $this->getSchoolMapper()->findOneByColumnList([
+                            'name' => $row[9]
+                        ]);
+                    } catch (MapperException $e) {
+                        /** @var School $schoolAway */
+                        $schoolAway = null;
+                    }
+
+                    // Make sure we have a valid home combination
+
+                    if ($teamHome != null && $schoolHome != null) {
+                        // A team and school were both found matching the away team name, need user intervention to deduplicate
+                        $this->updateLog($storageObject, $reader->key(), 9, "SKIPPED FIXTURE: Home team name matches both school and team");
+                        $error = true;
+                    } else {
+                        if ($teamHome == null && $schoolHome == null) {
+                            // No home team/school specified
+                            $this->updateLog($storageObject, $reader->key(), 9, "SKIPPED FIXTURE: No home team name specified");
+                            $error = true;
                         }
+                    }
 
-                        if (!isset($seasons[$season_key])) {
-                            throw new \Exception("Unable to find season when creating match ({$season_key})");
+                    // Make sure we have a valid away combination
+
+                    if ($teamAway != null && $schoolAway != null) {
+                        // A team and school were both found matching the away team name, need user intervention to deduplicate
+                        $this->updateLog($storageObject, $reader->key(), 9, "SKIPPED FIXTURE: Away team name matches both school and team");
+                        $error = true;
+                    } else {
+                        if ($teamAway == null && $schoolAway == null) {
+                            // No away team/school specified
+                            $this->updateLog($storageObject, $reader->key(), 9, "SKIPPED FIXTURE: No away team name specified");
+                            $error = true;
                         }
+                    }
 
-                        if (!isset($venues[$fixture['venue_key']])) {
-                            throw new \Exception("Unable to find season when creating match ({$fixture['venue_key']})");
+                    if (!$error) {
+
+                        // Remove existing matches for this combination of division/season/home team the first time we encounter them
+                        // Bit crude but ¯\_(ツ)_/¯ it works
+
+                        $deleted_key =
+                            $division->getId() . "_" .
+                            $season->getId() . "_" .
+                            (($teamHome == null) ? 'null' : $teamHome->getId()) . "_" .
+                            (($teamAway == null) ? 'null' : $teamAway->getId()) . "_" .
+                            (($schoolHome == null) ? 'null' : $schoolHome->getId()) . "_" .
+                            (($schoolAway == null) ? 'null' : $schoolAway->getId());
+
+                        if (!isset($deleted[$deleted_key])) {
+
+                            $this->getMatchMapper()->deleteByColumnList([
+                                'division_id' => $division->getId(),
+                                'season_id' => $season->getId(),
+                                'home_team_id' => $teamHome == null ? null : $teamHome->getId(),
+                                'away_team_id' => $teamAway == null ? null : $teamAway->getId(),
+                                'home_school_id' => $schoolHome == null ? null : $schoolHome->getId(),
+                                'away_school_id' => $schoolAway == null ? null : $schoolAway->getId(),
+                            ]);
+
+                            $deleted[$deleted_key] = true;
                         }
-
-                        $fixture['division_id'] = $divisions[$season_key][$sport_key][$division_key]['id'];
-                        $fixture['season_id'] = $seasons[$season_key]['id'];
-                        $fixture['venue_id'] = $venues[$fixture['venue_key']]['id'];
-                        $fixture['start_at'] = $this->makeDateTime($fixture['date'], $fixture['time']);
-
-                        if ($fixture['start_at'] == null) {
-                            throw new \Exception("Fixtures must have a start date specified");
-                        }
-
-                        if (isset($teams[$season_key][$sport_key][$division_key][$fixture['home_team_key']])) {
-                            $fixture['home_team_id'] = $teams[$season_key][$sport_key][$division_key][$fixture['home_team_key']]['id'];
-                        } else {
-                            if (isset($schools[$fixture['home_team_key']])) {
-                                $fixture['home_school_id'] = $schools[$fixture['home_team_key']]['id'];
-                            } else {
-                                // The school/team didn't exist- "Houston... we've got a problem"
-                                throw new \Exception("Unable to find home team when creating match ({$fixture['home_team_key']})");
-                            }
-                        }
-
-                        if (isset($teams[$season_key][$sport_key][$division_key][$fixture['away_team_key']])) {
-                            $fixture['away_team_id'] = $teams[$season_key][$sport_key][$division_key][$fixture['away_team_key']]['id'];
-                        } else {
-                            if (isset($schools[$fixture['away_team_key']])) {
-                                $fixture['away_school_id'] = $schools[$fixture['away_team_key']]['id'];
-                            } else {
-                                // The school/team didn't exist- "Houston... we've got a problem"
-                                throw new \Exception("Unable to find home team when creating match ({$fixture['away_team_key']})");
-                            }
-                        }
-
-                        foreach ($fixture['itinerary'] as &$item) {
-                            $item['start_at'] = $this->makeDateTime($item['date'], $item['time']);
-
-                            if ($item['start_at'] == null) {
-                                throw new \Exception("Itinerary items must have a date specified");
-                            }
-                        }
-
-                        // Create the database record
 
                         $match = new Match();
-
-                        $match->setName($fixture["name"]);
-                        $match->setStartAt($fixture["start_at"]);
-                        $match->setNotes($fixture["note"]);
-
-                        $division = new Division();
-                        $division->setId($fixture["division_id"]);
                         $match->setDivision($division);
-
-                        $season = new Season();
-                        $season->setId($fixture["season_id"]);
                         $match->setSeason($season);
-
-                        $venue = new Venue();
-                        $venue->setId($fixture["venue_id"]);
                         $match->setVenue($venue);
+                        $match->setName($row[4]);
+                        $match->setStartAt($this->makeDateTime($row[5], $row[6]));
+                        $match->setNotes($row[9]);
 
-                        if (isset($fixture['home_team_id'])) {
-                            $team = new Team();
-                            $team->setId($fixture["home_team_id"]);
-                            $match->setHomeTeam($team);
-                        } else {
-                            $school = new School();
-                            $school->setId($fixture["home_school_id"]);
-                            $match->setHomeSchool($school);
+                        if ($teamHome != null) {
+                            $match->setHomeTeam($teamHome);
                         }
-
-                        if (isset($fixture['away_team_id'])) {
-                            $team = new Team();
-                            $team->setId($fixture["away_team_id"]);
-                            $match->setAwayTeam($team);
-                        } else {
-                            $school = new School();
-                            $school->setId($fixture["away_school_id"]);
-                            $match->setAwaySchool($school);
+                        if ($teamAway != null) {
+                            $match->setAwayTeam($teamAway);
+                        }
+                        if ($schoolHome != null) {
+                            $match->setHomeSchool($schoolHome);
+                        }
+                        if ($schoolAway != null) {
+                            $match->setAwaySchool($schoolAway);
                         }
 
                         $this->getMatchMapper()->save($match);
 
-                        $itineraryItems = new Collection();
+                        // Grab itinerary items for the match and save them
 
-                        foreach ($fixture['itinerary'] as $itemCurrent) {
+                        $items = [];
+
+                        for ($i = 11; $i < count($row); $i += 3) {
+
+                            if (!empty($row[$i]) || !empty($row[$i+1]) || !empty($row[$i+2])) {
+
+                                $error = false;
+
+                                if (empty($row[$i])) {
+                                    $this->updateLog($storageObject, $reader->key(), ($i+1), "SKIPPED ITINERARY ITEM: No date specified");
+                                    $error = true;
+                                }
+                                if (empty($row[$i + 1])) {
+                                    $this->updateLog($storageObject, $reader->key(), ($i+1), "SKIPPED ITINERARY ITEM: No time specified");
+                                    $error = true;
+                                }
+                                if (empty($row[$i + 2])) {
+                                    $this->updateLog($storageObject, $reader->key(), ($i+1), "SKIPPED ITINERARY ITEM: No description specified");
+                                    $error = true;
+                                }
+
+                                try {
+                                    $this->makeDateTime($row[$i], $row[$i + 1]);
+                                } catch (\Exception $e) {
+                                    $this->updateLog($storageObject, $reader->key(), ($i+1), "SKIPPED ITINERARY ITEM: Invalid date/time specified ({$row[$i]} {$row[$i+1]})");
+                                    $error = true;
+                                }
+
+                                if (!$error) {
+                                    $items[] = [
+                                        'date' => $row[$i],
+                                        'time' => $row[$i + 1],
+                                        'description' => $row[$i + 2]
+                                    ];
+                                }
+                            }
+                        }
+
+                        foreach ($items as $item) {
                             $itineraryItem = new ItineraryItem();
                             $itineraryItem->setMatch($match);
-                            $itineraryItem->setDescription($itemCurrent['description']);
-                            $itineraryItem->setStartAt($itemCurrent['start_at']);
+                            $itineraryItem->setStartAt($this->makeDateTime($item['date'], $item['time']));
+                            $itineraryItem->setDescription($row['description']);
                             $this->getItineraryItemMapper()->save($itineraryItem);
                         }
-
-                        $match->setItinerary($itineraryItems);
-                        $this->getMatchMapper()->save($match);
-                        $count++;
                     }
                 }
             }
         }
-
-        $fixtures['matchCount'] = $count;
-
-        return $fixtures;
     }
 
     /* Getters/Setters
@@ -1951,9 +1464,19 @@ class Controller extends Base
     protected $importMapper;
 
     /**
+     * @var ImportErrorsMapper
+     */
+    protected $importErrorsMapper;
+
+    /**
      * @var TeamPlayerMapper
      */
     protected $teamPlayerMapper;
+
+    /**
+     * @var TeamCoachMapper
+     */
+    protected $teamCoachMapper;
 
     /**
      * @return SportMapper
@@ -2226,6 +1749,24 @@ class Controller extends Base
     }
 
     /**
+     * @return ImportErrorsMapper
+     */
+    protected function getImportErrorsMapper()
+    {
+        return $this->importErrorsMapper;
+    }
+
+    /**
+     * @param ImportErrorsMapper $importErrorsMapper
+     * @return static
+     */
+    protected function setImportErrorsMapper($importErrorsMapper)
+    {
+        $this->importErrorsMapper = $importErrorsMapper;
+        return $this;
+    }    
+
+    /**
      * @return TeamPlayerMapper
      */
     protected function getTeamPlayerMapper()
@@ -2240,6 +1781,24 @@ class Controller extends Base
     protected function setTeamPlayerMapper($teamPlayerMapper)
     {
         $this->teamPlayerMapper = $teamPlayerMapper;
+        return $this;
+    }
+
+    /**
+     * @return TeamCoachMapper
+     */
+    protected function getTeamCoachMapper()
+    {
+        return $this->teamCoachMapper;
+    }
+
+    /**
+     * @param TeamCoachMapper $teamCoachMapper
+     * @return static
+     */
+    protected function setTeamCoachMapper($teamCoachMapper)
+    {
+        $this->teamCoachMapper = $teamCoachMapper;
         return $this;
     }
 }

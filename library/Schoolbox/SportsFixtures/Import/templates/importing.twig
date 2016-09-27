@@ -1,3 +1,68 @@
+<script>
+    $(function () {
+        window.skipCount = 0;
+
+        function update() {
+            $.get('{{ routeLookup('sportsfixturesImport.getImportProgress', {id: id}) }}/' + window.skipCount)
+            .success(function (data) {
+                if (data.errors.length > 0) {
+
+                    // Add any new errors to the end of the table body
+
+                    for (var i = 0; i < data.errors.length; i++) {
+
+                        var divider = ' / ';
+                        var createdAt = data.errors[i]['created_at'];
+                        var result = data.errors[i]['result'];
+                        var filename = data.errors[i]['filename'];
+                        var line = data.errors[i]['line'];
+                        var column = data.errors[i]['column'];
+
+                        if (filename == null) {
+                            filename = '';
+                        }
+
+                        if (line == 0) {
+                            line = '';
+                        }
+
+                        if (column == 0) {
+                            column = '';
+                            divider = '';
+                        }
+
+                        $('#table-body').append('<tr><td>' + createdAt + '</td><td>' + result + '</td><td>' + filename + '</td><td>' + line + divider + column + '</td></tr>');
+                    }
+
+                    // Keep polling for updates if the import hasn't completed/failed
+
+                    if (data.status != 'completed' && data.status != 'failed') {
+                        window.setTimeout(update, 2000);
+                        $('#progress').html('CSV Import In Progress');
+                    } else if (data.status == 'completed') {
+                        $('#progress').html('CSV Import Completed');
+                    } else if (data.status == 'failed') {
+                        $('#progress').html('CSV Import Failed');
+                    }
+                } else {
+                    if (data.status != 'completed' && data.status != 'failed') {
+                        window.setTimeout(update, 2000);
+                        $('#progress').html('CSV Import In Progress');
+                    } else if (data.status == 'completed') {
+                        $('#progress').html('CSV Import Completed');
+                    } else if (data.status == 'failed') {
+                        $('#progress').html('CSV Import Failed');
+                    }
+                }
+
+                window.skipCount += data.errors.length;
+            });
+        }
+
+        update();
+    });
+</script>
+
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs(
 [ 'Fixtures',    routeLookup('sportsfixtures.getLanding') ],
@@ -6,26 +71,22 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>CSV Import In Progress</h1>
+        <h1 id="progress"></h1>
     </div>
 </div>
 
 <div class="row">
     <div class="small-12 island">
-
-        <section class="content">
-            <article>
-                <p>
-                    The import of your sports fixtures file has started.
-                </p>
-                <p>
-                    A notification will be sent when it has completed or you can view the current import status by clicking the link below.
-                </p>
-                <p>
-                    <a href="{{ routeLookup('sportsfixturesImport.getImportProgress', {id: id}) }}">Click here to view import progress</a>
-                </p>
-            </article>
-        </section>
-
+        <table>
+            <thead>
+            <tr>
+                <th>Time</th>
+                <th width="100%">Description</th>
+                <th>Filename</th>
+                <th>Row&nbsp;/&nbsp;Column</th>
+            </tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
     </div>
 </div>
