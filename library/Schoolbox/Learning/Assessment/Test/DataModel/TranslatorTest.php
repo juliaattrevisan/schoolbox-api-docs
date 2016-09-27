@@ -463,4 +463,27 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($link, $task->getLink());
         $this->assertEquals($selfMarkable, $task->getSelfMarkable());
     }
+
+    /**
+     * Test translating quiz-specific fields to domain model
+     */
+    public function testTranslateQuizToDomainModel()
+    {
+        $quizModel = (new QuizModel())
+            ->setId(13)
+            ->setAssessmentModel((new AssessmentModel())->setId(105))
+            ->setCompletionMessage('you done a quiz')
+            ->setDuration(Quiz::DURATION_UNLIMITED)
+            ->setMaxAttempts(Quiz::ATTEMPTS_UNLIMITED)
+        ;
+
+        /** @var Quiz $quiz */
+        $quiz = $this->translator->translateToDomainModel($quizModel);
+
+        $this->assertInstanceOf(Quiz::class, $quiz);
+        $this->assertEquals(105, $quiz->getId());
+        $this->assertEquals('you done a quiz', $quiz->getCompletionMessage());
+        $this->assertEquals(Quiz::DURATION_UNLIMITED, $quiz->getDuration());
+        $this->assertEquals(Quiz::ATTEMPTS_UNLIMITED, $quiz->getMaxAttempts());
+    }
 }
