@@ -196,6 +196,27 @@ class Translator
                 ->setCreator($dataModel->getUser())
             ;
 
+        } elseif ($dataModel instanceof DueWorkModel) {
+            // Due work-specific fields
+            $assessable = (new DueWork())
+                ->setShowSubmittedOnly($dataModel->getSkipUnsubmitted())
+                ->setHasRubric($dataModel->getUseRubric())
+                ->setCreator($dataModel->getOwner())
+            ;
+
+            // Figure out submission visibility
+            if ($dataModel->getAcceptOnline()) {
+                if ($dataModel->getAcceptMultiple()) {
+                    $assessable->setAcceptsMultiple();
+                } else {
+                    $assessable->setAcceptsSingle();
+                }
+            } else {
+                $assessable->setAcceptsNone();
+            }
+
+            // Convert attachments
+
         }
 
         if (!$assessable instanceof IAssessable) {
