@@ -94,7 +94,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
     /**
      * @return int|float
      */
-    protected function getTotalMark()
+    public function getTotalMark()
     {
         return $this->totalMark;
     }
