@@ -164,7 +164,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      *
      * @expectedException \UnexpectedValueException
      */
-    public function testTranslateProjectWithinProject()
+    public function testTranslateProjectWithinProjectToDataModel()
     {
         $project = (new Project(new Average()))->setId(12);
         $project->getAssessables()->add((new Project(new Minimum())));
@@ -174,7 +174,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     /**
      * Data provider for different due work response acceptance settings.
      */
-    public function getTestTranslateProjectSummatorData()
+    public function getTestTranslateProjectSummatorToDataModelData()
     {
         return [
             [new Project(new WeightedAverage()), ProjectModel::SUMMATOR_WEIGHTED_AVERAGE,],
@@ -187,12 +187,12 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     /**
      * Test translation of acceptance response settings.
      *
-     * @dataProvider getTestTranslateProjectSummatorData
+     * @dataProvider getTestTranslateProjectSummatorToDataModelData
      *
      * @param Project $project
      * @param string  $summatorType
      */
-    public function testTranslateProjectSummator(Project $project, $summatorType)
+    public function testTranslateProjectSummatorToDataModel(Project $project, $summatorType)
     {
         /** @var ProjectModel $projectModel */
         $projectModel = $this->translator->translateToDataModel($project, 1);
@@ -355,7 +355,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     /**
      * Data provider for different due work response acceptance settings.
      */
-    public function getTestTranslateDueWorkResponseAcceptanceData()
+    public function getTestTranslateDueWorkResponseAcceptanceToDataModelData()
     {
         return [
             [(new DueWork())->setAcceptsMultiple(), true, true,],
@@ -367,13 +367,13 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     /**
      * Test translation of acceptance response settings.
      *
-     * @dataProvider getTestTranslateDueWorkResponseAcceptanceData
+     * @dataProvider getTestTranslateDueWorkResponseAcceptanceToDataModelData
      *
      * @param DueWork $dueWork
      * @param bool    $acceptsOnline
      * @param bool    $acceptsMultiple
      */
-    public function testTranslateDueWorkResponseAcceptance(DueWork $dueWork, $acceptsOnline, $acceptsMultiple)
+    public function testTranslateDueWorkResponseAcceptanceToDataModel(DueWork $dueWork, $acceptsOnline, $acceptsMultiple)
     {
         /** @var DueWorkModel $dueWorkModel */
         $dueWorkModel = $this->translator->translateToDataModel($dueWork, 2);
