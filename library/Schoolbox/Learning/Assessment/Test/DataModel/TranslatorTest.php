@@ -496,4 +496,33 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(Quiz::ATTEMPTS_UNLIMITED, $quiz->getMaxAttempts());
         $this->assertEquals(3, $quiz->getCreator()->getId());
     }
+
+    /**
+     * Test translating due work specific fields to domain model
+     */
+    public function testTranslateDueWorkToDomainModel()
+    {
+        $dueWorkModel = (new DueWorkModel())
+            ->setId(6789)
+            ->setAssessmentModel(
+                (new AssessmentModel())->setId(33)
+            )
+            ->setSkipUnsubmitted(false)
+            ->setAcceptOnline(true)
+            ->setAcceptMultiple(true)
+            ->setUseRubric(false)
+            ->setOwner($this->teacher2)
+        ;
+
+        /** @var DueWork $dueWork */
+        $dueWork = $this->translator->translateToDomainModel($dueWorkModel);
+
+        $this->assertInstanceOf(DueWork::class, $dueWork);
+        $this->assertEquals(33, $dueWork->getId());
+        $this->assertFalse($dueWork->getShowSubmittedOnly());
+        $this->assertFalse($dueWork->isAcceptNone());
+        $this->assertFalse($dueWork->isAcceptSingle());
+        $this->assertTrue($dueWork->isAcceptMulti());
+        $this->assertEquals(151, $dueWork->getCreator()->getId());
+    }
 }
