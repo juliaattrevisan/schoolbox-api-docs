@@ -11,7 +11,7 @@ namespace Schoolbox\Assessment\Course;
 
 use Alaress_Date_Format;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Learning\Assessment\DataModel\AssessmentModel;
+use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Assessment\Component\SubmissionBox;
@@ -20,7 +20,7 @@ use Schoolbox\User;
 
 class Task implements ISoftDeletable, IAssessableDataModel
 {
-    use AssessmentModel;
+    use AssessmentModelTrait;
 
     const TYPE_TASK          = 1;
     const TYPE_DUE_WORK      = 2;

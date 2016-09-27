@@ -11,7 +11,7 @@ namespace Schoolbox\Learning\Assessment\DataModel;
  * A trait for base assessment models - allows easy storage and retrieval of
  * the base assessment.
  */
-trait AssessmentModel
+trait AssessmentModelTrait
 {
     /**
      * The base assessable model that is a part of this model.

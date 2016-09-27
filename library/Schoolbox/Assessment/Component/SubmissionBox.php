@@ -12,7 +12,7 @@ namespace Schoolbox\Assessment\Component;
 use Alaress_Date_Format;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Learning\Assessment\DataModel\AssessmentModel;
+use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\IStorage;
@@ -28,7 +28,7 @@ use Schoolbox\Permission\Access\Access;
 class SubmissionBox implements ISoftDeletable, IAssessableDataModel
 {
     use HasCurriculumNodes;
-    use AssessmentModel;
+    use AssessmentModelTrait;
 
     const MARK_VISIBILITY_PRIVATE = 0;
     const MARK_VISIBILITY_STUDENT = 1;

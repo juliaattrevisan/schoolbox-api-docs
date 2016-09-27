@@ -8,7 +8,7 @@
 namespace Schoolbox\Learning\Assessment\DataModel\Project;
 
 use Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\DataModel\AssessmentModel;
+use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Mapper\Traits\Model\Id;
 
@@ -19,7 +19,7 @@ class Model implements IAssessableDataModel
 {
     use Id;
 
-    use AssessmentModel;
+    use AssessmentModelTrait;
 
     /**
      * The average summator type.
