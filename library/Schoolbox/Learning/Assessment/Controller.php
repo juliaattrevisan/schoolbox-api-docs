@@ -118,45 +118,33 @@ class Controller extends Base
             ->setDueAt(Alaress_Date_Format::now())
             ->setCloseAt(Alaress_Date_Format::now());
 
+        /* Common data among all assessmentType fragments
+         */
+        $data = [
+            'types' => new Types(),
+            'assessment' => $assessment,
+            'curriculumNodes' => $folder->getCurriculumNodes(),
+            'allMarkTypes' => $this->getAllMarkTypes()
+        ];
+
         /* Select the fragment to return
          */
         switch($this->getRequest()->post['assessmentType']) {
             case Types::ASSESSMENT_PROJECT:
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/create.twig', [
-                    'types' => new Types(),
-                    'assessment' => $assessment,
-                    'curriculumNodes' => $folder->getCurriculumNodes(),
-                    'allSummators' => new SummatorCollection()
-                ]));
-
+                $data['allSummators'] = new SummatorCollection();
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/create.twig', $data));
                 break;
 
             case Types::ASSESSMENT_DUE_WORK:
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/dueWork/create.twig', [
-                    'types' => new Types(),
-                    'assessment' => $assessment,
-                    'curriculumNodes' => $folder->getCurriculumNodes(),
-                    'allMarkTypes' => $this->getAllMarkTypes(),
-                ]));
-
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/dueWork/create.twig', $data));
                 break;
 
             case Types::ASSESSMENT_TASK:
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/task/create.twig', [
-                    'types' => new Types(),
-                    'assessment' => $assessment,
-                    'curriculumNodes' => $folder->getCurriculumNodes(),
-                ]));
-
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/task/create.twig', $data));
                 break;
 
             case Types::ASSESSMENT_QUIZ:
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/quiz/create.twig', [
-                    'types' => new Types(),
-                    'assessment' => $assessment,
-                    'curriculumNodes' => $folder->getCurriculumNodes(),
-                ]));
-
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/quiz/create.twig', $data));
                 break;
 
             default:
