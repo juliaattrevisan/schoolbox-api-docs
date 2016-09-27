@@ -225,3 +225,21 @@ CREATE TABLE `project` (
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8
   COLLATE = utf8_general_ci;
+
+-- Represents 'A Project contains Assessments'
+CREATE TABLE `project_assessment` (
+  `project_id` INT UNSIGNED NOT NULL,
+  `assessment_id` INT UNSIGNED NOT NULL,
+  INDEX `fk_project_assessment_project_id_idx` (`project_id` ASC),
+  INDEX `fk_project_assessment_assessment_id_idx` (`assessment_id` ASC),
+  CONSTRAINT `fk_project_assessment_project_id_idx`
+  FOREIGN KEY (`project_id`)
+  REFERENCES `project` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_project_assessment_assessment_id`
+  FOREIGN KEY (`assessment_id`)
+  REFERENCES `assessment` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
