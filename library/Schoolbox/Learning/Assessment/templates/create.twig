@@ -117,14 +117,14 @@
 <div class="row">
     <div class="small-12 columns island">
         <form action="{{ routeLookup('learningAssessment.postSelectAssessment') }}" id="assessmentForm" method="post">
-            <input type="hidden" name="folderId" value="{{ folder.id }}" />
-
             <section>
                 <fieldset class="content" data-mage="part-1">
                     <legend>Choose Assessment Type</legend>
 
                     <fieldset class="radiolist">
                         <div class="column small-12">
+                            <input type="hidden" name="folderId" value="{{ folder.id }}" />
+
                             <input type="radio" name="assessmentType" value="project" id="project"><label for="project" class="radio-label">Project</label>
                             <input type="radio" name="assessmentType" value="dueWork" id="due-work"><label for="due-work" class="radio-label">Due Work</label>
                             <input type="radio" name="assessmentType" value="quiz" id="quiz"><label for="quiz" class="radio-label">Quiz</label>

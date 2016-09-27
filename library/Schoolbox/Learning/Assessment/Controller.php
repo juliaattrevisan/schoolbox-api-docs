@@ -116,7 +116,7 @@ class Controller extends Base
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
             'folder' => $folder,
 //            'allMarkTypes' => $this->getAllMarkTypes(),
-//            'curriculumNodes' => $folder->getCurriculumNodes()
+
         ]));
     }
 
@@ -125,6 +125,13 @@ class Controller extends Base
      */
     public function postSelectAssessment()
     {
+        try {
+            $folder = $this->getFolderMapper()->findById($this->getRequest()->post['folderId']);
+        }
+        catch (MapperException $e) {
+            $this->sendError('Could not create assessment', [ 'select a valid folder' ]);
+            return;
+        }
 
         /* TODO: Remove this stub
          * I added it to save myself choosing dates all the time
@@ -137,19 +144,36 @@ class Controller extends Base
 
         switch($this->getRequest()->post['assessmentType']) {
             case 'project':
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/create.twig', ['assessment' => $assessment, 'allSummators' => new SummatorCollection()]));
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/create.twig', [
+                    'assessment' => $assessment,
+                    'curriculumNodes' => $folder->getCurriculumNodes(),
+                    'allSummators' => new SummatorCollection()
+                ]));
+
                 break;
 
             case 'dueWork':
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/dueWork/create.twig', ['assessment' => $assessment]));
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/dueWork/create.twig', [
+                    'assessment' => $assessment,
+                    'curriculumNodes' => $folder->getCurriculumNodes(),
+                ]));
+
                 break;
 
             case 'task':
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/task/create.twig', ['assessment' => $assessment]));
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/task/create.twig', [
+                    'assessment' => $assessment,
+                    'curriculumNodes' => $folder->getCurriculumNodes(),
+                ]));
+
                 break;
 
             case 'quiz':
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/quiz/create.twig', ['assessment' => $assessment]));
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/quiz/create.twig', [
+                    'assessment' => $assessment,
+                    'curriculumNodes' => $folder->getCurriculumNodes(),
+                ]));
+
                 break;
 
             default:
