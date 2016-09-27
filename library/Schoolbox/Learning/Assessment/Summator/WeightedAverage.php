@@ -26,6 +26,13 @@ use \Schoolbox\Learning\Assessment\Task\Model as Task;
 class WeightedAverage extends AbstractSummator
 {
     /**
+     * Title
+     *
+     * @var string
+     */
+    protected $title = 'Weighted Average';
+
+    /**
      * @var float
      */
     protected $weightedAverage;

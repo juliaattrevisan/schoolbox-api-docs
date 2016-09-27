@@ -18,6 +18,13 @@ use \Schoolbox\User;
 
 class Average extends AbstractSummator
 {
+    /**
+     * Title
+     *
+     * @var string
+     */
+    protected $title = 'Average';
+
     /** @var float */
     protected $sum;
 

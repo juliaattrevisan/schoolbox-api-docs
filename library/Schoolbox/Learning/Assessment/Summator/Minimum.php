@@ -24,6 +24,13 @@ use \Schoolbox\Learning\Assessment\Participant;
 
 class Minimum extends AbstractSummator
 {
+    /**
+     * Title
+     *
+     * @var string
+     */
+    protected $title = 'Minimum';
+
     /** @var float */
     protected $min;
 

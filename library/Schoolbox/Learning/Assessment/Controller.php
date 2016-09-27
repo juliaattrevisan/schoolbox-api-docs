@@ -25,6 +25,7 @@ use \Schoolbox\Resource\Storage\Model as Storage;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\Assessment\Project as Project;
 
+use \Schoolbox\Learning\Assessment\Summator\Collection as SummatorCollection;
 use \Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedAverage;
 use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
 use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
@@ -128,7 +129,7 @@ class Controller extends Base
     {
         switch($this->getRequest()->post['assessmentType']) {
             case 'project':
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/create.twig', []));
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/create.twig', ['allSummators' => new SummatorCollection()]));
                 break;
 
             case 'dueWork':
