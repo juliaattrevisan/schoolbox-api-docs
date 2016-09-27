@@ -35,12 +35,13 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                ''                                           => 'getPendingAssessments',
-                '/classes'                                  => 'getClasses',
-                '/markbook/{classId}'                        => 'getMarkbook',
-                '/due/{studentId}'                           => 'getDue',
-                '/grades/{studentId}/{termCode}'             => 'getGrades',
-                '/grades/{studentId}/{termCode}/{subjectId}' => 'getGradesForSubject',
+                ''                                        => 'getPendingAssessments',
+                '/{userId}'                               => 'getPendingAssessmentsForUser',
+                '/classes'                                => 'getClasses',
+                '/markbook/{classId}'                     => 'getMarkbook',
+                '/due/{studentId}'                        => 'getDue',
+                '/grades/{userId}/{termCode}'             => 'getGrades',
+                '/grades/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',
             ],
             'POST' => []
         ];
@@ -63,6 +64,18 @@ class Module extends BaseModule
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn());
 
+        $ruleRegexp = '(?:getPendingAssessmentsForUser)';
+        $this
+            ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
+            ->addRoutePermission(
+                $authorizer,
+                $ruleRegexp,
+                new Rule\Any(
+                    new Rule\IsSuperuser(),
+                    new Rule\IsUser('userId')
+                )
+            );
+
         $ruleRegexp = '(?:getDue|getGrades|getGradesForSubject)';
         $this
             ->addRoutePermission($authorizer, $ruleRegexp, new Rule\IsLoggedIn())
@@ -72,7 +85,7 @@ class Module extends BaseModule
                 new Rule\Any(
                     new Rule\IsSuperuser(),
                     new Rule\HasRole(Role::STAFF),
-                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'studentId')
+                    new Rule\IsUserOrParentOfUser($this->getExternalUser(), $this->getUserMapper(), 'userId')
                 )
             );
     }
@@ -83,6 +96,22 @@ class Module extends BaseModule
      */
     public function initRoutePreloads(PathMatcher $matcher)
     {
+        $this->addRoutePreload(
+            $matcher,
+            '(?:getPendingAssessmentsForUser|getDue)',
+            function ($params) {
+                    try {
+                        $user = $this->getUserMapper()->findById($params['userId']);
+                    } catch (MapperException $e) {
+                        $user = $this->getUserMapper()->createModel();
+                    }
+                return [
+                    'user' => $user,
+                ];
+            }
+        );
+
+
         $this->addRoutePreload(
             $matcher,
             '(?:getMarkbook)',
@@ -99,20 +128,6 @@ class Module extends BaseModule
         );
 
 
-        $this->addRoutePreload(
-            $matcher,
-            '(?:getDue)',
-            function ($params) {
-                try {
-                    $student = $this->getUserMapper()->findById($params['studentId']);
-                } catch (MapperException $e) {
-                    $student = $this->getUserMapper()->createModel();
-                }
-                return [
-                    'student' => $student,
-                ];
-            }
-        );
 
 
         $this->addRoutePreload(
@@ -120,9 +135,9 @@ class Module extends BaseModule
             '(?:getGrades|getGradesForSubject)',
             function ($params) {
                 try {
-                    $args['student'] = $this->getUserMapper()->findById($params['studentId']);
+                    $args['user'] = $this->getUserMapper()->findById($params['userId']);
                 } catch (MapperException $e) {
-                    $args['student'] = $this->getUserMapper()->createModel();
+                    $args['user'] = $this->getUserMapper()->createModel();
                 }
                 try {
                     $args['term'] = $this->getTermMapper()->findOneByColumn('code', $params['termCode']);
