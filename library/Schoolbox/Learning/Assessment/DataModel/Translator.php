@@ -183,7 +183,9 @@ class Translator
             // Task-specific fields
             $assessable = (new Task())
                 ->setLink($dataModel->getLink())
-                ->setSelfMarkable(!$dataModel->getRequiresConfirmation());
+                ->setSelfMarkable(!$dataModel->getRequiresConfirmation())
+                ->setCreator($dataModel->getOwner())
+            ;
 
         } elseif ($dataModel instanceof QuizModel) {
             // Quiz-specific fields
@@ -191,6 +193,7 @@ class Translator
                 ->setMaxAttempts($dataModel->getMaxAttempts())
                 ->setDuration($dataModel->getDuration())
                 ->setCompletionMessage($dataModel->getCompletionMessage())
+                ->setCreator($dataModel->getUser())
             ;
 
         }

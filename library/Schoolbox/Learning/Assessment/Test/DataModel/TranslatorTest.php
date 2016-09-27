@@ -425,22 +425,28 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      */
     public function getTestTranslateTaskToDomainModelData()
     {
+        // Instance vars defined in setUp() aren't available to data providers
+        // I am not sure if this is a bug.
         return [
             [
                 (new TaskModel())
+                    ->setOwner((new User())->setId(3))
                     ->setAssessmentModel((new AssessmentModel()))
                     ->setLink('https://www.google.com.au/')
                     ->setRequiresConfirmation(false),
                 'https://www.google.com.au/',
                 true,
+                3
             ],
             [
                 (new TaskModel())
+                    ->setOwner((new User())->setId(151))
                     ->setAssessmentModel((new AssessmentModel()))
                     ->setLink(null)
                     ->setRequiresConfirmation(true),
                 null,
                 false,
+                151
             ],
         ];
     }
@@ -453,8 +459,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      * @param TaskModel $taskModel
      * @param string    $link
      * @param bool      $selfMarkable
+     * @param int       $creatorId
      */
-    public function testTranslateTaskToDomainModel(TaskModel $taskModel, $link, $selfMarkable)
+    public function testTranslateTaskToDomainModel(TaskModel $taskModel, $link, $selfMarkable, $creatorId)
     {
         /** @var Task $task */
         $task = $this->translator->translateToDomainModel($taskModel);
@@ -462,6 +469,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(Task::class, $task);
         $this->assertEquals($link, $task->getLink());
         $this->assertEquals($selfMarkable, $task->getSelfMarkable());
+        $this->assertEquals($creatorId, $task->getCreator()->getId());
     }
 
     /**
@@ -475,6 +483,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->setCompletionMessage('you done a quiz')
             ->setDuration(Quiz::DURATION_UNLIMITED)
             ->setMaxAttempts(Quiz::ATTEMPTS_UNLIMITED)
+            ->setUser($this->teacher1)
         ;
 
         /** @var Quiz $quiz */
@@ -485,5 +494,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('you done a quiz', $quiz->getCompletionMessage());
         $this->assertEquals(Quiz::DURATION_UNLIMITED, $quiz->getDuration());
         $this->assertEquals(Quiz::ATTEMPTS_UNLIMITED, $quiz->getMaxAttempts());
+        $this->assertEquals(3, $quiz->getCreator()->getId());
     }
 }
