@@ -119,13 +119,7 @@ class Project extends AbstractAssessment
 
         /** @var IAssessable $currentAssessable */
         foreach ($this->getAssessables() as $currentAssessable) {
-
-            /** @var Participant $currentParticipant */
-            foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
-                if ($currentParticipant->isAssessableMarked($currentAssessable)) {
-                    $num++;
-                }
-            }
+            $num += $currentAssessable->numMarked();
         }
 
         return $num;
