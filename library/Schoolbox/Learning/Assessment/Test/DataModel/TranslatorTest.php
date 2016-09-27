@@ -419,6 +419,17 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Test translation of projects which contain projects.
+     *
+     * @expectedException \UnexpectedValueException
+     */
+    public function testTranslateEmptyAssessmentToDataModel()
+    {
+        $dataModel = (new TaskModel())->setId(15);
+        $this->translator->translateToDomainModel($dataModel);
+    }
+
+    /**
      * Data provider for testTranslateTaskToDomainModel
      *
      * @return array
@@ -560,5 +571,69 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(DueWorkType::class, $dueWork->getType());
         $this->assertEquals(12, $dueWork->getType()->getId());
         $this->assertEquals('A dumb type', $dueWork->getType()->getName());
+    }
+
+    /**
+     * Data provider for different due work response acceptance settings.
+     */
+    public function getTestTranslateDueWorkResponseAcceptanceToDomainModelData()
+    {
+        return [
+            [
+                (new DueWorkModel())
+                    ->setAssessmentModel(new AssessmentModel())
+                    ->setAcceptOnline(true)
+                    ->setAcceptMultiple(true),
+                true,
+                true,
+            ],
+            [
+                (new DueWorkModel())
+                    ->setAssessmentModel(new AssessmentModel())
+                    ->setAcceptOnline(true)
+                    ->setAcceptMultiple(false),
+                true,
+                false,
+            ],
+            [
+                (new DueWorkModel())
+                    ->setAssessmentModel(new AssessmentModel())
+                    ->setAcceptOnline(false)
+                    ->setAcceptMultiple(false),
+                false,
+                false,
+            ],
+            [
+                (new DueWorkModel())
+                    ->setAssessmentModel(new AssessmentModel())
+                    ->setAcceptOnline(false)
+                    ->setAcceptMultiple(true),
+                false,
+                false,
+            ],
+        ];
+    }
+
+    /**
+     * Test translation of acceptance response settings to domain model.
+     *
+     * @dataProvider getTestTranslateDueWorkResponseAcceptanceToDomainModelData
+     *
+     * @param DueWorkModel $dataModel
+     * @param bool         $acceptsOnline
+     * @param bool         $acceptsMultiple
+     */
+    public function testTranslateDueWorkResponseAcceptanceToDomainModel(DueWorkModel $dataModel, $acceptsOnline, $acceptsMultiple)
+    {
+        /** @var DueWork $dueWork */
+        $dueWork = $this->translator->translateToDomainModel($dataModel);
+
+        // Test type
+        $this->assertInstanceOf(DueWork::class, $dueWork);
+
+        // Test due work-specific fields
+        $this->assertNotEquals($acceptsOnline, $dueWork->isAcceptNone());
+        $this->assertEquals($acceptsOnline && !$acceptsMultiple, $dueWork->isAcceptSingle());
+        $this->assertEquals($acceptsMultiple, $dueWork->isAcceptMulti());
     }
 }
