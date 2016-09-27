@@ -19,6 +19,7 @@ use Schoolbox\Assessment\StudentReportCard\Comment;
 use Schoolbox\Assessment\StudentReportCard\Conversation;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
+use Schoolbox\RoleMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\StudentReportCard\ContextSelector;
@@ -115,6 +116,9 @@ class StudentReportCard
     /** @var UserMapper */
     private $userMapper;
 
+    /** @var  RoleMapper */
+    private $roleMapper;
+
     // 'andlers
     protected $groupHandler;
 
@@ -133,6 +137,7 @@ class StudentReportCard
         $this->folderMapper     = new Folder\Mapper();
         $this->termMapper       = Term\Mapper::getInstance();
         $this->userMapper       = UserMapper::getInstance();
+        $this->roleMapper       = RoleMapper::getInstance();
 
         //Convert to user objects TODO: pass user objects initially
         $this->setViewingUser($this->userMapper->findById($this->viewingUserId));
@@ -1035,7 +1040,6 @@ class StudentReportCard
         $returnHandler = new \SubmissionReturn();
         $groupHandler  = new \Group();
         $synClass      = new \External_Class;
-        $userHandler   = new \User();
         $j             = 0;
         $visibilities  = array(
             SubmissionBox::MARK_VISIBILITY_PARENT_STUDENT,
@@ -1059,15 +1063,19 @@ class StudentReportCard
                     }
                 }
                 if (is_array($teacherList)) {
-                    $staffGroups = $groupHandler->getStaffGroupTypeIds();
+                    $staffGroups = $this->roleMapper->findByColumn('group_type', RoleMapper::ROLE_STAFF);
+                    $staffGroupIds = [];
+                    foreach($staffGroups as $staffGroup){
+                        $staffGroupIds[] = $staffGroup->getId();
+                    }
+
                     foreach ($teacherList as $teacherSynID) {
-                        $teacher = $userHandler->getBySynergyAndGroup($teacherSynID, $staffGroups);
-                        if (is_array($teacher)) {
-                            $teacherName     = $userHandler->formatName($teacher);
-                            $emailObj        = new \Email();
-                            $emailAddress    = $emailObj->formatEmailFromArray($teacher);
+                        $teacher = $this->userMapper->findByColumnList(['synergy_id' => $teacherSynID, 'group_id' => $staffGroupIds])->first();
+                        if ($teacher instanceof User) {
+                            $teacherName     = $teacher->formatName();
+                            $emailAddress    = $teacher->getEmail();
                             $teacherOutput[] = array(
-                                'id'    => $teacher['uid'],
+                                'id'    => $teacher->getId(),
                                 'name'  => $teacherName,
                                 'email' => $_SESSION['mailhandle'] . $emailAddress,
                                 'synid' => $teacherSynID,
