@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\DataModel\Project;
 
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
@@ -57,6 +58,13 @@ class Model implements IAssessableDataModel
     protected $summator;
 
     /**
+     * The mark type this project uses.
+     *
+     * @var MarkType
+     */
+    protected $markType;
+
+    /**
      * The collection of assessable models.
      *
      * @var Collection|IAssessableDataModel[]
@@ -69,6 +77,7 @@ class Model implements IAssessableDataModel
     public function __construct()
     {
         $this->assessments = new Collection();
+        $this->markType    = new MarkType();
     }
 
     /**
@@ -104,6 +113,24 @@ class Model implements IAssessableDataModel
     public function setAssessments(Collection $assessments)
     {
         $this->assessments = $assessments;
+        return $this;
+    }
+
+    /**
+     * @return MarkType
+     */
+    public function getMarkType()
+    {
+        return $this->markType;
+    }
+
+    /**
+     * @param MarkType $markType
+     * @return static
+     */
+    public function setMarkType(MarkType $markType)
+    {
+        $this->markType = $markType;
         return $this;
     }
 }
