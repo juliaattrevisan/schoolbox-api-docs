@@ -108,7 +108,7 @@ CREATE TABLE `sportsfixtures_venue` (
 	`name` VARCHAR(255) NOT NULL COMMENT '',
 	`latitude` DECIMAL(9,7) NULL COMMENT '',
 	`longitude` DECIMAL(10,7) NULL COMMENT '',
-	`address` VARCHAR(255) NOT NULL COMMENT '',
+	`address` VARCHAR(255) NULL COMMENT '',
 	`created_at` DATETIME NULL COMMENT '',
 	`updated_at` DATETIME NULL COMMENT '',
 	`deleted_at` DATETIME NULL COMMENT '',
