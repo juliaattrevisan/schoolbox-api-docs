@@ -255,11 +255,45 @@ class Controller extends Base
         }
     }
 
+
+    /**
+     * Reverse geocode an address
+     * @param $string
+     * @return array|null
+     */
+    private function lookupAddress($string) {
+
+        $string = str_replace (" ", "+", urlencode($string));
+        $details_url = "http://maps.googleapis.com/maps/api/geocode/json?address=".$string."&sensor=false";
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $details_url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $response = json_decode(curl_exec($ch), true);
+
+        // If Status Code is ZERO_RESULTS, OVER_QUERY_LIMIT, REQUEST_DENIED or INVALID_REQUEST
+        if ($response['status'] != 'OK') {
+            return null;
+        }
+
+        $geometry = $response['results'][0]['geometry'];
+
+        $array = array(
+            'longitude' => $geometry['location']['lng'],
+            'latitude' => $geometry['location']['lat'],
+            'location_type' => $geometry['location_type'],
+        );
+
+        return $array;
+
+    }
+
     /**
      * Display import status
      * @param $id
      */
     public function getImport($id) {
+
         $this->getResponse()->content->set([
             'template' => '@sportsfixturesImport/importing.twig',
             'data' => array(
@@ -665,6 +699,19 @@ class Controller extends Base
                 if (!is_numeric($row[4]) && !empty(trim($row[4]))) {
                     $this->updateLog($storageObject, $reader->key(), 5, "SKIPPED VENUE: Invalid longitude specified ({$row[4]})");
                     $error = true;
+                }
+
+                // If no latitude/longitude specified attempt to reverse geocode
+
+                if (empty($row[3]) && empty($row[4])) {
+                    $location = $this->lookupAddress($row[2]);
+
+                    if ($location != null) {
+                        $row[3] = $location['latitude'];
+                        $row[4] = $location['longitude'];
+                    } else {
+                        $this->updateLog($storageObject, $reader->key(), 4, "VENUE WARNING: Could not determine latitude/longitude from address");
+                    }
                 }
 
                 if (!$error) {
