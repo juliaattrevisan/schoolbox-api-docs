@@ -9,6 +9,7 @@ namespace Schoolbox\Learning;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -35,9 +36,9 @@ class Controller extends Base
 
 
     /**
-     * Displays a list of Assessments that require marking, and Assessments currently unsubmitted
+     * Redirects to current user
      *
-     * @api   GET /learning
+     * @api   GET /learning/pending
      * @level 165
      */
     public function getPendingAssessments()
@@ -49,6 +50,57 @@ class Controller extends Base
             ]));
         }
 
+        // If no staff explicitly requested, redirect to current user
+        $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getPendingAssessmentsForUser', [
+            'userId' => $this->getUser()->getId()
+        ]));
+    }
+
+    /**
+     * Displays a list of Assessments that require marking, and Assessments currently unsubmitted
+     *
+     * @api   GET /learning/pending/:userId
+     * @level 165
+     * @param User $user
+     */
+    public function getPendingAssessmentsForUser(User $user)
+    {
+        // Is current user not SuperUser or Staff ?
+        if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
+            $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getDue', [
+                'studentId' => $this->getUser()->getId()
+            ]));
+        }
+
+        $factory = new Factory();
+        $assessmentsToMark = $factory->getAssessmentsToMark($user);
+
+        var_dump($assessmentsToMark); die();
+
+
+        /* Get list of all subjects this teacher teaches
+         *
+         * ===STUFF TO MARK===
+         *
+         * For each subject
+         *   Get list of assessments
+         *      for each assessment
+         *          if(task)
+         *              no op
+         *          else if(quiz)
+         *              get unreviewed quiz attempts
+         *              for each quiz attempt
+         *                 add userId to array
+         *          else if(dueWork)
+         *              get unreviewed (submission without feedback)
+         *              for each unreviewed submission
+         *                 add userId to array
+         *
+         * === STUFF TO CHASE===
+         *
+         */
+
+
         // TODO - generate data
         $assessmentsToMark = [
             Assessment\Controller::getDummyAssessment(2),
@@ -58,6 +110,7 @@ class Controller extends Base
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', [
+            'user'                    => $user,
             'assessmentsToMark'       => $assessmentsToMark,
             'assessmentsNotSubmitted' => $assessmentsNotSubmitted,
         ]));

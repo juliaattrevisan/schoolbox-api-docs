@@ -35,8 +35,8 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
-                ''                                        => 'getPendingAssessments',
-                '/{userId}'                               => 'getPendingAssessmentsForUser',
+                '/pending'                                => 'getPendingAssessments',
+                '/pending/{userId}'                       => 'getPendingAssessmentsForUser',
                 '/classes'                                => 'getClasses',
                 '/markbook/{classId}'                     => 'getMarkbook',
                 '/due/{studentId}'                        => 'getDue',
