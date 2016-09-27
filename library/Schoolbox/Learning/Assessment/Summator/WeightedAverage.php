@@ -42,12 +42,7 @@ class WeightedAverage extends AbstractSummator
 
         /** @var IAssessable $currentAssessable */
         foreach ($allAssessables as $currentAssessable) {
-
-            /* Tasks don't count
-             */
-            if (!($currentAssessable instanceof Task)) {
-                $totalWeight += $currentAssessable->getWeight();
-            }
+            $totalWeight += $currentAssessable->getWeight();
         }
 
         return $totalWeight;

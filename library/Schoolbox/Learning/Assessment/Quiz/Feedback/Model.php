@@ -11,59 +11,46 @@
 namespace Schoolbox\Learning\Assessment\Quiz\Feedback;
 
 use \Schoolbox\Learning\Assessment\AbstractFeedback;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 
+/**
+ * @method QuizAttempt getResponse()
+ */
 class Model extends AbstractFeedback
 {
     /**
-     * All the Responses to this Quiz
+     * Calculate the normalised mark for this QuizFeedback
      *
-     * These are Students' Responses to individual Questions
-     * that were asked in the Quiz's Sections
-     *
-     * @var array
-     */
-    protected $allResponses = [];
-
-    /**
-     * Calculate the final mark for this IAssessable
+     * @return float|null
      */
     public function getNormalisedMark()
     {
-        $sum = 0;
-        $total = 0;
-
-        foreach ($this->getAllResponses() as $currentResponse) {
-            $sum += $currentResponse['mark'];
-            $total += $currentResponse['available'];
-        }
+        $marksAvailable = $this->getResponse()->getMarksAvailable();
 
         /* No marks because no questions with mark values
          */
-        if ($total == 0) {
+        if ($marksAvailable == 0) {
             return null;
         }
 
-        return 100 * (float)$sum / (float)$total;
+        $marksGiven = $this->getResponse()->getMarksGiven();
+
+        return floatval(IMarkScheme::NORMALISED_MARK_MAX * $marksGiven / $marksAvailable);
+    }
+
+
+
+    /**
+     * @return string
+     */
+    public function getHumanReadableMark()
+    {
+        $markScheme = $this->getAssessable()->getMarkScheme();
+        return $markScheme->getHumanReadableMark($this->getNormalisedMark(), $this->getResponse());
     }
 
     /* Getters/Setters
      */
 
-    /**
-     * @return array
-     */
-    public function getAllResponses()
-    {
-        return $this->allResponses;
-    }
-
-    /**
-     * @param array $allResponses
-     * @return self
-     */
-    public function setAllResponses($allResponses)
-    {
-        $this->allResponses = $allResponses;
-        return $this;
-    }
 }

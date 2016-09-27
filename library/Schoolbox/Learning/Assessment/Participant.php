@@ -32,7 +32,7 @@ class Participant
     /**
      * A Collection of IResponse instances that Students spawn
      *
-     * @var Collection
+     * @var Collection|IResponse[]
      */
     protected $allResponses;
 
@@ -90,7 +90,7 @@ class Participant
      * Find all the Feedbacks that were spawned for a particular IAssessable
      *
      * @param IAssessable $assessable
-     * @return Collection
+     * @return Collection|IFeedback[]
      */
     public function findAllFeedbackForAssessable(IAssessable $assessable)
     {
@@ -169,6 +169,24 @@ class Participant
     }
 
     /**
+     * @param IAssessable $assessable
+     * @return IResponse|null
+     */
+    public function findMostRecentResponse(IAssessable $assessable)
+    {
+        /** @var IResponse $mostRecentResponse */
+        $mostRecentResponse = null;
+        foreach ($this->allResponses as $response) {
+            if ($assessable->getId() === $response->getAssessable()->getId()) {
+                if (!$mostRecentResponse || $response->getUpdatedAt()->gt($mostRecentResponse->getUpdatedAt())) {
+                    $mostRecentResponse = $response;
+                }
+            }
+        }
+        return $mostRecentResponse;
+    }
+
+    /**
      * Finds the latest Feedback which determined whether an IAssessable was
      * marked or published based on the $type arg.
      *
@@ -192,13 +210,11 @@ class Participant
          */
         if (!$numResponses && !$numFeedbacks) {
             $outcome = null;
-        }
-        /* At least one Response, No Feedback >>> not marked
+        } /* At least one Response, No Feedback >>> not marked
          */
         elseif ($numResponses && !$numFeedbacks) {
             $outcome = null;
-        }
-        /* No Responses, at least one Feedback >>> marked
+        } /* No Responses, at least one Feedback >>> marked
          */
         elseif (!$numResponses && $numFeedbacks) {
 
@@ -220,40 +236,41 @@ class Participant
                 }
 
                 return null;
-            }
-            else if ($type == self::TRAVERSAL_MARKED) {
-                foreach ($allFeedbacks as $currentFeedback) {
+            } else {
+                if ($type == self::TRAVERSAL_MARKED) {
+                    foreach ($allFeedbacks as $currentFeedback) {
 
-                    /* In case publishAt is actually more recent than updatedAt value
-                     */
-                    $mostRecentDatetime = $latestFeedback->getUpdatedAt();
+                        /* In case publishAt is actually more recent than updatedAt value
+                         */
+                        $mostRecentDatetime = $latestFeedback->getUpdatedAt();
 
-                    /* Find the most recent datetime of $latestFeedback
-                     * by comparing its updatedAt to its publishedAt (if any)
-                     */
-                    if ($latestFeedback->isPublished() && $latestFeedback->getPublishedAt()->gt($latestFeedback->getUpdatedAt())) {
-                        $mostRecentDatetime = $latestFeedback->getPublishedAt();
-                    }
+                        /* Find the most recent datetime of $latestFeedback
+                         * by comparing its updatedAt to its publishedAt (if any)
+                         */
+                        if ($latestFeedback->isPublished() && $latestFeedback->getPublishedAt()->gt($latestFeedback->getUpdatedAt())) {
+                            $mostRecentDatetime = $latestFeedback->getPublishedAt();
+                        }
 
-                    /* Compare this datetime against currentFeedback's
-                     * publishAt and updatedAt to see which one is more recent
-                     */
-                    if ($currentFeedback->isPublished()) {
-                        if ($currentFeedback->getPublishedAt()->gt($mostRecentDatetime)) {
-                            $latestFeedback = $currentFeedback;
+                        /* Compare this datetime against currentFeedback's
+                         * publishAt and updatedAt to see which one is more recent
+                         */
+                        if ($currentFeedback->isPublished()) {
+                            if ($currentFeedback->getPublishedAt()->gt($mostRecentDatetime)) {
+                                $latestFeedback = $currentFeedback;
+                            }
+                        } else {
+                            if ($currentFeedback->getUpdatedAt()->gt($mostRecentDatetime)) {
+                                $latestFeedback = $currentFeedback;
+                            }
                         }
                     }
-                    else if ($currentFeedback->getUpdatedAt()->gt($mostRecentDatetime)) {
-                        $latestFeedback = $currentFeedback;
-                    }
-                }
 
-                return $latestFeedback;
+                    return $latestFeedback;
+                }
             }
 
             return null;
-        }
-        /* Time to inspect the stacks
+        } /* Time to inspect the stacks
          */
         else {
 
@@ -300,35 +317,35 @@ class Participant
                 }
 
                 return null;
-            }
-            else if ($type == self::TRAVERSAL_MARKED) {
-                foreach ($allFeedbacks as $currentFeedback) {
+            } else {
+                if ($type == self::TRAVERSAL_MARKED) {
+                    foreach ($allFeedbacks as $currentFeedback) {
 
-                    /* In case publishAt is actually more recent than updatedAt value
-                     */
-                    $mostRecentDatetime = $latestFeedback->getUpdatedAt();
+                        /* In case publishAt is actually more recent than updatedAt value
+                         */
+                        $mostRecentDatetime = $latestFeedback->getUpdatedAt();
 
-                    /* Find the most recent datetime of $latestFeedback
-                     * by comparing its updatedAt to its publishedAt (if any)
-                     */
-                    if ($latestFeedback->isPublished() && $latestFeedback->getPublishedAt()->gt($latestFeedback->getUpdatedAt())) {
-                        $mostRecentDatetime = $latestFeedback->getPublishedAt();
-                    }
+                        /* Find the most recent datetime of $latestFeedback
+                         * by comparing its updatedAt to its publishedAt (if any)
+                         */
+                        if ($latestFeedback->isPublished() && $latestFeedback->getPublishedAt()->gt($latestFeedback->getUpdatedAt())) {
+                            $mostRecentDatetime = $latestFeedback->getPublishedAt();
+                        }
 
-                    /* Compare this datetime against currentFeedback's
-                     * publishAt and updatedAt to see which one is more recent
-                     */
-                    if ($currentFeedback->isPublished()) {
-                        if ($currentFeedback->getPublishedAt()->gt($mostRecentDatetime)) {
+                        /* Compare this datetime against currentFeedback's
+                         * publishAt and updatedAt to see which one is more recent
+                         */
+                        if ($currentFeedback->isPublished()) {
+                            if ($currentFeedback->getPublishedAt()->gt($mostRecentDatetime)) {
+                                $latestFeedback = $currentFeedback;
+                            }
+                        } elseif ($currentFeedback->getUpdatedAt()->gt($mostRecentDatetime)) {
                             $latestFeedback = $currentFeedback;
                         }
                     }
-                    elseif ($currentFeedback->getUpdatedAt()->gt($mostRecentDatetime)) {
-                        $latestFeedback = $currentFeedback;
-                    }
-                }
 
-                return $latestFeedback;
+                    return $latestFeedback;
+                }
             }
 
             return null;
@@ -357,7 +374,7 @@ class Participant
     }
 
     /**
-     * @return Collection
+     * @return Collection|IResponse[]
      */
     public function getAllResponses()
     {
@@ -365,7 +382,7 @@ class Participant
     }
 
     /**
-     * @param Collection $allResponses
+     * @param Collection|IResponse[] $allResponses
      */
     public function setAllResponses($allResponses)
     {
@@ -373,7 +390,7 @@ class Participant
     }
 
     /**
-     * @return Collection
+     * @return Collection|IFeedback[]
      */
     public function getAllFeedbacks()
     {
@@ -381,7 +398,7 @@ class Participant
     }
 
     /**
-     * @param Collection $allFeedbacks
+     * @param Collection|IFeedback[] $allFeedbacks
      */
     public function setAllFeedbacks($allFeedbacks)
     {

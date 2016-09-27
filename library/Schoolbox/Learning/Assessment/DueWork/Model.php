@@ -70,6 +70,13 @@ class Model extends AbstractAssessment
     protected $hasRubric = false;
 
     /**
+     * Only relevant if this DueWork's MarkType is 'TotalMark'
+     *
+     * @var $int
+     */
+    private $maxMark;
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -277,5 +284,49 @@ class Model extends AbstractAssessment
     {
         $this->hasRubric = $hasRubric;
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxMark()
+    {
+        return $this->maxMark;
+    }
+
+    /**
+     * @param int $maxMark
+     * @return static
+     */
+    public function setMaxMark($maxMark)
+    {
+        $this->maxMark = $maxMark;
+        return $this;
+    }
+
+    /**
+     * DueWork does not use the MarkScheme. It merely returns the cached value.
+     *
+     * @param User $user
+     * @param bool $publishedOnly
+     * @return string|null
+     */
+    public function getHumanReadableMark(User $user, $publishedOnly)
+    {
+        $normalised = false;
+        return $this->getMark($user, $publishedOnly, $normalised);
+    }
+
+    /**
+     * DueWork does not use the MarkScheme. It merely returns the cached value.
+     *
+     * @param User $user
+     * @param bool $publishedOnly
+     * @return float|null
+     */
+    public function getNormalisedMark(User $user, $publishedOnly)
+    {
+        $normalised = true;
+        return $this->getMark($user, $publishedOnly, $normalised);
     }
 }

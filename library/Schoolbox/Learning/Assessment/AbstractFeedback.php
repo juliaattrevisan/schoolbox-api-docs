@@ -31,6 +31,13 @@ class AbstractFeedback implements IFeedback
     protected $assessable;
 
     /**
+     * The IResponse to which this Feedback relates
+     *
+     * @var IResponse|null
+     */
+    private $response;
+
+    /**
      * Mark given to this Assessable
      *
      * @var string
@@ -59,6 +66,15 @@ class AbstractFeedback implements IFeedback
 
     /**
      * The datetime at which this Feedback was made visible to Students
+     *
+     * @todo Remove when implemented. Special case for Quiz:
+     *     if(assess_attempt.reviewed_at){
+     *         $publishedAt = assess_attempt.reviewed_at
+     *     } else if (all questions in attempt are automarked_already) {
+     *         $publishedAt = assess_attempt.finish
+     *     } else {
+     *         $publishedAt = null
+     *     }
      *
      * @var \Alaress_Date_Format
      */
@@ -189,6 +205,24 @@ class AbstractFeedback implements IFeedback
     public function setAssessable($assessable)
     {
         $this->assessable = $assessable;
+        return $this;
+    }
+
+    /**
+     * @return IResponse
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+    /**
+     * @param IResponse $response
+     * @return static
+     */
+    public function setResponse($response)
+    {
+        $this->response = $response;
         return $this;
     }
 }

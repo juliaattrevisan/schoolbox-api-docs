@@ -17,8 +17,11 @@
 
 namespace Schoolbox\Learning\Assessment\Task;
 
+use Schoolbox\Collection;
+use Schoolbox\Learning\MarkScheme\Completion;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 
 class Model extends AbstractAssessment
 {
@@ -33,46 +36,44 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * Get the Human Readable Mark value for a particular User
-     *
-     * Optionally get the Published Human Readable Mark or the
-     * currently-unpublished Human Readable Mark
+     * Tasks always return null.
      *
      * @param User $user
      * @param bool $publishedOnly
-     * @return string
+     * @return null
      */
-    public function getHumanReadableMark(User $user, $publishedOnly)
+    public function getNormalisedMark(User $user, $publishedOnly)
     {
-        $participant = $this->getParticipant($user);
+        return null;
+    }
 
-        /* Get the Mark that was Published
-         */
-        if ($publishedOnly) {
-            $feedback = $participant->findMostRecentPublishedFeedback($this);
-
-            if ($feedback) {
-                return 'Published Feedback Exists';
-            }
+    /**
+     * @param GradeGroup|null $gradeGroup
+     * @return static
+     */
+    public function setGradeGroup(GradeGroup $gradeGroup = null)
+    {
+        if (!is_null($gradeGroup)) {
+            throw new \InvalidArgumentException('Tasks cannot have mark type of Letter Grade.');
         }
-        /* Otherwise just use the latest Feedback's current Mark value
-         */
-        else {
-            $feedback = $participant->findMostRecentFeedback($this);
+        return $this;
+    }
 
-            if ($feedback) {
-                return 'Feedback Exists';
-            }
-        }
+    /**
+     * @return null
+     */
+    public function getMaxMark()
+    {
+        return null;
+    }
 
-        /* If there was no Feedback, then check for Completions
-         */
-        $responseCount = $participant->findAllResponsesForAssessable($this)->count();
-
-        if ($responseCount) {
-            return 'Response Exists';
-        }
-
-        return 'Incomplete';
+    /**
+     * Tasks do not have any weight.
+     *
+     * @return int
+     */
+    public function getWeight()
+    {
+        return 0;
     }
 }

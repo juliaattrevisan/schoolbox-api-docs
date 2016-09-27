@@ -10,6 +10,9 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
 
@@ -41,7 +44,7 @@ interface IAssessable
 /**
      * @param User $user
      * @param bool $publishedOnly
-     * @return string
+     * @return string|null
      */
     public function getHumanReadableMark(User $user, $publishedOnly);
 
@@ -244,6 +247,16 @@ interface IAssessable
     public function setCloseAt($closeAt);
 
     /**
+     * Quiz    - float: all marks available in all sections
+     * DueWork - int: max mark
+     * Task    - null
+     * Project - null
+     *
+     * @return float|int|null
+     */
+    public function getMaxMark();
+
+    /**
      * Get the weight
      *
      * A multiplier applied to a Normalised Mark
@@ -266,6 +279,41 @@ interface IAssessable
     public function setWeight($weight);
 
     /**
+     * @return MarkType
+     */
+    public function getMarkType();
+
+    /**
+     * @param MarkType $markType
+     * @return static
+     */
+    public function setMarkType(MarkType $markType);
+
+    /**
+     * @return GradeGroup|null
+     */
+    public function getGradeGroup();
+
+    /**
+     * Must allow nulls (eg for Tasks and Quiz, which for the moment cannot have LetterGrade MarkTypes)
+     *
+     * @param GradeGroup|null $gradeGroup
+     * @return static
+     */
+    public function setGradeGroup(GradeGroup $gradeGroup);
+
+    /**
+     * @return IMarkScheme
+     */
+    public function getMarkScheme();
+
+    /**
+     * @param IMarkScheme $markScheme
+     * @return static
+     */
+    public function setMarkScheme(IMarkScheme $markScheme);
+
+    /**
      * Get the person who created this IAssessable
      *
      * @return User
@@ -283,17 +331,28 @@ interface IAssessable
     /**
      * Get a Collection of Participant instances
      *
-     * @return Collection
+     * @return Collection|Participant[]
      */
     public function getAllParticipants();
 
     /**
      * Set a Collection of Participant instances
      *
-     * @param mixed $allParticipants
+     * @param Collection|Participant[] $allParticipants
      * @return $this
      */
-    public function setAllParticipants($allParticipants);
+    public function setAllParticipants(Collection $allParticipants);
+
+    /**
+     * @return Collection|IFeedback[]
+     */
+    public function getFeedbacks();
+
+    /**
+     * @param Collection|IFeedback[] $feedbacks
+     * @return $this
+     */
+    public function setFeedbacks(Collection $feedbacks);
 
     /**
      * Created date

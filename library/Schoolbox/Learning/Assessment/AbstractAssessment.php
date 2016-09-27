@@ -11,7 +11,11 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use \Schoolbox\Collection;
+use Schoolbox\Learning\MarkScheme\Completion;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
 use \Schoolbox\Mapper\Traits\Model\Id;
 use \Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -63,7 +67,7 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * A Collection of Participant instances
      *
-     * @var
+     * @var Collection|Participant[]
      */
     protected $allParticipants;
 
@@ -75,11 +79,38 @@ abstract class AbstractAssessment implements IAssessable
     protected $creator;
 
     /**
+     * @var MarkType
+     */
+    private $markType;
+
+    /**
+     * @var GradeGroup|null
+     */
+    private $gradeGroup;
+
+    /**
+     * @var IMarkScheme
+     */
+    private $markScheme;
+
+    /**
+     * @var Collection|IResponse[]
+     */
+    private $responses;
+
+    /**
+     * @var Collection|IFeedback
+     */
+    private $feedbacks;
+
+    /**
      * Assessable constructor.
      */
     public function __construct()
     {
         $this->setAllParticipants(new Collection());
+        $this->responses = new Collection();
+        $this->feedbacks = new Collection();
     }
 
     /**
@@ -132,14 +163,40 @@ abstract class AbstractAssessment implements IAssessable
      *
      * @param User $user
      * @param bool $publishedOnly
-     * @return string
+     * @return string|null
      */
     public function getHumanReadableMark(User $user, $publishedOnly)
     {
-        // TODO: Implement getHumanReadableMark() method. This method gets the output from getNormalisedMark, then pipes that into the mark scheme (which doesn't yet exist on this class)
-        // return $this->getMark($user, $publishedOnly, false);
+        $markScheme = $this->getMarkScheme();
+        $response = null;
 
-        return 'TODO: Pass NormalisedMark value through MarkScheme';
+        // Special Case: Completion depends only presence of $response and/or $feedback
+        if ($markScheme instanceof Completion) {
+            $participant = $this->getParticipant($user);
+
+            $feedback = $publishedOnly
+                ? $participant->findMostRecentPublishedFeedback($this)
+                : $participant->findMostRecentFeedback($this);
+
+            if ($feedback) {
+                $response = $feedback->getResponse();
+            } else {
+                $response = $participant->findMostRecentResponse($this);
+
+                // Was this Assessment self-assessed ?
+                if ($response && $response->getSubmittedBy()->getId() === $response->getSubmittedOnBehalfOf()->getId()) {
+                    if($publishedOnly){
+                        // Ignore any unpublished teacher feedback
+                        $response = clone $response;
+                        $response->setAllFeedback(new Collection());
+                    }
+                } else {
+                    $response = null;
+                }
+            }
+        }
+
+        return $markScheme->getHumanReadableMark($this->getNormalisedMark($user, $publishedOnly), $response);
     }
 
     /**
@@ -169,7 +226,7 @@ abstract class AbstractAssessment implements IAssessable
      * @param $normalised
      * @return float|null|string
      */
-    private function getMark(User $user, $publishedOnly, $normalised)
+    protected function getMark(User $user, $publishedOnly, $normalised)
     {
         $participant = $this->getParticipant($user);
 
@@ -196,7 +253,7 @@ abstract class AbstractAssessment implements IAssessable
             return $feedback->getHumanReadableMark();
         }
 
-        return '';
+        return null;
     }
 
     /* Traversals
@@ -412,7 +469,7 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
-     * @return mixed
+     * @return Collection|Participant[]
      */
     public function getAllParticipants()
     {
@@ -420,15 +477,105 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
-     * @param mixed $allParticipants
+     * @param Collection $allParticipants
      * @return $this
      */
-    public function setAllParticipants($allParticipants)
+    public function setAllParticipants(Collection $allParticipants)
     {
         $this->allParticipants = $allParticipants;
         return $this;
     }
 
+    /**
+     * @return MarkType
+     */
+    public function getMarkType()
+    {
+        return $this->markType;
+    }
 
+    /**
+     * @param MarkType $markType
+     * @return static
+     */
+    public function setMarkType(MarkType $markType)
+    {
+        $this->markType = $markType;
+        return $this;
+    }
+
+    /**
+     * @return GradeGroup|null
+     */
+    public function getGradeGroup()
+    {
+        return $this->gradeGroup;
+    }
+
+    /**
+     * Default behaviour is not to permit nulls. Sub-classes can override this (eg Quiz + Task)
+     *
+     * @param GradeGroup $gradeGroup
+     * @return static
+     */
+    public function setGradeGroup(GradeGroup $gradeGroup)
+    {
+        $this->gradeGroup = $gradeGroup;
+        return $this;
+    }
+
+    /**
+     * @return IMarkScheme
+     */
+    public function getMarkScheme()
+    {
+        return $this->markScheme;
+    }
+
+    /**
+     * @param IMarkScheme $markScheme
+     * @return static
+     */
+    public function setMarkScheme(IMarkScheme $markScheme)
+    {
+        $this->markScheme = $markScheme;
+        return $this;
+    }
+
+    /**
+     * @return Collection|IResponse[]
+     */
+    public function getResponses()
+    {
+        return $this->responses;
+    }
+
+    /**
+     * @param Collection|IResponse[] $responses
+     * @return $this
+     */
+    public function setResponses(Collection $responses)
+    {
+        $this->responses = $responses;
+        return $this;
+    }
+
+    /**
+     * @return Collection|IFeedback[]
+     */
+    public function getFeedbacks()
+    {
+        return $this->responses;
+    }
+
+    /**
+     * @param Collection|IFeedback[] $feedbacks
+     * @return $this
+     */
+    public function setFeedbacks(Collection $feedbacks)
+    {
+        $this->feedbacks = $feedbacks;
+        return $this;
+    }
 }
 

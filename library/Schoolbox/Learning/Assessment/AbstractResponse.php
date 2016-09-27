@@ -120,7 +120,7 @@ class AbstractResponse implements IResponse
      */
 
     /**
-     * @return Collection
+     * @return Collection|IFeedback[]
      */
     public function getAllFeedback()
     {
@@ -128,7 +128,7 @@ class AbstractResponse implements IResponse
     }
 
     /**
-     * @param Collection $allFeedback
+     * @param Collection|IFeedback[] $allFeedback
      * @return $this
      */
     public function setAllFeedback($allFeedback)

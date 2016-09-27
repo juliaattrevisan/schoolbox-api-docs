@@ -14,6 +14,7 @@
 namespace Schoolbox\Learning\Assessment\Test;
 
 use \Schoolbox\Collection;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
 use \Schoolbox\Resource\Storage\Model as Storage;
 
@@ -62,7 +63,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
      *
      * @var float
      */
-    protected $delta = 0.00000000005;
+    protected $delta = 0.00000005;
 
     /**
      * Test the unweighted average
@@ -148,12 +149,12 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
 
         /* Most Recent Average is
-         *      = [98 + 77 + 100 + (100 * 5/20)] / 4
-         *      = [98 + 77 + 100 + 25] / 4
-         *      = 300/4
-         *      = 75
+         *      = [98 + null + 77 + 100 + (100 * 12/20)] / 4
+         *      = [98 + 77 + 100 + 60] / 4
+         *      = 335/4
+         *      = 83.75
          */
-        $this->assertEquals(75, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(83.75, $project->getNormalisedMark($this->hodes, false));
     }
 
     /**
@@ -165,7 +166,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /* There are three assessables for Hodes
          *
          * Due Work (100 marks)
-         * Task (null marks)
+         * Task (null)
          * Quiz (12 marks)
          */
         $project = $this->spawnProject(new SummatorAverage());
@@ -183,7 +184,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
 
         /* Most Recent Average is
          *      = [100 + (100 * 12/20)] / 2
-         *      = [100 + 25] / 2
+         *      = [100 + 60] / 2
          *      = 80 (most recent feedback also happens to be most recent published feedback)
          */
         $this->assertEquals(80, $project->getNormalisedMark($this->hodes, false));
@@ -198,7 +199,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /* There are five assessables for Hodes
          *
          * Due Work 3 (98 marks)
-         * Task (null marks)
+         * Task (null)
          * Due Work 2 (77 marks)
          * Due Work (100 marks)
          * Quiz (12 marks)
@@ -211,14 +212,14 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->add($this->spawnQuiz()));
 
         /* Most Recent Published Average is
-         *      = [77 + 100 + (100 * 12/20)] / 3
-         *      = [177 + 60] / 4
+         *      = [null + 77 + 100 + (100 * 12/20)] / 3
+         *      = [177 + 60] / 3
          *      = 79
          */
         $this->assertEquals(79, $project->getNormalisedMark($this->hodes, true));
 
         /* Most Recent Average is
-         *      = [77 + 100 + (100 * 12/20)] / 3
+         *      = [null + 77 + 100 + (100 * 5/20)] / 3
          *      = [177 + 60] / 3
          *      = 79 (most recent feedback also happens to be most recent published feedback)
          */
@@ -328,12 +329,12 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
 
         /* Most Recent Weighted Average is
-         *      = [(98*6) + (77*10) + (100*5) + ((100 * 5/20)*8)] / 29
-         *      = [588 + 770 + 500 + 200] / 29
-         *      = 2058 / 29
-         *      = 70.96551724138
+         *      = [(98*6) + (null*0) + (77*10) + (100*5) + ((100 * 12/20)*8)] / 29
+         *      = [588 + 0 + 770 + 500 + 480] / 29
+         *      = 2338 / 29
+         *      = 80.620689655
          */
-        $this->assertEquals(70.96551724138, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
+        $this->assertEquals(80.620689655, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
     }
 
     /**
@@ -465,22 +466,23 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         * Due Work 6: Weight  4, NormalisedMark: P,null UP,null
         * Due Work 7: Weight 22, NormalisedMark: P,96 UP,96
         *
-        * Total Weight: 66
+        * Total Weight Published: 54
+        * Total Weight UnPublished: 58
         *
         * Most Recent Published Weighted Average is:
-        *       = [(18*20/66) + (91*11/66) + (89*1/66) + (96*22/66)]
-        *       = [360/66 + 1001/66 + 89/66 + 2112/66]
-        *       = 3562/66
-        *       = 53.96969696970
+        *       = [(18*20) + (91*11) + (89*1) + (96*22)] / 54
+        *       = [360 + 1001 + 89 + 2112] / 54
+        *       = 3562/54
+        *       = 65.962962963
         *
         * Most Recent Weighted Average is:
-        *       = [(18*20/66) + (91*11/66) + (89*1/66) + (76*4/66) + (96*22/66)]
-        *       = [360/66 + 1001/66 + 89/66 + 304/66 + 2112/66]
-        *       = 3866/66
-        *       = 58.57575757576
+        *       = [(18*20) + (91*11) + (89*1) + (76*4) + (96*22)] / 58
+        *       = [360 + 1001 + 89 + 304 + 2112] / 58
+        *       = 3866/58
+        *       = 66.655172414
         */
-        $this->assertEquals(53.96969696970, $project->getNormalisedMark($this->hodes, true));
-        $this->assertEquals(58.57575757576, $project->getNormalisedMark($this->hodes, false));
+        $this->assertEquals(65.962962963, $project->getNormalisedMark($this->hodes, true), '', $this->delta);
+        $this->assertEquals(66.655172414, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
     }
 
     /**
@@ -1218,9 +1220,9 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(null, $project->getNormalisedMark($this->hodes, true));
 
         /* Most Recent Minimum
-         * Minimum of (25,
+         * Minimum of (98, null, 77, 100, 60)
          */
-        $this->assertEquals(25, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
+        $this->assertEquals(60, $project->getNormalisedMark($this->hodes, false), '', $this->delta);
     }
 
     /**
@@ -1682,7 +1684,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(41, $project->getNormalisedMark($this->hodes, true));
         $this->assertEquals(55, $project->getNormalisedMark($this->hodes, false));
     }
-    
+
     /**
      * Mass produce a giant Due Work set
      *
@@ -2460,15 +2462,43 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Spawn a Quiz
+     * Spawn a Quiz.
+     * * Quiz has 5 questions each of 5 marks, for total of 25.0
+     * * Quiz has 1 attempt of 4 questions worth 20.0 marks. He was given 12.0 marks total. ie 60.0
      *
-     * @return $this
+     * For now, since we are not updating the Quiz DB schema, a QuizAttempt has 0:1 QuizFeedback
+     *
+     * @return Quiz
      */
     protected function spawnQuiz()
     {
         $id = 3;
         $title = 'How did you find The Prime Evil?';
         $description = 'A quick pop quiz about how you died your way to Diablo.';
+
+        $responses = [
+            [
+                'mark' => 1, // Question 1
+                'available' => 5,
+            ],
+            [
+                'mark' => 1, // Question 2
+                'available' => 5,
+            ],
+            [
+                'mark' => 5, // Question 3
+                'available' => 5,
+            ],
+            [
+                'mark' => 5, // Question 4
+                'available' => 5,
+            ],
+        ];
+        $marksGiven = $marksAvailable = 0;
+        foreach($responses as $response){
+            $marksGiven += $response['mark'];
+            $marksAvailable += $response['available'];
+        }
 
         $quiz = (new Quiz())
             ->setId($id)
@@ -2495,98 +2525,23 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
             ->setCreatedAt($this->today)
-            ->setUpdatedAt($this->today);
+            ->setUpdatedAt($this->today)
+            ->setMarksAvailable($marksAvailable)
+            ->setMarksGiven($marksGiven);
 
         $feedback = new QuizReview();
         $feedback
             ->setId(99759)
             ->setAssessable($quiz)
-            ->setNormalisedMark(98)
+            ->setNormalisedMark(IMarkScheme::NORMALISED_MARK_MAX * $marksGiven / $marksAvailable)
             ->setReviewer($this->celia)
+            ->setResponse($attempt)
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-15 03:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
 
         $attempt->getAllFeedback()->add($feedback);
         $quiz->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
-
-        $feedback = new QuizReview();
-        $feedback
-            ->setId(99760)
-            ->setAssessable($quiz)
-            ->setNormalisedMark(45)
-            ->setReviewer($this->celia)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-09-16 05:31:29', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-09-12 12:12:12', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-09-12 12:12:12', \Alaress_Date_Format::DATABASE_FORMAT));
-
-        $attempt->getAllFeedback()->add($feedback);
-        $quiz->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
-
-        $feedback = new QuizReview();
-        $feedback
-            ->setId(99761)
-            ->setAssessable($quiz)
-            ->setNormalisedMark(1)
-            ->setAllResponses([
-                [
-                    'mark' => 1, // Question 1
-                    'available' => 5
-                ],
-                [
-                    'mark' => 1, // Question 2
-                    'available' => 5
-                ],
-                [
-                    'mark' => 1, // Question 3
-                    'available' => 5
-                ],
-                [
-                    'mark' => 2, // Question 4
-                    'available' => 5
-                ]
-            ])
-            ->setComment('Some ancient feedback')
-            ->setReviewer($this->celia)
-            ->setCreatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT));
-
-        $attempt->getAllFeedback()->add($feedback);
-        $quiz->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
-
-        $feedback = new QuizReview();
-        $feedback
-            ->setId(99762)
-            ->setAssessable($quiz)
-            ->setNormalisedMark(83)
-            ->setAllResponses([
-                [
-                    'mark' => 3, // Question 1,
-                    'available' => 5
-                ],
-                [
-                    'mark' => 2, // Question 2
-                    'available' => 5
-                ],
-                [
-                    'mark' => 2, // Question 3
-                    'available' => 5
-                ],
-                [
-                    'mark' => 5, // Question 4
-                    'available' => 5
-                ]
-            ])
-            ->setComment('This is the most recent published feedback; also this is the most recent feedback')
-            ->setReviewer($this->celia)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-09-25 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-09-10 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-09-10 21:22:29', \Alaress_Date_Format::DATABASE_FORMAT));
-
-        $attempt->getAllFeedback()->add($feedback);
-        $quiz->getParticipant($this->hodes)->getAllFeedbacks()->add($feedback);
-
-        $quiz->getParticipant($this->hodes)->getAllResponses()->add($attempt);
 
         return $quiz;
     }

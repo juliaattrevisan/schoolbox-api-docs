@@ -56,15 +56,6 @@ class Project extends AbstractAssessment
         $this->setSummator($summator);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getHumanReadableMark(User $user, $publishedOnly)
-    {
-        // TODO: Implement getHumanReadableMark() method. This method gets the output from getNormalisedMark, then pipes that into the mark scheme (which doesn't yet exist on this class)
-
-        return 'TODO: Pass NormalisedMark value through MarkScheme';
-    }
 
     /**
      * Calculate the final mark for this IAssessable, for a particular User
@@ -76,13 +67,23 @@ class Project extends AbstractAssessment
      */
     public function getNormalisedMark(User $user, $publishedOnly)
     {
-        $val = $this->getSummator()->summate($this->getAssessables(), $user, $publishedOnly);
+        // Get the Assessables that the Specified User has potential marks for
+        $markedAssessables = new Collection();
 
-        if (is_null($val)) {
-            return null;
+        foreach($this->getAssessables() as $assessable){
+            foreach($assessable->getAllParticipants() as $participant){
+                if($participant->getUser()->getId() == $user->getId()){
+                    $isMarked = $publishedOnly
+                        ? $participant->isAssessablePublished($assessable)
+                        : $participant->isAssessableMarked($assessable);
+                    if($isMarked){
+                        $markedAssessables[$assessable->getId()] = $assessable;
+                    }
+                }
+            }
         }
 
-        return number_format($val, $this->getPrecision());
+        return $this->getSummator()->summate($markedAssessables, $user, $publishedOnly);
     }
 
     /**
@@ -118,13 +119,7 @@ class Project extends AbstractAssessment
 
         /** @var IAssessable $currentAssessable */
         foreach ($this->getAssessables() as $currentAssessable) {
-
-            /** @var Participant $currentParticipant */
-            foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
-                if ($currentParticipant->isAssessableMarked($currentAssessable)) {
-                    $num++;
-                }
-            }
+            $num += $currentAssessable->numMarked();
         }
 
         return $num;
@@ -189,7 +184,7 @@ class Project extends AbstractAssessment
      */
 
     /**
-     * @return Collection
+     * @return Collection|IAssessable[]
      */
     public function getAssessables()
     {
@@ -197,7 +192,7 @@ class Project extends AbstractAssessment
     }
 
     /**
-     * @param Collection $assessables
+     * @param Collection|IAssessable[] $assessables
      * @return self
      */
     public function setAssessables($assessables)
@@ -230,5 +225,13 @@ class Project extends AbstractAssessment
     public function getPrecision()
     {
         return $this->precision;
+    }
+
+    /**
+     * @return null
+     */
+    public function getMaxMark()
+    {
+        return null;
     }
 }
