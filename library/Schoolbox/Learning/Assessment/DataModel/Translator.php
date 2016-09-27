@@ -150,7 +150,6 @@ class Translator
                 ->setMaxAttempts($assessment->getMaxAttempts())
             ;
             // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
-            // TODO add notify author? (I am reasonably sure this field is obsolete)
             return $model;
 
         } elseif ($assessment instanceof Task) {
