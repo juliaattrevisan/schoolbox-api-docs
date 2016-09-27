@@ -86,7 +86,12 @@ class TotalMarkFractional extends TotalMarkAbstract
             return null;
         }
         $this->checkQuizAttempt($response);
-        return parent::getHumanReadableMark($normalisedMark, $response);
+        $result = parent::getHumanReadableMark($normalisedMark, $response);
+
+        // Restore total mark, as checkQuizAttempt can change it
+        $this->setTotalMark($this->getOriginalTotalMark());
+
+        return $result;
     }
 
 
@@ -100,7 +105,12 @@ class TotalMarkFractional extends TotalMarkAbstract
     public function getNormalisedMark($humanReadableMark, IResponse $response = null)
     {
         $this->checkQuizAttempt($response);
-        return parent::getNormalisedMark($humanReadableMark, $response);
+        $result = parent::getNormalisedMark($humanReadableMark, $response);
+
+        // Restore total mark, as checkQuizAttempt can change it
+        $this->setTotalMark($this->getOriginalTotalMark());
+
+        return $result;
     }
 
     /**
