@@ -402,6 +402,7 @@ CREATE TABLE sportsfixtures_import_errors
 	id INT(11) NOT NULL AUTO_INCREMENT,
 	import_id INT,
 	filename VARCHAR(255),
+	hash VARCHAR(40),
 	line INT,
 	`column` INT,
 	result TEXT,
