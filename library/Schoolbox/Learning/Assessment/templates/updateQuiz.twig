@@ -1,0 +1,6 @@
+{% extends '@learningAssessment/updateAbstract.twig' %}
+
+{% block contents %}
+    <input type="hidden" name="assessmentType" value="quiz" />
+    {% include '@learningAssessment/fragments/quiz/create.twig' %}
+{% endblock %}

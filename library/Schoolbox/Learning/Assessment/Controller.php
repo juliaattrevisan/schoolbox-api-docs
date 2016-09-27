@@ -337,6 +337,24 @@ class Controller extends Base
          */
         $assessmentType = 'project';
 
+        switch ($assessmentType) {
+            case 'project':
+                $template = 'updateProject.twig';
+                break;
+            case 'dueWork':
+                $template = 'updateDueWork.twig';
+                break;
+            case 'task':
+                $template = 'updateTask.twig';
+                break;
+            case 'quiz':
+                $template = 'updateQuiz.twig';
+                break;
+            default:
+                $this->sendError('Could not create assessment', [ 'select a valid assessment type' ]);
+                return;
+        }
+
         /* TODO: Figure out assessment's relationship to $folder in some way
          */
         try {
@@ -347,7 +365,7 @@ class Controller extends Base
             return;
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/update.twig', [
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/' . $template, [
             'assessment' => $assessment,
             'assessmentType' => $assessmentType,
             'folder' => $folder,

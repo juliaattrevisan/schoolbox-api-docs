@@ -1,0 +1,28 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
+
+{{ bread.crumbs(
+[ folder.name, '/homepage/' ~ folder.id ],
+[ 'Update ' ~ assessment.title, routeLookup('learningAssessment.getUpdateAssessment') ]
+) }}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Update {{ assessment.title }}</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns island">
+        <form action="{{ routeLookup('learningAssessment.postUpdateAssessment', {assessmentId: assessment.id}) }}" id="assessmentForm" method="post">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        {% block contents %}
+                        {% endblock %}
+                    </div>
+                </fieldset>
+            </section>
+        </form>
+    </div>
+</div>
