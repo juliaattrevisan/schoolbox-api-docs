@@ -24,6 +24,11 @@ use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
+use Schoolbox\Learning\MarkScheme\LetterGrade;
+use Schoolbox\Learning\MarkScheme\None;
+use Schoolbox\Learning\MarkScheme\Percentage;
+use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use UnexpectedValueException;
 
@@ -109,7 +114,26 @@ class Translator
                 ->setAcceptMultiple($assessment->isAcceptMulti())
                 ->setUseRubric($assessment->hasRubric())
                 ->setOwner($assessment->getCreator())
+                ->setMarkType(new DueWorkModel\MarkType())
+                ->setGradeGroup(new DueWorkModel\GradeLevel\Group\Model())
             ;
+
+            // Convert a mark type into fields
+            if ($assessment->getMarkScheme() instanceof TotalMarkWholeNumber) {
+                $model->setMaxMark($assessment->getMarkScheme()->getTotalMark());
+                $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_TOTAL);
+
+            } elseif ($assessment->getMarkScheme() instanceof Percentage) {
+                $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_PERCENT);
+
+            } elseif ($assessment->getMarkScheme() instanceof LetterGrade) {
+                $model->setGradeGroup($assessment->getMarkScheme()->getGradeGroup());
+                $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_LETTER);
+
+            } elseif ($assessment->getMarkScheme() instanceof None) {
+                $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_NONE);
+
+            }
 
             // Translate files
             // TODO consider whether the DueWorkFile model is required - should Storage be used directly?
@@ -225,12 +249,16 @@ class Translator
                 ->setCreator($dataModel->getUser())
             ;
 
+            // TODO figure out how quiz sub-items (sections, questions) get stored
+
         } elseif ($dataModel instanceof DueWorkModel) {
             // Due work-specific fields
             $assessable = (new DueWork())
                 ->setShowSubmittedOnly($dataModel->getSkipUnsubmitted())
                 ->setHasRubric($dataModel->getUseRubric())
                 ->setCreator($dataModel->getOwner())
+                ->setMaxMark($dataModel->getMaxMark())
+                ->setGradeGroup($dataModel->getGradeGroup())
             ;
 
             // Figure out submission visibility
@@ -271,7 +299,12 @@ class Translator
         if (!$dataModel->getAssessmentModel() instanceof AssessmentModel) {
             throw new UnexpectedValueException('$dataModel has no assessment model');
         }
+
+        // TODO inject this factory
+        $markSchemeFactory = new MarkSchemeFactory();
+
         $assessable
+            ->setMarkScheme($markSchemeFactory->spawnMarkSchemeFor($assessable))
             ->setId($dataModel->getAssessmentModel()->getId())
             ->setTitle($dataModel->getAssessmentModel()->getTitle())
             ->setDescription($dataModel->getAssessmentModel()->getDescription())
