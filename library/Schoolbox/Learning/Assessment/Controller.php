@@ -63,6 +63,13 @@ class Controller extends Base
     protected $folderMapper;
 
     /**
+     * All the assessable types that can be spawned inside a project
+     *
+     * @var array
+     */
+    protected $allTypes = ['dueWork', 'task', 'quiz'];
+
+    /**
      * Controller constructor.
      * @param FolderMapper $folderMapper
      * @param ErrorMapper $errorMapper
@@ -273,34 +280,6 @@ class Controller extends Base
     }
 
     /**
-     * Find all the returnUrls
-     *
-     * @param int $assessmentId
-     * @return array
-     */
-    private function getAllReturnUrls($assessmentId)
-    {
-        /* Figure out a returnUrl
-         *
-         * When spawning a Project, its constituent Assessables return to this url
-         * after they are spawned
-         */
-        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessmentId]);
-        $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
-
-        /* TODO: Refactor this better
-         */
-        $allTypes = ['dueWork', 'task', 'quiz'];
-        $allReturnUrls = [];
-
-        foreach ($allTypes as $currentType) {
-            $allReturnUrls[$currentType] = $this->getRouter()->generate('learningAssessment.getCreateAssessmentWithinProject', ['assessmentId' => $assessmentId, 'assessmentType' => $currentType]) . $suffix;
-        }
-
-        return $allReturnUrls;
-    }
-
-    /**
      * Update an existing Assessment's details
      *
      * @param int $assessmentId
@@ -314,7 +293,75 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
         }
 
-        /* TODO: Actually retrieve the data here
+        /* TODO: Actually retrieve $assessmentId data here
+         */
+        $assessment = new Project(new SummatorAverage());
+        $assessment
+            ->setId($assessmentId)
+            ->setTitle('Find Diablo')
+            ->setDescription('The things you need to do in order to slay the prime evil')
+            ->setCreator($_SESSION['user'])
+            ->setAllParticipants(new Collection())
+            ->setWeight(100)
+            ->setAssessables((new Collection())
+                ->add((new DueWork())
+                    ->setId(2)
+                    ->setTitle('Enter the Realm of Terroarrrr')
+                    ->setDescription('Diablo was found in the land of terroarrrrr! Find him, and whack him!')
+                    ->setType((new DueWorkType())
+                        ->setId(1)
+                        ->setName('Essay'))
+                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
+                    ->setPublishAt(Alaress_Date_Format::now())
+                    ->setOpenAt(Alaress_Date_Format::now())
+                    ->setDueAt(Alaress_Date_Format::now())
+                    ->setCloseAt(Alaress_Date_Format::now())
+                    ->setCreatedAt(Alaress_Date_Format::now())
+                    ->setUpdatedAt(Alaress_Date_Format::now()))
+                ->add((new DueWork())
+                    ->setId(2)
+                    ->setTitle('Enter the Realm of Terroarrrr')
+                    ->setDescription('Diablo was found in the land of terroarrrrr! Find him, and whack him!')
+                    ->setType((new DueWorkType())
+                        ->setId(1)
+                        ->setName('Essay'))
+                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
+                    ->setPublishAt(Alaress_Date_Format::now())
+                    ->setOpenAt(Alaress_Date_Format::now())
+                    ->setDueAt(Alaress_Date_Format::now())
+                    ->setCloseAt(Alaress_Date_Format::now())
+                    ->setCreatedAt(Alaress_Date_Format::now())
+                    ->setUpdatedAt(Alaress_Date_Format::now())))
+            ->setPublishAt(Alaress_Date_Format::now())
+            ->setOpenAt(Alaress_Date_Format::now())
+            ->setDueAt(Alaress_Date_Format::now())
+            ->setCloseAt(Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+
+        $assessmentId = $assessment->getId();
+        $assessmentType = 'project';
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/update.twig', [
+//            'assessment' => $project,
+//            'assessmentType' => $assessmentType,
+//            'folder' => $folder,
+//            'allMarkTypes' => $this->getAllMarkTypes(),
+//            'allReturnUrls' => $this->getAllReturnUrls($assessmentId),
+//            'curriculumNodes' => $folder->getCurriculumNodes()
+        ]));
+    }
+
+    /**
+     * Create an Assessment within a particular Project
+     *
+     * @param $assessmentId
+     * @param $assessmentType
+     */
+    public function getCreateAssessmentWithinProject($assessmentId, $assessmentType)
+    {
+
+        /* TODO: Actually retrieve $assessmentId data here
          */
         $project = new Project(new SummatorAverage());
         $project
@@ -360,20 +407,45 @@ class Controller extends Base
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
 
-        $assessmentId = $project->getId();
-        $assessmentType = 'project';
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/update.twig', [
-//            'assessment' => $project,
-//            'assessmentType' => $assessmentType,
-//            'folder' => $folder,
-//            'allMarkTypes' => $this->getAllMarkTypes(),
-//            'allReturnUrls' => $this->getAllReturnUrls($assessmentId),
-//            'curriculumNodes' => $folder->getCurriculumNodes()
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/createWithinProject.twig', [
+            'project' => $project,
+            'assessment' => [],
+            'assessmentType' => $assessmentType,
+            'returnUrl' => $this->getRequest()->query['return_url']
         ]));
     }
 
-        /**
+    /* Utility methods - these can probably be refactored elsewhere
+     */
+
+    /**
+     * Find all the returnUrls
+     *
+     * @param int $assessmentId
+     * @return array
+     */
+    private function getAllReturnUrls($assessmentId)
+    {
+        /* Figure out a returnUrl
+         *
+         * When spawning a Project, its constituent Assessables return to this url
+         * after they are spawned
+         */
+        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessmentId]);
+        $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
+
+        /* TODO: Refactor this better
+         */
+        $allReturnUrls = [];
+
+        foreach ($this->allTypes as $currentType) {
+            $allReturnUrls[$currentType] = $this->getRouter()->generate('learningAssessment.getCreateAssessmentWithinProject', ['assessmentId' => $assessmentId, 'assessmentType' => $currentType]) . $suffix;
+        }
+
+        return $allReturnUrls;
+    }
+
+    /**
      * All the possible Mark Types to chooze from
      * TODO: Replace with actual objects
      */
@@ -503,25 +575,7 @@ class Controller extends Base
 //        new \Alaress_Probe($assessmentId, $this->getRequest()->post);
 //    }
 //
-//    /**
-//     * Create an Assessment within a particular Project
-//     *
-//     * @param $assessmentId
-//     * @param $assessmentType
-//     */
-//    public function getCreateAssessmentWithinProject($assessmentId, $assessmentType)
-//    {
-//
-//        /* TODO: Actually load data for $assessmentId here
-//         */
-//
-//        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/createWithinProject.twig', [
-//            'assessmentId' => $assessmentId,
-//            'assessmentName' => 'Diablo',
-//            'assessmentType' => $assessmentType,
-//            'returnUrl' => $this->getRequest()->query['return_url']
-//        ]));
-//    }
+
 //
 //    /**
 //     * Save the data when creating an assessment within a Project

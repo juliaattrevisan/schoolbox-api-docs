@@ -2,7 +2,7 @@
 
 <input type="hidden" name="assessmentType" value="task" />
 
-<fieldset class="content">
+<div class="row">
     <div class="small-10 columns">
         <label>Url
             <input name="taskUrl" type="text" placeholder="Url">
@@ -12,6 +12,6 @@
         <a href="#" class="button icon-attach" data-value="attach">Attach</a>
         {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
     </div>
-</fieldset>
+</div>
 
 {{ mage.submitRow('Next', 'part-2', 'end', 'Working...') }}

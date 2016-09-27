@@ -8,16 +8,15 @@
 
 <input type="hidden" name="assessmentType" value="dueWork" />
 
-<fieldset class="content">
-    <legend>
-        File Attachments
-        <span data-tooltip class="hint has-tip tip-top" title="">?</span>
-    </legend>
-    <div class="column small-12">
-        {% include 'sub/attachzone.twig' %}
-    </div>
-</fieldset>
-<fieldset>
+<legend>
+    File Attachments
+    <span data-tooltip class="hint has-tip tip-top" title="">?</span>
+</legend>
+<div class="column small-12">
+    {% include 'sub/attachzone.twig' %}
+</div>
+
+<div class="row">
     <div class="small-6 columns">
         <label>
             Mark Type
@@ -56,12 +55,14 @@
             </label>
         </div>
     </div>
-</fieldset>
+</div>
 
-<fieldset>
-    <div class="rubrics">
-        <!--Rubric Here-->
+<div class="row">
+    <div class="small-12 columns">
+        <div class="rubrics">
+            <!--Rubric Here-->
+        </div>
     </div>
-</fieldset>
+</div>
 
 {{ mage.submitRow('Next', 'part-2', 'end', 'Working...') }}

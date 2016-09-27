@@ -3,91 +3,66 @@
 
 {{ bread.crumbs(
     [ folder.name, '/homepage/' ~ folder.id ],
-    [ 'Create Assessment', routeLookup('learningAssessment.getCreateAssessment') ]
+    [ 'Create Assessment', routeLookup('learningAssessment.getSelectAssessment') ]
 ) }}
 
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
 <script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
 <script type="text/javascript">
-    $(function () {
+    {#$(function () {#}
 
-        /**
-         * Update the heading and perform transitions
-         *
-         * @param assessmentType
-         * @param selected
-         */
-        function updateType(assessmentType, selected) {
-            $('#assessmentType').text($('#assessmentType').text() + ': ' + assessmentType);
+        {#/**#}
+         {#* Update the heading and perform transitions#}
+         {#*#}
+         {#* @param assessmentType#}
+         {#* @param selected#}
+         {#*/#}
+        {#function updateType(assessmentType, selected) {#}
+            {#$('#assessmentType').text($('#assessmentType').text() + ': ' + assessmentType);#}
 
-            var next = $('[data-mage="part-2-'+selected+'"]');
-            next.removeAttr('disabled').removeClass('hide');
-            next.find('[data-mage-collapsed]').hide().removeClass('hide').slideDown(600);
-        }
+            {#var next = $('[data-mage="part-2-'+selected+'"]');#}
+            {#next.removeAttr('disabled').removeClass('hide');#}
+            {#next.find('[data-mage-collapsed]').hide().removeClass('hide').slideDown(600);#}
+        {#}#}
 
-        var assessmentType = '{{ assessmentType }}';
+        {#var assessmentType = '{{ assessmentType }}';#}
 
-        switch (assessmentType) {
-            case 'dueWork':
-                updateType('Due Work', assessmentType);
-                break;
-            case 'quiz':
-                updateType('Quiz', assessmentType);
-                break;
-            case 'task':
-                updateType('Task', assessmentType);
-                break;
-            default:
-                break;
-        }
-    });
+        {#switch (assessmentType) {#}
+            {#case 'dueWork':#}
+                {#updateType('Due Work', assessmentType);#}
+                {#break;#}
+            {#case 'quiz':#}
+                {#updateType('Quiz', assessmentType);#}
+                {#break;#}
+            {#case 'task':#}
+                {#updateType('Task', assessmentType);#}
+                {#break;#}
+            {#default:#}
+                {#break;#}
+        {#}#}
+    {#});#}
 </script>
 
 <div class="row">
-    <div class="small-12 columns"><h1>Create Assessment in {{ assessmentName }}</h1></div>
+    <div class="small-12 columns"><h1>Create Assessment in {{ project.title }}</h1></div>
 </div>
 
 <div class="row">
     <div class="small-12 columns island">
         <form action="{{ routeLookup('learningAssessment.postCreateAssessmentWithinProject', {assessmentId: assessmentId, assessmentType: assessmentType}) }}" id="assessmentForm" method="post">
-            <input type="hidden" name="projectId" value="{{ assessmentId }}" />
+            <input type="hidden" name="projectId" value="{{ project.id }}" />
             <input type="hidden" name="type" value="{{ assessmentType }}" />
-            <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
 
             <section>
                 <fieldset class="content">
-                    {% include '@learningAssessment/fragments/common.twig' %}
-                </fieldset>
-                <fieldset class="content">
-                    <legend>Dates</legend>
-
-                    {% include '@learningAssessment/fragments/dates.twig' %}
-                </fieldset>
-                <fieldset class="content">
-                    {% include '@learningAssessment/fragments/curriculumCodes.twig' %}
-                </fieldset>
-                <fieldset class="content">
-                    <legend id="assessmentType">Assessment Type</legend>
-
-                    <div class="hide" data-mage="part-2-dueWork">
-                        <div data-mage-collapsed>
-                            {% include '@learningAssessment/fragments/duework/create.twig' %}
-                            {{ mage.submitRow('Save', '', '', '') }}
-                        </div>
-                    </div>
-
-                    <div class="hide" data-mage="part-2-task">
-                        <div data-mage-collapsed>
+                    <div class="small-12 columns">
+                        {% if assessmentType == 'dueWork' %}
+                            {% include '@learningAssessment/fragments/dueWork/create.twig' %}
+                        {% elseif assessmentType == 'task' %}
                             {% include '@learningAssessment/fragments/task/create.twig' %}
-                            {{ mage.submitRow('Save', '', '', '') }}
-                        </div>
-                    </div>
-
-                    <div class="hide" data-mage="part-2-quiz">
-                        <div data-mage-collapsed>
+                        {% elseif assessmentType == 'quiz' %}
                             {% include '@learningAssessment/fragments/quiz/create.twig' %}
-                            {{ mage.submitRow('Save', '', '', '') }}
-                        </div>
+                        {% endif %}
                     </div>
                 </fieldset>
             </section>

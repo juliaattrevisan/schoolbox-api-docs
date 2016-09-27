@@ -41,14 +41,6 @@ class Module extends BaseModule
                  */
                 '/assessment/select/{folderId}' => 'getSelectAssessment',
 
-
-
-
-
-
-
-
-
                 /* This is the second half containing assessable-specific data
                  */
                 '/assessment/{assessmentId}/update' => 'getUpdateAssessment',
@@ -56,6 +48,15 @@ class Module extends BaseModule
                 /* Add assessments to a Project
                  */
                 '/assessment/{assessmentId}/new/{assessmentType}' => 'getCreateAssessmentWithinProject',
+
+
+
+
+
+
+
+
+
 
 
                 '/assessment/{assessmentId}/status'              => 'getStatus',

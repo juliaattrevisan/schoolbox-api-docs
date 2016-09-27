@@ -6,23 +6,21 @@
 
 <input type="hidden" name="assessmentType" value="quiz" />
 
-<div class="small-12 columns">
-    <label>
-        Max Attempts
-        {% set maxAttempts = 10 %}
-        <select name="quizMaxAttempts">
+<label>
+    Max Attempts
+    {% set maxAttempts = 10 %}
+    <select name="quizMaxAttempts">
 
-            {% for i in 0..maxAttempts %}
-            {% if i == 0 %}
-                <option value="{{ i }}">Unlimited</option>
-            {% else %}
-                <option value="{{ i }}">{{ i }}</option>
-            {% endif %}
-            {% endfor %}
+        {% for i in 0..maxAttempts %}
+        {% if i == 0 %}
+            <option value="{{ i }}">Unlimited</option>
+        {% else %}
+            <option value="{{ i }}">{{ i }}</option>
+        {% endif %}
+        {% endfor %}
 
-        </select>
-    </label>
-</div>
+    </select>
+</label>
 
 <script type="text/javascript">
     $(function() {
@@ -38,32 +36,30 @@
         });
     });
 </script>
-<div class="small-12 columns">
-    <div class="row">
-        <div class="small-12 columns">
-            <label for="quizDuration">Duration</label>
-            <div class="switch round">
-                <input name="quizHasDuration" id="quizHasDuration" type="checkbox" />
-                <label for="quizHasDuration">
-                    <span class="icon-approve"></span>
-                    <span class="icon-cancel"></span>
-                </label>
-            </div>
+<div class="row">
+    <div class="small-12 columns">
+        <label for="quizDuration">Duration</label>
+        <div class="switch round">
+            <input name="quizHasDuration" id="quizHasDuration" type="checkbox" />
+            <label for="quizHasDuration">
+                <span class="icon-approve"></span>
+                <span class="icon-cancel"></span>
+            </label>
         </div>
     </div>
+</div>
 
-    <div class="row hide" id="quizDurationPanel">
-        <div class="small-12 columns no-pad">
-            <div class="small-12 medium-6 columns">
-                <label>Hours
-                    <input name='quizDurationHours' type="text" />
-                </label>
-            </div>
-            <div class="small-12 medium-6 columns">
-                <label>Minutes
-                    <input name='quizDurationMinutes' type="text" />
-                </label>
-            </div>
+<div class="row hide" id="quizDurationPanel">
+    <div class="small-12 columns no-pad">
+        <div class="small-12 medium-6 columns">
+            <label>Hours
+                <input name='quizDurationHours' type="text" />
+            </label>
+        </div>
+        <div class="small-12 medium-6 columns">
+            <label>Minutes
+                <input name='quizDurationMinutes' type="text" />
+            </label>
         </div>
     </div>
 </div>
