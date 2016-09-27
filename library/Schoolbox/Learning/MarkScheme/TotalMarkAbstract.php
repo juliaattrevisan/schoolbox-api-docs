@@ -108,6 +108,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
     protected function setTotalMark($totalMark)
     {
         $this->totalMark = $totalMark;
+        return $this;
     }
 
     /**
