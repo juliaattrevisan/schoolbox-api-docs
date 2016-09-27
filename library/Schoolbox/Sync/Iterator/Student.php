@@ -55,17 +55,17 @@ class Student extends IteratorIterator
         $email = [];
         $email = array_merge(
             $email,
-            preg_split('/[,;]/', $currentResult['student_email'])
+            preg_split('/[,;]/', $currentResult['student_default_email'])
         );
-        foreach (array_unique($email) as $key => $anEmail) { 
+        foreach (array_unique($email) as $key => $anEmail) {
             $currentEmail = new User\Common\Email();
             $currentEmail->setAddress($anEmail);
 
             /** @var User\Common\Email $currentEmail */
-            if (strlen($currentEmail->getAddress())) { 
+            if (strlen($currentEmail->getAddress())) {
                 $student->addEmail($currentEmail);
-            } 
-        } 
+            }
+        }
 
         /* Work Email - one for every item in stack
          */
@@ -74,15 +74,32 @@ class Student extends IteratorIterator
             $workEmail,
             preg_split('/[,;]/', $currentResult['student_work_email'])
         );
-        foreach (array_unique($workEmail) as $key => $anEmail) { 
+        foreach (array_unique($workEmail) as $key => $anEmail) {
             $currentEmail = new User\Common\Email();
             $currentEmail->setAddress($anEmail);
 
             /** @var User\Common\Email $currentEmail */
-            if (strlen($currentEmail->getAddress())) { 
+            if (strlen($currentEmail->getAddress())) {
                 $student->addWorkEmail($currentEmail);
-            } 
+            }
         }
+
+        /* Home Email - one for every item in stack
+         */
+        $homeEmail = [];
+        $homeEmail = array_merge(
+            $homeEmail,
+            preg_split('/[,;]/', $currentResult['student_home_email'])
+        );
+        foreach (array_unique($homeEmail) as $key => $anEmail) {
+            $currentEmail = new User\Common\Email();
+            $currentEmail->setAddress($anEmail);
+
+            /** @var User\Common\Email $currentEmail */
+            if (strlen($currentEmail->getAddress())) {
+                $student->addHomeEmail($currentEmail);
+            }
+        }        
 
         /* Boarding House should be set if it has a value
          * You can't actually rely on StudentBoarder field, because that

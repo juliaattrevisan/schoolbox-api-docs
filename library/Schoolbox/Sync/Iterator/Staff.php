@@ -129,6 +129,25 @@ class Staff extends IteratorIterator
             }
         }
         $staff->getMeta()->setPosition($position);
+        /* Home Email - one for every item in stack
+         */
+        $homeEmail = [];
+        foreach ($preStack as $result) {
+            $homeEmail = array_merge(
+                $homeEmail,
+                preg_split('/[,;]/', $result['home_email'])
+            );
+        }
+        foreach (array_unique($homeEmail) as $key => $anEmail) {
+            $currentEmail = new User\Common\Email();
+            $currentEmail->setAddress($anEmail);
+
+            /** @var User\Common\Email $currentEmail */
+            if (strlen($currentEmail->getAddress())) {
+                $staff->addHomeEmail($currentEmail);
+            }
+        }
+
         /* Campus
          */
         $campus = new User\Common\Campus();

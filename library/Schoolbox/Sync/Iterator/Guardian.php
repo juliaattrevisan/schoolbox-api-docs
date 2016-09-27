@@ -101,6 +101,26 @@ class Guardian extends IteratorIterator
             }
         }
 
+        /* Home Email - one for every item in stack
+         */
+        $homeEmail = [];
+        foreach ($preStack as $result) {
+            $homeEmail = array_merge(
+                $homeEmail,
+                preg_split('/[,;]/', $result['student_contact_home_email'])
+            );
+        }
+        foreach (array_unique($homeEmail) as $key => $anEmail) {
+            $currentEmail = new User\Common\Email();
+            $currentEmail->setAddress($anEmail);
+
+            /** @var User\Common\Email $currentEmail */
+            if (strlen($currentEmail->getAddress())) {
+                $guardian->addHomeEmail($currentEmail);
+            }
+        }
+        
+
         /* Account
          */
         $guardian
