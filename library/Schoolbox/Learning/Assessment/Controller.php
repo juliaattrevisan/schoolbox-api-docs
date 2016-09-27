@@ -416,6 +416,30 @@ class Controller extends Base
         new \Alaress_Probe($_POST, $this->getRequest()->post, "Redirect to <a href='{$returnUrl}'>{$returnUrl}</a>");
     }
 
+    /**
+     * Delete an assessment
+     *
+     * @param $assessmentId
+     */
+    public function postDeleteAssessment($assessmentId)
+    {
+        /* TODO: soft-delete this assessment
+         */
+
+        /*
+        if ($assessment was inside a Project instance) {
+            $redirect = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $project->getId()]);
+        }
+        else {
+            $redirect = "/homepage/{$folder->getId()}";
+
+        }
+
+        $this->getResponse()->redirect->to($redirect);
+        */
+        return;
+    }
+
     /* Utility methods - these can probably be refactored elsewhere
      */
 
@@ -560,16 +584,7 @@ class Controller extends Base
 
 
 //
-//    /**
-//     * Delete an assessment
-//     *
-//     * @param $assessmentId
-//     */
-//    public function postDeleteAssessment($assessmentId)
-//    {
-//        /* TODO: soft-delete this assessment
-//         */
-//    }
+
 
 
 
