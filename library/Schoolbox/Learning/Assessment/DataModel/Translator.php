@@ -181,7 +181,33 @@ class Translator
     public function translateToDomainModel(IAssessableDataModel $dataModel)
     {
         $assessable = null;
-        if ($dataModel instanceof TaskModel) {
+
+        if ($dataModel instanceof ProjectModel) {
+            // Project-specific fields
+
+            // Figure out which summator to make
+            if ($dataModel->getSummator() == ProjectModel::SUMMATOR_AVERAGE) {
+                $summator = new Average();
+            } elseif ($dataModel->getSummator() == ProjectModel::SUMMATOR_WEIGHTED_AVERAGE) {
+                $summator = new WeightedAverage();
+            } elseif ($dataModel->getSummator() == ProjectModel::SUMMATOR_MINIMUM) {
+                $summator = new Minimum();
+            } elseif ($dataModel->getSummator() == ProjectModel::SUMMATOR_MAXIMUM) {
+                $summator = new Maximum();
+            } else {
+                throw new UnexpectedValueException('$dataModel->getSummator() is not a recognised summator type');
+            }
+
+            $assessable = new Project($summator);
+
+            foreach ($dataModel->getAssessments() as $subModel) {
+                if ($subModel instanceof ProjectModel) {
+                    throw new UnexpectedValueException('A project may not contain another project');
+                }
+                $assessable->getAssessables()->add($this->translateToDomainModel($subModel));
+            }
+
+        } elseif ($dataModel instanceof TaskModel) {
             // Task-specific fields
             $assessable = (new Task())
                 ->setLink($dataModel->getLink())
