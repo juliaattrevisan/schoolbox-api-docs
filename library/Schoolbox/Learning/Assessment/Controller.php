@@ -73,28 +73,6 @@ class Controller extends Base
         $this->setFolderMapper($folderMapper);
     }
 
-//    /**
-//     * All the possible Mark Types to chooze from
-//     * TODO: Replace with actual objects
-//     */
-//    private function getAllMarkTypes()
-//    {
-//        return [
-//            [
-//                'id'   => 1,
-//                'name' => 'None'
-//            ],
-//            [
-//                'id'   => 2,
-//                'name' => 'Percentage'
-//            ],
-//            [
-//                'id'   => 3,
-//                'name' => 'Letter'
-//            ]
-//        ];
-//    }
-
     /**
      * Select an Assessment
      *
@@ -156,6 +134,7 @@ class Controller extends Base
                 $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/dueWork/create.twig', [
                     'assessment' => $assessment,
                     'curriculumNodes' => $folder->getCurriculumNodes(),
+                    'allMarkTypes' => $this->getAllMarkTypes(),
                 ]));
 
                 break;
@@ -392,6 +371,28 @@ class Controller extends Base
 //            'allReturnUrls' => $this->getAllReturnUrls($assessmentId),
 //            'curriculumNodes' => $folder->getCurriculumNodes()
         ]));
+    }
+
+        /**
+     * All the possible Mark Types to chooze from
+     * TODO: Replace with actual objects
+     */
+    private function getAllMarkTypes()
+    {
+        return [
+            [
+                'id'   => 1,
+                'name' => 'None'
+            ],
+            [
+                'id'   => 2,
+                'name' => 'Percentage'
+            ],
+            [
+                'id'   => 3,
+                'name' => 'Letter'
+            ]
+        ];
     }
 
     /**
