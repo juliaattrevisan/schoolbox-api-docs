@@ -11,6 +11,7 @@ use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Collection;
+use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
@@ -173,30 +174,47 @@ class Translator
      *
      * @param IAssessableDataModel $dataModel
      * @return IAssessable
+     * @throws UnexpectedValueException if $dataModel wasn't able to be translated
      */
     public function translateToDomainModel(IAssessableDataModel $dataModel)
     {
+        $assessable = null;
         if ($dataModel instanceof TaskModel) {
-            // TODO add dates to data model?
-            $assessable = new Task();
-
-            // Generic fields
-            $assessable
-                ->setId($dataModel->getAssessmentModel()->getId())
-                ->setTitle($dataModel->getAssessmentModel()->getTitle())
-                ->setDescription($dataModel->getAssessmentModel()->getDescription())
-                ->setWeight($dataModel->getAssessmentModel()->getWeight())
-                ->setPublishAt($dataModel->getAssessmentModel()->getPublishDate())
-                ->setOpenAt($dataModel->getAssessmentModel()->getOpenDate())
-                ->setDueAt($dataModel->getAssessmentModel()->getDueDate())
-                ->setCloseAt($dataModel->getAssessmentModel()->getCloseDate())
-            ;
-
-            // Specific fields
-            $assessable
+            // Task-specific fields
+            $assessable = (new Task())
                 ->setLink($dataModel->getLink())
                 ->setSelfMarkable(!$dataModel->getRequiresConfirmation());
-            return $assessable;
+
+        } elseif ($dataModel instanceof QuizModel) {
+            // Quiz-specific fields
+            $assessable = (new Quiz())
+                ->setMaxAttempts($dataModel->getMaxAttempts())
+                ->setDuration($dataModel->getDuration())
+                ->setCompletionMessage($dataModel->getCompletionMessage())
+            ;
+
         }
+
+        if (!$assessable instanceof IAssessable) {
+            throw new UnexpectedValueException('$dataModel is not a recognised assessment data model');
+        }
+
+        // Generic fields
+        // Where there's both a version in assessment model and base model,
+        // use the version in assessment model.
+        if (!$dataModel->getAssessmentModel() instanceof AssessmentModel) {
+            throw new UnexpectedValueException('$dataModel has no assessment model');
+        }
+        $assessable
+            ->setId($dataModel->getAssessmentModel()->getId())
+            ->setTitle($dataModel->getAssessmentModel()->getTitle())
+            ->setDescription($dataModel->getAssessmentModel()->getDescription())
+            ->setWeight($dataModel->getAssessmentModel()->getWeight())
+            ->setPublishAt($dataModel->getAssessmentModel()->getPublishDate())
+            ->setOpenAt($dataModel->getAssessmentModel()->getOpenDate())
+            ->setDueAt($dataModel->getAssessmentModel()->getDueDate())
+            ->setCloseAt($dataModel->getAssessmentModel()->getCloseDate())
+        ;
+        return $assessable;
     }
 }
