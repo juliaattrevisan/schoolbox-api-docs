@@ -26,12 +26,22 @@
                     .find('[data-assessment-details]')
                     .html(data);
 
-                /**
-                 * Save everything
+                /* Save everything
                  */
                 $('input[data-mage-next="end"]').mage({
                     onXhrDone: function (data) {
                         console.log(data);
+                    }
+                });
+
+                /* Or, proceed with project configuration
+                 */
+                $('input[data-mage-next="part-3"]').mage({
+                    onXhrDone: function (data) {
+                        $('#assessmentForm')
+                            .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment') }}')
+                            .find('[data-project-contents]')
+                            .html(data);
                     }
                 });
             }
