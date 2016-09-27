@@ -42,7 +42,6 @@ class Translator
     public function translateToDataModel(IAssessable $assessment, $sequence)
     {
         // Extract assessment base model
-        // TODO add created/updated/deleted dates
         // TODO figure out how to pass in the assessable's container
         $assessmentModel = new Model();
         $assessmentModel
@@ -55,6 +54,9 @@ class Translator
             ->setCloseDate($assessment->getCloseAt())
             ->setWeight($assessment->getWeight())
             ->setSequence($sequence)
+            ->setCreatedAt($assessment->getCreatedAt())
+            ->setUpdatedAt($assessment->getUpdatedAt())
+            ->setDeletedAt($assessment->getDeletedAt())
         ;
 
         // The translation depends on the type of $assessment.
@@ -278,6 +280,9 @@ class Translator
             ->setOpenAt($dataModel->getAssessmentModel()->getOpenDate())
             ->setDueAt($dataModel->getAssessmentModel()->getDueDate())
             ->setCloseAt($dataModel->getAssessmentModel()->getCloseDate())
+            ->setCreatedAt($dataModel->getAssessmentModel()->getCreatedAt())
+            ->setUpdatedAt($dataModel->getAssessmentModel()->getUpdatedAt())
+            ->setDeletedAt($dataModel->getAssessmentModel()->getDeletedAt())
         ;
         return $assessable;
     }
