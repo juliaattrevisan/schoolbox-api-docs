@@ -38,6 +38,20 @@ use UnexpectedValueException;
 class Translator
 {
     /**
+     * @var MarkSchemeFactory
+     */
+    protected $markSchemeFactory;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        // TODO inject this factory
+        $this->markSchemeFactory = new MarkSchemeFactory();
+    }
+
+    /**
      * Translates the Assessment business domain model to a data model.
      *
      * @param IAssessable $assessment
@@ -315,11 +329,8 @@ class Translator
             throw new UnexpectedValueException('$dataModel has no assessment model');
         }
 
-        // TODO inject this factory
-        $markSchemeFactory = new MarkSchemeFactory();
-
         $assessable
-            ->setMarkScheme($markSchemeFactory->spawnMarkSchemeFor($assessable))
+            ->setMarkScheme($this->markSchemeFactory->spawnMarkSchemeFor($assessable))
             ->setId($dataModel->getAssessmentModel()->getId())
             ->setTitle($dataModel->getAssessmentModel()->getTitle())
             ->setDescription($dataModel->getAssessmentModel()->getDescription())
