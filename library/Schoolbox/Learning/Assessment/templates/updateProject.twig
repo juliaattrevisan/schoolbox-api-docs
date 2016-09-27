@@ -1,14 +1,22 @@
 {% extends '@learningAssessment/updateAbstract.twig' %}
 
 {% block contents %}
-    <input type="hidden" name="assessmentType" value="project" />
-    {% include '@learningAssessment/fragments/project/create.twig' %}
+    <section>
+        <fieldset class="content">
+            <div class="small-12 columns">
+                <input type="hidden" name="assessmentType" value="project" />
+                {% include '@learningAssessment/fragments/project/create.twig' %}
+            </div>
+        </fieldset>
+    </section>
 
-    <div class="row">
-        <div class="small-12 columns">
-            <h2>Assessments within {{ assessment.title }}</h2>
-            {% include '@learningAssessment/fragments/project/assessmentList.twig' %}
-            {% include '@learningAssessment/fragments/project/createAssessment.twig' %}
-        </div>
-    </div>
+    <h2 class="subheader">Assessments within {{ assessment.title }}</h2>
+    <section>
+        <fieldset class="content">
+            <div class="small-12 columns">
+                {% include '@learningAssessment/fragments/project/assessmentList.twig' %}
+                {% include '@learningAssessment/fragments/project/createAssessment.twig' %}
+            </div>
+        </fieldset>
+    </section>
 {% endblock %}

@@ -1,6 +1,12 @@
 {% extends '@learningAssessment/updateAbstract.twig' %}
 
 {% block contents %}
-    <input type="hidden" name="assessmentType" value="dueWork" />
-    {% include '@learningAssessment/fragments/dueWork/create.twig' %}
+    <section>
+        <fieldset class="content">
+            <div class="small-12 columns">
+                <input type="hidden" name="assessmentType" value="dueWork" />
+                {% include '@learningAssessment/fragments/dueWork/create.twig' %}
+            </div>
+        </fieldset>
+    </section>
 {% endblock %}

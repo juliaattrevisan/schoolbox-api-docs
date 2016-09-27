@@ -15,14 +15,8 @@
 <div class="row">
     <div class="small-12 columns island">
         <form action="{{ routeLookup('learningAssessment.postUpdateAssessment', {assessmentId: assessment.id}) }}" id="assessmentForm" method="post">
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        {% block contents %}
-                        {% endblock %}
-                    </div>
-                </fieldset>
-            </section>
+            {% block contents %}
+            {% endblock %}
         </form>
     </div>
 </div>
