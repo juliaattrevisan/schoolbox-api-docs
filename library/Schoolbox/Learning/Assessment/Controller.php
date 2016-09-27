@@ -115,8 +115,6 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
             'folder' => $folder,
-
-//            'assessment' => [],
 //            'allMarkTypes' => $this->getAllMarkTypes(),
 //            'curriculumNodes' => $folder->getCurriculumNodes()
         ]));
@@ -127,21 +125,31 @@ class Controller extends Base
      */
     public function postSelectAssessment()
     {
+
+        /* TODO: Remove this stub
+         * I added it to save myself choosing dates all the time
+         */
+        $assessment = (new DueWork())
+            ->setPublishAt(Alaress_Date_Format::now())
+            ->setOpenAt(Alaress_Date_Format::now())
+            ->setDueAt(Alaress_Date_Format::now())
+            ->setCloseAt(Alaress_Date_Format::now());
+
         switch($this->getRequest()->post['assessmentType']) {
             case 'project':
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/create.twig', ['allSummators' => new SummatorCollection()]));
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/create.twig', ['assessment' => $assessment, 'allSummators' => new SummatorCollection()]));
                 break;
 
             case 'dueWork':
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/dueWork/create.twig', []));
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/dueWork/create.twig', ['assessment' => $assessment]));
                 break;
 
             case 'task':
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/task/create.twig', []));
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/task/create.twig', ['assessment' => $assessment]));
                 break;
 
             case 'quiz':
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/quiz/create.twig', []));
+                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/quiz/create.twig', ['assessment' => $assessment]));
                 break;
 
             default:
