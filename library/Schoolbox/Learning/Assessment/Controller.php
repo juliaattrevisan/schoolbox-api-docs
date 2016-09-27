@@ -162,6 +162,7 @@ class Controller extends Base
         }
         catch (MapperException $e) {
             $this->sendError('Could not create assessment', [ 'select a valid Folder' ]);
+            return;
         }
 
         switch($this->getRequest()->post['assessmentType']) {
@@ -183,7 +184,7 @@ class Controller extends Base
 
             default:
                 $this->sendError('Could not create assessment', [ 'select a valid assessment type' ]);
-                break;
+                return;
         }
 
         /* Check dates are set to something
@@ -195,18 +196,22 @@ class Controller extends Base
 
         if (!strlen($publishAt)) {
             $this->sendError('Could not create assessment', [ 'set a publish date' ]);
+            return;
         }
 
         if (!strlen($openAt)) {
             $this->sendError('Could not create assessment', [ 'set an open date' ]);
+            return;
         }
 
         if (!strlen($dueAt)) {
             $this->sendError('Could not create assessment', [ 'set a due date' ]);
+            return;
         }
 
         if (!strlen($closeAt)) {
             $this->sendError('Could not create assessment', [ 'set a close date' ]);
+            return;
         }
 
         /* Start assembling assessment instance
@@ -242,8 +247,10 @@ class Controller extends Base
 
             $this->getResponse()->redirect->to($redirect);
         }
-
-        $this->sendError('Could not create assessment', [ 'fill in all fields' ]);
+        else {
+            $this->sendError('Could not create assessment', ['fill in all date fields correctly']);
+            return;
+        }
     }
 
 

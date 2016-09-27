@@ -25,8 +25,19 @@
                     .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment') }}')
                     .find('[data-assessment-details]')
                     .html(data);
+
+                /**
+                 * Save everything
+                 */
+                $('input[data-mage-next="end"]').mage({
+                    onXhrDone: function (data) {
+                        console.log(data);
+                    }
+                });
             }
         });
+
+
 
 //        // overload with specific callbacks (or other config values)
 //        $('input[data-mage-next="part-2"]').mage({
