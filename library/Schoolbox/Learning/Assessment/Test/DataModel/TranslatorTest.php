@@ -375,22 +375,31 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             [
                 (new DueWork())->setMarkScheme(new None()),
                 DueWorkModel\MarkType::TYPE_NONE,
+                null,
+                null,
             ],
             [
                 (new DueWork())->setMarkScheme(new Percentage()),
                 DueWorkModel\MarkType::TYPE_PERCENT,
+                null,
+                null,
             ],
             [
                 (new DueWork())->setMarkScheme(new TotalMarkWholeNumber(10)),
                 DueWorkModel\MarkType::TYPE_TOTAL,
+                10,
+                null,
             ],
             [
                 (new DueWork())->setMarkScheme(new LetterGrade((new DueWorkModel\GradeLevel\Group\Model())->setId(7))),
                 DueWorkModel\MarkType::TYPE_LETTER,
+                null,
+                7,
             ],
         ];
     }
 
+    /**
     /**
      * Test translation of mark scheme.
      *
@@ -398,8 +407,10 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      *
      * @param DueWork $dueWork
      * @param int     $markTypeId
+     * @param int     $totalMark
+     * @param int     $gradeGroupId
      */
-    public function testTranslateDueWorkMarkSchemeToDataModel(DueWork $dueWork, $markTypeId)
+    public function testTranslateDueWorkMarkSchemeToDataModel(DueWork $dueWork, $markTypeId, $totalMark, $gradeGroupId)
     {
         /** @var DueWorkModel $dueWorkModel */
         $dueWorkModel = $this->translator->translateToDataModel($dueWork, 2);
@@ -409,6 +420,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         // Test due work-specific fields
         $this->assertEquals($markTypeId, $dueWorkModel->getMarkType()->getId());
+        $this->assertEquals($totalMark, $dueWorkModel->getMaxMark());
+        $this->assertEquals($gradeGroupId, $dueWorkModel->getGradeGroup()->getId());
     }
 
     /**
