@@ -1110,8 +1110,6 @@ class Controller extends Base
         $reader = new Reader($storageObject->readStream());
         $reader->setLoadFromFirst(true);
 
-        $deleted = [];
-
         while ($reader->valid()) {
             $reader->next();
             $row = $reader->current();
@@ -1281,35 +1279,23 @@ class Controller extends Base
                             $error = true;
                         }
                     }
-
+                    
                     if (!$error) {
 
-                        // Remove existing matches for this combination of division/season/home team the first time we encounter them
-                        // Bit crude but ¯\_(ツ)_/¯ it works
-
-                        $deleted_key =
-                            $division->getId() . "_" .
-                            $season->getId() . "_" .
-                            (($teamHome == null) ? 'null' : $teamHome->getId()) . "_" .
-                            (($teamAway == null) ? 'null' : $teamAway->getId()) . "_" .
-                            (($schoolHome == null) ? 'null' : $schoolHome->getId()) . "_" .
-                            (($schoolAway == null) ? 'null' : $schoolAway->getId());
-
-                        if (!isset($deleted[$deleted_key])) {
-
-                            $this->getMatchMapper()->deleteByColumnList([
+                        try {
+                            $match = $this->getMatchMapper()->findOneByColumnList([
                                 'division_id' => $division->getId(),
                                 'season_id' => $season->getId(),
-                                'home_team_id' => $teamHome == null ? null : $teamHome->getId(),
-                                'away_team_id' => $teamAway == null ? null : $teamAway->getId(),
-                                'home_school_id' => $schoolHome == null ? null : $schoolHome->getId(),
-                                'away_school_id' => $schoolAway == null ? null : $schoolAway->getId(),
+                                'venue_id' => $venue->getId(),
+                                'home_team_id' => $teamHome,
+                                'away_team_id' => $teamAway,
+                                'home_school_id' => $schoolHome,
+                                'away_school_id' => $schoolAway
                             ]);
-
-                            $deleted[$deleted_key] = true;
+                        } catch (MapperException $e) {
+                            $match = new Match();
                         }
-
-                        $match = new Match();
+                        
                         $match->setDivision($division);
                         $match->setSeason($season);
                         $match->setVenue($venue);
