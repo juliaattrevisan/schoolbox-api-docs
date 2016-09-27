@@ -13,13 +13,7 @@
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>
-                {% if match.name %}
-                    {{ match.name }}
-                {% else %}
-                    {{ matchHeading.generateWithTeamLink(match) }}
-                {% endif %}
-            </h1>
+            <h1>{{ matchHeading.generateWithTeamLink(match) }}</h1>
         </div>
     </div>
     <nav>
@@ -33,9 +27,9 @@
     <div class="small-12 columns">
         <ul class="meta">
             {% if match.name %}{% spaceless %}
-            <li class="icon-team" title="{{ matchHeading.generate(match) }}">{{ matchHeading.generateWithTeamLink(match) }}</li>
+            <li class="icon-sport" title="{{ matchHeading.generate(match) }}">{{ match.name }}</li>
             {% endspaceless %}{% endif %}
-            <li class="icon-calendar" title="{{ match.startAt.local }}">{{ match.startAt.local }} ({{ match.startAt.relativeTime }})</li>
+            <li class="icon-calendar" title="{{ match.startAt.local }}">{{ match.startAt.long }} ({{ match.startAt.relativeTime }})</li>
             <li class="icon-location">{{ match.venue.name }}</li>
 
             {% if forecast.hasResults %}

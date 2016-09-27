@@ -4,21 +4,21 @@
 
             {% if not currentMatch.season.archived %}
                 {% if currentMatch.name %}
-                    <h3>{{ currentMatch.name }}</h3>
-                    <p class="meta">{{ matchHeading.generateWithResultLink(currentMatch) }}</p>
+                    <h3>{{ matchHeading.generateWithResultLink(currentMatch) }}</h3>
+                    <p class="meta">{{ currentMatch.name }}</p>
                 {% else %}
                     <h3>{{ matchHeading.generateWithResultLink(currentMatch) }}</h3>
                 {% endif %}
             {% else %}
                 {% if currentMatch.name %}
-                    <h3><del class="icon icon-archive" title="This match's season is archived.">{{ currentMatch.name }}</del></h3>
-                    <p class="meta">{{ matchHeading.generateWithResultLink(currentMatch) }}</p>
+                    <h3><del class="icon icon-archive" title="This match's season is archived."></del>{{ matchHeading.generateWithResultLink(currentMatch) }}</h3>
+                    <p class="meta">{{ currentMatch.name }}</p>
                 {% else %}
                     <h3>{{ matchHeading.generateWithResultLink(currentMatch) }}</h3>
                 {% endif %}
             {% endif %}
 
-            <p class="meta">{{ currentMatch.startAt.getLocal }}</p>
+            <p class="meta">{{ currentMatch.startAt.getLong }}</p>
         </div>
     </div>
     <nav>
