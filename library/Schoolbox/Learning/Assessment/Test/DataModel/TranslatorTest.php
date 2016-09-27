@@ -512,6 +512,24 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->setAcceptMultiple(true)
             ->setUseRubric(false)
             ->setOwner($this->teacher2)
+            ->setAttachments((new Collection())
+                ->add((new StorageModel())
+                    ->setFilename('a file.txt')
+                    ->setHash('1234567890123456789012345678901234567890')
+                )
+                ->add((new StorageModel())
+                    ->setFilename('an image.png')
+                    ->setHash('0000000000000000000000000000000000000002')
+                )
+                ->add((new StorageModel())
+                    ->setFilename('a sound.mp3')
+                    ->setHash('0000000000000000000000000000000000000001')
+                )
+            )
+            ->setWorkType((new WorkTypeModel())
+                ->setId(12)
+                ->setName('A dumb type')
+            )
         ;
 
         /** @var DueWork $dueWork */
@@ -524,5 +542,23 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($dueWork->isAcceptSingle());
         $this->assertTrue($dueWork->isAcceptMulti());
         $this->assertEquals(151, $dueWork->getCreator()->getId());
+
+        $this->assertCount(3, $dueWork->getAllFiles());
+
+        $this->assertInstanceOf(DueWorkFile::class, $dueWork->getAllFiles()[0]);
+        $this->assertEquals('a file.txt', $dueWork->getAllFiles()[0]->getFilename());
+        $this->assertEquals('1234567890123456789012345678901234567890', $dueWork->getAllFiles()[0]->getHash());
+
+        $this->assertInstanceOf(DueWorkFile::class, $dueWork->getAllFiles()[1]);
+        $this->assertEquals('an image.png', $dueWork->getAllFiles()[1]->getFilename());
+        $this->assertEquals('0000000000000000000000000000000000000002', $dueWork->getAllFiles()[1]->getHash());
+
+        $this->assertInstanceOf(DueWorkFile::class, $dueWork->getAllFiles()[2]);
+        $this->assertEquals('a sound.mp3', $dueWork->getAllFiles()[2]->getFilename());
+        $this->assertEquals('0000000000000000000000000000000000000001', $dueWork->getAllFiles()[2]->getHash());
+
+        $this->assertInstanceOf(DueWorkType::class, $dueWork->getType());
+        $this->assertEquals(12, $dueWork->getType()->getId());
+        $this->assertEquals('A dumb type', $dueWork->getType()->getName());
     }
 }
