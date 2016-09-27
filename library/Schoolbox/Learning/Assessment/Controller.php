@@ -540,56 +540,6 @@ class Controller extends Base
 
 
 
-
-
-//        /* TODO: Actually save data here
-//         */
-//        $project = new Project(new SummatorAverage());
-//        $project
-//            ->setId(5567)
-//            ->setCreator($_SESSION['user'])
-//            ->setCreatedAt(Alaress_Date_Format::now())
-//            ->setUpdatedAt(Alaress_Date_Format::now());
-//
-//        $assessmentId = $project->getId();
-//
-//        /* Final payload
-//         */
-//        $data = [
-//            'assessmentId' => $project->getId(),
-//            'allReturnUrls' => $this->getAllReturnUrls($assessmentId),
-//
-//            /* The next step of saving once you've chosen a type that isn't a project
-//             */
-//            'updateRoute' => $this->getRouter()->generate('learningAssessment.postUpdateAssessment', ['assessmentId' => $assessmentId]),
-//        ];
-//
-//        $this->getResponse()->content->set($this->buildJsonOutput($data));
-
-
-
-
-
-
-
-
-
-
-
-
-
-//
-
-//
-
-
-//
-
-
-
-
-
-
     /**
      * Displays information regarding an assessment
      *

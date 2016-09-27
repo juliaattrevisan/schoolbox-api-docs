@@ -49,67 +49,6 @@
                 });
             }
         });
-
-
-
-//        // overload with specific callbacks (or other config values)
-//        $('input[data-mage-next="part-2"]').mage({
-//            onXhrDone: function (data) {
-//
-//                /**
-//                 * Update the heading and perform transitions
-//                 *
-//                 * @param type
-//                 * @param selected
-//                 */
-//                function updateType(type, selected) {
-//                    $('#assessmentType').text($('#assessmentType').text() + ': ' + type);
-//
-//                    var next = $('[data-mage="part-2-'+selected+'"]');
-//                    next.removeAttr('disabled').removeClass('hide');
-//                    next.find('[data-mage-collapsed]').hide().removeClass('hide').slideDown(600);
-//                }
-//
-//                /**
-//                 * Change form url to update route instead
-//                 */
-//                function updateFormAction(url) {
-//                    $('#assessmentForm').attr('action', url);
-//                }
-//
-//                /* Switch between the Assessable types that you might
-//                 * have selected from part-1
-//                 */
-//                var selected = $('#assessmentForm').find('input[name=assessmentType]:checked').val();
-//
-//                switch(selected) {
-//                    case 'project':
-//                        updateType('Project', selected);
-//
-//                        /* Update each project assessable url with properly generated routes
-//                         */
-//                        $.each($('#projectButtons').find('[data-assessment-type]'), function(index, element) {
-//                            $(element).attr('href', data.allReturnUrls[$(element).attr('data-assessment-type')]);
-//                        });
-//
-//                        break;
-//                    case 'dueWork':
-//                        updateType('Due Work', selected);
-//                        updateFormAction(data.updateRoute);
-//                        break;
-//                    case 'quiz':
-//                        updateType('Quiz', selected);
-//                        updateFormAction(data.updateRoute);
-//                        break;
-//                    case 'task':
-//                        updateType('Task', selected);
-//                        updateFormAction(data.updateRoute);
-//                        break;
-//                    default:
-//                        break;
-//                }
-//            }
-//        });
     });
 </script>
 
@@ -149,49 +88,6 @@
                     <legend>Project Contents</legend>
                     <div class="small-12 columns hide" data-mage-collapsed data-project-contents></div>
                 </fieldset>
-
-                {#<fieldset class="content">#}
-                    {#{% include '@learningAssessment/fragments/common.twig' %}#}
-                {#</fieldset>#}
-                {#<fieldset class="content">#}
-                    {#<legend>Dates</legend>#}
-
-                    {#{% include '@learningAssessment/fragments/dates.twig' %}#}
-                {#</fieldset>#}
-                {#<fieldset class="content">#}
-                    {#{% include '@learningAssessment/fragments/curriculumCodes.twig' %}#}
-                {#</fieldset>#}
-
-                {#<fieldset class="content">#}
-                    {#<legend id="assessmentType">Assessment Type</legend>#}
-
-                    {#<div class="hide" data-mage="part-2-project">#}
-                        {#<div class="content" data-mage-collapsed>#}
-                            {#{% include '@learningAssessment/fragments/project/create.twig' %}#}
-                        {#</div>#}
-                    {#</div>#}
-
-                    {#<div class="hide" data-mage="part-2-dueWork">#}
-                        {#<div data-mage-collapsed>#}
-                            {#{% include '@learningAssessment/fragments/duework/create.twig' %}#}
-                            {#{{ mage.submitRow('Save', '', '', '') }}#}
-                        {#</div>#}
-                    {#</div>#}
-
-                    {#<div class="hide" data-mage="part-2-task">#}
-                        {#<div data-mage-collapsed>#}
-                            {#{% include '@learningAssessment/fragments/task/create.twig' %}#}
-                            {#{{ mage.submitRow('Save', '', '', '') }}#}
-                        {#</div>#}
-                    {#</div>#}
-
-                    {#<div class="hide" data-mage="part-2-quiz">#}
-                        {#<div data-mage-collapsed>#}
-                            {#{% include '@learningAssessment/fragments/quiz/create.twig' %}#}
-                            {#{{ mage.submitRow('Save', '', '', '') }}#}
-                        {#</div>#}
-                    {#</div>#}
-                {#</fieldset>#}
             </section>
         </form>
     </div>
