@@ -232,9 +232,16 @@ class Translator
                 $assessable->getAssessables()->add($this->translateToDomainModel($subModel));
             }
 
+            // Convert mark type
+            $assessable->setMarkType(
+                (new DueWorkModel\MarkType())
+                    ->setId($dataModel->getMarkType()->getId())
+            );
+
         } elseif ($dataModel instanceof TaskModel) {
             // Task-specific fields
             $assessable = (new Task())
+                ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_COMPLETION))
                 ->setLink($dataModel->getLink())
                 ->setSelfMarkable(!$dataModel->getRequiresConfirmation())
                 ->setCreator($dataModel->getOwner())
@@ -243,6 +250,7 @@ class Translator
         } elseif ($dataModel instanceof QuizModel) {
             // Quiz-specific fields
             $assessable = (new Quiz())
+                ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_TOTAL))
                 ->setMaxAttempts($dataModel->getMaxAttempts())
                 ->setDuration($dataModel->getDuration())
                 ->setCompletionMessage($dataModel->getCompletionMessage())
@@ -286,6 +294,12 @@ class Translator
                 (new DueWorkType())
                     ->setId($dataModel->getWorkType()->getId())
                     ->setName($dataModel->getWorkType()->getName())
+            );
+
+            // Convert mark type
+            $assessable->setMarkType(
+                (new DueWorkModel\MarkType())
+                    ->setId($dataModel->getMarkType()->getId())
             );
         }
 
