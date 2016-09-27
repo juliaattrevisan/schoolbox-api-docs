@@ -286,12 +286,6 @@ class Controller extends Base
      */
     public function getUpdateAssessment($assessmentId)
     {
-        try {
-            $folder = $this->getFolderMapper()->findById($assessmentId);
-        }
-        catch (MapperException $e) {
-            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
-        }
 
         /* TODO: Actually retrieve $assessmentId data here
          */
