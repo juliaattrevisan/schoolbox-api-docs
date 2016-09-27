@@ -27,6 +27,7 @@ use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
 
@@ -286,7 +287,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      */
     public function testTranslateDueWorkToDataModel()
     {
-        // TODO test variations
         $dueWork = (new DueWork())
             // Generic fields
             ->setId(908)
@@ -322,6 +322,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 ->setId(12)
                 ->setName('A dumb type')
             )
+            ->setMarkScheme(new None())
             ->setHasRubric(true)
         ;
 
@@ -357,6 +358,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(WorkTypeModel::class, $dueWorkModel->getWorkType());
         $this->assertEquals(12, $dueWorkModel->getWorkType()->getId());
         $this->assertEquals('A dumb type', $dueWorkModel->getWorkType()->getName());
+
+        // Test mark scheme
+        $this->assertEquals(DueWorkModel\MarkType::TYPE_NONE, $dueWorkModel->getMarkType()->getId());
     }
 
     /**
