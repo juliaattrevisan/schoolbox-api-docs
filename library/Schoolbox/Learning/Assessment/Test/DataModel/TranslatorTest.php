@@ -555,6 +555,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 ->setId(12)
                 ->setName('A dumb type')
             )
+            ->setMarkType($this->buildMarkType())
         ;
 
         /** @var DueWork $dueWork */
@@ -597,7 +598,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 (new DueWorkModel())
                     ->setAssessmentModel(new AssessmentModel())
                     ->setAcceptOnline(true)
-                    ->setAcceptMultiple(true),
+                    ->setAcceptMultiple(true)
+                    ->setMarkType($this->buildMarkType()),
                 true,
                 true,
             ],
@@ -605,7 +607,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 (new DueWorkModel())
                     ->setAssessmentModel(new AssessmentModel())
                     ->setAcceptOnline(true)
-                    ->setAcceptMultiple(false),
+                    ->setAcceptMultiple(false)
+                    ->setMarkType($this->buildMarkType()),
                 true,
                 false,
             ],
@@ -613,7 +616,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 (new DueWorkModel())
                     ->setAssessmentModel(new AssessmentModel())
                     ->setAcceptOnline(false)
-                    ->setAcceptMultiple(false),
+                    ->setAcceptMultiple(false)
+                    ->setMarkType($this->buildMarkType()),
                 false,
                 false,
             ],
@@ -621,7 +625,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                 (new DueWorkModel())
                     ->setAssessmentModel(new AssessmentModel())
                     ->setAcceptOnline(false)
-                    ->setAcceptMultiple(true),
+                    ->setAcceptMultiple(true)
+                    ->setMarkType($this->buildMarkType()),
                 false,
                 false,
             ],
@@ -658,7 +663,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $projectModel = (new ProjectModel())
             ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
-            ->setAssessmentModel((new AssessmentModel())->setId(4));
+            ->setAssessmentModel((new AssessmentModel())->setId(4))
+            ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_NONE));
+
         $projectModel->getAssessments()
             ->add((new TaskModel())
                 ->setOwner($this->teacher1)
@@ -671,6 +678,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->add((new DueWorkModel())
                 ->setOwner($this->teacher2)
                 ->setAssessmentModel((new AssessmentModel())->setId(3))
+                ->setMarkType($this->buildMarkType())
             );
 
         /** @var Project $project */
@@ -722,25 +730,29 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             [
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_WEIGHTED_AVERAGE)
-                    ->setAssessmentModel((new AssessmentModel())->setId(1)),
+                    ->setAssessmentModel((new AssessmentModel())->setId(1))
+                    ->setMarkType($this->buildMarkType()),
                 WeightedAverage::class,
             ],
             [
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
-                    ->setAssessmentModel((new AssessmentModel())->setId(1)),
+                    ->setAssessmentModel((new AssessmentModel())->setId(1))
+                    ->setMarkType($this->buildMarkType()),
                 Average::class,
             ],
             [
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_MINIMUM)
-                    ->setAssessmentModel((new AssessmentModel())->setId(1)),
+                    ->setAssessmentModel((new AssessmentModel())->setId(1))
+                    ->setMarkType($this->buildMarkType()),
                 Minimum::class,
             ],
             [
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_MAXIMUM)
-                    ->setAssessmentModel((new AssessmentModel())->setId(1)),
+                    ->setAssessmentModel((new AssessmentModel())->setId(1))
+                    ->setMarkType($this->buildMarkType()),
                 Maximum::class,
             ],
         ];
@@ -764,5 +776,16 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         // Test summator
         $this->assertInstanceOf($summatorClass, $project->getSummator());
+    }
+
+    /**
+     * Helper function for creating a mark type given a mark type ID.
+     *
+     * @param int $markTypeId
+     * @return DueWorkModel\MarkType
+     */
+    protected function buildMarkType($markTypeId = DueWorkModel\MarkType::TYPE_NONE)
+    {
+        return (new DueWorkModel\MarkType())->setId($markTypeId);
     }
 }
