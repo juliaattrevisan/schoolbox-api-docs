@@ -328,20 +328,18 @@ class Controller extends Base
      */
     public function getUpdateAssessment($assessmentId)
     {
-
-        /* TODO: Actually retrieve the data here
-         */
-
         try {
-            $folder = $this->getFolderMapper()->findById(43);
+            $folder = $this->getFolderMapper()->findById($assessmentId);
         }
         catch (MapperException $e) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
         }
 
+        /* TODO: Actually retrieve the data here
+         */
         $project = new Project(new SummatorAverage());
         $project
-            ->setId(5567)
+            ->setId($assessmentId)
             ->setTitle('Find Diablo')
             ->setDescription('The things you need to do in order to slay the prime evil')
             ->setCreator($_SESSION['user'])
