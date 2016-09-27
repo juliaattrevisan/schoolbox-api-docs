@@ -1312,7 +1312,7 @@ class Controller extends Base
                     } else {
                         if ($teamHome == null && $schoolHome == null) {
                             // No home team/school specified
-                            $this->updateLog($storageObject, $reader->key(), 9, "SKIPPED FIXTURE: No home team name specified");
+                            $this->updateLog($storageObject, $reader->key(), 9, "SKIPPED FIXTURE: Could not find a matching home team or school");
                             $error = true;
                         }
                     }
@@ -1326,7 +1326,7 @@ class Controller extends Base
                     } else {
                         if ($teamAway == null && $schoolAway == null) {
                             // No away team/school specified
-                            $this->updateLog($storageObject, $reader->key(), 9, "SKIPPED FIXTURE: No away team name specified");
+                            $this->updateLog($storageObject, $reader->key(), 9, "SKIPPED FIXTURE: Could not find a matching away team or school");
                             $error = true;
                         }
                     }
@@ -1352,7 +1352,7 @@ class Controller extends Base
                         $match->setVenue($venue);
                         $match->setName($row[4]);
                         $match->setStartAt($this->makeDateTime($row[5], $row[6]));
-                        $match->setNotes($row[9]);
+                        $match->setNotes($row[10]);
 
                         if ($teamHome != null) {
                             $match->setHomeTeam($teamHome);
