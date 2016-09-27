@@ -29,12 +29,12 @@
 {{ bread.crumbs(
     [ 'Fixtures', routeLookup('sportsfixtures.getLanding') ],
     [ 'Venues',   routeLookup('sportsfixturesVenue.getList') ],
-    [ venue.name | default ('New Venue') ]
+    [ venue.name | default ('Create Venue') ]
 ) }}
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Fixtures</h1>
+        <h1>{{ action }} Venue</h1>
     </div>
 </div>
 
@@ -47,8 +47,6 @@
         {% endif %}
 
         <form id='venueForm' action="{{ formUrl }}" method="post">
-            <h2 class="subheader">{{ action }} Venue</h2>
-
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">

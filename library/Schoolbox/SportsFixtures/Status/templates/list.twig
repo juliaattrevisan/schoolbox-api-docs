@@ -13,45 +13,39 @@
     [ 'Fixtures', routeLookup('sportsfixtures.getLanding') ],
     [ 'Statuses' ]
 ) }}
-
-<div class="row">
-    <div class="small-12 columns">
-        <h1>Fixtures</h1>
-    </div>
-</div>
-
-<div class="row">
-    <div class="small-12 island" id="allItems">
-        <div class="actions-small-1 row">
-            <div class="list-item">
-                <div class="small-12 columns">
-                    <h2 class="subheader">All Statuses</h2>
-                </div>
+<div id="allItems">
+    <div class="actions-small-1 row">
+        <div class="list-item">
+            <div class="small-12 columns">
+                <h1>Match Status</h1>
             </div>
-            <nav>
-                <a class="icon-add" title="Add Status" data-item-add></a>
-            </nav>
         </div>
+        <nav>
+            <a class="icon-add" title="Add Status" data-item-add></a>
+        </nav>
+    </div>
 
-        <section>
-            <ul class="information-list hide" data-item-list>
-                {% for currentStatus in allStatus %}
-                    <li class="actions-small-2" data-item="{{ currentStatus.id }}">
-                        {% include '@sportsfixturesStatus/listItem.twig' %}
-                    </li>
-                {% endfor %}
+    <div class="row">
+        <div class="small-12 island" id="allItems">
+            <section>
+                <ul class="information-list hide" data-item-list>
+                    {% for currentStatus in allStatus %}
+                        <li class="actions-small-2" data-item="{{ currentStatus.id }}">
+                            {% include '@sportsfixturesStatus/listItem.twig' %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+            <div class="empty-state hide">
+                <i class="icon-position"></i>
+                <p>You have no match status, these must exist in order to conclude a match.</p>
+                <p>Please <a title="Add a Status" data-item-add>add a status</a> now.</p>
+            </div>
+            <ul class="information-list hide">
+                <li id="item-clone" class="actions-small-2" data-item="">
+                    {% include '@sportsfixturesStatus/listItem.twig' %}
+                </li>
             </ul>
-        </section>
-        <div class="empty-state hide">
-            <i class="icon-position"></i>
-            <p>There are currently no statuses.</p>
-            <p><a title="Add a Status" data-item-add>Add a Status</a></p>
         </div>
-        <ul class="information-list hide">
-            <li id="item-clone" class="actions-small-2" data-item="">
-                {% include '@sportsfixturesStatus/listItem.twig' %}
-            </li>
-        </ul>
     </div>
 </div>
-

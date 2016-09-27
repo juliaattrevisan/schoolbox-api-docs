@@ -37,9 +37,11 @@
 <div class="row actions-small-1">
     <div class="small-12 columns list-item">
         <h1>{{ sport.name }}</h1>
+        {%  if sport.url %}
         <ul class="meta">
             <li class="icon-home"><a href="{{ sport.url }}">{{ sport.url }}</a></li>
         </ul>
+        {% endif %}
     </div>
     <nav>
         <a href="#" class="icon-overflow" data-dropdown="fdrop-sport"></a>
@@ -103,9 +105,10 @@
                         <a href="#" class="icon-overflow" data-dropdown="division-{{ division.id }}-dropdown" aria-expanded="false" title="Actions"></a>{#-dessicant-#}
                     </nav>
                     <ul class="f-dropdown" data-division-dropdown data-dropdown-content id="division-{{ division.id }}-dropdown">
-                        <li><a href="{{ routeLookup('sportsfixturesTeam.getCreateForm', { contextId: division.id }) }}" class="icon-add">Add new team</a></li>
-                        <li><a href="{{ routeLookup('sportsfixturesDivision.getModifyForm', { entityId: division.id }) }}" class="icon-modify">Modify {{ division.name }} division</a></li>
-                        <li><a href="#" data-division-action="delete" data-post-action="{{ routeLookup('sportsfixturesDivision.deleteEntity', {entityId: division.id}) }}" class="icon-delete">Delete {{ division.name }} division</a></li>
+                        <li><a href="{{ routeLookup('sportsfixturesMatch.getList', { contextId: division.id }) }}" class="icon-search">View Fixture</a></li>
+                        <li><a href="{{ routeLookup('sportsfixturesTeam.getCreateForm', { contextId: division.id }) }}" class="icon-add">Add New Team</a></li>
+                        <li><a href="{{ routeLookup('sportsfixturesDivision.getModifyForm', { entityId: division.id }) }}" class="icon-modify">Modify</a></li>
+                        <li><a href="#" data-division-action="delete" data-post-action="{{ routeLookup('sportsfixturesDivision.deleteEntity', {entityId: division.id}) }}" class="icon-delete">Delete</a></li>
                     </ul>
                 </li>
                 {% endfor %}

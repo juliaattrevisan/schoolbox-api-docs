@@ -32,7 +32,7 @@
 <div class="actions-small-1 row">
     <div class="list-item">
         <div class="small-12 columns">
-            <h1>Fixtures</h1>
+            <h1>Sports</h1>
         </div>
     </div>
     <nav>
@@ -42,7 +42,6 @@
 
 <div class="row">
     <div class="small-12 island" id="allSports">
-        <h2 class="subheader">All Sports</h2>
         {% if allSports|length %}
         <section>
             <ul class="information-list">
@@ -54,8 +53,8 @@
         {% else %}
         <div class="empty-state">
             <i class="icon-sport"></i>
-            <p>There are no Sports.</p>
-            <p><a href="{{ routeLookup('sportsfixturesSport.getCreateForm', {}) }}" title="Add a Sport">Add a Sport</a></p>
+            <p>You currently have no sports defined.<br />You can start by <a href="{{ routeLookup('sportsfixturesSport.getCreateForm', {}) }}" title="Add a Sport">adding a sport</a> or <a href="{{ routeLookup('sportsfixturesImport.getUpload') }}">bulk uploading</a> a list of sports</p>
+            <p>Add a Sport</a></p>
         </div>
         {% endif %}
     </div>
