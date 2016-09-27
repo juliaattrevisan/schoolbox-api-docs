@@ -228,6 +228,16 @@ class Controller extends Base
     public function getUpdateAssessment($assessmentId)
     {
 
+        /* TODO: Figure out assessment's relationship to $folder in some way
+         */
+        try {
+            $folder = $this->getFolderMapper()->findById(43);
+        }
+        catch (MapperException $e) {
+            $this->sendError('Could not create assessment', [ 'select a valid Folder' ]);
+            return;
+        }
+
         /* TODO: Actually retrieve $assessmentId data here
          */
         $assessment = new Project(new SummatorAverage());
@@ -278,9 +288,24 @@ class Controller extends Base
          */
         $assessmentType = Types::ASSESSMENT_PROJECT;
 
+        /* Twig payload
+         */
+        $data = [
+            'assessment' => $assessment,
+            'assessmentType' => $assessmentType,
+            'folder' => $folder,
+            'curriculumNodes' => $folder->getCurriculumNodes(),
+            'allMarkTypes' => $this->getAllMarkTypes(),
+        ];
+
         switch ($assessmentType) {
             case Types::ASSESSMENT_PROJECT:
                 $template = 'updateProject.twig';
+
+                $data['types'] = new Types();
+                $data['allReturnUrls'] = $this->getAllReturnUrls($assessmentId);
+                $data['allSummators'] = new SummatorCollection();
+
                 break;
             case Types::ASSESSMENT_DUE_WORK:
                 $template = 'updateDueWork.twig';
@@ -296,25 +321,7 @@ class Controller extends Base
                 return;
         }
 
-        /* TODO: Figure out assessment's relationship to $folder in some way
-         */
-        try {
-            $folder = $this->getFolderMapper()->findById(43);
-        }
-        catch (MapperException $e) {
-            $this->sendError('Could not create assessment', [ 'select a valid Folder' ]);
-            return;
-        }
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/' . $template, [
-            'assessment' => $assessment,
-            'assessmentType' => $assessmentType,
-            'folder' => $folder,
-            'allReturnUrls' => $this->getAllReturnUrls($assessmentId),
-            'curriculumNodes' => $folder->getCurriculumNodes(),
-            //            'allMarkTypes' => $this->getAllMarkTypes(),
-            'allSummators' => new SummatorCollection(),
-        ]));
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/' . $template, $data));
     }
 
     /**
@@ -428,13 +435,9 @@ class Controller extends Base
         $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessmentId]);
         $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
 
-        /* TODO: Refactor this better
-         */
         $allReturnUrls = [];
 
-        $allTypes = new Types();
-
-        foreach ($allTypes->getTypes() as $title => $index) {
+        foreach ((new Types())->getTypes() as $title => $index) {
             $allReturnUrls[$index] = $this->getRouter()->generate('learningAssessment.getCreateAssessmentWithinProject', ['assessmentId' => $assessmentId, 'assessmentType' => $index]) . $suffix;
         }
 
