@@ -34,5 +34,14 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        // Joins to:
+        // task
+        // duework
+        // quiz
+        // project
+        // folder (by assessment_folder table)
+        // unit specification (by assessment_course_unit_specification table)
+        // unit implementation (by assessment_course_unit_implementation table)
     }
 }
