@@ -172,96 +172,51 @@ class Controller extends Base
         /* Figure out what kind of assessment was chosen
          * and spawn a new instance of it to manipulate
          */
-        switch($this->getRequest()->post['assessmentType']) {
-            case Types::ASSESSMENT_PROJECT:
-                $assessment = new Project(new SummatorWeightedAverage());
-                break;
-
-            case Types::ASSESSMENT_DUE_WORK:
-                $assessment = new DueWork();
-                break;
-
-            case Types::ASSESSMENT_TASK:
-                $assessment = new Task();
-                break;
-
-            case Types::ASSESSMENT_QUIZ:
-                $assessment = new Quiz();
-                break;
-
-            default:
-                $this->sendError('Could not create assessment', [ 'select a valid assessment type' ]);
-                return;
+        try {
+            $assessment = (new Factory(
+                $this->getRequest()->post['assessmentType'],
+                $this->getRequest()->post['title'],
+                $this->getRequest()->post['description'],
+                $_SESSION['user'],
+                $this->getRequest()->post['weight'],
+                $this->getRequest()->post['publishDate'] . ' ' . $this->getRequest()->post['publishTime'],
+                $this->getRequest()->post['openDate'] . ' ' . $this->getRequest()->post['openTime'],
+                $this->getRequest()->post['dueDate'] . ' ' . $this->getRequest()->post['dueTime'],
+                $this->getRequest()->post['closeDate'] . ' ' . $this->getRequest()->post['closeTime'],
+                $this->getRequest()->post['summator']
+            ))->produce();
+        }
+        catch (\DomainException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            return;
+        }
+        catch (\InvalidArgumentException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            return;
+        }
+        catch (\UnexpectedValueException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            return;
         }
 
-        /* Check dates are set to something
+        /* TODO: Actually save data here
          */
-        $publishAt = trim($this->getRequest()->post['publishDate'] . ' ' . $this->getRequest()->post['publishTime']);
-        $openAt = trim($this->getRequest()->post['openDate'] . ' ' . $this->getRequest()->post['openTime']);
-        $dueAt = trim($this->getRequest()->post['dueDate'] . ' ' . $this->getRequest()->post['dueTime']);
-        $closeAt = trim($this->getRequest()->post['closeDate'] . ' ' . $this->getRequest()->post['closeTime']);
+        $assessment->setId(5568);
 
-        if (!strlen($publishAt)) {
-            $this->sendError('Could not create assessment', [ 'set a publish date' ]);
-            return;
-        }
-
-        if (!strlen($openAt)) {
-            $this->sendError('Could not create assessment', [ 'set an open date' ]);
-            return;
-        }
-
-        if (!strlen($dueAt)) {
-            $this->sendError('Could not create assessment', [ 'set a due date' ]);
-            return;
-        }
-
-        if (!strlen($closeAt)) {
-            $this->sendError('Could not create assessment', [ 'set a close date' ]);
-            return;
-        }
-
-        /* Start assembling assessment instance
+        /* If it were a project, go back to the project's Update screen
+         * Otherwise return to the homepage
          */
-        $assessment
-            ->setTitle($this->getRequest()->post['title'])
-            ->setDescription($this->getRequest()->post['description'])
-            ->setCreator($_SESSION['user'])
-            ->setWeight($this->getRequest()->post['weight'])
-            ->setPublishAt(Alaress_Date_Format::newLocal($publishAt))
-            ->setOpenAt(Alaress_Date_Format::newLocal($openAt))
-            ->setDueAt(Alaress_Date_Format::newLocal($dueAt))
-            ->setCloseAt(Alaress_Date_Format::newLocal($closeAt))
-            ->setCreatedAt(Alaress_Date_Format::now())
-            ->setUpdatedAt(Alaress_Date_Format::now());
+        if ($assessment instanceof Project) {
+            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/createAssessment.twig', [
+                'types' => new Types(),
+                'assessmentId' => $assessment->getId(),
+                'allReturnUrls' => $this->getAllReturnUrls($assessment->getId()),
+            ]));
 
-        /* Verify that dates are temporally correct
-         */
-        if ($assessment->isValidDates()) {
-
-            /* TODO: Actually save data here
-             */
-            $assessment->setId(5568);
-
-            /* If it were a project, go back to the project's Update screen
-             * Otherwise return to the homepage
-             */
-            if ($assessment instanceof Project) {
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/createAssessment.twig', [
-                    'types' => new Types(),
-                    'assessmentId' => $assessment->getId(),
-                    'allReturnUrls' => $this->getAllReturnUrls($assessment->getId()),
-                ]));
-
-                return;
-            }
-            else {
-                $this->getResponse()->redirect->to("/homepage/{$folder->getId()}");
-            }
+            return;
         }
         else {
-            $this->sendError('Could not create assessment', ['fill in all date fields correctly']);
-            return;
+            $this->getResponse()->redirect->to("/homepage/{$folder->getId()}");
         }
     }
 
