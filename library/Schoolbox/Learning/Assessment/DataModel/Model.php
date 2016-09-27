@@ -9,16 +9,21 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
+use Schoolbox\ISoftDeletable;
+use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
+use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
 
 /**
  * Class Model
  */
-class Model
+class Model implements ISoftDeletable
 {
     use Id;
-
-    // TODO add created/updated/deleted?
+    use CreatedAtDate;
+    use UpdatedAtDate;
+    use DeletedAtDate;
 
     /**
      * A descriptive title of the assessment.
@@ -90,6 +95,9 @@ class Model
         $this->openDate    = new Alaress_Date_NullDate();
         $this->dueDate     = new Alaress_Date_NullDate();
         $this->closeDate   = new Alaress_Date_NullDate();
+        $this->createdAt   = new Alaress_Date_NullDate();
+        $this->updatedAt   = new Alaress_Date_NullDate();
+        $this->deletedAt   = new Alaress_Date_NullDate();
     }
 
     /**
