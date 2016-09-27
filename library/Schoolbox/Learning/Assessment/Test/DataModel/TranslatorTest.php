@@ -27,7 +27,10 @@ use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
+use Schoolbox\Learning\MarkScheme\Percentage;
+use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
 
@@ -361,6 +364,51 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
         // Test mark scheme
         $this->assertEquals(DueWorkModel\MarkType::TYPE_NONE, $dueWorkModel->getMarkType()->getId());
+    }
+
+    /**
+     * Data provider for different due work response acceptance settings.
+     */
+    public function getTestTranslateDueWorkMarkSchemeToDataModelData()
+    {
+        return [
+            [
+                (new DueWork())->setMarkScheme(new None()),
+                DueWorkModel\MarkType::TYPE_NONE,
+            ],
+            [
+                (new DueWork())->setMarkScheme(new Percentage()),
+                DueWorkModel\MarkType::TYPE_PERCENT,
+            ],
+            [
+                (new DueWork())->setMarkScheme(new TotalMarkWholeNumber(10)),
+                DueWorkModel\MarkType::TYPE_TOTAL,
+            ],
+            [
+                (new DueWork())->setMarkScheme(new LetterGrade((new DueWorkModel\GradeLevel\Group\Model())->setId(7))),
+                DueWorkModel\MarkType::TYPE_LETTER,
+            ],
+        ];
+    }
+
+    /**
+     * Test translation of mark scheme.
+     *
+     * @dataProvider getTestTranslateDueWorkMarkSchemeToDataModelData
+     *
+     * @param DueWork $dueWork
+     * @param int     $markTypeId
+     */
+    public function testTranslateDueWorkMarkSchemeToDataModel(DueWork $dueWork, $markTypeId)
+    {
+        /** @var DueWorkModel $dueWorkModel */
+        $dueWorkModel = $this->translator->translateToDataModel($dueWork, 2);
+
+        // Test type
+        $this->assertInstanceOf(DueWorkModel::class, $dueWorkModel);
+
+        // Test due work-specific fields
+        $this->assertEquals($markTypeId, $dueWorkModel->getMarkType()->getId());
     }
 
     /**
