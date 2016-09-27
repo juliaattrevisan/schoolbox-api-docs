@@ -87,6 +87,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new Alaress_Date_Format('2016-10-15 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setDeletedAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setTitle('Mr Test Task сказать')
             ->setDescription('Blaargh ничего')
             ->setWeight(1000);
@@ -99,6 +102,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('2016-10-16 12:00:00', $assessmentModel->getOpenDate()->getDatabase());
         $this->assertEquals('2016-10-18 12:00:00', $assessmentModel->getDueDate()->getDatabase());
         $this->assertEquals('2016-10-23 13:00:00', $assessmentModel->getCloseDate()->getDatabase());
+        $this->assertEquals('2016-10-14 12:00:00', $assessmentModel->getCreatedAt()->getDatabase());
+        $this->assertEquals('2016-10-15 12:00:00', $assessmentModel->getUpdatedAt()->getDatabase());
+        $this->assertEquals('2016-10-16 12:00:00', $assessmentModel->getDeletedAt()->getDatabase());
         $this->assertEquals('Mr Test Task сказать', $assessmentModel->getTitle());
         $this->assertEquals('Blaargh ничего', $assessmentModel->getDescription());
         $this->assertEquals(1000, $assessmentModel->getWeight());
@@ -403,6 +409,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
                     ->setOpenDate(new Alaress_Date_Format('2016-10-11 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
                     ->setDueDate(new Alaress_Date_Format('2016-10-12 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
                     ->setCloseDate(new Alaress_Date_Format('2016-10-13 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+                    ->setCreatedAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+                    ->setUpdatedAt(new Alaress_Date_Format('2016-10-15 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+                    ->setDeletedAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
         );
 
         /** @var IAssessable $assessment */
@@ -416,6 +425,9 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('2016-10-11 12:00:00', $assessment->getOpenAt()->getDatabase());
         $this->assertEquals('2016-10-12 12:00:00', $assessment->getDueAt()->getDatabase());
         $this->assertEquals('2016-10-13 12:00:00', $assessment->getCloseAt()->getDatabase());
+        $this->assertEquals('2016-10-14 12:00:00', $assessment->getCreatedAt()->getDatabase());
+        $this->assertEquals('2016-10-15 12:00:00', $assessment->getUpdatedAt()->getDatabase());
+        $this->assertEquals('2016-10-16 12:00:00', $assessment->getDeletedAt()->getDatabase());
     }
 
     /**

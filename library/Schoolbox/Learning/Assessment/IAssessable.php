@@ -357,7 +357,7 @@ interface IAssessable
     /**
      * Created date
      *
-     * @var \Alaress_Date_Format
+     * @return \Alaress_Date_Format
      */
     public function getCreatedAt();
 
