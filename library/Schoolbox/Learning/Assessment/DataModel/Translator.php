@@ -13,6 +13,8 @@ use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
+use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
+use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
@@ -216,7 +218,20 @@ class Translator
             }
 
             // Convert attachments
+            foreach ($dataModel->getAttachments() as $attachment) {
+                $assessable->getAllFiles()->add(
+                    (new DueWorkFile())
+                        ->setHash($attachment->getHash())
+                        ->setFilename($attachment->getFilename())
+                );
+            }
 
+            // Convert work type
+            $assessable->setType(
+                (new DueWorkType())
+                    ->setId($dataModel->getWorkType()->getId())
+                    ->setName($dataModel->getWorkType()->getName())
+            );
         }
 
         if (!$assessable instanceof IAssessable) {
