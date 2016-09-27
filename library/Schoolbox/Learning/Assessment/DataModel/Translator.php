@@ -133,18 +133,20 @@ class Translator
             ;
 
             // Convert a mark type into fields
-            if ($assessment->getMarkScheme() instanceof TotalMarkWholeNumber) {
-                $model->setMaxMark($assessment->getMarkScheme()->getTotalMark());
+            // TODO move this to the mark scheme translator
+            $markScheme = $assessment->getMarkScheme();
+            if ($markScheme instanceof TotalMarkWholeNumber) {
+                $model->setMaxMark($markScheme->getTotalMark());
                 $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_TOTAL);
 
-            } elseif ($assessment->getMarkScheme() instanceof Percentage) {
+            } elseif ($markScheme instanceof Percentage) {
                 $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_PERCENT);
 
-            } elseif ($assessment->getMarkScheme() instanceof LetterGrade) {
-                $model->setGradeGroup($assessment->getMarkScheme()->getGradeGroup());
+            } elseif ($markScheme instanceof LetterGrade) {
+                $model->setGradeGroup($markScheme->getGradeGroup());
                 $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_LETTER);
 
-            } elseif ($assessment->getMarkScheme() instanceof None) {
+            } elseif ($markScheme instanceof None) {
                 $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_NONE);
 
             }
