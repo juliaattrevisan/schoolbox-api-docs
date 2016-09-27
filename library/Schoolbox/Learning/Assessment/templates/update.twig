@@ -12,44 +12,29 @@
 
 <div class="row">
     <div class="small-12 columns island">
-        <form action="{{ routeLookup('learningAssessment.postUpdateAssessment') }}" id="assessmentForm" method="post">
+        <form action="{{ routeLookup('learningAssessment.postUpdateAssessment', {assessmentId: assessment.id}) }}" id="assessmentForm" method="post">
             <section>
                 <fieldset class="content">
-                    {% include '@learningAssessment/fragments/common.twig' %}
-                </fieldset>
-                <fieldset class="content">
-                    <legend>Dates</legend>
+                    <div class="small-12 columns">
+                        {% include '@learningAssessment/fragments/common.twig' %}
+                        {% include '@learningAssessment/fragments/dates.twig' %}
+                        {% include '@learningAssessment/fragments/curriculumCodes.twig' %}
 
-                    {% include '@learningAssessment/fragments/dates.twig' %}
-                </fieldset>
-                <fieldset class="content">
-                    {% include '@learningAssessment/fragments/curriculumCodes.twig' %}
-                </fieldset>
-
-                <fieldset class="content">
-                    <legend>Assessments</legend>
-                    {% if assessmentType == 'project' %}
-                        <input type="hidden" name="assessmentType" value="project" />
-                        <div class="small-12 columns">
+                        {% if assessmentType == 'project' %}
+                            <input type="hidden" name="assessmentType" value="project" />
                             {% include '@learningAssessment/fragments/project/assessmentList.twig' %}
                             {% include '@learningAssessment/fragments/project/create.twig' %}
-                        </div>
-                    {% elseif assessmentType == 'dueWork' %}
-                        <input type="hidden" name="assessmentType" value="dueWork" />
-                        <div class="small-12 columns">
+                        {% elseif assessmentType == 'dueWork' %}
+                            <input type="hidden" name="assessmentType" value="dueWork" />
                             {% include '@learningAssessment/fragments/duework/create.twig' %}
-                        </div>
-                    {% elseif assessmentType == 'task' %}
-                        <input type="hidden" name="assessmentType" value="task" />
-                        <div class="small-12 columns">
+                        {% elseif assessmentType == 'task' %}
+                            <input type="hidden" name="assessmentType" value="task" />
                             {% include '@learningAssessment/fragments/task/create.twig' %}
-                        </div>
-                    {% elseif assessmentType == 'quiz' %}
-                        <input type="hidden" name="assessmentType" value="quiz" />
-                        <div class="small-12 columns">
+                        {% elseif assessmentType == 'quiz' %}
+                            <input type="hidden" name="assessmentType" value="quiz" />
                             {% include '@learningAssessment/fragments/quiz/create.twig' %}
-                        </div>
-                    {% endif %}
+                        {% endif %}
+                    </div>
 
                     {{ mage.submitRow('Save', '', '', '') }}
                 </fieldset>

@@ -337,13 +337,29 @@ class Controller extends Base
         $assessmentType = 'project';
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/update.twig', [
-//            'assessment' => $project,
+            'assessment' => $assessment,
 //            'assessmentType' => $assessmentType,
 //            'folder' => $folder,
 //            'allMarkTypes' => $this->getAllMarkTypes(),
 //            'allReturnUrls' => $this->getAllReturnUrls($assessmentId),
 //            'curriculumNodes' => $folder->getCurriculumNodes()
         ]));
+    }
+
+    /**
+     * Save the data when creating a specific kind of Assessment
+     *
+     * This happens after the common details are saved and after
+     * you've chosen one of project, due work, task, or quiz
+     *
+     * @param $assessmentId
+     */
+    public function postUpdateAssessment($assessmentId)
+    {
+        /* TODO: Actually save data here
+         * TODO: Save the attributes common among all assessables
+         */
+        new \Alaress_Probe($assessmentId, $this->getRequest()->post, "Redirect to <a href='".$this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessmentId])."'>this url</a>");
     }
 
     /**
@@ -560,24 +576,7 @@ class Controller extends Base
 
 
 //
-//    /**
-//     * Save the data when creating a specific kind of Assessment
-//     *
-//     * This happens after the common details are saved and after
-//     * you've chosen one of project, due work, task, or quiz
-//     *
-//     * @param $assessmentId
-//     */
-//    public function postUpdateAssessment($assessmentId)
-//    {
-//        /* TODO: Actually save data here
-//         */
-//
-//        /* TODO: Save the attributes common among all assessables
-//         */
-//
-//        new \Alaress_Probe($assessmentId, $this->getRequest()->post);
-//    }
+
 //
 
 
