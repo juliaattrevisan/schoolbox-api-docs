@@ -257,7 +257,8 @@ class Translator
                 ->setCreator($dataModel->getUser())
             ;
 
-            // TODO figure out how quiz sub-items (sections, questions) get stored
+            // TODO implement correct setting of max marks
+            $assessable->setMaxMark(1);
 
         } elseif ($dataModel instanceof DueWorkModel) {
             // Due work-specific fields
