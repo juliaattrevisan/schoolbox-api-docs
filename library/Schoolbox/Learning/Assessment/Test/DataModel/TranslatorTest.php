@@ -636,4 +636,119 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($acceptsOnline && !$acceptsMultiple, $dueWork->isAcceptSingle());
         $this->assertEquals($acceptsMultiple, $dueWork->isAcceptMulti());
     }
+
+    /**
+     * Test translation of project
+     */
+    public function testTranslateProjectToDomainModel()
+    {
+        $projectModel = (new ProjectModel())
+            ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
+            ->setAssessmentModel((new AssessmentModel())->setId(4));
+        $projectModel->getAssessments()
+            ->add((new TaskModel())
+                ->setOwner($this->teacher1)
+                ->setAssessmentModel((new AssessmentModel())->setId(1))
+            )
+            ->add((new QuizModel())
+                ->setUser($this->teacher2)
+                ->setAssessmentModel((new AssessmentModel())->setId(2))
+            )
+            ->add((new DueWorkModel())
+                ->setOwner($this->teacher2)
+                ->setAssessmentModel((new AssessmentModel())->setId(3))
+            );
+
+        /** @var Project $project */
+        $project = $this->translator->translateToDomainModel($projectModel);
+
+        // Test project-specific fields
+        $this->assertInstanceOf(Project::class, $project);
+        $this->assertInstanceOf(Average::class, $project->getSummator());
+        $this->assertEquals(4, $project->getId());
+
+        // Test sub-assessables
+        $this->assertCount(3, $project->getAssessables());
+
+        $this->assertInstanceOf(Task::class, $project->getAssessables()[0]);
+        $this->assertEquals(1, $project->getAssessables()[0]->getId());
+
+        $this->assertInstanceOf(Quiz::class, $project->getAssessables()[1]);
+        $this->assertEquals(2, $project->getAssessables()[1]->getId());
+
+        $this->assertInstanceOf(DueWork::class, $project->getAssessables()[2]);
+        $this->assertEquals(3, $project->getAssessables()[2]->getId());
+    }
+
+    /**
+     * Test translation of projects which contain projects.
+     *
+     * @expectedException \UnexpectedValueException
+     */
+    public function testTranslateProjectWithinProjectToDomainModel()
+    {
+        $projectModel = (new ProjectModel())
+            ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
+            ->setAssessmentModel((new AssessmentModel())->setId(4));
+        $projectModel->getAssessments()
+            ->add((new ProjectModel())
+                ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
+                ->setAssessmentModel((new AssessmentModel())->setId(1))
+            );
+
+        $this->translator->translateToDomainModel($projectModel);
+    }
+
+    /**
+     * Data provider for different due work response acceptance settings.
+     */
+    public function getTestTranslateProjectSummatorToDomainModelData()
+    {
+        return [
+            [
+                (new ProjectModel())
+                    ->setSummator(ProjectModel::SUMMATOR_WEIGHTED_AVERAGE)
+                    ->setAssessmentModel((new AssessmentModel())->setId(1)),
+                WeightedAverage::class,
+            ],
+            [
+                (new ProjectModel())
+                    ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
+                    ->setAssessmentModel((new AssessmentModel())->setId(1)),
+                Average::class,
+            ],
+            [
+                (new ProjectModel())
+                    ->setSummator(ProjectModel::SUMMATOR_MINIMUM)
+                    ->setAssessmentModel((new AssessmentModel())->setId(1)),
+                Minimum::class,
+            ],
+            [
+                (new ProjectModel())
+                    ->setSummator(ProjectModel::SUMMATOR_MAXIMUM)
+                    ->setAssessmentModel((new AssessmentModel())->setId(1)),
+                Maximum::class,
+            ],
+        ];
+    }
+
+    /**
+     * Test translation of acceptance response settings.
+     *
+     * @dataProvider getTestTranslateProjectSummatorToDomainModelData
+     *
+     * @param ProjectModel $dataModel
+     * @param string       $summatorClass
+     */
+    public function testTranslateProjectSummatorToDomainModel(ProjectModel $dataModel, $summatorClass)
+    {
+        /** @var Project $project */
+        $project = $this->translator->translateToDomainModel($dataModel);
+
+        // Test type
+        $this->assertInstanceOf(Project::class, $project);
+
+        // Test summator
+        $this->assertInstanceOf($summatorClass, $project->getSummator());
+    }
 }
