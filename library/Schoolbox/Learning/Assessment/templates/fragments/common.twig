@@ -9,22 +9,20 @@
     });
 </script>
 
-<div class="small-12 columns">
-    <label>Title
-        <input type="text" name="title" value="{{ assessment.title }}" required />
-    </label>
-</div>
-<div class="small-12 columns">
-    <label>Description
-        <textarea name="description">{{ assessment.description }}</textarea>
-    </label>
-</div>
-<div class="small-12 columns">
-    <label>Weight
-        <input type="number" name="weight" value="{{ assessment.weight }}">
-    </label>
-</div>
-<div class="small-12 columns">
-    {% import 'sub/visibility.twig' as visibility %}
-    {{ visibility.dropdown(assessment.visibility) }}
-</div>
+<label>
+    Title
+    <input type="text" name="title" value="{{ assessment.title }}" required />
+</label>
+
+<label>
+    Description
+    <textarea name="description">{{ assessment.description }}</textarea>
+</label>
+
+<label>
+    Weight
+    <input type="number" name="weight" value="{{ assessment.weight }}">
+</label>
+
+{% import 'sub/visibility.twig' as visibility %}
+{{ visibility.dropdown(assessment.visibility) }}
