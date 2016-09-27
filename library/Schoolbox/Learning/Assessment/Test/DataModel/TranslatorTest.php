@@ -107,7 +107,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('2016-10-16 12:00:00', $assessmentModel->getDeletedAt()->getDatabase());
         $this->assertEquals('Mr Test Task сказать', $assessmentModel->getTitle());
         $this->assertEquals('Blaargh ничего', $assessmentModel->getDescription());
-        $this->assertEquals(1000, $assessmentModel->getWeight());
+        // Tasks are always weightless, regardless of what the assessment says
+        $this->assertEquals(0, $assessmentModel->getWeight());
     }
 
     /**
@@ -420,7 +421,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(401, $assessment->getId());
         $this->assertEquals('Some assessment\'s title', $assessment->getTitle());
         $this->assertEquals('Blargh', $assessment->getDescription());
-        $this->assertEquals(51, $assessment->getWeight());
+        // Tasks are always weightless, regardless of what the assessment says
+        $this->assertEquals(0, $assessment->getWeight());
         $this->assertEquals('2016-10-10 12:00:00', $assessment->getPublishAt()->getDatabase());
         $this->assertEquals('2016-10-11 12:00:00', $assessment->getOpenAt()->getDatabase());
         $this->assertEquals('2016-10-12 12:00:00', $assessment->getDueAt()->getDatabase());
