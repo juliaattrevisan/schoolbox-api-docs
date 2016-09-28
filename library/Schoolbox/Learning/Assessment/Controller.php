@@ -239,16 +239,16 @@ class Controller extends Base
         $assessment = new Project(new SummatorAverage());
         $assessment
             ->setId($assessmentId)
-            ->setTitle('Find Diablo')
-            ->setDescription('The things you need to do in order to slay the prime evil')
+            ->setTitle('Test Project')
+            ->setDescription('This is an <b>example project</b>.')
             ->setCreator($_SESSION['user'])
             ->setAllParticipants(new Collection())
             ->setWeight(100)
             ->setAssessables((new Collection())
                 ->add((new DueWork())
-                    ->setId(2)
-                    ->setTitle('Enter the Realm of Terroarrrr')
-                    ->setDescription('Diablo was found in the land of terroarrrrr! Find him, and whack him!')
+                    ->setId(44)
+                    ->setTitle('Write an essay')
+                    ->setDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.')
                     ->setType((new DueWorkType())
                         ->setId(1)
                         ->setName('Essay'))
@@ -260,12 +260,12 @@ class Controller extends Base
                     ->setCreatedAt(Alaress_Date_Format::now())
                     ->setUpdatedAt(Alaress_Date_Format::now()))
                 ->add((new DueWork())
-                    ->setId(2)
-                    ->setTitle('Enter the Realm of Terroarrrr')
-                    ->setDescription('Diablo was found in the land of terroarrrrr! Find him, and whack him!')
+                    ->setId(55)
+                    ->setTitle('Do this homework')
+                    ->setDescription('Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.')
                     ->setType((new DueWorkType())
-                        ->setId(1)
-                        ->setName('Essay'))
+                        ->setId(2)
+                        ->setName('Homework Assignment'))
                     ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
                     ->setPublishAt(Alaress_Date_Format::now())
                     ->setOpenAt(Alaress_Date_Format::now())
@@ -301,7 +301,7 @@ class Controller extends Base
             /* Special treatment for projects for now
              */
             if ($assessmentType == Types::ASSESSMENT_PROJECT) {
-                $data['types']         = new Types();
+                $data['types']         = $types;
                 $data['allReturnUrls'] = $this->getAllReturnUrls($assessmentId);
                 $data['allSummators']  = new SummatorCollection();
             }
@@ -344,16 +344,16 @@ class Controller extends Base
         $project = new Project(new SummatorAverage());
         $project
             ->setId($assessmentId)
-            ->setTitle('Find Diablo')
-            ->setDescription('The things you need to do in order to slay the prime evil')
+            ->setTitle('Test Project')
+            ->setDescription('This is an <b>example project</b>.')
             ->setCreator($_SESSION['user'])
             ->setAllParticipants(new Collection())
             ->setWeight(100)
             ->setAssessables((new Collection())
                 ->add((new DueWork())
-                    ->setId(2)
-                    ->setTitle('Enter the Realm of Terroarrrr')
-                    ->setDescription('Diablo was found in the land of terroarrrrr! Find him, and whack him!')
+                    ->setId(44)
+                    ->setTitle('Write an essay')
+                    ->setDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.')
                     ->setType((new DueWorkType())
                         ->setId(1)
                         ->setName('Essay'))
@@ -365,12 +365,12 @@ class Controller extends Base
                     ->setCreatedAt(Alaress_Date_Format::now())
                     ->setUpdatedAt(Alaress_Date_Format::now()))
                 ->add((new DueWork())
-                    ->setId(2)
-                    ->setTitle('Enter the Realm of Terroarrrr')
-                    ->setDescription('Diablo was found in the land of terroarrrrr! Find him, and whack him!')
+                    ->setId(55)
+                    ->setTitle('Do this homework')
+                    ->setDescription('Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.')
                     ->setType((new DueWorkType())
-                        ->setId(1)
-                        ->setName('Essay'))
+                        ->setId(2)
+                        ->setName('Homework Assignment'))
                     ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
                     ->setPublishAt(Alaress_Date_Format::now())
                     ->setOpenAt(Alaress_Date_Format::now())
