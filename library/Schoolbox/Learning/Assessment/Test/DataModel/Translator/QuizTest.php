@@ -15,7 +15,6 @@ use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
-use Schoolbox\Learning\Assessment\DataModel\Translator;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
@@ -27,6 +26,7 @@ use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Test\DataModel\TestTrait;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
@@ -39,45 +39,7 @@ use Schoolbox\User;
  */
 class QuizTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var User
-     */
-    protected $teacher1;
-
-    /**
-     * @var User
-     */
-    protected $teacher2;
-
-    /**
-     * Set up
-     */
-    protected function setUp()
-    {
-        $this->translator = new Translator();
-
-        // Test users
-        $this->teacher1 = (new User())
-            ->setId(3)
-            ->setExternalId(8)
-            ->setTitle('Ms')
-            ->setFirstname('Celia')
-            ->setLastname('Glenn')
-        ;
-
-        $this->teacher2 = (new User())
-            ->setId(151)
-            ->setExternalId(165)
-            ->setTitle('Mr')
-            ->setFirstname('Zane')
-            ->setLastname('Smith')
-        ;
-    }
+    use TestTrait;
 
     /**
      * Test translation of generic assessment fields
@@ -841,16 +803,5 @@ class QuizTest extends \PHPUnit_Framework_TestCase
 
         // Test summator
         $this->assertInstanceOf($summatorClass, $project->getSummator());
-    }
-
-    /**
-     * Helper function for creating a mark type given a mark type ID.
-     *
-     * @param int $markTypeId
-     * @return DueWorkModel\MarkType
-     */
-    protected function buildMarkType($markTypeId = DueWorkModel\MarkType::TYPE_NONE)
-    {
-        return (new DueWorkModel\MarkType())->setId($markTypeId);
     }
 }

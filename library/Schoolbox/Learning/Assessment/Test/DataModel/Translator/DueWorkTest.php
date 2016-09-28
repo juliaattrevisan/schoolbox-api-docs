@@ -12,61 +12,22 @@ use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType as WorkTypeModel;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
-use Schoolbox\Learning\Assessment\DataModel\Translator;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
+use Schoolbox\Learning\Assessment\Test\DataModel\TestTrait;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
 use Schoolbox\Resource\Storage\Model as StorageModel;
-use Schoolbox\User;
 
 /**
  * Tests for the assessment data model translator (due work only).
  */
 class DueWorkTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var User
-     */
-    protected $teacher1;
-
-    /**
-     * @var User
-     */
-    protected $teacher2;
-
-    /**
-     * Set up
-     */
-    protected function setUp()
-    {
-        $this->translator = new Translator();
-
-        // Test users
-        $this->teacher1 = (new User())
-            ->setId(3)
-            ->setExternalId(8)
-            ->setTitle('Ms')
-            ->setFirstname('Celia')
-            ->setLastname('Glenn')
-        ;
-
-        $this->teacher2 = (new User())
-            ->setId(151)
-            ->setExternalId(165)
-            ->setTitle('Mr')
-            ->setFirstname('Zane')
-            ->setLastname('Smith')
-        ;
-    }
+    use TestTrait;
 
     /**
      * Test translation to due work
@@ -373,16 +334,5 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEquals($acceptsOnline, $dueWork->isAcceptNone());
         $this->assertEquals($acceptsOnline && !$acceptsMultiple, $dueWork->isAcceptSingle());
         $this->assertEquals($acceptsMultiple, $dueWork->isAcceptMulti());
-    }
-
-    /**
-     * Helper function for creating a mark type given a mark type ID.
-     *
-     * @param int $markTypeId
-     * @return DueWorkModel\MarkType
-     */
-    protected function buildMarkType($markTypeId = DueWorkModel\MarkType::TYPE_NONE)
-    {
-        return (new DueWorkModel\MarkType())->setId($markTypeId);
     }
 }

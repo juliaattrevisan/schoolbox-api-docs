@@ -10,8 +10,8 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel\Translator;
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
-use Schoolbox\Learning\Assessment\DataModel\Translator;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Test\DataModel\TestTrait;
 use Schoolbox\User;
 
 /**
@@ -19,45 +19,7 @@ use Schoolbox\User;
  */
 class TaskTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Translator
-     */
-    protected $translator;
-
-    /**
-     * @var User
-     */
-    protected $teacher1;
-
-    /**
-     * @var User
-     */
-    protected $teacher2;
-
-    /**
-     * Set up
-     */
-    protected function setUp()
-    {
-        $this->translator = new Translator();
-
-        // Test users
-        $this->teacher1 = (new User())
-            ->setId(3)
-            ->setExternalId(8)
-            ->setTitle('Ms')
-            ->setFirstname('Celia')
-            ->setLastname('Glenn')
-        ;
-
-        $this->teacher2 = (new User())
-            ->setId(151)
-            ->setExternalId(165)
-            ->setTitle('Mr')
-            ->setFirstname('Zane')
-            ->setLastname('Smith')
-        ;
-    }
+    use TestTrait;
 
     /**
      * Test translating a task
