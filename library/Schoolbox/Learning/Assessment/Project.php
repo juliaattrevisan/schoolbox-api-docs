@@ -236,4 +236,19 @@ class Project extends AbstractAssessment
     {
         return null;
     }
+
+    /**
+     * @param Project $project
+     * @throws \InvalidArgumentException
+     * @return static
+     */
+    public function setProject(Project $project = null)
+    {
+        if($project instanceof Project){
+            throw new \InvalidArgumentException('For now, a Project cannot reside inside another Project');
+        }
+        parent::setProject($project);
+        return $this;
+
+    }
 }

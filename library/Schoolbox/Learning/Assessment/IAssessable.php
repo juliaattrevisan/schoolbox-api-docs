@@ -377,6 +377,17 @@ interface IAssessable extends ISoftDeletable
     public function setFeedbacks(Collection $feedbacks);
 
     /**
+     * @param Project|null $project
+     * @return static
+     */
+    public function setProject(Project $project = null);
+
+    /**
+     * @return Project|null
+     */
+    public function getProject();
+
+    /**
      * Created date
      *
      * @return \Alaress_Date_Format

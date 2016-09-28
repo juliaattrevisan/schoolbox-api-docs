@@ -117,6 +117,13 @@ abstract class AbstractAssessment implements IAssessable
     private $feedbacks;
 
     /**
+     * Will be null for Assessments placed directly onto Group or Class Folders.
+     *
+     * @var Project|null
+     */
+    private $project;
+
+    /**
      * Assessable constructor.
      */
     public function __construct()
@@ -659,6 +666,24 @@ abstract class AbstractAssessment implements IAssessable
     {
         $this->feedbacks = $feedbacks;
         return $this;
+    }
+
+    /**
+     * @param Project|null $project
+     * @return static
+     */
+    public function setProject(Project $project = null)
+    {
+        $this->project = $project;
+        return $this;
+    }
+
+    /**
+     * @return Project|null
+     */
+    public function getProject()
+    {
+        return $this->project;
     }
 
     /**
