@@ -151,7 +151,7 @@ class Model implements ISoftDeletable
      */
     public function hasTask()
     {
-        return ($this->getTask() instanceof Task && $this->getTask()->getId());
+        return ($this->getTask() instanceof Task);
     }
 
     /**
@@ -161,7 +161,7 @@ class Model implements ISoftDeletable
      */
     public function hasQuiz()
     {
-        return ($this->getQuiz() instanceof Quiz && $this->getQuiz()->getId());
+        return ($this->getQuiz() instanceof Quiz);
     }
 
     /**
@@ -171,7 +171,7 @@ class Model implements ISoftDeletable
      */
     public function hasDueWork()
     {
-        return ($this->getDueWork() instanceof DueWork && $this->getDueWork()->getId());
+        return ($this->getDueWork() instanceof DueWork);
     }
 
     /**
@@ -181,7 +181,7 @@ class Model implements ISoftDeletable
      */
     public function hasProject()
     {
-        return ($this->getProject() instanceof Project && $this->getProject()->getId());
+        return ($this->getProject() instanceof Project);
     }
 
     /**
