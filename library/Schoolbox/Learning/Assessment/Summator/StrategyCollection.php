@@ -18,7 +18,7 @@ use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
 use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
 use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
 
-class Collection extends \Schoolbox\Collection
+class StrategyCollection extends \Schoolbox\Collection
 {
     const WEIGHTED_AVERAGE = 0;
     const AVERAGE = 1;

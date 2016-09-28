@@ -18,10 +18,8 @@
 namespace Schoolbox\Learning\Assessment\Summator;
 
 use \Schoolbox\Collection;
-use Schoolbox\Learning\Assessment\IAssessable;
+use \Schoolbox\Learning\Assessment\IAssessable;
 use \Schoolbox\User;
-
-use \Schoolbox\Learning\Assessment\Task\Model as Task;
 
 class WeightedAverage extends AbstractSummator
 {

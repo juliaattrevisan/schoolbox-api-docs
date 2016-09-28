@@ -25,7 +25,7 @@ use \Schoolbox\Resource\Storage\Model as Storage;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\Assessment\Project as Project;
 
-use \Schoolbox\Learning\Assessment\Summator\Collection as SummatorCollection;
+use \Schoolbox\Learning\Assessment\Summator\StrategyCollection as SummatorStrategyCollection;
 use \Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedAverage;
 use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
 use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
@@ -141,7 +141,7 @@ class Controller extends Base
             /* Special treatment for projects for now
              */
             if ($this->getRequest()->post['assessmentType'] == Types::ASSESSMENT_PROJECT) {
-                $data['allSummators'] = new SummatorCollection();
+                $data['allSummators'] = new SummatorStrategyCollection();
             }
 
             $this->getResponse()->content->set($this->buildUnthemedHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($this->getRequest()->post['assessmentType'])}/create.twig", $data));
@@ -303,7 +303,7 @@ class Controller extends Base
             if ($assessmentType == Types::ASSESSMENT_PROJECT) {
                 $data['types']         = $types;
                 $data['allReturnUrls'] = $this->getAllReturnUrls($assessmentId);
-                $data['allSummators']  = new SummatorCollection();
+                $data['allSummators']  = new SummatorStrategyCollection();
             }
 
             $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($assessmentType)}/update.twig", $data));

@@ -33,7 +33,7 @@ class Factory
      */
     public function produce()
     {
-        $summatorCollection = new Collection();
+        $summatorCollection = new StrategyCollection();
 
         $strategy = $summatorCollection->getOffset($this->getSummator());
 
