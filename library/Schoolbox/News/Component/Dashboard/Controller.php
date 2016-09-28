@@ -77,7 +77,14 @@ class Controller extends Component_Dashboard_ControllerAbstract
             foreach ($this->headlineList as $itemCurrent) {
                 $item = [];
                 $item['id'] = $itemCurrent['item_id'];
-                $item['blurb'] = empty($itemCurrent['item_blurb']) ? '<p>' . TextFormatter::cutSentence(Scrub::html2text($itemCurrent['item_body']), 300) . '</p>' : Scrub::html($itemCurrent['item_blurb']);
+
+                // We only want to show a read-more link if the body of the news article is not blank (but we need to trim all the junk
+                // HTML (eg. "<p>&nbsp;</p>"... "<ul></ul>") that CKeditor tends to leave behind when someone clears out the editor in the
+                // WYSIWYG view)
+
+                $item['showLink'] = !empty(trim(strip_tags(Scrub::html2text($itemCurrent['item_body']))));
+                $item['blurb'] = empty(trim(strip_tags(Scrub::html2text($itemCurrent['item_blurb'])))) ? '<p>' . TextFormatter::cutSentence(Scrub::html2text($itemCurrent['item_body']), 300) . '</p>' : Scrub::html($itemCurrent['item_blurb']);
+
                 $item['date'] = new \Alaress_Date_Format($itemCurrent['item_datetime_posted'], \Alaress_Date_Format::DATABASE_FORMAT);
                 $item['uid'] = $itemCurrent['uid'];
                 $item['image'] = $itemCurrent['item_image'];
