@@ -130,8 +130,14 @@ class MapperProxy
             $this->translator->translateToDataModel($assessable, $sequence)
         );
         $this->baseMapper->save($dataModel);
-        // Set ID on the domain model object
-        $assessable->setId($dataModel->getId());
+
+        // Set fields on the domain model object
+        $assessable
+            ->setId($dataModel->getId())
+            ->setCreatedAt($dataModel->getCreatedAt())
+            ->setUpdatedAt($dataModel->getUpdatedAt())
+            ->setDeletedAt($dataModel->getDeletedAt())
+        ;
 
         // Save sub-objects
         // TODO map assessement ID to all sub-objects
