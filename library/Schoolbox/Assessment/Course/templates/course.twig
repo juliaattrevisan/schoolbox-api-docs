@@ -175,18 +175,17 @@
 
             var modal = $('#parent-select');
 
-            modal.foundation('reveal', 'open', '{{ routeLookup('course.parentList') }}').one('click', '[data-selection]', function (e) {
+            modal.foundation('reveal', 'open', '{{ routeLookup('course.parentList') }}/' + $("#parent").val()).one('click', '[data-selection]', function (e) {
                 e.preventDefault();
 
                 var $selection = $(this);
 
                 // selector takes the name, input takes the ID
-                $selector.addClass('icon-folder').text($selection.text());
+                $selector.addClass('icon-folder').text($selection.data('label'));
                 $input.val($selection.data('selection'));
 
                 modal.foundation('reveal', 'close');
             });
-
             $(document).on('opened.fndtn.reveal', '[data-reveal]', function () {
                 $.magnificPopup.close();
             });

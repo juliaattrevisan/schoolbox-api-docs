@@ -42,7 +42,7 @@ class Module extends BaseModule
                 '/new'                                 => 'newCourse',
                 '/new/{name}'                          => 'newCourseFromSearch',
                 '/modify/{id}'                         => 'modifyCourse',
-                '/parent'                              => 'parentList',
+                '/parent{/folderId}'                   => 'parentList',
 
                 /* Course Management for a particular Homepage
                  */
