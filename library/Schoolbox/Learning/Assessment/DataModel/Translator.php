@@ -19,12 +19,10 @@ use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
@@ -60,6 +58,7 @@ class Translator
         // TODO inject all of this
         $this->markSchemeFactory = new MarkSchemeFactory();
         $this->subTranslators[]  = new Translator\Task();
+        $this->subTranslators[]  = new Translator\Quiz();
     }
 
     /**
@@ -194,26 +193,6 @@ class Translator
             // TODO set model's grade group, mark type, max mark based on mark scheme
             return $model;
 
-        } elseif ($assessment instanceof Quiz) {
-            // convert to quiz's model
-            $model = new QuizModel();
-            $model
-                ->setAssessmentModel($assessmentModel)
-                ->setAvailability(QuizModel::AVAILABILITY_ASSESS)
-                ->setTitle($assessment->getTitle())
-                ->setDescription($assessment->getDescription())
-                ->setStart($assessment->getOpenAt())
-                ->setFinish($assessment->getDueAt())
-                ->setWeight($assessment->getWeight())
-                ->setAnonymousResult(false)
-                ->setUser($assessment->getCreator())
-                ->setCompletionMessage($assessment->getCompletionMessage())
-                ->setDuration($assessment->getDuration())
-                ->setMaxAttempts($assessment->getMaxAttempts())
-            ;
-            // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
-            return $model;
-
         }
         throw new UnexpectedValueException('$assessment is not a recognised assessment type');
     }
@@ -266,19 +245,6 @@ class Translator
                     (new DueWorkModel\MarkType())
                         ->setId($dataModel->getMarkType()->getId())
                 );
-
-            } elseif ($dataModel instanceof QuizModel) {
-                // Quiz-specific fields
-                $assessable = (new Quiz())
-                    ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_TOTAL))
-                    ->setMaxAttempts($dataModel->getMaxAttempts())
-                    ->setDuration($dataModel->getDuration())
-                    ->setCompletionMessage($dataModel->getCompletionMessage())
-                    ->setCreator($dataModel->getUser())
-                ;
-
-                // TODO implement correct setting of max marks
-                $assessable->setMaxMark(1);
 
             } elseif ($dataModel instanceof DueWorkModel) {
                 // Due work-specific fields
