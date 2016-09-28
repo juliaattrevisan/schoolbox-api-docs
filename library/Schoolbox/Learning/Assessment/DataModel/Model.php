@@ -9,7 +9,11 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Alaress_Date_Format;
 use Alaress_Date_NullDate;
+use Schoolbox\Assessment\Component\OnlineAssessment as Quiz;
+use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
+use Schoolbox\Assessment\Course\Task;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -85,6 +89,46 @@ class Model implements ISoftDeletable
      * @var int
      */
     protected $sequence = 0;
+
+    /**
+     * The task which may or may not be associated with this assessment.
+     *
+     * Only one of task, due work, quiz or project may be associated with a
+     * single assessment.
+     *
+     * @var Task
+     */
+    protected $task;
+
+    /**
+     * The due work which may or may not be associated with this assessment.
+     *
+     * Only one of task, due work, quiz or project may be associated with a
+     * single assessment.
+     *
+     * @var DueWork
+     */
+    protected $dueWork;
+
+    /**
+     * The quiz which may or may not be associated with this assessment.
+     *
+     * Only one of task, due work, quiz or project may be associated with a
+     * single assessment.
+     *
+     * @var Quiz
+     */
+    protected $quiz;
+
+    /**
+     * The project which may or may not be associated with this assessment.
+     *
+     * Only one of task, due work, quiz or project may be associated with a
+     * single assessment.
+     *
+     * @var Project
+     */
+    protected $project;
 
     /**
      * Constructor
@@ -241,6 +285,78 @@ class Model implements ISoftDeletable
     public function setSequence($sequence)
     {
         $this->sequence = $sequence;
+        return $this;
+    }
+
+    /**
+     * @return Task
+     */
+    public function getTask()
+    {
+        return $this->task;
+    }
+
+    /**
+     * @param Task $task
+     * @return static
+     */
+    public function setTask(Task $task = null)
+    {
+        $this->task = $task;
+        return $this;
+    }
+
+    /**
+     * @return DueWork
+     */
+    public function getDueWork()
+    {
+        return $this->dueWork;
+    }
+
+    /**
+     * @param DueWork $dueWork
+     * @return static
+     */
+    public function setDueWork(DueWork $dueWork = null)
+    {
+        $this->dueWork = $dueWork;
+        return $this;
+    }
+
+    /**
+     * @return Quiz
+     */
+    public function getQuiz()
+    {
+        return $this->quiz;
+    }
+
+    /**
+     * @param Quiz $quiz
+     * @return static
+     */
+    public function setQuiz(Quiz $quiz = null)
+    {
+        $this->quiz = $quiz;
+        return $this;
+    }
+
+    /**
+     * @return Project
+     */
+    public function getProject()
+    {
+        return $this->project;
+    }
+
+    /**
+     * @param Project $project
+     * @return static
+     */
+    public function setProject(Project $project = null)
+    {
+        $this->project = $project;
         return $this;
     }
 }
