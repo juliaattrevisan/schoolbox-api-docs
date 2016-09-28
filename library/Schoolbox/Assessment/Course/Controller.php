@@ -26,6 +26,7 @@ use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
 use Schoolbox\Assessment\Course\Import\Import as CourseImport;
 use Schoolbox\Assessment\Course\DeprecatedModel as CourseModel;
+use Schoolbox\Assessment\Course\Unit\DeprecatedMapper as CourseUnitMapper;
 use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
 use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
 use Schoolbox\Collection;
@@ -1069,7 +1070,7 @@ class Controller extends Base\Base
     public function parentList($folderId)
     {
         if (empty($folderId)) {
-            $folderId = $this->getCourseMapper()->getFacultyNode()->getId();
+            $folderId = $this->getCourseSpecificationMapper()->getFacultyRootFolder()->getId();
         }
 
         $treeBuilder = new TreeBuilder(
@@ -1079,7 +1080,7 @@ class Controller extends Base\Base
             'Courses'
         );
 
-        $treeData = $treeBuilder->buildPartialTree($folderId, $this->getCourseMapper()->getFacultyNode()->getId());
+        $treeData = $treeBuilder->buildPartialTree($folderId, $this->getCourseSpecificationMapper()->getFacultyRootFolder()->getId());
 
         $data = [
             'treedata' => json_encode($treeData),
