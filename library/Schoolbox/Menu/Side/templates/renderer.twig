@@ -1,0 +1,107 @@
+<div id="nav">
+    <ul class="off-canvas-list">
+        <div class="nav-wrapper">
+            <div id="nav">
+                <ul class="off-canvas-list">
+
+                    {% for section in sections %}
+
+                        {% if section.section == 'menu' %}
+
+                            <li><h3>{{ section.title }}</h3></li>
+                            <div class="nav-wrapper">
+                                <ul class="off-canvas-list">
+                                    {% for node in nodes if node.parentId == 0 %}
+                                        {% set submenu = false %}
+                                        <li
+                                                {% for subnode in nodes if subnode.parentId == node.id %}
+                                                    {% if submenu == false %}
+                                                        {% set submenu = true %}
+                                                        class="has-submenu"
+                                                    {% endif %}
+                                                {% endfor %}
+                                        >
+                                            <a href="{{ node.url }}">
+                                                <span>{{ node.title }}</span>
+                                            </a>
+                                            {% include "@menuSide/includes/treeLevel.twig" with {'parent': node} %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                        {% elseif section.section == 'children' %}
+
+                            {% if children | length > 0 %}
+                                <li><h3>{{ section.title }}</h3></li>
+                                <div class="nav-wrapper">
+                                    <ul class="off-canvas-list">
+                                        {% for child in children %}
+                                            <li><a href="/search/user/{{ child.id }}">{{ child.name }} ({{ child.year }})</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+
+                        {% elseif section.section == 'groups' %}
+
+                            {% if groups | length > 0 %}
+                                <li><h3>{{ section.title }}</h3></li>
+                                <div class="nav-wrapper">
+                                    <ul class="off-canvas-list">
+                                        {% for group in groups %}
+                                            <li>
+                                                <a href="/homepage/{{ group.id }}/">{{ group.name }}</a>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+
+                        {% elseif section.section == 'bookmarks' %}
+
+                            {% if showBookmarks %}
+                                <li><h3>{{ section.title }}</h3></li>
+                                <div class="nav-wrapper my-links">
+                                    <ul class="off-canvas-list">
+                                        {% if bookmarks | length > 0 %}
+                                            {% for link in bookmarks %}
+                                                <li>
+                                                    <a href="{{ link.url }}">{{ link.description }}</a>
+                                                </li>
+                                            {% endfor %}
+                                        {% endif %}
+                                        <li>
+                                            <a href="/cms/myLinks" class="icon-modify">Edit</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            {% endif %}
+
+                        {% elseif section.section == 'subjects' %}
+
+                            {% if subjects | length > 0 %}
+                                <li><h3>{{ section.title }}</h3></li>
+                                <div class="nav-wrapper">
+                                    <ul class="off-canvas-list">
+                                        {% for type,subjectTypes in subjects %}
+                                            <li><h4>{{ type }}</h4></li>
+                                            {% for subject in subjectTypes %}
+                                                <li>
+                                                    <a href="/homepage/code/{{ subject.code }}">{{ subject.name }}</a>
+                                                </li>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+
+                        {% endif %}
+
+                    {% endfor %}
+
+                </ul>
+            </div>
+        </div>
+    </ul>
+</div>

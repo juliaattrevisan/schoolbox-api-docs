@@ -1,0 +1,192 @@
+<script>
+    $(function () {
+        var form = $('form#itemForm');
+
+        $('[data-cancel]').click(function () {
+            window.location.href = '{{ routeLookup('adminMenuTop.getIndex') }}';
+            return false;
+        });
+
+        $('[data-submit]').click(function () {
+            form.alaressValidate({
+                ignore: ':disabled',
+                rules: {
+                    'text': {required: true},
+                    'url': {required: true, isURL: true}
+                },
+                messages: {
+                    'text': {required: 'You must enter a name before you can proceed.'},
+                    'url': {required: 'You must enter a valid URL for this menu item before you can proceed.'}
+                }
+            });
+        });
+
+    });
+</script>
+
+{# Shared navigation menu #}
+{{ renderAdminNavigation(pageCurrent) }}
+
+<form id="itemForm" action="{{ routeLookup('adminMenuTop.postModify') }}" method="post">
+    <input type="hidden" name="id" value="{{ item.id }}">
+    <div class="row">
+        <div class="small-12 island">
+            {% if item.id is empty %}
+                <h1>Insert Menu Item</h1>
+            {% else %}
+                <h1>Edit Menu Item</h1>
+            {% endif %}
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label>
+                            Item Label
+                            <input required type="text" name='text' placeholder="Hover Description" value="{{ item.text }}">
+                        </label>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>
+                            Hover Description
+                            <input name='title' type="text" placeholder="Item Label" value="{{ item.title }}">
+                        </label>
+                    </div>
+                    <div class="small-11 columns">
+                        <label>
+                            Icon
+                            <select id="icon-select" name="icon" data-icon>
+                                {% for icon in icons %}
+                                    <option {% if icon.name == item.icon %}selected{% endif %} value="{{ icon.name }}">{{ icon.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+                    <div class="small-1 columns">
+                        <label>
+                            Preview
+                            <div id="icon" style="margin-top:5px" class="icon-32 icon-{{ item.icon }}"></div>
+                        </label>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>
+                            Destination URL
+                            <input name="url" required type="text" placeholder="Destination URL" value="{{ item.url }}">
+                        </label>
+                    </div>
+                    <div class="small-12 columns">
+                        <label>
+                            Destination Target
+                            <select name="target">
+                                <option {% if item.target == '' %}selected{% endif %} value="">Same Window</option>
+                                <option {% if item.target == '_blank' %}selected{% endif %} value="_blank">New Window
+                                </option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <fieldset class="checklist">
+                            <legend>
+                                Display To These Campuses
+                                <span data-tooltip="" class="hint has-tip tip-top" data-width="200" title="">?</span>
+                            </legend>
+                            <input id="campus-all" type="checkbox">
+                            <label for="campus-all">Select All</label>
+                            {% for campus in campuses %}
+                                <input name="campuses[]" data-campus id="campus-{{ campus.id }}" type="checkbox" {% if campusesSelected[campus.id] %}checked{% endif %} value="{{ campus.id }}">
+                                <label for="campus-{{ campus.id }}">{{ campus.name }}</label>
+                            {% endfor %}
+                        </fieldset>
+                    </div>
+                    <div class="small-12 medium-6 columns">
+                        <fieldset class="checklist">
+                            <legend>
+                                Display To These Groups
+                                <span data-tooltip="" class="hint has-tip tip-top" data-width="200" title="">?</span>
+                            </legend>
+                            <input id="group-all" type="checkbox">
+                            <label for="group-all">Select All</label>
+                            {% for group in groups %}
+                                <input name="groups[]" data-group id="group-{{ group.id }}" type="checkbox" {% if groupsSelected[group.id] %}checked{% endif %} value="{{ group.id }}">
+                                <label for="group-{{ group.id }}">{{ group.name }}</label>
+                            {% endfor %}
+                        </fieldset>
+                    </div>
+                </fieldset>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="small-12 column">
+            <ul class="flex-list buttons">
+                <li><input data-submit type="submit" class="submit expand" value="Save"></li>
+                <li>
+                    <button data-cancel class="button expand icon-cancel">Cancel Changes</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</form>
+<script>
+
+    $(function() {
+
+        {# Icon preview#}
+
+        $('[data-icon]').change(function() {
+            $('#icon').attr('class', 'icon-32 icon-' + $('#icon-select').val())
+        });
+
+        $('#icon').attr('class', 'icon-32 icon-' + $('#icon-select').val())
+
+        {# Check all checkboxes if everything was selected #}
+
+        var allChecked = true;
+
+        {# Groups #}
+
+        $('[data-group]').each(function() {
+            if (!$(this).prop('checked')) {
+                allChecked = false;
+            }
+        });
+
+        if (allChecked) {
+            $('#group-all').prop('checked', true);
+        }
+
+        {# Campuses #}
+
+        $('[data-campus]').each(function() {
+            if (!$(this).prop('checked')) {
+                allChecked = false;
+            }
+        });
+
+        if (allChecked) {
+            $('#campus-all').prop('checked', true);
+        }
+
+        $('[data-campus]').change(function() {
+            $('#campus-all').prop('checked', false);
+        });
+
+        $('#campus-all').change(function() {
+            var status = $(this).prop('checked');
+            $('[data-campus]').each(function() {
+                $(this).prop('checked', status);
+            });
+        });
+
+        $('[data-group]').change(function() {
+            $('#group-all').prop('checked', false);
+        });
+
+        $('#group-all').change(function() {
+            var status = $(this).prop('checked');
+            $('[data-group]').each(function() {
+                $(this).prop('checked', status);
+            });
+        });
+
+    });
+</script>

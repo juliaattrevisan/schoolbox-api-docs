@@ -14,7 +14,7 @@ class TextFormatter {
 	 *
 	 * @return string
 	 */
-	public function greeting() {
+	public static function greeting() {
 		if (date('A') == 'AM') {
 			return 'Good Morning';
 		}

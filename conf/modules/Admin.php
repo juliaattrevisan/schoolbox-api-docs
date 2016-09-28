@@ -10,7 +10,6 @@
 namespace Config\Modules;
 
 use Alaress\Application\Kernel;
-use Schoolbox\Assessment\Term;
 use Schoolbox\Realtime\Admin\Module;
 
 class Admin implements ModuleConfigInterface
@@ -69,6 +68,14 @@ class Admin implements ModuleConfigInterface
         // Admin terms manager page
         $terms = new \Schoolbox\Admin\Terms\Module($di);
         $terms->init('/adminv2/terms');
+
+        // Top menu manager
+        $menuTop = new \Schoolbox\Admin\Menu\Top\Module($di);
+        $menuTop->init('/adminv2/menu-top');
+
+        // Side menu manager
+        $menuSide = new \Schoolbox\Admin\Menu\Side\Module($di);
+        $menuSide->init('/adminv2/menu-side');
 
         // Pastoral care import page
 

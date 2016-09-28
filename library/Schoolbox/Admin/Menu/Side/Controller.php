@@ -1,0 +1,466 @@
+<?php
+/**
+ * @author    Damian Sloane <damian.sloane@alaress.com.au>
+ * @copyright Copyright 2016, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Admin\Menu\Side;
+
+use Alaress\Web\Controller\Base;
+use Schoolbox\Menu\Side\Campus\Mapper as MenuSideCampusMapper;
+use \Schoolbox\Menu\Side\Group\Mapper as MenuSideGroupMapper;
+use \Schoolbox\Menu\Side\Section\Mapper as MenuSideSectionMapper;
+use Schoolbox\Menu\Side\Campus\Model as MenuSideCampus;
+use Schoolbox\Menu\Side\Group\Model as MenuSideGroup;
+use Schoolbox\Menu\Side\Section\Model as MenuSideSection;
+use Schoolbox\Menu\Side\Mapper as MenuSideMapper;
+use Schoolbox\Menu\Side\Model as MenuSide;
+use Schoolbox\CampusMapper;
+use Schoolbox\RoleMapper;
+use Schoolbox\Collection;
+use Schoolbox\Mapper\Exception as MapperException;
+
+/**
+ * Controller for managing school terms through the admin section.
+ *
+ * @package Schoolbox\Admin\Terms
+ */
+class Controller extends Base
+{
+    /**
+     * Controller constructor.
+     */
+    public function __construct()
+    {
+        $this->setMenuSideMapper(MenuSideMapper::getInstance());
+        $this->setRoleMapper(RoleMapper::getInstance());
+        $this->setCampusMapper(CampusMapper::getInstance());
+        $this->setMenuSideCampusMapper(MenuSideCampusMapper::getInstance());
+        $this->setMenuSideGroupMapper(MenuSideGroupMapper::getInstance());
+        $this->setMenuSideSectionMapper(MenuSideSectionMapper::getInstance());
+    }
+
+    /**
+     * Display tree
+     */
+    public function getIndex()
+    {
+        // Grab all the menu items
+
+        $collection = $this->getMenuSideMapper()->findAll()->sortBy('sortOrder', 'asc');
+
+        // Polulate kids where appropriate
+
+        $treeList = new Collection();
+
+        /** @var MenuSide $node */
+        foreach ($collection as $node) {
+            $nodeId   = $node->getId();
+            $parentId = $node->getParentId();
+
+            if (!$parentId) {
+                $treeList->add($node);
+            }
+
+            $node->setChildren($collection->filterBy('parentId', $nodeId));
+        }
+
+        // Create root node
+
+        $base = new MenuSide();
+        $base
+            ->setId(0)
+            ->setTitle('Top Level')
+            ->setChildren($treeList);
+
+        $tree = new Collection();
+        $tree->add($base);
+
+        // Create the rest of the tree underneath the root
+
+        $treeList = $this->renderTree($tree);
+
+        $sections = $this->getMenuSideSectionMapper()->findAll()->sortBy('sortOrder', 'asc');
+
+        // Render this thing out
+
+        $this->getResponse()->content->set([
+            'template' => '@adminMenuSide/index.twig',
+            'data' => [
+                'pageCurrent' => basename($this->getRequest()->query->get('page')),
+                'tree' => $treeList,
+                'sections' => $sections,
+                'configTitle' => $this->getConfigLoader()->get('title'),
+                'sectionName' => MenuSideSectionMapper::getSectionNameDefaults()
+            ],
+            'title' => 'Admin - Side Menu'
+        ]);
+    }
+
+    /**
+     * Recursively build tree HTML
+     * @param Collection $tree
+     * @param bool $selectable
+     * @param int $level
+     * @return string
+     */
+    private function renderTree(Collection $tree, $selectable = false, $level = 0)
+    {
+        if ($level > 50) {
+            return '';
+        }
+
+        $text = "<ul>\n";
+
+        foreach ($tree as $menuItem) {
+            $id       = $menuItem->getId();
+            $menuText = \Scrub::text($menuItem->getTitle());
+            $children = $menuItem->getChildren();
+
+            $text .= '<li id="node_' . $id . '">';
+
+            if ($selectable || $id == 0) {
+                $text .= '<a id="' . $id . '" href="#">' . $menuText . "</a>";
+            } else {
+                $text .= '<a href="/adminv2/menu-side/modify/' . $id . '">' . $menuText . '</a>';
+            }
+
+            if (count($children)) {
+                $text .= $this->renderTree($children, $selectable, ($level + 1));
+            }
+
+            $text .= "</li>\n";
+        }
+
+        $text .= "</ul>\n";
+
+        return $text;
+    }
+
+    /**
+     * Display modification screen
+     * @param $id
+     */
+    public function getModify($id)
+    {
+        // Get selected campuses and groups
+
+        $selections = $this->getMenuSideGroupMapper()->findByColumn('menu_side_id', $id);
+
+        $groupsSelected = [];
+
+        /** @var MenuSideGroup $selection */
+        foreach ($selections as $selection) {
+            $groupsSelected[$selection->getGroupId()] = true;
+        }
+
+        $selections = $this->getMenuSideCampusMapper()->findByColumn('menu_side_id', $id);
+
+        $campusesSelected = [];
+
+        /** @var MenuSideCampus $selection */
+        foreach ($selections as $selection) {
+            $campusesSelected[$selection->getCampusId()] = true;
+        }
+
+        // Render this mess out
+
+        $this->getResponse()->content->set([
+            'template' => '@adminMenuSide/modify.twig',
+            'data'     => [
+                'pageCurrent' => basename($this->getRequest()->query->get('page')),
+                'item' => $this->getMenuSideMapper()->findById($id),
+                'groups' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
+                'groupsSelected' => $groupsSelected,
+                'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc'),
+                'campusesSelected' => $campusesSelected
+            ],
+            'title' => 'Admin - Side Menu'
+        ]);
+    }
+
+    /**
+     * Display section modification screen
+     * @param $id
+     */
+    public function getSectionModify($id)
+    {
+        // Render this mess out
+
+        $this->getResponse()->content->set([
+            'template' => '@adminMenuSide/modifySection.twig',
+            'data'     => [
+                'pageCurrent' => basename($this->getRequest()->query->get('page')),
+                'section' => $this->getMenuSideSectionMapper()->findOneByColumn('section', $id),
+                'configTitle' => $this->getConfigLoader()->get('title'),
+                'sectionName' => MenuSideSectionMapper::getSectionNameDefaults()
+            ],
+            'title' => 'Admin - Side Menu'
+        ]);
+    }
+
+    /**
+     * Display create screen
+     */
+    public function getInsert()
+    {
+        $this->getResponse()->content->set([
+            'template' => '@adminMenuSide/modify.twig',
+            'data'     => [
+                'pageCurrent' => basename($this->getRequest()->query->get('page')),
+                'groups' => $this->getRoleMapper()->findAll()->sortBy('name', 'asc'),
+                'campuses' => $this->getCampusMapper()->findAll()->sortBy('name', 'asc')
+            ],
+            'title' => 'Admin - Side Menu'
+        ]);
+    }
+
+    /**
+     * Save menu item
+     */
+    public function postModify()
+    {
+        $post = $this->getRequest()->post;
+
+        if (!empty($post['id'])) {
+            $item = $this->getMenuSideMapper()->findById($post['id']);
+        } else {
+            $item = new MenuSide();
+
+            $itemOrder = $this->getMenuSideMapper()->findAll()->sortBy('sortOrder', 'desc')->first();
+            $item->setParentId(0);
+            $item->setSortOrder($itemOrder->getSortOrder() + 1);
+        }
+
+        $item->setTitle($post['title']);
+        $item->setUrl($post['url']);
+        $item->setTarget($post['target']);
+        $this->getMenuSideMapper()->save($item);
+
+        $this->getMenuSideCampusMapper()->deleteByColumn('menu_side_id', $item->getId());
+
+        if (is_array($post['campuses'])) {
+            foreach ($post['campuses'] as $campusId) {
+                $menuSideCampus = new MenuSideCampus();
+                $menuSideCampus->setMenuSideId($item->getId());
+                $menuSideCampus->setCampusId($campusId);
+                $this->getMenuSideCampusMapper()->save($menuSideCampus);
+            }
+        }
+
+        $this->getMenuSideGroupMapper()->deleteByColumn('menu_side_id', $item->getId());
+
+        if (is_array($post['groups'])) {
+            foreach ($post['groups'] as $groupId) {
+                $menuSideGroup = new MenuSideGroup();
+                $menuSideGroup->setMenuSideId($item->getId());
+                $menuSideGroup->setGroupId($groupId);
+                $this->getMenuSideGroupMapper()->save($menuSideGroup);
+            }
+        }
+
+        $this->getResponse()->redirect->afterPost("/adminv2/menu-side");
+    }
+
+    /**
+     * Save menu item
+     */
+    public function postSectionModify()
+    {
+        $post = $this->getRequest()->post;
+
+        /** @var MenuSideSection $section */
+        $section = $this->getMenuSideSectionMapper()->findOneByColumn('section', $post['id']);
+
+        if (empty($post['title'])) {
+
+            $post['title'] = MenuSideSectionMapper::getSectionNameDefaults()[$post['id']];
+        }
+
+        $section->setTitle($post['title']);
+        $section->setVisible($post['visible']);
+        $this->getMenuSideSectionMapper()->save($section);
+
+        $this->getResponse()->redirect->afterPost("/adminv2/menu-side");
+    }
+
+    /**
+     * Delete menu item
+     */
+    public function postDelete()
+    {
+        $post = $this->getRequest()->post;
+        $this->getMenuSideMapper()->deleteByColumn("id", $post["id"]);
+    }
+
+    /**
+     * Update menu item order
+     */
+    public function postOrder()
+    {
+        $post = $this->getRequest()->post;
+
+        try {
+            /** @var MenuSide $item */
+            $item = $this->getMenuSideMapper()->findById($post['id']);
+            $item->setParentId($post['parentId']);
+            $this->getMenuSideMapper()->save($item);
+
+            $parentChildren = $this->getMenuSideMapper()->findByColumn('parent_id', $post['parentId']);
+
+            $orderCurrent = 0;
+
+            /** @var MenuSide $node */
+            foreach ($parentChildren as $node) {
+                if ($node->getId() == $post['id']) {
+                    $node->setSortOrder($post['position']);
+                } else {
+                    if ($orderCurrent == $post['position']) {
+                        $orderCurrent++;
+                    }
+                    $node->setSortOrder($orderCurrent++);
+                }
+                $this->getMenuSideMapper()->save($node);
+            }
+        } catch (\Exception $e) {
+        }
+    }
+
+    /**
+     * Update menu item order
+     */
+    public function postSectionOrder()
+    {
+        $post = $this->getRequest()->post;
+        $orderArray = explode(",", $post['order']);
+
+        $order = 1;
+
+        foreach ($orderArray as $id) {
+            try {
+                /** @var MenuSideSection $item */
+                $item = $this->getMenuSideSectionMapper()->findOneByColumn('section', $id);
+                $item->setSortOrder($order++);
+                $this->getMenuSideSectionMapper()->save($item);
+            } catch (MapperException $e) {
+            }
+        }
+    }
+
+    /** Here be mappers and stuff */
+
+    /** @var MenuSideMapper $menuSideMapper */
+    private $menuSideMapper;
+
+    /**
+     * @return MenuSideMapper
+     */
+    public function getMenuSideMapper() {
+        return $this->menuSideMapper;
+    }
+
+    /**
+     * @param $mapper
+     * @return $this
+     */
+    public function setMenuSideMapper($mapper) {
+        $this->menuSideMapper = $mapper;
+        return $this;
+    }
+
+    /** @var RoleMapper $roleMapper */
+    private $roleMapper;
+
+    /**
+     * @return RoleMapper
+     */
+    public function getRoleMapper() {
+        return $this->roleMapper;
+    }
+
+    /**
+     * @param $mapper
+     * @return $this
+     */
+    public function setRoleMapper($mapper) {
+        $this->roleMapper = $mapper;
+        return $this;
+    }
+
+    /** @var CampusMapper $campusMapper */
+    private $campusMapper;
+
+    /**
+     * @return CampusMapper
+     */
+    public function getCampusMapper() {
+        return $this->campusMapper;
+    }
+
+    /**
+     * @param $mapper
+     * @return $this
+     */
+    public function setCampusMapper($mapper) {
+        $this->campusMapper = $mapper;
+        return $this;
+    }
+
+    /** @var MenuSideCampusMapper $menuSideCampusMapper */
+    private $menuSideCampusMapper;
+
+    /**
+     * @return MenuSideCampusMapper
+     */
+    public function getMenuSideCampusMapper() {
+        return $this->menuSideCampusMapper;
+    }
+
+    /**
+     * @param $mapper
+     * @return $this
+     */
+    public function setMenuSideCampusMapper($mapper) {
+        $this->menuSideCampusMapper = $mapper;
+        return $this;
+    }
+
+    /** @var MenuSideGroupMapper $menuSideGroupMapper */
+    private $menuSideGroupMapper;
+
+    /**
+     * @return MenuSideGroupMapper
+     */
+    public function getMenuSideGroupMapper() {
+        return $this->menuSideGroupMapper;
+    }
+
+    /**
+     * @param $mapper
+     * @return $this
+     */
+    public function setMenuSideGroupMapper($mapper) {
+        $this->menuSideGroupMapper = $mapper;
+        return $this;
+    }
+
+    /** @var MenuSideSectionMapper $menuSideSectionMapper */
+    private $menuSideSectionMapper;
+
+    /**
+     * @return MenuSideSectionMapper
+     */
+    public function getMenuSideSectionMapper() {
+        return $this->menuSideSectionMapper;
+    }
+
+    /**
+     * @param $mapper
+     * @return $this
+     */
+    public function setMenuSideSectionMapper($mapper) {
+        $this->menuSideSectionMapper = $mapper;
+        return $this;
+    }
+}

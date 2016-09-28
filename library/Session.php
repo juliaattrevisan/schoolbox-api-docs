@@ -46,7 +46,7 @@ class Session
      *
      * @return string
      */
-    public function getIP()
+    public static function getIP()
     {
         if ($_SERVER['HTTP_CLIENT_IP']) {
             $ip = $_SERVER['HTTP_CLIENT_IP'];

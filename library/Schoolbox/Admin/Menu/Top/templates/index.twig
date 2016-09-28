@@ -1,0 +1,85 @@
+{# Shared navigation menu #}
+{{ renderAdminNavigation(pageCurrent) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <div class="row actions-small-3">
+            <div class="list-item">
+                <div class="small-12 island">
+                    <h1>Top Menu</h1>
+                    <h2 class="subheader">Menu Items</h2>
+                </div>
+            </div>
+            <nav>
+                <a href="{{ routeLookup('adminMenuTop.getInsert') }}" class="icon-add" title="Add Menu Item"></a>
+            </nav>
+        </div>
+        <section>
+            <ul class="information-list sortable-card ui-sortable" data-sortable="">
+                {% for item in menu %}
+                    <li class="actions-small-2" data-menu-top="{{ item.id }}">
+                        <div class="grip"></div>
+                        <div class="list-item">
+                            <div class="card small-12">
+                                <a href="/search/user/206">
+                                    <div class="icon-{{ item.icon }} icon-32"></div>
+                                    <h3>{{ item.text }}</h3>
+                                    <p class="meta">{{ item.title }}</p>
+                                </a>
+                            </div>
+                        </div>
+                        <nav>
+                            <a class="icon-modify" title="Edit menu item" href="{{ routeLookup('adminMenuTop.getModify', {id: ''}) }}{{ item.id }}"></a>
+                            <a class="icon-delete" data-delete="{{ item.id }}" title="Delete menu item"></a>
+                        </nav>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+
+    </div>
+</div>
+
+<!-- BEGIN custom_head -->
+<script>
+    $(function () {
+        $('#content').find('ul[data-sortable]').sortable({
+            handle: '.grip',
+            axis: 'y',
+            update: function () {
+                var order = '';
+                // Update the sort order in the database
+                $('[data-menu-top]').each(function (e) {
+                    if (order != '') {
+                        order += ',';
+                    }
+                    order += $(this).data('menu-top');
+                });
+
+                $.post('{{ routeLookup('adminMenuTop.postOrder') }}', {
+                    order: order
+                })
+                        .success(function () {
+                        });
+            }
+        });
+
+        $('[data-delete]').click(function (event) {
+            event.preventDefault();
+            var id = $(this).data('delete');
+            var listItem = $(this).closest('li');
+            console.log(id);
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this menu item?',
+                confirmEvent: function () {
+                    $.post('{{ routeLookup('adminMenuTop.postDelete') }}', {
+                        id: id
+                    }).success(function (e) {
+                        $(listItem).remove();
+                    });
+                }
+            });
+        });
+    });
+</script>
+<!-- END custom_head -->
