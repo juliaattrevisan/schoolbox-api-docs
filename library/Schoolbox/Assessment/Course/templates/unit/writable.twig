@@ -5,7 +5,7 @@
         </div>
         <div class="small-11 column">
             <label>
-                <input type="text" value="{{ unit.name }}" placeholder="Unit Name" name="unitname[{{ unit.id }}]" />
+                <input type="text" value="{{ unit.folder.name }}" placeholder="Unit Name" name="unitname[{{ unit.id }}]" />
             </label>
         </div>
     </div>
@@ -13,12 +13,12 @@
         <a class="icon-overflow" title="" data-dropdown="unit-{{ unit.id }}-modify"></a>
     </nav>
     <ul id="unit-{{ unit.id }}-modify" class="f-dropdown" data-dropdown-content>
-        {% if unit.hasHomepage %}
-            <li><a href="/homepage/{{ unit.id }}" class="icon-home">View Homepage</a></li>
+        {% if unit.folder.hasHomepage %}
+            <li><a href="/homepage/{{ unit.folder.id }}" class="icon-home">View Homepage</a></li>
         {% else %}
-            <li><a href="/resources/{{ unit.id }}" class="icon-folder">Browse Resources</a></li>
+            <li><a href="/resources/{{ unit.folder.id }}" class="icon-folder">Browse Resources</a></li>
         {% endif %}
-        <li><a href="/course/unit/{{ unit.id }}/delete" class="icon-delete" data-delete="{{ unit.id }}">Delete Unit</a></li>
+        <li><a href="{{ routeLookup('course.deleteUnitSpecification', {id: unit.id}) }}" class="icon-delete" data-delete="{{ unit.id }}">Delete Unit</a></li>
     </ul>
     <div class="small-12 column {% if not _expanded %}hide{% endif %}" data-collapsable="unit-{{ unit.id }}" {% if not _expanded %}data-collapse-state="collapsed"{% endif %}>
         <ul class="information-list sortable" data-sortable data-task_list>

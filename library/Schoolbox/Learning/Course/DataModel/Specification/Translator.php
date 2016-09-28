@@ -61,7 +61,7 @@ class Translator
         // Constituent Unit Specs - return in separate object, or this object?
         foreach ($specification->getUnits() as $unitSpecification) {
             $dataModel->getUnits()->add(
-                $this->unitTranslator->translateToDataModel($unitSpecification, $dataModel)
+                $this->unitTranslator->translateToDataModel($unitSpecification, $specification)
             );
         }
 

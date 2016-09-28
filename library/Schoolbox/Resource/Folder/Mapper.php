@@ -81,6 +81,15 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     protected $interimNodes = array();
 
     /**
+     * A cache of ancestral Folder instances, to save
+     * on re-querying the same Folder from the db over
+     * and over again
+     *
+     * @var Ancestry
+     */
+    protected $ancestry;
+
+    /**
      * Mapper constructor.
      */
     public function __construct() {
@@ -161,6 +170,7 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $this->registerCallback(self::CALLBACK_POSTDELETE, array($this, 'hardDeleteCategoryCodes'));
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'softDeleteCategoryCodes'));
 
+        $this->ancestry = new Ancestry($this);
     }
 
     /**
@@ -204,9 +214,9 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
         $fileMapper = $this->getJoinMapper('files');
 
         $limit = (int)$limit;
-        
+
         $opts = [ 'filter' => 'image' ];
-        
+
         if ($limit) {
             $opts['size'] = $limit;
         }
@@ -258,6 +268,35 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
             return false;
         }
         return true;
+    }
+
+    /**
+     * Is $possibleDescendant a descendant of $possibleAncestor?
+     *
+     * @param Model $possibleDescendant The folder that may be a descendant of $possibleAncestor
+     * @param Model $possibleAncestor
+     * @return bool
+     */
+    public function isDescendant(Model $possibleDescendant, Model $possibleAncestor)
+    {
+        foreach ($this->findParents($possibleDescendant, null, true) as $ancestor) {
+            if ($ancestor->getId() == $possibleAncestor->getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Is $possibleAncestor an ancestor of $possibleDescendant?
+     *
+     * @param Model $possibleAncestor The folder that may be an ancestor of $possibleDescendant
+     * @param Model $possibleDescendant
+     * @return bool
+     */
+    public function isAncestor(Model $possibleAncestor, Model $possibleDescendant)
+    {
+        return $this->isDescendant($possibleDescendant, $possibleAncestor);
     }
 
     /**
@@ -1413,5 +1452,13 @@ class Mapper extends AbstractFolderMapper implements ILocator, Searchable
     public function setGroupMapper($groupMapper) {
         $this->groupMapper = $groupMapper;
         return $this;
+    }
+
+    /**
+     * @return Ancestry
+     */
+    public function getAncestry()
+    {
+        return $this->ancestry;
     }
 }

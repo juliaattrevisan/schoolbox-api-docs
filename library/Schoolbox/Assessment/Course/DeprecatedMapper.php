@@ -43,15 +43,6 @@ class DeprecatedMapper extends FolderMapper
     private $facultyNode = null;
 
     /**
-     * A cache of ancestral Folder instances, to save
-     * on re-querying the same Folder from the db over
-     * and over again
-     *
-     * @var Ancestry
-     */
-    protected $ancestry;
-
-    /**
      * @inheritdoc
      *
      * @throws \Schoolbox\Mapper\Exception
@@ -64,8 +55,6 @@ class DeprecatedMapper extends FolderMapper
 
         // reverse join onto self for unit definition
         $this->joins('id', Unit\DeprecatedMapper::class, 'parent', null, self::COLUMN_JOIN_MULTI, 'units', 'unit');
-
-        $this->ancestry = new Ancestry(FolderMapper::getInstance());
     }
 
 
@@ -313,14 +302,5 @@ class DeprecatedMapper extends FolderMapper
         }
 
         return false;
-    }
-
-
-    /**
-     * @return Ancestry
-     */
-    public function getAncestry()
-    {
-        return $this->ancestry;
     }
 }

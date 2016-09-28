@@ -66,7 +66,8 @@ class Module extends BaseModule
             ],
             'POST' => [
                 '/unit/new'         => 'newUnit',
-                '/unit/delete'      => 'deleteUnit',
+                // AFAICT this was never used - I'm re-purposing it
+                '/unit/delete/{id}' => 'deleteUnitSpecification',
                 '/import/ownership' => 'importOwnership',
                 '/importTasks'      => 'importTasks',
                 '/importUnits'      => 'importUnits',
@@ -80,7 +81,8 @@ class Module extends BaseModule
                 '/new'              => 'createCourse',
                 '/modify/{id}'      => 'updateCourse',
                 '/finalise'         => 'persistCourse',
-                '/delete'           => 'deleteCourse',
+                // AFAICT this was never used - I'm re-purposing it
+                '/delete/{id}'      => 'deleteCourseSpecification',
             ]
         ];
 

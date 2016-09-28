@@ -7,9 +7,13 @@
 
 namespace Schoolbox\Learning\Course\DataModel\Specification\Unit;
 
+use PDOStatement;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as FolderModel;
 
 /**
  * Mapper for the data model for Unit Specifications.
@@ -27,10 +31,97 @@ class Mapper extends BaseMapper
         $this->hasTable('course_unit_specification');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('course_specification_id', CourseSpecificationMapper::class, 'id', null, null, 'course');
+        $this->joins('course_specification_id', CourseSpecificationMapper::class, 'id', null, null, 'course', 'course');
         $this->joins('folder_id', FolderMapper::class, 'id', null, null, null, 'folder');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+    /**
+     * Folders and course spec are hydrated by default.
+     *
+     * @return string
+     */
+    public function getSelectString()
+    {
+        return "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('folder', 'f')},
+                {$this->getJoinColumnString('folder.homepages', 'fh')},
+                {$this->getJoinColumnString('course', 'c')},
+                {$this->getJoinColumnString('course.folder', 'cf')}
+            FROM {$this->database->quoteIdentifier($this->table)}
+            INNER JOIN {$this->getJoinSql('folder', '', 'f')}
+            LEFT  JOIN {$this->getJoinSql('folder.homepages', 'f', 'fh')}
+            INNER JOIN {$this->getJoinSql('course', '', 'c')}
+            INNER JOIN {$this->getJoinSql('course.folder', 'c', 'cf')}
+        ";
+    }
+
+    /**
+     * Hydrate joined folders
+     *
+     * @param PDOStatement $statement
+     * @return Collection|Model[]
+     */
+    public function hydrateSelect(PDOStatement $statement)
+    {
+        $modelList = $this->createCollection();
+        foreach ($statement as $row) {
+            /** @var Model $model */
+            $model = $this->hydrate($row);
+
+            /** @var FolderModel $folder */
+            $folder = $this->hydrateJoin($row, 'folder', 'f');
+            $folder->setHomepage($this->hydrateJoin($row, 'folder.homepages', 'fh'));
+            $model->setFolder($folder);
+
+            /** @var CourseSpecificationModel $course */
+            $course = $this->hydrateJoin($row, 'course', 'c');
+            $course->setFolder($this->hydrateJoin($row, 'course.folder', 'cf'));
+            $model->setCourse($course);
+
+            // Add to list
+            $modelList->add($model);
+        }
+        return $modelList;
+    }
+
+    /**
+     * Finds the unit spec for this folder.
+     *
+     * @param int   $folderId
+     * @param array $options
+     * @return Model
+     */
+    public function findByFolderId($folderId, $options = [])
+    {
+        return $this->findOneByColumn('folder_id', $folderId, $options);
+    }
+
+    /**
+     * Finds all unit specs for this course spec.
+     *
+     * @param int|array $courseId
+     * @param array     $options
+     * @return Collection|Model[]
+     */
+    public function findAllByCourseId($courseId, $options = [])
+    {
+        return $this->findByColumn('course_specification_id', $courseId, $options);
+    }
+
+    /**
+     * Finds all unit specs for the course spec that is linked to this folder.
+     *
+     * @param int|array $courseFolderId
+     * @param array     $options
+     * @return Collection|Model[]
+     */
+    public function findAllByCourseFolderId($courseFolderId, $options = [])
+    {
+        return $this->findByColumn('c.folder_id', $courseFolderId, $options);
     }
 }

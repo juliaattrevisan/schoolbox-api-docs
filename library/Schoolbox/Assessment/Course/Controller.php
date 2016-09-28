@@ -25,36 +25,33 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Assessment\Course\Config\Model as CourseConfigModel;
 use Schoolbox\Assessment\Course\Import\Import as CourseImport;
-use Schoolbox\Assessment\Course\DeprecatedMapper as CourseMapper;
 use Schoolbox\Assessment\Course\DeprecatedModel as CourseModel;
-use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\Task\Instance as TaskInstance;
 use Schoolbox\Assessment\Course\Task\InstanceMapper as TaskInstanceMapper;
-use Schoolbox\Assessment\Course\Unit\DeprecatedMapper;
 use Schoolbox\Collection;
-use Schoolbox\Curriculum;
 use Schoolbox\Error;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseSpecificationTranslator;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecificationTranslator;
+use Schoolbox\Learning\Course\Specification as CourseSpecification;
+use Schoolbox\Learning\Course\SpecificationMapperProxy as CourseSpecificationMapperProxy;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationMapperProxy;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\RoleAccessMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
-use Schoolbox\Resource\Browser\AbstractTreeBuilder;
-use Schoolbox\Resource\Browser\Resources\TreeBuilder;
-use Schoolbox\Resource\Category;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Ancestry;
-use Schoolbox\Resource\Folder\Code;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
-use Schoolbox\Resource\GroupMapper;
 use Schoolbox\Resource\HomepageConfigMapper;
 use Schoolbox\Resource\HomepageTemplate;
 use Schoolbox\Resource\HomepageTemplateMapper;
 use Schoolbox\Role;
-use Schoolbox\RoleMapper;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
@@ -76,11 +73,43 @@ class Controller extends Base\Base
     /** @var TaskInstanceMapper */
     protected $taskInstanceMapper = null;
 
-    /** @var CourseMapper */
-    protected $courseMapper;
+    /**
+     * @var CourseSpecificationMapper
+     */
+    protected $courseSpecificationMapper;
 
-    /** @var Unit\DeprecatedMapper */
-    protected $unitMapper;
+    /**
+     * @var CourseSpecificationMapperProxy
+     */
+    protected $courseSpecificationMapperProxy;
+
+    /**
+     * @var UnitSpecificationMapper
+     */
+    protected $unitSpecificationMapper;
+
+    /**
+     * @var UnitSpecificationMapperProxy
+     */
+    protected $unitSpecificationMapperProxy;
+
+    /**
+     * Translates between course specification data and domain models
+     *
+     * TODO: figure out if this should be a part of the course spec mapper
+     *
+     * @var CourseSpecificationTranslator
+     */
+    protected $courseSpecificationTranslator;
+
+    /**
+     * Translates between unit specification data and domain models
+     *
+     * TODO: figure out if this should be a part of the unit spec mapper
+     *
+     * @var UnitSpecificationTranslator
+     */
+    protected $unitSpecificationTranslator;
 
     /** @var Component_DefinitionMapper */
     protected $componentDefinitionMapper;
@@ -117,8 +146,32 @@ class Controller extends Base\Base
      */
     public function __construct()
     {
-        $this->setCourseMapper(CourseMapper::getInstance());
-        $this->setUnitMapper(Unit\DeprecatedMapper::getInstance());
+        // Deprecated course/unit specification mappers - all gone!
+
+        // Modern course/unit specification mappers
+        $this->setCourseSpecificationMapper(CourseSpecificationMapper::getInstance());
+        $this->setUnitSpecificationMapper(UnitSpecificationMapper::getInstance());
+
+        // Mapper/domain translation layer
+        $this->setUnitSpecificationTranslator(new UnitSpecificationTranslator());
+        $this->setCourseSpecificationTranslator(new CourseSpecificationTranslator($this->getUnitSpecificationTranslator()));
+
+        // Proxy for course/unit specification mappers
+        $this->setUnitSpecificationMapperProxy(
+            new UnitSpecificationMapperProxy(
+                $this->getUnitSpecificationMapper(),
+                $this->getUnitSpecificationTranslator()
+            )
+        );
+        $this->setCourseSpecificationMapperProxy(
+            new CourseSpecificationMapperProxy(
+                $this->getCourseSpecificationMapper(),
+                $this->getCourseSpecificationTranslator(),
+                $this->getUnitSpecificationMapper(),
+                $this->getUnitSpecificationTranslator()
+            )
+        );
+
         $this->setSubmissionBoxMapper(SubmissionBoxMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
         $this->setOnlineAssessmentMapper(OnlineAssessmentMapper::getInstance());
@@ -213,12 +266,12 @@ class Controller extends Base\Base
 
 
     /**
-     * Form to modify a course
+     * Form to modify a course specification
      *
      * @api   GET /course/modify/{id}
      * @level 160
      *
-     * @param int    $id
+     * @param int    $id   The ID of the course specification that is being modified
      * @param string $name
      */
     public function modifyCourse($id = null, $name = null)
@@ -230,41 +283,34 @@ class Controller extends Base\Base
             try {
                 // First, check whether or not this is already a course. We don't want to barr access to courses that
                 // are already courses.
-                $folder = $this->getCourseMapper()->findById($id);
+                $course = $this->getCourseSpecificationMapperProxy()->findById($id);
+
+                // Rehydrate course folder so that curriculum codes exist
+                $course->setFolder($this->getFolderMapper()->findById($course->getFolder()->getId()));
+                $folder = $course->getFolder();
 
             } catch (MapperException $e) {
-                // It was not a course: you may modify a FOLDER to convert it into a course by adding units.
-                // As such, we now search for folders rather than explicitly courses, but said course:
-                //   - must live in the faculty root; and
-                //   - must not have any course descendants itself
-                try {
-                    $folder = $this->getFolderMapper()->findById($id);
-                } catch (MapperException $e) {
-                    throw $this->getErrorMapper()->generateException(13);
-                }
-
-                // check ancestry
-                if (!$this->getCourseMapper()->mayBeConvertedToCourse($folder)) {
-                    throw $this->getErrorMapper()->generateException(172);
-                }
+                // It should no longer be possible for a folder to exist without a course spec.
+                throw $this->getErrorMapper()->generateException(172);
             }
 
             $folder->setParent($this->getFolderMapper()->findById($folder->getParent()->getId()));
 
             $instances = [];
 
-            $data['folder'] = $folder;
             $data['access'][$folder->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $folder->getId() ]);
-            $data['units']  = $this->getUnitMapper()->findByCourseId($folder->getId());
+            $data['course'] = $course;
 
-            foreach ($data['units'] as $unit) {
-                $data['access'][$unit->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $unit->getId() ]);
-                $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unit);
+            foreach ($course->getUnits() as $unit) {
+                /** @var UnitSpecification $unit */
+                $unitFolder = $unit->getFolder();
+                $data['access'][$unit->getId()] = $this->getAccess()->getFolderAccess($this->getUser(), [ $unitFolder->getId() ]);
+                $data['tasks'][$unit->getId()] = $this->getTaskMapper()->findByCategory($unitFolder);
                 $data['returnUrl'][$unit->getId()] = $this->getReturnUrl($id, $unit->getId());
                 $data['usages'][$unit->getId() ] = $this->getUnitInstanceMapper()->findAllFoldersUsingCourse($folder)->getColumnValues('id');
 
                 // obtain the Course Builder Component Instance from the homepage.
-                $instances[$unit->getId()] = $this->getCourseBuilderInstance($unit);
+                $instances[$unit->getId()] = $this->getCourseBuilderInstance($unitFolder);
 
                 foreach ($data['tasks'][$unit->getId()] as $task) {
                     /** @var Task $task */
@@ -342,11 +388,14 @@ class Controller extends Base\Base
         // if something got passed, don't care: overriding it
         $post['id'] = $id;
 
+        // Load course
+        $course = $this->getCourseSpecificationMapperProxy()->findById($post['id']);
+
         // Do not permit Courses to be moved to, or created in, Root
         if(0 == $post['parent']){
 
             // ...unless already in Root
-            if(0 != $parentId = $this->courseMapper->findCheaplyById($post['id'])->getParent()->getId()) {
+            if(0 != $course->getFolder()->getParent()->getId()) {
                 $this->sendError(
                     new Base\Exception("Course cannot reside directly in root",
                         ["move this Course out of root"]));
@@ -356,10 +405,11 @@ class Controller extends Base\Base
 
         if (is_array($post['unitname'])) {
             // save unit name changes
-            foreach ($post['unitname'] as $unitId => $unitName) {
-                $this->getFolderMapper()->save(
-                    $this->getFolderMapper()->findById($unitId)->setName($unitName)
-                );
+            foreach ($course->getUnits() as $unit) {
+                $unitName = $post['unitname'][$unit->getId()];
+                if (isset($unitName)) {
+                    $this->getFolderMapper()->save($unit->getFolder()->setName($unitName));
+                }
             }
         } else{
             $this->sendError(new Base\Exception("Cannot create a Course without Units",["create at least 1 unit"]));
@@ -396,18 +446,18 @@ class Controller extends Base\Base
 
         try {
             // attempt to persist this course based on the given POST data
-            $folder = $this->persistCourse($post);
+            $courseSpec = $this->persistCourse($post);
 
             if ($xhr) {
                 // respond to XHR with JSON
                 $rs->content->set([
                     'format' => 'json',
-                    'data'   => [ 'id' => $folder->getId() ]
+                    'data'   => [ 'id' => $courseSpec->getId() ]
                 ]);
 
             } else {
                 // respond to synchronous POST with redirect
-                $rs->redirect->afterPost($this->getRouteIfAuthorized($redir, [ $folder->getId() ]));
+                $rs->redirect->afterPost($this->getRouteIfAuthorized($redir, [ $courseSpec->getId() ]));
             }
 
         } catch (Base\Exception $e) {
@@ -422,7 +472,7 @@ class Controller extends Base\Base
      *
      * @param Values $post
      * @throws Base\Exception
-     * @return Folder\Model
+     * @return CourseSpecification
      */
     protected function persistCourse($post)
     {
@@ -469,17 +519,22 @@ class Controller extends Base\Base
         // extract codes
         $codes = $post->get('curriculumCodes', []);
 
+        $folderId = null;
         if ($id) {
             try {
+                // Retrieve the course specification
+                $courseSpecification = $this->getCourseSpecificationMapperProxy()->findById($id);
+
                 // do checks to make sure it exists
-                $folder = $this->getCourseMapper()->findById($id);
+                $folder = $courseSpecification->getFolder();
+                $folderId = $folder->getId();
                 $mode = BaseMapper::METHOD_UPDATE;
 
                 // Sanity check for existing courses:
                 // * Don't allow moving outside of faculty root
                 //   (Keeping a course in a folder outside fac root is okay)
                 if ($folder->getParent()->getId() != $parentId
-                    && !$this->getCourseMapper()->isValidCourseLocation($parent)
+                    && !$this->getCourseSpecificationMapper()->isFolderValid($parent)
                 ) {
                     throw new Base\Exception("Courses may not be moved outside the faculty folder");
                 }
@@ -493,15 +548,18 @@ class Controller extends Base\Base
             if ($parentId == 0) {
                 throw new Base\Exception("Courses may not be created in the root folder");
             }
-            if (!$this->getCourseMapper()->isValidCourseLocation($parent)) {
+            if (!$this->getCourseSpecificationMapper()->isFolderValid($parent)) {
                 throw new Base\Exception("Courses may not be created outside the faculty folder");
             }
+
+            // Create the course specification (no units yet)
+            $courseSpecification = new CourseSpecification();
         }
 
         try {
             $datums = [
                 // the basics
-                'categoryID'      => $id,
+                'categoryID'      => $folderId,
                 'name'            => $name,
                 'parent'          => $parent->getId(),
                 'curriculumCodes' => $codes,
@@ -520,7 +578,7 @@ class Controller extends Base\Base
 
 
                     // configurable things
-                    'inherit'         => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
+                    'inherit'   => $this->getConfigLoader()->get('course_builder_default_course_page_inherit'),
                     'template'  => $this->getConfigLoader()->get('course_builder_default_course_page_template'),
                     'group'     => $rolePermissions,
 
@@ -540,7 +598,10 @@ class Controller extends Base\Base
 
             $folder = $this->persistFolder($datums);
 
-            return $folder;
+            // Persist the course spec as well
+            $courseSpecification->setFolder($folder);
+            $this->getCourseSpecificationMapperProxy()->save($courseSpecification);
+            return $courseSpecification;
 
         } catch (ServiceNotFound $e) {
             // quite simple not able to find things we need. bye bye.
@@ -639,10 +700,13 @@ class Controller extends Base\Base
                 $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
             }
 
+            // Get the course I'm saving into
+            $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($post['id']);
+
             $folder = $this->persistFolder([
                 // the basics (note lack of ID and Codes)
                 'name'            => $name,
-                'parent'          => $post['id'],
+                'parent'          => $courseSpec->getFolder()->getId(),
 
                 // configurable things
                 'inherit'         => $this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
@@ -654,15 +718,17 @@ class Controller extends Base\Base
                 'code'            => null,  // LEAVE THIS
             ]);
 
+            // Persist the unit too
+            $unitSpec = new UnitSpecification();
+            $unitSpec->setFolder($folder);
+            $this->getUnitSpecificationMapperProxy()->save($unitSpec, $courseSpec);
+
             $instance  = $this->getCourseBuilderInstance($folder);
             $folderId  = $folder->getId();
             $returnUrl = $this->getReturnUrl($post['id'], $folderId);
 
             $data = [
-                'unit'  => [
-                    'id'   => $folderId,
-                    'name' => $folder->getName()
-                ],
+                'unit'      => $unitSpec,
                 'returnUrl' => [
                     $folderId => $returnUrl
                 ],
@@ -807,7 +873,8 @@ class Controller extends Base\Base
      */
     protected function getCourseData($searchParam)
     {
-        $allCourses = $this->getCourseMapper()->findCourseListByName($searchParam, [ 'order' => [ 'name' => 'ASC' ] ]);
+        // Use the new mapper to get the list of courses
+        $allCourses = $this->getCourseSpecificationMapperProxy()->findAllByName($searchParam);
 
         $data = [];
 
@@ -816,7 +883,7 @@ class Controller extends Base\Base
             // general search ignores Courses in Faculty
             if(NULL === $searchParam) {
                 try {
-                    if (!$this->getCourseMapper()->inFacultyArea($currentCourse)) {
+                    if (!($this->getFolderMapper()->isDescendant($currentCourse->getFolder(), $this->getCourseSpecificationMapper()->getFacultyRootFolder()))) {
                         continue;
                     }
                 } catch (MapperException $e) {
@@ -826,34 +893,27 @@ class Controller extends Base\Base
             }
 
             // confirm you at least have read access...
-            if (!$this->confirmAccess($currentCourse->getId())) {
+            if (!$this->confirmAccess($currentCourse->getFolder()->getId())) {
                 continue;
-            }
-
-            try {
-                $data['lineage'][$currentCourse->getId()] = $this->getLineage($currentCourse);
-            } catch (MapperException $e) {
-                // somehow, against all odds, one of my ancestors has been deleted
-                continue;
-            }
-
-            $data['courses'][] = $currentCourse;
-
-            $allUnits = $this->getUnitMapper()->findByCourseId($currentCourse->getId());
-
-            // Append to unit index, by ID
-            foreach ($allUnits as $currentUnit) {
-                // confirm you at least have read access...s
-                if (!$this->confirmAccess($currentUnit->getId())) {
-                    continue;
-                }
-
-                $data['units'][$currentCourse->getId()][] = $currentUnit;
             }
 
             /* Also store the path to this Course
              */
+            try {
+                $data['lineage'][$currentCourse->getId()] = $this->getLineage($currentCourse->getFolder());
+            } catch (MapperException $e) {
+                // somehow, against all odds, one of my ancestors has been deleted: show nothing
+                continue;
+            }
 
+            // Remove units whose folders aren't accessible by this user
+            $currentCourse->getUnits()->filter(function($unit) {
+                /** @var UnitSpecification $unit */
+                return $this->confirmAccess($unit->getFolder()->getId());
+            });
+
+            // Add course directly into $data
+            $data['courses'][] = $currentCourse;
         }
 
         return $data;
@@ -869,7 +929,7 @@ class Controller extends Base\Base
      */
     protected function getLineage(Folder\Model $course)
     {
-        return $this->getAncestry()->findParentsCheaply($course, $this->getCourseMapper()->getFacultyNode());
+        return $this->getAncestry()->findParentsCheaply($course, $this->getCourseSpecificationMapper()->getFacultyRootFolder());
     }
 
 
@@ -885,8 +945,15 @@ class Controller extends Base\Base
         $codes   = $folder->getCurriculumNodes()->getColumnValues('code');
 
         // find all the folders that match this code, then filter for coarseness
-        return $this->getFolderMapper()->findByCurriculumCode($codes)->filter(function ($folder) {
-            return $this->courseMapper->verifyCourse($folder);
+        return $this->getFolderMapper()->findByCurriculumCode($codes)->filter(function ($result) {
+            /** @var Folder\Model $result */
+            // TODO: test this with folders and courses which have curriculum codes
+            try {
+                $this->getCourseSpecificationMapperProxy()->findByFolderId($result->getId());
+                return true;
+            } catch (MapperException $e) {
+                return false;
+            }
         });
     }
 
@@ -995,7 +1062,10 @@ class Controller extends Base\Base
         //  - stop at, and exclude, all Courses (folder that has > 0 units)
         //  - continue to exhaustion
 
-        $courseIds = $this->courseMapper->findAllIds();
+        $courseIds = $this->getCourseSpecificationMapperProxy()->findAll()->map(function($v) {
+            /** @var CourseSpecification $v */
+            return $v->getFolder()->getId();
+        })->getAll();
 
         // Enable later O(1) lookup
         $courseIds = array_combine($courseIds,$courseIds);
@@ -1045,7 +1115,7 @@ class Controller extends Base\Base
             }
         }
 
-        $courseRoot     = $nodes[$this->getCourseMapper()->getFacultyNode()->getId()];
+        $courseRoot     = $nodes[$this->getCourseSpecificationMapper()->getFacultyRootFolder()->getId()];
         $courseRootArr  = $this->recursiveTreeBuild($courseRoot,$courseIds,$permissions);
         $data['branch'] = $courseRootArr;
         $this->tpl('parentList', $data);
@@ -1072,6 +1142,9 @@ class Controller extends Base\Base
     /**
      * This POST is the result of import stage 2
      *
+     * TODO: replace component ID parameter with course implementation ID?
+     * TODO: figure out how this should work with course specification
+     *
      * @api   POST /course/import/ownership
      * @level 160
      */
@@ -1087,7 +1160,7 @@ class Controller extends Base\Base
             'homepage'       => implode(',', array_keys($ownerships)),
             'courseHomepage' => $courseHomepage,
             'componentId'    => $componentId,
-            'units'          => $this->getUnitMapper()->findByCourseId($courseHomepage),
+            'units'          => $this->getUnitSpecificationMapperProxy()->findAllByCourseFolderId($courseHomepage),
             'ownerships'     => implode(',', array_map(
                     function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
             )
@@ -1141,7 +1214,7 @@ class Controller extends Base\Base
         $componentId = trim($this->getRequest()->post["componentId"]);
 
         try {
-            $this->getCourseMapper()->findById($courseHomepage);
+            $this->getCourseSpecificationMapperProxy()->findByFolderId($courseHomepage);
 
         } catch (MapperException $e) {
             // the nominated "course" is not actually a course...
@@ -1206,6 +1279,8 @@ class Controller extends Base\Base
      * (a Task Abstract is one specified in the original Unit
      * but has not yet been imported)
      *
+     * TODO: make this take a course implementation ID, not a course component ID
+     *
      * @param $unitDates array User-selected dates for a Unit, (via POST, typically)
      * @param $courseComponentId int A componentId related to this course >.<
      * @return array
@@ -1217,10 +1292,11 @@ class Controller extends Base\Base
 
         /* Make a local cache for unit information
          */
+        // TODO: figure out how this should work with course implementation
         foreach ($unitDates as $unit) {
             if ($unit['import'] && !isset($unitCache[$unit['unit_id']])) {
                 try {
-                    $u = $this->getUnitMapper()->findById($unit['unit_id']);
+                    $u = $this->getUnitSpecificationMapperProxy()->findByFolderId($unit['unit_id']);
                 } catch (MapperException\Deleted $e) {
                     // ignore deletions here; the assumption is that any unit passed into here is legit. If you modify a class import and
                     // any source units have been deleted, their existence still needs to be honoured.
@@ -2031,20 +2107,6 @@ class Controller extends Base\Base
     }
 
     /**
-     * Recursively apply inheritance. Why? Not sure. Cut-Paste from /cms/categoryForm.php
-     *
-     * @param Folder\Model $model
-     */
-    protected function recurseInheritance(Folder\Model $model) {
-        $folders = $this->getCourseMapper()->findAllChildren($model->getId(), true);
-        foreach ($folders as $folder) {
-            $folder->setInherit($model->getInherit());
-            $this->getCourseMapper()->save($folder);
-            $this->recurseInheritance($folder);
-        }
-    }
-
-    /**
      * Delete unit INSTANCE. This will delete the instance and all its content.
      *
      * @api   POST /course/unit/delete
@@ -2130,6 +2192,8 @@ class Controller extends Base\Base
     /**
      * Restore a Course instance via rebuilding its component
      *
+     * @deprecated Course (implementation) existence is not tied to the existence of its component anymore.
+     *
      * @api   POST /course/import/restore
      * @level 160
      *
@@ -2176,17 +2240,47 @@ class Controller extends Base\Base
     }
 
     /**
-     * Delete a course by blowing away all its units
+     * Delete a course specification
      *
-     * @api   POST /course/delete
+     * @api   POST /course/delete/{id}
      * @level 160
+     *
+     * @param int $id The course to delete
      */
-    public function deleteCourse()
+    public function deleteCourseSpecification($id)
     {
+        // TODO: make delete of folder and course atomic
+
+        $courseSpec = $this->getCourseSpecificationMapperProxy()->findById($id);
+
+        // Delete course specs (this also deletes constituent units)
+        $this->getCourseSpecificationMapperProxy()->delete($courseSpec);
+
         /** @var Folder\Controller $folderController */
         $folderController = $this->getController('folder');
+        $folderController->recursiveDelete($courseSpec->getFolder()->getId(), $this->getUser());
+    }
 
-        $folderController->recursiveDelete($this->getRequest()->post->get('courseId'), $this->getUser());
+    /**
+     * Delete a unit specification
+     *
+     * @api   POST /course/unit/delete/{id}
+     * @level 160
+     *
+     * @param int $id The unit spec to delete
+     */
+    public function deleteUnitSpecification($id)
+    {
+        // TODO: make delete of folder and unit atomic
+
+        $unitSpec = $this->getUnitSpecificationMapperProxy()->findById($id);
+
+        // Delete unit spec
+        $this->getUnitSpecificationMapperProxy()->delete($unitSpec);
+
+        /** @var Folder\Controller $folderController */
+        $folderController = $this->getController('folder');
+        $folderController->recursiveDelete($unitSpec->getFolder()->getId(), $this->getUser());
     }
 
     /**
@@ -2207,47 +2301,6 @@ class Controller extends Base\Base
 
     /* Getters/Setters
      */
-
-    /**
-     * Get course mapper
-     *
-     * @return CourseMapper
-     */
-    protected function getCourseMapper()
-    {
-        return $this->courseMapper;
-    }
-
-    /**
-     * Set course mapper
-     *
-     * @param CourseMapper $courseMapper
-     */
-    public function setCourseMapper($courseMapper)
-    {
-        $this->courseMapper = $courseMapper;
-    }
-
-
-    /**
-     * @return Unit\DeprecatedMapper
-     */
-    public function getUnitMapper()
-    {
-        return $this->unitMapper;
-    }
-
-
-    /**
-     * @param Unit\DeprecatedMapper $unitMapper
-     * @return static
-     */
-    public function setUnitMapper($unitMapper)
-    {
-        $this->unitMapper = $unitMapper;
-        return $this;
-    }
-
 
     /**
      * Get folder mapper
@@ -2543,13 +2596,120 @@ class Controller extends Base\Base
         $this->taskInstanceMapper = $taskInstanceMapper;
     }
 
+    /**
+     * @return CourseSpecificationMapper
+     */
+    public function getCourseSpecificationMapper()
+    {
+        return $this->courseSpecificationMapper;
+    }
+
+    /**
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @return static
+     */
+    public function setCourseSpecificationMapper($courseSpecificationMapper)
+    {
+        $this->courseSpecificationMapper = $courseSpecificationMapper;
+        return $this;
+    }
+
+    /**
+     * @return UnitSpecificationMapper
+     */
+    public function getUnitSpecificationMapper()
+    {
+        return $this->unitSpecificationMapper;
+    }
+
+    /**
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @return static
+     */
+    public function setUnitSpecificationMapper($unitSpecificationMapper)
+    {
+        $this->unitSpecificationMapper = $unitSpecificationMapper;
+        return $this;
+    }
+
+    /**
+     * @return CourseSpecificationTranslator
+     */
+    public function getCourseSpecificationTranslator()
+    {
+        return $this->courseSpecificationTranslator;
+    }
+
+    /**
+     * @param CourseSpecificationTranslator $courseSpecificationTranslator
+     * @return static
+     */
+    public function setCourseSpecificationTranslator($courseSpecificationTranslator)
+    {
+        $this->courseSpecificationTranslator = $courseSpecificationTranslator;
+        return $this;
+    }
+
+    /**
+     * @return UnitSpecificationTranslator
+     */
+    public function getUnitSpecificationTranslator()
+    {
+        return $this->unitSpecificationTranslator;
+    }
+
+    /**
+     * @param UnitSpecificationTranslator $unitSpecificationTranslator
+     * @return static
+     */
+    public function setUnitSpecificationTranslator($unitSpecificationTranslator)
+    {
+        $this->unitSpecificationTranslator = $unitSpecificationTranslator;
+        return $this;
+    }
+
+    /**
+     * @return CourseSpecificationMapperProxy
+     */
+    public function getCourseSpecificationMapperProxy()
+    {
+        return $this->courseSpecificationMapperProxy;
+    }
+
+    /**
+     * @param CourseSpecificationMapperProxy $courseSpecificationMapperProxy
+     * @return static
+     */
+    public function setCourseSpecificationMapperProxy($courseSpecificationMapperProxy)
+    {
+        $this->courseSpecificationMapperProxy = $courseSpecificationMapperProxy;
+        return $this;
+    }
+
+    /**
+     * @return UnitSpecificationMapperProxy
+     */
+    public function getUnitSpecificationMapperProxy()
+    {
+        return $this->unitSpecificationMapperProxy;
+    }
+
+    /**
+     * @param UnitSpecificationMapperProxy $unitSpecificationMapperProxy
+     * @return static
+     */
+    public function setUnitSpecificationMapperProxy($unitSpecificationMapperProxy)
+    {
+        $this->unitSpecificationMapperProxy = $unitSpecificationMapperProxy;
+        return $this;
+    }
 
     /**
      * @return Ancestry
      */
     public function getAncestry()
     {
-        return $this->getCourseMapper()->getAncestry();
+        return $this->getFolderMapper()->getAncestry();
     }
 
 }

@@ -8,6 +8,7 @@
 namespace Schoolbox\Learning\Course\DataModel\Specification\Unit;
 
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseDataModel;
+use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
@@ -19,15 +20,19 @@ class Translator
     /**
      * Translates the Unit Specification business domain model to a data model.
      *
-     * @param UnitSpecification $unitSpecification
-     * @param CourseDataModel   $dataModel         The course data model to put the new unit data model in.
+     * @param UnitSpecification   $unitSpecification
+     * @param CourseSpecification $courseSpecification The course data model to put the new unit data model in.
      * @return Model
      */
-    public function translateToDataModel(UnitSpecification $unitSpecification, CourseDataModel $dataModel)
+    public function translateToDataModel(UnitSpecification $unitSpecification, CourseSpecification $courseSpecification)
     {
+        // Don't perform a full translation here?
+        $courseDataModel = new CourseDataModel();
+        $courseDataModel->setId($courseSpecification->getId());
+
         $unitDataModel = new Model();
         $unitDataModel
-            ->setCourse($dataModel)
+            ->setCourse($courseDataModel)
             ->setId($unitSpecification->getId())
             ->setCreatedAt($unitSpecification->getCreatedAt())
             ->setUpdatedAt($unitSpecification->getUpdatedAt())

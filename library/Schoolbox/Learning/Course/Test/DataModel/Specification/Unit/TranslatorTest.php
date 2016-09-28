@@ -13,6 +13,7 @@ use Schoolbox\Learning\Assessment\Task\Model as TaskModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseDataModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitDataModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitTranslator;
+use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 
@@ -43,9 +44,8 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $courseSpecFolder = new FolderModel();
         $courseSpecFolder->setId(51)->setName('Houses');
 
-        $courseDataModel = new CourseDataModel();
-        $courseDataModel->setId(3)
-                           ->setFolder($courseSpecFolder);
+        $courseSpec = new CourseSpecification();
+        $courseSpec->setId(3)->setFolder($courseSpecFolder);
 
         // Create a Unit Specification
         $unitSpecFolder = new FolderModel();
@@ -68,12 +68,12 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $unitSpec->getAssessables()->add($unitTask1)->add($unitTask2);
 
         // Translate!
-        $dataModel = $this->unitTranslator->translateToDataModel($unitSpec, $courseDataModel);
+        $dataModel = $this->unitTranslator->translateToDataModel($unitSpec, $courseSpec);
 
         // Verify that some of these things are the same
         $this->assertEquals($unitSpec->getId(), $dataModel->getId());
         $this->assertSame($unitSpec->getFolder(), $dataModel->getFolder());
-        $this->assertSame($courseDataModel, $dataModel->getCourse());
+        $this->assertEquals($courseSpec->getId(), $dataModel->getCourse()->getId());
         $this->assertEquals($unitSpec->getCreatedAt()->getDatabase(), $dataModel->getCreatedAt()->getDatabase());
         $this->assertEquals($unitSpec->getUpdatedAt()->getDatabase(), $dataModel->getUpdatedAt()->getDatabase());
         $this->assertInstanceOf(Alaress_Date_NullDate::class, $dataModel->getDeletedAt());
