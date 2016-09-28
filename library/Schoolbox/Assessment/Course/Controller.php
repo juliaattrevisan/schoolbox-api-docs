@@ -1062,11 +1062,16 @@ class Controller extends Base\Base
     /**
      * List the folders that are allowed to be course parents
      *
+     * @param $folderId
      * @api   GET /course/parent
      * @level 160
      */
-    public function parentList()
+    public function parentList($folderId)
     {
+        if (empty($folderId)) {
+            $folderId = $this->getCourseMapper()->getFacultyNode()->getId();
+        }
+
         $treeBuilder = new TreeBuilder(
             Folder\Mapper::getInstance(),
             CourseUnitMapper::getInstance(),
@@ -1074,13 +1079,7 @@ class Controller extends Base\Base
             'Courses'
         );
 
-        $folderId = $this->getSession()->get('resourcesID', $this->getCourseMapper()->getFacultyNode()->getId(), $this->namespace);
-
-        if ($folderId == 0) {
-            $treeData = $treeBuilder->buildPartialTree($folderId);
-        } else {
-            $treeData = $treeBuilder->buildPartialTree($folderId, $folderId);
-        }
+        $treeData = $treeBuilder->buildPartialTree($folderId, $this->getCourseMapper()->getFacultyNode()->getId());
 
         $data = [
             'treedata' => json_encode($treeData),

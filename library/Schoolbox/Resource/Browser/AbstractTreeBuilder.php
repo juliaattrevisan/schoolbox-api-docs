@@ -67,7 +67,6 @@ abstract class AbstractTreeBuilder
      */
     public function buildPartialTree($categoryId, $baseFolder='#')
     {
-
         // build a list of parentage
         $parentList[] = $parentId = $categoryId;
         $i = 0;
@@ -94,6 +93,7 @@ abstract class AbstractTreeBuilder
                 );
             }
         } else {
+
             $found = false;
             foreach ($parentList as $parentCategoryId) {
                 $nodes = $this->buildChildNodes($parentCategoryId, $parentList);
@@ -109,9 +109,32 @@ abstract class AbstractTreeBuilder
                     break;
                 }
             }
+
+            // Build the parent nodes
+            foreach ($parentList as $parentCategoryId) {
+                $partialTree = array_merge(
+                    $partialTree,
+                    $this->buildChildNodes($parentCategoryId, $parentList)
+                );
+            }
+
+            // Need to deduplicate the tree
+
+            $found = [];
+            $treeDeduplicated = [];
+
+            foreach ($partialTree as $item) {
+                if (!in_array($item['id'], $found)) {
+                    $treeDeduplicated[] = $item;
+                    $found[] = $item['id'];
+                }
+            }
+
+            $partialTree = $treeDeduplicated;
         }
 
         // Open $categoryId's node and its parents
+
         foreach ($partialTree as &$leaf) {
             $leaf['state']['opened'] = in_array($leaf['id'], $parentList) || $leaf['id'] == 0;
             $leaf['state']['selected'] = ($leaf['id'] == $categoryId);
