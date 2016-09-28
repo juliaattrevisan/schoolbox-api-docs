@@ -197,6 +197,8 @@ INSERT INTO `component_config_definition` (
 CREATE TABLE `project` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `assessment_id` INT UNSIGNED NOT NULL,
+  `mark_type_id` INT(11) NOT NULL,
+  `summator` ENUM('min', 'max', 'avg', 'weighted') NOT NULL DEFAULT 'weighted',
   `title` VARCHAR(250) NOT NULL,
   `description` TEXT NULL,
   `weight` INT(11) NOT NULL DEFAULT 0,
@@ -207,6 +209,7 @@ CREATE TABLE `project` (
   REFERENCES `assessment` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
+  -- mark type would be a FK, but it's a MyISAM table
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8
   COLLATE = utf8_general_ci;
