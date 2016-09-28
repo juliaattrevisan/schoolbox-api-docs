@@ -48,7 +48,7 @@ class Project extends AbstractAssessment
      *
      * @param ISummator $summator
      */
-    public function __construct(ISummator $summator)
+    public function __construct(ISummator $summator = null)
     {
         /* I know Dr hates hook methods, so do this instead
          */
@@ -215,7 +215,7 @@ class Project extends AbstractAssessment
      * @param ISummator $summator
      * @return $this
      */
-    public function setSummator($summator)
+    public function setSummator(ISummator $summator = null)
     {
         $this->summator = $summator;
         return $this;
