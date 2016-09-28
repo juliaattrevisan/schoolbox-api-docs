@@ -16,7 +16,7 @@ use Schoolbox\Learning\Assessment\Task\Model as TaskObject;
 /**
  * Sub-translator for task specific fields.
  */
-class Task
+class Task implements IAssessmentTypeTranslator
 {
     /**
      * Translates this assessable to a data model.
