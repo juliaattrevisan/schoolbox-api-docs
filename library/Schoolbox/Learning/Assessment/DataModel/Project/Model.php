@@ -48,7 +48,7 @@ class Model implements IAssessableDataModel
      *
      * @var string
      */
-    const SUMMATOR_WEIGHTED_AVERAGE = 'weightedAvg';
+    const SUMMATOR_WEIGHTED_AVERAGE = 'weighted';
 
     /**
      * The name of the summator that this uses.
