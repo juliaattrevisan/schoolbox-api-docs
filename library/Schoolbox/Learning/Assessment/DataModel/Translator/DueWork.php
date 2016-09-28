@@ -9,6 +9,8 @@ namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
+use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
+use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
@@ -97,6 +99,51 @@ class DueWork implements IAssessmentTypeTranslator
      */
     public function translateToDomainModel(IAssessableDataModel $model)
     {
+        if ($model instanceof DueWorkModel) {
+            // Due work-specific fields
+            $assessable = (new DueWorkObject())
+                ->setShowSubmittedOnly($model->getSkipUnsubmitted())
+                ->setHasRubric($model->getUseRubric())
+                ->setCreator($model->getOwner())
+                ->setMaxMark($model->getMaxMark())
+                ->setGradeGroup($model->getGradeGroup())
+            ;
+
+            // Figure out submission visibility
+            if ($model->getAcceptOnline()) {
+                if ($model->getAcceptMultiple()) {
+                    $assessable->setAcceptsMultiple();
+                } else {
+                    $assessable->setAcceptsSingle();
+                }
+            } else {
+                $assessable->setAcceptsNone();
+            }
+
+            // Convert attachments
+            foreach ($model->getAttachments() as $attachment) {
+                $assessable->getAllFiles()->add(
+                    (new DueWorkFile())
+                        ->setHash($attachment->getHash())
+                        ->setFilename($attachment->getFilename())
+                );
+            }
+
+            // Convert work type
+            $assessable->setType(
+                (new DueWorkType())
+                    ->setId($model->getWorkType()->getId())
+                    ->setName($model->getWorkType()->getName())
+            );
+
+            // Convert mark type
+            $assessable->setMarkType(
+                (new DueWorkModel\MarkType())
+                    ->setId($model->getMarkType()->getId())
+            );
+
+            return $assessable;
+        }
         return null;
     }
 }
