@@ -1,0 +1,1 @@
+INSERT INTO localisation (term, singular_form, plural_form, capitalise_first) VALUES ('specialNeeds', 'special needs', 'special needs', 1);
