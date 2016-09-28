@@ -12,11 +12,12 @@ namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
 
-interface IAssessable
+interface IAssessable extends ISoftDeletable
 {
 
     /**
