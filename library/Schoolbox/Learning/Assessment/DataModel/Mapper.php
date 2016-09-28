@@ -44,14 +44,44 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         // Joins to:
-        // task
-        // duework
-        // quiz
-        // project
-        $this->joins('id', TaskMapper::class, 'assessment_id', null, null, 'task', 'task');
-        $this->joins('id', SubmissionBoxMapper::class, 'assessment_id', null, null, 'dueWork', 'duework');
-        $this->joins('id', OnlineAssessmentMapper::class, 'assessment_id', null, null, 'quiz', 'quiz');
-        $this->joins('id', ProjectMapper::class, 'assessment_id', null, null, 'project', 'project');
+        // * task
+        // * due work
+        // * quiz
+        // * project
+        // are defined without a related field, because they don't have a matching key in this mapper
+        // (that isn't this mapper's PK)
+        $this->hasJoin(
+            'task',
+            [
+                'mapper'    => TaskMapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'assessment_id'
+            ]
+        );
+        $this->hasJoin(
+            'duework',
+            [
+                'mapper'    => SubmissionBoxMapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'assessment_id'
+            ]
+        );
+        $this->hasJoin(
+            'quiz',
+            [
+                'mapper'    => OnlineAssessmentMapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'assessment_id'
+            ]
+        );
+        $this->hasJoin(
+            'project',
+            [
+                'mapper'    => ProjectMapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'assessment_id'
+            ]
+        );
 
         // folder (by assessment_folder table)
         // unit specification (by assessment_course_unit_specification table)
