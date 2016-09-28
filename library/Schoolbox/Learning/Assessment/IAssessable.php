@@ -222,6 +222,7 @@ interface IAssessable
      * Set the date when this IAssessable is due
      *
      * @param \Alaress_Date_Format $dueAt
+     * @return $this
      */
     public function setDueAt($dueAt);
 
