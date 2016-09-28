@@ -305,30 +305,24 @@ class Controller extends Base
             'allMarkTypes' => $this->getAllMarkTypes(),
         ];
 
-        switch ($assessmentType) {
-            case Types::ASSESSMENT_PROJECT:
-                $template = 'updateProject.twig';
+        $types = new Types();
 
-                $data['types'] = new Types();
+        if ($types->isValidIndex($assessmentType)) {
+
+            /* Special treatment for projects for now
+             */
+            if ($assessmentType == Types::ASSESSMENT_PROJECT) {
+                $data['types']         = new Types();
                 $data['allReturnUrls'] = $this->getAllReturnUrls($assessmentId);
-                $data['allSummators'] = new SummatorCollection();
+                $data['allSummators']  = new SummatorCollection();
+            }
 
-                break;
-            case Types::ASSESSMENT_DUE_WORK:
-                $template = 'updateDueWork.twig';
-                break;
-            case Types::ASSESSMENT_TASK:
-                $template = 'updateTask.twig';
-                break;
-            case Types::ASSESSMENT_QUIZ:
-                $template = 'updateQuiz.twig';
-                break;
-            default:
-                $this->sendError('Could not create assessment', [ 'select a valid assessment type' ]);
-                return;
+            $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($assessmentType)}/update.twig", $data));
         }
-
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/' . $template, $data));
+        else {
+            $this->sendError('Could not create assessment', [ 'select a valid assessment type' ]);
+            return;
+        }
     }
 
     /**
