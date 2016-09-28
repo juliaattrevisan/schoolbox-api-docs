@@ -52,6 +52,7 @@ class Translator
         $this->subTranslators[]  = new Translator\Task();
         $this->subTranslators[]  = new Translator\Quiz();
         $this->subTranslators[]  = new Translator\DueWork();
+        $this->subTranslators[]  = new Translator\Project($this);
     }
 
     /**
@@ -82,6 +83,8 @@ class Translator
         ;
 
         // Attempt to translate tasks using the sub-translators
+        // TODO figure out which fields on assessable sub-objects are now redundant
+        // TODO figure out how to translate participants
         foreach ($this->subTranslators as $subTranslator) {
             $model = $subTranslator->translateToDataModel($assessment);
             if ($model instanceof IAssessableDataModel) {
@@ -90,40 +93,6 @@ class Translator
             }
         }
 
-        // The translation depends on the type of $assessment.
-        // Probably doesn't always return a Model either, it will return an old
-        // Quiz/DueWork/Task/Project model, with an Assessment attached.
-        // TODO figure out which fields on assessable sub-objects are now redundant
-        // TODO figure out how to translate participants
-        if ($assessment instanceof Project) {
-            // convert to project's model
-            $model     = new ProjectModel();
-            $subModels = new Collection();
-            $i         = 0;
-            foreach ($assessment->getAssessables() as $assessable) {
-                $subModel = $this->translateToDataModel($assessable, $i++);
-                // You can't have projects within projects
-                if ($subModel instanceof ProjectModel) {
-                    throw new UnexpectedValueException('A project may not contain another project');
-                }
-                $subModels->add($subModel);
-            }
-            $model->setAssessments($subModels);
-
-            // Translate summator
-            if ($assessment->getSummator() instanceof Average) {
-                $model->setSummator(ProjectModel::SUMMATOR_AVERAGE);
-            } elseif ($assessment->getSummator() instanceof WeightedAverage) {
-                $model->setSummator(ProjectModel::SUMMATOR_WEIGHTED_AVERAGE);
-            } elseif ($assessment->getSummator() instanceof Minimum) {
-                $model->setSummator(ProjectModel::SUMMATOR_MINIMUM);
-            } elseif ($assessment->getSummator() instanceof Maximum) {
-                $model->setSummator(ProjectModel::SUMMATOR_MAXIMUM);
-            }
-
-            return $model;
-
-        }
         throw new UnexpectedValueException('$assessment is not a recognised assessment type');
     }
 
@@ -141,41 +110,6 @@ class Translator
             $assessable = $subTranslator->translateToDomainModel($dataModel);
             if ($assessable instanceof IAssessable) {
                 break;
-            }
-        }
-
-        if (!$assessable instanceof IAssessable) {
-            if ($dataModel instanceof ProjectModel) {
-                // Project-specific fields
-
-                // Figure out which summator to make
-                if ($dataModel->getSummator() == ProjectModel::SUMMATOR_AVERAGE) {
-                    $summator = new Average();
-                } elseif ($dataModel->getSummator() == ProjectModel::SUMMATOR_WEIGHTED_AVERAGE) {
-                    $summator = new WeightedAverage();
-                } elseif ($dataModel->getSummator() == ProjectModel::SUMMATOR_MINIMUM) {
-                    $summator = new Minimum();
-                } elseif ($dataModel->getSummator() == ProjectModel::SUMMATOR_MAXIMUM) {
-                    $summator = new Maximum();
-                } else {
-                    throw new UnexpectedValueException('$dataModel->getSummator() is not a recognised summator type');
-                }
-
-                $assessable = new Project($summator);
-
-                foreach ($dataModel->getAssessments() as $subModel) {
-                    if ($subModel instanceof ProjectModel) {
-                        throw new UnexpectedValueException('A project may not contain another project');
-                    }
-                    $assessable->getAssessables()->add($this->translateToDomainModel($subModel));
-                }
-
-                // Convert mark type
-                $assessable->setMarkType(
-                    (new DueWorkModel\MarkType())
-                        ->setId($dataModel->getMarkType()->getId())
-                );
-
             }
         }
 
