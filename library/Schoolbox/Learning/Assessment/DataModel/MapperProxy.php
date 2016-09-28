@@ -140,9 +140,11 @@ class MapperProxy
         ;
 
         // Save sub-objects
-        // TODO map assessement ID to all sub-objects
         $subObject = $dataModel->getSubObject();
         if ($subObject instanceof Task) {
+            // TODO remove vestigal folder - for now, this is required to save a task
+            $vestigalFolder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findAll(['limit' => 1])->first();
+            $subObject->setCategory($vestigalFolder);
             TaskMapper::getInstance()->save($subObject);
 
         } elseif ($subObject instanceof DueWork) {
