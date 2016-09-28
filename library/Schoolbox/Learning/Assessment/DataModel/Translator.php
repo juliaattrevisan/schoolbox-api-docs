@@ -38,17 +38,27 @@ use UnexpectedValueException;
 class Translator
 {
     /**
+     * Factory for mark schemes for assessables.
+     *
      * @var MarkSchemeFactory
      */
     protected $markSchemeFactory;
+
+    /**
+     * Translator exclusively for tasks.
+     *
+     * @var Translator\Task
+     */
+    protected $taskTranslator;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        // TODO inject this factory
+        // TODO inject all of this
         $this->markSchemeFactory = new MarkSchemeFactory();
+        $this->taskTranslator    = new Translator\Task();
     }
 
     /**
@@ -77,6 +87,13 @@ class Translator
             ->setUpdatedAt($assessment->getUpdatedAt())
             ->setDeletedAt($assessment->getDeletedAt())
         ;
+
+        // Attempt to translate tasks using the translator
+        $model = $this->taskTranslator->translateToDataModel($assessment);
+        if ($model instanceof IAssessableDataModel) {
+            $model->setAssessmentModel($assessmentModel);
+            return $model;
+        }
 
         // The translation depends on the type of $assessment.
         // Probably doesn't always return a Model either, it will return an old
@@ -194,20 +211,6 @@ class Translator
             // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
             return $model;
 
-        } elseif ($assessment instanceof Task) {
-            // convert to task's model
-            // task currently has its own ID, but that will be handled in the mapper proxy
-            $model = new TaskModel();
-            $model
-                ->setAssessmentModel($assessmentModel)
-                ->setTitle($assessment->getTitle())
-                ->setOrder(0)
-                ->setOwner($assessment->getCreator())
-                ->setLink($assessment->getLink())
-                ->setRequiresConfirmation(!$assessment->isSelfMarkable())
-            ;
-            return $model;
-
         }
         throw new UnexpectedValueException('$assessment is not a recognised assessment type');
     }
@@ -221,103 +224,96 @@ class Translator
      */
     public function translateToDomainModel(IAssessableDataModel $dataModel)
     {
-        $assessable = null;
+        $assessable = $this->taskTranslator->translateToDomainModel($dataModel);
 
-        if ($dataModel instanceof ProjectModel) {
-            // Project-specific fields
+        if (!$assessable instanceof IAssessable) {
+            if ($dataModel instanceof ProjectModel) {
+                // Project-specific fields
 
-            // Figure out which summator to make
-            if ($dataModel->getSummator() == ProjectModel::SUMMATOR_AVERAGE) {
-                $summator = new Average();
-            } elseif ($dataModel->getSummator() == ProjectModel::SUMMATOR_WEIGHTED_AVERAGE) {
-                $summator = new WeightedAverage();
-            } elseif ($dataModel->getSummator() == ProjectModel::SUMMATOR_MINIMUM) {
-                $summator = new Minimum();
-            } elseif ($dataModel->getSummator() == ProjectModel::SUMMATOR_MAXIMUM) {
-                $summator = new Maximum();
-            } else {
-                throw new UnexpectedValueException('$dataModel->getSummator() is not a recognised summator type');
-            }
-
-            $assessable = new Project($summator);
-
-            foreach ($dataModel->getAssessments() as $subModel) {
-                if ($subModel instanceof ProjectModel) {
-                    throw new UnexpectedValueException('A project may not contain another project');
-                }
-                $assessable->getAssessables()->add($this->translateToDomainModel($subModel));
-            }
-
-            // Convert mark type
-            $assessable->setMarkType(
-                (new DueWorkModel\MarkType())
-                    ->setId($dataModel->getMarkType()->getId())
-            );
-
-        } elseif ($dataModel instanceof TaskModel) {
-            // Task-specific fields
-            $assessable = (new Task())
-                ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_COMPLETION))
-                ->setLink($dataModel->getLink())
-                ->setSelfMarkable(!$dataModel->getRequiresConfirmation())
-                ->setCreator($dataModel->getOwner())
-            ;
-
-        } elseif ($dataModel instanceof QuizModel) {
-            // Quiz-specific fields
-            $assessable = (new Quiz())
-                ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_TOTAL))
-                ->setMaxAttempts($dataModel->getMaxAttempts())
-                ->setDuration($dataModel->getDuration())
-                ->setCompletionMessage($dataModel->getCompletionMessage())
-                ->setCreator($dataModel->getUser())
-            ;
-
-            // TODO implement correct setting of max marks
-            $assessable->setMaxMark(1);
-
-        } elseif ($dataModel instanceof DueWorkModel) {
-            // Due work-specific fields
-            $assessable = (new DueWork())
-                ->setShowSubmittedOnly($dataModel->getSkipUnsubmitted())
-                ->setHasRubric($dataModel->getUseRubric())
-                ->setCreator($dataModel->getOwner())
-                ->setMaxMark($dataModel->getMaxMark())
-                ->setGradeGroup($dataModel->getGradeGroup())
-            ;
-
-            // Figure out submission visibility
-            if ($dataModel->getAcceptOnline()) {
-                if ($dataModel->getAcceptMultiple()) {
-                    $assessable->setAcceptsMultiple();
+                // Figure out which summator to make
+                if ($dataModel->getSummator() == ProjectModel::SUMMATOR_AVERAGE) {
+                    $summator = new Average();
+                } elseif ($dataModel->getSummator() == ProjectModel::SUMMATOR_WEIGHTED_AVERAGE) {
+                    $summator = new WeightedAverage();
+                } elseif ($dataModel->getSummator() == ProjectModel::SUMMATOR_MINIMUM) {
+                    $summator = new Minimum();
+                } elseif ($dataModel->getSummator() == ProjectModel::SUMMATOR_MAXIMUM) {
+                    $summator = new Maximum();
                 } else {
-                    $assessable->setAcceptsSingle();
+                    throw new UnexpectedValueException('$dataModel->getSummator() is not a recognised summator type');
                 }
-            } else {
-                $assessable->setAcceptsNone();
-            }
 
-            // Convert attachments
-            foreach ($dataModel->getAttachments() as $attachment) {
-                $assessable->getAllFiles()->add(
-                    (new DueWorkFile())
-                        ->setHash($attachment->getHash())
-                        ->setFilename($attachment->getFilename())
+                $assessable = new Project($summator);
+
+                foreach ($dataModel->getAssessments() as $subModel) {
+                    if ($subModel instanceof ProjectModel) {
+                        throw new UnexpectedValueException('A project may not contain another project');
+                    }
+                    $assessable->getAssessables()->add($this->translateToDomainModel($subModel));
+                }
+
+                // Convert mark type
+                $assessable->setMarkType(
+                    (new DueWorkModel\MarkType())
+                        ->setId($dataModel->getMarkType()->getId())
+                );
+
+            } elseif ($dataModel instanceof QuizModel) {
+                // Quiz-specific fields
+                $assessable = (new Quiz())
+                    ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_TOTAL))
+                    ->setMaxAttempts($dataModel->getMaxAttempts())
+                    ->setDuration($dataModel->getDuration())
+                    ->setCompletionMessage($dataModel->getCompletionMessage())
+                    ->setCreator($dataModel->getUser())
+                ;
+
+                // TODO implement correct setting of max marks
+                $assessable->setMaxMark(1);
+
+            } elseif ($dataModel instanceof DueWorkModel) {
+                // Due work-specific fields
+                $assessable = (new DueWork())
+                    ->setShowSubmittedOnly($dataModel->getSkipUnsubmitted())
+                    ->setHasRubric($dataModel->getUseRubric())
+                    ->setCreator($dataModel->getOwner())
+                    ->setMaxMark($dataModel->getMaxMark())
+                    ->setGradeGroup($dataModel->getGradeGroup())
+                ;
+
+                // Figure out submission visibility
+                if ($dataModel->getAcceptOnline()) {
+                    if ($dataModel->getAcceptMultiple()) {
+                        $assessable->setAcceptsMultiple();
+                    } else {
+                        $assessable->setAcceptsSingle();
+                    }
+                } else {
+                    $assessable->setAcceptsNone();
+                }
+
+                // Convert attachments
+                foreach ($dataModel->getAttachments() as $attachment) {
+                    $assessable->getAllFiles()->add(
+                        (new DueWorkFile())
+                            ->setHash($attachment->getHash())
+                            ->setFilename($attachment->getFilename())
+                    );
+                }
+
+                // Convert work type
+                $assessable->setType(
+                    (new DueWorkType())
+                        ->setId($dataModel->getWorkType()->getId())
+                        ->setName($dataModel->getWorkType()->getName())
+                );
+
+                // Convert mark type
+                $assessable->setMarkType(
+                    (new DueWorkModel\MarkType())
+                        ->setId($dataModel->getMarkType()->getId())
                 );
             }
-
-            // Convert work type
-            $assessable->setType(
-                (new DueWorkType())
-                    ->setId($dataModel->getWorkType()->getId())
-                    ->setName($dataModel->getWorkType()->getName())
-            );
-
-            // Convert mark type
-            $assessable->setMarkType(
-                (new DueWorkModel\MarkType())
-                    ->setId($dataModel->getMarkType()->getId())
-            );
         }
 
         if (!$assessable instanceof IAssessable) {

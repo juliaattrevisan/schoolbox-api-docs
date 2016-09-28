@@ -1,0 +1,64 @@
+<?php
+/**
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2016, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Learning\Assessment\DataModel\Translator;
+
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Assessment\Course\Task as TaskModel;
+use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Task\Model as TaskObject;
+
+/**
+ * Sub-translator for task specific fields.
+ */
+class Task
+{
+    /**
+     * Translates this assessable to a data model.
+     *
+     * @param IAssessable $assessment
+     * @return TaskModel|null A task model if the assessable is a task, or null otherwise.
+     */
+    public function translateToDataModel(IAssessable $assessment)
+    {
+        if ($assessment instanceof TaskObject) {
+            // convert to task's model
+            // task currently has its own ID, but that will be handled in the mapper proxy
+            $model = new TaskModel();
+            $model
+                ->setTitle($assessment->getTitle())
+                ->setOrder(0)
+                ->setOwner($assessment->getCreator())
+                ->setLink($assessment->getLink())
+                ->setRequiresConfirmation(!$assessment->isSelfMarkable())
+            ;
+            return $model;
+        }
+        return null;
+    }
+
+    /**
+     * Translates this data model to an assessable.
+     *
+     * @param IAssessableDataModel $model
+     * @return IAssessable|null A task if the data model is for a task, or null otherwise.
+     */
+    public function translateToDomainModel(IAssessableDataModel $model)
+    {
+        if ($model instanceof TaskModel) {
+            // Task-specific fields
+            return (new TaskObject())
+                ->setMarkType((new MarkType())->setId(MarkType::TYPE_COMPLETION))
+                ->setLink($model->getLink())
+                ->setSelfMarkable(!$model->getRequiresConfirmation())
+                ->setCreator($model->getOwner())
+            ;
+        }
+        return null;
+    }
+}
