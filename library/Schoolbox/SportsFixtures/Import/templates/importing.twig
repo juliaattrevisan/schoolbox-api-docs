@@ -36,11 +36,11 @@
                         var style = '';
 
                         if (data.errors[i]['type'] == 'error') {
-                            style = 'background-color:#fcc;';
+                            style = 'class="alert"';
                             window.countErrors++;
                         }
                         
-                        $("#table-body").append("<tr style='" + style + "'><td>" + createdAt + "</td><td>" + result + "</td><td>" + filename + "</td><td>" + line + divider + column + "</td></tr>");
+                        $("#table-body").append("<tr "+ style + "><td>" + createdAt + "</td><td>" + result + "</td><td>" + filename + "</td><td>" + line + divider + column + "</td></tr>");
                     }
 
                     // Keep polling for updates if the import hasn't completed/failed
@@ -69,6 +69,9 @@
                 } else if (window.countErrors > 0) {
                     $('#warning').html(window.countErrors + ' Error During Import');
                 }
+                else {
+                    $('#warning').hide();
+                }
 
                 window.skipCount += data.errors.length;
             });
@@ -87,7 +90,7 @@
 <div class="row">
     <div class="small-12 columns">
         <h1 id="progress"></h1>
-        <h2 id="warning" class="gradient-1"></h2>
+        <h2 id="warning" class="alert label">Please wait loading...</h2>
     </div>
 </div>
 
