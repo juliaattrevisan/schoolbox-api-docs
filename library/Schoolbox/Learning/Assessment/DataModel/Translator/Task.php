@@ -19,10 +19,7 @@ use Schoolbox\Learning\Assessment\Task\Model as TaskObject;
 class Task implements IAssessmentTypeTranslator
 {
     /**
-     * Translates this assessable to a data model.
-     *
-     * @param IAssessable $assessment
-     * @return TaskModel|null A task model if the assessable is a task, or null otherwise.
+     * @inheritdoc
      */
     public function translateToDataModel(IAssessable $assessment)
     {
@@ -43,10 +40,7 @@ class Task implements IAssessmentTypeTranslator
     }
 
     /**
-     * Translates this data model to an assessable.
-     *
-     * @param IAssessableDataModel $model
-     * @return IAssessable|null A task if the data model is for a task, or null otherwise.
+     * @inheritdoc
      */
     public function translateToDomainModel(IAssessableDataModel $model)
     {
