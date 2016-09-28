@@ -24,11 +24,6 @@ use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
-use Schoolbox\Learning\MarkScheme\LetterGrade;
-use Schoolbox\Learning\MarkScheme\None;
-use Schoolbox\Learning\MarkScheme\Percentage;
-use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
-use Schoolbox\Resource\Storage\Model as StorageModel;
 use UnexpectedValueException;
 
 /**
@@ -59,6 +54,7 @@ class Translator
         $this->markSchemeFactory = new MarkSchemeFactory();
         $this->subTranslators[]  = new Translator\Task();
         $this->subTranslators[]  = new Translator\Quiz();
+        $this->subTranslators[]  = new Translator\DueWork();
     }
 
     /**
@@ -128,69 +124,6 @@ class Translator
                 $model->setSummator(ProjectModel::SUMMATOR_MAXIMUM);
             }
 
-            return $model;
-
-        } elseif ($assessment instanceof DueWork) {
-            // convert to due work's model
-            $model = new DueWorkModel();
-            $model
-                ->setAssessmentModel($assessmentModel)
-                ->setName($assessment->getTitle())
-                ->setDescription($assessment->getDescription())
-                ->setPublishDate($assessment->getPublishAt())
-                ->setOpenDate($assessment->getOpenAt())
-                ->setDueDate($assessment->getDueAt())
-                ->setLateDate($assessment->getCloseAt())
-                ->setWeight($assessment->getWeight())
-                ->setSkipUnsubmitted($assessment->getShowSubmittedOnly())
-                ->setAcceptOnline($assessment->isAcceptSingle() || $assessment->isAcceptMulti())
-                ->setAcceptMultiple($assessment->isAcceptMulti())
-                ->setUseRubric($assessment->hasRubric())
-                ->setOwner($assessment->getCreator())
-                ->setMarkType(new DueWorkModel\MarkType())
-                ->setGradeGroup(new DueWorkModel\GradeLevel\Group\Model())
-            ;
-
-            // Convert a mark type into fields
-            // TODO move this to the mark scheme translator
-            $markScheme = $assessment->getMarkScheme();
-            if ($markScheme instanceof TotalMarkWholeNumber) {
-                $model->setMaxMark($markScheme->getTotalMark());
-                $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_TOTAL);
-
-            } elseif ($markScheme instanceof Percentage) {
-                $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_PERCENT);
-
-            } elseif ($markScheme instanceof LetterGrade) {
-                $model->setGradeGroup($markScheme->getGradeGroup());
-                $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_LETTER);
-
-            } elseif ($markScheme instanceof None) {
-                $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_NONE);
-
-            }
-
-            // Translate files
-            // TODO consider whether the DueWorkFile model is required - should Storage be used directly?
-            foreach ($assessment->getAllFiles() as $file) {
-                $model->addAttachment(
-                    (new StorageModel())
-                        ->setHash($file->getHash())
-                        ->setFilename($file->getFilename())
-                );
-            }
-
-            // Translate work type
-            $model->setWorkType(
-                (new DueWorkModel\WorkType())
-                    ->setId($assessment->getType()->getId())
-                    ->setName($assessment->getType()->getName())
-            );
-
-            // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
-            // TODO figure out rubric result set
-            // TODO figure out mark per rubric group
-            // TODO set model's grade group, mark type, max mark based on mark scheme
             return $model;
 
         }
