@@ -775,6 +775,8 @@ class Controller extends Base
                 if (!$error) {
                     try {
                         $school = $this->getSchoolMapper()->findOneByColumn('name', $row[1]);
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "SKIPPED SCHOOL: School '{$row[1]}' already exists");
+
                     } catch (MapperException $e) {
                         $school = new School();
                         $school->setName($row[1]);
@@ -814,6 +816,8 @@ class Controller extends Base
                 if (!$error) {
                     try {
                         $status = $this->getStatusMapper()->findOneByColumn('name', $row[1]);
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "SKIPPED STATUS: Status '{$row[1]}' already exists");
+
                     } catch (MapperException $e) {
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Status '{$row[1]}'");
                         $status = new Status();
