@@ -120,8 +120,15 @@ class Controller extends Base
 
         /* Common data among all assessmentType fragments
          */
+        $types = new Types();
+
+        if (!$types->isValidIndex($this->getRequest()->post['assessmentType'])) {
+            $this->sendError('Could not create assessment', ['select a valid assessment type']);
+            return;
+        }
+
         $data = [
-            'types' => new Types(),
+            'types' => $types,
             'assessment' => $assessment,
             'curriculumNodes' => $folder->getCurriculumNodes(),
             'allMarkTypes' => $this->getAllMarkTypes()

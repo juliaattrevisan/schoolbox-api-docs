@@ -69,6 +69,21 @@ class Types extends \Schoolbox\Collection
         return $this->types[$title];
     }
 
+    /**
+     * Is the $index valid?
+     *
+     * @param $index
+     * @return bool
+     */
+    public function isValidIndex($index)
+    {
+        if ($index !== null) {
+            return in_array($index, array_values($this->getTypes()));
+        }
+
+        return false;
+    }
+
     /* Getters/Setters
      */
 
