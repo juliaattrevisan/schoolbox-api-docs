@@ -25,6 +25,7 @@ class Mapper extends BaseMapper
         $this->uses('result', self::TYPE_STRING);
         $this->uses('filename', self::TYPE_STRING);
         $this->uses('hash', self::TYPE_STRING);
+        $this->uses('type', self::TYPE_STRING);
         $this->uses('line', self::TYPE_INTEGER);
         $this->uses('column', self::TYPE_INTEGER);
         $this->uses('updated_at', self::TYPE_DATETIME);

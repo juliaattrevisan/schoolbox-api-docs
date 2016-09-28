@@ -92,6 +92,9 @@ class Controller extends Base
     const STATUS_FAILED = 'failed';
     const STATUS_COMPLETED = 'completed';
 
+    const RESULT_SUCCESS = 'success';
+    const RESULT_ERROR = 'error';
+
     /** @var Import $import */
     private $import;
 
@@ -125,13 +128,14 @@ class Controller extends Base
 
     /**
      * Update import progress in log table
+     * @param string Result (success/error)
      * @param \Schoolbox\Resource\Storage\Model $file File currently being processed
      * @param int $line Line number
      * @param int $column Column number
      * @param string $text Message to add to log
      * @param string $status Status of CSV import
      */
-    private function updateLog($file, $line, $column, $text, $status = Controller::STATUS_RUNNING)
+    private function updateLog($result, $file, $line, $column, $text, $status = Controller::STATUS_RUNNING)
     {
         // Record error
 
@@ -148,6 +152,7 @@ class Controller extends Base
         $importError->setResult($text);
         $importError->setCreatedAt(\Alaress_Date_Format::now());
         $importError->setUpdatedAt(\Alaress_Date_Format::now());
+        $importError->setType($result);
         $this->getImportErrorsMapper()->save($importError);
 
         // Update import status
@@ -234,6 +239,7 @@ class Controller extends Base
                         'result' => $error->getResult(),
                         'filename' => $error->getFilename(),
                         'line' => $error->getLine(),
+                        'type' => $error->getType(),
                         'column' => $error->getColumn()
                     ];
                 }
@@ -329,7 +335,7 @@ class Controller extends Base
             $this->import->setUpdatedAt(\Alaress_Date_Format::now());
             $this->getImportMapper()->save($this->import);
 
-            $this->updateLog(null, 0, 0, "Import started");
+            $this->updateLog(Controller::RESULT_SUCCESS, null, 0, 0, "Import started");
 
             $this->getResponse()->content->set([
                 'postOutput' => [
@@ -383,13 +389,13 @@ class Controller extends Base
 
                             // Success, update the status
 
-                            $this->updateLog(null, 0, 0, "Import completed", Controller::STATUS_COMPLETED);
+                            $this->updateLog(Controller::RESULT_SUCCESS, null, 0, 0, "Import completed", Controller::STATUS_COMPLETED);
 
                         } catch (\Exception $e) {
 
                             // Failed, record the error message
 
-                            $this->updateLog(null, 0, 0, "Import failed - {$e->getMessage()} {$e->getTraceAsString()}", Controller::STATUS_FAILED);
+                            $this->updateLog(Controller::RESULT_ERROR, null, 0, 0, "Import failed - {$e->getMessage()} {$e->getTraceAsString()}", Controller::STATUS_FAILED);
                         }
 
                         // All done!
@@ -471,7 +477,7 @@ class Controller extends Base
                 $error = false;
 
                 if (empty(trim($row[1]))) {
-                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED SPORT: No sport name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED SPORT: No sport name specified");
                     $error = true;
                 }
 
@@ -479,15 +485,17 @@ class Controller extends Base
                     $url = new \Url($row[2]);
 
                     if (!$url->isUrl()) {
-                        $this->updateLog($storageObject, $reader->key(), 3, "SKIPPED SPORT: Invalid URL specified ({$row[2]})");
+                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 3, "SKIPPED SPORT: Invalid URL specified ({$row[2]})");
                         $error = true;
                     }
                 }
 
                 try {
                     $sport = $this->getSportMapper()->findOneByColumn('name', $row[1]);
+                    $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Sport '{$row[1]}'");
                 } catch (MapperException $e) {
                     $sport = new Sport();
+                    $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[1]}'");
                 }
 
                 if (!$error) {
@@ -520,12 +528,12 @@ class Controller extends Base
                 $error = false;
 
                 if (empty(trim($row[1]))) {
-                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED POSITION: No sport name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED POSITION: No sport name specified");
                     $error = true;
                 }
 
                 if (empty(trim($row[2]))) {
-                    $this->updateLog($storageObject, $reader->key(), 3, "SKIPPED POSITION: No position name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 3, "SKIPPED POSITION: No position name specified");
                     $error = true;
                 }
 
@@ -533,8 +541,9 @@ class Controller extends Base
                     try {
                         $sport = $this->getSportMapper()->findOneByColumn('name', $row[1]);
                     } catch (MapperException $e) {
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[1]}'");
                         $sport = new Sport();
-                        $sport->setName($row[2]);
+                        $sport->setName($row[1]);
                         $this->getSportMapper()->save($sport);
                     }
 
@@ -543,8 +552,10 @@ class Controller extends Base
                             'sport_id' => $sport->getId(),
                             'name' => $row[2]
                         ]);
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Position '{$row[2]}'");
                     } catch (MapperException $e) {
                         $position = new Position();
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Position '{$row[2]}'");
                     }
 
                     $position->setName($row[2]);
@@ -578,25 +589,25 @@ class Controller extends Base
                 $season = null;
 
                 if (empty(trim($row[1]))) {
-                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED DIVISION: No season name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED DIVISION: No season name specified");
                     $error = true;
 
                 } else {
                     try {
                         $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1]);
                     } catch (MapperException $e) {
-                        $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED DIVISION: Season not found in database ({$row[1]})");
+                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED DIVISION: Season not found in database ({$row[1]})");
                         $error = true;
                     }
                 }
 
                 if (empty(trim($row[2]))) {
-                    $this->updateLog($storageObject, $reader->key(), 3, "SKIPPED DIVISION: No sport name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 3, "SKIPPED DIVISION: No sport name specified");
                     $error = true;
                 }
 
                 if (empty(trim($row[3]))) {
-                    $this->updateLog($storageObject, $reader->key(), 4, "SKIPPED DIVISION: No division name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 4, "SKIPPED DIVISION: No division name specified");
                     $error = true;
                 }
 
@@ -604,7 +615,7 @@ class Controller extends Base
                     $url = new \Url($row[4]);
 
                     if (!$url->isUrl()) {
-                        $this->updateLog($storageObject, $reader->key(), 5, "SKIPPED DIVISION: Invalid URL specified ({$row[4]})");
+                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 5, "SKIPPED DIVISION: Invalid URL specified ({$row[4]})");
                         $error = true;
                     }
                 }
@@ -616,6 +627,7 @@ class Controller extends Base
                     try {
                         $sport = $this->getSportMapper()->findOneByColumn('name', $row[2]);
                     } catch (MapperException $e) {
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[2]}'");
                         $sport = new Sport();
                         $sport->setName($row[2]);
                         $this->getSportMapper()->save($sport);
@@ -629,12 +641,14 @@ class Controller extends Base
                             'season_id' => $season->getId(),
                             'name' => $row[3]
                         ]);
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Division '{$row[3]}'");
                     } catch (MapperException $e) {
                         $division = new Division();
                         $division->setName($row[3]);
                         $division->setSeason($season);
                         $division->setSport($sport);
                         $this->getDivisionMapper()->save($division);
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Division '{$row[3]}'");
                     }
 
                     // Add new players to division, this will not delete any existing players so as not to screw over existing
@@ -663,6 +677,7 @@ class Controller extends Base
                             $divisionUser->setSequence(0);
                             $divisionUser->setUser($user);
                             $this->getDivisionUserMapper()->save($divisionUser);
+                            $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Player '{$player}' to division '{$division->getName()}'");
                         }
                     }
                 }
@@ -688,17 +703,17 @@ class Controller extends Base
                 $error = false;
 
                 if (empty(trim($row[1]))) {
-                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED VENUE: No venue name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED VENUE: No venue name specified");
                     $error = true;
                 }
 
                 if (!is_numeric($row[3]) && !empty(trim($row[3]))) {
-                    $this->updateLog($storageObject, $reader->key(), 4, "SKIPPED VENUE: Invalid latitude specified ({$row[3]})");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 4, "SKIPPED VENUE: Invalid latitude specified ({$row[3]})");
                     $error = true;
                 }
 
                 if (!is_numeric($row[4]) && !empty(trim($row[4]))) {
-                    $this->updateLog($storageObject, $reader->key(), 5, "SKIPPED VENUE: Invalid longitude specified ({$row[4]})");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 5, "SKIPPED VENUE: Invalid longitude specified ({$row[4]})");
                     $error = true;
                 }
 
@@ -711,7 +726,7 @@ class Controller extends Base
                         $row[3] = $location['latitude'];
                         $row[4] = $location['longitude'];
                     } else {
-                        $this->updateLog($storageObject, $reader->key(), 4, "VENUE WARNING: Could not determine latitude/longitude from address");
+                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 4, "VENUE WARNING: Could not determine latitude/longitude from address");
                     }
                 }
 
@@ -722,6 +737,7 @@ class Controller extends Base
                         $venue = new Venue();
                     }
 
+                    $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Venue '{$row[1]}'");
                     $venue->setName($row[1]);
                     $venue->setAddress($row[2]);
                     $venue->setLatitude($row[3]);
@@ -752,7 +768,7 @@ class Controller extends Base
                 $error = false;
 
                 if (empty(trim($row[1]))) {
-                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED SCHOOL: No school name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED SCHOOL: No school name specified");
                     $error = true;
                 }
 
@@ -761,10 +777,11 @@ class Controller extends Base
                         $school = $this->getSchoolMapper()->findOneByColumn('name', $row[1]);
                     } catch (MapperException $e) {
                         $school = new School();
-                    }
+                        $school->setName($row[1]);
+                        $this->getSchoolMapper()->save($school);
 
-                    $school->setName($row[1]);
-                    $this->getSchoolMapper()->save($school);
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: School '{$row[1]}'");
+                    }
                 }
             }
         }
@@ -790,7 +807,7 @@ class Controller extends Base
                 $error = false;
 
                 if (empty(trim($row[1]))) {
-                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED STATUS: No status name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED STATUS: No status name specified");
                     $error = true;
                 }
 
@@ -798,11 +815,11 @@ class Controller extends Base
                     try {
                         $status = $this->getStatusMapper()->findOneByColumn('name', $row[1]);
                     } catch (MapperException $e) {
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Status '{$row[1]}'");
                         $status = new Status();
+                        $status->setName($row[1]);
+                        $this->getStatusMapper()->save($status);
                     }
-
-                    $status->setName($row[1]);
-                    $this->getStatusMapper()->save($status);
                 }
             }
         }
@@ -828,12 +845,12 @@ class Controller extends Base
                 $error = false;
 
                 if (empty(trim($row[1]))) {
-                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED SEASON: No season name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED SEASON: No season name specified");
                     $error = true;
                 }
 
                 if (empty(trim($row[2]))) {
-                    $this->updateLog($storageObject, $reader->key(), 3, "SKIPPED SEASON: No start date specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 3, "SKIPPED SEASON: No start date specified");
                     $error = true;
 
                     // Kludge to stop storm complaining about not being set
@@ -842,7 +859,7 @@ class Controller extends Base
                     try {
                         $startDate = $this->makeDateTime($row[2]);
                     } catch (\Exception $e) {
-                        $this->updateLog($storageObject, $reader->key(), 3, "SKIPPED SEASON: Invalid start date specified ({$row[2]})");
+                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 3, "SKIPPED SEASON: Invalid start date specified ({$row[2]})");
                         $error = true;
 
                         // Kludge to stop storm complaining about not being set
@@ -851,7 +868,7 @@ class Controller extends Base
                 }
 
                 if (empty(trim($row[3]))) {
-                    $this->updateLog($storageObject, $reader->key(), 4, "SKIPPED SEASON: No end date specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 4, "SKIPPED SEASON: No end date specified");
                     $error = true;
 
                     // Kludge to stop storm complaining about not being set
@@ -860,7 +877,7 @@ class Controller extends Base
                     try {
                         $endDate = $this->makeDateTime($row[3], '23:59:59');
                     } catch (\Exception $e) {
-                        $this->updateLog($storageObject, $reader->key(), 4, "SKIPPED SEASON: Invalid end date specified ({$row[3]})");
+                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 4, "SKIPPED SEASON: Invalid end date specified ({$row[3]})");
                         $error = true;
 
                         // Kludge to stop storm complaining about not being set
@@ -871,8 +888,10 @@ class Controller extends Base
                 if (!$error) {
                     try {
                         $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1]);
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Season '{$row[1]}'");
                     } catch (MapperException $e) {
                         $season = new Season();
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Season '{$row[1]}'");
                     }
 
                     $season->setName($row[1]);
@@ -908,7 +927,7 @@ class Controller extends Base
                 $season = null;
 
                 if (empty(trim($row[4]))) {
-                    $this->updateLog($storageObject, $reader->key(), 5, "SKIPPED TEAM: No team name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 5, "SKIPPED TEAM: No team name specified");
                     $error = true;
                 }
 
@@ -916,30 +935,30 @@ class Controller extends Base
                     $url = new \Url($row[5]);
 
                     if (!$url->isUrl()) {
-                        $this->updateLog($storageObject, $reader->key(), 6, "SKIPPED TEAM: Invalid URL specified ({$row[5]})");
+                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 6, "SKIPPED TEAM: Invalid URL specified ({$row[5]})");
                         $error = true;
                     }
                 }
 
                 if (empty(trim($row[1]))) {
-                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED TEAM: No season name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED TEAM: No season name specified");
                     $error = true;
                 } else {
                     try {
                         $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1]);
                     } catch (MapperException $e) {
-                        $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED TEAM: Season not found in database ({$row[1]})");
+                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED TEAM: Season not found in database ({$row[1]})");
                         $error = true;
                     }
                 }
 
                 if (empty(trim($row[2]))) {
-                    $this->updateLog($storageObject, $reader->key(), 3, "SKIPPED TEAM: No sport name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 3, "SKIPPED TEAM: No sport name specified");
                     $error = true;
                 }
 
                 if (empty(trim($row[3]))) {
-                    $this->updateLog($storageObject, $reader->key(), 4, "SKIPPED TEAM: No division name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 4, "SKIPPED TEAM: No division name specified");
                     $error = true;
                 }
 
@@ -950,6 +969,7 @@ class Controller extends Base
                     try {
                         $sport = $this->getSportMapper()->findOneByColumn('name', $row[2]);
                     } catch (MapperException $e) {
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[2]}'");
                         $sport = new Sport();
                         $sport->setName($row[2]);
                         $this->getSportMapper()->save($sport);
@@ -964,6 +984,7 @@ class Controller extends Base
                             'season_id' => $season->getId()
                         ]);
                     } catch (MapperException $e) {
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Division '{$row[3]}'");
                         $division = new Division();
                         $division->setName($row[3]);
                         $division->setSport($sport);
@@ -978,7 +999,9 @@ class Controller extends Base
                             'name' => $row[4],
                             'division_id' => $division->getId()
                         ]);
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Team '{$row[1]}'");
                     } catch (MapperException $e) {
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Team '{$row[4]}'");
                         $team = new Team();
                     }
 
@@ -1009,13 +1032,15 @@ class Controller extends Base
                             try {
                                 $user = $this->getUserMapper()->findByExternalId($player);
 
+                                $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Player '{$player}' to team '{$team->getName()}'");
+
                                 $teamPlayer = new TeamPlayer();
                                 $teamPlayer->setTeam($team);
                                 $teamPlayer->setSequence(0);
                                 $teamPlayer->setUser($user);
                                 $this->getTeamPlayerMapper()->save($teamPlayer);
                             } catch (MapperException $e) {
-                                $this->updateLog($storageObject, $reader->key(), 0, "SKIPPED TEAM PLAYER: Unknown ID ({$player})");
+                                $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 0, "SKIPPED TEAM PLAYER: Unknown ID ({$player})");
                             }
                         }
                     }
@@ -1044,28 +1069,28 @@ class Controller extends Base
                 $season = null;
 
                 if (empty(trim($row[1]))) {
-                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED COACH: No season name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED COACH: No season name specified");
                     $error = true;
                 } else {
                     try {
                         $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1]);
                     } catch (MapperException $e) {
-                        $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED COACH: Season not found in database ({$row[1]})");
+                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED COACH: Season not found in database ({$row[1]})");
                         $error = true;
                     }
                 }
                 if (empty(trim($row[2]))) {
-                    $this->updateLog($storageObject, $reader->key(), 3, "SKIPPED COACH: No sport name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 3, "SKIPPED COACH: No sport name specified");
                     $error = true;
                 }
 
                 if (empty(trim($row[3]))) {
-                    $this->updateLog($storageObject, $reader->key(), 4, "SKIPPED COACH: No division name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 4, "SKIPPED COACH: No division name specified");
                     $error = true;
                 }
 
                 if (empty(trim($row[4]))) {
-                    $this->updateLog($storageObject, $reader->key(), 5, "SKIPPED COACH: No team name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 5, "SKIPPED COACH: No team name specified");
                     $error = true;
                 }
 
@@ -1076,6 +1101,7 @@ class Controller extends Base
                     try {
                         $sport = $this->getSportMapper()->findOneByColumn('name', $row[2]);
                     } catch (MapperException $e) {
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[2]}'");
                         $sport = new Sport();
                         $sport->setName($row[2]);
                         $this->getSportMapper()->save($sport);
@@ -1090,6 +1116,7 @@ class Controller extends Base
                             'season_id' => $season->getId()
                         ]);
                     } catch (MapperException $e) {
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Division '{$row[3]}'");
                         $division = new Division();
                         $division->setName($row[3]);
                         $division->setSport($sport);
@@ -1103,6 +1130,7 @@ class Controller extends Base
                             'division_id' => $division->getId()
                         ]);
                     } catch (MapperException $e) {
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Team '{$row[4]}'");
                         $team = new Team();
                         $team->setName($row[4]);
                         $team->setDivision($division);
@@ -1126,6 +1154,8 @@ class Controller extends Base
                             try {
                                 $user = $this->getUserMapper()->findByExternalId($coach);
 
+                                $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Coach '{$user->getExternalId()}'");
+
                                 try {
                                     $coach = $this->getCoachMapper()->findOneByColumn('user_id', $user->getId());
                                 } catch (MapperException $e) {
@@ -1142,7 +1172,7 @@ class Controller extends Base
 
                             } catch (MapperException $e) {
 
-                                $this->updateLog($storageObject, $reader->key(), 0, "SKIPPED COACH: Unknown ID ({$coach})");
+                                $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 0, "SKIPPED COACH: Unknown ID ({$coach})");
                             }
                         }
                     }
@@ -1171,53 +1201,53 @@ class Controller extends Base
                 $season = null;
 
                 if (empty(trim($row[1]))) {
-                    $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED FIXTURE: No season name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED FIXTURE: No season name specified");
                     $error = true;
                 } else {
                     try {
                         $season = $this->getSeasonMapper()->findOneByColumn('name', $row[1]);
                     } catch (MapperException $e) {
-                        $this->updateLog($storageObject, $reader->key(), 2, "SKIPPED FIXTURE: Season not found in database ({$row[1]})");
+                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 2, "SKIPPED FIXTURE: Season not found in database ({$row[1]})");
                         $error = true;
                     }
                 }
 
                 if (empty(trim($row[2]))) {
-                    $this->updateLog($storageObject, $reader->key(), 3, "SKIPPED FIXTURE: No sport name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 3, "SKIPPED FIXTURE: No sport name specified");
                     $error = true;
                 }
 
                 if (empty(trim($row[3]))) {
-                    $this->updateLog($storageObject, $reader->key(), 4, "SKIPPED FIXTURE: No division name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 4, "SKIPPED FIXTURE: No division name specified");
                     $error = true;
                 }
 
                 if (empty(trim($row[4]))) {
-                    $this->updateLog($storageObject, $reader->key(), 5, "SKIPPED FIXTURE: No match name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 5, "SKIPPED FIXTURE: No match name specified");
                     $error = true;
                 }
 
                 if (empty(trim($row[7]))) {
-                    $this->updateLog($storageObject, $reader->key(), 6, "SKIPPED FIXTURE: No venue name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 6, "SKIPPED FIXTURE: No venue name specified");
                     $error = true;
                 }
 
                 if (empty(trim($row[8]))) {
-                    $this->updateLog($storageObject, $reader->key(), 7, "SKIPPED FIXTURE: No home team name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 7, "SKIPPED FIXTURE: No home team name specified");
                     $error = true;
                 }
 
                 if (empty(trim($row[9]))) {
-                    $this->updateLog($storageObject, $reader->key(), 8, "SKIPPED FIXTURE: No away team name specified");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 8, "SKIPPED FIXTURE: No away team name specified");
                     $error = true;
                 }
                 try {
                     if ($this->makeDateTime($row[5], $row[6]) == null) {
-                        $this->updateLog($storageObject, $reader->key(), 6, "SKIPPED FIXTURE: No date/time specified");
+                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 6, "SKIPPED FIXTURE: No date/time specified");
                         $error = true;
                     }
                 } catch (\Exception $e) {
-                    $this->updateLog($storageObject, $reader->key(), 6, "SKIPPED FIXTURE: Invalid date/time specified ({$row[5]} {$row[6]})");
+                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 6, "SKIPPED FIXTURE: Invalid date/time specified ({$row[5]} {$row[6]})");
                     $error = true;
                 }
 
@@ -1228,6 +1258,7 @@ class Controller extends Base
                     try {
                         $sport = $this->getSportMapper()->findOneByColumn('name', $row[2]);
                     } catch (MapperException $e) {
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Sport '{$row[2]}'");
                         $sport = new Sport();
                         $sport->setName($row[2]);
                         $this->getSportMapper()->save($sport);
@@ -1242,6 +1273,7 @@ class Controller extends Base
                             'season_id' => $season->getId()
                         ]);
                     } catch (MapperException $e) {
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Division '{$row[3]}'");
                         $division = new Division();
                         $division->setName($row[3]);
                         $division->setSport($sport);
@@ -1256,6 +1288,7 @@ class Controller extends Base
                             'name' => $row[7]
                         ]);
                     } catch (MapperException $e) {
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Venue '{$row[7]}'");
                         $venue = new Venue();
                         $venue->setName($row[7]);
                         $this->getVenueMapper()->save($venue);
@@ -1307,12 +1340,12 @@ class Controller extends Base
 
                     if ($teamHome != null && $schoolHome != null) {
                         // A team and school were both found matching the away team name, need user intervention to deduplicate
-                        $this->updateLog($storageObject, $reader->key(), 9, "SKIPPED FIXTURE: Home team name matches both school and team");
+                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 9, "SKIPPED FIXTURE: Home team name matches both school and team");
                         $error = true;
                     } else {
                         if ($teamHome == null && $schoolHome == null) {
                             // No home team/school specified
-                            $this->updateLog($storageObject, $reader->key(), 9, "SKIPPED FIXTURE: Could not find a matching home team or school");
+                            $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 9, "SKIPPED FIXTURE: Could not find a matching home team or school");
                             $error = true;
                         }
                     }
@@ -1321,12 +1354,12 @@ class Controller extends Base
 
                     if ($teamAway != null && $schoolAway != null) {
                         // A team and school were both found matching the away team name, need user intervention to deduplicate
-                        $this->updateLog($storageObject, $reader->key(), 9, "SKIPPED FIXTURE: Away team name matches both school and team");
+                        $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 9, "SKIPPED FIXTURE: Away team name matches both school and team");
                         $error = true;
                     } else {
                         if ($teamAway == null && $schoolAway == null) {
                             // No away team/school specified
-                            $this->updateLog($storageObject, $reader->key(), 9, "SKIPPED FIXTURE: Could not find a matching away team or school");
+                            $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), 9, "SKIPPED FIXTURE: Could not find a matching away team or school");
                             $error = true;
                         }
                     }
@@ -1334,6 +1367,7 @@ class Controller extends Base
                     if (!$error) {
 
                         try {
+                            $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Match '{$division->getName()} {$sport->getName()} {$venue->getName()}'");
                             $match = $this->getMatchMapper()->findOneByColumnList([
                                 'division_id' => $division->getId(),
                                 'season_id' => $season->getId(),
@@ -1344,6 +1378,7 @@ class Controller extends Base
                                 'away_school_id' => $schoolAway == null ? null : $schoolAway->getId()
                             ]);
                         } catch (MapperException $e) {
+                            $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Match '{$division->getName()} {$sport->getName()} {$venue->getName()}'");
                             $match = new Match();
                         }
 
@@ -1380,22 +1415,22 @@ class Controller extends Base
                                 $error = false;
 
                                 if (empty($row[$i])) {
-                                    $this->updateLog($storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: No date specified");
+                                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: No date specified");
                                     $error = true;
                                 }
                                 if (empty($row[$i + 1])) {
-                                    $this->updateLog($storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: No time specified");
+                                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: No time specified");
                                     $error = true;
                                 }
                                 if (empty($row[$i + 2])) {
-                                    $this->updateLog($storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: No description specified");
+                                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: No description specified");
                                     $error = true;
                                 }
 
                                 try {
                                     $this->makeDateTime($row[$i], $row[$i + 1]);
                                 } catch (\Exception $e) {
-                                    $this->updateLog($storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: Invalid date/time specified ({$row[$i]} {$row[$i+1]})");
+                                    $this->updateLog(Controller::RESULT_ERROR, $storageObject, $reader->key(), ($i + 1), "SKIPPED ITINERARY ITEM: Invalid date/time specified ({$row[$i]} {$row[$i+1]})");
                                     $error = true;
                                 }
 
@@ -1410,11 +1445,14 @@ class Controller extends Base
                         }
 
                         foreach ($items as $item) {
-                            $itineraryItem = new ItineraryItem();
-                            $itineraryItem->setMatch($match);
-                            $itineraryItem->setStartAt($this->makeDateTime($item['date'], $item['time']));
-                            $itineraryItem->setDescription($row['description']);
-                            $this->getItineraryItemMapper()->save($itineraryItem);
+                            if (!empty(trim($row['description']))) {
+                                $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Itinerary Item '{$row['description']}'");
+                                $itineraryItem = new ItineraryItem();
+                                $itineraryItem->setMatch($match);
+                                $itineraryItem->setStartAt($this->makeDateTime($item['date'], $item['time']));
+                                $itineraryItem->setDescription($row['description']);
+                                $this->getItineraryItemMapper()->save($itineraryItem);
+                            }
                         }
                     }
                 }

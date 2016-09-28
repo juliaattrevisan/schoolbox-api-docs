@@ -1,6 +1,7 @@
 <script>
     $(function () {
         window.skipCount = 0;
+        window.countErrors = 0;
 
         function update() {
             $.get('{{ routeLookup('sportsfixturesImport.getImportProgress', {id: id}) }}/' + window.skipCount)
@@ -12,6 +13,7 @@
                     for (var i = 0; i < data.errors.length; i++) {
 
                         var divider = ' / ';
+                        var style = '';
                         var createdAt = data.errors[i]['created_at'];
                         var result = data.errors[i]['result'];
                         var filename = data.errors[i]['filename'];
@@ -31,7 +33,14 @@
                             divider = '';
                         }
 
-                        $('#table-body').append('<tr><td>' + createdAt + '</td><td>' + result + '</td><td>' + filename + '</td><td>' + line + divider + column + '</td></tr>');
+                        var style = '';
+
+                        if (data.errors[i]['type'] == 'error') {
+                            style = 'background-color:#fcc;';
+                            window.countErrors++;
+                        }
+                        
+                        $("#table-body").append("<tr style='" + style + "'><td>" + createdAt + "</td><td>" + result + "</td><td>" + filename + "</td><td>" + line + divider + column + "</td></tr>");
                     }
 
                     // Keep polling for updates if the import hasn't completed/failed
@@ -55,6 +64,12 @@
                     }
                 }
 
+                if (window.countErrors > 1) {
+                    $('#warning').html(window.countErrors + ' Errors During Import');
+                } else if (window.countErrors > 0) {
+                    $('#warning').html(window.countErrors + ' Error During Import');
+                }
+
                 window.skipCount += data.errors.length;
             });
         }
@@ -72,6 +87,7 @@
 <div class="row">
     <div class="small-12 columns">
         <h1 id="progress"></h1>
+        <h2 id="warning" class="gradient-1"></h2>
     </div>
 </div>
 

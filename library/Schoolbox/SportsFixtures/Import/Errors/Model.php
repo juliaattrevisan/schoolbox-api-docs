@@ -26,6 +26,9 @@ class Model {
     /** @var string */
     protected $hash;
 
+    /** @var string */
+    protected $type;
+
     /** @var int */
     protected $row;
 
@@ -84,7 +87,23 @@ class Model {
      */
     public function getHash() {
         return $this->hash;
-    }    
+    }
+
+    /**
+     * @param string $type
+     * @return self
+     */
+    public function setType($type) {
+        $this->type = $type;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType() {
+        return $this->type;
+    }
 
     /**
      * @param int $line
