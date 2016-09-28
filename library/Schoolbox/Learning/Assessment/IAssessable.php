@@ -12,8 +12,8 @@ namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
@@ -62,7 +62,7 @@ interface IAssessable extends ISoftDeletable
      */
     public function getParticipant(User $user);
 
-/**
+    /**
      * @param User $user
      * @param bool $publishedOnly
      * @return string|null
@@ -386,6 +386,17 @@ interface IAssessable extends ISoftDeletable
      * @return Project|null
      */
     public function getProject();
+
+    /**
+     * @param AssessmentContext $context
+     * @return static
+     */
+    public function setContext(AssessmentContext $context);
+
+    /**
+     * @return AssessmentContext
+     */
+    public function getContext();
 
     /**
      * Created date
