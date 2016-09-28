@@ -145,6 +145,56 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * Does this have a task?
+     *
+     * @return bool
+     */
+    public function hasTask()
+    {
+        return ($this->getTask() instanceof Task && $this->getTask()->getId());
+    }
+
+    /**
+     * Does this have a quiz?
+     *
+     * @return bool
+     */
+    public function hasQuiz()
+    {
+        return ($this->getQuiz() instanceof Quiz && $this->getQuiz()->getId());
+    }
+
+    /**
+     * Does this have a due work?
+     *
+     * @return bool
+     */
+    public function hasDueWork()
+    {
+        return ($this->getDueWork() instanceof DueWork && $this->getDueWork()->getId());
+    }
+
+    /**
+     * Does this have a project?
+     *
+     * @return bool
+     */
+    public function hasProject()
+    {
+        return ($this->getProject() instanceof Project && $this->getProject()->getId());
+    }
+
+    /**
+     * Does this have any sub-objects?
+     *
+     * @return bool
+     */
+    public function hasSubObject()
+    {
+        return $this->hasTask() || $this->hasDueWork() || $this->hasQuiz() || $this->hasProject();
+    }
+
+    /**
      * @return string
      */
     public function getTitle()
