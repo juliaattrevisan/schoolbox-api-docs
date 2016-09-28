@@ -1,0 +1,6 @@
+TYPE,STATUS NAME
+Status,Win
+Status,Loss
+Status,Draw
+Status,Cancelled (Hot Weather)
+Status,Cancelled (Rain)

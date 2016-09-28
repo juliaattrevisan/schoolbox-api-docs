@@ -176,11 +176,11 @@
                     {% else %}
                         <div class="empty-state">
                             <i class="icon-match"></i>
-                            <p>There are no matches in {{ division.name }} {{ division.sport.name }} {{ season.name }}.</p>
+                            <p>There are no matches scheduled for {{ division.name }} {{ division.sport.name }} in the {{ season.name }} season.</p>
                         {% if division.season.archived %}
                             <p>This season is currently archived. To add a match, you first need to <a href="{{ routeLookup('sportsfixturesSeason.getList') }}">restore it</a> or <a href="{{ routeLookup('sportsfixturesDivision.getModifyForm', { entityId: division.id }) }}">assign the division to a different season</a>.</p>
                         {% else %}
-                            <p><a href="{{ routeLookup('sportsfixturesMatch.getCreateForm', {contextId: division.id}) }}?season={{ season.id }}" title="Add match to {{ division.name }} {{ division.sport.name }} {{ season.name }}">Add a Match</a></p>
+                            <p>You may <a href="{{ routeLookup('sportsfixturesMatch.getCreateForm', {contextId: division.id}) }}?season={{ season.id }}" title="Add match to {{ division.name }} {{ division.sport.name }} {{ season.name }}">add a match</a> or <a href="{{ routeLookup('sportsfixturesImport.getUpload') }}">bulk upload</a> an entire fixture.</p>
                         {% endif %}
                         </div>
                     {% endif %}

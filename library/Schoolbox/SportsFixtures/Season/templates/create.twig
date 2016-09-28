@@ -38,12 +38,12 @@
 {{ bread.crumbs(
     [ 'Fixtures', routeLookup('sportsfixtures.getLanding') ],
     [ 'Seasons',  routeLookup('sportsfixturesSeason.getList') ],
-    [ season.name | default('New Season') ]
+    [ season.name | default('Create Season') ]
 ) }}
 
 <div class="row">
     <div class="small-12 columns">
-        <h1>Fixtures</h1>
+        <h1>{{ action }} Season</h1>
     </div>
 </div>
 
@@ -56,8 +56,6 @@
         {% endif %}
 
         <form id='seasonForm' action="{{ formUrl }}" method="post">
-            <h2 class="subheader">{{ action }} Season</h2>
-
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">

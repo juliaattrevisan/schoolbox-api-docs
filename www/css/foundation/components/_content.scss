@@ -410,6 +410,9 @@ table{
 			margin: 0 1rem 0 0;
 		}
 	}
+	tr.alert {
+		background-color: tint($alert-color, 74%);
+	}
 }
 thead tr th, .row-header, .island table.dataTable thead th {
 	border-bottom: 2px solid $body-bg;

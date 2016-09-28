@@ -44,7 +44,7 @@ class Model {
      */
     public function setHeading($heading) {
         $this->heading = $heading;
-        return $heading;
+        return $this;
     }
 
     /**
@@ -60,7 +60,7 @@ class Model {
      */
     public function setResult($result) {
         $this->result = $result;
-        return $result;
+        return $this;
     }
 
     /**
@@ -75,7 +75,7 @@ class Model {
      */
     public function setCreatorName($creatorName) {
         $this->creatorName = $creatorName;
-        return $creatorName;
+        return $this;
     }
 
     /**
@@ -91,7 +91,7 @@ class Model {
      */
     public function setStudentName($studentName) {
         $this->studentName = $studentName;
-        return $studentName;
+        return $this;
     }
 
     /**

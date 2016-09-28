@@ -16,42 +16,40 @@
 ) }}
 
 
-<div class="row">
-    <div class="small-12 columns">
-        <h1>External Schools</h1>
-    </div>
-</div>
+<div id="allSchools">
 
-<div class="row">
-    <div class="small-12 island" id="allSchools">
-        <div class="actions-small-1 row">
-            <div class="list-item">
-                <div class="small-12 columns">
-                    <h2 class="subheader">External Schools</h2>
-                </div>
+    <div class="actions-small-1 row">
+        <div class="list-item">
+            <div class="small-12 columns">
+                <h1>External Schools</h1>
             </div>
-            <nav>
-                <a href="#" data-item-add class="icon-add" title="Add School"></a>
-            </nav>
         </div>
-        <section>
-            <ul class="information-list hide" data-item-list>
-                {% for school in schools %}
-                    <li class="actions-small-1" data-item="{{ school.id }}">
-                        {% include '@sportsfixturesSchool/listItem.twig' %}
-                    </li>
-                {% endfor %}
+        <nav>
+            <a class="icon-add" title="Add School" data-item-add></a>
+        </nav>
+    </div>
+
+    <div class="row">
+        <div class="small-12 island">
+            <section>
+                <ul class="information-list hide" data-item-list>
+                    {% for school in schools %}
+                        <li class="actions-small-1" data-item="{{ school.id }}">
+                            {% include '@sportsfixturesSchool/listItem.twig' %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+            <div id="schoolEmpty" class="empty-state hide">
+                <i class="icon-match"></i>
+                <p>There are currently no schools, in order to play against other schools these must be created.</p>
+                <p>You may <a href="#" data-item-add>add a school</a> or import a <a href="{{ routeLookup('sportsfixturesImport.getUpload') }}">bulk list</a></p>
+            </div>
+            <ul class="information-list hide">
+                <li data-clone class="actions-small-1" data-item>
+                    {% include '@sportsfixturesSchool/listItem.twig' %}
+                </li>
             </ul>
-        </section>
-        <div id="schoolEmpty" class="empty-state hide">
-            <i class="icon-match"></i>
-            <p>There are currently no external schools.</p>
-            <p><a href="#" data-item-add>Add a school</a></p>
         </div>
-        <ul class="information-list hide">
-            <li data-clone class="actions-small-1" data-item>
-                {% include '@sportsfixturesSchool/listItem.twig' %}
-            </li>
-        </ul>
     </div>
 </div>

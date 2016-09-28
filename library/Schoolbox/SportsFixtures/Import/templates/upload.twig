@@ -1,0 +1,112 @@
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Fixtures',    routeLookup('sportsfixtures.getLanding') ],
+[ 'CSV Import',  routeLookup('sportsfixturesImport.getUpload') ]
+) }}
+
+<div class="row">
+    <div class="small-12 columns">
+        <h1>CSV Import</h1>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+
+
+        <section class="content">
+            <article>
+                <h2>Instructions</h2>
+                <p>
+                    Using the example templates below as a guide, download and populate each file with the required information
+                    then attach the completed files at the bottom of the page and click on the 'Import' button to import the data.
+                    You can upload one or many files at a time so if you fixture contains new venues you can also include the new venue import while uploading the fixture.
+                </p>
+            </article>
+        </section>
+
+        <section class="content">
+            <article>
+                <h2>CSV Templates</h2>
+                <ul class="grid small-block-grid-1 medium-block-grid-2">
+                    <li>
+                        <div class="card small-12">
+                            <a href="/sportsfixtures/import/sports.csv">
+                                <div class="icon-sport icon-32"></div>
+                                <h3>Sports Template</h3>
+                                <p class="meta">Sports played at your school</p>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="card small-12">
+                            <a href="/sportsfixtures/import/positions.csv">
+                                <div class="icon-position icon-32"></div>
+                                <h3>Positions Template</h3>
+                                <p class="meta">Positions played in sport (optional)</p>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="card small-12">
+                            <a href="/sportsfixtures/import/teams.csv">
+                                <div class="icon-team icon-32"></div>
+                                <h3>Teams Template</h3>
+                                <p class="meta">All the teams at your school for each sport</p>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="card small-12">
+                            <a href="/sportsfixtures/import/schools.csv">
+                                <div class="icon-home icon-32"></div>
+                                <h3>Schools Template</h3>
+                                <p class="meta">Opposition schools that you play against</p>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="card small-12">
+                            <a href="/sportsfixtures/import/venues.csv">
+                                <div class="icon-venue icon-32"></div>
+                                <h3>Venues Template</h3>
+                                <p class="meta">Locations of the venues you play games</p>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="card small-12">
+                            <a href="/sportsfixtures/import/coaches.csv">
+                                <div class="icon-player icon-32"></div>
+                                <h3>Coaches Template</h3>
+                                <p class="meta">The coaches for each team</p>
+                            </a>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="card small-12">
+                            <a href="/sportsfixtures/import/fixture.csv">
+                                <div class="icon-match icon-32"></div>
+                                <h3>Fixture Template</h3>
+                                <p class="meta">The teams playing, location and time of each game</p>
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </article>
+        </section>
+
+        <form method="post" enctype="multipart/form-data" action="{{ routeLookup('sportsfixturesImport.postUpload') }}">
+            <h2 class="subheader">Attach Files</h2>
+            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+
+            <ul class="flex-list buttons">
+                <li><input type="submit" data-submit value="Import"></li>
+                <li><input type="button" data-cancel class="button expand icon-cancel" value="Cancel Changes"></li>
+            </ul>
+        </form>
+
+    </div>
+</div>
