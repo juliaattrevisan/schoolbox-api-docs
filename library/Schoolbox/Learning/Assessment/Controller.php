@@ -207,7 +207,7 @@ class Controller extends Base
          * Otherwise return to the homepage
          */
         if ($assessment instanceof Project) {
-            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/createAssessment.twig', [
+            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/assessmentList.twig', [
                 'types' => new Types(),
                 'assessmentId' => $assessment->getId(),
                 'allReturnUrls' => $this->getAllReturnUrls($assessment->getId()),
