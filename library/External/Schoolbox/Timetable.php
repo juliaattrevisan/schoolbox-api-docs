@@ -220,7 +220,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
 
         foreach ($periodList as $period) {
 
-            $startTime = $period['state'] ? new Alaress_Date_Format($period['start'], Alaress_Date_Format::DATABASE_TIME_FORMAT) : new Alaress_Date_NullDate();
+            $startTime = $period['start'] ? new Alaress_Date_Format($period['start'], Alaress_Date_Format::DATABASE_TIME_FORMAT) : new Alaress_Date_NullDate();
             $endTime = $period['finish'] ? new Alaress_Date_Format($period['finish'], Alaress_Date_Format::DATABASE_TIME_FORMAT) : new Alaress_Date_NullDate();
 
             $periodAdaption = array(
