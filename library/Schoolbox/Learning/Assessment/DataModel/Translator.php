@@ -13,6 +13,7 @@ use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
+use Schoolbox\Learning\Assessment\DataModel\Translator\IAssessmentTypeTranslator;
 use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
 use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -45,11 +46,11 @@ class Translator
     protected $markSchemeFactory;
 
     /**
-     * Translator exclusively for tasks.
+     * Sub-translators
      *
-     * @var Translator\Task
+     * @var IAssessmentTypeTranslator[]
      */
-    protected $taskTranslator;
+    protected $subTranslators = [];
 
     /**
      * Constructor
@@ -58,7 +59,7 @@ class Translator
     {
         // TODO inject all of this
         $this->markSchemeFactory = new MarkSchemeFactory();
-        $this->taskTranslator    = new Translator\Task();
+        $this->subTranslators[]  = new Translator\Task();
     }
 
     /**
@@ -88,11 +89,13 @@ class Translator
             ->setDeletedAt($assessment->getDeletedAt())
         ;
 
-        // Attempt to translate tasks using the translator
-        $model = $this->taskTranslator->translateToDataModel($assessment);
-        if ($model instanceof IAssessableDataModel) {
-            $model->setAssessmentModel($assessmentModel);
-            return $model;
+        // Attempt to translate tasks using the sub-translators
+        foreach ($this->subTranslators as $subTranslator) {
+            $model = $subTranslator->translateToDataModel($assessment);
+            if ($model instanceof IAssessableDataModel) {
+                $model->setAssessmentModel($assessmentModel);
+                return $model;
+            }
         }
 
         // The translation depends on the type of $assessment.
@@ -224,7 +227,13 @@ class Translator
      */
     public function translateToDomainModel(IAssessableDataModel $dataModel)
     {
-        $assessable = $this->taskTranslator->translateToDomainModel($dataModel);
+        $assessable = null;
+        foreach ($this->subTranslators as $subTranslator) {
+            $assessable = $subTranslator->translateToDomainModel($dataModel);
+            if ($assessable instanceof IAssessable) {
+                break;
+            }
+        }
 
         if (!$assessable instanceof IAssessable) {
             if ($dataModel instanceof ProjectModel) {
