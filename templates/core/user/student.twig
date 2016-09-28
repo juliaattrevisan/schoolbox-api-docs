@@ -48,7 +48,7 @@
                         {% block specialAlert %}
                             {% if externalUser.StudentSpecialNeedsFlag and showSpecialAlert %}
                                 <div class="alert-box warning icon-bell no-margin">
-                                    Special Needs
+                                    {{ locale.translate('specialNeeds', false, true) }}
                                 </div>
                             {% endif %}
                         {% endblock specialAlert %}

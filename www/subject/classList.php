@@ -114,6 +114,7 @@ if ($_SESSION['user']->getRole()->isStaff() || $_SESSION['user']->isSuperuser())
                 'SYNERGYID' => $student['synergy_id'],
                 'EMAIL' => $emailLink,
                 'EMAIL_ADDRESS' => $user->getEmail(),
+                'SPECIAL_NEEDS' => $this->getLocalisedTerm('specialNeeds', false, true),
                 'MEDICAL_ALERT' => $student['StudentMedicalAlert'],
                 'ON_OFF' => ++$j % 2 ? '' : 'dark',
                 'SELECT' => $user->getEmail() ? sprintf('<input id="c%s" name="c%s" type="checkbox" value="%s"/>', $j, $j, $emailaddr) : '',
