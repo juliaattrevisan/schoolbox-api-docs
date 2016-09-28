@@ -7,8 +7,8 @@
  * @version     SVN: $Id$
  */
 use Schoolbox\Collection;
-use Schoolbox\Resource\Textbox\Model;
-use Schoolbox\Resource\Textbox\Mapper;
+use Schoolbox\Resource\Textbox\Model as Textbox;
+use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 
 class Component_Config_TextboxSearch extends Component_Config_Abstract
 {
@@ -23,18 +23,19 @@ class Component_Config_TextboxSearch extends Component_Config_Abstract
      */
     public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
     {
-        $mapper = new Mapper();
+        $mapper = new TextboxMapper();
 
         $page->setBlock($key, 'is_linked', 'is_linked_block');
 
         try {
+            /** @var Textbox $textbox */
             $textbox   = $mapper->findById($configValue);
             $allUsages = $mapper->findComponentUsage($textbox);
         } catch (\Exception $e) {
             $allUsages = new Collection();
         }
         if (count($allUsages) === 0) {
-            $textbox = new Model();
+            $textbox = new Textbox();
             $allUsages->add(new \Component_Instance());
         }
 

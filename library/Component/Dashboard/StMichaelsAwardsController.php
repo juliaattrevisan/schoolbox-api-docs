@@ -55,7 +55,7 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
             return false;
         }
 
-        $userId = $this->user->getExternalId();
+        $userId = $this->getUser()->getExternalId();
 
 //        // Here's some test data, because this only works on St Michaels servers
 //        $this->detentionList = array(
@@ -130,8 +130,8 @@ class Component_Dashboard_StMichaelsAwardsController extends Component_Dashboard
         $this->absenceList   = $this->externalDb->getAbsences($userId);
         $this->awardList     = $this->externalDb->getAwards(
             $userId,
-            $userDb->getCurrentYear($this->user->getExternalId()),
-            $userDb->getCurrentSemester($this->user->getExternalId())
+            $userDb->getCurrentYear($this->getUser()->getExternalId()),
+            $userDb->getCurrentSemester($this->getUser()->getExternalId())
         );
 
         // Filter award list into absences and lateness

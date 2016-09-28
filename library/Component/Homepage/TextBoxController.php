@@ -6,6 +6,10 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_TextBoxController extends Component_Homepage_ControllerAbstract
 {
 
@@ -38,7 +42,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
             $this->textbox = new \Schoolbox\Resource\Textbox\Model();
             $this->textbox
                 ->setHeading('Text Box')
-                ->setCategory(\Schoolbox\Resource\Folder\Mapper::getInstance()->createModel()->setId($this->getSource()->getId()));
+                ->setCategory(FolderMapper::getInstance()->createModel()->setId($this->getSource()->getId()));
         }
 
         if (!$this->getTextbox()->getHeading()) {
@@ -96,15 +100,15 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
              * To just edit one homepage's textbox, you need write access to that homepage.
              */
             $editing = false;
-            if ($this->contentPermission >= WRITE_ACCESS && $this->sitepage->arg[2] == $this->instance->getId()) {
-                if ($this->sitepage->arg[1] == 'textBoxModify') {
+            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && $this->getSitePage()->arg[2] == $this->getInstance()->getId()) {
+                if ($this->getSitePage()->arg[1] == 'textBoxModify') {
                     $editing = true;
                     $this->setVar(
                         array(
                             'TEXTBOX_BODY' => Scrub::text($this->getTextbox()->getBody()),
                         )
                     );
-                } elseif ($this->sitepage->arg[1] == 'textBoxCreate') {
+                } elseif ($this->getSitePage()->arg[1] == 'textBoxCreate') {
                     $editing = true;
                     $this->setVar(
                         array(
@@ -118,7 +122,7 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
                 $this->parse('text_editable_block', 'text_editable');
             } else {
                 // modify links
-                if ($this->contentPermission >= WRITE_ACCESS) {
+                if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                     if ($this->getTextbox()->getId()) {
                         $this->parse('modify_text_block', 'modify_text');
                     } else {
@@ -135,11 +139,11 @@ class Component_Homepage_TextBoxController extends Component_Homepage_Controller
         /* Need title injected here
          */
         if ($editing) {
-            $this->config['collapse']['value'] = false;
+            $this->getConfig()['collapse']['value'] = false;
         }
         $this->parseConfig();
 
-        if ($this->contentPermission < WRITE_ACCESS && $this->getConfig('compactMode')) {
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE && $this->getConfig('compactMode')) {
             /* Remove headers */
             $this->setVar('CONFIGURATION', '');
             $this->setBlock($templateHandle, 'header', 'header_block');

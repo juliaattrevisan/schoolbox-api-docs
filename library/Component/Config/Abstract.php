@@ -11,11 +11,17 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 abstract class Component_Config_Abstract
 {
+    /**
+     * Where this Config's Component resides
+     *
+     * @var Folder|Eportfolio_Page_Instance|null
+     */
+    private $context;
 
-    protected $cat;
-
-    protected $filterFields = null;
-    protected $sortFields = null;
+    // Defined on respective Component Controller, and passed in
+    // via Component/ControllerAbstract::renderConfigElements()
+    private $filterFields = null;
+    private $sortFields = null;
 
     /**
      * Does this config option show on templates? Most do, but some don't (e.g.
@@ -26,17 +32,12 @@ abstract class Component_Config_Abstract
     protected $is_shown_on_template = true;
 
     /**
-     * Constructor
-     *
-     * Folder should be an instance of \Schoolbox\Resource\Folder\Model
-     * but may be either handler array or instance, for now
-     *
-     * @param $folder
+     * @param Folder|Eportfolio_Page_Instance|null $context
      * @param null $fields
      */
-    public function __construct($folder, $fields = null)
+    public function __construct($context, $fields = null)
     {
-        $this->folder = $folder;
+        $this->context = $context;
 
         if (isset($fields['sort'])) {
             $this->sortFields = $fields['sort'];
@@ -46,15 +47,6 @@ abstract class Component_Config_Abstract
         }
     }
 
-    /**
-     * Get folder
-     *
-     * @return mixed
-     */
-    protected function getCategory()
-    {
-        return $this->folder;
-    }
 
     /**
      * Converts value from a form into a value that can be stored in a database.
@@ -66,16 +58,6 @@ abstract class Component_Config_Abstract
     public function dehydrate($value, Component_ControllerAbstract $controller)
     {
         return $value;
-    }
-
-    /**
-     * Is this config option shown on templates?
-     *
-     * @return bool
-     */
-    public function isShownOnTemplate()
-    {
-        return $this->is_shown_on_template;
     }
 
     /**
@@ -97,4 +79,41 @@ abstract class Component_Config_Abstract
         $configValue,
         Component_ControllerAbstract $component = null
     );
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @return Folder|Eportfolio_Page_Instance|null
+     */
+    protected function getContext()
+    {
+        return $this->context;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getFilterFields()
+    {
+        return $this->filterFields;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getSortFields()
+    {
+        return $this->sortFields;
+    }
+
+    /**
+     * Is this config option shown on templates?
+     *
+     * @return bool
+     */
+    public function isShownOnTemplate()
+    {
+        return $this->is_shown_on_template;
+    }
 }

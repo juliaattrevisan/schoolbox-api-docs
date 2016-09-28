@@ -45,7 +45,7 @@ if (is_array($templateList)) {
 }
 
 // Output the components for this template
-$componentFactory     = new Component_Eportfolio_Factory(new \Schoolbox\User(), $this, true);
+$componentFactory     = new Component_Eportfolio_Factory($this->getDi()->get('session')->get('user'), $this, true);
 $occupiedPositionList = [];
 $componentCounts      = [];
 foreach ($componentFactory->buildComponentList($templateList[0]['id']) as $component) {
@@ -61,7 +61,7 @@ foreach ($componentFactory->buildComponentList($templateList[0]['id']) as $compo
         $this->setFile($position, 'adminv2/component/placeholder.html');
     }
 
-    $component->setup(null, $component->getInstance()->getConfigArray());
+    $component->setup();
 
     $this->setVar(array(
         'COMPONENT_INSTANCE_ID'     => $instance_id,

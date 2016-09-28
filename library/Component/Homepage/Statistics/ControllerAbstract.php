@@ -6,6 +6,13 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\Resource\Folder\Model as Folder;
+
+/**
+ * @method Folder getContext()
+ * @method Folder getSource()
+ */
 abstract class Component_Homepage_Statistics_ControllerAbstract extends Component_ControllerAbstract
 {
     /**
@@ -21,24 +28,18 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
     protected $groupType;
     private $validGroups = array('student','parent','staff','guest');
 
-    public function setup($context = null, array $config = array())
+    /**
+     * @param Folder $context
+     */
+    public function setup(Folder $context)
     {
-        parent::setup($context, $config);
+        parent::setup($context);
 
         $accessor = \Schoolbox\Permission\Access\Access::getInstance();
 
-        /* ffs arrays
-         * TODO: This should just be an object, never an array
-         */
-        if (is_object($context)) {
-            $contextId = $context->getId();
-            $this->contentPermission = $accessor->getFolderAccess($this->getUser(), [$context->getId()]);
-        } elseif (is_array($context)) {
-            $contextId = $context['id'];
-            $this->contentPermission = $accessor->getFolderAccess($this->getUser(), [$context['id']]);
-        }
+        $this->setContentPermission($accessor->getFolderAccess($this->getUser(), [$context->getId()]));
 
-        $args = $this->sitepage->arg;
+        $args = $this->getSitePage()->arg;
 
         // $args[1]: start month
         $this->startDate = Alaress_Date_Format::now();
@@ -65,8 +66,8 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
         // args[3]: group type, default all
         $this->groupType = isset($args[3]) && in_array($args[3], $this->validGroups) ? $args[3] : 'all';
 
-        $this->sitepage->setVar(array(
-            'ID'    => $contextId,
+        $this->getSitePage()->setVar(array(
+            'ID'    => $context->getId(),
             'GROUP' => $this->groupType
         ));
     }
@@ -101,5 +102,28 @@ abstract class Component_Homepage_Statistics_ControllerAbstract extends Componen
      */
     protected function renderAltSourceDeleted(){
         throw new DomainException('HomepageStatistic components do not currently allow alternative data sources');
+    }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @param Folder $context
+     * @return static
+     */
+    protected function setContext(Folder $context)
+    {
+        parent::setContext($context);
+        return $this;
+    }
+
+    /**
+     * @param Folder $context
+     * @return static
+     */
+    public function setSource(Folder $context)
+    {
+        parent::setSource($context);
+        return $this;
     }
 }

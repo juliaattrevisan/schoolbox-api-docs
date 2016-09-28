@@ -1,13 +1,12 @@
 <?php
-
 /**
- * Component_Homepage_EtherpadController
- *
  * @author      Steve Chan <steve.chan@alaress.com.au>
  * @copyright   Copyright 2011, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_EtherpadController extends Component_Homepage_ControllerAbstract
 {
 
@@ -102,14 +101,14 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
             foreach ($allPads as $currentPad) {
                 $this->setVar(
                     array(
-                        'HOMEPAGE_ID' => $this->instance->getIdentifier(),
+                        'HOMEPAGE_ID' => $this->getInstance()->getIdentifier(),
                         'ETHERPAD_PAD_ID' => $currentPad->getId(),
                         'ETHERPAD_NAME' => $currentPad->getDisplayName(),
                         'ETHERPAD_UPDATED_AT' => $currentPad->getUpdatedAt()->getShort(),
                     )
                 );
 
-                if ($this->contentPermission > READ_ACCESS) {
+                if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
                     $this->parse('etherpad_has_modify_block', 'etherpad_has_modify');
                 }
 
@@ -126,7 +125,7 @@ class Component_Homepage_EtherpadController extends Component_Homepage_Controlle
 
             /* Only provide Create Document button to those with write access
              */
-            if ($this->contentPermission > READ_ACCESS) {
+            if ($this->getContentPermission() > UserAccess::ACCESS_READ) {
                 $this->setVar('SOURCE_ID', $this->getSource()->getId());
                 $this->parse('etherpad_has_create_block', 'etherpad_has_create');
             }

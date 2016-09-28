@@ -7,6 +7,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Eportfolio_TextboxController extends Component_Eportfolio_ControllerAbstract {
 
 	/**
@@ -58,7 +60,7 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_Contro
 
 		/* Gather everything
 		 */
-        $instance_id = $this->instance->getId();
+        $instance_id = $this->getInstance()->getId();
 
 		$this->setVar('TEXTBOX_ITEM_ID', $instance_id);
 
@@ -69,8 +71,8 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_Contro
 
             /* If modifying this textbox */
 
-            if ($this->contentPermission >= WRITE_ACCESS) {
-                if (($this->sitepage->arg[2] == 'textbox') && ($this->sitepage->arg[4] == $instance_id)) {
+            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                if (($this->getSitePage()->arg[2] == 'textbox') && ($this->getSitePage()->arg[4] == $instance_id)) {
                     $this->setVar('TEXTBOX_CONTENT', Scrub::text($textBox->getContent()));
                     $this->parse('has_modify_form_block', 'has_modify_form');
                 }
@@ -86,8 +88,8 @@ class Component_Eportfolio_TextboxController extends Component_Eportfolio_Contro
 		catch (Exception $e) {
 			$this->setVar('TEXTBOX_CONTENT', '');
 
-            if ($this->contentPermission >= WRITE_ACCESS) {
-                if (($this->sitepage->arg[2] == 'textbox') && ($this->sitepage->arg[4] == $instance_id)) {
+            if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
+                if (($this->getSitePage()->arg[2] == 'textbox') && ($this->getSitePage()->arg[4] == $instance_id)) {
                     $this->parse('has_modify_form_block', 'has_modify_form');
                 }
                 else {

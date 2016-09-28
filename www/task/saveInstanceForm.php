@@ -145,14 +145,11 @@ if ($page->detectAjax()) {
         if ($component instanceof Component_Instance) {
             // Dump out template contents
             // There ought to be a method which does this.
-            $chf = new Component_Homepage_Factory(new \Schoolbox\User(), $page);
+            $chf = new Component_Homepage_Factory($page->getDi()->get('session')->get('user'), $page);
 
             /** @var Component_Homepage_CourseOutlineController $controller */
             $controller = $chf->buildComponent($component);
-            $controller->setup(
-                $category,
-                $controller->getInstance()->getConfigArray()
-            );
+            $controller->setup($category);
 
             $target = "component_position_{$controller->getInstance()->getPosition()}";
             $handle = TEMPLATE_content;

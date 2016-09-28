@@ -28,7 +28,7 @@ class Component_Dashboard_GreetingController extends Component_Dashboard_Control
 		 */
 		$greetingString = str_replace('{timeofday}', $tf->greeting(), $this->getConfig('componentname'));
 
-        $this->greeting = Scrub::html($_SESSION['user']->formatName($greetingString));
+        $this->greeting = Scrub::html($this->getUser()->formatName($greetingString));
 
         return true;
     }

@@ -31,43 +31,43 @@ abstract class Component_ControllerAbstract
     /**
      * @var Component_Instance
      */
-    protected $instance;
+    private $instance;
 
     /**
      * @var User
      */
-    protected $user;
+    private $user;
 
     /**
      * @var SitePage
      */
-    protected $sitepage;
+    private $sitepage;
 
     /**
-     * The folder the component is on, if any.
+     * The folder|page the component is on, if any.
      *
-     * @var Folder|null
+     * @var Folder|Eportfolio_Page_Instance|null
      */
-    protected $context;
+    private $context;
 
     /**
-     * The folder the component pulls data from, if any.
+     * The folder|page the component pulls data from, if any.
      *
-     * @var Folder
+     * @var Folder|Eportfolio_Page_Instance|null
      */
-    protected $source;
+    private $source;
 
     /**
      * @var array
      */
-    protected $config;
+    private $config;
 
     /**
      * Permission for component contents.
      *
      * @var int
      */
-    protected $contentPermission = DENY_ACCESS;
+    private $contentPermission = UserAccess::ACCESS_DENY;
 
     /**
      * Permission for component controls, as opposed to the component content.
@@ -78,16 +78,16 @@ abstract class Component_ControllerAbstract
      *
      * @var int
      */
-    protected $contextPermission = DENY_ACCESS;
+    private $contextPermission = UserAccess::ACCESS_DENY;
 
     /**
      * The maximum permission allowed for this component.
      *
-     * Set to READ_ACCESS to force a read-only view of this component.
+     * Set to ACCESS_READ to force a read-only view of this component.
      *
      * @var int
      */
-    protected $maximumPermission = FULL_ACCESS;
+    private $maximumPermission = UserAccess::ACCESS_FULL;
 
     /**
      * @var array
@@ -104,14 +104,14 @@ abstract class Component_ControllerAbstract
      *
      * @var string
      */
-    protected $componentName = '';
+    private $componentName = '';
 
     /**
      * Link that the component header points to. Usually nowhere?
      *
      * @var string
      */
-    protected $componentHref = '#';
+    private $componentHref = '#';
 
     /**
      * Configuration template to use.
@@ -119,20 +119,20 @@ abstract class Component_ControllerAbstract
      * Usually determined by `$this->determineTemplate()`, but can be set with
      * `$this->setConfigurationTemplate()`.
      */
-    protected $configurationTemplate = '';
+    private $configurationTemplate = '';
 
     /** @var FolderMapper $folderMapper */
-    protected $folderMapper;
+    private $folderMapper;
 
     /** @var ErrorMapper $errorMapper */
-    protected $errorMapper;
+    private $errorMapper;
 
     /**
      * Constructor
      *
-     * @param Component_Instance $instance
-     * @param User $user
-     * @param SitePage $sitepage
+     * @param Component_Instance                   $instance
+     * @param User                                 $user
+     * @param SitePage                             $sitepage
      */
     public function __construct(Component_Instance $instance, User $user, SitePage $sitepage)
     {
@@ -142,24 +142,22 @@ abstract class Component_ControllerAbstract
             ->setSitePage($sitepage)
             ->setConfig($instance->getConfigArray())
             ->setFolderMapper(FolderMapper::getInstance())
-            ->setErrorMapper(ErrorMapper::getInstance())
-            ->setContext($this->getFolderMapper()->createModel())
-            ->setSource($this->getFolderMapper()->createModel());
+            ->setErrorMapper(ErrorMapper::getInstance());
     }
 
     /**
-     * Provide global config details to the component in preparation for business logic.
+     * Setup operations common to all component types.
      *
-     * May perform setup operations common to all component types.
+     * Responsible for permission setup
      *
-     * @param mixed $context Type is clarified in subclasses
-     * @param array $config
-     * @return void
+     * Note: Cannot inject $context in constructor because in many scenarios it is
+     *       irrelevant (eg admin config) and causes un-necessary processing.
+     *
+     * @param Folder|Eportfolio_Page_Instance|null $context
      */
-    public function setup($context = null, array $config = array())
+    public function setup($context = null)
     {
         $this->setContext($context);
-        $this->setConfig($config);
 
         if ($this->isUsingAltSource()) {
             // remove any non-numeric values from the source config (legacy support)
@@ -178,16 +176,8 @@ abstract class Component_ControllerAbstract
         } else {
             $this->setSource($context);
         }
-
-        $this->postConstruct();
     }
 
-    /**
-     * Hook method for components to perform their own dynamic setup() amendments
-     */
-    protected function postConstruct()
-    {
-    }
 
     /**
      * Prepares data for the render function. Business logic.
@@ -354,7 +344,7 @@ abstract class Component_ControllerAbstract
     {
         if (is_array($config) && count($config)) {
             // have write access
-            if ($this->contextPermission > READ_ACCESS) {
+            if ($this->contextPermission > UserAccess::ACCESS_READ) {
                 // display full configuration block
                 return array(true, true, true);
             } // do not have write access
@@ -368,7 +358,7 @@ abstract class Component_ControllerAbstract
         } // there is no configuration
         else {
             // have write access
-            if ($this->contextPermission > READ_ACCESS) {
+            if ($this->contextPermission > UserAccess::ACCESS_READ) {
                 // display delete option
                 return array(true, false, false);
             } // do not have write access
@@ -411,19 +401,16 @@ abstract class Component_ControllerAbstract
     {
         if ($configTemplate = $this->getConfigurationTemplate()) {
             return $configTemplate;
-        } /* Admin area; used when configuring dashboard/homepage/eportfolio layouts
-         */
-        else {
-            if (in_array($this->instance->getModule(), array('homepage_template', 'eportfolio_template'))) {
-                return 'component/config/_templatewrapper.html';
-            } /* Public-facing pages for dashboard, homepage, eportfolio
-         */
-            else {
-                if (in_array($this->instance->getModule(), array('dashboard', 'homepage', 'eportfolio'))) {
-                    return 'component/config/' . $this->instance->getModule() . '_wrapper.html';
-                }
-            }
         }
+        // Admin area; used when configuring dashboard/homepage/eportfolio layouts
+        else if (in_array($this->instance->getModule(), ['homepage_template', 'eportfolio_template'])) {
+            return 'component/config/_templatewrapper.html';
+        }
+        // Public-facing pages for dashboard, homepage, eportfolio
+        else if (in_array($this->instance->getModule(), ['dashboard', 'homepage', 'eportfolio'])) {
+            return 'component/config/' . $this->instance->getModule() . '_wrapper.html';
+        }
+        throw new DomainException('Could not determine template file.');
     }
 
     /**
@@ -480,9 +467,8 @@ abstract class Component_ControllerAbstract
     /**
      * Render each config element into the statue
      *
-     * @param $processConfig
-     * @param $is_for_template
-     * @return int
+     * @param bool $processConfig
+     * @param bool $is_for_template
      */
     protected function renderConfigElements($processConfig, $is_for_template)
     {
@@ -495,7 +481,7 @@ abstract class Component_ControllerAbstract
          * element and set it up, to save some processing
          */
         // every config key has a corresponding controller and template to be called
-        foreach ($this->instance->getConfigArray() as $key => $params) {
+        foreach ($this->getInstance()->getConfigArray() as $key => $params) {
 
             /* Special case for componentname default value when empty
              */
@@ -521,18 +507,18 @@ abstract class Component_ControllerAbstract
 
             $fields = array();
 
-            if ($this->sortFields) {
+            if ($this->getSortFields()) {
                 $fields['sort'] = $this->sortFields;
             }
 
-            if ($this->filterFields) {
+            if ($this->getFilterFields()) {
                 $fields['filter'] = $this->filterFields;
             }
 
             // attempt to build a configuration instance from the key provided
             if ($conf = Component_Config_Factory::build($key, $this->context, $fields)) {
                 if (!($is_for_template && !$conf->isShownOnTemplate())) {
-                    $this->parseConfigInstance($conf, $key, $this->sitepage, $params, $this->instance->getConfigArray());
+                    $this->parseConfigInstance($conf, $key, $this->sitepage, $params);
                     ++$configCount;
                 }
             }
@@ -600,9 +586,8 @@ abstract class Component_ControllerAbstract
      * @param string $key
      * @param SitePage $page
      * @param array $params
-     * @param array $allConfigs All configurations for this component
      */
-    protected function parseConfigInstance($conf, $key, $page, $params, $allConfigs = array())
+    protected function parseConfigInstance($conf, $key, $page, $params)
     {
         $templateFile = "component/config/$key.html";
 
@@ -916,7 +901,10 @@ abstract class Component_ControllerAbstract
         if (!$this->hasReadAccess() || ($this->isUsingAltSource() && $this->getSource()->isDeleted())) {
             return false;
         }
-        return true;
+
+        // Dashboard components that pull data from a homepage
+        // source will be null until a homepage is selected
+        return null != $this->getSource();
     }
 
 
@@ -928,7 +916,7 @@ abstract class Component_ControllerAbstract
      */
 
     /**
-     * @return \Schoolbox\Resource\Folder\Model
+     * @return Folder|Eportfolio_Page_Instance|null
      */
     public function getContext()
     {
@@ -936,10 +924,10 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * @param Folder|null $context
+     * @param Folder|Eportfolio_Page_Instance|null $context
      * @return static
      */
-    protected function setContext(Folder $context = null)
+    protected function setContext($context = null)
     {
         $this->context = $context;
         return $this;
@@ -1019,13 +1007,10 @@ abstract class Component_ControllerAbstract
     }
 
     /**
-     * Public accessor for $this->instance - use this instead of magic method
-     * obscuring a protected variable. (wat)
-     *
      * @param \Component_Instance $instance
      * @return static
      */
-    public function setInstance($instance)
+    public function setInstance(Component_Instance $instance)
     {
         $this->instance = $instance;
         return $this;
@@ -1052,7 +1037,7 @@ abstract class Component_ControllerAbstract
     /**
      * Gets the Folder, if any, this component draws its data from
      *
-     * @return Schoolbox\Resource\Folder\Model
+     * @return Folder|Eportfolio_Page_Instance|null
      */
     public function getSource()
     {
@@ -1062,7 +1047,7 @@ abstract class Component_ControllerAbstract
     /**
      * Sets the Folder, if any, this component draws its data from
      *
-     * @param Schoolbox\Resource\Folder\Model $source
+     * @param Folder|Eportfolio_Page_Instance|null $source
      * @return static
      */
     public function setSource($source)
@@ -1123,7 +1108,7 @@ abstract class Component_ControllerAbstract
      * @param  Schoolbox\Resource\Folder\Mapper $folderMapper
      * @return $this
      */
-    public function setFolderMapper($folderMapper)
+    public function setFolderMapper(FolderMapper $folderMapper)
     {
         $this->folderMapper = $folderMapper;
         return $this;
@@ -1141,7 +1126,7 @@ abstract class Component_ControllerAbstract
      * @param  ErrorMapper $errorMapper
      * @return $this
      */
-    public function setErrorMapper($errorMapper)
+    public function setErrorMapper(ErrorMapper $errorMapper)
     {
         $this->errorMapper = $errorMapper;
         return $this;
@@ -1187,6 +1172,42 @@ abstract class Component_ControllerAbstract
     protected function setSitePage(SitePage $sitePage)
     {
         $this->sitepage = $sitePage;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getContextPermission()
+    {
+        return $this->contextPermission;
+    }
+
+    /**
+     * @param int $contextPermission
+     * @return $this
+     */
+    protected function setContextPermission($contextPermission)
+    {
+        $this->contextPermission = $contextPermission;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getContentPermission()
+    {
+        return $this->contentPermission;
+    }
+
+    /**
+     * @param int $contentPermission
+     * @return $this
+     */
+    protected function setContentPermission($contentPermission)
+    {
+        $this->contentPermission = $contentPermission;
         return $this;
     }
 

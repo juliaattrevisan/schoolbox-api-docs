@@ -75,7 +75,7 @@ class Component_Dashboard_HomepageNewsController extends Component_Dashboard_Con
         $alist = new Activity_ListArray($this->feedList);
         $alist->setShowAvatars(false);
         $alist->setShowTrends(false);
-        $alist->setTarget($this->sitepage, 'ACTIVITY_LIST');
+        $alist->setTarget($this->getSitePage(), 'ACTIVITY_LIST');
         foreach ($alist as $a) {
             // iterates the set
         }

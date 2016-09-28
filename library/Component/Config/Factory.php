@@ -15,12 +15,12 @@ abstract class Component_Config_Factory
 
     /**
      * @static
-     * @param $key
-     * @param Folder $folder
-     * @param $fields
+     * @param string                               $key
+     * @param Folder|Eportfolio_Page_Instance|null $context
+     * @param array                                $fields
      * @return Component_Config_Abstract|bool
      */
-    public static function build($key, $folder, $fields)
+    public static function build($key, $context = null, array $fields)
     {
         if (in_array(strtolower($key), self::$invalid)) {
             return false;
@@ -32,7 +32,7 @@ abstract class Component_Config_Factory
 
         if (class_exists($classname)) {
             // echo "Found $classname - will need template $key.html<br/>\n";
-            return new $classname($folder, $fields);
+            return new $classname($context, $fields);
         } else {
             // echo "Problem: couldn't find $classname ($key.html won't be rendered)<br/>\n";
             return false;

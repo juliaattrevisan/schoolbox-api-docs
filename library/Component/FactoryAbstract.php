@@ -8,12 +8,12 @@
  * @version     SVN: $Id$
  * 
  */
-
+use \Schoolbox\Permission\Access\UserAccess;
 abstract class Component_FactoryAbstract {
     /**
      * @var String
      */
-    protected $module;
+    private $module;
 
     /**
      * @var Integer
@@ -21,7 +21,7 @@ abstract class Component_FactoryAbstract {
     protected $identifier;
 
     /**
-     * @var Array
+     * @var array
      */
     protected $dependencyList;
 
@@ -32,7 +32,7 @@ abstract class Component_FactoryAbstract {
      *
      * @var int
      */
-    protected $maximumPermission = FULL_ACCESS;
+    protected $maximumPermission = UserAccess::ACCESS_FULL;
 
 	/**
 	 * Constructor
@@ -116,7 +116,9 @@ abstract class Component_FactoryAbstract {
     public function getInstance ($instanceId) {
         /* @var $instance Component_Instance */
         $instance = Component_InstanceMapper::getInstance()->findById($instanceId);
-        $instance->setDefinition(Component_DefinitionMapper::getInstance()->findById($instance->getDefinitionId()));
+        /** @var Component_Definition $componentDefinition */
+        $componentDefinition = Component_DefinitionMapper::getInstance()->findById($instance->getDefinitionId());
+        $instance->setDefinition($componentDefinition);
 
         return $instance;
     }
@@ -134,9 +136,10 @@ abstract class Component_FactoryAbstract {
      *
      * @param String $class
      * @param Integer $offset
-     * @return Array
+     * @return array
      */
-    protected function buildDependencyList ($class, $offset = 0) {
+    protected function buildDependencyList ($class, $offset = 0)
+    {
         $dependencyList = array();
 
         $classReflection = new ReflectionClass($class);
@@ -181,6 +184,24 @@ abstract class Component_FactoryAbstract {
     public function setMaximumPermission($maximumPermission)
     {
         $this->maximumPermission = $maximumPermission;
+        return $this;
+    }
+
+    /**
+     * @return String
+     */
+    protected function getModule()
+    {
+        return $this->module;
+    }
+
+    /**
+     * @param $module
+     * @return static
+     */
+    protected function setModule($module)
+    {
+        $this->module = $module;
         return $this;
     }
 }

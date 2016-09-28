@@ -10,7 +10,7 @@
  * This component is deprecated, it was previously used to display a school's campus calendar on a homepage
  *
  */
-
+use \Schoolbox\Permission\Access\UserAccess;
 use Calendar\Event\Collection\Lister;
 
 class Component_Homepage_CalendarListController extends Component_Homepage_ControllerAbstract
@@ -78,22 +78,23 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
         }
 
         $now         = Alaress_Date_Format::now();
+        /** @var Alaress_Date_Format|bool $prevDay */
         $prevDay     = false;
         $this->start = $now->startOfDay();
         $this->end   = clone $this->start;
         $this->end->addDays($days);
 
         // Produce API for schoolbox group events
-        $calendarApi  = new Calendar_Api_EventType_Event_Schoolbox_Campus($_SESSION['user'], array());
+        $calendarApi  = new Calendar_Api_EventType_Event_Schoolbox_Campus($this->getUser(), array());
 
         // Render all events for group using html renderer
         $eventRenderer = new Lister(
             $calendarApi,
-            $this->start->getUnixTimestamp(),
-            $this->end->getUnixTimestamp(),
-            $_SESSION['user'],
-            $this->sitepage,
-            $_SESSION['user']
+            $this->start->getUnixTimeStamp(),
+            $this->end->getUnixTimeStamp(),
+            $this->getUser(),
+            $this->getSitePage(),
+            $this->getUser()
         );
         foreach ($eventRenderer->getAllEvents() as $currentEvent) {
 
@@ -119,7 +120,7 @@ class Component_Homepage_CalendarListController extends Component_Homepage_Contr
 
         //setup block for submission button
         $this->setBlock($templateHandle, "submit_event", "submit_event_block");
-        if ($this->contentPermission < WRITE_ACCESS) {
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
             $this->setVar("submit_event_block", "");
         } else {
             $this->parse("submit_event_block", "submit_event");

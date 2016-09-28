@@ -111,7 +111,7 @@ class Component_Homepage_ManagersController extends Component_Homepage_Controlle
             }
             /* Student bulk email
         	 */
-            if ($_SESSION['user']->getRole()->isStaff() && isset($emailall) && \Cfg::get('mail_enable')) {
+            if ($this->getUser()->getRole()->isStaff() && isset($emailall) && \Cfg::get('mail_enable')) {
                 $this->setVar("REPLYTO", $emailObj->formatEmailFromArray($_SESSION));
                 $this->setVar("EMAILALL", implode(',', $emailall));
                 $this->parse("member_email_block", "member_email");

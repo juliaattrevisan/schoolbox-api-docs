@@ -7,13 +7,15 @@
  * @version     SVN: $Id$
  *
  */
+
+/** @var SitePage $this */
 $this->setFile(TEMPLATE_content, 'dashboard/index.html');
 $this->setTab('main');
 
 /* Instance factory */
 $groupID = $_SESSION['gid'];
 
-$componentFactory = new Component_Dashboard_Factory($_SESSION['user'], $this);
+$componentFactory = new Component_Dashboard_Factory($this->getDi()->get('session')->get('user'), $this);
 $componentCollection = $componentFactory->buildComponentList($groupID);
 
 $occupiedPositionList = array();
@@ -24,7 +26,7 @@ foreach ($componentCollection as $component) {
     $templateTarget = "component_position_{$instance->getPosition()}";
     $templateHandle = "component_{$instance->getId()}";
 
-    $component->setup(null, $instance->getConfigArray());
+    $component->setup();
 
     if ($component->execute()) {
         $component->parseConfig();

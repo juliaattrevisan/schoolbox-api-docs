@@ -27,7 +27,7 @@ class Component_Dashboard_RecentSubmissionsController extends Component_Dashboar
         $this->submissionHandler = new Submission();
 
         // don't try to parse data if we're not a teacher
-        if (!$_SESSION['user']->getRole()->isStaff()) {
+        if (!$this->getUser()->getRole()->isStaff()) {
             return false;
         }
 

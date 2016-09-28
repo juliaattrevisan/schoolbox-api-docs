@@ -1,12 +1,12 @@
 <?php
-
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_WikiController extends Component_Homepage_ControllerAbstract
 {
 
@@ -79,7 +79,7 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
 
             $this->setVar(
                 array(
-                    'WIKI_CATEGORY_ID' => $this->source->getId()
+                    'WIKI_CATEGORY_ID' => $this->getSource()->getId()
                 )
             );
 
@@ -88,11 +88,11 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
             /* First check that Allow Create is active. If it is, continue;
              * otherwise proceed to the usual getPermission()
              */
-            $value = \Component_ConfigMapper::getInstance()->findValue('allowCreate', $this->instance->getId());
+            $value = \Component_ConfigMapper::getInstance()->findValue('allowCreate', $this->getInstance()->getId());
 
-            if (((int)$value === 1) && ($this->contentPermission < WRITE_ACCESS)) {
+            if (((int)$value === 1) && ($this->getContentPermission() < UserAccess::ACCESS_WRITE)) {
                 $this->parse("submit_wiki_block", "submit_wiki");
-            } elseif ($this->contentPermission < WRITE_ACCESS) {
+            } elseif ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
                 $this->setVar("submit_wiki_block", "");
             } else {
                 /* Allow Create is off
@@ -139,7 +139,8 @@ class Component_Homepage_WikiController extends Component_Homepage_ControllerAbs
                         )
                     );
 
-                    if (($this->contentPermission >= READ_ACCESS && $wiki['locked'] == 'false') || $this->contentPermission >= WRITE_ACCESS) {
+                    if (($this->getContentPermission() >= UserAccess::ACCESS_READ && $wiki['locked'] == 'false')
+                        || $this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
                         $this->parse('modify_wiki_block', 'modify_wiki');
                     }
 

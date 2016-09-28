@@ -10,6 +10,7 @@
 use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
+use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_DueWorkListController extends Component_Homepage_ControllerAbstract
 {
@@ -74,9 +75,9 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         // We need the count of returns and submissions within the submission
         // boxes that have been retrieved.
         $submission_counts = array();
-        $isStudent         = $_SESSION['user']->getRole()->isStudent();
-        $isStaff           = $_SESSION['user']->getRole()->isStaff();
-        $userId            = $_SESSION['id'];
+        $isStudent         = $this->getUser()->getRole()->isStudent();
+        $isStaff           = $this->getUser()->getRole()->isStaff();
+        $userId            = $this->getUser()->getId();
         if ($isStudent) {
             $box_id_list       = $this->submissionList->getColumnValues('id');
             $submission_counts = SubmissionBox\Submission\FileMapper::getInstance()->findCountsForSubmissionBoxes(
@@ -150,13 +151,13 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
             $this->setVar('duework_actions_block', '');
             $this->setVar('duework_due_date_block', '');
 
-            if ($_SESSION['user']->getRole()->isStudent()) {
+            if ($this->getUser()->getRole()->isStudent()) {
                 // what to display if student
                 if (!$isTask) {
                     $displayActions = false;
                     $displayHistory = true;
                 }
-            } elseif ($this->contentPermission >= WRITE_ACCESS && $_SESSION['user']->getRole()->isStaff()) {
+            } elseif ($this->getContentPermission() >= UserAccess::ACCESS_WRITE && $this->getUser()->getRole()->isStaff()) {
                 // what to display if staff
                 if (!$isTask) {
                     $displayResults = true;
@@ -205,7 +206,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
         }
 
         //setup block for submission button
-        if ($this->contentPermission < WRITE_ACCESS) {
+        if ($this->getContentPermission() < UserAccess::ACCESS_WRITE) {
             $this->setVar("submit_dw_block", "");
         } else {
             $this->parse("submit_dw_block", "submit_dw");
@@ -217,7 +218,7 @@ class Component_Homepage_DueWorkListController extends Component_Homepage_Contro
 
         // Allow students or staff acting as students to see the view results buttons.
         // (Staff have no context for actually following the view result button)
-        if ($this->contentPermission == READ_ACCESS) {
+        if ($this->getContentPermission() == UserAccess::ACCESS_READ) {
             $groupHandler = new Group;
 
             // is the current user a member of this category?

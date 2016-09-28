@@ -1,5 +1,6 @@
 <?php
 
+use \Schoolbox\Collection;
 /**
  * Really basic component renderer, copied out of /homepage/configForm.php
  *
@@ -13,7 +14,7 @@ class Component_Renderer
      * Renders all components for an admin page.
      *
      * @param SitePage $page
-     * @param Component_ControllerAbstract[] $componentCollection
+     * @param Collection|Component_ControllerAbstract[] $componentCollection
      */
     public function renderAllAdminComponents(SitePage $page, $componentCollection)
     {
@@ -35,7 +36,7 @@ class Component_Renderer
                 $page->setFile($position, 'adminv2/component/placeholder.html');
             }
 
-            $component->setup(null, $component->getInstance()->getConfigArray());
+            $component->setup();
 
             $page->setVar(array(
                 'ID' => $instance_no,
@@ -74,7 +75,7 @@ class Component_Renderer
     {
         $page->setFile(TEMPLATE_body, 'adminv2/component/placeholder.html');
 
-        $component->setup(null, $component->getInstance()->getConfigArray());
+        $component->setup();
 
         $instance_no = $component->getInstance()->getId();
         $definitionId = $component->getInstance()->getDefinition()->getId();
@@ -105,7 +106,7 @@ class Component_Renderer
         $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
         $templateHandle = TEMPLATE_content;
 
-        $component->setup($folder, $component->getInstance()->getConfigArray());
+        $component->setup($folder);
 
         if ($component->execute() !== false) {
             $component->parseConfig();
@@ -145,7 +146,7 @@ class Component_Renderer
         $templateTarget = "component_position_{$component->getInstance()->getPosition()}";
         $templateHandle = TEMPLATE_content;
 
-        $component->setup($eportfolioPage, $component->getInstance()->getConfigArray());
+        $component->setup($eportfolioPage);
         if ($component->execute() !== false) {
             $component->parseConfig();
             if ($component->renderTemplate($templateHandle) !== false) {
@@ -160,6 +161,6 @@ class Component_Renderer
             'USER_ID' => $eportfolioPage->getUserId(),
             'PAGE_ID' => $eportfolioPage->getPageId(),
         ));
-        $component->getPageTemplate()->pparse($templateTarget, $templateHandle);
+        $component->getPageTemplate()->pParse($templateTarget, $templateHandle);
     }
 }

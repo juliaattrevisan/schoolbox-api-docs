@@ -1,32 +1,37 @@
 <?php
-
 /**
  *
  * @author      Alex Tworowsky <alex.tworowsky@alaress.com.au>
  * @copyright   2011 Alaress Pty Ltd
  * @link        http://www.alaress.com.au
  * @version     SVN: $Id$
- *
+ */
+
+use \Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Model as Folder;
+
+/**
+ * @method null getContext()
+ * @method Folder|null getSource()
  */
 abstract class Component_Dashboard_ControllerAbstract extends Component_ControllerAbstract
 {
     /**
      * Sets up a dashboard component.
      *
-     * @param array $context Ignored - dashboard components have no context
-     * @param array $config
+     * @param null       $context
      */
-    public function setup($context = null, array $config = array())
+    public function setup($context = null)
     {
-        parent::setup(null, $config);
+        parent::setup($context);
 
-        $this->contextPermission = FULL_ACCESS;
+        $this->setContextPermission(UserAccess::ACCESS_FULL);
 
         if($this->isUsingAltSource()){
             $accessor = \Schoolbox\Permission\Access\Access::getInstance();
-            $this->contentPermission = min($accessor->getFolderAccess($this->getUser(),[$this->getSource()->getId()]), $this->getMaximumPermission());
+            $this->setContentPermission(min($accessor->getFolderAccess($this->getUser(),[$this->getSource()->getId()]), $this->getMaximumPermission()));
         } else {
-            $this->contentPermission = FULL_ACCESS;
+            $this->setContentPermission(UserAccess::ACCESS_FULL);
         }
     }
 
@@ -49,5 +54,29 @@ abstract class Component_Dashboard_ControllerAbstract extends Component_Controll
         }
 
         return parent::getTemplate($templateName, $templatePath);
+    }
+
+    /* Getters / Setters
+     */
+
+    /**
+     * @param null $context
+     * @return static
+     */
+    protected function setContext($context = null)
+    {
+        // Dashboard components never have context
+        parent::setContext(null);
+        return $this;
+    }
+
+    /**
+     * @param Folder|null $source
+     * @return static
+     */
+    public function setSource(Folder $source = null)
+    {
+        parent::setSource($source);
+        return $this;
     }
 }

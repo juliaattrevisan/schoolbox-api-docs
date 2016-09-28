@@ -93,6 +93,7 @@ if (is_numeric($_REQUEST['cid'])) {
         $componentList = $componentInstanceMapper->findByInstanceId($instanceID);
         $cList         = array_values($componentList);
 
+        /** @var Component_Homepage_ControllerAbstract $component */
         $component = $factory->buildComponent($cList[0]);
 
         if (!($component instanceof Component_ControllerAbstract)) {
@@ -136,7 +137,7 @@ if (is_numeric($_REQUEST['cid'])) {
             // dehydrating config values into database
             $cclass = $instance->getDefinition()->getClass();
             /** @var Component_Homepage_ControllerAbstract $controller */
-            $controller = new $cclass($instance, new \Schoolbox\User(), $page);
+            $controller = new $cclass($instance, $page->getDi()->get('session')->get('user'), $page);
             // No need to execute at all just to set configuration,
             // and doing so can break components that rely on context
 //            $controller->execute();
@@ -145,7 +146,7 @@ if (is_numeric($_REQUEST['cid'])) {
             foreach ($configDefinitionCollection as $confD) {
                 $key = $confD->getKey();
                 if (isset($config[$key])) {
-                    $configItem = Component_Config_Factory::build($key, $folder, $config);
+                    $configItem = Component_Config_Factory::build($key, null, $config);
                     $value      = $configItem->dehydrate($config[$key], $controller);
 
                     // this should be 1:1 relation, so return only the first instance of this definition
@@ -174,7 +175,7 @@ if (is_numeric($_REQUEST['cid'])) {
             if (SitePage::detectAjax()) {
                 // Just refetch the instance
                 $instance   = reset($componentInstanceMapper->findByInstanceId($instance->getId()));
-                $controller = new $cclass($instance, new \Schoolbox\User(), $page);
+                $controller = new $cclass($instance, $page->getDi()->get('session')->get('user'), $page);
                 $renderer   = new Component_Renderer();
                 $renderer->renderHomepageComponent($folder, $controller);
                 exit;

@@ -10,6 +10,7 @@
  */
 
 // require SitePage context
+/** @var SitePage $this */
 if (!isset($this)) {
     require_once('../../../library/Bootstrap.php');
     httpError(400, 101); // resource not available
@@ -26,7 +27,7 @@ if (empty($context) || empty($groupId)) {
 
 try {
     $factoryFactory   = new Component_FactoryFactory();
-    $componentFactory = $factoryFactory->build($context, new Schoolbox\User(), $this, true);
+    $componentFactory = $factoryFactory->build($context, $this->getDi()->get('session')->get('user'), $this, true);
 } catch (Exception $e) {
     httpError(400, 'Invalid context specified.');
     exit;

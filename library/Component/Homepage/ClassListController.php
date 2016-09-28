@@ -1,12 +1,12 @@
 <?php
-
 /**
- *
  * @author      Matt Day <matt.day@alaress.com.au>
  * @copyright   Copyright 2012, Alaress Pty Ltd
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Homepage_ClassListController extends Component_Homepage_ControllerAbstract
 {
 
@@ -146,7 +146,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
 
             /* Student bulk email
               */
-            if ($this->contentPermission > READ_ACCESS && \Cfg::get('mail_enable')) {
+            if ($this->getContentPermission() > UserAccess::ACCESS_READ && \Cfg::get('mail_enable')) {
                 $this->setVar(
                     array(
                         'REPLY_TO'           => $emailHandler->formatEmailFromArray($_SESSION),
@@ -162,7 +162,7 @@ class Component_Homepage_ClassListController extends Component_Homepage_Controll
             /* Parent bulk email
               */
             if (count($synergyIds)
-                && $this->contentPermission > READ_ACCESS
+                && $this->getContentPermission() > UserAccess::ACCESS_READ
                 && (Cfg::get('email_all_parents') == 1)
                 && \Cfg::get('mail_enable')
             ) {

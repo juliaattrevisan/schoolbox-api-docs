@@ -18,6 +18,7 @@ use UnexpectedValueException;
  *
  * @package Schoolbox
  * @method User findById($id)
+ * @method User findByIdWithFallback($id)
  * @method User findOneByColumn($columnName, $columnValue, $order = [])
  * @method User findOneByColumnList($columnList, $order = [])
  * @method User hydrate($row, $alias = '', $callback = null)

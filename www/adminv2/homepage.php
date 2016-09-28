@@ -9,7 +9,8 @@
  *
  */
 
-if (!$_SESSION['user']->isSuperuser()) {
+/** @var SitePage $this */
+if (!$this->getDi()->get('session')->get('user')->isSuperuser()) {
     error(19);
 }
 
@@ -46,7 +47,7 @@ foreach ($homepageTemplateList as $currentTemplate) {
 }
 
 // Output the components for this template
-$componentFactory = new Component_Homepage_Factory(new \Schoolbox\User(), $this, true);
+$componentFactory = new Component_Homepage_Factory($this->getDi()->get('session')->get('user'), $this, true);
 $cid = null;
 $firstTemplate = $homepageTemplateList->first();
 if ($firstTemplate instanceof \Schoolbox\Resource\HomepageTemplate) {
@@ -55,7 +56,7 @@ if ($firstTemplate instanceof \Schoolbox\Resource\HomepageTemplate) {
 $occupiedPositionList = [];
 $componentCounts      = [];
 foreach ($componentFactory->buildComponentList($cid) as $component) {
-    /** @var Component_ControllerAbstract $component */
+    /** @var Component_Homepage_ControllerAbstract $component */
     $instance_id   = $component->getInstance()->getId();
     $position_no   = $component->getInstance()->getPosition();
     $position      = "position_{$position_no}";
@@ -67,10 +68,7 @@ foreach ($componentFactory->buildComponentList($cid) as $component) {
         $this->setFile($position, 'adminv2/component/placeholder.html');
     }
 
-    $component->setup(
-        new Schoolbox\Resource\Folder\Model(),
-        $component->getInstance()->getConfigArray()
-    );
+    $component->setup();
 
     $this->setVar(array(
         'COMPONENT_INSTANCE_ID'     => $instance_id,

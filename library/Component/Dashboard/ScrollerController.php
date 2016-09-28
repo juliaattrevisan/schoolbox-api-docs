@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plag'd from Doctore's component
  *
@@ -10,6 +9,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Dashboard_ScrollerController extends Component_Dashboard_ControllerAbstract
 {
 
@@ -38,7 +39,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
             return false;
         }
 
-        if ($this->contentPermission < READ_ACCESS) {
+        if ($this->getContentPermission() < UserAccess::ACCESS_READ) {
             return false;
         }
 
@@ -91,7 +92,7 @@ class Component_Dashboard_ScrollerController extends Component_Dashboard_Control
         }
 
         // Have update form to back to this homepage, not the gallery's homepage
-        $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->source->getId());
+        $this->setVar('IMAGESCROLLER_CATEGORY_ID', $this->getSource()->getId());
 
         // Iterate
         if ($allFiles->count()) {

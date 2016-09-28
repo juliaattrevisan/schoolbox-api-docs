@@ -9,6 +9,7 @@
 
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\CriterionMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\Criterion;
+use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_RubricController extends Component_Homepage_ControllerAbstract
 {
@@ -82,7 +83,7 @@ class Component_Homepage_RubricController extends Component_Homepage_ControllerA
             $this->parse('rubric_criterion_block', 'rubric_criterion', true);
         }
 
-        if ($this->contentPermission >= WRITE_ACCESS) {
+        if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
             $this->parse('modify_rubric_block', 'modify_rubric');
         } else {
             $this->setVar('modify_rubric_block', '');

@@ -7,6 +7,7 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
 
 class Component_Eportfolio_ImageListController extends Component_Eportfolio_ControllerAbstract {
 
@@ -42,7 +43,7 @@ class Component_Eportfolio_ImageListController extends Component_Eportfolio_Cont
 
 		/* Show edit buttons
 		 */
-		if ($this->contentPermission >= WRITE_ACCESS) {
+		if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
 			$this->parse('dropzone_block', 'dropzone');
 			$this->parse('modify_button_block', 'modify_button');
 		} else {

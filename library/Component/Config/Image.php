@@ -15,14 +15,16 @@ class Component_Config_Image extends Component_Config_Abstract
         $page->setBlock($keyblock, 'config_images', 'config_images_block');
         $page->setVar('config_images_block', '');
 
-        $allImages = \Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
-            [$this->getCategory()->getId()],
-            [
-                'filter'    => ['image'],
-                'sort'      => 'date',
-                'getHidden' => true,
-            ]
-        );
+        $allImages = $this->getContext()
+            ? \Schoolbox\Resource\File\Mapper::getInstance()->findForFolders(
+                [$this->getContext()->getId()],
+                [
+                    'filter'    => ['image'],
+                    'sort'      => 'date',
+                    'getHidden' => true,
+                ]
+            )
+            : new \Schoolbox\Collection();
 
         if ($allImages->count()) {
             foreach ($allImages as $currentImage) {

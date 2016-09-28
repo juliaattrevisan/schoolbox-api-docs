@@ -48,8 +48,8 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
              * and disable javascript and hide links
              */
             $newPost = new \SocialStream_Post_String();
-            $currentUser = $_SESSION['user'];
-            $authenticator = new \SocialStream\Authenticator($newPost, $this->instance, $currentUser);
+            $currentUser = $this->getUser();
+            $authenticator = new \SocialStream\Authenticator($newPost, $this->getInstance(), $currentUser);
 
             if (!$authenticator->canComment() && !$authenticator->canCollaborate()) {
                 $this->setVar(
@@ -76,7 +76,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
                     }
                 }
 
-                $zone = new Zone('sstream-attachment-' . $this->instance->getId());
+                $zone = new Zone('sstream-attachment-' . $this->getInstance()->getId());
                 $zone->setMimeFilter(null)
                     ->setAttachPrompt('Share a file')
                     ->setAttachmentsLabel('')
@@ -84,7 +84,7 @@ class Component_Homepage_SocialStreamController extends Component_Homepage_Contr
                     ->setMulti(false)
                     ->setThumbnailSize(32);
 
-                $zone->renderIntoSitePage($this->sitepage, 'ATTACH_ZONE');
+                $zone->renderIntoSitePage($this->getSitePage(), 'ATTACH_ZONE');
 
                 $this->parse('socialstream_has_newpost_block', 'socialstream_has_newpost');
             }

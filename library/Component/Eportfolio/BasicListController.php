@@ -7,6 +7,8 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+use \Schoolbox\Permission\Access\UserAccess;
+
 class Component_Eportfolio_BasicListController extends Component_Eportfolio_ControllerAbstract {
 
 	/**
@@ -57,13 +59,13 @@ class Component_Eportfolio_BasicListController extends Component_Eportfolio_Cont
 
 		/* Controls
 		 */
-		if ($this->contentPermission >= WRITE_ACCESS) {
+		if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
 			$this->parse('has_create_form_block', 'has_create_form');
 		}
 
 		/* Gather everything
 		 */
-        $instance_id = $this->instance->getId();
+        $instance_id = $this->getInstance()->getId();
 		$allItems = $this->getMapperClass()->findByColumn('component_instance_id', $instance_id);
 
 		if ($allItems->count()) {
@@ -79,7 +81,7 @@ class Component_Eportfolio_BasicListController extends Component_Eportfolio_Cont
 
 				/* Controls
 				 */
-				if ($this->contentPermission >= WRITE_ACCESS) {
+				if ($this->getContentPermission() >= UserAccess::ACCESS_WRITE) {
 					$this->parse('has_modify_button_block', 'has_modify_button');
 					$this->parse('has_modify_form_block', 'has_modify_form');
 					$this->parse('has_delete_form_block', 'has_delete_form');

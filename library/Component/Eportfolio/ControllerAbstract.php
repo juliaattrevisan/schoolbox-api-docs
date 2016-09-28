@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @author      Matt Day <matt.day@alaress.com.au>
@@ -7,9 +6,17 @@
  * @link        http://www.alaress.com.au/
  * @version     SVN: $Id$
  */
+
+use Schoolbox\User;
+use \Schoolbox\Permission\Access\UserAccess;
+
+
+/**
+ * @method Eportfolio_Page_Instance|null getContext()
+ * @method Eportfolio_Page_Instance|null getSource()
+ */
 abstract class Component_Eportfolio_ControllerAbstract extends Component_ControllerAbstract
 {
-
     /**
      * A mapper instance, for polymorphism
      *
@@ -20,26 +27,24 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
     /**
      * Apply permissions here
      *
-     * @param Eportfolio_Page_Instance $context the Eportfolio_Page_Instance object this component is on
-     * @param array                    $config
-     */
-    public function setup(Eportfolio_Page_Instance $context = null, array $config = array())
+     * @param Eportfolio_Page_Instance|null $context Null when used in admin ePortfolio screen
+      */
+    public function setup(Eportfolio_Page_Instance $context = null)
     {
-        /** @var Schoolbox\User $_SESSION['user'] */
-        if ($_SESSION['user']->isSuperuser()) {
-            $this->contentPermission = \Schoolbox\Permission\Access\UserAccess::ACCESS_FULL;
+        parent::setup($context);
+
+        if ($this->getUser()->isSuperuser()) {
+            $this->setContentPermission(UserAccess::ACCESS_FULL);
         } elseif (!isset($context)) {
-            $this->contentPermission = \Schoolbox\Permission\Access\UserAccess::ACCESS_DENY;
+            $this->setContentPermission(UserAccess::ACCESS_DENY);
         } else {
-            $this->contentPermission = $context->getPermission();
+            $this->setContentPermission($context->getPermission());
         }
-        $this->contextPermission = $this->contentPermission;
+        $this->setContextPermission($this->getContentPermission());
 
         /* Check primary key is being used correctly!
          */
-        $this->sitepage->setVar('ID', isset($context) ? $context->getUserId() : -1);
-
-        $this->postConstruct();
+        $this->getSitePage()->setVar('ID', isset($context) ? $context->getUserId() : -1);
     }
 
     /**
@@ -90,8 +95,8 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
                  */
                 $configInstance = Component_ConfigMapper::getInstance()->findByColumnList(
                     array(
-                        'component_instance_id'          => $this->instance->getId(),
-                        'component_config_definition_id' => $this->instance->getDefinition()->getId()
+                        'component_instance_id'          => $this->getInstance()->getId(),
+                        'component_config_definition_id' => $this->getInstance()->getDefinition()->getId()
                     )
                 );
 
@@ -109,6 +114,25 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
             $page->setVar('CONFIG_DISPLAY', $params['label'] ? '' : ' style="display:none;"');
             $page->parse('config_element_block', 'config_element', true);
         }
+    }
+
+
+    /**
+     * For now, Eportfolio Components are unable to use Alt Data Sources
+     *
+     * @throws DomainException
+     */
+    protected function renderAltSourceDenied(){
+        throw new DomainException('Eportfolio components do not currently allow alternative data sources');
+    }
+
+    /**
+     * For now, Eportfolio Components are unable to use Alt Data Sources
+     *
+     * @throws DomainException
+     */
+    protected function renderAltSourceDeleted(){
+        throw new DomainException('Eportfolio components do not currently allow alternative data sources');
     }
 
     /* Getters/Setters
@@ -131,40 +155,23 @@ abstract class Component_Eportfolio_ControllerAbstract extends Component_Control
     }
 
     /**
-     * Gets the Eportfolio_Page_Instance this component draws its data from
-     *
-     * @return Eportfolio_Page_Instance
+     * @param Eportfolio_Page_Instance|null $context
+     * @return static
      */
-    public function getSource(){
-        return $this->source;
+    protected function setContext(Eportfolio_Page_Instance $context = null)
+    {
+        parent::setContext($context);
+        return $this;
     }
 
     /**
      * Sets the Eportfolio_Page_Instance this component draws its data from
      *
-     * @param Eportfolio_Page_Instance $source
+     * @param Eportfolio_Page_Instance|null $source
+     * @return static
      */
-    public function setSource($source) {
-        $this->source = $source;
+    public function setSource(Eportfolio_Page_Instance $source = null) {
+        parent::setSource($source);
+        return $this;
     }
-
-    /**
-     * For now, Eportfolio Components are unable to use Alt Data Sources
-     *
-     * @throws DomainException
-     */
-    protected function renderAltSourceDenied(){
-        throw new DomainException('Eportfolio components do not currently allow alternative data sources');
-    }
-
-    /**
-     * For now, Eportfolio Components are unable to use Alt Data Sources
-     *
-     * @throws DomainException
-     */
-    protected function renderAltSourceDeleted(){
-        throw new DomainException('Eportfolio components do not currently allow alternative data sources');
-    }
-
-
 }
