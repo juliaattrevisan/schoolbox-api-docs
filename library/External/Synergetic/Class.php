@@ -22,6 +22,11 @@ class External_Synergetic_Class implements External_ClassInterface
      */
     private $externalUser;
 
+    /**
+     * @var \Schoolbox\User
+     */
+    private $viewingUser;
+
     function __construct()
     {
         $this->setDatabase(MSSQL::getInstance());
@@ -81,8 +86,16 @@ class External_Synergetic_Class implements External_ClassInterface
         }
 
         $classQuery   = $this->getClassCodeQuery($subCode);
-        $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
-        $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
+        //TODO: Inject $_SESSION['user'], short term to get this working without arch changes
+        if($_SESSION['user'] instanceof \Schoolbox\User) {
+            $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester($_SESSION['user']->getExternalId()));
+            $fileYear     = $this->database->quote($this->externalUser->getCurrentYear($_SESSION['user']->getExternalId()));
+        }
+        else {
+            $fileSemester = $this->database->quote($this->externalUser->getCurrentSemester());
+            $fileYear     = $this->database->quote($this->externalUser->getCurrentYear());
+        }
+
         $query = "
         SELECT DISTINCT StudentClasses.StudentSurname as lastname, StudentClasses.StudentPreferred as firstname,
                         StudentClasses.StudentYearLevelDescription as yearlevel,
