@@ -1,0 +1,34 @@
+<?php
+
+require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
+
+// Create a task
+$mapper = new \Schoolbox\Learning\Assessment\DataModel\MapperProxy(
+    \Schoolbox\Learning\Assessment\DataModel\Mapper::getInstance(),
+    new \Schoolbox\Learning\Assessment\DataModel\Translator()
+);
+
+$task = (new Schoolbox\Learning\Assessment\Task\Model())
+    // Generic fields
+    ->setCreator((new \Schoolbox\User())->setId(3))
+    ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setTitle('Mr Test Task сказать')
+    // Description is ignored for tasks
+    ->setDescription('Blaargh ничего')
+    // Tasks are always weight 0, so this doesn't matter
+    ->setWeight(1000)
+    // Specific fields
+    ->setLink('https://www.something.com/')
+    ->setSelfMarkable(true)
+;
+
+$mapper->save($task, 0);
+
+// Change and save it again
+$task->setSelfMarkable(false)
+     ->setLink('https://www.nothing.com/')
+;
+$mapper->save($task, 0);
