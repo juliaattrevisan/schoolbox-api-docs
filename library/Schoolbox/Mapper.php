@@ -1354,9 +1354,9 @@ abstract class Mapper implements IMapper, Serializable
     /**
      * Returns a collection with models filtered by column/property
      *
-     * @param String $columnName
-     * @param String $columnValue
-     * @param array  $options @see findByColumnList() $options param
+     * @param String       $columnName
+     * @param String|array $columnValue
+     * @param array        $options @see findByColumnList() $options param
      *
      * @return Collection
      */
