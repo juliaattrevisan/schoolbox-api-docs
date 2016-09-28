@@ -136,26 +136,15 @@ class Controller extends Base
 
         /* Select the fragment to return
          */
-        switch($this->getRequest()->post['assessmentType']) {
-            case Types::ASSESSMENT_PROJECT:
+        if ($types->isValidIndex($this->getRequest()->post['assessmentType'])) {
+
+            /* Special treatment for projects for now
+             */
+            if ($this->getRequest()->post['assessmentType'] == Types::ASSESSMENT_PROJECT) {
                 $data['allSummators'] = new SummatorCollection();
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/create.twig', $data));
-                break;
+            }
 
-            case Types::ASSESSMENT_DUE_WORK:
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/dueWork/create.twig', $data));
-                break;
-
-            case Types::ASSESSMENT_TASK:
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/task/create.twig', $data));
-                break;
-
-            case Types::ASSESSMENT_QUIZ:
-                $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/quiz/create.twig', $data));
-                break;
-
-            default:
-                break;
+            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($this->getRequest()->post['assessmentType'])}/create.twig", $data));
         }
     }
 
