@@ -32,6 +32,6 @@ class Mapper extends BaseMapper
         $this->uses('description', self::TYPE_STRING);
         $this->uses('weight', self::TYPE_INTEGER);
         $this->uses('summator', self::TYPE_STRING);
-        $this->joins('mark_type', MarkTypeMapper::class, 'mark_type_id');
+        $this->joins('mark_type_id', MarkTypeMapper::class, 'mark_type_id', null, null, 'markType');
     }
 }
