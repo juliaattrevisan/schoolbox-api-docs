@@ -195,6 +195,51 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * Gets the sub-object for this model (task, quiz, duework, project)
+     *
+     * TODO figure out a better name than subobject
+     *
+     * @return IAssessableDataModel
+     * @throws \UnexpectedValueException if there's no sub-object
+     */
+    public function getSubObject()
+    {
+        if ($this->hasTask()) {
+            return $this->getTask();
+        }
+        if ($this->hasDueWork()) {
+            return $this->getDueWork();
+        }
+        if ($this->hasQuiz()) {
+            return $this->getQuiz();
+        }
+        if ($this->hasProject()) {
+            return $this->getProject();
+        }
+        throw new \UnexpectedValueException('This object has no sub-object');
+    }
+
+    /**
+     * Sets the sub-object for this model (task, quiz, duework, project)
+     *
+     * @param IAssessableDataModel $subObject
+     * @return static
+     */
+    public function setSubObject(IAssessableDataModel $subObject)
+    {
+        if ($subObject instanceof Task) {
+            return $this->setTask($subObject);
+        } elseif ($subObject instanceof DueWork) {
+            return $this->setDueWork($subObject);
+        } elseif ($subObject instanceof Quiz) {
+            return $this->setQuiz($subObject);
+        } elseif ($subObject instanceof Project) {
+            return $this->setProject($subObject);
+        }
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getTitle()

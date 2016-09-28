@@ -8,7 +8,7 @@
 namespace Schoolbox\Learning\Assessment\DataModel;
 
 use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Mapper\Exception as MapperException;
 
 /**
  * Proxy mapper for IAssessable objects.
@@ -18,13 +18,54 @@ use Schoolbox\Mapper as BaseMapper;
 class MapperProxy
 {
     /**
+     * The mapper for the base assessment table.
+     *
+     * @var Mapper
+     */
+    protected $baseMapper;
+
+    /**
+     * The translator between domain and data objects.
+     *
+     * @var Translator
+     */
+    protected $translator;
+
+    /**
+     * Constructor
+     *
+     * @param Mapper     $baseMapper
+     * @param Translator $translator
+     */
+    public function __construct(Mapper $baseMapper, Translator $translator)
+    {
+        $this->baseMapper = $baseMapper;
+        $this->translator = $translator;
+    }
+
+    /**
      * Finds an assessable by ID
      *
      * @param int $id
+     * @return IAssessable
+     * @throws MapperException\Deleted if the assessment was deleted
      */
     public function findById($id)
     {
-        //
+        try {
+            return $this->translator->translateToDomainModel(
+                $this->translateDataModelFromMapper(
+                    $this->baseMapper->findById($id)
+                )
+            );
+        } catch (MapperException\Deleted $e) {
+            $e->setDeletedObject(
+                $this->translator->translateToDomainModel(
+                    $this->translateDataModelFromMapper($e->getDeletedObject())
+                )
+            );
+            throw $e;
+        }
     }
 
     /**
@@ -34,7 +75,7 @@ class MapperProxy
      */
     public function findAllForUnitSpecificationId($unitSpecId)
     {
-        //
+        // TODO implement
     }
 
     /**
@@ -44,7 +85,7 @@ class MapperProxy
      */
     public function findAllForUnitImplementationId($unitImplId)
     {
-        //
+        // TODO implement
     }
 
     /**
@@ -54,7 +95,7 @@ class MapperProxy
      */
     public function findAllForFolderId($folderId)
     {
-        //
+        // TODO implement
     }
 
     /**
@@ -64,7 +105,7 @@ class MapperProxy
      */
     public function findAllForProjectId($projectId)
     {
-        //
+        // TODO implement
     }
 
     /**
@@ -74,7 +115,7 @@ class MapperProxy
      */
     public function save(IAssessable $assessable)
     {
-        //
+        // TODO implement
     }
 
     /**
@@ -84,6 +125,38 @@ class MapperProxy
      */
     public function delete(IAssessable $assessable)
     {
-        //
+        // TODO implement
+    }
+
+    /**
+     * Translates the data model from mapper format to a format usable by
+     * this object's translator.
+     *
+     * TODO try to remove this, and update translator to return Model objects directly
+     *
+     * @param Model $model
+     * @return IAssessableDataModel
+     */
+    protected function translateDataModelFromMapper(Model $model)
+    {
+        // Turn the data model inside out
+        $subModel = $model->getSubObject();
+        $subModel->setAssessmentModel($model);
+        return $subModel;
+    }
+
+    /**
+     * Translates the data model from the format this object's translator returns
+     * to a format the mapper can use.
+     *
+     * @param IAssessableDataModel $subModel
+     * @return Model
+     */
+    protected function translateDataModelToMapper(IAssessableDataModel $subModel)
+    {
+        // Turn the data model inside out
+        $model = $subModel->getAssessmentModel();
+        $model->setSubObject($subModel);
+        return $model;
     }
 }
