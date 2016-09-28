@@ -30,7 +30,7 @@
                     {% for unit in course.units %}
                 <li>
                         {% if linkToUnits %}
-                    <a title="Visit {{ unit.folder.name }} homepage" href="/homepage/{{ unit.id }}">{{ unit.folder.name }}</a>
+                    <a title="Visit {{ unit.folder.name }} homepage" href="/homepage/{{ unit.folder.id }}">{{ unit.folder.name }}</a>
                         {% else %}
                     {{ unit.folder.name }}
                         {% endif %}
