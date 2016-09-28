@@ -7,7 +7,16 @@
 
 namespace Schoolbox\Learning\Assessment\DataModel;
 
+use Schoolbox\Assessment\Component\OnlineAssessment as Quiz;
+use Schoolbox\Assessment\Component\OnlineAssessmentMapper as QuizMapper;
+use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
+use Schoolbox\Assessment\Component\SubmissionBoxMapper as DueWorkMapper;
+use Schoolbox\Assessment\Course\Task;
+use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
+use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**
@@ -112,10 +121,45 @@ class MapperProxy
      * Saves an assessable
      *
      * @param IAssessable $assessable
+     * @param int         $sequence
      */
-    public function save(IAssessable $assessable)
+    public function save(IAssessable $assessable, $sequence)
     {
-        // TODO implement
+        // Save assessment
+        $dataModel = $this->translateDataModelToMapper(
+            $this->translator->translateToDataModel($assessable, $sequence)
+        );
+        $this->baseMapper->save($dataModel);
+        // Set ID on the domain model object
+        $assessable->setId($dataModel->getId());
+
+        // Save sub-objects
+        // TODO map assessement ID to all sub-objects
+        $subObject = $dataModel->getSubObject();
+        if ($subObject instanceof Task) {
+            TaskMapper::getInstance()->save($subObject);
+
+        } elseif ($subObject instanceof DueWork) {
+            DueWorkMapper::getInstance()->save($subObject);
+
+        } elseif ($subObject instanceof Quiz) {
+            QuizMapper::getInstance()->save($subObject);
+
+        } elseif ($subObject instanceof Project) {
+            ProjectMapper::getInstance()->save($subObject);
+
+            // Save sub-projects
+            if ($assessable instanceof ProjectObject) {
+                $i = 0;
+                foreach ($assessable->getAssessables() as $projectAssessable) {
+                    // Disallow save of projects within projects
+                    if ($projectAssessable instanceof ProjectObject) {
+                        throw new \UnexpectedValueException('Projects may not contain projects');
+                    }
+                    $this->save($projectAssessable, $i++);
+                }
+            }
+        }
     }
 
     /**
@@ -125,7 +169,15 @@ class MapperProxy
      */
     public function delete(IAssessable $assessable)
     {
-        // TODO implement
+        // Delete assessment
+        $this->baseMapper->delete(
+            $this->translateDataModelToMapper(
+                $this->translator->translateToDataModel($assessable, 0)
+            )
+        );
+
+        // I don't think I need to delete sub-objects.
+        // The assessable itself is all that should need deletion
     }
 
     /**
