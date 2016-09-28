@@ -94,4 +94,15 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('2016-10-15 12:00:00', $assessment->getUpdatedAt()->getDatabase());
         $this->assertEquals('2016-10-16 12:00:00', $assessment->getDeletedAt()->getDatabase());
     }
+
+    /**
+     * Test translation of data model with no assessment.
+     *
+     * @expectedException \UnexpectedValueException
+     */
+    public function testTranslateEmptyAssessmentToDomainModel()
+    {
+        $dataModel = (new TaskModel())->setId(15);
+        $this->translator->translateToDomainModel($dataModel);
+    }
 }
