@@ -10,7 +10,7 @@
 namespace Schoolbox\Assessment\Course;
 
 use Schoolbox;
-//use Schoolbox\Assessment\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -69,8 +69,8 @@ class TaskMapper extends Schoolbox\Mapper {
             'type'       => self::TYPE_MODEL,
             'join'       => 'assessment',
         ));
-//        $this->joins('assessment_id', AssessmentMapper::class, null, null, null, 'assessment', 'assessment');
 
+        $this->joins('assessment_id', AssessmentMapper::class, null, null, null, 'assessmentModel');
 
         $this->hasMap(array(
             'column'     => 'user_id',

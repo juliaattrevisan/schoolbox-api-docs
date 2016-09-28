@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\File;
 use Schoolbox\Resource\Storage;
@@ -70,6 +71,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->joins('task_instance_id', Task\InstanceMapper::class, 'id', null, null, 'taskInstance', 'task_instance');
         $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
         $this->joins('submission_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'gradeGroup');
+        $this->joins('assessment_id', AssessmentMapper::class, null, null, null, 'assessmentModel');
 
         $this->joinsVia('submission_box_file', Storage\Mapper::class, 'hash', 'storage_id', 'box_id', 'id', null, null, 'attachments');
 

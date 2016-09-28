@@ -7,10 +7,8 @@
 
 namespace Schoolbox\Learning\Assessment\DataModel\Project;
 
-use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
-use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
 
 /**
@@ -33,5 +31,6 @@ class Mapper extends BaseMapper
         $this->uses('weight', self::TYPE_INTEGER);
         $this->uses('summator', self::TYPE_STRING);
         $this->joins('mark_type_id', MarkTypeMapper::class, 'mark_type_id', null, null, 'markType');
+        $this->joins('assessment_id', AssessmentMapper::class, null, null, null, 'assessmentModel');
     }
 }
