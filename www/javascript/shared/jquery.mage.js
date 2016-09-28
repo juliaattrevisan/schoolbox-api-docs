@@ -16,6 +16,9 @@
         onXhrDone: $.noop,
         onXhrFail: $.noop,
         onXhrAlways: $.noop,
+        manipulateSerialized: function(formSerial) {
+            return formSerial;
+        },
         setFormData: $.noop
     };
 
@@ -183,6 +186,11 @@
         // set up an object that can be manipulated outside
         formSerial = form.serializeArray();
 
+        /* Last chance to manipulate serialized data stack
+         * There might be a better way than this, but didn't find it
+         */
+        formSerial = mage.options.manipulateSerialized.call(mage, formSerial);
+
         // pre-flight check
         mage.options.setFormData(formSerial);
 
@@ -201,7 +209,6 @@
                 xhrAlways.call(mage, mage.options.onXhrAlways, targetElement);
             });
     }
-
 
     /**
      * This function works around a long-standing jquery bug: http://dev.jquery.com/ticket/1294

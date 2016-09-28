@@ -137,6 +137,16 @@ class Factory
                 throw new \DomainException('select a valid assessment type');
         }
 
+        /* Check required data
+         */
+        if (!strlen(trim($this->getTitle()))) {
+            throw new \InvalidArgumentException('set an assessment title');
+        }
+
+        if (!strlen(trim($this->getDescription()))) {
+            throw new \InvalidArgumentException('set an assessment description');
+        }
+
         /* Check dates are provided
          * Re-throw a more friendly exception message than crappy "Laravel blahblah data missing":
          */

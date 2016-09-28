@@ -29,6 +29,17 @@
                 /* Save everything
                  */
                 $('input[data-mage-next="end"]').mage({
+                    manipulateSerialized: function(data) {
+                        var newData = data;
+
+                        newData.push({
+                            name: 'description',
+                            value: CKEDITOR.instances['description'].getData()
+                        });
+
+                        return newData;
+                    },
+
                     onXhrDone: function (data) {
 
                         /* TODO: Redirect somewhere upon success
@@ -40,6 +51,16 @@
                 /* Or, proceed with project configuration
                  */
                 $('input[data-mage-next="part-3"]').mage({
+                    manipulateSerialized: function(data) {
+                        var newData = data;
+
+                        newData.push({
+                            name: 'description',
+                            value: CKEDITOR.instances['description'].getData()
+                        });
+
+                        return newData;
+                    },
                     onXhrDone: function (data) {
                         $('#assessmentForm')
                             .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment') }}')
