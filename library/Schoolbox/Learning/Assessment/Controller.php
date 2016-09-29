@@ -411,9 +411,43 @@ class Controller extends Base
     {
         /* TODO: Actually save data here then redirect back to project update screen
          */
-        $returnUrl = (new Redirect())->decode($this->getRequest()->post['returnUrl']);
+        //        new \Alaress_Probe($_POST, $this->getRequest()->post, "Redirect to <a href='{$returnUrl}'>{$returnUrl}</a>");
 
-        new \Alaress_Probe($_POST, $this->getRequest()->post, "Redirect to <a href='{$returnUrl}'>{$returnUrl}</a>");
+        /* Figure out what kind of assessment was chosen
+         * and spawn a new instance of it to manipulate
+         */
+        try {
+            $assessment = (new Factory(
+                $this->getRequest()->post['assessmentType'],
+                $this->getRequest()->post['title'],
+                $this->getRequest()->post['description'],
+                $_SESSION['user'],
+                $this->getRequest()->post['weight'],
+                $this->getRequest()->post['publishDate'] . ' ' . $this->getRequest()->post['publishTime'],
+                $this->getRequest()->post['openDate'] . ' ' . $this->getRequest()->post['openTime'],
+                $this->getRequest()->post['dueDate'] . ' ' . $this->getRequest()->post['dueTime'],
+                $this->getRequest()->post['closeDate'] . ' ' . $this->getRequest()->post['closeTime'],
+                $this->getRequest()->post['summator']
+            ))->produce();
+        }
+        catch (\DomainException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            return;
+        }
+        catch (\InvalidArgumentException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            return;
+        }
+        catch (\UnexpectedValueException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            return;
+        }
+
+        $data = [
+            'returnUrl' => (new Redirect())->decode($this->getRequest()->post['returnUrl'])
+        ];
+
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
     }
 
     /**

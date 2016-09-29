@@ -6,6 +6,28 @@
     [ 'Create Assessment', routeLookup('learningAssessment.getSelectAssessment') ]
 ) }}
 
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
+<script type="text/javascript">
+    $(function () {
+        // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
+        $('input[data-mage-next]').mage({
+            manipulateSerialized: function (data) {
+                var newData = data;
+
+                newData.push({
+                    name: 'description',
+                    value: CKEDITOR.instances['description'].getData()
+                });
+
+                return newData;
+            },
+            onXhrDone: function (data) {
+                window.location.href = data.returnUrl;
+            }
+        });
+    });
+</script>
 <div class="row">
     <div class="small-12 columns">
         <h1>Create Assessment in {{ project.title }}</h1>
@@ -15,12 +37,12 @@
 <div class="row">
     <div class="small-12 columns island">
         <form action="{{ routeLookup('learningAssessment.postCreateAssessmentWithinProject', {assessmentId: project.id}) }}" method="post">
-            <input type="hidden" name="projectId" value="{{ project.id }}" />
-            <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
-            <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
-
             <section>
                 <fieldset class="content">
+                    <input type="hidden" name="projectId" value="{{ project.id }}" />
+                    <input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+                    <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
+
                     <div class="small-12 columns">
                         {% block content %}
                         {% endblock %}
