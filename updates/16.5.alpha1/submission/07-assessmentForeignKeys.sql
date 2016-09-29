@@ -18,6 +18,9 @@ REFERENCES `assessment` (`id`)
  * Due work table indices and FKs
  */
 
+-- Index for performance on WHERE clause
+CREATE INDEX assess_assessment_id_index ON schoolbox.assess (assessment_id);
+
 ALTER TABLE `submission_box` ENGINE = InnoDB ;
 
 ALTER TABLE `submission_box`
