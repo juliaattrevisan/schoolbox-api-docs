@@ -25,25 +25,30 @@ class Factory
      *
      * @var array
      */
-    private $map = [
-        AssessmentTypes::ASSESSMENT_PROJECT => [
-            MarkType::TYPE_PERCENT => 'Percentage',
-            MarkType::TYPE_NONE => 'None',
-            MarkType::TYPE_LETTER => 'Letter Grade'
-        ],
-        AssessmentTypes::ASSESSMENT_DUE_WORK => [
-            MarkType::TYPE_PERCENT => 'Percentage',
-            MarkType::TYPE_NONE => 'None',
-            MarkType::TYPE_TOTAL => 'Total Mark',
-            MarkType::TYPE_LETTER => 'Letter Grade'
-        ],
-        AssessmentTypes::ASSESSMENT_TASK => [
-            MarkType::TYPE_COMPLETION => 'Completion',
-        ],
-        AssessmentTypes::ASSESSMENT_QUIZ => [
-            MarkType::TYPE_TOTAL => 'Total Mark',
-        ],
-    ];
+    private $map = [];
+
+    public function __construct()
+    {
+        $this->setMap([
+            AssessmentTypes::ASSESSMENT_PROJECT => [
+                MarkType::TYPE_PERCENT => Percentage::getTitle(),
+                MarkType::TYPE_NONE => None::getTitle(),
+                MarkType::TYPE_LETTER => LetterGrade::getTitle()
+            ],
+            AssessmentTypes::ASSESSMENT_DUE_WORK => [
+                MarkType::TYPE_PERCENT => Percentage::getTitle(),
+                MarkType::TYPE_NONE => None::getTitle(),
+                MarkType::TYPE_TOTAL => TotalMarkWholeNumber::getTitle(),
+                MarkType::TYPE_LETTER => LetterGrade::getTitle()
+            ],
+            AssessmentTypes::ASSESSMENT_TASK => [
+                MarkType::TYPE_COMPLETION => Completion::getTitle(),
+            ],
+            AssessmentTypes::ASSESSMENT_QUIZ => [
+                MarkType::TYPE_TOTAL => TotalMarkFractional::getTitle(),
+            ],
+        ]);
+    }
 
     /**
      * @param IAssessable $assessable

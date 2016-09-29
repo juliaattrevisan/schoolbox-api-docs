@@ -39,4 +39,12 @@ class None extends AbstractMarkScheme
     {
         return null;
     }
+
+    /**
+     * @return string
+     */
+    public static function getTitle()
+    {
+        return 'None';
+    }
 }
