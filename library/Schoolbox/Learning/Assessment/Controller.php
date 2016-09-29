@@ -338,6 +338,16 @@ class Controller extends Base
     public function getCreateAssessmentWithinProject($assessmentId, $assessmentType)
     {
 
+        /* TODO: Figure out assessment's relationship to $folder in some way
+         */
+        try {
+            $folder = $this->getFolderMapper()->findById(43);
+        }
+        catch (MapperException $e) {
+            $this->sendError('Could not create assessment', [ 'select a valid Folder' ]);
+            return;
+        }
+
         /* TODO: Actually retrieve $assessmentId data here
          */
         $project = new Project((new SummatorFactory(SummatorFactory::WEIGHTED_AVERAGE))->produce());
@@ -388,6 +398,7 @@ class Controller extends Base
 
         if ($types->isValidIndex($assessmentType)) {
             $data = [
+                'folder' => $folder,
                 'types' => $types,
                 'project' => $project,
                 'assessment' => [],
