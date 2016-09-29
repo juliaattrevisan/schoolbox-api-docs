@@ -9,7 +9,7 @@
 <label>
     Max Attempts
     {% set maxAttempts = 10 %}
-    <select name="quizMaxAttempts">
+    <select name="maxAttempts">
 
         {% for i in 0..maxAttempts %}
         {% if i == 0 %}
@@ -26,10 +26,10 @@
     $(function() {
         $('#quizDuration').on('click', function(event) {
             if ($(this).is(':checked')) {
-                $('#quizDurationPanel').hide().removeClass('hide').slideDown(600);
+                $('#durationPanel').hide().removeClass('hide').slideDown(600);
             }
             else {
-                $('#quizDurationPanel').slideUp(600, function() {
+                $('#durationPanel').slideUp(600, function() {
                     $(this).addClass('hide');
                 });
             }
@@ -38,10 +38,10 @@
 </script>
 <div class="row">
     <div class="small-12 columns">
-        <label for="quizDuration">Duration</label>
+        <label for="hasDuration">Duration</label>
         <div class="switch round">
-            <input name="quizHasDuration" id="quizHasDuration" type="checkbox" />
-            <label for="quizHasDuration">
+            <input name="hasDuration" id="hasDuration" type="checkbox" />
+            <label for="hasDuration">
                 <span class="icon-approve"></span>
                 <span class="icon-cancel"></span>
             </label>
@@ -49,16 +49,16 @@
     </div>
 </div>
 
-<div class="row hide" id="quizDurationPanel">
+<div class="row hide" id="durationPanel">
     <div class="small-12 columns no-pad">
         <div class="small-12 medium-6 columns">
             <label>Hours
-                <input name='quizDurationHours' type="text" />
+                <input name='durationHours' type="text" />
             </label>
         </div>
         <div class="small-12 medium-6 columns">
             <label>Minutes
-                <input name='quizDurationMinutes' type="text" />
+                <input name='durationMinutes' type="text" />
             </label>
         </div>
     </div>

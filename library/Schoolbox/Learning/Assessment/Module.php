@@ -37,11 +37,11 @@ class Module extends BaseModule
         $routes = [
             'GET' => [
 
-                /* Select an assessment
+                /* Select an assessment fragment to start with
                  */
                 '/assessment/select/{folderId}' => 'getSelectAssessment',
 
-                /* This is the second half containing assessable-specific data
+                /* Edit an assessment with their type-specific data
                  */
                 '/assessment/{assessmentId}/update' => 'getUpdateAssessment',
 
@@ -49,16 +49,8 @@ class Module extends BaseModule
                  */
                 '/assessment/{assessmentId}/new/{assessmentType}' => 'getCreateAssessmentWithinProject',
 
-
-
-
-
-
-
-
-
-
-
+                /* Temporary methods
+                 */
                 '/assessment/{assessmentId}/status'              => 'getStatus',
                 '/assessment/{assessmentId}/summary/{studentId}' => 'getSummary',
                 '/assessment/{assessmentId}/submit/{studentId}'  => 'getSubmitForm',
@@ -77,16 +69,9 @@ class Module extends BaseModule
                  */
                 '/assessment/{assessmentId}/new' => 'postCreateAssessmentWithinProject',
 
-
-
-
-
-
-
                 /* This is the second half containing assessable-specific data
                  */
                 '/assessment/{assessmentId}/update' => 'postUpdateAssessment',
-
 
                 /* Delete an assessment
                  */

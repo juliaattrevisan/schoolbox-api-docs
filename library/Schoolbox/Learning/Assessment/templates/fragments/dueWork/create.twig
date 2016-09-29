@@ -20,7 +20,7 @@
     <div class="small-6 columns">
         <label>
             Mark Type
-            <select name="dueWorkMarkType">
+            <select name="markType">
                 {% for index, title in allMarkTypes %}
                 <option value="{{ index }}">{{ title }}</option>
                 {% endfor %}
@@ -36,20 +36,20 @@
         </label>
     </div>
     <div class="small-6 columns">
-        <label for="dueWorkUseRubric">Use Rubric?</label>
+        <label for="useRubric">Use Rubric?</label>
         <div class="switch round">
-            <input name="dueWorkUseRubric" id="dueWorkUseRubric" type="checkbox"  />
-            <label for="dueWorkUseRubric">
+            <input name="useRubric" id="useRubric" type="checkbox"  />
+            <label for="useRubric">
                 <span class="icon-approve"></span>
                 <span class="icon-cancel"></span>
             </label>
         </div>
     </div>
     <div class="small-6 columns">
-        <label for="dueWorkMarkPerCapability">Mark Per-Capability</label>
+        <label for="markPerCapability">Mark Per-Capability</label>
         <div class="switch round">
-            <input name="dueWorkMarkPerCapability" id="dueWorkMarkPerCapability" type="checkbox" />
-            <label for="dueWorkMarkPerCapability">
+            <input name="markPerCapability" id="markPerCapability" type="checkbox" />
+            <label for="markPerCapability">
                 <span class="icon-approve"></span>
                 <span class="icon-cancel"></span>
             </label>
