@@ -1,6 +1,6 @@
 <?php
 /**
- * Collection
+ * Map
  *
  * A pre-built collection of all available strats to save you
  * having to build it yourself at compile time
@@ -20,7 +20,7 @@ use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
 use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
 use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
 
-class StrategyCollection
+class Mapping
 {
     /**
      * @var array
