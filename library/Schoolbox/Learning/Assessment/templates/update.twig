@@ -3,7 +3,7 @@
 
 {{ bread.crumbs(
 [ folder.name, '/homepage/' ~ folder.id ],
-[ 'Update ' ~ assessment.title, routeLookup('learningAssessment.getUpdateAssessment') ]
+[ 'Update ' ~ assessment.title, routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: assessment.id}) ]
 ) }}
 
 <div class="row">
