@@ -390,6 +390,7 @@ class Controller extends Base
             'project' => $project,
             'assessment' => [],
             'assessmentType' => $assessmentType,
+            'allMarkTypes' => $this->getAllMarkTypes(),
             'returnUrl' => $this->getRequest()->query['return_url']
         ]));
     }
