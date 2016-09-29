@@ -385,14 +385,24 @@ class Controller extends Base
             ->setCreatedAt(Alaress_Date_Format::now())
             ->setUpdatedAt(Alaress_Date_Format::now());
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/createWithinProject.twig', [
-            'types' => new Types(),
-            'project' => $project,
-            'assessment' => [],
-            'assessmentType' => $assessmentType,
-            'allMarkTypes' => $this->getAllMarkTypes(),
-            'returnUrl' => $this->getRequest()->query['return_url']
-        ]));
+        $types = new Types();
+
+        if ($types->isValidIndex($assessmentType)) {
+            $data = [
+                'types' => $types,
+                'project' => $project,
+                'assessment' => [],
+                'assessmentType' => $assessmentType,
+                'allMarkTypes' => $this->getAllMarkTypes(),
+                'returnUrl' => $this->getRequest()->query['return_url']
+            ];
+
+            $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($assessmentType)}/createWithinProject.twig", $data));
+        }
+        else {
+            $this->sendError('Could not create assessment', [ 'select a valid assessment type' ]);
+            return;
+        }
     }
 
     /**

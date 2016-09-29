@@ -22,13 +22,8 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        {% if assessmentType == types.fromTitle('dueWork') %}
-                            {% include '@learningAssessment/fragments/dueWork/create.twig' %}
-                        {% elseif assessmentType == types.fromTitle('task') %}
-                            {% include '@learningAssessment/fragments/task/create.twig' %}
-                        {% elseif assessmentType == types.fromTitle('quiz') %}
-                            {% include '@learningAssessment/fragments/quiz/create.twig' %}
-                        {% endif %}
+                        {% block content %}
+                        {% endblock %}
                     </div>
                 </fieldset>
             </section>
