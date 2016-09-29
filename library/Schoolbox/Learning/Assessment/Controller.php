@@ -25,7 +25,7 @@ use \Schoolbox\Resource\Storage\Model as Storage;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\Assessment\Project as Project;
 
-use \Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
+use \Schoolbox\Learning\MarkScheme\Mapping as MarkSchemeMapping;
 
 use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 use \Schoolbox\Learning\Assessment\Summator\Mapping as SummatorMapping;
@@ -479,7 +479,7 @@ class Controller extends Base
         $types = new Types();
 
         if ($types->isValidIndex($assessmentType)) {
-            $mapping = (new MarkSchemeFactory())->getMap();
+            $mapping = (new MarkSchemeMapping())->getMap();
 
             return $mapping[$assessmentType];
         }

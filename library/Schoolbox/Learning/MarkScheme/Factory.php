@@ -13,42 +13,13 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Project;
-use \Schoolbox\Learning\Assessment\Types as AssessmentTypes;
+
 
 /**
  * Spawns an appropriate MarkScheme for a given Assessment
  */
 class Factory
 {
-    /**
-     * Mapping of consts to human-readable titles
-     *
-     * @var array
-     */
-    private $map = [];
-
-    public function __construct()
-    {
-        $this->setMap([
-            AssessmentTypes::ASSESSMENT_PROJECT => [
-                MarkType::TYPE_PERCENT => Percentage::getTitle(),
-                MarkType::TYPE_NONE => None::getTitle(),
-                MarkType::TYPE_LETTER => LetterGrade::getTitle()
-            ],
-            AssessmentTypes::ASSESSMENT_DUE_WORK => [
-                MarkType::TYPE_PERCENT => Percentage::getTitle(),
-                MarkType::TYPE_NONE => None::getTitle(),
-                MarkType::TYPE_TOTAL => TotalMarkWholeNumber::getTitle(),
-                MarkType::TYPE_LETTER => LetterGrade::getTitle()
-            ],
-            AssessmentTypes::ASSESSMENT_TASK => [
-                MarkType::TYPE_COMPLETION => Completion::getTitle(),
-            ],
-            AssessmentTypes::ASSESSMENT_QUIZ => [
-                MarkType::TYPE_TOTAL => TotalMarkFractional::getTitle(),
-            ],
-        ]);
-    }
 
     /**
      * @param IAssessable $assessable
@@ -134,24 +105,5 @@ class Factory
             default:
                 throw new \DomainException("Invalid MarkType for Project: " . $project->getMarkType()->getName());
         }
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return array
-     */
-    public function getMap()
-    {
-        return $this->map;
-    }
-
-    /**
-     * @param array $map
-     */
-    private function setMap($map)
-    {
-        $this->map = $map;
     }
 }
