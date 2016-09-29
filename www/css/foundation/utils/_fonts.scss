@@ -138,8 +138,7 @@
 .icon-curriculum:before {
 	content: "\e617";
 }
-.icon-curriculum-details:before,
-.icon-project:before{
+.icon-curriculum-details:before{
 	content: "\e618";
 }
 .icon-danger:before {
@@ -350,6 +349,9 @@
 }
 .icon-print:before {
 	content: "\e656";
+}
+.icon-project:before {
+	content: "\e90b";
 }
 .icon-result:before,
 .icon-progress:before,
