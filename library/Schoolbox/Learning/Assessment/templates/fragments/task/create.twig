@@ -1,5 +1,9 @@
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
+{% include '@learningAssessment/fragments/common.twig' %}
+{% include '@learningAssessment/fragments/curriculumCodes.twig' %}
+{% include '@learningAssessment/fragments/dates.twig' %}
+
 <input type="hidden" name="assessmentType" value="{{ types.fromTitle('task') }}" />
 
 <div class="row">
