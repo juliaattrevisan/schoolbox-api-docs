@@ -17,7 +17,24 @@
 </div>
 
 <div class="row">
-    <div class="small-6 columns">
+    <div class="small-12 columns">
+        <label for="acceptsSubmissions">Accepts Submissions?</label>
+        <select name="acceptsSubmissions">
+            {% set options = {
+                0: 'None',
+                1: 'Single',
+                2: 'Multiple'
+            }
+            %}
+            {% for index, title in options %}
+            <option value="{{ index }}">{{ title }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 medium-6 columns">
         <label>
             Mark Type
             <select name="markType">
@@ -27,15 +44,18 @@
             </select>
         </label>
     </div>
-    <div class="small-6 columns">
-        <label>Grading Scheme
+    <div class="small-12 medium-6 columns">
+        <label>
+            Grading Scheme
             <select>
                 <option>Standard</option>
                 <option>Non Standard</option>
             </select>
         </label>
     </div>
-    <div class="small-6 columns">
+</div>
+<div class="row">
+    <div class="small-12 medium-6 columns">
         <label for="useRubric">Use Rubric?</label>
         <div class="switch round">
             <input name="useRubric" id="useRubric" type="checkbox"  />
@@ -45,7 +65,7 @@
             </label>
         </div>
     </div>
-    <div class="small-6 columns">
+    <div class="small-12 medium-6 columns">
         <label for="markPerCapability">Mark Per-Capability</label>
         <div class="switch round">
             <input name="markPerCapability" id="markPerCapability" type="checkbox" />
