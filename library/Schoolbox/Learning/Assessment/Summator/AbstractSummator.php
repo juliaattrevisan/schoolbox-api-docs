@@ -19,13 +19,6 @@ use Schoolbox\User;
 
 abstract class AbstractSummator implements ISummator
 {
-    /**
-     * Title of the summator strat
-     * e.g. "Weighted Average"
-     *
-     * @var string
-     */
-    protected $title = '';
 
     /**
      * @inheritDoc
@@ -99,15 +92,4 @@ abstract class AbstractSummator implements ISummator
      * @return float|null
      */
     protected abstract function finalise();
-
-    /* Getters/Setters
-     */
-
-    /**
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
 }

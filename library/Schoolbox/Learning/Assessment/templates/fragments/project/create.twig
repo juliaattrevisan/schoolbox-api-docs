@@ -7,9 +7,10 @@
 <input type="hidden" name="assessmentType" value="{{ types.fromTitle('project') }}" />
 
 <label for="summatorSelect">Summation Options</label>
+
 <select id="summatorSelect" name="summator">
-    {% for currentSummator in allSummators %}
-    <option value="{{ loop.index0 }}">{{ currentSummator.title }}</option>
+    {% for index, title in allSummators.map %}
+    <option value="{{ index }}">{{ title }}</option>
     {% endfor %}
 </select>
 

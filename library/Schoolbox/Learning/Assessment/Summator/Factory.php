@@ -10,8 +10,18 @@
 
 namespace Schoolbox\Learning\Assessment\Summator;
 
+use \Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedAverage;
+use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
+use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
+use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
+
 class Factory
 {
+    const WEIGHTED_AVERAGE = 0;
+    const AVERAGE = 1;
+    const MAXIMUM = 2;
+    const MINIMUM = 3;
+
     /**
      * @var int
      */
@@ -19,7 +29,8 @@ class Factory
 
     /**
      * Factory constructor.
-     * @param $summator
+     *
+     * @param int $summator
      */
     public function __construct($summator)
     {
@@ -33,12 +44,18 @@ class Factory
      */
     public function produce()
     {
-        $summatorCollection = new StrategyCollection();
+        switch ($this->getSummator()) {
+            case self::WEIGHTED_AVERAGE:
+                return new SummatorWeightedAverage();
 
-        $strategy = $summatorCollection->getOffset($this->getSummator());
+            case self::AVERAGE:
+                return new SummatorAverage();
 
-        if ($strategy instanceof ISummator) {
-            return $strategy;
+            case self::MAXIMUM:
+                return new SummatorMaximum();
+
+            case self::MINIMUM:
+                return new SummatorMinimum();
         }
 
         throw new \InvalidArgumentException('choose a valid summation option');

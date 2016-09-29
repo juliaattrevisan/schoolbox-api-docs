@@ -24,12 +24,6 @@ use \Schoolbox\Learning\Assessment\Participant;
 
 class Minimum extends AbstractSummator
 {
-    /**
-     * Title
-     *
-     * @var string
-     */
-    protected $title = 'Minimum';
 
     /** @var float */
     protected $min;
@@ -75,4 +69,11 @@ class Minimum extends AbstractSummator
         return $this->min;
     }
 
+    /**
+     * @return string
+     */
+    public static function getTitle()
+    {
+        return 'Minimum';
+    }
 }

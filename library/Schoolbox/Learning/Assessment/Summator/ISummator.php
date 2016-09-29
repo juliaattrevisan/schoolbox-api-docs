@@ -28,7 +28,7 @@ interface ISummator
     /**
      * Get the public-facing title for this summator strat
      *
-     * @return mixed
+     * @return string
      */
-    public function getTitle();
+    public static function getTitle();
 }

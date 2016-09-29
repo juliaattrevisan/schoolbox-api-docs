@@ -23,12 +23,6 @@ use \Schoolbox\User;
 
 class WeightedAverage extends AbstractSummator
 {
-    /**
-     * Title
-     *
-     * @var string
-     */
-    protected $title = 'Weighted Average';
 
     /**
      * @var float
@@ -85,5 +79,13 @@ class WeightedAverage extends AbstractSummator
         }
 
         return (float)$this->weightedAverage;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getTitle()
+    {
+        return 'Weighted Average';
     }
 }
