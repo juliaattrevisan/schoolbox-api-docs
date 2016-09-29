@@ -61,12 +61,17 @@ class Session
         return $ip;
     }
 
+    /**
+     * @param string $username New user's user.username
+     * @param bool $remember Whether to store a 'remember' me cookie
+     * @return bool Whether new Session started for proposed user
+     */
     public function create($username, $remember = false)
     {
         $userHandler = new User;
         $groupHandler = new Group;
 
-        //Clear all remenants of past sessions
+        //Clear all remnants of past sessions
         $this->destroy();
 
         $user = $userHandler->getByUsername($username);
@@ -105,6 +110,10 @@ class Session
             $_SESSION['campus'] = $userHandler->getUserCampus($user['uid']);
             $_SESSION['calendar_view'] = $user['calendar_view'];
 
+            // add mobile session data
+            $sbmAuth = new Authenticator();
+            $result = $sbmAuth->appendSession($user['uid']);
+
             //if no mail enabled or user has elected to use external client set mailhandle to mailto:
             //TODO: remove this parent special config, but schools currently rely on it, need to update all parents to mail_handler = 1
             if (Cfg::get('mail_enable') == 0 || $user['mail_handler'] || ($groupHandler->isParent() && !$user['local_email'])) {
@@ -123,9 +132,7 @@ class Session
                 $this->setSynergyInfo($userHandler);
             }
 
-            // add mobile session data
-            $sbmAuth = new Authenticator();
-            $result = $sbmAuth->appendSession($user['uid']);
+
 
             if ($this->getUseLoginLog()) {
                 $notif = Notifactory::create(Notif::TOPIC_AUTH);
