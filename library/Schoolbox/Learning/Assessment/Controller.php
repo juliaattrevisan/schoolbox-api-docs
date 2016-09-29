@@ -25,11 +25,8 @@ use \Schoolbox\Resource\Storage\Model as Storage;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\Assessment\Project as Project;
 
+use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 use \Schoolbox\Learning\Assessment\Summator\Mapping as SummatorMapping;
-use \Schoolbox\Learning\Assessment\Summator\WeightedAverage as SummatorWeightedAverage;
-use \Schoolbox\Learning\Assessment\Summator\Average as SummatorAverage;
-use \Schoolbox\Learning\Assessment\Summator\Maximum as SummatorMaximum;
-use \Schoolbox\Learning\Assessment\Summator\Minimum as SummatorMinimum;
 
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
@@ -236,7 +233,7 @@ class Controller extends Base
 
         /* TODO: Actually retrieve $assessmentId data here
          */
-        $assessment = new Project(new SummatorAverage());
+        $assessment = new Project((new SummatorFactory(SummatorFactory::WEIGHTED_AVERAGE))->produce());
         $assessment
             ->setId($assessmentId)
             ->setTitle('Test Project')
@@ -341,7 +338,7 @@ class Controller extends Base
 
         /* TODO: Actually retrieve $assessmentId data here
          */
-        $project = new Project(new SummatorAverage());
+        $project = new Project((new SummatorFactory(SummatorFactory::WEIGHTED_AVERAGE))->produce());
         $project
             ->setId($assessmentId)
             ->setTitle('Test Project')
