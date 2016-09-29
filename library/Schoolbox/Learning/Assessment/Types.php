@@ -84,6 +84,17 @@ class Types extends \Schoolbox\Collection
         return false;
     }
 
+    /**
+     * $index is a project assessment type
+     *
+     * @param $index
+     * @return bool
+     */
+    public function isProject($index)
+    {
+        return $index == self::ASSESSMENT_PROJECT;
+    }
+
     /* Getters/Setters
      */
 

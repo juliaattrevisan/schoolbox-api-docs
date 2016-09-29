@@ -140,7 +140,7 @@ class Controller extends Base
 
             /* Special treatment for projects for now
              */
-            if ($this->getRequest()->post['assessmentType'] == Types::ASSESSMENT_PROJECT) {
+            if ($types->isProject($this->getRequest()->post['assessmentType'])) {
                 $data['allSummators'] = new SummatorMapping();
             }
 
@@ -300,7 +300,7 @@ class Controller extends Base
 
             /* Special treatment for projects for now
              */
-            if ($assessmentType == Types::ASSESSMENT_PROJECT) {
+            if ($types->isProject($assessmentType)) {
                 $data['types']         = $types;
                 $data['allReturnUrls'] = $this->getAllReturnUrls($assessmentId);
                 $data['allSummators']  = new SummatorMapping();
