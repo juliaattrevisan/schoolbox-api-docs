@@ -25,6 +25,8 @@ use \Schoolbox\Resource\Storage\Model as Storage;
 use \Schoolbox\Learning\Assessment\Participant;
 use \Schoolbox\Learning\Assessment\Project as Project;
 
+use \Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
+
 use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 use \Schoolbox\Learning\Assessment\Summator\Mapping as SummatorMapping;
 
@@ -128,7 +130,7 @@ class Controller extends Base
             'types' => $types,
             'assessment' => $assessment,
             'curriculumNodes' => $folder->getCurriculumNodes(),
-            'allMarkTypes' => $this->getAllMarkTypes()
+            'allMarkTypes' => $this->getAllMarkTypes($this->getRequest()->post['assessmentType'])
         ];
 
         /* Select the fragment to return
@@ -288,7 +290,7 @@ class Controller extends Base
             'assessmentType' => $assessmentType,
             'folder' => $folder,
             'curriculumNodes' => $folder->getCurriculumNodes(),
-            'allMarkTypes' => $this->getAllMarkTypes(),
+            'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
         ];
 
         $types = new Types();
@@ -390,7 +392,7 @@ class Controller extends Base
                 'project' => $project,
                 'assessment' => [],
                 'assessmentType' => $assessmentType,
-                'allMarkTypes' => $this->getAllMarkTypes(),
+                'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
                 'returnUrl' => $this->getRequest()->query['return_url']
             ];
 
@@ -467,25 +469,22 @@ class Controller extends Base
     }
 
     /**
-     * All the possible Mark Types to chooze from
-     * TODO: Replace with actual objects
+     * All the possible Mark Types to chooze from for this particular $assessmentType
+     *
+     * @param $assessmentType
+     * @return array
      */
-    private function getAllMarkTypes()
+    private function getAllMarkTypes($assessmentType)
     {
-        return [
-            [
-                'id'   => 1,
-                'name' => 'None'
-            ],
-            [
-                'id'   => 2,
-                'name' => 'Percentage'
-            ],
-            [
-                'id'   => 3,
-                'name' => 'Letter'
-            ]
-        ];
+        $types = new Types();
+
+        if ($types->isValidIndex($assessmentType)) {
+            $mapping = (new MarkSchemeFactory())->getMap();
+
+            return $mapping[$assessmentType];
+        }
+
+        return [];
     }
 
     /**

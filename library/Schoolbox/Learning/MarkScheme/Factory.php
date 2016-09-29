@@ -13,12 +13,38 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Project;
+use \Schoolbox\Learning\Assessment\Types as AssessmentTypes;
 
 /**
  * Spawns an appropriate MarkScheme for a given Assessment
  */
 class Factory
 {
+    /**
+     * Mapping of consts to human-readable titles
+     *
+     * @var array
+     */
+    private $map = [
+        AssessmentTypes::ASSESSMENT_PROJECT => [
+            MarkType::TYPE_PERCENT => 'Percentage',
+            MarkType::TYPE_NONE => 'None',
+            MarkType::TYPE_LETTER => 'Letter Grade'
+        ],
+        AssessmentTypes::ASSESSMENT_DUE_WORK => [
+            MarkType::TYPE_PERCENT => 'Percentage',
+            MarkType::TYPE_NONE => 'None',
+            MarkType::TYPE_TOTAL => 'Total Mark',
+            MarkType::TYPE_LETTER => 'Letter Grade'
+        ],
+        AssessmentTypes::ASSESSMENT_TASK => [
+            MarkType::TYPE_COMPLETION => 'Completion',
+        ],
+        AssessmentTypes::ASSESSMENT_QUIZ => [
+            MarkType::TYPE_TOTAL => 'Total Mark',
+        ],
+    ];
+
     /**
      * @param IAssessable $assessable
      * @return IMarkScheme
@@ -103,5 +129,24 @@ class Factory
             default:
                 throw new \DomainException("Invalid MarkType for Project: " . $project->getMarkType()->getName());
         }
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return array
+     */
+    public function getMap()
+    {
+        return $this->map;
+    }
+
+    /**
+     * @param array $map
+     */
+    private function setMap($map)
+    {
+        $this->map = $map;
     }
 }

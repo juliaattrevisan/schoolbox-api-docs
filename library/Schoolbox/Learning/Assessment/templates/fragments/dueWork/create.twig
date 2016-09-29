@@ -21,8 +21,8 @@
         <label>
             Mark Type
             <select name="dueWorkMarkType">
-                {% for currentMarkType in allMarkTypes %}
-                <option value="{{ currentMarkType.id }}">{{ currentMarkType.name }}</option>
+                {% for index, title in allMarkTypes %}
+                <option value="{{ index }}">{{ title }}</option>
                 {% endfor %}
             </select>
         </label>
