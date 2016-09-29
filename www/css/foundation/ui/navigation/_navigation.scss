@@ -140,6 +140,9 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		right: $tabbar-height;
 		top: 0;
 		@include placeholder-color(transparent, $font-weight-normal);
+		@media #{$medium-up} {
+			padding-left: $tabbar-height;
+		}
 		input[type="text"]{
 			border: 0;
 			background-color: transparent;
@@ -192,11 +195,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 			&:before {
 				color: $navigation-background;
 			}
-		}
-	}
-	@media #{$medium-up} {
-		#search {
-			padding-left: $tabbar-height;
 		}
 	}
 	// When notifications are disabled
