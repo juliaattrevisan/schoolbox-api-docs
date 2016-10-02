@@ -51,6 +51,27 @@ class Model implements IAssessableDataModel
     const SUMMATOR_WEIGHTED_AVERAGE = 'weighted';
 
     /**
+     * The title of the project.
+     *
+     * @var string
+     */
+    protected $title;
+
+    /**
+     * The long form description of the project.
+     *
+     * @var string
+     */
+    protected $description;
+
+    /**
+     * The weight of this project in determining class grades.
+     *
+     * @var int
+     */
+    protected $weight;
+
+    /**
      * The name of the summator that this uses.
      *
      * @var string
@@ -131,6 +152,60 @@ class Model implements IAssessableDataModel
     public function setMarkType(MarkType $markType)
     {
         $this->markType = $markType;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     * @return static
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     * @return static
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getWeight()
+    {
+        return $this->weight;
+    }
+
+    /**
+     * @param int $weight
+     * @return static
+     */
+    public function setWeight($weight)
+    {
+        $this->weight = $weight;
         return $this;
     }
 }
