@@ -168,9 +168,11 @@ ENGINE = InnoDB;
 
 
 -- New and existing assessment types
+-- Note that assess.assessment_id is nullable, because this table is shared
+-- with surveys (which don't have an assessment at all).
 
 ALTER TABLE `assess`
-ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `category_id`;
+ADD COLUMN `assessment_id` INT UNSIGNED NULL DEFAULT NULL AFTER `category_id`;
 
 ALTER TABLE `task`
 ADD COLUMN `assessment_id` INT UNSIGNED NOT NULL AFTER `id`;
