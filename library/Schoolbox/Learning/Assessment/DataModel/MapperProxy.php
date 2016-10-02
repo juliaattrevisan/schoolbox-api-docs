@@ -152,7 +152,13 @@ class MapperProxy
             TaskMapper::getInstance()->save($subObject);
 
         } elseif ($subObject instanceof DueWork) {
-            $subObject->setCategory($vestigialFolder);
+            // TODO figure out what to do, if anything, about rubric result sets
+            // I think they should be removed, as a RRS is only ever used to set levels on a rubric.
+            // Thereafter, it's ignored.
+            $subObject
+                ->setCategory($vestigialFolder)
+                ->setRubricResultSet(0)
+            ;
             DueWorkMapper::getInstance()->save($subObject);
 
         } elseif ($subObject instanceof Quiz) {
