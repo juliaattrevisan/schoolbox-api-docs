@@ -60,7 +60,7 @@ class SubmissionBoxMapper extends Schoolbox\Mapper implements FeedableMapperInte
         $this->uses('use_rubric', self::TYPE_BOOLEAN);
         $this->uses('rubric_group_marks', self::TYPE_BOOLEAN, null, 'markedPerRubricGroup');
         $this->uses('mark_visibility', self::TYPE_INTEGER);
-        $this->uses('skip_unsubmitted', self::TYPE_INTEGER);
+        $this->uses('skip_unsubmitted', self::TYPE_BOOLEAN);
         $this->uses('created', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('deleted', self::TYPE_BOOLEAN, self::COLUMN_SOFTDELETE);
 
