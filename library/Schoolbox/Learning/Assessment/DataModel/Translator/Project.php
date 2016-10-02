@@ -47,7 +47,11 @@ class Project implements IAssessmentTypeTranslator
     {
         if ($assessment instanceof ProjectObject) {
             // convert to project's model
-            $model     = new ProjectModel();
+            $model = (new ProjectModel())
+                ->setTitle($assessment->getTitle())
+                ->setDescription($assessment->getDescription())
+                ->setWeight($assessment->getWeight())
+            ;
             $subModels = new Collection();
             $i         = 0;
             foreach ($assessment->getAssessables() as $assessable) {
