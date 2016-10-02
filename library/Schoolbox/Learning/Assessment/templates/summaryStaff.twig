@@ -1,0 +1,141 @@
+<div class="row">
+    <div class="small-12 island">
+
+        <h1>{{ assessment.title }} - {{ student.getFullName }}</h1>
+        <p>{{ assessment.description }}</p>
+
+        <h2 class="subheader">Important Dates</h2>
+        <div class="row">
+            <div class="small-12 medium-3 island">
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="list-item">
+                                <div class="card wrap-down small-12">
+                                    <a href="#">
+                                        <i class="icon-clock icon-32"></i>
+                                    </a>
+                                    <p>
+                                        Publish Date
+                                    </p>
+                                    <p class="meta spaced">{{ assessment.publish_date.getLocal }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <div class="small-12 medium-3 island">
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="list-item">
+                                <div class="card wrap-down small-12">
+                                    <a href="#">
+                                        <i class="icon-clock icon-32"></i>
+                                    </a>
+                                    <p>
+                                        Open Date
+                                    </p>
+                                    <p class="meta spaced">{{ assessment.open_date.getLocal }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <div class="small-12 medium-3 island">
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="list-item">
+                                <div class="card wrap-down small-12">
+                                    <a href="#">
+                                        <i class="icon-clock icon-32"></i>
+                                    </a>
+                                    <p>
+                                        Due Date
+                                    </p>
+                                    <p class="meta spaced">{{ assessment.due_date.getLocal }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <div class="small-12 medium-3 island">
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="list-item">
+                                <div class="card wrap-down small-12">
+                                    <a href="#">
+                                        <i class="icon-clock icon-32"></i>
+                                    </a>
+                                    <p>
+                                        Close Date
+                                    </p>
+                                    <p class="meta spaced">{{ assessment.close_date.getLocal }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+
+        <h2 class="subheader">Assessables</h2>
+
+        <section>
+            <ul class="information-list">
+                {% for assessable in assessment.assessables %}
+
+                    {% if assessable.totalFeedbacks < assessable.totalResponses or assessable.totalResponses == 0 %}
+                        {% set classResponses = 'alert' %}
+                    {% elseif assessable.totalFeedbacks == assessable.totalResponses %}
+                        {% set classResponses = 'success' %}
+                    {% else %}
+                        {% set classResponses = '' %}
+                    {% endif %}
+
+                    {% if assessable.assessment_type == 'dueWork' %}
+                        {% set icon = 'due-work' %}
+                        {% set url = '/somewhere/' ~ assessable.id %}
+                    {% elseif assessable.assessment_type == 'quiz' %}
+                        {% set icon = 'quiz' %}
+                        {% set url = '/somewhere/' ~ assessable.id %}
+                    {% elseif assessable.assessment_type == 'task' %}
+                        {% set icon = 'task' %}
+                        {% set url = '/somewhere/' ~ assessable.id %}
+                    {% endif %}
+
+                    <li>
+                        <div class="list-item">
+                            <div class="card wrap-down small-12">
+                                <div class="icon-{{ icon }} icon-32"></div>
+                                <a href="{{ url }}">
+                                    <h3>
+                                        {{ assessable.title }}
+                                        {% if assessable.totalResponses > 0 %}
+                                            ({{ assessable.totalResponses }} Response{% if assessable.totalResponses > 1 %}s{% endif %})
+                                        {% endif %}
+                                    </h3>
+                                </a>
+                                <p class="meta">
+                                    <span class="{{ classResponses }}">
+                                        {% if assessable.totalResponses == 0 %}
+                                            No Submission Received
+                                        {% else %}
+                                            {{ (assessable.totalFeedbacks / assessable.totalResponses * 100 ) | round(1, 'common') }}% Feedback Provided
+                                        {% endif %}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+
+    </div>
+</div>

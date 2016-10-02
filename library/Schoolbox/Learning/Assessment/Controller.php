@@ -803,7 +803,6 @@ class Controller extends Base
         ]));
     }
 
-
     /**
      * Displays specified student's progress in relation to a specified assessable
      *
@@ -813,11 +812,10 @@ class Controller extends Base
      * @param User $student
      * @todo implement IAssessable interface
      */
-    public function getSummary($assessmentId, User $student)
+    public function getSummaryStaff($assessmentId, User $student)
     {
         // Replaces /submission/submissionHistory/dueWorkId/studentId
         //       eg /submission/submissionHistory/56/219
-
 
         // ==================== test URLs: ======================
         // http://192.168.36.10/learning/assessment/1/summary/230   - project with 1 quiz, 1 dueWork + 3 tasks
@@ -825,20 +823,119 @@ class Controller extends Base
         // http://192.168.36.10/learning/assessment/3/summary/230   - dueWork
         // http://192.168.36.10/learning/assessment/4/summary/230   - task
 
-        $twigData = [
-            'breadcrumbs' => self::getDummyBreadcrumbs(),
-            'student'     => $student,
-            'assessment'  => self::getDummyAssessment($assessmentId),
-        ];
+        $assessment = self::getDummyAssessment($assessmentId);
 
         // Is it a due work?
-        if(in_array($assessmentId, [2])){
+        if (in_array($assessmentId, [2])){
             // Rubric
             $submissionBox = SubmissionBoxMapper::getInstance()->findById(56);
             $twigData['rubric'] = RubricMapper::getInstance()->findBySubmissionBoxAndStudent($submissionBox, $student)->toContext();
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/summary.twig', $twigData));
+        // Calculate some totals for display purposes
+
+        foreach ($assessment['assessables'] as &$assessable) {
+
+            $assessable['totalResponses'] = 0;
+            $assessable['totalFeedbacks'] = 0;
+
+            foreach ($assessable['responses'] as $response) {
+                $assessable['totalResponses']++;
+
+                if (count($response['feedbacks']) > 0) {
+                    $assessable['totalFeedbacks']++;
+                }
+            }
+        }
+
+        $twigData = [
+            'breadcrumbs' => self::getDummyBreadcrumbs(),
+            'student' => $student,
+            'assessment' => $assessment,
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStaff.twig", $twigData));
+    }
+
+    /**
+     * Displays specified student's progress in relation to a specified assessable
+     *
+     * @api   GET /learning/assessment/:assessmentId/summary/:studentId
+     * @level 165
+     * @param IAssessable|int $assessmentId  TODO - replace int with IAssessable in Module
+     * @todo implement IAssessable interface
+     */
+    public function getSummaryStudent($assessmentId)
+    {
+        // Replaces /submission/submissionHistory/dueWorkId/studentId
+        //       eg /submission/submissionHistory/56/219
+
+        // ==================== test URLs: ======================
+        // http://192.168.36.10/learning/assessment/1/summary/230   - project with 1 quiz, 1 dueWork + 3 tasks
+        // http://192.168.36.10/learning/assessment/2/summary/230   - quiz
+        // http://192.168.36.10/learning/assessment/3/summary/230   - dueWork
+        // http://192.168.36.10/learning/assessment/4/summary/230   - task
+
+        $assessment = self::getDummyAssessment($assessmentId);
+
+        // Is it a due work?
+        if (in_array($assessmentId, [2])){
+            // Rubric
+            $submissionBox = SubmissionBoxMapper::getInstance()->findById(56);
+            $twigData['rubric'] = RubricMapper::getInstance()->findBySubmissionBoxAndStudent($submissionBox, $this->getUser())->toContext();
+        }
+
+        // Calculate some totals for display purposes
+
+        $counts = [
+            'dueWork' => 0,
+            'dueWorkCompleted' => 0,
+            'quiz' => 0,
+            'quizCompleted' => 0,
+            'task' => 0,
+            'taskCompleted' => 0,
+            'total' => 0,
+            'totalCompleted' => 0,
+        ];
+
+        foreach ($assessment['assessables'] as $assessable) {
+
+            $counts[$assessable['assessment_type']]++;
+            $counts['total']++;
+
+            switch ($assessable['assessment_type']) {
+                case 'dueWork':
+                    if (count($assessable['responses']) > 0) {
+                        $counts['dueWorkCompleted']++;
+                        $counts['totalCompleted']++;
+                    }
+                    break;
+                case 'quiz':
+                    if (count($assessable['attempts']) > 0) {
+                        $counts['quizCompleted']++;
+                        $counts['totalCompleted']++;
+                    }
+                    break;
+                case 'task':
+                    foreach ($assessable['responses'] as $response) {
+                        if ($response['responseType'] == 'taskCompletion') {
+                            $counts['taskCompleted']++;
+                            $counts['totalCompleted']++;
+                            break;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        $twigData = [
+            'breadcrumbs' => self::getDummyBreadcrumbs(),
+            'student' => $student,
+            'assessment' => $assessment,
+            'counts' => $counts
+        ];
+
+        $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStudent.twig", $twigData));
     }
 
     /**

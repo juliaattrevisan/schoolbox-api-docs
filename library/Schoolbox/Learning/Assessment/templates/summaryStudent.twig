@@ -1,0 +1,271 @@
+{# Set color classes depending on status #}
+
+{% if counts.taskCompleted == counts.task %}
+    {% set taskClass = 'success' %}
+{% elseif counts.taskCompleted < counts.task %}
+    {% set taskClass = 'alert' %}
+{% endif %}
+
+{% if counts.dueWorkCompleted == counts.dueWork %}
+    {% set dueWorkClass = 'success' %}
+{% elseif counts.dueWorkCompleted < counts.dueWork %}
+    {% set dueWorkClass = 'alert' %}
+{% endif %}
+
+{% if counts.quizCompleted == counts.quiz %}
+    {% set quizClass = 'success' %}
+{% elseif counts.quizCompleted < counts.quiz %}
+    {% set quizClass = 'alert' %}
+{% endif %}
+
+{% if counts.totalCompleted == counts.total %}
+    {% set totalClass = 'success' %}
+{% elseif counts.totalCompleted < counts.total %}
+    {% set totalClass = 'alert' %}
+{% endif %}
+
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>{{ assessment.title }}</h1>
+        <p>{{ assessment.description }}</p>
+
+        <h2 class="subheader">Progress</h2>
+        <div class="row">
+            <div class="small-12 medium-6 island">
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="list-item">
+                                <div class="card wrap-down small-12">
+                                    <a href="#">
+                                        <i class="icon-clock icon-32"></i>
+                                    </a>
+                                    <p>
+                                        Open Date
+                                    </p>
+                                    <p class="meta spaced">{{ assessment.open_date.getLocal }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <div class="small-12 medium-6 island">
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="list-item">
+                                <div class="card wrap-down small-12">
+                                    <a href="#">
+                                        <i class="icon-clock icon-32"></i>
+                                    </a>
+                                    <p>
+                                        Due Date
+                                    </p>
+                                    <p class="meta spaced">{{ assessment.due_date.getLocal }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+        <div class="row">
+            <div class="small-12 medium-3 island">
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="list-item">
+                                <div class="card wrap-down small-12">
+                                    <a href="#">
+                                        <i class="icon-due-work icon-32"></i>
+                                    </a>
+                                    <p>
+                                        Overall Project Completion
+                                    </p>
+                                    <p class="meta spaced {{ totalClass }}">{{ (counts.totalCompleted / counts.total * 100) | round(1, 'common') }}%
+                                        Completed</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            {% if counts.dueWork > 0 %}
+                <div class="small-12 medium-3 island">
+                    <section>
+                        <ul class="information-list">
+                            <li>
+                                <div class="list-item">
+                                    <div class="card wrap-down small-12">
+                                        <a href="#">
+                                            <i class="icon-due-work icon-32"></i>
+                                        </a>
+                                        <p>
+                                            Due Work
+                                        </p>
+                                        <p class="meta spaced {{ dueWorkClass }}">{{ (counts.dueWorkCompleted / counts.dueWork * 100) | round(1, 'common') }}%
+                                            Submitted</p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+            {% endif %}
+            {% if counts.quiz > 0 %}
+                <div class="small-12 medium-3 island">
+                    <section>
+                        <ul class="information-list">
+                            <li>
+                                <div class="list-item">
+                                    <div class="card wrap-down small-12">
+                                        <a href="#">
+                                            <i class="icon-quiz icon-32"></i>
+                                        </a>
+                                        <p>
+                                            Quizzes
+                                        </p>
+                                        <p class="meta spaced {{ quizClass }}">{{ (counts.quizCompleted / counts.quiz * 100) | round(1, 'common') }}%
+                                            Attempted</p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+            {% endif %}
+            {% if counts.task > 0 %}
+                <div class="small-12 medium-3 island">
+                    <section>
+                        <ul class="information-list">
+                            <li>
+                                <div class="list-item">
+                                    <div class="card wrap-down small-12">
+                                        <a href="#">
+                                            <i class="icon-task icon-32"></i>
+                                        </a>
+                                        <p>
+                                            Tasks
+                                        </p>
+                                        <p class="meta spaced {{ taskClass }}">{{ (counts.taskCompleted / counts.task * 100) | round(1, 'common') }}%
+                                            Attempted</p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+            {% endif %}
+        </div>
+
+        <h2 class="subheader">Assessables</h2>
+        <section>
+            <ul class="information-list">
+                {% for assessable in assessment.assessables %}
+
+                    {# Work out where each assessables link should go to and pick an icon based on assessment type #}
+
+                    {% if assessable.assessment_type == 'dueWork' %}
+                        {% set icon = 'due-work' %}
+                        {% set url = '/somewhere/' ~ assessable.id %}
+                    {% elseif assessable.assessment_type == 'quiz' %}
+                        {% set icon = 'quiz' %}
+                        {% set url = '/somewhere/' ~ assessable.id %}
+                    {% elseif assessable.assessment_type == 'task' %}
+                        {% set icon = 'task' %}
+                        {% set url = assessable.link %}
+                    {% endif %}
+
+                    <li class="actions-small-2">
+                        <div class="list-item">
+                            <div class="card wrap-down small-12">
+                                <div class="icon-{{ icon }} icon-32"></div>
+                                <a href="{{ url }}">
+                                    <h3>
+                                        {{ assessable.title }}
+
+                                        {# If the assessment is a task display completion indicator where appropriate #}
+
+                                        {% if assessable.assessment_type == 'task' %}
+
+                                            {% set taskCompleted = false %}
+                                            {% for response in assessable.responses %}
+                                                {% if response.responseType == 'taskCompletion' %}
+                                                    {% set taskCompleted = true %}
+                                                {% endif %}
+                                            {% endfor %}
+
+                                            {% if taskCompleted %}
+                                                (Completed)
+                                            {% endif %}
+                                        {% endif %}
+                                    </h3>
+                                </a>
+                                <p class="meta">
+                                    {{ assessable.description }}
+                                </p>
+                            </div>
+                        </div>
+                        <nav>
+                            {% if assessable.assessment_type == 'dueWork' %}
+
+                                {# Check if the due work is accepting submissions #}
+
+                                {% if assessable.accept_submission %}
+
+                                    {# Work out if there has been any feedback for this item #}
+
+                                    {% set showFeedback = false %}
+
+                                    {% for response in assessable.responses %}
+                                        {% if response.feedbacks | length %}
+                                            {% set showFeedback = true %}
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {# If there was feedback, display view feedback icon #}
+
+                                    {% if showFeedback %}
+                                        <a href="/feedback/{{ assessable.id }}" class="icon-view no-text" title="View Feedback"></a>
+                                    {% endif %}
+
+                                    {# Show upload link if multiple submissions are allowed, or the student hasn't submitted already #}
+
+                                    {% if assessable.multi_submission == true or assessable.responses | length == 0 %}
+                                        <a href="/submit/{{ assessable.id }}" class="icon-modify no-text" title="Submit Response"></a>
+                                    {% endif %}
+
+                                {% endif %}
+
+                            {% elseif assessable.assessment_type == 'quiz' %}
+
+                                {# Work out if there is any feeedback for this item #}
+
+                                {% set showFeedback = false %}
+                                {% for attempt in assessable.attempts %}
+                                    {% if attempt.feedbacks | length %}
+                                        {% set showFeedback = true %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                {# Display feedback #}
+
+                                {% if showFeedback %}
+                                    <a href="/feedback/{{ assessable.id }}" class="icon-view no-text" title="View Feedback"></a>
+                                {% endif %}
+
+                                {# Display attempt icon #}
+
+                                <a href="/quiz-attempt/{{ assessable.id }}" class="icon-modify no-text" title="Attempt Quiz"></a>
+
+                            {% endif %}
+
+                        </nav>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>
