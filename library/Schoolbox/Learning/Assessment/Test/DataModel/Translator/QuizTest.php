@@ -9,30 +9,9 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel\Translator;
 
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
-use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
-use Schoolbox\Assessment\Component\SubmissionBox\WorkType as WorkTypeModel;
-use Schoolbox\Assessment\Course\Task as TaskModel;
-use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
-use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
-use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
-use Schoolbox\Learning\Assessment\IAssessable;
-use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use Schoolbox\Learning\Assessment\Summator\Average;
-use Schoolbox\Learning\Assessment\Summator\Maximum;
-use Schoolbox\Learning\Assessment\Summator\Minimum;
-use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Test\DataModel\TestTrait;
-use Schoolbox\Learning\MarkScheme\LetterGrade;
-use Schoolbox\Learning\MarkScheme\None;
-use Schoolbox\Learning\MarkScheme\Percentage;
-use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
-use Schoolbox\Resource\Storage\Model as StorageModel;
-use Schoolbox\User;
 
 /**
  * Tests for the assessment data model translator (quizzes only).
