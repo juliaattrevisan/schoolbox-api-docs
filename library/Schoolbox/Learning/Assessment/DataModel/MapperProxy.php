@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception;
 
 /**
  * Proxy mapper for IAssessable objects.
@@ -139,18 +140,23 @@ class MapperProxy
             ->setDeletedAt($dataModel->getDeletedAt())
         ;
 
+        // Vestigial folder - for now, task/quiz/duework are linked to folders.
+        // This link will disappear eventually.
+        // TODO remove vestigial folder
+        $vestigialFolder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findAll(['limit' => 1])->first();
+
         // Save sub-objects
         $subObject = $dataModel->getSubObject();
         if ($subObject instanceof Task) {
-            // TODO remove vestigal folder - for now, this is required to save a task
-            $vestigalFolder = \Schoolbox\Resource\Folder\Mapper::getInstance()->findAll(['limit' => 1])->first();
-            $subObject->setCategory($vestigalFolder);
+            $subObject->setCategory($vestigialFolder);
             TaskMapper::getInstance()->save($subObject);
 
         } elseif ($subObject instanceof DueWork) {
+            $subObject->setCategory($vestigialFolder);
             DueWorkMapper::getInstance()->save($subObject);
 
         } elseif ($subObject instanceof Quiz) {
+            $subObject->setCategory($vestigialFolder);
             QuizMapper::getInstance()->save($subObject);
 
         } elseif ($subObject instanceof Project) {
