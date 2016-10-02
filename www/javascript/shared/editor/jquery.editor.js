@@ -275,7 +275,7 @@
 
                 /* set to use our iframely API key for oEmbed calls
                  */
-                embed_provider: '//iframe.ly/api/oembed?url={url}&callback={callback}&api_key=94aa8fc28ac1089a2dfb28&omit_script=1',
+                embed_provider: '//iframe.ly/api/oembed?url={url}&callback={callback}&api_key=94aa8fc28ac1089a2dfb28',
 
                 /* This used to be 'mode', a legacy setting from Tiny.
                  *
