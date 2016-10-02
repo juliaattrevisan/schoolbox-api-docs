@@ -17,7 +17,7 @@ REFERENCES `assessment` (`id`)
 ALTER TABLE `submission_box` ENGINE = InnoDB ;
 
 ALTER TABLE `submission_box`
-  ADD INDEX `fk_submission_box_assessment_id_idx` (`assessment_id` ASC);
+  ADD UNIQUE INDEX `fk_submission_box_assessment_id_idx` (`assessment_id` ASC);
 ALTER TABLE `submission_box`
   ADD CONSTRAINT `fk_submission_box_assessment_id`
 FOREIGN KEY (`assessment_id`)
@@ -26,7 +26,7 @@ REFERENCES `assessment` (`id`)
   ON UPDATE NO ACTION;
 
 ALTER TABLE `task`
-  ADD INDEX `fk_task_assessment_id_idx` (`assessment_id` ASC);
+  ADD UNIQUE INDEX `fk_task_assessment_id_idx` (`assessment_id` ASC);
 ALTER TABLE `task`
   ADD CONSTRAINT `fk_task_assessment_id`
 FOREIGN KEY (`assessment_id`)
