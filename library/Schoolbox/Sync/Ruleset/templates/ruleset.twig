@@ -158,7 +158,7 @@ set upsConfig = {
                                 <i class="icon-help"></i>
                                 <p>Use effects to map data fields from your SIS to user account attributes.</p>
                                 <p>When <a href="/adminv2/ups/effect/add/{{ currentRule.id }}" title="Add new Effect" data-effect-create="{{ currentRule.id }}">creating a data mapping</a> they may either be directly copied, altered using <a title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">filters</a> or mapped using a lookup table.</p>
-                                <p>Start by selecting you user account field you wish to populate, then select a method and finally add a <a title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">token</a> to use as a modifier.</p>
+                                <p>Start by selecting your user account field you wish to populate, then select a method and finally add a <a title="Show available Tokens" data-reveal-id="token-list" title="Tell me about Tokens and Filters">token</a> to use as a modifier.</p>
                             </div>
                             <ul class="information-list no-pad" id="rule-{{ currentRule.id }}-effects">
                                 {% for currentEffect in currentRule.effects %}
