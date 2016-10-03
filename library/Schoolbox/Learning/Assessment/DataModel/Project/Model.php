@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\DataModel\Project;
 
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
@@ -84,6 +85,13 @@ class Model implements IAssessableDataModel
      * @var MarkType
      */
     protected $markType;
+
+    /**
+     * The grade group this project uses (only if $this->markType is letter grade)
+     *
+     * @var GradeGroup
+     */
+    protected $gradeGroup;
 
     /**
      * The collection of assessable models.
@@ -206,6 +214,24 @@ class Model implements IAssessableDataModel
     public function setWeight($weight)
     {
         $this->weight = $weight;
+        return $this;
+    }
+
+    /**
+     * @return GradeGroup
+     */
+    public function getGradeGroup()
+    {
+        return $this->gradeGroup;
+    }
+
+    /**
+     * @param GradeGroup $gradeGroup
+     * @return static
+     */
+    public function setGradeGroup($gradeGroup)
+    {
+        $this->gradeGroup = $gradeGroup;
         return $this;
     }
 }
