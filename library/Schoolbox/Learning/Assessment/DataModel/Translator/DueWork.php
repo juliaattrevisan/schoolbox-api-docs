@@ -125,7 +125,7 @@ class DueWork implements IAssessmentTypeTranslator
                 $assessable->getAllFiles()->add(
                     (new DueWorkFile())
                         ->setHash($attachment->getHash())
-                        ->setFilename($attachment->getFilename())
+                        ->setFilename($attachment->getBasename())
                 );
             }
 
