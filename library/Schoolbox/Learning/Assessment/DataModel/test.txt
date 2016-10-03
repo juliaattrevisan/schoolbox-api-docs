@@ -2,13 +2,25 @@
 
 require_once(dirname(__FILE__) . '/../library/Bootstrap.php');
 
+use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
+use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
+use Schoolbox\Assessment\Course\Task as TaskModel;
+use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
+use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+
 // Create a task
 $mapper = new \Schoolbox\Learning\Assessment\DataModel\MapperProxy(
     \Schoolbox\Learning\Assessment\DataModel\Mapper::getInstance(),
     new \Schoolbox\Learning\Assessment\DataModel\Translator()
 );
 
-$task = (new Schoolbox\Learning\Assessment\Task\Model())
+$task = (new Task())
     // Generic fields
     ->setCreator((new \Schoolbox\User())->setId(3))
     ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -32,3 +44,143 @@ $task->setSelfMarkable(false)
      ->setLink('https://www.nothing.com/')
 ;
 $mapper->save($task, 0);
+
+
+// Create a quiz
+// (The mapper doesn't know how to save all of a quiz's sub-objects yet.)
+$quiz = (new Quiz())
+    // Generic fields
+    ->setCreator((new \Schoolbox\User())->setId(151))
+    ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setTitle('Test Task κάτι')
+    ->setDescription('Blah blah blah τίποτα')
+    ->setWeight(65)
+    // Specific fields
+    ->setMaxAttempts(7)
+    ->setDuration(1500)
+    ->setCompletionMessage('You done the quiz, Συγχαρητήρια!')
+;
+$mapper->save($quiz, 0);
+
+// Change and save it again
+$quiz->setMaxAttempts(5);
+$mapper->save($task, 0);
+
+
+// Create a due work
+$dueWork = (new DueWork())
+    // Generic fields
+    ->setCreator((new \Schoolbox\User())->setId(3))
+    ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setTitle('Due Work Test งาน')
+    ->setDescription('Something ไม่มีอะไร')
+    ->setWeight(21)
+    // Specific fields
+    ->setAcceptsMultiple()
+    ->showOnlySubmittedStudents()
+    ->setAllFiles((new \Schoolbox\Collection())
+        ->add((new DueWorkFile())
+            ->setId(33)
+            ->setFilename('a file.txt')
+            ->setHash('1234567890123456789012345678901234567890')
+        )
+        ->add((new DueWorkFile())
+            ->setId(65)
+            ->setFilename('an image.png')
+            ->setHash('0000000000000000000000000000000000000002')
+        )
+        ->add((new DueWorkFile())
+            ->setId(82)
+            ->setFilename('a sound.mp3')
+            ->setHash('0000000000000000000000000000000000000001')
+        )
+    )
+    ->setType((new DueWorkType())
+        ->setId(12)
+        ->setName('A dumb type')
+    )
+    ->setMarkScheme(new \Schoolbox\Learning\MarkScheme\None())
+    ->setHasRubric(true)
+;
+$mapper->save($dueWork, 0);
+
+// Change and save it again
+$dueWork->setWeight(3);
+$mapper->save($dueWork, 0);
+
+
+// Create a project
+$project = (new Project(new WeightedAverage()))
+    // Generic fields
+    ->setCreator((new \Schoolbox\User())->setId(151))
+    ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setTitle('Mr Test Project ништа')
+    ->setDescription('A description сплат')
+    ->setWeight(13)
+    // Specific fields
+    ->setMarkScheme(new \Schoolbox\Learning\MarkScheme\None())
+;
+
+// Add sub-assessables
+$project->getAssessables()
+        ->add((new Task())
+            // Generic
+            ->setCreator((new \Schoolbox\User())->setId(151))
+            ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setTitle('zzz')
+            ->setDescription('zzzzz')
+            ->setWeight(1)
+            // Specific
+            ->setLink('https://www.something.com/')
+            ->setSelfMarkable(false)
+        )
+        ->add((new Quiz())
+            // Generic
+            ->setCreator((new \Schoolbox\User())->setId(151))
+            ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setTitle('zzz')
+            ->setDescription('zzzzz')
+            ->setWeight(1)
+            // Specific
+            ->setMaxAttempts(7)
+            ->setDuration(1500)
+            ->setCompletionMessage('Quiz done')
+        )
+        ->add((new DueWork())
+            // Generic
+            ->setCreator((new \Schoolbox\User())->setId(151))
+            ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setDueAt(new Alaress_Date_Format('2016-10-18 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCloseAt(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+            ->setTitle('zzz')
+            ->setDescription('zzzzz')
+            ->setWeight(1)
+            // Specific
+            ->setAcceptsMultiple()
+            ->showOnlySubmittedStudents()
+            ->setType((new DueWorkType())->setId(1))
+            ->setMarkScheme(new \Schoolbox\Learning\MarkScheme\None())
+        );
+
+/** @var ProjectModel $projectModel */
+$mapper->save($project, 0);
+
+// Change and save it again
+$project->setWeight(3);
+$mapper->save($project, 0);
