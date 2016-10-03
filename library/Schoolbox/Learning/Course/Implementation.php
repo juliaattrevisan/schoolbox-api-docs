@@ -30,7 +30,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
  *
  * @package Schoolbox\Learning\Course\Implementation
  */
-class Implementation implements AssessmentContext, ISoftDeletable
+class Implementation implements ISoftDeletable
 {
     use Id;
     use CreatedAtDate;
