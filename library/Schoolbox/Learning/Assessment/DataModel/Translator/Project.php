@@ -133,11 +133,17 @@ class Project implements IAssessmentTypeTranslator
                 $assessable->getAssessables()->add($this->baseTranslator->translateToDomainModel($subModel));
             }
 
-            // Convert mark type
+            // Convert mark type and grade group
             $assessable->setMarkType(
                 (new MarkType())
                     ->setId($model->getMarkType()->getId())
             );
+            if ($model->getGradeGroup() instanceof GradeGroup) {
+                $assessable->setGradeGroup(
+                    (new GradeGroup())
+                        ->setId($model->getGradeGroup()->getId())
+                );
+            }
 
             return $assessable;
         }
