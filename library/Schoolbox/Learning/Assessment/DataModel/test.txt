@@ -283,6 +283,6 @@ assertEquals($dbProject->getTitle(), $project->getTitle());
 assertEquals($dbProject->getDescription(), $project->getDescription());
 assertEquals($dbProject->getWeight(), $project->getWeight());
 // Specific fields
-assertEquals(get_class($dbDueWork->getMarkScheme()), get_class($project->getMarkScheme()));
+assertEquals(get_class($dbProject->getMarkScheme()), get_class($project->getMarkScheme()));
 // Sub-assessments - unable to be fetched yet
 //assertEquals($dbProject->getAssessables()->count(), $project->getAssessables()->count());
