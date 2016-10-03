@@ -59,31 +59,31 @@
     <div class="small-12 medium-6 columns">
         <script type="text/javascript">
             $(function() {
-                $('#useRubric').click(function(event) {
+                $('#hasRubric').click(function(event) {
                     if ($(this).is(':checked')) {
-                        $('#markPerCapabilityPanel').removeClass('hide');
+                        $('#hasMarkPerCapabilityPanel').removeClass('hide');
                     }
                     else {
-                        $('#markPerCapabilityPanel').addClass('hide');
+                        $('#hasMarkPerCapabilityPanel').addClass('hide');
                     }
                 });
             });
         </script>
-        <label for="useRubric">Use Rubric?</label>
+        <label for="hasRubric">Use Rubric?</label>
         <div class="switch round">
-            <input name="useRubric" id="useRubric" type="checkbox"  />
-            <label for="useRubric">
+            <input name="hasRubric" id="hasRubric" type="checkbox" {% if assessment.hasRubric %}checked="checked"{% endif %} />
+            <label for="hasRubric">
                 <span class="icon-approve"></span>
                 <span class="icon-cancel"></span>
             </label>
         </div>
     </div>
     <div class="small-12 medium-6 columns">
-        <div id="markPerCapabilityPanel" class="hide">
-            <label for="markPerCapability">Mark Per-Capability</label>
+        <div id="hasMarkPerCapabilityPanel" class="{% if not assessment.hasRubric %}hide{% endif %}">
+            <label for="hasMarkPerCapability">Mark Per-Capability</label>
             <div class="switch round">
-                <input name="markPerCapability" id="markPerCapability" type="checkbox" />
-                <label for="markPerCapability">
+                <input name="hasMarkPerCapability" id="hasMarkPerCapability" type="checkbox"  {% if assessment.hasMarkPerCapability %}checked="checked"{% endif %} />
+                <label for="hasMarkPerCapability">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>
                 </label>

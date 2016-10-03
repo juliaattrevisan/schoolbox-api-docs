@@ -71,6 +71,16 @@ class Factory
     protected $closeAt;
 
     /**
+     * @var bool
+     */
+    protected $hasRubric = false;
+
+    /**
+     * @var bool
+     */
+    protected $hasMarkPerCapability = false;
+
+    /**
      * @var int
      */
     protected $summator;
@@ -87,7 +97,7 @@ class Factory
      * @param $dueAt
      * @param $closeAt
      */
-    public function __construct($type, $title, $description, User $creator, $weight, $publishAt, $openAt, $dueAt, $closeAt, $summator)
+    public function __construct($type, $title, $description, User $creator, $weight, $publishAt, $openAt, $dueAt, $closeAt, $hasRubric, $hasMarkPerCapability, $summator)
     {
         $this->setType($type);
         $this->setTitle($title);
@@ -98,6 +108,11 @@ class Factory
         $this->setOpenAt(trim($openAt));
         $this->setDueAt(trim($dueAt));
         $this->setCloseAt(trim($closeAt));
+
+        /* Due Work needs this to instantiate correctly
+         */
+        $this->setHasRubric(trim($hasRubric));
+        $this->setHasMarkPerCapability(trim($hasMarkPerCapability));
 
         /* Projects need this to instantiate
          */
@@ -364,6 +379,42 @@ class Factory
     protected function setCloseAt($closeAt)
     {
         $this->closeAt = $closeAt;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function getHasRubric()
+    {
+        return $this->hasRubric;
+    }
+
+    /**
+     * @param boolean $hasRubric
+     * @return $this
+     */
+    protected function setHasRubric($hasRubric)
+    {
+        $this->hasRubric = $hasRubric;
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function getHasMarkPerCapability()
+    {
+        return $this->hasMarkPerCapability;
+    }
+
+    /**
+     * @param boolean $hasMarkPerCapability
+     * @return $this
+     */
+    protected function setHasMarkPerCapability($hasMarkPerCapability)
+    {
+        $this->hasMarkPerCapability = $hasMarkPerCapability;
         return $this;
     }
 

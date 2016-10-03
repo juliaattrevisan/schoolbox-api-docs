@@ -70,6 +70,13 @@ class Model extends AbstractAssessment
     protected $hasRubric = false;
 
     /**
+     * This DueWork has Mark Per Capability on
+     *
+     * @var bool
+     */
+    protected $hasMarkPerCapability = false;
+
+    /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
      *
      * @var $int
@@ -192,6 +199,15 @@ class Model extends AbstractAssessment
         return $this->getHasRubric();
     }
 
+    /**
+     * This DueWork has Mark Per Capability on
+     *
+     * @return bool
+     */
+    public function hasMarkPerCapbility()
+    {
+        return $this->getHasMarkPerCapability();
+    }
 
     /* Getters/Setters
      */
@@ -328,5 +344,23 @@ class Model extends AbstractAssessment
     {
         $normalised = true;
         return $this->getMark($user, $publishedOnly, $normalised);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getHasMarkPerCapability()
+    {
+        return $this->hasMarkPerCapability;
+    }
+
+    /**
+     * @param boolean $hasMarkPerCapability
+     * @return $this
+     */
+    public function setHasMarkPerCapability($hasMarkPerCapability)
+    {
+        $this->hasMarkPerCapability = $hasMarkPerCapability;
+        return $this;
     }
 }

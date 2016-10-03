@@ -114,6 +114,7 @@ class Controller extends Base
          * I added it to save myself choosing dates all the time
          */
         $assessment = (new DueWork())
+            ->setHasRubric(true)
             ->setPublishAt(Alaress_Date_Format::now())
             ->setOpenAt(Alaress_Date_Format::now())
             ->setDueAt(Alaress_Date_Format::now())
@@ -184,6 +185,8 @@ class Controller extends Base
                 $this->getRequest()->post['openDate'] . ' ' . $this->getRequest()->post['openTime'],
                 $this->getRequest()->post['dueDate'] . ' ' . $this->getRequest()->post['dueTime'],
                 $this->getRequest()->post['closeDate'] . ' ' . $this->getRequest()->post['closeTime'],
+                $this->getRequest()->post['hasRubric'],
+                $this->getRequest()->post['hasMarkPerCapability'],
                 $this->getRequest()->post['summator']
             ))->produce();
         }
@@ -444,6 +447,8 @@ class Controller extends Base
                 $this->getRequest()->post['openDate'] . ' ' . $this->getRequest()->post['openTime'],
                 $this->getRequest()->post['dueDate'] . ' ' . $this->getRequest()->post['dueTime'],
                 $this->getRequest()->post['closeDate'] . ' ' . $this->getRequest()->post['closeTime'],
+                $this->getRequest()->post['hasRubric'],
+                $this->getRequest()->post['hasMarkPerCapability'],
                 $this->getRequest()->post['summator']
             ))->produce();
         }
