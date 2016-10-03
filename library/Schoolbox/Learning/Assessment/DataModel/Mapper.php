@@ -119,33 +119,48 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
-        $modelList = $this->createCollection();
+        $modelList  = $this->createCollection();
+        $dueWorkIds = [];
         foreach ($statement as $row) {
             /** @var Model $model */
             $model = $this->hydrate($row);
-            $model
-                ->setTask(
-                    $row['t.id']
-                        ? $this->hydrateJoin($row, 'task', 't')
-                        : null
-                )
-                ->setDueWork(
-                    $row['d.id']
-                        ? $this->hydrateJoin($row, 'duework', 'd')
-                        : null
-                )
-                ->setQuiz(
-                    $row['q.assess_id']
-                        ? $this->hydrateJoin($row, 'quiz', 'q')
-                        : null
-                )
-                ->setProject(
-                    $row['p.id']
-                        ? $this->hydrateJoin($row, 'project', 'p')
-                        : null
-                );
+
+            // Task?
+            if ($row['t.id']) {
+                $model->setTask($this->hydrateJoin($row, 'task', 't'));
+            } else {
+                $model->setTask(null);
+            }
+
+            // Due work?
+            if ($row['d.id']) {
+                $model->setDueWork($this->hydrateJoin($row, 'duework', 'd'));
+                $dueWorkIds[] = $row['d.id'];
+            } else {
+                $model->setDueWork(null);
+            }
+
+            // Quiz?
+            if ($row['q.assess_id']) {
+                $model->setQuiz($this->hydrateJoin($row, 'quiz', 'q'));
+            } else {
+                $model->setQuiz(null);
+            }
+
+            // Project?
+            if ($row['p.id']) {
+                $model->setProject($this->hydrateJoin($row, 'project', 'p'));
+            } else {
+                $model->setProject(null);
+            }
+
             $modelList->add($model);
         }
+
+//        // Load related 1..* models:
+//        // * due work files
+//        $dueWorkFiles = $this->getJoinMapper('duework.submission_box_file')->findByColumn('box_id', $dueWorkIds);
+
         return $modelList;
     }
 }
