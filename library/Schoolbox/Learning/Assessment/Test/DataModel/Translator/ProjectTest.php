@@ -315,6 +315,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_NONE))
                     ->setGradeGroup((new GradeGroup())),
                 None::class,
+                null
             ],
             [
                 (new ProjectModel())
@@ -323,6 +324,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT))
                     ->setGradeGroup((new GradeGroup())),
                 Percentage::class,
+                null
             ],
             [
                 (new ProjectModel())
@@ -331,6 +333,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
                     ->setGradeGroup((new GradeGroup())->setId(1)),
                 LetterGrade::class,
+                1
             ],
         ];
     }
@@ -342,8 +345,9 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
      *
      * @param ProjectModel $dataModel
      * @param string       $markSchemeClass
+     * @param int          $gradeGroupId
      */
-    public function testTranslateProjectMarkSchemeToDomainModel(ProjectModel $dataModel, $markSchemeClass)
+    public function testTranslateProjectMarkSchemeToDomainModel(ProjectModel $dataModel, $markSchemeClass, $gradeGroupId)
     {
         /** @var Project $project */
         $project = $this->translator->translateToDomainModel($dataModel);
@@ -351,7 +355,11 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
         // Test type
         $this->assertInstanceOf(Project::class, $project);
 
-        // Test mark type
-        $this->assertInstanceOf($markSchemeClass, $project->getMarkScheme());
+        // Test mark scheme and ancillary information
+        $scheme = $project->getMarkScheme();
+        $this->assertInstanceOf($markSchemeClass, $scheme);
+        if ($scheme instanceof LetterGrade) {
+            $this->assertEquals($gradeGroupId, $scheme->getGradeGroup()->getId());
+        }
     }
 }

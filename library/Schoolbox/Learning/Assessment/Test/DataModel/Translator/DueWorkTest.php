@@ -347,12 +347,16 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
                     ->setAssessmentModel(new AssessmentModel())
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_NONE)),
                 None::class,
+                null,
+                null,
             ],
             [
                 (new DueWorkModel())
                     ->setAssessmentModel(new AssessmentModel())
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT)),
                 Percentage::class,
+                null,
+                null,
             ],
             [
                 (new DueWorkModel())
@@ -360,6 +364,8 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
                     ->setGradeGroup((new DueWorkModel\GradeLevel\Group\Model())->setId(1)),
                 LetterGrade::class,
+                null,
+                1,
             ],
             [
                 (new DueWorkModel())
@@ -367,6 +373,8 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_TOTAL))
                     ->setMaxMark(15),
                 TotalMarkWholeNumber::class,
+                15,
+                null
             ],
         ];
     }
@@ -378,8 +386,10 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
      *
      * @param DueWorkModel $dataModel
      * @param string       $markSchemeClass
+     * @param int          $totalMark
+     * @param int          $gradeGroupId
      */
-    public function testTranslateDueWorkMarkSchemeToDomainModel(DueWorkModel $dataModel, $markSchemeClass)
+    public function testTranslateDueWorkMarkSchemeToDomainModel(DueWorkModel $dataModel, $markSchemeClass, $totalMark, $gradeGroupId)
     {
         /** @var DueWork $project */
         $dueWork = $this->translator->translateToDomainModel($dataModel);
@@ -387,7 +397,14 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         // Test type
         $this->assertInstanceOf(DueWork::class, $dueWork);
 
-        // Test mark type
-        $this->assertInstanceOf($markSchemeClass, $dueWork->getMarkScheme());
+        // Test mark scheme and ancillary information
+        $scheme = $dueWork->getMarkScheme();
+        $this->assertInstanceOf($markSchemeClass, $scheme);
+        if ($scheme instanceof TotalMarkWholeNumber) {
+            $this->assertEquals($totalMark, $scheme->getTotalMark());
+        }
+        if ($scheme instanceof LetterGrade) {
+            $this->assertEquals($gradeGroupId, $scheme->getGradeGroup()->getId());
+        }
     }
 }
