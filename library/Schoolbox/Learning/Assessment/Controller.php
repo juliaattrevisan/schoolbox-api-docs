@@ -115,6 +115,7 @@ class Controller extends Base
          */
         $assessment = (new DueWork())
             ->setHasRubric(true)
+            ->setAcceptsMultiple()
             ->setPublishAt(Alaress_Date_Format::now())
             ->setOpenAt(Alaress_Date_Format::now())
             ->setDueAt(Alaress_Date_Format::now())
@@ -185,6 +186,7 @@ class Controller extends Base
                 $this->getRequest()->post['openDate'] . ' ' . $this->getRequest()->post['openTime'],
                 $this->getRequest()->post['dueDate'] . ' ' . $this->getRequest()->post['dueTime'],
                 $this->getRequest()->post['closeDate'] . ' ' . $this->getRequest()->post['closeTime'],
+                $this->getRequest()->post['acceptOnline'],
                 $this->getRequest()->post['hasRubric'],
                 $this->getRequest()->post['hasMarkPerCapability'],
                 $this->getRequest()->post['summator']
@@ -244,7 +246,8 @@ class Controller extends Base
 
         /* TODO: Actually retrieve $assessmentId data here
          */
-        $assessment = new Project((new SummatorFactory(SummatorFactory::WEIGHTED_AVERAGE))->produce());
+        // $assessment = new Project((new SummatorFactory(SummatorFactory::WEIGHTED_AVERAGE))->produce());
+        $assessment = new DueWork();
         $assessment
             ->setId($assessmentId)
             ->setTitle('Test Project')
@@ -252,35 +255,37 @@ class Controller extends Base
             ->setCreator($_SESSION['user'])
             ->setAllParticipants(new Collection())
             ->setWeight(100)
-            ->setAssessables((new Collection())
-                ->add((new DueWork())
-                    ->setId(44)
-                    ->setTitle('Write an essay')
-                    ->setDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.')
-                    ->setType((new DueWorkType())
-                        ->setId(1)
-                        ->setName('Essay'))
-                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
-                    ->setPublishAt(Alaress_Date_Format::now())
-                    ->setOpenAt(Alaress_Date_Format::now())
-                    ->setDueAt(Alaress_Date_Format::now())
-                    ->setCloseAt(Alaress_Date_Format::now())
-                    ->setCreatedAt(Alaress_Date_Format::now())
-                    ->setUpdatedAt(Alaress_Date_Format::now()))
-                ->add((new DueWork())
-                    ->setId(55)
-                    ->setTitle('Do this homework')
-                    ->setDescription('Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.')
-                    ->setType((new DueWorkType())
-                        ->setId(2)
-                        ->setName('Homework Assignment'))
-                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
-                    ->setPublishAt(Alaress_Date_Format::now())
-                    ->setOpenAt(Alaress_Date_Format::now())
-                    ->setDueAt(Alaress_Date_Format::now())
-                    ->setCloseAt(Alaress_Date_Format::now())
-                    ->setCreatedAt(Alaress_Date_Format::now())
-                    ->setUpdatedAt(Alaress_Date_Format::now())))
+            ->setAcceptsMultiple()
+
+//            ->setAssessables((new Collection())
+//                ->add((new DueWork())
+//                    ->setId(44)
+//                    ->setTitle('Write an essay')
+//                    ->setDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.')
+//                    ->setType((new DueWorkType())
+//                        ->setId(1)
+//                        ->setName('Essay'))
+//                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
+//                    ->setPublishAt(Alaress_Date_Format::now())
+//                    ->setOpenAt(Alaress_Date_Format::now())
+//                    ->setDueAt(Alaress_Date_Format::now())
+//                    ->setCloseAt(Alaress_Date_Format::now())
+//                    ->setCreatedAt(Alaress_Date_Format::now())
+//                    ->setUpdatedAt(Alaress_Date_Format::now()))
+//                ->add((new DueWork())
+//                    ->setId(55)
+//                    ->setTitle('Do this homework')
+//                    ->setDescription('Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.')
+//                    ->setType((new DueWorkType())
+//                        ->setId(2)
+//                        ->setName('Homework Assignment'))
+//                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
+//                    ->setPublishAt(Alaress_Date_Format::now())
+//                    ->setOpenAt(Alaress_Date_Format::now())
+//                    ->setDueAt(Alaress_Date_Format::now())
+//                    ->setCloseAt(Alaress_Date_Format::now())
+//                    ->setCreatedAt(Alaress_Date_Format::now())
+//                    ->setUpdatedAt(Alaress_Date_Format::now())))
             ->setPublishAt(Alaress_Date_Format::now())
             ->setOpenAt(Alaress_Date_Format::now())
             ->setDueAt(Alaress_Date_Format::now())
@@ -447,6 +452,7 @@ class Controller extends Base
                 $this->getRequest()->post['openDate'] . ' ' . $this->getRequest()->post['openTime'],
                 $this->getRequest()->post['dueDate'] . ' ' . $this->getRequest()->post['dueTime'],
                 $this->getRequest()->post['closeDate'] . ' ' . $this->getRequest()->post['closeTime'],
+                $this->getRequest()->post['acceptSubmissions'],
                 $this->getRequest()->post['hasRubric'],
                 $this->getRequest()->post['hasMarkPerCapability'],
                 $this->getRequest()->post['summator']

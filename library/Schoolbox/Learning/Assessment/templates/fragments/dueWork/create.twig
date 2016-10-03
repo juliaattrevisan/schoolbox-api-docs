@@ -19,8 +19,8 @@
 
 <div class="row">
     <div class="small-12 columns">
-        <label for="acceptsSubmissions">Accepts Submissions?</label>
-        <select name="acceptsSubmissions">
+        <label for="acceptOnline">Accepts Online Submissions?</label>
+        <select name="acceptOnline">
             {% set options = {
                 0: 'None',
                 1: 'Single',
@@ -28,7 +28,7 @@
             }
             %}
             {% for index, title in options %}
-            <option value="{{ index }}">{{ title }}</option>
+            <option value="{{ index }}" {% if assessment.acceptOnline == index %}selected="selected"{% endif %}>{{ title }}</option>
             {% endfor %}
         </select>
     </div>

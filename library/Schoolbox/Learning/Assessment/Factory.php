@@ -71,6 +71,11 @@ class Factory
     protected $closeAt;
 
     /**
+     * @var int
+     */
+    protected $acceptOnline = DueWork::ACCEPT_ONLINE_NONE;
+
+    /**
      * @var bool
      */
     protected $hasRubric = false;
@@ -96,8 +101,12 @@ class Factory
      * @param $openAt
      * @param $dueAt
      * @param $closeAt
+     * @param $acceptSubmissions
+     * @param $hasRubric
+     * @param $hasMarkPerCapability
+     * @param $summator
      */
-    public function __construct($type, $title, $description, User $creator, $weight, $publishAt, $openAt, $dueAt, $closeAt, $hasRubric, $hasMarkPerCapability, $summator)
+    public function __construct($type, $title, $description, User $creator, $weight, $publishAt, $openAt, $dueAt, $closeAt, $acceptOnline, $hasRubric, $hasMarkPerCapability, $summator)
     {
         $this->setType($type);
         $this->setTitle($title);
@@ -111,6 +120,7 @@ class Factory
 
         /* Due Work needs this to instantiate correctly
          */
+        $this->setAcceptOnline(trim($acceptOnline));
         $this->setHasRubric(trim($hasRubric));
         $this->setHasMarkPerCapability(trim($hasMarkPerCapability));
 
@@ -379,6 +389,24 @@ class Factory
     protected function setCloseAt($closeAt)
     {
         $this->closeAt = $closeAt;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getAcceptOnline()
+    {
+        return $this->acceptOnline;
+    }
+
+    /**
+     * @param int $acceptOnline
+     * @return $this
+     */
+    protected function setAcceptOnline($acceptOnline)
+    {
+        $this->acceptOnline = $acceptOnline;
         return $this;
     }
 
