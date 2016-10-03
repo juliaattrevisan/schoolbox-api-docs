@@ -747,7 +747,7 @@ class SitePage extends Page
             switch ($this->site) {
                 case 'shore':
                     if ($user->getRole()->isStaff()) {
-                        $location = 'https://mail.shore.nsw.edu.au/exchange/';
+                        $location = 'https://owa.shore.nsw.edu.au/owa';
                     } elseif ($user->getRole()->isStudent()) {
                         if (strpos(Session::getIP(), '192.168.') === false) {
                             $location = 'https://mail.student.shore.nsw.edu.au/exchange/';
