@@ -24,7 +24,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
     /**
      * Test translating a task
      */
-    public function testTranslateTaskToDataModel()
+    public function testTranslateToDataModel()
     {
         $task = (new Task())
             // Generic fields
@@ -57,11 +57,11 @@ class TaskTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Data provider for testTranslateTaskToDomainModel
+     * Data provider for testTranslateToDomainModel
      *
      * @return array
      */
-    public function getTestTranslateTaskToDomainModelData()
+    public function getTestTranslateToDomainModelData()
     {
         // Instance vars defined in setUp() aren't available to data providers
         // I am not sure if this is a bug.
@@ -92,14 +92,14 @@ class TaskTest extends \PHPUnit_Framework_TestCase
     /**
      * Test translating task-specific data model fields
      *
-     * @dataProvider getTestTranslateTaskToDomainModelData
+     * @dataProvider getTestTranslateToDomainModelData
      *
      * @param TaskModel $taskModel
      * @param string    $link
      * @param bool      $selfMarkable
      * @param int       $creatorId
      */
-    public function testTranslateTaskToDomainModel(TaskModel $taskModel, $link, $selfMarkable, $creatorId)
+    public function testTranslateToDomainModel(TaskModel $taskModel, $link, $selfMarkable, $creatorId)
     {
         /** @var Task $task */
         $task = $this->translator->translateToDomainModel($taskModel);

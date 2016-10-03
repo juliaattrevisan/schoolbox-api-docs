@@ -23,7 +23,7 @@ class QuizTest extends \PHPUnit_Framework_TestCase
     /**
      * Test translation to quiz
      */
-    public function testTranslateQuizToDataModel()
+    public function testTranslateToDataModel()
     {
         $quiz = (new Quiz())
             // Generic fields
@@ -58,7 +58,7 @@ class QuizTest extends \PHPUnit_Framework_TestCase
     /**
      * Test translating quiz-specific fields to domain model
      */
-    public function testTranslateQuizToDomainModel()
+    public function testTranslateToDomainModel()
     {
         $quizModel = (new QuizModel())
             ->setId(13)

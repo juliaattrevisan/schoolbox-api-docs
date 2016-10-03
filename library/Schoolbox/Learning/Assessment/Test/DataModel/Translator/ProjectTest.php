@@ -37,7 +37,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     /**
      * Test translating a project
      */
-    public function testTranslateProjectToDataModel()
+    public function testTranslateToDataModel()
     {
         $project = (new Project(new WeightedAverage()))
             // Generic fields
@@ -94,7 +94,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
      *
      * @expectedException \UnexpectedValueException
      */
-    public function testTranslateProjectWithinProjectToDataModel()
+    public function testTranslateWithinProjectToDataModel()
     {
         $project = (new Project(new Average()))->setId(12);
         $project->getAssessables()->add((new Project(new Minimum())));
@@ -104,7 +104,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     /**
      * Data provider for different due work response acceptance settings.
      */
-    public function getTestTranslateProjectSummatorToDataModelData()
+    public function getTestTranslateSummatorToDataModelData()
     {
         return [
             [new Project(new WeightedAverage()), ProjectModel::SUMMATOR_WEIGHTED_AVERAGE,],
@@ -117,12 +117,12 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     /**
      * Test translation of acceptance response settings.
      *
-     * @dataProvider getTestTranslateProjectSummatorToDataModelData
+     * @dataProvider getTestTranslateSummatorToDataModelData
      *
      * @param Project $project
      * @param string  $summatorType
      */
-    public function testTranslateProjectSummatorToDataModel(Project $project, $summatorType)
+    public function testTranslateSummatorToDataModel(Project $project, $summatorType)
     {
         /** @var ProjectModel $projectModel */
         $projectModel = $this->translator->translateToDataModel($project, 1);
@@ -137,7 +137,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     /**
      * Data provider for different due work response acceptance settings.
      */
-    public function getTestTranslateProjectMarkSchemeToDataModelData()
+    public function getTestTranslateMarkSchemeToDataModelData()
     {
         return [
             [
@@ -161,13 +161,13 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     /**
      * Test translation of acceptance response settings.
      *
-     * @dataProvider getTestTranslateProjectMarkSchemeToDataModelData
+     * @dataProvider getTestTranslateMarkSchemeToDataModelData
      *
      * @param Project $project
      * @param int     $markTypeId
      * @param int     $gradeGroupId
      */
-    public function testTranslateProjectMarkSchemeToDataModel(Project $project, $markTypeId, $gradeGroupId)
+    public function testTranslateMarkSchemeToDataModel(Project $project, $markTypeId, $gradeGroupId)
     {
         /** @var ProjectModel $projectModel */
         $projectModel = $this->translator->translateToDataModel($project, 1);
@@ -183,7 +183,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     /**
      * Test translation of project
      */
-    public function testTranslateProjectToDomainModel()
+    public function testTranslateToDomainModel()
     {
         $projectModel = (new ProjectModel())
             ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
@@ -231,7 +231,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
      *
      * @expectedException \UnexpectedValueException
      */
-    public function testTranslateProjectWithinProjectToDomainModel()
+    public function testTranslateWithinProjectToDomainModel()
     {
         $projectModel = (new ProjectModel())
             ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
@@ -248,7 +248,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     /**
      * Data provider for different due work response acceptance settings.
      */
-    public function getTestTranslateProjectSummatorToDomainModelData()
+    public function getTestTranslateSummatorToDomainModelData()
     {
         return [
             [
@@ -285,12 +285,12 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     /**
      * Test translation of acceptance response settings.
      *
-     * @dataProvider getTestTranslateProjectSummatorToDomainModelData
+     * @dataProvider getTestTranslateSummatorToDomainModelData
      *
      * @param ProjectModel $dataModel
      * @param string       $summatorClass
      */
-    public function testTranslateProjectSummatorToDomainModel(ProjectModel $dataModel, $summatorClass)
+    public function testTranslateSummatorToDomainModel(ProjectModel $dataModel, $summatorClass)
     {
         /** @var Project $project */
         $project = $this->translator->translateToDomainModel($dataModel);
@@ -305,7 +305,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     /**
      * Data provider for different project mark scheme settings.
      */
-    public function getTestTranslateProjectMarkSchemeToDomainModelData()
+    public function getTestTranslateMarkSchemeToDomainModelData()
     {
         return [
             [
@@ -341,13 +341,13 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     /**
      * Test translation of acceptance response settings.
      *
-     * @dataProvider getTestTranslateProjectMarkSchemeToDomainModelData
+     * @dataProvider getTestTranslateMarkSchemeToDomainModelData
      *
      * @param ProjectModel $dataModel
      * @param string       $markSchemeClass
      * @param int          $gradeGroupId
      */
-    public function testTranslateProjectMarkSchemeToDomainModel(ProjectModel $dataModel, $markSchemeClass, $gradeGroupId)
+    public function testTranslateMarkSchemeToDomainModel(ProjectModel $dataModel, $markSchemeClass, $gradeGroupId)
     {
         /** @var Project $project */
         $project = $this->translator->translateToDomainModel($dataModel);
