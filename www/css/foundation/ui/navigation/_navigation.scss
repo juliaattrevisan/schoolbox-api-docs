@@ -139,7 +139,6 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		position: absolute;
 		right: $tabbar-height;
 		top: 0;
-		padding-left: $tabbar-height;
 		@include placeholder-color(transparent, $font-weight-normal);
 		input[type="text"]{
 			border: 0;
