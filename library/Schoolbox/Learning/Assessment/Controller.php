@@ -172,7 +172,7 @@ class Controller extends Base
                 $this->getRequest()->post['assessmentType'],
                 $this->getRequest()->post['title'],
                 $this->getRequest()->post['description'],
-                $_SESSION['user'],
+                $this->getUser(),
                 $this->getRequest()->post['weight'],
                 $this->getRequest()->post['publishDate'] . ' ' . $this->getRequest()->post['publishTime'],
                 $this->getRequest()->post['openDate'] . ' ' . $this->getRequest()->post['openTime'],
