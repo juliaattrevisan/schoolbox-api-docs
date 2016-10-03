@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel\Translator;
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Component\OnlineAssessment as QuizModel;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as ProjectModel;
@@ -299,5 +300,58 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
 
         // Test summator
         $this->assertInstanceOf($summatorClass, $project->getSummator());
+    }
+
+    /**
+     * Data provider for different project mark scheme settings.
+     */
+    public function getTestTranslateProjectMarkSchemeToDomainModelData()
+    {
+        return [
+            [
+                (new ProjectModel())
+                    ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
+                    ->setAssessmentModel((new AssessmentModel())->setId(1))
+                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_NONE))
+                    ->setGradeGroup((new GradeGroup())),
+                None::class,
+            ],
+            [
+                (new ProjectModel())
+                    ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
+                    ->setAssessmentModel((new AssessmentModel())->setId(1))
+                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT))
+                    ->setGradeGroup((new GradeGroup())),
+                Percentage::class,
+            ],
+            [
+                (new ProjectModel())
+                    ->setSummator(ProjectModel::SUMMATOR_MINIMUM)
+                    ->setAssessmentModel((new AssessmentModel())->setId(1))
+                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
+                    ->setGradeGroup((new GradeGroup())->setId(1)),
+                LetterGrade::class,
+            ],
+        ];
+    }
+
+    /**
+     * Test translation of acceptance response settings.
+     *
+     * @dataProvider getTestTranslateProjectMarkSchemeToDomainModelData
+     *
+     * @param ProjectModel $dataModel
+     * @param string       $markSchemeClass
+     */
+    public function testTranslateProjectMarkSchemeToDomainModel(ProjectModel $dataModel, $markSchemeClass)
+    {
+        /** @var Project $project */
+        $project = $this->translator->translateToDomainModel($dataModel);
+
+        // Test type
+        $this->assertInstanceOf(Project::class, $project);
+
+        // Test mark type
+        $this->assertInstanceOf($markSchemeClass, $project->getMarkScheme());
     }
 }
