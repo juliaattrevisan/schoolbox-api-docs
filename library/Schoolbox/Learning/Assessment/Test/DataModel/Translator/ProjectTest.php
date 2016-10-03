@@ -22,6 +22,9 @@ use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Learning\Assessment\Test\DataModel\TestTrait;
+use Schoolbox\Learning\MarkScheme\LetterGrade;
+use Schoolbox\Learning\MarkScheme\None;
+use Schoolbox\Learning\MarkScheme\Percentage;
 
 /**
  * Tests for the assessment data model translator (projects only).
@@ -128,6 +131,52 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
 
         // Test summator
         $this->assertEquals($summatorType, $projectModel->getSummator());
+    }
+
+    /**
+     * Data provider for different due work response acceptance settings.
+     */
+    public function getTestTranslateProjectMarkSchemeToDataModelData()
+    {
+        return [
+            [
+                (new Project(new WeightedAverage()))->setMarkScheme(new None()),
+                DueWorkModel\MarkType::TYPE_NONE,
+                null,
+            ],
+            [
+                (new Project(new WeightedAverage()))->setMarkScheme(new Percentage()),
+                DueWorkModel\MarkType::TYPE_PERCENT,
+                null,
+            ],
+            [
+                (new Project(new WeightedAverage()))->setMarkScheme(new LetterGrade((new DueWorkModel\GradeLevel\Group\Model())->setId(7))),
+                DueWorkModel\MarkType::TYPE_LETTER,
+                7,
+            ],
+        ];
+    }
+
+    /**
+     * Test translation of acceptance response settings.
+     *
+     * @dataProvider getTestTranslateProjectMarkSchemeToDataModelData
+     *
+     * @param Project $project
+     * @param int     $markTypeId
+     * @param int     $gradeGroupId
+     */
+    public function testTranslateProjectMarkSchemeToDataModel(Project $project, $markTypeId, $gradeGroupId)
+    {
+        /** @var ProjectModel $projectModel */
+        $projectModel = $this->translator->translateToDataModel($project, 1);
+
+        // Test type
+        $this->assertInstanceOf(ProjectModel::class, $projectModel);
+
+        // Test mark type
+        $this->assertEquals($markTypeId, $projectModel->getMarkType()->getId());
+        $this->assertEquals($gradeGroupId, $projectModel->getGradeGroup()->getId());
     }
 
     /**
