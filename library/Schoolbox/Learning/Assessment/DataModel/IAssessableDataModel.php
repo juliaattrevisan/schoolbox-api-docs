@@ -17,6 +17,21 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 interface IAssessableDataModel
 {
     /**
+     * Gets ID of the data model itself.
+     *
+     * This is the ID of the specific data model, not the ID of $this->getAssessmentModel().
+     *
+     * @return int
+     */
+    public function getId();
+
+    /**
+     * @param int $id
+     * @return static
+     */
+    public function setId($id);
+
+    /**
      * Retrieves the base assessment model for this data model.
      *
      * This would be called `getAssessment`, but this name conflicts with the
