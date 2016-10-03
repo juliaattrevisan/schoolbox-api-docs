@@ -47,6 +47,8 @@ use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
+use Schoolbox\Resource\Attachment\Zone;
+
 class Controller extends Base
 {
 
@@ -126,7 +128,11 @@ class Controller extends Base
             return;
         }
 
+        $zone = new Zone('files');
+        $zone->setMulti(true);
+
         $data = [
+            'attachzone' => $zone->getTwigContext(),
             'types' => $types,
             'assessment' => $assessment,
             'curriculumNodes' => $folder->getCurriculumNodes(),

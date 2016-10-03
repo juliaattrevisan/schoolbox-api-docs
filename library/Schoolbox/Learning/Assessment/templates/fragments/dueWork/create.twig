@@ -8,12 +8,13 @@
 
 <input type="hidden" name="assessmentType" value="{{ types.fromTitle('dueWork') }}" />
 
-<legend>
-    File Attachments
-    <span data-tooltip class="hint has-tip tip-top" title="">?</span>
-</legend>
-<div class="column small-12">
-    {% include 'sub/attachzone.twig' %}
+<div class="row">
+    <div class="small-12 columns">
+        <label>Attach Files</label>
+
+        <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+        {% include 'sub/attachzone.twig' %}
+    </div>
 </div>
 
 <div class="row">
