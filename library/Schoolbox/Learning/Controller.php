@@ -72,47 +72,18 @@ class Controller extends Base
             ]));
         }
 
+        if($this->getUser()->getId() == $user->getId()){
+            $user = $this->getUser();
+        }
+
         $factory = new Factory();
-        $assessmentsToMark = $factory->getAssessmentsToMark($user);
 
-        var_dump($assessmentsToMark); die();
-
-
-        /* Get list of all subjects this teacher teaches
-         *
-         * ===STUFF TO MARK===
-         *
-         * For each subject
-         *   Get list of assessments
-         *      for each assessment
-         *          if(task)
-         *              no op
-         *          else if(quiz)
-         *              get unreviewed quiz attempts
-         *              for each quiz attempt
-         *                 add userId to array
-         *          else if(dueWork)
-         *              get unreviewed (submission without feedback)
-         *              for each unreviewed submission
-         *                 add userId to array
-         *
-         * === STUFF TO CHASE===
-         *
-         */
-
-
-        // TODO - generate data
-        $assessmentsToMark = [
-            Assessment\Controller::getDummyAssessment(2),
-        ];
-        $assessmentsNotSubmitted = [
-            Assessment\Controller::getDummyAssessment(3),
-        ];
+        $factory->getPendingAssessments($user, $assessmentsToMark, $lateAssessments);
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', [
             'user'                    => $user,
             'assessmentsToMark'       => $assessmentsToMark,
-            'assessmentsNotSubmitted' => $assessmentsNotSubmitted,
+            'assessmentsNotSubmitted' => $lateAssessments,
         ]));
     }
 
