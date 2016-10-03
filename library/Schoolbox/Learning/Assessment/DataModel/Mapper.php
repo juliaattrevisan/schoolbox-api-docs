@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\DataModel;
 
 use PDOStatement;
 use Schoolbox\Assessment\Component\OnlineAssessmentMapper;
+use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
@@ -119,6 +120,7 @@ class Mapper extends BaseMapper
      */
     protected function hydrateSelect(PDOStatement $statement)
     {
+        /** @var Collection|Model[] $modelList */
         $modelList  = $this->createCollection();
         $dueWorkIds = [];
         foreach ($statement as $row) {
@@ -157,9 +159,35 @@ class Mapper extends BaseMapper
             $modelList->add($model);
         }
 
-//        // Load related 1..* models:
-//        // * due work files
-//        $dueWorkFiles = $this->getJoinMapper('duework.submission_box_file')->findByColumn('box_id', $dueWorkIds);
+        // Load related 1-M models
+        if (!empty($dueWorkIds)) {
+
+            // Due work files
+            $files      = [];
+            $filesQuery = "
+                SELECT
+                    d.id as duework_id,
+                    {$this->getJoinColumnString('duework.submission_box_file', 's')}
+                FROM {$this->getJoinMapper('duework', 'd')->getTable()} d
+                INNER JOIN {$this->getJoinSql('duework.submission_box_file', 'd', 's')}
+                WHERE d.id IN {$this->getArrayPlaceholders($dueWorkIds, 'id')}
+                ORDER BY d.id ASC
+            ";
+            $filesStatement = $this->getDatabase()->prepare($filesQuery);
+            $filesStatement->execute($this->getArrayParameters($dueWorkIds, 'id'));
+            foreach ($filesStatement as $row) {
+                if (!isset($files[$row['duework_id']])) {
+                    $files[$row['duework_id']] = new Collection();
+                }
+                $files[$row['duework_id']]->add($this->getJoinMapper('duework.submission_box_file')->hydrate($row, 's'));
+            }
+            foreach ($modelList as $model) {
+                $submodel = $model->getSubObject();
+                if ($submodel instanceof SubmissionBox && !empty($files[$submodel->getId()])) {
+                    $submodel->setAttachments($files[$submodel->getId()]);
+                }
+            }
+        }
 
         return $modelList;
     }
