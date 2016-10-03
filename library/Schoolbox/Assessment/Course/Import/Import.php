@@ -7,6 +7,7 @@ use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\DeprecatedMapper as CourseMapper;
 use Schoolbox\Assessment\Course\Unit\DeprecatedModel as Unit;
 use Schoolbox\Assessment\Course\Unit\DeprecatedMapper as UnitMapper;
+use Schoolbox\Permission\Access\Access;
 
 /**
  * Import
@@ -27,6 +28,8 @@ class Import
     /** @var FolderMapper */
     private $folderMapper;
 
+    /** @var Access */
+    private $access;
 
     /**
      * Constructor
@@ -34,6 +37,7 @@ class Import
      */
     public function __construct()
     {
+        $this->setAccess(Access::getInstance());
         $this->setCourseMapper(CourseMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
         $this->setUnitMapper(UnitMapper::getInstance());
@@ -56,15 +60,20 @@ class Import
         /* Swap keys for selectize compatibility -_-
          */
         foreach ($allFolders as $currentFolder) {
-            $name = $currentFolder->getName();
-            if ($currentFolder->getCodeString()) {
-                $name .= " ({$currentFolder->getCodeString()})";
-            }
 
-            $data[] = [
-                'id' => $currentFolder->getId(),
-                'name' => $name,
-            ];
+            // Make sure the user has access to the folder before we return it
+            if ($this->getAccess()->getFolderAccess($_SESSION["user"], [$currentFolder->getId()])) {
+
+                $name = $currentFolder->getName();
+                if ($currentFolder->getCodeString()) {
+                    $name .= " ({$currentFolder->getCodeString()})";
+                }
+
+                $data[] = [
+                    'id' => $currentFolder->getId(),
+                    'name' => $name,
+                ];
+            }
         }
 
         return $data;
@@ -252,5 +261,23 @@ class Import
         $this->folderMapper = $folderMapper;
         return $this;
     }
+
+    /**
+     * @return Access
+     */
+    private function getAccess()
+    {
+        return $this->access;
+    }
+
+    /**
+     * @param Access $access
+     * @return self
+     */
+    private function setAccess($access)
+    {
+        $this->access = $access;
+        return $this;
+    }    
 
 }
