@@ -57,6 +57,18 @@
 </div>
 <div class="row">
     <div class="small-12 medium-6 columns">
+        <script type="text/javascript">
+            $(function() {
+                $('#useRubric').click(function(event) {
+                    if ($(this).is(':checked')) {
+                        $('#markPerCapabilityPanel').removeClass('hide');
+                    }
+                    else {
+                        $('#markPerCapabilityPanel').addClass('hide');
+                    }
+                });
+            });
+        </script>
         <label for="useRubric">Use Rubric?</label>
         <div class="switch round">
             <input name="useRubric" id="useRubric" type="checkbox"  />
@@ -67,13 +79,15 @@
         </div>
     </div>
     <div class="small-12 medium-6 columns">
-        <label for="markPerCapability">Mark Per-Capability</label>
-        <div class="switch round">
-            <input name="markPerCapability" id="markPerCapability" type="checkbox" />
-            <label for="markPerCapability">
-                <span class="icon-approve"></span>
-                <span class="icon-cancel"></span>
-            </label>
+        <div id="markPerCapabilityPanel" class="hide">
+            <label for="markPerCapability">Mark Per-Capability</label>
+            <div class="switch round">
+                <input name="markPerCapability" id="markPerCapability" type="checkbox" />
+                <label for="markPerCapability">
+                    <span class="icon-approve"></span>
+                    <span class="icon-cancel"></span>
+                </label>
+            </div>
         </div>
     </div>
 </div>
