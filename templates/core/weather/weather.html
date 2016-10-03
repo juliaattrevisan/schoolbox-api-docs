@@ -1,16 +1,24 @@
+<!-- BEGIN weather_available -->
 <div class="row">
     <div class="small-12 columns">
         <h1>Weather for {LOCATION}</h1>
     </div>
 </div>
+<!-- END weather_available -->
 
 <!-- BEGIN weather_unavailable -->
+<div class="row">
+    <div class="small-12 columns">
+        <h1>Weather Service Unavailable</h1>
+    </div>
+</div>
 <div class="row">
     <div class="small-12 island">
         <div class="alert-box warning">Weather service is temporarily unavailable.</div>
     </div>
 </div>
 <!-- END weather_unavailable -->
+
 
 <!-- BEGIN forecast -->
 <div class="row">
@@ -71,6 +79,7 @@
     </div>
     <!-- END current -->
 
+    <!-- BEGIN region_list -->
     <div class="small-12 medium-6 island">
         <h2 class="subheader">Weather around Australia</h2>
         <section>
@@ -83,6 +92,6 @@
             </ul>
         </section>
     </div>
+    <!-- END region_list -->
 </div>
-
 

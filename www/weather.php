@@ -24,11 +24,16 @@ $this->setTitle('Weather Forecast');
 $this->setBlock(TEMPLATE_content, 'current', 'current_block');
 $this->setBlock(TEMPLATE_content, 'forecast', 'forecast_block');
 $this->setBlock('forecast', 'forecast_day', 'forecast_day_block');
+$this->setBlock(TEMPLATE_content, "region_list", "region_list_block");
+$this->setBlock('region_list', "regions", "regions_block");
 $this->setBlock(TEMPLATE_content, "weather_unavailable", "weather_unavailable_block");
+$this->setBlock(TEMPLATE_content, "weather_available", "weather_available_block");
 
+$this->setVar("region_list_block", "");
 $this->setVar("current_block", "");
 $this->setVar("forecast_block", "");
 $this->setVar("weather_unavailable_block", "");
+$this->setVar("weather_available_block", "");
 
 $imageLocation = '/weather/image.php?path=';
 
@@ -81,27 +86,37 @@ if($count) {
 if($weather['location']['city']) {
     $this->parse("current_block", "current");
     $this->parse("forecast_block", "forecast");
-} else {
-    $this->parse("weather_unavailable_block", "weather_unavailable");
-}
+    $this->parse("weather_available_block", "weather_available");
+    $this->parse("region_list_block", "region_list");
 
 //ouput drop down box of available locations
-$locations = array(
-    array('LOCATION_VALUE' => 'Australia/Adelaide', 'LOCATION_NAME' => 'Adelaide', 'ON_OFF' => ''),
-    array('LOCATION_VALUE' => 'Australia/Brisbane', 'LOCATION_NAME' => 'Brisbane', 'ON_OFF' => 'dark'),
-    array('LOCATION_VALUE' => 'Australia/Canberra', 'LOCATION_NAME' => 'Canberra', 'ON_OFF' => ''),
-    array('LOCATION_VALUE' => 'Australia/Darwin', 'LOCATION_NAME' => 'Darwin', 'ON_OFF' => 'dark'),
-    array('LOCATION_VALUE' => 'Australia/Hobart', 'LOCATION_NAME' => 'Hobart', 'ON_OFF' => ''),
-    array('LOCATION_VALUE' => 'Australia/Melbourne', 'LOCATION_NAME' => 'Melbourne', 'ON_OFF' => 'dark'),
-    array('LOCATION_VALUE' => 'Australia/Perth', 'LOCATION_NAME' => 'Perth', 'ON_OFF' => ''),
-    array('LOCATION_VALUE' => 'Australia/Sydney', 'LOCATION_NAME' => 'Sydney', 'ON_OFF' => 'dark')
-);
+    $locations = array(
+        array('LOCATION_VALUE' => 'Australia/Adelaide', 'LOCATION_NAME' => 'Adelaide', 'ON_OFF' => ''),
+        array('LOCATION_VALUE' => 'Australia/Brisbane', 'LOCATION_NAME' => 'Brisbane', 'ON_OFF' => 'dark'),
+        array('LOCATION_VALUE' => 'Australia/Canberra', 'LOCATION_NAME' => 'Canberra', 'ON_OFF' => ''),
+        array('LOCATION_VALUE' => 'Australia/Darwin', 'LOCATION_NAME' => 'Darwin', 'ON_OFF' => 'dark'),
+        array('LOCATION_VALUE' => 'Australia/Hobart', 'LOCATION_NAME' => 'Hobart', 'ON_OFF' => ''),
+        array('LOCATION_VALUE' => 'Australia/Melbourne', 'LOCATION_NAME' => 'Melbourne', 'ON_OFF' => 'dark'),
+        array('LOCATION_VALUE' => 'Australia/Perth', 'LOCATION_NAME' => 'Perth', 'ON_OFF' => ''),
+        array('LOCATION_VALUE' => 'Australia/Sydney', 'LOCATION_NAME' => 'Sydney', 'ON_OFF' => 'dark')
+    );
 
-$this->dropDown('regions', $locations, $location);
+    $this->dropDown('regions', $locations, $location);
+} else {
+    $this->parse("weather_unavailable_block", "weather_unavailable");
+    $this->setVar("region_list_block", "");
+}
 
-$url = new Url($weather['attribution']['url']);
+
+if (empty($weather['attribution']['url'])) {
+    $suppliedByURL = '';
+} else {
+    $url = new Url($weather['attribution']['url']);
+    $suppliedByURL = $url->getBase64EncodedRedirect();
+}
+
 $this->setVar(array(
     'SUPPLIED_BY_NAME' => $weather['attribution']['name'],
-    'SUPPLIED_BY_URL'  => $url->getBase64EncodedRedirect(),
+    'SUPPLIED_BY_URL'  => $suppliedByURL,
     'SUPPLIED_BY_LOGO' => 'http://icons.wxug.com/logos/PNG/wundergroundLogo_4c_horz.png',
 ));
