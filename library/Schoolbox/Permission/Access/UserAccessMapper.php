@@ -521,19 +521,21 @@ class UserAccessMapper extends Mapper
      * Check if user is invovlved in a group
      * @param User $user
      * @param int $serviceIdentifier
-     * @return UserAccess
+     * @return bool
      */
     public function involvedInGroup(User $user, $serviceIdentifier) {
         try {
-            return $this->findOneByColumnList(
+            $this->findOneByColumnList(
                 array(
                     'service' => UserAccess::SERVICE_HOMEPAGE,
                     'sid' => $serviceIdentifier,
                     'uid' => $user->getId(),
                 )
             );
+
+            return true;
         } catch (\Schoolbox\Mapper\Exception $e) {
-            return UserAccess::ACCESS_DENY;
+            return false;
         }
     }
 
