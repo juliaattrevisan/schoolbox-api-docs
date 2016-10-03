@@ -57,6 +57,7 @@ class Project implements IAssessmentTypeTranslator
                 ->setWeight($assessment->getWeight())
                 ->setMarkType(new MarkType())
                 ->setGradeGroup(new GradeGroup())
+                ->setOwner($assessment->getCreator())
             ;
             $subModels = new Collection();
             $i         = 0;
@@ -123,7 +124,8 @@ class Project implements IAssessmentTypeTranslator
                 throw new UnexpectedValueException('$model->getSummator() is not a recognised summator type');
             }
 
-            $assessable = new ProjectObject($summator);
+            $assessable = (new ProjectObject($summator))
+                ->setCreator($model->getOwner());
 
             // Convert sub-assessments
             foreach ($model->getAssessments() as $subModel) {

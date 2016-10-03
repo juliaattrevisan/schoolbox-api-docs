@@ -198,6 +198,7 @@ INSERT INTO `component_config_definition` (
 -- The new project assessment type
 CREATE TABLE `project` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `owner_id` INT(11) NOT NULL,
   `assessment_id` INT UNSIGNED NOT NULL,
   `mark_type_id` INT(11) NOT NULL,
   `grade_group_id` INT(11) NULL DEFAULT NULL,
@@ -206,6 +207,8 @@ CREATE TABLE `project` (
   `description` TEXT NULL,
   `weight` INT(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
+  -- owner would be a FK, but user is a MyISAM table
+  INDEX `fk_project_owner_id_idx` (`owner_id` ASC),
   INDEX `fk_project_grade_group_id_idx` (`grade_group_id` ASC),
   CONSTRAINT `fk_project_grade_group_id`
   FOREIGN KEY (`grade_group_id`)

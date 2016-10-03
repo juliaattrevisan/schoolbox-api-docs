@@ -11,6 +11,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeGroupMapper;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\UserMapper;
 
 /**
  * Project Mapper
@@ -31,6 +32,7 @@ class Mapper extends BaseMapper
         $this->uses('description', self::TYPE_STRING);
         $this->uses('weight', self::TYPE_INTEGER);
         $this->uses('summator', self::TYPE_STRING);
+        $this->joins('owner_id', UserMapper::class);
         $this->joins('mark_type_id', MarkTypeMapper::class, 'mark_type_id', null, null, 'markType');
         $this->joins('assessment_id', AssessmentMapper::class, null, null, null, 'assessmentModel');
         $this->joins('grade_group_id', GradeGroupMapper::class, 'id', null, null, 'gradeGroup');

@@ -13,6 +13,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Mapper\Traits\Model\Id;
+use Schoolbox\User;
 
 /**
  * Data Model for Projects
@@ -50,6 +51,13 @@ class Model implements IAssessableDataModel
      * @var string
      */
     const SUMMATOR_WEIGHTED_AVERAGE = 'weighted';
+
+    /**
+     * Owner of the project.
+     *
+     * @var User
+     */
+    protected $owner;
 
     /**
      * The title of the project.
@@ -232,6 +240,24 @@ class Model implements IAssessableDataModel
     public function setGradeGroup(GradeGroup $gradeGroup = null)
     {
         $this->gradeGroup = $gradeGroup;
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * @param User $owner
+     * @return static
+     */
+    public function setOwner(User $owner)
+    {
+        $this->owner = $owner;
         return $this;
     }
 }
