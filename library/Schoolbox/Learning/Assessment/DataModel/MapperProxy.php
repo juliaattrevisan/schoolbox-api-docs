@@ -135,9 +135,11 @@ class MapperProxy
         // Set fields on the domain model object
         $assessable
             ->setId($dataModel->getId())
-            ->setCreatedAt($dataModel->getCreatedAt())
-            ->setUpdatedAt($dataModel->getUpdatedAt())
-            ->setDeletedAt($dataModel->getDeletedAt())
+            // Create/update/delete stamps aren't updated in the data model,
+            // therefore it's useless to set them here.
+//            ->setCreatedAt($dataModel->getCreatedAt())
+//            ->setUpdatedAt($dataModel->getUpdatedAt())
+//            ->setDeletedAt($dataModel->getDeletedAt())
         ;
 
         // Vestigial folder - for now, task/quiz/duework are linked to folders.
