@@ -170,16 +170,17 @@ $dueWork = (new DueWork())
     ->setAcceptsMultiple()
     ->showOnlySubmittedStudents()
     ->setAllFiles((new \Schoolbox\Collection())
+        // Duework files have no separate filenames
         ->add((new DueWorkFile())
-            ->setFilename('1.txt')
+            ->setFilename('test1.txt')
             ->setHash($file1->getHash())
         )
         ->add((new DueWorkFile())
-            ->setFilename('2.txt')
+            ->setFilename('test2.txt')
             ->setHash($file2->getHash())
         )
         ->add((new DueWorkFile())
-            ->setFilename('3.txt')
+            ->setFilename('test3.txt')
             ->setHash($file3->getHash())
         )
     )
@@ -190,6 +191,8 @@ $dueWork = (new DueWork())
     ->setMarkScheme(new \Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber(40))
     ->setHasRubric(true)
 ;
+// Due work files have no sequence stored, so order by name
+$dueWork->getAllFiles()->sortBy('filename', 'asc');
 $mapper->save($dueWork, 0);
 
 // Change and save it again
@@ -216,8 +219,13 @@ assertEquals($dbDueWork->isAcceptMulti(), $dueWork->isAcceptMulti());
 assertEquals($dbDueWork->getType()->getId(), $dueWork->getType()->getId());
 assertEquals(get_class($dbDueWork->getMarkScheme()), get_class($dueWork->getMarkScheme()));
 assertEquals($dbDueWork->getMarkScheme()->getTotalMark(), $dueWork->getMarkScheme()->getTotalMark());
-// Submission box files - not implemented yet
+// Due work files
 assertEquals($dbDueWork->getAllFiles()->count(), $dueWork->getAllFiles()->count());
+// Due work files have no sequence stored, so order by name
+$dbDueWork->getAllFiles()->sortBy('filename', 'asc');
+assertEquals($dbDueWork->getAllFiles()[0]->getFilename(), $dueWork->getAllFiles()[0]->getFilename());
+assertEquals($dbDueWork->getAllFiles()[1]->getFilename(), $dueWork->getAllFiles()[1]->getFilename());
+assertEquals($dbDueWork->getAllFiles()[2]->getFilename(), $dueWork->getAllFiles()[2]->getFilename());
 
 // Delete and try to refetch it
 $mapper->delete($dueWork);
