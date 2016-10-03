@@ -96,7 +96,6 @@ class Mapper extends BaseMapper
      */
     protected function getSelectString()
     {
-        assert(true);
         return "
             SELECT
                 {$this->getColumnString()},
