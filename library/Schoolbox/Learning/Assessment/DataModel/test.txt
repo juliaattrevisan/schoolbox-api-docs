@@ -74,6 +74,16 @@ assertEquals($dbTask->getWeight(), 0);
 assertEquals($dbTask->getLink(), $task->getLink());
 assertEquals($dbTask->isSelfMarkable(), $task->isSelfMarkable());
 
+// Delete and try to refetch it
+$mapper->delete($task);
+try {
+    $dbTask = $mapper->findById($task->getId());
+    // This must have thrown an exception
+    assert(false, 'Task should have been deleted');
+} catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+    assert($e->getDeletedObject() instanceof Task);
+    assertEquals($dbTask->getId(), $task->getId());
+}
 
 
 /**
@@ -121,6 +131,16 @@ assertEquals($dbQuiz->getMaxAttempts(), $quiz->getMaxAttempts());
 assertEquals($dbQuiz->getDuration(), $quiz->getDuration());
 assertEquals($dbQuiz->getCompletionMessage(), $quiz->getCompletionMessage());
 
+// Delete and try to refetch it
+$mapper->delete($quiz);
+try {
+    $dbQuiz = $mapper->findById($quiz->getId());
+    // This must have thrown an exception
+    assert(false, 'Quiz should have been deleted');
+} catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+    assert($e->getDeletedObject() instanceof Quiz);
+    assertEquals($dbQuiz->getId(), $quiz->getId());
+}
 
 
 /**
@@ -193,6 +213,17 @@ assertEquals(get_class($dbDueWork->getMarkScheme()), get_class($dueWork->getMark
 assertEquals($dbDueWork->getMarkScheme()->getTotalMark(), $dueWork->getMarkScheme()->getTotalMark());
 // Submission box files - not implemented yet
 //assertEquals($dbDueWork->getAllFiles()->count(), $dueWork->getAllFiles()->count());
+
+// Delete and try to refetch it
+$mapper->delete($dueWork);
+try {
+    $dbDueWork = $mapper->findById($dueWork->getId());
+    // This must have thrown an exception
+    assert(false, 'Due work should have been deleted');
+} catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+    assert($e->getDeletedObject() instanceof DueWork);
+    assertEquals($dbDueWork->getId(), $dueWork->getId());
+}
 
 
 /**
@@ -286,3 +317,14 @@ assertEquals($dbProject->getWeight(), $project->getWeight());
 assertEquals(get_class($dbProject->getMarkScheme()), get_class($project->getMarkScheme()));
 // Sub-assessments - unable to be fetched yet
 //assertEquals($dbProject->getAssessables()->count(), $project->getAssessables()->count());
+
+// Delete and try to refetch it
+$mapper->delete($project);
+try {
+    $dbProject = $mapper->findById($project->getId());
+    // This must have thrown an exception
+    assert(false, 'Project should have been deleted');
+} catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+    assert($e->getDeletedObject() instanceof Project);
+    assertEquals($dbProject->getId(), $project->getId());
+}
