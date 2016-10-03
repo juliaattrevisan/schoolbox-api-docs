@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
@@ -18,6 +19,9 @@ use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
+use Schoolbox\Learning\MarkScheme\LetterGrade;
+use Schoolbox\Learning\MarkScheme\None;
+use Schoolbox\Learning\MarkScheme\Percentage;
 use UnexpectedValueException;
 
 /**
@@ -51,6 +55,8 @@ class Project implements IAssessmentTypeTranslator
                 ->setTitle($assessment->getTitle())
                 ->setDescription($assessment->getDescription())
                 ->setWeight($assessment->getWeight())
+                ->setMarkType(new MarkType())
+                ->setGradeGroup(new GradeGroup())
             ;
             $subModels = new Collection();
             $i         = 0;
@@ -73,6 +79,21 @@ class Project implements IAssessmentTypeTranslator
                 $model->setSummator(ProjectModel::SUMMATOR_MINIMUM);
             } elseif ($assessment->getSummator() instanceof Maximum) {
                 $model->setSummator(ProjectModel::SUMMATOR_MAXIMUM);
+            }
+
+            // Translate mark scheme
+            // TODO move this to the mark scheme translator
+            $markScheme = $assessment->getMarkScheme();
+            if ($markScheme instanceof Percentage) {
+                $model->getMarkType()->setId(MarkType::TYPE_PERCENT);
+
+            } elseif ($markScheme instanceof LetterGrade) {
+                $model->setGradeGroup($markScheme->getGradeGroup());
+                $model->getMarkType()->setId(MarkType::TYPE_LETTER);
+
+            } elseif ($markScheme instanceof None) {
+                $model->getMarkType()->setId(MarkType::TYPE_NONE);
+
             }
 
             return $model;
