@@ -106,7 +106,7 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
     }
 
     function uniqueView($threadID) {
-        if (!isset($_SESSION['threads_viewed']) {
+        if (!isset($_SESSION['threads_viewed'])) {
             $_SESSION['threads_viewed'] = array();
         }
 
