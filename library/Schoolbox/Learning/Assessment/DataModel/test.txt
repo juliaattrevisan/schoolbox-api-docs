@@ -14,6 +14,18 @@ use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 
+// Bail out on an assert that fails
+assert_options(ASSERT_BAIL, true);
+
+function assertEquals($value1, $value2) {
+    assert($value1 == $value2, sprintf('"%s" != "%s"', $value1, $value2));
+}
+
+
+/**
+ * Tasks
+ */
+
 // Create a task
 $mapper = new \Schoolbox\Learning\Assessment\DataModel\MapperProxy(
     \Schoolbox\Learning\Assessment\DataModel\Mapper::getInstance(),
@@ -45,6 +57,28 @@ $task->setSelfMarkable(false)
 ;
 $mapper->save($task, 0);
 
+// Load from DB and assert that all fields match
+/** @var Task $dbTask */
+$dbTask = $mapper->findById($task->getId());
+// Generic fields
+assertEquals($dbTask->getId(), $task->getId());
+assertEquals($dbTask->getCreator()->getId(), $task->getCreator()->getId());
+assertEquals($dbTask->getPublishAt()->getUnixTimeStamp(), $task->getPublishAt()->getUnixTimeStamp());
+assertEquals($dbTask->getOpenAt()->getUnixTimeStamp(), $task->getOpenAt()->getUnixTimeStamp());
+assertEquals($dbTask->getDueAt()->getUnixTimeStamp(), $task->getDueAt()->getUnixTimeStamp());
+assertEquals($dbTask->getCloseAt()->getUnixTimeStamp(), $task->getCloseAt()->getUnixTimeStamp());
+assertEquals($dbTask->getTitle(), $task->getTitle());
+assertEquals($dbTask->getDescription(), $task->getDescription());
+assertEquals($dbTask->getWeight(), 0);
+// Specific fields
+assertEquals($dbTask->getLink(), $task->getLink());
+assertEquals($dbTask->isSelfMarkable(), $task->isSelfMarkable());
+
+
+
+/**
+ * Quizzes
+ */
 
 // Create a quiz
 // (The mapper doesn't know how to save all of a quiz's sub-objects yet.)
@@ -67,8 +101,31 @@ $mapper->save($quiz, 0);
 
 // Change and save it again
 $quiz->setMaxAttempts(5);
-$mapper->save($task, 0);
+$mapper->save($quiz, 0);
 
+// Load from DB and assert that all fields match
+/** @var Quiz $dbQuiz */
+$dbQuiz = $mapper->findById($quiz->getId());
+// Generic fields
+assertEquals($dbQuiz->getId(), $quiz->getId());
+assertEquals($dbQuiz->getCreator()->getId(), $quiz->getCreator()->getId());
+assertEquals($dbQuiz->getPublishAt()->getUnixTimeStamp(), $quiz->getPublishAt()->getUnixTimeStamp());
+assertEquals($dbQuiz->getOpenAt()->getUnixTimeStamp(), $quiz->getOpenAt()->getUnixTimeStamp());
+assertEquals($dbQuiz->getDueAt()->getUnixTimeStamp(), $quiz->getDueAt()->getUnixTimeStamp());
+assertEquals($dbQuiz->getCloseAt()->getUnixTimeStamp(), $quiz->getCloseAt()->getUnixTimeStamp());
+assertEquals($dbQuiz->getTitle(), $quiz->getTitle());
+assertEquals($dbQuiz->getDescription(), $quiz->getDescription());
+assertEquals($dbQuiz->getWeight(), $quiz->getWeight());
+// Specific fields
+assertEquals($dbQuiz->getMaxAttempts(), $quiz->getMaxAttempts());
+assertEquals($dbQuiz->getDuration(), $quiz->getDuration());
+assertEquals($dbQuiz->getCompletionMessage(), $quiz->getCompletionMessage());
+
+
+
+/**
+ * Due Works
+ */
 
 // Create a due work
 $dueWork = (new DueWork())
@@ -105,7 +162,7 @@ $dueWork = (new DueWork())
         ->setId(12)
         ->setName('A dumb type')
     )
-    ->setMarkScheme(new \Schoolbox\Learning\MarkScheme\None())
+    ->setMarkScheme(new \Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber(40))
     ->setHasRubric(true)
 ;
 $mapper->save($dueWork, 0);
@@ -114,6 +171,33 @@ $mapper->save($dueWork, 0);
 $dueWork->setWeight(3);
 $mapper->save($dueWork, 0);
 
+// Load from DB and assert that all fields match
+/** @var DueWork $dbDueWork */
+$dbDueWork = $mapper->findById($dueWork->getId());
+// Generic fields
+assertEquals($dbDueWork->getId(), $dueWork->getId());
+assertEquals($dbDueWork->getCreator()->getId(), $dueWork->getCreator()->getId());
+assertEquals($dbDueWork->getPublishAt()->getUnixTimeStamp(), $dueWork->getPublishAt()->getUnixTimeStamp());
+assertEquals($dbDueWork->getOpenAt()->getUnixTimeStamp(), $dueWork->getOpenAt()->getUnixTimeStamp());
+assertEquals($dbDueWork->getDueAt()->getUnixTimeStamp(), $dueWork->getDueAt()->getUnixTimeStamp());
+assertEquals($dbDueWork->getCloseAt()->getUnixTimeStamp(), $dueWork->getCloseAt()->getUnixTimeStamp());
+assertEquals($dbDueWork->getTitle(), $dueWork->getTitle());
+assertEquals($dbDueWork->getDescription(), $dueWork->getDescription());
+assertEquals($dbDueWork->getWeight(), $dueWork->getWeight());
+// Specific fields
+assertEquals($dbDueWork->isAcceptSingle(), $dueWork->isAcceptSingle());
+assertEquals($dbDueWork->isAcceptNone(), $dueWork->isAcceptNone());
+assertEquals($dbDueWork->isAcceptMulti(), $dueWork->isAcceptMulti());
+assertEquals($dbDueWork->getType()->getId(), $dueWork->getType()->getId());
+assertEquals(get_class($dbDueWork->getMarkScheme()), get_class($dueWork->getMarkScheme()));
+assertEquals($dbDueWork->getMarkScheme()->getTotalMark(), $dueWork->getMarkScheme()->getTotalMark());
+// Submission box files - not implemented yet
+//assertEquals($dbDueWork->getAllFiles()->count(), $dueWork->getAllFiles()->count());
+
+
+/**
+ * Projects
+ */
 
 // Create a project
 $project = (new Project(new WeightedAverage()))
@@ -184,3 +268,21 @@ $mapper->save($project, 0);
 // Change and save it again
 $project->setWeight(3);
 $mapper->save($project, 0);
+
+// Load from DB and assert that all fields match
+/** @var Project $dbProject */
+$dbProject = $mapper->findById($project->getId());
+// Generic fields
+assertEquals($dbProject->getId(), $project->getId());
+assertEquals($dbProject->getCreator()->getId(), $project->getCreator()->getId());
+assertEquals($dbProject->getPublishAt()->getUnixTimeStamp(), $project->getPublishAt()->getUnixTimeStamp());
+assertEquals($dbProject->getOpenAt()->getUnixTimeStamp(), $project->getOpenAt()->getUnixTimeStamp());
+assertEquals($dbProject->getDueAt()->getUnixTimeStamp(), $project->getDueAt()->getUnixTimeStamp());
+assertEquals($dbProject->getCloseAt()->getUnixTimeStamp(), $project->getCloseAt()->getUnixTimeStamp());
+assertEquals($dbProject->getTitle(), $project->getTitle());
+assertEquals($dbProject->getDescription(), $project->getDescription());
+assertEquals($dbProject->getWeight(), $project->getWeight());
+// Specific fields
+assertEquals(get_class($dbDueWork->getMarkScheme()), get_class($project->getMarkScheme()));
+// Sub-assessments - unable to be fetched yet
+//assertEquals($dbProject->getAssessables()->count(), $project->getAssessables()->count());
