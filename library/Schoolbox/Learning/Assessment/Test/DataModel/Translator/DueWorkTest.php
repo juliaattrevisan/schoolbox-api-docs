@@ -335,4 +335,59 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($acceptsOnline && !$acceptsMultiple, $dueWork->isAcceptSingle());
         $this->assertEquals($acceptsMultiple, $dueWork->isAcceptMulti());
     }
+
+    /**
+     * Data provider for different project mark scheme settings.
+     */
+    public function getTestTranslateDueWorkMarkSchemeToDomainModelData()
+    {
+        return [
+            [
+                (new DueWorkModel())
+                    ->setAssessmentModel(new AssessmentModel())
+                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_NONE)),
+                None::class,
+            ],
+            [
+                (new DueWorkModel())
+                    ->setAssessmentModel(new AssessmentModel())
+                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT)),
+                Percentage::class,
+            ],
+            [
+                (new DueWorkModel())
+                    ->setAssessmentModel(new AssessmentModel())
+                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
+                    ->setGradeGroup((new DueWorkModel\GradeLevel\Group\Model())->setId(1)),
+                LetterGrade::class,
+            ],
+            [
+                (new DueWorkModel())
+                    ->setAssessmentModel(new AssessmentModel())
+                    ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_TOTAL))
+                    ->setMaxMark(15),
+                TotalMarkWholeNumber::class,
+            ],
+        ];
+    }
+
+    /**
+     * Test translation of acceptance response settings.
+     *
+     * @dataProvider getTestTranslateDueWorkMarkSchemeToDomainModelData
+     *
+     * @param DueWorkModel $dataModel
+     * @param string       $markSchemeClass
+     */
+    public function testTranslateDueWorkMarkSchemeToDomainModel(DueWorkModel $dataModel, $markSchemeClass)
+    {
+        /** @var DueWork $project */
+        $dueWork = $this->translator->translateToDomainModel($dataModel);
+
+        // Test type
+        $this->assertInstanceOf(DueWork::class, $dueWork);
+
+        // Test mark type
+        $this->assertInstanceOf($markSchemeClass, $dueWork->getMarkScheme());
+    }
 }
