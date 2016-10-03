@@ -212,7 +212,7 @@ assertEquals($dbDueWork->getType()->getId(), $dueWork->getType()->getId());
 assertEquals(get_class($dbDueWork->getMarkScheme()), get_class($dueWork->getMarkScheme()));
 assertEquals($dbDueWork->getMarkScheme()->getTotalMark(), $dueWork->getMarkScheme()->getTotalMark());
 // Submission box files - not implemented yet
-//assertEquals($dbDueWork->getAllFiles()->count(), $dueWork->getAllFiles()->count());
+assertEquals($dbDueWork->getAllFiles()->count(), $dueWork->getAllFiles()->count());
 
 // Delete and try to refetch it
 $mapper->delete($dueWork);
