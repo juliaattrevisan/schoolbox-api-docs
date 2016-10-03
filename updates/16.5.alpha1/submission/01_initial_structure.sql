@@ -200,11 +200,18 @@ CREATE TABLE `project` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `assessment_id` INT UNSIGNED NOT NULL,
   `mark_type_id` INT(11) NOT NULL,
+  `grade_group_id` INT(11) NULL DEFAULT NULL,
   `summator` ENUM('min', 'max', 'avg', 'weighted') NOT NULL DEFAULT 'weighted',
   `title` VARCHAR(250) NOT NULL,
   `description` TEXT NULL,
   `weight` INT(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
+  INDEX `fk_project_grade_group_id_idx` (`grade_group_id` ASC),
+  CONSTRAINT `fk_project_grade_group_id`
+  FOREIGN KEY (`grade_group_id`)
+  REFERENCES `schoolbox`.`submission_grade_group` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
   INDEX `fk_project_assessment_id_idx` (`assessment_id` ASC),
   CONSTRAINT `fk_project_course_unit_project_id`
   FOREIGN KEY (`assessment_id`)
