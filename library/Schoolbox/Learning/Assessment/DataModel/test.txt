@@ -149,6 +149,12 @@ try {
  * Due Works
  */
 
+// Preliminary step: upload some files into storage
+$storageMapper = \Schoolbox\Resource\Storage\Mapper::getInstance();
+$file1         = $storageMapper->acceptStream('test1.txt', 'a test file');
+$file2         = $storageMapper->acceptStream('test2.txt', 'not a test');
+$file3         = $storageMapper->acceptStream('test3.txt', 'also not a test');
+
 // Create a due work
 $dueWork = (new DueWork())
     // Generic fields
@@ -165,19 +171,16 @@ $dueWork = (new DueWork())
     ->showOnlySubmittedStudents()
     ->setAllFiles((new \Schoolbox\Collection())
         ->add((new DueWorkFile())
-            ->setId(33)
-            ->setFilename('a file.txt')
-            ->setHash('1234567890123456789012345678901234567890')
+            ->setFilename('1.txt')
+            ->setHash($file1->getHash())
         )
         ->add((new DueWorkFile())
-            ->setId(65)
-            ->setFilename('an image.png')
-            ->setHash('0000000000000000000000000000000000000002')
+            ->setFilename('2.txt')
+            ->setHash($file2->getHash())
         )
         ->add((new DueWorkFile())
-            ->setId(82)
-            ->setFilename('a sound.mp3')
-            ->setHash('0000000000000000000000000000000000000001')
+            ->setFilename('3.txt')
+            ->setHash($file3->getHash())
         )
     )
     ->setType((new DueWorkType())
