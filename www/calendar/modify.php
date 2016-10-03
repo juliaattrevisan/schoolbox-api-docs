@@ -91,8 +91,8 @@ if (is_numeric($_GET['eventID'])) {
     $page->setVar(
         array(
             'EVENT_ID'             => $event->getId(),
-            'EVENT_USER_ID'        => $selectedUser->getId(),
-            'EVENT_AUTHOR_ID'      => $_SESSION['user']->getId(),
+            'EVENT_USER_ID'        => $event->getOwner()->getId(),
+            'EVENT_AUTHOR_ID'      => $event->getAuthor()->getId(),
             'EVENT_TITLE'          => Scrub::text($event->getTitle()),
             'EVENT_ALLDAY_CHECKED' => $event->getAllDay() ? 'checked="checked"' : '',
             'EVENT_TIMEINPUTS'     => $event->getAllDay() ? 'hide' : '',
