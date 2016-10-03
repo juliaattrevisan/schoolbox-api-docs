@@ -106,13 +106,17 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
     }
 
     function uniqueView($threadID) {
-        $threads_viewed = explode(",", $_COOKIE['threads_viewed']);
-        if (!is_array($threads_viewed) || !in_array($threadID, $threads_viewed)) {
+        if (!isset($_SESSION['threads_viewed']) {
+            $_SESSION['threads_viewed'] = array();
+        }
+
+        if (!isset($_SESSION['threads_viewed'][$threadID])) {
             $query = "UPDATE " . $this->_table . " SET views = views + 1 WHERE threadID = $threadID";
             $this->db->query($query);
 
-            setcookie('threads_viewed', $_COOKIE['threads_viewed'] . ',' . $threadID);
+            $_SESSION['threads_viewed'][$threadID] = true;
         }
+        
         return;
     }
 
