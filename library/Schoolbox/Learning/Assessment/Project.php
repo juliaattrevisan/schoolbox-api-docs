@@ -18,12 +18,13 @@
 namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
+use Schoolbox\Learning\AssessmentContext;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Summator\ISummator;
+use Schoolbox\Resource\Folder\Model as Folder;
 
-class Project extends AbstractAssessment
+class Project extends AbstractAssessment implements AssessmentContext
 {
-
     /**
      * @var Collection|IAssessable[]
      */
@@ -238,17 +239,27 @@ class Project extends AbstractAssessment
     }
 
     /**
-     * @param Project $project
+     * @param AssessmentContext $context
      * @throws \InvalidArgumentException
      * @return static
      */
-    public function setProject(Project $project = null)
+    public function setContext(AssessmentContext $context = null)
     {
-        if($project instanceof Project){
+        if($context instanceof Project){
             throw new \InvalidArgumentException('For now, a Project cannot reside inside another Project');
         }
-        parent::setProject($project);
+        parent::setContext($context);
         return $this;
+    }
 
+    /**
+     * Retrieves the folder that any Assessable objects within this object
+     * belongs within.
+     *
+     * @return Folder
+     */
+    public function getFolder()
+    {
+        return $this->getContext()->getFolder();
     }
 }
