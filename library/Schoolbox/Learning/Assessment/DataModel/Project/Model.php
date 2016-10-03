@@ -229,7 +229,7 @@ class Model implements IAssessableDataModel
      * @param GradeGroup $gradeGroup
      * @return static
      */
-    public function setGradeGroup($gradeGroup)
+    public function setGradeGroup(GradeGroup $gradeGroup = null)
     {
         $this->gradeGroup = $gradeGroup;
         return $this;
