@@ -73,6 +73,30 @@ class Csv extends Base {
 				$attendance
 				) = $thisRow;
 
+            /* Event name is mandatory
+             */
+            if (!strlen(trim($name))) {
+                $output[] = array(
+                    'name' => \Scrub::text($name),
+                    'status' => 'Not Added',
+                    'error' => 'Event name not provided',
+                );
+
+                continue;
+            }
+
+            /* Start date is mandatory
+             */
+            if (!strlen(trim($start_date))) {
+                $output[] = array(
+                    'name' => \Scrub::text($name),
+                    'status' => 'Not Added',
+                    'error' => 'Start date not provided',
+                );
+
+                continue;
+            }
+
 			/* Skip empty comments and no dates
 			 *
 			 * If access is 3, then the sid corresponds to campus id's
@@ -162,7 +186,7 @@ class Csv extends Base {
 
                 continue;
             }
-            
+
             /* Start datetime occurs after finish datetime
              */
             if ($startDatetime->getUnixTimestamp() > $finishDatetime->getUnixTimestamp()) {
@@ -177,72 +201,65 @@ class Csv extends Base {
 
 			/* Save
 			 */
-			if ((trim($thisRow[0]) != '') && (trim($name) != '')) {
-				$event = new Event();
-				$event->setOwner($this->getUser());
-				$event->setAuthor($this->getAuthor());
-				$event->setAccess($this->getAccess());
-				$event->setStartDateTime($startDatetime);
-				$event->setEndDateTime($finishDatetime);
-				$event->setTitle($name);
-				$event->setDetail(nl2br(\Scrub::text($detail)));
-				$event->setLocation($location);
-				$event->setAllDay($all_day);
-				$event->setType($event_type);
-				$event->setAttendance($attendance);
-				$event->setCampusCollection($allCampuses);
 
-				/* If a publish date is specified, use it; otherwise leave as empty
-				 */
-				if (strlen(trim($publish_date))) {
-					$pdate = new Alaress_Date_Format($publish_date, 'd/m/Y');
-					$event->setPublishDateTime($pdate);
-				}
+            $event = new Event();
+            $event->setOwner($this->getUser());
+            $event->setAuthor($this->getAuthor());
+            $event->setAccess($this->getAccess());
+            $event->setStartDateTime($startDatetime);
+            $event->setEndDateTime($finishDatetime);
+            $event->setTitle($name);
+            $event->setDetail(nl2br(\Scrub::text($detail)));
+            $event->setLocation($location);
+            $event->setAllDay($all_day);
+            $event->setType($event_type);
+            $event->setAttendance($attendance);
+            $event->setCampusCollection($allCampuses);
 
-				/* Save it
-				 */
-				$result = $eventMapper->save($event);
+            /* If a publish date is specified, use it; otherwise leave as empty
+             */
+            if (strlen(trim($publish_date))) {
+                $pdate = new Alaress_Date_Format($publish_date, 'd/m/Y');
+                $event->setPublishDateTime($pdate);
+            }
 
-				/* Assign Category relations
-				 */
-				foreach($this->getCategoryList() as $currentCategory) {
-					$category = new Category();
-					$category->setEventId($event->getId());
-					$category->setCategoryId($currentCategory);
-					$categoryRelationMapper->save($category);
-				}
+            /* Save it
+             */
+            $result = $eventMapper->save($event);
 
-				/* Assign Role relations
-				 */
-				foreach($this->getGroupList() as $currentRole) {
-					$role = new Role();
-					$role->setEventId($event->getId());
-					$role->setRoleId($currentRole);
-					$roleRelationMapper->save($role);
-				}
+            /* Assign Category relations
+             */
+            foreach($this->getCategoryList() as $currentCategory) {
+                $category = new Category();
+                $category->setEventId($event->getId());
+                $category->setCategoryId($currentCategory);
+                $categoryRelationMapper->save($category);
+            }
 
-				if (is_array($result) && count($result)) {
-					$output[] = array(
-						'name' => \Scrub::text($event->getTitle()),
-						'status' => 'Added',
-						'error' => 'OK',
-					);
-				}
-				else {
-					$output[] = array(
-						'name' => \Scrub::text($event->getTitle()),
-						'status' => 'Not Added',
-						'error' => 'Could not create event',
-					);
-				}
-			}
-			else {
-				$output[] = array(
-					'name' => \Scrub::text($name),
-					'status' => 'Not Added',
-					'error' => 'Missing date and/or name',
-				);
-			}
+            /* Assign Role relations
+             */
+            foreach($this->getGroupList() as $currentRole) {
+                $role = new Role();
+                $role->setEventId($event->getId());
+                $role->setRoleId($currentRole);
+                $roleRelationMapper->save($role);
+            }
+
+            if (is_array($result) && count($result)) {
+                $output[] = array(
+                    'name' => \Scrub::text($event->getTitle()),
+                    'status' => 'Added',
+                    'error' => 'OK',
+                );
+            }
+            else {
+                $output[] = array(
+                    'name' => \Scrub::text($event->getTitle()),
+                    'status' => 'Not Added',
+                    'error' => 'Could not create event',
+                );
+            }
+
 
 			/* Free memory */
 			unset($publish_date, $start, $finish);
