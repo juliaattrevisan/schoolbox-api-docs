@@ -18,7 +18,6 @@ use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper\Exception;
 
 /**
  * Proxy mapper for IAssessable objects.
@@ -81,34 +80,43 @@ class MapperProxy
     /**
      * Finds all assessables for a unit specification
      *
-     * @param int $unitSpecId
+     * @param int   $unitSpecId
+     * @param array $options
+     * @return IAssessable[]
      */
-    public function findAllForUnitSpecificationId($unitSpecId)
+    public function findAllForUnitSpecificationId($unitSpecId, $options = [])
     {
-        // TODO implement
-        // Requires M..M join onto assessment_course_unit_specification
+        return $this->baseMapper->findByColumn('us.id', $unitSpecId, $options)
+                                ->map([$this, 'translateDataModelFromMapper'])
+                                ->map([$this->translator, 'translateToDomainModel']);
     }
 
     /**
      * Finds all assessables for a unit implementation
      *
-     * @param int $unitImplId
+     * @param int   $unitImplId
+     * @param array $options
+     * @return IAssessable[]
      */
-    public function findAllForUnitImplementationId($unitImplId)
+    public function findAllForUnitImplementationId($unitImplId, $options = [])
     {
-        // TODO implement
-        // Requires M..M join onto assessment_course_unit_implementation
+        return $this->baseMapper->findByColumn('ui.id', $unitImplId, $options)
+                                ->map([$this, 'translateDataModelFromMapper'])
+                                ->map([$this->translator, 'translateToDomainModel']);
     }
 
     /**
      * Finds all assessables for a folder
      *
-     * @param int $folderId
+     * @param int   $folderId
+     * @param array $options
+     * @return IAssessable[]
      */
-    public function findAllForFolderId($folderId)
+    public function findAllForFolderId($folderId, $options = [])
     {
-        // TODO implement
-        // Requires M..M join onto assessment_folder
+        return $this->baseMapper->findByColumn('f.id', $folderId, $options)
+                                ->map([$this, 'translateDataModelFromMapper'])
+                                ->map([$this->translator, 'translateToDomainModel']);
     }
 
     /**
@@ -215,7 +223,7 @@ class MapperProxy
      * @param Model $model
      * @return IAssessableDataModel
      */
-    protected function translateDataModelFromMapper(Model $model)
+    public function translateDataModelFromMapper(Model $model)
     {
         // Turn the data model inside out
         $subModel = $model->getSubObject();
