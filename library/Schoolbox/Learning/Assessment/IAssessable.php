@@ -13,12 +13,32 @@ namespace Schoolbox\Learning\Assessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
 
 interface IAssessable extends ISoftDeletable
 {
+    /**
+     * Return the context within which this assessment belongs.
+     *
+     * Currently, they may belong to:
+     * * a folder
+     * * a unit specification
+     * * a unit implementation
+     *
+     * @return AssessmentContext
+     */
+    public function getAssessmentContext();
+
+    /**
+     * Set the context within which this assessment belongs.
+     *
+     * @param AssessmentContext $assessmentContext
+     * @return static
+     */
+    public function setAssessmentContext(AssessmentContext $assessmentContext);
 
     /**
      * Return the name of the "type" of Assessable this is
