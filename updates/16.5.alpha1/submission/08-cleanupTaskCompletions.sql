@@ -1,16 +1,3 @@
-/* add new column to link up */
-ALTER TABLE `task_instance_completion`
-  ADD COLUMN `task_id` INT(11) NULL AFTER `id`;
-
-/* inject linked data */
-UPDATE task_instance_completion c
-SET task_id = (
-    SELECT t.id
-    FROM task_instance i
-    LEFT JOIN task t ON i.task_id = t.id
-    WHERE c.task_instance_id = i.id
-);
-
 /* rename table */
 RENAME TABLE `task_instance_completion` TO `task_completion`;
 
