@@ -144,7 +144,10 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('project', 'p')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
-                {$this->getJoinColumnString('assessment_course_unit_implementation', 'ui')}
+                {$this->getJoinColumnString('assessment_course_unit_specification.folder', 'usf')},
+                {$this->getJoinColumnString('assessment_course_unit_implementation', 'ui')},
+                {$this->getJoinColumnString('assessment_course_unit_implementation.course', 'uic')},
+                {$this->getJoinColumnString('assessment_course_unit_implementation.course.folder', 'uicf')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('task', '', 't')}
             LEFT JOIN {$this->getJoinSql('duework', '', 'd')}
@@ -152,7 +155,10 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('project', '', 'p')}
             LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us')}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification.folder', 'us', 'usf')}
             LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', '', 'ui')}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course', 'ui', 'uic')}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation.course.folder', 'uic', 'uicf')}
         ";
     }
 
@@ -205,9 +211,16 @@ class Mapper extends BaseMapper
             if ($row['f.id']) {
                 $context = $this->hydrateJoin($row, 'assessment_folder', 'f');
             } elseif ($row['us.id']) {
-                $context = $this->hydrateJoin($row, 'assessment_course_unit_specification', 'us');
+                $context = $this->hydrateJoin($row, 'assessment_course_unit_specification', 'us')
+                    ->setFolder($this->hydrateJoin($row, 'assessment_course_unit_specification.folder', 'usf'));
             } elseif ($row['ui.id']) {
-                $context = $this->hydrateJoin($row, 'assessment_course_unit_implementation', 'ui');
+                $context = $this->hydrateJoin($row, 'assessment_course_unit_implementation', 'ui')
+                    ->setCourse(
+                        $this->hydrateJoin($row, 'assessment_course_unit_implementation.course', 'uic')
+                             ->setFolder(
+                                 $this->hydrateJoin($row, 'assessment_course_unit_implementation.course.folder', 'uicf')
+                             )
+                    );
             }
             $model->setAssessmentContext($context);
 
