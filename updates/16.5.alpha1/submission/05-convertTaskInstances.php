@@ -87,6 +87,8 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $selectDueWorkQuery            = $db->prepare("SELECT weight, publish_date, open_date, date FROM submission_box WHERE id = :boxId");
     $selectCourseUnitInstanceQuery = $db->prepare("SELECT open_date, due_date FROM course_unit_implementation WHERE id = :courseUnitInstanceId");
 
+    // Update task completions
+    $updateTaskCompletionQuery     = $db->prepare("UPDATE task_instance_completion SET task_id = :taskId WHERE task_instance_id = :instanceId");
 
     // Go
     $selectTaskInstanceQuery->execute();
@@ -177,6 +179,11 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                     'taskInstanceId' => $taskId,
                 ]);
                 $log->debug('Task instance has no quiz or due work - copied task instance to task');
+
+                $newTaskId = $db->lastInsertId();
+
+                $updateTaskCompletionQuery->execute([ 'taskId' => $newTaskId, 'instanceId' => $taskId ]);
+                $log->debug('Bound task completions to new task');
             }
 
             $successCount++;
