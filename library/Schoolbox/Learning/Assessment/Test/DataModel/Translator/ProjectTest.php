@@ -26,6 +26,7 @@ use Schoolbox\Learning\Assessment\Test\DataModel\TestTrait;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
+use Schoolbox\User;
 
 /**
  * Tests for the assessment data model translator (projects only).
@@ -96,8 +97,10 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
      */
     public function testTranslateWithinProjectToDataModel()
     {
-        $project = (new Project(new Average()))->setId(12);
-        $project->getAssessables()->add((new Project(new Minimum())));
+        $project = (new Project(new Average()))
+            ->setId(12)
+            ->setCreator($this->teacher1);
+        $project->getAssessables()->add((new Project(new Minimum()))->setCreator($this->teacher1));
         $this->translator->translateToDataModel($project, 1);
     }
 
@@ -106,11 +109,28 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
      */
     public function getTestTranslateSummatorToDataModelData()
     {
+        $user = (new User())->setId(3);
         return [
-            [new Project(new WeightedAverage()), ProjectModel::SUMMATOR_WEIGHTED_AVERAGE,],
-            [new Project(new Average()), ProjectModel::SUMMATOR_AVERAGE,],
-            [new Project(new Minimum()), ProjectModel::SUMMATOR_MINIMUM,],
-            [new Project(new Maximum()), ProjectModel::SUMMATOR_MAXIMUM,],
+            [
+                (new Project(new WeightedAverage()))
+                    ->setCreator($user),
+                ProjectModel::SUMMATOR_WEIGHTED_AVERAGE,
+            ],
+            [
+                (new Project(new Average()))
+                    ->setCreator($user),
+                ProjectModel::SUMMATOR_AVERAGE,
+            ],
+            [
+                (new Project(new Minimum()))
+                    ->setCreator($user),
+                ProjectModel::SUMMATOR_MINIMUM,
+            ],
+            [
+                (new Project(new Maximum()))
+                    ->setCreator($user),
+                ProjectModel::SUMMATOR_MAXIMUM,
+            ],
         ];
     }
 
@@ -139,19 +159,26 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
      */
     public function getTestTranslateMarkSchemeToDataModelData()
     {
+        $user = (new User())->setId(3);
         return [
             [
-                (new Project(new WeightedAverage()))->setMarkScheme(new None()),
+                (new Project(new WeightedAverage()))
+                    ->setCreator($user)
+                    ->setMarkScheme(new None()),
                 DueWorkModel\MarkType::TYPE_NONE,
                 null,
             ],
             [
-                (new Project(new WeightedAverage()))->setMarkScheme(new Percentage()),
+                (new Project(new WeightedAverage()))
+                    ->setCreator($user)
+                    ->setMarkScheme(new Percentage()),
                 DueWorkModel\MarkType::TYPE_PERCENT,
                 null,
             ],
             [
-                (new Project(new WeightedAverage()))->setMarkScheme(new LetterGrade((new DueWorkModel\GradeLevel\Group\Model())->setId(7))),
+                (new Project(new WeightedAverage()))
+                    ->setCreator($user)
+                    ->setMarkScheme(new LetterGrade((new DueWorkModel\GradeLevel\Group\Model())->setId(7))),
                 DueWorkModel\MarkType::TYPE_LETTER,
                 7,
             ],
