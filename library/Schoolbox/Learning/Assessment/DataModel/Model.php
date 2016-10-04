@@ -168,6 +168,8 @@ class Model implements ISoftDeletable
 
     /**
      * Helper method for getting this assessment data model's context.
+     *
+     * @return IAssessmentContextDataModel
      */
     public function getAssessmentContext()
     {
@@ -187,10 +189,10 @@ class Model implements ISoftDeletable
     /**
      * Helper method for getting this assessment data model's context.
      *
-     * @param $context
+     * @param IAssessmentContextDataModel $context
      * @return static
      */
-    public function setAssessmentContext($context)
+    public function setAssessmentContext(IAssessmentContextDataModel $context = null)
     {
         if ($context instanceof Folder) {
             return $this->setFolder($context)
@@ -204,8 +206,11 @@ class Model implements ISoftDeletable
             return $this->setFolder(null)
                         ->setUnitImplementation($context)
                         ->setUnitSpecification(null);
+        } else {
+            return $this->setFolder(null)
+                        ->setUnitImplementation(null)
+                        ->setUnitSpecification(null);
         }
-        return $this;
     }
 
     /**
