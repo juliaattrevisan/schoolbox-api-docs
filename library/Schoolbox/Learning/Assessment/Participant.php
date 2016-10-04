@@ -39,7 +39,7 @@ class Participant
     /**
      * A Collection of IFeedback instances that Teachers spawn
      *
-     * @var Collection
+     * @var Collection|IFeedback[]
      */
     protected $allFeedbacks;
 
@@ -59,31 +59,19 @@ class Participant
      * Find all the Responses that were spawned for a particular IAssessable
      *
      * @param IAssessable $assessable
-     * @return Collection
+     * @return Collection|IResponse[]
      */
     public function findAllResponsesForAssessable(IAssessable $assessable)
     {
-        $assessableClass = get_class($assessable);
+        $responses = new Collection();
 
-        $collection = new Collection();
-
-        /** @var IResponse $currentResponse */
-        foreach ($this->getAllResponses() as $currentResponse) {
-
-            /** @var IAssessable $currentAssessable */
-            $currentAssessable = $currentResponse->getAssessable();
-
-            /* So that $dueWork 1 doesn't get matched with $quiz 1
-             * or $task 1 - have to check types as well as id
-             */
-            if ($currentAssessable instanceof $assessableClass) {
-                if ($currentAssessable->getId() == $assessable->getId()) {
-                    $collection->add($currentResponse);
-                }
+        foreach ($this->getAllResponses() as $response) {
+            $responseAssessable = $response->getAssessable();
+            if ($assessable->getId() == $responseAssessable->getId()) {
+                $responses->add($response);
             }
         }
-
-        return $collection;
+        return $responses;
     }
 
     /**
@@ -94,31 +82,35 @@ class Participant
      */
     public function findAllFeedbackForAssessable(IAssessable $assessable)
     {
-        $assessableClass = get_class($assessable);
+        $feedbacks = new Collection();
 
-        $collection = new Collection();
-
-        /** @var IFeedback $currentFeedback */
-        foreach ($this->getAllFeedbacks() as $currentFeedback) {
-
-            /** @var IAssessable $currentAssessable */
-            $currentAssessable = $currentFeedback->getAssessable();
-
-            /* So that $dueWork 1 doesn't get matched with $quiz 1
-             * or $task 1 - have to check types as well as id
-             */
-            if ($currentAssessable instanceof $assessableClass) {
-                if ($currentAssessable->getId() == $assessable->getId()) {
-                    $collection->add($currentFeedback);
-                }
+        foreach ($this->getAllFeedbacks() as $feedback) {
+            $feedbackAssessable = $feedback->getAssessable();
+            if ($assessable->getId() == $feedbackAssessable->getId()) {
+                $feedbacks->add($feedback);
             }
         }
-
-        return $collection;
+        return $feedbacks;
     }
 
-    /* Traveller
+    /**
+     * Whether this Participant has unmarked Response to the specified Assessment
+     *
+     * @param IAssessable $assessable
+     * @return bool
      */
+    public function isMarkingRequired(IAssessable $assessable)
+    {
+        $latestResponse = $this->findMostRecentResponse($assessable);
+        if(!$latestResponse){
+            return false;
+        }
+        $latestFeedback = $this->findMostRecentFeedback($assessable);
+        if(!$latestFeedback){
+            return true;
+        }
+        return $latestResponse->getUpdatedAt() > $latestFeedback->getUpdatedAt();
+    }
 
     /**
      * This Participant received a Feedback for the $assessable
@@ -128,9 +120,8 @@ class Participant
      */
     public function isAssessableMarked(IAssessable $assessable)
     {
-        $outcome = $this->assessableFeedbackTraversal($assessable, self::TRAVERSAL_MARKED);
-
-        return $outcome !== null;
+        $feedbacks = $this->findAllFeedbackForAssessable($assessable);
+        return count($feedbacks) > 0;
     }
 
     /**
@@ -141,32 +132,9 @@ class Participant
      */
     public function isAssessablePublished(IAssessable $assessable)
     {
-        $outcome = $this->assessableFeedbackTraversal($assessable, self::TRAVERSAL_PUBLISHED);
-
-        return $outcome !== null;
+        return $this->findMostRecentPublishedFeedback($assessable) instanceof IFeedback;
     }
 
-    /**
-     * Find the most recent published IFeedback for an IAssessable for this Participant
-     *
-     * @param IAssessable $assessable
-     * @return null|IFeedback
-     */
-    public function findMostRecentPublishedFeedback(IAssessable $assessable)
-    {
-        return $this->assessableFeedbackTraversal($assessable, self::TRAVERSAL_PUBLISHED);
-    }
-
-    /**
-     * Find the most recent IFeedback for an IAssessable for this Participant
-     *
-     * @param IAssessable $assessable
-     * @return null|IFeedback
-     */
-    public function findMostRecentFeedback(IAssessable $assessable)
-    {
-        return $this->assessableFeedbackTraversal($assessable, self::TRAVERSAL_MARKED);
-    }
 
     /**
      * @param IAssessable $assessable
@@ -187,171 +155,103 @@ class Participant
     }
 
     /**
-     * Finds the latest Feedback which determined whether an IAssessable was
-     * marked or published based on the $type arg.
-     *
-     * A unified traversal of Feedbacks for the $assessable for this Participant
-     *
-     * This should probably be rammed away into its own class, as there will be
-     * a lot of traversals coming up IMHO
+     * Find the most recent IFeedback for an IAssessable for this Participant
      *
      * @param IAssessable $assessable
-     * @param $type
-     * @return IFeedback|null
+     * @return null|IFeedback
      */
-    private function assessableFeedbackTraversal(IAssessable $assessable, $type)
+    public function findMostRecentFeedback(IAssessable $assessable)
     {
-        $outcome = null;
+        return $this->getMostRecentFeedback($assessable, false);
+    }
 
-        $numResponses = $this->findAllResponsesForAssessable($assessable)->count();
-        $numFeedbacks = $this->findAllFeedbackForAssessable($assessable)->count();
+    /**
+     * Find the most recent published IFeedback for an IAssessable for this Participant
+     *
+     * @param IAssessable $assessable
+     * @return null|IFeedback
+     */
+    public function findMostRecentPublishedFeedback(IAssessable $assessable)
+    {
+        return $this->getMostRecentFeedback($assessable, true);
+    }
 
-        /* No Responses, No Feedback >>> not marked
-         */
-        if (!$numResponses && !$numFeedbacks) {
-            $outcome = null;
-        } /* At least one Response, No Feedback >>> not marked
-         */
-        elseif ($numResponses && !$numFeedbacks) {
-            $outcome = null;
-        } /* No Responses, at least one Feedback >>> marked
-         */
-        elseif (!$numResponses && $numFeedbacks) {
+    /**
+     * Find the most recent published IFeedback for an IAssessable for this Participant
+     *
+     * Consider following scenario for DueWork.
+     * * Student submits $response1 in 2010 and receives $feedback1 on it in 2014.
+     * * Student submits $response2 in 2011 and receives $feedback2a on it in 2011 and $feedback2b in 2012
+     * * Student submits $response3 in 2013
+     * * Teacher provides floating $feedback 4 in 2010
+     *
+     * In this case, the authoritative feedback is the floating $feedback in 2010,
+     * even though is predates the linked $feedback2b of 2012 and linked $feedback1 pf 2014.
+     *
+     * If no floating feedback exists, we would fall back to the latest feedback on the latest
+     * response, ie $feedback2b. Even though it predates $feedback1.
+     *
+     * Need to also apply the $publishedOnly filter to all traversals.
+     *
+     * @param IAssessable $assessable
+     * @param bool $publishedOnly
+     * @return null|IFeedback
+     */
+    private function getMostRecentFeedback(IAssessable $assessable, $publishedOnly)
+    {
+        /** @var IFeedback $mostRecentFloatingFeedback */
+        $mostRecentFloatingFeedback = null;
 
-            /** @var IFeedback $latestFeedback */
-            $allFeedbacks = $this->findAllFeedbackForAssessable($assessable);
-            $latestFeedback = $allFeedbacks->first();
-
-            /* Compare to see whether $latestFeedback matches $type requirement
-             */
-            if ($type == self::TRAVERSAL_PUBLISHED) {
-                foreach ($allFeedbacks as $currentFeedback) {
-                    if ($currentFeedback->isPublished() && $currentFeedback->getPublishedAt()->gt($latestFeedback->getUpdatedAt())) {
-                        $latestFeedback = $currentFeedback;
+        foreach ($this->findAllFeedbackForAssessable($assessable) as $feedback) {
+            if (!$publishedOnly || $feedback->isPublished()) {
+                if(!$feedback->getResponse() instanceof IResponse){
+                    if (!$mostRecentFloatingFeedback || $feedback->getUpdatedAt()->gt($mostRecentFloatingFeedback->getUpdatedAt())) {
+                        $mostRecentFloatingFeedback = $feedback;
                     }
-                }
-
-                if ($latestFeedback->isPublished()) {
-                    return $latestFeedback;
-                }
-
-                return null;
-            } else {
-                if ($type == self::TRAVERSAL_MARKED) {
-                    foreach ($allFeedbacks as $currentFeedback) {
-
-                        /* In case publishAt is actually more recent than updatedAt value
-                         */
-                        $mostRecentDatetime = $latestFeedback->getUpdatedAt();
-
-                        /* Find the most recent datetime of $latestFeedback
-                         * by comparing its updatedAt to its publishedAt (if any)
-                         */
-                        if ($latestFeedback->isPublished() && $latestFeedback->getPublishedAt()->gt($latestFeedback->getUpdatedAt())) {
-                            $mostRecentDatetime = $latestFeedback->getPublishedAt();
-                        }
-
-                        /* Compare this datetime against currentFeedback's
-                         * publishAt and updatedAt to see which one is more recent
-                         */
-                        if ($currentFeedback->isPublished()) {
-                            if ($currentFeedback->getPublishedAt()->gt($mostRecentDatetime)) {
-                                $latestFeedback = $currentFeedback;
-                            }
-                        } else {
-                            if ($currentFeedback->getUpdatedAt()->gt($mostRecentDatetime)) {
-                                $latestFeedback = $currentFeedback;
-                            }
-                        }
-                    }
-
-                    return $latestFeedback;
                 }
             }
+        }
 
-            return null;
-        } /* Time to inspect the stacks
-         */
-        else {
+        if($mostRecentFloatingFeedback){
+            return $mostRecentFloatingFeedback;
+        }
 
-            /** @var IResponse $latestResponse */
-            $allResponses = $this->findAllResponsesForAssessable($assessable);
-            $latestResponse = $allResponses->first();
+        /** @var IResponse $latestResponseWithFeedback */
+        $latestResponseWithFeedback = null;
 
-            /** @var IFeedback $latestFeedback */
-            $allFeedbacks = $this->findAllFeedbackForAssessable($assessable);
-            $latestFeedback = $allFeedbacks->first();
-
-            /* Find the most recent Response
-             *
-             * @var IResponse $currentResponse
-             */
-            foreach ($allResponses as $currentResponse) {
-                if ($currentResponse->getUpdatedAt()->gt($latestResponse->getUpdatedAt())) {
-                    $latestResponse = $currentResponse;
-                }
-            }
-
-            /* Find the most recent feedback
-             * Compare to see which one is the most recent action to occur
-             */
-            if ($type == self::TRAVERSAL_PUBLISHED) {
-                foreach ($allFeedbacks as $currentFeedback) {
-                    if ($currentFeedback->isPublished()) {
-
-                        /* Look to the future!
-                         * Make sure this feedback is more recent than the previously-known latest feedback
-                         * Make sure this feedback is more recent than the response
-                         */
-                        if ($currentFeedback->getPublishedAt()->gt($latestFeedback->getPublishedAt()) && $currentFeedback->getPublishedAt()->gt($latestResponse->getUpdatedAt())) {
-                            $latestFeedback = $currentFeedback;
+        foreach($this->findAllResponsesForAssessable($assessable) as $response){
+            if(!$latestResponseWithFeedback || $response->getUpdatedAt()->gt($latestResponseWithFeedback->getUpdatedAt())){
+                if(!$publishedOnly){
+                    if(count($response->getAllFeedback())){
+                        $latestResponseWithFeedback = $response;
+                    }
+                } else {
+                    foreach($response->getAllFeedback() as $feedback){
+                        if($feedback->isPublished()){
+                            $latestResponseWithFeedback = $response;
+                            break;
                         }
                     }
                 }
-
-                /* Check in case the first one is the most recent anyway
-                 * and that it is also actually published
-                 */
-                if ($latestFeedback->isPublished()) {
-                    return $latestFeedback;
-                }
-
-                return null;
-            } else {
-                if ($type == self::TRAVERSAL_MARKED) {
-                    foreach ($allFeedbacks as $currentFeedback) {
-
-                        /* In case publishAt is actually more recent than updatedAt value
-                         */
-                        $mostRecentDatetime = $latestFeedback->getUpdatedAt();
-
-                        /* Find the most recent datetime of $latestFeedback
-                         * by comparing its updatedAt to its publishedAt (if any)
-                         */
-                        if ($latestFeedback->isPublished() && $latestFeedback->getPublishedAt()->gt($latestFeedback->getUpdatedAt())) {
-                            $mostRecentDatetime = $latestFeedback->getPublishedAt();
-                        }
-
-                        /* Compare this datetime against currentFeedback's
-                         * publishAt and updatedAt to see which one is more recent
-                         */
-                        if ($currentFeedback->isPublished()) {
-                            if ($currentFeedback->getPublishedAt()->gt($mostRecentDatetime)) {
-                                $latestFeedback = $currentFeedback;
-                            }
-                        } elseif ($currentFeedback->getUpdatedAt()->gt($mostRecentDatetime)) {
-                            $latestFeedback = $currentFeedback;
-                        }
-                    }
-
-                    return $latestFeedback;
-                }
             }
+        }
 
+        // No Response with Feedback?
+        if(!$latestResponseWithFeedback){
             return null;
         }
 
-        return $outcome;
+        /** @var IFeedback $mostRecentLinkedFeedback */
+        $mostRecentLinkedFeedback = null;
+
+        foreach($latestResponseWithFeedback->getAllFeedback() as $feedback){
+            if (!$publishedOnly || $feedback->isPublished()) {
+                if (!$mostRecentLinkedFeedback || $feedback->getUpdatedAt()->gt($mostRecentLinkedFeedback->getUpdatedAt())) {
+                    $mostRecentLinkedFeedback = $feedback;
+                }
+            }
+        }
+        return $mostRecentLinkedFeedback;
     }
 
     /* Getters/Setters
