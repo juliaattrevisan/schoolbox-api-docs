@@ -39,6 +39,12 @@ trait TestTrait
     protected function setUp()
     {
         $this->translator = new Translator(new MarkSchemeFactory());
+        $this->translator
+            ->addSubTranslator(new Translator\Task())
+            ->addSubTranslator(new Translator\DueWork())
+            ->addSubTranslator(new Translator\Quiz())
+            ->addSubTranslator(new Translator\Project($this->translator))
+        ;
 
         // Test users
         $this->teacher1 = (new User())

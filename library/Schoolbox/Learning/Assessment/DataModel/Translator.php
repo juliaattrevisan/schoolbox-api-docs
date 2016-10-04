@@ -37,15 +37,25 @@ class Translator
 
     /**
      * Constructor
+     *
+     * @param MarkSchemeFactory $markSchemeFactory
      */
     public function __construct(MarkSchemeFactory $markSchemeFactory)
     {
-        // TODO inject all of this
         $this->markSchemeFactory = $markSchemeFactory;
-        $this->subTranslators[]  = new Translator\Task();
-        $this->subTranslators[]  = new Translator\Quiz();
-        $this->subTranslators[]  = new Translator\DueWork();
-        $this->subTranslators[]  = new Translator\Project($this);
+    }
+
+    /**
+     * Adds a sub-translator which is able to handle a particular variant of
+     * IAssessable or IAssessableDataModel.
+     *
+     * @param IAssessmentTypeTranslator $subTranslator
+     * @return static
+     */
+    public function addSubTranslator(IAssessmentTypeTranslator $subTranslator)
+    {
+        $this->subTranslators[] = $subTranslator;
+        return $this;
     }
 
     /**

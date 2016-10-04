@@ -23,19 +23,27 @@ function assertEquals($value1, $value2) {
     assert($value1 == $value2, sprintf('"%s" != "%s"', $value1, $value2));
 }
 
+// Mapper for assessables, and its required translator
+$translator = new \Schoolbox\Learning\Assessment\DataModel\Translator(
+    new \Schoolbox\Learning\MarkScheme\Factory()
+);
+$translator
+    ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\Task())
+    ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\DueWork())
+    ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\Quiz())
+    ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\Project($translator))
+;
+$mapper = new \Schoolbox\Learning\Assessment\DataModel\MapperProxy(
+    \Schoolbox\Learning\Assessment\DataModel\Mapper::getInstance(),
+    $translator
+);
+
 
 /**
  * Tasks
  */
 
 // Create a task
-$mapper = new \Schoolbox\Learning\Assessment\DataModel\MapperProxy(
-    \Schoolbox\Learning\Assessment\DataModel\Mapper::getInstance(),
-    new \Schoolbox\Learning\Assessment\DataModel\Translator(
-        new \Schoolbox\Learning\MarkScheme\Factory()
-    )
-);
-
 $task = (new Task())
     // Generic fields
     ->setCreator((new \Schoolbox\User())->setId(3))
