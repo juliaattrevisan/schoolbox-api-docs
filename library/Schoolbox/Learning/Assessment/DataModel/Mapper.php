@@ -14,7 +14,10 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Assessment\Course\TaskMapper;
 use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
  * Class Mapper
@@ -85,8 +88,43 @@ class Mapper extends BaseMapper
         );
 
         // folder (by assessment_folder table)
+        $this->joinsVia(
+            'assessment_folder',
+            FolderMapper::class,
+            'id',
+            'folder_id',
+            'assessment_id',
+            'id',
+            self::TYPE_MODEL,
+            null,
+            'folder'
+        );
+
         // unit specification (by assessment_course_unit_specification table)
+        $this->joinsVia(
+            'assessment_course_unit_specification',
+            UnitSpecificationMapper::class,
+            'id',
+            'course_unit_specification_id',
+            'assessment_id',
+            'id',
+            self::TYPE_MODEL,
+            null,
+            'unitSpecification'
+        );
+
         // unit implementation (by assessment_course_unit_implementation table)
+        $this->joinsVia(
+            'assessment_course_unit_implementation',
+            UnitImplementationMapper::class,
+            'id',
+            'course_unit_implementation_id',
+            'assessment_id',
+            'id',
+            self::TYPE_MODEL,
+            null,
+            'unitImplementation'
+        );
     }
 
     /**
@@ -103,12 +141,18 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('task', 't')},
                 {$this->getJoinColumnString('duework', 'd')},
                 {$this->getJoinColumnString('quiz', 'q')},
-                {$this->getJoinColumnString('project', 'p')}
+                {$this->getJoinColumnString('project', 'p')},
+                {$this->getJoinColumnString('assessment_folder', 'f')},
+                {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
+                {$this->getJoinColumnString('assessment_course_unit_implementation', 'ui')}
             FROM {$this->getDatabase()->quoteIdentifier($this->getTable())}
             LEFT JOIN {$this->getJoinSql('task', '', 't')}
             LEFT JOIN {$this->getJoinSql('duework', '', 'd')}
             LEFT JOIN {$this->getJoinSql('quiz', '', 'q')}
             LEFT JOIN {$this->getJoinSql('project', '', 'p')}
+            LEFT JOIN {$this->getJoinSql('assessment_folder', '', 'f')}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_specification', '', 'us')}
+            LEFT JOIN {$this->getJoinSql('assessment_course_unit_implementation', '', 'ui')}
         ";
     }
 
@@ -155,6 +199,17 @@ class Mapper extends BaseMapper
             } else {
                 $model->setProject(null);
             }
+
+            // Context (whatever it might be)
+            $context = null;
+            if ($row['f.id']) {
+                $context = $this->hydrateJoin($row, 'assessment_folder', 'f');
+            } elseif ($row['us.id']) {
+                $context = $this->hydrateJoin($row, 'assessment_course_unit_specification', 'us');
+            } elseif ($row['ui.id']) {
+                $context = $this->hydrateJoin($row, 'assessment_course_unit_implementation', 'ui');
+            }
+            $model->setAssessmentContext($context);
 
             $modelList->add($model);
         }
