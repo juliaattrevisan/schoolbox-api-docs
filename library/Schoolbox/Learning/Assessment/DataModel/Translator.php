@@ -90,7 +90,7 @@ class Translator
             ->setDeletedAt($assessment->getDeletedAt())
         ;
 
-        // Translate assessable's context?
+        // Translate assessment context
         // TODO consider moving this to a translator
         $context = $assessment->getAssessmentContext();
         if ($context instanceof Folder) {
@@ -157,6 +157,18 @@ class Translator
             ->setUpdatedAt($dataModel->getAssessmentModel()->getUpdatedAt())
             ->setDeletedAt($dataModel->getAssessmentModel()->getDeletedAt())
         ;
+
+        // Translate assessment context
+        // TODO consider moving this to a translator
+        $context = $dataModel->getAssessmentModel()->getAssessmentContext();
+        if ($context instanceof Folder) {
+            $assessable->setAssessmentContext($context);
+        } elseif ($context instanceof UnitSpecificationModel) {
+            $assessable->setAssessmentContext((new UnitSpecification())->setId($context->getId()));
+        } elseif ($context instanceof UnitImplementationModel) {
+            $assessable->setAssessmentContext((new UnitImplementation())->setId($context->getId()));
+        }
+
         return $assessable;
     }
 }
