@@ -1136,17 +1136,29 @@ class Controller extends Base\Base
      */
     public function importOwnership()
     {
-        $ownerships = $this->getRequest()->post["ownership"];
-        $courseHomepage = trim($this->getRequest()->post["importCourse"]);
+        $ownerships  = $this->getRequest()->post["ownership"];
+        $courseId    = trim($this->getRequest()->post["importCourse"]);
         $componentId = trim($this->getRequest()->post["componentId"]);
+
+        $unitSpecs = $this->getUnitSpecificationMapperProxy()->findAllByCourseId($courseId);
+
+        // build implementation objects from the specs
+        // this may seem a little redundant, but the "new import" and "modify import" screen are one, and so require consistent data models
+        $unitImplFactory = new Course\Unit\ImplementationFactory();
+
+        $unitImpls = new Collection();
+
+        foreach ($unitSpecs as $spec) {
+            $unitImpls->add($unitImplFactory->build($spec));
+        }
 
         // process ownership assignments
         // respond with stage 3: unit selection
         $this->tpl('unitImportForm', [
             'homepage' => implode(',', array_keys($ownerships)),
-            'courseHomepage' => $courseHomepage,
+            'courseHomepage' => $courseId,
             'componentId'    => $componentId,
-            'units'          => $this->getUnitSpecificationMapperProxy()->findAllByCourseFolderId($courseHomepage),
+            'units'          => $unitImpls,
             'ownerships'     => implode(',', array_map(
                     function ($k, $v) { return "$k:$v"; }, array_keys($ownerships), array_values($ownerships))
             )

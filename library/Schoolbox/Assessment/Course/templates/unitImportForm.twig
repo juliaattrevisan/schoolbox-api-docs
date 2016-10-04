@@ -46,7 +46,7 @@
 
             {% for unit in units %}
                 <li>
-                    <input name="unit[{{ loop.index }}][unit_id]" type="hidden" value="{{ unit.id }}" />
+                    <input name="unit[{{ loop.index }}][unit_id]" type="hidden" value="{{ unit.specification.id }}" />
 
                     <div class="list-item" data-type="unit_row">
 
@@ -65,7 +65,7 @@
                                    value="1"
                                    data-interaction="enable" />
                             <label for="import-{{ loop.index }}" class="checkbox-label">
-                                {{ unit.name }}
+                                {{ unit.title }}
                                 {% if not isUnitCheckable %}
                                     <span data-tooltip class="has-tip hint" title="This unit's course builder component has been deleted - its tasks may not be modified here.">?</span>
                                 {% endif %}
