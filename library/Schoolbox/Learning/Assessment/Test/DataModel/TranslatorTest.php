@@ -12,6 +12,11 @@ use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * Tests for the assessment data model translator.
@@ -104,5 +109,56 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $dataModel = (new TaskModel())->setId(15);
         $this->translator->translateToDomainModel($dataModel);
+    }
+
+    /**
+     * Data for assessment context tests.
+     *
+     * @return array
+     */
+    public function getTranslateAssessmentContextToDataModelData()
+    {
+        return [
+            [
+                (new Task())
+                    ->setAssessmentContext((new Folder())->setId(1))
+                    ->setId(1)
+                    ->setCreator($this->teacher1),
+                Folder::class,
+                1
+            ],
+            [
+                (new Task())
+                    ->setAssessmentContext((new UnitSpecification())->setId(3))
+                    ->setId(1)
+                    ->setCreator($this->teacher1),
+                UnitSpecificationModel::class,
+                3
+            ],
+            [
+                (new Task())
+                    ->setAssessmentContext((new UnitImplementation())->setId(6))
+                    ->setId(1)
+                    ->setCreator($this->teacher1),
+                UnitImplementationModel::class,
+                6
+            ],
+        ];
+    }
+
+    /**
+     * Test translation of assessment context to data model.
+     *
+     * @dataProvider getTranslateAssessmentContextToDataModelData
+     *
+     * @param IAssessable $assessment
+     * @param string      $contextClass
+     * @param int         $contextId
+     */
+    public function testTranslateAssessmentContextToDataModel(IAssessable $assessment, $contextClass, $contextId)
+    {
+        $assessmentModel = $this->translator->translateToDataModel($assessment, 1)->getAssessmentModel();
+        $this->assertInstanceOf($contextClass, $assessmentModel->getAssessmentContext());
+        $this->assertEquals($contextId, $assessmentModel->getAssessmentContext()->getId());
     }
 }
