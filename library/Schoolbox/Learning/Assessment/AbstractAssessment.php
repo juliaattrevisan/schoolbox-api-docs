@@ -254,29 +254,15 @@ abstract class AbstractAssessment implements IAssessable
     {
         $participant = $this->getParticipant($user);
 
-        /* Get the Mark that was Published
-         */
-        if ($publishedOnly) {
-            $feedback = $participant->findMostRecentPublishedFeedback($this);
-        }
-        /* Otherwise just use the latest Feedback's current Mark value
-         */
-        else {
-            $feedback = $participant->findMostRecentFeedback($this);
-        }
+        $feedback = $publishedOnly
+            ? $participant->findMostRecentPublishedFeedback($this)
+            : $participant->findMostRecentFeedback($this);
 
-        /* If you're after the Normalised numeric mark
-         */
-        if ($normalised) {
-            if ($feedback) {
-                return $feedback->getNormalisedMark();
-            }
+        if($feedback){
+            return $normalised
+                ? $feedback->getNormalisedMark()
+                : $feedback->getHumanReadableMark();
         }
-
-        if ($feedback) {
-            return $feedback->getHumanReadableMark();
-        }
-
         return null;
     }
 
@@ -293,6 +279,38 @@ abstract class AbstractAssessment implements IAssessable
         return $this->getAllParticipants()->count();
     }
 
+
+
+    /**
+     * Returns the number of Participants who have Responses to this Assessment
+     *
+     * @return int
+     */
+    public function numSubmitted()
+    {
+        $num = 0;
+        foreach ($this->getAllParticipants() as $currentParticipant) {
+            if (count($currentParticipant->findAllResponsesForAssessable($this))) {
+                $num++;
+            }
+        }
+        return $num;
+    }
+
+    /**
+     * Returns what percentage of Participants have Responses to this Assessment
+     *
+     * @return float
+     */
+    public function getPercentageSubmitted()
+    {
+        $numParticipants = $this->numParticipants();
+        if(!$numParticipants){
+            return 0;
+        }
+        return 100 * ($this->numSubmitted() / $numParticipants);
+    }
+
     /**
      * @inheritdoc
      *
@@ -301,14 +319,11 @@ abstract class AbstractAssessment implements IAssessable
     public function numMarked()
     {
         $num = 0;
-
-        /** @var Participant $currentParticipant */
         foreach ($this->getAllParticipants() as $currentParticipant) {
             if ($currentParticipant->isAssessableMarked($this)) {
                 $num++;
             }
         }
-
         return $num;
     }
 
@@ -324,6 +339,26 @@ abstract class AbstractAssessment implements IAssessable
         return 100 * ($this->numMarked() / $numParticipants);
     }
 
+    public function numMarkingRequired()
+    {
+        $num = 0;
+        foreach ($this->getAllParticipants() as $participant) {
+            if ($participant->isMarkingRequired($this)) {
+                $num++;
+            }
+        }
+        return $num;
+    }
+
+    public function getPercentageMarkingRequired()
+    {
+        $numParticipants = $this->numParticipants();
+        if(!$numParticipants){
+            return 0;
+        }
+        return 100 * ($this->numMarkingRequired() / $numParticipants);
+    }
+
     /**
      * @inheritdoc
      */
@@ -331,7 +366,6 @@ abstract class AbstractAssessment implements IAssessable
     {
         $num = 0;
 
-        /** @var Participant $currentParticipant */
         foreach ($this->getAllParticipants() as $currentParticipant) {
             if ($currentParticipant->isAssessablePublished($this)) {
                 $num++;

@@ -87,6 +87,20 @@ interface IAssessable extends ISoftDeletable
     public function numParticipants();
 
     /**
+     * Returns what percentage of Participants have Responses to this Assessment
+     *
+     * @return float
+     */
+    public function getPercentageSubmitted();
+
+    /**
+     * Returns the number of Participants who have Responses to this Assessment
+     *
+     * @return int
+     */
+    public function numSubmitted();
+
+    /**
      * Calculate how many IAssessable instances have a non-null mark value
      *
      * The most recent action determines the marked/not-marked state of
@@ -120,6 +134,22 @@ interface IAssessable extends ISoftDeletable
      * @return float
      */
     public function getPercentageMarked();
+
+    /**
+     * How many Participants have Responses that require marking.
+     *
+     * @return int
+     */
+    public function numMarkingRequired();
+
+    /**
+     * What percentage of Participants have Responses that require marking.
+     *
+     * This does not always equate to 100 - getPercentageMarked()
+     *
+     * @return float
+     */
+    public function getPercentageMarkingRequired();
 
     /**
      * Calculate the number of Feedbacks that have been Published
