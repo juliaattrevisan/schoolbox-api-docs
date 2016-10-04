@@ -7,7 +7,7 @@ UPDATE task_instance_completion c
 SET task_id = (
     SELECT t.id
     FROM task_instance i
-    LEFT JOIN task t ON i.tasK_id = t.id
+    LEFT JOIN task t ON i.task_id = t.id
     WHERE c.task_instance_id = i.id
 );
 
