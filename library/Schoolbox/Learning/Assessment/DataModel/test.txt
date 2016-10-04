@@ -19,8 +19,12 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
  * @param mixed $value1
  * @param mixed $value2
  */
-function assertEquals($value1, $value2) {
-    assert($value1 == $value2, sprintf('"%s" != "%s"', $value1, $value2));
+function assertEquals($value1, $value2)
+{
+    $backtrace = debug_backtrace();
+    $origin    = $backtrace[0];
+    var_dump(sprintf('%d: %s(%s, %s)', $origin['line'], $origin['function'], $value1, $value2));
+    assert($value1 == $value2);
 }
 
 // Mapper for assessables, and its required translator
