@@ -1,1 +1,120 @@
-<h1>TODO - pendingAssessments.twig</h1>
+{% import 'sub/breadcrumbs.twig' as breadcrumbs %}
+
+<!-- BEGIN custom_head -->
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
+<!-- END custom_head -->
+
+<ul class="breadcrumb">
+    <li><a href="/">Schoolbox</a></li>
+    <li class="active"><a href="/pendingAssessments" title="Pending Assessments">Pending Assessments</a></li>
+</ul>
+
+<div class="row">
+    <div class="small-12 columns"><h1>Pending Assessments</h1></div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns island">
+        <h2 class="subheader">Stuff you need to mark</h2>
+        <section>
+            <div class="content collapsible">
+                <div class="small-6 columns no-pad">
+                    <h3 data-collapser="optional-1" class="icon-down-arrow">Assessment Title</h3>
+                    {{ breadcrumbs.basic(
+                        [ 'Course Title',    routeLookup('sportsfixtures.getLanding') ],
+                        [ 'Class Title',      routeLookup('sportsfixturesSport.getList') ],
+                        [ sport.name,    routeLookup('sportsfixturesSport.getEntity', { entityId: sport.id }) ],
+                        [ division.name | default(action ~ ' Unit Title') ]
+                    ) }}
+                </div>
+                <div class="small-4 columns hide-for-small-only">
+                    <div class="progress">
+                        <span class="meter" style="width:70%"></span>
+                        <span class="pipe-meter" style="left: 30%"></span>
+                    </div>
+                </div>
+                <div class="small-6 medium-2 columns text-center">
+                    <p>2 unmarked</p>
+                </div>
+                <ul class="information-list hide" data-collapsable="optional-1" data-collapse-state="collapsed">
+                    <li>
+                        <a class="link-row">
+                            <div class="compact card small-6">
+                                <img src="/portrait.php?userId=8&amp;size=square64" alt="View Submission">
+                                <h3>Anita Saxon</h3>
+                            </div>
+                            <div class="small-6 columns">
+                                <p>Submitted yesterday</p>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="link-row">
+                            <div class="compact card small-6">
+                                <img src="/portrait.php?userId=8&amp;size=square64" alt="View Submission">
+                                <h3>Anita Saxon</h3>
+                            </div>
+                            <div class="small-6 columns">
+                                <p>Submitted yesterday</p>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <h2 class="subheader">Stuff you need to chase</h2>
+        <section>
+            <div class="content collapsible">
+                <div class="small-6 columns no-pad">
+                    <h3 data-collapser="optional-2" class="icon-down-arrow">Assessment Title</h3>
+                    <p class="meta">Course Title &rsaquo; Class Title &rsaquo; Unit Title</p>
+                </div>
+                <div class="small-4 columns hide-for-small-only">
+                    <div class="progress">
+                        <span class="meter" style="width:70%"></span>
+                        <span class="pipe-meter" style="left: 0%"></span>
+                    </div>
+                </div>
+                <div class="small-6 medium-2 columns text-center">
+                    <p>2 unmarked</p>
+                </div>
+                <ul class="information-list hide" data-collapsable="optional-2" data-collapse-state="collapsed">
+                    <li>
+                        <a class="link-row">
+                            <div class="compact card small-6">
+                                <img src="/portrait.php?userId=8&amp;size=square64" alt="View Submission">
+                                <h3>Anita Saxon</h3>
+                            </div>
+                            <div class="small-6 columns">
+                                <p>Submitted yesterday</p>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="link-row">
+                            <div class="compact card small-6">
+                                <img src="/portrait.php?userId=8&amp;size=square64" alt="View Submission">
+                                <h3>Anita Saxon</h3>
+                            </div>
+                            <div class="small-6 columns">
+                                <p>Submitted yesterday</p>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="component-action" data-collapsable="optional-2" data-collapse-state="collapsed" style="display: none;">
+                <section>
+                    <a class="button">Email all</a>
+                </section>
+            </div>
+        </section>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $('[data-collapser]').collapsable();
+    });
+</script>

@@ -314,3 +314,19 @@
 		margin-bottom: rem-calc(($base-font-size - 10));
 	}
 }
+
+.link-row{
+	// because .card floats
+	float: left;
+	width: 100%;
+	&:after{
+		content: "\e64b";
+		position: absolute;
+		right: 1rem;
+		top: 50%;
+		margin-top: -12px;
+	}
+	&:hover{
+		background-color: $content-ui-hover;
+	}
+}
