@@ -5,21 +5,67 @@
 {% include '@learningAssessment/fragments/dates.twig' %}
 
 <input type="hidden" name="assessmentType" value="{{ types.fromTitle('task') }}" />
+<input type="hidden" name="type" value="{% if reveal.url %}url{% else %}attach{% endif %}"/>
 
-<div class="row">
-    <div class="small-12 columns">
-        <label>
-            Url
-            <input name="url" type="text" placeholder="Url">
-        </label>
+<script type="text/javascript">
+    $(function() {
+        $('#taskEditor').on('click', '[data-attachment] a[data-value]', function() {
+            var container = $('#assessmentForm');
+            var anchor = $(this);
+            var type = anchor.attr('data-value');
+
+            /**
+             * Clears all the attachments out of the form.
+             */
+            var clearAttachments = function() {
+                container.find('.attachzone').data('plugin_resourceAttach').dropzone.removeAllFiles();
+            };
+
+            /* Remember the option we selected
+             */
+            $('#taskEditor').find('input[name=type]').val(type);
+
+            {# show only the one we want -#}
+            var attachers = $('#taskEditor').find('[data-attachment]');
+            attachers.hide().filter('[data-attachment="'+type+'"]').show();
+
+            $('#taskEditor').find('input[name=url]').val('').prop('readonly', type == 'attach');
+
+            if (type == 'url') {
+                {#
+                    tell the attacher to clear any attachments by simulating clicking of all the (one...) delete buttons
+                    not jQuery.detach() - it can't trigger dropzone's event listener
+                -#}
+                clearAttachments();
+            }
+        });
+    });
+</script>
+
+<div id='taskEditor'>
+    <div class="row" {% if assessment.url|length %}style="display:none"{% endif %} data-attachment="attach">
+        <div class="small-9 medium-10 columns">
+            <label>Attach Files</label>
+
+            <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+            {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+        </div>
+        <div class="small-3 medium-2 columns no-pad">
+            <label>&nbsp;</label>
+            <a class='button icon-link' data-value='url'>Link</a>
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="small-12 columns">
-        <label>Attach Files</label>
-
-        <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
-        {% include 'sub/attachzone.twig' with { attachzone: attachzone } %}
+    <div class="row" {% if not assessment.url|length %}style="display:none"{% endif %} data-attachment="url">
+        <div class="small-9 medium-10 columns">
+            <label>
+                Link
+                <input type='text' name='url' maxlength='1024' placeholder="http://" value="{{ assessment.url }}" />
+            </label>
+        </div>
+        <div class="small-3 medium-2 columns no-pad">
+            <label>&nbsp;</label>
+            <a class='button icon-attach' data-value='attach'>Attach</a>
+        </div>
     </div>
 </div>
 
