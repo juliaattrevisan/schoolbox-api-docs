@@ -717,17 +717,16 @@ var_dump('time: '.(microtime(true)-$start));
         // Get Task Completions for all selected students
         $query = "
             SELECT 
-                t.assessment_id          AS 't.assessment_id',
+                t.assessment_id         AS 't.assessment_id',
                 ti.requires_confirmation AS 'ti.requires_confirmation',
                 tic.id                   AS 'tic.id',
                 tic.student_id           AS 'tic.student_id',
                 tic.marking_user_id      AS 'tic.marking_user_id',
                 tic.completion_date      AS 'tic.completion_date'
             FROM task t
-            JOIN task_instance ti             ON ti.task_id = t.id
+            JOIN task_instance ti ON ti.task_id = t.id AND ti.deleted_at IS NULL
             JOIN task_instance_completion tic ON tic.task_instance_id = ti.id
             WHERE t.deleted_at IS NULL
-            AND ti.deleted_at IS NULL
             AND t.assessment_id IN (" . implode(',', $this->taskAssessmentIds) . ") 
             AND tic.student_id IN (" . implode(',', $this->studentInternalIds) . ")
         ";
@@ -907,7 +906,7 @@ var_dump('time: '.(microtime(true)-$start));
             $userId = $row['tic.student_id'];
             $response = new TaskCompletion();
             $response->setId($row['tic.id']);
-            $response->setSubmittedBy($this->studentIntCache[$row['tic.student_id']]);
+            $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setAssessable($task);
             $response->setUpdatedAt($this->getFastDateFromString($row['tic.completion_date']));
 
@@ -995,7 +994,9 @@ var_dump('time: '.(microtime(true)-$start));
             <th>Participants</th>
             <th>Responses</th>
             <th>Feedbacks</th>
-            <th>% Marked</th>
+            <th>%<br>Submitted</th>
+            <th>%<br>Marked</th>
+            <th>%<br>Marking<br>Required</th>
             <th>Needs Marking</th>
             <th>Needs Chasing</th>
         </tr>';
@@ -1004,12 +1005,12 @@ var_dump('time: '.(microtime(true)-$start));
             echo '<tr>';
             $folderId = $assessment->getContext()->getFolder()->getId();
             echo "<td><a href='/homepage/$folderId'>$folderId</a></td>\n";
-            echo "<td>{$assessment->getTitle()}</td>\n";
+            echo "<td>{$assessment->getTitle()} ({$assessment->getId()})</td>\n";
             echo "<td>{$assessment->getTypeName()}</td>\n";
             echo "<td>{$assessment->getDueAt()->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT)}</td>\n";
             echo "<td>";
             foreach($assessment->getAllParticipants() as $participant){
-                echo $participant->getUser()->getFirstname()." ".$participant->getUser()->getLastname().'<br>';
+                echo $participant->getUser()->getFirstname()." ".$participant->getUser()->getLastname()." (".$participant->getUser()->getId().')<br>';
             }
             echo "</td>";
             echo "<td>";
@@ -1022,10 +1023,12 @@ var_dump('time: '.(microtime(true)-$start));
                 echo ' F: '.count($participant->getAllFeedbacks()).'<br>';
             }
             echo "</td>";
-            echo "<td>{$assessment->getPercentageMarked()} %</td>\n";
+            echo "<td>".round($assessment->getPercentageSubmitted(),2)." %</td>\n";
+            echo "<td>".round($assessment->getPercentageMarked(),2)." %</td>\n";
+            echo "<td>".round($assessment->getPercentageMarkingRequired(),2)." %</td>\n";
             echo "<td>";
             foreach($assessment->getAllParticipants() as $participant){
-                if(count($participant->getAllResponses()) && !$participant->isAssessableMarked($assessment)){
+                if($participant->isMarkingRequired($assessment)){
                     echo $participant->getUser()->getFirstname()." ".$participant->getUser()->getLastname();
                 }
                 echo '<br>';
