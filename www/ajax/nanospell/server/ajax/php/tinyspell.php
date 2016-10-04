@@ -3,6 +3,7 @@
 $rawPostData = file_get_contents('php://input');
 $post        = json_decode($rawPostData);
 
+// Dictionaries, in order of preference
 // TODO figure out how dictionaries should be installed
 $dicts = [
     pspell_new('en', '', '', 'utf-8', PSPELL_FAST),
@@ -24,7 +25,13 @@ if ($post->method == 'spellcheck') {
         // Check each dictionary
         foreach ($dicts as $dict) {
             if (!pspell_check($dict, $word)) {
-                $corrections = array_merge($corrections, pspell_suggest($dict, $word));
+                // Only a small number of suggestions per dict
+                $suggestions = array_slice(pspell_suggest($dict, $word), 10);
+                // Are there any suggestions for this word? Use only this dictionary
+                if (!empty($suggestions)) {
+                    $corrections = array_merge($corrections, $suggestions);
+                    break;
+                }
             } else {
                 $correctInAnyLanguage = true;
                 break;
