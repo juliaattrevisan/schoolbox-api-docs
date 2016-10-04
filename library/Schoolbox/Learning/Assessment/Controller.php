@@ -186,9 +186,12 @@ class Controller extends Base
                 $this->getRequest()->post['openDate'] . ' ' . $this->getRequest()->post['openTime'],
                 $this->getRequest()->post['dueDate'] . ' ' . $this->getRequest()->post['dueTime'],
                 $this->getRequest()->post['closeDate'] . ' ' . $this->getRequest()->post['closeTime'],
+                $this->getRequest()->post['attachedFiles'],
                 $this->getRequest()->post['acceptOnline'],
                 $this->getRequest()->post['hasRubric'],
                 $this->getRequest()->post['hasMarkPerCapability'],
+                $this->getRequest()->post['hasSelfAssessed'],
+                $this->getRequest()->post['url'],
                 $this->getRequest()->post['summator']
             ))->produce();
         }
@@ -222,6 +225,8 @@ class Controller extends Base
             return;
         }
         else {
+            new \Alaress_Probe($assessment->isSelfAssessed(), $assessment->isTeacherAssessed(), $assessment->getUrl());
+            return;
             $this->getResponse()->redirect->to("/homepage/{$folder->getId()}");
         }
     }
@@ -452,9 +457,12 @@ class Controller extends Base
                 $this->getRequest()->post['openDate'] . ' ' . $this->getRequest()->post['openTime'],
                 $this->getRequest()->post['dueDate'] . ' ' . $this->getRequest()->post['dueTime'],
                 $this->getRequest()->post['closeDate'] . ' ' . $this->getRequest()->post['closeTime'],
-                $this->getRequest()->post['acceptSubmissions'],
+                $this->getRequest()->post['attachedFiles'],
+                $this->getRequest()->post['acceptOnline'],
                 $this->getRequest()->post['hasRubric'],
                 $this->getRequest()->post['hasMarkPerCapability'],
+                $this->getRequest()->post['hasSelfAssessed'],
+                $this->getRequest()->post['url'],
                 $this->getRequest()->post['summator']
             ))->produce();
         }

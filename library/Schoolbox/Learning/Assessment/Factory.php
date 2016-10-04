@@ -71,6 +71,11 @@ class Factory
     protected $closeAt;
 
     /**
+     * @var array
+     */
+    protected $attachedFiles = [];
+
+    /**
      * @var int
      */
     protected $acceptOnline = DueWork::ACCEPT_ONLINE_NONE;
@@ -84,6 +89,16 @@ class Factory
      * @var bool
      */
     protected $hasMarkPerCapability = false;
+
+    /**
+     * @var bool
+     */
+    protected $hasSelfAssessed = false;
+
+    /**
+     * @var string
+     */
+    protected $url;
 
     /**
      * @var int
@@ -101,13 +116,21 @@ class Factory
      * @param $openAt
      * @param $dueAt
      * @param $closeAt
-     * @param $acceptSubmissions
+     * @param $attachedFiles
+     * @param $acceptOnline
      * @param $hasRubric
      * @param $hasMarkPerCapability
+     * @param $hasSelfAssessed
+     * @param $url
      * @param $summator
      */
-    public function __construct($type, $title, $description, User $creator, $weight, $publishAt, $openAt, $dueAt, $closeAt, $acceptOnline, $hasRubric, $hasMarkPerCapability, $summator)
-    {
+    public function __construct(
+        $type, $title, $description, User $creator, $weight,
+        $publishAt, $openAt, $dueAt, $closeAt, $attachedFiles,
+        $acceptOnline, $hasRubric, $hasMarkPerCapability,
+        $hasSelfAssessed, $url,
+        $summator
+    ) {
         $this->setType($type);
         $this->setTitle($title);
         $this->setDescription($description);
@@ -118,15 +141,20 @@ class Factory
         $this->setDueAt(trim($dueAt));
         $this->setCloseAt(trim($closeAt));
 
+        /* Projects need this to instantiate
+         */
+        $this->setSummator($summator);
+
         /* Due Work needs this to instantiate correctly
          */
         $this->setAcceptOnline(trim($acceptOnline));
         $this->setHasRubric(trim($hasRubric));
         $this->setHasMarkPerCapability(trim($hasMarkPerCapability));
 
-        /* Projects need this to instantiate
+        /* Task needs this to instantiate correctly
          */
-        $this->setSummator($summator);
+        $this->setHasSelfAssessed($hasSelfAssessed);
+        $this->setUrl($url);
     }
 
     /**
@@ -217,9 +245,50 @@ class Factory
             ->setCreatedAt(\Alaress_Date_Format::now())
             ->setUpdatedAt(\Alaress_Date_Format::now());
 
+        /* TODO: Attach files to instance
+         */
+        foreach ($this->getAttachedFiles() as $currentFile) {
+            $assessment->getAttachedFiles()->add($currentFile);
+        }
+
         /* Verify that dates are temporally correct
          */
         if ($assessment->isValidDates()) {
+
+            /* TODO: Use Decorator pattern here, imho
+             */
+            switch($this->getType()) {
+                case Types::ASSESSMENT_PROJECT:
+                    /* TODO: Set project-specific attributes here
+                     */
+                    break;
+
+                case Types::ASSESSMENT_DUE_WORK:
+                    /* TODO: Set duework-specific attributes here
+                     */
+                    break;
+
+                case Types::ASSESSMENT_TASK:
+                    if ($this->getHasSelfAssessed()) {
+                        $assessment->selfAssessed();
+                    }
+                    else {
+                        $assessment->teacherAssessed();
+                    }
+
+                    $assessment->setUrl($this->getUrl());
+
+                    break;
+
+                case Types::ASSESSMENT_QUIZ:
+                    /* TODO: Set quiz-specific attributes here
+                     */
+                    break;
+
+                default:
+                    break;
+            }
+
             return $assessment;
         }
         else {
@@ -393,6 +462,25 @@ class Factory
     }
 
     /**
+     * @return array
+     */
+    protected function getAttachedFiles()
+    {
+        return $this->attachedFiles;
+    }
+
+    /**
+     * @param array $attachedFiles
+     */
+    protected function setAttachedFiles($attachedFiles)
+    {
+        $this->attachedFiles = $attachedFiles;
+    }
+
+    /* Due Work info
+     */
+
+    /**
      * @return int
      */
     protected function getAcceptOnline()
@@ -445,6 +533,44 @@ class Factory
         $this->hasMarkPerCapability = $hasMarkPerCapability;
         return $this;
     }
+
+    /* Task info
+     */
+
+    /**
+     * @return boolean
+     */
+    protected function getHasSelfAssessed()
+    {
+        return $this->hasSelfAssessed;
+    }
+
+    /**
+     * @param boolean $hasSelfAssessed
+     */
+    protected function setHasSelfAssessed($hasSelfAssessed)
+    {
+        $this->hasSelfAssessed = $hasSelfAssessed;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param string $url
+     */
+    protected function setUrl($url)
+    {
+        $this->url = $url;
+    }
+
+    /* Project info
+     */
 
     /**
      * @return int

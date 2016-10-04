@@ -60,6 +60,11 @@ abstract class AbstractAssessment implements IAssessable
     protected $closeAt;
 
     /**
+     * @var Collection
+     */
+    protected $attachedFiles;
+
+    /**
      * @var float
      */
     protected $weight;
@@ -109,6 +114,7 @@ abstract class AbstractAssessment implements IAssessable
     public function __construct()
     {
         $this->setAllParticipants(new Collection());
+        $this->setAttachedFiles(new Collection());
         $this->responses = new Collection();
         $this->feedbacks = new Collection();
     }
@@ -126,6 +132,9 @@ abstract class AbstractAssessment implements IAssessable
         /* Explicitly dump away all the Participants
          */
         $this->setAllParticipants(new Collection());
+
+        /* TODO: Dump away all the attached files?
+         */
 
         $this->setCreatedAt($this->getCreatedAt() instanceof \Alaress_Date_Format ? clone $this->getCreatedAt() : null);
         $this->setUpdatedAt($this->getUpdatedAt() instanceof \Alaress_Date_Format ? clone $this->getUpdatedAt() : null);
@@ -480,6 +489,22 @@ abstract class AbstractAssessment implements IAssessable
     {
         $this->closeAt = $closeAt;
         return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAttachedFiles()
+    {
+        return $this->attachedFiles;
+    }
+
+    /**
+     * @param Collection $attachedFiles
+     */
+    public function setAttachedFiles($attachedFiles)
+    {
+        $this->attachedFiles = $attachedFiles;
     }
 
     /**
