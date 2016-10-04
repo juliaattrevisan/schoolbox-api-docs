@@ -46,7 +46,8 @@
 
             {% for unit in units %}
                 <li>
-                    <input name="unit[{{ loop.index }}][unit_id]" type="hidden" value="{{ unit.specification.id }}" />
+                    <input name="unit[{{ loop.index }}][unit_spec_id]" type="hidden" value="{{ unit.specification.id }}" />
+                    <input name="unit[{{ loop.index }}][unit_impl_id]" type="hidden" value="{{ unit.id }}" />
 
                     <div class="list-item" data-type="unit_row">
 
