@@ -154,6 +154,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 		&:hover, &.focus {
 			width: 100%;
 			@include placeholder-color($black, $font-weight-normal);
+            padding-left: $tabbar-height;
 		}
 
 		/* Search icon in its idle state
@@ -564,7 +565,7 @@ $icon-nav-highlight-color: calc-text-color($tabbar-bg, $white, contrast-bg($back
 	}
 }
 
-// Large down
+// Large downhttp://192.168.36.10/blog/modify/11#
 @media #{$large-down} {
 	.hybrid-bar #search {
 		right: 5rem;
