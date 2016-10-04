@@ -9,6 +9,7 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel;
 
 use Alaress_Date_Format;
 use Schoolbox\Assessment\Course\Task as TaskModel;
+use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
@@ -112,7 +113,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Data for assessment context tests.
+     * Data for assessment context to data model test.
      *
      * @return array
      */
@@ -158,6 +159,63 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTranslateAssessmentContextToDataModel(IAssessable $assessment, $contextClass, $contextId)
     {
         $assessmentModel = $this->translator->translateToDataModel($assessment, 1)->getAssessmentModel();
+        $this->assertInstanceOf($contextClass, $assessmentModel->getAssessmentContext());
+        $this->assertEquals($contextId, $assessmentModel->getAssessmentContext()->getId());
+    }
+
+    /**
+     * Data for assessment context to domain model test.
+     *
+     * @return array
+     */
+    public function getTranslateAssessmentContextToDomainModelData()
+    {
+        return [
+            [
+                (new TaskModel())
+                    ->setId(1)
+                    ->setAssessmentModel(
+                        (new AssessmentModel())
+                            ->setAssessmentContext((new Folder())->setId(12))
+                    ),
+                Folder::class,
+                12
+            ],
+            [
+                (new TaskModel())
+                    ->setId(2)
+                    ->setAssessmentModel(
+                        (new AssessmentModel())
+                            ->setAssessmentContext((new UnitSpecificationModel())->setId(34))
+                    ),
+                UnitSpecification::class,
+                34
+            ],
+            [
+                (new TaskModel())
+                    ->setId(2)
+                    ->setAssessmentModel(
+                        (new AssessmentModel())
+                            ->setAssessmentContext((new UnitImplementationModel())->setId(56))
+                    ),
+                UnitImplementation::class,
+                56
+            ],
+        ];
+    }
+
+    /**
+     * Test translation of assessment context to data model.
+     *
+     * @dataProvider getTranslateAssessmentContextToDomainModelData
+     *
+     * @param IAssessableDataModel $assessmentModel
+     * @param string               $contextClass
+     * @param int                  $contextId
+     */
+    public function testTranslateAssessmentContextToDomainModel(IAssessableDataModel $assessmentModel, $contextClass, $contextId)
+    {
+        $assessmentModel = $this->translator->translateToDomainModel($assessmentModel);
         $this->assertInstanceOf($contextClass, $assessmentModel->getAssessmentContext());
         $this->assertEquals($contextId, $assessmentModel->getAssessmentContext()->getId());
     }
