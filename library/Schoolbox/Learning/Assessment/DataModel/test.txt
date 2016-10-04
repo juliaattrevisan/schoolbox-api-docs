@@ -31,7 +31,9 @@ function assertEquals($value1, $value2) {
 // Create a task
 $mapper = new \Schoolbox\Learning\Assessment\DataModel\MapperProxy(
     \Schoolbox\Learning\Assessment\DataModel\Mapper::getInstance(),
-    new \Schoolbox\Learning\Assessment\DataModel\Translator()
+    new \Schoolbox\Learning\Assessment\DataModel\Translator(
+        new \Schoolbox\Learning\MarkScheme\Factory()
+    )
 );
 
 $task = (new Task())
@@ -221,7 +223,7 @@ assertEquals(get_class($dbDueWork->getMarkScheme()), get_class($dueWork->getMark
 assertEquals($dbDueWork->getMarkScheme()->getTotalMark(), $dueWork->getMarkScheme()->getTotalMark());
 // Due work files
 assertEquals($dbDueWork->getAllFiles()->count(), $dueWork->getAllFiles()->count());
-// Due work files have no sequence stored, so order by name
+// Sequence isn't stored for due work files
 $dbDueWork->getAllFiles()->sortBy('filename', 'asc');
 assertEquals($dbDueWork->getAllFiles()[0]->getFilename(), $dueWork->getAllFiles()[0]->getFilename());
 assertEquals($dbDueWork->getAllFiles()[1]->getFilename(), $dueWork->getAllFiles()[1]->getFilename());

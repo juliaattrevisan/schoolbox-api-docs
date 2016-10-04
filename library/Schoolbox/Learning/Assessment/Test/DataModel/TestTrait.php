@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment\Test\DataModel;
 use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
 use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator;
+use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\User;
 
 /**
@@ -37,7 +38,7 @@ trait TestTrait
      */
     protected function setUp()
     {
-        $this->translator = new Translator();
+        $this->translator = new Translator(new MarkSchemeFactory());
 
         // Test users
         $this->teacher1 = (new User())

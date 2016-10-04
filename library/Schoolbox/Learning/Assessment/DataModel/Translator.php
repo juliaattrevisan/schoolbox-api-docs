@@ -38,10 +38,10 @@ class Translator
     /**
      * Constructor
      */
-    public function __construct()
+    public function __construct(MarkSchemeFactory $markSchemeFactory)
     {
         // TODO inject all of this
-        $this->markSchemeFactory = new MarkSchemeFactory();
+        $this->markSchemeFactory = $markSchemeFactory;
         $this->subTranslators[]  = new Translator\Task();
         $this->subTranslators[]  = new Translator\Quiz();
         $this->subTranslators[]  = new Translator\DueWork();
