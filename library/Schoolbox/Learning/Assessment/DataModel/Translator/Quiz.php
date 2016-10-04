@@ -62,7 +62,7 @@ class Quiz implements IAssessmentTypeTranslator
                 ->setCreator($model->getUser())
             ;
 
-            // TODO implement correct setting of max marks
+            // TODO implement setting of max marks from quiz's questions
             $assessable->setMaxMark(1);
             return $assessable;
         }

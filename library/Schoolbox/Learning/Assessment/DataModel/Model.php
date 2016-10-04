@@ -67,8 +67,6 @@ class Model implements ISoftDeletable
     /**
      * The date/time at which participants are no longer able to create responses to this assessment.
      *
-     * TODO add close date to database and imports
-     *
      * @var Alaress_Date_Format
      */
     protected $closeDate;
