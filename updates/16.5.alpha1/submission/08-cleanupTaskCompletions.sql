@@ -2,9 +2,12 @@
 RENAME TABLE `task_instance_completion` TO `task_completion`;
 
 /* drop now-unnecessary column */
+/*
 ALTER TABLE `task_completion`
   DROP COLUMN `task_instance_id`,
   DROP INDEX `task_instance_completion_task_instance_id`;
+
+*/
 
 /* remove column nullability, add indices and foreign key */
 ALTER TABLE `task_completion`
