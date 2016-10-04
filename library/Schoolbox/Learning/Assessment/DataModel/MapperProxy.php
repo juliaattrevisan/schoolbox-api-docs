@@ -86,6 +86,7 @@ class MapperProxy
     public function findAllForUnitSpecificationId($unitSpecId)
     {
         // TODO implement
+        // Requires M..M join onto assessment_course_unit_specification
     }
 
     /**
@@ -96,6 +97,7 @@ class MapperProxy
     public function findAllForUnitImplementationId($unitImplId)
     {
         // TODO implement
+        // Requires M..M join onto assessment_course_unit_implementation
     }
 
     /**
@@ -106,6 +108,7 @@ class MapperProxy
     public function findAllForFolderId($folderId)
     {
         // TODO implement
+        // Requires M..M join onto assessment_folder
     }
 
     /**
@@ -116,6 +119,7 @@ class MapperProxy
     public function findAllForProjectId($projectId)
     {
         // TODO implement
+        // Requires 1..M join onto not yet existent project_assessment
     }
 
     /**
