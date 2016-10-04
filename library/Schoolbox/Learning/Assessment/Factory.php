@@ -182,18 +182,6 @@ class Factory
     /** @var \Alaress_Date_Format $tomorrow */
     private $tomorrow;
 
-    /**
-     * Indexed by assessment.id
-     * @var Collection|IAssessable[] $assessmentsToMark
-     */
-    private $assessmentsToMark;
-
-    /**
-     * Indexed by assessment.id
-     * @var Collection|IAssessable[] $lateAssessments
-     */
-    private $lateAssessments;
-
     public function __construct()
     {
         $this->database = \Database::getInstance();
@@ -218,7 +206,7 @@ class Factory
         $this->studentExternalIds = [];
 
         $this->term = TermMapper::getInstance()->findForToday();
-        $this->term->getStart()->addYears(-2); // TODO remove this line. Just here to get more results
+        $this->term->getStart()->addYears(-1); // TODO remove this line. Just here to get more results
 
         $this->tomorrow = (new \Alaress_Date_Format(null, \Alaress_Date_Format::DATABASE_FORMAT))->addDays(1);
 
@@ -241,14 +229,10 @@ class Factory
      * TODO Also get Task where task_instance.user_id = user.id
      *
      * @param User $user
-     * @param Collection|IAssessable[] $assessmentsToMark Will be returned order dueDate ASC  (ie closest to dueDate)
-     * @param Collection|IAssessable[] $lateAssessments    Will be returned order dueDate DESC (ie most overdue first)
      * @return Collection|IAssessable[]
      */
-    public function getPendingAssessments(User $user, &$assessmentsToMark, &$lateAssessments)
+    public function getPendingAssessments(User $user)
     {
-        $assessmentsToMark = $this->assessmentsToMark;
-        $lateAssessments = $this->lateAssessments;
 
 $start = microtime(true);
 
@@ -695,6 +679,7 @@ var_dump('time: '.(microtime(true)-$start));
                 q.assessment_id AS 'q.assessment_id',
                 qa.attempt_id   AS 'qa.attempt_id',
                 qa.user_id      AS 'qa.user_id',
+                qa.start        AS 'qa.start',
                 qa.finish       AS 'qa.finish',
                 qa.reviewed_at  AS 'qa.reviewed_at'                
             FROM assess q
@@ -770,27 +755,30 @@ var_dump('time: '.(microtime(true)-$start));
         //die();
 var_dump('time: '.(microtime(true)-$start));
 
-        // Get Due Work Submissions for all selected students
-        $query = "
-            SELECT
-                sb.assessment_id   AS 'sb.assessment_id',
-                sb.mark_visibility AS 'sb.mark_visibility',
-                ss.id              AS 'ss.id',
-                ss.owner           AS 'ss.owner',
-                ss.submitted       AS 'ss.submitted',
-                ss.marked          AS 'ss.marked'
-            FROM submission_box sb
-            JOIN student_submission ss ON ss.box_id = sb.id
-            WHERE sb.deleted = 0
-            AND ss.draft = 0
-            AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ") 
-            AND ss.owner IN (" . implode(',', $this->studentInternalIds) . ")              
-        ";
-
-        //die($query);
-        $statement = $this->database->prepare($query);
-        $statement->execute();
-        $dueWorkResponseResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        if(count($this->dueWorkAssessmentIds) && count($this->studentInternalIds)){
+            // Get Due Work Submissions for all selected students
+            $query = "
+                SELECT
+                    sb.assessment_id   AS 'sb.assessment_id',
+                    sb.mark_visibility AS 'sb.mark_visibility',
+                    ss.id              AS 'ss.id',
+                    ss.owner           AS 'ss.owner',
+                    ss.submitted       AS 'ss.submitted',
+                    ss.marked          AS 'ss.marked'
+                FROM submission_box sb
+                JOIN student_submission ss ON ss.box_id = sb.id
+                WHERE sb.deleted = 0
+                AND ss.draft = 0
+                AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ") 
+                AND ss.owner IN (" . implode(',', $this->studentInternalIds) . ")              
+            ";
+            //die($query);
+            $statement = $this->database->prepare($query);
+            $statement->execute();
+            $dueWorkResponseResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        } else {
+            $dueWorkResponseResults = [];
+        }
         $this->printTable($dueWorkResponseResults);
 
         // Find Students who submitted DueWorkSubmissions but weren't in the class
@@ -806,28 +794,33 @@ var_dump('time: '.(microtime(true)-$start));
 
 var_dump('time: '.(microtime(true)-$start));
 
-        // Get Due Work Returns for all selected students
-        $query = "
-            SELECT
-                sb.assessment_id                 AS 'sb.assessment_id',
-                sb.mark_visibility               AS 'sb.mark_visibility',
-                sr.id                            AS 'sr.id',
-                sr.marker                        AS 'sr.marker',
-                sr.owner                         AS 'sr.owner',
-                sr.returned                      AS 'sr.returned',
-                sr.is_confirmation_of_submission AS 'sr.is_confirmation_of_submission'
-            FROM submission_box sb
-            JOIN submission_return sr ON sr.box_id = sb.id 
-            WHERE sb.deleted = 0
-            AND sr.deleted_at IS NULL
-            AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ") 
-            AND sr.owner IN (" . implode(',', $this->studentInternalIds) . ")             
-        ";
+        if(count($this->dueWorkAssessmentIds) && count($this->studentInternalIds)){
+            // Get Due Work Returns for all selected students
+            $query = "
+                SELECT
+                    sb.assessment_id                 AS 'sb.assessment_id',
+                    sb.mark_visibility               AS 'sb.mark_visibility',
+                    sr.id                            AS 'sr.id',
+                    sr.marker                        AS 'sr.marker',
+                    sr.owner                         AS 'sr.owner',
+                    sr.returned                      AS 'sr.returned',
+                    sr.is_confirmation_of_submission AS 'sr.is_confirmation_of_submission'
+                FROM submission_box sb
+                JOIN submission_return sr ON sr.box_id = sb.id 
+                WHERE sb.deleted = 0
+                AND sr.deleted_at IS NULL
+                AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ") 
+                AND sr.owner IN (" . implode(',', $this->studentInternalIds) . ")             
+            ";
 
-        //die($query);
-        $statement = $this->database->prepare($query);
-        $statement->execute();
-        $dueWorkFeedbackResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
+            //die($query);
+            $statement = $this->database->prepare($query);
+            $statement->execute();
+            $dueWorkFeedbackResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        } else {
+            $dueWorkFeedbackResults = [];
+        }
+
         $this->printTable($dueWorkFeedbackResults);
 
         // Find Students who received DueWork Feedback but weren't in the class
@@ -866,7 +859,6 @@ var_dump('time: '.(microtime(true)-$start));
 
         }
 
-
         // Process the results, creating extra Participants where required, pulling User from caches
 
 
@@ -874,38 +866,45 @@ var_dump('time: '.(microtime(true)-$start));
         //$this->printTable($quizResults); //die();
         foreach($quizResults as $row){
             $quiz = $this->assessmentsCache[$row['q.assessment_id']];
+            $userId = $row['qa.user_id'];
             $response = new QuizAttempt();
             $response->setId($row['qa.attempt_id']);
-            $response->setSubmittedBy($this->studentIntCache[$row['qa.user_id']]);
-            $response->setSubmittedOnBehalfOf($this->studentIntCache[$row['qa.user_id']]);
+            $response->setSubmittedBy($this->studentIntCache[$userId]);
+            $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
             $response->setAssessable($quiz);
-            $response->setUpdatedAt($this->getFastDateFromString($row['qa.finish']));
+            $updatedAt = $row['qa.finish'] ?: $row['qa.start'];
+            $response->setUpdatedAt($this->getFastDateFromString($updatedAt));
 
             $quiz->getResponses()->add($response);
             $participants = $quiz->getAllParticipants();
 
             // Are we missing the Participant?
-            if(!$participants[$row['qa.user_id']]){
-                echo "<span style='color:green;'>Missing Quiz Participant ".$row['qa.user_id']." - Generating from cache...</span></br>";
-                $participants[$row['qa.user_id']] = new Participant($this->studentIntCache[$row['tic.student_id']]);
+            if(!$participants[$userId]){
+                echo "<span style='color:green;'>Missing Quiz Participant ".$userId." - Generating from cache...</span></br>";
+                $participants[$userId] = new Participant($this->studentIntCache[$userId]);
             }
-            $participants[$row['qa.user_id']]->getAllResponses()->add($response);
+            $participants[$userId]->getAllResponses()->add($response);
 
             // In this context, if not 'reviewed', then we interpret this as NO feedback
             if(!is_null($row['qa.reviewed_at'])){
                 $feedback = new QuizReview();
                 $feedback->setId($row['qa.attempt_id']);
                 $feedback->setPublishedAt($this->getFastDateFromString($row['qa.reviewed_at']));
+
+                $updatedAt = $row['qa.reviewed_at'] ?: $updatedAt;
+                $feedback->setUpdatedAt($this->getFastDateFromString($updatedAt));
+
                 $feedback->setResponse($response);
                 $feedback->setAssessable($quiz);
 
                 $quiz->getFeedbacks()->add($feedback);
-                $participants[$row['qa.user_id']]->getAllFeedbacks()->add($feedback);
+                $participants[$userId]->getAllFeedbacks()->add($feedback);
             }
         }
 
         foreach($taskResults as $row){
             $task = $this->assessmentsCache[$row['t.assessment_id']];
+            $userId = $row['tic.student_id'];
             $response = new TaskCompletion();
             $response->setId($row['tic.id']);
             $response->setSubmittedBy($this->studentIntCache[$row['tic.student_id']]);
@@ -917,31 +916,33 @@ var_dump('time: '.(microtime(true)-$start));
 
 
             // Are we missing the Participant?
-            if(!$participants[$row['tic.student_id']]){
-                echo "<span style='color:green;'>Missing Task Participant ".$row['tic.student_id']."- Generating from cache...</span></br>";
-                $participants[$row['tic.student_id']] = new Participant($this->studentIntCache[$row['tic.student_id']]);
+            if(!$participants[$userId]){
+                echo "<span style='color:green;'>Missing Task Participant ".$userId."- Generating from cache...</span></br>";
+                $participants[$userId] = new Participant($this->studentIntCache[$userId]);
             }
-            $participants[$row['tic.student_id']]->getAllResponses()->add($response);
+            $participants[$userId]->getAllResponses()->add($response);
 
 
             // For tasks, if 'reviewer' != 'reviewee', then that is Teacher Feedback
-            if($row['tic.student_id'] != $row['tic.marking_user_id']){
+            if($userId != $row['tic.marking_user_id']){
                 $feedback = new TaskFeedback();
                 $feedback->setId($row['tic.id']);
                 $feedback->setPublishedAt($this->getFastDateFromString($row['tic.completion_date']));
+                $feedback->setUpdatedAt($this->getFastDateFromString($row['tic.completion_date']));
                 $feedback->setResponse($response);
                 $feedback->setAssessable($task);
 
                 $task->getFeedbacks()->add($feedback);
-                $participants[$row['tic.student_id']]->getAllFeedbacks()->add($feedback);
+                $participants[$userId]->getAllFeedbacks()->add($feedback);
             }
         }
 
         foreach($dueWorkResponseResults as $row){
             $dueWork = $this->assessmentsCache[$row['sb.assessment_id']];
+            $userId = $row['ss.owner'];
             $response = new DueWorkSubmission();
             $response->setId($row['ss.id']);
-            $response->setSubmittedBy($this->studentIntCache[$row['ss.owner']]);
+            $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setAssessable($dueWork);
             $response->setUpdatedAt($this->getFastDateFromString($row['ss.submitted']));
 
@@ -949,29 +950,31 @@ var_dump('time: '.(microtime(true)-$start));
             $participants = $dueWork->getAllParticipants();
 
             // Are we missing the Participant?
-            if(!$participants[$row['ss.owner']]){
-                echo "<span style='color:green;'>Missing DueWork Response Participant ".$row['ss.owner']."- Generating from cache...</span></br>";
-                $participants[$row['ss.owner']] = new Participant($this->studentIntCache[$row['ss.owner']]);
+            if(!$participants[$userId]){
+                echo "<span style='color:green;'>Missing DueWork Response Participant ".$userId."- Generating from cache...</span></br>";
+                $participants[$userId] = new Participant($this->studentIntCache[$userId]);
             }
-            $participants[$row['ss.owner']]->getAllResponses()->add($response);
+            $participants[$userId]->getAllResponses()->add($response);
         }
 
         foreach($dueWorkFeedbackResults as $row){
             $dueWork = $this->assessmentsCache[$row['sb.assessment_id']];
+            $userId = $row['sr.owner'];
             $feedback = new DueWorkFeedback();
             $feedback->setId($row['sr.id']);
+            $feedback->setUpdatedAt($this->getFastDateFromString($row['sr.returned']));
             $feedback->setPublishedAt($this->getFastDateFromString($row['sr.returned']));
-            $feedback->setAssessable($task);
+            $feedback->setAssessable($dueWork);
 
-            $task->getFeedbacks()->add($feedback);
+            $dueWork->getFeedbacks()->add($feedback);
             $participants = $dueWork->getAllParticipants();
 
             // Are we missing the Participant?
-            if(!$participants[$row['sr.owner']]){
-                echo "<span style='color:green;'>Missing DueWork Feedback Participant ".$row['sr.owner']."- Generating from cache...</span></br>";
-                $participants[$row['sr.owner']] = new Participant($this->studentIntCache[$row['sr.owner']]);
+            if(!$participants[$userId]){
+                echo "<span style='color:green;'>Missing DueWork Feedback Participant ".$userId."- Generating from cache...</span></br>";
+                $participants[$userId] = new Participant($this->studentIntCache[$userId]);
             }
-            $participants[$row['sr.owner']]->getAllFeedbacks()->add($feedback);
+            $participants[$userId]->getAllFeedbacks()->add($feedback);
         }
 
 
@@ -982,8 +985,68 @@ var_dump('time: '.(microtime(true)-$start));
 var_dump('time: '.(microtime(true)-$start));
         //die();
 
+        echo "<h1>Things to Mark</h1>\n";
+        echo '<table>';
+        echo '<tr>
+            <th>Context</th>
+            <th>Title</th>
+            <th>Type</th>
+            <th>DueDate</th>
+            <th>Participants</th>
+            <th>Responses</th>
+            <th>Feedbacks</th>
+            <th>% Marked</th>
+            <th>Needs Marking</th>
+            <th>Needs Chasing</th>
+        </tr>';
+        foreach ($this->assessmentsCache as $assessment){
+            $isLate = $assessment->getDueAt()->lt($this->tomorrow);
+            echo '<tr>';
+            $folderId = $assessment->getContext()->getFolder()->getId();
+            echo "<td><a href='/homepage/$folderId'>$folderId</a></td>\n";
+            echo "<td>{$assessment->getTitle()}</td>\n";
+            echo "<td>{$assessment->getTypeName()}</td>\n";
+            echo "<td>{$assessment->getDueAt()->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT)}</td>\n";
+            echo "<td>";
+            foreach($assessment->getAllParticipants() as $participant){
+                echo $participant->getUser()->getFirstname()." ".$participant->getUser()->getLastname().'<br>';
+            }
+            echo "</td>";
+            echo "<td>";
+            foreach($assessment->getAllParticipants() as $participant){
+                echo ' R: '.count($participant->getAllResponses()).'<br>';
+            }
+            echo "</td>";
+            echo "<td>";
+            foreach($assessment->getAllParticipants() as $participant){
+                echo ' F: '.count($participant->getAllFeedbacks()).'<br>';
+            }
+            echo "</td>";
+            echo "<td>{$assessment->getPercentageMarked()} %</td>\n";
+            echo "<td>";
+            foreach($assessment->getAllParticipants() as $participant){
+                if(count($participant->getAllResponses()) && !$participant->isAssessableMarked($assessment)){
+                    echo $participant->getUser()->getFirstname()." ".$participant->getUser()->getLastname();
+                }
+                echo '<br>';
+            }
+            echo "</td>";
+            echo "<td ".(!$isLate ? 'style="background-color:grey;"' : '').">";
+            if($isLate) {
+                foreach ($assessment->getAllParticipants() as $participant) {
+                    if (!count($participant->getAllResponses()) && !count($participant->getAllFeedbacks())) {
+                        echo $participant->getUser()->getFirstname() . " " . $participant->getUser()->getLastname();
+                    }
+                    echo '<br>';
+                }
+            }
+            echo "</td>";
+            echo '</tr>';
+        }
+        echo '</table>';
+        var_dump('time: '.(microtime(true)-$start));    die();
 
-        // Get a list of all students
+        return $this->assessmentsCache;
     }
 
     /**
@@ -1392,9 +1455,11 @@ var_dump('time: '.(microtime(true)-$start));
      */
     private function getFastDateFromString($dateString, $format = \Alaress_Date_Format::DATABASE_FORMAT)
     {
+
         if(empty($dateString)){
             return new \Alaress_Date_NullDate();
         }
+        //return new \Alaress_Date_Format($dateString, $format);
         return new \Alaress_Date_Format(new Carbon($dateString), $format);
     }
 

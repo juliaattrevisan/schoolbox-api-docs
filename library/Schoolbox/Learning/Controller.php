@@ -78,12 +78,9 @@ class Controller extends Base
 
         $factory = new Factory();
 
-        $factory->getPendingAssessments($user, $assessmentsToMark, $lateAssessments);
-
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', [
-            'user'                    => $user,
-            'assessmentsToMark'       => $assessmentsToMark,
-            'assessmentsNotSubmitted' => $lateAssessments,
+            'user'              => $user,
+            'assessments'       => $factory->getPendingAssessments($user),
         ]));
     }
 
