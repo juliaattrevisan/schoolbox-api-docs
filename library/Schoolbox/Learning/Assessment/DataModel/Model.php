@@ -167,6 +167,48 @@ class Model implements ISoftDeletable
     }
 
     /**
+     * Helper method for getting this assessment data model's context.
+     */
+    public function getAssessmentContext()
+    {
+        $folder   = $this->getFolder();
+        $unitSpec = $this->getUnitSpecification();
+        $unitImpl = $this->getUnitImplementation();
+        if (isset($folder)) {
+            return $folder;
+        } elseif (isset($unitSpec)) {
+            return $unitSpec;
+        } elseif (isset($unitImpl)) {
+            return $unitImpl;
+        }
+        return null;
+    }
+
+    /**
+     * Helper method for getting this assessment data model's context.
+     *
+     * @param $context
+     * @return static
+     */
+    public function setAssessmentContext($context)
+    {
+        if ($context instanceof Folder) {
+            return $this->setFolder($context)
+                        ->setUnitImplementation(null)
+                        ->setUnitSpecification(null);
+        } elseif ($context instanceof UnitSpecification) {
+            return $this->setFolder(null)
+                        ->setUnitImplementation(null)
+                        ->setUnitSpecification($context);
+        } elseif ($context instanceof UnitImplementation) {
+            return $this->setFolder(null)
+                        ->setUnitImplementation($context)
+                        ->setUnitSpecification(null);
+        }
+        return $this;
+    }
+
+    /**
      * Does this have a task?
      *
      * @return bool
