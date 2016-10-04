@@ -20,6 +20,13 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
 interface AssessmentContext
 {
     /**
+     * Retrieves this assessment context's ID.
+     *
+     * @return int
+     */
+    public function getId();
+
+    /**
      * Retrieves the folder that any Assessable objects within this object
      * belongs within.
      *
