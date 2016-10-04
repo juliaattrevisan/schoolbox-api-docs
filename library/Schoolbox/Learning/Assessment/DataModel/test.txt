@@ -377,3 +377,18 @@ try {
     assert($e->getDeletedObject() instanceof Project);
     assertEquals($dbProject->getId(), $project->getId());
 }
+
+
+/**
+ * Tests of mapper searches
+ *
+ * For now just test that they don't fail, rather than their actual results
+ */
+$items = $mapper->findAllForFolderId(51);
+var_dump($items->count());
+
+$items = $mapper->findAllForUnitSpecificationId(1);
+var_dump($items->count());
+
+$items = $mapper->findAllForUnitImplementationId(1);
+var_dump($items->count());
