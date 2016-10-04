@@ -317,7 +317,11 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function getPercentageMarked()
     {
-        return 100 * ($this->numMarked() / $this->numParticipants());
+        $numParticipants = $this->numParticipants();
+        if(!$numParticipants){
+            return 0;
+        }
+        return 100 * ($this->numMarked() / $numParticipants);
     }
 
     /**
@@ -342,7 +346,11 @@ abstract class AbstractAssessment implements IAssessable
      */
     public function getPercentagePublished()
     {
-        return 100 * ($this->numPublished() / $this->numParticipants());
+        $numParticipants = $this->numParticipants();
+        if(!$numParticipants){
+            return 0;
+        }
+        return 100 * ($this->numPublished() / $numParticipants);
     }
 
     /* Validations
