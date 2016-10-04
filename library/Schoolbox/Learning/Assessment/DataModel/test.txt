@@ -13,6 +13,8 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * Shortcut for assert($value1 == $value2).
@@ -42,12 +44,62 @@ $mapper = new \Schoolbox\Learning\Assessment\DataModel\MapperProxy(
     $translator
 );
 
-// Folder
-$folder = Schoolbox\Resource\Folder\Mapper::getInstance()->findById(51);
-// Unit spec and impl: there is at least one of these in demo data.
-// That is good enough for this test.
-$unitSpec = (new \Schoolbox\Learning\Course\Unit\Specification())->setId(1);
-$unitImpl = (new \Schoolbox\Learning\Course\Unit\Implementation())->setId(1);
+$folderMapper = FolderMapper::getInstance();
+
+// Create a new folder, unit spec and implementation for testing with
+$parentFolder = (new Folder())
+    ->setName('Test Folder')
+    ->setParent(0);
+$folderMapper->save($parentFolder);
+
+$folder = (new Folder())
+    ->setName('Class')
+    ->setParent($parentFolder);
+$folderMapper->save($folder);
+
+// Create a new folder tree for unit spec and impl
+$courseSpecFolder = (new Folder())
+    ->setName('Course Specification')
+    ->setParent($parentFolder);
+$folderMapper->save($courseSpecFolder);
+
+$unitSpecFolder = (new Folder())
+    ->setName('Unit Specification')
+    ->setParent($courseSpecFolder);
+$folderMapper->save($unitSpecFolder);
+
+$courseImplFolder = (new Folder())
+    ->setName('Class With Course')
+    ->setParent($parentFolder);
+$folderMapper->save($courseImplFolder);
+
+$unitImplFolder = (new Folder())
+    ->setName('Unit Implementation')
+    ->setParent($courseImplFolder);
+$folderMapper->save($unitImplFolder);
+
+// Actually create the course spec and implementation
+$courseSpecModel = (new Schoolbox\Learning\Course\DataModel\Specification\Model())
+    ->setFolder($courseSpecFolder);
+$unitSpecModel = (new Schoolbox\Learning\Course\DataModel\Specification\Unit\Model())
+    ->setFolder($unitSpecFolder)
+    ->setCourse($courseSpecModel);
+Schoolbox\Learning\Course\DataModel\Specification\Mapper::getInstance()->save($courseSpecModel);
+Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper::getInstance()->save($unitSpecModel);
+$unitSpec = (new \Schoolbox\Learning\Course\Unit\Specification())->setId($unitSpecModel->getId());
+
+$courseImplModel = (new Schoolbox\Learning\Course\DataModel\Implementation\Model())
+    ->setFolder($courseImplFolder)
+    ->setSpecification($courseSpecModel);
+$unitImplModel = (new Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model())
+    ->setCourse($courseImplModel)
+    ->setSpecification($unitSpecModel)
+    ->setTitle($unitSpecFolder->getName())
+    ->setOpenDate(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
+    ->setDueDate(new Alaress_Date_Format('2016-10-23 13:00:00', Alaress_Date_Format::DATABASE_FORMAT));
+Schoolbox\Learning\Course\DataModel\Implementation\Mapper::getInstance()->save($courseImplModel);
+Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper::getInstance()->save($unitImplModel);
+$unitImpl = (new \Schoolbox\Learning\Course\Unit\Implementation())->setId($unitImplModel->getId());
 
 
 /**
@@ -162,17 +214,6 @@ assertEquals($dbQuiz->getMaxAttempts(), $quiz->getMaxAttempts());
 assertEquals($dbQuiz->getDuration(), $quiz->getDuration());
 assertEquals($dbQuiz->getCompletionMessage(), $quiz->getCompletionMessage());
 
-// Delete and try to refetch it
-$mapper->delete($quiz);
-try {
-    $dbQuiz = $mapper->findById($quiz->getId());
-    // This must have thrown an exception
-    assert(false, 'Quiz should have been deleted');
-} catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-    assert($e->getDeletedObject() instanceof Quiz);
-    assertEquals($dbQuiz->getId(), $quiz->getId());
-}
-
 
 /**
  * Due Works
@@ -259,17 +300,6 @@ $dbDueWork->getAllFiles()->sortBy('filename', 'asc');
 assertEquals($dbDueWork->getAllFiles()[0]->getFilename(), $dueWork->getAllFiles()[0]->getFilename());
 assertEquals($dbDueWork->getAllFiles()[1]->getFilename(), $dueWork->getAllFiles()[1]->getFilename());
 assertEquals($dbDueWork->getAllFiles()[2]->getFilename(), $dueWork->getAllFiles()[2]->getFilename());
-
-// Delete and try to refetch it
-$mapper->delete($dueWork);
-try {
-    $dbDueWork = $mapper->findById($dueWork->getId());
-    // This must have thrown an exception
-    assert(false, 'Due work should have been deleted');
-} catch (\Schoolbox\Mapper\Exception\Deleted $e) {
-    assert($e->getDeletedObject() instanceof DueWork);
-    assertEquals($dbDueWork->getId(), $dueWork->getId());
-}
 
 
 /**
@@ -371,7 +401,44 @@ assertEquals(get_class($dbProject->getMarkScheme()), get_class($project->getMark
 // Sub-assessments - unable to be fetched yet
 //assertEquals($dbProject->getAssessables()->count(), $project->getAssessables()->count());
 
-// Delete and try to refetch it
+
+/**
+ * Tests of mapper searches
+ *
+ * For now just test that the counts are correct, rather than their actual results
+ */
+assertEquals(5, count($mapper->findAllForFolderId($folder->getId())));
+assertEquals(1, count($mapper->findAllForUnitSpecificationId($unitSpec->getId())));
+assertEquals(1, count($mapper->findAllForUnitImplementationId($unitImpl->getId())));
+
+
+/**
+ * Clean up after myself
+ */
+
+// Delete quiz
+$mapper->delete($quiz);
+try {
+    $dbQuiz = $mapper->findById($quiz->getId());
+    // This must have thrown an exception
+    assert(false, 'Quiz should have been deleted');
+} catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+    assert($e->getDeletedObject() instanceof Quiz);
+    assertEquals($dbQuiz->getId(), $quiz->getId());
+}
+
+// Delete due work
+$mapper->delete($dueWork);
+try {
+    $dbDueWork = $mapper->findById($dueWork->getId());
+    // This must have thrown an exception
+    assert(false, 'Due work should have been deleted');
+} catch (\Schoolbox\Mapper\Exception\Deleted $e) {
+    assert($e->getDeletedObject() instanceof DueWork);
+    assertEquals($dbDueWork->getId(), $dueWork->getId());
+}
+
+// Delete project
 $mapper->delete($project);
 try {
     $dbProject = $mapper->findById($project->getId());
@@ -382,17 +449,15 @@ try {
     assertEquals($dbProject->getId(), $project->getId());
 }
 
+// For now, manually delete assessments that are in the deleted project
+foreach ($project->getAssessables() as $subAssessment) {
+    $mapper->delete($subAssessment);
+}
 
-/**
- * Tests of mapper searches
- *
- * For now just test that they don't fail, rather than their actual results
- */
-$items = $mapper->findAllForFolderId(51);
-var_dump($items->count());
+// Nothing should remain
+assertEquals(0, count($mapper->findAllForFolderId($folder->getId())));
+assertEquals(0, count($mapper->findAllForUnitSpecificationId($unitSpec->getId())));
+assertEquals(0, count($mapper->findAllForUnitImplementationId($unitImpl->getId())));
 
-$items = $mapper->findAllForUnitSpecificationId(1);
-var_dump($items->count());
-
-$items = $mapper->findAllForUnitImplementationId(1);
-var_dump($items->count());
+// And finally delete our test folder
+$folderMapper->delete($parentFolder);
