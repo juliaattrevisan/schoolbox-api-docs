@@ -62,17 +62,9 @@ class MapperProxy
     public function findById($id)
     {
         try {
-            return $this->translator->translateToDomainModel(
-                $this->translateDataModelFromMapper(
-                    $this->baseMapper->findById($id)
-                )
-            );
+            return $this->translateToDomainModel($this->baseMapper->findById($id));
         } catch (MapperException\Deleted $e) {
-            $e->setDeletedObject(
-                $this->translator->translateToDomainModel(
-                    $this->translateDataModelFromMapper($e->getDeletedObject())
-                )
-            );
+            $e->setDeletedObject($this->translateToDomainModel($e->getDeletedObject()));
             throw $e;
         }
     }
@@ -87,8 +79,7 @@ class MapperProxy
     public function findAllForUnitSpecificationId($unitSpecId, $options = [])
     {
         return $this->baseMapper->findByColumn('us.id', $unitSpecId, $options)
-                                ->map([$this, 'translateDataModelFromMapper'])
-                                ->map([$this->translator, 'translateToDomainModel']);
+                                ->map([$this, 'translateToDomainModel']);
     }
 
     /**
@@ -101,8 +92,7 @@ class MapperProxy
     public function findAllForUnitImplementationId($unitImplId, $options = [])
     {
         return $this->baseMapper->findByColumn('ui.id', $unitImplId, $options)
-                                ->map([$this, 'translateDataModelFromMapper'])
-                                ->map([$this->translator, 'translateToDomainModel']);
+                                ->map([$this, 'translateToDomainModel']);
     }
 
     /**
@@ -115,8 +105,7 @@ class MapperProxy
     public function findAllForFolderId($folderId, $options = [])
     {
         return $this->baseMapper->findByColumn('f.id', $folderId, $options)
-                                ->map([$this, 'translateDataModelFromMapper'])
-                                ->map([$this->translator, 'translateToDomainModel']);
+                                ->map([$this, 'translateToDomainModel']);
     }
 
     /**
@@ -139,9 +128,7 @@ class MapperProxy
     public function save(IAssessable $assessable, $sequence)
     {
         // Save assessment
-        $dataModel = $this->translateDataModelToMapper(
-            $this->translator->translateToDataModel($assessable, $sequence)
-        );
+        $dataModel = $this->translateToDataModel($assessable, $sequence);
         $this->baseMapper->save($dataModel);
 
         // Set fields on the domain model object
@@ -204,45 +191,43 @@ class MapperProxy
     public function delete(IAssessable $assessable)
     {
         // Delete assessment
-        $this->baseMapper->delete(
-            $this->translateDataModelToMapper(
-                $this->translator->translateToDataModel($assessable, 0)
-            )
-        );
+        $this->baseMapper->delete($this->translateToDataModel($assessable, 0));
 
         // I don't think I need to delete sub-objects.
         // The assessable itself is all that should need deletion
     }
 
     /**
-     * Translates the data model from mapper format to a format usable by
-     * this object's translator.
-     *
-     * TODO try to remove this, and update translator to return Model objects directly
+     * Translates the data model to a domain object.
      *
      * @param Model $model
-     * @return IAssessableDataModel
+     * @return IAssessable
      */
-    public function translateDataModelFromMapper(Model $model)
+    public function translateToDomainModel(Model $model)
     {
         // Turn the data model inside out
+        // TODO try to remove this, and update translator to return Model objects directly
         $subModel = $model->getSubObject();
         $subModel->setAssessmentModel($model);
-        return $subModel;
+
+        return $this->translator->translateToDomainModel($subModel);
     }
 
     /**
-     * Translates the data model from the format this object's translator returns
-     * to a format the mapper can use.
+     * Translates the domain object to a data model.
      *
-     * @param IAssessableDataModel $subModel
+     * @param IAssessable $assessable
+     * @param int         $sequence
      * @return Model
      */
-    protected function translateDataModelToMapper(IAssessableDataModel $subModel)
+    public function translateToDataModel(IAssessable $assessable, $sequence)
     {
+        $dataModel = $this->translator->translateToDataModel($assessable, $sequence);
+
         // Turn the data model inside out
-        $model = $subModel->getAssessmentModel();
-        $model->setSubObject($subModel);
+        // TODO try to remove this, and update translator to accept Model objects directly
+        $model = $dataModel->getAssessmentModel();
+        $model->setSubObject($dataModel);
         return $model;
     }
 }
