@@ -290,12 +290,19 @@
         // also slide away this section's helptext
         $(this.element).closest(this.options.submittable).find('[data-mage-helptext]').slideUp(slideDuration);
 
-        // call the callback (this would include any specific manipulation for the section being targeted)
-        onXhrDone.call(this.element, data);
-
         // slide out the target section
         var next = $('[data-mage="' + $(this.element).data('mage-next') +  '"]');
         next.removeAttr('disabled');
+
+        /* Enable the fieldset and then inject the dom fragment in
+         * selectize (and perhaps other plugins) won't re-enable themselves if the
+         * parent fieldset is re-enabled. Upon instantiation selectize sets its
+         * locked/unlocked state - but previously, instantiation was into a disabled
+         * fieldset, so you have to manually re-enable them which is terrible
+         */
+        // call the callback (this would include any specific manipulation for the section being targeted)
+        onXhrDone.call(this.element, data);
+
         next.find('[data-mage-collapsed]').hide().removeClass('hide').slideDown(slideDuration);
     }
 
