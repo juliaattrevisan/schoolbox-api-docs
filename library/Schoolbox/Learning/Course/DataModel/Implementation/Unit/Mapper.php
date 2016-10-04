@@ -32,13 +32,14 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
 
         // Course Implementation
-        $this->joins('course_implementation_id', CourseImplementationMapper::class, 'id', null, null, null, 'course');
+        $this->joins('course_implementation_id', CourseImplementationMapper::class, 'id', null, null, 'course', 'course');
 
         // Unit Specification
-        $this->joins('course_unit_specification_id', UnitSpecificationMapper::class, 'id', null, null, null, 'specification');
+        $this->joins('course_unit_specification_id', UnitSpecificationMapper::class, 'id', null, null, 'specification', 'specification');
 
         // The folder which this unit implementation is on
-        $this->joins('category_id', FolderMapper::class, 'id', null, null, null, 'folder');
+        // TODO rename this to folder_id
+        $this->joins('category_id', FolderMapper::class, 'id', null, null, 'folder', 'folder');
 
         // Title
         $this->uses('title', self::TYPE_STRING);

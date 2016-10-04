@@ -37,6 +37,11 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
     protected $course;
 
     /**
+     * @var FolderModel
+     */
+    protected $folder;
+
+    /**
      * @var UnitSpecificationModel
      */
     protected $specification;
@@ -183,6 +188,24 @@ class Model implements ISoftDeletable, IAssessmentContextDataModel
     public function setAssessables($assessables)
     {
         $this->assessables = $assessables;
+        return $this;
+    }
+
+    /**
+     * @return FolderModel
+     */
+    public function getFolder()
+    {
+        return $this->folder;
+    }
+
+    /**
+     * @param FolderModel $folder
+     * @return static
+     */
+    public function setFolder(FolderModel $folder)
+    {
+        $this->folder = $folder;
         return $this;
     }
 }
