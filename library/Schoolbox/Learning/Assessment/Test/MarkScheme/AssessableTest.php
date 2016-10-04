@@ -2080,20 +2080,21 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
             ->setId(4)
             ->setMarksGiven(1.0)
             ->setMarksAvailable(2.0)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 00:00:00'));
         $feedback4a = (new QuizFeedback())
             ->setId(4)
             ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'))
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'));
+
         $attempt4b = (new QuizAttempt())
             ->setId(5)
             ->setMarksGiven(2.0)
             ->setMarksAvailable(2.0)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt($this->getDummyDate('2016-08-09 00:00:00'));
         $feedback4b = (new QuizFeedback())
             ->setId(5)
             ->setPublishedAt($this->getDummyDate(null))
-            ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'));
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
 
         // student 5: 2 attempt + 1 published feedback (1/3) + 1 unpublished feedback (2/2)
         $attempt5a = (new QuizAttempt())
@@ -2105,11 +2106,12 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
             ->setId(6)
             ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'))
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+
         $attempt5b = (new QuizAttempt())
             ->setId(7)
             ->setMarksGiven(2.0)
             ->setMarksAvailable(2.0)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt($this->getDummyDate('2016-08-09 21:03:19'));
         $feedback5b = (new QuizFeedback())
             ->setId(7)
             ->setPublishedAt($this->getDummyDate(null))
