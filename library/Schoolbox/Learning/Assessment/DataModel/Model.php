@@ -14,10 +14,13 @@ use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementation;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * Class Model
@@ -127,6 +130,27 @@ class Model implements ISoftDeletable
      * @var Project
      */
     protected $project;
+
+    /**
+     * This assessment may be attached to a folder.
+     *
+     * @var Folder
+     */
+    protected $folder;
+
+    /**
+     * This assessment may be attached to a unit specification.
+     *
+     * @var UnitSpecification
+     */
+    protected $unitSpecification;
+
+    /**
+     * This assessment may be attached to a unit implementation.
+     *
+     * @var UnitImplementation
+     */
+    protected $unitImplementation;
 
     /**
      * Constructor
@@ -450,6 +474,60 @@ class Model implements ISoftDeletable
     public function setProject(Project $project = null)
     {
         $this->project = $project;
+        return $this;
+    }
+
+    /**
+     * @return Folder
+     */
+    public function getFolder()
+    {
+        return $this->folder;
+    }
+
+    /**
+     * @param Folder $folder
+     * @return static
+     */
+    public function setFolder(Folder $folder = null)
+    {
+        $this->folder = $folder;
+        return $this;
+    }
+
+    /**
+     * @return UnitSpecification
+     */
+    public function getUnitSpecification()
+    {
+        return $this->unitSpecification;
+    }
+
+    /**
+     * @param UnitSpecification $unitSpecification
+     * @return static
+     */
+    public function setUnitSpecification(UnitSpecification $unitSpecification = null)
+    {
+        $this->unitSpecification = $unitSpecification;
+        return $this;
+    }
+
+    /**
+     * @return UnitImplementation
+     */
+    public function getUnitImplementation()
+    {
+        return $this->unitImplementation;
+    }
+
+    /**
+     * @param UnitImplementation $unitImplementation
+     * @return static
+     */
+    public function setUnitImplementation(UnitImplementation $unitImplementation = null)
+    {
+        $this->unitImplementation = $unitImplementation;
         return $this;
     }
 }
