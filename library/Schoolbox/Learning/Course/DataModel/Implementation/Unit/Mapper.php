@@ -10,7 +10,6 @@ namespace Schoolbox\Learning\Course\DataModel\Implementation\Unit;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 /**
  * Mapper for the data model for Unit Implementations.
@@ -36,10 +35,6 @@ class Mapper extends BaseMapper
 
         // Unit Specification
         $this->joins('course_unit_specification_id', UnitSpecificationMapper::class, 'id', null, null, 'specification', 'specification');
-
-        // The folder which this unit implementation is on
-        // TODO rename this to folder_id
-        $this->joins('category_id', FolderMapper::class, 'id', null, null, 'folder', 'folder');
 
         // Title
         $this->uses('title', self::TYPE_STRING);
