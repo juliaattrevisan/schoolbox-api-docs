@@ -63,6 +63,7 @@ use Schoolbox\Resource\File\IFile as FileInterface;
 use Schoolbox\Resource\Folder\IFolder as FolderInterface;
 use Schoolbox\Resource;
 use Schoolbox\Resource\Folder\IFolder;
+use Schoolbox\Learning\Course;
 
 class Controller extends Base\Base
 {
@@ -1110,15 +1111,17 @@ class Controller extends Base\Base
      * @api   GET /course/import/{courseId}/class/{classCode}{/componentId}
      * @level 160
      *
-     * @param int $courseId
-     * @param string $classCode
-     * @param int $componentId (Optional) the ID of the component the course is to be imported into
+     * @param Course\Specification $courseSpec
+     * @param Folder\Model         $targetClass
+     * @param int                  $componentId the ID of the component the course is to be imported into
      */
-    public function import($courseId, $classCode, $componentId = null)
+    public function import(Course\Specification $courseSpec = null, Folder\Model $targetClass = null, $componentId = null)
     {
         $importer = new CourseImport();
 
-        $this->tpl('import', array_merge($importer->importSelectize($courseId, $classCode), ['componentId' => $componentId]));
+        $context = array_merge($importer->importSelectize($courseSpec, $targetClass), ['componentId' => $componentId]);
+
+        $this->tpl('import', $context);
     }
 
 
@@ -1193,11 +1196,11 @@ class Controller extends Base\Base
     public function importUnits()
     {
         $homepage = trim($this->getRequest()->post["importFolders"]);
-        $courseHomepage = trim($this->getRequest()->post["importCourse"]);
+        $courseId = trim($this->getRequest()->post["importCourse"]);
         $componentId = trim($this->getRequest()->post["componentId"]);
 
         try {
-            $this->getCourseSpecificationMapperProxy()->findByFolderId($courseHomepage);
+            $this->getCourseSpecificationMapperProxy()->findById($courseId);
 
         } catch (MapperException $e) {
             // the nominated "course" is not actually a course...
@@ -1205,49 +1208,51 @@ class Controller extends Base\Base
             return;
         }
 
-        if ($homepage == "" && $courseHomepage == "") {
+        if ($homepage == "" && $courseId == "") {
             // They didn't select anything
 
             $this->throwError('You must select at least one class and a course to import before you can proceed');
-        } else {
-            if ($homepage == "") {
-                // They didn't select a class code
+            return;
 
-                $this->throwError('You must select at least one class before you can proceed');
-            } else {
-                if ($courseHomepage == "") {
-                    // They didn't select a course to import
+        } elseif ($homepage == "") {
+            // They didn't select a class code
 
-                    $this->throwError('You must select a course to import before you can proceed');
-                } else {
-                    $targetFolderIds = explode(',', $homepage);
+            $this->throwError('You must select at least one class before you can proceed');
+            return;
 
-                    $folders = $this->getFolderMapper()->findByColumn('id', $targetFolderIds);
+        } elseif ($courseId == "") {
+            // They didn't select a course to import
 
-                    $possibleOwnerships = [];
+            $this->throwError('You must select a course to import before you can proceed');
+            return;
+        }
 
-                    foreach ($folders as $folder) {
-                        $possibleOwnerships[$folder->getId()] = $this->getUserAccessMapper()->findUsersInCategory(
-                            $folder, Role::STAFF, UserAccess::ACCESS_WRITE
-                        );
+        $targetFolderIds = explode(',', $homepage);
 
-                        if (count($possibleOwnerships[$folder->getId()]) == 0) {
-                            // if nobody else was returned, jam the session user in there.
-                            $possibleOwnerships[$folder->getId()] = new Collection([$this->getUser()]);
-                        }
-                    }
+        $folders = $this->getFolderMapper()->findByColumn('id', $targetFolderIds);
 
-                    // Everything kosher, proceed with the mage
-                    // respond with stage 2: ownership
-                    $this->tpl('import/ownership', [
-                        'targetFolders' => $folders,
-                        'importCourse' => $courseHomepage,
-                        'ownershipCandidates' => $possibleOwnerships,
-                        'componentId' => $componentId
-                    ]);
-                }
+        $possibleOwnerships = [];
+
+        foreach ($folders as $folder) {
+            $possibleOwnerships[$folder->getId()] = $this->getUserAccessMapper()->findUsersInCategory(
+                $folder, Role::STAFF, UserAccess::ACCESS_WRITE
+            );
+
+            if (count($possibleOwnerships[$folder->getId()]) == 0) {
+                // if nobody else was returned, jam the session user in there.
+                $possibleOwnerships[$folder->getId()] = new Collection([$this->getUser()]);
             }
         }
+
+        // Everything kosher, proceed with the mage
+        // respond with stage 2: ownership
+        $this->tpl('import/ownership', [
+            'targetFolders' => $folders,
+            'importCourse' => $courseId,
+            'ownershipCandidates' => $possibleOwnerships,
+            'componentId' => $componentId
+        ]);
+
     }
 
     /**

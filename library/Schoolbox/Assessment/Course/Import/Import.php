@@ -2,10 +2,11 @@
 
 namespace Schoolbox\Assessment\Course\Import;
 
+use Schoolbox\Learning\Course;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Assessment\Course\DeprecatedMapper as CourseMapper;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Assessment\Course\Unit\DeprecatedModel as Unit;
 use Schoolbox\Assessment\Course\Unit\DeprecatedMapper as UnitMapper;
 use Schoolbox\Permission\Access\Access;
@@ -20,8 +21,6 @@ use Schoolbox\Permission\Access\Access;
  */
 class Import
 {
-    /** @var CourseMapper */
-    private $courseMapper;
 
     /** @var UnitMapper */
     private $unitMapper;
@@ -39,7 +38,6 @@ class Import
     public function __construct()
     {
         $this->setAccess(Access::getInstance());
-        $this->setCourseMapper(CourseMapper::getInstance());
         $this->setFolderMapper(FolderMapper::getInstance());
         $this->setUnitMapper(UnitMapper::getInstance());
     }
@@ -83,17 +81,17 @@ class Import
     /**
      * Generate selectize data for the main import screen
      *
-     * @param $courseId
-     * @param $classCode
+     * @param Course\Specification $courseSpec
+     * @param Folder\Model         $targetClass
      * @return array
      */
-    public function importSelectize($courseId, $classCode)
+    public function importSelectize(Course\Specification $courseSpec = null, Folder\Model $targetClass = null)
     {
         $data = [
 
-            /* Course Folder
+            /* Course object
              */
-            'folder'       => null,
+            'course'       => null,
 
             /* All Units associated with this Course
              */
@@ -115,20 +113,19 @@ class Import
         /* A course was already chosen
          */
         try {
-            if ($courseId) {
-                $course = $this->getCourseMapper()->findById($courseId);
-                $course->setParent($this->getFolderMapper()->findById($course->getParent()->getId()));
 
-                $data['folder'] = $course;
+            if ($courseSpec) {
+
+                $data['course'] = $courseSpec;
 
                 $data['sources'] = [
-                    'id'   => $course->getId(),
-                    'name' => $course->getName()
+                    'id'   => $courseSpec->getFolder()->getId(),
+                    'name' => $courseSpec->getFolder()->getName()
                 ];
 
                 /* Bolt on the Unit/Task data
                  */
-                $data = array_merge($data, $this->findUnitsAndTasks($courseId));
+                $data = array_merge($data, $this->findUnitsAndTasks($courseSpec->getId()));
             }
         } catch (\Exception $e) {
 
@@ -139,13 +136,8 @@ class Import
         /* A class was already chosen
          */
         try {
-            if ($classCode) {
-                try {
-                    $course = $this->getFolderMapper()->findByCode($classCode);
-                } catch (MapperException $e) {
-                    $course = $this->getFolderMapper()->findById($classCode);
-                }
-                $pair   = $course->findValueLabelPair();
+            if ($targetClass) {
+                $pair = $targetClass->findValueLabelPair();
 
                 $data['destinations'] = [
                     'id'   => $pair['value'],
@@ -201,27 +193,6 @@ class Import
     /* Getters/Setters
      */
 
-    /**
-     * Get course mapper
-     *
-     * @return CourseMapper
-     */
-    private function getCourseMapper()
-    {
-        return $this->courseMapper;
-    }
-
-    /**
-     * Set course mapper
-     *
-     * @param CourseMapper $courseMapper
-     * @return self
-     */
-    private function setCourseMapper($courseMapper)
-    {
-        $this->courseMapper = $courseMapper;
-        return $this;
-    }
 
     /**
      * @return UnitMapper

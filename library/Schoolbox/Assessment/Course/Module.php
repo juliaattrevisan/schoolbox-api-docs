@@ -11,8 +11,11 @@ namespace Schoolbox\Assessment\Course;
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
+use Alaress\Web\Router\PathMatcher;
 use Aura\Di\ContainerInterface;
 use Aura\Router\Router;
+use Schoolbox\Learning\Course;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Role;
 use Twig_Error_Loader;
 use Twig_Loader_Chain;
@@ -94,6 +97,60 @@ class Module extends BaseModule
             $this->addPostRoute($router, $alias, $basePath, $path);
         }
     }
+
+
+    /**
+     * Initializes any preloads on routes for this module.
+     *
+     * Preloads adjust route params before they are passed to the controller.
+     * Usually, they're used to load a single item into the route's params,
+     * which is then passed directly as a parameter to the action.
+     *
+     * @param PathMatcher $matcher
+     */
+    public function initRoutePreloads(PathMatcher $matcher)
+    {
+        // these routes require that the entity exist
+        $this->addRoutePreload($matcher, 'import', function ($params) {
+
+            try {
+                $dmSpecUnitMapper   = $this->injector->get('mapperFactory')->get(\Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper::class);
+                $dmSpecCourseMapper = $this->injector->get('mapperFactory')->get(\Schoolbox\Learning\Course\DataModel\Specification\Mapper::class);
+
+                $unitTranslator   = new Course\DataModel\Specification\Unit\Translator();
+                $courseTranslator = new Course\DataModel\Specification\Translator($unitTranslator);
+                $courseSpecMapper = new Course\SpecificationMapperProxy($dmSpecCourseMapper, $courseTranslator, $dmSpecUnitMapper, $unitTranslator);
+
+                $courseSpec = $courseSpecMapper->findById($params['courseId']);
+
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // null is ok
+                $courseSpec = null;
+            }
+
+            try {
+                /** @var Folder\Mapper $folderMapper */
+                $folderMapper = $this->injector->get('mapperFactory')->get(Folder\Mapper::class);
+                try {
+                    $targetClass = $folderMapper->findByCode($params['classCode']);
+                } catch (\Schoolbox\Mapper\Exception $e) {
+                    $targetClass = $folderMapper->findById($params['classCode']);
+                }
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                // null is ok
+                $targetClass = null;
+            }
+
+            return [
+                'courseSpec'  => $courseSpec,
+                'targetClass' => $targetClass,
+                'componentId' => $params['componentId']
+            ];
+
+        });
+
+    }
+
 
     /**
      * {@inheritdoc}

@@ -35,11 +35,11 @@
 
 <label>
     {{ formLabel }}
-    <input type="hidden" name="{{ formInputName }}" id="{{ formInputName }}" value="{{ folder.id }}" />
+    <input type="hidden" name="{{ formInputName }}" id="{{ formInputName }}" value="{{ course.id }}" />
     <a {{ activator }}
        data-source="{{ formInputName }}"
        href="#"
-       class="source-select {{ folder.id ? 'icon-folder' : '' }}"
-       title="{{ title }}">{{ folder.id ? folder.name : '(Click to select)' }}
+       class="source-select {{ course.id ? 'icon-folder' : '' }}"
+       title="{{ title }}">{{ course.id ? course.folder.name : '(Click to select)' }}
     </a>
 </label>
