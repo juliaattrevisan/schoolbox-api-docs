@@ -13,7 +13,12 @@ use Schoolbox\Assessment\Course\Task as TaskModel;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentModel;
 use Schoolbox\Learning\Assessment\DataModel\Translator\IAssessmentTypeTranslator;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
+use Schoolbox\Resource\Folder\Model as Folder;
 use UnexpectedValueException;
 
 /**
@@ -84,6 +89,17 @@ class Translator
             ->setUpdatedAt($assessment->getUpdatedAt())
             ->setDeletedAt($assessment->getDeletedAt())
         ;
+
+        // Translate assessable's context?
+        // TODO consider moving this to a translator
+        $context = $assessment->getAssessmentContext();
+        if ($context instanceof Folder) {
+            $assessmentModel->setAssessmentContext($context);
+        } elseif ($context instanceof UnitSpecification) {
+            $assessmentModel->setAssessmentContext((new UnitSpecificationModel())->setId($context->getId()));
+        } elseif ($context instanceof UnitImplementation) {
+            $assessmentModel->setAssessmentContext((new UnitImplementationModel())->setId($context->getId()));
+        }
 
         // Attempt to translate tasks using the sub-translators
         // TODO figure out which fields on assessable sub-objects are now redundant
