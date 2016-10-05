@@ -93,9 +93,9 @@ class Factory
      * Folder IDs of all Subjects either taught by this User or where this User has created Assessments
      * key = value = folder.id
      *
-     * @var int[] $subjectIds
+     * @var int[] $classIds
      */
-    private $subjectIds;
+    private $classIds;
 
     /**
      * Folder IDs of all Groups either administered by this User or where this User has created Assessments
@@ -119,12 +119,14 @@ class Factory
     private $projectAssessmentIds;
 
     /**
-     * Sets of non-indexed, non-unique subjectCodes, each set indexed by folder.id
+     * Maps a folder.id to set of non-unique classCodes.
+
      * Need to make sets unique before use.
+     * Cannot ensure uniqueness by using classCodes as strings as class codes are not always valid array keys.
      *
-     * @var string[][]|Collection[] $subjectCodes
+     * @var string[][]|Collection[] $folderClassCodes
      */
-    private $subjectCodes;
+    private $folderClassCodes;
 
     /**
      * Maps Subject/Group folder.id to sets of Student externalIds
@@ -158,7 +160,7 @@ class Factory
      *
      * Indexed by user.externalId so we can find O(1) when assigning to Classes
      *
-     * @var Collection|User[] $studentExtCache
+     * @var User[] $studentExtCache
      */
     private $studentExtCache;
 
@@ -167,18 +169,42 @@ class Factory
      *
      * Indexed by user.id so we can find O(1) when generating Participants
      *
-     * @var Collection|User[] $studentIntCache
+     * @var User[] $studentIntCache
      */
     private $studentIntCache;
 
-    /** @var \Schoolbox\Assessment\Term\Model  */
+    /** @var Term $term */
     private $term;
 
-    /** @var \Alaress_Date_Format $tomorrow */
-    private $tomorrow;
 
-    public function __construct()
+    /**
+     * Which User the Assessments produced by this factory relate to
+     *
+     * @var User $viewee
+     */
+    private $viewee;
+
+    /**
+     * Students with Responses/Feedbacks but Student not currently a member of Group/Class studentList
+     *
+     * Occurs if Student leaves a Group/Class after Response or Feedback created.
+     *
+     * If we detect these cases, and can't find the Student in our cache, we need to go back to
+     * SB DB and get their data.
+     *
+     * key = val = user.id
+     *
+     * @var int[]
+     */
+    private $assessmentExtraStudentIds;
+
+
+    /**
+     * @param User $viewee
+     */
+    public function __construct(User $viewee)
     {
+        $this->viewee = $viewee;
         $this->database = \Database::getInstance();
 
         $this->assessmentsCache = new Collection();
@@ -188,142 +214,218 @@ class Factory
         $this->unitImplsCache = new Collection();
         $this->foldersCache = new Collection();
         $this->projectCache = new Collection();
-        $this->studentExtCache = new Collection();
-        $this->studentIntCache = new Collection();
-        $this->subjectIds = [];
+        $this->studentExtCache = [];
+        $this->studentIntCache = [];
+        $this->classIds = [];
         $this->groupIds = [];
         $this->quizAssessmentIds    = [];
         $this->dueWorkAssessmentIds = [];
         $this->taskAssessmentIds    = [];
         $this->projectAssessmentIds = [];
-        $this->subjectCodes = new Collection();
+        $this->folderClassCodes = new Collection();
         $this->folderToStudentListMap = [];
         $this->studentExternalIds = [];
+        $this->assessmentExtraStudentIds = [];
 
         $this->term = TermMapper::getInstance()->findForToday();
-        $this->term->getStart()->addYears(-1); // TODO remove this line. Just here to get more results
-
-        $this->tomorrow = (new \Alaress_Date_Format(null, \Alaress_Date_Format::DATABASE_FORMAT))->addDays(1);
+        $this->term->getStart()->addYears(-1); // TODO remove this line. Just here to get more data
     }
 
 
-
     /**
-     * Get Assessments for specified User that have participants that have submitted work
-     * that requires marking.
+     * Get Assessments that belong to Classes taught by User, or Groups administered by User.
      *
-     * Assessments may live directly on folders, or in UnitImplementations that reside on a folder.
+     * Also get any Assessments created by the User.
      *
-     * If an assessment belongs to a unit, we need that units name, and its course's name.
+     * Note that Projects do not have a 'creator', so we don't have to handle odd case where
+     * UserA creates ProjectX on UserB's class page, and UserB creates the Assessments in ProjectX.
      *
-     * TODO Also get Quiz where assess.user_id = user.id
-     * TODO Also get DueWork where submission_box.owner = user.id
-     * TODO Also get Task where task_instance.user_id = user.id
+     * Assessments may reside:
+     * * directly on Folders,
+     * * in Projects on Folders,
+     * * in UnitImplementations on Folders
+     * * in Projects that are in UnitImplementation on Folders
      *
-     * @param User $user
      * @return Collection|IAssessable[]
      */
-    public function getPendingAssessments(User $user)
+    public function getPendingAssessments()
+    {
+        $this->getTaughtClasses();
+        $this->getGroupsAdministered();
+        $this->getAssessments();
+        $this->getClassStudentLists();
+        $this->getStudentsForClassesAndGroups();
+        $this->createAssessmentParticipants();
+
+        // We now have Assessments, linked to their Contexts, and with their Participants.
+        // Let's populate and link up the Responses and Feedbacks to the Assessments and Participants
+
+        // Need to handle Responses and Feedbacks for Users who are not in the Group or Class studentList.
+        // - Run all DB Response/Feedback queries & store results in associative arrays
+        // - iterate arrays to find missing students (if missing from assessment, but exists in student cache, we can skip)
+        // - Get all missing students from DB, and add to studentCache
+        // - Now process result arrays, inserting missing Participants when required.
+
+        $quizResults = $this->getQuizResponsesAndFeedback();
+        $taskResults = $this->getTaskResponsesAndFeedback();
+        $dueWorkResponses = $this->getDueWorkResponses();
+        $dueWorkFeedbackResults = $this->getDueWorkFeedbacks();
+
+        $this->getMissingUsers();
+
+        // Process the results, creating extra Participants where required, pulling User from caches
+        $this->hydrateQuizResults($quizResults);
+        $this->hydrateTaskResults($taskResults);
+        $this->hydrateDueWorkResponses($dueWorkResponses);
+        $this->hydrateDueWorkFeedbacks($dueWorkFeedbackResults);
+
+        return $this->assessmentsCache;
+    }
+
+
+    /**
+     * @return \External_UserInterface
+     */
+    private function getExternalUser()
+    {
+        if(!$this->externalUser instanceof \External_UserInterface){
+            $this->externalUser = new \External_User();
+        }
+        return $this->externalUser;
+    }
+
+    /**
+     * @return \External_ClassInterface
+     */
+    private function getExternalClass()
+    {
+        if(!$this->externalClass instanceof \External_ClassInterface){
+            $this->externalClass = new \External_Class();
+        }
+        return $this->externalClass;
+    }
+
+
+    /**
+     * Ensure each logically same Folder is same object instance
+     *
+     * @param int $id
+     * @param string $name
+     */
+    private function cacheFolder($id, $name)
+    {
+        $id = intval($id);
+        if(!$this->foldersCache[$id] instanceof Folder){
+            $this->foldersCache[$id] = (new Folder())->setId($id)->setName($name);
+        }
+    }
+
+    /**
+     * Ensure each logically same Project is same object instance
+     *
+     * @param int $id
+     * @param string $title
+     */
+    private function cacheProject($id, $title)
+    {
+        $id = intval($id);
+        if(!$this->projectCache[$id] instanceof Project){
+            $this->projectCache[$id] = (new Project())->setId($id)->setTitle($title);
+        }
+    }
+
+    /**
+     * Ensure each logically same CourseSpecification is same object instance
+     *
+     * @param int $id
+     */
+    private function cacheCourseSpecification($id)
+    {
+        $id = intval($id);
+        if(!$this->courseSpecsCache[$id] instanceof CourseSpecification){
+            $this->courseSpecsCache[$id] = (new CourseSpecification())->setId($id);
+        }
+    }
+
+    /**
+     * Ensure each logically same CourseSpecification is same object instance
+     *
+     * @param int $id
+     */
+    private function cacheCourseImplementation($id)
+    {
+        $id = intval($id);
+        if(!$this->courseImplsCache[$id] instanceof CourseImplementation){
+            $this->courseImplsCache[$id] = (new CourseImplementation())->setId($id);
+        }
+    }
+
+    /**
+     * Ensure each logically same UnitSpecification is same object instance
+     *
+     * @param int $id
+     */
+    private function cacheUnitSpecification($id)
+    {
+        $id = intval($id);
+        if(!$this->unitSpecsCache[$id] instanceof UnitSpecification){
+            $this->unitSpecsCache[$id] = (new UnitSpecification())->setId($id);
+        }
+    }
+
+    /**
+     * Ensure each logically same UnitImplementation is same object instance
+     *
+     * @param int $id
+     */
+    private function cacheUnitImplementation($id)
+    {
+        $id = intval($id);
+        if(!$this->unitImplsCache[$id] instanceof UnitImplementation){
+            $this->unitImplsCache[$id] = (new UnitImplementation())->setId($id);
+        }
+    }
+
+    /**
+     * Adds the specified classCode to the specified folder's set.
+     *
+     * Does NOT ensure codes are only added once.
+     *
+     * @param int $folderId
+     * @param string $code
+     */
+    private function addClassCodeToFolder($folderId, $code)
+    {
+        if(!$this->folderClassCodes[$folderId] instanceOf Collection){
+            $this->folderClassCodes[$folderId] = new Collection();
+        }
+        $this->folderClassCodes[$folderId]->add($code);
+    }
+
+    /**
+     * Get Assessments associated with Classes taught, or Groups administered, by User.
+     * Also get Assessments created by User.
+     *
+     * Required Data:
+     * * CourseSpec's Folder id/name
+     * * UnitSpec's Folder id/name
+     * * Subject/Group Folder id/name
+     * * Project name
+     * so we can build context breadcrumbs
+     *
+     * This is because UserA may create an Assessment on a pageX taught by UserB.
+     * UserA is still interested in this Assessment, but not in other Assessments on pageX
+     *
+     * Case 1: Assessment resides directly on Folder                  => Folder name+id
+     * Case 2: Assessment in Project that resides on Folder           => Folder name+id + Project name
+     * Case 3: Assessment in UnitImpl imported on Folder              => Folder name+id + UnitSpec name+id + ClassSpec name+id
+     * Case 4: Assessment in Project in UnitImpl imported on Folder   => Folder name+id + UnitSpec name+id + ClassSpec name+id + Project name
+     */
+    private function getAssessments()
     {
 
-$this->start = microtime(true);
-
-        // Get Subjects taught by User
-
-        // Do we already have the subject collection?
-        if ($subjectsTaught = $user->getSubjectCollection()) {
-            // Get SubjectIds
-            foreach ($subjectsTaught as $row) {
-                $this->subjectIds[intval($row['id'])] = intval($row['id']);
-                $this->createFolder($row['id'], $row['name']);
-                $this->saveFolderCode($row['id'], $row['code']);
-            }
-        } else {
-            // Get Subjects Taught from External_DB
-            $subjects = $this->getExternalUser()->getSubjectList($user->getExternalId(), $user->getId()); //var_dump($subjects);
-
-            // Get SubjectCodes + SB FolderIds
-            if(is_array($subjects) && !empty($subjects)) {
-                $folderCodes = array_map(
-                    function ($row) {
-                        return trim($row['code']);
-                    }, $subjects
-                );
-                $prefixedCodeClause = '';
-                foreach ($folderCodes as $folderCode) {
-                    $prefixedCodeClause .= ' OR fc.code LIKE "%/' . $folderCode . '"';
-                }
-                $wrappedRawCodes = array_map(
-                    function ($code) {
-                        return "'$code'";
-                    }, $folderCodes
-                );
-                $query = "
-                    SELECT 
-                        f.id AS 'f.id',
-                        f.name AS 'f.name',
-                        fc.code AS 'fc.code'
-                    FROM folder f
-                    JOIN folder_code fc ON fc.folder_id = f.id
-                    WHERE f.deleted_at IS NULL 
-                    AND fc.deleted_at IS NULL
-                    AND (fc.code IN (".implode(',',$wrappedRawCodes).") $prefixedCodeClause)
-                ";
-
-                $statement = $this->database->prepare($query);
-                $statement->execute();
-                //$this->printTable($statement->fetchAll(\PDO::FETCH_ASSOC)); die();
-                while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                    $this->subjectIds[$row['f.id']] = intval($row['f.id']);
-                    $this->createFolder($row['f.id'], $row['f.name']);
-                    $this->saveFolderCode($row['f.id'], $row['fc.code']);
-                }
-            }
-        }
-
-        // Get Groups administered
-        $query = "
-            SELECT 
-                f.id AS 'f.id',
-                f.name AS 'f.name'
-            FROM folder f
-            JOIN userAccess ua ON ua.sid = f.id
-            WHERE f.deleted_at IS NULL
-            AND ua.uid = {$user->getId()}
-            AND ua.type >= ".UserAccess::ACCESS_READ."
-            AND ua.service = ".UserAccess::SERVICE_HOMEPAGE."
-        ";
-        //die($query);
-        $statement = $this->database->prepare($query);
-        $statement->execute();
-
-        while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            $this->createFolder($row['f.id'], $row['f.name']);
-            $this->groupIds[$row['f.id']] = intval($row['f.id']);
-        }
-
-
-
-
-        /* Get GroupIds and SubjectCodes where User has created Work so we can generated Participant Lists
-         *
-         * Also get:
-         * * CourseSpec's Folder id/name
-         * * UnitSpec's Folder id/name
-         * * Subject/Group Folder id/name
-         * * Project name
-         * so we can build context breadcrumbs
-         *
-         * This is because UserA may create an Assessment on a pageX taught by UserB.
-         * UserA is still interested in this Assessment, but not in other Assessments on pageX
-         *
-         * Case 1: Assessment resides directly on Folder                  => Folder name+id
-         * Case 2: Assessment in Project that resides on Folder           => Folder name+id + Project name
-         * Case 3: Assessment in UnitImpl imported on Folder              => Folder name+id + UnitSpec name+id + ClassSpec name+id
-         * Case 4: Assessment in Project in UnitImpl imported on Folder   => Folder name+id + UnitSpec name+id + ClassSpec name+id + Project name
-         */
         // Get Assessments for Groups and Subjects administered/taught by User
-        $folderIds = array_unique(array_merge($this->subjectIds, $this->groupIds));
+        $folderIds = array_unique(array_merge($this->classIds, $this->groupIds));
 
         $folderClause = count($folderIds) ? " OR f.id IN (".implode(',',$folderIds).") " : '';
         $query1 = "
@@ -364,7 +466,7 @@ $this->start = microtime(true);
             LEFT JOIN folder_code fc    ON fc.folder_id = f.id AND fc.deleted_at IS NULL
             LEFT JOIN userGroups ug     ON ug.cid = f.id
             
-            WHERE ((qz.user_id = {$user->getId()} OR dw.owner = {$user->getId()} OR tk.user_id = {$user->getId()}) $folderClause)
+            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
             AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL OR tk.id IS NOT NULL)
             AND a.due_date >= STR_TO_DATE('".$this->term->getStart()->getDatabase()."', '%Y-%m-%d %H:%i:%s')
         ";
@@ -411,7 +513,7 @@ $this->start = microtime(true);
             LEFT JOIN folder_code fc    ON fc.folder_id = pf.id AND fc.deleted_at IS NULL
             LEFT JOIN userGroups ug     ON ug.cid = pf.id
             
-            WHERE ((qz.user_id = {$user->getId()} OR dw.owner = {$user->getId()} OR tk.user_id = {$user->getId()}) $folderClause)
+            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
             AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL OR tk.id IS NOT NULL)
             AND a.due_date >= STR_TO_DATE('".$this->term->getStart()->getDatabase()."', '%Y-%m-%d %H:%i:%s')
         ";
@@ -461,7 +563,7 @@ $this->start = microtime(true);
             LEFT JOIN folder_code fc                       ON fc.folder_id = cif.id AND fc.deleted_at IS NULL
             LEFT JOIN userGroups ug                        ON ug.cid = cif.id
             
-            WHERE ((qz.user_id = {$user->getId()} OR dw.owner = {$user->getId()} OR tk.user_id = {$user->getId()}) $folderClause)
+            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
             AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL OR tk.id IS NOT NULL)
             AND a.due_date >= STR_TO_DATE('".$this->term->getStart()->getDatabase()."', '%Y-%m-%d %H:%i:%s')
         ";
@@ -515,58 +617,183 @@ $this->start = microtime(true);
             LEFT JOIN folder_code fc                       ON fc.folder_id = cif.id AND fc.deleted_at IS NULL
             LEFT JOIN userGroups ug                        ON ug.cid = cif.id
             
-            WHERE ((qz.user_id = {$user->getId()} OR dw.owner = {$user->getId()} OR tk.user_id = {$user->getId()}) $folderClause)
+            WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
             AND a.due_date >= STR_TO_DATE('".$this->term->getStart()->getDatabase()."', '%Y-%m-%d %H:%i:%s')
         ";
 
-        //$statement = $this->database->prepare("SELECT * FROM ($query1 UNION $query2 UNION $query3 UNION $query4) AS temp ORDER BY `a.id`");
         $statement = $this->database->prepare("$query1 UNION $query2 UNION $query3 UNION $query4");
 
         $statement->execute();
-        $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
-        //$this->printTable($rows); die();
-        $this->parseAssessments($rows);
-        //$this->printCrumbs($this->assessmentsCache);
-        //die();
+        $this->parseAssessments($statement);
+    }
 
 
 
 
-        // var_dump('time: '.(microtime(true)-$this->start));
 
+    /**
+     * Iterate over results to build Assessment graph
+     *
+     * Extract and cache any GroupIds or ClassCodes to later retrieve the studentLists
+     *
+     * @param \PDOStatement $statement
+     */
+    private function parseAssessments($statement)
+    {
+        while($row = $statement->fetch(\PDO::FETCH_ASSOC)){
 
+            $assessmentId = intval($row['a.id']);
 
-        //var_dump($user->getSubjectCollection());die();
+            // Hydrate Assessment
+            if(!$this->assessmentsCache[$assessmentId] instanceof IAssessable){
 
+                // Create Quiz / DueWork / Task object
 
-        // Add TaughtSubjects to SubjectsWithCreatedAssessments to get Participant Lists
+                // Add ID to type array for later retrieval of Response / Feedback
+                if(!is_null($row['qz.id'])){
+                    $this->quizAssessmentIds[$assessmentId] = $assessmentId;
+                    $this->assessmentsCache[$assessmentId] = new Quiz();
+                    $this->assessmentsCache[$assessmentId]->setQuizId($row['qz.id']);
+                } else if(!is_null($row['dw.id'])){
+                    $this->dueWorkAssessmentIds[$assessmentId] = intval($assessmentId);
+                    $this->assessmentsCache[$assessmentId] = new DueWork();
+                    $this->assessmentsCache[$assessmentId]->setDueWorkId($row['dw.id']);
+                } else if(!is_null($row['tk.id'])){
+                    $this->taskAssessmentIds[$assessmentId] = intval($assessmentId);
+                    $this->assessmentsCache[$assessmentId] = new Task();
+                    $this->assessmentsCache[$assessmentId]->setTaskId($row['tk.id']);
+                } else {
+                    throw new \LogicException('Assessment must be Quiz, DueWork or Task: '.print_r($row,true));
+                }
 
+                $assessment = $this->assessmentsCache[$assessmentId];
+                $assessment->setId($assessmentId);
+                $assessment->setTitle($row['a.title']);
 
-        // Get Student Lists for each Subject
-        foreach($this->subjectIds as $subjectId){
+                // It is VERY slow to create a new AlaressDateFormat from a DB formatted string.
+                $assessment->setDueAt($this->getFastDateFromString($row['a.due_date']));
 
-            $uniqueCodes = array_unique($this->subjectCodes[$subjectId]->getAll());
+                $projectId            = intval($row['p.id']);
+                $projectTitle         = $row['p.title'];
+                $unitImplId           = intval($row['ui.id']);
+                $unitSpecId           = intval($row['us.id']);
+                $courseImplId         = intval($row['ci.id']);
+                $courseSpecId         = $row['cs.id'];
+                $folderId             = intval($row['f.id']);
+                $folderName           = $row['f.name'];
+                $unitSpecFolderId     = intval($row['usf.id']);
+                $unitSpecFolderName   = $row['usf.name'];
+                $courseSpecFolderId   = intval($row['csf.id']);
+                $courseSpecFolderName = $row['csf.name'];
 
-            $this->folderToStudentListMap[$subjectId] = [];
-            $studentList = $this->getExternalClass()->getStudents(implode(',',$uniqueCodes));
-            //var_dump("getting classLists($subjectId)... time: ".(microtime(true)-$this->start));
+                switch($row['case']){
+                    // Case 1 - Assessment resides directly on Folder
+                    case 1:
+                        $this->cacheFolder($folderId, $folderName);
+                        $assessment->setContext($this->foldersCache[$folderId]);
+                        break;
+                    // Case 2 - Assessment in Project that resides directly on Folder
+                    case 2:
+                        $this->cacheProject($projectId, $projectTitle);
+                        $this->cacheFolder($folderId, $folderName);
+                        $assessment->setContext($this->projectCache[$projectId]);
+                        $this->projectCache[$projectId]->setContext($this->foldersCache[$folderId]);
+                        break;
+                    case 3:
+                        $this->cacheUnitImplementation($unitImplId);
+                        $this->cacheUnitSpecification($unitSpecId);
+                        $this->cacheCourseImplementation($courseImplId);
+                        $this->cacheCourseSpecification($courseSpecId);
+                        $this->cacheFolder($unitSpecFolderId, $unitSpecFolderName);
+                        $this->cacheFolder($folderId, $folderName);
+                        $this->cacheFolder($courseSpecFolderId, $courseSpecFolderName);
+
+                        $assessment->setContext($this->unitImplsCache[$unitImplId]);
+                        $this->unitImplsCache[$unitImplId]->setSpecification($this->unitSpecsCache[$unitSpecId]);
+                        $this->unitSpecsCache[$unitSpecId]->setFolder($this->foldersCache[$unitSpecFolderId]);
+                        $this->unitImplsCache[$unitImplId]->setCourse($this->courseImplsCache[$courseImplId]);
+                        $this->courseImplsCache[$courseImplId]->setFolder($this->foldersCache[$folderId]);
+                        $this->courseImplsCache[$courseImplId]->setSpecification($this->courseSpecsCache[$courseSpecId]);
+                        $this->courseSpecsCache[$courseSpecId]->setFolder($this->foldersCache[$courseSpecFolderId]);
+                        break;
+                    case 4:
+                        $this->cacheProject($projectId, $projectTitle);
+                        $this->cacheUnitImplementation($unitImplId);
+                        $this->cacheUnitSpecification($unitSpecId);
+                        $this->cacheCourseImplementation($courseImplId);
+                        $this->cacheCourseSpecification($courseSpecId);
+                        $this->cacheFolder($unitSpecFolderId, $unitSpecFolderName);
+                        $this->cacheFolder($folderId, $folderName);
+                        $this->cacheFolder($courseSpecFolderId, $courseSpecFolderName);
+
+                        $assessment->setContext($this->projectCache[$projectId]);
+                        $this->projectCache[$projectId]->setContext($this->unitImplsCache[$unitImplId]);
+                        $this->unitImplsCache[$unitImplId]->setSpecification($this->unitSpecsCache[$unitSpecId]);
+                        $this->unitSpecsCache[$unitSpecId]->setFolder($this->foldersCache[$unitSpecFolderId]);
+                        $this->unitImplsCache[$unitImplId]->setCourse($this->courseImplsCache[$courseImplId]);
+                        $this->courseImplsCache[$courseImplId]->setFolder($this->foldersCache[$folderId]);
+                        $this->courseImplsCache[$courseImplId]->setSpecification($this->courseSpecsCache[$courseSpecId]);
+                        $this->courseSpecsCache[$courseSpecId]->setFolder($this->foldersCache[$courseSpecFolderId]);
+                        break;
+                    default:
+                        throw new \LogicException('Cannot derive AssessmentContext: '.print_r($row,true));
+                }
+            }
+
+            // ClassCodes
+            $classCode = $row['fc.code'];
+            if(!is_null($classCode)){
+                $folder = $this->assessmentsCache[$assessmentId]->getContext()->getFolder();
+                $folder->getCodes()->add(new FolderCode($classCode));
+                $classFolderId = $folder->getId();
+                $this->classIds[$classFolderId] = $classFolderId;
+                $this->addClassCodeToFolder($classFolderId, $classCode);
+
+            }
+            // Group IDs
+            $groupId = $row['g.id'];
+            if(!is_null($groupId)){
+                $this->groupIds[$groupId] = intval($groupId);
+            }
+        }
+    }
+
+    /**
+     * For each Class taught by this User, or where the User has created an assessment, get a list of students.
+     *
+     * Generate two structures:
+     * 1. A list of all user.externalIds
+     * 2. A map of classIds to sets of user.externalsIds
+     */
+    private function getClassStudentLists()
+    {
+        // Get Student Lists for each Class
+        foreach($this->classIds as $classId){
+
+            $uniqueCodes = array_unique($this->folderClassCodes[$classId]->getAll());
+
+            $this->folderToStudentListMap[$classId] = [];
+            $classList = $this->getExternalClass()->getStudents(implode(',',$uniqueCodes));
 
             // Each Student in Subject
-            if(is_array($studentList)) {
-                foreach ($studentList as $student) {
+            if(is_array($classList)) {
+                foreach ($classList as $student) {
                     $this->studentExternalIds[$student['synergy_id']] = $student['synergy_id'];
-                    $this->folderToStudentListMap[$subjectId][$student['synergy_id']] = $student['synergy_id'];
+                    $this->folderToStudentListMap[$classId][$student['synergy_id']] = $student['synergy_id'];
                 }
             }
         }
-//    var_dump($this->groupsAdministeredIds);
-//    var_dump($this->groupsWithCreatedAssessmentsIds);
-//        var_dump(array_unique(array_merge($this->groupsAdministeredIds,$this->groupsWithCreatedAssessmentsIds)));
-//        die();
-
-        //var_dump($this->folderToStudentListMap);
+    }
 
 
+    /**
+     * Get Student data from SB database to build User objects.
+     *
+     * For classes we find the user using their externalId
+     * For groups we find the users belonging to that group
+     */
+    private function getStudentsForClassesAndGroups()
+    {
         // Get Students with matching externalIds, or in Groups
         if(!empty($this->groupIds) || !empty($this->studentExternalIds))
         {
@@ -607,14 +834,12 @@ $this->start = microtime(true);
                     AND u.deleted_at IS NULL
                 ";
             }
-            $query = "SELECT * FROM ($query) AS temp ORDER BY `u.id`";
             $statement = $this->database->prepare($query);
             $statement->execute();
             $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
-            //$this->printTable($rows);die();
 
             foreach($rows as $row){
-                $this->createStudent($row['u.id'], $row['u.synergy_id'], $row['u.firstname'], $row['u.lastname']);
+                $this->cacheUser($row['u.id'], $row['u.synergy_id'], $row['u.firstname'], $row['u.lastname']);
 
                 // Was this user from a Group ?
                 if(!is_null($row['g.id'])){
@@ -625,15 +850,16 @@ $this->start = microtime(true);
                 }
             }
         }
+    }
 
-        //var_dump($this->folderToStudentListMap);die();
-
-//var_dump('time: '.(microtime(true) - $this->start));
-
-
+    /**
+     * For each Assessment, get its underlying context's folderId.
+     * Each User associated with that folder becomes a Participant of the Assessment.
+     */
+    private function createAssessmentParticipants()
+    {
         // We have all Student ExternalIds, grouped by Subject/Group FolderId
         // We also have a cache of all Student User objects, indexed by Student.ExternalId
-        // Lets turn them all into participants
         foreach($this->assessmentsCache as $assessment){
             $folderId = $assessment->getContext()->getFolder()->getId();
 
@@ -648,37 +874,29 @@ $this->start = microtime(true);
             }
             $assessment->setAllParticipants($participants);
         }
+    }
 
-        // We now have Assessments, linked to their Contexts, and with their Participants.
-        // Lets populate and link up the Responses and Feedbacks to the Assessments and Participants
+    /**
+     * Get any QuizAttempts or QuizReviews related to selected Quizzes
+     *
+     * @return array
+     */
+    private function getQuizResponsesAndFeedback()
+    {
+        // Bug out early if no quizzes
+        if(!count($this->quizAssessmentIds)) {
+            return [];
+        }
 
-        // Need to handle Responses and Feedbacks for Users who are not in the Group or Subject studentList.
-        // - Run all DB Response/Feedback queries & store results in associative arrays
-        // - iterate arrays to find missing students (if missing from assessment, but exists in student cache, we can skip)
-        // - Get all missing students from DB, and add to studentCache
-        // - Now process result arrays, inserting new Participants when required.
-
-        /**
-         * Students with Responses/Feedbacks but not in Group/Class studentList
-         * key = val = user.id
-         *
-         * @var int[] $assessmentExtraStudentIds
-         */
-        $assessmentExtraStudentIds = [];
-
-        //var_dump($this->quizAssessmentIds);die();
-
-        if(count($this->quizAssessmentIds) && count($this->studentInternalIds)) {
-
-            // Get Quiz Attempts for all selected students
-            $query = "
+        // Get QuizAttempts for specified Quizzes
+        $query = "
             SELECT
-                q.assessment_id AS 'q.assessment_id',
-                qa.attempt_id   AS 'qa.attempt_id',
-                qa.user_id      AS 'qa.user_id',
-                qa.start        AS 'qa.start',
-                qa.finish       AS 'qa.finish',
-                qa.reviewed_at  AS 'qa.reviewed_at',
+                q.assessment_id      AS 'q.assessment_id',
+                qa.attempt_id        AS 'qa.attempt_id',
+                qa.user_id           AS 'qa.user_id',
+                qa.start             AS 'qa.start',
+                qa.finish            AS 'qa.finish',
+                qa.reviewed_at       AS 'qa.reviewed_at',
                 min(qs.section_id)   AS 'qs.first_section_id'                                
             FROM assess q
             JOIN assess_attempt qa ON qa.assess_id = q.assess_id AND qa.deleted_at IS NULL
@@ -686,44 +904,36 @@ $this->start = microtime(true);
             WHERE q.deleted_at IS NULL
             AND q.availability = 'assess'
             AND q.assessment_id IN (" . implode(',', $this->quizAssessmentIds) . ") 
-            AND qa.user_id IN (" . implode(',', $this->studentInternalIds) . ")
-            
             GROUP BY q.assessment_id, qa.attempt_id, qa.user_id
-            
-            ORDER BY qa.attempt_id
         ";
 
-            //die($query);
-            $statement = $this->database->prepare($query);
-            $statement->execute();
-            $quizResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
-            $this->printTable($quizResults);
-            //die();
+        $statement = $this->database->prepare($query);
+        $statement->execute();
+        $quizResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
-            // Find Students who attempted Quizzes but weren't in the class
-            foreach ($quizResults as $row) {
-                $studentId = intval($row['qa.user_id']);
-                $participants = $this->assessmentsCache[$row['q.assessment_id']]->getAllParticipants();
-                // Are we missing the student and student does not exists in student cache?
-                if (!$participants[$studentId] && !$this->studentIntCache[$studentId]) {
-                    $assessmentExtraStudentIds[$studentId] = $studentId;
-                }
-            }
-        } else {
-            $quizResults = [];
+        // Find Students who attempted Quizzes but are't in the current studentList
+        $this->findExtraStudentResults($quizResults, 'qa.user_id', 'q.assessment_id');
+
+        return $quizResults;
+    }
+
+
+    /**
+     * Get any TaskCompletions or TaskFeedbacks related to selected Tasks
+     *
+     * @return array
+     */
+    private function getTaskResponsesAndFeedback()
+    {
+        // Bug out early if no Tasks
+        if(!count($this->taskAssessmentIds)) {
+            return [];
         }
-
-
-        //var_dump($this->assessmentsCache); die();
-
-
-
-//var_dump('time: '.(microtime(true) - $this->start));
 
         // Get Task Completions for all selected students
         $query = "
             SELECT 
-                t.assessment_id         AS 't.assessment_id',
+                t.assessment_id          AS 't.assessment_id',
                 ti.requires_confirmation AS 'ti.requires_confirmation',
                 tic.id                   AS 'tic.id',
                 tic.student_id           AS 'tic.student_id',
@@ -733,116 +943,106 @@ $this->start = microtime(true);
             JOIN task_instance ti ON ti.task_id = t.id AND ti.deleted_at IS NULL
             JOIN task_instance_completion tic ON tic.task_instance_id = ti.id
             WHERE t.deleted_at IS NULL
-            AND t.assessment_id IN (" . implode(',', $this->taskAssessmentIds) . ") 
-            AND tic.student_id IN (" . implode(',', $this->studentInternalIds) . ")
+            AND t.assessment_id IN (" . implode(',', $this->taskAssessmentIds) . ")
         ";
 
-        //die($query);
         $statement = $this->database->prepare($query);
         $statement->execute();
         $taskResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
-        $this->printTable($taskResults); //die();
 
-        // Find Students who completed Tasks but weren't in the class
-        foreach($taskResults as $row){
-            $studentId = intval($row['tic.student_id']);
-            $participants = $this->assessmentsCache[$row['t.assessment_id']]->getAllParticipants();
-            // Are we missing the student and student does not exists in student cache?
-            if(!$participants[$studentId] && !$this->studentIntCache[$studentId]){
-                $assessmentExtraStudentIds[$studentId] = $studentId;
-            }
+        // Find Students who attempted Tasks but are't in the current studentList
+        $this->findExtraStudentResults($taskResults, 'tic.student_id', 't.assessment_id');
+
+        return $taskResults;
+    }
+
+
+    /**
+     * Get any DueWork Submissions related to selected DueWork
+     *
+     * @return array
+     */
+    private function getDueWorkResponses()
+    {
+        // Bug out early if no DueWork
+        if(!count($this->dueWorkAssessmentIds)) {
+            return [];
         }
 
+        // Get Due Work Submissions for all selected students
+        $query = "
+            SELECT
+                sb.assessment_id   AS 'sb.assessment_id',
+                sb.mark_visibility AS 'sb.mark_visibility',
+                ss.id              AS 'ss.id',
+                ss.owner           AS 'ss.owner',
+                ss.submitted       AS 'ss.submitted',
+                ss.marked          AS 'ss.marked'
+            FROM submission_box sb
+            JOIN student_submission ss ON ss.box_id = sb.id
+            WHERE sb.deleted = 0
+            AND ss.draft = 0
+            AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ")
+        ";
+        $statement = $this->database->prepare($query);
+        $statement->execute();
+        $dueWorkSubmissions = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
+        // Find Students who submitted DueWorkSubmissions but are't in the current studentList
+        $this->findExtraStudentResults($dueWorkSubmissions, 'ss.owner', 'sb.assessment_id');
 
+        return $dueWorkSubmissions;
+    }
 
-
-        //die();
-//var_dump('time: '.(microtime(true) - $this->start));
-
-        if(count($this->dueWorkAssessmentIds) && count($this->studentInternalIds)){
-            // Get Due Work Submissions for all selected students
-            $query = "
-                SELECT
-                    sb.assessment_id   AS 'sb.assessment_id',
-                    sb.mark_visibility AS 'sb.mark_visibility',
-                    ss.id              AS 'ss.id',
-                    ss.owner           AS 'ss.owner',
-                    ss.submitted       AS 'ss.submitted',
-                    ss.marked          AS 'ss.marked'
-                FROM submission_box sb
-                JOIN student_submission ss ON ss.box_id = sb.id
-                WHERE sb.deleted = 0
-                AND ss.draft = 0
-                AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ") 
-                AND ss.owner IN (" . implode(',', $this->studentInternalIds) . ")              
-            ";
-            //die($query);
-            $statement = $this->database->prepare($query);
-            $statement->execute();
-            $dueWorkResponseResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
-        } else {
-            $dueWorkResponseResults = [];
+    /**
+     * Get any DueWork Feedback related to selected DueWork
+     *
+     * @return array
+     */
+    private function getDueWorkFeedbacks()
+    {
+        // Bug out early if no DueWork
+        if(!count($this->dueWorkAssessmentIds)) {
+            return [];
         }
-        $this->printTable($dueWorkResponseResults);
+        $query = "
+            SELECT
+                sb.assessment_id                 AS 'sb.assessment_id',
+                sb.mark_visibility               AS 'sb.mark_visibility',
+                sr.id                            AS 'sr.id',
+                sr.marker                        AS 'sr.marker',
+                sr.owner                         AS 'sr.owner',
+                sr.returned                      AS 'sr.returned',
+                sr.is_confirmation_of_submission AS 'sr.is_confirmation_of_submission'
+            FROM submission_box sb
+            JOIN submission_return sr ON sr.box_id = sb.id 
+            WHERE sb.deleted = 0
+            AND sr.deleted_at IS NULL
+            AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ")
+        ";
 
-        // Find Students who submitted DueWorkSubmissions but weren't in the class
-        foreach($dueWorkResponseResults as $row){
-            $studentId = intval($row['ss.owner']);
-            $participants = $this->assessmentsCache[$row['sb.assessment_id']]->getAllParticipants();
-            // Are we missing the student and student does not exists in student cache?
-            if(!$participants[$studentId] && !$this->studentIntCache[$studentId]){
-                $assessmentExtraStudentIds[$studentId] = $studentId;
-            }
-        }
+        $statement = $this->database->prepare($query);
+        $statement->execute();
+        $dueWorkFeedbacks = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
+        // Find Students who received DueWork Feedback but are't in the current studentList
+        $this->findExtraStudentResults($dueWorkFeedbacks, 'sr.owner', 'sb.assessment_id');
 
-
-        if(count($this->dueWorkAssessmentIds) && count($this->studentInternalIds)){
-            // Get Due Work Returns for all selected students
-            $query = "
-                SELECT
-                    sb.assessment_id                 AS 'sb.assessment_id',
-                    sb.mark_visibility               AS 'sb.mark_visibility',
-                    sr.id                            AS 'sr.id',
-                    sr.marker                        AS 'sr.marker',
-                    sr.owner                         AS 'sr.owner',
-                    sr.returned                      AS 'sr.returned',
-                    sr.is_confirmation_of_submission AS 'sr.is_confirmation_of_submission'
-                FROM submission_box sb
-                JOIN submission_return sr ON sr.box_id = sb.id 
-                WHERE sb.deleted = 0
-                AND sr.deleted_at IS NULL
-                AND sb.assessment_id IN (" . implode(',', $this->dueWorkAssessmentIds) . ") 
-                AND sr.owner IN (" . implode(',', $this->studentInternalIds) . ")             
-            ";
-
-            //die($query);
-            $statement = $this->database->prepare($query);
-            $statement->execute();
-            $dueWorkFeedbackResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
-        } else {
-            $dueWorkFeedbackResults = [];
-        }
-
-        $this->printTable($dueWorkFeedbackResults);
-
-        // Find Students who received DueWork Feedback but weren't in the class
-        foreach($dueWorkFeedbackResults as $row){
-            $studentId = intval($row['sr.owner']);
-            $participants = $this->assessmentsCache[$row['sb.assessment_id']]->getAllParticipants();
-            // Are we missing the student and student does not exists in student cache?
-            if(!$participants[$studentId] && !$this->studentIntCache[$studentId]){
-                $assessmentExtraStudentIds[$studentId] = $studentId;
-            }
-        }
+        return $dueWorkFeedbacks;
+    }
 
 
-        //die();
 
-
+    /**
+     * When retrieving Assessment Responses and Feedbacks, we may have
+     * found references to Users not in the current Participant lists.
+     *
+     * In also unable to locate the missing students in our cache, we need to go back to SB DB.
+     */
+    private function getMissingUsers()
+    {
         // Do we have Responses / Feedbacks for students that are not yet loaded?
-        if(count($assessmentExtraStudentIds)){
+        if(count($this->assessmentExtraStudentIds)){
             $query = "
                 SELECT 
                     u.id         AS 'u.id',
@@ -850,23 +1050,24 @@ $this->start = microtime(true);
                     u.firstname  AS 'u.firstname',
                     u.lastname   AS 'u.lastname'
                 FROM user u
-                WHERE u.id IN (".implode(',',$assessmentExtraStudentIds).")
+                WHERE u.id IN (".implode(',',$this->assessmentExtraStudentIds).")
             ";
             $statement = $this->database->prepare($query);
             $statement->execute();
             $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
-            echo '<br><h2>Extra Students:</h2>'; $this->printTable($rows);
             foreach($rows as $row){
-                $this->createStudent($row['u.id'], $row['u.synergy_id'], $row['u.firstname'], $row['u.lastname']);
+                $this->cacheUser($row['u.id'], $row['u.synergy_id'], $row['u.firstname'], $row['u.lastname']);
             }
-
         }
+    }
 
-        // Process the results, creating extra Participants where required, pulling User from caches
-
-
-
-        //$this->printTable($quizResults); //die();
+    /**
+     * Create QuizResponses and QuizFeedbacks from DB results
+     *
+     * @param array $quizResults
+     */
+    private function hydrateQuizResults($quizResults)
+    {
         foreach($quizResults as $row){
             $quiz = $this->assessmentsCache[$row['q.assessment_id']];
             $userId = $row['qa.user_id'];
@@ -884,7 +1085,6 @@ $this->start = microtime(true);
 
             // Are we missing the Participant?
             if(!$participants[$userId]){
-                echo "<span style='color:green;'>Missing Quiz Participant ".$userId." - Generating from cache...</span></br>";
                 $participants[$userId] = new Participant($this->studentIntCache[$userId]);
             }
             $participants[$userId]->getAllResponses()->add($response);
@@ -902,11 +1102,17 @@ $this->start = microtime(true);
                 $response->getAllFeedback()->add($feedback);
                 $quiz->getFeedbacks()->add($feedback);
                 $participants[$userId]->getAllFeedbacks()->add($feedback);
-
-                //var_dump($feedback);die();
             }
         }
+    }
 
+    /**
+     * Create TaskResponses and TaskFeedbacks from DB results
+     *
+     * @param array $taskResults
+     */
+    private function hydrateTaskResults($taskResults)
+    {
         foreach($taskResults as $row){
             $task = $this->assessmentsCache[$row['t.assessment_id']];
             $userId = $row['tic.student_id'];
@@ -919,10 +1125,8 @@ $this->start = microtime(true);
             $task->getResponses()->add($response);
             $participants = $task->getAllParticipants();
 
-
             // Are we missing the Participant?
             if(!$participants[$userId]){
-                echo "<span style='color:green;'>Missing Task Participant ".$userId."- Generating from cache...</span></br>";
                 $participants[$userId] = new Participant($this->studentIntCache[$userId]);
             }
             $participants[$userId]->getAllResponses()->add($response);
@@ -942,8 +1146,16 @@ $this->start = microtime(true);
                 $participants[$userId]->getAllFeedbacks()->add($feedback);
             }
         }
+    }
 
-        foreach($dueWorkResponseResults as $row){
+    /**
+     * Create DueWorkResponses from DB results
+     *
+     * @param array $dueWorkResponses
+     */
+    private function hydrateDueWorkResponses($dueWorkResponses)
+    {
+        foreach($dueWorkResponses as $row){
             $dueWork = $this->assessmentsCache[$row['sb.assessment_id']];
             $userId = $row['ss.owner'];
             $response = new DueWorkSubmission();
@@ -957,12 +1169,19 @@ $this->start = microtime(true);
 
             // Are we missing the Participant?
             if(!$participants[$userId]){
-                echo "<span style='color:green;'>Missing DueWork Response Participant ".$userId."- Generating from cache...</span></br>";
                 $participants[$userId] = new Participant($this->studentIntCache[$userId]);
             }
             $participants[$userId]->getAllResponses()->add($response);
         }
+    }
 
+    /**
+     * Create DueWorkFeedbacks from DB results
+     *
+     * @param array $dueWorkFeedbackResults
+     */
+    private function hydrateDueWorkFeedbacks($dueWorkFeedbackResults)
+    {
         foreach($dueWorkFeedbackResults as $row){
             $dueWork = $this->assessmentsCache[$row['sb.assessment_id']];
             $userId = $row['sr.owner'];
@@ -977,386 +1196,48 @@ $this->start = microtime(true);
 
             // Are we missing the Participant?
             if(!$participants[$userId]){
-                echo "<span style='color:green;'>Missing DueWork Feedback Participant ".$userId."- Generating from cache...</span></br>";
                 $participants[$userId] = new Participant($this->studentIntCache[$userId]);
             }
             $participants[$userId]->getAllFeedbacks()->add($feedback);
         }
-
-        // TODO - Hydrate Responses + Feedbacks and add to Assessments + Participants
-
-
-        $this->printPlainTextPage();
-        //die();
-
-
-        return $this->assessmentsCache;
     }
 
-    private function printPlainTextPage()
+    /**
+     * It's quite possible to have Responses or Feedback for Students not in the current studentList.
+     * * Eg, student leaves a class after a submission.
+     *
+     * In this case, record their Id, and we'll fetch them from the DB and add them to the Assessment's Participant List.
+     *
+     * We may already have the User in our cache. If so, no need to fetch from DB.
+     *
+     * @param array $results
+     * @param string $userKey
+     * @param string $assessmentKey
+     */
+    private function findExtraStudentResults($results, $userKey, $assessmentKey)
     {
-        return;
-
-        echo '<table>';
-        echo '<tr>
-            <th>Context</th>
-            <th>Title</th>
-            <th>Type</th>
-            <th>DueDate</th>
-            <th>Participants</th>
-            <th>Responses</th>
-            <th>Feedbacks</th>
-            <th>%<br>Submitted</th>
-            <th>%<br>Marked</th>
-            <th>%<br>Marking<br>Required</th>
-            <th>Needs Marking</th>
-            <th>Needs Chasing</th>
-        </tr>';
-        foreach ($this->assessmentsCache as $assessment){
-            $isLate = $assessment->getDueAt()->lt($this->tomorrow);
-            echo '<tr>';
-            $folderId = $assessment->getContext()->getFolder()->getId();
-            echo "<td><a href='/homepage/$folderId'>$folderId</a></td>\n";
-            echo "<td>{$assessment->getTitle()} ({$assessment->getId()})</td>\n";
-            echo "<td>{$assessment->getTypeName()}</td>\n";
-            echo "<td>{$assessment->getDueAt()->getUsingFormat(\Alaress_Date_Format::DATABASE_DATE_FORMAT)}</td>\n";
-            echo "<td>";
-            foreach($assessment->getAllParticipants() as $participant){
-                echo $participant->getUser()->getFirstname()." ".$participant->getUser()->getLastname()." (".$participant->getUser()->getId().')<br>';
+        foreach ($results as $row) {
+            $studentId = intval($row[$userKey]);
+            $participants = $this->assessmentsCache[$row[$assessmentKey]]->getAllParticipants();
+            // Are we missing the student and student does not exists in student cache?
+            if (!$participants[$studentId] && !$this->studentIntCache[$studentId]) {
+                // Add to our TO-FETCH list.
+                $this->assessmentExtraStudentIds[$studentId] = $studentId;
             }
-            echo "</td>";
-            echo "<td>";
-            foreach($assessment->getAllParticipants() as $participant){
-                echo ' R: '.count($participant->getAllResponses()).'<br>';
-            }
-            echo "</td>";
-            echo "<td>";
-            foreach($assessment->getAllParticipants() as $participant){
-                echo ' F: '.count($participant->getAllFeedbacks()).'<br>';
-            }
-            echo "</td>";
-            echo "<td>".round($assessment->getPercentageSubmitted(),2)." %</td>\n";
-            echo "<td>".round($assessment->getPercentageMarked(),2)." %</td>\n";
-            echo "<td>".round($assessment->getPercentageMarkingRequired(),2)." %</td>\n";
-            echo "<td>";
-            foreach($assessment->getAllParticipants() as $participant){
-                if($participant->isMarkingRequired($assessment)){
-                    echo $participant->getUser()->getFirstname()." ".$participant->getUser()->getLastname();
-                }
-                echo '<br>';
-            }
-            echo "</td>";
-            echo "<td ".(!$isLate ? 'style="background-color:grey;"' : '').">";
-            if($isLate) {
-                foreach ($assessment->getAllParticipants() as $participant) {
-                    if (!count($participant->getAllResponses()) && !count($participant->getAllFeedbacks())) {
-                        echo $participant->getUser()->getFirstname() . " " . $participant->getUser()->getLastname();
-                    }
-                    echo '<br>';
-                }
-            }
-            echo "</td>";
-            echo '</tr>';
         }
-        echo '</table>';
     }
 
 
 
     /**
-     * @return \External_UserInterface
+     * Ensure logically same users refer to single instance of User object
+     *
+     * @param int $id
+     * @param int $externalId
+     * @param string $firstname
+     * @param string $lastname
      */
-    private function getExternalUser()
-    {
-        if(!$this->externalUser instanceof \External_UserInterface){
-            $this->externalUser = new \External_User();
-        }
-        return $this->externalUser;
-    }
-
-    /**
-     * @return \External_ClassInterface
-     */
-    private function getExternalClass()
-    {
-        if(!$this->externalClass instanceof \External_ClassInterface){
-            $this->externalClass = new \External_Class();
-        }
-        return $this->externalClass;
-    }
-
-    private function printTable(array $rows)
-    {
-        return;
-
-        echo '
-        <style type="text/css" media="screen">
-        
-            table{
-                border-collapse:collapse;
-                border:1px solid #000000;
-            }
-            
-            table td, table th{
-                border:1px solid #000000;
-            }
-        </style>';
-
-        echo "<table>\n";
-        $first = true;
-        foreach($rows as $row) {
-            if($first){
-                echo "<tr>\n";
-                foreach(array_keys($row) as $key){  echo "<th>$key</th>\n"; }
-                echo "<tr>\n";
-            }
-
-            echo "<tr>\n";
-            foreach($row as $val){ echo "<td>$val</td>\n"; }
-            echo "<tr>\n";
-            $first = false;
-        }
-        echo "</table><br>\n";
-    }
-
-
-    private function createFolder($id, $name)
-    {
-        $id = intval($id);
-        if(!$this->foldersCache[$id] instanceof Folder){
-            $this->foldersCache[$id] = (new Folder())->setId($id)->setName($name);
-        }
-    }
-
-    private function createProject($id, $title)
-    {
-        $id = intval($id);
-        if(!$this->projectCache[$id] instanceof Project){
-            $this->projectCache[$id] = (new Project())->setId($id)->setTitle($title);
-        }
-    }
-
-    private function createCourseSpec($id)
-    {
-        $id = intval($id);
-        if(!$this->courseSpecsCache[$id] instanceof CourseSpecification){
-            $this->courseSpecsCache[$id] = (new CourseSpecification())->setId($id);
-        }
-    }
-
-    private function createCourseImpl($id)
-    {
-        $id = intval($id);
-        if(!$this->courseImplsCache[$id] instanceof CourseImplementation){
-            $this->courseImplsCache[$id] = (new CourseImplementation())->setId($id);
-        }
-    }
-
-    private function createUnitSpec($id)
-    {
-        $id = intval($id);
-        if(!$this->unitSpecsCache[$id] instanceof UnitSpecification){
-            $this->unitSpecsCache[$id] = (new UnitSpecification())->setId($id);
-        }
-    }
-
-    private function createUnitImpl($id)
-    {
-        $id = intval($id);
-        if(!$this->unitImplsCache[$id] instanceof UnitImplementation){
-            $this->unitImplsCache[$id] = (new UnitImplementation())->setId($id);
-        }
-    }
-
-
-    /**
-     * @param Collection|IAssessable[] $assessmentsCache
-     */
-    private function printCrumbs(Collection $assessmentsCache)
-    {
-        $assessmentsCache->sortBy('id','asc');
-
-        // Test navigation
-        foreach($assessmentsCache as $assessment)
-        {
-            $context = $assessment->getContext();
-            // Case 1
-            if($context instanceof Folder) {
-                $classId = $context->getFolder()->getId();
-                $className = $context->getFolder()->getName();
-                $course = '';
-                $unit = '';
-                $class = "<a href='/homepage/$classId'>$className</a>";
-                $project = '';
-            }
-            // Case 2
-            else if($context instanceof UnitImplementation){
-                $courseId = $context->getCourse()->getSpecification()->getFolder()->getId();
-                $courseName = $context->getCourse()->getSpecification()->getFolder()->getName();
-                $unitId = $context->getSpecification()->getFolder()->getId();
-                $unitName = $context->getSpecification()->getFolder()->getName();
-                $classId = $context->getCourse()->getFolder()->getId();
-                $className = $context->getCourse()->getFolder()->getName();
-
-                $course = "<a href='/homepage/$courseId'>$courseName</a> &gt; ";
-                $class = "<a href='/homepage/$classId'>$className</a> &gt; ";
-                $unit = "<a href='/homepage/$unitId'>$unitName</a>";
-                $project = '';
-            }
-            else if($context instanceof Project){
-                $projectContext = $context->getContext();
-
-                // Case 3 - Project on Folder
-                if($projectContext instanceof Folder) {
-                    $classId = $projectContext->getFolder()->getId();
-                    $className = $projectContext->getFolder()->getName();
-                    $projectName = $context->getTitle();
-                    $course = '';
-                    $class = "<a href='/homepage/$classId'>$className</a> &gt; ";
-                    $unit = '';
-                    $project = "<em>$projectName</em>";
-                }
-                // Case 4 - Project on UnitImplementation
-                else if($projectContext instanceof UnitImplementation){
-                    $courseId = $projectContext->getCourse()->getSpecification()->getFolder()->getId();
-                    $courseName = $projectContext->getCourse()->getSpecification()->getFolder()->getName();
-                    $unitId = $projectContext->getSpecification()->getFolder()->getId();
-                    $unitName = $projectContext->getSpecification()->getFolder()->getName();
-                    $classId = $projectContext->getCourse()->getFolder()->getId();
-                    $className = $projectContext->getCourse()->getFolder()->getName();
-                    $projectName = $context->getTitle();
-
-                    $course = "<a href='/homepage/$courseId'>$courseName</a> &gt; ";
-                    $class = "<a href='/homepage/$classId'>$className</a> &gt; ";
-                    $unit = "<a href='/homepage/$unitId'>$unitName</a> &gt; ";
-                    $project = "<em>$projectName</em>";
-                } else {
-                    throw new \LogicException('Unknown Project context: '.print_r($assessment,true));
-                }
-            } else {
-                throw new \LogicException('Unknown Assessment context: '.print_r($assessment,true));
-            }
-            echo "{$assessment->getId()}: {$course}{$class}{$unit}{$project}: {$assessment->getTitle()}<br>";
-        }
-    }
-
-
-    private function saveFolderCode($folderId, $code)
-    {
-        if(!$this->subjectCodes[$folderId] instanceOf Collection){
-            $this->subjectCodes[$folderId] = new Collection();
-        }
-        $this->subjectCodes[$folderId]->add($code);
-    }
-
-    /**
-     * @param array $rows
-     */
-    private function parseAssessments($rows)
-    {
-        foreach($rows as $row){
-
-            // Hydrate Assessment
-            if(!$this->assessmentsCache[$row['a.id']] instanceof IAssessable){
-
-                // Create Quiz / DueWork / Task object
-                // Add ID to type array for later retrieval of Response / Feedback
-                if(!is_null($row['qz.id'])){
-                    $this->quizAssessmentIds[$row['a.id']] = intval($row['a.id']);
-                    $this->assessmentsCache[$row['a.id']] = new Quiz();
-                    $this->assessmentsCache[$row['a.id']]->setQuizId($row['qz.id']);
-                } else if(!is_null($row['dw.id'])){
-                    $this->dueWorkAssessmentIds[$row['a.id']] = intval($row['a.id']);
-                    $this->assessmentsCache[$row['a.id']] = new DueWork();
-                    $this->assessmentsCache[$row['a.id']]->setDueWorkId($row['dw.id']);
-                } else if(!is_null($row['tk.id'])){
-                    $this->taskAssessmentIds[$row['a.id']] = intval($row['a.id']);
-                    $this->assessmentsCache[$row['a.id']] = new Task();
-                    $this->assessmentsCache[$row['a.id']]->setTaskId($row['tk.id']);
-                } else {
-                    throw new \LogicException('Assessment must be Quiz, DueWork or Task: '.print_r($row,true));
-                }
-
-                $assessment = $this->assessmentsCache[$row['a.id']];
-                $assessment->setId($row['a.id']);
-                $assessment->setTitle($row['a.title']);
-
-                // It is VERY slow to create a new AlaressDateFormat from a DB formatted string.
-                $assessment->setDueAt($this->getFastDateFromString($row['a.due_date']));
-
-
-
-                switch($row['case']){
-                    // Case 1 - Assessment resides directly on Folder
-                    case 1:
-                        $this->createFolder($row['f.id'], $row['f.name']);
-                        $assessment->setContext($this->foldersCache[$row['f.id']]);
-                        break;
-                    // Case 2 - Assessment in Project that resides directly on Folder
-                    case 2:
-                        $this->createProject($row['p.id'], $row['p.title']);
-                        $this->createFolder($row['f.id'], $row['f.name']);
-                        $assessment->setContext($this->projectCache[$row['p.id']]);
-                        $this->projectCache[$row['p.id']]->setContext($this->foldersCache[$row['f.id']]);
-                        break;
-                    case 3:
-                        $this->createUnitImpl($row['ui.id']);
-                        $this->createUnitSpec($row['us.id']);
-                        $this->createCourseImpl($row['ci.id']);
-                        $this->createCourseSpec($row['cs.id']);
-                        $this->createFolder($row['usf.id'], $row['usf.name']);
-                        $this->createFolder($row['f.id'], $row['f.name']);
-                        $this->createFolder($row['csf.id'], $row['csf.name']);
-
-                        $assessment->setContext($this->unitImplsCache[$row['ui.id']]);
-                        $this->unitImplsCache[$row['ui.id']]->setSpecification($this->unitSpecsCache[$row['us.id']]);
-                        $this->unitSpecsCache[$row['us.id']]->setFolder($this->foldersCache[$row['usf.id']]);
-                        $this->unitImplsCache[$row['ui.id']]->setCourse($this->courseImplsCache[$row['ci.id']]);
-                        $this->courseImplsCache[$row['ci.id']]->setFolder($this->foldersCache[$row['f.id']]);
-                        $this->courseImplsCache[$row['ci.id']]->setSpecification($this->courseSpecsCache[$row['cs.id']]);
-                        $this->courseSpecsCache[$row['cs.id']]->setFolder($this->foldersCache[$row['csf.id']]);
-                        break;
-                    case 4:
-                        $this->createProject($row['p.id'], $row['p.title']);
-                        $this->createUnitImpl($row['ui.id']);
-                        $this->createUnitSpec($row['us.id']);
-                        $this->createCourseImpl($row['ci.id']);
-                        $this->createCourseSpec($row['cs.id']);
-                        $this->createFolder($row['usf.id'], $row['usf.name']);
-                        $this->createFolder($row['f.id'], $row['f.name']);
-                        $this->createFolder($row['csf.id'], $row['csf.name']);
-
-                        $assessment->setContext($this->projectCache[$row['p.id']]);
-                        $this->projectCache[$row['p.id']]->setContext($this->unitImplsCache[$row['ui.id']]);
-                        $this->unitImplsCache[$row['ui.id']]->setSpecification($this->unitSpecsCache[$row['us.id']]);
-                        $this->unitSpecsCache[$row['us.id']]->setFolder($this->foldersCache[$row['usf.id']]);
-                        $this->unitImplsCache[$row['ui.id']]->setCourse($this->courseImplsCache[$row['ci.id']]);
-                        $this->courseImplsCache[$row['ci.id']]->setFolder($this->foldersCache[$row['f.id']]);
-                        $this->courseImplsCache[$row['ci.id']]->setSpecification($this->courseSpecsCache[$row['cs.id']]);
-                        $this->courseSpecsCache[$row['cs.id']]->setFolder($this->foldersCache[$row['csf.id']]);
-                        break;
-                    default:
-                        throw new \LogicException('Cannot derive AssessmentContext: '.print_r($row,true));
-                }
-            }
-
-            // Subject ClassCodes
-            if(!is_null($row['fc.code'])){
-                $folder = $this->assessmentsCache[$row['a.id']]->getContext()->getFolder();
-                $folder->getCodes()->add(new FolderCode($row['fc.code']));
-                $subjectFolderId = $folder->getId();
-                $this->subjectIds[$subjectFolderId] = $subjectFolderId;
-                $this->saveFolderCode($subjectFolderId, $row['fc.code']);
-
-            }
-            // Group IDs
-            if(!is_null($row['g.id'])){
-                $this->groupIds[$row['g.id']] = intval($row['g.id']);
-            }
-        }
-    }
-
-    private function createStudent($id, $externalId, $firstname, $lastname)
+    private function cacheUser($id, $externalId, $firstname, $lastname)
     {
         $id = intval($id);
         $externalId = intval($externalId);
@@ -1379,19 +1260,107 @@ $this->start = microtime(true);
 
     /**
      * For some reason this is many times faster than having Alaress_Date_Format parse the string directly
+     *
      * @param string|null $dateString
      * @param string $format
      * @return \Alaress_Date_Format
      */
     private function getFastDateFromString($dateString, $format = \Alaress_Date_Format::DATABASE_FORMAT)
     {
-
         if(empty($dateString)){
             return new \Alaress_Date_NullDate();
         }
-        //return new \Alaress_Date_Format($dateString, $format);
         return new \Alaress_Date_Format(new Carbon($dateString), $format);
     }
 
 
+    /**
+     * Get all Classes taught by the specified User.
+     *
+     * If already available from Session, use that, otherwise get from External DB
+     */
+    private function getTaughtClasses()
+    {
+        // Do we already have the classes taught by this User?
+        if ($classesTaught = $this->viewee->getSubjectCollection()) {
+            // Get SubjectIds
+            foreach ($classesTaught as $row) {
+                $classId = intval($row['id']);
+                $className = $row['name'];
+                $classCode = $row['code'];
+                $this->classIds[$classId] = $classId;
+                $this->cacheFolder($classId, $className);
+                $this->addClassCodeToFolder($classId, $classCode);
+            }
+        } else {
+            // Get Classes Taught from External_DB
+            $classes = $this->getExternalUser()->getSubjectList($this->viewee->getExternalId(), $this->viewee->getId());
+
+            // Get ClassCodes + SB FolderIds
+            if(is_array($classes) && !empty($classes)) {
+                $folderCodes = array_map(
+                    function ($row) {
+                        return trim($row['code']);
+                    }, $classes
+                );
+                $prefixedCodeClause = '';
+                foreach ($folderCodes as $folderCode) {
+                    $prefixedCodeClause .= ' OR fc.code LIKE "%/' . $folderCode . '"';
+                }
+                $wrappedRawCodes = array_map(
+                    function ($code) {
+                        return "'$code'";
+                    }, $folderCodes
+                );
+                $query = "
+                    SELECT 
+                        f.id    AS 'f.id',
+                        f.name  AS 'f.name',
+                        fc.code AS 'fc.code'
+                    FROM folder f
+                    JOIN folder_code fc ON fc.folder_id = f.id AND fc.deleted_at IS NULL
+                    AND (fc.code IN (".implode(',',$wrappedRawCodes).") $prefixedCodeClause)
+                ";
+
+                $statement = $this->database->prepare($query);
+                $statement->execute();
+                while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+                    $folderId = intval($row['f.id']);
+                    $folderName = $row['f.name'];
+                    $classCode = $row['fc.code'];
+                    $this->classIds[$folderId] = $folderId;
+                    $this->cacheFolder($folderId, $folderName);
+                    $this->addClassCodeToFolder($folderId, $classCode);
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets all Groups administered by the specified User and populate instance vars
+     */
+    private function getGroupsAdministered()
+    {
+        // Get Groups administered
+        $query = "
+            SELECT 
+                f.id   AS 'f.id',
+                f.name AS 'f.name'
+            FROM folder f
+            JOIN userAccess ua ON ua.sid = f.id
+            WHERE f.deleted_at IS NULL
+            AND ua.uid = {$this->viewee->getId()}
+            AND ua.type >= ".UserAccess::ACCESS_READ."
+            AND ua.service = ".UserAccess::SERVICE_HOMEPAGE."
+        ";
+        $statement = $this->database->prepare($query);
+        $statement->execute();
+
+        while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $folderId = intval($row['f.id']);
+            $folderName = $row['f.name'];
+            $this->cacheFolder($folderId, $folderName);
+            $this->groupIds[$folderId] = $folderId;
+        }
+    }
 }
