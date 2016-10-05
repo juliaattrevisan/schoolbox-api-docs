@@ -3,6 +3,7 @@
 namespace Schoolbox\Assessment\Course\Import;
 
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Assessment\Course\DeprecatedMapper as CourseMapper;
 use Schoolbox\Assessment\Course\Unit\DeprecatedModel as Unit;
@@ -62,7 +63,7 @@ class Import
         foreach ($allFolders as $currentFolder) {
 
             // Make sure the user has access to the folder before we return it
-            if ($this->getAccess()->getFolderAccess($_SESSION["user"], [$currentFolder->getId()])) {
+            if ($this->getAccess()->getFolderAccess($_SESSION["user"], [$currentFolder->getId()]) >= UserAccess::ACCESS_WRITE) {
 
                 $name = $currentFolder->getName();
                 if ($currentFolder->getCodeString()) {
