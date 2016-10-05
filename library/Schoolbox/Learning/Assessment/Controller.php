@@ -114,7 +114,7 @@ class Controller extends Base
          * I added it to save myself choosing dates all the time
          */
         $assessment = (new DueWork())
-            ->setHasRubric(true)
+            ->useRubric()
             ->setAcceptsMultiple()
             ->setPublishAt(Alaress_Date_Format::now())
             ->setOpenAt(Alaress_Date_Format::now())
@@ -225,8 +225,6 @@ class Controller extends Base
             return;
         }
         else {
-            new \Alaress_Probe($assessment->isSelfAssessed(), $assessment->isTeacherAssessed(), $assessment->getUrl());
-            return;
             $this->getResponse()->redirect->to("/homepage/{$folder->getId()}");
         }
     }
@@ -451,7 +449,7 @@ class Controller extends Base
                 $this->getRequest()->post['assessmentType'],
                 $this->getRequest()->post['title'],
                 $this->getRequest()->post['description'],
-                $_SESSION['user'],
+                $this->getUser(),
                 $this->getRequest()->post['weight'],
                 $this->getRequest()->post['publishDate'] . ' ' . $this->getRequest()->post['publishTime'],
                 $this->getRequest()->post['openDate'] . ' ' . $this->getRequest()->post['openTime'],

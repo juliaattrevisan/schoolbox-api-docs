@@ -200,6 +200,28 @@ class Model extends AbstractAssessment
     }
 
     /**
+     * Use rubrics
+     *
+     * @return $this
+     */
+    public function useRubric()
+    {
+        $this->setHasRubric(true);
+        return $this;
+    }
+
+    /**
+     * Don't use rubrics
+     *
+     * @return $this
+     */
+    public function noRubric()
+    {
+        $this->setHasRubric(false);
+        return $this;
+    }
+
+    /**
      * This DueWork has Mark Per Capability on
      *
      * @return bool
@@ -207,6 +229,28 @@ class Model extends AbstractAssessment
     public function hasMarkPerCapbility()
     {
         return $this->getHasMarkPerCapability();
+    }
+
+    /**
+     * This DueWork's Rubrics uses Mark Per Capability
+     *
+     * @return $this
+     */
+    public function useMarkPerCapability()
+    {
+        $this->setHasMarkPerCapability(true);
+        return $this;
+    }
+
+    /**
+     * This DueWork's Rubrics does not use Mark Per Capability
+     *
+     * @return $this
+     */
+    public function noMarkPerCapability()
+    {
+        $this->setHasMarkPerCapability(false);
+        return $this;
     }
 
     /* Getters/Setters
@@ -287,7 +331,7 @@ class Model extends AbstractAssessment
     /**
      * @return boolean
      */
-    public function getHasRubric()
+    protected function getHasRubric()
     {
         return $this->hasRubric;
     }
@@ -296,7 +340,7 @@ class Model extends AbstractAssessment
      * @param boolean $hasRubric
      * @return $this
      */
-    public function setHasRubric($hasRubric)
+    protected function setHasRubric($hasRubric)
     {
         $this->hasRubric = $hasRubric;
         return $this;

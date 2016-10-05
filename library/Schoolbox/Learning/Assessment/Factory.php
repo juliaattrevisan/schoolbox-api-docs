@@ -81,6 +81,11 @@ class Factory
     protected $acceptOnline = DueWork::ACCEPT_ONLINE_NONE;
 
     /**
+     * @var int
+     */
+    protected $markType;
+
+    /**
      * @var bool
      */
     protected $hasRubric = false;
@@ -118,6 +123,7 @@ class Factory
      * @param $closeAt
      * @param $attachedFiles
      * @param $acceptOnline
+     * @param $markType
      * @param $hasRubric
      * @param $hasMarkPerCapability
      * @param $hasSelfAssessed
@@ -127,7 +133,7 @@ class Factory
     public function __construct(
         $type, $title, $description, User $creator, $weight,
         $publishAt, $openAt, $dueAt, $closeAt, $attachedFiles,
-        $acceptOnline, $hasRubric, $hasMarkPerCapability,
+        $acceptOnline, $markType, $hasRubric, $hasMarkPerCapability,
         $hasSelfAssessed, $url,
         $summator
     ) {
@@ -148,6 +154,7 @@ class Factory
         /* Due Work needs this to instantiate correctly
          */
         $this->setAcceptOnline(trim($acceptOnline));
+        $this->setMarkType(trim($markType));
         $this->setHasRubric(trim($hasRubric));
         $this->setHasMarkPerCapability(trim($hasMarkPerCapability));
 
@@ -264,8 +271,40 @@ class Factory
                     break;
 
                 case Types::ASSESSMENT_DUE_WORK:
-                    /* TODO: Set duework-specific attributes here
-                     */
+                    if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_NONE) {
+                        $assessment->setAcceptsNone();
+                    }
+                    else if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_SINGLE) {
+                        $assessment->setAcceptsSingle();
+                    }
+                    else if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_MULTI) {
+                        $assessment->setAcceptsMultiple();
+                    }
+
+                    $markType = new \Schoolbox\Assessment\Component\SubmissionBox\MarkType();
+                    $markType->setId($this->getMarkType());
+
+                    $assessment->setMarkType($markType);
+
+                    $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
+                    $markScheme = $markSchemeFactory->spawnMarkSchemeFor($assessment);
+
+                    $assessment->setMarkScheme($markScheme);
+
+                    if ($this->getHasRubric()) {
+                        $assessment->useRubric();
+                    }
+                    else {
+                        $assessment->noRubric();
+                    }
+
+                    if ($this->getHasMarkPerCapability()) {
+                        $assessment->useMarkPerCapability();
+                    }
+                    else {
+                        $assessment->noMarkPerCapability();
+                    }
+
                     break;
 
                 case Types::ASSESSMENT_TASK:
@@ -471,10 +510,12 @@ class Factory
 
     /**
      * @param array $attachedFiles
+     * @return $this
      */
     protected function setAttachedFiles($attachedFiles)
     {
         $this->attachedFiles = $attachedFiles;
+        return $this;
     }
 
     /* Due Work info
@@ -495,6 +536,24 @@ class Factory
     protected function setAcceptOnline($acceptOnline)
     {
         $this->acceptOnline = $acceptOnline;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getMarkType()
+    {
+        return $this->markType;
+    }
+
+    /**
+     * @param int $markType
+     * @return $this
+     */
+    protected function setMarkType($markType)
+    {
+        $this->markType = $markType;
         return $this;
     }
 
@@ -547,10 +606,12 @@ class Factory
 
     /**
      * @param boolean $hasSelfAssessed
+     * @return $this
      */
     protected function setHasSelfAssessed($hasSelfAssessed)
     {
         $this->hasSelfAssessed = $hasSelfAssessed;
+        return $this;
     }
 
     /**
@@ -563,10 +624,12 @@ class Factory
 
     /**
      * @param string $url
+     * @return $this
      */
     protected function setUrl($url)
     {
         $this->url = $url;
+        return $this;
     }
 
     /* Project info
