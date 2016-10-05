@@ -103,7 +103,7 @@ class Module extends BaseModule
                     try {
                         $user = $this->getUserMapper()->findById($params['userId']);
                     } catch (MapperException $e) {
-                        $user = $this->getUserMapper()->createModel();
+                        $user = null;
                     }
                 return [
                     'user' => $user,
