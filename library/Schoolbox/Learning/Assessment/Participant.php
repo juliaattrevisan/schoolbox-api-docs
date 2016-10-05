@@ -174,13 +174,67 @@ class Participant
     }
 
     /**
-     * Find the most recent published IFeedback for an IAssessable for this Participant
+     * Gets the authoritative Feedback for an Assessment for this Participant
+     *
+     * @param IAssessable $assessable
+     * @param bool $publishedOnly
+     * @return null|IFeedback
+     */
+    private function getMostRecentFeedback(IAssessable $assessable, $publishedOnly)
+    {
+        $favorFloating = false;
+        if($favorFloating){
+            return $this->getMostRecentFeedback_favorFloating($assessable, $publishedOnly);
+        } else {
+            return $this->getMostRecentFeedback_noFavor($assessable, $publishedOnly);
+        }
+    }
+
+    /**
+     * Find the most recent IFeedback for an IAssessable for this Participant
+     *
+     * All Feedbacks are considered equal, compared purely by dates
      *
      * Consider following scenario for DueWork.
      * * Student submits $response1 in 2010 and receives $feedback1 on it in 2014.
      * * Student submits $response2 in 2011 and receives $feedback2a on it in 2011 and $feedback2b in 2012
      * * Student submits $response3 in 2013
-     * * Teacher provides floating $feedback 4 in 2010
+     * * Teacher provides floating $feedback4 in 2010
+     *
+     * In this case, the authoritative feedback is the linked $feedback1 in 2014,
+     * even though it is attached to an old response and we have an overall floating $feedback4 in 2010
+     *
+     * Need to also apply the $publishedOnly filter to all traversals.
+     *
+     * @param IAssessable $assessable
+     * @param bool $publishedOnly
+     * @return null|IFeedback
+     */
+    private function getMostRecentFeedback_noFavor(IAssessable $assessable, $publishedOnly)
+    {
+        /** @var IFeedback $mostRecentFeedback */
+        $mostRecentFeedback = null;
+
+        foreach ($this->findAllFeedbackForAssessable($assessable) as $feedback) {
+            if (!$publishedOnly || $feedback->isPublished()) {
+                if (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt())) {
+                    $mostRecentFeedback = $feedback;
+                }
+            }
+        }
+        return $mostRecentFeedback;
+    }
+
+    /**
+     * Find the most recent IFeedback for an IAssessable for this Participant
+     *
+     * Floating Feedback trumps linked Feedback
+     *
+     * Consider following scenario for DueWork.
+     * * Student submits $response1 in 2010 and receives $feedback1 on it in 2014.
+     * * Student submits $response2 in 2011 and receives $feedback2a on it in 2011 and $feedback2b in 2012
+     * * Student submits $response3 in 2013
+     * * Teacher provides floating $feedback4 in 2010
      *
      * In this case, the authoritative feedback is the floating $feedback in 2010,
      * even though is predates the linked $feedback2b of 2012 and linked $feedback1 pf 2014.
@@ -194,8 +248,9 @@ class Participant
      * @param bool $publishedOnly
      * @return null|IFeedback
      */
-    private function getMostRecentFeedback(IAssessable $assessable, $publishedOnly)
+    private function getMostRecentFeedback_favorFloating(IAssessable $assessable, $publishedOnly)
     {
+
         /** @var IFeedback $mostRecentFloatingFeedback */
         $mostRecentFloatingFeedback = null;
 
