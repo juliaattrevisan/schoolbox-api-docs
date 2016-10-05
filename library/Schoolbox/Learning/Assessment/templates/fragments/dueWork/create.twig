@@ -38,20 +38,163 @@
     <div class="small-12 medium-6 columns">
         <label>
             Mark Type
-            <select name="markType">
+            <select id="markType" name="markType">
                 {% for index, title in allMarkTypes %}
                 <option value="{{ index }}">{{ title }}</option>
                 {% endfor %}
             </select>
         </label>
     </div>
-    <div class="small-12 medium-6 columns">
+
+    {# Letter Grade enables Grading Scheme
+     # Total Mark enables Maximum Available Marks
+     #}
+    {% set markTypeLetterGrade = 2 %}
+    {% set markTypeTotalMark = 3 %}
+
+    <script type="text/javascript">
+        $(function() {
+
+            /**
+             * Show max mark
+             */
+            function showMaxMark() {
+                $('#assessmentForm').find('[data-max-mark]').show();
+            }
+
+            /**
+             * Hide max mark
+             */
+            function hideMaxMark() {
+                $('#assessmentForm').find('[data-max-mark]').hide();
+            }
+
+            /**
+             * Show grading scheme
+             */
+            function showGradingScheme() {
+                $('#assessmentForm').find('[data-grading-scheme]').show();
+            }
+
+            /**
+             * Hide grading scheme
+             */
+            function hideGradingScheme() {
+                $('#assessmentForm').find('[data-grading-scheme]').hide();
+            }
+
+            /**
+             * Rubrics is activated
+             */
+            function hasRubric() {
+                return $('#hasRubric:checked').length;
+            }
+
+            /**
+             * Disable the field, but allow us to show its value
+             * which will be programmatically generated
+             */
+            function disableMaxMark() {
+                $('#maxMark').prop('disabled', true);
+            }
+
+            /**
+             * Enable the field for humans to change its value
+             */
+            function enableMaxMark() {
+                $('#maxMark').prop('disabled', false);
+            }
+
+            /**
+             * Disable Mark Type select
+             */
+            function disableMarkType() {
+                $('#markType').prop('disabled', true);
+            }
+
+            /**
+             * Enable Mark Type select
+             */
+            function enableMarkType() {
+                $('#markType').prop('disabled', false);
+            }
+
+            /* Disable everything initially
+             */
+            disableMaxMark();
+            hideMaxMark();
+            hideGradingScheme();
+
+            /* Mark Type switcher
+             */
+            $('#assessmentForm').on('change', '#markType', function(event) {
+                if ($(this).val() == {{ markTypeLetterGrade }}) {
+                    hideMaxMark();
+                    showGradingScheme();
+                }
+                else if ($(this).val() == {{ markTypeTotalMark }}) {
+                    hideGradingScheme();
+                    showMaxMark();
+
+                    /* Disable maxmark field if rubrics is selected
+                     * Dynamically alter value according to rubric grid
+                     */
+                    if (hasRubric()) {
+                        disableMaxMark();
+                    }
+                    else {
+                        enableMaxMark();
+                    }
+                }
+                else {
+                    disableMaxMark();
+                    hideMaxMark();
+                    hideGradingScheme();
+                }
+            });
+
+            /**
+             * Determine which fields to show when Rubrics is activated
+             */
+            function determineRubricSetting(element) {
+                if (element.is(':checked')) {
+                    $('#hasMarkPerCapabilityPanel').removeClass('hide');
+
+                    /* Force a particular marktype
+                     */
+                    $('#markType').val({{ markTypeTotalMark }});
+                    disableMaxMark();
+                    disableMarkType();
+                }
+                else {
+                    $('#hasMarkPerCapabilityPanel').addClass('hide');
+                    enableMaxMark();
+                    enableMarkType();
+                }
+
+                showMaxMark();
+            }
+
+            /* Rubrics switcher
+             */
+            determineRubricSetting($('#hasRubric'));
+
+            $('#hasRubric').click(function(event) {
+                determineRubricSetting($(this));
+            });
+
+        });
+    </script>
+
+    {{ dump(allMarkTypes) }}
+
+    <div class="small-12 medium-6 columns" style="display:none;" data-max-mark>
         <label for="maxMark">
             Maximum Available Marks
             <input id="maxMark" type="text" name="maxMark" value="{{ assessment.maxMark }}" />
         </label>
     </div>
-    <div class="small-12 medium-6 columns">
+    <div class="small-12 medium-6 columns" style="display:none;" data-grading-scheme>
         <label>
             Grading Scheme
             <select name="gradingScheme">
@@ -64,18 +207,6 @@
 </div>
 <div class="row">
     <div class="small-12 medium-6 columns">
-        <script type="text/javascript">
-            $(function() {
-                $('#hasRubric').click(function(event) {
-                    if ($(this).is(':checked')) {
-                        $('#hasMarkPerCapabilityPanel').removeClass('hide');
-                    }
-                    else {
-                        $('#hasMarkPerCapabilityPanel').addClass('hide');
-                    }
-                });
-            });
-        </script>
         <label for="hasRubric">Use Rubric?</label>
         <div class="switch round">
             <input name="hasRubric" id="hasRubric" type="checkbox" {% if assessment.hasRubric %}checked="checked"{% endif %} />
