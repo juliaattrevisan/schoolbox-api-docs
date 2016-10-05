@@ -94,6 +94,13 @@ interface IAssessable extends ISoftDeletable
     public function getPercentageSubmitted();
 
     /**
+     * Returns the number of Participants who have neither Feedback nor Responses to this Assessment
+     *
+     * @return int
+     */
+    public function numNoResponseOrFeedback();
+
+    /**
      * Returns the number of Participants who have Responses to this Assessment
      *
      * @return int

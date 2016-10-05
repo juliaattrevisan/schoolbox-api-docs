@@ -312,6 +312,22 @@ abstract class AbstractAssessment implements IAssessable
     }
 
     /**
+     * Returns the number of Participants who have neither Feedback nor Responses to this Assessment
+     *
+     * @return int
+     */
+    public function numNoResponseOrFeedback()
+    {
+        $num = 0;
+        foreach ($this->getAllParticipants() as $currentParticipant) {
+            if (!count($currentParticipant->findAllResponsesForAssessable($this)) && !count($currentParticipant->findAllFeedbackForAssessable($this))) {
+                $num++;
+            }
+        }
+        return $num;
+    }
+
+    /**
      * @inheritdoc
      *
      * @return int
@@ -339,6 +355,11 @@ abstract class AbstractAssessment implements IAssessable
         return 100 * ($this->numMarked() / $numParticipants);
     }
 
+    /**
+     * How many Participants have Responses that require marking.
+     *
+     * @return int
+     */
     public function numMarkingRequired()
     {
         $num = 0;
@@ -350,6 +371,13 @@ abstract class AbstractAssessment implements IAssessable
         return $num;
     }
 
+    /**
+     * What percentage of Participants have Responses that require marking.
+     *
+     * This does not always equate to 100 - getPercentageMarked()
+     *
+     * @return float
+     */
     public function getPercentageMarkingRequired()
     {
         $numParticipants = $this->numParticipants();
