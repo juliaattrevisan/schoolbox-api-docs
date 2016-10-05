@@ -26,6 +26,16 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 class Model extends AbstractAssessment
 {
     /**
+     * Does not equate to assessment.id
+     *
+     * The taskId comes from the task table
+     * The assessment.id comes from the assessment table
+     *
+     * @var int
+     */
+    private $taskId;
+
+    /**
      * Is this task self-markable?
      *
      * @var bool
@@ -47,6 +57,24 @@ class Model extends AbstractAssessment
     public function getTypeName()
     {
         return 'Task';
+    }
+
+    /**
+     * @return int
+     */
+    public function getTaskId()
+    {
+        return $this->taskId;
+    }
+
+    /**
+     * @param $taskId
+     * @return static
+     */
+    public function setTaskId($taskId)
+    {
+        $this->taskId = $taskId;
+        return $this;
     }
 
     /**
