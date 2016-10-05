@@ -643,21 +643,16 @@ class Factory
                     $this->quizAssessmentIds[$assessmentId] = $assessmentId;
                     $this->assessmentsCache[$assessmentId] = new Quiz();
                     $this->assessmentsCache[$assessmentId]->setQuizId($row['qz.id']);
+                } elseif (!is_null($row['dw.id'])) {
+                    $this->dueWorkAssessmentIds[$assessmentId] = intval($assessmentId);
+                    $this->assessmentsCache[$assessmentId] = new DueWork();
+                    $this->assessmentsCache[$assessmentId]->setDueWorkId($row['dw.id']);
+                } elseif (!is_null($row['tk.id'])) {
+                    $this->taskAssessmentIds[$assessmentId] = intval($assessmentId);
+                    $this->assessmentsCache[$assessmentId] = new Task();
+                    $this->assessmentsCache[$assessmentId]->setTaskId($row['tk.id']);
                 } else {
-                    if (!is_null($row['dw.id'])) {
-                        $this->dueWorkAssessmentIds[$assessmentId] = intval($assessmentId);
-                        $this->assessmentsCache[$assessmentId] = new DueWork();
-                        $this->assessmentsCache[$assessmentId]->setDueWorkId($row['dw.id']);
-                    } else {
-                        if (!is_null($row['tk.id'])) {
-                            $this->taskAssessmentIds[$assessmentId] = intval($assessmentId);
-                            $this->assessmentsCache[$assessmentId] = new Task();
-                            $this->assessmentsCache[$assessmentId]->setTaskId($row['tk.id']);
-                        } else {
-                            throw new \LogicException('Assessment must be Quiz, DueWork or Task: ' . print_r($row,
-                                    true));
-                        }
-                    }
+                    throw new \LogicException('Assessment must be Quiz, DueWork or Task: ' . print_r($row, true));
                 }
 
                 $assessment = $this->assessmentsCache[$assessmentId];
