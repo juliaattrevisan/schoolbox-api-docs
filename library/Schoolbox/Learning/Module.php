@@ -39,7 +39,7 @@ class Module extends BaseModule
                 '/pending/{userId}'                       => 'getPendingAssessmentsForUser',
                 '/classes'                                => 'getClasses',
                 '/markbook/{classId}'                     => 'getMarkbook',
-                '/due/{studentId}'                        => 'getDue',
+                '/due/{userId}'                           => 'getDue',
                 '/grades/{userId}/{termCode}'             => 'getGrades',
                 '/grades/{userId}/{termCode}/{subjectId}' => 'getGradesForSubject',
             ],
@@ -101,12 +101,12 @@ class Module extends BaseModule
             '(?:getPendingAssessmentsForUser|getDue)',
             function ($params) {
                     try {
-                        $user = $this->getUserMapper()->findById($params['userId']);
+                        $viewee = $this->getUserMapper()->findById($params['userId']);
                     } catch (MapperException $e) {
-                        $user = null;
+                        $viewee = null;
                     }
                 return [
-                    'user' => $user,
+                    'viewee' => $viewee,
                 ];
             }
         );

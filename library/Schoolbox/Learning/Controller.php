@@ -63,30 +63,36 @@ class Controller extends Base
      *
      * @api   GET /learning/pending/:userId
      * @level 165
-     * @param User $user The user whose pending assessments we are viewing.
+     * @param User $viewee The user whose pending assessments we are viewing.
      */
-    public function getPendingAssessmentsForUser(User $user = null)
+    public function getPendingAssessmentsForUser(User $viewee = null)
     {
         // No User found ?
-        if(is_null($user)){
+        if(is_null($viewee)){
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
         }
 
-        // Is current user not SuperUser or Staff (ie a student or parent) ?
-        // TODO - this logic requires re-thinking
-        if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
-            $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getDue', [
-                'studentId' => $this->getUser()->getId()
-            ]));
+        // Only display from Staff perspective.
+        if(!$viewee->getRole()->isStaff()){
+            // Is the Viewee as student or parent?
+            if($viewee->getRole()->isStudent() || $viewee->getRole()->isParent()) {
+                // Redirect to 'Due Assessments' page
+                $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getDue', [
+                    'userId' => $viewee->getId()
+                ]));
+                return;
+            }
+            // Must be a Guest. Block them.
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
         }
 
         // If currentUser == viewee, use currentUser as it may already have class codes
         // attached and avoid the need for an external DB call.
-        if($this->getUser()->getId() == $user->getId()){
-            $user = $this->getUser();
+        if($this->getUser()->getId() == $viewee->getId()){
+            $viewee = $this->getUser();
         }
 
-        $factory = new Factory($user);
+        $factory = new Factory($viewee);
         $assessments = $factory->getPendingAssessments();
 
         /** @var IAssessable[] $assessmentsToMark */
@@ -110,7 +116,7 @@ class Controller extends Base
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', [
             'viewer'             => $this->getUser(),
-            'viewee'             => $user,
+            'viewee'             => $viewee,
             'assessmentsToMark'  => $assessmentsToMark,
             'assessmentsToChase' => $assessmentsToChase,
         ]));
@@ -197,9 +203,9 @@ class Controller extends Base
      *
      * @api   GET /due/{studentId}
      * @level 165
-     * @param User $student
+     * @param User $viewee
      */
-    public function getDue(User $student)
+    public function getDue(User $viewee)
     {
         // TODO - generate data
         $assessmentsDue = [
@@ -209,7 +215,7 @@ class Controller extends Base
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/dueWork.twig', [
-            'student'        => $student,
+            'viewee'         => $viewee,
             'assessmentsDue' => $assessmentsDue,
         ]));
     }
