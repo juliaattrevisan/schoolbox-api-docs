@@ -38,7 +38,6 @@ use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
  */
 class Factory
 {
-
     /** @var IDatabase */
     private $database;
 
@@ -47,9 +46,6 @@ class Factory
 
     /** @var \External_ClassInterface */
     private $externalClass;
-
-
-    // All Caches for holding single instance of each logical entity
 
     /**
      * Indexed by assessment.id
@@ -92,7 +88,6 @@ class Factory
      * @var Collection|Project[] $projectCache
      */
     private $projectCache;
-
 
     /**
      * Folder IDs of all Subjects either taught by this User or where this User has created Assessments
@@ -209,9 +204,6 @@ class Factory
         $this->term->getStart()->addYears(-1); // TODO remove this line. Just here to get more results
 
         $this->tomorrow = (new \Alaress_Date_Format(null, \Alaress_Date_Format::DATABASE_FORMAT))->addDays(1);
-
-        $this->assessmentsToMark = new Collection();
-        $this->lateAssessments = new Collection();
     }
 
 
@@ -234,7 +226,7 @@ class Factory
     public function getPendingAssessments(User $user)
     {
 
-$start = microtime(true);
+$this->start = microtime(true);
 
         // Get Subjects taught by User
 
@@ -297,10 +289,11 @@ $start = microtime(true);
             FROM folder f
             JOIN userAccess ua ON ua.sid = f.id
             WHERE f.deleted_at IS NULL
-            AND uid = {$user->getId()}
-            AND type >= ".UserAccess::ACCESS_READ."
-            AND service = ".UserAccess::SERVICE_HOMEPAGE."
+            AND ua.uid = {$user->getId()}
+            AND ua.type >= ".UserAccess::ACCESS_READ."
+            AND ua.service = ".UserAccess::SERVICE_HOMEPAGE."
         ";
+        //die($query);
         $statement = $this->database->prepare($query);
         $statement->execute();
 
@@ -473,6 +466,7 @@ $start = microtime(true);
             AND a.due_date >= STR_TO_DATE('".$this->term->getStart()->getDatabase()."', '%Y-%m-%d %H:%i:%s')
         ";
 
+
         $folderClause = count($folderIds) ? " OR cif.id IN (".implode(',',$folderIds).") " : '';
         $query4 = "
         SELECT 
@@ -538,7 +532,7 @@ $start = microtime(true);
 
 
 
-        var_dump('time: '.(microtime(true)-$start));
+        // var_dump('time: '.(microtime(true)-$this->start));
 
 
 
@@ -555,7 +549,7 @@ $start = microtime(true);
 
             $this->folderToStudentListMap[$subjectId] = [];
             $studentList = $this->getExternalClass()->getStudents(implode(',',$uniqueCodes));
-            var_dump("getting classLists($subjectId)... time: ".(microtime(true)-$start));
+            //var_dump("getting classLists($subjectId)... time: ".(microtime(true)-$this->start));
 
             // Each Student in Subject
             if(is_array($studentList)) {
@@ -634,7 +628,7 @@ $start = microtime(true);
 
         //var_dump($this->folderToStudentListMap);die();
 
-var_dump('time: '.(microtime(true)-$start));
+//var_dump('time: '.(microtime(true) - $this->start));
 
 
         // We have all Student ExternalIds, grouped by Subject/Group FolderId
@@ -672,39 +666,51 @@ var_dump('time: '.(microtime(true)-$start));
          */
         $assessmentExtraStudentIds = [];
 
+        //var_dump($this->quizAssessmentIds);die();
 
-        // Get Quiz Attempts for all selected students
-        $query = "
+        if(count($this->quizAssessmentIds) && count($this->studentInternalIds)) {
+
+            // Get Quiz Attempts for all selected students
+            $query = "
             SELECT
                 q.assessment_id AS 'q.assessment_id',
                 qa.attempt_id   AS 'qa.attempt_id',
                 qa.user_id      AS 'qa.user_id',
                 qa.start        AS 'qa.start',
                 qa.finish       AS 'qa.finish',
-                qa.reviewed_at  AS 'qa.reviewed_at'                
+                qa.reviewed_at  AS 'qa.reviewed_at',
+                min(qs.section_id)   AS 'qs.first_section_id'                                
             FROM assess q
-            JOIN assess_attempt qa ON qa.assess_id = q.assess_id
+            JOIN assess_attempt qa ON qa.assess_id = q.assess_id AND qa.deleted_at IS NULL
+            JOIN assess_section qs ON qs.assess_id = q.assess_id AND qs.deleted_at IS NULL
             WHERE q.deleted_at IS NULL
-            AND qa.deleted_at IS NULL
             AND q.availability = 'assess'
             AND q.assessment_id IN (" . implode(',', $this->quizAssessmentIds) . ") 
             AND qa.user_id IN (" . implode(',', $this->studentInternalIds) . ")
+            
+            GROUP BY q.assessment_id, qa.attempt_id, qa.user_id
+            
+            ORDER BY qa.attempt_id
         ";
 
-        //die($query);
-        $statement = $this->database->prepare($query);
-        $statement->execute();
-        $quizResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
-        $this->printTable($quizResults); //die();
+            //die($query);
+            $statement = $this->database->prepare($query);
+            $statement->execute();
+            $quizResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
+            $this->printTable($quizResults);
+            //die();
 
-        // Find Students who attempted Quizzes but weren't in the class
-        foreach($quizResults as $row){
-            $studentId = intval($row['qa.user_id']);
-            $participants = $this->assessmentsCache[$row['q.assessment_id']]->getAllParticipants();
-            // Are we missing the student and student does not exists in student cache?
-            if(!$participants[$studentId] && !$this->studentIntCache[$studentId]){
-                $assessmentExtraStudentIds[$studentId] = $studentId;
+            // Find Students who attempted Quizzes but weren't in the class
+            foreach ($quizResults as $row) {
+                $studentId = intval($row['qa.user_id']);
+                $participants = $this->assessmentsCache[$row['q.assessment_id']]->getAllParticipants();
+                // Are we missing the student and student does not exists in student cache?
+                if (!$participants[$studentId] && !$this->studentIntCache[$studentId]) {
+                    $assessmentExtraStudentIds[$studentId] = $studentId;
+                }
             }
+        } else {
+            $quizResults = [];
         }
 
 
@@ -712,7 +718,7 @@ var_dump('time: '.(microtime(true)-$start));
 
 
 
-var_dump('time: '.(microtime(true)-$start));
+//var_dump('time: '.(microtime(true) - $this->start));
 
         // Get Task Completions for all selected students
         $query = "
@@ -752,7 +758,7 @@ var_dump('time: '.(microtime(true)-$start));
 
 
         //die();
-var_dump('time: '.(microtime(true)-$start));
+//var_dump('time: '.(microtime(true) - $this->start));
 
         if(count($this->dueWorkAssessmentIds) && count($this->studentInternalIds)){
             // Get Due Work Submissions for all selected students
@@ -791,7 +797,6 @@ var_dump('time: '.(microtime(true)-$start));
         }
 
 
-var_dump('time: '.(microtime(true)-$start));
 
         if(count($this->dueWorkAssessmentIds) && count($this->studentInternalIds)){
             // Get Due Work Returns for all selected students
@@ -834,7 +839,6 @@ var_dump('time: '.(microtime(true)-$start));
 
 
         //die();
-var_dump('time: '.(microtime(true)-$start));
 
 
         // Do we have Responses / Feedbacks for students that are not yet loaded?
@@ -870,6 +874,7 @@ var_dump('time: '.(microtime(true)-$start));
             $response->setId($row['qa.attempt_id']);
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
+            $response->setFirstSectionId($row['qs.first_section_id']);
             $response->setAssessable($quiz);
             $updatedAt = $row['qa.finish'] ?: $row['qa.start'];
             $response->setUpdatedAt($this->getFastDateFromString($updatedAt));
@@ -889,15 +894,16 @@ var_dump('time: '.(microtime(true)-$start));
                 $feedback = new QuizReview();
                 $feedback->setId($row['qa.attempt_id']);
                 $feedback->setPublishedAt($this->getFastDateFromString($row['qa.reviewed_at']));
-
-                $updatedAt = $row['qa.reviewed_at'] ?: $updatedAt;
-                $feedback->setUpdatedAt($this->getFastDateFromString($updatedAt));
+                $feedback->setUpdatedAt($this->getFastDateFromString($row['qa.reviewed_at']));
 
                 $feedback->setResponse($response);
                 $feedback->setAssessable($quiz);
 
+                $response->getAllFeedback()->add($feedback);
                 $quiz->getFeedbacks()->add($feedback);
                 $participants[$userId]->getAllFeedbacks()->add($feedback);
+
+                //var_dump($feedback);die();
             }
         }
 
@@ -931,6 +937,7 @@ var_dump('time: '.(microtime(true)-$start));
                 $feedback->setResponse($response);
                 $feedback->setAssessable($task);
 
+                $response->getAllFeedback()->add($feedback);
                 $task->getFeedbacks()->add($feedback);
                 $participants[$userId]->getAllFeedbacks()->add($feedback);
             }
@@ -976,15 +983,20 @@ var_dump('time: '.(microtime(true)-$start));
             $participants[$userId]->getAllFeedbacks()->add($feedback);
         }
 
-
-
         // TODO - Hydrate Responses + Feedbacks and add to Assessments + Participants
 
 
-var_dump('time: '.(microtime(true)-$start));
+        $this->printPlainTextPage();
         //die();
 
-        echo "<h1>Things to Mark</h1>\n";
+
+        return $this->assessmentsCache;
+    }
+
+    private function printPlainTextPage()
+    {
+        return;
+
         echo '<table>';
         echo '<tr>
             <th>Context</th>
@@ -1047,95 +1059,9 @@ var_dump('time: '.(microtime(true)-$start));
             echo '</tr>';
         }
         echo '</table>';
-        var_dump('time: '.(microtime(true)-$start));    die();
-
-        return $this->assessmentsCache;
-    }
-
-    /**
-     * Anything due tomorrow or before
-     *
-     * @param User $user
-     */
-    public function getAssessmentsToChase(User $user)
-    {
-        // 1. Get Group Folder collection
-        // 2. Get Class Folder collection
-        // 2. Get all students in Groups
-        // 3. Get all students in Classes
-
-        $folderMapper = FolderMapper::getInstance();
-
-        // Get ass Folder IDs of this User's Subjects and Groups
-        $folderIds = $subjectIds = $groupIds = [];
-        if ($user->getSubjectCollection()) {
-            $subjects = $user->getSubjectCollection();
-            foreach ($subjects as $subject) {
-                $subjectIds[] = intval($subject['id']);
-            }
-            $subjects = $folderMapper->findByColumn($folderMapper->getIdentifierColumn(), $subjectIds);
-            $groups = $folderMapper->findForUser($user, false);
-            foreach ($groups as $group) {
-                $groupIds[] = $group->getId();
-            }
-            $folderIds = array_merge($subjectIds, $groupIds);
-        } else {
-            $subjectsAndGroups = $folderMapper->findForUser($user, true);
-            foreach ($subjectsAndGroups as $folder) {
-                $folderIds[] = $folder->getId();
-            }
-        }
     }
 
 
-    private function printAssessments(array $rows)
-    {
-        echo '
-        <style type="text/css" media="screen">
-        
-            table{
-                border-collapse:collapse;
-                border:1px solid #000000;
-            }
-            
-            table td, table th{
-                border:1px solid #000000;
-            }
-        </style>';
-
-        echo "<table>\n";
-        $first = true;
-        foreach($rows as $row) {
-            if($first){
-                echo "<tr>\n";
-                echo "<th></th><th colspan='2'>CourseSpec</th><th colspan='4'>Class</th><th colspan='2'>UnitSpec</th><th colspan='2'>Project</th><th colspan='3'>Assignment</th><th colspan='4'></th>";
-                echo "<tr>\n";
-
-                echo "<tr>\n";
-                foreach(array_keys($row) as $key){  echo "<th>$key</th>\n"; }
-                echo "<tr>\n";
-            }
-
-            echo "<tr>\n";
-            foreach($row as $val){ echo "<td>$val</td>\n"; }
-            echo "<tr>\n";
-            $first = false;
-        }
-        echo "</table><br>\n";
-    }
-
-    private function sortAssessmentRows(array &$rows)
-    {
-        usort($rows, function($a, $b){
-            if($a['ass.id'] < $b['ass.id']){
-                return -1;
-            } else if($a['ass.id'] > $b['ass.id']){
-                return 1;
-            } else {
-                return 0;
-            }
-        });
-    }
 
     /**
      * @return \External_UserInterface
@@ -1161,6 +1087,7 @@ var_dump('time: '.(microtime(true)-$start));
 
     private function printTable(array $rows)
     {
+        return;
 
         echo '
         <style type="text/css" media="screen">
@@ -1310,7 +1237,6 @@ var_dump('time: '.(microtime(true)-$start));
                 throw new \LogicException('Unknown Assessment context: '.print_r($assessment,true));
             }
             echo "{$assessment->getId()}: {$course}{$class}{$unit}{$project}: {$assessment->getTitle()}<br>";
-
         }
     }
 
@@ -1336,14 +1262,17 @@ var_dump('time: '.(microtime(true)-$start));
                 // Create Quiz / DueWork / Task object
                 // Add ID to type array for later retrieval of Response / Feedback
                 if(!is_null($row['qz.id'])){
-                    $this->quizAssessmentIds[$row['a.id']] = $row['a.id'];
+                    $this->quizAssessmentIds[$row['a.id']] = intval($row['a.id']);
                     $this->assessmentsCache[$row['a.id']] = new Quiz();
+                    $this->assessmentsCache[$row['a.id']]->setQuizId($row['qz.id']);
                 } else if(!is_null($row['dw.id'])){
-                    $this->dueWorkAssessmentIds[$row['a.id']] = $row['a.id'];
+                    $this->dueWorkAssessmentIds[$row['a.id']] = intval($row['a.id']);
                     $this->assessmentsCache[$row['a.id']] = new DueWork();
+                    $this->assessmentsCache[$row['a.id']]->setDueWorkId($row['dw.id']);
                 } else if(!is_null($row['tk.id'])){
-                    $this->taskAssessmentIds[$row['a.id']] = $row['a.id'];
+                    $this->taskAssessmentIds[$row['a.id']] = intval($row['a.id']);
                     $this->assessmentsCache[$row['a.id']] = new Task();
+                    $this->assessmentsCache[$row['a.id']]->setTaskId($row['tk.id']);
                 } else {
                     throw new \LogicException('Assessment must be Quiz, DueWork or Task: '.print_r($row,true));
                 }
@@ -1355,9 +1284,7 @@ var_dump('time: '.(microtime(true)-$start));
                 // It is VERY slow to create a new AlaressDateFormat from a DB formatted string.
                 $assessment->setDueAt($this->getFastDateFromString($row['a.due_date']));
 
-                if($assessment->getDueAt()->lt($this->tomorrow)){
-                    $this->lateAssessments[$row['a.id']] = $assessment;
-                }
+
 
                 switch($row['case']){
                     // Case 1 - Assessment resides directly on Folder
