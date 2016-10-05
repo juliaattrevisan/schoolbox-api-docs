@@ -8,18 +8,14 @@ namespace Schoolbox\Learning\Assessment;
 
 use Alaress\IDatabase;
 use Carbon\Carbon;
-use Jenssegers\Date\Date;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Model as Folder;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\Resource\Group;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
 use Schoolbox\Learning\Course\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
@@ -49,7 +45,7 @@ class Factory
 
     /**
      * Indexed by assessment.id
-     * @var IAssessable[] $assessmentsCache
+     * @var IAssessable[]|Collection $assessmentsCache
      */
     private $assessmentsCache;
 
@@ -79,13 +75,13 @@ class Factory
 
     /**
      * Each Folder requires an ID and Name. Indexed by folder.id
-     * @var Collection|Folder[] $foldersCache
+     * @var Folder[] $foldersCache
      */
     private $foldersCache;
 
     /**
      * Each Project requires an ID and Title. Indexed by assessment.id
-     * @var Collection|Project[] $projectCache
+     * @var Project[] $projectCache
      */
     private $projectCache;
 
@@ -105,26 +101,24 @@ class Factory
      */
     private $groupIds;
 
-    // Used for retrieving Responses and Feedbacks
     /** @var int[] $quizAssessmentIds */
     private $quizAssessmentIds;
 
-        /** @var int[] $dueWorkAssessmentIds */
+    /** @var int[] $dueWorkAssessmentIds */
     private $dueWorkAssessmentIds;
 
-        /** @var int[] $taskAssessmentIds */
+    /** @var int[] $taskAssessmentIds */
     private $taskAssessmentIds;
 
-        /** @var int[] $projectAssessmentIds */
+    /** @var int[] $projectAssessmentIds */
     private $projectAssessmentIds;
 
     /**
      * Maps a folder.id to set of non-unique classCodes.
-
      * Need to make sets unique before use.
      * Cannot ensure uniqueness by using classCodes as strings as class codes are not always valid array keys.
      *
-     * @var string[][]|Collection[] $folderClassCodes
+     * @var string[][] $folderClassCodes
      */
     private $folderClassCodes;
 
@@ -208,27 +202,27 @@ class Factory
         $this->database = \Database::getInstance();
 
         $this->assessmentsCache = new Collection();
-        $this->courseSpecsCache = new Collection();
-        $this->courseImplsCache = new Collection();
-        $this->unitSpecsCache = new Collection();
-        $this->unitImplsCache = new Collection();
-        $this->foldersCache = new Collection();
-        $this->projectCache = new Collection();
+        $this->courseSpecsCache = [];
+        $this->courseImplsCache = [];
+        $this->unitSpecsCache = [];
+        $this->unitImplsCache = [];
+        $this->foldersCache = [];
+        $this->projectCache = [];
         $this->studentExtCache = [];
         $this->studentIntCache = [];
         $this->classIds = [];
         $this->groupIds = [];
-        $this->quizAssessmentIds    = [];
+        $this->quizAssessmentIds = [];
         $this->dueWorkAssessmentIds = [];
-        $this->taskAssessmentIds    = [];
+        $this->taskAssessmentIds = [];
         $this->projectAssessmentIds = [];
-        $this->folderClassCodes = new Collection();
+        $this->folderClassCodes = [];
         $this->folderToStudentListMap = [];
         $this->studentExternalIds = [];
         $this->assessmentExtraStudentIds = [];
 
         $this->term = TermMapper::getInstance()->findForToday();
-        $this->term->getStart()->addYears(-1); // TODO remove this line. Just here to get more data
+        //$this->term->getStart()->addYears(-1); // TODO remove this line. Just here to get more data
     }
 
 
@@ -288,7 +282,7 @@ class Factory
      */
     private function getExternalUser()
     {
-        if(!$this->externalUser instanceof \External_UserInterface){
+        if (!$this->externalUser instanceof \External_UserInterface) {
             $this->externalUser = new \External_User();
         }
         return $this->externalUser;
@@ -299,7 +293,7 @@ class Factory
      */
     private function getExternalClass()
     {
-        if(!$this->externalClass instanceof \External_ClassInterface){
+        if (!$this->externalClass instanceof \External_ClassInterface) {
             $this->externalClass = new \External_Class();
         }
         return $this->externalClass;
@@ -315,7 +309,7 @@ class Factory
     private function cacheFolder($id, $name)
     {
         $id = intval($id);
-        if(!$this->foldersCache[$id] instanceof Folder){
+        if (!$this->foldersCache[$id] instanceof Folder) {
             $this->foldersCache[$id] = (new Folder())->setId($id)->setName($name);
         }
     }
@@ -329,7 +323,7 @@ class Factory
     private function cacheProject($id, $title)
     {
         $id = intval($id);
-        if(!$this->projectCache[$id] instanceof Project){
+        if (!$this->projectCache[$id] instanceof Project) {
             $this->projectCache[$id] = (new Project())->setId($id)->setTitle($title);
         }
     }
@@ -342,7 +336,7 @@ class Factory
     private function cacheCourseSpecification($id)
     {
         $id = intval($id);
-        if(!$this->courseSpecsCache[$id] instanceof CourseSpecification){
+        if (!$this->courseSpecsCache[$id] instanceof CourseSpecification) {
             $this->courseSpecsCache[$id] = (new CourseSpecification())->setId($id);
         }
     }
@@ -355,7 +349,7 @@ class Factory
     private function cacheCourseImplementation($id)
     {
         $id = intval($id);
-        if(!$this->courseImplsCache[$id] instanceof CourseImplementation){
+        if (!$this->courseImplsCache[$id] instanceof CourseImplementation) {
             $this->courseImplsCache[$id] = (new CourseImplementation())->setId($id);
         }
     }
@@ -368,7 +362,7 @@ class Factory
     private function cacheUnitSpecification($id)
     {
         $id = intval($id);
-        if(!$this->unitSpecsCache[$id] instanceof UnitSpecification){
+        if (!$this->unitSpecsCache[$id] instanceof UnitSpecification) {
             $this->unitSpecsCache[$id] = (new UnitSpecification())->setId($id);
         }
     }
@@ -381,7 +375,7 @@ class Factory
     private function cacheUnitImplementation($id)
     {
         $id = intval($id);
-        if(!$this->unitImplsCache[$id] instanceof UnitImplementation){
+        if (!$this->unitImplsCache[$id] instanceof UnitImplementation) {
             $this->unitImplsCache[$id] = (new UnitImplementation())->setId($id);
         }
     }
@@ -396,10 +390,10 @@ class Factory
      */
     private function addClassCodeToFolder($folderId, $code)
     {
-        if(!$this->folderClassCodes[$folderId] instanceOf Collection){
-            $this->folderClassCodes[$folderId] = new Collection();
+        if (!is_array($this->folderClassCodes[$folderId])) {
+            $this->folderClassCodes[$folderId] = [];
         }
-        $this->folderClassCodes[$folderId]->add($code);
+        array_push($this->folderClassCodes[$folderId], $code);
     }
 
     /**
@@ -423,11 +417,10 @@ class Factory
      */
     private function getAssessments()
     {
-
         // Get Assessments for Groups and Subjects administered/taught by User
         $folderIds = array_unique(array_merge($this->classIds, $this->groupIds));
 
-        $folderClause = count($folderIds) ? " OR f.id IN (".implode(',',$folderIds).") " : '';
+        $folderClause = count($folderIds) ? " OR f.id IN (" . implode(',', $folderIds) . ") " : '';
         $query1 = "
         SELECT 
                 1            AS 'case',
@@ -468,10 +461,10 @@ class Factory
             
             WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
             AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL OR tk.id IS NOT NULL)
-            AND a.due_date >= STR_TO_DATE('".$this->term->getStart()->getDatabase()."', '%Y-%m-%d %H:%i:%s')
+            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabase() . "', '%Y-%m-%d %H:%i:%s')
         ";
 
-        $folderClause = count($folderIds) ? " OR pf.id IN (".implode(',',$folderIds).") " : '';
+        $folderClause = count($folderIds) ? " OR pf.id IN (" . implode(',', $folderIds) . ") " : '';
         $query2 = "
         SELECT 
                 2            AS 'case',
@@ -515,10 +508,10 @@ class Factory
             
             WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
             AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL OR tk.id IS NOT NULL)
-            AND a.due_date >= STR_TO_DATE('".$this->term->getStart()->getDatabase()."', '%Y-%m-%d %H:%i:%s')
+            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabase() . "', '%Y-%m-%d %H:%i:%s')
         ";
 
-        $folderClause = count($folderIds) ? " OR cif.id IN (".implode(',',$folderIds).") " : '';
+        $folderClause = count($folderIds) ? " OR cif.id IN (" . implode(',', $folderIds) . ") " : '';
         $query3 = "
         SELECT 
                 3            AS 'case',
@@ -565,11 +558,11 @@ class Factory
             
             WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
             AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL OR tk.id IS NOT NULL)
-            AND a.due_date >= STR_TO_DATE('".$this->term->getStart()->getDatabase()."', '%Y-%m-%d %H:%i:%s')
+            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabase() . "', '%Y-%m-%d %H:%i:%s')
         ";
 
 
-        $folderClause = count($folderIds) ? " OR cif.id IN (".implode(',',$folderIds).") " : '';
+        $folderClause = count($folderIds) ? " OR cif.id IN (" . implode(',', $folderIds) . ") " : '';
         $query4 = "
         SELECT 
                 4            AS 'case',
@@ -618,7 +611,7 @@ class Factory
             LEFT JOIN userGroups ug                        ON ug.cid = cif.id
             
             WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
-            AND a.due_date >= STR_TO_DATE('".$this->term->getStart()->getDatabase()."', '%Y-%m-%d %H:%i:%s')
+            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabase() . "', '%Y-%m-%d %H:%i:%s')
         ";
 
         $statement = $this->database->prepare("$query1 UNION $query2 UNION $query3 UNION $query4");
@@ -626,9 +619,6 @@ class Factory
         $statement->execute();
         $this->parseAssessments($statement);
     }
-
-
-
 
 
     /**
@@ -640,30 +630,35 @@ class Factory
      */
     private function parseAssessments($statement)
     {
-        while($row = $statement->fetch(\PDO::FETCH_ASSOC)){
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
 
             $assessmentId = intval($row['a.id']);
 
             // Hydrate Assessment
-            if(!$this->assessmentsCache[$assessmentId] instanceof IAssessable){
+            if (!$this->assessmentsCache[$assessmentId] instanceof IAssessable) {
 
                 // Create Quiz / DueWork / Task object
 
                 // Add ID to type array for later retrieval of Response / Feedback
-                if(!is_null($row['qz.id'])){
+                if (!is_null($row['qz.id'])) {
                     $this->quizAssessmentIds[$assessmentId] = $assessmentId;
                     $this->assessmentsCache[$assessmentId] = new Quiz();
                     $this->assessmentsCache[$assessmentId]->setQuizId($row['qz.id']);
-                } else if(!is_null($row['dw.id'])){
-                    $this->dueWorkAssessmentIds[$assessmentId] = intval($assessmentId);
-                    $this->assessmentsCache[$assessmentId] = new DueWork();
-                    $this->assessmentsCache[$assessmentId]->setDueWorkId($row['dw.id']);
-                } else if(!is_null($row['tk.id'])){
-                    $this->taskAssessmentIds[$assessmentId] = intval($assessmentId);
-                    $this->assessmentsCache[$assessmentId] = new Task();
-                    $this->assessmentsCache[$assessmentId]->setTaskId($row['tk.id']);
                 } else {
-                    throw new \LogicException('Assessment must be Quiz, DueWork or Task: '.print_r($row,true));
+                    if (!is_null($row['dw.id'])) {
+                        $this->dueWorkAssessmentIds[$assessmentId] = intval($assessmentId);
+                        $this->assessmentsCache[$assessmentId] = new DueWork();
+                        $this->assessmentsCache[$assessmentId]->setDueWorkId($row['dw.id']);
+                    } else {
+                        if (!is_null($row['tk.id'])) {
+                            $this->taskAssessmentIds[$assessmentId] = intval($assessmentId);
+                            $this->assessmentsCache[$assessmentId] = new Task();
+                            $this->assessmentsCache[$assessmentId]->setTaskId($row['tk.id']);
+                        } else {
+                            throw new \LogicException('Assessment must be Quiz, DueWork or Task: ' . print_r($row,
+                                    true));
+                        }
+                    }
                 }
 
                 $assessment = $this->assessmentsCache[$assessmentId];
@@ -673,20 +668,20 @@ class Factory
                 // It is VERY slow to create a new AlaressDateFormat from a DB formatted string.
                 $assessment->setDueAt($this->getFastDateFromString($row['a.due_date']));
 
-                $projectId            = intval($row['p.id']);
-                $projectTitle         = $row['p.title'];
-                $unitImplId           = intval($row['ui.id']);
-                $unitSpecId           = intval($row['us.id']);
-                $courseImplId         = intval($row['ci.id']);
-                $courseSpecId         = $row['cs.id'];
-                $folderId             = intval($row['f.id']);
-                $folderName           = $row['f.name'];
-                $unitSpecFolderId     = intval($row['usf.id']);
-                $unitSpecFolderName   = $row['usf.name'];
-                $courseSpecFolderId   = intval($row['csf.id']);
+                $projectId = intval($row['p.id']);
+                $projectTitle = $row['p.title'];
+                $unitImplId = intval($row['ui.id']);
+                $unitSpecId = intval($row['us.id']);
+                $courseImplId = intval($row['ci.id']);
+                $courseSpecId = $row['cs.id'];
+                $folderId = intval($row['f.id']);
+                $folderName = $row['f.name'];
+                $unitSpecFolderId = intval($row['usf.id']);
+                $unitSpecFolderName = $row['usf.name'];
+                $courseSpecFolderId = intval($row['csf.id']);
                 $courseSpecFolderName = $row['csf.name'];
 
-                switch($row['case']){
+                switch ($row['case']) {
                     // Case 1 - Assessment resides directly on Folder
                     case 1:
                         $this->cacheFolder($folderId, $folderName);
@@ -736,13 +731,13 @@ class Factory
                         $this->courseSpecsCache[$courseSpecId]->setFolder($this->foldersCache[$courseSpecFolderId]);
                         break;
                     default:
-                        throw new \LogicException('Cannot derive AssessmentContext: '.print_r($row,true));
+                        throw new \LogicException('Cannot derive AssessmentContext: ' . print_r($row, true));
                 }
             }
 
             // ClassCodes
             $classCode = $row['fc.code'];
-            if(!is_null($classCode)){
+            if (!is_null($classCode)) {
                 $folder = $this->assessmentsCache[$assessmentId]->getContext()->getFolder();
                 $folder->getCodes()->add(new FolderCode($classCode));
                 $classFolderId = $folder->getId();
@@ -752,7 +747,7 @@ class Factory
             }
             // Group IDs
             $groupId = $row['g.id'];
-            if(!is_null($groupId)){
+            if (!is_null($groupId)) {
                 $this->groupIds[$groupId] = intval($groupId);
             }
         }
@@ -768,15 +763,15 @@ class Factory
     private function getClassStudentLists()
     {
         // Get Student Lists for each Class
-        foreach($this->classIds as $classId){
+        foreach ($this->classIds as $classId) {
 
-            $uniqueCodes = array_unique($this->folderClassCodes[$classId]->getAll());
+            $uniqueCodes = array_unique($this->folderClassCodes[$classId]);
 
             $this->folderToStudentListMap[$classId] = [];
-            $classList = $this->getExternalClass()->getStudents(implode(',',$uniqueCodes));
+            $classList = $this->getExternalClass()->getStudents(implode(',', $uniqueCodes));
 
             // Each Student in Subject
-            if(is_array($classList)) {
+            if (is_array($classList)) {
                 foreach ($classList as $student) {
                     $this->studentExternalIds[$student['synergy_id']] = $student['synergy_id'];
                     $this->folderToStudentListMap[$classId][$student['synergy_id']] = $student['synergy_id'];
@@ -795,10 +790,9 @@ class Factory
     private function getStudentsForClassesAndGroups()
     {
         // Get Students with matching externalIds, or in Groups
-        if(!empty($this->groupIds) || !empty($this->studentExternalIds))
-        {
+        if (!empty($this->groupIds) || !empty($this->studentExternalIds)) {
             $query = '';
-            if(!empty($this->groupIds)){
+            if (!empty($this->groupIds)) {
                 $query .= "
                     SELECT 
                         1            AS 'case',
@@ -810,14 +804,14 @@ class Factory
                     FROM user u
                     JOIN userAccess ua ON ua.uid = u.id
                     JOIN groups g ON u.group_id = g.id
-                    WHERE ua.sid IN (".implode(',',$this->groupIds).")
-                    AND ua.service = ".UserAccess::SERVICE_HOMEPAGE."
-                    AND g.group_type = '".\Group::STUDENT_GROUP_TYPE."'
+                    WHERE ua.sid IN (" . implode(',', $this->groupIds) . ")
+                    AND ua.service = " . UserAccess::SERVICE_HOMEPAGE . "
+                    AND g.group_type = '" . \Group::STUDENT_GROUP_TYPE . "'
                 ";
             }
 
-            if(!empty($this->studentExternalIds)){
-                if(!empty($query)){
+            if (!empty($this->studentExternalIds)) {
+                if (!empty($query)) {
                     $query .= ' UNION ';
                 }
 
@@ -838,12 +832,12 @@ class Factory
             $statement->execute();
             $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
-            foreach($rows as $row){
+            foreach ($rows as $row) {
                 $this->cacheUser($row['u.id'], $row['u.synergy_id'], $row['u.firstname'], $row['u.lastname']);
 
                 // Was this user from a Group ?
-                if(!is_null($row['g.id'])){
-                    if(!is_array($this->folderToStudentListMap[$row['g.id']])){
+                if (!is_null($row['g.id'])) {
+                    if (!is_array($this->folderToStudentListMap[$row['g.id']])) {
                         $this->folderToStudentListMap[$row['g.id']] = [];
                     }
                     $this->folderToStudentListMap[$row['g.id']][$row['u.synergy_id']] = intval($row['u.synergy_id']);
@@ -860,14 +854,14 @@ class Factory
     {
         // We have all Student ExternalIds, grouped by Subject/Group FolderId
         // We also have a cache of all Student User objects, indexed by Student.ExternalId
-        foreach($this->assessmentsCache as $assessment){
+        foreach ($this->assessmentsCache as $assessment) {
             $folderId = $assessment->getContext()->getFolder()->getId();
 
             $studentList = $this->folderToStudentListMap[$folderId];
 
             $participants = new Collection();
-            if(is_array($studentList)){
-                foreach($studentList as $studentExternalId){
+            if (is_array($studentList)) {
+                foreach ($studentList as $studentExternalId) {
                     $student = $this->studentExtCache[$studentExternalId];
                     $participants[$student->getId()] = new Participant($student);
                 }
@@ -884,7 +878,7 @@ class Factory
     private function getQuizResponsesAndFeedback()
     {
         // Bug out early if no quizzes
-        if(!count($this->quizAssessmentIds)) {
+        if (!count($this->quizAssessmentIds)) {
             return [];
         }
 
@@ -926,7 +920,7 @@ class Factory
     private function getTaskResponsesAndFeedback()
     {
         // Bug out early if no Tasks
-        if(!count($this->taskAssessmentIds)) {
+        if (!count($this->taskAssessmentIds)) {
             return [];
         }
 
@@ -965,7 +959,7 @@ class Factory
     private function getDueWorkResponses()
     {
         // Bug out early if no DueWork
-        if(!count($this->dueWorkAssessmentIds)) {
+        if (!count($this->dueWorkAssessmentIds)) {
             return [];
         }
 
@@ -1002,7 +996,7 @@ class Factory
     private function getDueWorkFeedbacks()
     {
         // Bug out early if no DueWork
-        if(!count($this->dueWorkAssessmentIds)) {
+        if (!count($this->dueWorkAssessmentIds)) {
             return [];
         }
         $query = "
@@ -1032,7 +1026,6 @@ class Factory
     }
 
 
-
     /**
      * When retrieving Assessment Responses and Feedbacks, we may have
      * found references to Users not in the current Participant lists.
@@ -1042,7 +1035,7 @@ class Factory
     private function getMissingUsers()
     {
         // Do we have Responses / Feedbacks for students that are not yet loaded?
-        if(count($this->assessmentExtraStudentIds)){
+        if (count($this->assessmentExtraStudentIds)) {
             $query = "
                 SELECT 
                     u.id         AS 'u.id',
@@ -1050,12 +1043,12 @@ class Factory
                     u.firstname  AS 'u.firstname',
                     u.lastname   AS 'u.lastname'
                 FROM user u
-                WHERE u.id IN (".implode(',',$this->assessmentExtraStudentIds).")
+                WHERE u.id IN (" . implode(',', $this->assessmentExtraStudentIds) . ")
             ";
             $statement = $this->database->prepare($query);
             $statement->execute();
             $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
-            foreach($rows as $row){
+            foreach ($rows as $row) {
                 $this->cacheUser($row['u.id'], $row['u.synergy_id'], $row['u.firstname'], $row['u.lastname']);
             }
         }
@@ -1068,7 +1061,7 @@ class Factory
      */
     private function hydrateQuizResults($quizResults)
     {
-        foreach($quizResults as $row){
+        foreach ($quizResults as $row) {
             $quiz = $this->assessmentsCache[$row['q.assessment_id']];
             $userId = $row['qa.user_id'];
             $response = new QuizAttempt();
@@ -1084,13 +1077,13 @@ class Factory
             $participants = $quiz->getAllParticipants();
 
             // Are we missing the Participant?
-            if(!$participants[$userId]){
+            if (!$participants[$userId]) {
                 $participants[$userId] = new Participant($this->studentIntCache[$userId]);
             }
             $participants[$userId]->getAllResponses()->add($response);
 
             // In this context, if not 'reviewed', then we interpret this as NO feedback
-            if(!is_null($row['qa.reviewed_at'])){
+            if (!is_null($row['qa.reviewed_at'])) {
                 $feedback = new QuizReview();
                 $feedback->setId($row['qa.attempt_id']);
                 $feedback->setPublishedAt($this->getFastDateFromString($row['qa.reviewed_at']));
@@ -1113,7 +1106,7 @@ class Factory
      */
     private function hydrateTaskResults($taskResults)
     {
-        foreach($taskResults as $row){
+        foreach ($taskResults as $row) {
             $task = $this->assessmentsCache[$row['t.assessment_id']];
             $userId = $row['tic.student_id'];
             $response = new TaskCompletion();
@@ -1126,14 +1119,14 @@ class Factory
             $participants = $task->getAllParticipants();
 
             // Are we missing the Participant?
-            if(!$participants[$userId]){
+            if (!$participants[$userId]) {
                 $participants[$userId] = new Participant($this->studentIntCache[$userId]);
             }
             $participants[$userId]->getAllResponses()->add($response);
 
 
             // For tasks, if 'reviewer' != 'reviewee', then that is Teacher Feedback
-            if($userId != $row['tic.marking_user_id']){
+            if ($userId != $row['tic.marking_user_id']) {
                 $feedback = new TaskFeedback();
                 $feedback->setId($row['tic.id']);
                 $feedback->setPublishedAt($this->getFastDateFromString($row['tic.completion_date']));
@@ -1155,7 +1148,7 @@ class Factory
      */
     private function hydrateDueWorkResponses($dueWorkResponses)
     {
-        foreach($dueWorkResponses as $row){
+        foreach ($dueWorkResponses as $row) {
             $dueWork = $this->assessmentsCache[$row['sb.assessment_id']];
             $userId = $row['ss.owner'];
             $response = new DueWorkSubmission();
@@ -1168,7 +1161,7 @@ class Factory
             $participants = $dueWork->getAllParticipants();
 
             // Are we missing the Participant?
-            if(!$participants[$userId]){
+            if (!$participants[$userId]) {
                 $participants[$userId] = new Participant($this->studentIntCache[$userId]);
             }
             $participants[$userId]->getAllResponses()->add($response);
@@ -1182,7 +1175,7 @@ class Factory
      */
     private function hydrateDueWorkFeedbacks($dueWorkFeedbackResults)
     {
-        foreach($dueWorkFeedbackResults as $row){
+        foreach ($dueWorkFeedbackResults as $row) {
             $dueWork = $this->assessmentsCache[$row['sb.assessment_id']];
             $userId = $row['sr.owner'];
             $feedback = new DueWorkFeedback();
@@ -1195,7 +1188,7 @@ class Factory
             $participants = $dueWork->getAllParticipants();
 
             // Are we missing the Participant?
-            if(!$participants[$userId]){
+            if (!$participants[$userId]) {
                 $participants[$userId] = new Participant($this->studentIntCache[$userId]);
             }
             $participants[$userId]->getAllFeedbacks()->add($feedback);
@@ -1228,7 +1221,6 @@ class Factory
     }
 
 
-
     /**
      * Ensure logically same users refer to single instance of User object
      *
@@ -1245,7 +1237,7 @@ class Factory
         $this->studentInternalIds[$id] = $id;
         $this->studentExternalIds[$externalId] = $externalId;
 
-        if(!$this->studentExtCache[$externalId] instanceof User){
+        if (!$this->studentExtCache[$externalId] instanceof User) {
             $this->studentExtCache[$externalId] = (new User())
                 ->setId($id)
                 ->setExternalId($externalId)
@@ -1253,7 +1245,7 @@ class Factory
                 ->setLastname($lastname);
         }
 
-        if(!$this->studentIntCache[$id] instanceof User){
+        if (!$this->studentIntCache[$id] instanceof User) {
             $this->studentIntCache[$id] = $this->studentExtCache[$externalId];
         }
     }
@@ -1267,7 +1259,7 @@ class Factory
      */
     private function getFastDateFromString($dateString, $format = \Alaress_Date_Format::DATABASE_FORMAT)
     {
-        if(empty($dateString)){
+        if (empty($dateString)) {
             return new \Alaress_Date_NullDate();
         }
         return new \Alaress_Date_Format(new Carbon($dateString), $format);
@@ -1297,7 +1289,7 @@ class Factory
             $classes = $this->getExternalUser()->getSubjectList($this->viewee->getExternalId(), $this->viewee->getId());
 
             // Get ClassCodes + SB FolderIds
-            if(is_array($classes) && !empty($classes)) {
+            if (is_array($classes) && !empty($classes)) {
                 $folderCodes = array_map(
                     function ($row) {
                         return trim($row['code']);
@@ -1319,7 +1311,7 @@ class Factory
                         fc.code AS 'fc.code'
                     FROM folder f
                     JOIN folder_code fc ON fc.folder_id = f.id AND fc.deleted_at IS NULL
-                    AND (fc.code IN (".implode(',',$wrappedRawCodes).") $prefixedCodeClause)
+                    AND (fc.code IN (" . implode(',', $wrappedRawCodes) . ") $prefixedCodeClause)
                 ";
 
                 $statement = $this->database->prepare($query);
@@ -1350,13 +1342,13 @@ class Factory
             JOIN userAccess ua ON ua.sid = f.id
             WHERE f.deleted_at IS NULL
             AND ua.uid = {$this->viewee->getId()}
-            AND ua.type >= ".UserAccess::ACCESS_READ."
-            AND ua.service = ".UserAccess::SERVICE_HOMEPAGE."
+            AND ua.type >= " . UserAccess::ACCESS_READ . "
+            AND ua.service = " . UserAccess::SERVICE_HOMEPAGE . "
         ";
         $statement = $this->database->prepare($query);
         $statement->execute();
 
-        while($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $folderId = intval($row['f.id']);
             $folderName = $row['f.name'];
             $this->cacheFolder($folderId, $folderName);
