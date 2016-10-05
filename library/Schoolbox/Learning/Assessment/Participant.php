@@ -19,9 +19,6 @@ use \Schoolbox\Collection;
 
 class Participant
 {
-    const TRAVERSAL_MARKED = 1;
-    const TRAVERSAL_PUBLISHED = 2;
-
     /**
      * The User to whom all these Responses and Feedbacks are relevant
      *
@@ -101,14 +98,14 @@ class Participant
      */
     public function isMarkingRequired(IAssessable $assessable)
     {
-        $latestResponse = $this->findMostRecentResponse($assessable);
-        if(!$latestResponse){
+        if(!count($this->allResponses)){
             return false;
         }
-        $latestFeedback = $this->findMostRecentFeedback($assessable);
-        if(!$latestFeedback){
+        if(!count($this->allFeedbacks)){
             return true;
         }
+        $latestResponse = $this->findMostRecentResponse($assessable);
+        $latestFeedback = $this->findMostRecentFeedback($assessable);
         return $latestResponse->getUpdatedAt() > $latestFeedback->getUpdatedAt();
     }
 
