@@ -91,20 +91,13 @@ div.jstree-default, ul.jstree-default {
 
     @extend %browser-icon-colors;
 
-    .icon-loading:before {
+    .icon-loading {
         background-image: url('/images/foundation/preloader.gif');
         content: "";
         width: 1rem;
         height: 1rem;
         display: inline-block;
     }
-
-    .jstree-hovered {
-        [class*=icon-]:before {
-            //color: $tree-node-hover-color;
-        }
-    }
-
 }
 
 // override throbber.gif

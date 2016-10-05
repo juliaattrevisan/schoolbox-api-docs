@@ -1274,11 +1274,26 @@ tr:hover{
 	position: fixed;
 }
 
-// Loader .gif
+// Schoolbox Loader
 .loader{
-	background: url('/images/foundation/preloader.gif') center center no-repeat;
-  	min-height: 68px;
-  	min-width: 68px;
+	background-color: $accent-foreground;
+	border-radius: 0.5rem;
+	margin: 2rem auto;
+	width: 3rem;
+	height: 3rem;
+	@include animation(sb-loader 1.2s infinite ease-in-out);
+}
+span.loader{
+	border-radius: 0.2rem;
+	display: inline-block;
+	margin: 0 0.5rem;
+	width: 1rem;
+	height: 1rem;
+}
+@include keyframes(sb-loader) {
+	0% { transform: perspective(7.5rem) rotateX(0deg) rotateY(0deg); }
+	50% { transform: perspective(7.5rem) rotateX(-180.1deg) rotateY(0deg); }
+	100% { transform: perspective(7.5rem) rotateX(-180deg) rotateY(-179.9deg); }
 }
 
 .minw-1  { min-width: 1rem; }
