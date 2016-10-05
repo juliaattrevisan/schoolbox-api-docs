@@ -33,8 +33,9 @@
                             <span class="pipe-meter" style="left: {{ assessment.getPercentageMarked }}%"></span>
                         </div>
                     </div>
-                    <div class="small-6 medium-2 columns text-center">
+                    <div class="small-6 medium-2 columns text-right">
                         <p>{{ assessment.numMarkingRequired }} unmarked</p>
+                        <p><span class="meta" title="{{ assessment.dueAt.local }}">Due {{ assessment.dueAt.relativeTime }}</span></p>
                     </div>
                     <ul class="information-list hide" data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
                         {% for participant in assessment.allParticipants %}
@@ -75,9 +76,10 @@
                             <span class="pipe-meter" style="left: {{ assessment.getPercentageMarked }}%"></span>
                         </div>
                     </div>
-                    <div class="small-6 medium-2 columns text-center">
+                    <div class="small-6 medium-2 columns text-right">
                         {% set state = assessment is quiz ? 'unattempted' : 'unsubmitted' %}
                         <p>{{ assessment.numNoResponseOrFeedback }} {{ state }}</p>
+                        <p><span class="meta" title="{{ assessment.dueAt.local }}">Due {{ assessment.dueAt.relativeTime }}</span></p>
                     </div>
                     <ul class="information-list hide" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed">
                         {% for participant in assessment.allParticipants %}
