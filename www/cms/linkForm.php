@@ -39,6 +39,11 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
         $link->setTarget($_POST['target']);
         $link->setModified(Alaress_Date_Format::now());
 
+        // If the owner has been deleted - set new owner to the editor
+        if ($link->getOwner()->getId() === null) {
+            $link->setOwner($_SESSION['id']);
+        }
+
     } else {
         /** @var Link $link */
         $link = LinkMapper::getInstance()->createModel();
