@@ -156,7 +156,7 @@ abstract class AbstractNode implements NodeInterface
 
                 $folder = $currentFolder;
 
-                if ($this->hasPermission($folder->getParent()->getId(), READ_ACCESS)) {
+                if (!$this->hasPermission($folder->getParent()->getId(), READ_ACCESS)) {
                     $crumb['disabled'] = 'disabled';
                 }
 
