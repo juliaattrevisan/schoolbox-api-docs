@@ -222,7 +222,7 @@ class Factory
         $this->assessmentExtraStudentIds = [];
 
         $this->term = TermMapper::getInstance()->findForToday();
-        //$this->term->getStart()->addYears(-1); // TODO remove this line. Just here to get more data
+        $this->term->getStart()->addMonths(-36); // TODO remove this line. Just here to get more data
     }
 
 
@@ -1154,6 +1154,7 @@ class Factory
             $response = new DueWorkSubmission();
             $response->setId($row['ss.id']);
             $response->setSubmittedBy($this->studentIntCache[$userId]);
+            $response->setSubmittedOnBehalfOf($this->studentIntCache[$userId]);
             $response->setAssessable($dueWork);
             $response->setUpdatedAt($this->getFastDateFromString($row['ss.submitted']));
 
