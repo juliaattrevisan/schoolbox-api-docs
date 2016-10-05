@@ -29,15 +29,6 @@ input.course-selector-loader:focus {
     &.course-selector-search-loading {
         background-image: url('/images/foundation/preloader.gif');
         background-size: 16px 16px;
-        &:after{
-            background-color: $accent-foreground;
-            border-radius: 0.2rem;
-            display: inline-block;
-            margin: 0 0.5rem;
-            width: 1rem;
-            height: 1rem;
-            @include animation(sb-loader 1.2s infinite ease-in-out);
-        }
     }
 }
 
