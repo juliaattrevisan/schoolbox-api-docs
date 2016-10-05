@@ -10,6 +10,8 @@ use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Factory;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -61,11 +63,17 @@ class Controller extends Base
      *
      * @api   GET /learning/pending/:userId
      * @level 165
-     * @param User $user
+     * @param User $user The user whose pending assessments we are viewing.
      */
-    public function getPendingAssessmentsForUser(User $user)
+    public function getPendingAssessmentsForUser(User $user = null)
     {
-        // Is current user not SuperUser or Staff ?
+        // No User found ?
+        if(is_null($user)){
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
+        }
+
+        // Is current user not SuperUser or Staff (ie a student or parent) ?
+        // TODO - this logic requires re-thinking
         if (!($this->getUser()->isSuperuser() || $this->getUser()->getRole()->isStaff())) {
             $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getDue', [
                 'studentId' => $this->getUser()->getId()
@@ -78,9 +86,32 @@ class Controller extends Base
 
         $factory = new Factory();
 
+        $assessments = $factory->getPendingAssessments($user);
+
+        /** @var IAssessable[] $assessmentsToMark */
+        $assessmentsToMark = new Collection();
+        foreach($assessments as $assessment){
+            if($assessment->numMarkingRequired()){
+                $assessmentsToMark->add($assessment);
+            }
+        }
+        $assessmentsToMark->sortBy('dueAt', 'asc');
+
+        /** @var IAssessable[] $assessmentsToMark */
+        $assessmentsToChase = new Collection();
+        $tomorrow = (new \Alaress_Date_Format())->addDays(1);
+        foreach($assessments as $assessment){
+            if($assessment->getDueAt()->lt($tomorrow)){
+                $assessmentsToChase->add($assessment);
+            }
+        }
+        $assessmentsToChase->sortBy('dueAt', 'desc');
+
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', [
-            'user'              => $user,
-            'assessments'       => $factory->getPendingAssessments($user),
+            'viewer'             => $this->getUser(),
+            'viewee'             => $user,
+            'assessmentsToMark'  => $assessmentsToMark,
+            'assessmentsToChase' => $assessmentsToChase,
         ]));
     }
 
