@@ -7,16 +7,11 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Web\Controller\Base;
-use InvalidArgumentException;
-use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
-use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
 use Schoolbox\Learning\Assessment\Summator\Sum;
-use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -25,59 +20,19 @@ use Schoolbox\UserMapper;
 use \Alaress_Date_Format;
 use \Alaress_Date_NullDate;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
-
-use \Schoolbox\Resource\Storage\Model as Storage;
-
-use \Schoolbox\Learning\Assessment\Participant;
-use \Schoolbox\Learning\Assessment\Project as Project;
-
 use \Schoolbox\Learning\MarkScheme\Mapping as MarkSchemeMapping;
-
 use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 use \Schoolbox\Learning\Assessment\Summator\Mapping as SummatorMapping;
-
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
-use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as DueWorkSubmissionFilePlagscan;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
-use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
-use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
-
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
 use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
-
 use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
-use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
-
 use Schoolbox\Resource\Attachment\Zone;
-
-use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
-use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
-use Schoolbox\Learning\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
-use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
 use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
-use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
-use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
-use Schoolbox\Learning\Assessment\Task\Model as Task;
-use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
-use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
-use Schoolbox\Learning\Assessment\Project;
-use Schoolbox\Learning\MarkScheme\Completion;
-use Schoolbox\Learning\MarkScheme\LetterGrade;
-use Schoolbox\Learning\MarkScheme\None;
-use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
-use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
-use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevel;
-use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
-use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 
 class Controller extends Base
 {
