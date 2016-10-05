@@ -84,9 +84,9 @@ class Controller extends Base
             $user = $this->getUser();
         }
 
-        $factory = new Factory();
+        $factory = new Factory($user);
 
-        $assessments = $factory->getPendingAssessments($user);
+        $assessments = $factory->getPendingAssessments();
 
         /** @var IAssessable[] $assessmentsToMark */
         $assessmentsToMark = new Collection();
