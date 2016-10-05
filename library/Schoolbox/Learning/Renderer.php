@@ -24,7 +24,7 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
 
 /**
  * Enables twig template 'is a' tests.
- * Usage:
+ * Usage, where 'assessment' is the var name for an IAssessable:
  * * {% if assessment.context is a folder %}
  * * {% if assessment.context is a unitImplementation %}
  * * {% if assessment.context is a unitSpecification %}
@@ -36,6 +36,11 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
  */
 class Renderer extends \Twig_Extension
 {
+    /**
+     * Returns a list of tests to add to the existing list.
+     *
+     * @return \Twig_SimpleTest[]
+     */
     public function getTests ()
     {
         return [
@@ -50,6 +55,11 @@ class Renderer extends \Twig_Extension
         ];
     }
 
+    /**
+     * Returns the name of the extension.
+     *
+     * @return string The extension name
+     */
     public function getName()
     {
         return 'assessment_tests';
