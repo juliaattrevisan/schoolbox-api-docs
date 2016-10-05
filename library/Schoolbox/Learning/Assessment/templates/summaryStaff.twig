@@ -1,10 +1,126 @@
+{# Set color classes depending on status #}
+
+{% if counts.taskCompleted == counts.task %}
+    {% set taskClass = 'success' %}
+{% elseif counts.taskCompleted < counts.task %}
+    {% set taskClass = 'alert' %}
+{% endif %}
+
+{% if counts.dueWorkCompleted == counts.dueWork %}
+    {% set dueWorkClass = 'success' %}
+{% elseif counts.dueWorkCompleted < counts.dueWork %}
+    {% set dueWorkClass = 'alert' %}
+{% endif %}
+
+{% if counts.quizCompleted == counts.quiz %}
+    {% set quizClass = 'success' %}
+{% elseif counts.quizCompleted < counts.quiz %}
+    {% set quizClass = 'alert' %}
+{% endif %}
+
+{% if counts.totalCompleted == counts.total %}
+    {% set totalClass = 'success' %}
+{% elseif counts.totalCompleted < counts.total %}
+    {% set totalClass = 'alert' %}
+{% endif %}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Learning',    '#' ],
+[ 'Classname',   '#' ],
+[ student.getFullName,   '#' ],
+[ assessment.title,   '#' ]
+) }}
+
 <div class="row">
     <div class="small-12 island">
-
         <h1>{{ assessment.title }} - {{ student.getFullName }}</h1>
-        <p>{{ assessment.description }}</p>
+        <section>
+            <div class="content">
+                <p class="meta">{{ summatorName }}</p>
+                <p>{{ assessment.description }}</p>
+            </div>
+        </section>
 
-        <h2 class="subheader">Important Dates</h2>
+        <h2 class="subheader">Progress</h2>
+        <div class="row">
+            <div class="small-12 medium-3 island">
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="list-item">
+                                <div class="card wrap-down small-12" title="{{ assessment.getPublishAt.getLocal }}">
+                                    <a href="#">
+                                        <i class="icon-clock icon-32"></i>
+                                    </a>
+                                    <p>
+                                        Published
+                                    </p>
+                                    <p class="meta spaced">{{ assessment.getPublishAt.getRelativeTime }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <div class="small-12 medium-3 island">
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="list-item">
+                                <div class="card wrap-down small-12" title="{{ assessment.getOpenAt.getLocal }}">
+                                    <a href="#">
+                                        <i class="icon-clock icon-32"></i>
+                                    </a>
+                                    <p>
+                                        Project Open
+                                    </p>
+                                    <p class="meta spaced">{{ assessment.getOpenAt.getRelativeTime }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <div class="small-12 medium-3 island">
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="list-item" title="{{ assessment.getDueAt.getLocal }}">
+                                <div class="card wrap-down small-12">
+                                    <a href="#">
+                                        <i class="icon-clock icon-32"></i>
+                                    </a>
+                                    <p>
+                                        Project Due
+                                    </p>
+                                    <p class="meta spaced">{{ assessment.getDueAt.getRelativeTime }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+            <div class="small-12 medium-3 island">
+                <section>
+                    <ul class="information-list">
+                        <li>
+                            <div class="list-item" title="{{ assessment.getCloseAt.getLocal }}">
+                                <div class="card wrap-down small-12">
+                                    <a href="#">
+                                        <i class="icon-clock icon-32"></i>
+                                    </a>
+                                    <p>
+                                        Closes
+                                    </p>
+                                    <p class="meta spaced">{{ assessment.getCloseAt.getRelativeTime }}</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
+        </div>
         <div class="row">
             <div class="small-12 medium-3 island">
                 <section>
@@ -13,129 +129,200 @@
                             <div class="list-item">
                                 <div class="card wrap-down small-12">
                                     <a href="#">
-                                        <i class="icon-clock icon-32"></i>
+                                        <i class="icon-due-work icon-32"></i>
                                     </a>
                                     <p>
-                                        Publish Date
+                                        Overall Completion
                                     </p>
-                                    <p class="meta spaced">{{ assessment.publish_date.getLocal }}</p>
+                                    <p class="meta spaced {{ totalClass }}">{{ (counts.totalCompleted / counts.total * 100) | round(1, 'common') }}%
+                                        Completed</p>
                                 </div>
                             </div>
                         </li>
                     </ul>
                 </section>
             </div>
-            <div class="small-12 medium-3 island">
-                <section>
-                    <ul class="information-list">
-                        <li>
-                            <div class="list-item">
-                                <div class="card wrap-down small-12">
-                                    <a href="#">
-                                        <i class="icon-clock icon-32"></i>
-                                    </a>
-                                    <p>
-                                        Open Date
-                                    </p>
-                                    <p class="meta spaced">{{ assessment.open_date.getLocal }}</p>
+            {% if counts.dueWork > 0 %}
+                <div class="small-12 medium-3 island">
+                    <section>
+                        <ul class="information-list">
+                            <li>
+                                <div class="list-item">
+                                    <div class="card wrap-down small-12">
+                                        <a href="#">
+                                            <i class="icon-due-work icon-32"></i>
+                                        </a>
+                                        <p>
+                                            Due Work
+                                        </p>
+                                        <p class="meta spaced {{ dueWorkClass }}">{{ (counts.dueWorkCompleted / counts.dueWork * 100) | round(1, 'common') }}%
+                                            Submitted</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
-                    </ul>
-                </section>
-            </div>
-            <div class="small-12 medium-3 island">
-                <section>
-                    <ul class="information-list">
-                        <li>
-                            <div class="list-item">
-                                <div class="card wrap-down small-12">
-                                    <a href="#">
-                                        <i class="icon-clock icon-32"></i>
-                                    </a>
-                                    <p>
-                                        Due Date
-                                    </p>
-                                    <p class="meta spaced">{{ assessment.due_date.getLocal }}</p>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+            {% endif %}
+            {% if counts.quiz > 0 %}
+                <div class="small-12 medium-3 island">
+                    <section>
+                        <ul class="information-list">
+                            <li>
+                                <div class="list-item">
+                                    <div class="card wrap-down small-12">
+                                        <a href="#">
+                                            <i class="icon-quiz icon-32"></i>
+                                        </a>
+                                        <p>
+                                            Quizzes
+                                        </p>
+                                        <p class="meta spaced {{ quizClass }}">{{ (counts.quizCompleted / counts.quiz * 100) | round(1, 'common') }}%
+                                            Attempted</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
-                    </ul>
-                </section>
-            </div>
-            <div class="small-12 medium-3 island">
-                <section>
-                    <ul class="information-list">
-                        <li>
-                            <div class="list-item">
-                                <div class="card wrap-down small-12">
-                                    <a href="#">
-                                        <i class="icon-clock icon-32"></i>
-                                    </a>
-                                    <p>
-                                        Close Date
-                                    </p>
-                                    <p class="meta spaced">{{ assessment.close_date.getLocal }}</p>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+            {% endif %}
+            {% if counts.task > 0 %}
+                <div class="small-12 medium-3 island">
+                    <section>
+                        <ul class="information-list">
+                            <li>
+                                <div class="list-item">
+                                    <div class="card wrap-down small-12">
+                                        <a href="#">
+                                            <i class="icon-task icon-32"></i>
+                                        </a>
+                                        <p>
+                                            Tasks
+                                        </p>
+                                        <p class="meta spaced {{ taskClass }}">{{ (counts.taskCompleted / counts.task * 100) | round(1, 'common') }}%
+                                            Attempted</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
-                    </ul>
-                </section>
-            </div>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+            {% endif %}
         </div>
 
         <h2 class="subheader">Assessables</h2>
-
         <section>
             <ul class="information-list">
                 {% for assessable in assessment.assessables %}
 
-                    {% if assessable.totalFeedbacks < assessable.totalResponses or assessable.totalResponses == 0 %}
-                        {% set classResponses = 'alert' %}
-                    {% elseif assessable.totalFeedbacks == assessable.totalResponses %}
-                        {% set classResponses = 'success' %}
-                    {% else %}
-                        {% set classResponses = '' %}
-                    {% endif %}
+                    {# Work out where each assessables link should go to and pick an icon based on assessment type #}
 
-                    {% if assessable.assessment_type == 'dueWork' %}
-                        {% set icon = 'due-work' %}
-                        {% set url = '/somewhere/' ~ assessable.id %}
-                    {% elseif assessable.assessment_type == 'quiz' %}
+                    {% if assessable.getTypeName == 'Quiz' %}
                         {% set icon = 'quiz' %}
-                        {% set url = '/somewhere/' ~ assessable.id %}
-                    {% elseif assessable.assessment_type == 'task' %}
+                        {% set url = '/somewhere/' ~ assessable.id %}               {# Link to the quiz page #}
+                    {% elseif assessable.getTypeName == 'Task' %}
                         {% set icon = 'task' %}
-                        {% set url = '/somewhere/' ~ assessable.id %}
+                        {% set url = assessable.link %}                             {# Link to the task #}
+                    {% else %}
+                        {% set icon = 'due-work' %}
+                        {% set url = '/somewhere/' ~ assessable.id %}               {# Link to the due work page #}
                     {% endif %}
 
                     <li>
                         <div class="list-item">
                             <div class="card wrap-down small-12">
-                                <div class="icon-{{ icon }} icon-32"></div>
+                                <div class="icon-{{ icon }} icon-32" title="{{ assessable.getTypeName }}"></div>
                                 <a href="{{ url }}">
                                     <h3>
                                         {{ assessable.title }}
-                                        {% if assessable.totalResponses > 0 %}
-                                            ({{ assessable.totalResponses }} Response{% if assessable.totalResponses > 1 %}s{% endif %})
-                                        {% endif %}
                                     </h3>
                                 </a>
-                                <p class="meta">
-                                    <span class="{{ classResponses }}">
-                                        {% if assessable.totalResponses == 0 %}
-                                            No Submission Received
-                                        {% else %}
-                                            {{ (assessable.totalFeedbacks / assessable.totalResponses * 100 ) | round(1, 'common') }}% Feedback Provided
-                                        {% endif %}
-                                    </span>
+                                <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
+                                    Due {{ assessable.getDueAt.getRelativeTime }}
                                 </p>
+
                             </div>
                         </div>
+
                     </li>
+
+                    {# Display list of all responses the student provided- this is a bit of an ugly technicolor label rainbow
+                    but I do kinda suck at front-end... so if anyone has any suggestions... #}
+
+                    {% if assessable.getTypeName != 'Task' %}
+
+                        {# Check if there was a response #}
+
+                        {% if assessable.getParticipant(student).getAllResponses | length %}
+                            {% for response in assessable.getParticipant(student).getAllResponses %}
+
+                                <li class="actions-small-2">
+                                    <div class="list-item">
+                                        <div class="card small-12">
+                                            <div class="row">
+                                                <div class="small-12 columns no-pad">
+
+                                                    {# Check if submission was late and style appropriately #}
+
+                                                    {% if response.getCreatedAt < assessable.getDueAt %}
+                                                        <span class="label status success"
+                                                              title="{{ response.getCreatedAt.getLocal }}">Submission Received: {{ response.getCreatedAt.getRelativeTime }}</span>
+                                                    {% else %}
+                                                        <span class="label status alert"
+                                                              title="{{ response.getCreatedAt.getLocal }}">Submission Received Late: {{ response.getCreatedAt.getRelativeTime }}</span>
+                                                    {% endif %}
+                                                </div>
+
+                                                {# Indicate if feedback was provided #}
+
+                                                <div class="small-12 columns no-pad">
+                                                    {% if response.getAllFeedback %}
+                                                        <span class="label status success">Feedback Provided</span>
+                                                    {% else %}
+                                                        <span class="label status alert">Feedback Pending</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <nav>
+                                        <a href="#" class="icon-view" title="View Submission"></a>
+                                        <a href="#" class="icon-modify" title="Feedback"></a>
+                                    </nav>
+                                </li>
+                            {% endfor %}
+
+                        {% else %}
+
+                            {# No submission was received #}
+
+                            <li class="actions-small-2">
+                                <div class="list-item">
+                                    <div class="card small-12">
+                                        <div class="row">
+                                            <div class="small-12 columns no-pad">
+
+                                                {# Check if it is overdue and style appropriately#}
+
+                                                {% if assessable.getDueAt.isFuture %}
+                                                    <span class="label status netural">
+                                                        No Submission Received
+                                                    </span>
+                                                {% else %}
+                                                    <span class="label status alert">
+                                                        No Submission Received (Overdue)
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                        {% endif %}
+                    {% endif %}
                 {% endfor %}
             </ul>
         </section>
-
     </div>
 </div>

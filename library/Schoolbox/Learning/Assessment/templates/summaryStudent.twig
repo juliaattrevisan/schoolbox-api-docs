@@ -24,11 +24,22 @@
     {% set totalClass = 'alert' %}
 {% endif %}
 
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs(
+[ 'Learning',    '#' ],
+[ 'Classname',   '#' ],
+[ assessment.title,   '#' ]
+) }}
 
 <div class="row">
     <div class="small-12 island">
         <h1>{{ assessment.title }}</h1>
-        <p>{{ assessment.description }}</p>
+        <section>
+            <div class="content">
+                <p class="meta">{{ summatorName }}</p>
+                <p>{{ assessment.description }}</p>
+            </div>
+        </section>
 
         <h2 class="subheader">Progress</h2>
         <div class="row">
@@ -37,14 +48,14 @@
                     <ul class="information-list">
                         <li>
                             <div class="list-item">
-                                <div class="card wrap-down small-12">
+                                <div class="card wrap-down small-12" title="{{ assessment.getOpenAt.getLocal }}">
                                     <a href="#">
                                         <i class="icon-clock icon-32"></i>
                                     </a>
                                     <p>
-                                        Open Date
+                                        Project Open
                                     </p>
-                                    <p class="meta spaced">{{ assessment.open_date.getLocal }}</p>
+                                    <p class="meta spaced">{{ assessment.getOpenAt.getRelativeTime }}</p>
                                 </div>
                             </div>
                         </li>
@@ -55,15 +66,15 @@
                 <section>
                     <ul class="information-list">
                         <li>
-                            <div class="list-item">
+                            <div class="list-item" title="{{ assessment.getDueAt.getLocal }}">
                                 <div class="card wrap-down small-12">
                                     <a href="#">
                                         <i class="icon-clock icon-32"></i>
                                     </a>
                                     <p>
-                                        Due Date
+                                        Project Due
                                     </p>
-                                    <p class="meta spaced">{{ assessment.due_date.getLocal }}</p>
+                                    <p class="meta spaced">{{ assessment.getDueAt.getRelativeTime }}</p>
                                 </div>
                             </div>
                         </li>
@@ -82,7 +93,7 @@
                                         <i class="icon-due-work icon-32"></i>
                                     </a>
                                     <p>
-                                        Overall Project Completion
+                                        Overall Completion
                                     </p>
                                     <p class="meta spaced {{ totalClass }}">{{ (counts.totalCompleted / counts.total * 100) | round(1, 'common') }}%
                                         Completed</p>
@@ -167,98 +178,70 @@
 
                     {# Work out where each assessables link should go to and pick an icon based on assessment type #}
 
-                    {% if assessable.assessment_type == 'dueWork' %}
-                        {% set icon = 'due-work' %}
-                        {% set url = '/somewhere/' ~ assessable.id %}
-                    {% elseif assessable.assessment_type == 'quiz' %}
+                    {% if assessable.getTypeName == 'Quiz' %}
                         {% set icon = 'quiz' %}
-                        {% set url = '/somewhere/' ~ assessable.id %}
-                    {% elseif assessable.assessment_type == 'task' %}
+                        {% set url = '/somewhere/' ~ assessable.id %}               {# Link to the quiz page #}
+                    {% elseif assessable.getTypeName == 'Task' %}
                         {% set icon = 'task' %}
-                        {% set url = assessable.link %}
+                        {% set url = assessable.link %}                             {# Link to the task #}
+                    {% else %}
+                        {% set icon = 'due-work' %}
+                        {% set url = '/somewhere/' ~ assessable.id %}               {# Link to the due work page #}
                     {% endif %}
 
                     <li class="actions-small-2">
                         <div class="list-item">
                             <div class="card wrap-down small-12">
-                                <div class="icon-{{ icon }} icon-32"></div>
+                                <div class="icon-{{ icon }} icon-32" title="{{ assessable.getTypeName }}"></div>
                                 <a href="{{ url }}">
                                     <h3>
                                         {{ assessable.title }}
 
-                                        {# If the assessment is a task display completion indicator where appropriate #}
+                                        {# If the assessment is a task, display completion indicator if there is a response #}
 
-                                        {% if assessable.assessment_type == 'task' %}
-
-                                            {% set taskCompleted = false %}
-                                            {% for response in assessable.responses %}
-                                                {% if response.responseType == 'taskCompletion' %}
-                                                    {% set taskCompleted = true %}
-                                                {% endif %}
-                                            {% endfor %}
-
-                                            {% if taskCompleted %}
-                                                (Completed)
-                                            {% endif %}
+                                        {% if assessable.getTypeName == 'Task' and (assessable.getParticipant(student).getAllResponses | length) %}
+                                            (Completed)
                                         {% endif %}
                                     </h3>
                                 </a>
-                                <p class="meta">
-                                    {{ assessable.description }}
+                                <p class="meta" title="{{ assessable.getDueAt.getLocal }}">
+                                    Due {{ assessable.getDueAt.getRelativeTime }}
                                 </p>
                             </div>
                         </div>
                         <nav>
-                            {% if assessable.assessment_type == 'dueWork' %}
 
-                                {# Check if the due work is accepting submissions #}
-
-                                {% if assessable.accept_submission %}
-
-                                    {# Work out if there has been any feedback for this item #}
-
-                                    {% set showFeedback = false %}
-
-                                    {% for response in assessable.responses %}
-                                        {% if response.feedbacks | length %}
-                                            {% set showFeedback = true %}
-                                        {% endif %}
-                                    {% endfor %}
-
-                                    {# If there was feedback, display view feedback icon #}
-
-                                    {% if showFeedback %}
-                                        <a href="/feedback/{{ assessable.id }}" class="icon-view no-text" title="View Feedback"></a>
-                                    {% endif %}
-
-                                    {# Show upload link if multiple submissions are allowed, or the student hasn't submitted already #}
-
-                                    {% if assessable.multi_submission == true or assessable.responses | length == 0 %}
-                                        <a href="/submit/{{ assessable.id }}" class="icon-modify no-text" title="Submit Response"></a>
-                                    {% endif %}
-
-                                {% endif %}
-
-                            {% elseif assessable.assessment_type == 'quiz' %}
-
-                                {# Work out if there is any feeedback for this item #}
-
-                                {% set showFeedback = false %}
-                                {% for attempt in assessable.attempts %}
-                                    {% if attempt.feedbacks | length %}
-                                        {% set showFeedback = true %}
-                                    {% endif %}
-                                {% endfor %}
+                            {% if assessable.getTypeName == 'Quiz' %}
 
                                 {# Display feedback #}
 
-                                {% if showFeedback %}
+                                {% if assessable.getParticipant(student).getAllFeedbacks | length %}
                                     <a href="/feedback/{{ assessable.id }}" class="icon-view no-text" title="View Feedback"></a>
                                 {% endif %}
 
                                 {# Display attempt icon #}
 
                                 <a href="/quiz-attempt/{{ assessable.id }}" class="icon-modify no-text" title="Attempt Quiz"></a>
+
+                            {% elseif assessable.getTypeName != 'Task' %}
+
+                                {# Check if the due work is accepting submissions #}
+
+                                {% if assessable.getAcceptOnline %}
+
+                                    {# Display feedback if there is any#}
+
+                                    {% if assessable.getParticipant(student).getAllFeedbacks | length %}
+                                        <a href="/feedback/{{ assessable.id }}" class="icon-view no-text" title="View Feedback"></a>
+                                    {% endif %}
+
+                                    {# Show upload link if multiple submissions are allowed, or the student hasn't submitted already #}
+
+                                    {% if assessable.isAcceptMulti or (assessable.getParticipant(student).getAllResponses | length) == 0 %}
+                                        <a href="/submit/{{ assessable.id }}" class="icon-modify no-text" title="Submit Response"></a>
+                                    {% endif %}
+
+                                {% endif %}
 
                             {% endif %}
 

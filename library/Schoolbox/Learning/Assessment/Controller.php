@@ -7,11 +7,17 @@
 namespace Schoolbox\Learning\Assessment;
 
 use Alaress\Web\Controller\Base;
+use InvalidArgumentException;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Component\SubmissionBox\Rubric\RubricMapper;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\Summator\Minimum;
+use Schoolbox\Learning\Assessment\Summator\Sum;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
+use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\User as User;
@@ -48,6 +54,30 @@ use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
 
 use Schoolbox\Resource\Attachment\Zone;
+
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
+use Schoolbox\Learning\Assessment\Summator\Average;
+use Schoolbox\Learning\Assessment\Summator\Maximum;
+use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
+use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\MarkScheme\Completion;
+use Schoolbox\Learning\MarkScheme\LetterGrade;
+use Schoolbox\Learning\MarkScheme\None;
+use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
+use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Model as GradeLevel;
+use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
+use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 
 class Controller extends Base
 {
@@ -823,35 +853,61 @@ class Controller extends Base
         // http://192.168.36.10/learning/assessment/3/summary/230   - dueWork
         // http://192.168.36.10/learning/assessment/4/summary/230   - task
 
-        $assessment = self::getDummyAssessment($assessmentId);
+        $project = self::getDummyAssessment($assessmentId);
+        $hodes = (new User)->setId(230)->setFirstname('David')->setLastname('Rhodes');
 
-        // Is it a due work?
-        if (in_array($assessmentId, [2])){
-            // Rubric
-            $submissionBox = SubmissionBoxMapper::getInstance()->findById(56);
-            $twigData['rubric'] = RubricMapper::getInstance()->findBySubmissionBoxAndStudent($submissionBox, $student)->toContext();
-        }
+        // Calculate summary totals for display purposes
 
-        // Calculate some totals for display purposes
+        $counts = [
+            'dueWork' => 0,
+            'dueWorkCompleted' => 0,
+            'quiz' => 0,
+            'quizCompleted' => 0,
+            'task' => 0,
+            'taskCompleted' => 0,
+            'total' => 0,
+            'totalCompleted' => 0,
+        ];
 
-        foreach ($assessment['assessables'] as &$assessable) {
+        $assessables = $project->getAssessables();
 
-            $assessable['totalResponses'] = 0;
-            $assessable['totalFeedbacks'] = 0;
+        /** @var IAssessable $assessable */
+        foreach ($assessables as $assessable) {
 
-            foreach ($assessable['responses'] as $response) {
-                $assessable['totalResponses']++;
+            $participant = $assessable->getParticipant($student);
 
-                if (count($response['feedbacks']) > 0) {
-                    $assessable['totalFeedbacks']++;
-                }
+            switch ($assessable->getTypeName()) {
+                case 'Quiz': $type = "quiz"; break;
+                case 'Task': $type = "task"; break;
+                default: $type = "dueWork"; break;
+            }
+
+            $counts[$type]++;
+            $counts['total']++;
+
+            // If the student has submitted at least one response we will assume it is completed
+
+            if ($participant->getAllResponses()->count() > 0) {
+                $counts[$type.'Completed']++;
+                $counts['totalCompleted']++;
             }
         }
+
+        // Get a friendly summator name
+
+        $summatorName = $project->getSummator() instanceof Sum ? 'Sum' :
+            $project->getSummator() instanceof Minimum ? 'Minimum' :
+                $project->getSummator() instanceof Maximum ? 'Maximum' :
+                    $project->getSummator() instanceof Average ? 'Average' :
+                        $project->getSummator() instanceof WeightedAverage ? 'Weighted Average' :
+                            'None';
 
         $twigData = [
             'breadcrumbs' => self::getDummyBreadcrumbs(),
             'student' => $student,
-            'assessment' => $assessment,
+            'assessment' => $project,
+            'counts' => $counts,
+            'summatorName' => $summatorName
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStaff.twig", $twigData));
@@ -876,16 +932,10 @@ class Controller extends Base
         // http://192.168.36.10/learning/assessment/3/summary/230   - dueWork
         // http://192.168.36.10/learning/assessment/4/summary/230   - task
 
-        $assessment = self::getDummyAssessment($assessmentId);
+        $project = self::getDummyAssessment($assessmentId);
+        $hodes = (new User)->setId(230)->setFirstname('David')->setLastname('Rhodes');
 
-        // Is it a due work?
-        if (in_array($assessmentId, [2])){
-            // Rubric
-            $submissionBox = SubmissionBoxMapper::getInstance()->findById(56);
-            $twigData['rubric'] = RubricMapper::getInstance()->findBySubmissionBoxAndStudent($submissionBox, $this->getUser())->toContext();
-        }
-
-        // Calculate some totals for display purposes
+        // Calculate summary totals for display purposes
 
         $counts = [
             'dueWork' => 0,
@@ -898,41 +948,46 @@ class Controller extends Base
             'totalCompleted' => 0,
         ];
 
-        foreach ($assessment['assessables'] as $assessable) {
+        $assessables = $project->getAssessables();
 
-            $counts[$assessable['assessment_type']]++;
+        /** @var IAssessable $assessable */
+        foreach ($assessables as $assessable) {
+
+            $participant = $assessable->getParticipant($this->getUser());
+
+            switch ($assessable->getTypeName()) {
+                case 'Quiz': $type = "quiz"; break;
+                case 'Task': $type = "task"; break;
+                default: $type = "dueWork"; break;
+            }
+
+            $counts[$type]++;
             $counts['total']++;
 
-            switch ($assessable['assessment_type']) {
-                case 'dueWork':
-                    if (count($assessable['responses']) > 0) {
-                        $counts['dueWorkCompleted']++;
-                        $counts['totalCompleted']++;
-                    }
-                    break;
-                case 'quiz':
-                    if (count($assessable['attempts']) > 0) {
-                        $counts['quizCompleted']++;
-                        $counts['totalCompleted']++;
-                    }
-                    break;
-                case 'task':
-                    foreach ($assessable['responses'] as $response) {
-                        if ($response['responseType'] == 'taskCompletion') {
-                            $counts['taskCompleted']++;
-                            $counts['totalCompleted']++;
-                            break;
-                        }
-                    }
-                    break;
+            // If the student has submitted at least one response we will assume it is completed
+
+            if ($participant->getAllResponses()->count() > 0) {
+                $counts[$type.'Completed']++;
+                $counts['totalCompleted']++;
             }
         }
 
+        // Get a friendly summator name
+
+        $summatorName = $project->getSummator() instanceof Sum ? 'Sum' :
+            $project->getSummator() instanceof Minimum ? 'Minimum' :
+                $project->getSummator() instanceof Maximum ? 'Maximum' :
+                    $project->getSummator() instanceof Average ? 'Average' :
+                        $project->getSummator() instanceof WeightedAverage ? 'Weighted Average' :
+                            'None';
+
+
         $twigData = [
             'breadcrumbs' => self::getDummyBreadcrumbs(),
-            'student' => $student,
-            'assessment' => $assessment,
-            'counts' => $counts
+            'student' => $this->getUser(),
+            'assessment' => $project,
+            'counts' => $counts,
+            'summatorName' => $summatorName
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/summaryStudent.twig", $twigData));
@@ -1051,18 +1106,17 @@ class Controller extends Base
         return UserMapper::getInstance()->findByColumn('id', $internalIds);
     }
 
-
     /**
      * Temp method to generate dummy assessment
      *
-     * @param $assessmentId      1 => project
+     * @param $assessmentId      1 => project (7 => object)
      *                           2 => dueWork
      *                           3 => quiz
      *                           4 => task1
      *                           5 => task2
      *                           6 => task3
      * @todo remove this method when no longer required
-     * @return array
+     * @return array|\Schoolbox\Learning\Assessment\Project
      */
     public static function getDummyAssessment($assessmentId){
         $creator = UserMapper::getInstance()->findById(151);    // Zane Smith (teacher)
@@ -1083,6 +1137,32 @@ class Controller extends Base
         ];
 
         switch($assessmentId){
+            case 7: // project (object)
+
+                $summatorTest = new \Schoolbox\Learning\Assessment\Test\SummatorTest();
+
+                $project = new Project(new Minimum());
+                $project->setTitle('mProject');
+                $project->setDescription('This is a project. It contains assessables');
+                $project->setMarkScheme(new Percentage());
+                $project->setId($assessmentId);
+                $project->setPublishAt(new Alaress_Date_Format('2016/08/01','Y/m/d'));
+                $project->setOpenAt(new Alaress_Date_Format('2016/08/08','Y/m/d'));
+                $project->setDueAt(new Alaress_Date_Format('2016/11/08','Y/m/d'));
+                $project->setCloseAt(new Alaress_Date_Format('2016/11/09','Y/m/d'));
+                $project->setWeight(40);
+                $project->setCreator($creator);
+
+                $project->setAssessables((new Collection())
+                    ->add(self::spawnDueWork())
+                    ->add(self::spawnQuiz())
+                    ->add(self::spawnTask())
+                    ->add(self::spawnTask())
+                    ->add(self::spawnTask())
+                );
+
+                return $project;
+
             case 1: // project
                 $assessment = array_merge($assessment, [
                     'assessment_type' => 'project',
@@ -1090,6 +1170,7 @@ class Controller extends Base
                     'description'     => 'This is a project. It contains assessables',
                     'mark_scheme'     => self::getDummyMarkScheme(6),
                 ]);
+
                 return array_merge($assessment, [
                     'mark_summator' => [
                         'calculateMark' => 85.00,
@@ -1102,6 +1183,7 @@ class Controller extends Base
                         self::getDummyAssessment(6),
                     ],
                 ]);
+
             case 2: // dueWork
                 $assessment = array_merge($assessment, [
                     'assessment_type' => 'dueWork',
@@ -2107,6 +2189,296 @@ class Controller extends Base
                     'reviewer' => UserMapper::getInstance()->findById(151),
                 ]);
         }
+    }
+
+
+
+
+
+
+
+
+
+    /** These are dummy assessable objects used to test the assessment summary, nothing elegant here */
+
+    /**
+     * Spawn a Due Work
+     *
+     * @return DueWork
+     */
+    protected function spawnDueWork()
+    {
+        $hodes = (new User)->setId(230)->setFirstname('David')->setLastname('Rhodes');
+        $sberryhill = (new User)->setId(15)->setFirstname('Scott')->setLastname('Berryhill');
+        $slucier = (new User)->setId(16)->setFirstname('Sam')->setLastname('Lucier');
+        $bsalem = (new User)->setId(32)->setFirstname('Bobby')->setLastname('Salem');
+        $asaxon = (new User)->setId(17)->setFirstname('Anita')->setLastname('Saxon');
+        $celia = (new User)->setId(3)->setFirstname('Celia')->setLastname('Glenn');
+        $somodio = (new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio');
+
+        $id = 2;
+        $title = 'Enter the Realm of Terroarrrr';
+        $description = 'Diablo was found in the land of terroarrrrr! Find him, and whack him!';
+        $typeName = 'Essay';
+        $dateFormat = 'Y-m-d H:i:s';
+        $dateInit = '2016-09-08 11:30:00';
+        $dueWork = new DueWork();
+        $dueWork
+            ->setId($id)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setType((new DueWorkType())
+                ->setId(1)
+                ->setName($typeName))
+            ->setCreator($somodio)
+            ->setAllParticipants((new Collection())
+                ->add(new Participant($hodes))
+                ->add(new Participant($bsalem))
+                ->add(new Participant($sberryhill))
+                ->add(new Participant($asaxon)))
+            ->setWeight(5)
+            ->setAcceptOnline(true)
+            ->setAcceptsMultiple(true)
+            ->setPublishAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
+            ->setOpenAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
+            ->setDueAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(57))
+            ->setCloseAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(60))
+            ->setCreatedAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
+            ->setUpdatedAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1));
+
+        $submission = new DueWorkSubmission();
+        $submission
+            ->setId(553)
+            ->setAssessable($dueWork)
+            ->setSubmittedBy($hodes)
+            ->setSubmittedOnBehalfOf($hodes)
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-01 09:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $feedback = (new DueWorkFeedback())
+            ->setId(3385)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(-3)
+            ->setReviewer($celia)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-03 14:15:16', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:14:15', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:14:12', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dueWork->getParticipant($hodes)->getAllResponses()->add($submission);
+        $dueWork->getParticipant($hodes)->getAllFeedbacks()->add($feedback);
+
+        $submission->getAllFeedback()->add($feedback);
+
+        /* Freefloating Feedback
+         *
+         * This Feedback isn't associated with a particular Submission,
+         * just the Assessable itself
+         */
+        $floatingFeedback = (new DueWorkFeedback())
+            ->setId(4223)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(37)
+            ->setReviewer($celia)
+            ->setAllFiles(new Collection())
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-06 22:22:13', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dueWork->getParticipant($hodes)->getAllFeedbacks()->add($floatingFeedback);
+
+        $floatingFeedback = (new DueWorkFeedback())
+            ->setId(4236)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(100)
+            ->setComment('meow - this is the most recently published feedback, despite the ordering in which this appears')
+            ->setReviewer($celia)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-06 23:43:43', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 23:41:41', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 23:41:41', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dueWork->getParticipant($hodes)->getAllFeedbacks()->add($floatingFeedback);
+
+        $floatingFeedback = (new DueWorkFeedback())
+            ->setId(4225)
+            ->setAssessable($dueWork)
+            ->setNormalisedMark(10)
+            ->setReviewer($celia)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-06 23:23:25', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 23:23:21', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $dueWork->getParticipant($hodes)->getAllFeedbacks()->add($floatingFeedback);
+
+        return $dueWork;
+    }
+
+    /**
+     * Spawn a Task
+     */
+    protected function spawnTask()
+    {
+        $hodes = (new User)->setId(230)->setFirstname('David')->setLastname('Rhodes');
+        $sberryhill = (new User)->setId(15)->setFirstname('Scott')->setLastname('Berryhill');
+        $slucier = (new User)->setId(16)->setFirstname('Sam')->setLastname('Lucier');
+        $bsalem = (new User)->setId(32)->setFirstname('Bobby')->setLastname('Salem');
+        $asaxon = (new User)->setId(17)->setFirstname('Anita')->setLastname('Saxon');
+        $celia = (new User)->setId(3)->setFirstname('Celia')->setLastname('Glenn');
+        $somodio = (new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio');
+
+        $id = 1234;
+        $title = 'Read the Horadric Scrolls';
+        $description = 'There is a book by Deckard Cain which you must read before searching for Diablo.';
+        $dateFormat = 'Y-m-d H:i:s';
+        $dateInit = '2016-09-08 11:30:00';
+
+        $task = new Task();
+        $task
+            ->setId($id)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setCreator($celia)
+            ->setAllParticipants((new Collection())
+                ->add(new Participant($hodes))
+                ->add(new Participant($sberryhill))
+                ->add(new Participant($asaxon)))
+            ->setWeight(4)
+            ->setPublishAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
+            ->setOpenAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
+            ->setDueAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(57))
+            ->setCloseAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(60))
+            ->setCreatedAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
+            ->setUpdatedAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1));
+
+        $completion = (new TaskCompletion);
+        $completion
+            ->setId(883)
+            ->setAssessable($task)
+            ->setSubmittedBy($hodes)
+            ->setSubmittedOnBehalfOf($hodes)
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-06 10:01:22', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $feedback = new TaskFeedback();
+        $feedback
+            ->setId(87)
+            ->setAssessable($task)
+            ->setComment('This is the most recently published feedback')
+            ->setNormalisedMark(999999)
+            ->setReviewer($celia)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-09-15 01:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $floatingFeedback = new TaskFeedback();
+        $floatingFeedback
+            ->setId(89)
+            ->setAssessable($task)
+            ->setNormalisedMark(8888888)
+            ->setReviewer($celia)
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-07 19:03:20', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-07 19:03:20', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $completion->getAllFeedback()->add($feedback);
+
+        $task->getParticipant($hodes)->getAllResponses()->add($completion);
+        $task->getParticipant($hodes)->getAllFeedbacks()->add($feedback);
+        $task->getParticipant($hodes)->getAllFeedbacks()->add($floatingFeedback);
+
+        return $task;
+    }
+
+    /**
+     * Spawn a Quiz.
+     * * Quiz has 5 questions each of 5 marks, for total of 25.0
+     * * Quiz has 1 attempt of 4 questions worth 20.0 marks. He was given 12.0 marks total. ie 60.0
+     *
+     * For now, since we are not updating the Quiz DB schema, a QuizAttempt has 0:1 QuizFeedback
+     *
+     * @return Quiz
+     */
+    protected function spawnQuiz()
+    {
+        $hodes = (new User)->setId(230)->setFirstname('David')->setLastname('Rhodes');
+        $sberryhill = (new User)->setId(15)->setFirstname('Scott')->setLastname('Berryhill');
+        $slucier = (new User)->setId(16)->setFirstname('Sam')->setLastname('Lucier');
+        $bsalem = (new User)->setId(32)->setFirstname('Bobby')->setLastname('Salem');
+        $asaxon = (new User)->setId(17)->setFirstname('Anita')->setLastname('Saxon');
+        $celia = (new User)->setId(3)->setFirstname('Celia')->setLastname('Glenn');
+        $somodio = (new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio');
+
+        $id = 3;
+        $title = 'How did you find The Prime Evil?';
+        $description = 'A quick pop quiz about how you died your way to Diablo.';
+
+        $responses = [
+            [
+                'mark' => 1, // Question 1
+                'available' => 5,
+            ],
+            [
+                'mark' => 1, // Question 2
+                'available' => 5,
+            ],
+            [
+                'mark' => 5, // Question 3
+                'available' => 5,
+            ],
+            [
+                'mark' => 5, // Question 4
+                'available' => 5,
+            ],
+        ];
+        $marksGiven = $marksAvailable = 0;
+        foreach($responses as $response){
+            $marksGiven += $response['mark'];
+            $marksAvailable += $response['available'];
+        }
+        $dateFormat = 'Y-m-d H:i:s';
+        $dateInit = '2016-09-08 11:30:00';
+
+        $quiz = (new Quiz())
+            ->setId($id)
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setCreator($somodio)
+            ->setWeight(8)
+            ->setAllParticipants((new Collection())->add(new Participant($hodes)))
+            ->setPublishAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
+            ->setOpenAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
+            ->setDueAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(57))
+            ->setCloseAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(60))
+            ->setCreatedAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1))
+            ->setUpdatedAt((new \Alaress_Date_Format($dateInit, $dateFormat))->addDays(1));
+
+        $attempt = (new QuizAttempt);
+        $attempt
+            ->setId(8655)
+            ->setAssessable($quiz)
+            ->setSubmittedBy($hodes)
+            ->setSubmittedOnBehalfOf($hodes)
+            ->setCreatedAt(new \Alaress_Date_Format('2016-11-15 03:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-15 03:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setMarksAvailable($marksAvailable)
+            ->setMarksGiven($marksGiven);
+
+/*
+        $feedback = new QuizReview();
+        $feedback
+            ->setId(99759)
+            ->setAssessable($quiz)
+            ->setNormalisedMark(IMarkScheme::NORMALISED_MARK_MAX * $marksGiven / $marksAvailable)
+            ->setReviewer($celia)
+            ->setResponse($attempt)
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-15 03:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
+
+        $attempt->getAllFeedback()->add($feedback);
+*/
+        $quiz->getParticipant($hodes)->getAllResponses()->add($attempt);
+        //$quiz->getParticipant($hodes)->getAllFeedbacks()->add($feedback);
+
+        return $quiz;
     }
 }
 
