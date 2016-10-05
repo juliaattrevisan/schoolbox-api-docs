@@ -20,7 +20,6 @@ function Calendar(id, bubbleId, opts) {
     this.dom = $('#'+id)
     this.bubble = new Bubble(this, bubbleId)
     this.suppress = false
-    console.log(this.dom);
 
     // default options
     this.options = {
