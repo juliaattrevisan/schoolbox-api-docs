@@ -111,7 +111,7 @@ class Forum extends DeprecatedModel implements \Schoolbox\IHomepageCleanable{
         }
 
         if (!isset($_SESSION['threads_viewed'][$threadID])) {
-            $query = "UPDATE " . $this->_table . " SET views = views + 1 WHERE threadID = $threadID";
+            $query = "UPDATE " . $this->_table . " SET views = views + 1 WHERE threadID = " . $this->db->smartQuote($threadID);
             $this->db->query($query);
 
             $_SESSION['threads_viewed'][$threadID] = true;
