@@ -149,11 +149,11 @@
                 });
             }
 
-            /* Destroy two overlays and adjust a z-index so the
+            /* Hide cke overlay and adjust a z-index so the
              * Schoolbox Resource Browser appears on top of the
              * ckeditor dialog (enormous sigh)
              */
-            $('.cke_dialog_background_cover').remove();
+            $('.cke_dialog_background_cover').addClass('hide');
 
             /* ckeditor dialog appears at z-index 10010 so our
              * Resource Browser needs to be more
@@ -171,6 +171,9 @@
                     if(undefined !== config.previousModal) {
                         config.previousModal.removeClass('hide');
                     }
+
+                    // Show the cke dialog overlay again
+                    $('.cke_dialog_background_cover').removeClass('hide');
                 });
 
             singletonModal.on('click', '.cancel[role=button]', function (e) {
