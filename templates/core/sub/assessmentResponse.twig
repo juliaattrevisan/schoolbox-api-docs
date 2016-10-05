@@ -1,13 +1,27 @@
 {# Generates the local URL to review an Assessment Response #}
-{% macro localUrl(response) %}
+{% macro localUrl(response) -%}
 
     {%- if response.assessable is quiz -%}
         /assess/review/{{ response.assessable.quizId }}/{{ response.firstSectionId }}/{{ response.id }}
     {%- elseif response.assessable is dueWork -%}
-        {#- TODO - which page should this link to ? -#}
-        #
+        /submission/inlineGrading/view/{{ response.assessable.dueWorkId }}/{{ response.submittedOnBehalfOf.id }}
     {%- elseif response.assessable is task -%}
-        {#- TODO - should we have in-page marking of Tasks ? -#}
-        #
+
+        {%- set context = response.assessable.context -%}
+        {%- set prefix = '/task/progressReport/' -%}
+
+        {%- if context is folder -%}
+            {{ prefix }}{{ context.folder.id }}
+        {%- elseif context is unitImplementation -%}
+            {{ prefix }}{{ context.course.folder.id }}/{{ context.course.specification.folder.id }}
+
+            {%- set projectContext = context.context -%}
+
+            {%- if projectContext is folder -%}
+                {{ prefix }}{{ projectContext.folder.id }}
+            {%- else -%}
+                {{ prefix }}{{ projectContext.course.folder.id }}/{{ projectContext.course.specification.folder.id }}
+            {%- endif -%}
+        {%- endif -%}
     {%- endif -%}
 {% endmacro %}
