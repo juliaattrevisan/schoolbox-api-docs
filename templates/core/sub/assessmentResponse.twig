@@ -1,0 +1,13 @@
+{# Generates the local URL to review an Assessment Response #}
+{% macro localUrl(response) %}
+
+    {%- if response is quizAttempt -%}
+        /assess/review/{{ response.assessable.quizId }}/{{ response.firstSectionId }}/{{ response.id }}
+    {%- elseif response is dueWorkSubmission -%}
+        {#- TODO - which page should this link to ? -#}
+        #
+    {%- elseif response is taskCompletion -%}
+        {#- TODO - should we have in-page marking of Tasks ? -#}
+        #
+    {%- endif -%}
+{% endmacro %}
