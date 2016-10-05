@@ -24,7 +24,13 @@
             <section>
                 <div class="content collapsible">
                     <div class="small-6 columns no-pad">
-                        <h3 data-collapser="to-mark-{{ assessment.id }}" class="icon-down-arrow"><span class="icon-{{ icon }}"></span>{{ assessment.title }}</h3>
+                        <h3>
+                            {#- Dessicator -#}
+                            <span data-collapser="to-mark-{{ assessment.id }}" class="icon-down-arrow"><span class="icon-{{ icon }}"></span>
+                            {#- Dessicator -#}
+                            </span><a href="{{ routeLookup('learningAssessment.getStatus', { assessmentId: assessment.id }) }}">{{ assessment.title }}</a>
+                            {#- Dessicator -#}
+                        </h3>
                         {{ assessmentContext.crumbs(assessment) }}
                     </div>
                     <div class="small-4 columns hide-for-small-only">
@@ -67,7 +73,13 @@
             <section>
                 <div class="content collapsible">
                     <div class="small-6 columns no-pad">
-                        <h3 data-collapser="to-chase-{{ assessment.id }}" class="icon-down-arrow"><span class="icon-{{ icon }}"></span>{{ assessment.title }}</h3>
+                        <h3>
+                            {#- Dessicator -#}
+                            <span data-collapser="to-chase-{{ assessment.id }}" class="icon-down-arrow"><span class="icon-{{ icon }}"></span>
+                            {#- Dessicator -#}
+                            </span><a href="{{ routeLookup('learningAssessment.getStatus', { assessmentId: assessment.id }) }}">{{ assessment.title }}</a>
+                            {#- Dessicator -#}
+                        </h3>
                         {{ assessmentContext.crumbs(assessment) }}
                     </div>
                     <div class="small-4 columns hide-for-small-only">
