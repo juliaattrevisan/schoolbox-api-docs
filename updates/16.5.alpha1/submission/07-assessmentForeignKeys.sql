@@ -19,7 +19,7 @@ REFERENCES `assessment` (`id`)
  */
 
 -- Index for performance on WHERE clause
-CREATE INDEX assess_assessment_id_index ON schoolbox.assess (assessment_id);
+CREATE INDEX assess_assessment_id_index ON assess (assessment_id);
 
 ALTER TABLE `submission_box` ENGINE = InnoDB ;
 
