@@ -1041,8 +1041,7 @@ class Factory
             ";
             $statement = $this->database->prepare($query);
             $statement->execute();
-            $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
-            foreach ($rows as $row) {
+            while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
                 $this->cacheUser($row['u.id'], $row['u.synergy_id'], $row['u.firstname'], $row['u.lastname']);
             }
         }
