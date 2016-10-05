@@ -50,7 +50,6 @@ function Calendar(id, bubbleId, opts) {
             listViewButton: true
         },
         fullCalendar: {
-            contentHeight: $(window).height() - this.dom.offset().top - 60,
             header: {
                 left: 'prev,today,next',
                 center: 'title',
@@ -70,6 +69,21 @@ function Calendar(id, bubbleId, opts) {
             month: null,
             year: null,
             eventLimit: true,
+
+            /**
+             * Calculate a height for the calendar content
+             */
+            contentHeight: function() {
+                var windowHeight = $(window).height();
+
+                if (windowHeight < 768) {
+                    // Not enough space - set to auto
+                    return 'auto';
+                }
+                else {
+                    return windowHeight - self.dom.offset().top - 60;
+                }
+            },
 
             /**
              * Generic action for when an event is clicked
