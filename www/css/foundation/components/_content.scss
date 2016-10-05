@@ -1283,6 +1283,7 @@ tr:hover{
 	height: 3rem;
 	@include animation(sb-loader 1.2s infinite ease-in-out);
 }
+// for loaders inside headings, use span.
 span.loader{
 	border-radius: 0.2rem;
 	display: inline-block;
