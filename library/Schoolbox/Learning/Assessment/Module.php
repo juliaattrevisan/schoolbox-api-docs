@@ -15,9 +15,7 @@ use Aura\Router\Router;
 use Schoolbox\Role;
 use \Twig_Loader_Chain;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\User;
 use Schoolbox\UserMapper;
-use \External_UserInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 

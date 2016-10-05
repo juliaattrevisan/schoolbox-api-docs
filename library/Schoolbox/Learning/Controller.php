@@ -80,12 +80,13 @@ class Controller extends Base
             ]));
         }
 
+        // If currentUser == viewee, use currentUser as it may already have class codes
+        // attached and avoid the need for an external DB call.
         if($this->getUser()->getId() == $user->getId()){
             $user = $this->getUser();
         }
 
         $factory = new Factory($user);
-
         $assessments = $factory->getPendingAssessments();
 
         /** @var IAssessable[] $assessmentsToMark */
@@ -105,7 +106,7 @@ class Controller extends Base
                 $assessmentsToChase->add($assessment);
             }
         }
-        $assessmentsToChase->sortBy('dueAt', 'desc');
+        $assessmentsToChase->sortBy('dueAt', 'asc');
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', [
             'viewer'             => $this->getUser(),
