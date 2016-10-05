@@ -188,8 +188,11 @@ class Controller extends Base
                 $this->getRequest()->post['closeDate'] . ' ' . $this->getRequest()->post['closeTime'],
                 $this->getRequest()->post['attachedFiles'],
                 $this->getRequest()->post['acceptOnline'],
+                $this->getRequest()->post['markType'],
+                $this->getRequest()->post['gradingScheme'],
                 $this->getRequest()->post['hasRubric'],
                 $this->getRequest()->post['hasMarkPerCapability'],
+                $this->getRequest()->post['maxMark'],
                 $this->getRequest()->post['hasSelfAssessed'],
                 $this->getRequest()->post['url'],
                 $this->getRequest()->post['summator']
@@ -457,8 +460,11 @@ class Controller extends Base
                 $this->getRequest()->post['closeDate'] . ' ' . $this->getRequest()->post['closeTime'],
                 $this->getRequest()->post['attachedFiles'],
                 $this->getRequest()->post['acceptOnline'],
+                $this->getRequest()->post['markType'],
+                $this->getRequest()->post['gradingScheme'],
                 $this->getRequest()->post['hasRubric'],
                 $this->getRequest()->post['hasMarkPerCapability'],
+                $this->getRequest()->post['maxMark'],
                 $this->getRequest()->post['hasSelfAssessed'],
                 $this->getRequest()->post['url'],
                 $this->getRequest()->post['summator']

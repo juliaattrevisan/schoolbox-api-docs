@@ -46,11 +46,18 @@
         </label>
     </div>
     <div class="small-12 medium-6 columns">
+        <label for="maxMark">
+            Maximum Available Marks
+            <input id="maxMark" type="text" name="maxMark" value="{{ assessment.maxMark }}" />
+        </label>
+    </div>
+    <div class="small-12 medium-6 columns">
         <label>
             Grading Scheme
-            <select>
-                <option>Standard</option>
-                <option>Non Standard</option>
+            <select name="gradingScheme">
+                <option value="1">Standard</option>
+                <option value="2">Satisfactory</option>
+                <option value="3">Competency</option>
             </select>
         </label>
     </div>
@@ -82,7 +89,7 @@
         <div id="hasMarkPerCapabilityPanel" class="{% if not assessment.hasRubric %}hide{% endif %}">
             <label for="hasMarkPerCapability">Mark Per-Capability</label>
             <div class="switch round">
-                <input name="hasMarkPerCapability" id="hasMarkPerCapability" type="checkbox"  {% if assessment.hasMarkPerCapability %}checked="checked"{% endif %} />
+                <input name="hasMarkPerCapability" id="hasMarkPerCapability" type="checkbox" {% if assessment.hasMarkPerCapability %}checked="checked"{% endif %} />
                 <label for="hasMarkPerCapability">
                     <span class="icon-approve"></span>
                     <span class="icon-cancel"></span>

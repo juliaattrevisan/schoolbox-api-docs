@@ -86,6 +86,11 @@ class Factory
     protected $markType;
 
     /**
+     * @var int
+     */
+    protected $gradingScheme;
+
+    /**
      * @var bool
      */
     protected $hasRubric = false;
@@ -99,6 +104,11 @@ class Factory
      * @var bool
      */
     protected $hasSelfAssessed = false;
+
+    /**
+     * @var int
+     */
+    protected $maxMark;
 
     /**
      * @var string
@@ -124,16 +134,18 @@ class Factory
      * @param $attachedFiles
      * @param $acceptOnline
      * @param $markType
+     * @param $gradingScheme
      * @param $hasRubric
      * @param $hasMarkPerCapability
      * @param $hasSelfAssessed
+     * @param $maxMark
      * @param $url
      * @param $summator
      */
     public function __construct(
         $type, $title, $description, User $creator, $weight,
         $publishAt, $openAt, $dueAt, $closeAt, $attachedFiles,
-        $acceptOnline, $markType, $hasRubric, $hasMarkPerCapability,
+        $acceptOnline, $markType, $gradingScheme, $hasRubric, $hasMarkPerCapability, $maxMark,
         $hasSelfAssessed, $url,
         $summator
     ) {
@@ -155,8 +167,10 @@ class Factory
          */
         $this->setAcceptOnline(trim($acceptOnline));
         $this->setMarkType(trim($markType));
+        $this->setGradingScheme(trim($gradingScheme));
         $this->setHasRubric(trim($hasRubric));
         $this->setHasMarkPerCapability(trim($hasMarkPerCapability));
+        $this->setMaxMark(trim($maxMark));
 
         /* Task needs this to instantiate correctly
          */
@@ -281,6 +295,10 @@ class Factory
                         $assessment->setAcceptsMultiple();
                     }
 
+                    $assessment->setMaxMark($this->getMaxMark());
+
+                    /* TODO: Replace old classes and stuff?
+                     */
                     $markType = new \Schoolbox\Assessment\Component\SubmissionBox\MarkType();
                     $markType->setId($this->getMarkType());
 
@@ -290,6 +308,13 @@ class Factory
                     $markScheme = $markSchemeFactory->spawnMarkSchemeFor($assessment);
 
                     $assessment->setMarkScheme($markScheme);
+
+                    /* TODO: Replace old classes and stuff?
+                     */
+                    $gradingGroup = new \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model();
+                    $gradingGroup->setId($this->getGradingScheme());
+
+                    $assessment->setGradeGroup($gradingGroup);
 
                     if ($this->getHasRubric()) {
                         $assessment->useRubric();
@@ -558,6 +583,24 @@ class Factory
     }
 
     /**
+     * @return int
+     */
+    protected function getGradingScheme()
+    {
+        return $this->gradingScheme;
+    }
+
+    /**
+     * @param int $gradingScheme
+     * @return $this
+     */
+    protected function setGradingScheme($gradingScheme)
+    {
+        $this->gradingScheme = $gradingScheme;
+        return $this;
+    }
+
+    /**
      * @return boolean
      */
     protected function getHasRubric()
@@ -612,6 +655,22 @@ class Factory
     {
         $this->hasSelfAssessed = $hasSelfAssessed;
         return $this;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getMaxMark()
+    {
+        return $this->maxMark;
+    }
+
+    /**
+     * @param int $maxMark
+     */
+    protected function setMaxMark($maxMark)
+    {
+        $this->maxMark = $maxMark;
     }
 
     /**
