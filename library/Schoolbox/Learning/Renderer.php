@@ -29,6 +29,10 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
  * * {% if assessment.context is a unitImplementation %}
  * * {% if assessment.context is a unitSpecification %}
  * * {% if assessment.context is a project %}
+ *
+ * * {% if assessment is a quiz %}
+ * * {% if assessment is a dueWork %}
+ * * {% if assessment is a task %}
  */
 class Renderer extends \Twig_Extension
 {
