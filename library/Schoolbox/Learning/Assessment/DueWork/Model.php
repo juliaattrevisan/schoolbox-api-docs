@@ -84,6 +84,17 @@ class Model extends AbstractAssessment
     private $maxMark;
 
     /**
+     * Does not equate to assessment.id
+     *
+     * The dueWorkId comes from the submission_box table
+     * The assessment.id comes from the assessment table
+     *
+     * @var int
+     */
+    private $dueWorkId;
+
+
+    /**
      * Model constructor.
      */
     public function __construct()
@@ -96,6 +107,24 @@ class Model extends AbstractAssessment
         $this->setAllFiles(new Collection());
         $this->setType(new Type());
         $this->setAcceptOnline(self::ACCEPT_ONLINE_NONE);
+    }
+
+    /**
+     * @return int
+     */
+    public function getDueWorkId()
+    {
+        return $this->dueWorkId;
+    }
+
+    /**
+     * @param $dueWorkId
+     * @return static
+     */
+    public function setDueWorkId($dueWorkId)
+    {
+        $this->dueWorkId = $dueWorkId;
+        return $this;
     }
 
     /**
