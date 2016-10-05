@@ -222,7 +222,6 @@ class Factory
         $this->assessmentExtraStudentIds = [];
 
         $this->term = TermMapper::getInstance()->findForToday();
-        $this->term->getStart()->addMonths(-36); // TODO remove this line. Just here to get more data
     }
 
 
