@@ -206,7 +206,8 @@ class Controller extends Base
                     $email = $this->mailFactory->build('userPasswordReset/userNotExists.twig');
                     $email->setFrom($config->get('password_change_email_from'), $config->get('mail_from_name'));
                     $email->setSubject($config->get('title') . ' Password Reset');
-                    $email->sendToBlackhole();                }
+                    $email->sendToBlackhole();                
+                }
             }
         } else {
 
