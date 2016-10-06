@@ -105,20 +105,6 @@
                 $('#maxMark').prop('disabled', false);
             }
 
-            /**
-             * Disable Mark Type select
-             */
-            function disableMarkType() {
-                $('#markType').prop('disabled', true);
-            }
-
-            /**
-             * Enable Mark Type select
-             */
-            function enableMarkType() {
-                $('#markType').prop('disabled', false);
-            }
-
             /* Disable everything initially
              */
             disableMaxMark();
@@ -164,7 +150,6 @@
                 else {
                     $('#hasMarkPerCapabilityPanel').addClass('hide');
                     enableMaxMark();
-                    enableMarkType();
                 }
 
                 showMaxMark();
