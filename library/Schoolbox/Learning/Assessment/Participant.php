@@ -20,6 +20,17 @@ use \Schoolbox\Collection;
 class Participant
 {
     /**
+     * Whether when determining the current mark for an Assessment, we prefer
+     * overall feedback over feedback linked to specific Responses.
+     *
+     * @TODO - Probably remove at some point, or make this a user-config option, or
+     * provide some UI to give the choice to the user.
+     *
+     * @var bool
+     */
+    const FAVOR_FLOATING = false;
+
+    /**
      * The User to whom all these Responses and Feedbacks are relevant
      *
      * @var User
@@ -182,8 +193,7 @@ class Participant
      */
     private function getMostRecentFeedback(IAssessable $assessable, $publishedOnly)
     {
-        $favorFloating = false;
-        if($favorFloating){
+        if(self::FAVOR_FLOATING){
             return $this->getMostRecentFeedback_favorFloating($assessable, $publishedOnly);
         } else {
             return $this->getMostRecentFeedback_noFavor($assessable, $publishedOnly);
