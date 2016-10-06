@@ -37,11 +37,10 @@ class Model extends AbstractAssessment
      */
     private $hasFixedTotalMarks;
 
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    /**
+     * @var int
+     */
+    protected $duration = 0;
 
     /**
      * @inheritdoc
@@ -127,5 +126,26 @@ class Model extends AbstractAssessment
         }
 
         return parent::getHumanReadableMark($user, $publishedOnly);
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return int
+     */
+    public function getDuration()
+    {
+        return $this->duration;
+    }
+
+    /**
+     * @param int $duration
+     * @return $this
+     */
+    public function setDuration($duration)
+    {
+        $this->duration = $duration;
+        return $this;
     }
 }

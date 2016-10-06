@@ -195,6 +195,8 @@ class Controller extends Base
                 $this->getRequest()->post['maxMark'],
                 $this->getRequest()->post['hasSelfAssessed'],
                 $this->getRequest()->post['url'],
+                $this->getRequest()->post['durationHours'],
+                $this->getRequest()->post['durationMinutes'],
                 $this->getRequest()->post['summator']
             ))->produce();
         }
@@ -467,6 +469,8 @@ class Controller extends Base
                 $this->getRequest()->post['maxMark'],
                 $this->getRequest()->post['hasSelfAssessed'],
                 $this->getRequest()->post['url'],
+                $this->getRequest()->post['durationHours'],
+                $this->getRequest()->post['durationMinutes'],
                 $this->getRequest()->post['summator']
             ))->produce();
         }

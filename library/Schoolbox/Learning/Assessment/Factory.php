@@ -75,6 +75,9 @@ class Factory
      */
     protected $attachedFiles = [];
 
+    /* Due Work info
+     */
+
     /**
      * @var int
      */
@@ -100,6 +103,9 @@ class Factory
      */
     protected $hasMarkPerCapability = false;
 
+    /* Task info
+     */
+
     /**
      * @var bool
      */
@@ -114,6 +120,22 @@ class Factory
      * @var string
      */
     protected $url;
+
+    /* Quiz info
+     */
+
+    /**
+     * @var int
+     */
+    protected $durationHours = 0;
+
+    /**
+     * @var int
+     */
+    protected $durationMinutes = 0;
+
+    /* Project info
+     */
 
     /**
      * @var int
@@ -137,9 +159,11 @@ class Factory
      * @param $gradingScheme
      * @param $hasRubric
      * @param $hasMarkPerCapability
-     * @param $hasSelfAssessed
      * @param $maxMark
+     * @param $hasSelfAssessed
      * @param $url
+     * @param $durationHours
+     * @param $durationMinutes
      * @param $summator
      */
     public function __construct(
@@ -147,6 +171,7 @@ class Factory
         $publishAt, $openAt, $dueAt, $closeAt, $attachedFiles,
         $acceptOnline, $markType, $gradingScheme, $hasRubric, $hasMarkPerCapability, $maxMark,
         $hasSelfAssessed, $url,
+        $durationHours, $durationMinutes,
         $summator
     ) {
         $this->setType($type);
@@ -176,6 +201,11 @@ class Factory
          */
         $this->setHasSelfAssessed($hasSelfAssessed);
         $this->setUrl($url);
+
+        /* Quiz needs this to instantiate correctly
+         */
+        $this->setDurationHours($durationHours);
+        $this->setDurationMinutes($durationMinutes);
     }
 
     /**
@@ -345,8 +375,12 @@ class Factory
                     break;
 
                 case Types::ASSESSMENT_QUIZ:
-                    /* TODO: Set quiz-specific attributes here
+                    /* TODO: Work out $numSeconds from $this->getDurationHours() and $this->getDurationMinutes()
                      */
+                    $duration = $this->getDurationHours() + $this->getDurationMinutes();
+
+                    $assessment->setDuration($duration);
+
                     break;
 
                 default:
@@ -688,6 +722,45 @@ class Factory
     protected function setUrl($url)
     {
         $this->url = $url;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDurationHours()
+    {
+        return $this->durationHours;
+    }
+
+    /**
+     * @param int $durationHours
+     * @return $this
+     */
+    public function setDurationHours($durationHours)
+    {
+        $this->durationHours = $durationHours;
+        return $this;
+    }
+
+    /* Quiz info
+     */
+
+    /**
+     * @return int
+     */
+    public function getDurationMinutes()
+    {
+        return $this->durationMinutes;
+    }
+
+    /**
+     * @param int $durationMinutes
+     * @return $this
+     */
+    public function setDurationMinutes($durationMinutes)
+    {
+        $this->durationMinutes = $durationMinutes;
         return $this;
     }
 
