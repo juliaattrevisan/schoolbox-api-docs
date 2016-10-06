@@ -13,3 +13,6 @@ ALTER TABLE `task_completion`
   ADD FOREIGN KEY (`task_id`) REFERENCES `task`(`id`)
     ON UPDATE NO ACTION
     ON DELETE NO ACTION;
+
+/* remove Quiz + DueWork task references */
+DELETE FROM `task_completion` WHERE `task_id` IS NULL;
