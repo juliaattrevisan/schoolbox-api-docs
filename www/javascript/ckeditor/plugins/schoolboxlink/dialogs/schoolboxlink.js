@@ -180,6 +180,9 @@ CKEDITOR.dialog.add('schoolboxlinkDialog', function (editorInstance) {
                                                     /* Shut modal, go back to Dialog
                                                      */
                                                     $('[data-reveal]').foundation('reveal', 'close');
+
+                                                    // Show the cke dialog overlay again
+                                                    $('.cke_dialog_background_cover').removeClass('hide');
                                                 });
                                             } else {
                                                 // The file was rejected, probably cause it was the wrong mimetype.
