@@ -168,6 +168,14 @@ class Model implements ISoftDeletable
     protected $contextProject;
 
     /**
+     * If this assessment is attached to a unit implementation, it will have
+     * been based off of a specification assessment.
+     *
+     * @var Model
+     */
+    protected $specificationAssessment;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -622,6 +630,24 @@ class Model implements ISoftDeletable
     public function setContextProject(Project $contextProject = null)
     {
         $this->contextProject = $contextProject;
+        return $this;
+    }
+
+    /**
+     * @return Model
+     */
+    public function getSpecificationAssessment()
+    {
+        return $this->specificationAssessment;
+    }
+
+    /**
+     * @param Model $specificationAssessment
+     * @return static
+     */
+    public function setSpecificationAssessment(Model $specificationAssessment = null)
+    {
+        $this->specificationAssessment = $specificationAssessment;
         return $this;
     }
 }

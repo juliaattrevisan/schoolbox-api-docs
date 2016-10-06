@@ -137,6 +137,22 @@ class Mapper extends BaseMapper
             null,
             'contextProject'
         );
+
+        // the specification of this assessment
+        // (if this assessment is within a unit implementation)
+        // An implementation may only have one specification,
+        // a spec may have multiple implementations.
+        $this->joinsVia(
+            'assessment_specification_implementation',
+            static::class,
+            'id',
+            'implementation_assessment_id',
+            'specification_assessment_id',
+            'id',
+            self::TYPE_MODEL,
+            null,
+            'specificationAssessment'
+        );
     }
 
     /**
