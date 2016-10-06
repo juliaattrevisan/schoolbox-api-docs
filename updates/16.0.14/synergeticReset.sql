@@ -13,3 +13,9 @@ VALUES (
   'false',
   'false'
 );
+
+DELETE FROM `config` WHERE `name` IN (
+  'external_web_services_url',
+  'external_vendor_token_guid',
+  'external_vendor_password'
+)
