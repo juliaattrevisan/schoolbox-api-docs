@@ -22,8 +22,24 @@ use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 
+use \Schoolbox\Learning\Assessment\DueWork\Decorator\DueWorkTrait as DueWorkTrait;
+use \Schoolbox\Learning\Assessment\DueWork\Decorator\Decorator as DueWorkDecorator;
+
+use \Schoolbox\Learning\Assessment\Quiz\Decorator\QuizTrait as QuizTrait;
+use \Schoolbox\Learning\Assessment\Quiz\Decorator\Decorator as QuizDecorator;
+
+use \Schoolbox\Learning\Assessment\Task\Decorator\TaskTrait as TaskTrait;
+use \Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
+
+use \Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait as ProjectTrait;
+use \Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
+
 class Factory
 {
+    use DueWorkTrait;
+    use QuizTrait;
+    use TaskTrait;
+    use ProjectTrait;
 
     /**
      * @var int
@@ -75,73 +91,6 @@ class Factory
      */
     protected $attachedFiles = [];
 
-    /* Due Work info
-     */
-
-    /**
-     * @var int
-     */
-    protected $acceptOnline = DueWork::ACCEPT_ONLINE_NONE;
-
-    /**
-     * @var int
-     */
-    protected $markType;
-
-    /**
-     * @var int
-     */
-    protected $gradingScheme;
-
-    /**
-     * @var bool
-     */
-    protected $hasRubric = false;
-
-    /**
-     * @var bool
-     */
-    protected $hasMarkPerCapability = false;
-
-    /* Task info
-     */
-
-    /**
-     * @var bool
-     */
-    protected $hasSelfAssessed = false;
-
-    /**
-     * @var int
-     */
-    protected $maxMark;
-
-    /**
-     * @var string
-     */
-    protected $url;
-
-    /* Quiz info
-     */
-
-    /**
-     * @var int
-     */
-    protected $durationHours = 0;
-
-    /**
-     * @var int
-     */
-    protected $durationMinutes = 0;
-
-    /* Project info
-     */
-
-    /**
-     * @var int
-     */
-    protected $summator;
-
     /**
      * Factory constructor.
      * @param $type
@@ -174,11 +123,11 @@ class Factory
         $durationHours, $durationMinutes,
         $summator
     ) {
-        $this->setType($type);
-        $this->setTitle($title);
-        $this->setDescription($description);
+        $this->setType(trim($type));
+        $this->setTitle(trim($title));
+        $this->setDescription(trim($description));
         $this->setCreator($creator);
-        $this->setWeight($weight);
+        $this->setWeight(trim($weight));
         $this->setPublishAt(trim($publishAt));
         $this->setOpenAt(trim($openAt));
         $this->setDueAt(trim($dueAt));
@@ -199,13 +148,13 @@ class Factory
 
         /* Task needs this to instantiate correctly
          */
-        $this->setHasSelfAssessed($hasSelfAssessed);
-        $this->setUrl($url);
+        $this->setHasSelfAssessed(trim($hasSelfAssessed));
+        $this->setUrl(trim($url));
 
         /* Quiz needs this to instantiate correctly
          */
-        $this->setDurationHours($durationHours);
-        $this->setDurationMinutes($durationMinutes);
+        $this->setDurationHours(trim($durationHours));
+        $this->setDurationMinutes(trim($durationMinutes));
     }
 
     /**
@@ -223,18 +172,35 @@ class Factory
         switch($this->getType()) {
             case Types::ASSESSMENT_PROJECT:
                 $assessment = new Project((new SummatorFactory($this->getSummator()))->produce());
+                $decorator = new ProjectDecorator();
                 break;
 
             case Types::ASSESSMENT_DUE_WORK:
                 $assessment = new DueWork();
+                $decorator = new DueWorkDecorator(
+                    $this->getAcceptOnline(),
+                    $this->getMarkType(),
+                    $this->getGradingScheme(),
+                    $this->getHasRubric(),
+                    $this->getHasMarkPerCapability(),
+                    $this->getMaxMark()
+                );
                 break;
 
             case Types::ASSESSMENT_TASK:
                 $assessment = new Task();
+                $decorator = new TaskDecorator(
+                    $this->getHasSelfAssessed(),
+                    $this->getUrl()
+                );
                 break;
 
             case Types::ASSESSMENT_QUIZ:
                 $assessment = new Quiz();
+                $decorator = new QuizDecorator(
+                    $this->getDurationHours(),
+                    $this->getDurationMinutes()
+                );
                 break;
 
             default:
@@ -305,87 +271,7 @@ class Factory
         /* Verify that dates are temporally correct
          */
         if ($assessment->isValidDates()) {
-
-            /* TODO: Use Decorator pattern here, imho
-             */
-            switch($this->getType()) {
-                case Types::ASSESSMENT_PROJECT:
-                    /* TODO: Set project-specific attributes here
-                     */
-                    break;
-
-                case Types::ASSESSMENT_DUE_WORK:
-                    if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_NONE) {
-                        $assessment->setAcceptsNone();
-                    }
-                    else if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_SINGLE) {
-                        $assessment->setAcceptsSingle();
-                    }
-                    else if ($this->getAcceptOnline() == DueWork::ACCEPT_ONLINE_MULTI) {
-                        $assessment->setAcceptsMultiple();
-                    }
-
-                    $assessment->setMaxMark($this->getMaxMark());
-
-                    /* TODO: Replace old classes and stuff?
-                     */
-                    $markType = new \Schoolbox\Assessment\Component\SubmissionBox\MarkType();
-                    $markType->setId($this->getMarkType());
-
-                    $assessment->setMarkType($markType);
-
-                    $markSchemeFactory = new \Schoolbox\Learning\MarkScheme\Factory();
-                    $markScheme = $markSchemeFactory->spawnMarkSchemeFor($assessment);
-
-                    $assessment->setMarkScheme($markScheme);
-
-                    /* TODO: Replace old classes and stuff?
-                     */
-                    $gradingGroup = new \Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model();
-                    $gradingGroup->setId($this->getGradingScheme());
-
-                    $assessment->setGradeGroup($gradingGroup);
-
-                    if ($this->getHasRubric()) {
-                        $assessment->useRubric();
-                    }
-                    else {
-                        $assessment->noRubric();
-                    }
-
-                    if ($this->getHasMarkPerCapability()) {
-                        $assessment->useMarkPerCapability();
-                    }
-                    else {
-                        $assessment->noMarkPerCapability();
-                    }
-
-                    break;
-
-                case Types::ASSESSMENT_TASK:
-                    if ($this->getHasSelfAssessed()) {
-                        $assessment->selfAssessed();
-                    }
-                    else {
-                        $assessment->teacherAssessed();
-                    }
-
-                    $assessment->setUrl($this->getUrl());
-
-                    break;
-
-                case Types::ASSESSMENT_QUIZ:
-                    /* TODO: Work out $numSeconds from $this->getDurationHours() and $this->getDurationMinutes()
-                     */
-                    $duration = $this->getDurationHours() + $this->getDurationMinutes();
-
-                    $assessment->setDuration($duration);
-
-                    break;
-
-                default:
-                    break;
-            }
+            $decorator->decorate($assessment);
 
             return $assessment;
         }
@@ -574,214 +460,6 @@ class Factory
     protected function setAttachedFiles($attachedFiles)
     {
         $this->attachedFiles = $attachedFiles;
-        return $this;
-    }
-
-    /* Due Work info
-     */
-
-    /**
-     * @return int
-     */
-    protected function getAcceptOnline()
-    {
-        return $this->acceptOnline;
-    }
-
-    /**
-     * @param int $acceptOnline
-     * @return $this
-     */
-    protected function setAcceptOnline($acceptOnline)
-    {
-        $this->acceptOnline = $acceptOnline;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    protected function getMarkType()
-    {
-        return $this->markType;
-    }
-
-    /**
-     * @param int $markType
-     * @return $this
-     */
-    protected function setMarkType($markType)
-    {
-        $this->markType = $markType;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    protected function getGradingScheme()
-    {
-        return $this->gradingScheme;
-    }
-
-    /**
-     * @param int $gradingScheme
-     * @return $this
-     */
-    protected function setGradingScheme($gradingScheme)
-    {
-        $this->gradingScheme = $gradingScheme;
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    protected function getHasRubric()
-    {
-        return $this->hasRubric;
-    }
-
-    /**
-     * @param boolean $hasRubric
-     * @return $this
-     */
-    protected function setHasRubric($hasRubric)
-    {
-        $this->hasRubric = $hasRubric;
-        return $this;
-    }
-
-    /**
-     * @return boolean
-     */
-    protected function getHasMarkPerCapability()
-    {
-        return $this->hasMarkPerCapability;
-    }
-
-    /**
-     * @param boolean $hasMarkPerCapability
-     * @return $this
-     */
-    protected function setHasMarkPerCapability($hasMarkPerCapability)
-    {
-        $this->hasMarkPerCapability = $hasMarkPerCapability;
-        return $this;
-    }
-
-    /* Task info
-     */
-
-    /**
-     * @return boolean
-     */
-    protected function getHasSelfAssessed()
-    {
-        return $this->hasSelfAssessed;
-    }
-
-    /**
-     * @param boolean $hasSelfAssessed
-     * @return $this
-     */
-    protected function setHasSelfAssessed($hasSelfAssessed)
-    {
-        $this->hasSelfAssessed = $hasSelfAssessed;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    protected function getMaxMark()
-    {
-        return $this->maxMark;
-    }
-
-    /**
-     * @param int $maxMark
-     */
-    protected function setMaxMark($maxMark)
-    {
-        $this->maxMark = $maxMark;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getUrl()
-    {
-        return $this->url;
-    }
-
-    /**
-     * @param string $url
-     * @return $this
-     */
-    protected function setUrl($url)
-    {
-        $this->url = $url;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getDurationHours()
-    {
-        return $this->durationHours;
-    }
-
-    /**
-     * @param int $durationHours
-     * @return $this
-     */
-    public function setDurationHours($durationHours)
-    {
-        $this->durationHours = $durationHours;
-        return $this;
-    }
-
-    /* Quiz info
-     */
-
-    /**
-     * @return int
-     */
-    public function getDurationMinutes()
-    {
-        return $this->durationMinutes;
-    }
-
-    /**
-     * @param int $durationMinutes
-     * @return $this
-     */
-    public function setDurationMinutes($durationMinutes)
-    {
-        $this->durationMinutes = $durationMinutes;
-        return $this;
-    }
-
-    /* Project info
-     */
-
-    /**
-     * @return int
-     */
-    protected function getSummator()
-    {
-        return $this->summator;
-    }
-
-    /**
-     * @param int $summator
-     * @return $this
-     */
-    protected function setSummator($summator)
-    {
-        $this->summator = $summator;
         return $this;
     }
 }

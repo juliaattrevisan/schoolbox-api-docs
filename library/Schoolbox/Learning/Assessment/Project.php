@@ -13,6 +13,8 @@
  * @version     SVN: $Id$
  */
 
+/* TODO: Move into Learning/Assessment/Project/Model
+ */
 namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
