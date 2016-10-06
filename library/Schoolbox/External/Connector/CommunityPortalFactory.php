@@ -21,11 +21,10 @@ class CommunityPortalFactory
     {
         // TODO inject config
         $connector          = ucwords(\Config::get('external_type'));
-        $webServicesUrl     = \Config::get('external_web_services_url');
         $webServicesKeyFile = '/etc/schoolbox-synergetic/config.json';
 
         // Synergetic only
-        if ($connector == 'Synergetic' && !empty($webServicesUrl)) {
+        if ($connector == 'Synergetic') {
             $key = false;
             $iv  = false;
             if (is_readable($webServicesKeyFile) && is_file($webServicesKeyFile)) {
