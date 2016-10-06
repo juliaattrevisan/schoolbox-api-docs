@@ -11,7 +11,7 @@ if (is_array($allLinks)) {
 	foreach($allLinks as $currentLink) {
 		$this->setVar(array(
 			'MYLINK_URL' => $currentLink['url'],
-			'MYLINK_DESCRIPTION' => htmlspecialchars($currentLink['description']),
+			'MYLINK_DESCRIPTION' => \Scrub::text($currentLink['description']),
 			'MYLINK_ID' => $currentLink['id'],
 		));
 
