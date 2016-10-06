@@ -8,6 +8,8 @@ use Schoolbox\Resource\LinkMapper;
 $page         = new SitePage();
 $groupHandler = new Group();
 
+/** @var \Schoolbox\User $sessionUser */
+$sessionUser = $_SESSION['user'];
 
 if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) || is_array($_POST['category']))) {
 
@@ -41,13 +43,13 @@ if ($_POST['url'] && $_POST['description'] && (is_numeric($_POST['category']) ||
 
         // If the owner has been deleted - set new owner to the editor
         if ($link->getOwner()->getId() === null) {
-            $link->setOwner($_SESSION['id']);
+            $link->setOwner($sessionUser->getId());
         }
 
     } else {
         /** @var Link $link */
         $link = LinkMapper::getInstance()->createModel();
-        $link->setOwner($_SESSION['id']);
+        $link->setOwner($sessionUser->getId());
 
         $link->setUrl($url->getUrl());
         $link->setDescription($_POST['description']);
