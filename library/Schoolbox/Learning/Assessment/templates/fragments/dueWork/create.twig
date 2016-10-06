@@ -159,12 +159,7 @@
             function determineRubricSetting(element) {
                 if (element.is(':checked')) {
                     $('#hasMarkPerCapabilityPanel').removeClass('hide');
-
-                    /* Force a particular marktype
-                     */
-                    $('#markType').val({{ markTypeTotalMark }});
                     disableMaxMark();
-                    disableMarkType();
                 }
                 else {
                     $('#hasMarkPerCapabilityPanel').addClass('hide');
