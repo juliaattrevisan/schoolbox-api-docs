@@ -170,6 +170,28 @@ CREATE TABLE `assessment_course_unit_specification` (
 ENGINE = InnoDB;
 
 
+-- Join between an assessment within a unit implementation, and the assessment
+-- it is based upon (which lives within a unit specification).
+
+CREATE TABLE `assessment_specification_implementation` (
+  `specification_assessment_id` INT UNSIGNED NOT NULL,
+  `implementation_assessment_id` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`specification_assessment_id`, `implementation_assessment_id`),
+  INDEX `fk_assessment_implementation_specification_1_idx` (`specification_assessment_id` ASC),
+  UNIQUE INDEX `fk_assessment_implementation_specification_2_idx` (`implementation_assessment_id` ASC),
+  CONSTRAINT `fk_assessment_implementation_specification_1`
+  FOREIGN KEY (`specification_assessment_id`)
+  REFERENCES `assessment` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_assessment_implementation_specification_2`
+  FOREIGN KEY (`implementation_assessment_id`)
+  REFERENCES `assessment` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+  ENGINE = InnoDB;
+
+
 -- New and existing assessment types
 -- Note that assess.assessment_id is nullable, because this table is shared
 -- with surveys (which don't have an assessment at all).
