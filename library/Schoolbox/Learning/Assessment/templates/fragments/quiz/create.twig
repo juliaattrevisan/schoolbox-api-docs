@@ -24,12 +24,12 @@
 
 <script type="text/javascript">
     $(function() {
-        $('#quizDuration').on('click', function(event) {
+        $('#hasDuration').on('click', function(event) {
             if ($(this).is(':checked')) {
-                $('#durationPanel').hide().removeClass('hide').slideDown(600);
+                $('#durationPanel').stop().hide().removeClass('hide').slideDown(600);
             }
             else {
-                $('#durationPanel').slideUp(600, function() {
+                $('#durationPanel').stop().slideUp(600, function() {
                     $(this).addClass('hide');
                 });
             }
