@@ -172,7 +172,9 @@
 
             /* Rubrics switcher
              */
-            determineRubricSetting($('#hasRubric'));
+            if ($('#hasRubric').is(':checked')) {
+                determineRubricSetting($('#hasRubric'));
+            }
 
             $('#hasRubric').click(function(event) {
                 determineRubricSetting($(this));
