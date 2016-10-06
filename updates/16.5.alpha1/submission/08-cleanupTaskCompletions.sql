@@ -16,3 +16,6 @@ ALTER TABLE `task_completion`
 
 /* remove Quiz + DueWork task references */
 DELETE FROM `task_completion` WHERE `task_id` IS NULL;
+
+/* drop harvested table */
+DROP TABLE `task_instance`;
