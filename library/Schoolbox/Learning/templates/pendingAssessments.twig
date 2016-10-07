@@ -50,7 +50,7 @@
                                 <li>
                                     <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}">
                                         <div class="compact card small-6">
-                                            <img src="/portrait.php?userId={{ participant.user.id }}&amp;size=square64" alt="View Submission">
+                                            <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
                                             <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
                                         </div>
                                         <div class="small-6 columns">
@@ -99,7 +99,7 @@
                                 <li>
                                     <a class="link-row" href="{{ routeLookup('learningAssessment.getSubmitForm', {assessmentId: assessment.id, studentId: participant.user.id}) }}">
                                         <div class="compact card small-6">
-                                            <img src="/portrait.php?userId={{ participant.user.id }}&amp;size=square64" alt="View Submission">
+                                            <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
                                             <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
                                         </div>
                                     </a>
