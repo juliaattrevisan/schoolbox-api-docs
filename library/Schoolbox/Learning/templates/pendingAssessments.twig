@@ -97,7 +97,7 @@
                         {% for participant in assessment.allParticipants %}
                             {% if not participant.findAllResponsesForAssessable(assessment)|length and not participant.findAllFeedbackForAssessable(assessment)|length %}
                                 <li>
-                                    <a class="link-row" href="{{ routeLookup('learningAssessment.getSubmitForm', {assessmentId: assessment.id, studentId: participant.user.id}) }}">
+                                    <a class="link-row" href="/search/user/{{ participant.user.id }}">
                                         <div class="compact card small-6">
                                             <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
                                             <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
