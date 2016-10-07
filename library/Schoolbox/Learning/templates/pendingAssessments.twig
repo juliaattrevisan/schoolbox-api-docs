@@ -140,6 +140,7 @@
                         <form action="/mail/createMail.php" method="post" class="no-margin">
                             <div class="row">
                                 <div class="small-12 columns">
+                                    <input type="hidden" name="subject" value="Overdue - {{ assessment.title }}"/>
                                     <input type="hidden" name="replyto" value="{{ viewee.getEmail() }}"/>
                                     <input type="hidden" name="bcc" value="{{ studentEmails|join(',') }}"/>
                                     <button type="submit" class="button icon-email">Email all</button>
