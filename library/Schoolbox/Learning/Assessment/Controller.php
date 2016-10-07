@@ -176,29 +176,7 @@ class Controller extends Base
          * and spawn a new instance of it to manipulate
          */
         try {
-            $assessment = (new Factory(
-                $this->getRequest()->post['assessmentType'],
-                $this->getRequest()->post['title'],
-                $this->getRequest()->post['description'],
-                $this->getUser(),
-                $this->getRequest()->post['weight'],
-                $this->getRequest()->post['publishDate'] . ' ' . $this->getRequest()->post['publishTime'],
-                $this->getRequest()->post['openDate'] . ' ' . $this->getRequest()->post['openTime'],
-                $this->getRequest()->post['dueDate'] . ' ' . $this->getRequest()->post['dueTime'],
-                $this->getRequest()->post['closeDate'] . ' ' . $this->getRequest()->post['closeTime'],
-                $this->getRequest()->post['attachedFiles'],
-                $this->getRequest()->post['acceptOnline'],
-                $this->getRequest()->post['markType'],
-                $this->getRequest()->post['gradingScheme'],
-                $this->getRequest()->post['hasRubric'],
-                $this->getRequest()->post['hasMarkPerCapability'],
-                $this->getRequest()->post['maxMark'],
-                $this->getRequest()->post['hasSelfAssessed'],
-                $this->getRequest()->post['url'],
-                $this->getRequest()->post['durationHours'],
-                $this->getRequest()->post['durationMinutes'],
-                $this->getRequest()->post['summator']
-            ))->produce();
+            $assessment = (new Factory($this->getUser(), $this->getRequest()->post))->produce();
         }
         catch (\DomainException $e) {
             $this->sendError('Could not create assessment', [$e->getMessage()]);
@@ -450,29 +428,7 @@ class Controller extends Base
          * and spawn a new instance of it to manipulate
          */
         try {
-            $assessment = (new Factory(
-                $this->getRequest()->post['assessmentType'],
-                $this->getRequest()->post['title'],
-                $this->getRequest()->post['description'],
-                $this->getUser(),
-                $this->getRequest()->post['weight'],
-                $this->getRequest()->post['publishDate'] . ' ' . $this->getRequest()->post['publishTime'],
-                $this->getRequest()->post['openDate'] . ' ' . $this->getRequest()->post['openTime'],
-                $this->getRequest()->post['dueDate'] . ' ' . $this->getRequest()->post['dueTime'],
-                $this->getRequest()->post['closeDate'] . ' ' . $this->getRequest()->post['closeTime'],
-                $this->getRequest()->post['attachedFiles'],
-                $this->getRequest()->post['acceptOnline'],
-                $this->getRequest()->post['markType'],
-                $this->getRequest()->post['gradingScheme'],
-                $this->getRequest()->post['hasRubric'],
-                $this->getRequest()->post['hasMarkPerCapability'],
-                $this->getRequest()->post['maxMark'],
-                $this->getRequest()->post['hasSelfAssessed'],
-                $this->getRequest()->post['url'],
-                $this->getRequest()->post['durationHours'],
-                $this->getRequest()->post['durationMinutes'],
-                $this->getRequest()->post['summator']
-            ))->produce();
+            $assessment = (new Factory($this->getUser(), $this->getRequest()->post))->produce();
         }
         catch (\DomainException $e) {
             $this->sendError('Could not create assessment', [$e->getMessage()]);

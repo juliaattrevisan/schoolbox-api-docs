@@ -93,68 +93,46 @@ class Factory
 
     /**
      * Factory constructor.
-     * @param $type
-     * @param $title
-     * @param $description
      * @param User $creator
-     * @param $weight
-     * @param $publishAt
-     * @param $openAt
-     * @param $dueAt
-     * @param $closeAt
-     * @param $attachedFiles
-     * @param $acceptOnline
-     * @param $markType
-     * @param $gradingScheme
-     * @param $hasRubric
-     * @param $hasMarkPerCapability
-     * @param $maxMark
-     * @param $hasSelfAssessed
-     * @param $url
-     * @param $durationHours
-     * @param $durationMinutes
-     * @param $summator
+     * @param $post (an array of post vars from the create/update forms)
      */
-    public function __construct(
-        $type, $title, $description, User $creator, $weight,
-        $publishAt, $openAt, $dueAt, $closeAt, $attachedFiles,
-        $acceptOnline, $markType, $gradingScheme, $hasRubric, $hasMarkPerCapability, $maxMark,
-        $hasSelfAssessed, $url,
-        $durationHours, $durationMinutes,
-        $summator
-    ) {
-        $this->setType(trim($type));
-        $this->setTitle(trim($title));
-        $this->setDescription(trim($description));
+    public function __construct(User $creator, $post) {
+        $this->setType(trim($post['assessmentType']));
+        $this->setTitle(trim($post['title']));
+        $this->setDescription(trim($post['description']));
         $this->setCreator($creator);
-        $this->setWeight(trim($weight));
-        $this->setPublishAt(trim($publishAt));
-        $this->setOpenAt(trim($openAt));
-        $this->setDueAt(trim($dueAt));
-        $this->setCloseAt(trim($closeAt));
+        $this->setWeight(trim($post['weight']));
+        $this->setPublishAt(trim($post['publishDate'] . ' ' . $post['publishTime']));
+        $this->setOpenAt(trim($post['openDate'] . ' ' . $post['openTime']));
+        $this->setDueAt(trim($post['dueDate'] . ' ' . $post['dueTime']));
+        $this->setCloseAt(trim($post['closeDate'] . ' ' . $post['closeTime']));
+
+        /* TODO: Work out file attachments
+         */
+        $this->setAttachedFiles([$post['attachedFiles']]);
 
         /* Projects need this to instantiate
          */
-        $this->setSummator($summator);
+        $this->setSummator($post['summator']);
 
         /* Due Work needs this to instantiate correctly
          */
-        $this->setAcceptOnline(trim($acceptOnline));
-        $this->setMarkType(trim($markType));
-        $this->setGradingScheme(trim($gradingScheme));
-        $this->setHasRubric(trim($hasRubric));
-        $this->setHasMarkPerCapability(trim($hasMarkPerCapability));
-        $this->setMaxMark(trim($maxMark));
+        $this->setAcceptOnline(trim($post['acceptOnline']));
+        $this->setMarkType(trim($post['markType']));
+        $this->setGradingScheme(trim($post['gradingScheme']));
+        $this->setHasRubric(trim($post['hasRubric']));
+        $this->setHasMarkPerCapability(trim($post['hasMarkPerCapability']));
+        $this->setMaxMark(trim($post['maxMark']));
 
         /* Task needs this to instantiate correctly
          */
-        $this->setHasSelfAssessed(trim($hasSelfAssessed));
-        $this->setUrl(trim($url));
+        $this->setHasSelfAssessed(trim($post['hasSelfAssessed']));
+        $this->setUrl(trim($post['url']));
 
         /* Quiz needs this to instantiate correctly
          */
-        $this->setDurationHours(trim($durationHours));
-        $this->setDurationMinutes(trim($durationMinutes));
+        $this->setDurationHours(trim($post['durationHours']));
+        $this->setDurationMinutes(trim($post['durationMinutes']));
     }
 
     /**
