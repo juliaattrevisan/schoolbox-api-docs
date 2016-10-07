@@ -257,7 +257,7 @@ $dueWork = (new DueWork())
         ->setName('A dumb type')
     )
     ->setMarkScheme(new \Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber(40))
-    ->setHasRubric(true)
+    ->useRubric()
 ;
 // Due work files have no sequence stored, so order by name
 $dueWork->getAllFiles()->sortBy('filename', 'asc');

@@ -103,11 +103,17 @@ class DueWork implements IAssessmentTypeTranslator
             // Due work-specific fields
             $assessable = (new DueWorkObject())
                 ->setShowSubmittedOnly($model->getSkipUnsubmitted())
-                ->setHasRubric($model->getUseRubric())
                 ->setCreator($model->getOwner())
                 ->setMaxMark($model->getMaxMark())
                 ->setGradeGroup($model->getGradeGroup())
             ;
+
+            // Has Rubric?
+            if ($model->getUseRubric()) {
+                $assessable->useRubric();
+            } else {
+                $assessable->noRubric();
+            }
 
             // Figure out submission visibility
             if ($model->getAcceptOnline()) {
