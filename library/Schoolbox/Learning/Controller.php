@@ -108,7 +108,7 @@ class Controller extends Base
         $assessmentsToChase = new Collection();
         $tomorrow = (new \Alaress_Date_Format())->addDays(1);
         foreach($assessments as $assessment){
-            if($assessment->getDueAt()->lt($tomorrow)){
+            if($assessment->getDueAt()->lt($tomorrow) && $assessment->numNoResponseOrFeedback()){
                 $assessmentsToChase->add($assessment);
             }
         }
