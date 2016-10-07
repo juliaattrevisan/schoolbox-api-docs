@@ -177,6 +177,13 @@ class Controller extends Base
          */
         try {
             $assessment = (new Factory($this->getUser(), $this->getRequest()->post))->produce();
+
+            /* Manually do a check
+             */
+            if (!$assessment->isValidDates()) {
+                $this->sendError('Could not create assessment', ['double-check the date fields you provided']);
+                return;
+            }
         }
         catch (\DomainException $e) {
             $this->sendError('Could not create assessment', [$e->getMessage()]);
@@ -429,6 +436,13 @@ class Controller extends Base
          */
         try {
             $assessment = (new Factory($this->getUser(), $this->getRequest()->post))->produce();
+
+            /* Manually do a check
+             */
+            if (!$assessment->isValidDates()) {
+                $this->sendError('Could not create assessment', ['double-check the date fields you provided']);
+                return;
+            }
         }
         catch (\DomainException $e) {
             $this->sendError('Could not create assessment', [$e->getMessage()]);

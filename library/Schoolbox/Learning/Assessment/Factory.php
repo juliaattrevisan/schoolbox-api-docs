@@ -246,16 +246,11 @@ class Factory
             $assessment->getAttachedFiles()->add($currentFile);
         }
 
-        /* Verify that dates are temporally correct
+        /* Decorate with Assessable-specific data
          */
-        if ($assessment->isValidDates()) {
-            $decorator->decorate($assessment);
+        $decorator->decorate($assessment);
 
-            return $assessment;
-        }
-        else {
-            throw new \UnexpectedValueException('fill in all the date fields correctly');
-        }
+        return $assessment;
     }
 
     /* Getters/Setters
