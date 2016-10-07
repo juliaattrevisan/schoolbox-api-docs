@@ -119,8 +119,10 @@
                         <p><span class="meta" title="{{ assessment.dueAt.local }}">Due {{ assessment.dueAt.relativeTime }}</span></p>
                     </div>
                     <ul class="information-list hide" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed">
+                        {% set studentEmails = '' %}
                         {% for participant in assessment.allParticipants %}
                             {% if not participant.findAllResponsesForAssessable(assessment)|length and not participant.findAllFeedbackForAssessable(assessment)|length %}
+                                {% set studentEmails = studentEmails ~ ',' ~ participant.user.getEmail() %}
                                 <li>
                                     <a class="link-row" href="/search/user/{{ participant.user.id }}">
                                         <div class="compact card small-6">
@@ -133,10 +135,20 @@
                         {% endfor %}
                     </ul>
                 </div>
-                <div class="component-action" data-collapsable="optional-2" data-collapse-state="collapsed" style="display: none;">
+                <div class="component-action" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed" style="display: none;">
                     <section>
-                        <a class="button">Email all</a>
+                        <form action="/mail/createMail.php" method="post" class="no-margin">
+                            <div class="row">
+                                <div class="small-12 columns">
+                                    <input type="hidden" name="replyto" value="{{ viewee.getEmail() }}"/>
+                                    <input type="hidden" name="bcc" value="{{ studentEmails }}"/>
+                                    <button type="submit" class="button icon-email">Email all</button>
+                                </div>
+                            </div>
+                        </form>
                     </section>
+
+
                 </div>
             </section>
         {% endfor %}
