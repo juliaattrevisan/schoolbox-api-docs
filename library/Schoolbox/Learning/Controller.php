@@ -9,7 +9,7 @@ namespace Schoolbox\Learning;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Learning\Assessment\Factory;
+use Schoolbox\Learning\Assessment\PendingFactory;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -92,7 +92,7 @@ class Controller extends Base
             $viewee = $this->getUser();
         }
 
-        $factory = new Factory($viewee);
+        $factory = new PendingFactory($viewee);
         $assessments = $factory->getPendingAssessments();
 
         /** @var IAssessable[] $assessmentsToMark */

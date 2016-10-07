@@ -32,7 +32,7 @@ use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 /**
  * Optimised DB queries to build objects for specific purposes
  */
-class Factory
+class PendingFactory
 {
     /** @var IDatabase */
     private $database;
