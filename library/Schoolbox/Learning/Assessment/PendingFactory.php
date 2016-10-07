@@ -927,15 +927,14 @@ class PendingFactory
         // Get Task Completions for all selected students
         $query = "
             SELECT 
-                t.assessment_id          AS 't.assessment_id',
-                ti.requires_confirmation AS 'ti.requires_confirmation',
-                tic.id                   AS 'tic.id',
-                tic.student_id           AS 'tic.student_id',
-                tic.marking_user_id      AS 'tic.marking_user_id',
-                tic.completion_date      AS 'tic.completion_date'
+                t.assessment_id         AS 't.assessment_id',
+                t.requires_confirmation AS 't.requires_confirmation',
+                tc.id                   AS 'tc.id',
+                tc.student_id           AS 'tc.student_id',
+                tc.marking_user_id      AS 'tc.marking_user_id',
+                tc.completion_date      AS 'tc.completion_date'
             FROM task t
-            JOIN task_instance ti ON ti.task_id = t.id AND ti.deleted_at IS NULL
-            JOIN task_instance_completion tic ON tic.task_instance_id = ti.id
+            JOIN task_completion tc ON tc.task_id = t.id
             WHERE t.deleted_at IS NULL
             AND t.assessment_id IN (" . implode(',', $this->taskAssessmentIds) . ")
         ";
@@ -945,7 +944,7 @@ class PendingFactory
         $taskResults = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
         // Find Students who attempted Tasks but are't in the current studentList
-        $this->findExtraStudentResults($taskResults, 'tic.student_id', 't.assessment_id');
+        $this->findExtraStudentResults($taskResults, 'tc.student_id', 't.assessment_id');
 
         return $taskResults;
     }
@@ -1110,12 +1109,12 @@ class PendingFactory
     {
         foreach ($taskResults as $row) {
             $task = $this->assessmentsCache[$row['t.assessment_id']];
-            $userId = $row['tic.student_id'];
+            $userId = $row['tc.student_id'];
             $response = new TaskCompletion();
-            $response->setId($row['tic.id']);
+            $response->setId($row['tc.id']);
             $response->setSubmittedBy($this->studentIntCache[$userId]);
             $response->setAssessable($task);
-            $response->setUpdatedAt($this->getFastDateFromString($row['tic.completion_date']));
+            $response->setUpdatedAt($this->getFastDateFromString($row['tc.completion_date']));
 
             $task->getResponses()->add($response);
             $participants = $task->getAllParticipants();
@@ -1128,11 +1127,11 @@ class PendingFactory
 
 
             // For tasks, if 'reviewer' != 'reviewee', then that is Teacher Feedback
-            if ($userId != $row['tic.marking_user_id']) {
+            if ($userId != $row['tc.marking_user_id']) {
                 $feedback = new TaskFeedback();
-                $feedback->setId($row['tic.id']);
-                $feedback->setPublishedAt($this->getFastDateFromString($row['tic.completion_date']));
-                $feedback->setUpdatedAt($this->getFastDateFromString($row['tic.completion_date']));
+                $feedback->setId($row['tc.id']);
+                $feedback->setPublishedAt($this->getFastDateFromString($row['tc.completion_date']));
+                $feedback->setUpdatedAt($this->getFastDateFromString($row['tc.completion_date']));
                 $feedback->setResponse($response);
                 $feedback->setAssessable($task);
 
