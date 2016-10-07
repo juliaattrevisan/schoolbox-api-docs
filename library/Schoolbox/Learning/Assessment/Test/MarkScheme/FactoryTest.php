@@ -256,7 +256,6 @@ class FactoryTest extends \PHPUnit_Framework_TestCase
             new Average(),
             new Maximum(),
             new Minimum(),
-            new Sum(),
             new WeightedAverage(),
         ];
     }
