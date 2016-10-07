@@ -16,9 +16,6 @@
     <input type="text" name="title" value="{{ assessment.title }}" required />
 </label>
 
-{% import 'sub/visibility.twig' as visibility %}
-{{ visibility.dropdown(assessment.visibility) }}
-
 {% include '@learningAssessment/fragments/dates.twig' %}
 
 <input type="hidden" name="assessmentType" value="{{ types.fromTitle('task') }}" />
