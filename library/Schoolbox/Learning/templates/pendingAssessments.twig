@@ -48,7 +48,7 @@
                             {% if participant.isMarkingRequired(assessment) %}
                                 {% set response = participant.findMostRecentResponse(assessment) %}
                                 <li>
-                                    <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}">
+                                    <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
                                         <div class="compact card small-6">
                                             <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
                                             <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>

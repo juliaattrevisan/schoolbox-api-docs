@@ -25,3 +25,14 @@
         {%- endif -%}
     {%- endif -%}
 {% endmacro %}
+
+{# Generates the hover title text shown over the link to Review a Student Response #}
+{% macro reviewResponseTitle(response) -%}
+    {%- if response.assessable is quiz -%}
+        Review Quiz Attempt
+    {%- elseif response.assessable is dueWork -%}
+        Review Student Submission
+    {%- elseif response.assessable is task -%}
+        Review Task Completion
+    {%- endif -%}
+{% endmacro %}
