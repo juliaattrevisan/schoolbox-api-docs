@@ -118,15 +118,15 @@ $task = (new Task())
     // Tasks are always weight 0, so this doesn't matter
     ->setWeight(1000)
     // Specific fields
-    ->setLink('https://www.something.com/')
-    ->setSelfMarkable(true)
+    ->setUrl('https://www.something.com/')
+    ->selfAssessed()
 ;
 
 $mapper->save($task, 0);
 
 // Change and save it again
-$task->setSelfMarkable(false)
-     ->setLink('https://www.nothing.com/')
+$task->teacherAssessed()
+     ->setUrl('https://www.nothing.com/')
 ;
 $mapper->save($task, 0);
 
@@ -147,8 +147,9 @@ assertEquals($dbTask->getWeight(), 0);
 assertEquals(get_class($dbTask->getAssessmentContext()), get_class($task->getAssessmentContext()));
 assertEquals($dbTask->getAssessmentContext()->getId(), $task->getAssessmentContext()->getId());
 // Specific fields
-assertEquals($dbTask->getLink(), $task->getLink());
-assertEquals($dbTask->isSelfMarkable(), $task->isSelfMarkable());
+assertEquals($dbTask->getUrl(), $task->getUrl());
+assertEquals($dbTask->isSelfAssessed(), $task->isSelfAssessed());
+assertEquals($dbTask->isTeacherAssessed(), $task->isTeacherAssessed());
 
 // Delete and try to refetch it
 $mapper->delete($task);
@@ -333,8 +334,8 @@ $project->getAssessables()
             ->setDescription('zzzzz')
             ->setWeight(1)
             // Specific
-            ->setLink('https://www.something.com/')
-            ->setSelfMarkable(false)
+            ->setUrl('https://www.something.com/')
+            ->teacherAssessed()
         )
         ->add((new Quiz())
             // Generic

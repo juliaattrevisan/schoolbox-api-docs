@@ -161,30 +161,4 @@ class Model extends AbstractAssessment
         $this->url = $url;
         return $this;
     }
-
-    /**
-     * @return bool
-     */
-    public function isSelfMarkable()
-    {
-        return $this->getSelfMarkable();
-    }
-
-    /**
-     * @return bool
-     */
-    public function getSelfMarkable()
-    {
-        return $this->selfMarkable;
-    }
-
-    /**
-     * @param bool $selfMarkable
-     * @return static
-     */
-    public function setSelfMarkable($selfMarkable)
-    {
-        $this->selfMarkable = $selfMarkable;
-        return $this;
-    }
 }

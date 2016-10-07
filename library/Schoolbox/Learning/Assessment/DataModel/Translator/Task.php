@@ -32,7 +32,7 @@ class Task implements IAssessmentTypeTranslator
                 ->setOrder(0)
                 ->setOwner($assessment->getCreator())
                 ->setLink($assessment->getUrl())
-                ->setRequiresConfirmation(!$assessment->isSelfMarkable())
+                ->setRequiresConfirmation($assessment->isTeacherAssessed())
             ;
             return $model;
         }
@@ -46,12 +46,17 @@ class Task implements IAssessmentTypeTranslator
     {
         if ($model instanceof TaskModel) {
             // Task-specific fields
-            return (new TaskObject())
+            $task = (new TaskObject())
                 ->setMarkType((new MarkType())->setId(MarkType::TYPE_COMPLETION))
                 ->setUrl($model->getLink())
-                ->setSelfMarkable(!$model->getRequiresConfirmation())
                 ->setCreator($model->getOwner())
             ;
+            if ($model->getRequiresConfirmation()) {
+                $task->teacherAssessed();
+            } else {
+                $task->selfAssessed();
+            }
+            return $task;
         }
         return null;
     }

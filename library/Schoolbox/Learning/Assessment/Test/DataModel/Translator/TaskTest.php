@@ -41,7 +41,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
             ->setWeight(1000)
             // Specific fields
             ->setUrl('https://www.something.com/')
-            ->setSelfMarkable(true)
+            ->selfAssessed()
         ;
 
         /** @var TaskModel $taskModel */
@@ -106,7 +106,8 @@ class TaskTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(Task::class, $task);
         $this->assertEquals($link, $task->getUrl());
-        $this->assertEquals($selfMarkable, $task->getSelfMarkable());
+        $this->assertEquals($selfMarkable, $task->isSelfAssessed());
+        $this->assertNotEquals($selfMarkable, $task->isTeacherAssessed());
         $this->assertEquals($creatorId, $task->getCreator()->getId());
     }
 }
