@@ -11,6 +11,7 @@ namespace Schoolbox;
 
 use PDOStatement;
 use Schoolbox;
+use Schoolbox\External\Connector\CommunityPortalFactory;
 use UnexpectedValueException;
 
 /**
@@ -273,6 +274,16 @@ class UserMapper extends Mapper
         $this->joinsVia('userCampus', CampusMapper::class, 'id', 'campus', 'uid', 'id', null, null, 'campusCollection');
 
         $this->registerCallback(self::CALLBACK_PRESAVE, function ($model) {
+
+            /** @var User $model */
+            if ($model->getRole()->isParent() && !empty($model->getRetrievablePassword())) {
+                $communityPortalFactory = new CommunityPortalFactory();
+                $communityPortal = $communityPortalFactory->build();
+                try {
+                    $communityPortal->changePassword($model->getExternalId(), $model->getRetrievablePassword());
+                } catch (\UnexpectedValueException $e) {
+                }
+            }
 
             /** @var User $model */
 
