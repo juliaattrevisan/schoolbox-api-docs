@@ -1,6 +1,34 @@
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
-{% include '@learningAssessment/fragments/common.twig' %}
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        /* Description
+         */
+        $.fn.alaressEditor();
+    });
+</script>
+
+<label>
+    Title
+    <input type="text" name="title" value="{{ assessment.title }}" required />
+</label>
+
+<label>
+    Description
+    <textarea name="description">{{ assessment.description }}</textarea>
+</label>
+
+<label>
+    Weight
+    <input type="number" name="weight" value="{{ assessment.weight }}">
+</label>
+
+{% import 'sub/visibility.twig' as visibility %}
+{{ visibility.dropdown(assessment.visibility) }}
+
 {% include '@learningAssessment/fragments/curriculumCodes.twig' %}
 {% include '@learningAssessment/fragments/dates.twig' %}
 
