@@ -789,12 +789,15 @@ class PendingFactory
             if (!empty($this->groupIds)) {
                 $query .= "
                     SELECT 
-                        1            AS 'case',
-                        ua.sid       AS 'g.id',
-                        u.id         AS 'u.id',
-                        u.synergy_id AS 'u.synergy_id',
-                        u.firstname  AS 'u.firstname',
-                        u.lastname   AS 'u.lastname'
+                        1             AS 'case',
+                        ua.sid        AS 'g.id',
+                        u.id          AS 'u.id',
+                        u.username    AS 'u.username',
+                        u.synergy_id  AS 'u.synergy_id',
+                        u.firstname   AS 'u.firstname',
+                        u.lastname    AS 'u.lastname',
+                        u.local_email AS 'u.local_email',
+                        u.alt_email   AS 'u.alt_email'
                     FROM user u
                     JOIN userAccess ua ON ua.uid = u.id
                     JOIN groups g ON u.group_id = g.id
@@ -811,12 +814,15 @@ class PendingFactory
 
                 $query .= "
                     SELECT
-                        2            AS 'case',
-                        NULL         AS 'g.id',
-                        u.id         AS 'u.id',
-                        u.synergy_id AS 'u.synergy_id',
-                        u.firstname  AS 'u.firstname',
-                        u.lastname   AS 'u.lastname'
+                        2             AS 'case',
+                        NULL          AS 'g.id',
+                        u.id          AS 'u.id',
+                        u.username    AS 'u.username',
+                        u.synergy_id  AS 'u.synergy_id',
+                        u.firstname   AS 'u.firstname',
+                        u.lastname    AS 'u.lastname',
+                        u.local_email AS 'u.local_email',
+                        u.alt_email   AS 'u.alt_email'
                     FROM user u
                     WHERE u.synergy_id IN (" . implode(',', $this->studentExternalIds) . ")
                     AND u.deleted_at IS NULL
@@ -827,7 +833,7 @@ class PendingFactory
             $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
             foreach ($rows as $row) {
-                $this->cacheUser($row['u.id'], $row['u.synergy_id'], $row['u.firstname'], $row['u.lastname']);
+                $this->cacheUser($row['u.id'], $row['u.username'], $row['u.synergy_id'], $row['u.firstname'], $row['u.lastname'], $row['u.local_email'], $row['u.alt_email']);
 
                 // Was this user from a Group ?
                 if (!is_null($row['g.id'])) {
@@ -1032,17 +1038,20 @@ class PendingFactory
         if (count($this->assessmentExtraStudentIds)) {
             $query = "
                 SELECT 
-                    u.id         AS 'u.id',
-                    u.synergy_id AS 'u.synergy_id',
-                    u.firstname  AS 'u.firstname',
-                    u.lastname   AS 'u.lastname'
+                    u.id          AS 'u.id',
+                    u.username    AS 'u.username',
+                    u.synergy_id  AS 'u.synergy_id',
+                    u.firstname   AS 'u.firstname',
+                    u.lastname    AS 'u.lastname',
+                    u.local_email AS 'u.local_email',
+                    u.alt_email   AS 'u.alt_email'
                 FROM user u
                 WHERE u.id IN (" . implode(',', $this->assessmentExtraStudentIds) . ")
             ";
             $statement = $this->database->prepare($query);
             $statement->execute();
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $this->cacheUser($row['u.id'], $row['u.synergy_id'], $row['u.firstname'], $row['u.lastname']);
+                $this->cacheUser($row['u.id'], $row['u.username'], $row['u.synergy_id'], $row['u.firstname'], $row['u.lastname'], $row['u.local_email'], $row['u.alt_email']);
             }
         }
     }
@@ -1219,14 +1228,18 @@ class PendingFactory
      * Ensure logically same users refer to single instance of User object
      *
      * @param int $id
+     * @param string $username
      * @param int $externalId
      * @param string $firstname
      * @param string $lastname
+     * @param bool $localEmail
+     * @param string $altEmail
      */
-    private function cacheUser($id, $externalId, $firstname, $lastname)
+    private function cacheUser($id, $username, $externalId, $firstname, $lastname, $localEmail, $altEmail)
     {
         $id = intval($id);
         $externalId = intval($externalId);
+        $localEmail = boolval($localEmail);
 
         $this->studentInternalIds[$id] = $id;
         $this->studentExternalIds[$externalId] = $externalId;
@@ -1234,9 +1247,12 @@ class PendingFactory
         if (!$this->studentExtCache[$externalId] instanceof User) {
             $this->studentExtCache[$externalId] = (new User())
                 ->setId($id)
+                ->setUsername($username)
                 ->setExternalId($externalId)
                 ->setFirstname($firstname)
-                ->setLastname($lastname);
+                ->setLastname($lastname)
+                ->setLocalEmail($localEmail)
+                ->setAltEmail($altEmail);
         }
 
         if (!$this->studentIntCache[$id] instanceof User) {
