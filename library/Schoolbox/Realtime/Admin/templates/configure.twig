@@ -35,7 +35,23 @@
                 }
 
                 ii = setTimeout(function () {
-                    $.post(form.attr('action'), form.serialize()).done(customiserCallback);
+
+                    // Disable all radios while it's saving
+                    $(form).find('input[type=radio]').prop('disabled', true);
+
+                    // Serialize the form
+                    var formSerialized = form.serialize();
+
+                    // Go through disabled radios and add selected to the serialized form
+                    form.find('input[type=radio][disabled]').each(function() {
+                        if ($(this).is(':checked')) {
+                            formSerialized = formSerialized + '&' + $(this).attr('name') + '=' + $(this).val();
+                        }
+                    });
+
+                    // Post the form
+                    $.post(form.attr('action'), formSerialized).done(customiserCallback(form));
+
                 }, 1000);
 
             },
@@ -139,44 +155,48 @@
         $('[data-collapser]').collapsable();
     });
 
-    function customiserCallback(data) {
+    function customiserCallback(form) {
+        return function(data) {
+            $.each(data, function (slug, sources) {
 
-        $.each(data, function (slug, sources) {
+                var $ns = $('#configurator').find('[data-namespace=' + slug + ']');
 
-            var $ns = $('#configurator').find('[data-namespace='+slug+']');
+                $.each(sources, function (source, roles) {
 
-            $.each(sources, function (source, roles) {
+                    var $src = $ns.find('[data-source=' + source + ']');
 
-                var $src = $ns.find('[data-source='+source+']');
+                    $.each(roles, function (role, config) {
 
-                $.each(roles, function (role, config) {
+                        var $role = $src.find('[data-role=' + role + ']'),
+                                options,
+                                inDefault = function () {
+                                    var p = $(this).data('perm');
+                                    // bitwise! single &
+                                    return !!(config.default & p || (config.default == 0 && p == 0));
+                                },
+                                inMask = function () {
+                                    var p = $(this).data('perm');
+                                    // bitwise! single &
+                                    return !!(config.mask[1] & p || (config.mask[0] && p == 0));
+                                };
 
-                    var $role = $src.find('[data-role='+role+']'),
-                        options,
-                        inDefault = function () {
-                            var p = $(this).data('perm');
-                            // bitwise! single &
-                            return !!(config.default & p || (config.default == 0 && p == 0));
-                        },
-                        inMask    = function () {
-                            var p = $(this).data('perm');
-                            // bitwise! single &
-                            return !!(config.mask[1] & p || (config.mask[0] && p == 0));
-                        };
+                        // reset all, switch on/off based on masks
+                        options = $role.find('input[data-perm]')
+                                .prop('checked', false)
+                                .prop('disabled', true)
+                                .attr('disabled', 'disabled');
 
-                    // reset all, switch on/off based on masks
-                    options = $role.find('input[data-perm]')
-                        .prop('checked', false)
-                        .prop('disabled', true)
-                        .attr('disabled', 'disabled');
+                        options.filter(inMask).prop('disabled', false).removeAttr('disabled');
+                        options.filter(inDefault).prop('checked', true);
 
-                    options.filter(inMask).prop('disabled', false).removeAttr('disabled');
-                    options.filter(inDefault).prop('checked', true);
-
-                    options.eq(0).trigger('change.force');
+                        options.eq(0).trigger('change.force');
+                    });
                 });
             });
-        });
+
+            // Re-enable radios, excluding the ones that were already disabled
+            $(form).find('input[type=radio]').not('[data-perm-disabled]').prop('disabled', false);
+        }
     }
 </script>
 
