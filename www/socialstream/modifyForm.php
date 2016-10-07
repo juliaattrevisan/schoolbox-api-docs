@@ -35,7 +35,7 @@ if (is_numeric($_GET['delete'])) {
         $post = $postMapper->findById($_GET['delete']);
     }
     catch(\Schoolbox\Mapper\Exception $e){
-        error(9, 'The post has already been deleted or doesn\'t exist.' );
+        error(173);
     }
 
     /* Determine permissions
