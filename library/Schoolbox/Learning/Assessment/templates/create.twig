@@ -32,10 +32,12 @@
                     manipulateSerialized: function(data) {
                         var newData = data;
 
-                        newData.push({
-                            name: 'description',
-                            value: CKEDITOR.instances['description'].getData()
-                        });
+                        if (CKEDITOR.instances['description'] != undefined) {
+                            newData.push({
+                                name: 'description',
+                                value: CKEDITOR.instances['description'].getData()
+                            });
+                        }
 
                         return newData;
                     },
@@ -54,10 +56,12 @@
                     manipulateSerialized: function(data) {
                         var newData = data;
 
-                        newData.push({
-                            name: 'description',
-                            value: CKEDITOR.instances['description'].getData()
-                        });
+                        if (CKEDITOR.instances['description'] != undefined) {
+                            newData.push({
+                                name: 'description',
+                                value: CKEDITOR.instances['description'].getData()
+                            });
+                        }
 
                         return newData;
                     },
