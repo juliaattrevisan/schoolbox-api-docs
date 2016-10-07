@@ -1,5 +1,12 @@
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="/socialstream/browser/browser.js"></script>
+<script src="/javascript/components/schoolbox.min.js?v={SITE_VERSION}"></script>
+
+<!--[if lt IE 10]>
+<link rel="stylesheet" type="text/css" href="/css/{SITE_LOCATION}/chrome-foundation-ie9.css?v={SITE_VERSION}" />
+<![endif]-->
+<!--[if gte IE 10]> -->
+<link rel="stylesheet" type="text/css" href="/css/{SITE_LOCATION}/chrome-foundation.css?v={SITE_VERSION}" />
+<!-- <![endif]-->
+
 <script type="application/javascript">
   $(function () {
     $('#ab-{SOURCE_SLUG}').socialstreamBrowser({

@@ -22,6 +22,11 @@ $source   = $this->arg[1];
 $multi    = $this->arg[2] == 'multi';
 $mime     = $_GET['mime'];
 
+$this->setVar([
+    'SITE_VERSION'  => Cfg::get('site_version'),
+    'SITE_LOCATION' => $this->site,
+]);
+
 $factory = new Schoolbox\Resource\Attachment\Factory();
 
 $factory->setSource($location, $source)
