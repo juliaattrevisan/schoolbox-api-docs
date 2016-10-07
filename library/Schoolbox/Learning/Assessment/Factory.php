@@ -191,10 +191,6 @@ class Factory
             throw new \InvalidArgumentException('set an assessment title');
         }
 
-        if (!strlen(trim($this->getDescription()))) {
-            throw new \InvalidArgumentException('set an assessment description');
-        }
-
         /* Check dates are provided
          * Re-throw a more friendly exception message than crappy "Laravel blahblah data missing":
          */
