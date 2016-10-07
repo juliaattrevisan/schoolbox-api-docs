@@ -75,11 +75,6 @@ $courseImplFolder = (new Folder())
     ->setParent($parentFolder);
 $folderMapper->save($courseImplFolder);
 
-$unitImplFolder = (new Folder())
-    ->setName('Unit Implementation')
-    ->setParent($courseImplFolder);
-$folderMapper->save($unitImplFolder);
-
 // Actually create the course spec and implementation
 $courseSpecModel = (new Schoolbox\Learning\Course\DataModel\Specification\Model())
     ->setFolder($courseSpecFolder);
