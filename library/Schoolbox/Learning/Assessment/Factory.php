@@ -34,7 +34,7 @@ use \Schoolbox\Learning\Assessment\Task\Decorator\Decorator as TaskDecorator;
 use \Schoolbox\Learning\Assessment\Project\Decorator\ProjectTrait as ProjectTrait;
 use \Schoolbox\Learning\Assessment\Project\Decorator\Decorator as ProjectDecorator;
 
-class FactoryTempMove
+class Factory
 {
     use DueWorkTrait;
     use QuizTrait;
