@@ -67,7 +67,7 @@ class Model extends AbstractAssessment
      *
      * @var int
      */
-    protected $duration;
+    protected $duration = 0;
 
     /**
      * A (HTML) message that is displayed to a participant once they have completed the quiz.
@@ -75,11 +75,6 @@ class Model extends AbstractAssessment
      * @var string
      */
     protected $completionMessage;
-
-    /**
-     * @var int
-     */
-    protected $duration = 0;
 
     /**
      * @inheritdoc
@@ -180,7 +175,7 @@ class Model extends AbstractAssessment
 
     /**
      * @param int $duration
-     * @return $this
+     * @return static
      */
     public function setDuration($duration)
     {
@@ -203,24 +198,6 @@ class Model extends AbstractAssessment
     public function setMaxAttempts($maxAttempts)
     {
         $this->maxAttempts = $maxAttempts;
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getDuration()
-    {
-        return $this->duration;
-    }
-
-    /**
-     * @param int $duration
-     * @return static
-     */
-    public function setDuration($duration)
-    {
-        $this->duration = $duration;
         return $this;
     }
 
