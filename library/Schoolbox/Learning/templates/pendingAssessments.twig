@@ -34,13 +34,25 @@
                         {{ assessmentContext.crumbs(assessment) }}
                     </div>
                     <div class="small-4 columns hide-for-small-only">
-                        <div class="progress">
+
+                        {%- if assessment is quiz -%}
+                            {%- set submitTitleSuffix = 'attempted this quiz' -%}
+                            {%- set markedTitleSuffix = 'been reviewed' -%}
+                        {%- elseif assessment is dueWork %}
+                            {%- set submitTitleSuffix = 'submitted work' -%}
+                            {%- set markedTitleSuffix = 'recevied feedback' -%}
+                        {%- elseif assessment is task -%}
+                            {% set submitTitleSuffix = 'self-assessed this task' -%}
+                            {% set markedTitleSuffix = 'been teacher assessed' -%}
+                        {%- endif -%}
+
+                        <div class="progress" title="{{ assessment.numSubmitted }} of {{ assessment.numParticipants }} students have {{ submitTitleSuffix }}">
                             <span class="meter" style="width:{{ assessment.getPercentageSubmitted }}%"></span>
-                            <span class="pipe-meter" style="left: {{ assessment.getPercentageMarked }}%"></span>
+                            <span class="pipe-meter" style="left: {{ assessment.getPercentageMarked }}%" title="{{ assessment.numMarked }} of {{ assessment.numParticipants }} students have  {{ markedTitleSuffix }}"></span>
                         </div>
                     </div>
                     <div class="small-6 medium-2 columns text-right">
-                        <p>{{ assessment.numMarkingRequired }} unmarked</p>
+                        <p title="{{ assessment.numMarkingRequired }} of {{ assessment.numParticipants }} students require marking">{{ assessment.numMarkingRequired }} unmarked</p>
                         <p><span class="meta" title="{{ assessment.dueAt.local }}">Due {{ assessment.dueAt.relativeTime }}</span></p>
                     </div>
                     <ul class="information-list hide" data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
@@ -69,7 +81,21 @@
             <h2 class="subheader">Stuff you need to chase</h2>
         {% endif %}
         {% for assessment in assessmentsToChase %}
-            {% set icon = assessment is task ? 'task' : assessment is quiz ? 'quiz' : 'due-work'  %}
+            {%- set icon = assessment is task ? 'task' : assessment is quiz ? 'quiz' : 'due-work'  -%}
+            {%- set state = assessment is quiz ? 'unattempted' : 'unsubmitted' -%}
+            {%- if assessment is quiz %}
+                {%- set submitTitleSuffix = 'attempted this quiz' -%}
+                {%- set markedTitleSuffix = 'been reviewed' -%}
+                {%- set noResultsTitleSuffix = 'attempted this quiz' -%}
+            {%- elseif assessment is dueWork %}
+                {%- set submitTitleSuffix = 'submitted work' -%}
+                {%- set markedTitleSuffix = 'recevied feedback' -%}
+                {%- set noResultsTitleSuffix = 'submitted work or received feedback' -%}
+            {%- elseif assessment is task %}
+                {%- set submitTitleSuffix = 'self-assessed this task' -%}
+                {%- set markedTitleSuffix = 'been teacher assessed' -%}
+                {%- set noResultsTitleSuffix = 'completed this task' -%}
+            {%- endif -%}
             <section>
                 <div class="content collapsible">
                     <div class="small-6 columns no-pad">
@@ -83,14 +109,13 @@
                         {{ assessmentContext.crumbs(assessment) }}
                     </div>
                     <div class="small-4 columns hide-for-small-only">
-                        <div class="progress">
+                        <div class="progress" title="{{ assessment.numSubmitted }} of {{ assessment.numParticipants }} students have {{ submitTitleSuffix }}">
                             <span class="meter" style="width:{{ assessment.getPercentageSubmitted }}%"></span>
-                            <span class="pipe-meter" style="left: {{ assessment.getPercentageMarked }}%"></span>
+                            <span class="pipe-meter" style="left: {{ assessment.getPercentageMarked }}%" title="{{ assessment.numMarked }} of {{ assessment.numParticipants }} students have  {{ markedTitleSuffix }}"></span>
                         </div>
                     </div>
                     <div class="small-6 medium-2 columns text-right">
-                        {% set state = assessment is quiz ? 'unattempted' : 'unsubmitted' %}
-                        <p>{{ assessment.numNoResponseOrFeedback }} {{ state }}</p>
+                        <p title="{{ assessment.numNoResponseOrFeedback }} of {{ assessment.numParticipants }} students have not {{ noResultsTitleSuffix }}">{{ assessment.numNoResponseOrFeedback }} {{ state }}</p>
                         <p><span class="meta" title="{{ assessment.dueAt.local }}">Due {{ assessment.dueAt.relativeTime }}</span></p>
                     </div>
                     <ul class="information-list hide" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed">
