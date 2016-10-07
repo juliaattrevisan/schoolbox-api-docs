@@ -26,6 +26,16 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 class Model extends AbstractAssessment
 {
     /**
+     * @var bool
+     */
+    protected $isSelfAssessed = false;
+
+    /**
+     * @var string
+     */
+    protected $url = '';
+
+    /**
      * @inheritdoc
      *
      * @return string
@@ -75,5 +85,76 @@ class Model extends AbstractAssessment
     public function getWeight()
     {
         return 0;
+    }
+
+    /**
+     * This task is student self-assessed
+     *
+     * @return boolean
+     */
+    public function isSelfAssessed()
+    {
+        return $this->isSelfAssessed == true;
+    }
+
+    /**
+     * This task is teacher-assessed
+     *
+     * @return bool
+     */
+    public function isTeacherAssessed()
+    {
+        return $this->isSelfAssessed == false;
+    }
+
+    /**
+     * Set this task to be teacher-assessed
+     *
+     * @return $this
+     */
+    public function teacherAssessed()
+    {
+        $this->setIsSelfAssessed(false);
+        return $this;
+    }
+
+    /**
+     * Set this task to be self-assessed
+     *
+     * @return $this
+     */
+    public function selfAssessed()
+    {
+        $this->setIsSelfAssessed(true);
+        return $this;
+    }
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @param boolean $isSelfAssessed
+     */
+    protected function setIsSelfAssessed($isSelfAssessed)
+    {
+        $this->isSelfAssessed = $isSelfAssessed;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param string $url
+     * @return $this;
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+        return $this;
     }
 }

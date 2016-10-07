@@ -20,6 +20,7 @@ use \Schoolbox\Learning\Assessment\Participant;
 
 class Maximum extends AbstractSummator
 {
+
     /** @var float */
     protected $max;
 
@@ -58,4 +59,11 @@ class Maximum extends AbstractSummator
         return $this->max;
     }
 
+    /**
+     * @return string
+     */
+    public static function getTitle()
+    {
+        return 'Maximum';
+    }
 }

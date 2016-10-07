@@ -19,6 +19,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use \External_UserInterface;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 
 class Module extends BaseModule
 {
@@ -35,11 +36,47 @@ class Module extends BaseModule
     {
         $routes = [
             'GET' => [
+
+                /* Select an assessment fragment to start with
+                 */
+                '/assessment/select/{folderId}' => 'getSelectAssessment',
+
+                /* Edit an assessment with their type-specific data
+                 */
+                '/assessment/{assessmentId}/update' => 'getUpdateAssessment',
+
+                /* Add assessments to a Project
+                 */
+                '/assessment/{assessmentId}/new/{assessmentType}' => 'getCreateAssessmentWithinProject',
+
+                /* Temporary methods
+                 */
                 '/assessment/{assessmentId}/status'              => 'getStatus',
                 '/assessment/{assessmentId}/summary/{studentId}' => 'getSummary',
                 '/assessment/{assessmentId}/submit/{studentId}'  => 'getSubmitForm',
             ],
-            'POST' => []
+            'POST' => [
+
+                /* Return a fragment corresponding to the type of assessment you choze
+                 */
+                '/assessment/select' => 'postSelectAssessment',
+
+                /* Save the Assessment's data
+                 */
+                '/assessment/create' => 'postCreateAssessment',
+
+                /* Add assessments to a Project
+                 */
+                '/assessment/{assessmentId}/new' => 'postCreateAssessmentWithinProject',
+
+                /* This is the second half containing assessable-specific data
+                 */
+                '/assessment/{assessmentId}/update' => 'postUpdateAssessment',
+
+                /* Delete an assessment
+                 */
+                '/assessment/{assessmentId}/delete' => 'postDeleteAssessment',
+            ]
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
@@ -93,6 +130,7 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
+                'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
                 'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
             ])
         );

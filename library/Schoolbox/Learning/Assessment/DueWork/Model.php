@@ -70,6 +70,13 @@ class Model extends AbstractAssessment
     protected $hasRubric = false;
 
     /**
+     * This DueWork has Mark Per Capability on
+     *
+     * @var bool
+     */
+    protected $hasMarkPerCapability = false;
+
+    /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
      *
      * @var $int
@@ -192,6 +199,59 @@ class Model extends AbstractAssessment
         return $this->getHasRubric();
     }
 
+    /**
+     * Use rubrics
+     *
+     * @return $this
+     */
+    public function useRubric()
+    {
+        $this->setHasRubric(true);
+        return $this;
+    }
+
+    /**
+     * Don't use rubrics
+     *
+     * @return $this
+     */
+    public function noRubric()
+    {
+        $this->setHasRubric(false);
+        return $this;
+    }
+
+    /**
+     * This DueWork has Mark Per Capability on
+     *
+     * @return bool
+     */
+    public function hasMarkPerCapbility()
+    {
+        return $this->getHasMarkPerCapability();
+    }
+
+    /**
+     * This DueWork's Rubrics uses Mark Per Capability
+     *
+     * @return $this
+     */
+    public function useMarkPerCapability()
+    {
+        $this->setHasMarkPerCapability(true);
+        return $this;
+    }
+
+    /**
+     * This DueWork's Rubrics does not use Mark Per Capability
+     *
+     * @return $this
+     */
+    public function noMarkPerCapability()
+    {
+        $this->setHasMarkPerCapability(false);
+        return $this;
+    }
 
     /* Getters/Setters
      */
@@ -271,7 +331,7 @@ class Model extends AbstractAssessment
     /**
      * @return boolean
      */
-    public function getHasRubric()
+    protected function getHasRubric()
     {
         return $this->hasRubric;
     }
@@ -280,7 +340,7 @@ class Model extends AbstractAssessment
      * @param boolean $hasRubric
      * @return $this
      */
-    public function setHasRubric($hasRubric)
+    protected function setHasRubric($hasRubric)
     {
         $this->hasRubric = $hasRubric;
         return $this;
@@ -328,5 +388,23 @@ class Model extends AbstractAssessment
     {
         $normalised = true;
         return $this->getMark($user, $publishedOnly, $normalised);
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getHasMarkPerCapability()
+    {
+        return $this->hasMarkPerCapability;
+    }
+
+    /**
+     * @param boolean $hasMarkPerCapability
+     * @return $this
+     */
+    public function setHasMarkPerCapability($hasMarkPerCapability)
+    {
+        $this->hasMarkPerCapability = $hasMarkPerCapability;
+        return $this;
     }
 }

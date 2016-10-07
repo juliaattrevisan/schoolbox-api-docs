@@ -24,4 +24,11 @@ interface ISummator
      * @return float|null
      */
     public function summate(Collection $allAssessables, User $user, $publishedOnly);
+
+    /**
+     * Get the public-facing title for this summator strat
+     *
+     * @return string
+     */
+    public static function getTitle();
 }

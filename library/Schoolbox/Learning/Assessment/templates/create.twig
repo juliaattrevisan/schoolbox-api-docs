@@ -1,9 +1,81 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
+
 {{ bread.crumbs(
-    [ 'Learning',    routeLookup('sportsfixtures.getLanding') ],
-    [ 'Classname',   routeLookup('sportsfixturesSport.getList') ],
-    [ 'Create Assessment',   routeLookup('sportsfixturesSport.getList') ]
+    [ folder.name, '/homepage/' ~ folder.id ],
+    [ 'Create Assessment', routeLookup('learningAssessment.getSelectAssessment') ]
 ) }}
+
+<script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
+<script type="text/javascript" src="/javascript/shared/jquery.mage.js"></script>
+<script type="text/javascript">
+    $(function () {
+        // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
+        $('input[data-mage-next]').mage();
+
+        /**
+         * Update new form action url
+         *
+         * Inject common details
+         * Inject assessmentType-specific details
+         */
+        $('input[data-mage-next="part-2"]').mage({
+            onXhrDone: function(data) {
+                $('#assessmentForm')
+                    .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment') }}')
+                    .find('[data-assessment-details]')
+                    .html(data);
+
+                /* Save everything
+                 */
+                $('input[data-mage-next="end"]').mage({
+                    manipulateSerialized: function(data) {
+                        var newData = data;
+
+                        if (CKEDITOR.instances['description'] != undefined) {
+                            newData.push({
+                                name: 'description',
+                                value: CKEDITOR.instances['description'].getData()
+                            });
+                        }
+
+                        return newData;
+                    },
+
+                    onXhrDone: function (data) {
+
+                        /* TODO: Redirect somewhere upon success
+                         */
+                        console.log(data);
+                    }
+                });
+
+                /* Or, proceed with project configuration
+                 */
+                $('input[data-mage-next="part-3"]').mage({
+                    manipulateSerialized: function(data) {
+                        var newData = data;
+
+                        if (CKEDITOR.instances['description'] != undefined) {
+                            newData.push({
+                                name: 'description',
+                                value: CKEDITOR.instances['description'].getData()
+                            });
+                        }
+
+                        return newData;
+                    },
+                    onXhrDone: function (data) {
+                        $('#assessmentForm')
+                            .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment') }}')
+                            .find('[data-project-contents]')
+                            .html(data);
+                    }
+                });
+            }
+        });
+    });
+</script>
 
 <div class="row">
     <div class="small-12 columns"><h1>Create Assessment</h1></div>
@@ -11,90 +83,37 @@
 
 <div class="row">
     <div class="small-12 columns island">
-        <form action="#">
+        <form action="{{ routeLookup('learningAssessment.postSelectAssessment') }}" id="assessmentForm" method="post">
             <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <label>Title
-                            <input type="text" required />
-                        </label>
-                    </div>
-                    <div class="small-12 columns">
-                        <label>Description
-                            <textarea>
-                            </textarea>
-                        </label>
-                        <script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
-                        <script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
-                        <script type="text/javascript">
-                            $(function () {
-                                $.fn.alaressEditor();
-                            });
-                        </script>
-                    </div>
-                    <div class="small-12 columns">
-                        <label>Weight
-                            <input type="number" name="weight">
-                        </label>
-                    </div>
-                    <div class="small-12 columns">
-                        <label>Visibility
-                            <select>
-                                <option>&#xe66b;&nbsp;&nbsp;&nbsp;Staff Only</option>
-                                <option>&#xe667;&nbsp;&nbsp;&nbsp;Staff and Students</option>
-                                <option>&#xe666;&nbsp;&nbsp;&nbsp;Staff, Students and their Parents</option>
-                            </select>
-                        </label>
-                    </div>
+                <fieldset class="content" data-mage="part-1">
+                    <legend>Choose Assessment Type</legend>
 
-                    <div class="column small-12 medium-4">
-                        <label>Publish Date
-                            <input type="text" data-datepicker placeholder="Publish Date">
-                        </label>
-                    </div>
-                    <div class="column small-6 medium-4">
-                        <div class="timepick">
-                            <label>Commencement Date
-                                <input data-timepicker type="text" autocomplete="off" placeholder="Commencement Date" />
-                            </label>
+                    <fieldset class="radiolist">
+                        <div class="column small-12">
+                            <input type="hidden" name="folderId" value="{{ folder.id }}" />
+
+                            <input type="radio" name="assessmentType" value="{{ types.getFromTitle('project') }}" id="project"><label for="project" class="radio-label">Project</label>
+                            <input type="radio" name="assessmentType" value="{{ types.getFromTitle('dueWork') }}" id="due-work"><label for="due-work" class="radio-label">Due Work</label>
+                            <input type="radio" name="assessmentType" value="{{ types.getFromTitle('task') }}" id="task"><label for="task" class="radio-label">Task</label>
+                            <input type="radio" name="assessmentType" value="{{ types.getFromTitle('quiz') }}" id="quiz"><label for="quiz" class="radio-label">Quiz</label>
                         </div>
-                    </div>
-                    <div class="column small-6 medium-4">
-                        <div class="timepick">
-                            <label>Due Date
-                                <input data-timepicker type="text" autocomplete="off" placeholder="Due Date" />
-                            </label>
-                        </div>
-                    </div>
-                    <script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
-                    <script type="text/javascript">
-                        $(function () {
-                            $('[data-datepicker]').datepicker();
-                            $('[data-timepicker]').timepicker({
-                                appendTo: function ($input) {
-                                    return $input.closest('.timepick');
-                                }
-                            });
-                        });
-                    </script>
-                    <div class="column small-12">
-                        <label>Curriculum Codes</label>
-                        <input id='user' name="userId" type='text' value='' placeholder="Curriculum Codes" data-selectizeuser required />
+                    </fieldset>
+
+                    <div class="small-12 column">
+                        {{ mage.submitRow('Next', 'part-1', 'part-2', 'Working...') }}
                     </div>
                 </fieldset>
-                <fieldset class="content">
-                    <legend>Type</legend>
-                    <input type="radio" name="project" value="Project" id="project" checked><label for="project">Project</label>
-                    <input type="radio" name="due-work" value="Due Work" id="due-work"><label for="due-work">Due Work</label>
-                    <input type="radio" name="quiz" value="Quiz" id="quiz" disabled><label for="quiz">Quiz</label>
-                    <input type="radio" name="task" value="Task" id="task" disabled><label for="task">Task</label>
+
+                <fieldset class="content" data-mage="part-2" disabled="disabled">
+                    <legend>Assessment Details</legend>
+                    <div class="small-12 columns hide" data-mage-collapsed data-assessment-details></div>
+                </fieldset>
+
+                <fieldset class="content" data-mage="part-3" disabled="disabled">
+                    <legend>Project Contents</legend>
+                    <div class="small-12 columns hide" data-mage-collapsed data-project-contents></div>
                 </fieldset>
             </section>
-            <div class="row">
-                <div class="small-12 column">
-                    <input type="submit" name="submit" value="Next" />
-                </div>
-            </div>
         </form>
     </div>
 </div>

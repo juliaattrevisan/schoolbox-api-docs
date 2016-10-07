@@ -1,0 +1,64 @@
+{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
+<script type="text/javascript">
+    $(function() {
+        $('#assessmentList').find('[data-assessment-delete]').click(function(event) {
+            event.preventDefault();
+
+            var element = $(this);
+
+            $(this).confirmDialog({
+                text: 'Are you sure you want to delete this item?',
+                confirmEvent: function() {
+                    $.post($(element).attr('href'), function(responseText) {
+                        console.log(responseText);
+
+                        /* TODO: If success, remove row item
+                         */
+                        $(element).parents('li').remove();
+                    });
+                }
+            });
+        });
+    });
+</script>
+
+{% if assessment.assessables|length > 0 %}
+<ul class="information-list" id="assessmentList">
+    {% for currentAssessment in assessment.assessables %}
+        <li class="actions-small-1">
+            <div class="list-item">
+                <div class="compact card small-12">
+                    <a href="{{ routeLookup('learningAssessment.getUpdateAssessment', {'assessmentId': currentAssessment.id}) }}">
+                        <div class="{{ icon.renderClass(currentAssessment.typeName) }}"></div>
+                        <h3>{{ currentAssessment.title }}</h3>
+                    </a>
+                </div>
+            </div>
+            <nav>
+                <a class="icon-modify no-text" href="{{ routeLookup('learningAssessment.getUpdateAssessment', {'assessmentId': currentAssessment.id}) }}" title="Modify"></a>
+                <a class="icon-delete no-text" href="{{ routeLookup('learningAssessment.postDeleteAssessment', {'assessmentId': currentAssessment.id}) }}" title="Delete" data-assessment-delete></a>
+            </nav>
+        </li>
+    {% else %}
+        No assessments in this project - create some
+    {% endfor %}
+</ul>
+<div class="content">
+    <ul id="projectButtons" class="flex-list buttons">
+        <li><a href="{{ allReturnUrls[types.fromTitle('dueWork')] }}" title="Create a new Due Work" class="button icon-due-work">New Due Work</a></li>
+        <li><a href="{{ allReturnUrls[types.fromTitle('task')] }}" title="Create a new Task" class="button icon-task">New Task</a></li>
+        <li><a href="{{ allReturnUrls[types.fromTitle('quiz')] }}" title="Create a new Quiz" class="button icon-quiz">New Quiz</a></li>
+    </ul>
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="icon-due-work"></i>
+    <p>Your project is empty.</p>
+    <p>Add a
+        <a href="{{ allReturnUrls[types.fromTitle('dueWork')] }}" title="Create a new Due Work">Due Work</a>,
+        <a href="{{ allReturnUrls[types.fromTitle('task')] }}" title="Create a new Task">Task</a>, or
+        <a href="{{ allReturnUrls[types.fromTitle('quiz')] }}" title="Create a new Quiz">Quiz</a>
+    </p>
+</div>
+{% endif %}

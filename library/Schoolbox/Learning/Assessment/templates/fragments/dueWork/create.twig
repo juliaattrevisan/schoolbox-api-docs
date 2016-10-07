@@ -1,0 +1,249 @@
+{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
+
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        /* Description
+         */
+        $.fn.alaressEditor();
+    });
+</script>
+
+<label>
+    Title
+    <input type="text" name="title" value="{{ assessment.title }}" required />
+</label>
+
+<label>
+    Description
+    <textarea name="description">{{ assessment.description }}</textarea>
+</label>
+
+<label>
+    Weight
+    <input type="number" name="weight" value="{{ assessment.weight }}">
+</label>
+
+{% import 'sub/visibility.twig' as visibility %}
+{{ visibility.dropdown(assessment.visibility) }}
+
+{% include '@learningAssessment/fragments/curriculumCodes.twig' %}
+{% include '@learningAssessment/fragments/dates.twig' %}
+
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+
+<input type="hidden" name="assessmentType" value="{{ types.fromTitle('dueWork') }}" />
+
+<div class="row">
+    <div class="small-12 columns">
+        <label>Attach Files</label>
+
+        <script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+        {% include 'sub/attachzone.twig' %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <label for="acceptOnline">Accepts Online Submissions?</label>
+        <select name="acceptOnline">
+            {% set options = {
+                0: 'None',
+                1: 'Single',
+                2: 'Multiple'
+            }
+            %}
+            {% for index, title in options %}
+            <option value="{{ index }}" {% if assessment.acceptOnline == index %}selected="selected"{% endif %}>{{ title }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 medium-6 columns">
+        <label>
+            Mark Type
+            <select id="markType" name="markType">
+                {% for index, title in allMarkTypes %}
+                <option value="{{ index }}">{{ title }}</option>
+                {% endfor %}
+            </select>
+        </label>
+    </div>
+
+    {# Letter Grade enables Grading Scheme
+     # Total Mark enables Maximum Available Marks
+     #}
+    {% set markTypeLetterGrade = 2 %}
+    {% set markTypeTotalMark = 3 %}
+
+    <script type="text/javascript">
+        $(function() {
+
+            /**
+             * Show max mark
+             */
+            function showMaxMark() {
+                $('#assessmentForm').find('[data-max-mark]').show();
+            }
+
+            /**
+             * Hide max mark
+             */
+            function hideMaxMark() {
+                $('#assessmentForm').find('[data-max-mark]').hide();
+            }
+
+            /**
+             * Show grading scheme
+             */
+            function showGradingScheme() {
+                $('#assessmentForm').find('[data-grading-scheme]').show();
+            }
+
+            /**
+             * Hide grading scheme
+             */
+            function hideGradingScheme() {
+                $('#assessmentForm').find('[data-grading-scheme]').hide();
+            }
+
+            /**
+             * Rubrics is activated
+             */
+            function hasRubric() {
+                return $('#hasRubric:checked').length;
+            }
+
+            /**
+             * Disable the field, but allow us to show its value
+             * which will be programmatically generated
+             */
+            function disableMaxMark() {
+                $('#maxMark').prop('disabled', true);
+            }
+
+            /**
+             * Enable the field for humans to change its value
+             */
+            function enableMaxMark() {
+                $('#maxMark').prop('disabled', false);
+            }
+
+            /* Disable everything initially
+             */
+            disableMaxMark();
+            hideMaxMark();
+            hideGradingScheme();
+
+            /* Mark Type switcher
+             */
+            $('#assessmentForm').on('change', '#markType', function(event) {
+                if ($(this).val() == {{ markTypeLetterGrade }}) {
+                    hideMaxMark();
+                    showGradingScheme();
+                }
+                else if ($(this).val() == {{ markTypeTotalMark }}) {
+                    hideGradingScheme();
+                    showMaxMark();
+
+                    /* Disable maxmark field if rubrics is selected
+                     * Dynamically alter value according to rubric grid
+                     */
+                    if (hasRubric()) {
+                        disableMaxMark();
+                    }
+                    else {
+                        enableMaxMark();
+                    }
+                }
+                else {
+                    disableMaxMark();
+                    hideMaxMark();
+                    hideGradingScheme();
+                }
+            });
+
+            /**
+             * Determine which fields to show when Rubrics is activated
+             */
+            function determineRubricSetting(element) {
+                if (element.is(':checked')) {
+                    $('#hasMarkPerCapabilityPanel').removeClass('hide');
+                    disableMaxMark();
+                }
+                else {
+                    $('#hasMarkPerCapabilityPanel').addClass('hide');
+                    enableMaxMark();
+                }
+
+                showMaxMark();
+            }
+
+            /* Rubrics switcher
+             */
+            if ($('#hasRubric').is(':checked')) {
+                determineRubricSetting($('#hasRubric'));
+            }
+
+            $('#hasRubric').click(function(event) {
+                determineRubricSetting($(this));
+            });
+
+        });
+    </script>
+
+    <div class="small-12 medium-6 columns" style="display:none;" data-max-mark>
+        <label for="maxMark">
+            Maximum Available Marks
+            <input id="maxMark" type="text" name="maxMark" value="{{ assessment.maxMark }}" />
+        </label>
+    </div>
+    <div class="small-12 medium-6 columns" style="display:none;" data-grading-scheme>
+        <label>
+            Grading Scheme
+            <select name="gradingScheme">
+                <option value="1">Standard</option>
+                <option value="2">Satisfactory</option>
+                <option value="3">Competency</option>
+            </select>
+        </label>
+    </div>
+</div>
+<div class="row">
+    <div class="small-12 medium-6 columns">
+        <label for="hasRubric">Use Rubric?</label>
+        <div class="switch round">
+            <input name="hasRubric" id="hasRubric" type="checkbox" {% if assessment.hasRubric %}checked="checked"{% endif %} />
+            <label for="hasRubric">
+                <span class="icon-approve"></span>
+                <span class="icon-cancel"></span>
+            </label>
+        </div>
+    </div>
+    <div class="small-12 medium-6 columns">
+        <div id="hasMarkPerCapabilityPanel" class="{% if not assessment.hasRubric %}hide{% endif %}">
+            <label for="hasMarkPerCapability">Mark Per-Capability</label>
+            <div class="switch round">
+                <input name="hasMarkPerCapability" id="hasMarkPerCapability" type="checkbox" {% if assessment.hasMarkPerCapability %}checked="checked"{% endif %} />
+                <label for="hasMarkPerCapability">
+                    <span class="icon-approve"></span>
+                    <span class="icon-cancel"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 columns">
+        <div class="rubrics">
+            <!--Rubric Here-->
+        </div>
+    </div>
+</div>
+
+{{ mage.submitRow('Next', 'part-2', 'end', 'Working...') }}

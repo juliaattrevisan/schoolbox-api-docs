@@ -50,4 +50,12 @@ class Completion extends AbstractMarkScheme
     {
         return null;
     }
+
+    /**
+     * @return string
+     */
+    public static function getTitle()
+    {
+        return 'Completion';
+    }
 }

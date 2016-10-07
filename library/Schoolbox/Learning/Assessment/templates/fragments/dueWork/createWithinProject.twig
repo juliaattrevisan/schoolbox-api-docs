@@ -1,0 +1,18 @@
+{% extends '@learningAssessment/fragments/project/assessmentCreate.twig' %}
+
+{% block breadcrumbs %}
+    {% import 'sub/breadcrumbs.twig' as bread %}
+    {{ bread.crumbs(
+        [ folder.name, '/homepage/' ~ folder.id ],
+        [ project.title, routeLookup('learningAssessment.getUpdateAssessment', {assessmentId: project.id}) ],
+        [ 'Create Due Work', routeLookup('learningAssessment.getSelectAssessment') ]
+    ) }}
+{% endblock %}
+
+{% block assessmentTypeName %}
+Due Work
+{% endblock %}
+
+{% block content %}
+{% include '@learningAssessment/fragments/dueWork/create.twig' %}
+{% endblock %}

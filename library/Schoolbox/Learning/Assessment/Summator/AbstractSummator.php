@@ -19,6 +19,7 @@ use Schoolbox\User;
 
 abstract class AbstractSummator implements ISummator
 {
+
     /**
      * @inheritDoc
      */
@@ -91,5 +92,4 @@ abstract class AbstractSummator implements ISummator
      * @return float|null
      */
     protected abstract function finalise();
-
 }

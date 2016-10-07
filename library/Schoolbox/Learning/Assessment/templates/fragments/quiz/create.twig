@@ -1,0 +1,95 @@
+{% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
+
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        /* Description
+         */
+        $.fn.alaressEditor();
+    });
+</script>
+
+<label>
+    Title
+    <input type="text" name="title" value="{{ assessment.title }}" required />
+</label>
+
+<label>
+    Description
+    <textarea name="description">{{ assessment.description }}</textarea>
+</label>
+
+<label>
+    Weight
+    <input type="number" name="weight" value="{{ assessment.weight }}">
+</label>
+
+{% import 'sub/visibility.twig' as visibility %}
+{{ visibility.dropdown(assessment.visibility) }}
+
+{% include '@learningAssessment/fragments/curriculumCodes.twig' %}
+{% include '@learningAssessment/fragments/dates.twig' %}
+
+<input type="hidden" name="assessmentType" value="{{ types.fromTitle('quiz') }}" />
+
+<label>
+    Max Attempts
+    {% set maxAttempts = 10 %}
+    <select name="maxAttempts">
+
+        {% for i in 0..maxAttempts %}
+        {% if i == 0 %}
+            <option value="{{ i }}">Unlimited</option>
+        {% else %}
+            <option value="{{ i }}">{{ i }}</option>
+        {% endif %}
+        {% endfor %}
+
+    </select>
+</label>
+
+<script type="text/javascript">
+    $(function() {
+        $('#hasDuration').on('click', function(event) {
+            if ($(this).is(':checked')) {
+                $('#durationPanel').stop().hide().removeClass('hide').slideDown(600);
+            }
+            else {
+                $('#durationPanel').stop().slideUp(600, function() {
+                    $(this).addClass('hide');
+                });
+            }
+        });
+    });
+</script>
+<div class="row">
+    <div class="small-12 columns">
+        <label for="hasDuration">Duration</label>
+        <div class="switch round">
+            <input name="hasDuration" id="hasDuration" type="checkbox" />
+            <label for="hasDuration">
+                <span class="icon-approve"></span>
+                <span class="icon-cancel"></span>
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="row hide" id="durationPanel">
+    <div class="small-12 columns no-pad">
+        <div class="small-12 medium-6 columns">
+            <label>Hours
+                <input name='durationHours' type="text" />
+            </label>
+        </div>
+        <div class="small-12 medium-6 columns">
+            <label>Minutes
+                <input name='durationMinutes' type="text" />
+            </label>
+        </div>
+    </div>
+</div>
+
+{{ mage.submitRow('Next', 'part-2', 'end', 'Working...') }}

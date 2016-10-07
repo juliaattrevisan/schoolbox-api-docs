@@ -42,5 +42,10 @@ interface IMarkScheme
      */
     public function getNormalisedMark($humanReadableMark, IResponse $response = null);
 
-
+    /**
+     * Get the Mark Type's human-readable title
+     *
+     * @return string
+     */
+    public static function getTitle();
 }

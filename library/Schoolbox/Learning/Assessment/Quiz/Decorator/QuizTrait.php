@@ -1,0 +1,61 @@
+<?php
+/**
+ * QuizTrait
+ *
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2011, Alaress Pty Ltd
+ * @link        http://www.alaress.com.au/
+ * @version     SVN: $Id$
+ */
+
+namespace Schoolbox\Learning\Assessment\Quiz\Decorator;
+
+trait QuizTrait
+{
+
+    /**
+     * @var int
+     */
+    protected $durationHours = 0;
+
+    /**
+     * @var int
+     */
+    protected $durationMinutes = 0;
+
+    /**
+     * @return int
+     */
+    public function getDurationHours()
+    {
+        return $this->durationHours;
+    }
+
+    /**
+     * @param int $durationHours
+     * @return $this
+     */
+    public function setDurationHours($durationHours)
+    {
+        $this->durationHours = $durationHours;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDurationMinutes()
+    {
+        return $this->durationMinutes;
+    }
+
+    /**
+     * @param int $durationMinutes
+     * @return $this
+     */
+    public function setDurationMinutes($durationMinutes)
+    {
+        $this->durationMinutes = $durationMinutes;
+        return $this;
+    }
+}

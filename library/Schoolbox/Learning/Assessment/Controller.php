@@ -13,10 +13,41 @@ use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 use \Alaress_Date_Format;
 use \Alaress_Date_NullDate;
+use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
+
+use \Schoolbox\Resource\Storage\Model as Storage;
+
+use \Schoolbox\Learning\Assessment\Participant;
+use \Schoolbox\Learning\Assessment\Project as Project;
+
+use \Schoolbox\Learning\MarkScheme\Mapping as MarkSchemeMapping;
+
+use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
+use \Schoolbox\Learning\Assessment\Summator\Mapping as SummatorMapping;
+
+use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Model as DueWorkSubmissionFile;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\File\Plagscan as DueWorkSubmissionFilePlagscan;
+use \Schoolbox\Learning\Assessment\DueWork\Feedback\File\Model as DueWorkFeedbackFile;
+use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use \Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
+use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
+
+use \Schoolbox\Learning\Assessment\Task\Model as Task;
+use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
+
+use \Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use \Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use \Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
+
+use Schoolbox\Resource\Attachment\Zone;
 
 class Controller extends Base
 {
@@ -27,13 +58,532 @@ class Controller extends Base
     protected $errorMapper;
 
     /**
+     * @var FolderMapper
+     */
+    protected $folderMapper;
+
+    /**
      * Controller constructor.
+     * @param FolderMapper $folderMapper
      * @param ErrorMapper $errorMapper
      */
-    public function __construct(ErrorMapper $errorMapper)
+    public function __construct(FolderMapper $folderMapper, ErrorMapper $errorMapper)
     {
         $this->setErrorMapper($errorMapper);
+        $this->setFolderMapper($folderMapper);
     }
+
+    /**
+     * Select an Assessment
+     *
+     * This is when you chooze what type of assessment it is, which
+     * returns you an appropriate fragment of common+assessmentType
+     * form inputs for you to fill out
+     *
+     * @param $folderId
+     */
+    public function getSelectAssessment($folderId)
+    {
+        try {
+            $folder = $this->getFolderMapper()->findById($folderId);
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
+            'folder' => $folder,
+            'types' => new Types(),
+        ]));
+    }
+
+    /**
+     * Return a fragment corresponding to the type of assessment you choze
+     */
+    public function postSelectAssessment()
+    {
+        try {
+            $folder = $this->getFolderMapper()->findById($this->getRequest()->post['folderId']);
+        }
+        catch (MapperException $e) {
+            $this->sendError('Could not create assessment', [ 'select a valid folder' ]);
+            return;
+        }
+
+        /* TODO: Remove this stub
+         * I added it to save myself choosing dates all the time
+         */
+        $assessment = (new DueWork())
+            ->useRubric()
+            ->setAcceptsMultiple()
+            ->setPublishAt(Alaress_Date_Format::now())
+            ->setOpenAt(Alaress_Date_Format::now())
+            ->setDueAt(Alaress_Date_Format::now())
+            ->setCloseAt(Alaress_Date_Format::now());
+
+        /* Common data among all assessmentType fragments
+         */
+        $types = new Types();
+
+        if (!$types->isValidIndex($this->getRequest()->post['assessmentType'])) {
+            $this->sendError('Could not create assessment', ['select a valid assessment type']);
+            return;
+        }
+
+        $zone = new Zone('files');
+        $zone->setMulti(true);
+
+        $data = [
+            'attachzone' => $zone->getTwigContext(),
+            'types' => $types,
+            'assessment' => $assessment,
+            'curriculumNodes' => $folder->getCurriculumNodes(),
+            'allMarkTypes' => $this->getAllMarkTypes($this->getRequest()->post['assessmentType'])
+        ];
+
+        /* Select the fragment to return
+         */
+        if ($types->isValidIndex($this->getRequest()->post['assessmentType'])) {
+
+            /* Special treatment for projects for now
+             */
+            if ($types->isProject($this->getRequest()->post['assessmentType'])) {
+                $data['allSummators'] = new SummatorMapping();
+            }
+
+            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($this->getRequest()->post['assessmentType'])}/create.twig", $data));
+        }
+    }
+
+    /**
+     * Save the Assessment's data
+     *
+     * This saves the combination of common+assessmentType-specific details
+     */
+    public function postCreateAssessment()
+    {
+        $assessment = null;
+
+        try {
+            $folder = $this->getFolderMapper()->findById($this->getRequest()->post['folderId']);
+        }
+        catch (MapperException $e) {
+            $this->sendError('Could not create assessment', [ 'select a valid Folder' ]);
+            return;
+        }
+
+        /* Figure out what kind of assessment was chosen
+         * and spawn a new instance of it to manipulate
+         */
+        try {
+            $assessment = (new Factory($this->getUser(), $this->getRequest()->post))->produce();
+
+            /* Manually do a check
+             */
+            if (!$assessment->isValidDates()) {
+                $this->sendError('Could not create assessment', ['double-check the date fields you provided']);
+                return;
+            }
+        }
+        catch (\DomainException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            return;
+        }
+        catch (\InvalidArgumentException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            return;
+        }
+        catch (\UnexpectedValueException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            return;
+        }
+
+        /* TODO: Actually save data here
+         */
+        $assessment->setId(5568);
+
+        /* If it were a project, go back to the project's Update screen
+         * Otherwise return to the homepage
+         */
+        if ($assessment instanceof Project) {
+            $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/assessmentList.twig', [
+                'types' => new Types(),
+                'assessmentId' => $assessment->getId(),
+                'allReturnUrls' => $this->getAllReturnUrls($assessment->getId()),
+            ]));
+
+            return;
+        }
+        else {
+            $this->getResponse()->redirect->to("/homepage/{$folder->getId()}");
+        }
+    }
+
+    /**
+     * Update an existing Assessment's details
+     *
+     * @param int $assessmentId
+     */
+    public function getUpdateAssessment($assessmentId)
+    {
+
+        /* TODO: Figure out assessment's relationship to $folder in some way
+         */
+        try {
+            $folder = $this->getFolderMapper()->findById(43);
+        }
+        catch (MapperException $e) {
+            $this->sendError('Could not create assessment', [ 'select a valid Folder' ]);
+            return;
+        }
+
+        /* TODO: Actually retrieve $assessmentId data here
+         */
+         $assessment = new Project((new SummatorFactory(SummatorFactory::WEIGHTED_AVERAGE))->produce());
+//        $assessment = new DueWork();
+        $assessment
+//            ->setId($assessmentId)
+//            ->setTitle('Test Project')
+//            ->setDescription('This is an <b>example project</b>.')
+//            ->setCreator($_SESSION['user'])
+//            ->setAllParticipants(new Collection())
+//            ->setWeight(100)
+//            ->setAcceptsMultiple()
+
+            ->setAssessables((new Collection())
+                ->add((new DueWork())
+                    ->setId(44)
+                    ->setTitle('Write an essay')
+                    ->setDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.')
+                    ->setType((new DueWorkType())
+                        ->setId(1)
+                        ->setName('Essay'))
+                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
+                    ->setPublishAt(Alaress_Date_Format::now())
+                    ->setOpenAt(Alaress_Date_Format::now())
+                    ->setDueAt(Alaress_Date_Format::now())
+                    ->setCloseAt(Alaress_Date_Format::now())
+                    ->setCreatedAt(Alaress_Date_Format::now())
+                    ->setUpdatedAt(Alaress_Date_Format::now()))
+                ->add((new DueWork())
+                    ->setId(55)
+                    ->setTitle('Do this homework')
+                    ->setDescription('Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.')
+                    ->setType((new DueWorkType())
+                        ->setId(2)
+                        ->setName('Homework Assignment'))
+                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
+                    ->setPublishAt(Alaress_Date_Format::now())
+                    ->setOpenAt(Alaress_Date_Format::now())
+                    ->setDueAt(Alaress_Date_Format::now())
+                    ->setCloseAt(Alaress_Date_Format::now())
+                    ->setCreatedAt(Alaress_Date_Format::now())
+                    ->setUpdatedAt(Alaress_Date_Format::now())))
+            ->setPublishAt(Alaress_Date_Format::now())
+            ->setOpenAt(Alaress_Date_Format::now())
+            ->setDueAt(Alaress_Date_Format::now())
+            ->setCloseAt(Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+
+        /* TODO: Determine type
+         */
+        $assessmentType = Types::ASSESSMENT_PROJECT;
+
+        /* Twig payload
+         */
+        $data = [
+            'assessment' => $assessment,
+            'assessmentType' => $assessmentType,
+            'folder' => $folder,
+            'curriculumNodes' => $folder->getCurriculumNodes(),
+            'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
+        ];
+
+        $types = new Types();
+
+        if ($types->isValidIndex($assessmentType)) {
+
+            /* Special treatment for projects for now
+             */
+            if ($types->isProject($assessmentType)) {
+                $data['types']         = $types;
+                $data['allReturnUrls'] = $this->getAllReturnUrls($assessmentId);
+                $data['allSummators']  = new SummatorMapping();
+            }
+
+            $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($assessmentType)}/update.twig", $data));
+        }
+        else {
+            $this->sendError('Could not create assessment', [ 'select a valid assessment type' ]);
+            return;
+        }
+    }
+
+    /**
+     * Save the data when creating a specific kind of Assessment
+     *
+     * This happens after the common details are saved and after
+     * you've chosen one of project, due work, task, or quiz
+     *
+     * @param $assessmentId
+     */
+    public function postUpdateAssessment($assessmentId)
+    {
+        /* TODO: Actually save data here
+         * TODO: Save the attributes common among all assessables
+         */
+        new \Alaress_Probe($assessmentId, $this->getRequest()->post, "Redirect to <a href='".$this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessmentId])."'>this url</a>");
+    }
+
+    /**
+     * Create an Assessment within a particular Project
+     *
+     * @param $assessmentId
+     * @param $assessmentType
+     */
+    public function getCreateAssessmentWithinProject($assessmentId, $assessmentType)
+    {
+
+        /* TODO: Figure out assessment's relationship to $folder in some way
+         */
+        try {
+            $folder = $this->getFolderMapper()->findById(43);
+        }
+        catch (MapperException $e) {
+            $this->sendError('Could not create assessment', [ 'select a valid Folder' ]);
+            return;
+        }
+
+        /* TODO: Actually retrieve $assessmentId data here
+         */
+        $project = new Project((new SummatorFactory(SummatorFactory::WEIGHTED_AVERAGE))->produce());
+        $project
+            ->setId($assessmentId)
+            ->setTitle('Test Project')
+            ->setDescription('This is an <b>example project</b>.')
+            ->setCreator($_SESSION['user'])
+            ->setAllParticipants(new Collection())
+            ->setWeight(100)
+            ->setAssessables((new Collection())
+                ->add((new DueWork())
+                    ->setId(44)
+                    ->setTitle('Write an essay')
+                    ->setDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.')
+                    ->setType((new DueWorkType())
+                        ->setId(1)
+                        ->setName('Essay'))
+                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
+                    ->setPublishAt(Alaress_Date_Format::now())
+                    ->setOpenAt(Alaress_Date_Format::now())
+                    ->setDueAt(Alaress_Date_Format::now())
+                    ->setCloseAt(Alaress_Date_Format::now())
+                    ->setCreatedAt(Alaress_Date_Format::now())
+                    ->setUpdatedAt(Alaress_Date_Format::now()))
+                ->add((new DueWork())
+                    ->setId(55)
+                    ->setTitle('Do this homework')
+                    ->setDescription('Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.')
+                    ->setType((new DueWorkType())
+                        ->setId(2)
+                        ->setName('Homework Assignment'))
+                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
+                    ->setPublishAt(Alaress_Date_Format::now())
+                    ->setOpenAt(Alaress_Date_Format::now())
+                    ->setDueAt(Alaress_Date_Format::now())
+                    ->setCloseAt(Alaress_Date_Format::now())
+                    ->setCreatedAt(Alaress_Date_Format::now())
+                    ->setUpdatedAt(Alaress_Date_Format::now())))
+            ->setPublishAt(Alaress_Date_Format::now())
+            ->setOpenAt(Alaress_Date_Format::now())
+            ->setDueAt(Alaress_Date_Format::now())
+            ->setCloseAt(Alaress_Date_Format::now())
+            ->setCreatedAt(Alaress_Date_Format::now())
+            ->setUpdatedAt(Alaress_Date_Format::now());
+
+        $types = new Types();
+
+        if ($types->isValidIndex($assessmentType)) {
+            $data = [
+                'folder' => $folder,
+                'types' => $types,
+                'project' => $project,
+                'assessment' => [],
+                'assessmentType' => $assessmentType,
+                'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
+                'returnUrl' => $this->getRequest()->query['return_url']
+            ];
+
+            $this->getResponse()->content->set($this->buildHtmlOutput("@learningAssessment/fragments/{$types->getFromIndex($assessmentType)}/createWithinProject.twig", $data));
+        }
+        else {
+            $this->sendError('Could not create assessment', [ 'select a valid assessment type' ]);
+            return;
+        }
+    }
+
+    /**
+     * Save the data when creating an assessment within a Project
+     */
+    public function postCreateAssessmentWithinProject()
+    {
+        /* TODO: Actually save data here then redirect back to project update screen
+         */
+        //        new \Alaress_Probe($_POST, $this->getRequest()->post, "Redirect to <a href='{$returnUrl}'>{$returnUrl}</a>");
+
+        /* Figure out what kind of assessment was chosen
+         * and spawn a new instance of it to manipulate
+         */
+        try {
+            $assessment = (new Factory($this->getUser(), $this->getRequest()->post))->produce();
+
+            /* Manually do a check
+             */
+            if (!$assessment->isValidDates()) {
+                $this->sendError('Could not create assessment', ['double-check the date fields you provided']);
+                return;
+            }
+        }
+        catch (\DomainException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            return;
+        }
+        catch (\InvalidArgumentException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            return;
+        }
+        catch (\UnexpectedValueException $e) {
+            $this->sendError('Could not create assessment', [$e->getMessage()]);
+            return;
+        }
+
+        $data = [
+            'returnUrl' => (new Redirect())->decode($this->getRequest()->post['returnUrl'])
+        ];
+
+        $this->getResponse()->content->set($this->buildJsonOutput($data));
+    }
+
+    /**
+     * Delete an assessment
+     *
+     * @param $assessmentId
+     */
+    public function postDeleteAssessment($assessmentId)
+    {
+        /* TODO: soft-delete this assessment
+         */
+
+        /*
+        if ($assessment was inside a Project instance) {
+            $redirect = $this->getRouter()->generate('learningAssessment.getUpdateAssessment', ['assessmentId' => $project->getId()]);
+        }
+        else {
+            $redirect = "/homepage/{$folder->getId()}";
+
+        }
+
+        $this->getResponse()->redirect->to($redirect);
+        */
+        return;
+    }
+
+    /* Utility methods - these can probably be refactored elsewhere
+     */
+
+    /**
+     * Find all the returnUrls
+     *
+     * @param int $assessmentId
+     * @return array
+     */
+    private function getAllReturnUrls($assessmentId)
+    {
+        /* Figure out a returnUrl
+         *
+         * When spawning a Project, its constituent Assessables return to this url
+         * after they are spawned
+         */
+        $returnUrl = $this->getRouteIfAuthorized('learningAssessment.getUpdateAssessment', ['assessmentId' => $assessmentId]);
+        $suffix = '?return_url=' . (new Redirect())->encode($returnUrl);
+
+        $allReturnUrls = [];
+
+        foreach ((new Types())->getTypes() as $title => $index) {
+            $allReturnUrls[$index] = $this->getRouter()->generate('learningAssessment.getCreateAssessmentWithinProject', ['assessmentId' => $assessmentId, 'assessmentType' => $index]) . $suffix;
+        }
+
+        return $allReturnUrls;
+    }
+
+    /**
+     * All the possible Mark Types to chooze from for this particular $assessmentType
+     *
+     * @param $assessmentType
+     * @return array
+     */
+    private function getAllMarkTypes($assessmentType)
+    {
+        $types = new Types();
+
+        if ($types->isValidIndex($assessmentType)) {
+            $mapping = (new MarkSchemeMapping())->getMap();
+
+            return $mapping[$assessmentType];
+        }
+
+        return [];
+    }
+
+    /**
+     * Send a neat and tidy error back to the client
+     *
+     * TODO: I made a few fixes to this which need to be traitored
+     *
+     * @param $problem
+     * @param array $resolutions
+     * @param int $statusCode
+     * @throws SchoolboxException
+     */
+    protected function sendError($problem, array $resolutions = [], $statusCode = 400)
+    {
+        // cast exception to primitives
+        if ($problem instanceof \Alaress\Web\Controller\Exception) {
+            $resolutions = $problem->getReasons();
+            $problem     = $problem->getMessage();
+        }
+
+        if (count($resolutions)) {
+            $problem .= ". You need to ";
+        }
+
+        $this->getResponse()->status->set($statusCode);
+
+        if (!$this->getRequest()->isXhr()) {
+            throw $this->getErrorMapper()->generateException(105, null, $problem . implode(', ', $resolutions) . '.');
+        }
+
+        $this->getResponse()->content->set([
+            'template' => '@course/mage-error.twig',
+            'format'   => 'nochrome',
+            'data'     => [
+                'error' => [
+                    'problem' => $problem,
+                    'reasons' => $resolutions
+                ]
+            ]
+        ]);
+    }
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Displays information regarding an assessment
@@ -163,6 +713,24 @@ class Controller extends Base
         $this->errorMapper = $errorMapper;
         return $this;
     }
+
+    /**
+     * @return FolderMapper
+     */
+    protected function getFolderMapper()
+    {
+        return $this->folderMapper;
+    }
+
+    /**
+     * @param FolderMapper $folderMapper
+     */
+    protected function setFolderMapper($folderMapper)
+    {
+        $this->folderMapper = $folderMapper;
+    }
+
+
 
     // ================ DUMMY DATA GENERATION ===============================================
 

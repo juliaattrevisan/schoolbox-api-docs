@@ -64,4 +64,12 @@ class Average extends AbstractSummator
 
         return (float)$this->sum / (float)$this->numItems;
     }
+
+    /**
+     * @return string
+     */
+    public static function getTitle()
+    {
+        return 'Average';
+    }
 }

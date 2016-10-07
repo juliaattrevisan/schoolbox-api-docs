@@ -1,0 +1,13 @@
+{% macro renderClass(typeName) %}
+{% spaceless %}
+    {% if typeName|lower ==  'project' %}
+        icon-project
+    {% elseif typeName|lower == 'task' %}
+        icon-task
+    {% elseif typeName|lower == 'quiz' %}
+        icon-quiz
+    {% else %}
+        icon-due-work
+    {% endif %}
+{% endspaceless %}
+{% endmacro %}

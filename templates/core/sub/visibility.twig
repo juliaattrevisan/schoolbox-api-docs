@@ -1,0 +1,19 @@
+{% macro dropdown(selected) %}
+{% set allOptions = {
+    0: 'Staff Only',
+    1: 'Staff and Students',
+    2: 'Staff, Students and their Parents'
+}
+%}
+
+{% spaceless %}
+<label>Visibility
+    <select name="visibility">
+        {% for currentOption, label in allOptions %}
+            <option value="{{ currentOption }}" {% if currentOption == selected %}selected="selected"{% endif %}>&#xe66b;&nbsp;&nbsp;&nbsp;{{ label }}</option>
+        {% endfor %}
+    </select>
+</label>
+
+{% endspaceless %}
+{% endmacro %}

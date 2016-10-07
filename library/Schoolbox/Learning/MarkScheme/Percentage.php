@@ -54,4 +54,12 @@ class Percentage extends AbstractMarkScheme
         $this->validateNormalisedMark($floatVal);
         return $floatVal;
     }
+
+    /**
+     * @return string
+     */
+    public static function getTitle()
+    {
+        return 'Percentage';
+    }
 }

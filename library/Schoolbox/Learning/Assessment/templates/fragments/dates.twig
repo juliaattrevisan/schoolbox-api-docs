@@ -1,0 +1,86 @@
+<script type="text/javascript" charset="utf-8" src="/javascript/components/jquery-timepicker-jt/jquery.timepicker.min.js"></script>
+<script type="text/javascript">
+    $(function () {
+
+        /* Datepickers
+         */
+        $('[data-datepicker]').datepicker();
+        $('[data-timepicker]').timepicker({
+            appendTo: function ($input) {
+                return $input.closest('.timepick');
+            }
+        });
+    });
+</script>
+
+<div class="row">
+    <div class="column small-12 medium-6">
+        <label>
+            Publish Date
+            <input name="publishDate" type="text" value="{{ assessment.publishAt.localShort }}" data-datepicker />
+        </label>
+    </div>
+
+    <div class="column small-12 medium-6">
+        <div class="timepick">
+            <label>
+                Publish Time
+                <input name="publishTime" type="text" value="{{ assessment.publishAt.timeOnly }}" data-timepicker />
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="column small-12 medium-6">
+        <label>
+            Open Date
+            <input name="openDate" type="text" autocomplete="off" value="{{ assessment.openAt.localShort }}" data-datepicker />
+        </label>
+    </div>
+
+    <div class="column small-12 medium-6">
+        <div class="timepick">
+            <label>
+                Open Time
+                <input name="openTime" type="text" autocomplete="off" value="{{ assessment.openAt.timeOnly }}" data-timepicker />
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="column small-12 medium-6">
+        <label>
+            Due Date
+            <input name="dueDate" type="text" autocomplete="off" value="{{ assessment.dueAt.localShort }}" data-datepicker />
+        </label>
+    </div>
+
+    <div class="column small-12 medium-6">
+        <div class="timepick">
+            <label>
+                Due Time
+                <input name="dueTime" type="text" autocomplete="off" value="{{ assessment.dueAt.timeOnly }}" data-timepicker />
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="column small-12 medium-6">
+        <label>
+            Close Date
+            <input name="closeDate" type="text" autocomplete="off" value="{{ assessment.closeAt.localShort }}" data-datepicker />
+        </label>
+    </div>
+
+    <div class="column small-12 medium-6">
+        <div class="timepick">
+            <label>
+                Close Time
+                <input name="closeTime" type="text" autocomplete="off" value="{{ assessment.closeAt.timeOnly }}" data-timepicker />
+            </label>
+        </div>
+    </div>
+</div>

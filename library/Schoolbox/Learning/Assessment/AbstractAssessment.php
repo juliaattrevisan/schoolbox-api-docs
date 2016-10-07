@@ -60,6 +60,11 @@ abstract class AbstractAssessment implements IAssessable
     protected $closeAt;
 
     /**
+     * @var Collection
+     */
+    protected $attachedFiles;
+
+    /**
      * @var float
      */
     protected $weight;
@@ -109,6 +114,7 @@ abstract class AbstractAssessment implements IAssessable
     public function __construct()
     {
         $this->setAllParticipants(new Collection());
+        $this->setAttachedFiles(new Collection());
         $this->responses = new Collection();
         $this->feedbacks = new Collection();
     }
@@ -126,6 +132,9 @@ abstract class AbstractAssessment implements IAssessable
         /* Explicitly dump away all the Participants
          */
         $this->setAllParticipants(new Collection());
+
+        /* TODO: Dump away all the attached files?
+         */
 
         $this->setCreatedAt($this->getCreatedAt() instanceof \Alaress_Date_Format ? clone $this->getCreatedAt() : null);
         $this->setUpdatedAt($this->getUpdatedAt() instanceof \Alaress_Date_Format ? clone $this->getUpdatedAt() : null);
@@ -321,6 +330,56 @@ abstract class AbstractAssessment implements IAssessable
         return 100 * ($this->numPublished() / $this->numParticipants());
     }
 
+    /* Validations
+     */
+
+    /**
+     * Check that all four dates are set validly
+     *
+     * @return bool
+     */
+    public function isValidDates()
+    {
+        /* Null dates are invalid
+         * Each date must be provided
+         */
+        if (!($this->getPublishAt() instanceof \Alaress_Date_Format) || ($this->getPublishAt() instanceof \Alaress_Date_NullDate)) {
+            return false;
+        }
+
+        if (!($this->getOpenAt() instanceof \Alaress_Date_Format) || ($this->getPublishAt() instanceof \Alaress_Date_NullDate)) {
+            return false;
+        }
+
+        if (!($this->getDueAt() instanceof \Alaress_Date_Format) || ($this->getPublishAt() instanceof \Alaress_Date_NullDate)) {
+            return false;
+        }
+
+        if (!($this->getCloseAt() instanceof \Alaress_Date_Format) || ($this->getPublishAt() instanceof \Alaress_Date_NullDate)) {
+            return false;
+        }
+
+        /* Check publish date against everything else
+         */
+        if ($this->getPublishAt()->gt($this->getOpenAt()) || $this->getPublishAt()->gt($this->getDueAt()) || $this->getPublishAt()->gt($this->getCloseAt())) {
+            return false;
+        }
+
+        /* Check open date against everything else
+         */
+        if ($this->getOpenAt()->gt($this->getDueAt()) || $this->getOpenAt()->gt($this->getCloseAt())) {
+            return false;
+        }
+
+        /* Check due date against everything else
+         */
+        if ($this->getDueAt()->gt($this->getCloseAt())) {
+            return false;
+        }
+
+        return true;
+    }
+
     /* Getters/Setters
      */
 
@@ -430,6 +489,22 @@ abstract class AbstractAssessment implements IAssessable
     {
         $this->closeAt = $closeAt;
         return $this;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getAttachedFiles()
+    {
+        return $this->attachedFiles;
+    }
+
+    /**
+     * @param Collection $attachedFiles
+     */
+    public function setAttachedFiles($attachedFiles)
+    {
+        $this->attachedFiles = $attachedFiles;
     }
 
     /**

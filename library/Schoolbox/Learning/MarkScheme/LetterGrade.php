@@ -96,4 +96,11 @@ class LetterGrade extends AbstractMarkScheme
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public static function getTitle()
+    {
+        return 'Letter Grade';
+    }
 }
