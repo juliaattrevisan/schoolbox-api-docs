@@ -26,28 +26,18 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 class Model extends AbstractAssessment
 {
     /**
+     * Is this task self-markable?
+     *
      * @var bool
      */
     protected $isSelfAssessed = false;
-
-    /**
-     * @var string
-     */
-    protected $url = '';
 
     /**
      * The content this task links to (if any).
      *
      * @var string
      */
-    protected $link;
-
-    /**
-     * Is this task self-markable?
-     *
-     * @var bool
-     */
-    protected $selfMarkable;
+    protected $url = '';
 
     /**
      * @inheritdoc
@@ -169,23 +159,6 @@ class Model extends AbstractAssessment
     public function setUrl($url)
     {
         $this->url = $url;
-        return $this;
-    }
-    /**
-     * @return string
-     */
-    public function getLink()
-    {
-        return $this->link;
-    }
-
-    /**
-     * @param string $link
-     * @return static
-     */
-    public function setLink($link)
-    {
-        $this->link = $link;
         return $this;
     }
 
