@@ -58,6 +58,7 @@
                     event.preventDefault();
 
                     $.magnificPopup.open({
+                        showCloseBtn: false,
                         items: {
                             src: "<div class='preview loader'></div>",
                             type: 'inline'
