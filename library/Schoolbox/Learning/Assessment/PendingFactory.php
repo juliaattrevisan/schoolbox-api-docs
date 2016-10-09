@@ -460,7 +460,7 @@ class PendingFactory
             
             WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
             AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL OR tk.id IS NOT NULL)
-            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabase() . "', '%Y-%m-%d %H:%i:%s')
+            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
         $folderClause = count($folderIds) ? " OR pf.id IN (" . implode(',', $folderIds) . ") " : '';
@@ -507,7 +507,7 @@ class PendingFactory
             
             WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
             AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL OR tk.id IS NOT NULL)
-            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabase() . "', '%Y-%m-%d %H:%i:%s')
+            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
         $folderClause = count($folderIds) ? " OR cif.id IN (" . implode(',', $folderIds) . ") " : '';
@@ -557,7 +557,7 @@ class PendingFactory
             
             WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
             AND (qz.assess_id IS NOT NULL OR dw.id IS NOT NULL OR tk.id IS NOT NULL)
-            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabase() . "', '%Y-%m-%d %H:%i:%s')
+            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
 
@@ -610,7 +610,7 @@ class PendingFactory
             LEFT JOIN userGroups ug                        ON ug.cid = cif.id
             
             WHERE ((qz.user_id = {$this->viewee->getId()} OR dw.owner = {$this->viewee->getId()} OR tk.user_id = {$this->viewee->getId()}) $folderClause)
-            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabase() . "', '%Y-%m-%d %H:%i:%s')
+            AND a.due_date >= STR_TO_DATE('" . $this->term->getStart()->getDatabaseDate() . "', '%Y-%m-%d')
         ";
 
         $statement = $this->database->prepare("$query1 UNION $query2 UNION $query3 UNION $query4");
