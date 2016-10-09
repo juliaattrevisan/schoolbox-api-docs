@@ -14,6 +14,10 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\FeedbackStrategy\FavourFloating;
+use Schoolbox\Learning\Assessment\FeedbackStrategy\IFeedbackStrategy;
+use Schoolbox\Learning\Assessment\FeedbackStrategy\NoFavour;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
 
@@ -23,12 +27,18 @@ class Participant
      * Whether when determining the current mark for an Assessment, we prefer
      * overall feedback over feedback linked to specific Responses.
      *
-     * @TODO - Probably remove at some point, or make this a user-config option, or
-     * provide some UI to give the choice to the user.
+     * @TODO - Needs A/B testing, or make this a user-config option, or provide some UI to give the choice to the user.
      *
      * @var bool
      */
     const FAVOR_FLOATING = false;
+
+    /**
+     * How to determine what constitutes the current overall mark for a given User and Assessment
+     *
+     * @var IFeedbackStrategy
+     */
+    protected $feedbackStrategy;
 
     /**
      * The User to whom all these Responses and Feedbacks are relevant
@@ -40,14 +50,14 @@ class Participant
     /**
      * A Collection of IResponse instances that Students spawn
      *
-     * @var Collection|IResponse[]
+     * @var GenericCollection|IResponse[]
      */
     protected $allResponses;
 
     /**
      * A Collection of IFeedback instances that Teachers spawn
      *
-     * @var Collection|IFeedback[]
+     * @var GenericCollection|IFeedback[]
      */
     protected $allFeedbacks;
 
@@ -59,8 +69,9 @@ class Participant
     public function __construct(User $user)
     {
         $this->setUser($user);
-        $this->setAllResponses(new Collection());
-        $this->setAllFeedbacks(new Collection());
+        $this->setAllResponses(new GenericCollection());
+        $this->setAllFeedbacks(new GenericCollection());
+        $this->feedbackStrategy = self::FAVOR_FLOATING ? new FavourFloating() : new NoFavour();
     }
 
     /**
@@ -193,127 +204,7 @@ class Participant
      */
     private function getMostRecentFeedback(IAssessable $assessable, $publishedOnly)
     {
-        if(self::FAVOR_FLOATING){
-            return $this->getMostRecentFeedback_favorFloating($assessable, $publishedOnly);
-        } else {
-            return $this->getMostRecentFeedback_noFavor($assessable, $publishedOnly);
-        }
-    }
-
-    /**
-     * Find the most recent IFeedback for an IAssessable for this Participant
-     *
-     * All Feedbacks are considered equal, compared purely by dates
-     *
-     * Consider following scenario for DueWork.
-     * * Student submits $response1 in 2010 and receives $feedback1 on it in 2014.
-     * * Student submits $response2 in 2011 and receives $feedback2a on it in 2011 and $feedback2b in 2012
-     * * Student submits $response3 in 2013
-     * * Teacher provides floating $feedback4 in 2010
-     *
-     * In this case, the authoritative feedback is the linked $feedback1 in 2014,
-     * even though it is attached to an old response and we have an overall floating $feedback4 in 2010
-     *
-     * Need to also apply the $publishedOnly filter to all traversals.
-     *
-     * @param IAssessable $assessable
-     * @param bool $publishedOnly
-     * @return null|IFeedback
-     */
-    private function getMostRecentFeedback_noFavor(IAssessable $assessable, $publishedOnly)
-    {
-        /** @var IFeedback $mostRecentFeedback */
-        $mostRecentFeedback = null;
-
-        foreach ($this->findAllFeedbackForAssessable($assessable) as $feedback) {
-            if (!$publishedOnly || $feedback->isPublished()) {
-                if (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt())) {
-                    $mostRecentFeedback = $feedback;
-                }
-            }
-        }
-        return $mostRecentFeedback;
-    }
-
-    /**
-     * Find the most recent IFeedback for an IAssessable for this Participant
-     *
-     * Floating Feedback trumps linked Feedback
-     *
-     * Consider following scenario for DueWork.
-     * * Student submits $response1 in 2010 and receives $feedback1 on it in 2014.
-     * * Student submits $response2 in 2011 and receives $feedback2a on it in 2011 and $feedback2b in 2012
-     * * Student submits $response3 in 2013
-     * * Teacher provides floating $feedback4 in 2010
-     *
-     * In this case, the authoritative feedback is the floating $feedback in 2010,
-     * even though is predates the linked $feedback2b of 2012 and linked $feedback1 pf 2014.
-     *
-     * If no floating feedback exists, we would fall back to the latest feedback on the latest
-     * response, ie $feedback2b. Even though it predates $feedback1.
-     *
-     * Need to also apply the $publishedOnly filter to all traversals.
-     *
-     * @param IAssessable $assessable
-     * @param bool $publishedOnly
-     * @return null|IFeedback
-     */
-    private function getMostRecentFeedback_favorFloating(IAssessable $assessable, $publishedOnly)
-    {
-
-        /** @var IFeedback $mostRecentFloatingFeedback */
-        $mostRecentFloatingFeedback = null;
-
-        foreach ($this->findAllFeedbackForAssessable($assessable) as $feedback) {
-            if (!$publishedOnly || $feedback->isPublished()) {
-                if(!$feedback->getResponse() instanceof IResponse){
-                    if (!$mostRecentFloatingFeedback || $feedback->getUpdatedAt()->gt($mostRecentFloatingFeedback->getUpdatedAt())) {
-                        $mostRecentFloatingFeedback = $feedback;
-                    }
-                }
-            }
-        }
-
-        if($mostRecentFloatingFeedback){
-            return $mostRecentFloatingFeedback;
-        }
-
-        /** @var IResponse $latestResponseWithFeedback */
-        $latestResponseWithFeedback = null;
-
-        foreach($this->findAllResponsesForAssessable($assessable) as $response){
-            if(!$latestResponseWithFeedback || $response->getUpdatedAt()->gt($latestResponseWithFeedback->getUpdatedAt())){
-                if(!$publishedOnly){
-                    if(count($response->getAllFeedback())){
-                        $latestResponseWithFeedback = $response;
-                    }
-                } else {
-                    foreach($response->getAllFeedback() as $feedback){
-                        if($feedback->isPublished()){
-                            $latestResponseWithFeedback = $response;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        // No Response with Feedback?
-        if(!$latestResponseWithFeedback){
-            return null;
-        }
-
-        /** @var IFeedback $mostRecentLinkedFeedback */
-        $mostRecentLinkedFeedback = null;
-
-        foreach($latestResponseWithFeedback->getAllFeedback() as $feedback){
-            if (!$publishedOnly || $feedback->isPublished()) {
-                if (!$mostRecentLinkedFeedback || $feedback->getUpdatedAt()->gt($mostRecentLinkedFeedback->getUpdatedAt())) {
-                    $mostRecentLinkedFeedback = $feedback;
-                }
-            }
-        }
-        return $mostRecentLinkedFeedback;
+        return $this->feedbackStrategy->getMostRecentFeedback($this, $assessable, $publishedOnly);
     }
 
     /* Getters/Setters
@@ -336,7 +227,7 @@ class Participant
     }
 
     /**
-     * @return Collection|IResponse[]
+     * @return GenericCollection|IResponse[]
      */
     public function getAllResponses()
     {
@@ -344,7 +235,7 @@ class Participant
     }
 
     /**
-     * @param Collection|IResponse[] $allResponses
+     * @param GenericCollection|IResponse[] $allResponses
      */
     public function setAllResponses($allResponses)
     {
@@ -352,7 +243,7 @@ class Participant
     }
 
     /**
-     * @return Collection|IFeedback[]
+     * @return GenericCollection|IFeedback[]
      */
     public function getAllFeedbacks()
     {
@@ -360,7 +251,7 @@ class Participant
     }
 
     /**
-     * @param Collection|IFeedback[] $allFeedbacks
+     * @param GenericCollection|IFeedback[] $allFeedbacks
      */
     public function setAllFeedbacks($allFeedbacks)
     {
