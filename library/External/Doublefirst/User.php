@@ -848,15 +848,46 @@ class External_Doublefirst_User implements External_UserInterface
 
             $sql =
             "
-                SELECT DISTINCT 
-                ygsd.SubjectDivisionName AS ClassCode, 
-                '' AS ClassCampus, s.Name AS name, 
-                '' AS classType FROM SubjectMaster s 
+                SELECT DISTINCT
+                ygsd.SubjectDivisionName AS ClassCode,
+                '' AS ClassCampus,
+                sm.Name AS name,
+                '' AS classType
                 
-                JOIN PupilSubjects ps ON ps.SubjectID = s.SubjectID AND ps.SchoolYear = {$year} 
-                JOIN TimetableClassStaff tcs ON tcs.SubjectID = s.SubjectID AND tcs.AcademicYear = ps.SchoolYear
-                JOIN YearGroupSubjectDivision ygsd ON ygsd.DivisionID = tcs.DivisionID AND ygsd.SubjectID = ps.SubjectID AND ygsd.YearGroup = ps.YearGroup AND ygsd.AcademicYear = tcs.AcademicYear 
-                WHERE tcs.StaffID = '{$synergyID}'
+                FROM TimetableClassRoom tcr
+    
+                LEFT JOIN YearGroupSubjectDivision ygsd ON
+                ygsd.DivisionID = tcr.DivisionID AND
+                ygsd.SubjectID = tcr.SubjectID AND
+                ygsd.YearGroup = tcr.YearGroup AND
+                ygsd.AcademicYear = tcr.AcademicYear
+                
+                LEFT JOIN BatchMaster bm ON
+                bm.YearGroup = tcr.YearGroup AND
+                bm.SubjectID = tcr.SubjectID AND
+                bm.DivisionID = tcr.DivisionID
+    
+                JOIN TimetableMatrix tm ON
+                tm.MatrixID = tcr.MatrixID AND
+                tm.AcademicYear = tcr.AcademicYear AND
+                tm.YearGroup = tcr.YearGroup
+    
+                JOIN TimetableClassStaff tcs ON
+                tcs.YearGroup = tcr.YearGroup AND
+                tcs.SubjectID = tcr.SubjectID AND
+                tcs.DivisionID = tcr.DivisionID AND
+                tcs.AcademicYear = tcr.AcademicYear AND
+                tcs.MatrixID = tm.MatrixID
+
+                JOIN SubjectMaster sm ON
+                sm.SubjectID = tcr.SubjectID
+    
+                JOIN TimetableMaster tn ON
+                tn.TimetableName = tm.TimetableName AND
+                tn.IsWorking = 1
+                
+                WHERE tcr.AcademicYear = '{$year}'
+                AND tcs.StaffID = '{$synergyID}' ORDER BY name
             ";
         }
 
