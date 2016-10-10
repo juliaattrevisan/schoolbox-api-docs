@@ -194,10 +194,10 @@ class PendingFactory
 
     /**
      * @param User $viewee
-     * @param \External_UserInterface $externalUser
+     * @param \External_UserInterface|null $externalUser
      * @param \External_ClassInterface $externalClass
      */
-    public function __construct(User $viewee, \External_UserInterface $externalUser, \External_ClassInterface $externalClass)
+    public function __construct(User $viewee, \External_UserInterface $externalUser = null, \External_ClassInterface $externalClass)
     {
         $this->viewee = $viewee;
         $this->database = \Database::getInstance();
