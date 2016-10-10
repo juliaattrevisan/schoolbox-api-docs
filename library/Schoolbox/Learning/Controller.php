@@ -96,7 +96,9 @@ class Controller extends Base
             ? null
             : new \External_User();
 
-        $factory = new PendingFactory($viewee, $externalUser, new \External_Class());
+        $term = TermMapper::getInstance()->findForToday();
+
+        $factory = new PendingFactory($viewee, $externalUser, new \External_Class(), $term);
         $assessments = $factory->getPendingAssessments();
 
         /** @var IAssessable[] $assessmentsToMark */

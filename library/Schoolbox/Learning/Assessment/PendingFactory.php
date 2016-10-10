@@ -196,15 +196,20 @@ class PendingFactory
      * @param User $viewee
      * @param \External_UserInterface|null $externalUser
      * @param \External_ClassInterface $externalClass
+     * @param Term $term
      */
-    public function __construct(User $viewee, \External_UserInterface $externalUser = null, \External_ClassInterface $externalClass)
+    public function __construct(
+        User $viewee,
+        \External_UserInterface $externalUser = null,
+        \External_ClassInterface $externalClass,
+        Term $term)
     {
         $this->viewee = $viewee;
         $this->database = \Database::getInstance();
         $this->externalUser = $externalUser;
         $this->externalClass = $externalClass;
         $this->assessmentsCache = new Collection();
-        $this->term = TermMapper::getInstance()->findForToday();
+        $this->term = $term;
     }
 
 
