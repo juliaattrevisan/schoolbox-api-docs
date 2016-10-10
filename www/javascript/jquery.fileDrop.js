@@ -282,7 +282,7 @@
         e.addClass('dz-file-preview')
             .append($('<div class="dz-details" />')
                 .append($('<div class="dz-filename" />').html('<span data-dz-name></span>'))
-                .append('<img class="dz-pending" width="16" height="16" src="/images/resources/ajax.gif" />'))
+                .append('<img class="dz-pending" width="16" height="16" src="/images/foundation/preloader.gif" />'))
             .append($('<div class="dz-progress" />').html('<span class="dz-upload"></span>'));
 
         if(isself) {

@@ -147,7 +147,7 @@ input[type="submit"]{
 	}
 	&[readonly] {
 		background-color: rgba($submit-button-bg-color, $button-disabled-opacity);
-		background-image: url('/images/resources/ajax.gif');
+		background-image: url('/images/foundation/preloader.gif');
 		background-repeat: no-repeat;
 		background-size: 1rem;
 		background-position: 0.75rem 50%;

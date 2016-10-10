@@ -300,7 +300,7 @@ ul.az-error-list {
         }
     }
     img[data-dz-thumbnail] {
-        background: url('/images/resources/ajax.gif') no-repeat center center;
+        background: url('/images/foundation/preloader.gif') no-repeat center center;
         @include easy-transition(opacity  0.15s  $attachzone-overlay-timing);
     }
     ul.az-list > li {
