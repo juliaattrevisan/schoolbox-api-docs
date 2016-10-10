@@ -57,8 +57,8 @@
                     </div>
                     <ul class="information-list hide" data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
                         {% for participant in assessment.allParticipants %}
-                            {% if participant.isMarkingRequired(assessment) %}
-                                {% set response = participant.findMostRecentResponse(assessment) %}
+                            {% if participant.isMarkingRequired %}
+                                {% set response = participant.findMostRecentResponse %}
                                 <li>
                                     <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
                                         <div class="compact card small-6">
@@ -121,7 +121,7 @@
                     <ul class="information-list hide" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed">
                         {% set studentEmails = [] %}
                         {% for participant in assessment.allParticipants %}
-                            {% if not participant.findAllResponsesForAssessable(assessment)|length and not participant.findAllFeedbackForAssessable(assessment)|length %}
+                            {% if not participant.getAllResponses|length and not participant.getAllFeedbacks|length %}
                                 {% set studentEmails = studentEmails|merge([participant.user.getEmail()]) %}
                                 <li>
                                     <a class="link-row" href="/search/user/{{ participant.user.id }}">

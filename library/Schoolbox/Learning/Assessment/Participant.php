@@ -19,7 +19,6 @@ use Schoolbox\Learning\Assessment\FeedbackStrategy\FavourFloating;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\IFeedbackTraversalStrategy;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\NoFavour;
 use \Schoolbox\User;
-use \Schoolbox\Collection;
 
 class Participant
 {
@@ -48,6 +47,13 @@ class Participant
     protected $user;
 
     /**
+     * The Assessment which these Responses and Feedbacks relate to
+     *
+     * @var IAssessable
+     */
+    private $assessable;
+
+    /**
      * A Collection of IResponse instances that Students spawn
      *
      * @var GenericCollection|IResponse[]
@@ -65,60 +71,23 @@ class Participant
      * Participant constructor.
      *
      * @param User $user
+     * @param IAssessable $assessable
      */
-    public function __construct(User $user)
+    public function __construct(User $user, IAssessable $assessable)
     {
         $this->setUser($user);
+        $this->setAssessable($assessable);
         $this->setAllResponses(new GenericCollection());
         $this->setAllFeedbacks(new GenericCollection());
         $this->feedbackStrategy = self::FAVOR_FLOATING ? new FavourFloating() : new NoFavour();
     }
 
     /**
-     * Find all the Responses that were spawned for a particular IAssessable
+     * Whether this Participant has unmarked Response
      *
-     * @param IAssessable $assessable
-     * @return Collection|IResponse[]
-     */
-    public function findAllResponsesForAssessable(IAssessable $assessable)
-    {
-        $responses = new Collection();
-
-        foreach ($this->getAllResponses() as $response) {
-            $responseAssessable = $response->getAssessable();
-            if ($assessable->getId() == $responseAssessable->getId()) {
-                $responses->add($response);
-            }
-        }
-        return $responses;
-    }
-
-    /**
-     * Find all the Feedbacks that were spawned for a particular IAssessable
-     *
-     * @param IAssessable $assessable
-     * @return Collection|IFeedback[]
-     */
-    public function findAllFeedbackForAssessable(IAssessable $assessable)
-    {
-        $feedbacks = new Collection();
-
-        foreach ($this->getAllFeedbacks() as $feedback) {
-            $feedbackAssessable = $feedback->getAssessable();
-            if ($assessable->getId() == $feedbackAssessable->getId()) {
-                $feedbacks->add($feedback);
-            }
-        }
-        return $feedbacks;
-    }
-
-    /**
-     * Whether this Participant has unmarked Response to the specified Assessment
-     *
-     * @param IAssessable $assessable
      * @return bool
      */
-    public function isMarkingRequired(IAssessable $assessable)
+    public function isMarkingRequired()
     {
         if(!count($this->allResponses)){
             return false;
@@ -126,85 +95,65 @@ class Participant
         if(!count($this->allFeedbacks)){
             return true;
         }
-        $latestResponse = $this->findMostRecentResponse($assessable);
-        $latestFeedback = $this->findMostRecentFeedback($assessable);
+        $latestResponse = $this->findMostRecentResponse();
+        $latestFeedback = $this->findMostRecentFeedback();
         return $latestResponse->getUpdatedAt() > $latestFeedback->getUpdatedAt();
     }
 
     /**
      * This Participant received a Feedback for the $assessable
      *
-     * @param IAssessable $assessable
      * @return bool
      */
-    public function isAssessableMarked(IAssessable $assessable)
+    public function isAssessableMarked()
     {
-        $feedbacks = $this->findAllFeedbackForAssessable($assessable);
-        return count($feedbacks) > 0;
+        return count($this->allFeedbacks) > 0;
     }
 
     /**
      * This Participant received a Published Feedback for the $assessable
      *
-     * @param IAssessable $assessable
      * @return bool
      */
-    public function isAssessablePublished(IAssessable $assessable)
+    public function isAssessablePublished()
     {
-        return $this->findMostRecentPublishedFeedback($assessable) instanceof IFeedback;
+        return $this->findMostRecentPublishedFeedback() instanceof IFeedback;
     }
 
 
     /**
-     * @param IAssessable $assessable
      * @return IResponse|null
      */
-    public function findMostRecentResponse(IAssessable $assessable)
+    public function findMostRecentResponse()
     {
         /** @var IResponse $mostRecentResponse */
         $mostRecentResponse = null;
         foreach ($this->allResponses as $response) {
-            if ($assessable->getId() === $response->getAssessable()->getId()) {
-                if (!$mostRecentResponse || $response->getUpdatedAt()->gt($mostRecentResponse->getUpdatedAt())) {
-                    $mostRecentResponse = $response;
-                }
+            if (!$mostRecentResponse || $response->getUpdatedAt()->gt($mostRecentResponse->getUpdatedAt())) {
+                $mostRecentResponse = $response;
             }
         }
         return $mostRecentResponse;
     }
 
     /**
-     * Find the most recent IFeedback for an IAssessable for this Participant
+     * Find the authoritative Feedback for an Assessment for this Participant
      *
-     * @param IAssessable $assessable
      * @return null|IFeedback
      */
-    public function findMostRecentFeedback(IAssessable $assessable)
+    public function findMostRecentFeedback()
     {
-        return $this->getMostRecentFeedback($assessable, false);
+        return $this->feedbackStrategy->getMostRecentFeedback($this, false);
     }
 
     /**
-     * Find the most recent published IFeedback for an IAssessable for this Participant
+     * Find the authoritative published Feedback for an Assessment for this Participant
      *
-     * @param IAssessable $assessable
      * @return null|IFeedback
      */
-    public function findMostRecentPublishedFeedback(IAssessable $assessable)
+    public function findMostRecentPublishedFeedback()
     {
-        return $this->getMostRecentFeedback($assessable, true);
-    }
-
-    /**
-     * Gets the authoritative Feedback for an Assessment for this Participant
-     *
-     * @param IAssessable $assessable
-     * @param bool $publishedOnly
-     * @return null|IFeedback
-     */
-    private function getMostRecentFeedback(IAssessable $assessable, $publishedOnly)
-    {
-        return $this->feedbackStrategy->getMostRecentFeedback($this, $assessable, $publishedOnly);
+        return $this->feedbackStrategy->getMostRecentFeedback($this, true);
     }
 
     /* Getters/Setters
@@ -224,6 +173,24 @@ class Participant
     public function setUser($user)
     {
         $this->user = $user;
+    }
+
+    /**
+     * @return IAssessable
+     */
+    public function getAssessable()
+    {
+        return $this->assessable;
+    }
+
+    /**
+     * @param IAssessable $assessable
+     * @return static
+     */
+    public function setAssessable(IAssessable $assessable)
+    {
+        $this->assessable = $assessable;
+        return $this;
     }
 
     /**

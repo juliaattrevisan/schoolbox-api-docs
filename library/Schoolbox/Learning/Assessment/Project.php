@@ -77,8 +77,8 @@ class Project extends AbstractAssessment implements AssessmentContext
             foreach($assessable->getAllParticipants() as $participant){
                 if($participant->getUser()->getId() == $user->getId()){
                     $isMarked = $publishedOnly
-                        ? $participant->isAssessablePublished($assessable)
-                        : $participant->isAssessableMarked($assessable);
+                        ? $participant->isAssessablePublished()
+                        : $participant->isAssessableMarked();
                     if($isMarked){
                         $markedAssessables[$assessable->getId()] = $assessable;
                     }
@@ -152,7 +152,7 @@ class Project extends AbstractAssessment implements AssessmentContext
 
             /** @var Participant $currentParticipant */
             foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
-                if ($currentParticipant->isAssessablePublished($currentAssessable)) {
+                if ($currentParticipant->isAssessablePublished()) {
                     $num++;
                 }
             }

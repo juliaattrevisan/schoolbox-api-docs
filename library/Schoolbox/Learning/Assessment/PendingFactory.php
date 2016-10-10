@@ -823,7 +823,7 @@ class PendingFactory
             if (is_array($studentList)) {
                 foreach ($studentList as $studentExternalId) {
                     $student = $this->studentExtCache[$studentExternalId];
-                    $participants[$student->getId()] = new Participant($student);
+                    $participants[$student->getId()] = new Participant($student, $assessment);
                 }
             }
             $assessment->setAllParticipants($participants);
@@ -1039,7 +1039,7 @@ class PendingFactory
 
             // Are we missing the Participant?
             if (!$participants[$userId]) {
-                $participants[$userId] = new Participant($this->studentIntCache[$userId]);
+                $participants[$userId] = new Participant($this->studentIntCache[$userId], $quiz);
             }
             $participants[$userId]->getAllResponses()->add($response);
 
@@ -1081,7 +1081,7 @@ class PendingFactory
 
             // Are we missing the Participant?
             if (!$participants[$userId]) {
-                $participants[$userId] = new Participant($this->studentIntCache[$userId]);
+                $participants[$userId] = new Participant($this->studentIntCache[$userId], $task);
             }
             $participants[$userId]->getAllResponses()->add($response);
 
@@ -1124,7 +1124,7 @@ class PendingFactory
 
             // Are we missing the Participant?
             if (!$participants[$userId]) {
-                $participants[$userId] = new Participant($this->studentIntCache[$userId]);
+                $participants[$userId] = new Participant($this->studentIntCache[$userId], $dueWork);
             }
             $participants[$userId]->getAllResponses()->add($response);
         }
@@ -1151,7 +1151,7 @@ class PendingFactory
 
             // Are we missing the Participant?
             if (!$participants[$userId]) {
-                $participants[$userId] = new Participant($this->studentIntCache[$userId]);
+                $participants[$userId] = new Participant($this->studentIntCache[$userId], $dueWork);
             }
             $participants[$userId]->getAllFeedbacks()->add($feedback);
         }

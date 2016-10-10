@@ -16,7 +16,7 @@ use Schoolbox\Learning\Assessment\Participant;
 class NoFavour implements IFeedbackTraversalStrategy
 {
     /**
-     * Find the most recent IFeedback for an IAssessable for the Participant
+     * Find the most recent IFeedback for the Participant
      *
      * All Feedbacks are considered equal, compared purely by dates
      *
@@ -32,16 +32,15 @@ class NoFavour implements IFeedbackTraversalStrategy
      * Need to also apply the $publishedOnly filter to all traversals.
      *
      * @param Participant $participant
-     * @param IAssessable $assessable
      * @param bool $publishedOnly
      * @return IFeedback|null
      */
-    public function getMostRecentFeedback($participant, $assessable, $publishedOnly)
+    public function getMostRecentFeedback(Participant $participant, $publishedOnly)
     {
         /** @var IFeedback $mostRecentFeedback */
         $mostRecentFeedback = null;
 
-        foreach ($participant->findAllFeedbackForAssessable($assessable) as $feedback) {
+        foreach ($participant->getAllFeedbacks() as $feedback) {
             if (!$publishedOnly || $feedback->isPublished()) {
                 if (!$mostRecentFeedback || $feedback->getUpdatedAt()->gt($mostRecentFeedback->getUpdatedAt())) {
                     $mostRecentFeedback = $feedback;

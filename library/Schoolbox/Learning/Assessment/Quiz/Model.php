@@ -149,8 +149,8 @@ class Model extends AbstractAssessment
             $participant = $this->getParticipant($user);
 
             $feedback = $publishedOnly
-                ? $participant->findMostRecentPublishedFeedback($this)
-                : $participant->findMostRecentFeedback($this);
+                ? $participant->findMostRecentPublishedFeedback()
+                : $participant->findMostRecentFeedback();
 
             $response = $feedback
                 ? $feedback->getResponse()

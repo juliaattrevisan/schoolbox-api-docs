@@ -192,13 +192,13 @@ abstract class AbstractAssessment implements IAssessable
             $participant = $this->getParticipant($user);
 
             $feedback = $publishedOnly
-                ? $participant->findMostRecentPublishedFeedback($this)
-                : $participant->findMostRecentFeedback($this);
+                ? $participant->findMostRecentPublishedFeedback()
+                : $participant->findMostRecentFeedback();
 
             if ($feedback) {
                 $response = $feedback->getResponse();
             } else {
-                $response = $participant->findMostRecentResponse($this);
+                $response = $participant->findMostRecentResponse();
 
                 // Was this Assessment self-assessed ?
                 if ($response && $response->getSubmittedBy()->getId() === $response->getSubmittedOnBehalfOf()->getId()) {
@@ -248,8 +248,8 @@ abstract class AbstractAssessment implements IAssessable
         $participant = $this->getParticipant($user);
 
         $feedback = $publishedOnly
-            ? $participant->findMostRecentPublishedFeedback($this)
-            : $participant->findMostRecentFeedback($this);
+            ? $participant->findMostRecentPublishedFeedback()
+            : $participant->findMostRecentFeedback();
 
         if($feedback){
             return $normalised
@@ -283,7 +283,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         $num = 0;
         foreach ($this->getAllParticipants() as $currentParticipant) {
-            if (count($currentParticipant->findAllResponsesForAssessable($this))) {
+            if (count($currentParticipant->getAllResponses())) {
                 $num++;
             }
         }
@@ -313,7 +313,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         $num = 0;
         foreach ($this->getAllParticipants() as $currentParticipant) {
-            if (!count($currentParticipant->findAllResponsesForAssessable($this)) && !count($currentParticipant->findAllFeedbackForAssessable($this))) {
+            if (!count($currentParticipant->getAllResponses()) && !count($currentParticipant->getAllFeedbacks())) {
                 $num++;
             }
         }
@@ -329,7 +329,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         $num = 0;
         foreach ($this->getAllParticipants() as $currentParticipant) {
-            if ($currentParticipant->isAssessableMarked($this)) {
+            if ($currentParticipant->isAssessableMarked()) {
                 $num++;
             }
         }
@@ -357,7 +357,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         $num = 0;
         foreach ($this->getAllParticipants() as $participant) {
-            if ($participant->isMarkingRequired($this)) {
+            if ($participant->isMarkingRequired()) {
                 $num++;
             }
         }
@@ -388,7 +388,7 @@ abstract class AbstractAssessment implements IAssessable
         $num = 0;
 
         foreach ($this->getAllParticipants() as $currentParticipant) {
-            if ($currentParticipant->isAssessablePublished($this)) {
+            if ($currentParticipant->isAssessablePublished()) {
                 $num++;
             }
         }

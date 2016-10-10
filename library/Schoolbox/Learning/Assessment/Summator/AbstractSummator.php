@@ -45,9 +45,9 @@ abstract class AbstractSummator implements ISummator
                  * to prevent Tasks from influencing your result
                  */
                 if ($publishedOnly) {
-                    $feedback = $participant->findMostRecentPublishedFeedback($currentAssessable);
+                    $feedback = $participant->findMostRecentPublishedFeedback();
                 } else {
-                    $feedback = $participant->findMostRecentFeedback($currentAssessable);
+                    $feedback = $participant->findMostRecentFeedback();
                 }
 
                 if ($feedback) {

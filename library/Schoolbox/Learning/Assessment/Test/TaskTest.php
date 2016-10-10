@@ -52,9 +52,9 @@ class TaskTest extends \PHPUnit_Framework_TestCase
             ->setDescription($description)
             ->setCreator($this->celia)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $task))
+                ->add(new Participant($this->sberryhill, $task))
+                ->add(new Participant($this->asaxon, $task)))
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->thirteenDaysFromNow)
             ->setDueAt($this->fourteenDaysFromNow)
@@ -216,7 +216,7 @@ class TaskTest extends \PHPUnit_Framework_TestCase
         /* Total number of Responses
          */
         $this->assertCount(1, $task->getParticipant($this->hodes)->getAllResponses());
-        $this->assertCount(1, $task->getParticipant($this->hodes)->findAllFeedbackForAssessable($task));
+        $this->assertCount(1, $task->getParticipant($this->hodes)->getAllFeedbacks());
 
         /* Feedback setup
          */
@@ -226,7 +226,6 @@ class TaskTest extends \PHPUnit_Framework_TestCase
         /* Total number of Feedbacks
          */
         $this->assertCount(1, $task->getParticipant($this->hodes)->getAllFeedbacks());
-        $this->assertCount(1, $task->getParticipant($this->hodes)->findAllFeedbackForAssessable($task));
     }
 
     /**
@@ -262,8 +261,8 @@ class TaskTest extends \PHPUnit_Framework_TestCase
 
         /* The most recent feedback is published
          */
-        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->getId());
-        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback($task)->getId());
+        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
+        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
     }
 
     /**
@@ -312,14 +311,14 @@ class TaskTest extends \PHPUnit_Framework_TestCase
 
         /* The most recent feedback was published 2016-09-15 01:27:33
          */
-        $this->assertEquals(89, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->getId());
-        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback($task)->getId());
+        $this->assertEquals(89, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
+        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
 
         /* Most recent feedback has a normalised mark of null
          * Tasks always return null for normalised marks
          */
-        $this->assertEquals(null, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->getNormalisedMark());
-        $this->assertEquals(false, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->isPublished());
+        $this->assertEquals(null, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getNormalisedMark());
+        $this->assertEquals(false, $task->getParticipant($this->hodes)->findMostRecentFeedback()->isPublished());
     }
 
     /**
@@ -367,14 +366,14 @@ class TaskTest extends \PHPUnit_Framework_TestCase
 
         /* The most recent feedback was published 2016-09-15 01:27:33
          */
-        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->getId());
-        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback($task)->getId());
+        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
+        $this->assertEquals(87, $task->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
 
         /* Most recent feedback has a normalised mark of null
          * Tasks always return null for normalised marks
          */
-        $this->assertEquals(null, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->getNormalisedMark());
-        $this->assertEquals(true, $task->getParticipant($this->hodes)->findMostRecentFeedback($task)->isPublished());
+        $this->assertEquals(null, $task->getParticipant($this->hodes)->findMostRecentFeedback()->getNormalisedMark());
+        $this->assertEquals(true, $task->getParticipant($this->hodes)->findMostRecentFeedback()->isPublished());
     }
 }
 

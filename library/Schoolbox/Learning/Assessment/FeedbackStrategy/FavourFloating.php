@@ -17,7 +17,7 @@ use Schoolbox\Learning\Assessment\Participant;
 class FavourFloating implements IFeedbackTraversalStrategy
 {
     /**
-     * Find the most recent IFeedback for an IAssessable for the Participant
+     * Find the most recent IFeedback for the Participant
      *
      * Floating Feedback trumps linked Feedback
      *
@@ -35,16 +35,15 @@ class FavourFloating implements IFeedbackTraversalStrategy
      *
      * Need to also apply the $publishedOnly filter to all traversals.
      * @param Participant $participant
-     * @param IAssessable $assessable
      * @param bool $publishedOnly
      * @return IFeedback|null
      */
-    public function getMostRecentFeedback($participant, $assessable, $publishedOnly)
+    public function getMostRecentFeedback(Participant $participant, $publishedOnly)
     {
         /** @var IFeedback $mostRecentFloatingFeedback */
         $mostRecentFloatingFeedback = null;
 
-        foreach ($participant->findAllFeedbackForAssessable($assessable) as $feedback) {
+        foreach ($participant->getAllFeedbacks() as $feedback) {
             if (!$publishedOnly || $feedback->isPublished()) {
                 if(!$feedback->getResponse() instanceof IResponse){
                     if (!$mostRecentFloatingFeedback || $feedback->getUpdatedAt()->gt($mostRecentFloatingFeedback->getUpdatedAt())) {
@@ -61,7 +60,7 @@ class FavourFloating implements IFeedbackTraversalStrategy
         /** @var IResponse $latestResponseWithFeedback */
         $latestResponseWithFeedback = null;
 
-        foreach($participant->findAllResponsesForAssessable($assessable) as $response){
+        foreach($participant->getAllResponses() as $response){
             if(!$latestResponseWithFeedback || $response->getUpdatedAt()->gt($latestResponseWithFeedback->getUpdatedAt())){
                 if(!$publishedOnly){
                     if(count($response->getAllFeedback())){

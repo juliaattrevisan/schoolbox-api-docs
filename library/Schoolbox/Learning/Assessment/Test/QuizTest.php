@@ -43,16 +43,17 @@ class QuizTest extends \PHPUnit_Framework_TestCase
         $title = 'How did you find The Prime Evil?';
         $description = 'A quick pop quiz about how you died your way to Diablo.';
 
-        $quiz = (new Quiz())
+        $quiz = new Quiz();
+        $quiz
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $quiz))
+                ->add(new Participant($this->bsalem, $quiz))
+                ->add(new Participant($this->sberryhill, $quiz))
+                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -99,16 +100,17 @@ class QuizTest extends \PHPUnit_Framework_TestCase
         $title = 'How did you find The Prime Evil?';
         $description = 'A quick pop quiz about how you died your way to Diablo.';
 
-        $quiz = (new Quiz())
+        $quiz = new Quiz();
+        $quiz
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $quiz))
+                ->add(new Participant($this->bsalem, $quiz))
+                ->add(new Participant($this->sberryhill, $quiz))
+                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -152,16 +154,17 @@ class QuizTest extends \PHPUnit_Framework_TestCase
         $title = 'How did you find The Prime Evil?';
         $description = 'A quick pop quiz about how you died your way to Diablo.';
 
-        $quiz = (new Quiz())
+        $quiz = new Quiz();
+        $quiz
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $quiz))
+                ->add(new Participant($this->bsalem, $quiz))
+                ->add(new Participant($this->sberryhill, $quiz))
+                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -207,16 +210,17 @@ class QuizTest extends \PHPUnit_Framework_TestCase
         $title = 'How did you find The Prime Evil?';
         $description = 'A quick pop quiz about how you died your way to Diablo.';
 
-        $quiz = (new Quiz())
+        $quiz = new Quiz();
+        $quiz
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $quiz))
+                ->add(new Participant($this->bsalem, $quiz))
+                ->add(new Participant($this->sberryhill, $quiz))
+                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -296,12 +300,11 @@ class QuizTest extends \PHPUnit_Framework_TestCase
         /* Total number of Responses
          */
         $this->assertCount(1, $quiz->getParticipant($this->bsalem)->getAllResponses());
-        $this->assertCount(4, $quiz->getParticipant($this->bsalem)->findAllFeedbackForAssessable($quiz));
+        $this->assertCount(4, $quiz->getParticipant($this->bsalem)->getAllFeedbacks());
 
         /* Total number of Feedbacks
          */
         $this->assertCount(4, $quiz->getParticipant($this->bsalem)->getAllFeedbacks());
-        $this->assertCount(4, $quiz->getParticipant($this->bsalem)->findAllFeedbackForAssessable($quiz));
     }
 
     /**
@@ -314,16 +317,17 @@ class QuizTest extends \PHPUnit_Framework_TestCase
         $title = 'How did you find The Prime Evil?';
         $description = 'A quick pop quiz about how you died your way to Diablo.';
 
-        $quiz = (new Quiz())
+        $quiz = new Quiz();
+        $quiz
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $quiz))
+                ->add(new Participant($this->bsalem, $quiz))
+                ->add(new Participant($this->sberryhill, $quiz))
+                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -383,21 +387,21 @@ class QuizTest extends \PHPUnit_Framework_TestCase
 
         /* The most recent feedback is 99759
          */
-        $this->assertEquals(99759, $quiz->getParticipant($this->bsalem)->findMostRecentFeedback($quiz)->getId());
+        $this->assertEquals(99759, $quiz->getParticipant($this->bsalem)->findMostRecentFeedback()->getId());
 
         /* The most recent feedback is also published
          */
-        $this->assertEquals(99759, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getId());
+        $this->assertEquals(99759, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getId());
 
         /* Quiz's Normalised Mark is derived. It does not use the getter/setter
          * for Normalised Mark like the other Assessables
          */
-        $this->assertNotEquals(83, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getNormalisedMark());
+        $this->assertNotEquals(83, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
 
         /* Test its derived stuff instead
          * 7 / 20 = 35.0
          */
-        $this->assertEquals(35.0, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getNormalisedMark());
+        $this->assertEquals(35.0, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
     }
 
     /**
@@ -409,16 +413,17 @@ class QuizTest extends \PHPUnit_Framework_TestCase
         $title = 'How did you find The Prime Evil?';
         $description = 'A quick pop quiz about how you died your way to Diablo.';
 
-        $quiz = (new Quiz())
+        $quiz = new Quiz();
+        $quiz
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $quiz))
+                ->add(new Participant($this->bsalem, $quiz))
+                ->add(new Participant($this->sberryhill, $quiz))
+                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -599,19 +604,19 @@ class QuizTest extends \PHPUnit_Framework_TestCase
 
         /* The most recent feedback is 99762
          */
-        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentFeedback($quiz)->getId());
+        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentFeedback()->getId());
 
         /* The most recent feedback is also published
          */
-        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getId());
+        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getId());
 
         /* Quiz's Normalised Mark is derived. It does not use the getter/setter
          * for Normalised Mark like the other Assessables
          */
-        $this->assertNotEquals(83, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getNormalisedMark());
+        $this->assertNotEquals(83, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
 
         /* Test its derived stuff instead
          */
-        $this->assertEquals(60, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getNormalisedMark());
+        $this->assertEquals(60, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
     }
 }

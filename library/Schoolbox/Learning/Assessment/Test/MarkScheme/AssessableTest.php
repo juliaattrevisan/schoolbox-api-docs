@@ -8,8 +8,10 @@
 namespace Schoolbox\Learning\Assessment\Test\MarkScheme;
 
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
@@ -2099,10 +2101,10 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
 
         $teacher = $this->getDummyTeacher(101);
 
-        $participant1 = $this->getDummyParticipant($student1->getId());
-        $participant2 = $this->getDummyParticipant($student2->getId());
-        $participant3 = $this->getDummyParticipant($student3->getId());
-        $participant4 = $this->getDummyParticipant($student4->getId());
+        $participant1 = $this->getDummyParticipant($student1->getId(), $task);
+        $participant2 = $this->getDummyParticipant($student2->getId(), $task);
+        $participant3 = $this->getDummyParticipant($student3->getId(), $task);
+        $participant4 = $this->getDummyParticipant($student4->getId(), $task);
 
         $task->getAllParticipants()
             ->add($participant1)
@@ -2199,11 +2201,11 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $student5 = $this->getDummyStudent(5);
 
 
-        $participant1 = $this->getDummyParticipant($student1->getId());
-        $participant2 = $this->getDummyParticipant($student2->getId());
-        $participant3 = $this->getDummyParticipant($student3->getId());
-        $participant4 = $this->getDummyParticipant($student4->getId());
-        $participant5 = $this->getDummyParticipant($student5->getId());
+        $participant1 = $this->getDummyParticipant($student1->getId(), $quiz);
+        $participant2 = $this->getDummyParticipant($student2->getId(), $quiz);
+        $participant3 = $this->getDummyParticipant($student3->getId(), $quiz);
+        $participant4 = $this->getDummyParticipant($student4->getId(), $quiz);
+        $participant5 = $this->getDummyParticipant($student5->getId(), $quiz);
 
         // student 1: no attempts
 
@@ -2385,15 +2387,15 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $student8 = $this->getDummyStudent(8);
         $student9 = $this->getDummyStudent(9);
 
-        $participant1 = $this->getDummyParticipant($student1->getId());
-        $participant2 = $this->getDummyParticipant($student2->getId());
-        $participant3 = $this->getDummyParticipant($student3->getId());
-        $participant4 = $this->getDummyParticipant($student4->getId());
-        $participant5 = $this->getDummyParticipant($student5->getId());
-        $participant6 = $this->getDummyParticipant($student6->getId());
-        $participant7 = $this->getDummyParticipant($student7->getId());
-        $participant8 = $this->getDummyParticipant($student8->getId());
-        $participant9 = $this->getDummyParticipant($student9->getId());
+        $participant1 = $this->getDummyParticipant($student1->getId(), $dueWork);
+        $participant2 = $this->getDummyParticipant($student2->getId(), $dueWork);
+        $participant3 = $this->getDummyParticipant($student3->getId(), $dueWork);
+        $participant4 = $this->getDummyParticipant($student4->getId(), $dueWork);
+        $participant5 = $this->getDummyParticipant($student5->getId(), $dueWork);
+        $participant6 = $this->getDummyParticipant($student6->getId(), $dueWork);
+        $participant7 = $this->getDummyParticipant($student7->getId(), $dueWork);
+        $participant8 = $this->getDummyParticipant($student8->getId(), $dueWork);
+        $participant9 = $this->getDummyParticipant($student9->getId(), $dueWork);
 
         // student 1: no attempts
 
@@ -2643,9 +2645,16 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
             ->add($dueWork)
             ->add($quiz);
 
-        $project->setAllParticipants($task->getAllParticipants()
-            ->mergeUnique($dueWork->getAllParticipants(), 'user')
-            ->mergeUnique($quiz->getAllParticipants(), 'user')
+        $project->setAllParticipants((new Collection())
+                ->add(new Participant($this->getDummyStudent(1), $project) )
+                ->add(new Participant($this->getDummyStudent(2), $project) )
+                ->add(new Participant($this->getDummyStudent(3), $project) )
+                ->add(new Participant($this->getDummyStudent(4), $project) )
+                ->add(new Participant($this->getDummyStudent(5), $project) )
+                ->add(new Participant($this->getDummyStudent(6), $project) )
+                ->add(new Participant($this->getDummyStudent(7), $project) )
+                ->add(new Participant($this->getDummyStudent(8), $project) )
+                ->add(new Participant($this->getDummyStudent(9), $project) )
         );
 
         return $project;
@@ -2742,9 +2751,9 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      * @param int $userId
      * @return Participant
      */
-    private function getDummyParticipant($userId)
+    private function getDummyParticipant($userId, IAssessable $assessable)
     {
-        return new Participant($this->getDummyStudent($userId));
+        return new Participant($this->getDummyStudent($userId), $assessable);
     }
 
     /**

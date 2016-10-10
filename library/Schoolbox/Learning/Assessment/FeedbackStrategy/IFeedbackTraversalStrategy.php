@@ -17,9 +17,8 @@ interface IFeedbackTraversalStrategy
      * Gets the current authoritative Feedback for the given Participant and Assessment.
      *
      * @param Participant $participant
-     * @param IAssessable $assessable
      * @param bool $publishedOnly
      * @return IFeedback|null
      */
-    public function getMostRecentFeedback($participant, $assessable, $publishedOnly);
+    public function getMostRecentFeedback(Participant $participant, $publishedOnly);
 }
