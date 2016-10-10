@@ -213,16 +213,16 @@ CREATE TABLE `sportsfixtures_result` (
 
 /* Error table entries */
 INSERT INTO `error` VALUES
-    (173, 'The requested sport could not be found.'),
-    (174, 'The requested division could not be found.'),
-    (175, 'The requested team could not be found.'),
-    (176, 'The requested venue could not be found.'),
-		(177, 'The requested match could not be found.'),
-		(178, 'The requested position could not be found.'),
-		(179, 'The requested status could not be found.'),
+    (174, 'The requested sport could not be found.'),
+    (175, 'The requested division could not be found.'),
+    (176, 'The requested team could not be found.'),
+    (177, 'The requested venue could not be found.'),
+		(178, 'The requested match could not be found.'),
+		(179, 'The requested position could not be found.'),
+		(181, 'The requested status could not be found.'),
 		(180, 'That which you are looking for could not be found.'),
-		(181, 'The requested season could not be found.'),
-		(182, 'The requested item has been archived.');
+		(182, 'The requested season could not be found.'),
+		(183, 'The requested item has been archived.');
 
 /** Team players table **/
 CREATE TABLE `sportsfixtures_team_user` (
