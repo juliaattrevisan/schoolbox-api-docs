@@ -31,7 +31,12 @@ if (is_numeric($_GET['delete'])) {
     /* Softdelete the post and the entire thread
      */
     $postMapper = new PostMapper();
-    $post = $postMapper->findById($_GET['delete']);
+    try {
+        $post = $postMapper->findById($_GET['delete']);
+    }
+    catch(\Schoolbox\Mapper\Exception $e){
+        error(173);
+    }
 
     /* Determine permissions
      * Component instance not necessary in this context
