@@ -195,11 +195,15 @@ class PendingFactory
 
     /**
      * @param User $viewee
+     * @param \External_UserInterface|null $externalUser
+     * @param \External_ClassInterface|null $externalClass
      */
-    public function __construct(User $viewee)
+    public function __construct(User $viewee, \External_UserInterface $externalUser = null, \External_ClassInterface $externalClass = null)
     {
         $this->viewee = $viewee;
         $this->database = \Database::getInstance();
+        $this->externalUser = $externalUser;
+        $this->externalClass = $externalClass;
 
         $this->assessmentsCache = new Collection();
         $this->courseSpecsCache = [];
@@ -274,30 +278,6 @@ class PendingFactory
 
         return $this->assessmentsCache;
     }
-
-
-    /**
-     * @return \External_UserInterface
-     */
-    private function getExternalUser()
-    {
-        if (!$this->externalUser instanceof \External_UserInterface) {
-            $this->externalUser = new \External_User();
-        }
-        return $this->externalUser;
-    }
-
-    /**
-     * @return \External_ClassInterface
-     */
-    private function getExternalClass()
-    {
-        if (!$this->externalClass instanceof \External_ClassInterface) {
-            $this->externalClass = new \External_Class();
-        }
-        return $this->externalClass;
-    }
-
 
     /**
      * Ensure each logically same Folder is same object instance
@@ -762,7 +742,7 @@ class PendingFactory
             $uniqueCodes = array_unique($this->folderClassCodes[$classId]);
 
             $this->folderToStudentListMap[$classId] = [];
-            $classList = $this->getExternalClass()->getStudents(implode(',', $uniqueCodes));
+            $classList = $this->externalClass->getStudents(implode(',', $uniqueCodes));
 
             // Each Student in Subject
             if (is_array($classList)) {
@@ -1295,7 +1275,7 @@ class PendingFactory
             }
         } else {
             // Get Classes Taught from External_DB
-            $classes = $this->getExternalUser()->getSubjectList($this->viewee->getExternalId(), $this->viewee->getId());
+            $classes = $this->externalUser->getSubjectList($this->viewee->getExternalId(), $this->viewee->getId());
 
             // Get ClassCodes + SB FolderIds
             if (is_array($classes) && !empty($classes)) {

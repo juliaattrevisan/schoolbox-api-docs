@@ -92,7 +92,7 @@ class Controller extends Base
             $viewee = $this->getUser();
         }
 
-        $factory = new PendingFactory($viewee);
+        $factory = new PendingFactory($viewee, new \External_User(), new \External_Class());
         $assessments = $factory->getPendingAssessments();
 
         /** @var IAssessable[] $assessmentsToMark */
