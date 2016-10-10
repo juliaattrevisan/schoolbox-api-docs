@@ -28,9 +28,6 @@ class Mapper extends BaseMapper
         $this->hasTable('project');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('title', self::TYPE_STRING);
-        $this->uses('description', self::TYPE_STRING);
-        $this->uses('weight', self::TYPE_INTEGER);
         $this->uses('summator', self::TYPE_STRING);
         $this->joins('owner_id', UserMapper::class);
         $this->joins('mark_type_id', MarkTypeMapper::class, 'mark_type_id', null, null, 'markType');
