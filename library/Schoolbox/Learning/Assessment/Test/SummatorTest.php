@@ -100,10 +100,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
         /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
-            $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(new Collection());
+            $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0);
 
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                $currentResponse->setAllFeedback(new Collection());
+                $currentResponse->getAllFeedback()->slice(0,0);
             }
         }
 
@@ -280,10 +280,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
         /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
-            $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(new Collection());
+            $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0);
 
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                $currentResponse->setAllFeedback(new Collection());
+                $currentResponse->getAllFeedback()->slice(0,0);
             }
         }
 
@@ -638,10 +638,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
         /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
-            $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(new Collection());
+            $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0);
 
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                $currentResponse->setAllFeedback(new Collection());
+                $currentResponse->getAllFeedback()->slice(0,0);
             }
         }
 
@@ -1173,10 +1173,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
         /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
-            $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(new Collection());
+            $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0);
 
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                $currentResponse->setAllFeedback(new Collection());
+                $currentResponse->getAllFeedback()->slice(0,0);
             }
         }
 

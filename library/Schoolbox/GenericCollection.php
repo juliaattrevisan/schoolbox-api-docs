@@ -15,35 +15,47 @@ namespace Schoolbox;
 class GenericCollection extends Collection
 {
     /**
-     * What type the items in this Collection are allowed to be
+     * What type the elements in this Collection are allowed to be
      *
      * @var string
      */
-    private $itemType = null;
+    private $elementType = null;
 
     /**
      * If type is null, then set the type when first item is inserted
      *
+     * @param string|object $elementType
      * @param array $stack
-     * @param string|object|null $itemType
+     *
      */
-    public function __construct(array $stack = [], $itemType = null)
+    public function __construct($elementType, array $stack = [])
     {
-        if (is_string($itemType)) {
-            $this->itemType = $itemType;
-        } elseif (is_object($itemType)) {
-            $this->itemType = get_class($itemType);
-        } elseif (!is_null($itemType)) {
-            throw new \UnexpectedValueException('Element Type must be a class or interface name, or object. Found: ' . gettype($itemType));
+        if (is_string($elementType)) {
+            $this->elementType = $elementType;
+        } elseif (is_object($elementType)) {
+            $this->elementType = get_class($elementType);
+        } else {
+            throw new \UnexpectedValueException('Element Type must be a class or interface name, or object. Found: ' . gettype($elementType));
         }
 
         parent::__construct($stack);
     }
 
     /**
+     * Returns the class/interface name of elements in this Collection
+     *
+     * @return string
+     */
+    public function getElementClass()
+    {
+        return $this->elementType;
+    }
+
+    /**
      * Set stack
      *
      * @param $stack
+     * @return static
      */
     protected function setStack($stack)
     {
@@ -51,6 +63,7 @@ class GenericCollection extends Collection
             $this->checkType($item);
         }
         parent::setStack($stack);
+        return $this;
     }
 
     /**
@@ -62,18 +75,15 @@ class GenericCollection extends Collection
     protected function checkType($item)
     {
         if (is_scalar($item)) {
-            throw new \UnexpectedValueException("Items cannot be scalar. Expected: {$this->itemType}, Actual: " . gettype($item));
+            throw new \UnexpectedValueException("Items cannot be scalar. Expected: {$this->elementType}, Actual: " . gettype($item));
         }
 
-        if (is_array($item)) {
-            throw new \UnexpectedValueException("Items cannot be arrays. Expected: {$this->itemType}, Actual: " . gettype($item));
+        else if (is_array($item)) {
+            throw new \UnexpectedValueException("Items cannot be arrays. Expected: {$this->elementType}, Actual: " . gettype($item));
         }
 
-        // First item and no type yet set on this Collection?
-        if(is_null($this->itemType)){
-            $this->itemType = get_class($item);
-        } else if (!$item instanceof $this->itemType) {
-            throw new \UnexpectedValueException("Invalid type. Expected: {$this->itemType}, Actual: " . get_class($item));
+        else if (!$item instanceof $this->elementType) {
+            throw new \UnexpectedValueException("Invalid type. Expected: {$this->elementType}, Actual: " . get_class($item));
         }
     }
 

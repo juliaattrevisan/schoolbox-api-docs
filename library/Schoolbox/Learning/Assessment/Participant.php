@@ -14,11 +14,21 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\FavourFloating;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\IFeedbackTraversalStrategy;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\NoFavour;
 use \Schoolbox\User;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
+use Schoolbox\Learning\Assessment\Task\Model as Task;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
+use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizReview;
+use Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
+use Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
 
 class Participant
 {
@@ -56,14 +66,18 @@ class Participant
     /**
      * A Collection of IResponse instances that Students spawn
      *
-     * @var GenericCollection|IResponse[]
+     * Null for Projects
+     *
+     * @var GenericCollection|IResponse[]|null
      */
     protected $allResponses;
 
     /**
      * A Collection of IFeedback instances that Teachers spawn
      *
-     * @var GenericCollection|IFeedback[]
+     * Null for Projects
+     *
+     * @var GenericCollection|IFeedback[]|null
      */
     protected $allFeedbacks;
 
@@ -77,8 +91,13 @@ class Participant
     {
         $this->setUser($user);
         $this->setAssessable($assessable);
-        $this->setAllResponses(new GenericCollection());
-        $this->setAllFeedbacks(new GenericCollection());
+
+        $responseClass = $this->getAllowedResponseType();
+        $this->allResponses = $responseClass ? new GenericCollection($responseClass) : null;
+
+        $feedbackClass = $this->getAllowedFeedbackType();
+        $this->allFeedbacks = $feedbackClass ? new GenericCollection($feedbackClass) : null;
+
         $this->feedbackStrategy = self::FAVOR_FLOATING ? new FavourFloating() : new NoFavour();
     }
 
@@ -89,10 +108,10 @@ class Participant
      */
     public function isMarkingRequired()
     {
-        if(!count($this->allResponses)){
+        if (!count($this->allResponses)) {
             return false;
         }
-        if(!count($this->allFeedbacks)){
+        if (!count($this->allFeedbacks)) {
             return true;
         }
         $latestResponse = $this->findMostRecentResponse();
@@ -156,6 +175,46 @@ class Participant
         return $this->feedbackStrategy->getMostRecentFeedback($this, true);
     }
 
+    /**
+     * Determine what sort of objects are permitted in the Response collection
+     *
+     * @return string|null
+     */
+    protected function getAllowedResponseType()
+    {
+        if ($this->assessable instanceof Quiz) {
+            return QuizAttempt::class;
+        } elseif ($this->assessable instanceof DueWork) {
+            return DueWorkSubmission::class;
+        } elseif ($this->assessable instanceof Task) {
+            return TaskCompletion::class;
+        } elseif ($this->assessable instanceof Project) {
+            return null;
+        } else {
+            throw new \UnexpectedValueException('Unknown IAssessable: ' . get_class($this->assessable));
+        }
+    }
+
+    /**
+     * Determine what sort of objects are permitted in the Feedback collection
+     *
+     * @return string|null
+     */
+    protected function getAllowedFeedbackType()
+    {
+        if ($this->assessable instanceof Quiz) {
+            return QuizReview::class;
+        } elseif ($this->assessable instanceof DueWork) {
+            return DueWorkFeedback::class;
+        } elseif ($this->assessable instanceof Task) {
+            return TaskFeedback::class;
+        } elseif ($this->assessable instanceof Project) {
+            return null;
+        } else {
+            throw new \UnexpectedValueException('Unknown IAssessable: ' . get_class($this->assessable));
+        }
+    }
+
     /* Getters/Setters
      */
 
@@ -203,10 +262,19 @@ class Participant
 
     /**
      * @param GenericCollection|IResponse[] $allResponses
+     * @return static
      */
-    public function setAllResponses($allResponses)
+    public function setAllResponses(GenericCollection $allResponses)
     {
+        $proposedElementType = $allResponses->getElementClass();
+        $allowedElementType = $this->getAllowedResponseType();
+
+        if($proposedElementType != $allowedElementType){
+            throw new \UnexpectedValueException("Expected: $allowedElementType, Actual: $proposedElementType");
+        }
+
         $this->allResponses = $allResponses;
+        return $this;
     }
 
     /**
@@ -219,9 +287,18 @@ class Participant
 
     /**
      * @param GenericCollection|IFeedback[] $allFeedbacks
+     * @return static
      */
-    public function setAllFeedbacks($allFeedbacks)
+    public function setAllFeedbacks(GenericCollection $allFeedbacks)
     {
+        $proposedElementType = $allFeedbacks->getElementClass();
+        $allowedElementType = $this->getAllowedFeedbackType();
+
+        if($proposedElementType != $allowedElementType){
+            throw new \UnexpectedValueException("Expected: $allowedElementType, Actual: $proposedElementType");
+        }
+
         $this->allFeedbacks = $allFeedbacks;
+        return $this;
     }
 }
