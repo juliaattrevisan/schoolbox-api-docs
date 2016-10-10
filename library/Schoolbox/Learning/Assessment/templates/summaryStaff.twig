@@ -1,3 +1,5 @@
+{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
 {# Set color classes depending on status #}
 
 {% if counts.taskCompleted == counts.task %}
@@ -211,6 +213,8 @@
         </div>
 
         <h2 class="subheader">Assessables</h2>
+
+        {% if false and  assessment.assessables | length %}
         <section>
             <ul class="information-list">
                 {% for assessable in assessment.assessables %}
@@ -218,20 +222,17 @@
                     {# Work out where each assessables link should go to and pick an icon based on assessment type #}
 
                     {% if assessable.getTypeName == 'Quiz' %}
-                        {% set icon = 'quiz' %}
                         {% set url = '/somewhere/' ~ assessable.id %}               {# Link to the quiz page #}
                     {% elseif assessable.getTypeName == 'Task' %}
-                        {% set icon = 'task' %}
                         {% set url = assessable.link %}                             {# Link to the task #}
                     {% else %}
-                        {% set icon = 'due-work' %}
                         {% set url = '/somewhere/' ~ assessable.id %}               {# Link to the due work page #}
                     {% endif %}
 
                     <li>
                         <div class="list-item">
                             <div class="card wrap-down small-12">
-                                <div class="icon-{{ icon }} icon-32" title="{{ assessable.getTypeName }}"></div>
+                                <div class="{{ icon.renderClass(assessable.getTypeName) }} icon-32" title="{{ assessable.getTypeName }}"></div>
                                 <a href="{{ url }}">
                                     <h3>
                                         {{ assessable.title }}
@@ -324,5 +325,16 @@
                 {% endfor %}
             </ul>
         </section>
+        {% else %}
+            <div class="empty-state">
+                <i class="icon-due-work"></i>
+                <p>Your project is empty.</p>
+                <p>Add a
+                    <a href="{{ routeLookup('learningAssessment.getCreateAssessmentWithinProject', {assessmentId: assessment.id, assessmentType: 'dueWork'}) }}" title="Create a new Due Work">Due Work</a>,
+                    <a href="{{ routeLookup('learningAssessment.getCreateAssessmentWithinProject', {assessmentId: assessment.id, assessmentType: 'task'}) }}" title="Create a new Task">Task</a>, or
+                    <a href="{{ routeLookup('learningAssessment.getCreateAssessmentWithinProject', {assessmentId: assessment.id, assessmentType: 'quiz'}) }}" title="Create a new Quiz">Quiz</a>
+                </p>
+            </div>
+        {% endif %}
     </div>
 </div>

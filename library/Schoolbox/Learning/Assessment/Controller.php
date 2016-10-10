@@ -11,7 +11,6 @@ use Schoolbox\Assessment\Component\SubmissionBox\WorkTypeMapper;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Summator\Minimum;
-use Schoolbox\Learning\Assessment\Summator\Sum;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -24,6 +23,9 @@ use \Schoolbox\Learning\MarkScheme\Mapping as MarkSchemeMapping;
 use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 use \Schoolbox\Learning\Assessment\Summator\Mapping as SummatorMapping;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
+use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
+use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
+use \Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
 use \Schoolbox\Learning\Assessment\Task\Model as Task;
 use \Schoolbox\Learning\Assessment\Task\Completion\Model as TaskCompletion;
 use \Schoolbox\Learning\Assessment\Task\Feedback\Model as TaskFeedback;
@@ -850,7 +852,7 @@ class Controller extends Base
 
         // Get a friendly summator name
 
-        $summatorName = $project->getSummator() instanceof Sum ? 'Sum' :
+        $summatorName =
             $project->getSummator() instanceof Minimum ? 'Minimum' :
                 $project->getSummator() instanceof Maximum ? 'Maximum' :
                     $project->getSummator() instanceof Average ? 'Average' :
@@ -929,7 +931,7 @@ class Controller extends Base
 
         // Get a friendly summator name
 
-        $summatorName = $project->getSummator() instanceof Sum ? 'Sum' :
+        $summatorName =
             $project->getSummator() instanceof Minimum ? 'Minimum' :
                 $project->getSummator() instanceof Maximum ? 'Maximum' :
                     $project->getSummator() instanceof Average ? 'Average' :
@@ -1258,6 +1260,8 @@ class Controller extends Base
                     self::getDummyTaskCompletion(2),
                 ];
         }
+
+        return [];
     }
 
 
@@ -2082,6 +2086,8 @@ class Controller extends Base
                     'question' => $nestQuestion ? self::getDummyQuizQuestion(3,false) : null,
                 ]);
         }
+
+        return [];
     }
 
     /**

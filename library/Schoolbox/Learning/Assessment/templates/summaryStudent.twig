@@ -1,3 +1,5 @@
+{% import '@learningAssessment/fragments/project/macro/icon.twig' as icon %}
+
 {# Set color classes depending on status #}
 
 {% if counts.taskCompleted == counts.task %}
@@ -178,20 +180,17 @@
                     {# Work out where each assessables link should go to and pick an icon based on assessment type #}
 
                     {% if assessable.getTypeName == 'Quiz' %}
-                        {% set icon = 'quiz' %}
                         {% set url = '/somewhere/' ~ assessable.id %}               {# Link to the quiz page #}
                     {% elseif assessable.getTypeName == 'Task' %}
-                        {% set icon = 'task' %}
                         {% set url = assessable.link %}                             {# Link to the task #}
                     {% else %}
-                        {% set icon = 'due-work' %}
                         {% set url = '/somewhere/' ~ assessable.id %}               {# Link to the due work page #}
                     {% endif %}
 
                     <li class="actions-small-2">
                         <div class="list-item">
                             <div class="card wrap-down small-12">
-                                <div class="icon-{{ icon }} icon-32" title="{{ assessable.getTypeName }}"></div>
+                                <div class="{{ icon.renderClass(assessable.getTypeName) }} icon-32" title="{{ assessable.getTypeName }}"></div>
                                 <a href="{{ url }}">
                                     <h3>
                                         {{ assessable.title }}
@@ -220,7 +219,7 @@
 
                                 {# Display attempt icon #}
 
-                                <a href="/quiz-attempt/{{ assessable.id }}" class="icon-modify no-text" title="Attempt Quiz"></a>
+                                <a href="/assess/intro/{{ assessable.id }}" class="icon-modify no-text" title="Attempt Quiz"></a>
 
                             {% elseif assessable.getTypeName != 'Task' %}
 
@@ -231,13 +230,13 @@
                                     {# Display feedback if there is any#}
 
                                     {% if assessable.getParticipant(student).getAllFeedbacks | length %}
-                                        <a href="/feedback/{{ assessable.id }}" class="icon-view no-text" title="View Feedback"></a>
+                                        <a href="/learning/assessment/feedback/{{ assessable.id }}" class="icon-view no-text" title="View Feedback"></a>
                                     {% endif %}
 
                                     {# Show upload link if multiple submissions are allowed, or the student hasn't submitted already #}
 
                                     {% if assessable.isAcceptMulti or (assessable.getParticipant(student).getAllResponses | length) == 0 %}
-                                        <a href="/submit/{{ assessable.id }}" class="icon-modify no-text" title="Submit Response"></a>
+                                        <a href="/learning/assessment/submit/{{ assessable.id }}" class="icon-modify no-text" title="Submit Response"></a>
                                     {% endif %}
 
                                 {% endif %}
