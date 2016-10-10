@@ -244,6 +244,13 @@ class Controller extends Base
             'types' => $types,
         ];
 
+        /* Used to hide a ui element, preventing Projects being an option
+         * to spawn inside a Project context
+         */
+        if ($types->isProject($types->getFromTitle($contextType))) {
+            $data['hideProjectOption'] = true;
+        }
+
         /* Special treatment for projects for now
          */
         if ($types->isProject($assessmentType)) {
