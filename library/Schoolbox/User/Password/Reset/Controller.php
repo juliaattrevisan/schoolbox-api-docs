@@ -49,10 +49,10 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param UserMapper             $userMapper
-     * @param Mapper                 $resetMapper
-     * @param TwigEmailFactory       $mailFactory
-     * @param PasswordService        $passwordService
+     * @param UserMapper $userMapper
+     * @param Mapper $resetMapper
+     * @param TwigEmailFactory $mailFactory
+     * @param PasswordService $passwordService
      * @param CommunityPortalFactory $communityPortalFactory
      */
     public function __construct(
@@ -62,10 +62,10 @@ class Controller extends Base
         PasswordService $passwordService,
         CommunityPortalFactory $communityPortalFactory
     ) {
-        $this->userMapper             = $userMapper;
-        $this->resetMapper            = $resetMapper;
-        $this->mailFactory            = $mailFactory;
-        $this->passwordService        = $passwordService;
+        $this->userMapper = $userMapper;
+        $this->resetMapper = $resetMapper;
+        $this->mailFactory = $mailFactory;
+        $this->passwordService = $passwordService;
         $this->communityPortalFactory = $communityPortalFactory;
     }
 
@@ -77,13 +77,13 @@ class Controller extends Base
         $this->validateAccess();
         $sessionSegment = $this->getSessionSegment();
         $this->getResponse()->content->set([
-            'title'    => 'Reset Password',
+            'title' => 'Reset Password',
             'template' => '@userPasswordReset/createRequestForm.twig',
-            'data'     => [
-                'email'            => $sessionSegment->getFlash('email', ''),
-                'isEmailValid'     => $sessionSegment->getFlash('isEmailValid', true),
+            'data' => [
+                'email' => $sessionSegment->getFlash('email', ''),
+                'isEmailValid' => $sessionSegment->getFlash('isEmailValid', true),
                 'isEmailSubmitted' => $sessionSegment->getFlash('isEmailSubmitted', false),
-                'isResetExpired'   => $sessionSegment->getFlash('isResetExpired', false),
+                'isResetExpired' => $sessionSegment->getFlash('isResetExpired', false),
             ],
         ]);
     }
@@ -99,12 +99,12 @@ class Controller extends Base
         $this->validateResetRequest($reset);
         $sessionSegment = $this->getSessionSegment();
         $this->getResponse()->content->set([
-            'title'    => 'Reset Password',
+            'title' => 'Reset Password',
             'template' => '@userPasswordReset/resetForm.twig',
-            'data'     => [
-                'reset'               => $reset,
+            'data' => [
+                'reset' => $reset,
                 'isPasswordSubmitted' => $sessionSegment->getFlash('isPasswordSubmitted', false),
-                'isPasswordValid'     => $sessionSegment->getFlash('isPasswordValid', true),
+                'isPasswordValid' => $sessionSegment->getFlash('isPasswordValid', true),
             ],
         ]);
     }
@@ -115,9 +115,9 @@ class Controller extends Base
     public function displaySuccessMessage()
     {
         $this->getResponse()->content->set([
-            'title'    => 'Password Reset Successful',
+            'title' => 'Password Reset Successful',
             'template' => '@userPasswordReset/successMessage.twig',
-            'data'     => [
+            'data' => [
                 'isCommunityPortalPasswordSet' => $this->getSessionSegment()->getFlash('isCommunityPortalPasswordSet', true),
             ],
         ]);
@@ -128,54 +128,101 @@ class Controller extends Base
      */
     public function createRequest()
     {
+        $config = $this->getConfigLoader();
+
         $this->validateAccess();
-        $emailAddress   = $this->getRequest()->post->get('email');
+        $emailAddress = $this->getRequest()->post->get('email');
         $sessionSegment = $this->getSessionSegment();
         $sessionSegment->setFlash('email', $emailAddress);
         $sessionSegment->setFlash('isEmailSubmitted', true);
-        if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
-            $sessionSegment->setFlash('isEmailValid', false);
-        } else {
-            $sessionSegment->setFlash('isEmailValid', true);
-            // Find all users with this email address.
-            // If there is one, send a reset email to this address.
-            $users  = $this->userMapper->findByEmail($emailAddress);
-            $config = $this->getConfigLoader();
-            if (count($users) > 0) {
-                foreach ($users as $user) {
-                    // Tell me more about their role
-                    $reset = null;
-                    if ($user->getRole()->getCanChangePassword()) {
-                        // Make a password reset attempt (for each account, I guess)
-                        // And send it
-                        $reset = $this->resetMapper->createModel()
-                            ->setIp($this->getRequest()->server->get('REMOTE_ADDR'));
-                        if ($user->getEnabled()) {
-                            $reset->setUser($user);
-                            $this->resetMapper->save($reset);
-                        }
-                        $email = $this->mailFactory->build('userPasswordReset/reset.twig');
-                    } else {
-                        $email = $this->mailFactory->build('userPasswordReset/userNotAllowedReset.twig');
+
+        // Find all people with a matching username
+
+        $users = $this->userMapper->findByColumn('username', $emailAddress);
+
+        // If the user entered a validly formatted email address- search by email address as well
+
+        if (filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
+            $users->merge($this->userMapper->findByEmail($emailAddress));
+        }
+
+        // Check if we found any matching users
+
+        if (count($users) > 0) {
+
+            // Attempt to reset each account we found
+
+            /** @var \Schoolbox\User $user */
+            foreach ($users as $user) {
+
+                // Make sure the user is allowed to reset password based on their role
+
+                $reset = null;
+
+                if ($user->getRole()->getCanChangePassword()) {
+
+                    $reset = $this->resetMapper->createModel()->setIp($this->getRequest()->server->get('REMOTE_ADDR'));
+
+                    if ($user->getEnabled()) {
+                        $reset->setUser($user);
+                        $this->resetMapper->save($reset);
                     }
+
+                    $email = $this->mailFactory->build('userPasswordReset/reset.twig');
+                } else {
+
+                    // Password reset not allowed
+
+                    $email = $this->mailFactory->build('userPasswordReset/userNotAllowedReset.twig');
+                }
+
+                // If the user entered a username- try to retrieve their email address from the user record
+
+                if (!filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
+                    $emailAddress = $user->getEmail();
+                }
+
+                // Only try and send the email if we got a valid address in the end
+
+                if (filter_var($emailAddress, FILTER_VALIDATE_EMAIL)) {
 
                     $email->setFrom($config->get('password_change_email_from'), $config->get('mail_from_name'));
                     $email->setSubject($config->get('title') . ' Password Reset');
-                    $email->setContext(['user' => $user, 'reset' => $reset, 'hideUnsubscribe' => true]);
-                    $email->send(['name' => $user->formatName(), 'email' => $emailAddress,]);
+                    $email->setContext([
+                        'user' => $user,
+                        'reset' => $reset,
+                        'hideUnsubscribe' => true
+                    ]);
+
+                    $email->send([
+                        'name' => $user->formatName(),
+                        'email' => $emailAddress
+                    ]);
                 }
-            } else {
-                // No matches - send a message anyway?
-                // Weigh up security (give away no information about whether account exists)
-                // vs. flood prevention (don't send too many emails)
-                // vs. convenience (maybe user got password wrong)
-                // Currently, this sacrifices convenience for flood protection.
-                $email = $this->mailFactory->build('userPasswordReset/userNotExists.twig');
-                $email->setFrom($config->get('password_change_email_from'), $config->get('mail_from_name'));
-                $email->setSubject($config->get('title') . ' Password Reset');
-                $email->sendToBlackhole();
+                else
+                {
+                    // Not a valid email address, send blackhole email
+
+                    $email = $this->mailFactory->build('userPasswordReset/userNotExists.twig');
+                    $email->setFrom($config->get('password_change_email_from'), $config->get('mail_from_name'));
+                    $email->setSubject($config->get('title') . ' Password Reset');
+                    $email->sendToBlackhole();                
+                }
             }
+        } else {
+
+            // No matches - send a message anyway?
+            // Weigh up security (give away no information about whether account exists)
+            // vs. flood prevention (don't send too many emails)
+            // vs. convenience (maybe user got password wrong)
+            // Currently, this sacrifices convenience for flood protection.
+
+            $email = $this->mailFactory->build('userPasswordReset/userNotExists.twig');
+            $email->setFrom($config->get('password_change_email_from'), $config->get('mail_from_name'));
+            $email->setSubject($config->get('title') . ' Password Reset');
+            $email->sendToBlackhole();
         }
+
         $this->getResponse()->redirect->to($this->getRouter()->generate('userPasswordReset.displayCreateRequestForm'));
     }
 
@@ -189,7 +236,7 @@ class Controller extends Base
         $this->validateAccess();
         $this->validateResetRequest($reset);
         $password = $this->getRequest()->post->get('new_password', '');
-        $confirm  = $this->getRequest()->post->get('confirm_password', '');
+        $confirm = $this->getRequest()->post->get('confirm_password', '');
 
         // Verify that passwords match format and each other
         if ($password === $confirm && mb_strlen($password, 'UTF-8') >= 8) {
@@ -198,8 +245,7 @@ class Controller extends Base
             $user = $this->userMapper->findById($reset->getUser()->getId());
             $user
                 ->setPassword($this->passwordService->hash($password))
-                ->setRetrievablePassword($password)
-            ;
+                ->setRetrievablePassword($password);
             $this->userMapper->save($user);
 
             // This reset has been used, save it

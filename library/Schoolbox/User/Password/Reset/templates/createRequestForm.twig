@@ -16,13 +16,13 @@
                 </div>
             {% else %}
                 <div class="alert-box alert">
-                    The email address you provided is not valid - please check your email address.
+                    The email address or username you provided is not valid - please check your email address or username.
                 </div>
             {% endif %}
 
         {% else %}
             <div class="alert-box">
-                Please enter your email address below - we will send a link for you to reset your password. This feature works for parents only.
+                Please enter your email address or username below - we will send a link for you to reset your password. This feature works for parents only.
             </div>
         {% endif %}
 
@@ -30,7 +30,7 @@
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <label for="email">Email</label>
+                        <label for="email">Email / Username</label>
                         <input class="input_text" type="text" name="email" id="email" value="{{ email|e('html_attr') }}" />
                     </div>
                 </fieldset>
