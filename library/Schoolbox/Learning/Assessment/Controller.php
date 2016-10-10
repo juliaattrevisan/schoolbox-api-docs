@@ -93,30 +93,6 @@ class Controller extends Base
         $this->setFolderMapper($folderMapper);
     }
 
-//    /**
-//     * Select an Assessment
-//     *
-//     * This is when you chooze what type of assessment it is, which
-//     * returns you an appropriate fragment of common+assessmentType
-//     * form inputs for you to fill out
-//     *
-//     * @param $folderId
-//     */
-//    public function getSelectAssessment($folderId)
-//    {
-//        try {
-//            $folder = $this->getFolderMapper()->findById($folderId);
-//        }
-//        catch (MapperException $e) {
-//            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
-//        }
-//
-//        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
-//            'folder' => $folder,
-//            'types' => new Types(),
-//        ]));
-//    }
-
     /**
      * Select an IAssessable specified $assessmentTypeTitle into a Folder $folderId
      *

@@ -44,10 +44,6 @@ class Module extends BaseModule
                 '/assessment/unit/{unitId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitImplementation',
                 '/assessment/unitspec/{folderId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitSpecification',
 
-//                /* Select an assessment fragment to start with
-//                 */
-//                '/assessment/select/{folderId}' => 'getSelectAssessment',
-
                 /* Edit an assessment with their type-specific data
                  */
                 '/assessment/{assessmentId}/update' => 'getUpdateAssessment',
