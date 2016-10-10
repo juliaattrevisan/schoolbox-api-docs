@@ -45,6 +45,8 @@ class PendingFactory
 
     /**
      * Indexed by assessment.id
+     * Use a collection rather than array as the this gets return to caller.
+     *
      * @var IAssessable[]|Collection $assessmentsCache
      */
     private $assessmentsCache;
@@ -53,37 +55,37 @@ class PendingFactory
      * Indexed by course_specification.id
      * @var CourseSpecification[] $courseSpecsCache
      */
-    private $courseSpecsCache;
+    private $courseSpecsCache = [];
 
     /**
      * Indexed by course_implementation.id
      * @var CourseImplementation[] $courseImplsCache
      */
-    private $courseImplsCache;
+    private $courseImplsCache = [];
 
     /**
      * Indexed by course_unit_specification.id
      * @var UnitSpecification[] $unitSpecsCache
      */
-    private $unitSpecsCache;
+    private $unitSpecsCache = [];
 
     /**
      * Indexed by course_unit_implementation.id
      * @var UnitImplementation[] $unitImplsCache
      */
-    private $unitImplsCache;
+    private $unitImplsCache = [];
 
     /**
      * Each Folder requires an ID and Name. Indexed by folder.id
      * @var Folder[] $foldersCache
      */
-    private $foldersCache;
+    private $foldersCache = [];
 
     /**
      * Each Project requires an ID and Title. Indexed by assessment.id
      * @var Project[] $projectCache
      */
-    private $projectCache;
+    private $projectCache = [];
 
     /**
      * Folder IDs of all Subjects either taught by this User or where this User has created Assessments
@@ -91,7 +93,7 @@ class PendingFactory
      *
      * @var int[] $classIds
      */
-    private $classIds;
+    private $classIds = [];
 
     /**
      * Folder IDs of all Groups either administered by this User or where this User has created Assessments
@@ -99,19 +101,16 @@ class PendingFactory
      *
      * @var int[] $groupIds
      */
-    private $groupIds;
+    private $groupIds = [];
 
     /** @var int[] $quizAssessmentIds */
-    private $quizAssessmentIds;
+    private $quizAssessmentIds = [];
 
     /** @var int[] $dueWorkAssessmentIds */
-    private $dueWorkAssessmentIds;
+    private $dueWorkAssessmentIds = [];
 
     /** @var int[] $taskAssessmentIds */
-    private $taskAssessmentIds;
-
-    /** @var int[] $projectAssessmentIds */
-    private $projectAssessmentIds;
+    private $taskAssessmentIds = [];
 
     /**
      * Maps a folder.id to set of non-unique classCodes.
@@ -120,14 +119,14 @@ class PendingFactory
      *
      * @var string[][] $folderClassCodes
      */
-    private $folderClassCodes;
+    private $folderClassCodes = [];
 
     /**
      * Maps Subject/Group folder.id to sets of Student externalIds
      *
      * @var int[][] $folderToStudentListMap
      */
-    private $folderToStudentListMap;
+    private $folderToStudentListMap = [];
 
     /**
      * Set of all student.externalIds the specified User teaches, administers, or are in Groups or Subjects
@@ -137,7 +136,7 @@ class PendingFactory
      *
      * @var int[] $studentExternalIds
      */
-    private $studentExternalIds;
+    private $studentExternalIds = [];
 
     /**
      * Set of all student.ids the specified User teaches, administers, or are in Groups or Subjects
@@ -147,7 +146,7 @@ class PendingFactory
      *
      * @var int[] $studentInternalIds
      */
-    private $studentInternalIds;
+    private $studentInternalIds = [];
 
     /**
      * All known students.
@@ -156,7 +155,7 @@ class PendingFactory
      *
      * @var User[] $studentExtCache
      */
-    private $studentExtCache;
+    private $studentExtCache = [];
 
     /**
      * All known students.
@@ -165,7 +164,7 @@ class PendingFactory
      *
      * @var User[] $studentIntCache
      */
-    private $studentIntCache;
+    private $studentIntCache = [];
 
     /** @var Term $term */
     private $term;
@@ -190,7 +189,7 @@ class PendingFactory
      *
      * @var int[]
      */
-    private $assessmentExtraStudentIds;
+    private $assessmentExtraStudentIds = [];
 
 
     /**
@@ -204,27 +203,7 @@ class PendingFactory
         $this->database = \Database::getInstance();
         $this->externalUser = $externalUser;
         $this->externalClass = $externalClass;
-
         $this->assessmentsCache = new Collection();
-        $this->courseSpecsCache = [];
-        $this->courseImplsCache = [];
-        $this->unitSpecsCache = [];
-        $this->unitImplsCache = [];
-        $this->foldersCache = [];
-        $this->projectCache = [];
-        $this->studentExtCache = [];
-        $this->studentIntCache = [];
-        $this->classIds = [];
-        $this->groupIds = [];
-        $this->quizAssessmentIds = [];
-        $this->dueWorkAssessmentIds = [];
-        $this->taskAssessmentIds = [];
-        $this->projectAssessmentIds = [];
-        $this->folderClassCodes = [];
-        $this->folderToStudentListMap = [];
-        $this->studentExternalIds = [];
-        $this->assessmentExtraStudentIds = [];
-
         $this->term = TermMapper::getInstance()->findForToday();
     }
 
