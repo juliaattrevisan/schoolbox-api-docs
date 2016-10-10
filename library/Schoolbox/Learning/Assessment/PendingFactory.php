@@ -202,8 +202,8 @@ class PendingFactory
         User $viewee,
         \External_UserInterface $externalUser = null,
         \External_ClassInterface $externalClass,
-        Term $term)
-    {
+        Term $term
+    ) {
         $this->viewee = $viewee;
         $this->database = \Database::getInstance();
         $this->externalUser = $externalUser;
@@ -748,11 +748,14 @@ class PendingFactory
      */
     private function getStudentsForClassesAndGroups()
     {
-        // Get Students with matching externalIds, or in Groups
-        if (!empty($this->groupIds) || !empty($this->studentExternalIds)) {
-            $query = '';
-            if (!empty($this->groupIds)) {
-                $query .= "
+        if (empty($this->groupIds) && empty($this->studentExternalIds)) {
+            return; // bug out
+        }
+        $query = [];
+
+        // Get Students in Groups
+        if (count($this->groupIds)) {
+            $query[] = "
                     SELECT 
                         1             AS 'case',
                         ua.sid        AS 'g.id',
@@ -770,14 +773,11 @@ class PendingFactory
                     AND ua.service = " . UserAccess::SERVICE_HOMEPAGE . "
                     AND g.group_type = '" . \Group::STUDENT_GROUP_TYPE . "'
                 ";
-            }
+        }
 
-            if (!empty($this->studentExternalIds)) {
-                if (!empty($query)) {
-                    $query .= ' UNION ';
-                }
-
-                $query .= "
+        // Get Students in Classes
+        if (count($this->studentExternalIds)) {
+            $query[] = "
                     SELECT
                         2             AS 'case',
                         NULL          AS 'g.id',
@@ -792,21 +792,21 @@ class PendingFactory
                     WHERE u.synergy_id IN (" . implode(',', $this->studentExternalIds) . ")
                     AND u.deleted_at IS NULL
                 ";
-            }
-            $statement = $this->database->prepare($query);
-            $statement->execute();
-            $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
+        }
+        $statement = $this->database->prepare(implode(' UNION ', $query));
+        $statement->execute();
+        $rows = $statement->fetchAll(\PDO::FETCH_ASSOC);
 
-            foreach ($rows as $row) {
-                $this->cacheUser($row['u.id'], $row['u.username'], $row['u.synergy_id'], $row['u.firstname'], $row['u.lastname'], $row['u.local_email'], $row['u.alt_email']);
+        foreach ($rows as $row) {
+            $this->cacheUser($row['u.id'], $row['u.username'], $row['u.synergy_id'], $row['u.firstname'],
+                $row['u.lastname'], $row['u.local_email'], $row['u.alt_email']);
 
-                // Was this user from a Group ?
-                if (!is_null($row['g.id'])) {
-                    if (!is_array($this->folderToStudentListMap[$row['g.id']])) {
-                        $this->folderToStudentListMap[$row['g.id']] = [];
-                    }
-                    $this->folderToStudentListMap[$row['g.id']][$row['u.synergy_id']] = intval($row['u.synergy_id']);
+            // Was this user from a Group ?
+            if (!is_null($row['g.id'])) {
+                if (!is_array($this->folderToStudentListMap[$row['g.id']])) {
+                    $this->folderToStudentListMap[$row['g.id']] = [];
                 }
+                $this->folderToStudentListMap[$row['g.id']][$row['u.synergy_id']] = intval($row['u.synergy_id']);
             }
         }
     }
@@ -1015,7 +1015,8 @@ class PendingFactory
             $statement = $this->database->prepare($query);
             $statement->execute();
             while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-                $this->cacheUser($row['u.id'], $row['u.username'], $row['u.synergy_id'], $row['u.firstname'], $row['u.lastname'], $row['u.local_email'], $row['u.alt_email']);
+                $this->cacheUser($row['u.id'], $row['u.username'], $row['u.synergy_id'], $row['u.firstname'],
+                    $row['u.lastname'], $row['u.local_email'], $row['u.alt_email']);
             }
         }
     }
