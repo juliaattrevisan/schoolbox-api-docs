@@ -343,7 +343,7 @@ class Controller extends Base
          * and spawn a new instance of it to manipulate
          */
         try {
-            $assessment = (new Factory($this->getUser(), $this->getRequest()->post))->produce();
+            $assessment = (new FactoryTempMove($this->getUser(), $this->getRequest()->post))->produce();
 
             /* Manually do a check
              */
@@ -616,7 +616,7 @@ class Controller extends Base
          * and spawn a new instance of it to manipulate
          */
         try {
-            $assessment = (new Factory($this->getUser(), $this->getRequest()->post))->produce();
+            $assessment = (new FactoryTempMove($this->getUser(), $this->getRequest()->post))->produce();
 
             /* Manually do a check
              */
