@@ -36,7 +36,7 @@ class Model extends AbstractAssessment
      * e.g. "Here are some pictures to look at, so you can complete
      * this Due Work"
      *
-     * @var Collection
+     * @var Collection|File[]
      */
     protected $allFiles;
 
@@ -257,7 +257,7 @@ class Model extends AbstractAssessment
      */
 
     /**
-     * @return Collection
+     * @return Collection|File[]
      */
     public function getAllFiles()
     {
@@ -265,7 +265,7 @@ class Model extends AbstractAssessment
     }
 
     /**
-     * @param Collection $allFiles
+     * @param Collection|File[] $allFiles
      * @return self
      */
     public function setAllFiles($allFiles)

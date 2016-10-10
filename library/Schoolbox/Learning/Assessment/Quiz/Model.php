@@ -38,9 +38,43 @@ class Model extends AbstractAssessment
     private $hasFixedTotalMarks;
 
     /**
+     * Possible value for `$this->maxAttempts`.
+     *
+     * This value specifies that a participant may make an unlimited number of attempts at this quiz.
+     *
+     * @var int
+     */
+    const ATTEMPTS_UNLIMITED = 0;
+
+    /**
+     * Possible value for `$this->duration`.
+     *
+     * This value specifies that a participant may take an unlimited amount of time to complete this quiz.
+     *
+     * @var int
+     */
+    const DURATION_UNLIMITED = -1;
+
+    /**
+     * What's the maximum number of attempts a participant may make on this quiz?
+     *
+     * @var int
+     */
+    protected $maxAttempts;
+
+    /**
+     * How long (in seconds) does a participant have to complete this quiz, once their attempt has started?
+     *
      * @var int
      */
     protected $duration = 0;
+
+    /**
+     * A (HTML) message that is displayed to a participant once they have completed the quiz.
+     *
+     * @var string
+     */
+    protected $completionMessage;
 
     /**
      * @inheritdoc
@@ -141,11 +175,47 @@ class Model extends AbstractAssessment
 
     /**
      * @param int $duration
-     * @return $this
+     * @return static
      */
     public function setDuration($duration)
     {
         $this->duration = $duration;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxAttempts()
+    {
+        return $this->maxAttempts;
+    }
+
+    /**
+     * @param int $maxAttempts
+     * @return static
+     */
+    public function setMaxAttempts($maxAttempts)
+    {
+        $this->maxAttempts = $maxAttempts;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompletionMessage()
+    {
+        return $this->completionMessage;
+    }
+
+    /**
+     * @param string $completionMessage
+     * @return static
+     */
+    public function setCompletionMessage($completionMessage)
+    {
+        $this->completionMessage = $completionMessage;
         return $this;
     }
 }

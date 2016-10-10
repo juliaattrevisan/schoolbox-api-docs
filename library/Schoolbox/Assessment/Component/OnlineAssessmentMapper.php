@@ -8,6 +8,7 @@
  */
 
 namespace Schoolbox\Assessment\Component;
+
 use PDO;
 use Schoolbox;
 use Schoolbox\Assessment\ActivityFactory;
@@ -15,6 +16,7 @@ use Schoolbox\Assessment\ActivityCollection;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\IActivityMapper;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\Feed\FeedableMapperInterface;
@@ -24,14 +26,14 @@ use Schoolbox\Mapper;
  * Class OnlineAssessmentMapper
  *
  * @package Schoolbox\Assessment\Component
- * @method OnlineAssessment createModel()
+ * @method OnlineAssessment createModel($id=null)
  * @method Collection|OnlineAssessment[] findByColumnList($columnList, $options = [])
  */
 class OnlineAssessmentMapper extends Mapper implements IActivityMapper, FeedableMapperInterface {
 
 	protected function mapping () {
 		$this->hasTable('assess');
-		$this->hasModel('\\Schoolbox\\Assessment\\Component\\OnlineAssessment');
+		$this->hasModel(OnlineAssessment::class);
 		$this->hasMap(array(
 			'column'     => 'assess_id',
 			'property'   => 'id',
@@ -181,6 +183,8 @@ class OnlineAssessmentMapper extends Mapper implements IActivityMapper, Feedable
             null,
             'curriculumNodes'
         );
+
+        $this->joins('assessment_id', AssessmentMapper::class, null, null, null, 'assessmentModel');
 
 		$this->hasSoftDeleteDateField('deleted_at');
 

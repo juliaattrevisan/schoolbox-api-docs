@@ -11,6 +11,7 @@ use Alaress_Date_Format;
 use Alaress_Date_NullDate;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Implementation\Model as CourseImplementationModel;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
@@ -23,7 +24,7 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
 /**
  * Data domain model for Unit Implementations.
  */
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, IAssessmentContextDataModel
 {
     use Id;
     use CreatedAtDate;

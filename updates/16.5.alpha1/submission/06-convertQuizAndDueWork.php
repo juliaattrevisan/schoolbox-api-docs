@@ -30,8 +30,20 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
 
     // Insert folder and related information queries
     $insertAssessmentQuery = $db->prepare("
-        INSERT INTO assessment (title, description, publish_date, open_date, due_date, weight, sequence)
-        VALUES (:title, '', :publish, :open, :due, :weight, 1)
+        INSERT INTO assessment (
+            title,
+            description,
+            publish_date,
+            open_date,
+            due_date,
+            close_date,
+            weight,
+            sequence,
+            created_at,
+            updated_at,
+            deleted_at
+        )
+        VALUES (:title, '', :publish, :open, :due, :close, :weight, 1, :created, :updated, :deleted)
     ");
     $insertAssessmentFolderRelationQuery = $db->prepare("
         INSERT INTO assessment_folder (assessment_id, folder_id)
@@ -52,7 +64,10 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             weight,
             start AS publish_date,
             start AS open_date,
-            finish AS due_date
+            finish AS due_date,
+            finish AS close_date,
+            created_at,
+            deleted_at
         FROM  assess
         WHERE task_id IS NULL
         AND   task_instance_id IS NULL
@@ -69,7 +84,10 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             weight,
             publish_date,
             open_date,
-            date AS due_date
+            date AS due_date,
+            late_date AS close_date,
+            created AS created_at,
+            IF (deleted IS TRUE, created, NULL) AS deleted_at
         FROM  submission_box
         WHERE task_id IS NULL
         AND   task_instance_id IS NULL
@@ -101,6 +119,9 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         $publishDate = $row['publish_date'];
         $openDate    = $row['open_date'];
         $dueDate     = $row['due_date'];
+        $closeDate   = $row['close_date'];
+        $created     = $row['created_at'];
+        $deleted     = $row['deleted_at'];
 
         // What type of assessable is this?
         if ($quizId) {
@@ -124,6 +145,10 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                 'publish' => $publishDate,
                 'open'    => $openDate,
                 'due'     => $dueDate,
+                'close'   => $closeDate,
+                'created' => $created,
+                'updated' => $created,
+                'deleted' => $deleted,
             ]);
             $assessmentId = $db->lastInsertId();
             $log->debug('Created assessment');

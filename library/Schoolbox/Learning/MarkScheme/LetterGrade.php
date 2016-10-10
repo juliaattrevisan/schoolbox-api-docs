@@ -78,7 +78,7 @@ class LetterGrade extends AbstractMarkScheme
     /**
      * @return GradeGroup
      */
-    protected function getGradeGroup()
+    public function getGradeGroup()
     {
         return $this->gradeGroup;
     }

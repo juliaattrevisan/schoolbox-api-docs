@@ -12,6 +12,8 @@ namespace Schoolbox\Assessment\Component;
 use Alaress_Date_Format;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
+use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
@@ -23,9 +25,10 @@ use Schoolbox\User;
 use Schoolbox\Collection;
 use Schoolbox\Permission\Access\Access;
 
-class SubmissionBox implements ISoftDeletable
+class SubmissionBox implements ISoftDeletable, IAssessableDataModel
 {
     use HasCurriculumNodes;
+    use AssessmentModelTrait;
 
     const MARK_VISIBILITY_PRIVATE = 0;
     const MARK_VISIBILITY_STUDENT = 1;
@@ -706,20 +709,24 @@ class SubmissionBox implements ISoftDeletable
 
     /**
      * @param int $weight
+     * @return $this
      */
     public function setWeight($weight)
     {
         $this->weight = $weight;
+        return $this;
     }
 
     /**
      * Set skip unsubmitted
      *
      * @param int $skipUnsubmitted
+     * @return $this
      */
     public function setSkipUnsubmitted($skipUnsubmitted)
     {
         $this->skipUnsubmitted = $skipUnsubmitted;
+        return $this;
     }
 
     /**

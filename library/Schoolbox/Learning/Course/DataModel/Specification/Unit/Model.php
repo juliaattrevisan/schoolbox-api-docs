@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Course\DataModel\Specification\Unit;
 use Alaress_Date_NullDate;
 use Schoolbox\Collection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\DataModel\Specification\Model as CourseSpecificationModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
@@ -21,7 +22,7 @@ use Schoolbox\Resource\Folder\Model as FolderModel;
 /**
  * Data domain model for Unit Specifications.
  */
-class Model implements ISoftDeletable
+class Model implements ISoftDeletable, IAssessmentContextDataModel
 {
     use Id;
     use CreatedAtDate;

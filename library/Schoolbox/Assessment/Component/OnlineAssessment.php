@@ -16,14 +16,17 @@ use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Traits\HasCurriculumNodes;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\DataModel\AssessmentModelTrait;
+use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\Assessment\Component\SubmissionBox\WorkType;
 
-class OnlineAssessment implements ISoftDeletable
+class OnlineAssessment implements ISoftDeletable, IAssessableDataModel
 {
     use HasCurriculumNodes;
+    use AssessmentModelTrait;
 
     const AVAILABILITY_ASSESS = 'assess';
     const AVAILABILITY_SURVEY = 'survey';

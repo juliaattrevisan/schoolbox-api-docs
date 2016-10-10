@@ -26,9 +26,22 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
     $db = Database::getInstance();
 
     // Insert assessment and related information queries
+    // (Close date is the same as due date)
     $insertAssessmentQuery = $db->prepare("
-        INSERT INTO assessment (title, description, publish_date, open_date, due_date, weight, sequence)
-        VALUES (:title, '', :publish, :open, :due, :weight, 1)
+        INSERT INTO assessment (
+            title,
+            description,
+            publish_date,
+            open_date,
+            due_date,
+            close_date,
+            weight,
+            sequence,
+            created_at,
+            updated_at,
+            deleted_at
+        )
+        VALUES (:title, '', :publish, :open, :due, :close, :weight, 1, :created, :updated, :deleted)
     ");
     $insertAssessmentRelationQuery = $db->prepare("
         INSERT INTO assessment_course_unit_implementation (assessment_id, course_unit_implementation_id)
@@ -78,13 +91,15 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             ti.title,
             ti.assess_id,
             ti.box_id,
+            ti.created_at,
+            ti.deleted_at,
             ci.category_id
         FROM task_instance ti
         INNER JOIN course_unit_implementation ci ON ti.course_unit_instance_id = ci.id
         ORDER BY ti.id ASC
     ");
     $selectQuizQuery               = $db->prepare("SELECT weight, start, finish FROM assess WHERE assess_id = :assessId");
-    $selectDueWorkQuery            = $db->prepare("SELECT weight, publish_date, open_date, date FROM submission_box WHERE id = :boxId");
+    $selectDueWorkQuery            = $db->prepare("SELECT weight, publish_date, open_date, date, late_date FROM submission_box WHERE id = :boxId");
     $selectCourseUnitInstanceQuery = $db->prepare("SELECT open_date, due_date FROM course_unit_implementation WHERE id = :courseUnitInstanceId");
 
     // Update task completions
@@ -102,6 +117,8 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
         $title                = $row['title'];
         $quizId               = $row['assess_id'];
         $boxId                = $row['box_id'];
+        $created              = $row['created_at'];
+        $deleted              = $row['deleted_at'];
 
         // Convert this task
         $log->info(sprintf('Converting task instance "%s" (id: %d)...', $title, $taskId));
@@ -114,6 +131,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $publishDate = null;
             $openDate    = null;
             $dueDate     = null;
+            $closeDate   = null;
             if ($quizId) {
                 // Use weight and dates from quiz
                 $selectQuizQuery->execute(['assessId' => $quizId]);
@@ -123,6 +141,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                     $publishDate = $quizRow['start'];
                     $openDate    = $quizRow['start'];
                     $dueDate     = $quizRow['finish'];
+                    $closeDate   = $quizRow['finish'];
                 }
             } elseif ($boxId) {
                 // Use weight and dates from due work
@@ -133,6 +152,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                     $publishDate = $boxRow['publish_date'];
                     $openDate    = $boxRow['open_date'];
                     $dueDate     = $boxRow['date'];
+                    $closeDate   = $boxRow['late_date'];
                 }
             } else {
                 // Use dates from the course unit instance
@@ -142,6 +162,7 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
                     $publishDate = $courseUnitInstanceRow['open_date'];
                     $openDate    = $courseUnitInstanceRow['open_date'];
                     $dueDate     = $courseUnitInstanceRow['due_date'];
+                    $closeDate   = $courseUnitInstanceRow['due_date'];
                 }
             }
 
@@ -149,9 +170,13 @@ $kernel->run(function($di, $loop, LoggerInterface $log, $opts) {
             $insertAssessmentQuery->execute([
                 'title'   => $title,
                 'weight'  => intval($weight),
-                'publish'      => $publishDate,
-                'open'         => $openDate,
-                'due'          => $dueDate,
+                'publish' => $publishDate,
+                'open'    => $openDate,
+                'due'     => $dueDate,
+                'close'   => $closeDate,
+                'created' => $created,
+                'updated' => $created,
+                'deleted' => $deleted,
             ]);
             $assessmentId = $db->lastInsertId();
             $log->debug('Created assessment');

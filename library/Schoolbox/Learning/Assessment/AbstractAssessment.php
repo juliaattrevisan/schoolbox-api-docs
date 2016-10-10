@@ -14,6 +14,7 @@ namespace Schoolbox\Learning\Assessment;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use \Schoolbox\Collection;
+use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\MarkScheme\Completion;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
@@ -28,6 +29,13 @@ abstract class AbstractAssessment implements IAssessable
     use CreatedAtDate;
     use UpdatedAtDate;
     use DeletedAtDate;
+
+    /**
+     * The context within which this assessment lives.
+     *
+     * @var AssessmentContext
+     */
+    protected $assessmentContext;
 
     /**
      * @var string
@@ -650,6 +658,24 @@ abstract class AbstractAssessment implements IAssessable
     public function setFeedbacks(Collection $feedbacks)
     {
         $this->feedbacks = $feedbacks;
+        return $this;
+    }
+
+    /**
+     * @return AssessmentContext
+     */
+    public function getAssessmentContext()
+    {
+        return $this->assessmentContext;
+    }
+
+    /**
+     * @param AssessmentContext $assessmentContext
+     * @return static
+     */
+    public function setAssessmentContext(AssessmentContext $assessmentContext)
+    {
+        $this->assessmentContext = $assessmentContext;
         return $this;
     }
 }

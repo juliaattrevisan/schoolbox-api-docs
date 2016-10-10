@@ -26,11 +26,15 @@ use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as Grade
 class Model extends AbstractAssessment
 {
     /**
+     * Is this task self-markable?
+     *
      * @var bool
      */
     protected $isSelfAssessed = false;
 
     /**
+     * The content this task links to (if any).
+     *
      * @var string
      */
     protected $url = '';

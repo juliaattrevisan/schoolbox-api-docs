@@ -1,0 +1,155 @@
+<?php
+/**
+ * @author    Amri Sannang <amri.sannang@alaress.com.au>
+ * @copyright Copyright 2016, Alaress Pty Ltd
+ * @link      http://www.alaress.com.au/
+ */
+
+namespace Schoolbox\Learning\Assessment\DataModel\Translator;
+
+use Schoolbox\Assessment\Component\SubmissionBox as DueWorkModel;
+use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
+use Schoolbox\Learning\Assessment\DueWork\File as DueWorkFile;
+use Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
+use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\MarkScheme\LetterGrade;
+use Schoolbox\Learning\MarkScheme\None;
+use Schoolbox\Learning\MarkScheme\Percentage;
+use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
+use Schoolbox\Resource\Storage\Model as StorageModel;
+
+/**
+ * Sub-translator for due work specific fields.
+ */
+class DueWork implements IAssessmentTypeTranslator
+{
+    /**
+     * @inheritdoc
+     */
+    public function translateToDataModel(IAssessable $assessment)
+    {
+        if ($assessment instanceof DueWorkObject) {
+            // convert to due work's model
+            $model = new DueWorkModel();
+            $model
+                ->setName($assessment->getTitle())
+                ->setDescription($assessment->getDescription())
+                ->setPublishDate($assessment->getPublishAt())
+                ->setOpenDate($assessment->getOpenAt())
+                ->setDueDate($assessment->getDueAt())
+                ->setLateDate($assessment->getCloseAt())
+                ->setWeight($assessment->getWeight())
+                ->setSkipUnsubmitted($assessment->getShowSubmittedOnly())
+                ->setAcceptOnline($assessment->isAcceptSingle() || $assessment->isAcceptMulti())
+                ->setAcceptMultiple($assessment->isAcceptMulti())
+                ->setUseRubric($assessment->hasRubric())
+                ->setOwner($assessment->getCreator())
+                ->setMarkType(new DueWorkModel\MarkType())
+                ->setGradeGroup(new DueWorkModel\GradeLevel\Group\Model())
+            ;
+
+            // Convert a mark type into fields
+            // TODO move this to the mark scheme translator
+            $markScheme = $assessment->getMarkScheme();
+            if ($markScheme instanceof TotalMarkWholeNumber) {
+                $model->setMaxMark($markScheme->getTotalMark());
+                $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_TOTAL);
+
+            } elseif ($markScheme instanceof Percentage) {
+                $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_PERCENT);
+
+            } elseif ($markScheme instanceof LetterGrade) {
+                $model->setGradeGroup($markScheme->getGradeGroup());
+                $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_LETTER);
+
+            } elseif ($markScheme instanceof None) {
+                $model->getMarkType()->setId(DueWorkModel\MarkType::TYPE_NONE);
+
+            }
+
+            // Translate files
+            // TODO consider whether the DueWorkFile model is required - should Storage be used directly?
+            foreach ($assessment->getAllFiles() as $file) {
+                $model->addAttachment(
+                    (new StorageModel())
+                        ->setHash($file->getHash())
+                        ->setFilename($file->getFilename())
+                );
+            }
+
+            // Translate work type
+            $model->setWorkType(
+                (new DueWorkModel\WorkType())
+                    ->setId($assessment->getType()->getId())
+                    ->setName($assessment->getType()->getName())
+            );
+
+            // TODO figure out mark visibility - it's likely obsolete as feedback is manually published
+            // TODO figure out rubric result set
+            // TODO figure out mark per rubric group
+            // TODO set model's grade group, mark type, max mark based on mark scheme
+            return $model;
+        }
+        return null;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function translateToDomainModel(IAssessableDataModel $model)
+    {
+        if ($model instanceof DueWorkModel) {
+            // Due work-specific fields
+            $assessable = (new DueWorkObject())
+                ->setShowSubmittedOnly($model->getSkipUnsubmitted())
+                ->setCreator($model->getOwner())
+                ->setMaxMark($model->getMaxMark())
+                ->setGradeGroup($model->getGradeGroup())
+            ;
+
+            // Has Rubric?
+            if ($model->getUseRubric()) {
+                $assessable->useRubric();
+            } else {
+                $assessable->noRubric();
+            }
+
+            // Figure out submission visibility
+            if ($model->getAcceptOnline()) {
+                if ($model->getAcceptMultiple()) {
+                    $assessable->setAcceptsMultiple();
+                } else {
+                    $assessable->setAcceptsSingle();
+                }
+            } else {
+                $assessable->setAcceptsNone();
+            }
+
+            // Convert attachments
+            foreach ($model->getAttachments() as $attachment) {
+                $assessable->getAllFiles()->add(
+                    (new DueWorkFile())
+                        ->setHash($attachment->getHash())
+                        ->setFilename($attachment->getBasename())
+                );
+            }
+
+            // Convert work type
+            $assessable->setType(
+                (new DueWorkType())
+                    ->setId($model->getWorkType()->getId())
+                    ->setName($model->getWorkType()->getName())
+            );
+
+            // Convert mark type
+            $assessable->setMarkType(
+                (new DueWorkModel\MarkType())
+                    ->setId($model->getMarkType()->getId())
+            );
+
+            return $assessable;
+        }
+        return null;
+    }
+}

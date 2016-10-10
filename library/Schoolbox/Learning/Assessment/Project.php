@@ -25,7 +25,7 @@ class Project extends AbstractAssessment
 {
 
     /**
-     * @var Collection
+     * @var Collection|IAssessable[]
      */
     protected $assessables;
 

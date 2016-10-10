@@ -14,6 +14,7 @@ use Alaress\Color\Color;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\DataModel\IAssessmentContextDataModel;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\Specification as CourseSpecification;
@@ -33,7 +34,7 @@ use Schoolbox\ValueLabelInterface;
  *
  * @package Schoolbox\Resource\Folder
  */
-class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext
+class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterface, AssessmentContext, IAssessmentContextDataModel
 {
     use Node\Traits\HasCurriculumNodes;
     use DeletedAtDate;
