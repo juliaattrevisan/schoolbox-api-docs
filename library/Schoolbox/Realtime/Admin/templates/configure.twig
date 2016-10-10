@@ -35,7 +35,22 @@
                 }
 
                 ii = setTimeout(function () {
-                    $.post(form.attr('action'), form.serialize()).done(customiserCallback);
+
+                    // Disable all inputs while it's saving
+                    form.find('input').prop('disabled', true);
+
+                    // Serialize the form
+                    var formSerialized = form.serializeArray();
+
+                    // Go through disabled inputs and add selected to the serialized form
+                    form.find('input[disabled]').each(function() {
+                        if ($(this).is(':checked')) {
+                            formSerialized.push({name: $(this).attr('name'), value: $(this).val()});
+                        }
+                    });
+
+                    $.post(form.attr('action'), formSerialized).done(customiserCallback);
+
                 }, 1000);
 
             },
@@ -143,22 +158,22 @@
 
         $.each(data, function (slug, sources) {
 
-            var $ns = $('#configurator').find('[data-namespace='+slug+']');
+            var $ns = $('#configurator').find('[data-namespace=' + slug + ']');
 
             $.each(sources, function (source, roles) {
 
-                var $src = $ns.find('[data-source='+source+']');
+                var $src = $ns.find('[data-source=' + source + ']');
 
                 $.each(roles, function (role, config) {
 
-                    var $role = $src.find('[data-role='+role+']'),
+                    var $role = $src.find('[data-role=' + role + ']'),
                         options,
                         inDefault = function () {
                             var p = $(this).data('perm');
                             // bitwise! single &
                             return !!(config.default & p || (config.default == 0 && p == 0));
                         },
-                        inMask    = function () {
+                        inMask = function () {
                             var p = $(this).data('perm');
                             // bitwise! single &
                             return !!(config.mask[1] & p || (config.mask[0] && p == 0));
