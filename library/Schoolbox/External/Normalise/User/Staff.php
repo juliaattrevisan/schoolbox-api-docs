@@ -13,12 +13,20 @@ use Schoolbox\External\Normalise\User\Common\Account;
 use Schoolbox\External\Normalise\User\Common\Address;
 use Schoolbox\External\Normalise\User\Common\Phone;
 use Schoolbox\External\Normalise\User\Staff\Meta;
+use Schoolbox\External\Normalise\User\Staff\Year;
 use Schoolbox\Collection;
 
 class Staff extends Base {
 
     /* Personal
      */
+
+    /**
+     * An instance of Year
+     *
+     * @var Staff\Year
+     */
+    protected $year = null;
 
     /**
      * Staff metadata
@@ -58,6 +66,7 @@ class Staff extends Base {
         $this->setPhoneWork(new Phone());
         $this->setCampus(new Collection());
         $this->setMeta(new Meta());
+        $this->setYear(new Year());
     }
 
     /**
@@ -159,5 +168,27 @@ class Staff extends Base {
     public function getMeta()
     {
         return $this->meta;
+    }
+
+    /**
+     * Set year
+     *
+     * @param Year $year
+     * @return $this
+     */
+    public function setYear($year)
+    {
+        $this->year = $year;
+        return $this;
+    }
+
+    /**
+     * Get year
+     *
+     * @return Year
+     */
+    public function getYear()
+    {
+        return $this->year;
     }
 }

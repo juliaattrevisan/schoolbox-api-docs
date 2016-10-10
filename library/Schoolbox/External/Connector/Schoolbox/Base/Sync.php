@@ -121,7 +121,10 @@ class Sync implements SyncInterface
                 c.ext_timetable_code AS staff_campus,
                 ''                   AS staff_category_type,
                 ''                   AS staff_category,
-                ''                   AS staff_department
+                ''                   AS staff_department,
+                ''                   AS staff_year_level,
+                ''                   AS staff_year_level_description                
+                
             FROM `user` `u`
             INNER JOIN userCampus uc        ON u.id = uc.uid
             INNER JOIN luCampus c           ON uc.campus = c.id

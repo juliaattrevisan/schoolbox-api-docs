@@ -150,7 +150,10 @@ class Sync implements SyncInterface
                         END AS staff_category,
 			            
 			            cat.Description	      AS staff_position,
-                        ''                    AS staff_department
+                        ''                    AS staff_department,
+                        ''                    AS staff_year_level,
+                        ''                    AS staff_year_level_description                
+                        
                         
             FROM        StaffPersonalDetails  spd
             JOIN        CurrentStaff cs ON cs.StaffID = spd.StaffID

@@ -123,7 +123,10 @@ class Sync implements SyncInterface
                     ELSE 'Non-Teaching'
                 END         AS staff_category_type,
                 t.Position  AS staff_category,
-                ''          AS staff_department
+                ''          AS staff_department,
+                ''          AS staff_year_level,
+                ''          AS staff_year_level_description                
+                
             FROM Staff t
             WHERE t.DateLeft IS NULL
             AND   t.Active = 'Y'
