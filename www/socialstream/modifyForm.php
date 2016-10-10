@@ -10,6 +10,7 @@
 
 namespace SocialStream;
 
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Resource\Browser\NodeFactory;
 use Schoolbox\User;
 
@@ -35,7 +36,7 @@ if (is_numeric($_GET['delete'])) {
         $post = $postMapper->findById($_GET['delete']);
     }
     catch(\Schoolbox\Mapper\Exception $e){
-        error(173);
+        error(ErrorMapper::ERROR_SOCIAL_STREAM_NOT_FOUND);
     }
 
     /* Determine permissions

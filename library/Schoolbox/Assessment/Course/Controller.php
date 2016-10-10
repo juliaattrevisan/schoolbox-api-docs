@@ -299,7 +299,7 @@ class Controller extends Base\Base
 
             } catch (MapperException $e) {
                 // It should no longer be possible for a folder to exist without a course spec.
-                throw $this->getErrorMapper()->generateException(172);
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_COURSE_FOLDER_INVALID);
             }
 
             $folder->setParent($this->getFolderMapper()->findById($folder->getParent()->getId()));
