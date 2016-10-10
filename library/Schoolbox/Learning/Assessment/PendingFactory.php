@@ -675,12 +675,14 @@ class PendingFactory
                         $this->cacheFolder($courseSpecFolderId, $courseSpecFolderName);
 
                         $assessment->setContext($this->unitImplsCache[$unitImplId]);
-                        $this->unitImplsCache[$unitImplId]->setSpecification($this->unitSpecsCache[$unitSpecId]);
+                        $this->unitImplsCache[$unitImplId]
+                            ->setSpecification($this->unitSpecsCache[$unitSpecId])
+                            ->setCourse($this->courseImplsCache[$courseImplId]);
                         $this->unitSpecsCache[$unitSpecId]->setFolder($this->foldersCache[$unitSpecFolderId]);
-                        $this->unitImplsCache[$unitImplId]->setCourse($this->courseImplsCache[$courseImplId]);
-                        $this->courseImplsCache[$courseImplId]->setFolder($this->foldersCache[$folderId]);
-                        $this->courseImplsCache[$courseImplId]->setSpecification($this->courseSpecsCache[$courseSpecId]);
-                        $this->courseSpecsCache[$courseSpecId]->setFolder($this->foldersCache[$courseSpecFolderId]);
+                        $this->courseImplsCache[$courseImplId]
+                            ->setFolder($this->foldersCache[$folderId])
+                            ->setSpecification($this->courseSpecsCache[$courseSpecId])
+                            ->setFolder($this->foldersCache[$courseSpecFolderId]);
                         break;
                     case 4:
                         $this->cacheProject($projectId, $projectTitle);
@@ -694,12 +696,14 @@ class PendingFactory
 
                         $assessment->setContext($this->projectCache[$projectId]);
                         $this->projectCache[$projectId]->setContext($this->unitImplsCache[$unitImplId]);
-                        $this->unitImplsCache[$unitImplId]->setSpecification($this->unitSpecsCache[$unitSpecId]);
+                        $this->unitImplsCache[$unitImplId]
+                            ->setSpecification($this->unitSpecsCache[$unitSpecId])
+                            ->setCourse($this->courseImplsCache[$courseImplId]);
                         $this->unitSpecsCache[$unitSpecId]->setFolder($this->foldersCache[$unitSpecFolderId]);
-                        $this->unitImplsCache[$unitImplId]->setCourse($this->courseImplsCache[$courseImplId]);
-                        $this->courseImplsCache[$courseImplId]->setFolder($this->foldersCache[$folderId]);
-                        $this->courseImplsCache[$courseImplId]->setSpecification($this->courseSpecsCache[$courseSpecId]);
-                        $this->courseSpecsCache[$courseSpecId]->setFolder($this->foldersCache[$courseSpecFolderId]);
+                        $this->courseImplsCache[$courseImplId]
+                            ->setFolder($this->foldersCache[$folderId])
+                            ->setSpecification($this->courseSpecsCache[$courseSpecId])
+                            ->setFolder($this->foldersCache[$courseSpecFolderId]);
                         break;
                     default:
                         throw new \LogicException('Cannot derive AssessmentContext: ' . print_r($row, true));
