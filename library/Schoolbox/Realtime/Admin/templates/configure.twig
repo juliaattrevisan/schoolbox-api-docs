@@ -49,7 +49,7 @@
                         }
                     });
 
-                    $.post(form.attr('action'), formSerialized).done(customiserCallback(form));
+                    $.post(form.attr('action'), formSerialized).done(customiserCallback);
 
                 }, 1000);
 
@@ -154,48 +154,43 @@
         $('[data-collapser]').collapsable();
     });
 
-    function customiserCallback(form) {
-        return function(data) {
-            $.each(data, function (slug, sources) {
+    function customiserCallback(data) {
+        $.each(data, function (slug, sources) {
 
-                var $ns = $('#configurator').find('[data-namespace=' + slug + ']');
+            var $ns = $('#configurator').find('[data-namespace=' + slug + ']');
 
-                $.each(sources, function (source, roles) {
+            $.each(sources, function (source, roles) {
 
-                    var $src = $ns.find('[data-source=' + source + ']');
+                var $src = $ns.find('[data-source=' + source + ']');
 
-                    $.each(roles, function (role, config) {
+                $.each(roles, function (role, config) {
 
-                        var $role = $src.find('[data-role=' + role + ']'),
-                                options,
-                                inDefault = function () {
-                                    var p = $(this).data('perm');
-                                    // bitwise! single &
-                                    return !!(config.default & p || (config.default == 0 && p == 0));
-                                },
-                                inMask = function () {
-                                    var p = $(this).data('perm');
-                                    // bitwise! single &
-                                    return !!(config.mask[1] & p || (config.mask[0] && p == 0));
-                                };
+                    var $role = $src.find('[data-role=' + role + ']'),
+                            options,
+                            inDefault = function () {
+                                var p = $(this).data('perm');
+                                // bitwise! single &
+                                return !!(config.default & p || (config.default == 0 && p == 0));
+                            },
+                            inMask = function () {
+                                var p = $(this).data('perm');
+                                // bitwise! single &
+                                return !!(config.mask[1] & p || (config.mask[0] && p == 0));
+                            };
 
-                        // reset all, switch on/off based on masks
-                        options = $role.find('input[data-perm]')
-                                .prop('checked', false)
-                                .prop('disabled', true)
-                                .attr('disabled', 'disabled');
+                    // reset all, switch on/off based on masks
+                    options = $role.find('input[data-perm]')
+                            .prop('checked', false)
+                            .prop('disabled', true)
+                            .attr('disabled', 'disabled');
 
-                        options.filter(inMask).prop('disabled', false).removeAttr('disabled');
-                        options.filter(inDefault).prop('checked', true);
+                    options.filter(inMask).prop('disabled', false).removeAttr('disabled');
+                    options.filter(inDefault).prop('checked', true);
 
-                        options.eq(0).trigger('change.force');
-                    });
+                    options.eq(0).trigger('change.force');
                 });
             });
-
-            // Re-enable inputs, excluding the ones that were already disabled
-            form.find('input').not('[data-perm-disabled]').prop('disabled', false);
-        }
+        });
     }
 </script>
 
