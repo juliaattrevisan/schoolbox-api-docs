@@ -92,7 +92,7 @@ class Translator
 
         // Translate assessment context
         // TODO consider moving this to a translator
-        $context = $assessment->getAssessmentContext();
+        $context = $assessment->getContext();
         if ($context instanceof Folder) {
             $assessmentModel->setAssessmentContext($context);
         } elseif ($context instanceof UnitSpecification) {
@@ -162,11 +162,11 @@ class Translator
         // TODO consider moving this to a translator
         $context = $dataModel->getAssessmentModel()->getAssessmentContext();
         if ($context instanceof Folder) {
-            $assessable->setAssessmentContext($context);
+            $assessable->setContext($context);
         } elseif ($context instanceof UnitSpecificationModel) {
-            $assessable->setAssessmentContext((new UnitSpecification())->setId($context->getId()));
+            $assessable->setContext((new UnitSpecification())->setId($context->getId()));
         } elseif ($context instanceof UnitImplementationModel) {
-            $assessable->setAssessmentContext((new UnitImplementation())->setId($context->getId()));
+            $assessable->setContext((new UnitImplementation())->setId($context->getId()));
         }
 
         return $assessable;

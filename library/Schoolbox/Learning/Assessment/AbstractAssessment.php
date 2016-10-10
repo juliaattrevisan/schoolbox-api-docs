@@ -31,13 +31,6 @@ abstract class AbstractAssessment implements IAssessable
     use DeletedAtDate;
 
     /**
-     * The context within which this assessment lives.
-     *
-     * @var AssessmentContext
-     */
-    protected $assessmentContext;
-
-    /**
      * @var string
      */
     protected $title;
@@ -754,24 +747,6 @@ abstract class AbstractAssessment implements IAssessable
     public function getContext()
     {
         return $this->context;
-    }
-
-    /**
-     * @return AssessmentContext
-     */
-    public function getAssessmentContext()
-    {
-        return $this->assessmentContext;
-    }
-
-    /**
-     * @param AssessmentContext $assessmentContext
-     * @return static
-     */
-    public function setAssessmentContext(AssessmentContext $assessmentContext)
-    {
-        $this->assessmentContext = $assessmentContext;
-        return $this;
     }
 }
 

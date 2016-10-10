@@ -30,7 +30,7 @@ interface IAssessable extends ISoftDeletable
      *
      * @return AssessmentContext
      */
-    public function getAssessmentContext();
+    public function getContext();
 
     /**
      * Set the context within which this assessment belongs.
@@ -38,7 +38,7 @@ interface IAssessable extends ISoftDeletable
      * @param AssessmentContext $assessmentContext
      * @return static
      */
-    public function setAssessmentContext(AssessmentContext $assessmentContext);
+    public function setContext(AssessmentContext $assessmentContext);
 
     /**
      * Return the name of the "type" of Assessable this is
@@ -423,17 +423,6 @@ interface IAssessable extends ISoftDeletable
      * @return $this
      */
     public function setFeedbacks(Collection $feedbacks);
-
-    /**
-     * @param AssessmentContext $context
-     * @return static
-     */
-    public function setContext(AssessmentContext $context);
-
-    /**
-     * @return AssessmentContext
-     */
-    public function getContext();
 
     /**
      * Created date
