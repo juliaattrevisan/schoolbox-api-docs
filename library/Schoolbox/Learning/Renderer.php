@@ -25,14 +25,14 @@ use Schoolbox\Learning\Assessment\Task\Model as Task;
 /**
  * Enables twig template 'is a' tests.
  * Usage, where 'assessment' is the var name for an IAssessable:
- * * {% if assessment.context is a folder %}
- * * {% if assessment.context is a unitImplementation %}
- * * {% if assessment.context is a unitSpecification %}
- * * {% if assessment.context is a project %}
+ * * {% if assessment.context is folder %}
+ * * {% if assessment.context is unitImplementation %}
+ * * {% if assessment.context is unitSpecification %}
+ * * {% if assessment.context is project %}
  *
- * * {% if assessment is a quiz %}
- * * {% if assessment is a dueWork %}
- * * {% if assessment is a task %}
+ * * {% if assessment is quiz %}
+ * * {% if assessment is dueWork %}
+ * * {% if assessment is task %}
  */
 class Renderer extends \Twig_Extension
 {
@@ -43,15 +43,16 @@ class Renderer extends \Twig_Extension
      */
     public function getTests ()
     {
+        // Intentionally no type declaration functions to avoid fatal errors in twig if wrong type passed in.
         return [
-            new \Twig_SimpleTest('folder', function (AssessmentContext $context) { return $context instanceof Folder; }),
-            new \Twig_SimpleTest('unitImplementation', function (AssessmentContext $context) { return $context instanceof UnitImplementation; }),
-            new \Twig_SimpleTest('unitSpecification', function (AssessmentContext $context) { return $context instanceof UnitSpecification; }),
-            new \Twig_SimpleTest('project', function (AssessmentContext $context) { return $context instanceof Project; }),
+            new \Twig_SimpleTest('folder', function ($context) { return $context instanceof Folder; }),
+            new \Twig_SimpleTest('unitImplementation', function ($context) { return $context instanceof UnitImplementation; }),
+            new \Twig_SimpleTest('unitSpecification', function ($context) { return $context instanceof UnitSpecification; }),
+            new \Twig_SimpleTest('project', function ($context) { return $context instanceof Project; }),
 
-            new \Twig_SimpleTest('quiz', function (IAssessable $assessable) { return $assessable instanceof Quiz; }),
-            new \Twig_SimpleTest('dueWork', function (IAssessable $assessable) { return $assessable instanceof DueWork; }),
-            new \Twig_SimpleTest('task', function (IAssessable $assessable) { return $assessable instanceof Task; })
+            new \Twig_SimpleTest('quiz', function ($assessable) { return $assessable instanceof Quiz; }),
+            new \Twig_SimpleTest('dueWork', function ($assessable) { return $assessable instanceof DueWork; }),
+            new \Twig_SimpleTest('task', function ($assessable) { return $assessable instanceof Task; })
         ];
     }
 
