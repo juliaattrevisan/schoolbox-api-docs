@@ -85,7 +85,7 @@
     <div class="small-12 columns island">
         <form action="{{ routeLookup('learningAssessment.postSelectAssessment') }}" id="assessmentForm" method="post">
             <section>
-                {% if not assessmentType %}
+                {% if not assessmentType|length %}
                 <fieldset class="content" data-mage="part-1">
                     <legend>Choose Assessment Type</legend>
 
@@ -106,13 +106,13 @@
                 </fieldset>
                 {% endif %}
 
-                <fieldset class="content" data-mage="part-2" {% if not assessmentType %}disabled="disabled"{% endif %}>
+                <fieldset class="content" data-mage="part-2" {% if not assessmentType|length %}disabled="disabled"{% endif %}>
                     <input type="hidden" name="contextId" value="{{ contextId }}" />
                     <input type="hidden" name="contextType" value="{{ contextType }}" />
                     <input type="hidden" name="assessmentType" value="{{ assessmentType}}" />
 
                     <legend>Assessment Details</legend>
-                    <div class="small-12 columns {% if not assessmentType %}hide{% endif %}" data-mage-collapsed data-assessment-details>
+                    <div class="small-12 columns {% if not assessmentType|length %}hide{% endif %}" data-mage-collapsed data-assessment-details>
 
                         {% if assessmentTypeTitle == 'project' %}
                             {% include '@learningAssessment/fragments/project/create.twig' %}
