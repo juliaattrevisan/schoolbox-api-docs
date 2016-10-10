@@ -13,7 +13,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
 
-class NoFavour implements IFeedbackStrategy
+class NoFavour implements IFeedbackTraversalStrategy
 {
     /**
      * Find the most recent IFeedback for an IAssessable for the Participant

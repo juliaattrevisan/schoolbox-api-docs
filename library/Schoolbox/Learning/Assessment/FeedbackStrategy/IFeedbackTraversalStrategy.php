@@ -11,7 +11,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant;
 
-interface IFeedbackStrategy
+interface IFeedbackTraversalStrategy
 {
     /**
      * Gets the current authoritative Feedback for the given Participant and Assessment.

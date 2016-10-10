@@ -16,7 +16,7 @@ namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\FavourFloating;
-use Schoolbox\Learning\Assessment\FeedbackStrategy\IFeedbackStrategy;
+use Schoolbox\Learning\Assessment\FeedbackStrategy\IFeedbackTraversalStrategy;
 use Schoolbox\Learning\Assessment\FeedbackStrategy\NoFavour;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
@@ -36,7 +36,7 @@ class Participant
     /**
      * How to determine what constitutes the current overall mark for a given User and Assessment
      *
-     * @var IFeedbackStrategy
+     * @var IFeedbackTraversalStrategy
      */
     protected $feedbackStrategy;
 

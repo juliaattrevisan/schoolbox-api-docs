@@ -14,7 +14,7 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
 use Schoolbox\Learning\Assessment\Participant;
 
-class FavourFloating implements IFeedbackStrategy
+class FavourFloating implements IFeedbackTraversalStrategy
 {
     /**
      * Find the most recent IFeedback for an IAssessable for the Participant
