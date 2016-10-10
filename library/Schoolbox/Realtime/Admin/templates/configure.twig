@@ -155,6 +155,7 @@
     });
 
     function customiserCallback(data) {
+
         $.each(data, function (slug, sources) {
 
             var $ns = $('#configurator').find('[data-namespace=' + slug + ']');
@@ -166,23 +167,23 @@
                 $.each(roles, function (role, config) {
 
                     var $role = $src.find('[data-role=' + role + ']'),
-                            options,
-                            inDefault = function () {
-                                var p = $(this).data('perm');
-                                // bitwise! single &
-                                return !!(config.default & p || (config.default == 0 && p == 0));
-                            },
-                            inMask = function () {
-                                var p = $(this).data('perm');
-                                // bitwise! single &
-                                return !!(config.mask[1] & p || (config.mask[0] && p == 0));
-                            };
+                        options,
+                        inDefault = function () {
+                            var p = $(this).data('perm');
+                            // bitwise! single &
+                            return !!(config.default & p || (config.default == 0 && p == 0));
+                        },
+                        inMask = function () {
+                            var p = $(this).data('perm');
+                            // bitwise! single &
+                            return !!(config.mask[1] & p || (config.mask[0] && p == 0));
+                        };
 
                     // reset all, switch on/off based on masks
                     options = $role.find('input[data-perm]')
-                            .prop('checked', false)
-                            .prop('disabled', true)
-                            .attr('disabled', 'disabled');
+                        .prop('checked', false)
+                        .prop('disabled', true)
+                        .attr('disabled', 'disabled');
 
                     options.filter(inMask).prop('disabled', false).removeAttr('disabled');
                     options.filter(inDefault).prop('checked', true);
