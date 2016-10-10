@@ -2,9 +2,9 @@
 {% macro localUrl(response) -%}
 
     {%- if response.assessable is quiz -%}
-        /assess/review/{{ response.assessable.quizId }}/{{ response.firstSectionId }}/{{ response.id }}
+        /assess/review/{{ response.assessable.id }}/{{ response.firstSectionId }}/{{ response.id }}
     {%- elseif response.assessable is dueWork -%}
-        /submission/inlineGrading/view/{{ response.assessable.dueWorkId }}/{{ response.submittedOnBehalfOf.id }}
+        /submission/inlineGrading/view/{{ response.assessable.id }}/{{ response.submittedOnBehalfOf.id }}
     {%- elseif response.assessable is task -%}
 
         {%- set context = response.assessable.context -%}

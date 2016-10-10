@@ -600,13 +600,13 @@ class PendingFactory
                 // Add ID to type array for later retrieval of Response / Feedback
                 if (!is_null($row['qz.id'])) {
                     $this->quizAssessmentIds[$assessmentId] = $assessmentId;
-                    $this->assessmentsCache[$assessmentId] = (new Quiz())->setQuizId($row['qz.id']);
+                    $this->assessmentsCache[$assessmentId] = new Quiz();
                 } elseif (!is_null($row['dw.id'])) {
                     $this->dueWorkAssessmentIds[$assessmentId] = intval($assessmentId);
-                    $this->assessmentsCache[$assessmentId] = (new DueWork())->setDueWorkId($row['dw.id']);
+                    $this->assessmentsCache[$assessmentId] = new DueWork();
                 } elseif (!is_null($row['tk.id'])) {
                     $this->taskAssessmentIds[$assessmentId] = intval($assessmentId);
-                    $this->assessmentsCache[$assessmentId] = (new Task())->setTaskId($row['tk.id']);
+                    $this->assessmentsCache[$assessmentId] = new Task();
                 } else {
                     throw new \LogicException('Assessment must be Quiz, DueWork or Task: ' . print_r($row, true));
                 }

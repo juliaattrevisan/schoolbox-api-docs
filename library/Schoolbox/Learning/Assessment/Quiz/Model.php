@@ -22,16 +22,6 @@ use Schoolbox\User;
 class Model extends AbstractAssessment
 {
     /**
-     * Does not equate to assessment.id
-     *
-     * The quiz.id comes from the assess table.
-     * The assessment.id comes from the assessment table.
-     *
-     * @var int $quizId
-     */
-    private $quizId;
-
-    /**
      * Sum of all marks available across all questions in this Quiz
      *
      * @var float
@@ -78,24 +68,6 @@ class Model extends AbstractAssessment
      * @var int
      */
     protected $duration = 0;
-
-    /**
-     * @return int
-     */
-    public function getQuizId()
-    {
-        return $this->quizId;
-    }
-
-    /**
-     * @param $quizId
-     * @return static
-     */
-    public function setQuizId($quizId)
-    {
-        $this->quizId = $quizId;
-        return $this;
-    }
 
     /**
      * A (HTML) message that is displayed to a participant once they have completed the quiz.
