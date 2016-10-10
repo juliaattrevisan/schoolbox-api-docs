@@ -54,6 +54,7 @@ class Controller extends Base
 
     const SPAWN_CONTEXT_FOLDER = 'folder';
     const SPAWN_CONTEXT_PROJECT = 'project';
+    const SPAWN_CONTEXT_UNIT_IMPLEMENTATION = 'unit';
 
     /**
      * @var ErrorMapper
@@ -146,6 +147,31 @@ class Controller extends Base
         $this->getSelectAssessmentData($project->getId(), self::SPAWN_CONTEXT_PROJECT, $folder, $assessmentTypeTitle);
     }
 
+    /**
+     * Select an IAssessable specified $assessmentTypeTitle into a Unit Implementation $unitId
+     *
+     * @param int $unitId
+     * @param string $assessmentTypeTitle
+     */
+    public function getSelectAssessmentInUnitImplementation($unitId, $assessmentTypeTitle)
+    {
+        /* TODO: Get from db
+         */
+        $unit = (new \Schoolbox\Resource\Folder\Model())->setId($unitId);
+
+        /* TODO: Derive $folder from $unitId somehow
+         */
+        try {
+            $folder = new \Schoolbox\Resource\Folder\Model();
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
+        }
+
+        /* Pump into twig-land
+         */
+        $this->getSelectAssessmentData($unit->getId(), self::SPAWN_CONTEXT_UNIT_IMPLEMENTATION, $folder, $assessmentTypeTitle);
+    }
 
     /**
      * A macro for creating the standard data for all assessmentTypes
@@ -167,13 +193,21 @@ class Controller extends Base
         $zone = new Zone('files');
         $zone->setMulti(true);
 
+        /* contextId, contextType:
+         *
+         * Both exist here so you know where the new Assessment should be spawned
+         * in the corresponding post request
+         */
         $data = [
+            'contextId' => $contextId,
+            'contextType' => $contextType,
+
+            /* The usual info everything requires
+             */
             'attachzone' => $zone->getTwigContext(),
             'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
             'assessmentTypeTitle' => $assessmentTypeTitle,
             'assessmentType' => $assessmentType,
-            'contextId' => $contextId,
-            'contextType' => $contextType,
             'folder' => $folder,
             'curriculumNodes' => $folder->getCurriculumNodes(),
             'types' => $types,

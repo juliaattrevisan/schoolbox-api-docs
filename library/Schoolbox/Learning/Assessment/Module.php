@@ -41,7 +41,7 @@ class Module extends BaseModule
                  */
                 '/assessment/folder/{folderId}{/assessmentTypeTitle}' => 'getSelectAssessmentInFolder',
                 '/assessment/project/{projectId}{/assessmentTypeTitle}' => 'getSelectAssessmentInProject',
-                '/assessment/unitimpl/{folderId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitImplementation',
+                '/assessment/unit/{unitId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitImplementation',
                 '/assessment/unitspec/{folderId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitSpecification',
 
 //                /* Select an assessment fragment to start with
