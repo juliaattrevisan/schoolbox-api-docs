@@ -3,7 +3,7 @@
 
 {{ bread.crumbs(
     [ folder.name, '/homepage/' ~ folder.id ],
-    [ 'Create Assessment', routeLookup('learningAssessment.getSelectAssessment') ]
+    [ 'Create Assessment', '#' ]
 ) }}
 
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
@@ -114,8 +114,14 @@
                     <legend>Assessment Details</legend>
                     <div class="small-12 columns {% if not assessmentType %}hide{% endif %}" data-mage-collapsed data-assessment-details>
 
-                        {% if assessmentTypeTitle == 'dueWork' %}
-                        {% include '@learningAssessment/fragments/dueWork/create.twig' %}
+                        {% if assessmentTypeTitle == 'project' %}
+                            {% include '@learningAssessment/fragments/project/create.twig' %}
+                        {% elseif assessmentTypeTitle == 'dueWork' %}
+                            {% include '@learningAssessment/fragments/dueWork/create.twig' %}
+                        {% elseif assessmentTypeTitle == 'task' %}
+                            {% include '@learningAssessment/fragments/task/create.twig' %}
+                        {% elseif assessmentTypeTitle == 'quiz' %}
+                            {% include '@learningAssessment/fragments/quiz/create.twig' %}
                         {% endif %}
 
                     </div>

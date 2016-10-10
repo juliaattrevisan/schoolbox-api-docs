@@ -40,7 +40,7 @@ class Module extends BaseModule
                 /* Select an assessment fragment to start with
                  */
                 '/assessment/folder/{folderId}{/assessmentTypeTitle}' => 'getSelectAssessmentInFolder',
-                '/assessment/project/{folderId}{/assessmentTypeTitle}' => 'getSelectAssessmentInProject',
+                '/assessment/project/{projectId}{/assessmentTypeTitle}' => 'getSelectAssessmentInProject',
                 '/assessment/unitimpl/{folderId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitImplementation',
                 '/assessment/unitspec/{folderId}{/assessmentTypeTitle}' => 'getSelectAssessmentInUnitSpecification',
 

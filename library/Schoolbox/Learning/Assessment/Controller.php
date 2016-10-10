@@ -52,6 +52,9 @@ use Schoolbox\Resource\Attachment\Zone;
 class Controller extends Base
 {
 
+    const SPAWN_CONTEXT_FOLDER = 'folder';
+    const SPAWN_CONTEXT_PROJECT = 'project';
+
     /**
      * @var ErrorMapper
      */
@@ -100,8 +103,8 @@ class Controller extends Base
     /**
      * Select an IAssessable specified $assessmentTypeTitle into a Folder $folderId
      *
-     * @param $folderId
-     * @param $assessmentTypeTitle
+     * @param int $folderId
+     * @param string $assessmentTypeTitle
      */
     public function getSelectAssessmentInFolder($folderId, $assessmentTypeTitle)
     {
@@ -112,17 +115,46 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
         }
 
-        $this->getSelectAssessmentData($folder->getId(), 'folder', $folder, $assessmentTypeTitle);
+        /* Pump into twig-land
+         */
+        $this->getSelectAssessmentData($folder->getId(), self::SPAWN_CONTEXT_FOLDER, $folder, $assessmentTypeTitle);
     }
+
+    /**
+     * Select an IAssessable specified $assessmentTypeTitle into a Project $projectId
+     *
+     * @param int $projectId
+     * @param string $assessmentTypeTitle
+     */
+    public function getSelectAssessmentInProject($projectId, $assessmentTypeTitle)
+    {
+        /* TODO: Get from db
+         */
+        $project = (new Project((new SummatorFactory(SummatorFactory::WEIGHTED_AVERAGE))->produce()))->setId($projectId);
+
+        /* TODO: Derive $folder from $projectId somehow
+         */
+        try {
+            $folder = new \Schoolbox\Resource\Folder\Model();
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
+        }
+
+        /* Pump into twig-land
+         */
+        $this->getSelectAssessmentData($project->getId(), self::SPAWN_CONTEXT_PROJECT, $folder, $assessmentTypeTitle);
+    }
+
 
     /**
      * A macro for creating the standard data for all assessmentTypes
      * for use in their Create screen
      *
-     * @param $contextId
-     * @param $contextType
-     * @param \Schoolbox\Resource\Folder\Model $folder
-     * @param $assessmentTypeTitle
+     * @param int $contextId
+     * @param string $contextType e.g. one of "project", "folder", "unitimpl", "unitspec"
+     * @param \Schoolbox\Resource\Folder\Model $folder related to object that has $contextId
+     * @param string $assessmentTypeTitle e.g. one of "project", "dueWork", "task", "quiz"
      */
     private function getSelectAssessmentData($contextId, $contextType, \Schoolbox\Resource\Folder\Model $folder, $assessmentTypeTitle)
     {
