@@ -87,7 +87,12 @@ class Module extends BaseModule
         ];
 
         foreach ($routes['GET'] as $path => $alias) {
-            $this->addGetRoute($router, $alias, $basePath, $path);
+            $this->addGetRoute($router, $alias, $basePath, $path)->addTokens([
+                'assessmentId' => '\d+',
+                'assessmentType' => '\d+',
+                'assessmentTypeTitle' => '(dueWork|task|quiz|project)',
+                'studentId' => '\d+',
+            ]);
         }
 
         foreach ($routes['POST'] as $path => $alias) {

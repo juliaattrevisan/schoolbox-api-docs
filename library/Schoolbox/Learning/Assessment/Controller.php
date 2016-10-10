@@ -333,6 +333,8 @@ class Controller extends Base
     {
         $assessment = null;
 
+        /* TODO Everything magically happens here, correctly, based on $contextId and $contextType
+         */
         try {
             $folder = $this->getFolderMapper()->findById($this->getRequest()->post['folderId']);
         }
