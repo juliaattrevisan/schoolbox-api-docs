@@ -52,9 +52,25 @@ use Schoolbox\Resource\Attachment\Zone;
 class Controller extends Base
 {
 
+    /**
+     * Spawn in a Folder
+     */
     const SPAWN_CONTEXT_FOLDER = 'folder';
+
+    /**
+     * Spawn in a Project
+     */
     const SPAWN_CONTEXT_PROJECT = 'project';
+
+    /**
+     * Spawn in a Unit Implementation
+     */
     const SPAWN_CONTEXT_UNIT_IMPLEMENTATION = 'unit';
+
+    /**
+     * Spawn in a Unit Specification
+     */
+    const SPAWN_CONTEXT_UNIT_SPECIFICATION = 'unitspec';
 
     /**
      * @var ErrorMapper
@@ -171,6 +187,32 @@ class Controller extends Base
         /* Pump into twig-land
          */
         $this->getSelectAssessmentData($unit->getId(), self::SPAWN_CONTEXT_UNIT_IMPLEMENTATION, $folder, $assessmentTypeTitle);
+    }
+
+    /**
+     * Select an IAssessable specified $assessmentTypeTitle into a Unit Implementation $unitId
+     *
+     * @param int $unitId
+     * @param string $assessmentTypeTitle
+     */
+    public function getSelectAssessmentInUnitSpecification($unitId, $assessmentTypeTitle)
+    {
+        /* TODO: Get from db
+         */
+        $unit = (new \Schoolbox\Resource\Folder\Model())->setId($unitId);
+
+        /* TODO: Derive $folder from $unitId somehow
+         */
+        try {
+            $folder = new \Schoolbox\Resource\Folder\Model();
+        }
+        catch (MapperException $e) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
+        }
+
+        /* Pump into twig-land
+         */
+        $this->getSelectAssessmentData($unit->getId(), self::SPAWN_CONTEXT_UNIT_SPECIFICATION, $folder, $assessmentTypeTitle);
     }
 
     /**
