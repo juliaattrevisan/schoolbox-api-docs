@@ -60,11 +60,11 @@
 	background-image: url(/images/icons/22x22/home.png);
 }
 /** Temporary course label **/
-#tree tr.course span.label {
-	background-image: url(/images/famicons/chart_curve.png);
-	background-position-x: 3px;
-	background-position-y: 3px;
-}
+/*#tree tr.course span.label {*/
+	/*background-image: url(/images/famicons/chart_curve.png);*/
+	/*background-position-x: 3px;*/
+	/*background-position-y: 3px;*/
+/*}*/
 
 #tree tr.loading span.label {
 	background: transparent url(/images/tree/loading.gif) no-repeat 0 3px;
