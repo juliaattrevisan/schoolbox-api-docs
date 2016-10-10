@@ -300,7 +300,10 @@ ul.az-error-list {
         }
     }
     img[data-dz-thumbnail] {
-        background: url('/images/resources/ajax.gif') no-repeat center center;
+        background-image: url('/images/foundation/preloader.gif');
+        background-position: center center;
+        background-repeat: no-repeat;
+        background-size: 1rem 1rem;
         @include easy-transition(opacity  0.15s  $attachzone-overlay-timing);
     }
     ul.az-list > li {
@@ -589,8 +592,6 @@ ul.az-error-list {
     .dropzone-previews .dz-preview .dz-error-mark,
     .dz-preview .dz-success-mark,
     .dropzone-previews .dz-preview .dz-success-mark {
-        background-image: url('/images/foundation/dropzone.png');
-        background-repeat: no-repeat;
         display: block;
         opacity: 0;
         -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
@@ -787,7 +788,4 @@ ul.az-error-list {
     left: 0;
     width: 0%;
     height: 100%;
-    background-image: url('/images/foundation/dropzone.png');
-    background-repeat: repeat-x;
-    background-position: 0px -400px;
 }
