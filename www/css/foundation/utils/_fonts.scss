@@ -138,7 +138,7 @@
 .icon-curriculum:before {
 	content: "\e617";
 }
-.icon-curriculum-details:before {
+.icon-curriculum-details:before{
 	content: "\e618";
 }
 .icon-danger:before {
@@ -172,7 +172,8 @@
 .icon-dropdown:before {
 	content: "\e621";
 }
-.icon-due-work:before {
+.icon-due-work:before,
+.icon-submissions:before{
 	content: "\e622";
 }
 .icon-edit-columns:before {
@@ -349,6 +350,9 @@
 .icon-print:before {
 	content: "\e656";
 }
+.icon-project:before {
+	content: "\e90b";
+}
 .icon-result:before,
 .icon-progress:before,
 .icon-report:before {
@@ -450,6 +454,9 @@
 }
 .icon-down-arrow:before {
 	content: "\e901";
+}
+.icon-unit:before {
+	content: "\e90c";
 }
 .icon-up-down:before {
 	content: "\e800";

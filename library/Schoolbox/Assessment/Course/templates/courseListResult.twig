@@ -29,11 +29,13 @@
             <ul class="unit-list">
                     {% for unit in course.units %}
                 <li>
+                    <div class="tiny card small-12">
                         {% if linkToUnits %}
-                    <a title="Visit {{ unit.folder.name }} homepage" href="/homepage/{{ unit.folder.id }}">{{ unit.folder.name }}</a>
+                    <a title="Visit {{ unit.folder.name }} homepage" href="/homepage/{{ unit.folder.id }}"><div class="icon-unit"></div>{{ unit.folder.name }}</a>
                         {% else %}
-                    {{ unit.folder.name }}
+                            <div class="icon-unit"></div>{{ unit.folder.name }}
                         {% endif %}
+                    </div>
                 </li>
                     {% endfor %}
             </ul>
