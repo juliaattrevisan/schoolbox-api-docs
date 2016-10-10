@@ -36,14 +36,14 @@
 
                 ii = setTimeout(function () {
 
-                    // Disable all radios while it's saving
-                    form.find('input[type=radio]').prop('disabled', true);
+                    // Disable all inputs while it's saving
+                    form.find('input').prop('disabled', true);
 
                     // Serialize the form
                     var formSerialized = form.serializeArray();
 
-                    // Go through disabled radios and add selected to the serialized form
-                    form.find('input[type=radio][disabled]').each(function() {
+                    // Go through disabled inputs and add selected to the serialized form
+                    form.find('input[disabled]').each(function() {
                         if ($(this).is(':checked')) {
                             formSerialized.push({name: $(this).attr('name'), value: $(this).val()});
                         }
@@ -193,8 +193,8 @@
                 });
             });
 
-            // Re-enable radios, excluding the ones that were already disabled
-            form.find('input[type=radio]').not('[data-perm-disabled]').prop('disabled', false);
+            // Re-enable inputs, excluding the ones that were already disabled
+            form.find('input').not('[data-perm-disabled]').prop('disabled', false);
         }
     }
 </script>
