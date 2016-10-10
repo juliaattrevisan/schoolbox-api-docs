@@ -92,6 +92,8 @@ class Controller extends Base
             $viewee = $this->getUser();
         }
 
+        // TODO - both this, External_Class() and all Mappers should be singletons pulled from the DI.
+        // TODO - see pattern applied to MapperFactory in Modules.
         $externalUser = $viewee->getSubjectCollection()
             ? null
             : new \External_User();
