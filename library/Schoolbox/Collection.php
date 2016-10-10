@@ -52,10 +52,12 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      * Prepend an element to the start of the stack
      *
      * @param $element
+     * @return static
      */
     public function prepend($element)
     {
         array_unshift($this->stack, $element);
+        return $this;
     }
 
     /**
@@ -74,7 +76,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      * @param  mixed $offset
      * @param  mixed $value
      *
-     * @return void
+     * @return static
      */
     public function offsetSet($offset, $value)
     {
@@ -83,6 +85,7 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
         } else {
             $this->stack[$offset] = $value;
         }
+        return $this;
     }
 
     /**
@@ -118,21 +121,24 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      *
      * @param mixed $offset
      *
-     * @return void
+     * @return static
      */
     public function offsetUnset($offset)
     {
         unset($this->stack[$offset]);
+        return $this;
     }
 
     /**
      * Set stack
      *
      * @param $stack
+     * @return static
      */
     protected function setStack($stack)
     {
         $this->stack = $stack;
+        return $this;
     }
 
     /**
@@ -167,10 +173,12 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
 
     /**
      * Rewind
+     * @return static
      */
     public function rewind()
     {
         $this->position = 0;
+        return $this;
     }
 
     /**
@@ -409,7 +417,6 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      */
     public function sortByMultiFields(array $fields)
     {
-
         $fieldNames = [];
         $directions = [];
         $compareFunctions = [];
@@ -509,10 +516,12 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
      *
      * @param $index
      * @param $value
+     * @return static
      */
     public function setOffset($index, $value)
     {
         $this->stack[$index] = $value;
+        return $this;
     }
 
     /**
@@ -532,10 +541,12 @@ class Collection implements ICollection, JsonSerializable, ArrayAccess
     /**
      * Reindex the stack (useful when you setOffset() particular indexes and
      * want to restore 0-based indexes)
+     * @return static
      */
     public function reindex()
     {
         $this->setStack(array_values($this->getStack()));
+        return $this;
     }
 
     /**

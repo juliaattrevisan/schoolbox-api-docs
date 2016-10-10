@@ -57,6 +57,7 @@ class GenericCollection extends Collection
      * Ensures the $item is of the specified type
      *
      * @param $item
+     * @throws \UnexpectedValueException if $item is not a valid element for this Collection
      */
     protected function checkType($item)
     {
@@ -93,11 +94,13 @@ class GenericCollection extends Collection
      * Prepend an element to the start of the stack
      *
      * @param $element
+     * @return static
      */
     public function prepend($element)
     {
         $this->checkType($element);
         parent::prepend($element);
+        return $this;
     }
 
     /**
@@ -106,12 +109,13 @@ class GenericCollection extends Collection
      * @param  mixed $offset
      * @param  mixed $value
      *
-     * @return void
+     * @return static
      */
     public function offsetSet($offset, $value)
     {
         $this->checkType($value);
         parent::offsetSet($offset, $value);
+        return $this;
     }
 
     /**
@@ -119,10 +123,12 @@ class GenericCollection extends Collection
      *
      * @param int $index
      * @param object $value
+     * @return static
      */
     public function setOffset($index, $value)
     {
         $this->checkType($value);
         parent::offsetSet($index, $value);
+        return $this;
     }
 }
