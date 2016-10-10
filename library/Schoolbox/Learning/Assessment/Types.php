@@ -70,9 +70,24 @@ class Types extends \Schoolbox\Collection
     }
 
     /**
+     * Is the $Key valid?
+     *
+     * @param $key
+     * @return bool
+     */
+    public function isValidKey($key)
+    {
+        if (strlen($key)) {
+            return in_array($key, array_keys($this->getTypes()));
+        }
+
+        return false;
+    }
+
+    /**
      * Is the $index valid?
      *
-     * @param $index
+     * @param int $index
      * @return bool
      */
     public function isValidIndex($index)

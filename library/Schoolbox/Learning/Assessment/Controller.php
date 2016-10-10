@@ -73,16 +73,37 @@ class Controller extends Base
         $this->setFolderMapper($folderMapper);
     }
 
+//    /**
+//     * Select an Assessment
+//     *
+//     * This is when you chooze what type of assessment it is, which
+//     * returns you an appropriate fragment of common+assessmentType
+//     * form inputs for you to fill out
+//     *
+//     * @param $folderId
+//     */
+//    public function getSelectAssessment($folderId)
+//    {
+//        try {
+//            $folder = $this->getFolderMapper()->findById($folderId);
+//        }
+//        catch (MapperException $e) {
+//            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
+//        }
+//
+//        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
+//            'folder' => $folder,
+//            'types' => new Types(),
+//        ]));
+//    }
+
     /**
-     * Select an Assessment
-     *
-     * This is when you chooze what type of assessment it is, which
-     * returns you an appropriate fragment of common+assessmentType
-     * form inputs for you to fill out
+     * Select an IAssessable specified $assessmentTypeTitle into a Folder $folderId
      *
      * @param $folderId
+     * @param $assessmentTypeTitle
      */
-    public function getSelectAssessment($folderId)
+    public function getSelectAssessmentInFolder($folderId, $assessmentTypeTitle)
     {
         try {
             $folder = $this->getFolderMapper()->findById($folderId);
@@ -91,10 +112,48 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_CATEGORY_DELETED);
         }
 
-        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', [
+        $this->getSelectAssessmentData($folder->getId(), 'folder', $folder, $assessmentTypeTitle);
+    }
+
+    /**
+     * A macro for creating the standard data for all assessmentTypes
+     * for use in their Create screen
+     *
+     * @param $contextId
+     * @param $contextType
+     * @param \Schoolbox\Resource\Folder\Model $folder
+     * @param $assessmentTypeTitle
+     */
+    private function getSelectAssessmentData($contextId, $contextType, \Schoolbox\Resource\Folder\Model $folder, $assessmentTypeTitle)
+    {
+        /* Check that $type is valid
+         */
+        $types = new Types();
+
+        $assessmentType = $types->getFromTitle($assessmentTypeTitle);
+
+        $zone = new Zone('files');
+        $zone->setMulti(true);
+
+        $data = [
+            'attachzone' => $zone->getTwigContext(),
+            'allMarkTypes' => $this->getAllMarkTypes($assessmentType),
+            'assessmentTypeTitle' => $assessmentTypeTitle,
+            'assessmentType' => $assessmentType,
+            'contextId' => $contextId,
+            'contextType' => $contextType,
             'folder' => $folder,
-            'types' => new Types(),
-        ]));
+            'curriculumNodes' => $folder->getCurriculumNodes(),
+            'types' => $types,
+        ];
+
+        /* Special treatment for projects for now
+         */
+        if ($types->isProject($assessmentType)) {
+            $data['allSummators'] = new SummatorMapping();
+        }
+
+        $this->getResponse()->content->set($this->buildHtmlOutput('@learningAssessment/create.twig', $data));
     }
 
     /**
@@ -102,6 +161,8 @@ class Controller extends Base
      */
     public function postSelectAssessment()
     {
+        /* TODO: Check against ($contextId, $contextType) as well
+         */
         try {
             $folder = $this->getFolderMapper()->findById($this->getRequest()->post['folderId']);
         }
@@ -519,7 +580,7 @@ class Controller extends Base
     /**
      * All the possible Mark Types to chooze from for this particular $assessmentType
      *
-     * @param $assessmentType
+     * @param int $assessmentType
      * @return array
      */
     private function getAllMarkTypes($assessmentType)
