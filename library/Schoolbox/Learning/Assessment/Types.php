@@ -16,10 +16,10 @@ class Types extends \Schoolbox\Collection
     /**
      * Assessable types
      */
-    const ASSESSMENT_PROJECT = 0;
-    const ASSESSMENT_DUE_WORK = 1;
-    const ASSESSMENT_TASK = 2;
-    const ASSESSMENT_QUIZ = 3;
+    const ASSESSMENT_PROJECT = 1;
+    const ASSESSMENT_DUE_WORK = 2;
+    const ASSESSMENT_TASK = 3;
+    const ASSESSMENT_QUIZ = 4;
 
     /**
      * Set of key-value pairs

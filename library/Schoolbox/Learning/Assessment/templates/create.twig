@@ -81,9 +81,15 @@
     <div class="small-12 columns"><h1>Create Assessment</h1></div>
 </div>
 
+{% if assessmentType|length %}
+    {% set formAction = routeLookup('learningAssessment.postCreateAssessment') %}
+{% else %}
+    {% set formAction = routeLookup('learningAssessment.postSelectAssessment') %}
+{% endif %}
+
 <div class="row">
     <div class="small-12 columns island">
-        <form action="{{ routeLookup('learningAssessment.postSelectAssessment') }}" id="assessmentForm" method="post">
+        <form action="{{ formAction }}" id="assessmentForm" method="post">
             <section>
                 {% if not assessmentType|length %}
                 <fieldset class="content" data-mage="part-1">

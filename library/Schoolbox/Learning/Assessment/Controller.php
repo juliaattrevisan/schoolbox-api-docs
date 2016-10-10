@@ -121,6 +121,19 @@ class Controller extends Base
      */
     public function getSelectAssessmentInProject($projectId, $assessmentTypeTitle)
     {
+        /* Die early if you're trying to ram a project into a project
+         * We specifically don't allow it
+         *
+         * Instead, redirect to a safe place
+         */
+        $types = new Types();
+
+        if ($types->isProject($types->getFromTitle($assessmentTypeTitle))) {
+            $redirect = $this->getRouter()->generate('learningAssessment.getSelectAssessmentInProject', ['projectId' => $projectId]);
+
+            $this->getResponse()->redirect->to($redirect);
+        }
+
         /* TODO: Get from db
          */
         $project = (new Project((new SummatorFactory(SummatorFactory::WEIGHTED_AVERAGE))->produce()))->setId($projectId);
@@ -312,7 +325,7 @@ class Controller extends Base
         /* TODO Everything magically happens here, correctly, based on $contextId and $contextType
          */
         try {
-            $folder = $this->getFolderMapper()->findById($this->getRequest()->post['folderId']);
+            $folder = $this->getFolderMapper()->findById($this->getRequest()->post['contextId']);
         }
         catch (MapperException $e) {
             $this->sendError('Could not create assessment', [ 'select a valid Folder' ]);
@@ -351,10 +364,24 @@ class Controller extends Base
 
         /* If it were a project, go back to the project's Update screen
          * Otherwise return to the homepage
+         *
+         * Unless you tried to spawn nested projects, which we don't allow
          */
+        $types = new Types();
+
         if ($assessment instanceof Project) {
+
+            /* Check that you don't spawn a Project in a Project
+             */
+            if ($types->isProject($types->getFromTitle($this->getRequest()->post['contextType']))) {
+                $this->sendError('Could not create assessment', ['You cannot create nested projects.']);
+                return;
+            }
+
+            /* Continue as normal
+             */
             $this->getResponse()->content->set($this->buildUnthemedHtmlOutput('@learningAssessment/fragments/project/assessmentList.twig', [
-                'types' => new Types(),
+                'types' => $types,
                 'assessmentId' => $assessment->getId(),
                 'allReturnUrls' => $this->getAllReturnUrls($assessment->getId()),
             ]));
