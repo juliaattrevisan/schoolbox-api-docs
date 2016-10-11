@@ -124,9 +124,11 @@ class Translator
         if ($context instanceof Folder) {
             $assessmentModel->setAssessmentContext($context);
         } elseif ($context instanceof UnitSpecification) {
+            // Can't use translator here.
+            // UnitSpecificationTranslator->translateToDataModel requires a course spec I don't have.
             $assessmentModel->setAssessmentContext((new UnitSpecificationModel())->setId($context->getId()));
         } elseif ($context instanceof UnitImplementation) {
-            $assessmentModel->setAssessmentContext((new UnitImplementationModel())->setId($context->getId()));
+            $assessmentModel->setAssessmentContext($this->unitImplementationTranslator->translateToDataModel($context));
         } else {
             throw new UnexpectedValueException('$assessment has no context (folder, unit, unit spec or project)');
         }
