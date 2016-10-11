@@ -185,9 +185,9 @@
 
                     {# Work out where each assessables link should go to and pick an icon based on assessment type #}
 
-                    {% if assessable.getTypeName == 'Quiz' %}
+                    {% if assessable is quiz %}
                         {% set url = '/assess/intro/' ~ assessable.id %}               {# Link to the quiz page #}
-                    {% elseif assessable.getTypeName == 'Task' %}
+                    {% elseif assessable is task %}
                         {% set url = assessable.link %}                             {# Link to the task #}
                     {% else %}
                         {% set url = '/somewhere/' ~ assessable.id %}               {# Link to the due work page #}
@@ -203,7 +203,7 @@
 
                                         {# If the assessment is a task, display completion indicator if there is a response #}
 
-                                        {% if assessable.getTypeName == 'Task' and (assessable.getParticipant(student).getAllResponses | length) %}
+                                        {% if assessable is task and (assessable.getParticipant(student).getAllResponses | length) %}
                                             (Completed)
                                         {% endif %}
                                     </h3>
@@ -215,7 +215,7 @@
                         </div>
                         <nav>
 
-                            {% if assessable.getTypeName == 'Quiz' %}
+                            {% if assessable is quiz %}
 
                                 {# Display feedback #}
 
@@ -227,7 +227,7 @@
 
                                 <a href="/assess/intro/{{ assessable.id }}" class="icon-modify no-text" title="Attempt Quiz"></a>
 
-                            {% elseif assessable.getTypeName != 'Task' %}
+                            {% elseif assessable is dueWork %}
 
                                 {# Check if the due work is accepting submissions #}
 

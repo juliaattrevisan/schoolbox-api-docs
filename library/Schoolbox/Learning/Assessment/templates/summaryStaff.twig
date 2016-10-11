@@ -225,9 +225,9 @@
 
                     {# Work out where each assessables link should go to and pick an icon based on assessment type #}
 
-                    {% if assessable.getTypeName == 'Quiz' %}
+                    {% if assessable is quiz %}
                         {% set url = '/assess/intro/' ~ assessable.id %}               {# Link to the quiz page #}
-                    {% elseif assessable.getTypeName == 'Task' %}
+                    {% elseif assessable is task %}
                         {% set url = assessable.link %}                             {# Link to the task #}
                     {% else %}
                         {% set url = '/somewhere/' ~ assessable.id %}               {# Link to the due work page #}
@@ -252,7 +252,7 @@
                     {# Display list of all responses the student provided- this is a bit of an ugly technicolor label rainbow
                     but I do kinda suck at front-end... so if anyone has any suggestions... #}
 
-                    {% if assessable.getTypeName != 'Task' %}
+                    {% if assessable is dueWork %}
 
                         {# Check if there was a response #}
 
@@ -292,7 +292,7 @@
 
                                         {# Display different actions depending on the type of assessment #}
 
-                                        {% if assessable.getTypeName == 'Quiz' %}
+                                        {% if assessable is quiz %}
 
                                             {# Quiz #}
 
@@ -300,7 +300,7 @@
                                             <a href="#" class="icon-approve" title="Grade"></a>
                                             <a href="/assess/intro/{{ assessable.id }}" class="icon-modify no-text" title="Attempt Quiz On Behalf Of Student"></a>
 
-                                        {% elseif assessable.getTypeName != 'Task' %}
+                                        {% elseif assessable is dueWork %}
 
                                             {# Due Work #}
 
