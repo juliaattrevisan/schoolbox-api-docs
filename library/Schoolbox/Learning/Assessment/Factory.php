@@ -15,6 +15,9 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Resource\Folder\Model as Folder;
 use \Schoolbox\User;
 
 use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
@@ -45,6 +48,24 @@ class Factory
      * @var int
      */
     protected $type = -1;
+
+    /**
+     * What context is this within?
+     *
+     * Forms a unique identifier along with $contextIdentifier.
+     *
+     * @var string
+     */
+    protected $contextType;
+
+    /**
+     * What's the identifier of the context?
+     *
+     * Forms a unique identifier along with $contextType.
+     *
+     * @var int
+     */
+    protected $contextIdentifier;
 
     /**
      * @var string
@@ -98,6 +119,8 @@ class Factory
      */
     public function __construct(User $creator, $post) {
         $this->setType(trim($post['assessmentType']));
+        $this->setContextType(trim($post['contextType']));
+        $this->setContextIdentifier(trim($post['contextId']));
         $this->setTitle(trim($post['title']));
         $this->setDescription(trim($post['description']));
         $this->setCreator($creator);
@@ -245,6 +268,32 @@ class Factory
         /* Decorate with Assessable-specific data
          */
         $decorator->decorate($assessment);
+
+        // Figure out which context as well
+        // TODO make sure these are real
+        // TODO move these constants
+        $context = null;
+        switch ($this->getContextType()) {
+            case Controller::SPAWN_CONTEXT_FOLDER:
+                $context = new Folder();
+                break;
+
+            case Controller::SPAWN_CONTEXT_UNIT_IMPLEMENTATION:
+                $context = new UnitImplementation();
+                break;
+
+            case Controller::SPAWN_CONTEXT_UNIT_SPECIFICATION:
+                $context = new UnitSpecification();
+                break;
+
+            case Controller::SPAWN_CONTEXT_PROJECT:
+                $context = new Project();
+                break;
+
+            default:
+                throw new \DomainException('select a valid context');
+        }
+        $assessment->setContext($context->setId($this->getContextIdentifier()));
 
         return $assessment;
     }
@@ -429,6 +478,42 @@ class Factory
     protected function setAttachedFiles($attachedFiles)
     {
         $this->attachedFiles = $attachedFiles;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getContextType()
+    {
+        return $this->contextType;
+    }
+
+    /**
+     * @param string $contextType
+     * @return static
+     */
+    protected function setContextType($contextType)
+    {
+        $this->contextType = $contextType;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getContextIdentifier()
+    {
+        return $this->contextIdentifier;
+    }
+
+    /**
+     * @param int $contextIdentifier
+     * @return static
+     */
+    protected function setContextIdentifier($contextIdentifier)
+    {
+        $this->contextIdentifier = $contextIdentifier;
         return $this;
     }
 }
