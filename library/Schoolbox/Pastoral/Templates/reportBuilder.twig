@@ -1,0 +1,394 @@
+<script type="text/javascript" src="/javascript/components/selectize/dist/js/standalone/selectize.min.js"></script>
+<script type="text/javascript" src="/javascript/shared/selectize/jquery.selectize-selector.js"></script>
+<script type="text/javascript" src="/javascript/ckeditor/ckeditor.js"></script>
+<script type="text/javascript" src="/javascript/shared/editor/jquery.editor.js"></script>
+<script type="text/javascript" src="/javascript/resource/jquery.resourceAttach.js"></script>
+<script type="text/javascript" src="/javascript/shared/select-all/attacher.select-all.js"></script>
+
+<script type="text/javascript">
+
+    $(function () {
+
+        $('#sort-order').sortable({handle: '.grip', axis: 'y'});
+
+        {# Toggle all checkboxes when the 'Select All' box is changed #}
+
+        $('[data-check-all]').change(function (e) {
+            $('[data-check-type]').prop('checked', $(e.target)[0].checked);
+        });
+
+        $('[data-check-all-year]').change(function (e) {
+            $('[data-check-year]').prop('checked', $(e.target)[0].checked);
+        });
+
+        {# Whenever a type checkbox is changed disable the 'Select All' box #}
+
+        $('[data-check-type]').change(function (e) {
+            $('[data-check-all]').prop('checked', false);
+        });
+
+        $('[data-check-year]').change(function (e) {
+            $('[data-check-all-year]').prop('checked', false);
+        });
+
+        {# If we are changing report criteria this will tick the 'Select All' box if every type was selected #}
+
+        if ($('[data-check-type]:checked').length == $('[data-check-type]').length) {
+            $('[data-check-all]').prop('checked', true);
+        }
+
+        if ($('[data-check-year]:checked').length == $('[data-check-year]').length) {
+            $('[data-check-all-year]').prop('checked', true);
+        }
+
+        {# Setup selectize boxes #}
+
+        $('#tags_filter').selectizeSelector({
+            ajax: {
+                url: '/ajax/tags.php',
+                type: 'GET',
+                dataType: 'json'
+            },
+            multiple: true,
+            selectize: {
+                create: function (input) {
+                    return {
+                        id: input,
+                        name: input
+                    }
+                },
+            },
+            value: [
+                {% for tag in tagsSelected %}
+                {'id': '{{ tag | escape('js') }}', 'name': '{{ tag | escape('js') }}'},
+                {% endfor %}]
+        });
+
+        $('#filterStudents').selectizeSelector({
+            multiple: true,
+            ajax: {
+                url: '/ajax/user.php',
+                type: 'GET',
+                data: {roleTypeID: 'student'},
+                dataType: 'json'
+            },
+            value: [
+                {% for student in studentsSelected %}
+                {'id': '{{ student.id }}', 'name': '{{ student.name | escape('js') }}'},
+                {% endfor %}]
+        });
+
+        $('#filterAuthors').selectizeSelector({
+            multiple: true,
+            ajax: {
+                url: '/ajax/user.php',
+                type: 'GET',
+                data: {roleTypeID: 'staff'},
+                dataType: 'json'
+            },
+            value: [
+                {% for author in authorsSelected %}
+                {'id': '{{ author.id }}', 'name': '{{ author.name | escape('js') }}'},
+                {% endfor %}]
+        });
+
+        {# Setup datepicker#}
+
+        $('#datetime_before, #datetime_after').datepicker();
+
+        {# Generate the report after a little sanity checking#}
+
+        $('[data-report]').click(function (event) {
+
+            event.preventDefault();
+
+            var error = false;
+
+            // Dates can't be backwards
+
+            $('#datetime_after_error').hide();
+
+            if ($('#datetime_after').val() != '' && $('#datetime_before').val() != '') {
+
+                var datetime_after = $.datepicker.parseDate('dd/mm/yy', $('#datetime_after').val());
+                var datetime_before = $.datepicker.parseDate('dd/mm/yy', $('#datetime_before').val());
+
+                if (datetime_before < datetime_after) {
+                    $('#datetime_after_error').show();
+                    error = true;
+                }
+            }
+
+            // At least one record type has to be selected
+
+            $('#type_error').hide();
+
+            if ($('[data-check-type]:checked').length == 0) {
+                $('#type_error').show();
+                error = true;
+            }
+
+            if (!error) {
+                // Create report page GET variables
+
+                $('#tags').val($('#tags_filter').val());
+                $('#after').val($('#datetime_after').val());
+                $('#before').val($('#datetime_before').val());
+                $('#severity').val($('#filterSeverity').val());
+                $('#involved').val($('#involved-checkbox')[0].checked);
+
+                var order = '';
+
+                $('#sort-order').children('li').each(function (d) {
+                    if (order != '') {
+                        order += ',';
+                    }
+                    order = order + $(this).data('order');
+                });
+
+                $('#order').val(order);
+
+                var types = '';
+                var types_array = $('[name="types[]"]');
+                var students = $('#filterStudents');
+                var authors = $('#filterAuthors');
+
+                var years = '';
+                var years_array = $('[name="years[]"]');
+
+                if (students.val() != null)
+                    $('#students').val(students.val().join());
+
+                if (authors.val() != null)
+                    $('#authors').val(authors.val().join());
+
+                for (var i = 0; i < types_array.length; i++) {
+                    if (types_array[i].checked) {
+                        if (types != '') {
+                            types += ",";
+                        }
+                        types += types_array[i].value;
+                    }
+                }
+
+                $('#types').val(types);
+
+                for (var i = 0; i < years_array.length; i++) {
+                    if (years_array[i].checked) {
+                        if (years != '') {
+                            years += ",";
+                        }
+                        years += years_array[i].value;
+                    }
+                }
+
+                $('#years').val(years);
+
+                $('#formReport').submit();
+            }
+        });
+    });
+
+</script>
+
+<ul class="breadcrumb">
+    <li class="active"><a href="#">Pastoral Care Report Generator</a></li>
+</ul>
+
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Pastoral Report Generator</h1>
+            <h2 class="subheader">Select Report Criteria</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="small-12 island">
+
+        <form id="formReport" action="{{ routeLookup('pastoral.getReport') }}" method="get">
+            <input type="hidden" id="years" name="years">
+            <input type="hidden" id="students" name="students">
+            <input type="hidden" id="authors" name="authors">
+            <input type="hidden" id="severity" name="severity">
+            <input type="hidden" id="types" name="types">
+            <input type="hidden" id="tags" name="tags">
+            <input type="hidden" id="before" name="before">
+            <input type="hidden" id="after" name="after">
+            <input type="hidden" id="order" name="order">
+            <input type="hidden" id="involved" name="involved">
+        </form>
+
+        <section>
+            <fieldset class="content">
+                <div class="small-12 columns">
+                    <label>
+                        Filter By Student
+                        <select id="filterStudents" name="students[]" multiple placeholder="Select Students"></select>
+                    </label>
+                    <label>
+                        Filter By Author
+                        <select id="filterAuthors" name="authors[]" multiple placeholder="Select Authors"></select>
+                    </label>
+                    <label>
+                        Minimum Severity Level
+                        <select id="filterSeverity" name="severity_id">
+                            <option value="">Show All Severity Levels</option>
+                            {% for severity in severities %}
+                                <option {% if severity.id == severitySelected %}selected{% endif %}
+                                        value="{{ severity.order }}">{{ severity.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                </div>
+                <div class="small-12 columns">
+                    <label id="datetime_after_error" for="datetime_after" class="error" style="display:none;">Invalid
+                        date range specified</label>
+                </div>
+                <div class="small-12 large-6 columns">
+                    <label for="datetime_after">
+                        Published On Or After
+                        <input type="text" class="required" name="after" id="datetime_after" maxlength="50"
+                               value="{{ afterSelected }}"/>
+                    </label>
+                </div>
+                <div class="small-12 large-6 columns">
+                    <label for="item_datetime_published">
+                        Published On Or Before
+                        <input type="text" class="required" name="before" id="datetime_before" maxlength="50"
+                               value="{{ beforeSelected }}"/>
+                    </label>
+                </div>
+                <div class="small-12 columns">
+                    <label for="item_datetime_published">
+                        Filtered By Tags
+                        <input type="text" class="required" name="tags_filter" id="tags_filter" maxlength="50"
+                               value="{{ tagsSelected }}"/>
+                    </label>
+                </div>
+            </fieldset>
+        </section>
+
+        <h2 class="subheader">Record Types</h2>
+        <ul class="meta">
+            Select the record types you want to appear in the report
+        </ul>
+        <section>
+            <div class="small-12 columns content">
+                <div class="checklist" data-equalizer-watch="">
+                    <input id="type-all" data-check-all type="checkbox">
+                    <label for="type-all">Select All</label>
+                    {% for type in types %}
+                        <input data-check-type id="type-{{ type.id }}" name="types[]" value="{{ type.id }}" type="checkbox"
+                                {% for typeSelected in typesSelected %}
+                                    {% if typeSelected == type.id %}
+                                        checked
+                                    {% endif %}
+                                {% endfor %}
+                        >
+                        <label for="type-{{ type.id }}">
+                            {{ type.name }}
+                        </label>
+                    {% endfor %}
+                    <label id="type_error" for="datetime_after" class="error" style="display:none;">
+                        You must select at least one record type to show in the report
+                    </label>
+
+                    {% if superUser %}
+                        <hr>
+                        <label>
+                            Super User / Pastoral Moderator Filter
+                        </label>
+                        <p class="meta">
+                            As you are logged in as either a superuser or pastoral moderator you have access to view all
+                            records in the system. To filter the report to show only those incidents in which you are
+                            involved click on the checkbox below.
+                        </p>
+                        <input id="involved-checkbox" name="involved-checkbox" value="1" type="checkbox" {{ involved }}>
+                        <label for="involved-checkbox">
+                            Only show records in which you are the author or an audience member
+                        </label>
+                    {% else %}
+                        <input type="hidden" id="involved-checkbox" value="1">
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+
+        <h2 class="subheader">Year Levels</h2>
+        <ul class="meta">
+            Select the year levels you want included in the report
+        </ul>
+
+        <section>
+            <div class="small-12 columns content">
+                <div class="checklist" data-equalizer-watch="">
+                    <input id="year-all" data-check-all-year type="checkbox">
+                    <label for="year-all">Select All</label>
+                    {% for year in years %}
+                        <input data-check-year id="year-{{ year }}" name="years[]" value="{{ year }}" type="checkbox"
+                                {% for yearSelected in yearsSelected %}
+                                    {% if yearSelected == year %}
+                                        checked
+                                    {% endif %}
+                                {% endfor %}
+                        >
+                        <label for="year-{{ year }}">
+                            {{ year }}
+                        </label>
+                    {% endfor %}
+                    <label id="year_error" for="datetime_after" class="error" style="display:none;">
+                        You must select at least one year level to show in the report
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <h2 class="subheader">Sort Order</h2>
+        <ul class="meta">
+            Select the order in which you would like your report sorted
+        </ul>
+        <section>
+            <ul id="sort-order" class="information-list sortable ui-sortable" data-sortable="">
+                <li class="row" data-order="student">
+                    <div class="grip"></div>
+                    <div class="avatar card small-11">
+                        Student Name<br>&nbsp;
+                    </div>
+                </li>
+                <li class="row" data-order="date">
+                    <div class="grip"></div>
+                    <div class="avatar card small-11">
+                        Published Date<br>&nbsp;
+                    </div>
+                </li>
+                <li class="row" data-order="category">
+                    <div class="grip"></div>
+                    <div class="avatar card small-11">
+                        Record Type
+                        <div class="meta">({% for type in types %}{{ type.name }}{% if not loop.last %}, {% endif %}{% endfor %})</div>
+                    </div>
+                </li>
+                <li class="row" data-order="severity">
+                    <div class="grip"></div>
+                    <div class="avatar card small-11">
+                        Severity
+                        <div class="meta">({% for severity in severities %}{{ severity.name }}{% if not loop.last %}, {% endif %}{% endfor %})</div>
+                    </div>
+                </li>
+                <li class="row" data-order="author">
+                    <div class="grip"></div>
+                    <div class="avatar card small-11">
+                        Author Name<br>&nbsp;
+                    </div>
+                </li>
+            </ul>
+        </section>
+
+        <a href="#" data-report class="submit expand">Create Report</a>
+
+    </div>
+
+</div>

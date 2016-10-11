@@ -7,8 +7,8 @@
 
 use Schoolbox\Notif\SilentNotif;
 use Schoolbox\UserMapper;
-use Schoolbox\Pastoral\Pastoral\Model as PastoralModel;
-use Schoolbox\Pastoral\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Model as PastoralModel;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
 use Schoolbox\Pastoral\Category\Mapper as PastoralCategoryMapper;
@@ -78,10 +78,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * Returns the pastoral record if found in remote system
      *
-     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
+     * @param \Schoolbox\Pastoral\Model $pastoral
      * @return array
      */
-    public function getPastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
+    public function getPastoral(\Schoolbox\Pastoral\Model $pastoral)
     {
         $query = "SELECT  PastoralCareSeq,
                           ID,
@@ -114,10 +114,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * Returns the external ID used to identify this pastoral record
      *
-     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
+     * @param \Schoolbox\Pastoral\Model $pastoral
      * @return string
      */
-    private function getPastoralIdentifier(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
+    private function getPastoralIdentifier(\Schoolbox\Pastoral\Model $pastoral)
     {
         return ($pastoral->getExternalId());
     }
@@ -386,11 +386,11 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * Creates a new pastoral record in the external database
      *
-     * @param \Schoolbox\Pastoral\Pastoral
-     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
+     * @param \Schoolbox\Pastoral
+     * @param \Schoolbox\Pastoral\Model $pastoral
      * @return bool
      */
-    public function createPastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
+    public function createPastoral(\Schoolbox\Pastoral\Model $pastoral)
     {
         // Get the information necessary to create the query
 
@@ -536,10 +536,10 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * Updates an existing pastoral record
      *
-     * @param \Schoolbox\Pastoral\Pastoral\Model $pastoral
+     * @param \Schoolbox\Pastoral\Model $pastoral
      * @return bool
      */
-    public function updatePastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
+    public function updatePastoral(\Schoolbox\Pastoral\Model $pastoral)
     {
         // Get the information necessary to create the query
 
@@ -626,7 +626,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
      *
      * @param PastoralModel $pastoral
      */
-    public function updatePastoralCareContacts(\Schoolbox\Pastoral\Pastoral\Model $pastoral) {
+    public function updatePastoralCareContacts(\Schoolbox\Pastoral\Model $pastoral) {
 
         $external_id = $pastoral->getExternalId();
 
@@ -672,28 +672,29 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     /**
      * @inheritDoc
      */
-    public function deletePastoral(\Schoolbox\Pastoral\Pastoral\Model $pastoral)
+    public function deletePastoral(\Schoolbox\Pastoral\Model $pastoral)
     {
-        if (trim($pastoral->getExternalId()) != '') {
-            $result = $this->getDatabase()->query("DELETE FROM PastoralCareContacts WHERE PastoralCareSeq = " . $pastoral->getExternalId());
+        if (Config::get('pastoral_external_delete')) {
+            if (trim($pastoral->getExternalId()) != '') {
+                $result = $this->getDatabase()->query("DELETE FROM PastoralCareContacts WHERE PastoralCareSeq = " . $pastoral->getExternalId());
 
-            if ($result)
-                $result = $this->getDatabase()->query("DELETE FROM PastoralCareComments WHERE PastoralCareSeq = " . $pastoral->getExternalId());
-            else
-                return false;
+                if ($result) {
+                    $result = $this->getDatabase()->query("DELETE FROM PastoralCareComments WHERE PastoralCareSeq = " . $pastoral->getExternalId());
+                } else {
+                    return false;
+                }
 
-            if ($result)
-                $result = $this->getDatabase()->query("DELETE FROM tPastoralCare WHERE PastoralCareSeq = " . $pastoral->getExternalId());
-            else
-                return false;
+                if ($result) {
+                    $result = $this->getDatabase()->query("DELETE FROM tPastoralCare WHERE PastoralCareSeq = " . $pastoral->getExternalId());
+                } else {
+                    return false;
+                }
 
-            return $result;
-        } else {
-
-            // Nothing to delete
-
-            return true;
+                return $result;
+            }
         }
+
+        return true;
     }
 
 

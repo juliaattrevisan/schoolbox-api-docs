@@ -1,3 +1,5 @@
+{% set filters = 'students=' ~ students ~ '&authors=' ~  authors  ~ '&severity=' ~  severity  ~ '&types=' ~  types  ~ '&years=' ~  years  ~ '&tags=' ~  tags  ~ '&before=' ~  before  ~ '&after=' ~  after ~ '&order=' ~ order %}
+
 <script>
     $(function () {
         function popupCenter(url, title, w, h) {
@@ -18,7 +20,7 @@
 
         $("[data-print]").click(function() {
             popupCenter(
-                    '/pastoral/report-print?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}',
+                    '{{ routeLookup('pastoral.getReportPrint') }}?{{ filters | raw }}',
                     'Print Pastoral Record',
                     900,
                     500);
@@ -26,7 +28,7 @@
     });
 </script>
 <ul class="breadcrumb hide-on-print">
-    <li><a href="/pastoral/report-builder">Pastoral Care Report Generator</a></li>
+    <li><a href="{{ routeLookup('pastoral.getReportBuilder') }}">Pastoral Care Report Generator</a></li>
     <li class="active"><a href="#">Report Results</a></li>
 </ul>
 
@@ -75,14 +77,28 @@
                                         Posted by <a href="/search/user/{{ record.owner.getId() }}">{{ record.owner.firstName }} {{ record.owner.lastName }}</a> {{  record.getCreatedAt().getShort() }}
                                     </p>
 
-                                    {# Show tags #}
-                                    {% if record.tagsList | length > 0 %}
-                                        <p class="spaced">
-                                            {% for tag in record.tagsList %}
-                                                <span class="hide-on-print neutral label">{{ tag.name }}</span>
-                                                <b class="show-for-print"> {{ tag.name }}</b>
-                                            {% endfor %}
-                                        </p>
+                                    {# Display tags #}
+                                    {% if role != 'parent' %}
+                                        {% if record.points != 0 or (record.tagsList | length) > 0 %}
+                                            <p class="spaced">
+                                                {% if record.points != 0 %}
+                                                    {% if record.points < 0 %}
+                                                        {% set labelClass='alert' %}
+                                                    {% endif %}
+                                                    {% if record.points > 0 %}
+                                                        {% set labelClass='success' %}
+                                                    {% endif %}
+                                                    <span class="{{ labelClass }} label hide-on-print">{{ record.points }} Point{% if record.points < -1 or record.points > 1 %}s{% endif %}</span>
+                                                    <b class="show-for-print"> {{ record.points }} Point{% if record.points < -1 or record.points > 1 %}s{% endif %}</b>
+                                                {% endif %}
+                                                {% if record.tagsList | length > 0 %}
+                                                    {% for tag in record.tagsList %}
+                                                        <span class="neutral label hide-on-print">{{ tag.name }}</span>
+                                                        <b class="show-for-print"> {{ tag.name }}</b>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </p>
+                                        {% endif %}
                                     {% endif %}
 
                                     {# Hide meta from parents#}
@@ -169,7 +185,7 @@
                     <p class="no-margin">No pastoral records matched your search criteria, please review your criteria and try again.</p>
                 </div>
             </section>
-            <a class="button submit expand" href="/pastoral/report-builder?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Change Report Criteria</a>
+            <a class="button submit expand" href="{{ routeLookup('pastoral.getReportBuilder') }}?{{ filters}}">Change Report Criteria</a>
         </div>
 
     {% endif %}
@@ -180,20 +196,20 @@
     <br>
     <div class="row">
         <div class="small-12 island">
-            <a class="button submit expand" href="/pastoral/report-builder?students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">Change Report Criteria</a>
+            <a class="button submit expand" href="{{ routeLookup('pastoral.getReportBuilder') }}?{{ filters}}">Change Report Criteria</a>
 
             {% if results | length > 0 and totalPages > 1 %}
                 <br><br>
                 <ul class="pagination">
-                    <li class="arrow"><a href="?pageCurrent=1&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">«</a></li>
-                    <li class="arrow {% if pageCurrent == 1 %}unavailable{% endif %}"><a href="{% if pageCurrent == 1 %}#{% else %}?pageCurrent={{ pageCurrent - 1 }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}{% endif %}">‹</a></li>
+                    <li class="arrow"><a href="?pageCurrent=1{{ filters }}">«</a></li>
+                    <li class="arrow {% if pageCurrent == 1 %}unavailable{% endif %}"><a href="{% if pageCurrent == 1 %}#{% else %}?pageCurrent={{ pageCurrent - 1 }}&(( filters }}{% endif %}">‹</a></li>
                     {% for i in range (max(1, pageCurrent - ( pagesToDisplay - (min(totalPages, pageCurrent +  pagesToDisplay - (pageCurrent - max(1, pageCurrent - (pagesToDisplay / 2) ))) - pageCurrent))), min(totalPages, pageCurrent + pagesToDisplay - (pageCurrent - max(1, pageCurrent - (pagesToDisplay / 2)))))  %}
                         <li {% if i == pageCurrent %} class='active' {% endif %}>
-                            <a href="?pageCurrent={{ i }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">{{ i }}</a>
+                            <a href="?pageCurrent={{ i }}&(( filters }}">{{ i }}</a>
                         </li>
                     {% endfor %}
-                    <li class="arrow"><a href="{% if pageCurrent == totalPages %}#{% else %}?pageCurrent={{ pageCurrent + 1 }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}{% endif %}">›</a></li>
-                    <li class="arrow"><a href="?pageCurrent={{ totalPages }}&students={{ students }}&authors={{ authors }}&severity={{ severity }}&types={{ types }}&tags={{ tags }}&before={{ before }}&after={{ after }}">»</a></li>
+                    <li class="arrow"><a href="{% if pageCurrent == totalPages %}#{% else %}?pageCurrent={{ pageCurrent + 1 }}&(( filters }}{% endif %}">›</a></li>
+                    <li class="arrow"><a href="?pageCurrent={{ totalPages }}&(( filters }}">»</a></li>
                 </ul>
             {% endif %}
         </div>

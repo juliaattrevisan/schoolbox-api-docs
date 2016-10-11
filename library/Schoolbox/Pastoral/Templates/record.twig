@@ -1,5 +1,3 @@
-{% set owner = session.user.getRole().isStaff() and record.owner.getId() == session.user.getId() %}
-
 {% if role != 'parent' %}
 
     <script type="text/javascript">
@@ -19,11 +17,9 @@
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete this record?',
                     confirmEvent: function() {
-                        $.post('/pastoral/delete', {
-                            id: {{ record.getId() }}
-                        })
+                        $.post('{{ routeLookup('pastoral.postDelete', {recordId: record.getId}) }}')
                         .done(function() {
-                            window.location.href = '/pastoral/{{ record.getStudent.getId() }}';
+                            window.location.href = '{{ routeLookup('pastoral.getIndex', {studentId: record.getStudent.getId}) }}';
                         });
                     }
                 });
@@ -37,9 +33,7 @@
                 $(this).confirmDialog({
                     text: 'Are you sure you want to delete this comment?',
                     confirmEvent: function() {
-                        $.post('/pastoral/comment-delete', {
-                            id: $(event.target).attr('data-delete-comment')
-                        })
+                        $.post('{{ routeLookup('pastoral.postCommentDelete', {'commentId': ''}) }}' + $(event.target).attr('data-delete-comment'))
                         .done(function() {
 
                             // Remove comment after AJAX return
@@ -56,7 +50,7 @@
 
 <ul class="breadcrumb">
     <li><a href="/search/user/{{ record.getStudent.getId }}">{{ record.getStudent.getFirstname }} {{ record.getStudent.getLastname }}</a></li>
-    <li><a href="/pastoral/{{ record.getStudent.getId }}">Pastoral Care</a></li>
+    <li><a href="{{ routeLookup('pastoral.getIndex', {studentId: record.getStudent.getId}) }}">Pastoral Care</a></li>
     <li class="active"><a href="#">{{ record.getHeading() }}</a></li>
 </ul>
 
@@ -120,15 +114,18 @@
                         </div>
                     </div>
 
-                    {# Only display the edit/delete links to the owner of the record or pastoral moderators #}
-                    {% if owner or pastoralModerator >= WRITE_ACCESS %}
                     <nav>
-                        <a class="icon-modify" href="/pastoral/update/{{ record.getId() }}" title="Modify Comment"></a>
-                        {% if owner or pastoralModerator >= FULL_ACCESS %}
-                            <a data-delete class="icon-delete" href="#" title="Delete Comment"></a>
+
+                        {# Display appropriate nav items based on permissions #}
+
+                        {% if isRouteAuthorized('pastoral.getUpdate', {record: record}) %}
+                            <a class="icon-modify" href="{{ routeLookup('pastoral.getUpdate', {recordId: record.getId()}) }}" title="Modify Record"></a>
+                        {% endif %}
+
+                        {% if isRouteAuthorized('pastoral.postDelete', {record: record}) %}
+                            <a data-delete class="icon-delete" href="#" title="Delete Record"></a>
                         {% endif %}
                     </nav>
-                    {% endif %}
                 </li>
             </ul>
         </section>
@@ -166,11 +163,11 @@
                                 <div class="list-item">
                                     <div class="small-12 card wrap-down">
                                         {# Show student photo #}
-                                        <a href="/pastoral/{{ related.getStudent.getId }}/{{ related.getId }}" title="View Record">
+                                        <a href="{{ routeLookup('pastoral.getRecord', {'studentId': related.getStudent.getId, 'recordId': related.getId}) }}" title="View Record">
                                             <img src="/portrait.php?userId={{ related.student.getExternalId() }}&size=square64" alt="" />
                                         </a>
                                         <p class="meta">
-                                            <a title="View Record" href="/pastoral/{{ related.getStudent.getId }}/{{ related.getId }}">
+                                            <a title="View Record" href="{{ routeLookup('pastoral.getRecord', {'studentId': related.getStudent.getId, 'recordId': related.getId}) }}">
                                                 {{ related.getStudent.getFirstName }} {{ related.getStudent.getLastName }}
                                             </a>
                                         </p>
@@ -205,7 +202,7 @@
                                         </a>
 
                                         {# Show comment author #}
-                                        <p class="meta">Posted By <a href="/search/user/{{ comment.getOwner.getId }}">{{ comment.getOwner.getFirstName }} {{ comment.getOwner.getLastName }}</a> {{ comment.getCreatedAt().getShort() }}</p>
+                                        <p class="meta">Posted by <a href="/search/user/{{ comment.getOwner.getId }}">{{ comment.getOwner.getFirstName }} {{ comment.getOwner.getLastName }}</a> {{ comment.getCreatedAt().getShort() }}</p>
 
                                         {# Show comment body #}
                                         <p class="spaced">
@@ -216,11 +213,7 @@
 
                                 {# Only the author of the comment, author of the pastoral record, or moderators can delete comments #}
 
-                                {%
-                                    if  record.getOwner.getId == session.user.getId or
-                                        comment.getOwner.getId == session.user.getId or
-                                        pastoralModerator >= FULL_ACCESS
-                                %}
+                                {% if isRouteAuthorized('pastoral.postCommentDelete', {comment: comment}) %}
                                     <nav>
                                         <a data-delete-comment="{{ comment.getId }}" class="icon-delete" href="#" title="Delete Comment"></a>
                                     </nav>
@@ -231,12 +224,10 @@
                     </ul>
                 </section>
             {% endif %}
-            <form method="post" action="/pastoral/comment">
+            <form method="post" action="{{ routeLookup('pastoral.postCommentSave', {'recordId': record.getId}) }}">
                 <input type="hidden" name="pastoral_id" value="{{ record.getId() }}">
                 <input type="hidden" name="student_id" value="{{ record.getStudent.getId() }}">
-                <section>
-                    <textarea id="body" rows="3" cols="50" name="body" placeholder="Add Comment"></textarea>
-                </section>
+                <textarea id="body" rows="3" cols="50" name="body" placeholder="Add Comment"></textarea>
                 <input disabled data-post type="submit" class="expand" value="Post Comment">
             </form>
 
