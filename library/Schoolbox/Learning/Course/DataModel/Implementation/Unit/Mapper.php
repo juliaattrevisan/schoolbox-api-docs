@@ -7,6 +7,7 @@
 
 namespace Schoolbox\Learning\Course\DataModel\Implementation\Unit;
 
+use Schoolbox\Collection;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper as BaseMapper;
@@ -47,5 +48,17 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+    }
+
+    /**
+     * Finds all unit implementations for this course implementation.
+     *
+     * @param int|array $courseId
+     * @param array     $options
+     * @return Collection|Model[]
+     */
+    public function findAllByCourseId($courseId, $options = [])
+    {
+        return $this->findByColumn('course_implementation_id', $courseId, $options);
     }
 }

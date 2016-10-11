@@ -62,62 +62,15 @@ class ImplementationMapperProxy
     }
 
     /**
-     * Proxy for `Mapper->findAllByCourseId()`.
-     *
-     * @param int|array $courseId One or more course IDs
-     * @param array     $options
-     * @return Implementation[]|Collection
-     */
-    public function findAllByCourseId($courseId, $options = [])
-    {
-        return $this->mapper
-            ->findAllByCourseId($courseId, $options)
-            ->map([$this->translator, 'translateToDomainModel']);
-    }
-
-    /**
-     * Proxy for `Mapper->findByFolderId()`.
-     *
-     * @param int $folderId
-     * @param array $options
-     * @return Implementation
-     * @throws Exception if object wasn't found
-     * @throws Exception\Deleted if object was deleted
-     */
-    public function findByFolderId($folderId, $options = [])
-    {
-        try {
-            return $this->translator->translateToDomainModel($this->mapper->findByFolderId($folderId, $options));
-        } catch (Exception\Deleted $e) {
-            throw $this->repopulateDeletedException($e);
-        }
-    }
-
-    /**
-     * Proxy for `Mapper->findAllByCourseFolderId()`.
-     *
-     * @param int|array $courseFolderId One or more folder IDs
-     * @param array     $options
-     * @return Implementation[]|Collection
-     */
-    public function findAllByCourseFolderId($courseFolderId, $options = [])
-    {
-        return $this->mapper
-            ->findAllByCourseFolderId($courseFolderId, $options)
-            ->map([$this->translator, 'translateToDomainModel']);
-    }
-
-    /**
      * Proxy for `Mapper->save()`.
      *
-     * @param Implementation       $implementation
-     * @param CourseImplementation $courseImplementation The course spec which contains $implementation
+     * @param Implementation $implementation
      * @return Implementation
      */
-    public function save(Implementation $implementation, CourseImplementation $courseImplementation)
+    public function save(Implementation $implementation)
     {
         // Convert to data model, then save
-        $dataModel = $this->translator->translateToDataModel($implementation, $courseImplementation);
+        $dataModel = $this->translator->translateToDataModel($implementation);
         $this->mapper->save($dataModel);
         // Assign ID
         $implementation->setId($dataModel->getId());
@@ -133,8 +86,7 @@ class ImplementationMapperProxy
     public function delete(Implementation $implementation)
     {
         // Convert to data model, then delete
-        // Don't need an intricate course spec
-        $dataModel = $this->translator->translateToDataModel($implementation, new CourseImplementation());
+        $dataModel = $this->translator->translateToDataModel($implementation);
         $this->mapper->delete($dataModel);
         return $implementation;
     }

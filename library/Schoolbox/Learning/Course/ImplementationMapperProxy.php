@@ -84,56 +84,6 @@ class ImplementationMapperProxy
     }
 
     /**
-     * Proxy for `Mapper->findByFolderId()`.
-     *
-     * @param int $folderId
-     * @param array $options
-     * @return Implementation
-     * @throws Exception if object wasn't found
-     * @throws Exception\Deleted if object was deleted
-     */
-    public function findByFolderId($folderId, $options = [])
-    {
-        try {
-            return $this->loadUnits(
-                $this->translator->translateToDomainModel($this->mapper->findByFolderId($folderId, $options))
-            );
-        } catch (Exception\Deleted $e) {
-            throw $this->repopulateDeletedException($e);
-        }
-    }
-
-    /**
-     * Proxy for `Mapper->findAll()`.
-     *
-     * @param array $options
-     * @return Collection|Implementation[]
-     */
-    public function findAll($options = [])
-    {
-        return $this->loadUnitsForCollection(
-            $this->mapper
-                ->findAll($options)
-                ->map([$this->translator, 'translateToDomainModel'])
-        );
-    }
-
-    /**
-     * Proxy for `Mapper->findAllByName()`.
-     *
-     * @param string $name
-     * @return Collection|Implementation[]
-     */
-    public function findAllByName($name)
-    {
-        return $this->loadUnitsForCollection(
-            $this->mapper
-                ->findAllByName($name, ['order' => ['f.name' => 'ASC' ]])
-                ->map([$this->translator, 'translateToDomainModel'])
-        );
-    }
-
-    /**
      * Proxy for `Mapper->save()`.
      *
      * @param Implementation $implementation
@@ -151,7 +101,7 @@ class ImplementationMapperProxy
         $existingUnits = $this->unitMapper->findAllByCourseId($implementation->getId());
         $savedUnits    = new Collection();
         foreach ($implementation->getUnits() as $unit) {
-            $savedUnits->add($this->unitTranslator->translateToDataModel($unit, $implementation));
+            $savedUnits->add($this->unitTranslator->translateToDataModel($unit));
         }
         $this->unitMapper->save($savedUnits);
 
