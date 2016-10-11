@@ -538,7 +538,9 @@ class Bootstrap implements BootstrapInterface {
             $di->lazyNew(
                 AssessmentMapperProxy::class,
                 [
-                    'baseMapper' => $di->get('mapperFactory')->getLazy(AssessmentMapper::class),
+                    'baseMapper' => $di->lazy(function () use ($di) {
+                        return $di->get('mapperFactory')->get(AssessmentMapper::class);
+                    }),
                     'translator' => $di->lazyGet('assessmentTranslator'),
                 ]
             )
