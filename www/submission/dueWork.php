@@ -333,7 +333,7 @@ foreach ($categoryList as $category) {
         }
 
         if (is_array($teacherList)) {
-            foreach ($teacherList as $teacherSynID) {
+            foreach (array_unique($teacherList) as $teacherSynID) {
                 $teacher = $userHandler->getBySynergy($teacherSynID);
                 if (is_array($teacher)) {
                     $teacherName = $userHandler->formatName($teacher);
