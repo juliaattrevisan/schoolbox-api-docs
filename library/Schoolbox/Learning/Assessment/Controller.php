@@ -424,8 +424,9 @@ class Controller extends Base
         }
 
         /* TODO: Figure out what the sequence# should be
+         * Likely it will be added to the end of the list of assessments
          */
-        $this->getAssessmentDataSource()->save($assessment, 0);
+        $this->getAssessmentDataSource()->save($assessment, 1);
 
         /* If it were a project, go back to the project's Update screen
          * Otherwise return to the homepage
