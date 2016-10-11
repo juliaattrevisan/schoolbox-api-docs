@@ -7,6 +7,9 @@
  */
 ;(function ($, window, document, undefined) {
 
+    var slideSlow = 600;
+    var slideFast = 100;
+
     var pluginName = 'mage';
 
     var defaults = {
@@ -262,7 +265,7 @@
      */
     function xhrBefore(target) {
         target.attr('disabled', 'disabled');
-        target.find('[data-mage-error]').slideUp(100);
+        target.find('[data-mage-error]').slideUp(slideFast);
 
         var $e = $(this.element);
 
@@ -279,16 +282,14 @@
      */
     function xhrDone(onXhrDone, target, data) {
 
-        var slideDuration = 600;
-
         // ensure the error is slidden away (although onBefore should have handled it)
-        target.find('[data-mage-error]').slideUp(slideDuration);
+        target.find('[data-mage-error]').slideUp(slideSlow);
 
         // slide away the submit for this section
-        $(this.element).data('mage-submitted', true).closest('[data-mage-submitrow]').slideUp(slideDuration);
+        $(this.element).data('mage-submitted', true).closest('[data-mage-submitrow]').slideUp(slideSlow);
 
         // also slide away this section's helptext
-        $(this.element).closest(this.options.submittable).find('[data-mage-helptext]').slideUp(slideDuration);
+        $(this.element).closest(this.options.submittable).find('[data-mage-helptext]').slideUp(slideSlow);
 
         // slide out the target section
         var next = $('[data-mage="' + $(this.element).data('mage-next') +  '"]');
@@ -303,7 +304,7 @@
         // call the callback (this would include any specific manipulation for the section being targeted)
         onXhrDone.call(this.element, data);
 
-        next.find('[data-mage-collapsed]').hide().removeClass('hide').slideDown(slideDuration);
+        next.find('[data-mage-collapsed]').hide().removeClass('hide').slideDown(slideSlow);
     }
 
 
