@@ -14,6 +14,67 @@
         $('input[data-mage-next]').mage();
 
         /**
+         * When you finish configuring a non-project assessment
+         */
+        function setupAssessmentEnd() {
+            $('input[data-mage-next="end"]').mage({
+                manipulateSerialized: function(data) {
+                    var newData = data;
+
+                    if (CKEDITOR.instances['description'] != undefined) {
+                        newData.push({
+                            name: 'description',
+                            value: CKEDITOR.instances['description'].getData()
+                        });
+                    }
+
+                    return newData;
+                },
+
+                onXhrDone: function (data) {
+
+                    /* TODO: Redirect somewhere upon success
+                     */
+                    console.log(data);
+                }
+            });
+        }
+
+        /**
+         * When you finish configuring a project
+         */
+        function setupProjectEnd() {
+            $('input[data-mage-next="part-3"]').mage({
+                manipulateSerialized: function(data) {
+                    var newData = data;
+
+                    if (CKEDITOR.instances['description'] != undefined) {
+                        newData.push({
+                            name: 'description',
+                            value: CKEDITOR.instances['description'].getData()
+                        });
+                    }
+
+                    return newData;
+                },
+                onXhrDone: function (data) {
+                    $('#assessmentForm')
+                        .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment') }}')
+                        .find('[data-project-contents]')
+                        .html(data);
+                }
+            });
+        }
+
+        /* Save everything when Part 1 was already chosen in route
+         */
+        setupAssessmentEnd();
+
+        /* Or, proceed with project configuration if Part 1 was already chosen in route
+         */
+        setupProjectEnd();
+
+        /**
          * Update new form action url
          *
          * Inject common details
@@ -26,52 +87,13 @@
                     .find('[data-assessment-details]')
                     .html(data);
 
-                /* Save everything
+                /* Save everything when creating with Part 1
                  */
-                $('input[data-mage-next="end"]').mage({
-                    manipulateSerialized: function(data) {
-                        var newData = data;
+                setupAssessmentEnd();
 
-                        if (CKEDITOR.instances['description'] != undefined) {
-                            newData.push({
-                                name: 'description',
-                                value: CKEDITOR.instances['description'].getData()
-                            });
-                        }
-
-                        return newData;
-                    },
-
-                    onXhrDone: function (data) {
-
-                        /* TODO: Redirect somewhere upon success
-                         */
-                        console.log(data);
-                    }
-                });
-
-                /* Or, proceed with project configuration
+                /* Or, proceed with project configuration when creating with Part 1
                  */
-                $('input[data-mage-next="part-3"]').mage({
-                    manipulateSerialized: function(data) {
-                        var newData = data;
-
-                        if (CKEDITOR.instances['description'] != undefined) {
-                            newData.push({
-                                name: 'description',
-                                value: CKEDITOR.instances['description'].getData()
-                            });
-                        }
-
-                        return newData;
-                    },
-                    onXhrDone: function (data) {
-                        $('#assessmentForm')
-                            .attr('action', '{{ routeLookup('learningAssessment.postCreateAssessment') }}')
-                            .find('[data-project-contents]')
-                            .html(data);
-                    }
-                });
+                setupProjectEnd();
             }
         });
     });
