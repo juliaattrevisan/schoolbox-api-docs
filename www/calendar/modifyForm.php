@@ -41,7 +41,7 @@ $validateOwner = function ($userId) use ($groupHandler, $userMapper) {
         }
     } catch (\Schoolbox\Mapper\Exception $e) {
         //If the event owner has been soft deleted, pass ownership to the current superuser
-        if($groupHandler->isSuperuser($_SESSION['user']->getId())) {
+        if($_SESSION['user']->isSuperuser()) {
             return $_SESSION['user'];
         }
         else {
