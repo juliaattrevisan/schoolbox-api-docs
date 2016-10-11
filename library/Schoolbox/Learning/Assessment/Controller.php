@@ -42,6 +42,7 @@ use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
 
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplementationDataSource;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationDataSource;
 
@@ -94,19 +95,26 @@ class Controller extends Base
     protected $unitSpecificationDataSource;
 
     /**
+     * @var UnitImplementationDataSource
+     */
+    protected $unitImplementationDataSource;
+
+    /**
      * Controller constructor.
      * @param FolderMapper $folderMapper
      * @param ErrorMapper $errorMapper
      * @param SubmissionFileMapper $submissionFileMapper
      * @param AssessmentDataSource $assessmentDataSource
      * @param UnitSpecificationDataSource $unitSpecificationDataSource
+     * @param UnitImplementationDataSource $unitImplementationDataSource
      */
     public function __construct(
         FolderMapper $folderMapper,
         ErrorMapper $errorMapper,
         SubmissionFileMapper $submissionFileMapper,
         AssessmentDataSource $assessmentDataSource,
-        UnitSpecificationDataSource $unitSpecificationDataSource
+        UnitSpecificationDataSource $unitSpecificationDataSource,
+        UnitImplementationDataSource $unitImplementationDataSource
     ) {
         $this->setErrorMapper($errorMapper);
         $this->setFolderMapper($folderMapper);
@@ -1160,6 +1168,24 @@ class Controller extends Base
     protected function setUnitSpecificationDataSource(UnitSpecificationDataSource $unitSpecificationDataSource)
     {
         $this->unitSpecificationDataSource = $unitSpecificationDataSource;
+    }
+
+    /**
+     * @return UnitImplementationDataSource
+     */
+    public function getUnitImplementationDataSource()
+    {
+        return $this->unitImplementationDataSource;
+    }
+
+    /**
+     * @param UnitImplementationDataSource $unitImplementationDataSource
+     * @return static
+     */
+    public function setUnitImplementationDataSource(UnitImplementationDataSource $unitImplementationDataSource)
+    {
+        $this->unitImplementationDataSource = $unitImplementationDataSource;
+        return $this;
     }
 
 
