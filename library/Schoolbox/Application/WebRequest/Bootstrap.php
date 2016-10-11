@@ -528,7 +528,7 @@ class Bootstrap implements BootstrapInterface {
         // Register External_Timetable service
         $di->set('externalTimetable', $di->lazyNew(\External_Timetable::class));
 
-        // TODO Register course/unit implementation data sources
+        // TODO Create and register course/unit implementation data sources
         // Register course/unit specification data sources
         $di->set(
             'unitSpecificationDataSource',
