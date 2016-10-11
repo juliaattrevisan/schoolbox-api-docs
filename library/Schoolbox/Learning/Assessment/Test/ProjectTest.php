@@ -72,10 +72,10 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $project))
+                ->add(new Participant($this->bsalem, $project))
+                ->add(new Participant($this->sberryhill, $project))
+                ->add(new Participant($this->asaxon, $project)))
             ->setPublishAt($this->tomorrow)
             ->setOpenAt($this->tomorrow)
             ->setDueAt($this->fiftyDaysFromNow)
@@ -131,10 +131,10 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $project))
+                ->add(new Participant($this->bsalem, $project))
+                ->add(new Participant($this->sberryhill, $project))
+                ->add(new Participant($this->asaxon, $project)))
             ->setPublishAt($this->tomorrow)
             ->setOpenAt($this->tomorrow)
             ->setDueAt($this->fiftyDaysFromNow)
@@ -166,17 +166,17 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
 
         /* I should be able to access each one's normalised mark from here
          */
-        $this->assertEquals(null, $projectTask->getParticipant($this->hodes)->findMostRecentPublishedFeedback($projectTask)->getNormalisedMark());
-        $this->assertEquals(100, $projectDueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback($projectDueWork)->getNormalisedMark());
+        $this->assertEquals(null, $projectTask->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getNormalisedMark());
+        $this->assertEquals(100, $projectDueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getNormalisedMark());
 
         /* Quiz's Normalised Mark is derived. It does not use the getter/setter
          * for Normalised Mark like the other Assessables
          */
-        $this->assertNotEquals(83, $projectQuiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($projectQuiz)->getNormalisedMark());
+        $this->assertNotEquals(83, $projectQuiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
 
         /* Test its derived stuff instead
          */
-        $this->assertEquals(60, $projectQuiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($projectQuiz)->getNormalisedMark());
+        $this->assertEquals(60, $projectQuiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
     }
 
     /**
@@ -245,10 +245,10 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork))
+                ->add(new Participant($this->bsalem, $dueWork))
+                ->add(new Participant($this->sberryhill, $dueWork))
+                ->add(new Participant($this->asaxon, $dueWork)))
             ->setAllFiles((new Collection())
                 ->add((new DueWorkFile())
                     ->setId($files[0]['id'])
@@ -377,9 +377,9 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             ->setDescription($description)
             ->setCreator($this->celia)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $task))
+                ->add(new Participant($this->sberryhill, $task))
+                ->add(new Participant($this->asaxon, $task)))
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->thirteenDaysFromNow)
             ->setDueAt($this->fourteenDaysFromNow)
@@ -436,16 +436,17 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
         $title = 'How did you find The Prime Evil?';
         $description = 'A quick pop quiz about how you died your way to Diablo.';
 
-        $quiz = (new Quiz())
+        $quiz = new Quiz();
+        $quiz
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $quiz))
+                ->add(new Participant($this->bsalem, $quiz))
+                ->add(new Participant($this->sberryhill, $quiz))
+                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)

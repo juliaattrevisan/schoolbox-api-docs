@@ -43,16 +43,17 @@ class QuizTest extends \PHPUnit_Framework_TestCase
         $title = 'How did you find The Prime Evil?';
         $description = 'A quick pop quiz about how you died your way to Diablo.';
 
-        $quiz = (new Quiz())
+        $quiz = new Quiz();
+        $quiz
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $quiz))
+                ->add(new Participant($this->bsalem, $quiz))
+                ->add(new Participant($this->sberryhill, $quiz))
+                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -99,16 +100,17 @@ class QuizTest extends \PHPUnit_Framework_TestCase
         $title = 'How did you find The Prime Evil?';
         $description = 'A quick pop quiz about how you died your way to Diablo.';
 
-        $quiz = (new Quiz())
+        $quiz = new Quiz();
+        $quiz
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $quiz))
+                ->add(new Participant($this->bsalem, $quiz))
+                ->add(new Participant($this->sberryhill, $quiz))
+                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -152,16 +154,17 @@ class QuizTest extends \PHPUnit_Framework_TestCase
         $title = 'How did you find The Prime Evil?';
         $description = 'A quick pop quiz about how you died your way to Diablo.';
 
-        $quiz = (new Quiz())
+        $quiz = new Quiz();
+        $quiz
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $quiz))
+                ->add(new Participant($this->bsalem, $quiz))
+                ->add(new Participant($this->sberryhill, $quiz))
+                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -207,16 +210,17 @@ class QuizTest extends \PHPUnit_Framework_TestCase
         $title = 'How did you find The Prime Evil?';
         $description = 'A quick pop quiz about how you died your way to Diablo.';
 
-        $quiz = (new Quiz())
+        $quiz = new Quiz();
+        $quiz
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $quiz))
+                ->add(new Participant($this->bsalem, $quiz))
+                ->add(new Participant($this->sberryhill, $quiz))
+                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -296,12 +300,11 @@ class QuizTest extends \PHPUnit_Framework_TestCase
         /* Total number of Responses
          */
         $this->assertCount(1, $quiz->getParticipant($this->bsalem)->getAllResponses());
-        $this->assertCount(4, $quiz->getParticipant($this->bsalem)->findAllFeedbackForAssessable($quiz));
+        $this->assertCount(4, $quiz->getParticipant($this->bsalem)->getAllFeedbacks());
 
         /* Total number of Feedbacks
          */
         $this->assertCount(4, $quiz->getParticipant($this->bsalem)->getAllFeedbacks());
-        $this->assertCount(4, $quiz->getParticipant($this->bsalem)->findAllFeedbackForAssessable($quiz));
     }
 
     /**
@@ -314,16 +317,17 @@ class QuizTest extends \PHPUnit_Framework_TestCase
         $title = 'How did you find The Prime Evil?';
         $description = 'A quick pop quiz about how you died your way to Diablo.';
 
-        $quiz = (new Quiz())
+        $quiz = new Quiz();
+        $quiz
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $quiz))
+                ->add(new Participant($this->bsalem, $quiz))
+                ->add(new Participant($this->sberryhill, $quiz))
+                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -331,27 +335,6 @@ class QuizTest extends \PHPUnit_Framework_TestCase
             ->setCreatedAt($this->today)
             ->setUpdatedAt($this->today);
 
-        $attempt = (new QuizAttempt);
-        $attempt
-            ->setId(8655)
-            ->setAssessable($quiz)
-            ->setSubmittedBy($this->bsalem)
-            ->setSubmittedOnBehalfOf($this->bsalem)
-            ->setCreatedAt($this->today)
-            ->setUpdatedAt($this->today);
-
-        $feedback = new QuizReview();
-        $feedback
-            ->setId(99759)
-            ->setAssessable($quiz)
-            ->setNormalisedMark(98)
-            ->setReviewer($this->celia)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-08-15 03:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT));
-
-        $attempt->getAllFeedback()->add($feedback);
-        $feedback->setResponse($attempt);
         $responses = [
             [
                 'mark' => 4, // Question 1,
@@ -376,148 +359,49 @@ class QuizTest extends \PHPUnit_Framework_TestCase
             $marksAvailable += $response['available'];
         }
 
-        $attempt->setMarksAvailable($marksAvailable);
-        $attempt->setMarksGiven($marksGiven);
-        $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
-
-        $feedback = new QuizReview();
-        $feedback
-            ->setId(99760)
+        $attempt = (new QuizAttempt())
+            ->setId(8655)
             ->setAssessable($quiz)
-            ->setNormalisedMark(45)
+            ->setSubmittedBy($this->bsalem)
+            ->setSubmittedOnBehalfOf($this->bsalem)
+            ->setCreatedAt($this->today)
+            ->setUpdatedAt($this->today)
+            ->setMarksAvailable($marksAvailable)
+            ->setMarksGiven($marksGiven);
+
+        $feedback = (new QuizReview())
+            ->setId(99759)
+            ->setAssessable($quiz)
+            ->setNormalisedMark(98)
             ->setReviewer($this->celia)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-09-16 05:31:29', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-09-12 12:12:12', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-09-12 12:12:12', \Alaress_Date_Format::DATABASE_FORMAT));
+            ->setPublishedAt(new \Alaress_Date_Format('2016-08-15 03:27:33', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setCreatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setUpdatedAt(new \Alaress_Date_Format('2016-08-08 21:03:19', \Alaress_Date_Format::DATABASE_FORMAT))
+            ->setResponse($attempt);
 
         $attempt->getAllFeedback()->add($feedback);
-        $feedback->setResponse($attempt);
-        $responses = [
-            [
-                'mark' => 5, // Question 1,
-                'available' => 5,
-            ],
-            [
-                'mark' => 5, // Question 2
-                'available' => 5,
-            ],
-            [
-                'mark' => 3, // Question 3
-                'available' => 5,
-            ],
-            [
-                'mark' => 3, // Question 4
-                'available' => 5,
-            ]
-        ];
-        $marksGiven = $marksAvailable = 0;
-        foreach($responses as $response){
-            $marksGiven += $response['mark'];
-            $marksAvailable += $response['available'];
-        }
 
-        $attempt->setMarksAvailable($marksAvailable);
-        $attempt->setMarksGiven($marksGiven);
+
         $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
-
-        $feedback = new QuizReview();
-        $feedback
-            ->setId(99761)
-            ->setAssessable($quiz)
-            ->setNormalisedMark(1)
-            ->setReviewer($this->celia)
-            ->setCreatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-09-17 13:23:13', \Alaress_Date_Format::DATABASE_FORMAT));
-
-        $attempt->getAllFeedback()->add($feedback);
-        $feedback->setResponse($attempt);
-        $responses = [
-            [
-                'mark' => 1, // Question 1,
-                'available' => 5
-            ],
-            [
-                'mark' => 1, // Question 2
-                'available' => 5
-            ],
-            [
-                'mark' => 1, // Question 3
-                'available' => 5
-            ],
-            [
-                'mark' => 2, // Question 4
-                'available' => 5
-            ]
-        ];
-        $marksGiven = $marksAvailable = 0;
-        foreach($responses as $response){
-            $marksGiven += $response['mark'];
-            $marksAvailable += $response['available'];
-        }
-
-        $attempt->setMarksAvailable($marksAvailable);
-        $attempt->setMarksGiven($marksGiven);
-        $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
-
-        $feedback = new QuizReview();
-        $feedback
-            ->setId(99762)
-            ->setAssessable($quiz)
-            ->setNormalisedMark(83)
-            ->setComment('This is the most recent published feedback; also most recent feedback')
-            ->setReviewer($this->celia)
-            ->setPublishedAt(new \Alaress_Date_Format('2016-09-25 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setCreatedAt(new \Alaress_Date_Format('2016-09-10 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT))
-            ->setUpdatedAt(new \Alaress_Date_Format('2016-09-10 21:22:19', \Alaress_Date_Format::DATABASE_FORMAT));
-
-        $attempt->getAllFeedback()->add($feedback);
-        $feedback->setResponse($attempt);
-        $responses = [
-            [
-                'mark' => 3, // Question 1,
-                'available' => 5
-            ],
-            [
-                'mark' => 2, // Question 2
-                'available' => 5
-            ],
-            [
-                'mark' => 2, // Question 3
-                'available' => 5
-            ],
-            [
-                'mark' => 5, // Question 4
-                'available' => 5
-            ]
-        ];
-        $marksGiven = $marksAvailable = 0;
-        foreach($responses as $response){
-            $marksGiven += $response['mark'];
-            $marksAvailable += $response['available'];
-        }
-
-        $attempt->setMarksAvailable($marksAvailable);
-        $attempt->setMarksGiven($marksGiven);
-        $quiz->getParticipant($this->bsalem)->getAllFeedbacks()->add($feedback);
-
         $quiz->getParticipant($this->bsalem)->getAllResponses()->add($attempt);
 
-        /* The most recent feedback is 99762
+        /* The most recent feedback is 99759
          */
-        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentFeedback($quiz)->getId());
+        $this->assertEquals(99759, $quiz->getParticipant($this->bsalem)->findMostRecentFeedback()->getId());
 
         /* The most recent feedback is also published
          */
-        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getId());
+        $this->assertEquals(99759, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getId());
 
         /* Quiz's Normalised Mark is derived. It does not use the getter/setter
          * for Normalised Mark like the other Assessables
          */
-        $this->assertNotEquals(83, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getNormalisedMark());
+        $this->assertNotEquals(83, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
 
         /* Test its derived stuff instead
+         * 7 / 20 = 35.0
          */
-        $this->assertEquals(60, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getNormalisedMark());
+        $this->assertEquals(35.0, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
     }
 
     /**
@@ -529,16 +413,17 @@ class QuizTest extends \PHPUnit_Framework_TestCase
         $title = 'How did you find The Prime Evil?';
         $description = 'A quick pop quiz about how you died your way to Diablo.';
 
-        $quiz = (new Quiz())
+        $quiz = new Quiz();
+        $quiz
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $quiz))
+                ->add(new Participant($this->bsalem, $quiz))
+                ->add(new Participant($this->sberryhill, $quiz))
+                ->add(new Participant($this->asaxon, $quiz)))
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
             ->setDueAt($this->thirtyDaysFromNow)
@@ -719,19 +604,19 @@ class QuizTest extends \PHPUnit_Framework_TestCase
 
         /* The most recent feedback is 99762
          */
-        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentFeedback($quiz)->getId());
+        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentFeedback()->getId());
 
         /* The most recent feedback is also published
          */
-        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getId());
+        $this->assertEquals(99762, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getId());
 
         /* Quiz's Normalised Mark is derived. It does not use the getter/setter
          * for Normalised Mark like the other Assessables
          */
-        $this->assertNotEquals(83, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getNormalisedMark());
+        $this->assertNotEquals(83, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
 
         /* Test its derived stuff instead
          */
-        $this->assertEquals(60, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback($quiz)->getNormalisedMark());
+        $this->assertEquals(60, $quiz->getParticipant($this->bsalem)->findMostRecentPublishedFeedback()->getNormalisedMark());
     }
 }

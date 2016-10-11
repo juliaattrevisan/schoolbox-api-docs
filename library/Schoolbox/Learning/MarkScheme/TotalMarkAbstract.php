@@ -125,4 +125,9 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @return int|float
      */
     abstract protected function getTotalMarkMin();
+
+    public static function getTitle()
+    {
+        return 'Total Mark';
+    }
 }

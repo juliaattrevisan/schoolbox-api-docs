@@ -12,8 +12,8 @@ namespace Schoolbox\Learning\Assessment;
 
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use \Schoolbox\User;
 use \Schoolbox\Collection;
@@ -30,7 +30,7 @@ interface IAssessable extends ISoftDeletable
      *
      * @return AssessmentContext
      */
-    public function getAssessmentContext();
+    public function getContext();
 
     /**
      * Set the context within which this assessment belongs.
@@ -38,7 +38,7 @@ interface IAssessable extends ISoftDeletable
      * @param AssessmentContext $assessmentContext
      * @return static
      */
-    public function setAssessmentContext(AssessmentContext $assessmentContext);
+    public function setContext(AssessmentContext $assessmentContext);
 
     /**
      * Return the name of the "type" of Assessable this is
@@ -62,7 +62,7 @@ interface IAssessable extends ISoftDeletable
      */
     public function getParticipant(User $user);
 
-/**
+    /**
      * @param User $user
      * @param bool $publishedOnly
      * @return string|null
@@ -85,6 +85,27 @@ interface IAssessable extends ISoftDeletable
      * @return int
      */
     public function numParticipants();
+
+    /**
+     * Returns what percentage of Participants have Responses to this Assessment
+     *
+     * @return float
+     */
+    public function getPercentageSubmitted();
+
+    /**
+     * Returns the number of Participants who have neither Feedback nor Responses to this Assessment
+     *
+     * @return int
+     */
+    public function numNoResponseOrFeedback();
+
+    /**
+     * Returns the number of Participants who have Responses to this Assessment
+     *
+     * @return int
+     */
+    public function numSubmitted();
 
     /**
      * Calculate how many IAssessable instances have a non-null mark value
@@ -120,6 +141,22 @@ interface IAssessable extends ISoftDeletable
      * @return float
      */
     public function getPercentageMarked();
+
+    /**
+     * How many Participants have Responses that require marking.
+     *
+     * @return int
+     */
+    public function numMarkingRequired();
+
+    /**
+     * What percentage of Participants have Responses that require marking.
+     *
+     * This does not always equate to 100 - getPercentageMarked()
+     *
+     * @return float
+     */
+    public function getPercentageMarkingRequired();
 
     /**
      * Calculate the number of Feedbacks that have been Published
@@ -364,6 +401,17 @@ interface IAssessable extends ISoftDeletable
      * @return $this
      */
     public function setAllParticipants(Collection $allParticipants);
+
+    /**
+     * @return Collection|IResponse[]
+     */
+    public function getResponses();
+
+    /**
+     * @param Collection|IResponse[] $responses
+     * @return $this
+     */
+    public function setResponses(Collection $responses);
 
     /**
      * @return Collection|IFeedback[]

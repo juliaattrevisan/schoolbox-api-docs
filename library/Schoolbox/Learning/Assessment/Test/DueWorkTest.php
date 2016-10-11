@@ -77,10 +77,10 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork))
+                ->add(new Participant($this->bsalem, $dueWork))
+                ->add(new Participant($this->sberryhill, $dueWork))
+                ->add(new Participant($this->asaxon, $dueWork)))
             ->setAllFiles((new Collection())
                 ->add((new DueWorkFile())
                     ->setId($files[0]['id'])
@@ -427,7 +427,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         /* Total number of Responses
          */
         $this->assertCount(1, $dueWork->getParticipant($this->hodes)->getAllResponses());
-        $this->assertCount(2, $dueWork->getParticipant($this->hodes)->findAllFeedbackForAssessable($dueWork));
+        $this->assertCount(2, $dueWork->getParticipant($this->hodes)->getAllFeedbacks());
 
         /* Feedback setup
          * The Freefloater isn't published
@@ -439,7 +439,6 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         /* Total number of Feedbacks
          */
         $this->assertCount(2, $dueWork->getParticipant($this->hodes)->getAllFeedbacks());
-        $this->assertCount(2, $dueWork->getParticipant($this->hodes)->findAllFeedbackForAssessable($dueWork));
 
         /* Feedbacks directly associated with Assessable
          * and not the Submission itself
@@ -571,13 +570,13 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         /* The most recent feedback is the unpublished one
          * This is 3385 and its currently drafted normalised mark of -3
          */
-        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback($dueWork)->getId());
-        $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback($dueWork)->getNormalisedMark());
+        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
+        $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback()->getNormalisedMark());
 
         /* Published Marks exist in 3385, which was published 2016-08-03 14:15:16 (which is
          * also after $submission was spawned on 2016-08-01 09:00:00)
          */
-        $this->assertEquals(3385, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback($dueWork)->getId());
+        $this->assertEquals(3385, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
     }
 
     /**
@@ -712,15 +711,15 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
 
         /* The most recently published feedback is 4236
          */
-        $this->assertEquals(4236, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback($dueWork)->getId());
+        $this->assertEquals(4236, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
 
         /* The most recent feedback is also 4236
          */
-        $this->assertEquals(4236, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback($dueWork)->getId());
+        $this->assertEquals(4236, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
 
         /* The mark for hodes should be 100
          */
-        $this->assertEquals(100, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback($dueWork)->getNormalisedMark());
+        $this->assertEquals(100, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getNormalisedMark());
     }
 
     /**
@@ -799,14 +798,14 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
 
         /* The most recently published feedback is 4223
          */
-        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback($dueWork)->getId());
+        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getId());
 
         /* The most recent feedback is also 4223
          */
-        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback($dueWork)->getId());
+        $this->assertEquals(4223, $dueWork->getParticipant($this->hodes)->findMostRecentFeedback()->getId());
 
         /* The mark for hodes should be 37
          */
-        $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback($dueWork)->getNormalisedMark());
+        $this->assertEquals(37, $dueWork->getParticipant($this->hodes)->findMostRecentPublishedFeedback()->getNormalisedMark());
     }
 }

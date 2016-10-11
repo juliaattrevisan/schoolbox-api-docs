@@ -1,0 +1,35 @@
+{# Renders an Assessment's Context Crumbs #}
+{% macro crumbs(assessment) %}
+    {% import 'sub/breadcrumbs.twig' as crumbs %}
+
+    {% set context = assessment.context %}
+
+    {% if context is folder %}
+        {{ crumbs.basic(
+            [ context.folder.name,    '/homepage/' ~ context.folder.id ]
+        ) }}
+    {% elseif context is unitImplementation %}
+        {{ crumbs.basic(
+            [ context.course.specification.folder.name,    '/homepage/' ~ context.course.specification.folder.id ],
+            [ context.specification.folder.name,    '/homepage/' ~ context.specification.folder.id ],
+            [ context.course.folder.name,    '/homepage/' ~ context.course.folder.id ]
+        ) }}
+    {% elseif context is project %}
+
+        {% set projectContext = context.context %}
+
+        {% if projectContext is folder %}
+            {{ crumbs.basic(
+                [ projectContext.folder.name,    '/homepage/' ~ projectContext.folder.id ],
+                [ context.title ]
+            ) }}
+        {% elseif projectContext is unitImplementation %}
+            {{ crumbs.basic(
+                [ projectContext.course.specification.folder.name,    '/homepage/' ~ projectContext.course.specification.folder.id ],
+                [ projectContext.specification.folder.name,    '/homepage/' ~ projectContext.specification.folder.id ],
+                [ projectContext.course.folder.name,    '/homepage/' ~ projectContext.course.folder.id ],
+                [ projectContext.title ]
+            ) }}
+        {% endif %}
+    {% endif %}
+{% endmacro %}

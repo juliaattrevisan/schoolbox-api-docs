@@ -29,7 +29,7 @@ use Schoolbox\Resource\Folder\Model as Folder;
  *
  * @package Schoolbox\Learning\Course
  */
-class Specification implements AssessmentContext, ISoftDeletable
+class Specification implements ISoftDeletable
 {
     use Id;
     use CreatedAtDate;
@@ -38,8 +38,6 @@ class Specification implements AssessmentContext, ISoftDeletable
 
     /**
      * The Folder within which this object lives.
-     *
-     * TODO review whether this relation needs to exist
      *
      * @var Folder
      */

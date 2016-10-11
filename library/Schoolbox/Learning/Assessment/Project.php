@@ -18,12 +18,13 @@
 namespace Schoolbox\Learning\Assessment;
 
 use \Schoolbox\Collection;
+use Schoolbox\Learning\AssessmentContext;
 use \Schoolbox\User;
 use \Schoolbox\Learning\Assessment\Summator\ISummator;
+use Schoolbox\Resource\Folder\Model as Folder;
 
-class Project extends AbstractAssessment
+class Project extends AbstractAssessment implements AssessmentContext
 {
-
     /**
      * @var Collection|IAssessable[]
      */
@@ -48,7 +49,7 @@ class Project extends AbstractAssessment
      *
      * @param ISummator $summator
      */
-    public function __construct(ISummator $summator)
+    public function __construct(ISummator $summator = null)
     {
         /* I know Dr hates hook methods, so do this instead
          */
@@ -76,8 +77,8 @@ class Project extends AbstractAssessment
             foreach($assessable->getAllParticipants() as $participant){
                 if($participant->getUser()->getId() == $user->getId()){
                     $isMarked = $publishedOnly
-                        ? $participant->isAssessablePublished($assessable)
-                        : $participant->isAssessableMarked($assessable);
+                        ? $participant->isAssessablePublished()
+                        : $participant->isAssessableMarked();
                     if($isMarked){
                         $markedAssessables[$assessable->getId()] = $assessable;
                     }
@@ -151,7 +152,7 @@ class Project extends AbstractAssessment
 
             /** @var Participant $currentParticipant */
             foreach ($currentAssessable->getAllParticipants() as $currentParticipant) {
-                if ($currentParticipant->isAssessablePublished($currentAssessable)) {
+                if ($currentParticipant->isAssessablePublished()) {
                     $num++;
                 }
             }
@@ -215,7 +216,7 @@ class Project extends AbstractAssessment
      * @param ISummator $summator
      * @return $this
      */
-    public function setSummator($summator)
+    public function setSummator(ISummator $summator = null)
     {
         $this->summator = $summator;
         return $this;
@@ -235,5 +236,30 @@ class Project extends AbstractAssessment
     public function getMaxMark()
     {
         return null;
+    }
+
+    /**
+     * @param AssessmentContext $context
+     * @throws \InvalidArgumentException
+     * @return static
+     */
+    public function setContext(AssessmentContext $context = null)
+    {
+        if($context instanceof Project){
+            throw new \InvalidArgumentException('For now, a Project cannot reside inside another Project');
+        }
+        parent::setContext($context);
+        return $this;
+    }
+
+    /**
+     * Retrieves the folder that any Assessable objects within this object
+     * belongs within.
+     *
+     * @return Folder
+     */
+    public function getFolder()
+    {
+        return $this->getContext()->getFolder();
     }
 }

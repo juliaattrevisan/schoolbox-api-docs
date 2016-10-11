@@ -116,6 +116,7 @@ COLLATE = utf8_general_ci;
 CREATE TABLE `assessment_folder` (
   `assessment_id` INT UNSIGNED NOT NULL,
   `folder_id` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`assessment_id`, `folder_id`),
   INDEX `fk_assessment_folder_folder_id_idx` (`folder_id` ASC),
   INDEX `fk_assessment_folder_assessment_id_idx` (`assessment_id` ASC),
   CONSTRAINT `fk_assessment_folder_folder_id`
@@ -134,6 +135,7 @@ ENGINE = InnoDB;
 CREATE TABLE `assessment_course_unit_implementation` (
   `assessment_id` INT UNSIGNED NOT NULL,
   `course_unit_implementation_id` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`assessment_id`, `course_unit_implementation_id`),
   INDEX `fk_assessment_course_unit_implementation_assessment_id_idx` (`assessment_id` ASC),
   INDEX `fk_assessment_course_unit_implementation_cui_id_idx` (`course_unit_implementation_id` ASC),
   CONSTRAINT `fk_assessment_course_unit_implementation_assessment_id`
@@ -152,6 +154,7 @@ ENGINE = InnoDB;
 CREATE TABLE `assessment_course_unit_specification` (
   `assessment_id` INT UNSIGNED NOT NULL,
   `course_unit_specification_id` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`assessment_id`, `course_unit_specification_id`),
   INDEX `fk_assessment_course_unit_specification_assessment_id_idx` (`assessment_id` ASC),
   INDEX `fk_assessment_course_unit_specification_cus_id_idx` (`course_unit_specification_id` ASC),
   CONSTRAINT `fk_assessment_course_unit_specification_assessment_id`
@@ -203,9 +206,6 @@ CREATE TABLE `project` (
   `mark_type_id` INT(11) NOT NULL,
   `grade_group_id` INT(11) NULL DEFAULT NULL,
   `summator` ENUM('min', 'max', 'avg', 'weighted') NOT NULL DEFAULT 'weighted',
-  `title` VARCHAR(250) NOT NULL,
-  `description` TEXT NULL,
-  `weight` INT(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   -- owner would be a FK, but user is a MyISAM table
   INDEX `fk_project_owner_id_idx` (`owner_id` ASC),
@@ -225,3 +225,22 @@ CREATE TABLE `project` (
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = utf8
   COLLATE = utf8_general_ci;
+
+-- Represents 'A Project contains Assessments'
+CREATE TABLE `project_assessment` (
+  `project_id` INT UNSIGNED NOT NULL,
+  `assessment_id` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`assessment_id`, `project_id`),
+  INDEX `fk_project_assessment_project_id_idx` (`project_id` ASC),
+  INDEX `fk_project_assessment_assessment_id_idx` (`assessment_id` ASC),
+  CONSTRAINT `fk_project_assessment_project_id_idx`
+  FOREIGN KEY (`project_id`)
+  REFERENCES `project` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_project_assessment_assessment_id`
+  FOREIGN KEY (`assessment_id`)
+  REFERENCES `assessment` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;

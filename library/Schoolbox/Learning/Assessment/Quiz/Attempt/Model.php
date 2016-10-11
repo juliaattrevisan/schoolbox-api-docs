@@ -28,6 +28,16 @@ class Model extends AbstractResponse
     private $marksAvailable;
 
     /**
+     * The first section in this attempt.
+     *
+     * Required so we can generate a link to the /assess/review/:quidId/:sectionId/:attemptId screen
+     *
+     * @var int
+     */
+    private $firstSectionId;
+
+
+    /**
      * Attempts are submitted at the updatedAt value
      * in case the Attempt is modified by the Student
      *
@@ -71,6 +81,24 @@ class Model extends AbstractResponse
     public function setMarksAvailable($marksAvailable)
     {
         $this->marksAvailable = $marksAvailable;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getFirstSectionId()
+    {
+        return $this->firstSectionId;
+    }
+
+    /**
+     * @param int $firstSectionId
+     * @return static
+     */
+    public function setFirstSectionId($firstSectionId)
+    {
+        $this->firstSectionId = $firstSectionId;
         return $this;
     }
 }

@@ -105,7 +105,8 @@ class Model extends AbstractAssessment
      */
     public function getTypeName()
     {
-        return $this->getType()->getName();
+        $subType = $this->getType()->getName();
+        return $subType ?: 'Due Work';
     }
 
     /**

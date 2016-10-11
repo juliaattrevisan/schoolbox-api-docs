@@ -190,6 +190,6 @@ class TotalMarkFractional extends TotalMarkAbstract
      */
     public static function getTitle()
     {
-        return 'Total Mark';
+        return parent::getTitle();
     }
 }

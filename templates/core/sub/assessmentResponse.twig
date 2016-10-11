@@ -1,0 +1,38 @@
+{# Generates the local URL to review an Assessment Response #}
+{% macro localUrl(response) -%}
+
+    {%- if response.assessable is quiz -%}
+        /assess/review/{{ response.assessable.id }}/{{ response.firstSectionId }}/{{ response.id }}
+    {%- elseif response.assessable is dueWork -%}
+        /submission/inlineGrading/view/{{ response.assessable.id }}/{{ response.submittedOnBehalfOf.id }}
+    {%- elseif response.assessable is task -%}
+
+        {%- set context = response.assessable.context -%}
+        {%- set prefix = '/task/progressReport/' -%}
+
+        {%- if context is folder -%}
+            {{ prefix }}{{ context.folder.id }}
+        {%- elseif context is unitImplementation -%}
+            {{ prefix }}{{ context.course.folder.id }}/{{ context.course.specification.folder.id }}
+
+            {%- set projectContext = context.context -%}
+
+            {%- if projectContext is folder -%}
+                {{ prefix }}{{ projectContext.folder.id }}
+            {%- else -%}
+                {{ prefix }}{{ projectContext.course.folder.id }}/{{ projectContext.course.specification.folder.id }}
+            {%- endif -%}
+        {%- endif -%}
+    {%- endif -%}
+{% endmacro %}
+
+{# Generates the hover title text shown over the link to Review a Student Response #}
+{% macro reviewResponseTitle(response) -%}
+    {%- if response.assessable is quiz -%}
+        Review Quiz Attempt
+    {%- elseif response.assessable is dueWork -%}
+        Review Student Submission
+    {%- elseif response.assessable is task -%}
+        Review Task Completion
+    {%- endif -%}
+{% endmacro %}

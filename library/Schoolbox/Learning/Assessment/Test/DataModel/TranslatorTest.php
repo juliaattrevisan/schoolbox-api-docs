@@ -122,7 +122,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 (new Task())
-                    ->setAssessmentContext((new Folder())->setId(1))
+                    ->setContext((new Folder())->setId(1))
                     ->setId(1)
                     ->setCreator($this->teacher1),
                 Folder::class,
@@ -130,7 +130,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 (new Task())
-                    ->setAssessmentContext((new UnitSpecification())->setId(3))
+                    ->setContext((new UnitSpecification())->setId(3))
                     ->setId(1)
                     ->setCreator($this->teacher1),
                 UnitSpecificationModel::class,
@@ -138,7 +138,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 (new Task())
-                    ->setAssessmentContext((new UnitImplementation())->setId(6))
+                    ->setContext((new UnitImplementation())->setId(6))
                     ->setId(1)
                     ->setCreator($this->teacher1),
                 UnitImplementationModel::class,
@@ -216,7 +216,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTranslateAssessmentContextToDomainModel(IAssessableDataModel $assessmentModel, $contextClass, $contextId)
     {
         $assessmentModel = $this->translator->translateToDomainModel($assessmentModel);
-        $this->assertInstanceOf($contextClass, $assessmentModel->getAssessmentContext());
-        $this->assertEquals($contextId, $assessmentModel->getAssessmentContext()->getId());
+        $this->assertInstanceOf($contextClass, $assessmentModel->getContext());
+        $this->assertEquals($contextId, $assessmentModel->getContext()->getId());
     }
 }

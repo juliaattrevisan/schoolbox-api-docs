@@ -8,8 +8,10 @@
 namespace Schoolbox\Learning\Assessment\Test\MarkScheme;
 
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\DueWork\Submission\Model as DueWorkSubmission;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Quiz\Attempt\Model as QuizAttempt;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
@@ -1127,13 +1129,24 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     {
         $quiz = $this->getDummyQuiz();
         $quiz->setMarkScheme(new TotalMarkFractional($quiz->getMaxMark()));
-        return [
-            [$quiz, $this->getDummyStudent(1), null],
-            [$quiz, $this->getDummyStudent(2), '1 / 2'],
-            [$quiz, $this->getDummyStudent(3), '1 / 2'],
-            [$quiz, $this->getDummyStudent(4), '2 / 2'],
-            [$quiz, $this->getDummyStudent(5), '2 / 2'],
-        ];
+        if(Participant::FAVOR_FLOATING){
+            return [
+                [$quiz, $this->getDummyStudent(1), null],
+                [$quiz, $this->getDummyStudent(2), '1 / 2'],
+                [$quiz, $this->getDummyStudent(3), '1 / 2'],
+                [$quiz, $this->getDummyStudent(4), '2 / 2'],
+                [$quiz, $this->getDummyStudent(5), '2 / 2'],
+            ];
+        } else {
+            return [
+                [$quiz, $this->getDummyStudent(1), null],
+                [$quiz, $this->getDummyStudent(2), '1 / 2'],
+                [$quiz, $this->getDummyStudent(3), '1 / 2'],
+                [$quiz, $this->getDummyStudent(4), '1 / 2'],
+                [$quiz, $this->getDummyStudent(5), '2 / 2'],
+            ];
+        }
+
     }
 
     public function provider_quiz_totalMarkFraction_getHR_publishedOnly()
@@ -1153,14 +1166,27 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     {
         $quiz = $this->getDummyQuiz();
         $quiz->setMarkScheme(new TotalMarkFractional($quiz->getMaxMark()));
-        return [
-            [$quiz, $this->getDummyStudent(1), null],
-            [$quiz, $this->getDummyStudent(2), 50.0],
-            [$quiz, $this->getDummyStudent(3), 50.0],
-            [$quiz, $this->getDummyStudent(4), 100.0],
-            [$quiz, $this->getDummyStudent(5), 100.0],
-        ];
+
+        if(Participant::FAVOR_FLOATING){
+            return [
+                [$quiz, $this->getDummyStudent(1), null],
+                [$quiz, $this->getDummyStudent(2), 50.0],
+                [$quiz, $this->getDummyStudent(3), 50.0],
+                [$quiz, $this->getDummyStudent(4), 100.0],
+                [$quiz, $this->getDummyStudent(5), 100.0],
+            ];
+        } else {
+            return [
+                [$quiz, $this->getDummyStudent(1), null],
+                [$quiz, $this->getDummyStudent(2), 50.0],
+                [$quiz, $this->getDummyStudent(3), 50.0],
+                [$quiz, $this->getDummyStudent(4), 50.0],
+                [$quiz, $this->getDummyStudent(5), 100.0],
+            ];
+        }
+
     }
+
 
     public function provider_quiz_totalMarkFraction_getNorm_publishedOnly()
     {
@@ -1503,17 +1529,31 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Maximum());
-        return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 50.0],
-            [$project, $this->getDummyStudent(3), 50.0],
-            [$project, $this->getDummyStudent(4), 100.0],
-            [$project, $this->getDummyStudent(5), 100.0],
-            [$project, $this->getDummyStudent(6), 50.0],
-            [$project, $this->getDummyStudent(7), 100.0],
-            [$project, $this->getDummyStudent(8), 50.0],
-            [$project, $this->getDummyStudent(9), 100.0],
-        ];
+        if(Participant::FAVOR_FLOATING){
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), 50.0],
+                [$project, $this->getDummyStudent(3), 50.0],
+                [$project, $this->getDummyStudent(4), 100.0],
+                [$project, $this->getDummyStudent(5), 100.0],
+                [$project, $this->getDummyStudent(6), 50.0],
+                [$project, $this->getDummyStudent(7), 100.0],
+                [$project, $this->getDummyStudent(8), 50.0],
+                [$project, $this->getDummyStudent(9), 100.0],
+            ];
+        } else {
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), 50.0],
+                [$project, $this->getDummyStudent(3), 50.0],
+                [$project, $this->getDummyStudent(4), 50.0],
+                [$project, $this->getDummyStudent(5), 100.0],
+                [$project, $this->getDummyStudent(6), 50.0],
+                [$project, $this->getDummyStudent(7), 100.0],
+                [$project, $this->getDummyStudent(8), 50.0],
+                [$project, $this->getDummyStudent(9), 100.0],
+            ];
+        }
     }
 
     public function provider_project_Max_getNorm_publishedOnly()
@@ -1537,17 +1577,31 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     {
         $project = $this->getDummyProject();
         $project->setSummator(new Average());
-        return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 50.0],
-            [$project, $this->getDummyStudent(3), 50.0],
-            [$project, $this->getDummyStudent(4), 75.0],
-            [$project, $this->getDummyStudent(5), 100.0],
-            [$project, $this->getDummyStudent(6), 50.0],
-            [$project, $this->getDummyStudent(7), 100.0],
-            [$project, $this->getDummyStudent(8), 50.0],
-            [$project, $this->getDummyStudent(9), 100.0],
-        ];
+        if(Participant::FAVOR_FLOATING){
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), 50.0],
+                [$project, $this->getDummyStudent(3), 50.0],
+                [$project, $this->getDummyStudent(4), 75.0],
+                [$project, $this->getDummyStudent(5), 100.0],
+                [$project, $this->getDummyStudent(6), 50.0],
+                [$project, $this->getDummyStudent(7), 100.0],
+                [$project, $this->getDummyStudent(8), 50.0],
+                [$project, $this->getDummyStudent(9), 100.0],
+            ];
+        } else {
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), 50.0],
+                [$project, $this->getDummyStudent(3), 50.0],
+                [$project, $this->getDummyStudent(4), 50.0],
+                [$project, $this->getDummyStudent(5), 100.0],
+                [$project, $this->getDummyStudent(6), 50.0],
+                [$project, $this->getDummyStudent(7), 100.0],
+                [$project, $this->getDummyStudent(8), 50.0],
+                [$project, $this->getDummyStudent(9), 100.0],
+            ];
+        }
     }
 
     public function provider_project_Average_getNorm_publishedOnly()
@@ -1571,17 +1625,31 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
     {
         $project = $this->getDummyProject();
         $project->setSummator(new WeightedAverage());
-        return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 50.0],
-            [$project, $this->getDummyStudent(3), 50.0],
-            [$project, $this->getDummyStudent(4), 60.0],
-            [$project, $this->getDummyStudent(5), 100.0],
-            [$project, $this->getDummyStudent(6), 50.0],
-            [$project, $this->getDummyStudent(7), 100.0],
-            [$project, $this->getDummyStudent(8), 50.0],
-            [$project, $this->getDummyStudent(9), 100.0],
-        ];
+        if(Participant::FAVOR_FLOATING){
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), 50.0],
+                [$project, $this->getDummyStudent(3), 50.0],
+                [$project, $this->getDummyStudent(4), 60.0],
+                [$project, $this->getDummyStudent(5), 100.0],
+                [$project, $this->getDummyStudent(6), 50.0],
+                [$project, $this->getDummyStudent(7), 100.0],
+                [$project, $this->getDummyStudent(8), 50.0],
+                [$project, $this->getDummyStudent(9), 100.0],
+            ];
+        } else {
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), 50.0],
+                [$project, $this->getDummyStudent(3), 50.0],
+                [$project, $this->getDummyStudent(4), 50.0],
+                [$project, $this->getDummyStudent(5), 100.0],
+                [$project, $this->getDummyStudent(6), 50.0],
+                [$project, $this->getDummyStudent(7), 100.0],
+                [$project, $this->getDummyStudent(8), 50.0],
+                [$project, $this->getDummyStudent(9), 100.0],
+            ];
+        }
     }
 
     public function provider_project_WeightedAverage_getNorm_publishedOnly()
@@ -1700,17 +1768,32 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setSummator(new Maximum());
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
-        return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 'Acceptable'],
-            [$project, $this->getDummyStudent(3), 'Acceptable'],
-            [$project, $this->getDummyStudent(4), 'Excellent'],
-            [$project, $this->getDummyStudent(5), 'Excellent'],
-            [$project, $this->getDummyStudent(6), 'Acceptable'],
-            [$project, $this->getDummyStudent(7), 'Excellent'],
-            [$project, $this->getDummyStudent(8), 'Acceptable'],
-            [$project, $this->getDummyStudent(9), 'Excellent'],
-        ];
+        if(Participant::FAVOR_FLOATING){
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), 'Acceptable'],
+                [$project, $this->getDummyStudent(3), 'Acceptable'],
+                [$project, $this->getDummyStudent(4), 'Excellent'],
+                [$project, $this->getDummyStudent(5), 'Excellent'],
+                [$project, $this->getDummyStudent(6), 'Acceptable'],
+                [$project, $this->getDummyStudent(7), 'Excellent'],
+                [$project, $this->getDummyStudent(8), 'Acceptable'],
+                [$project, $this->getDummyStudent(9), 'Excellent'],
+            ];
+        } else {
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), 'Acceptable'],
+                [$project, $this->getDummyStudent(3), 'Acceptable'],
+                [$project, $this->getDummyStudent(4), 'Acceptable'],
+                [$project, $this->getDummyStudent(5), 'Excellent'],
+                [$project, $this->getDummyStudent(6), 'Acceptable'],
+                [$project, $this->getDummyStudent(7), 'Excellent'],
+                [$project, $this->getDummyStudent(8), 'Acceptable'],
+                [$project, $this->getDummyStudent(9), 'Excellent'],
+            ];
+        }
+
     }
 
     public function provider_project_Max_LetterGrade_getHR_publishedOnly()
@@ -1738,17 +1821,31 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setSummator(new Maximum());
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
         $project->setMarkScheme(new Percentage());
-        return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), '50 %'],
-            [$project, $this->getDummyStudent(3), '50 %'],
-            [$project, $this->getDummyStudent(4), '100 %'],
-            [$project, $this->getDummyStudent(5), '100 %'],
-            [$project, $this->getDummyStudent(6), '50 %'],
-            [$project, $this->getDummyStudent(7), '100 %'],
-            [$project, $this->getDummyStudent(8), '50 %'],
-            [$project, $this->getDummyStudent(9), '100 %'],
-        ];
+        if(Participant::FAVOR_FLOATING){
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), '50 %'],
+                [$project, $this->getDummyStudent(3), '50 %'],
+                [$project, $this->getDummyStudent(4), '100 %'],
+                [$project, $this->getDummyStudent(5), '100 %'],
+                [$project, $this->getDummyStudent(6), '50 %'],
+                [$project, $this->getDummyStudent(7), '100 %'],
+                [$project, $this->getDummyStudent(8), '50 %'],
+                [$project, $this->getDummyStudent(9), '100 %'],
+            ];
+        } else {
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), '50 %'],
+                [$project, $this->getDummyStudent(3), '50 %'],
+                [$project, $this->getDummyStudent(4), '50 %'],
+                [$project, $this->getDummyStudent(5), '100 %'],
+                [$project, $this->getDummyStudent(6), '50 %'],
+                [$project, $this->getDummyStudent(7), '100 %'],
+                [$project, $this->getDummyStudent(8), '50 %'],
+                [$project, $this->getDummyStudent(9), '100 %'],
+            ];
+        }
     }
 
     public function provider_project_Max_Percentage_getHR_publishedOnly()
@@ -1776,17 +1873,32 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setSummator(new Average());
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
-        return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 'Acceptable'],
-            [$project, $this->getDummyStudent(3), 'Acceptable'],
-            [$project, $this->getDummyStudent(4), 'Very Good'],
-            [$project, $this->getDummyStudent(5), 'Excellent'],
-            [$project, $this->getDummyStudent(6), 'Acceptable'],
-            [$project, $this->getDummyStudent(7), 'Excellent'],
-            [$project, $this->getDummyStudent(8), 'Acceptable'],
-            [$project, $this->getDummyStudent(9), 'Excellent'],
-        ];
+        if(Participant::FAVOR_FLOATING){
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), 'Acceptable'],
+                [$project, $this->getDummyStudent(3), 'Acceptable'],
+                [$project, $this->getDummyStudent(4), 'Very Good'],
+                [$project, $this->getDummyStudent(5), 'Excellent'],
+                [$project, $this->getDummyStudent(6), 'Acceptable'],
+                [$project, $this->getDummyStudent(7), 'Excellent'],
+                [$project, $this->getDummyStudent(8), 'Acceptable'],
+                [$project, $this->getDummyStudent(9), 'Excellent'],
+            ];
+        } else {
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), 'Acceptable'],
+                [$project, $this->getDummyStudent(3), 'Acceptable'],
+                [$project, $this->getDummyStudent(4), 'Acceptable'],
+                [$project, $this->getDummyStudent(5), 'Excellent'],
+                [$project, $this->getDummyStudent(6), 'Acceptable'],
+                [$project, $this->getDummyStudent(7), 'Excellent'],
+                [$project, $this->getDummyStudent(8), 'Acceptable'],
+                [$project, $this->getDummyStudent(9), 'Excellent'],
+            ];
+        }
+
     }
 
     public function provider_project_Average_LetterGrade_getHR_publishedOnly()
@@ -1814,17 +1926,32 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setSummator(new Average());
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
         $project->setMarkScheme(new Percentage());
-        return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), '50 %'],
-            [$project, $this->getDummyStudent(3), '50 %'],
-            [$project, $this->getDummyStudent(4), '75 %'],
-            [$project, $this->getDummyStudent(5), '100 %'],
-            [$project, $this->getDummyStudent(6), '50 %'],
-            [$project, $this->getDummyStudent(7), '100 %'],
-            [$project, $this->getDummyStudent(8), '50 %'],
-            [$project, $this->getDummyStudent(9), '100 %'],
-        ];
+        if(Participant::FAVOR_FLOATING){
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), '50 %'],
+                [$project, $this->getDummyStudent(3), '50 %'],
+                [$project, $this->getDummyStudent(4), '75 %'],
+                [$project, $this->getDummyStudent(5), '100 %'],
+                [$project, $this->getDummyStudent(6), '50 %'],
+                [$project, $this->getDummyStudent(7), '100 %'],
+                [$project, $this->getDummyStudent(8), '50 %'],
+                [$project, $this->getDummyStudent(9), '100 %'],
+            ];
+        } else {
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), '50 %'],
+                [$project, $this->getDummyStudent(3), '50 %'],
+                [$project, $this->getDummyStudent(4), '50 %'],
+                [$project, $this->getDummyStudent(5), '100 %'],
+                [$project, $this->getDummyStudent(6), '50 %'],
+                [$project, $this->getDummyStudent(7), '100 %'],
+                [$project, $this->getDummyStudent(8), '50 %'],
+                [$project, $this->getDummyStudent(9), '100 %'],
+            ];
+        }
+
     }
 
     public function provider_project_Average_Percent_getHR_publishedOnly()
@@ -1852,17 +1979,32 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_LETTER));
         $project->setMarkScheme(new LetterGrade($this->getDummyLetterGradeGroup()));
-        return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), 'Acceptable'],
-            [$project, $this->getDummyStudent(3), 'Acceptable'],
-            [$project, $this->getDummyStudent(4), 'Good'],
-            [$project, $this->getDummyStudent(5), 'Excellent'],
-            [$project, $this->getDummyStudent(6), 'Acceptable'],
-            [$project, $this->getDummyStudent(7), 'Excellent'],
-            [$project, $this->getDummyStudent(8), 'Acceptable'],
-            [$project, $this->getDummyStudent(9), 'Excellent'],
-        ];
+        if(Participant::FAVOR_FLOATING){
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), 'Acceptable'],
+                [$project, $this->getDummyStudent(3), 'Acceptable'],
+                [$project, $this->getDummyStudent(4), 'Good'],
+                [$project, $this->getDummyStudent(5), 'Excellent'],
+                [$project, $this->getDummyStudent(6), 'Acceptable'],
+                [$project, $this->getDummyStudent(7), 'Excellent'],
+                [$project, $this->getDummyStudent(8), 'Acceptable'],
+                [$project, $this->getDummyStudent(9), 'Excellent'],
+            ];
+        } else {
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), 'Acceptable'],
+                [$project, $this->getDummyStudent(3), 'Acceptable'],
+                [$project, $this->getDummyStudent(4), 'Acceptable'],
+                [$project, $this->getDummyStudent(5), 'Excellent'],
+                [$project, $this->getDummyStudent(6), 'Acceptable'],
+                [$project, $this->getDummyStudent(7), 'Excellent'],
+                [$project, $this->getDummyStudent(8), 'Acceptable'],
+                [$project, $this->getDummyStudent(9), 'Excellent'],
+            ];
+        }
+
     }
 
     public function provider_project_WeightedAverage_LetterGrade_getHR_publishedOnly()
@@ -1890,17 +2032,31 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $project->setSummator(new WeightedAverage());
         $project->setMarkType($this->getDummyMarkType(MarkType::TYPE_PERCENT));
         $project->setMarkScheme(new Percentage());
-        return [
-            [$project, $this->getDummyStudent(1), null],
-            [$project, $this->getDummyStudent(2), '50 %'],
-            [$project, $this->getDummyStudent(3), '50 %'],
-            [$project, $this->getDummyStudent(4), '60 %'],
-            [$project, $this->getDummyStudent(5), '100 %'],
-            [$project, $this->getDummyStudent(6), '50 %'],
-            [$project, $this->getDummyStudent(7), '100 %'],
-            [$project, $this->getDummyStudent(8), '50 %'],
-            [$project, $this->getDummyStudent(9), '100 %'],
-        ];
+        if(Participant::FAVOR_FLOATING){
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), '50 %'],
+                [$project, $this->getDummyStudent(3), '50 %'],
+                [$project, $this->getDummyStudent(4), '60 %'],
+                [$project, $this->getDummyStudent(5), '100 %'],
+                [$project, $this->getDummyStudent(6), '50 %'],
+                [$project, $this->getDummyStudent(7), '100 %'],
+                [$project, $this->getDummyStudent(8), '50 %'],
+                [$project, $this->getDummyStudent(9), '100 %'],
+            ];
+        } else {
+            return [
+                [$project, $this->getDummyStudent(1), null],
+                [$project, $this->getDummyStudent(2), '50 %'],
+                [$project, $this->getDummyStudent(3), '50 %'],
+                [$project, $this->getDummyStudent(4), '50 %'],
+                [$project, $this->getDummyStudent(5), '100 %'],
+                [$project, $this->getDummyStudent(6), '50 %'],
+                [$project, $this->getDummyStudent(7), '100 %'],
+                [$project, $this->getDummyStudent(8), '50 %'],
+                [$project, $this->getDummyStudent(9), '100 %'],
+            ];
+        }
     }
 
     public function provider_project_WeightedAverage_Percent_getHR_publishedOnly()
@@ -1945,10 +2101,10 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
 
         $teacher = $this->getDummyTeacher(101);
 
-        $participant1 = $this->getDummyParticipant($student1->getId());
-        $participant2 = $this->getDummyParticipant($student2->getId());
-        $participant3 = $this->getDummyParticipant($student3->getId());
-        $participant4 = $this->getDummyParticipant($student4->getId());
+        $participant1 = $this->getDummyParticipant($student1->getId(), $task);
+        $participant2 = $this->getDummyParticipant($student2->getId(), $task);
+        $participant3 = $this->getDummyParticipant($student3->getId(), $task);
+        $participant4 = $this->getDummyParticipant($student4->getId(), $task);
 
         $task->getAllParticipants()
             ->add($participant1)
@@ -2045,11 +2201,11 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $student5 = $this->getDummyStudent(5);
 
 
-        $participant1 = $this->getDummyParticipant($student1->getId());
-        $participant2 = $this->getDummyParticipant($student2->getId());
-        $participant3 = $this->getDummyParticipant($student3->getId());
-        $participant4 = $this->getDummyParticipant($student4->getId());
-        $participant5 = $this->getDummyParticipant($student5->getId());
+        $participant1 = $this->getDummyParticipant($student1->getId(), $quiz);
+        $participant2 = $this->getDummyParticipant($student2->getId(), $quiz);
+        $participant3 = $this->getDummyParticipant($student3->getId(), $quiz);
+        $participant4 = $this->getDummyParticipant($student4->getId(), $quiz);
+        $participant5 = $this->getDummyParticipant($student5->getId(), $quiz);
 
         // student 1: no attempts
 
@@ -2080,20 +2236,21 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
             ->setId(4)
             ->setMarksGiven(1.0)
             ->setMarksAvailable(2.0)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 00:00:00'));
         $feedback4a = (new QuizFeedback())
             ->setId(4)
             ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'))
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'));
+
         $attempt4b = (new QuizAttempt())
             ->setId(5)
             ->setMarksGiven(2.0)
             ->setMarksAvailable(2.0)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt($this->getDummyDate('2016-08-09 00:00:00'));
         $feedback4b = (new QuizFeedback())
             ->setId(5)
             ->setPublishedAt($this->getDummyDate(null))
-            ->setUpdatedAt($this->getDummyDate('2016-08-10 21:03:19'));
+            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
 
         // student 5: 2 attempt + 1 published feedback (1/3) + 1 unpublished feedback (2/2)
         $attempt5a = (new QuizAttempt())
@@ -2105,11 +2262,12 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
             ->setId(6)
             ->setPublishedAt($this->getDummyDate('2016-08-08 21:03:19'))
             ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+
         $attempt5b = (new QuizAttempt())
             ->setId(7)
             ->setMarksGiven(2.0)
             ->setMarksAvailable(2.0)
-            ->setUpdatedAt($this->getDummyDate('2016-08-08 21:03:19'));
+            ->setUpdatedAt($this->getDummyDate('2016-08-09 21:03:19'));
         $feedback5b = (new QuizFeedback())
             ->setId(7)
             ->setPublishedAt($this->getDummyDate(null))
@@ -2229,15 +2387,15 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
         $student8 = $this->getDummyStudent(8);
         $student9 = $this->getDummyStudent(9);
 
-        $participant1 = $this->getDummyParticipant($student1->getId());
-        $participant2 = $this->getDummyParticipant($student2->getId());
-        $participant3 = $this->getDummyParticipant($student3->getId());
-        $participant4 = $this->getDummyParticipant($student4->getId());
-        $participant5 = $this->getDummyParticipant($student5->getId());
-        $participant6 = $this->getDummyParticipant($student6->getId());
-        $participant7 = $this->getDummyParticipant($student7->getId());
-        $participant8 = $this->getDummyParticipant($student8->getId());
-        $participant9 = $this->getDummyParticipant($student9->getId());
+        $participant1 = $this->getDummyParticipant($student1->getId(), $dueWork);
+        $participant2 = $this->getDummyParticipant($student2->getId(), $dueWork);
+        $participant3 = $this->getDummyParticipant($student3->getId(), $dueWork);
+        $participant4 = $this->getDummyParticipant($student4->getId(), $dueWork);
+        $participant5 = $this->getDummyParticipant($student5->getId(), $dueWork);
+        $participant6 = $this->getDummyParticipant($student6->getId(), $dueWork);
+        $participant7 = $this->getDummyParticipant($student7->getId(), $dueWork);
+        $participant8 = $this->getDummyParticipant($student8->getId(), $dueWork);
+        $participant9 = $this->getDummyParticipant($student9->getId(), $dueWork);
 
         // student 1: no attempts
 
@@ -2487,9 +2645,16 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
             ->add($dueWork)
             ->add($quiz);
 
-        $project->setAllParticipants($task->getAllParticipants()
-            ->mergeUnique($dueWork->getAllParticipants(), 'user')
-            ->mergeUnique($quiz->getAllParticipants(), 'user')
+        $project->setAllParticipants((new Collection())
+                ->add(new Participant($this->getDummyStudent(1), $project) )
+                ->add(new Participant($this->getDummyStudent(2), $project) )
+                ->add(new Participant($this->getDummyStudent(3), $project) )
+                ->add(new Participant($this->getDummyStudent(4), $project) )
+                ->add(new Participant($this->getDummyStudent(5), $project) )
+                ->add(new Participant($this->getDummyStudent(6), $project) )
+                ->add(new Participant($this->getDummyStudent(7), $project) )
+                ->add(new Participant($this->getDummyStudent(8), $project) )
+                ->add(new Participant($this->getDummyStudent(9), $project) )
         );
 
         return $project;
@@ -2586,9 +2751,9 @@ class AssessableTest extends \PHPUnit_Framework_TestCase
      * @param int $userId
      * @return Participant
      */
-    private function getDummyParticipant($userId)
+    private function getDummyParticipant($userId, IAssessable $assessable)
     {
-        return new Participant($this->getDummyStudent($userId));
+        return new Participant($this->getDummyStudent($userId), $assessable);
     }
 
     /**

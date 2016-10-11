@@ -100,10 +100,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
         /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
-            $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(new Collection());
+            $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0);
 
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                $currentResponse->setAllFeedback(new Collection());
+                $currentResponse->getAllFeedback()->slice(0,0);
             }
         }
 
@@ -280,10 +280,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
         /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
-            $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(new Collection());
+            $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0);
 
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                $currentResponse->setAllFeedback(new Collection());
+                $currentResponse->getAllFeedback()->slice(0,0);
             }
         }
 
@@ -638,10 +638,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
         /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
-            $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(new Collection());
+            $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0);
 
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                $currentResponse->setAllFeedback(new Collection());
+                $currentResponse->getAllFeedback()->slice(0,0);
             }
         }
 
@@ -940,10 +940,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork))
+                ->add(new Participant($this->bsalem, $dueWork))
+                ->add(new Participant($this->sberryhill, $dueWork))
+                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(20)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1001,8 +1001,8 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         $description = 'The first due work to do';
         $typeName = 'Homework';
 
-        $dueWork = new DueWork();
-        $dueWork
+        $dueWork1 = new DueWork();
+        $dueWork1
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
@@ -1011,10 +1011,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork1))
+                ->add(new Participant($this->bsalem, $dueWork1))
+                ->add(new Participant($this->sberryhill, $dueWork1))
+                ->add(new Participant($this->asaxon, $dueWork1)))
             ->setWeight(20)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1030,7 +1030,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          */
         $floatingFeedback = (new DueWorkFeedback())
             ->setId(90011)
-            ->setAssessable($dueWork)
+            ->setAssessable($dueWork1)
             ->setNormalisedMark(44)
             ->setReviewer($this->celia)
             ->setAllFiles(new Collection())
@@ -1038,11 +1038,11 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+        $dueWork1->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
         $floatingFeedback = (new DueWorkFeedback())
             ->setId(90011)
-            ->setAssessable($dueWork)
+            ->setAssessable($dueWork1)
             ->setNormalisedMark(55)
             ->setComment('A revision to the previous feedback, unpublished')
             ->setReviewer($this->celia)
@@ -1050,15 +1050,15 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+        $dueWork1->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
 
         /**
          * A Due Work with multiple floating feedback
          */
-        $id = 10001;
-        $title = 'First Due Work';
-        $description = 'The first due work to do';
+        $id = 10002;
+        $title = 'Second Due Work';
+        $description = 'The second due work to do';
         $typeName = 'Homework';
 
         $dueWork2 = new DueWork();
@@ -1071,10 +1071,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork2))
+                ->add(new Participant($this->bsalem, $dueWork2))
+                ->add(new Participant($this->sberryhill, $dueWork2))
+                ->add(new Participant($this->asaxon, $dueWork2)))
             ->setWeight(20)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1090,19 +1090,20 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
          */
         $floatingFeedback = (new DueWorkFeedback())
             ->setId(90121)
-            ->setAssessable($dueWork)
+            ->setAssessable($dueWork2)
             ->setNormalisedMark(41)
+            ->setComment('Initial feedback, published')
             ->setReviewer($this->celia)
             ->setAllFiles(new Collection())
             ->setPublishedAt(new \Alaress_Date_Format('2016-08-13 13:31:13', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-01 13:19:25', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-02 14:44:42', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+        $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
         $floatingFeedback = (new DueWorkFeedback())
             ->setId(90122)
-            ->setAssessable($dueWork)
+            ->setAssessable($dueWork2)
             ->setNormalisedMark(55)
             ->setComment('A revision to the previous feedback, unpublished')
             ->setReviewer($this->celia)
@@ -1110,20 +1111,20 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-22 14:14:14', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+        $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
         $submission = new DueWorkSubmission();
         $submission
             ->setId(70121)
-            ->setAssessable($dueWork)
+            ->setAssessable($dueWork2)
             ->setSubmittedBy($this->hodes)
             ->setSubmittedOnBehalfOf($this->hodes)
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-23 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-23 23:23:23', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $feedback = (new DueWorkFeedback())
+        $linkedFeedback = (new DueWorkFeedback())
             ->setId(90123)
-            ->setAssessable($dueWork)
+            ->setAssessable($dueWork2)
             ->setNormalisedMark(71)
             ->setComment('Some additional feedback, recently updated but not published')
             ->setReviewer($this->celia)
@@ -1131,12 +1132,13 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-08-24 01:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-08-24 16:16:16', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $submission->getAllFeedback()->add($feedback);
-        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+        $submission->getAllFeedback()->add($linkedFeedback);
+        $linkedFeedback->setResponse($submission);
+        $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
         $floatingFeedback = (new DueWorkFeedback())
             ->setId(90124)
-            ->setAssessable($dueWork)
+            ->setAssessable($dueWork2)
             ->setNormalisedMark(73)
             ->setComment('Thought about it some more and decided to recompose my entire Feedback')
             ->setReviewer($this->celia)
@@ -1144,12 +1146,12 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setCreatedAt(new \Alaress_Date_Format('2016-09-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setUpdatedAt(new \Alaress_Date_Format('2016-09-01 01:01:01', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $dueWork->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
+        $dueWork2->getParticipant($this->hodes)->getAllFeedbacks()->add($floatingFeedback);
 
         $project = $this->spawnProject(new SummatorMaximum());
-        $project->setAssessables((new Collection())->add($dueWork));
+        $project->setAssessables((new Collection())->add($dueWork1)->add($dueWork2));
 
-        $this->assertEquals(41, $project->getNormalisedMark($this->hodes, true));
+        $this->assertEquals(44, $project->getNormalisedMark($this->hodes, true));
         $this->assertEquals(73, $project->getNormalisedMark($this->hodes, false));
     }
 
@@ -1171,10 +1173,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
         /** @var \Schoolbox\Learning\Assessment\IFeedback $currentFeedback */
         /** @var \Schoolbox\Learning\Assessment\IResponse $currentResponse */
         foreach ($project->getAssessables() as $currentAssessable) {
-            $currentAssessable->getParticipant($this->hodes)->setAllFeedbacks(new Collection());
+            $currentAssessable->getParticipant($this->hodes)->getAllFeedbacks()->slice(0,0);
 
             foreach ($currentAssessable->getParticipant($this->hodes)->getAllResponses() as $currentResponse) {
-                $currentResponse->setAllFeedback(new Collection());
+                $currentResponse->getAllFeedback()->slice(0,0);
             }
         }
 
@@ -1472,10 +1474,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork))
+                ->add(new Participant($this->bsalem, $dueWork))
+                ->add(new Participant($this->sberryhill, $dueWork))
+                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(20)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1543,10 +1545,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork))
+                ->add(new Participant($this->bsalem, $dueWork))
+                ->add(new Participant($this->sberryhill, $dueWork))
+                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(20)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1603,10 +1605,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork2))
+                ->add(new Participant($this->bsalem, $dueWork2))
+                ->add(new Participant($this->sberryhill, $dueWork2))
+                ->add(new Participant($this->asaxon, $dueWork2)))
             ->setWeight(20)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1712,10 +1714,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork))
+                ->add(new Participant($this->bsalem, $dueWork))
+                ->add(new Participant($this->sberryhill, $dueWork))
+                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(20)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1761,10 +1763,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork))
+                ->add(new Participant($this->bsalem, $dueWork))
+                ->add(new Participant($this->sberryhill, $dueWork))
+                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(11)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1850,10 +1852,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork))
+                ->add(new Participant($this->bsalem, $dueWork))
+                ->add(new Participant($this->sberryhill, $dueWork))
+                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(1)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1921,10 +1923,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork))
+                ->add(new Participant($this->bsalem, $dueWork))
+                ->add(new Participant($this->sberryhill, $dueWork))
+                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(4)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -1962,10 +1964,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork))
+                ->add(new Participant($this->bsalem, $dueWork))
+                ->add(new Participant($this->sberryhill, $dueWork))
+                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(4)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -2014,10 +2016,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork))
+                ->add(new Participant($this->bsalem, $dueWork))
+                ->add(new Participant($this->sberryhill, $dueWork))
+                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(4)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -2048,10 +2050,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork))
+                ->add(new Participant($this->bsalem, $dueWork))
+                ->add(new Participant($this->sberryhill, $dueWork))
+                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(22)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -2172,10 +2174,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $project))
+                ->add(new Participant($this->bsalem, $project))
+                ->add(new Participant($this->sberryhill, $project))
+                ->add(new Participant($this->asaxon, $project)))
             ->setPublishAt($this->tomorrow)
             ->setOpenAt($this->tomorrow)
             ->setDueAt($this->fiftyDaysFromNow)
@@ -2208,10 +2210,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork))
+                ->add(new Participant($this->bsalem, $dueWork))
+                ->add(new Participant($this->sberryhill, $dueWork))
+                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(6)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -2263,10 +2265,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork))
+                ->add(new Participant($this->bsalem, $dueWork))
+                ->add(new Participant($this->sberryhill, $dueWork))
+                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(10)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -2318,10 +2320,10 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
                 ->setName($typeName))
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $dueWork))
+                ->add(new Participant($this->bsalem, $dueWork))
+                ->add(new Participant($this->sberryhill, $dueWork))
+                ->add(new Participant($this->asaxon, $dueWork)))
             ->setWeight(5)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->fourteenDaysFromNow)
@@ -2412,9 +2414,9 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setDescription($description)
             ->setCreator($this->celia)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $task))
+                ->add(new Participant($this->sberryhill, $task))
+                ->add(new Participant($this->asaxon, $task)))
             ->setWeight(4)
             ->setPublishAt($this->thirteenDaysFromNow)
             ->setOpenAt($this->thirteenDaysFromNow)
@@ -2500,16 +2502,17 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             $marksAvailable += $response['available'];
         }
 
-        $quiz = (new Quiz())
+        $quiz = new Quiz();
+        $quiz
             ->setId($id)
             ->setTitle($title)
             ->setDescription($description)
             ->setCreator($this->somodio)
             ->setAllParticipants((new Collection())
-                ->add(new Participant($this->hodes))
-                ->add(new Participant($this->bsalem))
-                ->add(new Participant($this->sberryhill))
-                ->add(new Participant($this->asaxon)))
+                ->add(new Participant($this->hodes, $quiz))
+                ->add(new Participant($this->bsalem, $quiz))
+                ->add(new Participant($this->sberryhill, $quiz))
+                ->add(new Participant($this->asaxon, $quiz)))
             ->setWeight(8)
             ->setPublishAt($this->twentyDaysFromNow)
             ->setOpenAt($this->twentyDaysFromNow)
@@ -2528,6 +2531,7 @@ class SummatorTest extends \PHPUnit_Framework_TestCase
             ->setUpdatedAt($this->today)
             ->setMarksAvailable($marksAvailable)
             ->setMarksGiven($marksGiven);
+        $quiz->getParticipant($this->hodes)->getAllResponses()->add($attempt);
 
         $feedback = new QuizReview();
         $feedback

@@ -106,7 +106,7 @@ $unitImpl = (new \Schoolbox\Learning\Course\Unit\Implementation())->setId($unitI
 // Create a task
 $task = (new Task())
     // Generic fields
-    ->setAssessmentContext($folder)
+    ->setContext($folder)
     ->setCreator((new \Schoolbox\User())->setId(3))
     ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
     ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -144,8 +144,8 @@ assertEquals($dbTask->getTitle(), $task->getTitle());
 assertEquals($dbTask->getDescription(), $task->getDescription());
 assertEquals($dbTask->getWeight(), 0);
 // Context
-assertEquals(get_class($dbTask->getAssessmentContext()), get_class($task->getAssessmentContext()));
-assertEquals($dbTask->getAssessmentContext()->getId(), $task->getAssessmentContext()->getId());
+assertEquals(get_class($dbTask->getContext()), get_class($task->getContext()));
+assertEquals($dbTask->getContext()->getId(), $task->getContext()->getId());
 // Specific fields
 assertEquals($dbTask->getUrl(), $task->getUrl());
 assertEquals($dbTask->isSelfAssessed(), $task->isSelfAssessed());
@@ -171,7 +171,7 @@ try {
 // (The mapper doesn't know how to save all of a quiz's sub-objects yet.)
 $quiz = (new Quiz())
     // Generic fields
-    ->setAssessmentContext($unitSpec)
+    ->setContext($unitSpec)
     ->setCreator((new \Schoolbox\User())->setId(151))
     ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
     ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -205,8 +205,8 @@ assertEquals($dbQuiz->getTitle(), $quiz->getTitle());
 assertEquals($dbQuiz->getDescription(), $quiz->getDescription());
 assertEquals($dbQuiz->getWeight(), $quiz->getWeight());
 // Context
-assertEquals(get_class($dbQuiz->getAssessmentContext()), get_class($quiz->getAssessmentContext()));
-assertEquals($dbQuiz->getAssessmentContext()->getId(), $quiz->getAssessmentContext()->getId());
+assertEquals(get_class($dbQuiz->getContext()), get_class($quiz->getContext()));
+assertEquals($dbQuiz->getContext()->getId(), $quiz->getContext()->getId());
 // Specific fields
 assertEquals($dbQuiz->getMaxAttempts(), $quiz->getMaxAttempts());
 assertEquals($dbQuiz->getDuration(), $quiz->getDuration());
@@ -226,7 +226,7 @@ $file3         = $storageMapper->acceptStream('test3.txt', 'also not a test');
 // Create a due work
 $dueWork = (new DueWork())
     // Generic fields
-    ->setAssessmentContext($unitImpl)
+    ->setContext($unitImpl)
     ->setCreator((new \Schoolbox\User())->setId(3))
     ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
     ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -282,8 +282,8 @@ assertEquals($dbDueWork->getTitle(), $dueWork->getTitle());
 assertEquals($dbDueWork->getDescription(), $dueWork->getDescription());
 assertEquals($dbDueWork->getWeight(), $dueWork->getWeight());
 // Context
-assertEquals(get_class($dbDueWork->getAssessmentContext()), get_class($dueWork->getAssessmentContext()));
-assertEquals($dbDueWork->getAssessmentContext()->getId(), $dueWork->getAssessmentContext()->getId());
+assertEquals(get_class($dbDueWork->getContext()), get_class($dueWork->getContext()));
+assertEquals($dbDueWork->getContext()->getId(), $dueWork->getContext()->getId());
 // Specific fields
 assertEquals($dbDueWork->isAcceptSingle(), $dueWork->isAcceptSingle());
 assertEquals($dbDueWork->isAcceptNone(), $dueWork->isAcceptNone());
@@ -307,7 +307,7 @@ assertEquals($dbDueWork->getAllFiles()[2]->getFilename(), $dueWork->getAllFiles(
 // Create a project
 $project = (new Project(new WeightedAverage()))
     // Generic fields
-    ->setAssessmentContext($folder)
+    ->setContext($folder)
     ->setCreator((new \Schoolbox\User())->setId(151))
     ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
     ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -324,7 +324,7 @@ $project = (new Project(new WeightedAverage()))
 $project->getAssessables()
         ->add((new Task())
             // Generic
-            ->setAssessmentContext($folder)
+            ->setContext($folder)
             ->setCreator((new \Schoolbox\User())->setId(151))
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -339,7 +339,7 @@ $project->getAssessables()
         )
         ->add((new Quiz())
             // Generic
-            ->setAssessmentContext($folder)
+            ->setContext($folder)
             ->setCreator((new \Schoolbox\User())->setId(151))
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -355,7 +355,7 @@ $project->getAssessables()
         )
         ->add((new DueWork())
             // Generic
-            ->setAssessmentContext($folder)
+            ->setContext($folder)
             ->setCreator((new \Schoolbox\User())->setId(151))
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -392,8 +392,8 @@ assertEquals($dbProject->getTitle(), $project->getTitle());
 assertEquals($dbProject->getDescription(), $project->getDescription());
 assertEquals($dbProject->getWeight(), $project->getWeight());
 // Context
-assertEquals(get_class($dbProject->getAssessmentContext()), get_class($project->getAssessmentContext()));
-assertEquals($dbProject->getAssessmentContext()->getId(), $project->getAssessmentContext()->getId());
+assertEquals(get_class($dbProject->getContext()), get_class($project->getContext()));
+assertEquals($dbProject->getContext()->getId(), $project->getContext()->getId());
 // Specific fields
 assertEquals(get_class($dbProject->getMarkScheme()), get_class($project->getMarkScheme()));
 // Sub-assessments - unable to be fetched yet

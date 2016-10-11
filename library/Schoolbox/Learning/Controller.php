@@ -9,6 +9,9 @@ namespace Schoolbox\Learning;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\PendingFactory;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
@@ -35,9 +38,9 @@ class Controller extends Base
 
 
     /**
-     * Displays a list of Assessments that require marking, and Assessments currently unsubmitted
+     * Redirects to current user
      *
-     * @api   GET /learning
+     * @api   GET /learning/pending
      * @level 165
      */
     public function getPendingAssessments()
@@ -49,17 +52,81 @@ class Controller extends Base
             ]));
         }
 
-        // TODO - generate data
-        $assessmentsToMark = [
-            Assessment\Controller::getDummyAssessment(2),
-        ];
-        $assessmentsNotSubmitted = [
-            Assessment\Controller::getDummyAssessment(3),
-        ];
+        // If no staff explicitly requested, redirect to current user
+        $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getPendingAssessmentsForUser', [
+            'userId' => $this->getUser()->getId()
+        ]));
+    }
+
+    /**
+     * Displays a list of Assessments that require marking, and Assessments currently unsubmitted
+     *
+     * @api   GET /learning/pending/:userId
+     * @level 165
+     * @param User $viewee The user whose pending assessments we are viewing.
+     */
+    public function getPendingAssessmentsForUser(User $viewee = null)
+    {
+        // No User found ?
+        if(is_null($viewee)){
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_USER_NOT_FOUND);
+        }
+
+        // Only display from Staff perspective.
+        if(!$viewee->getRole()->isStaff()){
+            // Is the Viewee as student or parent?
+            if($viewee->getRole()->isStudent() || $viewee->getRole()->isParent()) {
+                // Redirect to 'Due Assessments' page
+                $this->getResponse()->redirect->to($this->getRouter()->generate('learning.getDue', [
+                    'userId' => $viewee->getId()
+                ]));
+                return;
+            }
+            // Must be a Guest. Block them.
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        }
+
+        // If currentUser == viewee, use currentUser as it may already have class codes
+        // attached and avoid the need for an external DB call.
+        if($this->getUser()->getId() == $viewee->getId()){
+            $viewee = $this->getUser();
+        }
+
+        // TODO - both this, External_Class() and all Mappers should be singletons pulled from the DI.
+        // TODO - see pattern applied to MapperFactory in Modules.
+        $externalUser = $viewee->getSubjectCollection()
+            ? null
+            : new \External_User();
+
+        $term = TermMapper::getInstance()->findForToday();
+
+        $factory = new PendingFactory($viewee, $externalUser, new \External_Class(), $term);
+        $assessments = $factory->getPendingAssessments();
+
+        /** @var IAssessable[] $assessmentsToMark */
+        $assessmentsToMark = new Collection();
+        foreach($assessments as $assessment){
+            if($assessment->numMarkingRequired()){
+                $assessmentsToMark->add($assessment);
+            }
+        }
+        $assessmentsToMark->sortBy('dueAt', 'asc');
+
+        /** @var IAssessable[] $assessmentsToMark */
+        $assessmentsToChase = new Collection();
+        $tomorrow = (new \Alaress_Date_Format())->addDays(1);
+        foreach($assessments as $assessment){
+            if($assessment->getDueAt()->lt($tomorrow) && $assessment->numNoResponseOrFeedback()){
+                $assessmentsToChase->add($assessment);
+            }
+        }
+        $assessmentsToChase->sortBy('dueAt', 'asc');
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/pendingAssessments.twig', [
-            'assessmentsToMark'       => $assessmentsToMark,
-            'assessmentsNotSubmitted' => $assessmentsNotSubmitted,
+            'viewer'             => $this->getUser(),
+            'viewee'             => $viewee,
+            'assessmentsToMark'  => $assessmentsToMark,
+            'assessmentsToChase' => $assessmentsToChase,
         ]));
     }
 
@@ -144,9 +211,9 @@ class Controller extends Base
      *
      * @api   GET /due/{studentId}
      * @level 165
-     * @param User $student
+     * @param User $viewee
      */
-    public function getDue(User $student)
+    public function getDue(User $viewee)
     {
         // TODO - generate data
         $assessmentsDue = [
@@ -156,7 +223,7 @@ class Controller extends Base
         ];
 
         $this->getResponse()->content->set($this->buildHtmlOutput('@learning/dueWork.twig', [
-            'student'        => $student,
+            'viewee'         => $viewee,
             'assessmentsDue' => $assessmentsDue,
         ]));
     }

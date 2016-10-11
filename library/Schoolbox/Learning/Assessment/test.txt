@@ -805,8 +805,8 @@ foreach ($project->getAssessables() as $currentAssessable) {
              */
             $allFiles = [];
 
-            if ($currentParticipant->findAllResponsesForAssessable($currentAssessable)->count()) {
-                $latestSubmission = $currentParticipant->findAllResponsesForAssessable($currentAssessable)->first();
+            if ($currentParticipant->getAllResponses->count()) {
+                $latestSubmission = $currentParticipant->getAllResponses->first();
 
                 if ($latestSubmission) {
                     $submittedBy         = $latestSubmission->getSubmittedBy();
@@ -843,8 +843,8 @@ foreach ($project->getAssessables() as $currentAssessable) {
             /** @var \Schoolbox\User $submittedBy */
             $submittedBy = null;
 
-            if ($currentParticipant->findAllResponsesForAssessable($currentAssessable)->count()) {
-                $latestSubmission = $currentParticipant->findAllResponsesForAssessable($currentAssessable)->first();
+            if ($currentParticipant->getAllResponses->count()) {
+                $latestSubmission = $currentParticipant->getAllResponses->first();
 
                 if ($latestSubmission) {
                     $submittedBy         = $latestSubmission->getSubmittedBy();
@@ -874,8 +874,8 @@ foreach ($project->getAssessables() as $currentAssessable) {
             /** @var \Schoolbox\User $submittedBy */
             $submittedBy = null;
 
-            if ($currentParticipant->findAllResponsesForAssessable($currentAssessable)->count()) {
-                $latestSubmission = $currentParticipant->findAllResponsesForAssessable($currentAssessable)->first();
+            if ($currentParticipant->getAllResponses->count()) {
+                $latestSubmission = $currentParticipant->getAllResponses->first();
 
                 if ($latestSubmission) {
                     $submittedBy         = $latestSubmission->getSubmittedBy();
@@ -922,8 +922,8 @@ foreach ($project->getAssessables() as $currentAssessable) {
             /** @var \Schoolbox\User $submittedOnBehalfOf */
             $submittedOnBehalfOf = null;
 
-            if ($currentParticipant->findAllResponsesForAssessable($currentAssessable)->count()) {
-                $latestSubmission = $currentParticipant->findAllResponsesForAssessable($currentAssessable)->first();
+            if ($currentParticipant->getAllResponses->count()) {
+                $latestSubmission = $currentParticipant->getAllResponses->first();
 
                 if ($latestSubmission) {
                     $submittedBy = $latestSubmission->getSubmittedBy();
@@ -968,8 +968,8 @@ foreach ($project->getAssessables() as $currentAssessable) {
             /** @var \Schoolbox\User $submittedBy */
             $submittedBy = null;
 
-            if ($currentParticipant->findAllResponsesForAssessable($currentAssessable)->count()) {
-                $latestSubmission = $currentParticipant->findAllResponsesForAssessable($currentAssessable)->first();
+            if ($currentParticipant->getAllResponses->count()) {
+                $latestSubmission = $currentParticipant->getAllResponses->first();
 
                 if ($latestSubmission) {
                     $submittedBy = $latestSubmission->getSubmittedBy();
@@ -1008,8 +1008,8 @@ foreach ($project->getAssessables() as $currentAssessable) {
 
             $completionString = '';
 
-            if ($currentParticipant->findAllResponsesForAssessable($currentAssessable)->count()) {
-                $latestSubmission = $currentParticipant->findAllResponsesForAssessable($currentAssessable)->first();
+            if ($currentParticipant->getAllResponses->count()) {
+                $latestSubmission = $currentParticipant->getAllResponses->first();
 
                 if ($latestSubmission) {
                     $submittedBy = $latestSubmission->getSubmittedBy();

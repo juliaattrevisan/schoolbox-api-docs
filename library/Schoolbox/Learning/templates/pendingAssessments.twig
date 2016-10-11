@@ -1,4 +1,5 @@
-{% import 'sub/breadcrumbs.twig' as breadcrumbs %}
+{% import 'sub/assessmentContext.twig' as assessmentContext %}
+{% import 'sub/assessmentResponse.twig' as assessmentResponse %}
 
 <!-- BEGIN custom_head -->
 <script type="text/javascript" src="/javascript/shared/jquery.collapsable.js"></script>
@@ -6,110 +7,159 @@
 
 <ul class="breadcrumb">
     <li><a href="/">Schoolbox</a></li>
-    <li class="active"><a href="/pendingAssessments" title="Pending Assessments">Pending Assessments</a></li>
+    <li class="active"><a href="{{ routeLookup('learning.getPendingAssessmentsForUser', { userId: viewee.id }) }}" title="Pending Assessments">Pending Assessments</a></li>
 </ul>
 
 <div class="row">
-    <div class="small-12 columns"><h1>Pending Assessments</h1></div>
+    <div class="small-12 columns"><h1>{% if viewer.id != viewee.id %}{{ viewee.fullName }}'s {% endif %}Pending Assessments</h1></div>
 </div>
 
 <div class="row">
     <div class="small-12 columns island">
-        <h2 class="subheader">Stuff you need to mark</h2>
-        <section>
-            <div class="content collapsible">
-                <div class="small-6 columns no-pad">
-                    <h3 data-collapser="optional-1" class="icon-down-arrow">Assessment Title</h3>
-                    {{ breadcrumbs.basic(
-                        [ 'Course Title',    routeLookup('sportsfixtures.getLanding') ],
-                        [ 'Class Title',      routeLookup('sportsfixturesSport.getList') ],
-                        [ sport.name,    routeLookup('sportsfixturesSport.getEntity', { entityId: sport.id }) ],
-                        [ division.name | default(action ~ ' Unit Title') ]
-                    ) }}
-                </div>
-                <div class="small-4 columns hide-for-small-only">
-                    <div class="progress">
-                        <span class="meter" style="width:70%"></span>
-                        <span class="pipe-meter" style="left: 30%"></span>
+        {% if assessmentsToMark|length %}
+            <h2 class="subheader">Stuff you need to mark</h2>
+        {% endif %}
+        {% for assessment in assessmentsToMark %}
+            {% set icon = assessment is task ? 'task' : assessment is quiz ? 'quiz' : 'due-work'  %}
+            <section>
+                <div class="content collapsible">
+                    <div class="small-6 columns no-pad">
+                        <h3>
+                            {#- Dessicator -#}
+                            <span data-collapser="to-mark-{{ assessment.id }}" class="icon-down-arrow"><span class="icon-{{ icon }}"></span>
+                            {#- Dessicator -#}
+                            </span><a href="{{ routeLookup('learningAssessment.getStatus', { assessmentId: assessment.id }) }}">{{ assessment.title }}</a>
+                            {#- Dessicator -#}
+                        </h3>
+                        {{ assessmentContext.crumbs(assessment) }}
                     </div>
-                </div>
-                <div class="small-6 medium-2 columns text-center">
-                    <p>2 unmarked</p>
-                </div>
-                <ul class="information-list hide" data-collapsable="optional-1" data-collapse-state="collapsed">
-                    <li>
-                        <a class="link-row">
-                            <div class="compact card small-6">
-                                <img src="/portrait.php?userId=8&amp;size=square64" alt="View Submission">
-                                <h3>Anita Saxon</h3>
-                            </div>
-                            <div class="small-6 columns">
-                                <p>Submitted yesterday</p>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="link-row">
-                            <div class="compact card small-6">
-                                <img src="/portrait.php?userId=8&amp;size=square64" alt="View Submission">
-                                <h3>Anita Saxon</h3>
-                            </div>
-                            <div class="small-6 columns">
-                                <p>Submitted yesterday</p>
-                            </div>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </section>
+                    <div class="small-4 columns hide-for-small-only">
 
-        <h2 class="subheader">Stuff you need to chase</h2>
-        <section>
-            <div class="content collapsible">
-                <div class="small-6 columns no-pad">
-                    <h3 data-collapser="optional-2" class="icon-down-arrow">Assessment Title</h3>
-                    <p class="meta">Course Title &rsaquo; Class Title &rsaquo; Unit Title</p>
-                </div>
-                <div class="small-4 columns hide-for-small-only">
-                    <div class="progress">
-                        <span class="meter" style="width:70%"></span>
-                        <span class="pipe-meter" style="left: 0%"></span>
+                        {%- if assessment is quiz -%}
+                            {%- set submitTitleSuffix = 'attempted this quiz' -%}
+                            {%- set markedTitleSuffix = 'been reviewed' -%}
+                        {%- elseif assessment is dueWork %}
+                            {%- set submitTitleSuffix = 'submitted work' -%}
+                            {%- set markedTitleSuffix = 'recevied feedback' -%}
+                        {%- elseif assessment is task -%}
+                            {% set submitTitleSuffix = 'completed this task' -%}
+                            {% set markedTitleSuffix = 'been teacher assessed' -%}
+                        {%- endif -%}
+
+                        <div class="progress" title="{{ assessment.numSubmitted }} of {{ assessment.numParticipants }} students have {{ submitTitleSuffix }}">
+                            <span class="meter" style="width:{{ assessment.getPercentageSubmitted }}%"></span>
+                            <span class="pipe-meter" style="left: {{ assessment.getPercentageMarked }}%" title="{{ assessment.numMarked }} of {{ assessment.numParticipants }} students have  {{ markedTitleSuffix }}"></span>
+                        </div>
                     </div>
+                    <div class="small-6 medium-2 columns text-right">
+                        <p title="{{ assessment.numMarkingRequired }} of {{ assessment.numParticipants }} students require marking">{{ assessment.numMarkingRequired }} unmarked</p>
+                        <p><span class="meta" title="{{ assessment.dueAt.local }}">Due {{ assessment.dueAt.relativeTime }}</span></p>
+                    </div>
+                    <ul class="information-list hide" data-collapsable="to-mark-{{ assessment.id }}" data-collapse-state="collapsed">
+                        {% for participant in assessment.allParticipants %}
+                            {% if participant.isMarkingRequired %}
+                                {% set response = participant.findMostRecentResponse %}
+                                <li>
+                                    <a class="link-row" href="{{ assessmentResponse.localUrl(response) }}" title="{{ assessmentResponse.reviewResponseTitle(response) }}">
+                                        <div class="compact card small-6">
+                                            <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
+                                            <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
+                                        </div>
+                                        <div class="small-6 columns">
+                                            <p title="{{ response.updatedAt.local }}">Submitted {{ response.updatedAt.relativeTime }}</p>
+                                        </div>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
                 </div>
-                <div class="small-6 medium-2 columns text-center">
-                    <p>2 unmarked</p>
+            </section>
+        {% endfor %}
+
+        {% if assessmentsToChase|length %}
+            <h2 class="subheader">Stuff you need to chase</h2>
+        {% endif %}
+        {% for assessment in assessmentsToChase %}
+            {%- set icon = assessment is task ? 'task' : assessment is quiz ? 'quiz' : 'due-work'  -%}
+            {%- set state = assessment is quiz ? 'unattempted' : 'unsubmitted' -%}
+            {%- if assessment is quiz %}
+                {%- set submitTitleSuffix = 'attempted this quiz' -%}
+                {%- set markedTitleSuffix = 'been reviewed' -%}
+                {%- set noResultsTitleSuffix = 'attempted this quiz' -%}
+            {%- elseif assessment is dueWork %}
+                {%- set submitTitleSuffix = 'submitted work' -%}
+                {%- set markedTitleSuffix = 'recevied feedback' -%}
+                {%- set noResultsTitleSuffix = 'submitted work or received feedback' -%}
+            {%- elseif assessment is task %}
+                {%- set submitTitleSuffix = 'self-assessed this task' -%}
+                {%- set markedTitleSuffix = 'been teacher assessed' -%}
+                {%- set noResultsTitleSuffix = 'completed this task' -%}
+            {%- endif -%}
+            <section>
+                <div class="content collapsible">
+                    <div class="small-6 columns no-pad">
+                        <h3>
+                            {#- Dessicator -#}
+                            <span data-collapser="to-chase-{{ assessment.id }}" class="icon-down-arrow"><span class="icon-{{ icon }}"></span>
+                            {#- Dessicator -#}
+                            </span><a href="{{ routeLookup('learningAssessment.getStatus', { assessmentId: assessment.id }) }}">{{ assessment.title }}</a>
+                            {#- Dessicator -#}
+                        </h3>
+                        {{ assessmentContext.crumbs(assessment) }}
+                    </div>
+                    <div class="small-4 columns hide-for-small-only">
+                        <div class="progress" title="{{ assessment.numSubmitted }} of {{ assessment.numParticipants }} students have {{ submitTitleSuffix }}">
+                            <span class="meter" style="width:{{ assessment.getPercentageSubmitted }}%"></span>
+                            <span class="pipe-meter" style="left: {{ assessment.getPercentageMarked }}%" title="{{ assessment.numMarked }} of {{ assessment.numParticipants }} students have  {{ markedTitleSuffix }}"></span>
+                        </div>
+                    </div>
+                    <div class="small-6 medium-2 columns text-right">
+                        <p title="{{ assessment.numNoResponseOrFeedback }} of {{ assessment.numParticipants }} students have not {{ noResultsTitleSuffix }}">{{ assessment.numNoResponseOrFeedback }} {{ state }}</p>
+                        <p><span class="meta" title="{{ assessment.dueAt.local }}">Due {{ assessment.dueAt.relativeTime }}</span></p>
+                    </div>
+                    <ul class="information-list hide" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed">
+                        {% set studentEmails = [] %}
+                        {% for participant in assessment.allParticipants %}
+                            {% if not participant.getAllResponses|length and not participant.getAllFeedbacks|length %}
+                                {% set studentEmails = studentEmails|merge([participant.user.getEmail()]) %}
+                                <li>
+                                    <a class="link-row" href="/search/user/{{ participant.user.id }}">
+                                        <div class="compact card small-6">
+                                            <img src="/portrait.php?userId={{ participant.user.externalId }}&amp;size=square64" alt="View Submission">
+                                            <h3>{{ participant.user.firstname }} {{ participant.user.lastname }}</h3>
+                                        </div>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
                 </div>
-                <ul class="information-list hide" data-collapsable="optional-2" data-collapse-state="collapsed">
-                    <li>
-                        <a class="link-row">
-                            <div class="compact card small-6">
-                                <img src="/portrait.php?userId=8&amp;size=square64" alt="View Submission">
-                                <h3>Anita Saxon</h3>
+                <div class="component-action" data-collapsable="to-chase-{{ assessment.id }}" data-collapse-state="collapsed" style="display: none;">
+                    <section>
+                        <form action="/mail/createMail.php" method="post" class="no-margin">
+                            <div class="row">
+                                <div class="small-12 columns">
+                                    <input type="hidden" name="subject" value="Overdue - {{ assessment.title }}"/>
+                                    <input type="hidden" name="replyto" value="{{ viewee.getEmail() }}"/>
+                                    <input type="hidden" name="bcc" value="{{ studentEmails|join(',') }}"/>
+                                    <button type="submit" class="button icon-email">Email all</button>
+                                </div>
                             </div>
-                            <div class="small-6 columns">
-                                <p>Submitted yesterday</p>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="link-row">
-                            <div class="compact card small-6">
-                                <img src="/portrait.php?userId=8&amp;size=square64" alt="View Submission">
-                                <h3>Anita Saxon</h3>
-                            </div>
-                            <div class="small-6 columns">
-                                <p>Submitted yesterday</p>
-                            </div>
-                        </a>
-                    </li>
-                </ul>
+                        </form>
+                    </section>
+
+
+                </div>
+            </section>
+        {% endfor %}
+
+        {% if not assessmentsToMark|length and not assessmentsToChase|length %}
+            <div class="empty-state">
+                <i class="icon-approve"></i>
+                <p>You have no Assessments to Mark or Chase. Nice one!</p>
             </div>
-            <div class="component-action" data-collapsable="optional-2" data-collapse-state="collapsed" style="display: none;">
-                <section>
-                    <a class="button">Email all</a>
-                </section>
-            </div>
-        </section>
+        {% endif %}
     </div>
 </div>
 

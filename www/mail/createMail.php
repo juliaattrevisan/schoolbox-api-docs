@@ -34,7 +34,7 @@ if (Cfg::get('mail_enable') == 1) {
     $page->setTab('webmail');
 
     $output = array(
-        'SUBJECT' => '',
+        'SUBJECT' => $_REQUEST['subject'] ? Scrub::text($_REQUEST['subject']) : '',
         'BODY'    => '',
         'REPLYTO' => json_encode($replytoList),
         'BCC'     => json_encode($bccList),
