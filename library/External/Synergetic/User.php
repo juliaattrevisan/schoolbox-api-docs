@@ -776,7 +776,7 @@ class External_Synergetic_User implements External_UserInterface
                     AND (StudentClasses.StopDate >= getdate() OR StudentClasses.StopDate IS NULL)
                 ORDER BY SubjectClasses.FileType ASC, SubjectClasses.Description ASC
             ";
-        } else {
+        } else if ($this->getGroup()->isStaff($userID)) {
             $sql = "
                 SELECT
                     DISTINCT(c1.ClassCode),
@@ -795,7 +795,10 @@ class External_Synergetic_User implements External_UserInterface
                     c1.StaffID = '{$this->database->quote($synergyID)}'
                 LEFT JOIN luFileType ON c2.FileType = luFileType.Code
             ";
+        } else {
+            return false;
         }
+
         $this->getDatabase()->query($sql);
         $subjectList = array();
         while ($subject = $this->getDatabase()->getNextArray()) {
@@ -811,6 +814,8 @@ class External_Synergetic_User implements External_UserInterface
         } else {
             return false;
         }
+
+
     }
 
     /**
