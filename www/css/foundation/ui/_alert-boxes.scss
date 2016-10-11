@@ -73,11 +73,11 @@ $alert-default-background: darken($body-bg, 10%);
     }
     &.success {
         background-color: $success-color;
-        color: calc-text-color($success-color, tint($success-color, $alert-tint-amount), darken($success-color, $alert-tint-amount));
+        color: $white;
     }
     &.warning {
         background-color: $warning-color;
-        color: calc-text-color($warning-color, tint($warning-color, $alert-tint-amount), darken($warning-color, $alert-tint-amount));
+        color: $white;
     }
     &.alert {
         background-color: $alert-color;

@@ -350,7 +350,13 @@ $container-bg: white !default;
 		color: $aluminum;
 		&:before{ padding: 0; }
 	}
-
+	img{
+		margin-bottom: 1rem;
+	}
+	h1{
+		// default override
+		color: $aluminum;
+	}
 	p,a{
 		font-weight: 400;
 		margin-bottom: 0;

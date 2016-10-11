@@ -1,38 +1,39 @@
-<h1>Sorry, we are unable to complete this request</h1>
+<div class="empty-state">
+    <i class="icon-info"></i>
+    <h1>Sorry, we are unable to complete this request</h1>
+    <p>{{ summary.message|raw }}</p>
+</div>
 
-<div class="alert-box warning">{{ summary.message|raw }}</div>
+<div class="empty-state">
+    {% if info|length %}
+    <p>{{ info }}</p>
+    {% endif %}
+
+    <p class="meta">{{ date.local }}</p>
+
+    {% if url|length %}
+    <p class="meta">{{ url }}</p>
+    {% endif %}
+
+    {% if outputStackTrace %}
+    <p class="meta">
+        Error Code {{ code }} "{{ meta.message }}" in file {{ meta.file }} on line {{ meta.line }}
+    </p>
+
+    <pre class="content">
+        {%- spaceless -%}
+        {{ stackTrace }}
+        {%- endspaceless -%}
+    </pre>
+    {% else %}
+    <p class="meta">
+        Further details have been logged.
+    </p>
+    {% endif %}
+</div>
 
 <div class="row">
     <div class="small-12 island">
-        <section class="content">
-            {% if info|length %}
-            <p>{{ info }}</p>
-            {% endif %}
-
-            <p class="meta">{{ date.local }}</p>
-
-            {% if url|length %}
-            <p class="meta">{{ url }}</p>
-            {% endif %}
-
-            {% if outputStackTrace %}
-            <p class="meta">
-                Error Code {{ code }} "{{ meta.message }}" in file {{ meta.file }} on line {{ meta.line }}
-            </p>
-
-            <pre class="content">
-                {%- spaceless -%}
-                {{ stackTrace }}
-                {%- endspaceless -%}
-            </pre>
-            {% else %}
-            <p class="meta">
-                Further details have been logged.
-            </p>
-            {% endif %}
-
-        </section>
-
         {% include 'common/error/fragment/options.twig' %}
     </div>
 </div>
