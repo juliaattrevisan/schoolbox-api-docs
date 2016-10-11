@@ -25,6 +25,7 @@ use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Learning\MarkScheme\Mapping as MarkSchemeMapping;
 use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
 use \Schoolbox\Learning\Assessment\Summator\Mapping as SummatorMapping;
+use \Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use \Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use \Schoolbox\Learning\Assessment\DueWork\Type as DueWorkType;
 use \Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
@@ -78,16 +79,23 @@ class Controller extends Base
     protected $submissionFileMapper;
 
     /**
+     * @var AssessmentDataSource
+     */
+    protected $assessmentDataSource;
+
+    /**
      * Controller constructor.
      * @param FolderMapper $folderMapper
      * @param ErrorMapper $errorMapper
      * @param SubmissionFileMapper $submissionFileMapper
+     * @param AssessmentDataSource $assessmentDataSource
      */
-    public function __construct(FolderMapper $folderMapper, ErrorMapper $errorMapper, SubmissionFileMapper $submissionFileMapper)
+    public function __construct(FolderMapper $folderMapper, ErrorMapper $errorMapper, SubmissionFileMapper $submissionFileMapper, AssessmentDataSource $assessmentDataSource)
     {
         $this->setErrorMapper($errorMapper);
         $this->setFolderMapper($folderMapper);
         $this->setSubmissionFileMapper($submissionFileMapper);
+        $this->setAssessmentDataSource($assessmentDataSource);
     }
 
     /**
@@ -1103,6 +1111,22 @@ class Controller extends Base
     protected function setFolderMapper($folderMapper)
     {
         $this->folderMapper = $folderMapper;
+    }
+
+    /**
+     * @return AssessmentDataSource
+     */
+    protected function getAssessmentDataSource()
+    {
+        return $this->assessmentDataSource;
+    }
+
+    /**
+     * @param AssessmentDataSource $assessmentDataSource
+     */
+    protected function setAssessmentDataSource(AssessmentDataSource $assessmentDataSource)
+    {
+        $this->assessmentDataSource = $assessmentDataSource;
     }
 
 
@@ -2677,9 +2701,3 @@ class Controller extends Base
         return $zone->getTwigContext();
     }
 }
-
-
-
-
-
-

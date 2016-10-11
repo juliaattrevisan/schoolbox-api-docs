@@ -138,8 +138,9 @@ class Module extends BaseModule
         $injector->set(
             'controller:' . $this->basename,
             $injector->lazyNew(Controller::class, [
-                'folderMapper' => $this->getMapperFactory()->getLazy(FolderMapper::class),
-                'errorMapper' => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'folderMapper'         => $this->getMapperFactory()->getLazy(FolderMapper::class),
+                'errorMapper'          => $this->getMapperFactory()->getLazy(ErrorMapper::class),
+                'assessmentDataSource' => $injector->lazyGet('assessmentDataSource'),
             ])
         );
     }

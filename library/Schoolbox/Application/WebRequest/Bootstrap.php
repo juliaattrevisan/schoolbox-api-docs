@@ -33,6 +33,8 @@ use Schoolbox\Application\WebRequest;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\MapperFactory;
 use Schoolbox\Notif\SilentNotif;
 use Scrub;
@@ -514,6 +516,33 @@ class Bootstrap implements BootstrapInterface {
 
         // Register External_Timetable service
         $di->set('externalTimetable', $di->lazyNew(\External_Timetable::class));
+
+        // Register assessment data source
+        $di->set(
+            'assessmentTranslator',
+            $di->lazy(function () use ($di) {
+                $translator = new \Schoolbox\Learning\Assessment\DataModel\Translator(
+                    new \Schoolbox\Learning\MarkScheme\Factory()
+                );
+                $translator
+                    ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\Task())
+                    ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\DueWork())
+                    ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\Quiz())
+                    ->addSubTranslator(new \Schoolbox\Learning\Assessment\DataModel\Translator\Project($translator))
+                ;
+                return $translator;
+            })
+        );
+        $di->set(
+            'assessmentDataSource',
+            $di->lazyNew(
+                AssessmentMapperProxy::class,
+                [
+                    'baseMapper' => $di->get('mapperFactory')->getLazy(AssessmentMapper::class),
+                    'translator' => $di->lazyGet('assessmentTranslator'),
+                ]
+            )
+        );
 
 
         // load dependencies into the kernel itself
