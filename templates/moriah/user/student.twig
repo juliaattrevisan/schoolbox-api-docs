@@ -15,8 +15,8 @@
             >Cohort Report</a>
         </li>
     {% endif %}
-    <li class="no-pad"><a href="/synergetic/Docs/?id={{ user.getExternalId() }}" class="no-margin fat button icon-fat icon-32 icon-files">Reports</a></li>
-    <li class="no-pad"><a href="/synergetic/pti/?id={{ user.getExternalId() }}" class="no-margin fat button icon-fat icon-32 icon-group">PT Interviews</a></li>
-    <li class="no-pad"><a href="/synergetic/StudentParentContacts/?id={{ user.getExternalId() }}" class="no-margin fat button icon-fat icon-32 icon-group">Parent Contacts</a></li>
+    <li class="no-pad"><a href="/synergetic/Docs/?id={{ user.getExternalId() }}" target="_blank" class="no-margin fat button icon-fat icon-32 icon-files">Reports</a></li>
+    <li class="no-pad"><a href="/synergetic/pti/?id={{ user.getExternalId() }}" target="_blank" class="no-margin fat button icon-fat icon-32 icon-group">PT Interviews</a></li>
+    <li class="no-pad"><a href="/synergetic/StudentParentContacts/?id={{ user.getExternalId() }}" target="_blank" class="no-margin fat button icon-fat icon-32 icon-group">Parent Contacts</a></li>
     <li class="no-pad"><a href="/synRedir.php?page=MyDetails&menu=&id={{ user.getExternalId() }}" target="_blank" class="no-margin fat button icon-fat icon-32 icon-group">My Details</a></li>
 {% endblock buttons_grades %}
