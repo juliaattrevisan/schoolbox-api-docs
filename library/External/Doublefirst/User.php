@@ -843,7 +843,7 @@ class External_Doublefirst_User implements External_UserInterface
               WHERE               tcr.AcademicYear = '{$year}' AND 
                                   ps.PupilID = '{$synergyID}' 
             ";
-        } else {
+        } else if ($this->getGroup()->isStaff($userID)) {
             // Get staff subjects
 
             $sql =
@@ -889,6 +889,8 @@ class External_Doublefirst_User implements External_UserInterface
                 WHERE tcr.AcademicYear = '{$year}'
                 AND tcs.StaffID = '{$synergyID}' ORDER BY name
             ";
+        } else {
+            return false;
         }
 
         $this->getDatabase()->query($sql);
