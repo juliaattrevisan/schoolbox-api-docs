@@ -518,19 +518,30 @@ class UserAccessMapper extends Mapper
     }
 
     /**
-     * Check if user is invovlved in a group
+     * Returns a User's involvement in a Group
+     *
      * @param User $user
      * @param int $serviceIdentifier
      * @return UserAccess
      */
-    public function involvedInGroup(User $user, $serviceIdentifier) {
-        return $this->findOneByColumnList(
-            array(
-                'service' => UserAccess::SERVICE_HOMEPAGE,
-                'sid' => $serviceIdentifier,
-                'uid' => $user->getId(),
-            )
-        );
+    public function involvedInGroup(User $user, $serviceIdentifier)
+    {
+        try {
+            return $this->findOneByColumnList(
+                array(
+                    'service' => UserAccess::SERVICE_HOMEPAGE,
+                    'sid'     => $serviceIdentifier,
+                    'uid'     => $user->getId(),
+                )
+            );
+        } catch (Mapper\Exception $e){
+            // No involvement => DENY
+            return (new UserAccess())
+                ->setService(UserAccess::SERVICE_HOMEPAGE)
+                ->setServiceIdentifier($serviceIdentifier)
+                ->setUser($user)
+                ->setAccessLevel(UserAccess::ACCESS_DENY);
+        }
     }
 
 
