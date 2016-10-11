@@ -33,6 +33,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
     {
         $assessment = (new Task())
             ->setId(32)
+            ->setContext((new Folder())->setId(1))
             ->setCreator($this->teacher1)
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -72,6 +73,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->setAssessmentModel(
                 (new AssessmentModel())
                     ->setId(401)
+                    ->setAssessmentContext((new Folder())->setId(1))
                     ->setTitle('Some assessment\'s title')
                     ->setDescription('Blargh')
                     ->setWeight(51)

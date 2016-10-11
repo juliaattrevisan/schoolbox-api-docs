@@ -26,6 +26,7 @@ use Schoolbox\Learning\Assessment\Test\DataModel\TestTrait;
 use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
 
 /**
@@ -42,6 +43,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     {
         $project = (new Project(new WeightedAverage()))
             // Generic fields
+            ->setContext((new Folder())->setId(1))
             ->setId(16)
             ->setCreator($this->teacher1)
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -98,6 +100,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     public function testTranslateWithinProjectToDataModel()
     {
         $project = (new Project(new Average()))
+            ->setContext((new Folder())->setId(1))
             ->setId(12)
             ->setCreator($this->teacher1);
         $project->getAssessables()->add((new Project(new Minimum()))->setCreator($this->teacher1));
@@ -109,25 +112,30 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
      */
     public function getTestTranslateSummatorToDataModelData()
     {
-        $user = (new User())->setId(3);
+        $context = (new Folder())->setId(1);
+        $user    = (new User())->setId(3);
         return [
             [
                 (new Project(new WeightedAverage()))
+                    ->setContext($context)
                     ->setCreator($user),
                 ProjectModel::SUMMATOR_WEIGHTED_AVERAGE,
             ],
             [
                 (new Project(new Average()))
+                    ->setContext($context)
                     ->setCreator($user),
                 ProjectModel::SUMMATOR_AVERAGE,
             ],
             [
                 (new Project(new Minimum()))
+                    ->setContext($context)
                     ->setCreator($user),
                 ProjectModel::SUMMATOR_MINIMUM,
             ],
             [
                 (new Project(new Maximum()))
+                    ->setContext($context)
                     ->setCreator($user),
                 ProjectModel::SUMMATOR_MAXIMUM,
             ],
@@ -159,10 +167,12 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
      */
     public function getTestTranslateMarkSchemeToDataModelData()
     {
-        $user = (new User())->setId(3);
+        $context = (new Folder())->setId(1);
+        $user    = (new User())->setId(3);
         return [
             [
                 (new Project(new WeightedAverage()))
+                    ->setContext($context)
                     ->setCreator($user)
                     ->setMarkScheme(new None()),
                 DueWorkModel\MarkType::TYPE_NONE,
@@ -170,6 +180,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 (new Project(new WeightedAverage()))
+                    ->setContext($context)
                     ->setCreator($user)
                     ->setMarkScheme(new Percentage()),
                 DueWorkModel\MarkType::TYPE_PERCENT,
@@ -177,6 +188,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 (new Project(new WeightedAverage()))
+                    ->setContext($context)
                     ->setCreator($user)
                     ->setMarkScheme(new LetterGrade((new DueWorkModel\GradeLevel\Group\Model())->setId(7))),
                 DueWorkModel\MarkType::TYPE_LETTER,
@@ -214,7 +226,11 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     {
         $projectModel = (new ProjectModel())
             ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
-            ->setAssessmentModel((new AssessmentModel())->setId(4))
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setId(4)
+                    ->setAssessmentContext((new Folder())->setId(1))
+            )
             ->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_NONE));
 
         $projectModel->getAssessments()
@@ -262,7 +278,11 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
     {
         $projectModel = (new ProjectModel())
             ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
-            ->setAssessmentModel((new AssessmentModel())->setId(4));
+            ->setAssessmentModel(
+                (new AssessmentModel())
+                    ->setId(4)
+                    ->setAssessmentContext((new Folder())->setId(1))
+            );
         $projectModel->getAssessments()
             ->add((new ProjectModel())
                 ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
@@ -277,32 +297,35 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
      */
     public function getTestTranslateSummatorToDomainModelData()
     {
+        $assessmentModel = (new AssessmentModel())
+            ->setId(1)
+            ->setAssessmentContext((new Folder())->setId(1));
         return [
             [
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_WEIGHTED_AVERAGE)
-                    ->setAssessmentModel((new AssessmentModel())->setId(1))
+                    ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType()),
                 WeightedAverage::class,
             ],
             [
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
-                    ->setAssessmentModel((new AssessmentModel())->setId(1))
+                    ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType()),
                 Average::class,
             ],
             [
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_MINIMUM)
-                    ->setAssessmentModel((new AssessmentModel())->setId(1))
+                    ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType()),
                 Minimum::class,
             ],
             [
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_MAXIMUM)
-                    ->setAssessmentModel((new AssessmentModel())->setId(1))
+                    ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType()),
                 Maximum::class,
             ],
@@ -334,11 +357,14 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
      */
     public function getTestTranslateMarkSchemeToDomainModelData()
     {
+        $assessmentModel = (new AssessmentModel())
+            ->setId(1)
+            ->setAssessmentContext((new Folder())->setId(1));
         return [
             [
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
-                    ->setAssessmentModel((new AssessmentModel())->setId(1))
+                    ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_NONE))
                     ->setGradeGroup((new GradeGroup())),
                 None::class,
@@ -347,7 +373,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             [
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_AVERAGE)
-                    ->setAssessmentModel((new AssessmentModel())->setId(1))
+                    ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT))
                     ->setGradeGroup((new GradeGroup())),
                 Percentage::class,
@@ -356,7 +382,7 @@ class ProjectTest extends \PHPUnit_Framework_TestCase
             [
                 (new ProjectModel())
                     ->setSummator(ProjectModel::SUMMATOR_MINIMUM)
-                    ->setAssessmentModel((new AssessmentModel())->setId(1))
+                    ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
                     ->setGradeGroup((new GradeGroup())->setId(1)),
                 LetterGrade::class,

@@ -20,6 +20,7 @@ use Schoolbox\Learning\MarkScheme\LetterGrade;
 use Schoolbox\Learning\MarkScheme\None;
 use Schoolbox\Learning\MarkScheme\Percentage;
 use Schoolbox\Learning\MarkScheme\TotalMarkWholeNumber;
+use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 
 /**
@@ -37,6 +38,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $dueWork = (new DueWork())
             // Generic fields
             ->setId(908)
+            ->setContext((new Folder())->setId(1))
             ->setCreator($this->teacher1)
             ->setPublishAt(new Alaress_Date_Format('2016-10-14 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
             ->setOpenAt(new Alaress_Date_Format('2016-10-16 12:00:00', Alaress_Date_Format::DATABASE_FORMAT))
@@ -115,27 +117,36 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
      */
     public function getTestTranslateMarkSchemeToDataModelData()
     {
+        $context = (new Folder())->setId(1);
         return [
             [
-                (new DueWork())->setMarkScheme(new None()),
+                (new DueWork())
+                    ->setContext($context)
+                    ->setMarkScheme(new None()),
                 DueWorkModel\MarkType::TYPE_NONE,
                 null,
                 null,
             ],
             [
-                (new DueWork())->setMarkScheme(new Percentage()),
+                (new DueWork())
+                    ->setContext($context)
+                    ->setMarkScheme(new Percentage()),
                 DueWorkModel\MarkType::TYPE_PERCENT,
                 null,
                 null,
             ],
             [
-                (new DueWork())->setMarkScheme(new TotalMarkWholeNumber(10)),
+                (new DueWork())
+                    ->setContext($context)
+                    ->setMarkScheme(new TotalMarkWholeNumber(10)),
                 DueWorkModel\MarkType::TYPE_TOTAL,
                 10,
                 null,
             ],
             [
-                (new DueWork())->setMarkScheme(new LetterGrade((new DueWorkModel\GradeLevel\Group\Model())->setId(7))),
+                (new DueWork())
+                    ->setContext($context)
+                    ->setMarkScheme(new LetterGrade((new DueWorkModel\GradeLevel\Group\Model())->setId(7))),
                 DueWorkModel\MarkType::TYPE_LETTER,
                 null,
                 7,
@@ -173,10 +184,29 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
      */
     public function getTestTranslateResponseAcceptanceToDataModelData()
     {
+        $context = (new Folder())->setId(1);
         return [
-            [(new DueWork())->setAcceptsMultiple(), true, true,],
-            [(new DueWork())->setAcceptsSingle(), true, false,],
-            [(new DueWork())->setAcceptsNone(), false, false,],
+            [
+                (new DueWork())
+                    ->setContext($context)
+                    ->setAcceptsMultiple(),
+                 true,
+                 true,
+            ],
+            [
+                (new DueWork())
+                    ->setContext($context)
+                    ->setAcceptsSingle(),
+                true,
+                false,
+            ],
+            [
+                (new DueWork())
+                    ->setContext($context)
+                    ->setAcceptsNone(),
+                false,
+                false,
+            ],
         ];
     }
 
@@ -210,7 +240,9 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
         $dueWorkModel = (new DueWorkModel())
             ->setId(6789)
             ->setAssessmentModel(
-                (new AssessmentModel())->setId(33)
+                (new AssessmentModel())
+                    ->setAssessmentContext((new Folder())->setId(1))
+                    ->setId(33)
             )
             ->setSkipUnsubmitted(false)
             ->setAcceptOnline(true)
@@ -273,10 +305,12 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
      */
     public function getTestTranslateResponseAcceptanceToDomainModelData()
     {
+        $assessmentModel = (new AssessmentModel())
+            ->setAssessmentContext((new Folder())->setId(1));
         return [
             [
                 (new DueWorkModel())
-                    ->setAssessmentModel(new AssessmentModel())
+                    ->setAssessmentModel($assessmentModel)
                     ->setAcceptOnline(true)
                     ->setAcceptMultiple(true)
                     ->setMarkType($this->buildMarkType()),
@@ -285,7 +319,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 (new DueWorkModel())
-                    ->setAssessmentModel(new AssessmentModel())
+                    ->setAssessmentModel($assessmentModel)
                     ->setAcceptOnline(true)
                     ->setAcceptMultiple(false)
                     ->setMarkType($this->buildMarkType()),
@@ -294,7 +328,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 (new DueWorkModel())
-                    ->setAssessmentModel(new AssessmentModel())
+                    ->setAssessmentModel($assessmentModel)
                     ->setAcceptOnline(false)
                     ->setAcceptMultiple(false)
                     ->setMarkType($this->buildMarkType()),
@@ -303,7 +337,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 (new DueWorkModel())
-                    ->setAssessmentModel(new AssessmentModel())
+                    ->setAssessmentModel($assessmentModel)
                     ->setAcceptOnline(false)
                     ->setAcceptMultiple(true)
                     ->setMarkType($this->buildMarkType()),
@@ -341,10 +375,12 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
      */
     public function getTestTranslateMarkSchemeToDomainModelData()
     {
+        $assessmentModel = (new AssessmentModel())
+            ->setAssessmentContext((new Folder())->setId(1));
         return [
             [
                 (new DueWorkModel())
-                    ->setAssessmentModel(new AssessmentModel())
+                    ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_NONE)),
                 None::class,
                 null,
@@ -352,7 +388,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 (new DueWorkModel())
-                    ->setAssessmentModel(new AssessmentModel())
+                    ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_PERCENT)),
                 Percentage::class,
                 null,
@@ -360,7 +396,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 (new DueWorkModel())
-                    ->setAssessmentModel(new AssessmentModel())
+                    ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_LETTER))
                     ->setGradeGroup((new DueWorkModel\GradeLevel\Group\Model())->setId(1)),
                 LetterGrade::class,
@@ -369,7 +405,7 @@ class DueWorkTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 (new DueWorkModel())
-                    ->setAssessmentModel(new AssessmentModel())
+                    ->setAssessmentModel($assessmentModel)
                     ->setMarkType($this->buildMarkType(DueWorkModel\MarkType::TYPE_TOTAL))
                     ->setMaxMark(15),
                 TotalMarkWholeNumber::class,
