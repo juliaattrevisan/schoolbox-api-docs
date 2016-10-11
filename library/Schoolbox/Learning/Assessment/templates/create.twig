@@ -66,6 +66,8 @@
             });
         }
 
+        {% if assessmentType|length %}
+
         /* Save everything when Part 1 was already chosen in route
          */
         setupAssessmentEnd();
@@ -73,6 +75,8 @@
         /* Or, proceed with project configuration if Part 1 was already chosen in route
          */
         setupProjectEnd();
+
+        {% else %}
 
         /**
          * Update new form action url
@@ -96,6 +100,7 @@
                 setupProjectEnd();
             }
         });
+        {% endif %}
     });
 </script>
 
@@ -147,17 +152,9 @@
 
                     <legend>Assessment Details</legend>
                     <div class="small-12 columns {% if not assessmentType|length %}hide{% endif %}" data-mage-collapsed data-assessment-details>
-
-                        {% if assessmentTypeTitle == 'project' %}
-                            {% include '@learningAssessment/fragments/project/create.twig' %}
-                        {% elseif assessmentTypeTitle == 'dueWork' %}
-                            {% include '@learningAssessment/fragments/dueWork/create.twig' %}
-                        {% elseif assessmentTypeTitle == 'task' %}
-                            {% include '@learningAssessment/fragments/task/create.twig' %}
-                        {% elseif assessmentTypeTitle == 'quiz' %}
-                            {% include '@learningAssessment/fragments/quiz/create.twig' %}
+                        {% if assessmentTypeTitle|length %}
+                            {% include '@learningAssessment/fragments/'~assessmentTypeTitle~'/create.twig' %}
                         {% endif %}
-
                     </div>
                 </fieldset>
 
