@@ -204,7 +204,7 @@ class External_Tass_User implements External_UserInterface
 					AND yr_study = '{$this->database->quote($this->getCurrentYear($tassCode))}'
 					ORDER BY studsub.sub_code ASC, studsub.class ASC
 			";
-        } else {
+        } else if ($this->groupHandler->isStaff($userID)) {
             $sql = "SELECT class, tchsub.cmpy_code, semester, tchsub.sub_code, year_num, tchsub.year_grp, sub_desc, sub_type
 					FROM tchsub
 					JOIN subtab ON subtab.sub_code=tchsub.sub_code AND subtab.cmpy_code=tchsub.cmpy_code
@@ -213,6 +213,8 @@ class External_Tass_User implements External_UserInterface
 					AND year_num = '{$this->database->quote($this->getCurrentYear($tassCode))}'
 					ORDER BY tchsub.sub_code ASC, tchsub.class ASC
 			";
+        } else {
+            return false;
         }
         $this->getDatabase()->query($sql);
         $subjectList = array();
