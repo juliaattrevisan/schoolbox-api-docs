@@ -26,9 +26,10 @@ if ($post->method == 'spellcheck') {
 
         // Check each dictionary
         foreach ($dicts as $dict) {
-            if (!enchant_dict_check($dict, $word)) {
+            $suggestions = [];
+            if (!enchant_dict_quick_check($dict, $word, $suggestions)) {
                 // Only a small number of suggestions per dict
-                $suggestions = array_slice(enchant_dict_suggest($dict, $word), 10);
+                $suggestions = array_slice($suggestions, 10);
                 // Are there any suggestions for this word? Use only this dictionary
                 if (!empty($suggestions)) {
                     $corrections = array_merge($corrections, $suggestions);
