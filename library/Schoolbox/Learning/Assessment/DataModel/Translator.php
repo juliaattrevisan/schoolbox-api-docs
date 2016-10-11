@@ -16,7 +16,9 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
 use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model as UnitImplementationModel;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Translator as UnitImplementationTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecificationModel;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecificationTranslator;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Resource\Folder\Model as Folder;
 use UnexpectedValueException;
@@ -34,6 +36,24 @@ class Translator
     protected $markSchemeFactory;
 
     /**
+     * Translator for unit specifications.
+     *
+     * Used in this class's translators to convert contexts.
+     *
+     * @var UnitSpecificationTranslator
+     */
+    protected $unitSpecificationTranslator;
+
+    /**
+     * Translator for unit implementations.
+     *
+     * Used in this class's translators to convert contexts.
+     *
+     * @var UnitImplementationTranslator
+     */
+    protected $unitImplementationTranslator;
+
+    /**
      * Sub-translators
      *
      * @var IAssessmentTypeTranslator[]
@@ -43,11 +63,18 @@ class Translator
     /**
      * Constructor
      *
-     * @param MarkSchemeFactory $markSchemeFactory
+     * @param MarkSchemeFactory            $markSchemeFactory
+     * @param UnitSpecificationTranslator  $unitSpecificationTranslator
+     * @param UnitImplementationTranslator $unitImplementationTranslator
      */
-    public function __construct(MarkSchemeFactory $markSchemeFactory)
-    {
-        $this->markSchemeFactory = $markSchemeFactory;
+    public function __construct(
+        MarkSchemeFactory $markSchemeFactory,
+        UnitSpecificationTranslator $unitSpecificationTranslator,
+        UnitImplementationTranslator $unitImplementationTranslator
+    ) {
+        $this->markSchemeFactory            = $markSchemeFactory;
+        $this->unitSpecificationTranslator  = $unitSpecificationTranslator;
+        $this->unitImplementationTranslator = $unitImplementationTranslator;
     }
 
     /**
