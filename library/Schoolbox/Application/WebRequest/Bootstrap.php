@@ -33,8 +33,18 @@ use Schoolbox\Application\WebRequest;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\L10n\RosettaStone;
+
+// Learning related uses
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+
+use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseSpecTranslator;
+use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
+use Schoolbox\Learning\Course\SpecificationMapperProxy as CourseSpecMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Translator as UnitSpecTranslator;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecMapper;
+use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecMapperProxy;
+
 use Schoolbox\MapperFactory;
 use Schoolbox\Notif\SilentNotif;
 use Scrub;
@@ -516,6 +526,37 @@ class Bootstrap implements BootstrapInterface {
 
         // Register External_Timetable service
         $di->set('externalTimetable', $di->lazyNew(\External_Timetable::class));
+
+        // TODO Register course/unit implementation data sources
+        // Register course/unit specification data sources
+        $di->set(
+            'unitSpecificationDataSource',
+            $di->lazyNew(
+                UnitSpecMapperProxy::class,
+                [
+                    'mapper' => $di->lazy(function () use ($di) {
+                        return $di->get('mapperFactory')->get(UnitSpecMapper::class);
+                    }),
+                    'translator' => $di->lazyNew(UnitSpecTranslator::class),
+                ]
+            )
+        );
+        $di->set(
+            'courseSpecificationDataSource',
+            $di->lazyNew(
+                CourseSpecMapperProxy::class,
+                [
+                    'mapper' => $di->lazy(function () use ($di) {
+                        return $di->get('mapperFactory')->get(CourseSpecMapper::class);
+                    }),
+                    'translator' => $di->lazyNew(CourseSpecTranslator::class),
+                    'unitMapper' => $di->lazy(function () use ($di) {
+                        return $di->get('mapperFactory')->get(UnitSpecMapper::class);
+                    }),
+                    'unitTranslator' => $di->lazyNew(UnitSpecTranslator::class),
+                ]
+            )
+        );
 
         // Register assessment data source
         $di->set(
