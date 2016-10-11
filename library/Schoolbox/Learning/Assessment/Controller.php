@@ -359,16 +359,6 @@ class Controller extends Base
     {
         $assessment = null;
 
-        /* TODO Everything magically happens here, correctly, based on $contextId and $contextType
-         */
-        try {
-            $folder = $this->getFolderMapper()->findById($this->getRequest()->post['contextId']);
-        }
-        catch (MapperException $e) {
-            $this->sendError('Could not create assessment', [ 'select a valid Folder' ]);
-            return;
-        }
-
         /* Figure out what kind of assessment was chosen
          * and spawn a new instance of it to manipulate
          */
@@ -395,25 +385,54 @@ class Controller extends Base
             return;
         }
 
-        /* TODO: Actually save data here
+        // Verify that the context of the assessment is valid
+        // TODO replace returnUrl values once I know what they should actually be
+        $context = $assessment->getContext();
+        try {
+            if ($context instanceof Folder) {
+                $context   = $this->getFolderMapper()->findById($this->getRequest()->post['contextId']);
+                $returnUrl = "/homepage/{$context->getId()}";
+
+            } elseif ($context instanceof UnitImplementation) {
+                $context   = $this->getUnitImplementationDataSource()->findById($this->getRequest()->post['contextId']);
+                $returnUrl = "/homepage/{$context->getId()}";
+
+            } elseif ($context instanceof UnitSpecification) {
+                $context   = $this->getUnitSpecificationDataSource()->findById($this->getRequest()->post['contextId']);
+                $returnUrl = "/homepage/{$context->getId()}";
+
+            } elseif ($context instanceof Project) {
+                /* Check that you don't spawn a Project in a Project
+                 */
+                if ($assessment instanceof Project) {
+                    $this->sendError('Could not create assessment', ['You cannot create nested projects.']);
+                    return;
+                }
+
+                // TODO figure out what to do about this
+                $context   = $this->getAssessmentDataSource()->findById($this->getRequest()->post['contextId']);
+                $returnUrl = "/homepage/{$context->getId()}";
+
+            } else {
+                $this->sendError('Could not create assessment', [ 'select a valid context' ]);
+                return;
+            }
+
+        } catch (MapperException $e) {
+            $this->sendError('Could not create assessment', [ 'select a valid context' ]);
+            return;
+        }
+
+        /* TODO: Figure out what the sequence# should be
          */
-        $assessment->setId(5568);
+        $this->getAssessmentDataSource()->save($assessment, 0);
 
         /* If it were a project, go back to the project's Update screen
          * Otherwise return to the homepage
-         *
-         * Unless you tried to spawn nested projects, which we don't allow
          */
         $types = new Types();
 
         if ($assessment instanceof Project) {
-
-            /* Check that you don't spawn a Project in a Project
-             */
-            if ($types->isProject($types->getFromTitle($this->getRequest()->post['contextType']))) {
-                $this->sendError('Could not create assessment', ['You cannot create nested projects.']);
-                return;
-            }
 
             /* Continue as normal
              */
@@ -426,7 +445,7 @@ class Controller extends Base
             return;
         }
         else {
-            $this->getResponse()->redirect->to("/homepage/{$folder->getId()}");
+            $this->getResponse()->redirect->to($returnUrl);
         }
     }
 
