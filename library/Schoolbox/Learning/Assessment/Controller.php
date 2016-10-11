@@ -21,6 +21,7 @@ use Schoolbox\User as User;
 use Schoolbox\UserMapper;
 use \Alaress_Date_Format;
 use \Alaress_Date_NullDate;
+use \Schoolbox\Resource\Folder\Model as Folder;
 use \Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use \Schoolbox\Learning\MarkScheme\Mapping as MarkSchemeMapping;
 use \Schoolbox\Learning\Assessment\Summator\Factory as SummatorFactory;
@@ -39,6 +40,10 @@ use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Learning\Assessment\Summator\Average;
 use Schoolbox\Learning\Assessment\Summator\Maximum;
 use Schoolbox\Learning\Assessment\Summator\WeightedAverage;
+
+use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
+use Schoolbox\Learning\Course\Unit\SpecificationMapperProxy as UnitSpecificationDataSource;
 
 class Controller extends Base
 {
@@ -84,18 +89,30 @@ class Controller extends Base
     protected $assessmentDataSource;
 
     /**
+     * @var UnitSpecificationDataSource
+     */
+    protected $unitSpecificationDataSource;
+
+    /**
      * Controller constructor.
      * @param FolderMapper $folderMapper
      * @param ErrorMapper $errorMapper
      * @param SubmissionFileMapper $submissionFileMapper
      * @param AssessmentDataSource $assessmentDataSource
+     * @param UnitSpecificationDataSource $unitSpecificationDataSource
      */
-    public function __construct(FolderMapper $folderMapper, ErrorMapper $errorMapper, SubmissionFileMapper $submissionFileMapper, AssessmentDataSource $assessmentDataSource)
-    {
+    public function __construct(
+        FolderMapper $folderMapper,
+        ErrorMapper $errorMapper,
+        SubmissionFileMapper $submissionFileMapper,
+        AssessmentDataSource $assessmentDataSource,
+        UnitSpecificationDataSource $unitSpecificationDataSource
+    ) {
         $this->setErrorMapper($errorMapper);
         $this->setFolderMapper($folderMapper);
         $this->setSubmissionFileMapper($submissionFileMapper);
         $this->setAssessmentDataSource($assessmentDataSource);
+        $this->setUnitSpecificationDataSource($unitSpecificationDataSource);
     }
 
     /**
@@ -1127,6 +1144,22 @@ class Controller extends Base
     protected function setAssessmentDataSource(AssessmentDataSource $assessmentDataSource)
     {
         $this->assessmentDataSource = $assessmentDataSource;
+    }
+
+    /**
+     * @return UnitSpecificationDataSource
+     */
+    protected function getUnitSpecificationDataSource()
+    {
+        return $this->unitSpecificationDataSource;
+    }
+
+    /**
+     * @param UnitSpecificationDataSource $unitSpecificationDataSource
+     */
+    protected function setUnitSpecificationDataSource(UnitSpecificationDataSource $unitSpecificationDataSource)
+    {
+        $this->unitSpecificationDataSource = $unitSpecificationDataSource;
     }
 
 
