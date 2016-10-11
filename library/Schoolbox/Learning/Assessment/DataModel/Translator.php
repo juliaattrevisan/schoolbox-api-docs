@@ -92,6 +92,7 @@ class Translator
 
         // Translate assessment context
         // TODO consider moving this to a translator
+        // TODO add project context
         $context = $assessment->getContext();
         if ($context instanceof Folder) {
             $assessmentModel->setAssessmentContext($context);
@@ -99,6 +100,8 @@ class Translator
             $assessmentModel->setAssessmentContext((new UnitSpecificationModel())->setId($context->getId()));
         } elseif ($context instanceof UnitImplementation) {
             $assessmentModel->setAssessmentContext((new UnitImplementationModel())->setId($context->getId()));
+        } else {
+            throw new UnexpectedValueException('$assessment has no context (folder, unit, unit spec or project)');
         }
 
         // Attempt to translate tasks using the sub-translators
