@@ -360,7 +360,7 @@ class External_Denbigh_User implements External_UserInterface {
 				ORDER BY cl.classCode ASC, co.subjectName ASC
 			"
             );
-        } else {
+        } else if ($this->getGroup()->isStudent($userId)) {
             $statement = $this->getExternalDatabase()->query(
                 "
 				SELECT cl.classCode as code, co.subjectName as name
@@ -373,6 +373,8 @@ class External_Denbigh_User implements External_UserInterface {
 				ORDER BY cl.classCode ASC, co.subjectName ASC
 			"
             );
+        } else {
+            return false;
         }
 
         $subjectList = $statement->fetchAll(PDO::FETCH_ASSOC);
