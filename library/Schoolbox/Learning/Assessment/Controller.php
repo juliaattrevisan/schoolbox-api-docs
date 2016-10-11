@@ -456,69 +456,18 @@ class Controller extends Base
      */
     public function getUpdateAssessment($assessmentId)
     {
-
-        /* TODO: Figure out assessment's relationship to $folder in some way
-         */
-        try {
-            $folder = $this->getFolderMapper()->findById(43);
+        $assessmentType = null;
+        $assessment     = $this->getAssessmentDataSource()->findById($assessmentId);
+        $folder         = $assessment->getContext()->getFolder();
+        if ($assessment instanceof Task) {
+            $assessmentType = Types::ASSESSMENT_TASK;
+        } elseif ($assessment instanceof Quiz) {
+            $assessmentType = Types::ASSESSMENT_QUIZ;
+        } elseif ($assessment instanceof DueWork) {
+            $assessmentType = Types::ASSESSMENT_DUE_WORK;
+        } elseif ($assessment instanceof Project) {
+            $assessmentType = Types::ASSESSMENT_PROJECT;
         }
-        catch (MapperException $e) {
-            $this->sendError('Could not create assessment', [ 'select a valid Folder' ]);
-            return;
-        }
-
-        /* TODO: Actually retrieve $assessmentId data here
-         */
-         $assessment = new Project((new SummatorFactory(SummatorFactory::WEIGHTED_AVERAGE))->produce());
-//        $assessment = new DueWork();
-        $assessment
-//            ->setId($assessmentId)
-//            ->setTitle('Test Project')
-//            ->setDescription('This is an <b>example project</b>.')
-//            ->setCreator($_SESSION['user'])
-//            ->setAllParticipants(new Collection())
-//            ->setWeight(100)
-//            ->setAcceptsMultiple()
-
-            ->setAssessables((new Collection())
-                ->add((new DueWork())
-                    ->setId(44)
-                    ->setTitle('Write an essay')
-                    ->setDescription('Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.')
-                    ->setType((new DueWorkType())
-                        ->setId(1)
-                        ->setName('Essay'))
-                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
-                    ->setPublishAt(Alaress_Date_Format::now())
-                    ->setOpenAt(Alaress_Date_Format::now())
-                    ->setDueAt(Alaress_Date_Format::now())
-                    ->setCloseAt(Alaress_Date_Format::now())
-                    ->setCreatedAt(Alaress_Date_Format::now())
-                    ->setUpdatedAt(Alaress_Date_Format::now()))
-                ->add((new DueWork())
-                    ->setId(55)
-                    ->setTitle('Do this homework')
-                    ->setDescription('Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.')
-                    ->setType((new DueWorkType())
-                        ->setId(2)
-                        ->setName('Homework Assignment'))
-                    ->setCreator((new User)->setId(150)->setFirstname('Anelie')->setLastname('Somodio'))
-                    ->setPublishAt(Alaress_Date_Format::now())
-                    ->setOpenAt(Alaress_Date_Format::now())
-                    ->setDueAt(Alaress_Date_Format::now())
-                    ->setCloseAt(Alaress_Date_Format::now())
-                    ->setCreatedAt(Alaress_Date_Format::now())
-                    ->setUpdatedAt(Alaress_Date_Format::now())))
-            ->setPublishAt(Alaress_Date_Format::now())
-            ->setOpenAt(Alaress_Date_Format::now())
-            ->setDueAt(Alaress_Date_Format::now())
-            ->setCloseAt(Alaress_Date_Format::now())
-            ->setCreatedAt(Alaress_Date_Format::now())
-            ->setUpdatedAt(Alaress_Date_Format::now());
-
-        /* TODO: Determine type
-         */
-        $assessmentType = Types::ASSESSMENT_PROJECT;
 
         /* Twig payload
          */
