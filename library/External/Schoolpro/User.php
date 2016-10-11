@@ -326,9 +326,7 @@ class External_Schoolpro_User implements External_UserInterface
 
                 return $subjectList;
             }
-        } /* Otherwise assume staff
-		 */
-        else {
+        } else if ($groupHandler->isStaff($userId)) {
             $vars = array(
                 'sbGetStaffSubjectList',
                 array(
@@ -357,6 +355,8 @@ class External_Schoolpro_User implements External_UserInterface
 
                 return $subjectList;
             }
+        } else {
+            return false;
         }
 
         return false;
