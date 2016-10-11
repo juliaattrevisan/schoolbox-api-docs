@@ -1,15 +1,15 @@
+<h1></h1>
 <div class="empty-state">
     <i class="icon-info"></i>
-    <h1>Sorry, we are unable to complete this request</h1>
-    <p>{{ summary.message|raw }}</p>
-</div>
+    <h2>Sorry, we are unable to complete this request </h2>
 
-<div class="empty-state">
+    <p>{{ summary.message|raw }}</p>
+
     {% if info|length %}
     <p>{{ info }}</p>
     {% endif %}
 
-    <p class="meta">{{ date.local }}</p>
+
 
     {% if url|length %}
     <p class="meta">{{ url }}</p>
@@ -25,11 +25,8 @@
         {{ stackTrace }}
         {%- endspaceless -%}
     </pre>
-    {% else %}
-    <p class="meta">
-        Further details have been logged.
-    </p>
     {% endif %}
+    <p><br />Issued occured at {{ date.long }}, further information may have been logged</p>
 </div>
 
 <div class="row">
