@@ -13,11 +13,16 @@ use Schoolbox\Assessment\Component\SubmissionBox as DueWork;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper as DueWorkMapper;
 use Schoolbox\Assessment\Course\Task;
 use Schoolbox\Assessment\Course\TaskMapper;
+use Schoolbox\Collection;
 use Schoolbox\Learning\Assessment\DataModel\Project\Mapper as ProjectMapper;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Project as ProjectObject;
+use Schoolbox\Learning\AssessmentContext;
+use Schoolbox\Learning\Course\Unit\Implementation as UnitImplementation;
+use Schoolbox\Learning\Course\Unit\Specification as UnitSpecification;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Resource\Folder\Model as Folder;
 
 /**
  * Proxy mapper for IAssessable objects.
@@ -70,11 +75,35 @@ class MapperProxy
     }
 
     /**
+     * Find all assessables for this context
+     *
+     * @param AssessmentContext $context
+     * @param array             $options
+     * @return Collection|IAssessable[]
+     */
+    public function findAllForContext(AssessmentContext $context, $options = [])
+    {
+        if ($context instanceof Folder) {
+            return $this->findAllForFolderId($context->getId(), $options);
+        }
+        if ($context instanceof UnitSpecification) {
+            return $this->findAllForUnitSpecificationId($context->getId(), $options);
+        }
+        if ($context instanceof UnitImplementation) {
+            return $this->findAllForUnitImplementationId($context->getId(), $options);
+        }
+        if ($context instanceof ProjectObject) {
+            return $this->findAllForProjectId($context->getId(), $options);
+        }
+        return new Collection();
+    }
+
+    /**
      * Finds all assessables for a unit specification
      *
      * @param int   $unitSpecId
      * @param array $options
-     * @return IAssessable[]
+     * @return Collection|IAssessable[]
      */
     public function findAllForUnitSpecificationId($unitSpecId, $options = [])
     {
@@ -87,7 +116,7 @@ class MapperProxy
      *
      * @param int   $unitImplId
      * @param array $options
-     * @return IAssessable[]
+     * @return Collection|IAssessable[]
      */
     public function findAllForUnitImplementationId($unitImplId, $options = [])
     {
@@ -100,7 +129,7 @@ class MapperProxy
      *
      * @param int   $folderId
      * @param array $options
-     * @return IAssessable[]
+     * @return Collection|IAssessable[]
      */
     public function findAllForFolderId($folderId, $options = [])
     {
@@ -111,12 +140,15 @@ class MapperProxy
     /**
      * Finds all assessables that are part of the given project
      *
-     * @param int $projectId
+     * @param int   $projectId
+     * @param array $options
+     * @return Collection|IAssessable[]
      */
-    public function findAllForProjectId($projectId)
+    public function findAllForProjectId($projectId, $options = [])
     {
         // TODO implement
         // Requires 1..M join onto not yet existent project_assessment
+        return new Collection();
     }
 
     /**
