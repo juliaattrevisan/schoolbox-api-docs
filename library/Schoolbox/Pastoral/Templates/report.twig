@@ -136,7 +136,7 @@
 
                             {# Show article body #}
                             <div class="content">
-                                {{ record.getBody() | raw }}
+                                {{ record.getBody() | purify }}
 
                                 {# Show any file attachments #}
                                 {% if record.getAttachmentList.count > 0 %}
@@ -163,7 +163,7 @@
 
                                             {# Show comment body #}
                                             <p class="spaced">
-                                                {{ comment.body | raw }}
+                                                {{ comment.body | purify }}
                                             </p>
                                         </div>
                                     </div>
