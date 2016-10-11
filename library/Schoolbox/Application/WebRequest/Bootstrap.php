@@ -38,6 +38,14 @@ use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 
+
+use Schoolbox\Learning\Course\DataModel\Implementation\Translator as CourseImplTranslator;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplMapper;
+use Schoolbox\Learning\Course\ImplementationMapperProxy as CourseImplMapperProxy;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Translator as UnitImplTranslator;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplMapper;
+use Schoolbox\Learning\Course\Unit\ImplementationMapperProxy as UnitImplMapperProxy;
+
 use Schoolbox\Learning\Course\DataModel\Specification\Translator as CourseSpecTranslator;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecMapper;
 use Schoolbox\Learning\Course\SpecificationMapperProxy as CourseSpecMapperProxy;
@@ -528,7 +536,30 @@ class Bootstrap implements BootstrapInterface {
         // Register External_Timetable service
         $di->set('externalTimetable', $di->lazyNew(\External_Timetable::class));
 
-        // TODO Create and register course/unit implementation data sources
+        // Register course/unit implementation data sources
+        $di->set(
+            'unitImplementationDataSource',
+            $di->lazyNew(
+                UnitImplMapperProxy::class,
+                [
+                    'mapper'     => $mapperFactory->getLazy(UnitImplMapper::class),
+                    'translator' => $di->lazyNew(UnitImplTranslator::class),
+                ]
+            )
+        );
+        $di->set(
+            'courseImplementationDataSource',
+            $di->lazyNew(
+                CourseImplMapperProxy::class,
+                [
+                    'mapper'         => $mapperFactory->getLazy(CourseImplMapper::class),
+                    'translator'     => $di->lazyNew(CourseImplTranslator::class),
+                    'unitMapper'     => $mapperFactory->getLazy(UnitImplMapper::class),
+                    'unitTranslator' => $di->lazyNew(UnitImplTranslator::class),
+                ]
+            )
+        );
+
         // Register course/unit specification data sources
         $di->set(
             'unitSpecificationDataSource',
