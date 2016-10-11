@@ -300,7 +300,6 @@ class Controller extends Base
      */
     public function getImport($id)
     {
-
         $this->getResponse()->content->set([
             'template' => '@sportsfixturesImport/importing.twig',
             'data' => array(
@@ -733,11 +732,12 @@ class Controller extends Base
                 if (!$error) {
                     try {
                         $venue = $this->getVenueMapper()->findOneByColumn('name', $row[1]);
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Venue '{$row[1]}'");
                     } catch (MapperException $e) {
                         $venue = new Venue();
+                        $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Venue '{$row[1]}'");
                     }
 
-                    $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Venue '{$row[1]}'");
                     $venue->setName($row[1]);
                     $venue->setAddress($row[2]);
                     $venue->setLatitude($row[3]);
@@ -774,7 +774,7 @@ class Controller extends Base
 
                 if (!$error) {
                     try {
-                        $school = $this->getSchoolMapper()->findOneByColumn('name', $row[1]);
+                        $this->getSchoolMapper()->findOneByColumn('name', $row[1]);
                         $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "SKIPPED SCHOOL: School '{$row[1]}' already exists");
 
                     } catch (MapperException $e) {
@@ -1158,8 +1158,6 @@ class Controller extends Base
                             try {
                                 $user = $this->getUserMapper()->findByExternalId($coach);
 
-                                $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Coach '{$user->getExternalId()}'");
-
                                 try {
                                     $coach = $this->getCoachMapper()->findOneByColumn('user_id', $user->getId());
                                 } catch (MapperException $e) {
@@ -1169,10 +1167,19 @@ class Controller extends Base
                                     $this->getCoachMapper()->save($coach);
                                 }
 
-                                $teamCoach = new TeamCoach();
-                                $teamCoach->setTeam($team);
-                                $teamCoach->setCoach($coach);
-                                $this->getTeamCoachMapper()->save($teamCoach);
+                                try {
+                                    $teamCoach = $this->getTeamCoachMapper()->findOneByColumnList([
+                                       'team_id' => $team->getId(),
+                                       'coach_id' => $coach->getId()
+                                    ]);
+                                    $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "SKIPPING: Coach '{$user->getExternalId()}'");
+                                } catch (MapperException $e) {
+                                    $teamCoach = new TeamCoach();
+                                    $teamCoach->setTeam($team);
+                                    $teamCoach->setCoach($coach);
+                                    $this->getTeamCoachMapper()->save($teamCoach);
+                                    $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Coach '{$user->getExternalId()}'");
+                                }
 
                             } catch (MapperException $e) {
 
@@ -1371,7 +1378,6 @@ class Controller extends Base
                     if (!$error) {
 
                         try {
-                            $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Match '{$division->getName()} {$sport->getName()} {$venue->getName()}'");
                             $match = $this->getMatchMapper()->findOneByColumnList([
                                 'division_id' => $division->getId(),
                                 'season_id' => $season->getId(),
@@ -1381,9 +1387,10 @@ class Controller extends Base
                                 'home_school_id' => $schoolHome == null ? null : $schoolHome->getId(),
                                 'away_school_id' => $schoolAway == null ? null : $schoolAway->getId()
                             ]);
+                            $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "UPDATING: Match '{$division->getName()} {$sport->getName()} {$venue->getName()}'");
                         } catch (MapperException $e) {
-                            $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Match '{$division->getName()} {$sport->getName()} {$venue->getName()}'");
                             $match = new Match();
+                            $this->updateLog(Controller::RESULT_SUCCESS, $storageObject, $reader->key(), 1, "INSERTING: Match '{$division->getName()} {$sport->getName()} {$venue->getName()}'");
                         }
 
                         $match->setDivision($division);

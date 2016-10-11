@@ -40,7 +40,7 @@
                             window.countErrors++;
                         }
                         
-                        $("#table-body").append("<tr "+ style + "><td>" + createdAt + "</td><td>" + result + "</td><td>" + filename + "</td><td>" + line + divider + column + "</td></tr>");
+                        $("#table-body").append("<tr "+ style + "><td>" + createdAt + "</td><td>" + result + "</td><td>" + filename.replace(/ /g, "&nbsp;") + "</td><td>" + line + divider + column + "</td></tr>");
                     }
 
                     // Keep polling for updates if the import hasn't completed/failed
