@@ -246,8 +246,14 @@
                         </label>
                     </div>
                 </fieldset>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <section>
+                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                        </section>
+                    </div>
+                </fieldset>
             </section>
-
             <h2 class="subheader">Visibility</h2>
 
             <section>
@@ -346,17 +352,6 @@
                     </fieldset>
 
                 {% endif %}
-            </section>
-
-            <h2 class="subheader">Attach Files</h2>
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        <section>
-                            {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
-                        </section>
-                    </div>
-                </fieldset>
             </section>
 
             <div class="row">

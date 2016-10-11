@@ -202,7 +202,7 @@
                                         </a>
 
                                         {# Show comment author #}
-                                        <p class="meta">Posted By <a href="/search/user/{{ comment.getOwner.getId }}">{{ comment.getOwner.getFirstName }} {{ comment.getOwner.getLastName }}</a> {{ comment.getCreatedAt().getShort() }}</p>
+                                        <p class="meta">Posted by <a href="/search/user/{{ comment.getOwner.getId }}">{{ comment.getOwner.getFirstName }} {{ comment.getOwner.getLastName }}</a> {{ comment.getCreatedAt().getShort() }}</p>
 
                                         {# Show comment body #}
                                         <p class="spaced">
@@ -227,9 +227,7 @@
             <form method="post" action="{{ routeLookup('pastoral.postCommentSave', {'recordId': record.getId}) }}">
                 <input type="hidden" name="pastoral_id" value="{{ record.getId() }}">
                 <input type="hidden" name="student_id" value="{{ record.getStudent.getId() }}">
-                <section>
-                    <textarea id="body" rows="3" cols="50" name="body" placeholder="Add Comment"></textarea>
-                </section>
+                <textarea id="body" rows="3" cols="50" name="body" placeholder="Add Comment"></textarea>
                 <input disabled data-post type="submit" class="expand" value="Post Comment">
             </form>
 

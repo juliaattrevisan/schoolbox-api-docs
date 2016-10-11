@@ -278,6 +278,11 @@ class Controller extends Base
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
         }
 
+        // Filters out records that the user should not see
+        $records = $records->filter( function($record) {
+            return $this->getAuthorizer()->isPathAuthorizedForUser('pastoral.getRecord', ['record'=>$record, 'access'=>$record->getAccessList()], $this->getUser());
+        });
+
         $this->getResponse()->content->set(
             array(
                 'template' => '@pastoral/index.twig',
