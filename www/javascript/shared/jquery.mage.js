@@ -103,7 +103,7 @@
     /**
      * Prevent the form from submitting itself
      *
-     * @param {Event} e
+     * @param {event} e
      */
     function submitIntercept(e) {
         if ($(this).data('mage-preventsubmit')) {
@@ -113,7 +113,7 @@
 
     /**
      *
-     * @param {Event} e
+     * @param {event} e
      * @param {Mage} self
      * @param {jQuery} elem
      * @param {jQuery} [form] optional
