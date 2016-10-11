@@ -189,15 +189,14 @@ class Translator
         ;
 
         // Translate assessment context
-        // TODO consider moving this to a translator
         // TODO add project context
         $context = $dataModel->getAssessmentModel()->getAssessmentContext();
         if ($context instanceof Folder) {
             $assessable->setContext($context);
         } elseif ($context instanceof UnitSpecificationModel) {
-            $assessable->setContext((new UnitSpecification())->setId($context->getId()));
+            $assessable->setContext($this->unitSpecificationTranslator->translateToDomainModel($context));
         } elseif ($context instanceof UnitImplementationModel) {
-            $assessable->setContext((new UnitImplementation())->setId($context->getId()));
+            $assessable->setContext($this->unitImplementationTranslator->translateToDomainModel($context));
         } else {
             throw new UnexpectedValueException('$dataModel has no context (folder, unit, unit spec or project)');
         }
